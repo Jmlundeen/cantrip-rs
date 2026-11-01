@@ -492,6 +492,9 @@ struct ObjCtx<'a> {
     card: CardId,
     def: &'static CardDef,
     copy: Option<&'a Copiable>,
+    /// The values of a merged permanent's other components (CR 702.140e), whose abilities it has: those its copiable values
+    /// carry (`Copiable::merged`).
+    sources: &'a [Copiable],
     room: bool,
     spell: bool,
     on_battlefield: bool,
@@ -510,8 +513,34 @@ impl ObjCtx<'_> {
         if self.room {
             doors(cards, self.card, self.obj.marks.doors, self.copy, &mut chars);
         }
+        if !self.sources.is_empty() {
+            merged_abilities(cards, self.sources, &mut chars);
+        }
         chars
     }
+}
+
+/// A merged permanent's copiable values (CR 730.2a, 702.140e): its topmost component's characteristics, which `chars` holds,
+/// and every ability of each of its other components, `sources` - each instance its own (CR 113.2c), as many as an object
+/// holds (`MAX_ABILITIES`): the abilities its text lists, its keywords (toxic adding up, CR 702.164c), its protections and
+/// hexproofs from qualities. A characteristic-defining ability among them defines what it defines (CR 604.3, 613.3: the
+/// release notes' Boneyard Mycodrax), as a static ability of the permanent's (`texts`); changeling is applied again.
+fn merged_abilities(cards: &CardTable, sources: &[Copiable], chars: &mut Chars) {
+    let mut n = chars.abilities.iter().take_while(|a| a.is_some()).count();
+    for values in sources {
+        let other = initial(cards, values.card, Some(values));
+        chars.keywords = Keywords(chars.keywords.0 | other.keywords.0);
+        chars.toxic += other.toxic;
+        chars.protection = ColorSet(chars.protection.0 | other.protection.0);
+        chars.hexproof_from = chars.hexproof_from.and(other.hexproof_from);
+        for ability in other.abilities.iter().flatten() {
+            if n < MAX_ABILITIES {
+                chars.abilities[n] = Some(*ability);
+                n += 1;
+            }
+        }
+    }
+    changeling(chars);
 }
 
 fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'a> {
@@ -542,7 +571,8 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
     // A Room on the battlefield (CR 709.5): the name, mana cost and abilities of its unlocked doors alone, which no
     // card-only cache can hold, as they are the object's. In every other zone the card has both halves (CR 709.4).
     let room = def.is_room() && obj.zone.is(ZoneKind::Battlefield);
-    let o = ObjCtx { id, obj, card, def, copy, room, spell, on_battlefield: false, has_counters: false, has_hone: false };
+    let sources = crate::merge::sources(state, copy);
+    let o = ObjCtx { id, obj, card, def, copy, sources, room, spell, on_battlefield: false, has_counters: false, has_hone: false };
     // An object that has ceased to be itself - changed zones or ceased to exist - is as it last was (CR 400.7, 608.2h,
     // 603.10).
     if let Some(last) = state.last_known(id) {
@@ -556,7 +586,7 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
     // The effects on a card do not follow it to the stack (CR 400.7): a card judged as a spell has none.
     let has_effects = (on_battlefield || spell) && judged_as.is_none() && state.effects.iter().any(|e| e.affected == id);
     let has_counters = on_battlefield && obj.has_counters();
-    let has_own = !def.statics.is_empty();
+    let has_own = !def.statics.is_empty() || sources.iter().any(|v| !cards.get(v.card).statics.is_empty());
     // `statics_seen` is set by hone counters as well (CR 122.1j), which need no card with a static ability.
     let (any_sources, has_hone) = if state.statics_seen {
         let found = static_sources(cards, state);
@@ -1044,7 +1074,7 @@ pub(crate) fn effect_grants<'a>(
 /// a source that has not lost its abilities to a resolved effect, whose card - or the card it copies, or its face - has such
 /// a static ability.
 pub(crate) fn ability_grants_present(cards: &CardTable, state: &GameState) -> bool {
-    static_sources(cards, state).list.iter().any(|&(id, _, lost)| !lost && cards.ability_grants[cards.current(state.obj(id)).0 as usize])
+    static_sources(cards, state).list.iter().any(|&(id, _, lost)| !lost && cards.texts(state, state.obj(id)).any(|c| cards.ability_grants[c.0 as usize]))
 }
 
 fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref<'a, cantrip_state::StaticSources> {
@@ -1067,8 +1097,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         // none (CR 613.1f, 613.8a).
         let note = |list: &mut Vec<(ObjectId, ZoneKind, bool)>, source: ObjectId, from: ZoneKind| {
             let sobj = state.obj(source);
-            let scard = cards.current(sobj);
-            if cards.statics[scard.0 as usize] && live(state, source) {
+            if cards.texts(state, sobj).any(|c| cards.statics[c.0 as usize]) && live(state, source) {
                 list.push((source, from, state.lost_all_abilities_to_an_effect(source)));
             }
         };
@@ -1078,7 +1107,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
             if state.obj(source).counters(CounterKind::Hone) > 0 && live(state, source) {
                 made.honed.push(source);
             }
-            if cards.targeting_rules[cards.current(state.obj(source)).0 as usize] && live(state, source) {
+            if cards.texts(state, state.obj(source)).any(|c| cards.targeting_rules[c.0 as usize]) && live(state, source) {
                 made.targeting.push(source);
             }
         }
@@ -1106,21 +1135,21 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         made.list.sort_by_key(|&(source, _, _)| state.obj(source).timestamp);
         let (mut strippers, mut setters, mut controllers) = (Vec::new(), Vec::new(), Vec::new());
         for &(source, from, lost) in &made.list {
-            let statics = cards.get(cards.current(state.obj(source))).statics;
+            let statics = || statics_of(cards, state, source);
             // CR 613.1b: a control-changing ability applies in layer 2, before layer 6 could take it.
-            if from == ZoneKind::Battlefield && state.obj(source).zone.is(ZoneKind::Battlefield) && statics.iter().any(|s| s.layer == Layer::Control) {
+            if from == ZoneKind::Battlefield && state.obj(source).zone.is(ZoneKind::Battlefield) && statics().any(|s| s.layer == Layer::Control) {
                 controllers.push(source);
             }
-            if !lost && statics.iter().any(|s| s.loses_all && s.from == from) {
+            if !lost && statics().any(|s| s.loses_all && s.from == from) {
                 strippers.push((source, from));
             }
             // CR 305.7, 613.6: an ability that sets land subtypes applies in layer 4, whatever its source loses in layer 6.
-            if statics.iter().any(|s| s.sets_land_subtypes && s.from == from) {
+            if statics().any(|s| s.sets_land_subtypes && s.from == from) {
                 setters.push((source, from));
             }
         }
         made.strippers = strippers;
-        made.continuing = made.list.iter().any(|&(source, _, _)| cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.continues));
+        made.continuing = made.list.iter().any(|&(source, _, _)| statics_of(cards, state, source).any(|s| s.continues));
         made.setters = setters;
         made.controllers = controllers;
         made.granted.clear();
@@ -1330,6 +1359,12 @@ fn apply_static(st: &StaticDef, view: &View, source: ObjectId, id: ObjectId, cha
     }
 }
 
+/// Every static ability `source`'s card lists (`CardDef::statics`): those of the definition it has, then, for a merged
+/// permanent, those of each of its other components (CR 702.140e, `CardTable::texts`).
+fn statics_of<'a>(cards: &'a CardTable, state: &'a GameState, source: ObjectId) -> impl Iterator<Item = &'static StaticDef> + use<'a> {
+    cards.texts(state, state.obj(source)).flat_map(|c| cards.get(c).statics.iter())
+}
+
 /// The first part of the effect `statics[i]` is a part of (CR 613.6): itself, unless it continues the one before it.
 fn first_part(statics: &[StaticDef], mut i: usize) -> usize {
     while i > 0 && statics[i].continues {
@@ -1379,7 +1414,7 @@ impl GEntry {
     fn giver(&self, cards: &CardTable, state: &GameState) -> Giver {
         let grant = |part: usize| Acquired { by: AcquiredBy::Grant, stamp: self.timestamp, part: u8::try_from(part).unwrap_or(u8::MAX) };
         let part_of = |source: ObjectId, st: &'static StaticDef| {
-            cards.get(cards.current(state.obj(source))).statics.iter().position(|s| std::ptr::eq(s, st)).unwrap_or(0)
+            statics_of(cards, state, source).position(|s| std::ptr::eq(s, st)).unwrap_or(0)
         };
         match self.kind {
             GKind::Static { source, st, .. } => Giver { object: source, acquired: grant(part_of(source, st)) },
@@ -1445,7 +1480,7 @@ fn layers_with_entries(cx: &Ctx) -> u16 {
     if state.statics_seen {
         let found = static_sources(cards, state);
         for &(source, _, _) in &found.list {
-            for st in cards.get(cards.current(state.obj(source))).statics {
+            for st in statics_of(cards, state, source) {
                 mask |= bit(st.layer);
             }
         }
@@ -1488,14 +1523,17 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
         };
         // Whether each still exists - its source has not lost it - is judged as the layer applies (`exists`).
         for (source, from, _) in list {
-            let statics = cards.get(cards.current(state.obj(source))).statics;
-            for (i, st) in statics.iter().enumerate() {
-                if st.own || st.layer != layer || st.from != from {
-                    continue;
+            // A merged permanent's other components' static abilities are its own (CR 702.140e), at its timestamp.
+            for text in cards.texts(state, state.obj(source)) {
+                let statics = cards.get(text).statics;
+                for (i, st) in statics.iter().enumerate() {
+                    if st.own || st.layer != layer || st.from != from {
+                        continue;
+                    }
+                    let first = &statics[first_part(statics, i)];
+                    let kind = GKind::Static { source, st, first, continues: st.continues };
+                    entries.push(GEntry { kind, timestamp: state.obj(source).timestamp, seq: 0 });
                 }
-                let first = &statics[first_part(statics, i)];
-                let kind = GKind::Static { source, st, first, continues: st.continues };
-                entries.push(GEntry { kind, timestamp: state.obj(source).timestamp, seq: 0 });
             }
         }
         // The static abilities effects gave permanents that affect other objects, in their timestamp order (CR 613.7a).
@@ -1821,8 +1859,10 @@ fn order_entries(cx: &Ctx, li: usize, entries: &mut Vec<GEntry>) -> Vec<u32> {
 fn static_grants_present(cards: &CardTable, state: &GameState) -> bool {
     state.statics_seen
         && static_sources(cards, state).list.iter().any(|&(source, _, _)| {
-            let card = cards.get(cards.current(state.obj(source)));
-            card.statics.iter().any(|s| !s.own && s.layer == Layer::Ability) && card.delayed.iter().any(|a| matches!(a, AbilityDef::Static(_)))
+            cards.texts(state, state.obj(source)).any(|card| {
+                let card = cards.get(card);
+                card.statics.iter().any(|s| !s.own && s.layer == Layer::Ability) && card.delayed.iter().any(|a| matches!(a, AbilityDef::Static(_)))
+            })
         })
 }
 
@@ -2526,8 +2566,7 @@ pub(crate) fn play_rules_given_possible(cards: &CardTable, state: &GameState) ->
                 let found = static_sources(cards, state);
                 !found.granted.is_empty()
                     || found.list.iter().any(|&(source, _, _)| {
-                        let card = cards.current(state.obj(source)).0 as usize;
-                        cards.ability_statics[card] && cards.grants_play_rules[card]
+                        cards.texts(state, state.obj(source)).any(|card| cards.ability_statics[card.0 as usize] && cards.grants_play_rules[card.0 as usize])
                     })
             }))
 }
@@ -2537,7 +2576,7 @@ pub(crate) fn play_rules_given_possible(cards: &CardTable, state: &GameState) ->
 pub fn ability_granting_present(cards: &CardTable, state: &GameState) -> bool {
     state.statics_seen && {
         let found = static_sources(cards, state);
-        !found.granted.is_empty() || found.list.iter().any(|&(source, _, _)| cards.ability_statics[cards.current(state.obj(source)).0 as usize])
+        !found.granted.is_empty() || found.list.iter().any(|&(source, _, _)| cards.texts(state, state.obj(source)).any(|c| cards.ability_statics[c.0 as usize]))
     }
 }
 
@@ -2571,7 +2610,7 @@ pub fn control_order(cards: &CardTable, state: &GameState, log: &[Record]) -> Ve
     let mut entries: Vec<(u32, u8, Control)> = Vec::new();
     if state.statics_seen {
         for source in static_sources(cards, state).controllers.clone() {
-            for st in cards.get(cards.current(state.obj(source))).statics.iter().filter(|s| s.layer == Layer::Control) {
+            for st in statics_of(cards, state, source).filter(|s| s.layer == Layer::Control) {
                 entries.push((state.obj(source).timestamp, 0, Control::Static { source, st }));
             }
         }
@@ -3075,7 +3114,7 @@ fn targeting_forbidden(cards: &CardTable, state: &GameState, log: &[Record], for
     }
     let view = View::new(cards, state, log, Layer::Ability);
     forbidders.iter().any(|&from| {
-        cards.get(cards.current(state.obj(from))).targeting_rules.iter().any(|r| match r.kind {
+        cards.texts(state, state.obj(from)).flat_map(|c| cards.get(c).targeting_rules).any(|r| match r.kind {
             TargetingRuleKind::Forbid(forbids) => (r.applies)(&view, from, subject) && forbids(&view, from, asker, source),
             _ => false,
         })
@@ -3108,7 +3147,7 @@ pub fn lost_all_abilities(cards: &CardTable, state: &GameState, log: &[Record], 
 /// spell would have on the stack.
 pub fn statics_everywhere(cards: &CardTable, state: &GameState) -> bool {
     state.statics_seen
-        && static_sources(cards, state).list.iter().any(|&(source, _, _)| cards.get(cards.current(state.obj(source))).statics.iter().any(|st| st.everywhere))
+        && static_sources(cards, state).list.iter().any(|&(source, _, _)| statics_of(cards, state, source).any(|st| st.everywhere))
 }
 
 /// Whether any static ability could apply to an object on the battlefield: a permanent, emblem or card whose card has static
@@ -3138,9 +3177,8 @@ pub fn targeting_rule(cards: &CardTable, state: &GameState, log: &[Record], kind
     let sources: Vec<ObjectId> = static_sources(cards, state).targeting.clone();
     let view = View::new(cards, state, log, Layer::Ability);
     sources.into_iter().any(|source| {
-        let card = cards.current(state.obj(source));
         // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
-        cards.get(card).targeting_rules.iter().any(|r| std::mem::discriminant(&r.kind) == std::mem::discriminant(&kind) && (r.applies)(&view, source, subject))
+        cards.texts(state, state.obj(source)).flat_map(|c| cards.get(c).targeting_rules).any(|r| std::mem::discriminant(&r.kind) == std::mem::discriminant(&kind) && (r.applies)(&view, source, subject))
             && !lost_all_abilities(cards, state, log, source)
     })
 }
@@ -3151,11 +3189,10 @@ pub fn targeting_rule(cards: &CardTable, state: &GameState, log: &[Record], kind
 pub fn player_has(cards: &CardTable, state: &GameState, log: &[Record], player: PlayerId, keyword: Keyword) -> bool {
     let view = View::new(cards, state, log, Layer::Ability);
     state.battlefield().iter().any(|&source| {
-        let card = cards.current(state.obj(source));
         // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
-        cards.player_keywords[card.0 as usize]
-            && cards.get(card).player_keywords.iter().any(|r| r.keyword == keyword && (r.applies)(&view, source, player))
-            && !lost_all_abilities(cards, state, log, source)
+        cards.texts(state, state.obj(source)).any(|card| {
+            cards.player_keywords[card.0 as usize] && cards.get(card).player_keywords.iter().any(|r| r.keyword == keyword && (r.applies)(&view, source, player))
+        }) && !lost_all_abilities(cards, state, log, source)
     })
 }
 
@@ -3166,16 +3203,16 @@ fn player_statics_forbid_targeting(cards: &CardTable, state: &GameState, log: &[
     let view = View::new(cards, state, log, Layer::Ability);
     let opponent = player != asker;
     state.battlefield().iter().any(|&source| {
-        let card = cards.current(state.obj(source));
-        if !cards.player_keywords[card.0 as usize] {
-            return false;
-        }
-        let def = cards.get(card);
-        (def.player_keywords
-            .iter()
-            .any(|r| (r.keyword == Keyword::Shroud || (opponent && r.keyword == Keyword::Hexproof)) && (r.applies)(&view, source, player))
-            || def.player_protection.iter().any(|r| (r.applies)(&view, source, player, asker)))
-            && !lost_all_abilities(cards, state, log, source)
+        cards.texts(state, state.obj(source)).any(|card| {
+            if !cards.player_keywords[card.0 as usize] {
+                return false;
+            }
+            let def = cards.get(card);
+            def.player_keywords
+                .iter()
+                .any(|r| (r.keyword == Keyword::Shroud || (opponent && r.keyword == Keyword::Hexproof)) && (r.applies)(&view, source, player))
+                || def.player_protection.iter().any(|r| (r.applies)(&view, source, player, asker))
+        }) && !lost_all_abilities(cards, state, log, source)
     })
 }
 
@@ -3184,10 +3221,9 @@ fn player_statics_forbid_targeting(cards: &CardTable, state: &GameState, log: &[
 pub fn player_protected_by_static(cards: &CardTable, state: &GameState, log: &[Record], player: PlayerId, from: PlayerId) -> Option<ObjectId> {
     let view = View::new(cards, state, log, Layer::Ability);
     state.battlefield().iter().copied().find(|&source| {
-        let card = cards.current(state.obj(source));
-        cards.player_keywords[card.0 as usize]
-            && cards.get(card).player_protection.iter().any(|r| (r.applies)(&view, source, player, from))
-            && !lost_all_abilities(cards, state, log, source)
+        cards.texts(state, state.obj(source)).any(|card| {
+            cards.player_keywords[card.0 as usize] && cards.get(card).player_protection.iter().any(|r| (r.applies)(&view, source, player, from))
+        }) && !lost_all_abilities(cards, state, log, source)
     })
 }
 

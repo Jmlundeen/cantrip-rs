@@ -1253,12 +1253,16 @@ impl<'a> Projector<'a> {
             // gives it, and is no copy (CR 612.4, 111.4).
             // A prototyped spell or permanent has its own card's prototyped face as its copiable values (CR 718.2a, 718.3b),
             // and is no copy of anything.
-            is_copy: obj.copiable().is_some_and(|c| {
+            // A merged permanent is no copy for its merge (CR 730.2a): only a copy effect later than its latest merge makes it one.
+            is_copy: if let Some(merge) = s.merge_of(id) {
+                let latest = merge.parts.iter().map(|p| p.timestamp).max().unwrap_or(0);
+                s.effects.iter().any(|e| e.affected == id && e.timestamp > latest && matches!(e.kind, EffectKind::RestoreCopy(_)))
+            } else { obj.copiable().is_some_and(|c| {
                 let name = if !c.words.is_printed() && c.name == game.cards.get(c.card).token_name_under(c.words) { None } else { c.name };
                 let own_prototype = prototyped_face(game.cards.get(obj.card)).is_some_and(|f| std::ptr::eq(f, game.cards.get(c.card)));
                 let values = Copiable { words: Words::NONE, name, ..c };
                 values != Copiable::of(obj.card) && !(own_prototype && values == Copiable::of(c.card))
-            }) || obj.card_copy,
+            }) } || obj.card_copy,
             // A copy's exception may state its loyalty (CR 707.9b: "has starting loyalty X").
             starting_counter: if on_battlefield { None } else { obj.copiable().and_then(|c| c.stated_loyalty()).or(def.loyalty).map(i32::from) },
             other_face: def.back.map(|back| Box::new(printed(back))),
@@ -1273,6 +1277,20 @@ impl<'a> Projector<'a> {
             ..Default::default()
         };
 
+        // A merged permanent's other components (CR 730.2), topmost first: its own card, unless it is the topmost, and each
+        // card that merged with it, the last placed over first. A face-down one shows nothing of itself (CR 708.5, 730.2e).
+        if let Some(merge) = s.merge_of(id) {
+            let cards = self.game.cards;
+            let mut stack: Vec<(CardId, bool)> = vec![(merge.own_face, merge.own_face_down.is_some() || obj.face_down)];
+            for p in &merge.parts {
+                if p.on_top { stack.insert(0, (p.face, false)) } else { stack.push((p.face, false)) }
+            }
+            view.merged_with = stack
+                .into_iter()
+                .skip(1)
+                .map(|(card, hidden)| if hidden { ObjectView { known: false, ..Default::default() } } else { printed(cards.get(card)) })
+                .collect();
+        }
         // A name an effect set (CR 612.8) or a copy effect states (CR 707.9b) is the name it has.
         if c.name_set || obj.copiable().is_some_and(|copy| copy.name.is_some()) {
             view.name = c.name.to_string();

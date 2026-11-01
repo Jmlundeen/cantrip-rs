@@ -2592,6 +2592,46 @@ every object 20 bytes larger (the dense counter array); the benchmark measured 6
 6.28-7.12 us after, alternating the two builds on a busy machine (2026-10-16), and as much with the layer-6 work turned
 off, so the cost is the larger row.
 
+### Merged permanents and mutate
+
+A mutate card's way is `WayKind::Mutate` (`cantrip_mechanics::mutate::way`): cast for it, the card is its mutating face
+(`cantrip_api::mutating_face`, registered by every card table after its card, as the prototyped face is), the card itself
+with `CardDef::mutating`, whose one target is `intrinsic::MUTATE_TARGET`, "a non-Human creature with the same owner as this
+spell" (CR 702.140a); the spell has the face as its copiable values, so a copy of it is mutating too (CR 707.10). As it
+resolves (`resolve`, `merge`): with its target illegal it is its card again and enters (CR 702.140b, 608.3b); with it legal
+its controller chooses over or under (`Label::Mutate`), it leaves the stack - its row followed to the permanent by `became`, so
+what modifies the spell modifies the permanent (CR 702.140f) - and merges, recorded as `Event::Mutated` (CR 702.140d,
+`mutate::THIS_MUTATES`, `mutate::times_mutated`). Nothing enters.
+
+A merged permanent (CR 730) is the row it was (CR 730.2c): its own card stays its card. What else represents it is its `Merge`
+(`GameState::merges`, append-only, journalled, named by `Obj::merged`): its own face and token-ness, its own card's face-down
+values while a face-up card lies over it (CR 730.2e), and each `MergedPart` - card, face, token (a copy of a spell is one,
+CR 707.10f), over or under, its timestamp, and the copiable values just below it. A merge is a copiable effect at its timestamp
+(CR 730.2a): `GameState::rechain_merged` works the copy chain out again whenever a merge is made, a component turns (CR
+730.2i, `merge::turn_components`) or a copy effect below a merge ends (`effect_remove`). Each merge applies over the values just
+below it: on top, the part's values and every ability of what was below; under, what was below and every ability of the part
+(the release notes: "if a creature that's a copy of another creature mutates, the characteristics it gains from mutating apply
+after applying the copy effect"); a later copy effect replaces it all. The result is `Obj::copy`, the topmost values with
+`Copiable::merged` naming the other components' values in `GameState::merged_sources` - copiable, so a copy of a merged
+permanent has every ability and is one object of one card. The layers add those values' abilities, keywords, protections and
+toxic to the topmost's in layer 1 (`layers::merged_abilities`, CR 702.140e). Every rule a card lists beside its abilities is
+read off every definition the object has (`CardTable::texts`): static abilities (`layers::statics_of`), replacement and
+prevention effects (`replace::source_texts`, a printed effect's index counting through them all), cost changes, play, trigger,
+activation, attack and untap rules, each named by the card it is printed on. A merged permanent is a token only while its
+topmost component is (CR 730.2d), and no double-faced permanent (CR 730.2i: `copiable_values` gives no faces).
+
+Leaving the battlefield (`ops::move_together`, `merge::components`): one permanent leaves, its topmost component's new object the
+permanent's own move (`Event::ZoneChange` from the battlefield, which "dies" and "leaves" see once), and each other component
+arrives in the same zone as a new object of its own, recorded as a `ZoneChange` from `Zone::GONE` with the permanent as `old`:
+what triggers on a card put into a zone sees each, what triggers on a permanent leaving sees one (the release notes: "one
+creature died, three cards were put into the graveyard"). A token permanent's card components go where a replacement effect for
+cards alone would send them (CR 730.3e). Into a library, the owner orders them, unrevealed (CR 730.3a,
+`merge::arrange_in_library`); into a graveyard, with the other cards arriving (CR 404.3); face down, each is revealed (CR 708.9).
+The move returns every new object, the components' after the moves asked for, and `Query::became_all` / `found_all_after_move`
+find them all from the permanent (CR 730.3c), read from the history. Not built, as nothing the engine has can reach them: turning
+a permanent face down (CR 730.2f, 730.2j: no card does), flip cards (CR 730.2h), and the relative timestamp order of exiled
+components (CR 730.3b), which nothing in exile reads.
+
 ### Legal moves as a first-class output
 
 Every pending request comes with its legal answers enumerated, cheaply and in a stable order. The client's prompt

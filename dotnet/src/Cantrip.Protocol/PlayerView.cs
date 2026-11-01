@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 221;
+    public const int ProtocolVersion = 222;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -656,6 +656,14 @@ public sealed class ObjectView
     /// </summary>
     [Key(61)]
     public bool Prototyped { get; set; }
+
+    /// <summary>
+    /// A merged permanent's components other than its topmost (CR 730.2, 702.140e), topmost first, each as printed: the
+    /// permanent has their abilities as well as its own text's. A face-down one the viewer may not look at is unknown. Empty
+    /// for anything else.
+    /// </summary>
+    [Key(62)]
+    public List<ObjectView> MergedWith { get; set; } = [];
 
     /// <summary>
     /// What is printed on this card besides what it shows, to be read beside it: its other face, then its prepare spell,

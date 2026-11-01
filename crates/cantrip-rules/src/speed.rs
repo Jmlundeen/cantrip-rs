@@ -33,8 +33,7 @@ pub fn engines_start(cx: &mut Cx) -> bool {
     let mut starting = 0u32;
     for &id in cx.s().battlefield() {
         let obj = cx.s().obj(id);
-        let card = cx.cards().current(obj);
-        if !cx.cards().engines[card.0 as usize] {
+        if !cx.cards().texts(cx.s(), obj).any(|c| cx.cards().engines[c.0 as usize]) {
             continue;
         }
         let p = obj.controller;

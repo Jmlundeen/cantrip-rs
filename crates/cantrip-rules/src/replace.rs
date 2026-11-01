@@ -288,6 +288,37 @@ fn card_of(cx: &Cx, id: ObjectId) -> CardId {
     obj.copied_card().unwrap_or_else(|| cx.cards().face(obj.card, obj.transformed))
 }
 
+/// The definitions `id`'s printed replacement and prevention effects come from (`source_card`), and, for a merged permanent,
+/// each of its other components' (CR 702.140e, `CardTable::texts`): a printed effect's index counts through them all, in
+/// this order.
+fn source_texts<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = &'static CardDef> + 'a {
+    source_text_ids(cx, id).map(|c| cx.cards().get(c))
+}
+
+/// The cards of `source_texts`.
+fn source_text_ids<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = CardId> + 'a {
+    let entering = matches!(cx.entering, Some(w) if w.object == id);
+    let first = source_card(cx, id);
+    let obj = cx.s().obj(id);
+    let rest = if entering { None } else { Some(cx.cards().texts(cx.s(), obj).skip(1)) };
+    std::iter::once(first).chain(rest.into_iter().flatten())
+}
+
+/// `id`'s printed replacement effects (`source_texts`), numbered as `Candidate::index` names them.
+fn printed_replacements<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = &'static ReplacementDef> + 'a {
+    source_texts(cx, id).flat_map(|d| d.replacements.iter())
+}
+
+/// `id`'s printed replacement effect `index` (`printed_replacements`).
+fn printed_replacement(cx: &Cx, id: ObjectId, index: u8) -> &'static ReplacementDef {
+    printed_replacements(cx, id).nth(index as usize).expect("a printed replacement effect a candidate named")
+}
+
+/// `id`'s printed prevention effect `index`, numbered through its definitions as `printed_replacements` are.
+fn printed_prevention(cx: &Cx, id: ObjectId, index: u8) -> &'static PreventionDef {
+    source_texts(cx, id).flat_map(|d| d.preventions.iter()).nth(index as usize).expect("a printed prevention effect a candidate named")
+}
+
 /// Whether any effect could apply to an event about `subject`: a permanent with replacements, or the subject's own
 /// card, which has some that function from every zone. The guard that keeps the hot path free of replacement work.
 pub(crate) fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
@@ -300,7 +331,7 @@ pub(crate) fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
         return false;
     }
     subject.is_some_and(|id| cards.replaces[source_card(cx, id).0 as usize])
-        || cx.s().battlefield().iter().any(|&id| cards.replaces[card_of(cx, id).0 as usize])
+        || cx.s().battlefield().iter().any(|&id| cards.texts(cx.s(), cx.s().obj(id)).any(|c| cards.replaces[c.0 as usize]))
 }
 
 /// Whether a card in `player`'s graveyard has an ability that replaces their draws there (CR 702.52a: dredge).
@@ -416,15 +447,14 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
         // A permanent about to enter is judged as it would exist on the battlefield (CR 614.12): the card its replacements
         // of its own are read from is the one it would have there (a copy's), as its abilities are whether it would have
         // lost them (`Query::lost_all_abilities`).
-        let card = source_card(cx, id);
         // A permanent that has lost all its abilities has no replacement effects (CR 613.1f).
-        if !cards.replaces[card.0 as usize] || cx.lost_all_abilities(id) {
+        if !source_text_ids(cx, id).any(|c| cards.replaces[c.0 as usize]) || cx.lost_all_abilities(id) {
             return;
         }
         // "You" for an ability of a card in a graveyard is its owner (CR 108.4a: it has no controller).
         let controller = if at == At::Graveyard { cx.s().obj(id).owner } else { controller_of(cx, id, proposal) };
         let asker = Asker { source: id, controller, by: None, spell: false };
-        for (index, def) in cards.get(card).replacements.iter().enumerate() {
+        for (index, def) in printed_replacements(cx, id).enumerate() {
             let index = index as u8;
             let functions = match at {
                 At::Field => !def.in_graveyard,
@@ -445,7 +475,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
             && preventable
             && at == At::Field
         {
-            for (index, def) in cards.get(card).preventions.iter().enumerate() {
+            for (index, def) in source_texts(cx, id).flat_map(|d| d.preventions.iter()).enumerate() {
                 let index = index as u8;
                 if !applied.contains(&(id, index, Origin::Prevention)) && (def.applies)(cx, &asker, d) {
                     found.push(Candidate { source: id, index, origin: Origin::Prevention });
@@ -609,7 +639,7 @@ fn granted<'a>(cx: &'a Cx, timestamp: u32) -> Option<(&'a ContinuousEffect, &'st
 /// What an effect says it does, for the player who orders several (CR 616.1).
 fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
     match c.origin {
-        Origin::Printed => cx.cards().get(card_of(cx, c.source)).replacements[c.index as usize].hint,
+        Origin::Printed => printed_replacement(cx, c.source, c.index).hint,
         Origin::Granted(timestamp) => granted(cx, timestamp).map_or("", |(_, def)| def.hint),
         Origin::Madness => MADNESS_HINT,
         Origin::Flashback => FLASHBACK_HINT,
@@ -626,7 +656,7 @@ fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
         Origin::ShieldCounter if matches!(proposal, Proposal::Damage(_)) => SHIELD_DAMAGE_HINT,
         Origin::ShieldCounter => SHIELD_DESTROY_HINT,
         Origin::Protection => PROTECTION_HINT,
-        Origin::Prevention => cx.cards().get(card_of(cx, c.source)).preventions[c.index as usize].hint,
+        Origin::Prevention => printed_prevention(cx, c.source, c.index).hint,
         Origin::GrantedPrevention(timestamp) => match cx.s().effects.iter().find(|e| e.timestamp == timestamp).map(|e| e.kind) {
             Some(EffectKind::Prevention { card, index, .. }) => cx.cards().get(card).granted_preventions[index as usize].hint,
             _ => "",
@@ -642,7 +672,7 @@ fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
 fn prevents_all(cx: &Cx, c: &Candidate) -> bool {
     match c.origin {
         Origin::Protection => true,
-        Origin::Prevention => cx.cards().get(card_of(cx, c.source)).preventions[c.index as usize].amount.is_none(),
+        Origin::Prevention => printed_prevention(cx, c.source, c.index).amount.is_none(),
         Origin::GrantedPrevention(timestamp) => cx
             .s()
             .effects
@@ -862,7 +892,7 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
             Origin::Prevention => {
                 let asker = Asker { source, controller: controller_of(cx, source, proposal), by: None, spell: false };
                 if let Proposal::Damage(d) = proposal {
-                    let def = &cx.cards().get(card_of(cx, source)).preventions[index as usize];
+                    let def = printed_prevention(cx, source, index);
                     let amount = def.amount.map_or(d.amount, |how_much| how_much(&*cx, &asker, d).min(d.amount));
                     prevent(cx, d, amount, source);
                 }
@@ -902,14 +932,14 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
 /// The player whose "you" a source's printed effect has: its controller - for the permanent entering, the player it enters
 /// under - or, for one functioning from a graveyard, its owner (CR 108.4a).
 fn printed_controller(cx: &Cx, source: ObjectId, index: u8, proposal: &Proposal) -> PlayerId {
-    let def = &cx.cards().get(source_card(cx, source)).replacements[index as usize];
+    let def = printed_replacement(cx, source, index);
     if def.in_graveyard { cx.s().obj(source).owner } else { controller_of(cx, source, proposal) }
 }
 
 /// Whether a source's printed effect is taken as it applies: one that is not optional always is; an optional one ("you
 /// may ... instead", CR 614.1a) is its controller's to take (`takes`).
 fn printed_taken(cx: &mut Cx, source: ObjectId, index: u8, proposal: &Proposal) -> bool {
-    let Some(question) = cx.cards().get(source_card(cx, source)).replacements[index as usize].optional else { return true };
+    let Some(question) = printed_replacement(cx, source, index).optional else { return true };
     let controller = printed_controller(cx, source, index, proposal);
     takes(cx, controller, source, question)
 }
@@ -917,7 +947,7 @@ fn printed_taken(cx: &mut Cx, source: ObjectId, index: u8, proposal: &Proposal) 
 /// A source's printed effect, taken, applied to the event: what it changes of it, unless that is a redirection that can't be
 /// (CR 614.9), and what it does to the game as it applies (`run_then`).
 fn apply_printed(cx: &mut Cx, proposal: &mut Proposal, source: ObjectId, index: u8, applied: &[Applied]) {
-    let def = &cx.cards().get(source_card(cx, source)).replacements[index as usize];
+    let def = printed_replacement(cx, source, index);
     let (apply, then) = (def.apply, def.then);
     let controller = printed_controller(cx, source, index, proposal);
     let asker = Asker { source, controller, by: None, spell: false };
@@ -1032,7 +1062,7 @@ fn unlink_if_sent_elsewhere(before: &Proposal, after: &mut Proposal) {
 fn reshape(cx: &Cx, c: &Candidate, proposal: &mut Proposal) {
     match c.origin {
         Origin::Printed => {
-            let def = &cx.cards().get(source_card(cx, c.source)).replacements[c.index as usize];
+            let def = printed_replacement(cx, c.source, c.index);
             let asker = Asker { source: c.source, controller: controller_of(cx, c.source, proposal), by: None, spell: false };
             (def.apply)(cx, &asker, proposal);
         }
@@ -1054,7 +1084,7 @@ pub(crate) fn mana_may_be_replaced(cx: &Cx) -> bool {
 
 /// `mana_may_be_replaced`, of a position.
 pub(crate) fn mana_may_be_replaced_in(s: &GameState, cards: &CardTable) -> bool {
-    s.battlefield().iter().any(|&id| cards.mana_replaces[cards.current(s.obj(id)).0 as usize])
+    s.battlefield().iter().any(|&id| cards.texts(s, s.obj(id)).any(|c| cards.mana_replaces[c.0 as usize]))
         || s.effects.iter().any(|e| match e.kind {
             EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index } => {
                 cards.get(card).granted_replacements[index as usize].kind == ReplacementKind::ManaProduction
@@ -1103,7 +1133,7 @@ pub(crate) fn mana_outcomes(cx: &Cx, production: ManaProduction) -> Vec<ManaProd
             applied.push((c.source, c.index, c.origin));
             // Declined, it has had its opportunity, and the event goes on as it was (CR 614.5, 616.1).
             let optional = match c.origin {
-                Origin::Printed => cx.cards().get(source_card(cx, c.source)).replacements[c.index as usize].optional.is_some(),
+                Origin::Printed => printed_replacement(cx, c.source, c.index).optional.is_some(),
                 _ => false,
             };
             if optional {
@@ -1133,7 +1163,7 @@ pub(crate) fn damage_may_change(cx: &Cx) -> bool {
     }) || cx.s().battlefield().iter().any(|&id| {
         live(cx.s(), id)
             && !cx.lost_all_abilities(id)
-            && cards.get(card_of(cx, id)).replacements.iter().any(|r| r.kind == ReplacementKind::Damage)
+            && cards.texts(cx.s(), cx.s().obj(id)).any(|c| cards.get(c).replacements.iter().any(|r| r.kind == ReplacementKind::Damage))
     })
 }
 

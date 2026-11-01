@@ -564,9 +564,11 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
     for id in cx.s().battlefield().to_vec() {
         let obj = cx.s().obj(id);
         if obj.controller != active {
-            let def = cx.card(cx.cards().current(obj));
-            if !def.untap_in_others_untap_steps.is_empty() {
-                others.push((id, obj.controller, def));
+            // A merged permanent has its other components' rules too (CR 702.140e).
+            for def in cx.cards().texts(cx.s(), obj).map(|c| cx.card(c)) {
+                if !def.untap_in_others_untap_steps.is_empty() {
+                    others.push((id, obj.controller, def));
+                }
             }
             continue;
         }
@@ -577,7 +579,7 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
         {
             continue;
         }
-        if cx.card(cx.cards().current(obj)).may_not_untap && !cx.lost_all_abilities(id) {
+        if cx.cards().texts(cx.s(), obj).any(|c| cx.card(c).may_not_untap) && !cx.lost_all_abilities(id) {
             let ask = RequestKind::May { source: id, purpose: Purpose::Ask(&UNTAP_IT) };
             if cx.ask_rule(active, ask)? != Some(Answer::Yes) {
                 continue;

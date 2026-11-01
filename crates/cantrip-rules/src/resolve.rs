@@ -447,6 +447,13 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
         cx.st().update_obj(item.object, |o| o.copy = None);
         fizzles = false;
     }
+    // CR 702.140b, 608.3b: a mutating creature spell whose target is illegal ceases to be one, and resolves as the creature
+    // spell it is, put onto the battlefield under its controller's control.
+    let mutating = item.kind == StackKind::Spell && crate::merge::mutating(cx, item.object);
+    if fizzles && mutating {
+        crate::merge::cease_mutating(cx, item.object);
+        fizzles = false;
+    }
 
     match item.kind {
         StackKind::Spell => {
@@ -494,6 +501,9 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     cx.st().stack_remove(at);
                     leave_stack(cx, std::slice::from_ref(&item), ZoneReason::Resolve);
                 }
+            } else if mutating && let Some(target) = item.target(0).object().filter(|_| crate::merge::mutating(cx, item.object)) {
+                // CR 702.140c, 608.3d: with its target legal, it merges with it rather than entering.
+                crate::merge::merge(cx, &item, target)?;
             } else if cx.s().obj(item.object).card_copy {
                 // A copy of a permanent spell becomes a token as it resolves (CR 707.10f).
                 if let Some(at) = on_stack(cx) {

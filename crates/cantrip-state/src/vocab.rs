@@ -986,6 +986,9 @@ pub enum Keyword {
     Phasing = 56,
     /// "This spell can't be copied" (CR 101.2, 707.10): a characteristic of the spell, so no effect copies it. Printed on Choreographed Sparks.
     CantBeCopied = 57,
+    /// Mutate (CR 702.140a): a static ability that functions while the spell with it is on the stack. A card has it by its
+    /// mutate way (`WayKind::Mutate`), which holds its cost, so "if it has mutate" (Pollywog Symbiote) reads it.
+    Mutate = 58,
 }
 
 impl Keyword {

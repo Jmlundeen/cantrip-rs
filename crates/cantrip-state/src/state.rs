@@ -49,6 +49,12 @@ pub struct GameState {
     pub spill_targets: Vec<Target>,
     /// Parallel to `spill_targets`: the spec each was chosen for.
     pub spill_specs: Vec<u8>,
+    /// What represents each merged permanent besides its own card (CR 730.2), every version of it (`Obj::merged` names the
+    /// one an object has now). Append-only, journaled; empty in a game where nothing has merged.
+    pub merges: Vec<Merge>,
+    /// The values whose abilities a merged permanent's copiable values also have (CR 702.140e, `Copiable::merged` names a
+    /// run of it). Append-only, journaled; empty in a game where nothing has merged.
+    pub merged_sources: Vec<Vec<Copiable>>,
     /// The shares of a divided total of stack items that divide one (CR 601.2d; `StackItem::shares` names a run of it, one for
     /// each target). Append-only, journaled.
     pub share_arena: Vec<u32>,
@@ -276,7 +282,7 @@ impl GameState {
         (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<PlayPermission>),
         (&Vec<Attacker>, &Vec<Block>, &Vec<ExtraTurn>, (&LoopWatch, &Vec<LoopKey>)),
         &Vec<Frame>,
-        (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>, (&Vec<Target>, &Vec<u8>, &Vec<u32>)),
+        (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>, (&Vec<Target>, &Vec<u8>, &Vec<u32>), (&Vec<Merge>, &Vec<Vec<Copiable>>)),
     ) {
         (
             (&self.players, &self.restricted_mana, &self.counter_stamps, &self.mana_from),
@@ -288,7 +294,16 @@ impl GameState {
             (&self.triggers, &self.delayed, &self.permissions),
             (&self.attackers, &self.blocks, &self.extra_turns, (&self.loop_watch, &self.loop_keys)),
             &self.agenda,
-            (&self.rng, self.next_timestamp, &self.outcome, self.unsettled, &self.members, &self.left_stack, (&self.spill_targets, &self.spill_specs, &self.share_arena)),
+            (
+                &self.rng,
+                self.next_timestamp,
+                &self.outcome,
+                self.unsettled,
+                &self.members,
+                &self.left_stack,
+                (&self.spill_targets, &self.spill_specs, &self.share_arena),
+                (&self.merges, &self.merged_sources),
+            ),
         )
     }
 }
@@ -399,6 +414,12 @@ pub enum Undo {
     /// Shares appended since the arena was this long.
     SharesPushed(usize),
     SharesPopped(Vec<u32>),
+    /// Merge versions appended since the arena was this long.
+    MergesPushed(u32),
+    MergesPopped(Vec<Merge>),
+    /// Merged sources appended since the arena was this long.
+    SourcesPushed(u32),
+    SourcesPopped(Vec<Vec<Copiable>>),
     AttackersSet(Vec<Attacker>),
     BlocksSet(Vec<Block>),
     ExtraTurnsSet(Vec<ExtraTurn>),
@@ -443,6 +464,10 @@ impl Undo {
                 | Undo::TargetsUnspilled(..)
                 | Undo::SharesPushed(_)
                 | Undo::SharesPopped(_)
+                | Undo::MergesPushed(_)
+                | Undo::MergesPopped(_)
+                | Undo::SourcesPushed(_)
+                | Undo::SourcesPopped(_)
                 | Undo::LoopWatchSet(_)
                 | Undo::LoopKeyPushed
                 | Undo::LoopKeyPopped(_)
@@ -497,6 +522,8 @@ impl GameState {
             spill_targets: Vec::new(),
             spill_specs: Vec::new(),
             share_arena: Vec::new(),
+            merges: Vec::new(),
+            merged_sources: Vec::new(),
             attackers: Vec::new(),
             blocks: Vec::new(),
             extra_turns: Vec::new(),
@@ -981,6 +1008,26 @@ impl GameState {
         self.log(Undo::EffectRemoved(at as u32, Box::new(effect)));
         self.set_unsettled();
         let EffectKind::RestoreCopy(prior) = effect.kind else { return };
+        // A merge just above it in timestamp order (CR 730.2a: a copiable effect) is handed the values it applied over, and
+        // the merged permanent's values are worked out again from there (`rechain_merged`).
+        if let Some(merge) = self.merge_of(effect.affected) {
+            let above_copy = self
+                .effects
+                .iter()
+                .filter(|l| l.affected == effect.affected && l.timestamp > effect.timestamp && matches!(l.kind, EffectKind::RestoreCopy(_)))
+                .map(|l| l.timestamp)
+                .min()
+                .unwrap_or(u32::MAX);
+            if let Some(at) = merge.parts.iter().position(|p| p.timestamp > effect.timestamp && p.timestamp < above_copy) {
+                let mut merge = merge.clone();
+                merge.parts[at].prior = prior;
+                let obj = self.obj(effect.affected);
+                if obj.became.is_none() && (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) {
+                    self.set_merge(effect.affected, merge);
+                }
+                return;
+            }
+        }
         let above = self
             .effects
             .iter()
@@ -1153,6 +1200,127 @@ impl GameState {
     /// The objects a span names.
     pub fn members(&self, span: Span) -> &[ObjectId] {
         &self.members[span.start as usize..span.start as usize + span.len as usize]
+    }
+
+    // --- Merged permanents (CR 730) -------------------------------------------------------------------------------
+
+    /// What represents `id` besides its own card, if it is a merged permanent (CR 730.2; `Obj::merged`).
+    pub fn merge_of(&self, id: ObjectId) -> Option<&Merge> {
+        match self.obj(id).merged {
+            0 => None,
+            n => Some(&self.merges[n as usize - 1]),
+        }
+    }
+
+    /// The values whose abilities a merged permanent's copiable values also have (`Copiable::merged`): its other components'
+    /// (CR 702.140e). Empty for any other values.
+    pub fn merged_sources(&self, values: &Copiable) -> &[Copiable] {
+        match values.merged {
+            0 => &[],
+            n => &self.merged_sources[n as usize - 1],
+        }
+    }
+
+    /// Keeps the values a merged permanent's values give the abilities of (`Copiable::merged`), none of them merged itself:
+    /// one more than the index of their run in `merged_sources`, zero for none.
+    pub fn merged_sources_push(&mut self, sources: &[Copiable]) -> u32 {
+        if sources.is_empty() {
+            return 0;
+        }
+        let at = self.merged_sources.len();
+        self.merged_sources.push(sources.iter().map(|s| s.unmerged()).collect());
+        self.log(Undo::SourcesPushed(at as u32));
+        at as u32 + 1
+    }
+
+    /// Makes `merge` what represents `id` besides its own card (CR 730.2), a new version of it, and works out the copiable
+    /// values it leaves the permanent (`rechain_merged`).
+    pub fn set_merge(&mut self, id: ObjectId, merge: Merge) {
+        let at = self.merges.len();
+        self.merges.push(merge);
+        self.log(Undo::MergesPushed(at as u32));
+        self.update_obj(id, |o| o.merged = at as u32 + 1);
+        self.rechain_merged(id);
+    }
+
+    /// Works out a merged permanent's copiable values again (CR 613.2a, 613.7, 730.2a): its copy effects and merges, each a
+    /// copiable effect, in timestamp order. Each merge applies over the values the one just below it in that order leaves -
+    /// the permanent's own face's at the bottom - and a copy effect replaces them all: a merge that put a card on top has that
+    /// card's values and every ability of what it merged with (CR 702.140e), one under the permanent the values it merged
+    /// with and every ability of the card (the release notes: "if a creature that's a copy of another creature mutates, the
+    /// characteristics it gains from mutating apply after applying the copy effect"). The result is written where the copy
+    /// chain keeps it: the next copy effect's prior values, or the object's own (`Obj::copy`) at the top. Called whenever a
+    /// merge is made, a component's face turns, or a copy effect below a merge ends (`effect_remove`).
+    pub fn rechain_merged(&mut self, id: ObjectId) {
+        let Some(merge) = self.merge_of(id).cloned() else { return };
+        let mut links: Vec<(usize, u32)> = self
+            .effects
+            .iter()
+            .enumerate()
+            .filter(|(_, e)| e.affected == id && matches!(e.kind, EffectKind::RestoreCopy(_)))
+            .map(|(i, e)| (i, e.timestamp))
+            .collect();
+        links.sort_by_key(|&(_, t)| t);
+        let mut parts = merge.parts.clone();
+        let mut below: Option<Option<Copiable>> = None;
+        // Whether the values below are the permanent's own component's, unmerged and unchanged by a copy effect: a face-down
+        // one gives no abilities (CR 730.2e, 708.2).
+        let mut own_below = true;
+        let mut previous = 0u32;
+        let mut result = None;
+        for i in 0..parts.len() {
+            let stamp = parts[i].timestamp;
+            let copied_between = links.iter().any(|&(_, t)| t < stamp && (i == 0 || t > previous));
+            if copied_between {
+                own_below = false;
+            }
+            // The values just below: a merge's result, or - where a copy effect, or nothing, is just below - those the chain
+            // gave this merge (`Part::prior`), which only a copy effect below it ending changes.
+            let prior = match below {
+                Some(values) if !copied_between => values,
+                _ => parts[i].prior,
+            };
+            parts[i].prior = prior;
+            let base = prior.unwrap_or(Copiable::of(merge.own_face));
+            let base_gives = !(own_below && merge.own_face_down.is_some());
+            let part = parts[i];
+            let values = part.copy.unwrap_or(Copiable::of(part.face));
+            let mut sources: Vec<Copiable> = self.merged_sources(&base).to_vec();
+            let top = if part.on_top {
+                if base_gives {
+                    sources.insert(0, base.unmerged());
+                }
+                own_below = false;
+                values.unmerged()
+            } else {
+                sources.push(values.unmerged());
+                base.unmerged()
+            };
+            let span = self.merged_sources_push(&sources);
+            let made = Copiable { merged: span, ..top };
+            result = Some(made);
+            below = Some(Some(made));
+            // A copy effect just above takes these as the values it was applied over.
+            let next = parts.get(i + 1).map_or(u32::MAX, |p| p.timestamp);
+            if let Some(&(at, _)) = links.iter().find(|&&(_, t)| t > stamp && t < next) {
+                let effect = self.effects[at];
+                self.effect_set(at, ContinuousEffect { kind: EffectKind::RestoreCopy(Some(made)), ..effect });
+            }
+            previous = stamp;
+        }
+        if parts != merge.parts {
+            let at = self.merges.len();
+            self.merges.push(Merge { parts, ..merge });
+            self.log(Undo::MergesPushed(at as u32));
+            self.update_obj(id, |o| o.merged = at as u32 + 1);
+        }
+        // The merge latest in timestamp order is the top of the chain, unless a copy effect came after it.
+        let latest_copy = links.last().map_or(0, |&(_, t)| t);
+        if let Some(made) = result
+            && previous > latest_copy
+        {
+            self.update_obj(id, |o| o.copy = Some(made));
+        }
     }
 
     /// The run of the target arena a stack item with more than `INLINE_TARGETS` targets names.
@@ -1806,6 +1974,10 @@ impl GameState {
             }
             Undo::SharesPushed(len) => self.share_arena.truncate(len),
             Undo::SharesPopped(shares) => self.share_arena.extend(shares),
+            Undo::MergesPushed(len) => self.merges.truncate(len as usize),
+            Undo::MergesPopped(merges) => self.merges.extend(merges),
+            Undo::SourcesPushed(len) => self.merged_sources.truncate(len as usize),
+            Undo::SourcesPopped(sources) => self.merged_sources.extend(sources),
             Undo::TargetsUnspilled(targets, specs) => {
                 self.spill_targets.extend(targets);
                 self.spill_specs.extend(specs);
@@ -1914,6 +2086,10 @@ impl GameState {
             ),
             Undo::SharesPushed(len) => Undo::SharesPopped(self.share_arena[*len..].to_vec()),
             Undo::SharesPopped(_) => Undo::SharesPushed(self.share_arena.len()),
+            Undo::MergesPushed(len) => Undo::MergesPopped(self.merges[*len as usize..].to_vec()),
+            Undo::MergesPopped(_) => Undo::MergesPushed(self.merges.len() as u32),
+            Undo::SourcesPushed(len) => Undo::SourcesPopped(self.merged_sources[*len as usize..].to_vec()),
+            Undo::SourcesPopped(_) => Undo::SourcesPushed(self.merged_sources.len() as u32),
             Undo::TargetsUnspilled(..) => Undo::TargetsSpilled(self.spill_targets.len()),
             Undo::AttackersSet(_) => Undo::AttackersSet(self.attackers.clone()),
             Undo::BlocksSet(_) => Undo::BlocksSet(self.blocks.clone()),

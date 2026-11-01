@@ -1097,6 +1097,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     "Choose how to pay for it".into()
                 } else if matches!(modes.first(), Some(Label::CastPermission { .. })) {
                     "Choose which permission you cast it by".into()
+                } else if matches!(modes.first(), Some(Label::Mutate { .. })) {
+                    // CR 702.140c: the merged creature has the topmost card's characteristics and every card's abilities.
+                    format!("Choose where {} merges: on top, the creature is it; under, the creature stays itself, and has its abilities either way", game.name(*source))
                 } else if matches!(modes.first(), Some(Label::TargetSlot(..))) {
                     // Two instances of "target" hold the same object (CR 115.3): which one changes to the source (CR 115.7b).
                     format!("Choose which target to change to {}", game.name(*source))

@@ -112,7 +112,7 @@ impl SpellsAsCast {
 /// Whether `card`'s card has a characteristic-defining ability (CR 604.3), which functions in every zone and could read the
 /// zone or controller of its object.
 fn own_characteristic_defining(cx: &Cx, card: ObjectId) -> bool {
-    cx.card(cx.cards().current(cx.s().obj(card))).statics.iter().any(|st| st.own)
+    cx.cards().texts(cx.s(), cx.s().obj(card)).any(|c| cx.card(c).statics.iter().any(|st| st.own))
 }
 
 /// Whether a permission lets the player `priority_options` asks for cast `card` as `face` (`None`: itself) as though it had
@@ -2604,7 +2604,7 @@ fn cost_change_sources(cx: &Cx) -> Vec<ObjectId> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().cost_changes[cx.cards().current(obj).0 as usize] && !cx.lost_all_abilities(id)
+            cx.cards().texts(cx.s(), obj).any(|c| cx.cards().cost_changes[c.0 as usize]) && !cx.lost_all_abilities(id)
         })
         .collect()
 }
@@ -2620,7 +2620,7 @@ fn lasting_changes(cx: &Cx) -> bool {
 fn spell_cost_changers(game: &crate::Game) -> bool {
     game.state.effects.iter().any(|e| matches!(e.kind, EffectKind::SpellCostChange { .. }))
         || game.state.battlefield().iter().any(|&id| {
-            game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
+            game.cards.texts(&game.state, game.state.obj(id)).any(|c| game.cards.cost_changes[c.0 as usize]) && !game.lost_all_abilities(id)
         })
 }
 
@@ -2693,7 +2693,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
     let Some(ability) = game.chars(source).abilities().nth(index as usize) else { return Vec::new() };
     let AbilityDef::Activated(def) = game.cards.ability(ability) else { return Vec::new() };
     let changers = game.state.battlefield().iter().any(|&id| {
-        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
+        game.cards.texts(&game.state, game.state.obj(id)).any(|c| game.cards.cost_changes[c.0 as usize]) && !game.lost_all_abilities(id)
     });
     let obj = game.state.obj(source);
     let own = !game.cards.get(obj.copied_card().unwrap_or(obj.card)).own_cost_changes.is_empty();
@@ -3198,8 +3198,8 @@ fn deltas_watched(
     }
     for &source in sources {
         let obj = cx.s().obj(source);
-        let def = cx.card(cx.cards().current(obj));
-        for change in def.cost_changes {
+        // A merged permanent's other components' cost changes are its own (CR 702.140e).
+        for change in cx.cards().texts(cx.s(), obj).flat_map(|c| cx.card(c).cost_changes) {
             add(change(q, source, player, costed, targets));
         }
     }
@@ -5184,18 +5184,20 @@ pub fn each_play_rule_named(q: &dyn Query, cards: &CardTable, player: PlayerId, 
         let emblems: &[ObjectId] = if command { s.zone(Zone::COMMAND) } else { &[] };
         for &id in s.battlefield().iter().chain(emblems) {
             let obj = s.obj(id);
-            let card = cards.current(obj);
-            if obj.controller != player || !cards.play_rules[card.0 as usize] || q.lost_all_abilities(id) {
+            if obj.controller != player || !cards.texts(s, obj).any(|c| cards.play_rules[c.0 as usize]) || q.lost_all_abilities(id) {
                 continue;
             }
-            let def = cards.get(card);
             let asker = Asker { source: id, controller: player, by: None, spell: false };
-            if def.is_room() {
-                for door in def.unlocked_doors(obj.marks.doors) {
-                    walk(q, &asker, cards.id_of(door), door.play_rules, &mut 0, true, &mut f);
+            // A merged permanent has its other components' play rules too (CR 702.140e), each named by its own card.
+            for card in cards.texts(s, obj) {
+                let def = cards.get(card);
+                if def.is_room() {
+                    for door in def.unlocked_doors(obj.marks.doors) {
+                        walk(q, &asker, cards.id_of(door), door.play_rules, &mut 0, true, &mut f);
+                    }
+                } else {
+                    walk(q, &asker, card, def.play_rules, &mut 0, true, &mut f);
                 }
-            } else {
-                walk(q, &asker, card, def.play_rules, &mut 0, true, &mut f);
             }
         }
     }
@@ -5552,13 +5554,15 @@ fn given<T>(
     let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| cards.get(cards.current(s.obj(id))).types == TypeSet::NONE);
     for &id in s.battlefield().iter().chain(emblems) {
         let obj = s.obj(id);
-        let card = cards.current(obj);
-        let items = list(cards.get(card));
-        if items.is_empty() || crate::layers::lost_all_abilities(cards, s, log, id) {
-            continue;
-        }
-        for (k, what) in items.iter().enumerate() {
-            all.push(Given { source: id, controller: obj.controller, grant: Grant { object: id, ability: name(card, k) }, what });
+        // A merged permanent's other components' are its own (CR 702.140e), each named by the card it is printed on.
+        for card in cards.texts(s, obj) {
+            let items = list(cards.get(card));
+            if items.is_empty() || crate::layers::lost_all_abilities(cards, s, log, id) {
+                continue;
+            }
+            for (k, what) in items.iter().enumerate() {
+                all.push(Given { source: id, controller: obj.controller, grant: Grant { object: id, ability: name(card, k) }, what });
+            }
         }
     }
     all
@@ -5726,7 +5730,14 @@ fn cast_face(whole: &'static CardDef, way: u8) -> &'static CardDef {
         _ => None,
     };
     let prototyped = if way == WAY_PROTOTYPE { cantrip_api::prototyped_face(whole) } else { None };
-    whole.inset_face(way).or(back).or(bestow).or(half).or(prototyped).unwrap_or(whole)
+    whole.inset_face(way).or(back).or(bestow).or(half).or(prototyped).or_else(|| mutating_face_of(whole, way)).unwrap_or(whole)
+}
+
+/// The mutating face the card `whole` cast by its own way `way` is cast as, where that way is its mutate (CR 702.140a): the
+/// card as a mutating creature spell, targeting a non-Human creature with the same owner (`cantrip_api::mutating_face`).
+fn mutating_face_of(whole: &'static CardDef, way: u8) -> Option<&'static CardDef> {
+    let w = whole.ways.get((way as usize).checked_sub(1)?)?;
+    if w.kind == WayKind::Mutate { cantrip_api::mutating_face(whole) } else { None }
 }
 
 /// The face-down values the card `whole` cast by its own way `way` is cast as, where that way casts it face down (CR 702.37c,
@@ -6071,8 +6082,10 @@ impl<'a> Offer<'a> {
             // a permission allows (CR 601.3e), its speed - a 2/2 creature spell with no text, so with no flash of its own, or
             // one a permission judged on that spell gives it (CR 307.5) - its additional costs (none) and how its mana may
             // be paid are that spell's.
-            let face = face_down_values_of(def, (n + 1) as u8).unwrap_or(def);
-            let face_down = !std::ptr::eq(face, def);
+            let face_down_face = face_down_values_of(def, (n + 1) as u8);
+            let face_down = face_down_face.is_some();
+            // Cast for its mutate cost, it is the mutating creature spell (CR 702.140a), which needs a creature to target.
+            let face = face_down_face.or_else(|| mutating_face_of(def, (n + 1) as u8)).unwrap_or(def);
             if face_down && !matches!(route.allows, Allows::Any) && !route.allows.face(&AsFace { cx, spell: card, face: cx.card_id(face) }, card, player) {
                 continue;
             }
@@ -6619,7 +6632,7 @@ fn pay_with_grantors(cx: &Cx) -> Vec<ObjectId> {
         .battlefield()
         .iter()
         .copied()
-        .filter(|&id| cx.cards().pay_with_grants[cx.cards().current(cx.s().obj(id)).0 as usize] && !cx.lost_all_abilities(id))
+        .filter(|&id| cx.cards().texts(cx.s(), cx.s().obj(id)).any(|c| cx.cards().pay_with_grants[c.0 as usize]) && !cx.lost_all_abilities(id))
         .collect()
 }
 
@@ -6641,7 +6654,7 @@ fn pay_with(cx: &Cx, grantors: &[ObjectId], player: PlayerId, spell: ObjectId, d
         None => cx,
     };
     for &source in grantors {
-        for grant in cx.card(cx.cards().current(cx.s().obj(source))).grants_pay_with {
+        for grant in cx.cards().texts(cx.s(), cx.s().obj(source)).flat_map(|c| cx.card(c).grants_pay_with) {
             let given = grant(q, source, player, spell);
             with.convoke |= given.convoke;
             with.delve |= given.delve;
@@ -7302,7 +7315,9 @@ fn cast(
     if !cx.s().permissions.is_empty() {
         cx.st().permissions_retain(|p| p.what != Playable::Card(card));
     }
-    if inset.is_some() || back.is_some() || bestow.is_some() || half.is_some() || prototyped.is_some() {
+    // Cast for its mutate cost, it is a mutating creature spell (CR 702.140a) until it ceases to be one or merges.
+    let mutating = mutating_face_of(whole, way);
+    if inset.is_some() || back.is_some() || bestow.is_some() || half.is_some() || prototyped.is_some() || mutating.is_some() {
         cx.st().update_obj(spell, |o| {
             o.copy = Some(Copiable::of(face))
         });
@@ -9395,7 +9410,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
         return None;
     }
     let changers = game.state.battlefield().iter().any(|&id| {
-        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
+        game.cards.texts(&game.state, game.state.obj(id)).any(|c| game.cards.cost_changes[c.0 as usize]) && !game.lost_all_abilities(id)
     });
     if !changers {
         return None;

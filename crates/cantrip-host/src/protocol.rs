@@ -580,6 +580,11 @@ pub struct ObjectView {
     /// The power and toughness box a station card prints in its striation (CR 721.2b), "2/2": what it will be once it has
     /// enough charge counters, drawn there in any zone. Presentation, not a characteristic (CR 721.2c); empty for any other card.
     pub station_pt: String,
+    /// A merged permanent's components other than its topmost (CR 730.2, 702.140e), topmost first, each as printed: the
+    /// permanent has their abilities as well as its own text's. A face-down one the viewer may not look at is unknown. Empty
+    /// for anything else.
+    #[serde(default)]
+    pub merged_with: Vec<ObjectView>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

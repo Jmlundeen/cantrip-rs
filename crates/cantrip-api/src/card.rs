@@ -1745,6 +1745,9 @@ pub enum WayKind {
     Freerunning,
     /// Sneak (CR 702.190a): "if his sneak cost was paid" asks it of the permanent the spell became.
     Sneak,
+    /// Mutate (CR 702.140a): cast for it, the card is a mutating creature spell (`mutating_face`) that targets a non-Human
+    /// creature with the same owner (`intrinsic::MUTATE_TARGET`), and merges with it as it resolves (CR 702.140c, 730).
+    Mutate,
 }
 
 impl WayKind {
@@ -3019,6 +3022,10 @@ pub struct CardDef {
     /// becomes are, and a copy of either (CR 718.3c-d). Its `prototype` is its card's: the existence of the alternative
     /// characteristics is part of the copiable values (CR 718.2a).
     pub prototyped: bool,
+    /// It is a mutate card's mutating face (`mutating_face`, CR 702.140a): the card itself as the mutating creature spell its
+    /// mutate way casts, which targets a non-Human creature with the same owner (`intrinsic::MUTATE_TARGET`). Only a spell
+    /// has it: one that ceases to be mutating (CR 702.140b) or merges (CR 702.140c) is its card again.
+    pub mutating: bool,
     /// Rebound (CR 702.88a): cast from its caster's hand and resolving, it is exiled instead of put into the
     /// graveyard, and its controller may cast it from exile at the beginning of their next upkeep (`REBOUND_ABILITY`).
     pub rebound: bool,
@@ -3368,6 +3375,7 @@ impl CardDef {
         bestow_cost: ManaCost::ZERO,
         prototype: None,
         prototyped: false,
+        mutating: false,
         rebound: false,
         paradigm: None,
         play_rules: &[],
@@ -3577,6 +3585,8 @@ impl CardDef {
         match (&self.spell, &self.enchant) {
             (Some(spell), _) => spell.targets,
             (None, Some(enchant)) => std::slice::from_ref(enchant),
+            // A mutating creature spell targets a non-Human creature with the same owner as it (CR 702.140a, 115.1e).
+            (None, None) if self.mutating => std::slice::from_ref(&crate::intrinsic::MUTATE_TARGET),
             _ => &[],
         }
     }
@@ -3664,6 +3674,8 @@ impl CardDef {
                 keywords = Keywords(keywords.0 | Keywords::of(&[Keyword::Morph]).0);
             } else if way.kind == WayKind::Disguise {
                 keywords = Keywords(keywords.0 | Keywords::of(&[Keyword::Disguise]).0);
+            } else if way.kind == WayKind::Mutate {
+                keywords = Keywords(keywords.0 | Keywords::of(&[Keyword::Mutate]).0);
             }
         }
         keywords
@@ -3951,6 +3963,31 @@ pub fn prototyped_face(whole: &'static CardDef) -> Option<&'static CardDef> {
     Some(face)
 }
 
+/// The mutating face of `whole`, a card with mutate (CR 702.140a): the card itself as the mutating creature spell its mutate
+/// way casts, a creature spell with one target, "a non-Human creature with the same owner as this spell" (`mutating`,
+/// `CardDef::spell_targets`). None for a card without a mutate way.
+///
+/// Made from the card, never written beside it, so it can't differ from it in anything else: one definition for each mutate
+/// card for the life of the process, which every card table registers with its card. The spell has it as its copiable values
+/// while it is a mutating creature spell (`Obj::copy`), so a copy of it is one too (CR 707.10); one that ceases to be
+/// mutating (CR 702.140b) or merges (CR 702.140c) is its card again.
+pub fn mutating_face(whole: &'static CardDef) -> Option<&'static CardDef> {
+    use std::sync::{Mutex, OnceLock};
+    static FACES: OnceLock<Mutex<Vec<(usize, &'static CardDef)>>> = OnceLock::new();
+    if whole.mutating || !whole.ways.iter().any(|w| w.kind == WayKind::Mutate) {
+        return None;
+    }
+    let key = whole as *const CardDef as usize;
+    let faces = FACES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut faces = faces.lock().unwrap_or_else(|e| e.into_inner());
+    if let Some(&(_, face)) = faces.iter().find(|(k, _)| *k == key) {
+        return Some(face);
+    }
+    let face: &'static CardDef = Box::leak(Box::new(CardDef { mutating: true, ..*whole }));
+    faces.push((key, face));
+    Some(face)
+}
+
 impl CardTable {
     pub fn new(cards: impl IntoIterator<Item = &'static CardDef>) -> CardTable {
         let mut cards: Vec<&'static CardDef> = cards.into_iter().collect();
@@ -3966,6 +4003,9 @@ impl CardTable {
         // A prototype card's prototyped face (CR 718.3b), after its card so that a lookup by name finds the card.
         let prototyped: Vec<&'static CardDef> = cards.iter().filter_map(|&c| prototyped_face(c)).collect();
         cards.extend(prototyped);
+        // A mutate card's mutating face (CR 702.140a), after its card so that a lookup by name finds the card.
+        let mutating: Vec<&'static CardDef> = cards.iter().filter_map(|&c| mutating_face(c)).collect();
+        cards.extend(mutating);
         // Stable, and the first of a name kept: a card's own file comes before its characteristics-only definition.
         cards.sort_by(|a, b| a.name.cmp(b.name));
         // Only the same definition twice is merged: two tokens of one name (a Germ, a Golem) are two definitions,
@@ -4292,6 +4332,20 @@ impl CardTable {
     /// (CR 707.2, 708.2a, 712.3). The printed card of a transformed permanent is its front.
     pub fn current(&self, obj: &Obj) -> CardId {
         obj.copied_card().unwrap_or_else(|| self.face(obj.card, obj.transformed))
+    }
+
+    /// Every definition an object has rules from now: the one it has (`current`), then, for a merged permanent - or a copy of
+    /// one - each of its other components' (CR 702.140e: "a mutated permanent has all abilities of each card and token that
+    /// represents it"), which its copiable values carry (`Copiable::merged`). What every rule a card lists beside its
+    /// `abilities` is read off - its static abilities, its replacement effects, its cost changes, its trigger, play and
+    /// activation rules - each named by the card it is printed on. One definition for any other object; none of a face-down
+    /// permanent's components gives it anything (CR 708.2).
+    pub fn texts<'a>(&self, s: &'a GameState, obj: &Obj) -> impl Iterator<Item = CardId> + use<'a> {
+        let sources: &'a [Copiable] = match obj.copy {
+            Some(ref c) if c.merged != 0 && obj.marks.face_down_as.is_none() => s.merged_sources(c),
+            _ => &[],
+        };
+        std::iter::once(self.current(obj)).chain(sources.iter().map(|v| v.card))
     }
 
     /// The card a face's abilities are printed on, as linked abilities know it (CR 607.1, 607.1b): a transforming

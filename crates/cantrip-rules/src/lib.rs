@@ -31,6 +31,9 @@ mod day_night;
 mod designations;
 mod layers;
 mod loops;
+mod merge;
+#[cfg(test)]
+mod merge_tests;
 mod ops;
 mod phasing;
 #[cfg(test)]

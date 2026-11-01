@@ -1515,6 +1515,9 @@ pub enum Label {
     /// flash" (`own`), or another one - `by` the card that gives it, where a card does (Valley Floodcaller), none for a rule
     /// of the spell's own (an instant, flash).
     CastPermission { own: bool, by: Option<CardId> },
+    /// Where a mutating creature spell is put as it merges with the creature it targets (CR 702.140c): on top of it, or
+    /// under it.
+    Mutate { on_top: bool },
 }
 
 /// One miracle ability of a card (CR 702.94a), named without the object, which a question asked as the card is drawn may not

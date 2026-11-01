@@ -312,6 +312,11 @@ pub enum Event {
     /// one record of when an object came under a player's control besides its zone change onto the battlefield, which echo
     /// asks (CR 702.30a: "came under your control since the beginning of your last upkeep").
     ControlChanged { permanent: ObjectId, controller: PlayerId },
+    /// A mutating creature spell merged with the creature it targeted as it resolved (CR 702.140c-d, 730.2): `spell` was the
+    /// spell, `permanent` the merged permanent - the same object it was (CR 730.2c) - and `on_top` whether the spell was put
+    /// on top. What "whenever this creature mutates" triggers on (CR 702.140d), and "the number of times it has mutated"
+    /// counts.
+    Mutated { permanent: ObjectId, spell: ObjectId, on_top: bool },
 }
 
 /// Why a player loses the game (CR 104.3): what a "can't lose the game" or "don't lose the game for ..." effect is asked
@@ -429,6 +434,7 @@ impl Event {
             | Event::PhasedIn { permanent }
             | Event::ControlChanged { permanent, .. }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
+            Event::Mutated { permanent, spell, .. } => permanent == object || spell == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::Attached { attachment, to } => attachment == object || to == Target::Object(object),
             Event::ManaSpent { source, on, .. } => source == object || on == object,
@@ -526,6 +532,9 @@ impl EventMask {
     pub const ENTERED: EventMask = EventMask(1 << 62);
     /// A creature crewed a Vehicle (CR 702.122b): recorded only, for the history.
     pub const CREWED: EventMask = EventMask(1 << 63);
+    /// A spell merged with a permanent (CR 702.140d): it shares transforming's bit, every one of the 64 being taken, so an
+    /// ability listening for either is asked of both kinds, and tells them apart by the event.
+    pub const MUTATED: EventMask = EventMask::TRANSFORMED;
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -592,6 +601,7 @@ impl EventMask {
             Event::TurnedFaceUp { .. } => EventMask::TURNED_FACE_UP,
             Event::CountersPut { .. } => EventMask::COUNTERS,
             Event::Transformed { .. } => EventMask::TRANSFORMED,
+            Event::Mutated { .. } => EventMask::MUTATED,
             Event::Unattached { .. } => EventMask::UNATTACHED,
             Event::Attached { .. } => EventMask::ATTACHED,
             Event::Tapped { .. } => EventMask::TAPPED,

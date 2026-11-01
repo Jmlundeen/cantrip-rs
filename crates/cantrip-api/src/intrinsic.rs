@@ -406,3 +406,17 @@ pub const fn ward<const N: u8>(text: &'static str) -> AbilityDef {
 /// name, no mana cost, no color, no types, no abilities, no power or toughness. Who may look at it sees the card itself
 /// (CR 406.3), which is a matter of what they know, not of what it is.
 pub static NO_CHARACTERISTICS: CardDef = CardDef { name: "", has_cost: false, ..CardDef::BLANK };
+
+/// "Target non-Human creature with the same owner as this spell" (CR 702.140a): the target a mutating creature spell has (its
+/// mutating face's, `CardDef::spell_targets`). The word "target" is the rule's, not the card's (CR 115.1e), so no
+/// text-changing effect reaches "Human".
+pub static MUTATE_TARGET: TargetSpec = TargetSpec { label: "Non-Human creature with the same owner to mutate onto", ..target(mutate_target) };
+
+fn mutate_target(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    let Target::Object(id) = t else { return false };
+    if !q.is_on_battlefield(id) || q.obj(id).became.is_some() || q.obj(id).owner != q.obj(asker.source).owner {
+        return false;
+    }
+    let chars = q.chars(id);
+    chars.is(CardType::Creature) && !chars.has_subtype(Subtype::Human)
+}

@@ -1,0 +1,234 @@
+//! Merging with permanents (CR 730) and the mutating creature spell that does it (CR 702.140c-f).
+//!
+//! A merged permanent is the object it was before it merged (CR 730.2c): its row keeps its id, controller, counters, status,
+//! attachments and the effects on it, and its own card stays its card. What else represents it is its `Merge`
+//! (`GameState::merges`, named by `Obj::merged`): each card, token or copy that merged with it, over or under, with the
+//! time it merged. Each merge is a copiable effect at that time (CR 730.2a, 613.2), worked out in the copy chain with the
+//! copy effects on it (`GameState::rechain_merged`): the permanent has its topmost component's characteristics and every
+//! ability of each other component (CR 702.140e), which its copiable values carry (`Copiable::merged`), so a copy of it has
+//! them too. As it leaves the battlefield, one permanent leaves and each component goes to the same zone, a new object
+//! each (CR 730.3, `components_moving`).
+
+use cantrip_api::*;
+use cantrip_state::{Merge, MergedPart};
+
+use crate::{Cx, R, ops};
+
+/// Whether the spell `spell` is a mutating creature spell (CR 702.140a): cast for its mutate cost, it has its card's mutating
+/// face as its copiable values (`cantrip_api::mutating_face`) until it ceases to be one or merges.
+pub(crate) fn mutating(cx: &Cx, spell: ObjectId) -> bool {
+    cx.s().obj(spell).copy.is_some_and(|c| cx.card(c.card).mutating)
+}
+
+/// `values`, the copiable values of a mutating creature spell, as those of the card it is once it is no longer mutating (CR
+/// 702.140b-c): the card's own, or - for a copy of a spell whose values have exceptions (CR 707.10) - those exceptions over
+/// the card. `None` where they are the card's own.
+fn unmutated(cards: &CardTable, card: CardId, values: Option<Copiable>) -> Option<Copiable> {
+    let values = values?;
+    if !cards.get(values.card).mutating {
+        return Some(values);
+    }
+    let card_values = Copiable { card, ..values };
+    card_values.has_exceptions().then_some(card_values)
+}
+
+/// CR 702.140b, 608.3b: a mutating creature spell whose target is illegal as it begins to resolve ceases to be one, and goes
+/// on resolving as the creature spell it is.
+pub(crate) fn cease_mutating(cx: &mut Cx, spell: ObjectId) {
+    let obj = *cx.s().obj(spell);
+    let values = unmutated(cx.cards(), obj.card, obj.copy);
+    cx.st().update_obj(spell, |o| o.copy = values);
+}
+
+/// CR 702.140c, 608.3d, 730.2: the mutating creature spell `item` resolves with `target`, its target, legal: it doesn't enter
+/// the battlefield but merges with the target, put on top of it or under it as the spell's controller chooses. The spell
+/// leaves the stack and becomes part of the permanent, which is the same object it was (CR 730.2b-c): not new to the
+/// battlefield, nor to its controller. An effect that refers to or modifies the spell refers to or modifies the merged
+/// permanent from then on (CR 702.140f): the effects on the spell go on to it, and so does what the spell's paying gave it
+/// (haste from mana, a granted way's ability); and the spell, gone, is followed to it (`Obj::became`).
+pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
+    let spell = item.object;
+    let ask = RequestKind::ChooseModes {
+        source: spell,
+        modes: vec![Label::Mutate { on_top: true }, Label::Mutate { on_top: false }],
+        eligible: vec![0, 1],
+        count: 1,
+        at_most: 0,
+        affordable: Vec::new(),
+        additional_cost: false,
+        repeat: false,
+    };
+    let on_top = match cx.ask_core(item.controller, ask, false)? {
+        Answer::Modes(chosen) => chosen.first().is_none_or(|&n| n == 0),
+        _ => true,
+    };
+    let s = cx.s();
+    let card = *s.obj(spell);
+    let permanent = *s.obj(target);
+    let part = MergedPart {
+        card: card.card,
+        face: cx.cards().face(card.card, card.transformed),
+        // A copy of a permanent spell becomes a token as it resolves (CR 707.10f, 111.1): merging, it is a token component.
+        token: card.token || card.card_copy,
+        copy: unmutated(cx.cards(), card.card, card.copy),
+        on_top,
+        timestamp: 0,
+        prior: permanent.copy,
+    };
+    let mut merge = s.merge_of(target).cloned().unwrap_or_else(|| Merge {
+        own_face: cx.cards().face(permanent.card, permanent.transformed),
+        own_token: permanent.token,
+        own_face_down: None,
+        parts: Vec::new(),
+    });
+    // The spell leaves the stack (CR 730.2b): it is no object any more, but part of the permanent, which an effect that refers
+    // to it finds (CR 702.140f).
+    if let Some(at) = cx.s().stack.iter().rposition(|i| i.serial == item.serial) {
+        cx.st().stack_remove(at);
+    }
+    let known = ops::last_known_of(cx, spell);
+    let row = cx.st().last_known_push(known);
+    cx.st().zone_remove(Zone::STACK, spell);
+    cx.st().update_obj(spell, |o| {
+        o.became = Some(target);
+        o.last_known = Some(row);
+    });
+    let timestamp = cx.st().timestamp();
+    merge.parts.push(MergedPart { timestamp, ..part });
+    if on_top {
+        // A merged permanent is a token only while its topmost component is (CR 730.2d), and face down only while its topmost
+        // component is (CR 730.2e): a face-down permanent a face-up card is put on top of is face up, though no effect counts it
+        // as turned face up, and its own card stays face down under it.
+        if permanent.marks.face_down_as.is_some() && merge.parts.iter().filter(|p| p.on_top).count() == 1 {
+            merge.own_face_down = permanent.marks.face_down_as;
+        }
+        cx.st().update_obj(target, |o| {
+            o.token = part.token;
+            o.face_down = false;
+            o.marks.face_down_as = None;
+        });
+    }
+    cx.st().set_merge(target, merge);
+    // What modifies the spell modifies the merged permanent (CR 702.140f).
+    ops::carry_effects(cx, spell, target);
+    if card.marks.gains_haste {
+        Game::add_effect(cx, target, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
+    }
+    if let Some(ability) = card.marks.gains {
+        Game::add_effect(cx, target, target, EffectKind::AddAbility(ability), Duration::Indefinite);
+    }
+    cx.state_changed();
+    cx.emit(Event::Mutated { permanent: target, spell, on_top });
+    Ok(())
+}
+
+/// One component of a merged permanent (CR 730.2), as it leaves the battlefield (CR 730.3): the card, token or copy it is, and
+/// how it is.
+#[derive(Clone, Copy)]
+pub(crate) struct Component {
+    pub card: CardId,
+    pub token: bool,
+    pub transformed: bool,
+    /// Face down as it leaves: revealed as it moves (CR 708.9).
+    pub face_down: bool,
+    /// It is the topmost component: the one whose characteristics the permanent has had (CR 730.2a), which the permanent's
+    /// own move to its new zone is the move of.
+    pub top: bool,
+}
+
+/// Every component of the merged permanent `id` (CR 730.2): its own card first, then each that merged with it in the order it
+/// merged. None for a permanent that isn't merged.
+pub(crate) fn components(cx: &Cx, id: ObjectId) -> Option<Vec<Component>> {
+    let merge = cx.s().merge_of(id)?;
+    let obj = cx.s().obj(id);
+    let top = merge.parts.iter().rposition(|p| p.on_top).map_or(0, |i| i + 1);
+    let mut all = Vec::with_capacity(merge.parts.len() + 1);
+    // Each is a new object where it goes (CR 400.7), with none of the values copy effects gave the permanent, as any object
+    // that leaves the battlefield.
+    all.push(Component {
+        card: obj.card,
+        token: merge.own_token,
+        transformed: obj.transformed,
+        face_down: obj.face_down || merge.own_face_down.is_some(),
+        top: top == 0,
+    });
+    for (i, p) in merge.parts.iter().enumerate() {
+        all.push(Component { card: p.card, token: p.token, transformed: p.face != p.card, face_down: obj.face_down, top: top == i + 1 });
+    }
+    Some(all)
+}
+
+/// The values of every component of `id` but its topmost, whose abilities it has (CR 702.140e): the values its copiable
+/// values carry (`Copiable::merged`). Empty for an object that isn't merged and isn't a copy of one.
+pub(crate) fn sources<'a>(s: &'a GameState, values: Option<&Copiable>) -> &'a [Copiable] {
+    match values {
+        Some(c) if c.merged != 0 => s.merged_sources(c),
+        _ => &[],
+    }
+}
+
+/// CR 730.3a: the components of a merged permanent put into their owner's library together - at its top, as they arrived,
+/// `group` its own card's object first - are in the order that player arranges, which they don't reveal (the question is
+/// theirs alone).
+pub(crate) fn arrange_in_library(cx: &mut Cx, owner: PlayerId, group: &[ObjectId]) {
+    let library = Zone::library(owner);
+    // Top first, as they lie.
+    let listed: Vec<ObjectId> = cx.s().zone(library).iter().copied().filter(|id| group.contains(id)).collect();
+    if listed.len() < 2 {
+        return;
+    }
+    let source = match cx.cause() {
+        crate::Cause::Spell(spell) => spell,
+        crate::Cause::Ability { source, .. } => source,
+        _ => listed[0],
+    };
+    let ask = RequestKind::DistributeCards {
+        source,
+        cards: listed.clone(),
+        destinations: vec![Destination { kind: DestinationKind::LibraryTop, min: listed.len() as u8, max: listed.len() as u8, eligible: listed.clone() }],
+        may_shuffle: false,
+    };
+    let order = match cx.ask_rule(owner, ask) {
+        Ok(Some(Answer::Placements { placements, .. })) => placements.into_iter().next().unwrap_or_default(),
+        _ => return,
+    };
+    if order == listed || order.len() != listed.len() || !listed.iter().all(|id| order.contains(id)) {
+        return;
+    }
+    let at = cx.s().zone(library).iter().position(|id| listed.contains(id)).unwrap_or(0);
+    for &card in &listed {
+        cx.st().zone_remove(library, card);
+    }
+    for (k, &card) in order.iter().enumerate() {
+        cx.st().zone_insert(library, at + k, card);
+    }
+}
+
+
+/// CR 730.2i: transforming the merged permanent `id` turns each of its double-faced components that can transform (CR
+/// 701.27a, 701.27d: not one whose other face is an instant or sorcery) so that its other face is up, its own card as any
+/// double-faced permanent's and each other's in its merge. Whether any turned.
+pub(crate) fn turn_components(cx: &mut Cx, id: ObjectId) -> bool {
+    let Some(mut merge) = cx.s().merge_of(id).cloned() else { return false };
+    let cards = cx.cards();
+    let can_turn = |card: CardId, transformed: bool| cards.backs[card.0 as usize].is_some() && !ops::instant_or_sorcery(cards.get(cards.face(card, !transformed)));
+    let obj = *cx.s().obj(id);
+    let own = obj.represented_double_faced(cards.backs[obj.card.0 as usize].is_some()) && can_turn(obj.card, obj.transformed);
+    let mut any = own;
+    for p in &mut merge.parts {
+        let transformed = p.face != p.card;
+        if can_turn(p.card, transformed) {
+            p.face = cards.face(p.card, !transformed);
+            any = true;
+        }
+    }
+    if !any {
+        return false;
+    }
+    if own {
+        cx.st().update_obj(id, |o| o.transformed = !o.transformed);
+        merge.own_face = cards.face(obj.card, !obj.transformed);
+    }
+    cx.st().set_merge(id, merge);
+    true
+}

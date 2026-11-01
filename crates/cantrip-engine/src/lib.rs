@@ -120,6 +120,8 @@ pub fn label_text_in(table: &'static CardTable, label: &Label) -> &'static str {
         Label::Card(card, i) | Label::Option(card, i) => cards().get(card).labels.get(i as usize).copied().unwrap_or(""),
         Label::Name(card) | Label::Face(card) => cards().get(card).name,
         Label::Fused(_) => "Fuse: both halves",
+        Label::Mutate { on_top: true } => "Put it on top",
+        Label::Mutate { on_top: false } => "Put it under",
         Label::TargetSlot(text, _) => text,
         Label::Pile { first: true, ref cards } if cards.is_empty() => "First pile: nothing",
         Label::Pile { first: true, .. } => "First pile",

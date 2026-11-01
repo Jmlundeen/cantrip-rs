@@ -1011,7 +1011,7 @@ pub(crate) fn state_triggers_now(cx: &mut Cx) {
     let all = layers::ability_grants_present(cx.cards(), cx.s());
     let may_have = |cx: &Cx, id: ObjectId| {
         let obj = cx.s().obj(id);
-        all || cx.cards().state_triggers[cx.cards().current(obj).0 as usize]
+        all || cx.cards().texts(cx.s(), obj).any(|c| cx.cards().state_triggers[c.0 as usize])
             || obj.copy.is_some_and(|c| c.extra_abilities.iter().any(|e| e.instances > 0 && cx.cards().state_triggers[e.card.0 as usize]))
             || cx.s().effects.iter().any(|e| e.affected == id && matches!(e.kind, EffectKind::AddAbility(a) if is_state(cx, a)))
     };
@@ -1093,7 +1093,7 @@ impl<'a> TriggerStatics<'a> {
         self.sources(cx, triggering).iter().any(|&id| {
             let obj = cx.s().obj(id);
             let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
-            cx.card(cx.cards().current(obj)).trigger_rules.iter().any(|rule| rule(cx, &asker, event, triggering))
+            cx.cards().texts(cx.s(), obj).flat_map(|c| cx.card(c).trigger_rules).any(|rule| rule(cx, &asker, event, triggering))
         })
     }
 
@@ -1103,7 +1103,8 @@ impl<'a> TriggerStatics<'a> {
         for &id in self.sources(cx, triggering) {
             let obj = cx.s().obj(id);
             let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
-            for (n, rule) in cx.card(cx.cards().current(obj)).additional_triggers.iter().enumerate() {
+            // Numbered across the definitions it has rules from (CR 702.140e), each rule its own.
+            for (n, rule) in cx.cards().texts(cx.s(), obj).flat_map(|c| cx.card(c).additional_triggers).enumerate() {
                 if rule(cx, &asker, event, triggering) && !again.contains(&AdditionalTrigger::Static(id, n as u8)) {
                     again.push(AdditionalTrigger::Static(id, n as u8));
                 }
@@ -1130,7 +1131,7 @@ impl<'a> TriggerStatics<'a> {
 fn trigger_rule_sources(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
     ids.iter()
         .copied()
-        .filter(|&id| cx.cards().trigger_rules[cx.cards().current(cx.s().obj(id)).0 as usize] && !cx.lost_all_abilities(id))
+        .filter(|&id| cx.cards().texts(cx.s(), cx.s().obj(id)).any(|c| cx.cards().trigger_rules[c.0 as usize]) && !cx.lost_all_abilities(id))
         .collect()
 }
 
@@ -1276,7 +1277,7 @@ pub(crate) fn could_have<'a>(cx: &'a Cx, table: &'a [bool], kind: fn(&TriggeredD
     move |id: ObjectId| {
         let o = s.obj(id);
         granting
-            || table[cards.current(o).0 as usize]
+            || cards.texts(s, o).any(|c| table[c.0 as usize])
             || o.copy.is_some_and(|c| c.extra_instances().any(is_kind))
             || (effects && s.effects.iter().any(|e| e.affected == id && matches!(e.kind, EffectKind::AddAbility(a) if is_kind(a))))
     }

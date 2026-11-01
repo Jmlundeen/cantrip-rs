@@ -6,13 +6,18 @@ use cantrip_api::*;
 
 use crate::Cx;
 
-/// The permanents with a static ability of this kind, with the player who controls each.
-fn sources<'a>(cx: &'a Cx, has: impl Fn(&CardDef) -> bool + 'a) -> impl Iterator<Item = (ObjectId, PlayerId, &'static CardDef)> + 'a {
-    cx.s().battlefield().iter().filter_map(move |&id| {
+/// The permanents with a static ability of this kind, with the player who controls each, once for each definition it has
+/// one in: a merged permanent has its other components' (CR 702.140e, `CardTable::texts`).
+fn sources<'a>(cx: &'a Cx, has: impl Fn(&CardDef) -> bool + Copy + 'a) -> impl Iterator<Item = (ObjectId, PlayerId, &'static CardDef)> + 'a {
+    cx.s().battlefield().iter().flat_map(move |&id| {
         let obj = cx.s().obj(id);
-        let def = cx.card(cx.cards().current(obj));
         // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
-        (has(def) && !cx.lost_all_abilities(id)).then_some((id, obj.controller, def))
+        let lost = std::cell::OnceCell::new();
+        cx.cards()
+            .texts(cx.s(), obj)
+            .map(|c| cx.card(c))
+            .filter(move |&def| has(def) && !*lost.get_or_init(|| cx.lost_all_abilities(id)))
+            .map(move |def| (id, obj.controller, def))
     })
 }
 
@@ -44,11 +49,15 @@ pub fn mana_told_apart(q: &dyn Query, cards: &'static CardTable, player: PlayerI
     let rules: Vec<(ObjectId, PlayerId, &'static CardDef)> = s
         .battlefield()
         .iter()
-        .filter_map(|&id| {
+        .flat_map(|&id| {
             let obj = s.obj(id);
-            let def = cards.get(cards.current(obj));
-            // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
-            (!def.mana_told_apart.is_empty() && !q.lost_all_abilities(id)).then_some((id, obj.controller, def))
+            // A permanent that has lost all its abilities has none of these rules (CR 613.1f); a merged permanent has its
+            // other components' (CR 702.140e).
+            cards
+                .texts(s, obj)
+                .map(|c| cards.get(c))
+                .filter(move |def| !def.mana_told_apart.is_empty() && !q.lost_all_abilities(id))
+                .map(move |def| (id, obj.controller, def))
         })
         .collect();
     if rules.is_empty() {
@@ -225,11 +234,12 @@ pub fn cant_gain_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId
     }
     s.battlefield().iter().any(|&id| {
         let obj = s.obj(id);
-        let def = cards.get(cards.current(obj));
-        !def.cant_gain_life.is_empty() && !q.lost_all_abilities(id) && {
-            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
-            def.cant_gain_life.iter().any(|rule| rule(q, &asker, player))
-        }
+        cards.texts(s, obj).map(|c| cards.get(c)).any(|def| {
+            !def.cant_gain_life.is_empty() && !q.lost_all_abilities(id) && {
+                let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
+                def.cant_gain_life.iter().any(|rule| rule(q, &asker, player))
+            }
+        })
     })
 }
 
@@ -254,11 +264,12 @@ pub fn may_attack_despite_defender(q: &dyn Query, cards: &'static CardTable, cre
     }
     s.battlefield().iter().any(|&id| {
         let obj = s.obj(id);
-        let def = cards.get(cards.current(obj));
-        !def.attacks_despite_defender.is_empty() && !q.lost_all_abilities(id) && {
-            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
-            def.attacks_despite_defender.iter().any(|rule| rule(q, &asker, creature))
-        }
+        cards.texts(s, obj).map(|c| cards.get(c)).any(|def| {
+            !def.attacks_despite_defender.is_empty() && !q.lost_all_abilities(id) && {
+                let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
+                def.attacks_despite_defender.iter().any(|rule| rule(q, &asker, creature))
+            }
+        })
     })
 }
 
@@ -404,7 +415,7 @@ pub fn activation_alternatives(
     let mut all = Vec::new();
     for &(id, controller, card) in alternative_sources {
         let asker = Asker { source: id, controller, by: None, spell: false };
-        let card_id = cx.cards().current(cx.s().obj(id));
+        let card_id = cx.card_id(card);
         for (k, rule) in card.ability_alternatives.iter().enumerate() {
             if let Some(cost) = rule(cx, &asker, player, permanent, def) {
                 all.push((Grant { object: id, ability: AbilityRef::ability_alternative(card_id, k) }, cost));
@@ -459,7 +470,7 @@ pub fn activation_forbidders(cx: &Cx) -> Vec<ObjectId> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().activation_rules[cx.cards().current(obj).0 as usize] && !cx.lost_all_abilities(id)
+            cx.cards().texts(cx.s(), obj).any(|c| cx.cards().activation_rules[c.0 as usize]) && !cx.lost_all_abilities(id)
         })
         .collect()
 }
@@ -486,7 +497,7 @@ pub fn activation_barred(cx: &Cx, forbidders: &[ObjectId], source: ObjectId, def
     forbidders.iter().any(|&id| {
         let obj = cx.s().obj(id);
         let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
-        cx.card(cx.cards().current(obj)).activation_rules.iter().any(|rule| !rule(cx, &asker, source, def))
+        cx.cards().texts(cx.s(), obj).flat_map(|c| cx.card(c).activation_rules).any(|rule| !rule(cx, &asker, source, def))
     })
 }
 
@@ -496,11 +507,12 @@ fn attack_restrictors(q: &dyn Query, cards: &CardTable) -> Vec<(Asker, &'static 
     q.state()
         .battlefield()
         .iter()
-        .filter_map(|&id| {
+        .flat_map(|&id| {
             let obj = q.state().obj(id);
-            let card = cards.current(obj);
-            (cards.attack_rules[card.0 as usize] && !q.lost_all_abilities(id))
-                .then(|| (Asker { source: id, controller: obj.controller, by: None, spell: false }, cards.get(card)))
+            cards
+                .texts(q.state(), obj)
+                .filter(move |card| cards.attack_rules[card.0 as usize] && !q.lost_all_abilities(id))
+                .map(move |card| (Asker { source: id, controller: obj.controller, by: None, spell: false }, cards.get(card)))
         })
         .collect()
 }
@@ -577,11 +589,13 @@ fn any_static<R: Copy + 'static>(q: &dyn Query, cards: &'static CardTable, rules
     let s = q.state();
     s.battlefield().iter().any(|&id| {
         let obj = s.obj(id);
-        let list = rules(cards.get(cards.current(obj)));
-        !list.is_empty() && !q.lost_all_abilities(id) && {
-            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
-            list.iter().any(|&rule| test(rule, &asker))
-        }
+        cards.texts(s, obj).any(|card| {
+            let list = rules(cards.get(card));
+            !list.is_empty() && !q.lost_all_abilities(id) && {
+                let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
+                list.iter().any(|&rule| test(rule, &asker))
+            }
+        })
     })
 }
 
@@ -613,7 +627,7 @@ pub fn counters_banned(q: &dyn Query, cards: &'static CardTable, object: ObjectI
 /// (`CardDef::counter_bans`), whatever its abilities: the guard of judging a permanent about to enter with counters as it
 /// would exist on the battlefield (CR 614.12, 122.6).
 pub fn counter_bans_possible(state: &GameState, cards: &'static CardTable) -> bool {
-    state.battlefield().iter().any(|&id| !cards.get(cards.current(state.obj(id))).counter_bans.is_empty())
+    state.battlefield().iter().any(|&id| cards.texts(state, state.obj(id)).any(|c| !cards.get(c).counter_bans.is_empty()))
 }
 
 /// Whether `player` can't get `kind` counters (CR 122.1, 101.2): Melira's "you can't get poison counters"

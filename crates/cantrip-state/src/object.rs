@@ -114,6 +114,51 @@ pub struct Obj {
     /// For a face-down card in exile: the seats that may look at it, a bit each (CR 406.3), every seat a game deals
     /// (`MAX_SEATS`). Those who could see where it came from, and those it was shown to since.
     pub seen_by: u8,
+    /// A merged permanent (CR 730.2): one more than the index in `GameState::merges` of what represents it besides its own
+    /// card or token, zero for an object represented by one card or token alone. Its row stays the object's - the same
+    /// object it was before it merged (CR 730.2c) - and its own card is one of its components.
+    pub merged: u32,
+}
+
+/// What represents a merged permanent besides the card or token its row names (CR 730.2), one version of it: a new merge,
+/// a face turned or a copy effect below a merge ending makes a new version (`GameState::merges` is only appended to) that
+/// the object's row is pointed at, so every change is one journalled write of the row.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct Merge {
+    /// The face of the object's own card that is up (CR 712.3): the values it has as a component, what a transform changes
+    /// (CR 730.2i).
+    pub own_face: CardId,
+    /// Whether the object's own component is a token (CR 730.2d): the permanent itself is a token only while its topmost
+    /// component is (`Obj::token`), but its own component goes on being one as it leaves (CR 730.3).
+    pub own_token: bool,
+    /// The face-down values of the object's own component while it is face down under a face-up component (CR 730.2e): a
+    /// face-down permanent a face-up card merged over is a face-up permanent, and its own card stays face down - with no
+    /// characteristics to give - until it leaves, when it is revealed (CR 708.9).
+    pub own_face_down: Option<CardId>,
+    /// The objects merged with it, in the order they merged (CR 730.2), each placed over or under everything before it.
+    pub parts: Vec<MergedPart>,
+}
+
+/// One card, token or copy of a card that merged with a permanent (CR 730.2, 702.140c).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct MergedPart {
+    /// The card it is (its front face for a double-faced card), or a token's definition.
+    pub card: CardId,
+    /// The face of it that is up.
+    pub face: CardId,
+    /// A token, or a copy of a spell that became one as it resolved (CR 707.10f, 111.1).
+    pub token: bool,
+    /// Its own copiable values where they are not its card's (CR 707.2): a copy of a spell's, a prototyped spell's.
+    pub copy: Option<Copiable>,
+    /// It was put on top of the permanent (CR 702.140c), its characteristics the permanent's from then on (CR 730.2a), or
+    /// under it.
+    pub on_top: bool,
+    /// The time it merged: the timestamp of the copiable effect merging is (CR 730.2a, 613.2), which a copy effect with a
+    /// later one overrides and one with an earlier one is overridden by.
+    pub timestamp: u32,
+    /// The permanent's copiable values just before this merge - what the copy effects and merges earlier in timestamp order
+    /// make them, `None` for its own face's - which this merge applies over (CR 613.2a, 613.7).
+    pub prior: Option<Copiable>,
 }
 
 /// What a permanent is marked with: exerted (CR 701.43), monstrous (CR 701.37), solved (CR 719.3b), saddled (CR 702.171), a player chosen
@@ -492,6 +537,7 @@ impl Obj {
             exiled,
             face_down: _,
             seen_by: _,
+            merged: _,
         } = *self;
         let Marks {
             doors: _,
@@ -561,6 +607,7 @@ impl Obj {
             exiled: None,
             face_down: false,
             seen_by: 0,
+            merged: 0,
         }
     }
 
@@ -709,6 +756,12 @@ pub struct Copiable {
     /// double-faced, its card that front face (`faces`). A copy effect on an object copies `card` alone, whatever this says
     /// (CR 707.8: the face that is up). Kept in the bytes the values had to spare, as `stated` is.
     pub front: CardId,
+    /// The values of a merged permanent (CR 730.2a, 702.140e): these are its topmost component's, and it also has every
+    /// ability of each of the values this names in `GameState::merged_sources` (one more than the index of their run, zero for
+    /// none) - its other components', each as it is.
+    /// Copiable (the Ikoria release notes: "the characteristics of the combined merged creature are copiable"), so a copy
+    /// of a merged permanent has the abilities too, though it is one object of one card. Empty for any other values.
+    pub merged: u32,
 }
 
 impl Copiable {
@@ -727,6 +780,7 @@ impl Copiable {
             loyalty: 0,
             words: Words::NONE,
             front: CardId(0),
+            merged: 0,
         }
     }
 
@@ -832,6 +886,13 @@ impl Copiable {
             || self.pt().is_some()
             || self.name.is_some()
             || !self.words.is_printed()
+            || self.merged != 0
+    }
+
+    /// These values without the abilities of a merged permanent's other components (`merged`): its topmost component's.
+    pub fn unmerged(mut self) -> Copiable {
+        self.merged = 0;
+        self
     }
 
     /// "Except it's a [type] in addition to its other types."
@@ -1286,7 +1347,7 @@ pub enum EffectKind {
     /// static abilities that do the same (`PlayRule::ExtraLandPlays`): the number of lands a player can play is the sum
     /// (CR 305.2), compared with the lands they have already played this turn, however they were played (CR 305.2a/b), so
     /// a land play made before the effect began still leaves the new one. It counts only lands played, never lands put onto
-    /// the battlefield (CR 305.4). Explore, Urban Evolution, Scale the Heights, Kiora, the Crashing Wave's −1, Way of the
+    /// the battlefield (CR 305.4). Explore, Urban Evolution, Scale the Heights, Kiora, the Crashing Wave's âˆ’1, Way of the
     /// Paradox; "up to two" (Journey of Discovery) is 2, "X additional lands" (Nahiri's Lithoforming) is X, so the count is
     /// 32-bit. About the player, so it outlives its `affected` object, which is only the source.
     ExtraLandPlays(u32),
@@ -2807,10 +2868,11 @@ mod copiable_tests {
     use super::*;
 
     /// Every `Obj` holds an `Option<Copiable>`, so a copy's exceptions are packed: the yes-or-no ones and a stated loyalty
-    /// take three bytes, and an object pays nothing for them. Each reads back as it was set, a later one over an earlier.
+    /// take three bytes, and an object pays nothing for them. Each reads back as it was set, a later one over an earlier. A
+    /// merged permanent's run of other components (`merged`, CR 702.140e) took the last word: the values had no byte to spare.
     #[test]
     fn the_rare_exceptions_cost_an_object_nothing_and_read_back() {
-        assert!(std::mem::size_of::<Option<Copiable>>() <= 160, "Option<Copiable> is {} bytes", std::mem::size_of::<Option<Copiable>>());
+        assert!(std::mem::size_of::<Option<Copiable>>() <= 168, "Option<Copiable> is {} bytes", std::mem::size_of::<Option<Copiable>>());
         let plain = Copiable::of(CardId(1));
         assert!(!plain.has_exceptions() && plain.legendary_stated().is_none() && plain.stated_loyalty().is_none());
         let ob = plain.nonlegendary().with_loyalty(0);

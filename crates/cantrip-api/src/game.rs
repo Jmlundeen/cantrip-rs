@@ -9,6 +9,7 @@ use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef, CauseKind, PlayerCou
 use crate::chars::Chars;
 use crate::history::{History, Record};
 use crate::DamageResult;
+use crate::Event;
 
 /// A die roll (CR 706.2): the face the die showed, and the result once the roll was modified (CR 706.4).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -323,7 +324,8 @@ pub trait Query {
         if obj.marks.face_down_as.is_some() {
             return obj.copiable().unwrap_or_else(|| Copiable::of(self.chars(id).card));
         }
-        let front = obj.represented_double_faced(self.card(obj.card).back.is_some()).then_some(obj.card);
+        // A merged permanent is no double-faced permanent, whatever its components are (CR 730.2i).
+        let front = (obj.merged == 0 && obj.represented_double_faced(self.card(obj.card).back.is_some())).then_some(obj.card);
         let values = match obj.copiable() {
             // A double-faced token's own faces: the face up, under its exceptions.
             Some(c) if obj.own_faces(&c) => Copiable { card: self.chars(id).card, ..c },
@@ -433,6 +435,37 @@ pub trait Query {
     /// nothing once that card has moved again (a new object, CR 400.7). Persist, earthbend, Enduring Innocence and Enduring Curiosity return it.
     fn found_after_move(&self, left: ObjectId) -> Option<ObjectId> {
         self.obj(left).became.filter(|&new| self.obj(new).became.is_none() && !self.obj(new).zone.is(ZoneKind::Gone))
+    }
+
+    /// Every new object `left` became as it moved (CR 400.7), wherever each went: the one its `became` names and, for a
+    /// merged permanent that left the battlefield, each of its other components' (CR 730.3c: "if an effect can find the new
+    /// object that a merged permanent becomes as it leaves the battlefield, it finds all of those objects"). Read from the
+    /// event history, which recorded each one's arrival just after the permanent's own move.
+    fn became_all(&self, left: ObjectId) -> Vec<ObjectId> {
+        let Some(first) = self.obj(left).became else { return Vec::new() };
+        let mut all = vec![first];
+        if self.obj(left).merged == 0 {
+            return all;
+        }
+        let log = self.events();
+        let Some(at) = log.iter().rposition(|r| matches!(r.event, Event::ZoneChange { old, new, .. } if old == left && new == first)) else {
+            return all;
+        };
+        for r in &log[at + 1..] {
+            match r.event {
+                Event::ZoneChange { old, new, from, .. } if old == left && from == Zone::GONE => all.push(new),
+                Event::ZoneChange { .. } | Event::Revealed { .. } => {}
+                _ => break,
+            }
+        }
+        all
+    }
+
+    /// `found_after_move` of every object `left` became (`became_all`): each still where its move put it (CR 400.7e, 730.3c).
+    /// "Return it to the battlefield" from a "when this dies" ability returns each card of a merged permanent that died, and
+    /// the same is done to each (CR 730.3c).
+    fn found_all_after_move(&self, left: ObjectId) -> Vec<ObjectId> {
+        self.became_all(left).into_iter().filter(|&new| self.obj(new).became.is_none() && !self.obj(new).zone.is(ZoneKind::Gone)).collect()
     }
 
     /// What an Aura or Equipment is attached to, if both are still the permanents they were and on the battlefield: one

@@ -219,20 +219,20 @@ pub fn keyword_designations(cx: &mut Cx) -> bool {
     let (mut blessing, mut story) = (0u32, 0u32);
     for &id in cx.s().battlefield() {
         let obj = cx.s().obj(id);
-        let card = cx.cards().current(obj);
-        if !cx.cards().designators[card.0 as usize] {
+        if !cx.cards().texts(cx.s(), obj).any(|c| cx.cards().designators[c.0 as usize]) {
             continue;
         }
-        let def = cx.card(card);
+        // A merged permanent has its other components' keywords too (CR 702.140e).
+        let (ascend, storied) = cx.cards().texts(cx.s(), obj).fold((false, false), |(a, st), c| (a || cx.card(c).ascend, st || cx.card(c).storied));
         let p = obj.controller;
         let player = cx.s().player(p);
         if player.lost || cx.lost_all_abilities(id) {
             continue;
         }
-        if def.ascend && !player.citys_blessing {
+        if ascend && !player.citys_blessing {
             blessing |= 1 << p.index();
         }
-        if def.storied && !player.enduring_story {
+        if storied && !player.enduring_story {
             story |= 1 << p.index();
         }
     }

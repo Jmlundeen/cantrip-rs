@@ -139,7 +139,7 @@ public sealed class CardInspector : SKCanvasElement
         }
 
         _landscape = card.Halves.Count > 0;
-        List<ObjectView> faces = _landscape ? [card] : [card, .. card.AlsoPrinted(), .. new[] { card.CopyingCard }.OfType<ObjectView>()];
+        List<ObjectView> faces = _landscape ? [card] : [card, .. card.AlsoPrinted(), .. new[] { card.CopyingCard }.OfType<ObjectView>(), .. card.MergedWith.Where(c => c.Known)];
 
         // Its box as drawn, turned back upright: a tapped card's box is as wide as the card is tall.
         bool turned = MathF.Abs(angle % 180f) > 45f;

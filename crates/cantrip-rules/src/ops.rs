@@ -110,6 +110,9 @@ struct Plan {
     last_known: LastKnown,
     /// Every player could see it as it moved (`seen_by_all`), for a move into a hand or a library (CR 603.10a).
     seen_by_all: bool,
+    /// A merged permanent leaving the battlefield (CR 730.3): each of its components, and where its card components go if it
+    /// is a token a replacement effect for cards alone would have moved elsewhere (CR 730.3e).
+    components: Option<(Vec<crate::merge::Component>, Option<Zone>)>,
 }
 
 /// Whether every player can see `id` as it moves now (CR 603.10a: "an object that all players can see"), the instruction
@@ -378,6 +381,17 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         // still discarded, and the linked ability is queued below, once the exiled card exists - if no later effect sent
         // it on elsewhere, so that it was "exiled this way".
         let madness = change.madness && to.is(ZoneKind::Exile);
+        // A merged permanent leaving the battlefield (CR 730.3): one permanent leaves, and each of its components goes to the
+        // zone it goes to (CR 730.3d) - but a token one, whose components that are cards a replacement effect for cards alone
+        // moves instead (CR 730.3e), judged as the move would be of a card.
+        let components = if from.is(ZoneKind::Battlefield) || from.is(ZoneKind::PhasedOut) { crate::merge::components(cx, m.id) } else { None };
+        let components = components.map(|all| {
+            let card_to = (old.token && all.iter().any(|c| !c.token)).then(|| {
+                let as_card = replace::zone_change(cx, ZoneChange { is_card: true, ..proposed });
+                if as_card.regenerated || as_card.shielded || as_card.replaced { to } else { as_card.to }
+            });
+            (all, card_to.filter(|&z| z != to))
+        });
         // Whatever it leaves, it is as it last existed there (CR 400.7, 608.2h, 113.7a): what an ability of it, or one it
         // created, reads once it is gone.
         let last_known = last_known_of(cx, m.id);
@@ -479,7 +493,13 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         {
             verify_reveal_carried(cx, m.id);
         }
-        plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, counts, counts_by, last_known, seen_by_all });
+        // The permanent's move is its topmost component's (CR 730.2a, 730.3): the card or token it has been.
+        if let Some(top) = components.as_ref().and_then(|(all, _)| all.iter().find(|c| c.top)) {
+            new.card = top.card;
+            new.token = top.token;
+            new.transformed = top.transformed;
+        }
+        plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, counts, counts_by, last_known, seen_by_all, components });
     }
     *cx.s().leaving_together.borrow_mut() = outer_leaving;
     // The permanents regenerated, shielded or otherwise replaced instead of moving stay (CR 701.19a, 614.6): no attachment
@@ -507,7 +527,14 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
     let mut entered: Vec<ObjectId> = Vec::new();
     // The permanents a replacement makes arrive attacking (CR 614.1c, 508.4), put into the combat once they all are.
     let mut attacking_arrivals: Vec<ObjectId> = Vec::new();
-    for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known, .. } in plans {
+    // The new objects of a merged permanent's components other than its topmost (CR 730.3): after every other, so the objects
+    // returned line up with the moves asked for, and an effect that finds what the permanent became finds them too (CR
+    // 730.3c, `merge::became_all`).
+    let mut separated: Vec<ObjectId> = Vec::new();
+    // The components put into one library together, the owner's to order (CR 730.3a).
+    let mut into_library: Vec<(PlayerId, Vec<ObjectId>)> = Vec::new();
+    let turn = cx.s().turn.number;
+    for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known, components, .. } in plans {
         let m = &m;
         let row = cx.st().last_known_push(last_known);
         cx.st().zone_remove(from, m.id);
@@ -533,8 +560,47 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         } else {
             cx.st().zone_push(to, new_id);
         }
-        if to.is(ZoneKind::Graveyard) && !old.token && !old.card_copy {
+        if to.is(ZoneKind::Graveyard) && !new.token && !old.card_copy {
             binned.push((to.player, new_id));
+        }
+        // Each other component of a merged permanent goes there too, a new object of its own (CR 730.3), arriving from no zone
+        // as a component, not as a permanent that left: what triggers on a card put into a zone sees it, and what triggers on
+        // a permanent leaving sees the one permanent (CR 730.3, the release notes' "one creature died, three cards were put
+        // into the graveyard"). Face down, it is revealed as it moves (CR 708.9).
+        let mut part_events: Vec<Event> = Vec::new();
+        if let Some((all, card_to)) = &components {
+            let mut group = vec![new_id];
+            for c in all.iter().filter(|c| !c.top) {
+                let to_c = match card_to {
+                    Some(z) if !c.token => *z,
+                    _ => to,
+                };
+                let mut part = Obj::new(c.card, old.owner, to_c);
+                part.token = c.token;
+                part.transformed = c.transformed;
+                part.controlled_since = turn;
+                part.timestamp = cx.st().timestamp();
+                let part_id = cx.st().push_obj(part);
+                if to_c.is(ZoneKind::Library) {
+                    cx.st().zone_insert(to_c, 0, part_id);
+                } else {
+                    cx.st().zone_push(to_c, part_id);
+                }
+                if to_c.is(ZoneKind::Graveyard) && !c.token {
+                    binned.push((to_c.player, part_id));
+                }
+                part_events.push(Event::ZoneChange { old: m.id, new: part_id, from: Zone::GONE, to: to_c, reason });
+                if c.face_down {
+                    part_events.push(Event::Revealed { player: old.owner, card: part_id });
+                }
+                if to_c == to {
+                    group.push(part_id);
+                }
+                separated.push(part_id);
+            }
+            if to.is(ZoneKind::Library) && !change.shuffle && group.len() > 1 {
+                into_library.push((to.player, group));
+            }
         }
         cx.st().update_obj(m.id, |o| {
             o.became = Some(new_id);
@@ -574,6 +640,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             remove_from_combat(cx, &[m.id]);
         }
         events.push(Event::ZoneChange { old: m.id, new: new_id, from, to, reason });
+        events.append(&mut part_events);
         // CR 708.9: a face-down permanent or spell that moves to any other zone is revealed to all players by its owner as
         // it moves - where it arrives face up, as a card going anywhere but exile face down does.
         if old.face_down
@@ -616,6 +683,10 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
     if binned.len() > 1 {
         arrange_graveyards(cx, &binned);
     }
+    for (owner, group) in into_library {
+        crate::merge::arrange_in_library(cx, owner, &group);
+    }
+    created.extend(separated);
     // What each permanent was as it entered (CR 603.6a, 614.12): judged once they are all there, as each one's continuous effects
     // reach the ones entering with it, and recorded with the moves so the history can say it however they change after.
     for permanent in entered {
@@ -919,8 +990,13 @@ pub fn turn_face_up_as(cx: &mut Cx, id: ObjectId, player: PlayerId, megamorph: b
     }
     // CR 701.40g, 701.58g: a manifested or cloaked instant or sorcery card that would turn face up is revealed by its
     // controller and left face down, and nothing that triggers on turning face up does.
-    let card = cx.cards().get(cx.s().obj(id).card);
-    if card.types.has(CardType::Instant) || card.types.has(CardType::Sorcery) {
+    // CR 730.2g: so is a face-down merged permanent that contains an instant or sorcery card.
+    let spell_card = |card: CardId| {
+        let def = cx.cards().get(card);
+        def.types.has(CardType::Instant) || def.types.has(CardType::Sorcery)
+    };
+    let merged_spell = cx.s().merge_of(id).is_some_and(|m| m.parts.iter().any(|p| !p.token && spell_card(p.card)));
+    if spell_card(cx.s().obj(id).card) || merged_spell {
         let controller = cx.s().obj(id).controller;
         cx.emit(Event::Revealed { player: controller, card: id });
         return;
@@ -1540,7 +1616,7 @@ pub(crate) fn instant_or_sorcery_entering(cx: &Cx, id: ObjectId, transformed: bo
 }
 
 /// An instant or sorcery card face (CR 304, 307), which no permanent can be (CR 110.4).
-fn instant_or_sorcery(def: &CardDef) -> bool {
+pub(crate) fn instant_or_sorcery(def: &CardDef) -> bool {
     def.types.has(CardType::Instant) || def.types.has(CardType::Sorcery)
 }
 
@@ -1826,14 +1902,22 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
         return Ok(false);
     }
     let obj = cx.s().obj(id);
-    if !obj.zone.is(ZoneKind::Battlefield)
-        || obj.marks.face_down_as.is_some()
-        || !obj.represented_double_faced(cx.cards().backs[obj.card.0 as usize].is_some())
-        || instant_or_sorcery(cx.card(cx.cards().face(obj.card, !obj.transformed)))
-    {
-        return Ok(false);
+    // A merged permanent is no double-faced permanent, but transforming it turns each of its double-faced components that can
+    // transform (CR 730.2i).
+    if obj.merged != 0 {
+        if !obj.zone.is(ZoneKind::Battlefield) || obj.marks.face_down_as.is_some() || !crate::merge::turn_components(cx, id) {
+            return Ok(false);
+        }
+    } else {
+        if !obj.zone.is(ZoneKind::Battlefield)
+            || obj.marks.face_down_as.is_some()
+            || !obj.represented_double_faced(cx.cards().backs[obj.card.0 as usize].is_some())
+            || instant_or_sorcery(cx.card(cx.cards().face(obj.card, !obj.transformed)))
+        {
+            return Ok(false);
+        }
+        cx.st().update_obj(id, |o| o.transformed = !o.transformed);
     }
-    cx.st().update_obj(id, |o| o.transformed = !o.transformed);
     note_statics(cx, id);
     // The face now up, or what a copy effect makes it (CR 707.2).
     let face = cx.cards().current(cx.s().obj(id));
@@ -3892,8 +3976,7 @@ fn note_statics(cx: &mut Cx, id: ObjectId) {
         return;
     }
     let obj = cx.s().obj(id);
-    let card = cx.cards().current(&obj);
-    if cx.cards().statics[card.0 as usize] || obj.counters(CounterKind::Hone) > 0 {
+    if cx.cards().texts(cx.s(), obj).any(|c| cx.cards().statics[c.0 as usize]) || obj.counters(CounterKind::Hone) > 0 {
         cx.st().see_statics();
     }
 }
@@ -4165,7 +4248,7 @@ pub(crate) fn control_may_change(cx: &Cx) -> bool {
     s.effects.iter().any(|e| matches!(e.kind, EffectKind::Control(_)))
         || s.battlefield().iter().any(|&id| {
             let o = s.obj(id);
-            o.marks.control_base.is_some() || (s.statics_seen && cards.control_statics[cards.current(o).0 as usize])
+            o.marks.control_base.is_some() || (s.statics_seen && cards.texts(s, o).any(|c| cards.control_statics[c.0 as usize]))
         })
 }
 
