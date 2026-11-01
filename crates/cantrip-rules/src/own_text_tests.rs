@@ -173,7 +173,7 @@ fn what_triggers_is_asked_of_the_text_now() {
     let (mut g, id, frame) = resolving();
     let mut cx = own(&mut g, frame);
     reads_its_own_text(&cx, id);
-    cx.emit(Event::SpellCast { spell: id, player: YOU, nth: 1 });
+    cx.emit(Event::SpellCast { spell: id, player: YOU, nth: 1, options: 0 });
     assert_eq!(seen("trigger"), Some(Subtype::Elf));
     reads_its_own_text(&cx, id);
 }
@@ -184,7 +184,7 @@ fn what_triggers_is_asked_of_the_text_now() {
 fn the_objects_a_trigger_is_about_are_found_by_the_text_now() {
     let (mut g, id, frame) = resolving();
     let mut cx = own(&mut g, frame);
-    cx.emit(Event::SpellCast { spell: id, player: YOU, nth: 1 });
+    cx.emit(Event::SpellCast { spell: id, player: YOU, nth: 1, options: 0 });
     assert_eq!(seen("members"), Some(Subtype::Elf));
     reads_its_own_text(&cx, id);
 }
@@ -267,7 +267,7 @@ fn a_delayed_ability_keeps_the_text_that_created_it() {
     cantrip_api::Game::delayed_trigger(&mut cx, DelayedWhen::ThisTurn, id, YOU, AbilityRef::delayed(card, 0), Target::None);
     cx.g.own_text.set(false);
     assert_eq!(Query::words(&cx, id).subtype(Subtype::Goblin), Subtype::Elf, "the source says Elf to anything else");
-    cx.emit(Event::SpellCast { spell: id, player: YOU, nth: 1 });
+    cx.emit(Event::SpellCast { spell: id, player: YOU, nth: 1, options: 0 });
     assert_eq!(seen("delayed"), Some(Subtype::Goblin), "asked whether it triggers by the text that created it");
     let pending = cx.s().triggers.iter().find(|t| t.ability == AbilityRef::delayed(card, 0)).expect("it triggered");
     assert_eq!(pending.words.map(|w| w.subtype(Subtype::Goblin)), Some(Subtype::Goblin), "and put on the stack with it");
