@@ -4359,11 +4359,11 @@ impl CardTable {
             return &ENCHANT_ABILITY;
         }
         let card = self.get(ability.card);
-        if ability.is_delayed() {
-            &card.delayed[(ability.index - AbilityRef::DELAYED) as usize]
-        } else {
-            &card.abilities[ability.index as usize]
-        }
+        let (list, at) = if ability.is_delayed() { (card.delayed, (ability.index - AbilityRef::DELAYED) as usize) } else { (card.abilities, ability.index as usize) };
+        // An ability its card doesn't list is a card's mistake (`tests/delayed_abilities_are_listed.rs` in cantrip-cards
+        // finds one); in play it is an ability that never triggers and does nothing, never a crash.
+        debug_assert!(at < list.len(), "{}: no ability {} (delayed: {})", card.name, at, ability.is_delayed());
+        list.get(at).unwrap_or(&NO_ABILITY)
     }
 
     /// The modes of the modal spell or ability a mode label names (`Label::Mode`): `u8::MAX` for the card's spell, or one of
@@ -4398,6 +4398,9 @@ impl CardTable {
 /// what the Aura can enchant - its card's `CardDef::enchant` (`AbilityRef::enchant`) or, given, `becomes_aura_enchant`
 /// (`AbilityRef::enchant_given`) - read where a legal host is judged, and that generates no continuous effect
 /// (it applies in no layer). Lost as every ability is (CR 613.1f).
+/// What `CardTable::ability` answers for an ability its card doesn't list: one that never triggers and does nothing.
+static NO_ABILITY: AbilityDef = AbilityDef::Triggered(TriggeredDef::BLANK);
+
 pub static ENCHANT_ABILITY: AbilityDef = AbilityDef::Static(StaticDef { text: "Enchant", layer: Layer::End, own: true, ..StaticDef::BLANK });
 
 /// Madness's linked triggered ability (CR 702.35a), the core's own: "when this card is exiled this way, its owner may
