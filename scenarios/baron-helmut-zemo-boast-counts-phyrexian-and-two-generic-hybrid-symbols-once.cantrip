@@ -1,0 +1,64 @@
+# Baron Helmut Zemo: "fifteen or more black mana symbols among their mana costs" counts each Phyrexian {B/P} and each {2/B} hybrid
+# symbol as one black mana symbol (CR 107.4e, 107.4f, 202.1): Dismember ({1}{B/P}{B/P}, mana value 3) has two, Kin-Tree Severance
+# ({2/W}{2/B}{2/G}, mana value 6, white, black and green) one. Two Entombs put Doomsday Excruciator (6) and Pox Plague (5) into
+# Bot1's graveyard; on turn 5 Zemo's connive discards Dismember and the third Entomb takes Kin-Tree Severance. The Excruciator, Pox
+# Plague, Dismember and Kin-Tree Severance have fourteen symbols between them (though mana value 20), one short, and are refused;
+# with an Entomb ({B}) they have exactly fifteen and are exiled. Bot1 casts none of the copies.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Baron Helmut Zemo
+Entomb
+Entomb
+Entomb
+Dismember
+Doomsday Excruciator
+Pox Plague
+Swamp
+Swamp
+Swamp
+Kin-Tree Severance
+Swamp x7
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Doomsday Excruciator)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Pox Plague)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baron Helmut Zemo.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot1.Choose(Dismember)
+Bot1.Search(Kin-Tree Severance)
+Bot1.Pass
+Bot1.Attack(Baron Helmut Zemo > Bot2)
+Bot1.Battlefield.Baron Helmut Zemo.Activate
+! Bot1.Choose(Doomsday Excruciator; Pox Plague; Dismember; Kin-Tree Severance)
+Bot1.Choose(Doomsday Excruciator; Pox Plague; Dismember; Kin-Tree Severance; Entomb)
+Bot1.Choose()
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Baron Helmut Zemo; Mox Jet; Swamp; Swamp; Swamp
+Bot1.Graveyard = Entomb; Entomb
+Exile = Dismember; Doomsday Excruciator; Entomb; Kin-Tree Severance; Pox Plague
+Stack.Count = 0
