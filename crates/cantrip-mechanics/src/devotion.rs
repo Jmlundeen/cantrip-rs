@@ -5,14 +5,7 @@ use cantrip_api::*;
 /// color each count once, numeric and other colors' symbols not. A copy counts the cost it copies (CR 707.2, 700.5a),
 /// none if it has none (CR 707.9b); a Room permanent counts its unlocked doors alone (CR 709.5).
 pub fn symbols_of(q: &dyn Query, id: ObjectId, color: Color) -> u32 {
-    let mana = color.mana();
-    // The mana cost the object has now: a copy's is the one it copies, none if it has none (CR 707.9b), and a Room
-    // permanent's is its unlocked doors' alone (CR 709.5).
-    let cost = q.mana_cost(id);
-    cost.symbols[mana as usize]
-        + cost.hybrid.iter().flatten().filter(|(a, b)| *a == mana || *b == mana).count() as u32
-        + cost.phyrexian[mana as usize]
-        + cost.twobrid[mana as usize]
+    q.mana_symbols(id, color)
 }
 
 /// "Your devotion to [color]" (CR 700.5): the mana symbols of `color` among the mana costs of permanents `player`
