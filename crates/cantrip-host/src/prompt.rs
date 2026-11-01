@@ -956,7 +956,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     _ => 0,
                 },
                 prevent_left: match purpose {
-                    Purpose::PreventDamageFrom(n) => i32::from(*n),
+                    Purpose::PreventDamageFrom(n) => wire(*n),
                     _ => 0,
                 },
                 // A band may have at most one creature without banding (CR 702.22c): which of the ones offered those are.

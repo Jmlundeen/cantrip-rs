@@ -1238,15 +1238,16 @@ pub(crate) fn damage_may_change(cx: &Cx) -> bool {
 }
 
 /// The prevention shields that would apply to this damage (CR 615.7), taken together: the source of the first, and how much
-/// they have left to prevent between them. None where no shield applies, or the damage can't be prevented (CR 615.12).
-pub(crate) fn shields(cx: &Cx, d: &DamageEvent) -> Option<(ObjectId, u16)> {
+/// they have left to prevent between them, in 32 bits (each shield is a `u16`, and there may be many). None where no
+/// shield applies, or the damage can't be prevented (CR 615.12).
+pub(crate) fn shields(cx: &Cx, d: &DamageEvent) -> Option<(ObjectId, u32)> {
     if !cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Prevention { shield: Shield::Next(_), .. })) {
         return None;
     }
     if !crate::ops::damage_can_be_prevented(cx, d.source, d.combat) {
         return None;
     }
-    let mut found: Option<(ObjectId, u16)> = None;
+    let mut found: Option<(ObjectId, u32)> = None;
     let _others = cx.others_text();
     for e in &cx.s().effects {
         let EffectKind::Prevention { card, index, to, shield: Shield::Next(left) } = e.kind else { continue };
@@ -1255,7 +1256,7 @@ pub(crate) fn shields(cx: &Cx, d: &DamageEvent) -> Option<(ObjectId, u16)> {
         }
         let def = &cx.cards().get(card).granted_preventions[index as usize];
         if (def.applies)(cx, &Asker { source: e.source, controller: e.controller, by: None, spell: false }, e.affected, d) {
-            found = Some(found.map_or((e.source, left), |(s, n)| (s, n.saturating_add(left))));
+            found = Some(found.map_or((e.source, u32::from(left)), |(s, n)| (s, n + u32::from(left))));
         }
     }
     found

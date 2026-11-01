@@ -3256,7 +3256,7 @@ pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: 
     for (chooser, to) in recipients {
         // The assignments to it that a shield applies to, and what the shields have left between them.
         let mut shielded: Vec<usize> = Vec::new();
-        let (mut by, mut left) = (ObjectId(0), 0u16);
+        let (mut by, mut left) = (ObjectId(0), 0u32);
         for (i, &(source, target, amount)) in hits.iter().enumerate() {
             if target != to || amount == 0 {
                 continue;
@@ -3276,7 +3276,7 @@ pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: 
         let total = |rest: &[usize]| rest.iter().map(|&i| hits[i].2 as u32).sum::<u32>();
         let mut rest = shielded.clone();
         let mut chosen = Vec::new();
-        while may_change || (left > 0 && total(&rest) > left as u32) {
+        while may_change || (left > 0 && total(&rest) > left) {
 
             let mut sources: Vec<ObjectId> = Vec::new();
             for &i in &rest {
@@ -3294,7 +3294,7 @@ pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: 
                 _ => 0,
             };
             let i = rest.remove(pick);
-            left = left.saturating_sub(hits[i].2);
+            left = left.saturating_sub(u32::from(hits[i].2));
             chosen.push(i);
         }
         if chosen.is_empty() {
@@ -4857,6 +4857,10 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
 #[cfg(test)]
 #[path = "departed_damage_tests.rs"]
 mod departed_damage_tests;
+
+#[cfg(test)]
+#[path = "shield_total_tests.rs"]
+mod shield_total_tests;
 
 #[cfg(test)]
 mod tests {

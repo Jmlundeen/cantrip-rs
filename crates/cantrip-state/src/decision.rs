@@ -1451,7 +1451,7 @@ pub enum Purpose {
     /// Whose damage a prevention shield prevents first, where two or more sources would deal damage to the shielded
     /// permanent or player at the same time (CR 615.7): a source chosen from among them, by the player or the controller
     /// of the permanent, with this much left on the shield to prevent. The rest of the shield goes to the others.
-    PreventDamageFrom(u16),
+    PreventDamageFrom(u32),
     /// Cards in the chooser's hand drawn this turn, for each of which they will pay this much life or put it on top of their
     /// library (Sylvan Library): which of them the choice is about, not which go back.
     PayLifeOrPutOnTop(u8),
