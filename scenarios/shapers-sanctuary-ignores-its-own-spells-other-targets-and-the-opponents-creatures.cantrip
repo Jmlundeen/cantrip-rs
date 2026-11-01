@@ -1,0 +1,51 @@
+# Shapers' Sanctuary: only "a creature you control" targeted by "an opponent": Bot1's own Bolt on its own Ornithopter
+# (turn 3), Bot2's Bolt on Bot1 itself, and Bot2's Bolt on Bot2's own Ornithopter (turn 2) draw nothing and ask nothing
+# (CR 603.2, 115.1): no trigger joins the Bolt on the stack. Bot1's hand stays at the Bolt and three Forests after its casts, plus the card its turn-3 draw step gives.
+
+[Bot1 Deck]
+Shapers' Sanctuary
+Mox Emerald
+Ornithopter
+Lightning Bolt
+Forest x3
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Shapers' Sanctuary.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+? Stack.Count = 1
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 2
+! Bot1.Accept
+Bot2.Pass
+? Bot1.Hand.Count = 4
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 5
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+? Stack.Count = 1
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 2

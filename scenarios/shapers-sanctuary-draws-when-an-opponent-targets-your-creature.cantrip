@@ -1,0 +1,43 @@
+# Shapers' Sanctuary: Bot2's Lightning Bolts on Bot1's two Ornithopters each trigger it (CR 115.1, 603.2c); the first
+# is accepted (a card is drawn, before the Bolt resolves, so the Ornithopter then dies), the second declined (nothing
+# drawn): "you may". The draw is before the bolt resolves (the 2017 ruling), shown by the Stack still holding the Bolt.
+# Bot1's hand is three Forests once its spells are cast, so the hand count is the draws.
+
+[Bot1 Deck]
+Shapers' Sanctuary
+Mox Emerald
+Ornithopter
+Ornithopter
+Forest x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Shapers' Sanctuary.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter#1)
+Bot1.Accept
+? Bot1.Hand.Count = 4
+? Stack.Count = 1
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter#2)
+Bot1.Decline
+[Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 2

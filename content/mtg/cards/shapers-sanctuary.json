@@ -1,0 +1,6 @@
+{
+  "name": "Shapers' Sanctuary",
+  "manaCost": "{G}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a creature you control becomes the target of a spell or ability an opponent controls, you may draw a card."
+}
