@@ -745,6 +745,17 @@ pub fn surveil(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspe
     crate::surveil(g, item.controller, item.object, n)
 }
 
+/// "Return target <permanent> to its owner's hand. Surveil N." as one spell's whole effect, for its first target.
+/// Banishing Betrayal (nonland permanent, surveil 1) and Ephara's Dispersal (creature, surveil 2) print it. A spell whose
+/// only target has become illegal does nothing at all (CR 608.2b), so there is no surveil then; otherwise the surveil
+/// follows whether or not the permanent actually moved.
+pub fn return_first_target_to_hand_then_surveil<const N: usize>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(permanent) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    g.return_to_hand(&[permanent]);
+    g.end_sentence();
+    surveil(g, item, N)
+}
+
 /// "Scry N" (CR 701.22) for the ability's controller. The scry lands (Crystal Grotto, Temple of Deceit) print it.
 pub fn scry(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspend> {
     crate::scry(g, item.controller, item.object, n)
