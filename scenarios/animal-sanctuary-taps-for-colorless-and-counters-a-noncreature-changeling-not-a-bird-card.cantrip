@@ -1,0 +1,54 @@
+# Animal Sanctuary: "{T}: Add {C}." pays for Firdoch Core with two Moxen, and Thought Scour mills Aven Envoy, a Bird card.
+# Next turn "{2}, {T}: Put a +1/+1 counter on target Bird, Cat, Dog, Goat, Ox, or Snake" takes the Core - a Kindred artifact
+# with changeling, every creature type but no creature - since "target Bird" means a permanent with that subtype, creature or
+# not (CR 109.2, 205.3m), and the counter is put on it (CR 122.1). The Envoy in the graveyard is refused: with no zone named,
+# the target is a permanent on the battlefield (CR 109.2, 115.1).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Animal Sanctuary
+Firdoch Core
+Mox Sapphire
+Thought Scour
+Plains
+Aven Envoy
+Plains x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Animal Sanctuary.Play
+Bot1.Battlefield.Animal Sanctuary.Activate(Ability: {C})
+? Bot1.Mana = {C}
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Thought Scour; Plains; Aven Envoy
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot1.Graveyard.Aven Envoy)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot1.Battlefield.Firdoch Core)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Firdoch Core.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact
+Bot1.Battlefield.Animal Sanctuary.Tapped = true
+Bot1.Graveyard.Aven Envoy.Counters.PlusOnePlusOne = (absent)

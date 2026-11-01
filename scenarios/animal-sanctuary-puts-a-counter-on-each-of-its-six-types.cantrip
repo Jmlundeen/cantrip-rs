@@ -1,0 +1,125 @@
+# Animal Sanctuary: "{2}, {T}: Put a +1/+1 counter on target Bird, Cat, Dog, Goat, Ox, or Snake." Bot1 activates it once a turn on a
+# different one of the six types - Aven Envoy (Bird), Mountain Goat (Goat), Cauldron Familiar (Cat), Isamaru (Dog), Yoked
+# Ox (Ox) and Bot2's Hexdrinker (Snake, so an opponent's permanent is a legal target) - each time paying exactly {2} (the pool
+# is empty right after). On turn 1 the Ornithopters of both players, which have none of the six types, are refused, with the Envoy
+# as the positive control (CR 115.1, 205.3m). The counters are checked after each ability has resolved.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Animal Sanctuary
+Aven Envoy
+Mountain Goat
+Cauldron Familiar
+Isamaru, Hound of Konda
+Yoked Ox
+Plains x20
+
+[Bot2 Deck]
+Mox Emerald
+Hexdrinker
+Ornithopter
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Animal Sanctuary.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aven Envoy.Cast
+Bot1.Pass
+! Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot1.Battlefield.Aven Envoy)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Aven Envoy.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Animal Sanctuary.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Hexdrinker.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mountain Goat.Cast
+Bot1.Pass
+! Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot1.Battlefield.Mountain Goat)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mountain Goat.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Animal Sanctuary.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cauldron Familiar.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot1.Battlefield.Cauldron Familiar)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cauldron Familiar.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Animal Sanctuary.Tapped = true
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot1.Battlefield.Isamaru, Hound of Konda)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Isamaru, Hound of Konda.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Animal Sanctuary.Tapped = true
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Yoked Ox.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot1.Battlefield.Yoked Ox)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Yoked Ox.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Animal Sanctuary.Tapped = true
+[T11 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Animal Sanctuary.Activate(Ability: Put a +1/+1; Bot2.Battlefield.Hexdrinker)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T11 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Aven Envoy.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mountain Goat.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Cauldron Familiar.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Isamaru, Hound of Konda.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Yoked Ox.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Hexdrinker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
