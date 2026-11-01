@@ -81,8 +81,30 @@ pub fn this_attacks_for_the_first_time_each_turn(q: &dyn Query, me: &Asker, even
 /// `this_attacks_for_the_first_time_each_turn` as a trigger condition.
 pub const THIS_ATTACKS_FOR_THE_FIRST_TIME_EACH_TURN: Trigger = when_asked(EventMask::ATTACKS, this_attacks_for_the_first_time_each_turn);
 
+/// "Whenever a creature you control becomes the target of a spell or ability an opponent controls" (CR 115.1, 603.2c): each
+/// creature you control that becomes a target is its own event, so a spell naming two of them triggers it twice; the
+/// creature is the event's subject. Only a creature on the battlefield is "a creature you control" (a creature spell is
+/// not), and only a spell or ability one of this permanent's controller's opponents controls counts. MACO Strike Team,
+/// Pawpatch Recruit and Shapers' Sanctuary print it.
+pub fn your_creature_targeted_by_an_opponent(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::BecameTarget { target: Target::Object(t), controller, .. }
+            if q.state().opponents(me.controller).any(|p| p == *controller)
+                && q.is_on_battlefield(*t)
+                && q.controller(*t) == me.controller
+                && q.chars(*t).is(CardType::Creature) =>
+        {
+            Fired::about(Target::Object(*t))
+        }
+        _ => None,
+    }
+}
+
+/// `your_creature_targeted_by_an_opponent` as a trigger condition.
+pub const YOUR_CREATURE_TARGETED_BY_AN_OPPONENT: Trigger = when_asked(EventMask::BECAME_TARGET, your_creature_targeted_by_an_opponent);
+
 /// Valiant: "Whenever this creature becomes the target of a spell or ability you control for the first time each turn"
-/// (CR 115.10, 603.2): the creature became the target of something its controller controls, and no earlier event this turn
+/// (CR 115.1, 603.2): the creature became the target of something its controller controls, and no earlier event this turn
 /// made it the target of something they control - the history is as it was just before this event, so it holds the earlier
 /// ones only. A copy of a spell, and a spell or ability whose target was changed to it, make it a target too. Emberheart
 /// Challenger and Heartfire Hero print it.
