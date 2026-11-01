@@ -54,6 +54,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-114](#ki-114-the-web-client-cannot-name-colorless-mana-for-a-sacrificed-land-that-could-also-produce-a-color) | The web client cannot name colorless mana for a sacrificed land that could also produce a color | Pri-2 | Open |
 | [KI-116](#ki-116-a-resolutions-unless-pays-question-shows-only-the-mana-and-life-parts-of-its-cost) | A resolution's "unless pays" question shows only the mana and life parts of its cost | Pri-2 | Open |
 | [KI-148](#ki-148-a-waiting-when-event-delayed-trigger-is-shown-beside-its-controllers-life-not-on-the-object-it-watches) | A waiting "when [event]" delayed trigger is shown beside its controller's life, not on the object it watches | Pri-2 | Open |
+| [KI-149](#ki-149-no-test-reads-a-noncreature-permanents-printed-power-and-toughness-off-the-wire) | No test reads a noncreature permanent's printed power and toughness off the wire | Pri-2 | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Pri-3 | Fix queued |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Pri-3 | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Pri-3 | Open |
@@ -86,6 +87,20 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-147](#ki-147-two-tablet-browser-tests-wait-forever-for-unos-splash-to-go) | Two tablet browser tests wait forever for Uno's splash to go | Pri-3 | Open |
 
 ## Issues
+
+### KI-149: No test reads a noncreature permanent's printed power and toughness off the wire
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host (`crates/cantrip-host/src/view.rs`, `printed_box`) | 2026-11-01, review of the CR 208.3 change |
+
+**Notes.** A noncreature permanent has no power or toughness (CR 208.3), so the host sends `Power`/`Toughness` null for
+it and the card's printed box as `PrintedPower`/`PrintedToughness`, which the face draws (an uncrewed Vehicle's box).
+Nothing checks that the host fills them: `printed_box` returning `None` always passes the whole suite (the tactical
+tests set `PrintedPower` by hand). Rules are unaffected; a fix is a host or projection test of an uncrewed Vehicle's view.
+
+**Scenarios.**
+- none (a host view test, not a scenario).
 
 ### KI-148: A waiting "when [event]" delayed trigger is shown beside its controller's life, not on the object it watches
 
