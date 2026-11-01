@@ -540,6 +540,16 @@ pub fn create_emblem_choosing_subtype(g: &mut dyn Game, player: PlayerId, def: &
     g.create_emblem_choosing_subtype(def, player, subtype)
 }
 
+/// The 4/4 green Rhino Warrior creature token. Titan of Industry, Vivien on the Hunt, Workshop Warchief, Crash the Party and
+/// Killer Service make it.
+pub static RHINO_WARRIOR: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Green)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(4),
+    toughness: Some(4),
+    ..token!(Rhino Warrior)
+};
+
 /// The 1/1 white Ally creature token. Appa, Steadfast Guardian and Iroh, Tea Master make it.
 pub static ALLY: CardDef = CardDef {
     colors: Some(ColorSet::of(Color::White)),
