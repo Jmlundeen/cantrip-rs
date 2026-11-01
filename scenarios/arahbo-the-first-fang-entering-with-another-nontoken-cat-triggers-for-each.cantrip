@@ -1,0 +1,48 @@
+# Arahbo, the First Fang entering at the same time as a nontoken Cat (ruling 2024-11-08; CR 603.6a, 603.2): Collected
+# Company puts Arahbo and Sacred Cat onto the battlefield at once, and "Whenever Arahbo or another nontoken Cat you control
+# enters" triggers once for each - two white Cat tokens. Sacred Cat and both tokens get "Other Cats you control get +1/+1"
+# and are 2/2; Arahbo is not "other" and stays 2/2.
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Mox Ruby
+Collected Company
+Island
+Island
+Arahbo, the First Fang
+Sacred Cat
+Island
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Collected Company.Cast
+Bot1.Pass
+Bot1.Choose(Arahbo, the First Fang; Sacred Cat)
+Bot1.Arrange(Island; Island; Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Pearl; Mox Jet; Mox Ruby; Arahbo, the First Fang; Sacred Cat; Cat Token; Cat Token
+Bot1.Battlefield.Cat Token#1.Colors = White
+Bot1.Battlefield.Cat Token#2.Colors = White
+Bot1.Battlefield.Cat Token#2.Power = 2
+Bot1.Battlefield.Sacred Cat.Power = 2
+Bot1.Battlefield.Arahbo, the First Fang.Power = 2

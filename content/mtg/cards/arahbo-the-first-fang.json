@@ -1,0 +1,8 @@
+{
+  "name": "Arahbo, the First Fang",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Cat Avatar",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Other Cats you control get +1/+1.\nWhenever Arahbo or another nontoken Cat you control enters, create a 1/1 white Cat creature token."
+}

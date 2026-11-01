@@ -1,0 +1,36 @@
+# A token copy of Arahbo, the First Fang triggers its own "Whenever Arahbo or another nontoken Cat you control enters"
+# through "Arahbo" (CR 201.5, 603.6a, 707.2): the token is no nontoken Cat, so only the clause naming itself fires it, and the
+# original Arahbo, seeing a token Cat enter, does not trigger. Bot1 casts Arahbo (one Cat token), then Kindle the Inner Flame
+# copying her: one more Cat token, not two. The legend rule then keeps one Arahbo (CR 704.5j).
+[Bot1 Deck]
+Black Lotus x3
+Arahbo, the First Fang
+Kindle the Inner Flame
+Mountain x2
+Mountain x10
+[Bot2 Deck]
+Plains x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Arahbo, the First Fang.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Black Lotus; Black Lotus; Arahbo, the First Fang; Cat Token
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Kindle the Inner Flame.Cast(Bot1.Battlefield.Arahbo, the First Fang)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield = Arahbo, the First Fang; Cat Token; Cat Token
+
+[Expect]
+Bot1.Battlefield = Arahbo, the First Fang; Cat Token; Cat Token

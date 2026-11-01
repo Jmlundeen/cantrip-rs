@@ -1,0 +1,58 @@
+# "Other Cats you control get +1/+1" and "Whenever Arahbo or another nontoken Cat you control enters, create a 1/1 white Cat
+# creature token" (CR 603.6a, 613.4c). Arahbo entering makes one Cat token (2/2 with the bonus; Arahbo herself stays 2/2: "other");
+# the token's own entering does not trigger it (token). Bot1's Sacred Cat, a nontoken Cat, makes a second token and is 2/2; the Cat
+# tokens do not make more. Elvish Mystic is no Cat: no token, no bonus. Bot2's Sacred Cat is a Cat Bot1 does not control: no token
+# for Bot1, and it stays 1/1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Arahbo, the First Fang
+Sacred Cat
+Elvish Mystic
+Island x10
+
+[Bot2 Deck]
+Plains
+Sacred Cat
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Arahbo, the First Fang.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T1 Bot1.Main2]
+? Bot1.Battlefield = Plains; Mox Pearl; Mox Ruby; Mox Emerald; Arahbo, the First Fang; Cat Token
+? Bot1.Battlefield.Cat Token.Power = 2
+? Bot1.Battlefield.Arahbo, the First Fang.Power = 2
+Bot2.Hand.Plains.Play
+Bot2.Hand.Sacred Cat.Cast
+Bot2.Battlefield.Plains.Activate
+[T2 Bot2.Main2]
+? Bot2.Battlefield = Plains; Sacred Cat
+? Bot2.Battlefield.Sacred Cat.Power = 1
+? Bot1.Battlefield = Plains; Mox Pearl; Mox Ruby; Mox Emerald; Arahbo, the First Fang; Cat Token
+[T3 Bot1.Main1]
+Bot1.Hand.Sacred Cat.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Ruby; Mox Emerald; Arahbo, the First Fang; Sacred Cat; Elvish Mystic; Cat Token; Cat Token
+Bot1.Battlefield.Sacred Cat.Power = 2
+Bot1.Battlefield.Sacred Cat.Toughness = 2
+Bot1.Battlefield.Cat Token#1.Power = 2
+Bot1.Battlefield.Cat Token#2.Toughness = 2
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Battlefield.Arahbo, the First Fang.Power = 2
+Bot2.Battlefield = Plains; Sacred Cat
+Bot2.Battlefield.Sacred Cat.Power = 1
