@@ -161,6 +161,19 @@ pub fn may_cast_a_copy_without_paying(g: &mut dyn Game, player: PlayerId, of: Ob
     Ok(())
 }
 
+/// "Copy it. You may cast the copy" (CR 707.12, 608.2g): `may_cast_a_copy_without_paying` with every cost paid (CR 601.2f-h), its mana
+/// cost or an alternative cost it has, and an {X} chosen as it is cast. It is cast as the effect resolves or not at all; a copy not
+/// cast ceases to exist in exile (CR 707.10a, 704.5e). Founding the Third Path's chapter III and Demilich print it.
+pub fn may_cast_a_copy_paying_costs(g: &mut dyn Game, player: PlayerId, of: ObjectId) -> Result<(), Suspend> {
+    let copy = g.create_copy_in_exile(of, player);
+    if g.could_cast_during_resolution_by(copy, player) && g.ask(player, RequestKind::May { source: copy, purpose: Purpose::Cast })? == Answer::Yes {
+        let ways = g.cast_ways_during_resolution_by(copy, player);
+        let way = crate::choose::cast_way(g, player, copy, ways)?.map(|w| w.way);
+        g.cast_during_resolution_as(copy, CastTerms { instead: None, way, caster: Some(player), ..CastTerms::default() })?;
+    }
+    Ok(())
+}
+
 /// "Create a token that's a copy of target [permanent]" (CR 707.2, 111.1): the copiable values of the first target, for
 /// the ability's or spell's controller. Nothing happens if that target is no longer legal (CR 608.2b). Esika's Chariot,
 /// Octomancer, Three Steps Ahead and Caretaker's Talent print it.
