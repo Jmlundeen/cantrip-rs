@@ -1,0 +1,47 @@
+# Avengers Assemble!: "a Hero entered the battlefield under your control" asks the permanent as it entered (CR 603.6a,
+# 614.12). Bot1's Devoted Hero, an Elf Soldier, enters on turn 3 and Arcane Adaptation (choosing Hero) then makes it a Hero
+# too: a 3/4 under the Avengers (+2/+2 for the Heroes), yet no Hero entered, so the end step draws nothing and Bot1 holds
+# none of its cards.
+
+[Bot1 Deck]
+Devoted Hero
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Black Lotus
+Avengers Assemble!
+Arcane Adaptation
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Avengers Assemble!.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Devoted Hero.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+Bot1.Modes(Hero)
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Devoted Hero.Subtypes = Elf; Hero; Soldier
+Bot1.Battlefield.Devoted Hero.Power = 3
+Bot1.Battlefield.Devoted Hero.Toughness = 4

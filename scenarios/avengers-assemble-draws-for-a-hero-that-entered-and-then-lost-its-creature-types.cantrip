@@ -1,0 +1,59 @@
+# Avengers Assemble!: "a Hero entered the battlefield under your control this turn" asks the permanent as it entered (CR
+# 603.6a, 614.12), not as it is now. On turn 7 Bot1 casts Pet Avengers (a 4/4 Hero, 6/6 under the Avengers) and then Nameless
+# Inversion on it: it loses all creature types, so it is no Hero any more and loses the +2/+2 as well, a 7/1 (4/4 and +3/-3).
+# The Avengers' ability still finds that it entered as a Hero: Bot1, with an empty hand after the turn, draws 1 card at
+# that end step, and turn 8's end step (the entry was the turn before) draws nothing more.
+
+[Bot1 Deck]
+Avengers Assemble!
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Jet
+Pet Avengers
+Nameless Inversion
+Plains
+Forest
+Swamp
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Avengers Assemble!.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Pet Avengers.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Pet Avengers.Power = 6
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Nameless Inversion.Cast(Bot1.Battlefield.Pet Avengers)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Pet Avengers.Subtypes = (absent)
+? Bot1.Battlefield.Pet Avengers.Power = 7
+? Bot1.Battlefield.Pet Avengers.Toughness = 1
+[T9 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Pet Avengers.Subtypes = Bird; Cat; Dog; Dragon; Frog; Hero

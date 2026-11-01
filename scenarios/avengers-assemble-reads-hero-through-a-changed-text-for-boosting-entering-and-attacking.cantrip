@@ -1,0 +1,51 @@
+# Avengers Assemble!: its "Hero" is a word of its text (CR 612.1), which Artificial Evolution changes to Elf: the Avengers
+# then boosts Elves you control, and draws for an Elf that entered or attacked, not for a Hero. Bot1's Llanowar Elves enters
+# on turn 3 as a 3/3: Bot1 draws at that end step; on turn 5 it attacks (Bot2 goes to 17) and Bot1 draws at that end step.
+# Bot1 holds 1 card after turn 1 (the Elves), plays the Forest drawn on turn 3 and casts the Elves, and so ends with the
+# card of each of the two end steps and turn 5's draw: 3.
+
+[Bot1 Deck]
+Avengers Assemble!
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Artificial Evolution
+Llanowar Elves
+Forest
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Avengers Assemble!.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Avengers Assemble!)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Hero)
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2)
+[T7 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot2.Life = 17

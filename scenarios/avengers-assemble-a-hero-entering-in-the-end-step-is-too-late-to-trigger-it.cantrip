@@ -1,0 +1,40 @@
+# Avengers Assemble!: the "if" is an intervening if (CR 603.4): it is checked as the end step begins, and no Hero has
+# entered or attacked by then, so the ability does not trigger. Bot1's Night Nurse, flashed in during Bot2's end step on
+# turn 2, makes the condition true only afterwards: nothing is drawn (Bot1 has no card in hand), though the Nurse is a
+# Hero that entered this turn and is a 4/3 for the Avengers.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Avengers Assemble!
+Night Nurse, Healer of Heroes
+Island x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Avengers Assemble!.Cast
+Bot1.Pass
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Night Nurse, Healer of Heroes.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Night Nurse, Healer of Heroes.Power = 4
+Bot1.Battlefield.Night Nurse, Healer of Heroes.Toughness = 3

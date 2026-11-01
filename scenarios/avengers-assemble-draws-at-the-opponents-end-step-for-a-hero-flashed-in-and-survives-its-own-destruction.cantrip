@@ -1,0 +1,56 @@
+# Avengers Assemble!: "At the beginning of each end step, if you attacked with a Hero this turn or a Hero entered the
+# battlefield under your control this turn, draw a card." It triggers at the opponent's end step too (CR 513.1, "each end
+# step"). Bot1 casts it on turn 1 and on turn 2 flashes in Night Nurse (a Hero) in Bot2's second main phase. In Bot2's end
+# step the trigger goes on the stack and Bot2 Disenchants the Avengers in response: the ability exists apart from its
+# source (CR 113.7a) and its condition, checked again as it resolves (CR 603.4), is still true, so Bot1 draws its first
+# card of the game. The Nurse is a plain 2/1 again with the Avengers gone.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Avengers Assemble!
+Night Nurse, Healer of Heroes
+Island x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Avengers Assemble!.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Night Nurse, Healer of Heroes.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 0
+[T2 Bot2.End]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Avengers Assemble!)
+Bot2.Pass
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Graveyard = Avengers Assemble!; Black Lotus
+Bot1.Battlefield.Night Nurse, Healer of Heroes.Power = 2
+Bot1.Battlefield.Night Nurse, Healer of Heroes.Toughness = 1

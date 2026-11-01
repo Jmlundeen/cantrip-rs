@@ -1,0 +1,43 @@
+# Avengers Assemble!: "Heroes you control get +2/+2" and "you attacked with a Hero ... a Hero entered the battlefield
+# under your control" are about Bot1's Heroes. Bot1 casts it on turn 1; Bot2 casts Agent of Atlas (a Hero) on turn 2 and
+# attacks with it on turn 4. It stays a 2/2 (Bot1 takes 2), and Bot1 draws nothing at either of the end steps those
+# happened in: after turn 1's play (7 cards less Lotus, 2 Moxen, Avengers) it holds 3 cards, and turn 3's draw makes
+# 4 at turn 5's upkeep.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Avengers Assemble!
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Agent of Atlas
+Plains x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Avengers Assemble!.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Agent of Atlas.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Agent of Atlas > Bot1)
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand.Count = 4
+Bot2.Battlefield.Agent of Atlas.Power = 2

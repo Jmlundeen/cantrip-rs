@@ -1,0 +1,46 @@
+# Avengers Assemble!: "if you attacked with a Hero this turn" asks the creature as it was declared (CR 508.1), whatever
+# became of it. Bot1's Masked Meower entered on turn 1 (before the Avengers: no draw then, nor at Bot2's end step on turn
+# 2). On turn 3 Bot1 flashes the Avengers in during its upkeep (CR 702.8a: not a time it could cast an enchantment
+# without flash), attacks with the Meower (a 3/3 Hero) and sacrifices it, discarding an Island and drawing a card, before
+# the end step: at that end step Bot1 draws for the Hero that attacked. Turn 4's end step, with
+# Hero turn-1 entry and turn-3 attack both behind it, draws nothing: Bot1 holds the 2 cards left after turn 1, the turn-3
+# draw and the end-step draw, 3 in all.
+
+[Bot1 Deck]
+Masked Meower
+Mox Ruby
+Avengers Assemble!
+Black Lotus
+Mox Pearl
+Mox Jet
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Avengers Assemble!.Cast
+Bot1.Pass
+Bot2.Pass
+? Step = Upkeep
+? Bot1.Battlefield.Avengers Assemble!.Types = Enchantment
+[T3 Bot1.Main1]
+Bot1.Attack(Masked Meower > Bot2)
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Island)
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot2.Life = 20

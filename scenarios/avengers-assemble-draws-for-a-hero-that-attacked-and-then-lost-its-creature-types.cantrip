@@ -1,0 +1,51 @@
+# Avengers Assemble!: "you attacked with a Hero this turn" asks the creature as it was declared (CR 508.1), not as it is now.
+# Bot1's Pet Avengers (entered on turn 3, so not this turn's entry) attacks on turn 5 as a 6/6 Hero under the Avengers; then
+# Nameless Inversion takes its creature types and the +2/+2 with them, a 7/1 that deals 7 (Bot2 goes to 13). At the end step
+# it still attacked as a Hero: Bot1, with an empty hand after turn 5's play, draws 1 card there.
+
+[Bot1 Deck]
+Avengers Assemble!
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Jet
+Pet Avengers
+Nameless Inversion
+Swamp
+Plains
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Pet Avengers.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Avengers Assemble!.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Pet Avengers > Bot2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Nameless Inversion.Cast(Bot1.Battlefield.Pet Avengers)
+Bot1.Pass
+[T7 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot2.Life = 13
