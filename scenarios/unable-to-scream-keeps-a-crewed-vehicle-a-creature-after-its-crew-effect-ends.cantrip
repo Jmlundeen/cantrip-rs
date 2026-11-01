@@ -1,0 +1,43 @@
+# "... is a Toy artifact creature ... in addition to its other types" (CR 205.1b, 613.1d) makes it a creature for as long as
+# the Aura is on it, not only while something else does: on turn 3 Bot1's Llanowar Elves crews Smuggler's Copter, an
+# artifact creature until end of turn, and Unable to Scream goes on it. On turn 5 the crew effect is long over, and the Copter
+# is still a 0/2 Toy artifact creature - so still a creature the Aura may enchant (CR 303.4d) - its crew ability gone.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Smuggler's Copter
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Unable to Scream
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Smuggler's Copter.Types = Artifact
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unable to Scream.Cast(Bot1.Battlefield.Smuggler's Copter)
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Unable to Scream.AttachedTo = Smuggler's Copter
+Bot1.Battlefield.Smuggler's Copter.Types = Artifact; Creature
+Bot1.Battlefield.Smuggler's Copter.Subtypes = Toy; Vehicle
+Bot1.Battlefield.Smuggler's Copter.Power = 0
+Bot1.Battlefield.Smuggler's Copter.Toughness = 2

@@ -1,0 +1,82 @@
+# CR 708.7, 701.40b: a manifested creature card may be turned face up for its mana cost, a special action that a creature
+# losing all abilities keeps. Unable to Scream on it is the one thing that stops it ("can't be turned face up"). Abhorrent
+# Oculus (the opening of the other manifest scenarios) manifests Snapcaster Mage on Bot2's upkeep. On turn 3 the Aura makes
+# the face-down 2/2 a 0/2 artifact creature, a Toy (a face-down permanent has no subtypes), and Bot1, with Island's and
+# Sol Ring's {C}{C}{U} in its pool for the {1}{U}, is offered no turn-up. Bot2's Wheel of Fortune hand is Disenchant and two Moxen: its
+# Disenchant destroys the Aura on turn 4; on turn 5 the same {1}{U} turns it up: Snapcaster Mage, a 2/1 with flash, no
+# longer a Toy. (A morph or disguise permanent under the Aura is not turned up for that cost by the Aura's "loses all
+# abilities" already: face up it would have no such cost, CR 702.37e, 702.168d.)
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Island x4
+Mox Sapphire
+Sol Ring
+Abhorrent Oculus
+Island x4
+Snapcaster Mage
+Lightning Bolt
+Unable to Scream
+Island x10
+
+[Bot2 Deck]
+Plains x7
+Mox Pearl
+Mox Jet
+Disenchant
+Plains x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Abhorrent Oculus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Island; Island; Island; Island; Black Lotus; Wheel of Fortune)
+[T2 Bot2.Upkeep]
+Bot1.Arrange(Snapcaster Mage | Lightning Bolt)
+[T3 Bot1.Main1]
+? Bot1.Battlefield..FaceDownName = Snapcaster Mage
+? Bot1.Battlefield..Power = 2
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unable to Scream.Cast(Bot1.Battlefield.#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield..FaceDown = true
+? Bot1.Battlefield..Types = Creature; Artifact
+? Bot1.Battlefield..Subtypes = Toy
+? Bot1.Battlefield..Power = 0
+? Bot1.Battlefield..Toughness = 2
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.#1.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Unable to Scream)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.#1.Activate
+? Bot1.Battlefield.Snapcaster Mage.FaceDown = (absent)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Snapcaster Mage.Power = 2
+Bot1.Battlefield.Snapcaster Mage.Toughness = 1
+Bot1.Battlefield.Snapcaster Mage.Types = Creature
+Bot1.Battlefield.Snapcaster Mage.Subtypes = Human; Wizard
+Bot1.Battlefield.Snapcaster Mage.Keywords = Flash
