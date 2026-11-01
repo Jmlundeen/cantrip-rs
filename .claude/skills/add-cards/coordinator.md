@@ -30,7 +30,9 @@ core-feature agents and review agents run on Opus. Agents read only what their w
      their say.
 
    The hooks deny an edit or shell command into a slot by anyone but its member, and the main thread while a member
-   is in it. Agents are started without the Agent tool's own worktree isolation. Every build stays in the slot's own
+   is in it; and they keep a member in its own tree: its edit outside the tree (the temp directory aside), or its
+   shell command run from or naming the main checkout, is denied. When an agent's work truly needs a place outside,
+   it says so and the lease holder grants that path: `worktree.cmd allow <lease> <path>`, good until the release. Agents are started without the Agent tool's own worktree isolation. Every build stays in the slot's own
    `target/`: never `CARGO_TARGET_DIR` or `--target-dir` pointed at another tree's, and never a copied `target/` -
    cargo's freshness records name absolute source paths, so a shared or copied `target/` compiles another tree's files
    into a test run that claims to test this one.

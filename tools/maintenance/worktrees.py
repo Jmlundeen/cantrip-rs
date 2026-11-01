@@ -9,6 +9,7 @@
     python tools/maintenance/worktrees.py evict <lease-id> --member <member-id> --reason "..."
     python tools/maintenance/worktrees.py release <lease-id> [--discard --reason "..."]
     python tools/maintenance/worktrees.py clean <slot> --reason "..." [--discard-commits]
+    python tools/maintenance/worktrees.py allow <lease-id> <path>
     python tools/maintenance/worktrees.py status [<lease-member-or-slot>]
     python tools/maintenance/worktrees.py reconcile [--fix]
     python tools/maintenance/worktrees.py hooks install|uninstall|check
@@ -31,7 +32,9 @@ this tool:
       refusing while it holds commits on no origin branch unless told `--discard-commits`.
 
 The hooks (`hook`) hold agents to it: a subagent learns its agent ID when it starts, an edit or shell command into a
-slot by anyone but its member is denied, and a subagent that stops leaves its slot. The main thread may work in a
+slot by anyone but its member is denied, a member's edit or shell command outside its own tree (the main checkout
+above all; the temp directory is free) is denied unless the lease holder `allow`s that path, and a subagent that stops
+leaves its slot. The main thread may work in a
 leased slot only while nobody is a member of it. The pool is opt-in, machine by machine: `hooks install` (the
 `worktree-pool-setup` skill) puts the hooks in the gitignored .claude/settings.local.json, and `acquire` refuses
 until they are there.
@@ -50,6 +53,7 @@ import re
 import secrets
 import subprocess
 import sys
+import tempfile
 import time
 
 sys.stdout.reconfigure(encoding="utf-8")
@@ -102,8 +106,9 @@ def slot_number(slot):
 class Pool:
     """The pool of one repository. `now`, `warm` and `hooks_ready` are replaced by the tests."""
 
-    def __init__(self, root=None, now=None, warm=None, hooks_ready=None):
+    def __init__(self, root=None, now=None, warm=None, hooks_ready=None, scratch=None):
         self.root = os.path.normpath(root or main_checkout())
+        self.scratch = scratch or tempfile.gettempdir()  # where a member may write outside its tree unasked
         dot_git = os.path.join(self.root, ".git")
         self.common = dot_git if os.path.isdir(dot_git) else os.path.join(self.root, git(self.root, "rev-parse",
                                                                                           "--git-common-dir"))
@@ -659,7 +664,84 @@ class Pool:
                         f"never work in a worktree by a path you were given.")
             if member["read_only"] and tool in EDIT_TOOLS:
                 return f"You joined {slot} read-only: you change no files in it."
+        if agent is not None:
+            return self.outside_denial(state, tool, tool_input, cwd, agent)
         return None
+
+    # A member works in its own tree. Writing anywhere else - the main checkout above all, where a stray edit or a
+    # relative path from the wrong directory lands in what the coordinator tests and pushes - needs the lease holder's
+    # leave: `allow <lease> <path>`. The temp directory (scratchpads) is free to everyone.
+
+    @staticmethod
+    def inside(path, base):
+        p, b = os.path.normcase(os.path.normpath(path)), os.path.normcase(os.path.normpath(base))
+        return p == b or p.startswith(b.rstrip(os.sep) + os.sep)
+
+    def checkout_re(self):
+        """The main checkout's own path, in the spellings a shell command uses (D:\\x, D:/x, /d/x), not where it
+        continues into the pool."""
+        drive, rest = os.path.splitdrive(self.root)
+        sep = r"[\\/]+"
+        body = sep.join(re.escape(p) for p in re.split(r"[\\/]+", rest.strip("\\/")) if p)
+        start = rf"(?:{re.escape(drive[0])}:{sep}|/{re.escape(drive[0])}/)" if drive else "/"
+        return re.compile(rf"{start}{body}(?![\w.-])(?!{sep}\.claude{sep}worktrees)", re.IGNORECASE)
+
+    def outside_denial(self, state, tool, tool_input, cwd, agent):
+        mid, member = next(((k, m) for k, m in state["members"].items() if m["agent"] == agent), (None, None))
+        if not member:
+            return None
+        lease = state["leases"].get(member["lease"]) or {}
+        slot = lease.get("slot") or member.get("slot")
+        if not slot:
+            return None
+        own = self.path(slot)
+        grants = lease.get("grants", [])
+        pool = os.path.join(self.root, POOL)
+
+        def refused(where):
+            return (f"You are the member of {slot} ({mid}); you write only inside its tree, {own}, or the temp "
+                    f"directory. {where} is outside it. Do the work in your own tree (every shell command `cd`s into "
+                    f"it first, every file path is absolute inside it). If the work truly needs that place, stop and "
+                    f"say so in your report: whoever started you can allow it with `tools\\worktree.cmd allow <lease> "
+                    f"<path>`.")
+
+        def free(path):
+            if self.inside(path, own) or any(self.inside(path, g) for g in grants):
+                return True
+            if self.inside(path, self.root):
+                return False  # the main checkout (another slot is the slot check's)
+            return self.inside(path, self.scratch)
+
+        if tool in EDIT_TOOLS:
+            path = tool_input.get("file_path") or tool_input.get("notebook_path") or ""
+            if path and not os.path.isabs(path):
+                path = os.path.join(cwd or self.root, path)
+            if path and not free(path) and not (self.inside(path, pool) and not self.inside(path, own)):
+                return refused(path)
+            return None
+        if tool in SHELL_TOOLS:
+            command = tool_input.get("command") or ""
+            if runs_only_the_tool(command):
+                return None
+            named = self.checkout_re().search(command)
+            if named and not any(self.inside(self.root, g) for g in grants):
+                return refused(f"The main checkout ({named.group(0)})")
+            first = next((p.strip() for p in SEPARATOR_RE.split(command) if p.strip()), "")
+            enters_own = re.match(r"(?:cd|pushd|set-location)\s", first, re.IGNORECASE) and any(
+                m.group(1).lower() == slot for m in SLOT_RE.finditer(first))
+            if cwd and not enters_own and not free(cwd) and not (self.inside(cwd, pool) and not self.inside(cwd, own)):
+                return refused(f"This command's directory ({cwd})")
+        return None
+
+    def allow(self, lease_id, path):
+        """Lets the lease's members write at `path` (a file or a directory) outside their tree, until it is released."""
+        path = os.path.normpath(os.path.abspath(path))
+        with self.locked() as state:
+            lease = self.lease(state, lease_id)
+            if path not in lease.setdefault("grants", []):
+                lease["grants"].append(path)
+            self.log(state, "allow", lease=lease_id, path=path)
+        return f"The members of {lease['slot']} may now write at {path} (until the lease is released)."
 
 
 HOOK_COMMAND = 'python "$CLAUDE_PROJECT_DIR/tools/maintenance/worktrees.py" hook'
@@ -778,7 +860,9 @@ PATH {path}
 
 {mode}
 - Work only here: start every shell command with `cd {path}`, and keep every file path under it. Builds stay in its
-  own target/ (never CARGO_TARGET_DIR or --target-dir elsewhere).
+  own target/ (never CARGO_TARGET_DIR or --target-dir elsewhere). An edit, or a shell command run in or naming the
+  main checkout, outside this tree is refused unless whoever started you allows that path; scratch files go in the
+  temp directory (your scratchpad).
 - Never pass the path or your member ID to anyone, and never start a subagent to work in this tree.
 - Commit before you finish (and push only where your instructions say to). Your last command, as you finish:
   `tools\\worktree.cmd leave {member_id}`. Leaving changes no files: what you did not commit stays in the tree for its
@@ -818,6 +902,9 @@ def main():
     p.add_argument("slot", help="e.g. pool-1")
     p.add_argument("--reason", required=True)
     p.add_argument("--discard-commits", action="store_true", help="also throw away commits on no origin branch")
+    p = sub.add_parser("allow", help="let a lease's members write at a path outside their tree")
+    p.add_argument("lease_id")
+    p.add_argument("path")
     p = sub.add_parser("status", help="the pool, or one lease, member or slot")
     p.add_argument("id", nargs="?")
     p = sub.add_parser("reconcile", help="compare the pool with git; find what is stale")
@@ -856,6 +943,7 @@ def main():
             "evict": lambda: pool.evict(args.lease_id, args.member, args.reason),
             "release": lambda: pool.release(args.lease_id, args.discard, args.reason),
             "clean": lambda: pool.clean(args.slot, args.reason, args.discard_commits),
+            "allow": lambda: pool.allow(args.lease_id, args.path),
             "status": lambda: pool.status(args.id),
             "reconcile": lambda: pool.reconcile(args.fix),
         }[args.command]()

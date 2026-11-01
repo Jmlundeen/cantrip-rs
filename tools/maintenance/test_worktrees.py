@@ -347,6 +347,42 @@ class PoolTest(unittest.TestCase):
         self.assertIn("not a member", self.pre("Bash", "agent-2",
                                                command="rm .claude/worktrees/pool-1/x.txt # tools\\worktree.cmd"))
 
+    def test_hook_keeps_a_member_writing_in_its_own_tree_unless_the_holder_allows_a_path(self):
+        self.pool.create()
+        lease = self.granted()
+        self.joined(lease, "agent-1")
+        slot = self.slot_path()
+        scratch = tempfile.mkdtemp(prefix="pool-scratch-")
+        self.addCleanup(shutil.rmtree, scratch, True)
+        self.pool.scratch = scratch
+        main_file = os.path.join(self.main, "src", "x.rs")
+        # Edits: its own tree and the scratch directory, nothing else - the main checkout least of all.
+        self.assertIsNone(self.pre("Write", "agent-1", file_path=os.path.join(slot, "x.txt")))
+        self.assertIsNone(self.pre("Write", "agent-1", file_path=os.path.join(scratch, "probe.txt")))
+        self.assertIn("outside", self.pre("Edit", "agent-1", file_path=main_file))
+        self.assertIn("outside", self.pre("Write", "agent-1", file_path=os.path.join(self.tmp, "elsewhere.txt")))
+        # A relative path is read from the shell's directory: from the main checkout it lands there.
+        self.assertIn("outside", self.pre("Write", "agent-1", cwd=self.main, file_path="x.txt"))
+        # Shell commands: run from the main checkout, or naming it, are refused; entering its own tree first is not.
+        self.assertIn("outside", self.pre("Bash", "agent-1", cwd=self.main, command="git status"))
+        self.assertIsNone(self.pre("Bash", "agent-1", cwd=self.main, command=f"cd {slot} && git status"))
+        self.assertIsNone(self.pre("Bash", "agent-1", cwd=slot, command="cargo build"))
+        self.assertIn("outside", self.pre("PowerShell", "agent-1", cwd=slot,
+                                          command=f"Set-Content {main_file} 'x'"))
+        drive, rest = os.path.splitdrive(self.main)
+        if drive:
+            posix = "/" + drive[0].lower() + rest.replace("\\", "/")
+            self.assertIn("outside", self.pre("Bash", "agent-1", cwd=slot, command=f"cp a.txt {posix}/src/"))
+        self.assertIsNone(self.pre("Bash", "agent-1", cwd=self.main, command="tools\\worktree.cmd leave M-1"))
+        self.assertIsNone(self.pre("Bash", "agent-1", cwd=scratch, command="ls"))
+        # Someone who is a member of nothing is not this check's (the main thread, an agent outside the pool).
+        self.assertIsNone(self.pre("Edit", "agent-2", file_path=main_file))
+        self.assertIsNone(self.pre("Edit", None, file_path=main_file))
+        # The holder allows one place: that place, and nothing beside it.
+        self.pool.allow(lease, os.path.join(self.main, "src"))
+        self.assertIsNone(self.pre("Edit", "agent-1", file_path=main_file))
+        self.assertIn("outside", self.pre("Edit", "agent-1", file_path=os.path.join(self.main, "docs", "y.md")))
+
     def test_hook_keeps_a_read_only_member_from_editing(self):
         self.pool.create()
         lease = self.granted()
