@@ -45,10 +45,12 @@ fn exile_for_later(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !is_live(g, now) || !g.obj(now).zone.is(ZoneKind::Battlefield) {
         return Ok(());
     }
-    let owner = g.obj(now).owner;
-    let exiled = g.exile(now);
-    if g.obj(exiled).zone.is(ZoneKind::Exile) {
-        g.allow_play(exiled, owner, PlayGrant { later_turns: true, ..PlayGrant::CAST });
+    // Each card a merged permanent became may be cast (CR 730.3c: the same actions are taken upon each).
+    for exiled in g.exile_all(&[now]) {
+        if g.obj(exiled).zone.is(ZoneKind::Exile) {
+            let owner = g.obj(exiled).owner;
+            g.allow_play(exiled, owner, PlayGrant { later_turns: true, ..PlayGrant::CAST });
+        }
     }
     Ok(())
 }

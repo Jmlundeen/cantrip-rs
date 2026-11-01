@@ -33,9 +33,14 @@ pub fn at_next_end_step(g: &mut dyn Game, item: &StackItem, ability: u8, subject
 /// one"). Flickerwisp, Ennis, Debate Moderator, S.H.I.E.L.D. Flying Car and Wiccan, Rising Magician print it.
 pub fn exile_target_then_return_at_next_end_step(g: &mut dyn Game, item: &StackItem, slot: usize, ability: u8) {
     let Some(object) = crate::targets::object(g, item, slot) else { return };
-    let exiled = g.exile(object);
-    if g.obj(exiled).zone.is(ZoneKind::Exile) {
-        at_next_end_step(g, item, ability, Target::Object(exiled));
+    // Every card a merged permanent became is returned (CR 730.3c): the delayed ability carries them all
+    // (`return_subject_to_battlefield`). It is created whatever was exiled (CR 603.7a), a token too, which will have ceased to
+    // exist by then (CR 111.7), so the ability does nothing as it resolves (CR 603.7c).
+    let exiled: Vec<ObjectId> = g.exile_all(&[object]).into_iter().filter(|&c| g.obj(c).zone.is(ZoneKind::Exile)).collect();
+    match exiled[..] {
+        [] => {}
+        [one] => at_next_end_step(g, item, ability, Target::Object(one)),
+        _ => at_next_end_step_about(g, item, ability, &exiled),
     }
 }
 
@@ -129,6 +134,11 @@ pub fn exile_subject(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 /// card it was when the ability was set up (a new object if it left its zone, CR 603.7c, 400.7). Flickerwisp and Daretti,
 /// Scrap Savant's emblem print it at the next end step.
 pub fn return_subject_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    // The cards a merged permanent became, carried together (CR 730.3c, `exile_target_then_return_at_next_end_step`): each
+    // still in exile returns, together.
+    if item.subject == Target::None && !g.event_objects(item).is_empty() {
+        return return_exiled_to_battlefield(g, item);
+    }
     let Target::Object(card) = item.subject else { return Ok(()) };
     if !is_live(g, card) {
         return Ok(());

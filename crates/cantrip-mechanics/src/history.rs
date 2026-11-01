@@ -115,11 +115,13 @@ pub fn cards_left_graveyard_this_turn(q: &dyn Query, player: PlayerId) -> usize 
 /// Sunrise, No Rest for the Wicked): the graveyard objects those moves made, in the order they arrived.
 pub fn put_into_graveyard_from_battlefield_this_turn(q: &dyn Query, owner: PlayerId) -> Vec<ObjectId> {
     q.history()
-        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).to(ZoneKind::Graveyard).this_turn())
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).to(ZoneKind::Graveyard).this_turn())
         .filter_map(|r| match r.event {
-            // A token that left the battlefield is not a card in the graveyard (CR 111.7, 704.5d).
-            Event::ZoneChange { old, new, to, .. }
-                if to == Zone::graveyard(owner) && q.obj(new).became.is_none() && !q.obj(old).token =>
+            // A token that left the battlefield is not a card in the graveyard (CR 111.7, 704.5d) - the token itself, as it
+            // arrived: a merged permanent's card components are cards though its topmost is a token, and each came from the
+            // battlefield with it (CR 730.3, `Event::moved_from`).
+            Event::ZoneChange { new, to, .. }
+                if r.event.moved_from() == Some(Zone::BATTLEFIELD) && to == Zone::graveyard(owner) && q.obj(new).became.is_none() && !q.obj(new).token =>
             {
                 Some(new)
             }

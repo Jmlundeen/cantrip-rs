@@ -548,11 +548,12 @@ pub fn exile_and_return_transformed(g: &mut dyn Game, permanent: ObjectId, under
     if g.obj(permanent).became.is_some() || !g.is_on_battlefield(permanent) {
         return Ok(());
     }
-    // A token that is exiled is gone for good (CR 111.7): only a card comes back.
-    let token = g.obj(permanent).token;
-    let exiled = g.exile(permanent);
-    if !token && g.obj(exiled).zone.is(ZoneKind::Exile) {
-        g.put_onto_battlefield_transformed(exiled, under, false)?;
+    // A token that is exiled is gone for good (CR 111.7): only a card comes back - each card a merged permanent became (CR
+    // 730.3c), of which only a double-faced one returns transformed (CR 712.14a).
+    for exiled in g.exile_all(&[permanent]) {
+        if !g.obj(exiled).token && g.obj(exiled).zone.is(ZoneKind::Exile) {
+            g.put_onto_battlefield_transformed(exiled, under, false)?;
+        }
     }
     Ok(())
 }

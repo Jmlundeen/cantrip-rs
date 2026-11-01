@@ -1,5 +1,6 @@
 # Flickerwisp exiles Bot1's Blood token on turn 5. A token that has left the battlefield ceases to exist (CR 111.7, 704.5d), so it
-# is not in exile and nothing returns at the beginning of the end step: "return that card" has no card to return.
+# is not in exile and nothing returns at the beginning of the end step: "return that card" has no card to return. The delayed
+# ability is still created (CR 603.7a), and does nothing (CR 603.7c).
 
 [Bot1 Deck]
 Swamp
@@ -35,6 +36,8 @@ Bot1.Pass
 Bot1.Target(Blood Token)
 [T5 Bot1.Main2]
 ? Exile.Count = 0
+# The delayed ability is created whatever was exiled (CR 603.7a), the token too: it does nothing as it resolves (CR 603.7c).
+? Delayed.Count = 1
 [T6 Bot2.Main1]
 
 [Expect]
