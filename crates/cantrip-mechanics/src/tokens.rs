@@ -250,6 +250,18 @@ pub static SAMURAI: CardDef = CardDef {
     ..token!(Samurai)
 };
 
+/// A 2/2 white Knight creature token with vigilance (CR 111.4). Doom Foretold, Gallant Cavalry, Hopeful Vigil, Valorous Steed and
+/// Banish into Fable make it.
+pub static KNIGHT: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    keywords: Keywords::of(&[Keyword::Vigilance]),
+    text: "Vigilance",
+    ..token!(Knight)
+};
+
 /// A 1/1 colorless Shapeshifter creature token with changeling (CR 702.73a). Crib Swap, Personify and Stalactite Dagger make
 /// it.
 pub static SHAPESHIFTER: CardDef = CardDef {
