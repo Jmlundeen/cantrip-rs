@@ -1,0 +1,43 @@
+# A spell on the stack is itself the object a text-changing effect changes (CR 612.1), so it resolves with its changed text -
+# unlike an ability, whose text is fixed as it is put on the stack (CR 113.7a). Bot1 casts Glimpse the Core's first mode
+# ("search your library for a basic Forest card") and in response Magical Hack replaces Forest with Island in the spell's text:
+# it searches for a basic Island. The Forest in the library is not offered; the Island is found, and enters tapped.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Sapphire
+Glimpse the Core
+Magical Hack
+Plains
+Plains
+Forest
+Island
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Glimpse the Core.Cast
+Bot1.Modes(1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magical Hack.Cast(Stack.Glimpse the Core)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Forest)
+Bot1.Modes(Island)
+! Bot1.Search(Forest)
+Bot1.Search(Island)
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Glimpse the Core; Magical Hack
+Bot1.Battlefield = Forest; Island; Mox Jet; Mox Sapphire
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Library.Count = 12

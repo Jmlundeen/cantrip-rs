@@ -1,0 +1,56 @@
+# A triggered ability on the stack exists independently of its source (CR 113.7a), and a text-changing effect changes the
+# text of the spell or permanent it affects (CR 612.1), not of an ability already on the stack. Night Nurse, a Hero, entered
+# under Bot1's control this turn, so Avengers Assemble!'s end step ability triggers and goes on the stack saying "Hero".
+# In response Bot1 casts Artificial Evolution on the Avengers, replacing Hero with Elf. The Avengers' static ability follows
+# its new text at once (CR 612, 613.1c): Night Nurse is no Elf, and is no longer boosted (2/1, not 4/3), with the trigger
+# still waiting. The trigger resolves with its own text - its intervening "if" checked again (CR 603.4) asks of a Hero, and
+# a Hero did enter - so Bot1 draws a card.
+
+[Bot1 Deck]
+Avengers Assemble!
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Night Nurse, Healer of Heroes
+Artificial Evolution
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Avengers Assemble!.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Night Nurse, Healer of Heroes.Cast
+Bot1.Pass
+[T3 Bot1.End]
+? Bot1.Battlefield.Night Nurse, Healer of Heroes.Power = 4
+? Bot1.Hand.Count = 1
+? Stack.Count = 1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Avengers Assemble!)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Hero)
+Bot1.Modes(Elf)
+? Stack.Count = 1
+? Bot1.Battlefield.Night Nurse, Healer of Heroes.Power = 2
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Night Nurse, Healer of Heroes.Power = 2
+Bot1.Battlefield.Night Nurse, Healer of Heroes.Toughness = 1

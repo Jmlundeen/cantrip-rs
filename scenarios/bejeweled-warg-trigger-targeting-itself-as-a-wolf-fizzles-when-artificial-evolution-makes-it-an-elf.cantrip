@@ -1,0 +1,41 @@
+# A triggered ability's targets are checked again as it resolves (CR 608.2b) by its own text, fixed as it was put on the
+# stack (CR 603.3, 113.7a). The Warg deals combat damage to Bot2 and its trigger goes on the stack in the counter mode,
+# targeting the only Wolf Bot1 controls, itself. In response Artificial Evolution replaces Wolf with Elf in the Warg's text,
+# its type line included: the Warg is an Elf now. The ability still says "target Wolf you control", so its one target is
+# illegal and it does nothing: the Warg gets no counter.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Bejeweled Warg
+Artificial Evolution
+Forest x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bejeweled Warg.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Bejeweled Warg)
+Bot1.Modes(Put a +1/+1 counter)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bejeweled Warg)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wolf)
+Bot1.Modes(Elf)
+? Stack.Count = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Bejeweled Warg.Power = 3
+Bot1.Battlefield.Bejeweled Warg.Toughness = 2
+Bot1.Graveyard = Artificial Evolution

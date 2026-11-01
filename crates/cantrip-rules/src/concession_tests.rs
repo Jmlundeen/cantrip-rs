@@ -131,6 +131,7 @@ fn a_player_who_concedes_as_their_triggers_go_on_the_stack_puts_none_of_them_the
                 count: None,
                 since: None,
                 acquired: Acquired::OWN,
+                words: None,
             });
         }
         g.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));

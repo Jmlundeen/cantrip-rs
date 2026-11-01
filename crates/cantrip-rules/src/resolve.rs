@@ -218,9 +218,13 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     let q = Reader { cards, state, events };
     // A slot of its own sees what the slots before it chose (CR 601.2c).
     let earlier = if item.target_count > 1 { &state.targets(item)[..slot] } else { &[][..] };
-    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false, x: announced_x(item) }, &asker, target)
+    // An ability's targets are judged by its own text, as it was put on the stack (CR 113.7a, `StackItem::words`).
+    let text = item_text(item);
+    let given = Given { q: &q, earlier, subject: item.subject, slot_player, gift: false, x: announced_x(item), text };
+    (spec.filter)(&given, &asker, target)
         && layers::can_target(cards, state, events, &asker, target)
-        && (spec.together.is_none() || together_legal(&q, state, item, slot, &spec))
+        && (spec.together.is_none()
+            || together_legal(&Given { q: &q, earlier: &[], subject: Target::None, slot_player: None, gift: false, x: None, text }, state, item, slot, &spec))
 }
 
 /// Whether the targets of the slot target `slot` of `item` was chosen for are still allowed together by `spec`'s rule
@@ -229,6 +233,18 @@ fn together_legal(q: &dyn Query, state: &GameState, item: &StackItem, slot: usiz
     let run = state.spec_targets(item, state.spec(item, slot) as usize);
     let targets: Vec<Target> = state.targets(item)[run].iter().copied().filter(|&t| t != Target::None).collect();
     select::targets_together(q, spec.together_at(u32::from(item.counted)).as_slice(), item.controller, item.object, &targets)
+}
+
+/// The text an item on the stack judges its targets by, where it is not its source's now: an ability's source and the words
+/// it was put on the stack with (`StackItem::words`, CR 113.7a). None for a spell, which reads its own words.
+pub fn item_text(item: &StackItem) -> Option<(ObjectId, Words)> {
+    (item.kind != StackKind::Spell).then_some((item.object, item.words))
+}
+
+/// `q` reading `item`'s source's words as `item`'s own text has them (`item_text`): what the rule of its targets together is
+/// judged with as they are changed or chosen anew (CR 115.7, 601.2c).
+pub fn as_item<'a>(q: &'a dyn Query, item: &StackItem) -> Given<'a> {
+    Given { q, earlier: &[], subject: Target::None, slot_player: None, gift: false, x: None, text: item_text(item) }
 }
 
 /// The X announced for a spell or an activated ability on the stack (CR 107.3a, 601.2b, 602.2b), its own (CR 107.3k): what
@@ -249,6 +265,9 @@ pub struct Given<'a> {
     pub gift: bool,
     /// The X announced for the spell or ability whose targets these are (`Query::announced_x`, `announced_x`).
     pub x: Option<u16>,
+    /// For an ability on the stack, its source and the words of its text as it was put there (`StackItem::words`): what
+    /// `Query::words` of that source answers, the source's text since notwithstanding (CR 113.7a). None otherwise.
+    pub text: Option<(ObjectId, Words)>,
 }
 
 impl Query for Given<'_> {
@@ -310,6 +329,13 @@ impl Query for Given<'_> {
 
     fn announced_x(&self) -> Option<u32> {
         self.x.map(u32::from)
+    }
+
+    fn words(&self, id: ObjectId) -> Words {
+        match self.text {
+            Some((source, words)) if source == id => words,
+            _ => self.q.words(id),
+        }
     }
 
     /// As the game it wraps has it: a spell judged as announced has the X and kicker announced (`actions::Announcing`).
@@ -435,6 +461,8 @@ pub(crate) fn its_own_exile(cx: &Cx, item: &StackItem, moving: ops::Moving, reas
 pub fn resolve(cx: &mut Cx) -> R<Flow> {
     // The item this frame resolves (`Cx::resolving`), wherever it is: what it cast or copied as it resolved went above it.
     let Some(&item) = cx.resolving() else { return Ok(Flow::Done) };
+    // Nothing of the ability's own text is read yet (`Cx::own_text`), whatever a run cut short by a panic left.
+    cx.g.own_text.set(false);
     let on_stack = |cx: &Cx| cx.s().stack.iter().rposition(|i| i.serial == item.serial);
 
     // CR 608.2b: a spell or ability whose every target has become illegal does nothing.
@@ -617,16 +645,18 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
             cx.record(Event::Resolved { source: item.object, ability: AbilityRef::spell(card) });
         }
         StackKind::Activated | StackKind::Triggered => {
+            // The ability's condition and instructions are its own text, as it was put on the stack (CR 113.7a,
+            // `StackItem::words`), whatever has changed its source's since.
             // An intervening "if" no longer true: the ability does nothing (CR 603.4).
-            let holds = item.kind != StackKind::Triggered || crate::settle::still_holds(cx, &item);
+            let holds = item.kind != StackKind::Triggered || cx.own_text(true, |cx| crate::settle::still_holds(cx, &item));
             if !fizzles && holds {
-                match cx.cards().ability(item.ability) {
-                    AbilityDef::Activated(ActivatedDef { modal: Some(modal), .. }) => run_modes(cx, &item, modal)?,
-                    AbilityDef::Activated(a) => (a.effect)(cx, &item)?,
-                    AbilityDef::Triggered(TriggeredDef { modal: Some(modal), .. }) => run_modes(cx, &item, modal)?,
-                    AbilityDef::Triggered(t) => (t.effect)(cx, &item)?,
+                cx.own_text(true, |cx| match cx.cards().ability(item.ability) {
+                    AbilityDef::Activated(ActivatedDef { modal: Some(modal), .. }) => run_modes(cx, &item, modal),
+                    AbilityDef::Activated(a) => (a.effect)(cx, &item),
+                    AbilityDef::Triggered(TriggeredDef { modal: Some(modal), .. }) => run_modes(cx, &item, modal),
+                    AbilityDef::Triggered(t) => (t.effect)(cx, &item),
                     AbilityDef::Static(_) | AbilityDef::PlayRule(_) => unreachable!("a static ability is never on the stack"),
-                }
+                })?;
                 // It has resolved (CR 608.2m: "the first time this ability has resolved this turn").
                 cx.record(Event::Resolved { source: item.object, ability: item.ability });
             }

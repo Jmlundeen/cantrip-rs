@@ -1127,6 +1127,13 @@ pub struct StackItem {
     /// How its source acquired the ability it is (CR 607.5): what an ability linked to it is linked by (`Query::linked`).
     /// Own for a spell.
     pub acquired: Acquired,
+    /// For an ability, the words of its text (CR 612) as it was put on the stack: its source's then - as activated (CR 602.2),
+    /// as put there triggered (CR 603.3). The ability exists independently of its source (CR 113.7a), and a text-changing
+    /// effect changes only the spell or permanent it affects (CR 612.1), so what changes the source's text after that changes
+    /// none of the ability's: as it resolves its text is these words (`Query::words` of its source, while its own instructions
+    /// are followed). A copy of it has the same (CR 707.10). `Words::NONE` for a spell, which is itself the object a text
+    /// change affects, and reads its own words.
+    pub words: Words,
 }
 
 impl StackItem {
@@ -1740,6 +1747,10 @@ pub struct PendingTrigger {
     pub since: Option<u32>,
     /// How its source acquired the ability (CR 607.5): its stack item's `acquired`.
     pub acquired: Acquired,
+    /// The words of the text it is an ability of, where that is not its source's as it is put on the stack: a reflexive
+    /// ability's are those of the resolving ability that made it trigger (CR 603.12, 113.7a), a delayed ability's those of
+    /// the text that created it (`Delayed::words`, CR 603.7). Its stack item's `words`; None for the source's then.
+    pub words: Option<Words>,
 }
 
 /// A run of `GameState::members`: the objects of one batch of simultaneous events, kept for the ability they

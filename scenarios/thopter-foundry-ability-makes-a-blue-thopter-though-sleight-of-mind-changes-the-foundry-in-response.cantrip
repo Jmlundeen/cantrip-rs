@@ -1,0 +1,51 @@
+# A token is what the text that makes it says (CR 612.4, 111.4), and an activated ability's text is fixed as it is activated
+# (CR 602.2): it exists independently of its source (CR 113.7a), and a text-changing effect changes the permanent it affects
+# (CR 612.1), not the ability on the stack. Bot1 activates Thopter Foundry ("Create a 1/1 blue Thopter") and in response
+# Sleight of Mind replaces blue with red in the Foundry's text: the ability still makes a blue Thopter. The Foundry's own
+# text says red from then on (its control is trait-doctoring-changes-the-color-of-the-tokens-thopter-foundry-makes), so the
+# Thopter its next activation makes the same turn is red.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Thopter Foundry
+Mox Pearl
+Sleight of Mind
+Mox Ruby
+Mox Emerald
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thopter Foundry.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Thopter Foundry.Activate(Sacrifice: Mox Pearl)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sleight of Mind.Cast(Thopter Foundry)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Blue)
+Bot1.Colors(Red)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Thopter Token.Colors = Blue
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Thopter Foundry.Activate(Sacrifice: Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Thopter Token#1.Colors = Blue
+Bot1.Battlefield.Thopter Token#2.Colors = Red

@@ -1689,7 +1689,7 @@ pub fn target_candidates(cx: &Cx, asker: &Asker, spec: &TargetSpec) -> Vec<Targe
 
 /// The candidates for a slot of a spell as if its gift were promised (`Query::gift_assumed`), without promising it.
 fn target_candidates_if_promised(cx: &Cx, asker: &Asker, spec: &TargetSpec) -> Vec<Target> {
-    candidates(cx, asker, spec, &[], Target::None, None, None, true)
+    candidates(cx, asker, spec, &[], Target::None, None, None, true, None)
 }
 
 /// The candidates for a slot after the slots before it chose `earlier` (CR 601.2c); `slot_player` is the opponent the slot
@@ -1704,7 +1704,28 @@ pub fn target_candidates_given(
     slot_player: Option<PlayerId>,
     x: Option<u16>,
 ) -> Vec<Target> {
-    candidates(cx, asker, spec, earlier, subject, slot_player, x, false)
+    candidates(cx, asker, spec, earlier, subject, slot_player, x, false, None)
+}
+
+/// `target_candidates_given` with no X announced, judged by `text` (`resolve::Given::text`): a triggered ability's slots as it
+/// is put on the stack with the words of the text that made it (`PendingTrigger::words`).
+pub fn target_candidates_with_text(
+    cx: &Cx,
+    asker: &Asker,
+    spec: &TargetSpec,
+    earlier: &[Target],
+    subject: Target,
+    slot_player: Option<PlayerId>,
+    text: Option<(ObjectId, Words)>,
+) -> Vec<Target> {
+    candidates(cx, asker, spec, earlier, subject, slot_player, None, false, text)
+}
+
+/// The candidates for target `slot_player`'s slot of `item`, a spell or ability on the stack, after the slots before it chose
+/// `earlier`, as its targets are changed or chosen anew (CR 115.7, 707.10c): judged by its own text - an ability's as it was
+/// put on the stack (`resolve::item_text`, CR 113.7a) - with what it triggered on and the X it was announced with.
+pub fn item_target_candidates(cx: &Cx, asker: &Asker, spec: &TargetSpec, earlier: &[Target], item: &StackItem, slot_player: Option<PlayerId>) -> Vec<Target> {
+    candidates(cx, asker, spec, earlier, item.subject, slot_player, crate::resolve::announced_x(item), false, crate::resolve::item_text(item))
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1717,9 +1738,10 @@ fn candidates(
     slot_player: Option<PlayerId>,
     x: Option<u16>,
     gift: bool,
+    text: Option<(ObjectId, Words)>,
 ) -> Vec<Target> {
     let s = q.state();
-    let cx = &crate::resolve::Given { q, earlier, subject, slot_player, gift, x };
+    let cx = &crate::resolve::Given { q, earlier, subject, slot_player, gift, x, text };
     let mut out = Vec::new();
     for p in s.seats() {
         let t = Target::Player(p);
@@ -2094,7 +2116,7 @@ impl<K: PartialEq> AnnouncementSearch<'_, K> {
             return if (self.covered)(targets) { Found::Yes } else { Found::No };
         };
         let earlier: &[Target] = if in_segment > 1 { &targets[start..] } else { &[] };
-        let candidates = candidates(self.q, self.asker, &spec, earlier, Target::None, slot_player, None, self.gift);
+        let candidates = candidates(self.q, self.asker, &spec, earlier, Target::None, slot_player, None, self.gift, None);
         let (candidates, together) = within_together(self.q, self.asker, &spec, self.counted, candidates);
         let (least, most) = spec.bounds(self.counted);
         if candidates.len() < least as usize || (candidates.is_empty() && spec.required()) {
@@ -2699,7 +2721,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
         return Vec::new();
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default() };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     // The ability asked as it is (CR 607.5): its own cost change reads its own links.
     let by = cx.link_of_nth(source, index as usize);
@@ -2753,7 +2775,7 @@ pub fn cast_face_of(game: &crate::Game, card: ObjectId, index: u8) -> &'static C
 
 /// A copy of the position (no tree) to ask the rules of, through a frame's view, for a menu row's advice.
 fn advice_game(game: &crate::Game) -> crate::Game {
-    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default() }
+    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() }
 }
 
 /// What `player` would be offered at this priority with a thousand mana of every type in their pool: what a script's refusal
@@ -7051,6 +7073,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         copied: false,
         cast_known: u32::MAX,
         acquired: Acquired::OWN,
+        words: Words::NONE,
     };
     // Targets announced with the action are one at most (`targets_with_action`); more are set by `set_item_targets`.
     assert!(targets.len() <= cantrip_state::INLINE_TARGETS, "a stack item made with more targets than it holds");
@@ -9103,6 +9126,9 @@ fn activate(
     let mut item = stack_item(StackKind::Activated, source, ability, player, targets);
     // How the source acquired the ability (CR 607.5), read before any cost moves it: what it is linked by.
     item.acquired = acquired_nth(cx, source, index as usize);
+    // Its text is fixed as it is announced (CR 602.2, 113.7a): the source's words now, which nothing that changes the
+    // source's text later changes.
+    item.words = cantrip_api::words(cx.s(), source);
     let mut mana = def.cost.mana;
     // CR 118.9, 602.2b: a static ability may let the player pay another cost rather than the ability's mana cost: the
     // option it was offered as names which (`ActionOption::paid_by`), and it is paid if it still applies.
@@ -9424,7 +9450,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
     if !changers {
         return None;
     }
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default() };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);
@@ -9529,7 +9555,9 @@ pub fn activate_mana(
     // Asked as the ability it is (CR 607.5): one an effect gave the source reads only its own links - its colors, its
     // restriction, its costs and its effect.
     let by = if index < PLAYER_MANA_ABILITY { cx.link_of_nth(source, index as usize) } else { None };
-    activate_mana_as(cx, player, source, index, color, colorless, sacrifice, by)
+    // A mana ability activated while an ability resolves (paying a cost it asks for) is its own text, its source's now, as are
+    // the triggered mana abilities it triggers (`Cx::own_text`).
+    cx.own_text(false, |cx| activate_mana_as(cx, player, source, index, color, colorless, sacrifice, by))
 }
 
 #[allow(clippy::too_many_arguments)]

@@ -1,0 +1,51 @@
+# A triggered ability's text is fixed as it is put on the stack (CR 603.3) and it exists independently of its source
+# (CR 113.7a): a text-changing effect on the source afterwards changes the permanent's text (CR 612.1), not the ability's.
+# Trait Doctoring is a sorcery, so it can answer Starfield Shepherd's enters trigger only under Teferi, Time Raveler's +1
+# ("you may cast sorcery spells as though they had flash"). It replaces Plains with Forest in the Shepherd's text, but the
+# trigger already on the stack still searches for "a basic Plains card": it refuses the basic Forest and takes the Plains.
+# Teferi is paid with a Plains and Black Lotus (blue); the warp cost {1}{W} with Mox Pearl and the Lotus's remaining blue;
+# Trait Doctoring's {U} with Mox Sapphire.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Teferi, Time Raveler
+Starfield Shepherd
+Trait Doctoring
+Plains
+Forest
+Island x15
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Teferi, Time Raveler.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Teferi, Time Raveler.Activate(Ability: +1)
+Bot1.Hand.Starfield Shepherd.Cast(Ability: Warp)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Trait Doctoring.Cast(Starfield Shepherd)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Plains)
+Bot1.Modes(Forest)
+Bot1.Choose(Starfield Shepherd)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Forest)
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Hand = Plains

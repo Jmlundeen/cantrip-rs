@@ -638,6 +638,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
                 count: None,
                 since: None,
                 acquired: Acquired::OWN,
+                words: None,
             });
         }
 
@@ -2003,9 +2004,10 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
 /// Creates an emblem (CR 114.2): an object in the command zone, owned by the player, that nothing moves. `subtype` is the
 /// creature type its text says "chosen" (CR 607.2d), kept as a permanent keeps what it chose as it entered (`Choices`).
 pub fn create_emblem(cx: &mut Cx, def: CardId, player: PlayerId, subtype: Option<Subtype>) -> ObjectId {
-    // The emblem's abilities are the creating text's (CR 114.2, 612.4): words that text changed are changed in them.
+    // The emblem's abilities are the creating text's (CR 114.2, 612.4): words that text changed are changed in them. An
+    // ability's text is as it was put on the stack (`Cx::own_text`, CR 113.7a).
     let words = match cx.cause() {
-        Cause::Spell(source) | Cause::Ability { source, .. } => cantrip_api::words(cx.s(), source),
+        Cause::Spell(source) | Cause::Ability { source, .. } => Query::words(&*cx, source),
         _ => Words::NONE,
     };
     let copy = (!words.is_printed()).then(|| Copiable { words, ..Copiable::of(def) });
@@ -2219,9 +2221,9 @@ fn token_copy(cards: &CardTable, card: CardId, copy: Option<Copiable>, words: Wo
 /// them sees one event (CR 603.2c).
 pub fn create_tokens_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: bool, copy: Option<Copiable>, with: &[(CounterKind, i16)]) -> R<Vec<ObjectId>> {
     // CR 612.4, 612.2a: a token is what the text that makes it says, so a changed text makes tokens of the colors and
-    // creature types it names now.
+    // creature types it names now - an ability's text as it was put on the stack (`Cx::own_text`, CR 113.7a).
     let words = match cx.cause() {
-        Cause::Spell(source) | Cause::Ability { source, .. } if copy.is_none() => cantrip_api::words(cx.s(), source),
+        Cause::Spell(source) | Cause::Ability { source, .. } if copy.is_none() => Query::words(&*cx, source),
         _ => Words::NONE,
     };
     create_tokens_worded(cx, tokens, tapped, copy, with, words, None)
@@ -2249,7 +2251,7 @@ pub fn create_tokens_worded(
 /// making it (CR 612.4).
 pub fn create_token_attached(cx: &mut Cx, card: CardId, controller: PlayerId, host: ObjectId) -> R<Vec<ObjectId>> {
     let words = match cx.cause() {
-        Cause::Spell(source) | Cause::Ability { source, .. } => cantrip_api::words(cx.s(), source),
+        Cause::Spell(source) | Cause::Ability { source, .. } => Query::words(&*cx, source),
         _ => Words::NONE,
     };
     create_tokens_onto(cx, &[(card, controller)], false, Copies::All(None), &[], words, None, Some(host))
@@ -2670,14 +2672,16 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
             }
             // A slot sees what the slots before it now target (CR 601.2c: "another target creature").
             let earlier = if item.target_count > 1 { &targets[..run.start] } else { &[][..] };
-            let candidates = crate::actions::target_candidates_given(cx, &asker, &spec, earlier, item.subject, slot_player, crate::resolve::announced_x(&item));
+            // Judged by the item's own text: an ability's as it was put on the stack (CR 113.7a), a copy's the same (CR 707.10).
+            let candidates = crate::actions::item_target_candidates(cx, &asker, &spec, earlier, &item, slot_player);
             // The rule of the slot's targets together holds of the new targets (CR 115.7d, 601.2c), X as it was.
-            let (candidates, together) = crate::actions::within_together(cx, &asker, &spec, u32::from(item.counted), candidates);
+            let own = crate::resolve::as_item(cx, &item);
+            let (candidates, together) = crate::actions::within_together(&own, &asker, &spec, u32::from(item.counted), candidates);
             if candidates.len() <= current.len() && candidates.iter().all(|c| current.contains(c)) {
                 continue;
             }
             // No as many targets the rule allows together: nothing could be chosen anew, and the targets stay.
-            if !crate::actions::enough_together(cx, &asker, &together, &candidates, cantrip_state::count_u32(current.len())) {
+            if !crate::actions::enough_together(&own, &asker, &together, &candidates, cantrip_state::count_u32(current.len())) {
                 continue;
             }
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player,
@@ -2695,7 +2699,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
                 && chosen.len() == current.len()
                 && chosen.iter().all(|t| candidates.contains(t))
                 && chosen.iter().enumerate().all(|(i, t)| !chosen[..i].contains(t))
-                && select::targets_together(cx, together.as_slice(), asker.controller, asker.source, &chosen)
+                && select::targets_together(&crate::resolve::as_item(cx, &item), together.as_slice(), asker.controller, asker.source, &chosen)
             {
                 targets[run].copy_from_slice(&chosen);
                 changed = true;
@@ -2720,7 +2724,7 @@ fn fits_together(cx: &Cx, item: &StackItem, targets: &[Target], slot: usize, spe
     let run = cx.s().spec_targets(item, cx.s().spec(item, slot) as usize);
     let set: Vec<Target> =
         run.map(|i| if i == slot { to } else { targets.get(i).copied().unwrap_or(Target::None) }).filter(|&t| t != Target::None).collect();
-    select::targets_together(cx, spec.together_at(u32::from(item.counted)).as_slice(), item.controller, item.object, &set)
+    select::targets_together(&crate::resolve::as_item(cx, item), spec.together_at(u32::from(item.counted)).as_slice(), item.controller, item.object, &set)
 }
 
 /// `chooser` may choose new targets for a spell on the stack (CR 115.7d): Sudden Substitution's "then the spell's controller
@@ -2762,7 +2766,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         }
         let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return Ok(()) };
         let others: Vec<Target> =
-            crate::actions::target_candidates_given(cx, &asker, &spec, &all[..slot], item.subject, slot_player, crate::resolve::announced_x(&item))
+            crate::actions::item_target_candidates(cx, &asker, &spec, &all[..slot], &item, slot_player)
                 .into_iter()
                 .filter(|&t| t != all[slot] && fits_together(cx, &item, &all, slot, &spec, t))
                 .collect();
@@ -2836,7 +2840,7 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
     // before it.
     let legal = |cx: &Cx, list: &[Target], slot: usize| -> bool {
         let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return false };
-        crate::actions::target_candidates_given(cx, &asker, &spec, &list[..slot], item.subject, slot_player, crate::resolve::announced_x(&item)).contains(&list[slot])
+        crate::actions::item_target_candidates(cx, &asker, &spec, &list[..slot], &item, slot_player).contains(&list[slot])
             && fits_together(cx, &item, list, slot, &spec, list[slot])
     };
     let changeable: Vec<usize> = (0..count)
@@ -3010,6 +3014,7 @@ pub fn draw(cx: &mut Cx, player: PlayerId) {
                 count: None,
                 since: None,
                 acquired: Acquired::OWN,
+                words: None,
             });
         }
     }

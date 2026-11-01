@@ -1683,6 +1683,7 @@ mod tests {
             copied: false,
             cast_known: u32::MAX,
             acquired: Acquired::OWN,
+            words: Words::NONE,
         };
         let names = vec!["A".to_string(), "B".to_string()];
         let faces = HashSet::new();

@@ -602,6 +602,7 @@ fn a_card_revealed_for_miracle_is_looked_back_on_while_its_trigger_waits() {
         count: None,
         since: None,
         acquired: Acquired::OWN,
+        words: None,
     });
     let mut cx = cx(&mut game);
     assert!(librarian_triggers_as_it_dies_with(&mut cx, librarian, in_hand, Zone::library(PlayerId(0))));

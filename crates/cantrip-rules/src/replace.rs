@@ -445,6 +445,8 @@ fn affected(cx: &Cx, proposal: &Proposal) -> PlayerId {
 /// Every effect that applies to the event and has not been applied to it yet (CR 614.5), in a deterministic order:
 /// by source, then by the order the card lists them.
 fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&Entering>) -> Vec<Candidate> {
+    // Each effect's own text, its source's now (`Cx::own_text`).
+    let _others = cx.others_text();
     // Damage that has been prevented in full is no event any more: nothing is left to replace (CR 615.1); nor is a draw that
     // an effect has replaced, which never happens (CR 614.6).
     if let Proposal::Damage(d) = proposal
@@ -806,8 +808,13 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
     apply_to(cx, proposal, None);
 }
 
-/// `apply`, to a permanent's entry with its own replacements still to apply (`Entering::own`) where `entry` is given.
-fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Entering>) {
+/// `apply`, to a permanent's entry with its own replacements still to apply (`Entering::own`) where `entry` is given. Each
+/// effect is its own text, its source's now, though a resolving ability's instructions made the event (`Cx::own_text`).
+fn apply_to(cx: &mut Cx, proposal: &mut Proposal, entry: Option<&mut Entering>) {
+    cx.own_text(false, |cx| apply_each(cx, proposal, entry));
+}
+
+fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Entering>) {
     let mut applied: Vec<Applied> = cx.lineage.clone();
     loop {
         // An entering permanent is judged as it would exist with the changes of the replacements applied so far (CR 614.12).
@@ -1047,6 +1054,10 @@ fn used_up(cx: &mut Cx, timestamp: u32) {
 /// are, chooses one where there are several (CR 616.1); its "you may" is asked once; and it applies to every group it
 /// applies to then, after which it has applied to the whole event and applies to none of it again (CR 614.5).
 fn apply_to_parts(cx: &mut Cx, parts: &mut [Proposal]) {
+    cx.own_text(false, |cx| apply_to_each_part(cx, parts));
+}
+
+fn apply_to_each_part(cx: &mut Cx, parts: &mut [Proposal]) {
     let mut applied: Vec<Applied> = cx.lineage.clone();
     loop {
         let found: Vec<Vec<Candidate>> = parts.iter().map(|p| candidates(cx, p, &applied, None)).collect();
@@ -1098,6 +1109,7 @@ fn unlink_if_sent_elsewhere(before: &Proposal, after: &mut Proposal) {
 /// What one effect does to the event, and nothing else: its `apply`, with the "you" it has (`apply` does this and the rest).
 /// For the outcomes an event could have (`mana_outcomes`), which do nothing to the game.
 fn reshape(cx: &Cx, c: &Candidate, proposal: &mut Proposal) {
+    let _others = cx.others_text();
     match c.origin {
         Origin::Printed => {
             let def = printed_replacement(cx, c.source, c.index);
@@ -1215,6 +1227,7 @@ pub(crate) fn shields(cx: &Cx, d: &DamageEvent) -> Option<(ObjectId, u16)> {
         return None;
     }
     let mut found: Option<(ObjectId, u16)> = None;
+    let _others = cx.others_text();
     for e in &cx.s().effects {
         let EffectKind::Prevention { card, index, to, shield: Shield::Next(left) } = e.kind else { continue };
         if !(to == Target::None || to == d.target) || (to.object().is_some() && !live(cx.s(), e.affected)) {

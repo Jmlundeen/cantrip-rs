@@ -145,6 +145,8 @@ mod mixed_zone_tests;
 #[cfg(test)]
 mod mana_trigger_tests;
 #[cfg(test)]
+mod own_text_tests;
+#[cfg(test)]
 mod mana_replacement_tests;
 #[cfg(test)]
 mod entry_order_tests;
@@ -225,6 +227,11 @@ pub struct Game {
     /// What the offer of the actions a player may take asks of the spells cards would be (`actions::SpellsAsCast`), while
     /// `actions::priority_options` answers. Bookkeeping of a call, not of the game.
     pub(crate) spells_as_cast: std::cell::RefCell<actions::SpellsAsCast>,
+    /// The resolving ability's own text is being read (`Cx::own_text`): its condition, its targets and its instructions,
+    /// where `Query::words` of its source answers the words the ability was put on the stack with (`StackItem::words`, CR
+    /// 113.7a). Off while the engine asks other abilities - triggers, replacement effects, state triggers, durations -
+    /// in the middle of them: those are their own text, the source's now. Bookkeeping of a call, not of the game.
+    pub(crate) own_text: std::cell::Cell<bool>,
 }
 
 /// When the state triggers judge a change that records no event (CR 603.8: a state trigger "triggers as soon as the game
@@ -285,6 +292,7 @@ impl Clone for Game {
             history_end: self.history_end,
             check: StateCheck::NONE,
             spells_as_cast: Default::default(),
+            own_text: Default::default(),
         }
     }
 }
@@ -400,7 +408,7 @@ impl Game {
             t.priority = chooser;
         });
 
-        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default() };
+        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() };
         // CR 103.2b: the companion chosen as the deck was built is revealed once the starting player is known, if the starting
         // deck - the library as dealt - fulfils its condition; one that doesn't is a sideboard card, and nothing is said of it.
         for (p, id) in companions {
@@ -819,7 +827,7 @@ impl Game {
         let state = self.state.clone_with_journal_from(floor);
         let root = self.tree.next();
         let tree = tree::Tree::rooted(root, (state.mark(), self.log.len()));
-        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default() }
+        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() }
     }
 
     /// Gives the game's generator another seed (`GameState::reseed`): a fork for search that must not shuffle or roll
@@ -1246,6 +1254,9 @@ impl<'a> Cx<'a> {
             count,
             since: None,
             acquired: self.resolving_acquired(source),
+            // Made to trigger by the resolving ability, it is part of that ability's text, as it was put on the stack
+            // (CR 603.12, 113.7a), whatever has changed its source's text since.
+            words: Some(Query::words(&*self, source)),
         });
     }
 
@@ -1505,6 +1516,33 @@ impl<'a> Cx<'a> {
         s.stack.iter().rev().find(|i| i.serial == serial).or_else(|| s.left_stack.iter().rev().find(|i| i.serial == serial))
     }
 
+    /// Runs `f` reading the resolving ability's own text, or (`own` false) every other ability's: `Game::own_text`. What the
+    /// resolving ability's condition, targets and instructions read of its source's words is the ability's text as it was put
+    /// on the stack (CR 113.7a); what the engine asks of other abilities in the middle of them - what triggers, what replaces
+    /// an event - is each one's own text, its source's now.
+    pub(crate) fn own_text<T>(&mut self, own: bool, f: impl FnOnce(&mut Self) -> T) -> T {
+        let outer = self.g.own_text.replace(own);
+        let result = f(self);
+        self.g.own_text.set(outer);
+        result
+    }
+
+    /// `own_text(false, ..)` for a question asked of a shared `Cx`: the other abilities' text is read until the guard drops.
+    pub(crate) fn others_text(&self) -> OthersText<'_> {
+        OthersText { own: &self.g.own_text, outer: self.g.own_text.replace(false) }
+    }
+}
+
+/// Reads other abilities' text while it lives (`Cx::others_text`), and puts back what was read before as it drops.
+pub(crate) struct OthersText<'a> {
+    own: &'a std::cell::Cell<bool>,
+    outer: bool,
+}
+
+impl Drop for OthersText<'_> {
+    fn drop(&mut self) {
+        self.own.set(self.outer);
+    }
 }
 
 impl Query for Game {
@@ -1594,6 +1632,20 @@ impl Query for Cx<'_> {
 
     fn can_target(&self, asker: &Asker, target: Target) -> bool {
         layers::can_target(self.g.cards, &self.g.state, &self.g.log, asker, target)
+    }
+
+    /// The words of `id`'s text (CR 612) - but, while a resolving ability's own text is read (`Cx::own_text`), its source's are
+    /// the ability's: the words it was put on the stack with (`StackItem::words`), whatever has changed the source's text since
+    /// (CR 113.7a, 612.1). A spell reads its own, which a text change on the stack does change.
+    fn words(&self, id: ObjectId) -> Words {
+        if self.g.own_text.get()
+            && let Some(item) = self.resolving()
+            && item.kind != StackKind::Spell
+            && item.object == id
+        {
+            return item.words;
+        }
+        cantrip_api::words(&self.g.state, id)
     }
 }
 

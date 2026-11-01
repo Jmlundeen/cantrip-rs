@@ -1,0 +1,57 @@
+# Changing the target of an ability on the stack judges the new target by the ability's own text (CR 115.7a), fixed as it
+# was put on the stack (CR 603.3, 113.7a). Rattlechains enters and its trigger targets Spirit of the Labyrinth ("target
+# Spirit gains hexproof"). In response Artificial Evolution replaces Spirit with Horror in Rattlechains' text, then Bot1
+# activates Spellskite ("change the target of target spell or ability to Spellskite"). Spellskite is a Horror, but the
+# ability still says "target Spirit", so Spellskite is no legal target for it and the target stays: the Spirit of the
+# Labyrinth gains hexproof.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Spirit of the Labyrinth
+Spellskite
+Rattlechains
+Artificial Evolution
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Spellskite.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Rattlechains.Cast
+Bot1.Pass
+Bot1.Target(Spirit of the Labyrinth)
+Bot1.Hand.Artificial Evolution.Cast(Rattlechains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Spirit)
+Bot1.Modes(Horror)
+? Stack.Count = 1
+Bot1.Battlefield.Spellskite.Activate(Stack.Rattlechains)
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Spirit of the Labyrinth.Keywords = Hexproof
+Bot1.Battlefield.Spellskite.Keywords = (absent)

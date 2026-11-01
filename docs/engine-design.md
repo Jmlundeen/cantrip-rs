@@ -332,7 +332,12 @@ only the candidates the host's verdict on those picked says may be added.
   subtype) replaced by another. The layers change the type line; card code reads every word of its rules text through
   `Query::words` (`Words`, the changes in timestamp order unless one depends on another), so the card does what its changed text says. A token's
   colors and creature types are those of the text that made it (`Copiable::words`, 612.4), a permanent spell's effects
-  go on to the permanent (400.7a), and an object that has left keeps the words it last had (`LastKnown::words`). Layer 3
+  go on to the permanent (400.7a), and an object that has left keeps the words it last had (`LastKnown::words`). An
+  activated or triggered ability's text is fixed as it is put on the stack (602.2, 603.3, 113.7a): the stack item keeps its
+  source's words then (`StackItem::words`), and while its own condition, targets and instructions are read
+  (`Cx::own_text`, `resolve::Given::text`) `Query::words` of its source answers those - the engine turns that off while it
+  asks other abilities in the middle of them (triggers, replacement effects, state triggers). A spell reads its own words
+  (a text change on the stack changes it); static abilities read their source's words now. Layer 3
   also changes the words of printed keyword abilities that name a color or a land type: "hexproof from [color]",
   "protection from [color]" (`CardDef::protection`, White Knight) and a basic landwalk (`Keyword::Islandwalk` ...,
   702.14: Bog Wraith's swampwalk to Magical Hack's plainswalk); an ability another permanent grants reads the word through

@@ -1,0 +1,51 @@
+# A reflexive triggered ability is part of the ability that makes it trigger (CR 603.12), whose text was fixed as it was
+# activated (CR 602.2, 113.7a). Bot1 activates Minsc & Boo's -2 sacrificing Boo, a Hamster; in response Artificial Evolution
+# replaces Hamster with Elf in Minsc & Boo's text. The -2 resolves with its own text, and so does the reflexive trigger it
+# makes: "if the sacrificed creature was a Hamster, draw X cards" asks of a Hamster, so Bot1 draws (Boo has power 1).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Minsc & Boo, Timeless Heroes
+Mox Sapphire
+Artificial Evolution
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Minsc & Boo, Timeless Heroes.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Boo.Subtypes = Hamster
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Activate(Ability: Sacrifice)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Minsc & Boo, Timeless Heroes)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Hamster)
+Bot1.Modes(Elf)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Hand.Count = 2

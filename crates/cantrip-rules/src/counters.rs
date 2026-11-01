@@ -266,6 +266,7 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
         count: None,
         since: None,
         acquired: Acquired::OWN,
+        words: None,
     });
 }
 

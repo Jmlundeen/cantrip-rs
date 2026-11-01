@@ -22,6 +22,7 @@ pub(crate) fn queue(cx: &mut Cx, card: CardId, index: u8, controller: PlayerId, 
         count: None,
         since: None,
         acquired: Acquired::OWN,
+        words: None,
     });
     source
 }

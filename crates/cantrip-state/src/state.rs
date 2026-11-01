@@ -2172,6 +2172,7 @@ mod tests {
             copied: false,
             cast_known: u32::MAX,
             acquired: Acquired::OWN,
+            words: Words::NONE,
         }
     }
 

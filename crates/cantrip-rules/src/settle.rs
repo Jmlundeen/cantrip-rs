@@ -4,7 +4,6 @@
 use cantrip_api::*;
 use cantrip_state::{PendingTrigger, Span};
 
-use crate::actions::target_candidates_given;
 use crate::layers::{self, live};
 use crate::{Cx, Flow, R, counters, ops};
 
@@ -548,23 +547,27 @@ fn choose_trigger_targets(
     let slots = crate::resolve::expand_specs(cx.s(), trigger.controller, specs);
     // "If [it] was kicked, instead choose ..." (CR 702.33a, 601.2c), of the source.
     let kicked = cx.s().obj(trigger.source).kicked;
+    // The text it is put on the stack with judges its targets: a reflexive or delayed ability's is the text that made it
+    // (`PendingTrigger::words`, CR 603.12, 113.7a).
+    let text = trigger.words.map(|w| (trigger.source, w));
     for (spec, slot_player, at) in &slots {
         let spec = &spec.when_kicked(kicked);
         let before = targets.len();
         'slot: {
-            let candidates = target_candidates_given(
+            let candidates = crate::actions::target_candidates_with_text(
                 cx,
                 &asker,
                 spec,
                 if slots.len() > 1 { &targets[start..] } else { &[] },
                 trigger.subject,
                 *slot_player,
-                None,
+                text,
             );
             let counted = u32::from(trigger_counted(cx, trigger));
-            let (candidates, together) = crate::actions::within_together(cx, &asker, spec, counted, candidates);
+            let own = crate::resolve::Given { q: &*cx, earlier: &[], subject: Target::None, slot_player: None, gift: false, x: None, text };
+            let (candidates, together) = crate::actions::within_together(&own, &asker, spec, counted, candidates);
             let (least, most) = spec.bounds(counted);
-            if !crate::actions::enough_together(cx, &asker, &together, &candidates, least) {
+            if !crate::actions::enough_together(&own, &asker, &together, &candidates, least) {
                 // Fewer legal targets than the slot's minimum: it is removed from the stack (CR 603.3d, 601.2c).
                 return Ok(false);
             }
@@ -776,6 +779,9 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
         copied: false,
         cast_known: u32::MAX,
         acquired: trigger.acquired,
+        // Its text as it is put on the stack (CR 603.3, 113.7a): its source's words now, or last, if it has left.
+        // A reflexive or delayed ability's are those of the text that made it (`PendingTrigger::words`).
+        words: trigger.words.unwrap_or_else(|| cantrip_api::words(cx.s(), trigger.source)),
     };
     // Its controller left as one of its choices was asked (CR 800.4d).
     if cx.s().player(trigger.controller).lost {
@@ -902,6 +908,7 @@ fn consider(
                     count: None,
                     since: None,
                     acquired: acquired_at(nth),
+                    words: None,
                 },
                 t,
                 again,
@@ -939,7 +946,7 @@ fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event
     if index == cantrip_api::intrinsic::SPEED_UP {
         cx.record(Event::Triggered { source, ability });
     }
-    found.push((PendingTrigger { source, ability, controller, subject, data: [0; 2], members: Span::default(), count: None, since: None, acquired: Acquired::OWN }, t, again));
+    found.push((PendingTrigger { source, ability, controller, subject, data: [0; 2], members: Span::default(), count: None, since: None, acquired: Acquired::OWN, words: None }, t, again));
 }
 
 /// The slot of `chars`'s abilities that the `nth` of `Chars::abilities()` is in.
@@ -955,7 +962,7 @@ fn delayed_link(cx: &Cx, d: &cantrip_state::Delayed) -> Option<Linked> {
 
 /// The triggering of a state trigger (CR 603.8): about no event, so nothing is its subject.
 fn state_trigger(source: ObjectId, ability: AbilityRef, controller: PlayerId, acquired: Acquired) -> PendingTrigger {
-    PendingTrigger { source, ability, controller, subject: Target::None, data: [0; 2], members: Span::default(), count: None, since: None, acquired }
+    PendingTrigger { source, ability, controller, subject: Target::None, data: [0; 2], members: Span::default(), count: None, since: None, acquired, words: None }
 }
 
 /// Whether a state trigger of `source` has triggered and not yet left the stack (CR 603.8): found for this batch, waiting
@@ -1012,6 +1019,8 @@ pub(crate) fn state_triggers_now(cx: &mut Cx) {
     let sources: Vec<ObjectId> =
         cx.s().battlefield().iter().chain(cx.s().zone(Zone::COMMAND)).copied().filter(|&id| may_have(cx, id)).collect();
     let mut found: Found = Vec::new();
+    // Each state trigger's own text, its source's now, though a resolving ability's instructions are under way (`Cx::own_text`).
+    let others = cx.others_text();
     for source in sources {
         let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
         let controller = cx.s().obj(source).controller;
@@ -1026,6 +1035,7 @@ pub(crate) fn state_triggers_now(cx: &mut Cx) {
             }
         }
     }
+    drop(others);
     for (trigger, _, _) in found {
         cx.st().trigger_push(trigger);
     }
@@ -1336,6 +1346,9 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
     let before = before.map(|b| b.battlefield);
     let outer = cx.g.history_end;
     cx.g.history_end = Some(start);
+    // What triggers is asked of each ability's own text, its source's now, though a resolving ability's instructions made
+    // the events (`Cx::own_text`).
+    let own_text = cx.g.own_text.replace(false);
     // The cut is lifted however the look ends: a host that catches a panic goes on with the game (`cantrip_host::host`).
     let looked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         let mut found: Found = Vec::new();
@@ -1427,6 +1440,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                                 // A delayed ability goes on the stack with the moment it was created (CR 701.27f).
                                 since: Some(d.since),
                                 acquired: d.acquired,
+                                words: None,
                             },
                             t,
                             Again::new(),
@@ -1502,6 +1516,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                                 count: None,
                                 since: None,
                                 acquired: layers::acquired(cx.cards(), cx.s(), &cx.g.log, id, &chars, slot_of(&chars, nth)),
+                                words: None,
                             },
                             t,
                             again,
@@ -1514,6 +1529,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
     }));
     // The triggerings are counted in the history as it now is (`Event::Triggered`).
     cx.g.history_end = outer;
+    cx.g.own_text.set(own_text);
     let found = match looked {
         Ok(found) => found,
         Err(panic) => std::panic::resume_unwind(panic),
@@ -1580,7 +1596,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                 trigger.members = cx.st().members_push(&members);
             }
             if let Some(members_of) = def.members_of {
-                let objects = members_of(&*cx, trigger.subject);
+                let objects = {
+                    let _others = cx.others_text();
+                    members_of(&*cx, trigger.subject)
+                };
                 trigger.members = cx.st().members_push(&objects);
             }
             cx.st().trigger_push(trigger);
@@ -1624,7 +1643,7 @@ pub fn step_began(cx: &mut Cx, step: Step) {
             } else {
                 at += 1;
             }
-            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None, since: Some(d.since), acquired: d.acquired });
+            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None, since: Some(d.since), acquired: d.acquired, words: None });
         } else {
             at += 1;
         }
@@ -1658,6 +1677,7 @@ fn suspended_cards(cx: &mut Cx, active: PlayerId) {
             count: None,
             since: None,
             acquired: Acquired::OWN,
+            words: None,
         });
     }
 }
