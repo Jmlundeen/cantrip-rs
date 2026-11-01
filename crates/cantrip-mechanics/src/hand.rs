@@ -103,6 +103,15 @@ pub fn discard_chosen_nonland_permanent_from_revealed_hand(
     })
 }
 
+/// The whole effect "Target opponent reveals their hand. You choose a nonland permanent card from it. That player discards that card."
+/// (CR 701.9a, 110.4a) for a spell or mode whose target 0 is the opponent: nothing happens when that target is no longer legal
+/// (CR 608.2b). Auntie's Sentence, Dai Li Indoctrination and Solve for Disappointment print it.
+pub fn target_opponent_discards_chosen_nonland_permanent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(opponent) = crate::targets::player(g, item, 0) else { return Ok(()) };
+    discard_chosen_nonland_permanent_from_revealed_hand(g, item, opponent)?;
+    Ok(())
+}
+
 /// "Look at target player's hand. You may choose a card from it [that passes `eligible`]": the ability's controller sees the hand
 /// (it is shown to them alone, not revealed) and may choose one eligible card. Looking is part of the ability, so the choice is
 /// asked of any hand that is not empty, even when nothing in it is eligible; an empty hand is nothing to look at. The card chosen
