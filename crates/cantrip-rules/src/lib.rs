@@ -34,6 +34,8 @@ mod loops;
 mod merge;
 #[cfg(test)]
 mod merge_tests;
+#[cfg(test)]
+mod read_ahead_tests;
 mod ops;
 mod phasing;
 #[cfg(test)]

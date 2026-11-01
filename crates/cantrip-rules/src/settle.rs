@@ -313,13 +313,7 @@ fn check_once(cx: &mut Cx) -> R<bool> {
     // counter that reached it go on the stack, so the last chapter always gets to resolve.
     let mut sacrificed = Vec::new();
     for (id, chars) in sagas {
-        let last = chars
-            .abilities()
-            .filter_map(|a| match cx.cards().ability(a) {
-                AbilityDef::Triggered(t) if t.chapter > 0 => Some((a, t.chapter)),
-                _ => None,
-            })
-            .fold(0, |most, (_, chapter)| most.max(chapter));
+        let last = ops::final_chapter(chars.abilities().map(|a| cx.cards().ability(a)));
         if last == 0 || cx.s().obj(id).counters(CounterKind::Lore) < last as i16 {
             continue;
         }
@@ -868,7 +862,7 @@ fn consider(
             && (!permanent || t.functions.contains(ZoneKind::Battlefield))
             && (later.is_some() || cx.cards().looks_back(ability, event, seen) == look_back)
             && let Some(fired) = if t.chapter > 0 {
-                chapter_reached(source, t.chapter, event)
+                chapter_reached(cx, source, &chars, t.chapter, event)
             } else if t.attack_option.is_some() {
                 paid_to_attack(source, ability, chars.instance(nth), event)
             } else if t.listens.intersects(mask) {
@@ -1051,11 +1045,24 @@ fn paid_to_attack(source: ObjectId, ability: AbilityRef, instance: u8, event: &E
 }
 
 /// A Saga's chapter ability (CR 714.2b) triggers when lore counters are put on it and their number becomes at least
-/// its chapter number, having been less than it.
-fn chapter_reached(source: ObjectId, chapter: u8, event: &Event) -> Option<Fired> {
+/// its chapter number, having been less than it. One of a Saga with read ahead (`chars`, its characteristics as the event
+/// is judged) can't trigger the turn the Saga entered the battlefield unless it then has exactly the chapter's number of
+/// lore counters (CR 702.155a): the chapters a read-ahead Saga skips as it enters with several don't trigger, and nor do
+/// those more counters put on it that turn pass over. The history says whether it entered this turn, asked only of a
+/// chapter that would otherwise trigger.
+fn chapter_reached(cx: &Cx, source: ObjectId, chars: &Chars, chapter: u8, event: &Event) -> Option<Fired> {
     match event {
         Event::CountersPut { object, kind: CounterKind::Lore, amount, total, .. } if *object == source => {
-            if total - amount < chapter as i16 && *total >= chapter as i16 { Fired::PLAIN } else { None }
+            let chapter = i16::from(chapter);
+            if total - amount >= chapter || *total < chapter {
+                return None;
+            }
+            // The whole history so far: the move that brought it is in the batch being judged, which `Query::history`
+            // leaves out while triggers are found (`Game::history_end`).
+            if *total != chapter && chars.has(Keyword::ReadAhead) && History::new(&cx.g.log, cx.s().turn.number).entered_this_turn(source) {
+                return None;
+            }
+            Fired::PLAIN
         }
         _ => None,
     }

@@ -181,7 +181,7 @@ fn an_own_enters_out_of_its_tier_stops_a_verifying_run() {
             attach_player: None,
             x: 0,
             transformed: false,
-            protector: None,
+            protector: None, read_ahead: None,
             instead: None,
             becomes: None,
             own: Some(table.id_of(def)),

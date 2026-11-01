@@ -539,4 +539,11 @@ impl<'a> History<'a> {
     pub fn attacked_this_turn(&self, creature: ObjectId) -> bool {
         self.this_turn().iter().any(|r| matches!(r.event, Event::Attacks { attacker, .. } if attacker == creature))
     }
+
+    /// Whether `permanent` entered the battlefield this turn (CR 400.7: it is the object that move made): read ahead's "the
+    /// turn it entered the battlefield" (CR 702.155a), and `cantrip_mechanics::history::entered_this_turn`'s.
+    pub fn entered_this_turn(&self, permanent: ObjectId) -> bool {
+        self.select(EventQuery::kind(EventMask::ZONE_CHANGE).to(ZoneKind::Battlefield).this_turn())
+            .any(|r| matches!(r.event, Event::ZoneChange { new, .. } if new == permanent))
+    }
 }

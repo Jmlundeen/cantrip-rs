@@ -1753,6 +1753,16 @@ Saga as their precombat main phase begins (CR 714.3c, a turn-based action). So D
 loyalty and not its +1, and Innkeeper's Talent doubles both. A cost that would put counters a static ability forbids (CR 101.2,
 `CardDef::counter_bans`: Solemnity, Melira) can't be paid (CR 118.3, Solemnity's ruling): such a loyalty ability, counter cost or
 blight is not offered. Whether damage's -1/-1 counters (infect, CR 120.3d) are an effect's has no ruling; they are put as one.
+
+Read ahead (CR 702.155, `Keyword::ReadAhead`) is a core keyword, since it changes how a Saga enters and when its chapters
+trigger. As a Saga that would have it on the battlefield enters (CR 614.12: its own, a copy's, or a static ability's like
+Barbara Wright's), `ops::prepare_entry` asks its controller a number from one to its final chapter number (`ChooseNumber`,
+CR 702.155b, 714.2d), kept on the entry (`Entering::read_ahead`); `counters::intrinsic` gives it that many lore counters in
+place of 714.3a's one, put like any it enters with. A chapter of a Saga with read ahead triggers the turn it entered only on
+exactly its number of lore counters (CR 702.155a, `settle::chapter_reached`, the history asked whether it entered this turn),
+so the skipped chapters and those later counters pass over that turn don't trigger. A card prints it as `"ReadAhead"` in its
+content file's `keywords` and needs no code for it.
+
 A static ability may forbid some payments of the costs to cast spells and activate abilities (CR 101.2, 118.3, 601.2h, 602.2b:
 `CardDef::cost_bans`, a `CostBan` asked of the payer, what the cost is for - `CostFor::Spell`, `Ability` or `ManaAbility` - and the
 payment, `CostPayment::Life` or `Sacrifice(permanent)`, through `static_rules::cost_banned`). Yasharn, Implacable Earth forbids life

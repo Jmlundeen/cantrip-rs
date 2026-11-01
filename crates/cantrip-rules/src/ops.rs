@@ -467,7 +467,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
             new.marks.face_down_as = Some(c.card);
         }
         if entering {
-            counters::intrinsic(cx.cards(), &new, &mut counts);
+            counters::intrinsic(cx.cards(), &new, m.entering.and_then(|e| e.read_ahead), &mut counts);
             // Counters it enters with are counters put on it (CR 122.6, 614.1a), by its controller (CR 122.6a):
             // replacements that change how many apply to them, the permanent judged as it would exist on the battlefield
             // (CR 614.12).
@@ -1243,6 +1243,64 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     if !copied && !entering.transformed && copy_over(cx, entering) && enters_by_daybound(cx, entering, may_lose) {
         entering.transformed = true;
     }
+    // Read ahead's choice is judged on what it now enters as: its face, or the copy it enters as.
+    choose_read_ahead(cx, entering, may_lose)
+}
+
+/// A Saga's final chapter number (CR 714.2d): the greatest among the chapter abilities in `abilities`, 0 with none.
+pub(crate) fn final_chapter<'a>(abilities: impl Iterator<Item = &'a AbilityDef>) -> u8 {
+    abilities
+        .filter_map(|a| match a {
+            AbilityDef::Triggered(t) if t.chapter > 0 => Some(t.chapter),
+            _ => None,
+        })
+        .max()
+        .unwrap_or(0)
+}
+
+/// Read ahead (CR 702.155b, 714.3b): "As this Saga enters, choose a number between one and this Saga's final chapter
+/// number" and "This Saga enters with the chosen number of lore counters on it" - replacement effects (CR 614.1c) whose
+/// choice is made before it enters (CR 614.12a), by the player it enters under. Only a Saga that would have read ahead on
+/// the battlefield chooses (CR 614.12): by its own text or a copy's, or given by a static ability that would apply to it
+/// there (Barbara Wright's "Sagas you control have read ahead"), and not one that would have lost its abilities there. Its
+/// final chapter number is that of the chapter abilities it would have (CR 714.2d); one with none has no number to choose.
+/// The number chosen is the lore counters it enters with (`counters::intrinsic`), in place of a Saga's one (CR 714.3a).
+fn choose_read_ahead(cx: &mut Cx, entering: &mut Entering, may_lose: bool) -> R<()> {
+    // Its chapter abilities are its text's - its face's, or the copy's it enters as (no printed card gives a permanent a
+    // chapter ability): with none it has no final chapter, and nothing to choose.
+    let def = cx.cards().get(entering_card(cx, entering));
+    if final_chapter(def.abilities.iter()) == 0 {
+        return Ok(());
+    }
+    // Where no static ability could give it abilities or take them, and no copy effect or "it's a ..." could make it other
+    // than its card, it is on the battlefield what its card says.
+    let judged = may_lose || entering.copy.is_some() || entering.becomes.is_some() || layers::ability_grants_present(cx.cards(), cx.s());
+    let last = if judged {
+        let would = as_it_would_exist(cx, entering);
+        if would.lost || !would.chars.has(Keyword::ReadAhead) || !would.chars.has_subtype(Subtype::Saga) {
+            return Ok(());
+        }
+        final_chapter(would.chars.abilities().map(|a| cx.cards().ability(a)))
+    } else {
+        if !def.keywords.has(Keyword::ReadAhead) || !def.subtypes.has(Subtype::Saga) {
+            return Ok(());
+        }
+        final_chapter(def.abilities.iter())
+    };
+    if last == 0 {
+        return Ok(());
+    }
+    let ask = RequestKind::ChooseNumber {
+        source: entering.object,
+        least: 1,
+        most: u32::from(last),
+        heading: "Read ahead: choose the chapter it starts on (it enters with that many lore counters)",
+    };
+    // The core checks the answer is one offered (`validate`).
+    entering.read_ahead = match cx.ask_core(entering.controller, ask, false)? {
+        Answer::Announce(n) => u8::try_from(n).ok(),
+        _ => None,
+    };
     Ok(())
 }
 
@@ -1645,7 +1703,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None, becomes, own: None };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, read_ahead: None, instead: None, becomes, own: None };
         prepare_entry(cx, &mut entering)?;
         // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1710,7 +1768,7 @@ pub fn put_onto_battlefield_as(
         attach: None, attach_player: None,
         x: 0,
         transformed,
-        protector: None,
+        protector: None, read_ahead: None,
         instead: None,
         becomes: None,
         own: None,
@@ -1832,7 +1890,7 @@ pub fn put_onto_battlefield_attached(cx: &mut Cx, id: ObjectId, controller: Play
         attach_player: None,
         x: 0,
         transformed: false,
-        protector: None,
+        protector: None, read_ahead: None,
         instead: None,
         becomes: None,
         own: None,
@@ -2237,7 +2295,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, instead: None, becomes: None, own: None };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, read_ahead: None, instead: None, becomes: None, own: None };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
@@ -2311,7 +2369,7 @@ fn create_tokens_onto(
         // A token copy of a planeswalker, a battle or a Saga enters with its loyalty, defense or lore counters too
         // (CR 306.5b, 310.4b, 714.3a), put on by its controller like the rest (CR 122.6a).
         let mut counts = entering.counters;
-        counters::intrinsic(cx.cards(), cx.s().obj(id), &mut counts);
+        counters::intrinsic(cx.cards(), cx.s().obj(id), entering.read_ahead, &mut counts);
         entering.counters = counts;
         entering.counters =
             judged_entering(cx, &entering, counts.iter().any(|&n| n > 0), |cx| counters::entering(cx, id, controller, controller, counts));
@@ -4839,7 +4897,7 @@ mod tests {
             attach_player: None,
             x: 0,
             transformed: false,
-            protector: None,
+            protector: None, read_ahead: None,
             instead: None,
             becomes: None,
             own: None,

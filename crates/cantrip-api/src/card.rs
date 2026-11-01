@@ -103,6 +103,9 @@ pub struct Entering {
     pub transformed: bool,
     /// The player chosen to protect a battle as it enters (CR 310.9a, 310.12a), by `prepare_entry`.
     pub protector: Option<PlayerId>,
+    /// The number a Saga with read ahead chose as it enters (CR 702.155b, 714.3b), by `prepare_entry`: it enters with that
+    /// many lore counters, in place of the one a Saga without read ahead enters with (CR 714.3a).
+    pub read_ahead: Option<u8>,
     /// It does not enter: it goes to this zone instead (CR 614.12, 614.1a), as Mox Diamond's replacement sends it to the graveyard
     /// when its controller does not discard a land.
     pub instead: Option<Zone>,

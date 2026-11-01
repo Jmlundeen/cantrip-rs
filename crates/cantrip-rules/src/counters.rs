@@ -271,9 +271,10 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
 
 /// What a permanent enters with because of what it is (CR 614.1c), counters it enters with like any other (CR 122.6),
 /// put on by its controller (CR 122.6a): a planeswalker its printed loyalty (CR 306.5b), a battle its printed defense
-/// (CR 310.4b), a Saga a lore counter (CR 714.3a). Added to the counters the replacements give it, before the replacements
-/// of counters being put apply to them all (`entering`).
-pub fn intrinsic(cards: &CardTable, obj: &Obj, counts: &mut [i16; CounterKind::COUNT]) {
+/// (CR 310.4b), a Saga a lore counter (CR 714.3a) - or, with read ahead, the number its controller chose as it entered
+/// (`read_ahead`, CR 702.155b, 714.3b). Added to the counters the replacements give it, before the replacements of counters
+/// being put apply to them all (`entering`).
+pub fn intrinsic(cards: &CardTable, obj: &Obj, read_ahead: Option<u8>, counts: &mut [i16; CounterKind::COUNT]) {
     let card = obj.copied_card().unwrap_or_else(|| cards.face(obj.card, obj.transformed));
     let def = cards.get(card);
     // A copy effect's exception may state its loyalty (CR 707.9b: "has starting loyalty X"); a face-down permanent has
@@ -285,7 +286,9 @@ pub fn intrinsic(cards: &CardTable, obj: &Obj, counts: &mut [i16; CounterKind::C
         counts[CounterKind::Defense as usize] += defense;
     }
     let saga = def.subtypes.has(Subtype::Saga) && def.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.chapter > 0));
-    if saga {
+    if let Some(chosen) = read_ahead {
+        counts[CounterKind::Lore as usize] += i16::from(chosen);
+    } else if saga {
         counts[CounterKind::Lore as usize] += 1;
     }
 }

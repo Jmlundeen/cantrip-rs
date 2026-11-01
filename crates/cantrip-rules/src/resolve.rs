@@ -544,7 +544,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     x: item.x,
                     // Cast as its back face, or transformed, it enters with that face up (CR 712.8c, 712.8f, 712.13).
                     transformed: item.way == WAY_BACK_FACE || item.way == WAY_TRANSFORMED,
-                    protector: None,
+                    protector: None, read_ahead: None,
                     instead: None,
                     becomes: None,
                     own: None,

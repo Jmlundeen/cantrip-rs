@@ -989,6 +989,13 @@ pub enum Keyword {
     /// Mutate (CR 702.140a): a static ability that functions while the spell with it is on the stack. A card has it by its
     /// mutate way (`WayKind::Mutate`), which holds its cost, so "if it has mutate" (Pollywog Symbiote) reads it.
     Mutate = 58,
+    /// Read ahead (CR 702.155): a Saga with it chooses, as it enters, a number from one to its final chapter number and
+    /// enters with that many lore counters instead of one (CR 702.155b, 714.3b), and its chapter abilities can't trigger the
+    /// turn it entered unless it has exactly the number of lore counters of the chapter (CR 702.155a). Both change core
+    /// procedures - how a permanent enters and when a chapter ability triggers - so the core plays it (`ops::prepare_entry`,
+    /// `settle`). Printed (Founding the Third Path, The Cruelty of Gix, Urza Assembles the Titans) or granted (Barbara
+    /// Wright's "Sagas you control have read ahead"); instances are redundant (CR 702.155c).
+    ReadAhead = 59,
 }
 
 impl Keyword {
