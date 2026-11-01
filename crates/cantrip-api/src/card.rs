@@ -251,6 +251,12 @@ pub trait LayerQuery {
     fn linked_to(&self, source: ObjectId) -> Linked {
         self.cards().linked_to(self.state(), source)
     }
+    /// The definition the static ability being asked of `source` is printed on (CR 607.1): the one `source` has now
+    /// (`CardTable::current`), or - for an ability of one of a merged permanent's other components (CR 702.140e) - that
+    /// component's card. What "the card's delayed ability" a static ability gives is named by.
+    fn text_of(&self, source: ObjectId) -> CardId {
+        self.cards().current(self.state().obj(source))
+    }
     /// The cards in exile exiled by `by` (CR 607.2a; `Query::exiled_with`), in exile order.
     fn exiled_with(&self, by: Linked) -> Vec<ObjectId> {
         let s = self.state();
@@ -4346,6 +4352,28 @@ impl CardTable {
             _ => &[],
         };
         std::iter::once(self.current(obj)).chain(sources.iter().map(|v| v.card))
+    }
+
+    /// `texts`, each with the link an ability printed on it is asked with (CR 607.1, 607.5): `None` for the definition the
+    /// object has (`current`), whose abilities are asked as its own text's (`linked_to`); for each other component of a
+    /// merged permanent, that component's card (`component_link`), so a static ability, a replacement effect or a hook of a
+    /// card under another reads the choices and exiles its own card made, and names what it gives by its own card.
+    pub fn texts_linked<'a>(&'a self, s: &'a GameState, id: ObjectId) -> impl Iterator<Item = (CardId, Option<Linked>)> + use<'a> {
+        self.texts(s, s.obj(id)).enumerate().map(move |(i, card)| (card, (i > 0).then(|| self.component_link(s, id, card))))
+    }
+
+    /// How an ability printed on `card`, one of the merged permanent `id`'s components other than its topmost, is linked (CR
+    /// 607.1): by that card's text, acquired with the copiable values that give it (`GameState::copy_acquired`), as the layers
+    /// count every ability of an object's copiable values (`cantrip_rules::layers::acquired`), so what one of its abilities
+    /// links as it resolves is what its static abilities and replacement effects read.
+    pub fn component_link(&self, s: &GameState, id: ObjectId, card: CardId) -> Linked {
+        Linked { object: id, text: self.linked_card(card), acquired: s.copy_acquired(id) }
+    }
+
+    /// The link an ability printed on `card`, one of `id`'s texts (`texts`), is asked with: `None` for the text the object has,
+    /// a component's for any other (`texts_linked`).
+    pub fn link_of_text(&self, s: &GameState, id: ObjectId, card: CardId) -> Option<Linked> {
+        (s.merge_of(id).is_some() && card != self.current(s.obj(id))).then(|| self.component_link(s, id, card))
     }
 
     /// The card a face's abilities are printed on, as linked abilities know it (CR 607.1, 607.1b): a transforming

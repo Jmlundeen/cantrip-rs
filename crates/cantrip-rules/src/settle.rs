@@ -1092,8 +1092,10 @@ impl<'a> TriggerStatics<'a> {
     pub(crate) fn stop(&mut self, cx: &Cx, event: &Event, triggering: &Triggering) -> bool {
         self.sources(cx, triggering).iter().any(|&id| {
             let obj = cx.s().obj(id);
-            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
-            cx.cards().texts(cx.s(), obj).flat_map(|c| cx.card(c).trigger_rules).any(|rule| rule(cx, &asker, event, triggering))
+            cx.cards().texts_linked(cx.s(), id).any(|(c, by)| {
+                let asker = Asker { source: id, controller: obj.controller, by, spell: false };
+                cx.card(c).trigger_rules.iter().any(|rule| rule(cx, &asker, event, triggering))
+            })
         })
     }
 
@@ -1102,9 +1104,10 @@ impl<'a> TriggerStatics<'a> {
     pub(crate) fn additional(&mut self, cx: &Cx, event: &Event, triggering: &Triggering, again: &mut Again) {
         for &id in self.sources(cx, triggering) {
             let obj = cx.s().obj(id);
-            let asker = Asker { source: id, controller: obj.controller, by: None, spell: false };
-            // Numbered across the definitions it has rules from (CR 702.140e), each rule its own.
-            for (n, rule) in cx.cards().texts(cx.s(), obj).flat_map(|c| cx.card(c).additional_triggers).enumerate() {
+            // Numbered across the definitions it has rules from (CR 702.140e), each rule its own, asked as its own card's.
+            let rules = cx.cards().texts_linked(cx.s(), id).flat_map(|(c, by)| cx.card(c).additional_triggers.iter().map(move |r| (r, by)));
+            for (n, (rule, by)) in rules.enumerate() {
+                let asker = Asker { source: id, controller: obj.controller, by, spell: false };
                 if rule(cx, &asker, event, triggering) && !again.contains(&AdditionalTrigger::Static(id, n as u8)) {
                     again.push(AdditionalTrigger::Static(id, n as u8));
                 }

@@ -49,9 +49,13 @@ pub struct GameState {
     pub spill_targets: Vec<Target>,
     /// Parallel to `spill_targets`: the spec each was chosen for.
     pub spill_specs: Vec<u8>,
-    /// What represents each merged permanent besides its own card (CR 730.2), every version of it (`Obj::merged` names the
+    /// What represents each merged permanent besides its own card (CR 730.2), every version of it (`merged_objects` names the
     /// one an object has now). Append-only, journaled; empty in a game where nothing has merged.
     pub merges: Vec<Merge>,
+    /// Each merged permanent (CR 730.2), and one more than the index in `merges` of what represents it now besides its own
+    /// card: kept apart from the object rows, which pay nothing for it, and empty in a game where nothing has merged. An
+    /// object that has left keeps its entry, as its row keeps what it last was.
+    pub merged_objects: Vec<(ObjectId, u32)>,
     /// The values whose abilities a merged permanent's copiable values also have (CR 702.140e, `Copiable::merged` names a
     /// run of it). Append-only, journaled; empty in a game where nothing has merged.
     pub merged_sources: Vec<Vec<Copiable>>,
@@ -282,7 +286,7 @@ impl GameState {
         (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<PlayPermission>),
         (&Vec<Attacker>, &Vec<Block>, &Vec<ExtraTurn>, (&LoopWatch, &Vec<LoopKey>)),
         &Vec<Frame>,
-        (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>, (&Vec<Target>, &Vec<u8>, &Vec<u32>), (&Vec<Merge>, &Vec<Vec<Copiable>>)),
+        (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>, (&Vec<Target>, &Vec<u8>, &Vec<u32>), (&Vec<Merge>, &Vec<Vec<Copiable>>, &Vec<(ObjectId, u32)>)),
     ) {
         (
             (&self.players, &self.restricted_mana, &self.counter_stamps, &self.mana_from),
@@ -302,7 +306,7 @@ impl GameState {
                 &self.members,
                 &self.left_stack,
                 (&self.spill_targets, &self.spill_specs, &self.share_arena),
-                (&self.merges, &self.merged_sources),
+                (&self.merges, &self.merged_sources, &self.merged_objects),
             ),
         )
     }
@@ -420,6 +424,7 @@ pub enum Undo {
     /// Merged sources appended since the arena was this long.
     SourcesPushed(u32),
     SourcesPopped(Vec<Vec<Copiable>>),
+    MergedObjectsSet(Vec<(ObjectId, u32)>),
     AttackersSet(Vec<Attacker>),
     BlocksSet(Vec<Block>),
     ExtraTurnsSet(Vec<ExtraTurn>),
@@ -524,6 +529,7 @@ impl GameState {
             share_arena: Vec::new(),
             merges: Vec::new(),
             merged_sources: Vec::new(),
+            merged_objects: Vec::new(),
             attackers: Vec::new(),
             blocks: Vec::new(),
             extra_turns: Vec::new(),
@@ -1204,12 +1210,9 @@ impl GameState {
 
     // --- Merged permanents (CR 730) -------------------------------------------------------------------------------
 
-    /// What represents `id` besides its own card, if it is a merged permanent (CR 730.2; `Obj::merged`).
+    /// What represents `id` besides its own card, if it is a merged permanent (CR 730.2; `merged_objects`).
     pub fn merge_of(&self, id: ObjectId) -> Option<&Merge> {
-        match self.obj(id).merged {
-            0 => None,
-            n => Some(&self.merges[n as usize - 1]),
-        }
+        self.merged_objects.iter().find(|&&(o, _)| o == id).map(|&(_, n)| &self.merges[n as usize - 1])
     }
 
     /// The values whose abilities a merged permanent's copiable values also have (`Copiable::merged`): its other components'
@@ -1233,13 +1236,24 @@ impl GameState {
         at as u32 + 1
     }
 
+    /// Points the merged permanent `id` at the version `version` of `merges` (`merged_objects`).
+    fn point_merge(&mut self, id: ObjectId, version: u32) {
+        let old = self.merged_objects.clone();
+        match self.merged_objects.iter_mut().find(|(o, _)| *o == id) {
+            Some(entry) => entry.1 = version,
+            None => self.merged_objects.push((id, version)),
+        }
+        self.log(Undo::MergedObjectsSet(old));
+        self.set_unsettled();
+    }
+
     /// Makes `merge` what represents `id` besides its own card (CR 730.2), a new version of it, and works out the copiable
     /// values it leaves the permanent (`rechain_merged`).
     pub fn set_merge(&mut self, id: ObjectId, merge: Merge) {
         let at = self.merges.len();
         self.merges.push(merge);
         self.log(Undo::MergesPushed(at as u32));
-        self.update_obj(id, |o| o.merged = at as u32 + 1);
+        self.point_merge(id, at as u32 + 1);
         self.rechain_merged(id);
     }
 
@@ -1312,7 +1326,7 @@ impl GameState {
             let at = self.merges.len();
             self.merges.push(Merge { parts, ..merge });
             self.log(Undo::MergesPushed(at as u32));
-            self.update_obj(id, |o| o.merged = at as u32 + 1);
+            self.point_merge(id, at as u32 + 1);
         }
         // The merge latest in timestamp order is the top of the chain, unless a copy effect came after it.
         let latest_copy = links.last().map_or(0, |&(_, t)| t);
@@ -1978,6 +1992,7 @@ impl GameState {
             Undo::MergesPopped(merges) => self.merges.extend(merges),
             Undo::SourcesPushed(len) => self.merged_sources.truncate(len as usize),
             Undo::SourcesPopped(sources) => self.merged_sources.extend(sources),
+            Undo::MergedObjectsSet(old) => self.merged_objects = old,
             Undo::TargetsUnspilled(targets, specs) => {
                 self.spill_targets.extend(targets);
                 self.spill_specs.extend(specs);
@@ -2090,6 +2105,7 @@ impl GameState {
             Undo::MergesPopped(_) => Undo::MergesPushed(self.merges.len() as u32),
             Undo::SourcesPushed(len) => Undo::SourcesPopped(self.merged_sources[*len as usize..].to_vec()),
             Undo::SourcesPopped(_) => Undo::SourcesPushed(self.merged_sources.len() as u32),
+            Undo::MergedObjectsSet(_) => Undo::MergedObjectsSet(self.merged_objects.clone()),
             Undo::TargetsUnspilled(..) => Undo::TargetsSpilled(self.spill_targets.len()),
             Undo::AttackersSet(_) => Undo::AttackersSet(self.attackers.clone()),
             Undo::BlocksSet(_) => Undo::BlocksSet(self.blocks.clone()),

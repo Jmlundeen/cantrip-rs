@@ -2604,7 +2604,7 @@ what modifies the spell modifies the permanent (CR 702.140f) - and merges, recor
 `mutate::THIS_MUTATES`, `mutate::times_mutated`). Nothing enters.
 
 A merged permanent (CR 730) is the row it was (CR 730.2c): its own card stays its card. What else represents it is its `Merge`
-(`GameState::merges`, append-only, journalled, named by `Obj::merged`): its own face and token-ness, its own card's face-down
+(`GameState::merges`, append-only, journalled, named by `GameState::merged_objects`): its own face and token-ness, its own card's face-down
 values while a face-up card lies over it (CR 730.2e), and each `MergedPart` - card, face, token (a copy of a spell is one,
 CR 707.10f), over or under, its timestamp, and the copiable values just below it. A merge is a copiable effect at its timestamp
 (CR 730.2a): `GameState::rechain_merged` works the copy chain out again whenever a merge is made, a component turns (CR
@@ -2617,13 +2617,16 @@ permanent has every ability and is one object of one card. The layers add those 
 toxic to the topmost's in layer 1 (`layers::merged_abilities`, CR 702.140e). Every rule a card lists beside its abilities is
 read off every definition the object has (`CardTable::texts`): static abilities (`layers::statics_of`), replacement and
 prevention effects (`replace::source_texts`, a printed effect's index counting through them all), cost changes, play, trigger,
-activation, attack and untap rules, each named by the card it is printed on. A merged permanent is a token only while its
+activation, attack, block, untap and turn rules, each named by the card it is printed on and asked with that card's link
+(`CardTable::texts_linked`, `component_link`; the layers' `LayerQuery::text_of`, a cost change's `merge::AsText`), so a component
+under another reads what its own card chose and exiled and gives what its own card lists. A merged permanent is a token only while its
 topmost component is (CR 730.2d), and no double-faced permanent (CR 730.2i: `copiable_values` gives no faces).
 
 Leaving the battlefield (`ops::move_together`, `merge::components`): one permanent leaves, its topmost component's new object the
 permanent's own move (`Event::ZoneChange` from the battlefield, which "dies" and "leaves" see once), and each other component
-arrives in the same zone as a new object of its own, recorded as a `ZoneChange` from `Zone::GONE` with the permanent as `old`:
-what triggers on a card put into a zone sees each, what triggers on a permanent leaving sees one (the release notes: "one
+arrives in the same zone as a new object of its own, recorded as a `ZoneChange` with `part` set, from `Zone::GONE`, with the
+permanent as `old`: what triggers on a card put into a zone sees each, what asks where a card came from asks
+`Event::moved_from` (the battlefield, for a part), and what triggers on a permanent leaving sees one (the release notes: "one
 creature died, three cards were put into the graveyard"). A token permanent's card components go where a replacement effect for
 cards alone would send them (CR 730.3e). Into a library, the owner orders them, unrevealed (CR 730.3a,
 `merge::arrange_in_library`); into a graveyard, with the other cards arriving (CR 404.3); face down, each is revealed (CR 708.9).

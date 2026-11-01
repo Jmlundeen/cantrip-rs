@@ -77,7 +77,7 @@ pub(crate) struct SpellsAsCast {
     /// The card types an effect lets the player cast as though they had flash (`static_rules::flash_types`), and the
     /// permanents whose static abilities may let them (`static_rules::flash_granters`).
     flash_types: TypeSet,
-    granters: Vec<(ObjectId, PlayerId, &'static CardDef)>,
+    granters: Vec<(ObjectId, PlayerId, &'static CardDef, Option<Linked>)>,
     /// Each card and face (`None`: the card itself) judged: whether a permission lets it be cast as though it had flash, and
     /// the characteristics of the spell, where they are not those of the card where it is.
     flash: Vec<(SpellFace, bool)>,
@@ -323,7 +323,7 @@ fn suspends(cx: &Cx, card: ObjectId, index: u8) -> bool {
 
 /// Whether one of `forbidders` (`static_rules::spell_forbidders`) forbids `player` to cast `card` as `face` (`None`: the card
 /// itself), judged on the spell it would be on the stack under them (CR 101.2, 601.3, 601.3e, `ops::as_cast`).
-fn forbidden_as_cast(cx: &mut Cx, forbidders: &[(ObjectId, PlayerId, &'static CardDef)], card: ObjectId, face: Option<CardId>, player: PlayerId) -> bool {
+fn forbidden_as_cast(cx: &mut Cx, forbidders: &[(ObjectId, PlayerId, &'static CardDef, Option<Linked>)], card: ObjectId, face: Option<CardId>, player: PlayerId) -> bool {
     ops::as_cast(cx, card, face, player, |cx| static_rules::spell_forbidden(&*cx, forbidders, player, card))
 }
 
@@ -2696,7 +2696,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
         game.cards.texts(&game.state, game.state.obj(id)).any(|c| game.cards.cost_changes[c.0 as usize]) && !game.lost_all_abilities(id)
     });
     let obj = game.state.obj(source);
-    let own = !game.cards.get(obj.copied_card().unwrap_or(obj.card)).own_cost_changes.is_empty();
+    let own = game.cards.texts(&game.state, obj).any(|card| !game.cards.get(card).own_cost_changes.is_empty());
     if def.special_action || def.cost.mana.x > 0 || !(changers || own || def.cost_change.is_some()) {
         return Vec::new();
     }
@@ -2920,10 +2920,14 @@ pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, option: &ActionOp
     }
 }
 
-/// The cost changes the object `id` carries itself (CR 601.2f): its card's, or a copy's.
-fn own_cost_changes(cx: &Cx, id: ObjectId) -> &'static [CostChange] {
+/// The cost changes the object `id` carries itself (CR 601.2f): its card's, or a copy's, and a merged permanent's other
+/// components' (CR 702.140e), each with the link it is read with (`merge::AsText`).
+fn own_cost_changes(cx: &Cx, id: ObjectId) -> Vec<(CostChange, Option<Linked>)> {
     let obj = cx.s().obj(id);
-    cx.card(obj.copied_card().unwrap_or(obj.card)).own_cost_changes
+    if cx.s().merge_of(id).is_none() {
+        return cx.card(obj.copied_card().unwrap_or(obj.card)).own_cost_changes.iter().map(|&c| (c, None)).collect();
+    }
+    cx.cards().texts_linked(cx.s(), id).flat_map(|(card, by)| cx.card(card).own_cost_changes.iter().map(move |&c| (c, by))).collect()
 }
 
 fn change_with(
@@ -3127,9 +3131,9 @@ fn deltas_watched(
     };
     // A card's own changes are its spell's ("this spell costs {3} less ..."), never a special action's (CR 116.1): plotting
     // or foretelling the card is not made cheaper by what makes the spell cheaper.
-    let own: &[CostChange] = match (face, costed) {
-        (_, Costed::SpecialAction(..)) => &[],
-        (Some(face), _) => cx.card(face).own_cost_changes,
+    let own: Vec<(CostChange, Option<Linked>)> = match (face, costed) {
+        (_, Costed::SpecialAction(..)) => Vec::new(),
+        (Some(face), _) => cx.card(face).own_cost_changes.iter().map(|&c| (c, None)).collect(),
         (None, _) => own_cost_changes(cx, id),
     };
     // The ability's own change ("this ability costs ... less", power-up), asked for this ability alone.
@@ -3189,18 +3193,25 @@ fn deltas_watched(
         least = least.max(delta.at_least);
         discount += delta.less_to_one as u32;
     };
-    for change in own {
-        add(change(q, id, player, costed, targets));
+    for (change, link) in own {
+        match link {
+            Some(link) => add(change(&crate::merge::AsText { q, source: id, link }, id, player, costed, targets)),
+            None => add(change(q, id, player, costed, targets)),
+        }
     }
     // Asked as the ability it is (CR 607.5).
     if let Some((change, by)) = ability_own {
         add(change(q, &Asker { source: id, controller: player, by, spell: false }, costed, targets));
     }
     for &source in sources {
-        let obj = cx.s().obj(source);
-        // A merged permanent's other components' cost changes are its own (CR 702.140e).
-        for change in cx.cards().texts(cx.s(), obj).flat_map(|c| cx.card(c).cost_changes) {
-            add(change(q, source, player, costed, targets));
+        // A merged permanent's other components' cost changes are its own (CR 702.140e), each read as its own card's.
+        for (card, link) in cx.cards().texts_linked(cx.s(), source) {
+            for change in cx.card(card).cost_changes {
+                match link {
+                    Some(link) => add(change(&crate::merge::AsText { q, source, link }, source, player, costed, targets)),
+                    None => add(change(q, source, player, costed, targets)),
+                }
+            }
         }
     }
     // "[Kind of] spells you cast this turn cost {1} less" (CR 611.2c, 601.2f): each such effect about the caster, whatever has
@@ -3495,7 +3506,7 @@ pub struct Available {
     /// The permanents whose static abilities may let the player spend mana as though it were mana of any color for some
     /// payments (CR 609.4b: Oath of Nissa's planeswalker spells), asked of each spell judged (`spell_covers`). Empty in nearly
     /// every game.
-    spenders: Vec<(ObjectId, PlayerId, &'static CardDef)>,
+    spenders: Vec<(ObjectId, PlayerId, &'static CardDef, Option<Linked>)>,
     /// Mana that comes in groups of one type chosen once, by the mana types it may be and how many: a tap whose type the
     /// player chooses (Shivan Reef's {U} or {R}) and the "one mana of any type that land produced" it triggers (Mana Flare)
     /// are one choice, {U}{U} or {R}{R} and never {U}{R} (CR 106.12a, 605.1b). Empty unless such a trigger waits.
@@ -5529,11 +5540,14 @@ struct Given<T: 'static> {
     controller: PlayerId,
     grant: Grant,
     what: &'static T,
+    /// How the ability is linked (CR 607.1), where it is one of a merged permanent's components other than the one it has
+    /// now (CR 702.140e): that component's card's.
+    by: Option<Linked>,
 }
 
 impl<T> Given<T> {
     fn asker(&self) -> Asker {
-        Asker { source: self.source, controller: self.controller, by: None, spell: false }
+        Asker { source: self.source, controller: self.controller, by: self.by, spell: false }
     }
 }
 
@@ -5555,13 +5569,13 @@ fn given<T>(
     for &id in s.battlefield().iter().chain(emblems) {
         let obj = s.obj(id);
         // A merged permanent's other components' are its own (CR 702.140e), each named by the card it is printed on.
-        for card in cards.texts(s, obj) {
+        for (card, by) in cards.texts_linked(s, id) {
             let items = list(cards.get(card));
             if items.is_empty() || crate::layers::lost_all_abilities(cards, s, log, id) {
                 continue;
             }
             for (k, what) in items.iter().enumerate() {
-                all.push(Given { source: id, controller: obj.controller, grant: Grant { object: id, ability: name(card, k) }, what });
+                all.push(Given { source: id, controller: obj.controller, grant: Grant { object: id, ability: name(card, k) }, what, by });
             }
         }
     }
@@ -5598,7 +5612,7 @@ fn own_exile_casts(cards: &CardTable, s: &GameState, log: &[Record], card: Objec
     items
         .iter()
         .enumerate()
-        .map(|(k, what)| Given { source: card, controller: obj.controller, grant: Grant { object: card, ability: AbilityRef::exile_cast(printed, k) }, what })
+        .map(|(k, what)| Given { source: card, controller: obj.controller, grant: Grant { object: card, ability: AbilityRef::exile_cast(printed, k) }, what, by: None })
         .collect()
 }
 
@@ -5611,7 +5625,7 @@ fn spell_alternatives_of(cards: &CardTable, s: &GameState, log: &[Record]) -> Ve
 /// battlefield holds. The action was offered as it stands, so it is there.
 fn named<T>(s: &GameState, cards: &CardTable, g: Grant, list: fn(&'static CardDef) -> &'static [T], k: Option<usize>) -> Option<Given<T>> {
     let what = list(cards.get(g.ability.card)).get(k?)?;
-    Some(Given { source: g.object, controller: s.obj(g.object).controller, grant: g, what })
+    Some(Given { source: g.object, controller: s.obj(g.object).controller, grant: g, what, by: cards.link_of_text(s, g.object, g.ability.card) })
 }
 
 fn named_way(s: &GameState, cards: &CardTable, g: Grant) -> Option<Given<GrantedWay>> {
@@ -7153,10 +7167,10 @@ fn other_flash_permissions(cx: &Cx, player: PlayerId, spell: ObjectId, whole: &'
 /// spells"), and one of the `granters`' static abilities (`static_rules::flash_granters`: Valley Floodcaller's "noncreature
 /// spells", Rattlechains's "Spirit spells"). Asked of the spell on the stack, as it is cast (`other_flash_permissions`) or as
 /// it would be (`SpellsAsCast`), or of the card where it is where that is the same.
-fn flash_permissions(cx: &Cx, q: &dyn Query, granters: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, spell: ObjectId) -> Vec<ObjectId> {
+fn flash_permissions(cx: &Cx, q: &dyn Query, granters: &[(ObjectId, PlayerId, &'static CardDef, Option<Linked>)], player: PlayerId, spell: ObjectId) -> Vec<ObjectId> {
     let types = q.chars(spell).types;
     let mut by: Vec<ObjectId> = static_rules::flash_type_grants(cx, player).filter(|&(_, t)| types.0 & t.0 != 0).map(|(source, _)| source).collect();
-    by.extend(granters.iter().filter(|&&granter| static_rules::grants_flash(q, &[granter], player, spell)).map(|&(id, _, _)| id));
+    by.extend(granters.iter().filter(|&&granter| static_rules::grants_flash(q, &[granter], player, spell)).map(|&(id, _, _, _)| id));
     by
 }
 
@@ -8058,7 +8072,7 @@ pub fn cast_ways_during_resolution(cx: &mut Cx, card: ObjectId, player: PlayerId
 
 /// The card's own ways that cast it face down (morph, megamorph, disguise: CR 702.37c, 702.168b) that no static ability among
 /// `forbidders` forbids `player` to cast it by, judged on the face-down spell it would be (CR 601.3, 708.4, `ops::as_cast`).
-fn face_down_ways_allowed(cx: &mut Cx, card: ObjectId, player: PlayerId, forbidders: &[(ObjectId, PlayerId, &'static CardDef)]) -> Vec<u8> {
+fn face_down_ways_allowed(cx: &mut Cx, card: ObjectId, player: PlayerId, forbidders: &[(ObjectId, PlayerId, &'static CardDef, Option<Linked>)]) -> Vec<u8> {
     let whole = cx.card(cx.s().obj(card).card);
     let mut allowed = Vec::new();
     for n in 1..=whole.ways.len() as u8 {

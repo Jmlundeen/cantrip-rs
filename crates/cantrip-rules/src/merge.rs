@@ -2,7 +2,7 @@
 //!
 //! A merged permanent is the object it was before it merged (CR 730.2c): its row keeps its id, controller, counters, status,
 //! attachments and the effects on it, and its own card stays its card. What else represents it is its `Merge`
-//! (`GameState::merges`, named by `Obj::merged`): each card, token or copy that merged with it, over or under, with the
+//! (`GameState::merges`, named by `GameState::merged_objects`): each card, token or copy that merged with it, over or under, with the
 //! time it merged. Each merge is a copiable effect at that time (CR 730.2a, 613.2), worked out in the copy chain with the
 //! copy effects on it (`GameState::rechain_merged`): the permanent has its topmost component's characteristics and every
 //! ability of each other component (CR 702.140e), which its copiable values carry (`Copiable::merged`), so a copy of it has
@@ -109,6 +109,8 @@ pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
         });
     }
     cx.st().set_merge(target, merge);
+    // A card with static abilities is now part of a permanent (CR 702.140e): the layers look for them from here on.
+    ops::note_statics(cx, target);
     // What modifies the spell modifies the merged permanent (CR 702.140f).
     ops::carry_effects(cx, spell, target);
     if card.marks.gains_haste {
@@ -231,4 +233,79 @@ pub(crate) fn turn_components(cx: &mut Cx, id: ObjectId) -> bool {
     }
     cx.st().set_merge(id, merge);
     true
+}
+
+/// The game as a rule of one of the merged permanent `source`'s other components reads it, where the rule is asked with the
+/// object alone (a cost change, `CostChange`): `source`'s text is that component's (`Query::text_linked`, CR 607.1), so it
+/// reads what its own card chose and exiled. Everything else is the game it wraps.
+pub(crate) struct AsText<'a> {
+    pub q: &'a dyn Query,
+    pub source: ObjectId,
+    pub link: Linked,
+}
+
+impl Query for AsText<'_> {
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.q.linked_card(card)
+    }
+
+    fn text_linked(&self, source: ObjectId) -> Linked {
+        if source == self.source { self.link } else { self.q.text_linked(source) }
+    }
+
+    fn state(&self) -> &GameState {
+        self.q.state()
+    }
+
+    fn events(&self) -> &[Record] {
+        self.q.events()
+    }
+
+    fn card_id(&self, def: &'static CardDef) -> CardId {
+        self.q.card_id(def)
+    }
+
+    fn card(&self, id: CardId) -> &'static CardDef {
+        self.q.card(id)
+    }
+
+    fn chars(&self, id: ObjectId) -> Chars {
+        self.q.chars(id)
+    }
+
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        self.q.token_chars(card, copy)
+    }
+
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        self.q.lost_all_abilities(id)
+    }
+
+    fn can_target(&self, asker: &Asker, target: Target) -> bool {
+        self.q.can_target(asker, target)
+    }
+
+    fn chosen_targets(&self) -> &[Target] {
+        self.q.chosen_targets()
+    }
+
+    fn event_subject(&self) -> Target {
+        self.q.event_subject()
+    }
+
+    fn slot_opponent(&self) -> Option<PlayerId> {
+        self.q.slot_opponent()
+    }
+
+    fn gift_assumed(&self) -> bool {
+        self.q.gift_assumed()
+    }
+
+    fn announced_x(&self) -> Option<u32> {
+        self.q.announced_x()
+    }
+
+    fn obj(&self, id: ObjectId) -> &Obj {
+        self.q.obj(id)
+    }
 }

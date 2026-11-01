@@ -114,15 +114,12 @@ pub struct Obj {
     /// For a face-down card in exile: the seats that may look at it, a bit each (CR 406.3), every seat a game deals
     /// (`MAX_SEATS`). Those who could see where it came from, and those it was shown to since.
     pub seen_by: u8,
-    /// A merged permanent (CR 730.2): one more than the index in `GameState::merges` of what represents it besides its own
-    /// card or token, zero for an object represented by one card or token alone. Its row stays the object's - the same
-    /// object it was before it merged (CR 730.2c) - and its own card is one of its components.
-    pub merged: u32,
 }
 
 /// What represents a merged permanent besides the card or token its row names (CR 730.2), one version of it: a new merge,
 /// a face turned or a copy effect below a merge ending makes a new version (`GameState::merges` is only appended to) that
-/// the object's row is pointed at, so every change is one journalled write of the row.
+/// the object is pointed at (`GameState::merged_objects`). Its row stays the object's - the same object it was before it
+/// merged (CR 730.2c) - and its own card is one of its components.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Merge {
     /// The face of the object's own card that is up (CR 712.3): the values it has as a component, what a transform changes
@@ -537,7 +534,6 @@ impl Obj {
             exiled,
             face_down: _,
             seen_by: _,
-            merged: _,
         } = *self;
         let Marks {
             doors: _,
@@ -607,7 +603,6 @@ impl Obj {
             exiled: None,
             face_down: false,
             seen_by: 0,
-            merged: 0,
         }
     }
 

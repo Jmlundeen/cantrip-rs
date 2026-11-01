@@ -1259,7 +1259,9 @@ impl<'a> Projector<'a> {
                 s.effects.iter().any(|e| e.affected == id && e.timestamp > latest && matches!(e.kind, EffectKind::RestoreCopy(_)))
             } else { obj.copiable().is_some_and(|c| {
                 let name = if !c.words.is_printed() && c.name == game.cards.get(c.card).token_name_under(c.words) { None } else { c.name };
-                let own_prototype = prototyped_face(game.cards.get(obj.card)).is_some_and(|f| std::ptr::eq(f, game.cards.get(c.card)));
+                // A mutating creature spell has its own card's mutating face as its values (CR 702.140a): no copy either.
+                let own_prototype = prototyped_face(game.cards.get(obj.card)).is_some_and(|f| std::ptr::eq(f, game.cards.get(c.card)))
+                    || mutating_face(game.cards.get(obj.card)).is_some_and(|f| std::ptr::eq(f, game.cards.get(c.card)));
                 let values = Copiable { words: Words::NONE, name, ..c };
                 values != Copiable::of(obj.card) && !(own_prototype && values == Copiable::of(c.card))
             }) } || obj.card_copy,
@@ -1288,7 +1290,8 @@ impl<'a> Projector<'a> {
             view.merged_with = stack
                 .into_iter()
                 .skip(1)
-                .map(|(card, hidden)| if hidden { ObjectView { known: false, ..Default::default() } } else { printed(cards.get(card)) })
+                // The permanent's controller may look at a face-down component of it (CR 708.5).
+                .map(|(card, hidden)| if hidden && self.viewer != obj.controller { ObjectView { known: false, ..Default::default() } } else { printed(cards.get(card)) })
                 .collect();
         }
         // A name an effect set (CR 612.8) or a copy effect states (CR 707.9b) is the name it has.

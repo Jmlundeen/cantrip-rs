@@ -112,7 +112,7 @@ struct Plan {
     seen_by_all: bool,
     /// A merged permanent leaving the battlefield (CR 730.3): each of its components, and where its card components go if it
     /// is a token a replacement effect for cards alone would have moved elsewhere (CR 730.3e).
-    components: Option<(Vec<crate::merge::Component>, Option<Zone>)>,
+    components: Option<(Vec<crate::merge::Component>, Option<(Zone, Option<Linked>)>)>,
 }
 
 /// Whether every player can see `id` as it moves now (CR 603.10a: "an object that all players can see"), the instruction
@@ -388,9 +388,9 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         let components = components.map(|all| {
             let card_to = (old.token && all.iter().any(|c| !c.token)).then(|| {
                 let as_card = replace::zone_change(cx, ZoneChange { is_card: true, ..proposed });
-                if as_card.regenerated || as_card.shielded || as_card.replaced { to } else { as_card.to }
+                if as_card.regenerated || as_card.shielded || as_card.replaced { (to, change.exiled_with) } else { (as_card.to, as_card.exiled_with) }
             });
-            (all, card_to.filter(|&z| z != to))
+            (all, card_to.filter(|&(z, _)| z != to))
         });
         // Whatever it leaves, it is as it last existed there (CR 400.7, 608.2h, 113.7a): what an ability of it, or one it
         // created, reads once it is gone.
@@ -571,11 +571,17 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         if let Some((all, card_to)) = &components {
             let mut group = vec![new_id];
             for c in all.iter().filter(|c| !c.top) {
-                let to_c = match card_to {
-                    Some(z) if !c.token => *z,
-                    _ => to,
+                let (to_c, exiled_with) = match card_to {
+                    Some((z, by)) if !c.token => (*z, *by),
+                    _ => (to, change.exiled_with),
                 };
                 let mut part = Obj::new(c.card, old.owner, to_c);
+                // Exiled with the effect's source as the permanent is (CR 607.2b, 730.3d).
+                if to_c.is(ZoneKind::Exile)
+                    && let Some(by) = exiled_with
+                {
+                    part.exiled = Some(ExileLink::new(by, from, false));
+                }
                 part.token = c.token;
                 part.transformed = c.transformed;
                 part.controlled_since = turn;
@@ -589,7 +595,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
                 if to_c.is(ZoneKind::Graveyard) && !c.token {
                     binned.push((to_c.player, part_id));
                 }
-                part_events.push(Event::ZoneChange { old: m.id, new: part_id, from: Zone::GONE, to: to_c, reason });
+                part_events.push(Event::ZoneChange { old: m.id, new: part_id, from: Zone::GONE, to: to_c, reason, part: true });
                 if c.face_down {
                     part_events.push(Event::Revealed { player: old.owner, card: part_id });
                 }
@@ -639,7 +645,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
         if from.is(ZoneKind::Battlefield) {
             remove_from_combat(cx, &[m.id]);
         }
-        events.push(Event::ZoneChange { old: m.id, new: new_id, from, to, reason });
+        events.push(Event::ZoneChange { old: m.id, new: new_id, from, to, reason, part: false });
         events.append(&mut part_events);
         // CR 708.9: a face-down permanent or spell that moves to any other zone is revealed to all players by its owner as
         // it moves - where it arrives face up, as a card going anywhere but exile face down does.
@@ -849,9 +855,12 @@ pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: Linked, until_leaves: boo
     let from: Vec<Zone> = cards.iter().map(|&c| cx.s().obj(c).zone).collect();
     let moves: Vec<Moving> = cards.iter().map(|&c| Moving::to(c, Zone::exile(cx.s().obj(c).owner))).collect();
     let new = move_together(cx, &moves, ZoneReason::Exile);
-    for (&n, from) in new.iter().zip(from) {
-        if cx.s().obj(n).zone.is(ZoneKind::Exile) {
-            cx.st().update_obj(n, |o| o.exiled = Some(ExileLink::new(by, from, until_leaves)));
+    // Each card a merged permanent became is exiled with it as well (CR 730.3c: "the same actions are taken upon each").
+    for (&card, from) in cards.iter().zip(from) {
+        for n in Query::became_all(&*cx, card) {
+            if cx.s().obj(n).zone.is(ZoneKind::Exile) {
+                cx.st().update_obj(n, |o| o.exiled = Some(ExileLink::new(by, from, until_leaves)));
+            }
         }
     }
     new
@@ -1904,7 +1913,7 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
     let obj = cx.s().obj(id);
     // A merged permanent is no double-faced permanent, but transforming it turns each of its double-faced components that can
     // transform (CR 730.2i).
-    if obj.merged != 0 {
+    if cx.s().merge_of(id).is_some() {
         if !obj.zone.is(ZoneKind::Battlefield) || obj.marks.face_down_as.is_some() || !crate::merge::turn_components(cx, id) {
             return Ok(false);
         }
@@ -1919,13 +1928,16 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
         cx.st().update_obj(id, |o| o.transformed = !o.transformed);
     }
     note_statics(cx, id);
-    // The face now up, or what a copy effect makes it (CR 707.2).
-    let face = cx.cards().current(cx.s().obj(id));
-    if let Some(as_transforms) = cx.cards().get(face).as_transforms
-        && !cx.lost_all_abilities(id)
-    {
-        let controller = cx.s().obj(id).controller;
-        as_transforms(cx, &Asker { source: id, controller, by: None, spell: false })?;
+    // The face now up, or what a copy effect makes it (CR 707.2), and a merged permanent's other components' faces (CR
+    // 702.140e, 730.2i), each asked as its own card's.
+    let texts: Vec<(CardId, Option<Linked>)> = cx.cards().texts_linked(cx.s(), id).collect();
+    for (face, by) in texts {
+        if let Some(as_transforms) = cx.cards().get(face).as_transforms
+            && !cx.lost_all_abilities(id)
+        {
+            let controller = cx.s().obj(id).controller;
+            as_transforms(cx, &Asker { source: id, controller, by, spell: false })?;
+        }
     }
     cx.emit(Event::Transformed { object: id });
     Ok(true)
@@ -2330,8 +2342,8 @@ fn create_tokens_onto(
         note_statics(cx, id);
         cx.st().zone_push(Zone::BATTLEFIELD, id);
         events.push(match spell {
-            Some(spell) => Event::ZoneChange { old: spell.object, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, reason: ZoneReason::Resolve },
-            None => Event::ZoneChange { old: id, new: id, from: Zone::GONE, to: Zone::BATTLEFIELD, reason: ZoneReason::Created },
+            Some(spell) => Event::ZoneChange { old: spell.object, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, part: false, reason: ZoneReason::Resolve },
+            None => Event::ZoneChange { old: id, new: id, from: Zone::GONE, to: Zone::BATTLEFIELD, part: false, reason: ZoneReason::Created },
         });
         // CR 303.4f, 301.5e: created attached to something, it became attached to it.
         events.extend(entered_attached(cx, id));
@@ -3743,8 +3755,35 @@ pub fn put_into_library(cx: &mut Cx, ids: &[ObjectId], place: LibraryPlace) -> V
         }
         owners
     };
+    // A merged permanent's cards are in the order its owner arranged them as they arrived (CR 730.3a): kept together, in
+    // that order, wherever in the library they go.
+    let groups: Vec<Vec<ObjectId>> = ids
+        .iter()
+        .filter(|&&id| cx.s().merge_of(id).is_some())
+        .map(|&id| Query::became_all(&*cx, id).into_iter().filter(|n| arrived.contains(n)).collect::<Vec<_>>())
+        .filter(|g: &Vec<ObjectId>| g.len() > 1)
+        .collect();
     for owner in owners {
-        let mine: Vec<ObjectId> = arrived.iter().copied().filter(|&n| cx.s().obj(n).owner == owner).collect();
+        let mut mine: Vec<ObjectId> = arrived.iter().copied().filter(|&n| cx.s().obj(n).owner == owner).collect();
+        if !groups.is_empty() {
+            let library = cx.s().zone(Zone::library(owner));
+            let at = |n: &ObjectId| library.iter().position(|c| c == n).unwrap_or(usize::MAX);
+            let mut ordered: Vec<ObjectId> = Vec::with_capacity(mine.len());
+            for &n in &mine {
+                if ordered.contains(&n) {
+                    continue;
+                }
+                match groups.iter().find(|g| g.contains(&n)) {
+                    Some(group) => {
+                        let mut group = group.clone();
+                        group.sort_by_key(at);
+                        ordered.extend(group);
+                    }
+                    None => ordered.push(n),
+                }
+            }
+            mine = ordered;
+        }
         match place {
             LibraryPlace::Top => arrange_library(cx, owner, &mine, &[]),
             LibraryPlace::Bottom => arrange_library(cx, owner, &[], &mine),
@@ -3971,7 +4010,7 @@ pub fn tap_together_with(cx: &mut Cx, pending: &mut Vec<ObjectId>, ids: &[Object
 
 /// Marks the game as one where static abilities may apply, once an object whose card has any is made, or one that has
 /// hone counters (CR 122.1j) (the layers' guard; `GameState::statics_seen`).
-fn note_statics(cx: &mut Cx, id: ObjectId) {
+pub(crate) fn note_statics(cx: &mut Cx, id: ObjectId) {
     if cx.s().statics_seen {
         return;
     }

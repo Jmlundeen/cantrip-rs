@@ -325,7 +325,7 @@ pub trait Query {
             return obj.copiable().unwrap_or_else(|| Copiable::of(self.chars(id).card));
         }
         // A merged permanent is no double-faced permanent, whatever its components are (CR 730.2i).
-        let front = (obj.merged == 0 && obj.represented_double_faced(self.card(obj.card).back.is_some())).then_some(obj.card);
+        let front = (self.state().merge_of(id).is_none() && obj.represented_double_faced(self.card(obj.card).back.is_some())).then_some(obj.card);
         let values = match obj.copiable() {
             // A double-faced token's own faces: the face up, under its exceptions.
             Some(c) if obj.own_faces(&c) => Copiable { card: self.chars(id).card, ..c },
@@ -444,7 +444,7 @@ pub trait Query {
     fn became_all(&self, left: ObjectId) -> Vec<ObjectId> {
         let Some(first) = self.obj(left).became else { return Vec::new() };
         let mut all = vec![first];
-        if self.obj(left).merged == 0 {
+        if self.state().merge_of(left).is_none() {
             return all;
         }
         let log = self.events();

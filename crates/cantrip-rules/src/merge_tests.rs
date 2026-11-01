@@ -146,6 +146,23 @@ fn tuck(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> 
     Ok(())
 }
 
+fn tuck_bottom(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(id) = item.target(0).object() {
+        g.put_into_library(&[id], LibraryPlace::Bottom);
+    }
+    Ok(())
+}
+
+/// "Put target creature on the bottom of its owner's library."
+static TUCK_BOTTOM: CardDef = CardDef {
+    name: "Mutate Test Tuck Under",
+    cost: mana("{U}"),
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[target(creature_on_battlefield)], tuck_bottom),
+    text: "Put target creature on the bottom of its owner's library.",
+    ..CardDef::BLANK
+};
+
 /// "Put target creature on top of its owner's library."
 static TUCK: CardDef = CardDef {
     name: "Mutate Test Tuck",
@@ -177,13 +194,67 @@ static VOID: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn noop(_: &mut dyn cantrip_api::Game, _: &StackItem) -> Result<(), Suspend> {
+    Ok(())
+}
+
+fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected
+}
+
+/// "Has [its first delayed ability]" (`statics::grant_delayed_ability`'s shape): the card the ability is printed on, as the
+/// layers name it.
+fn grant_first_delayed(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let card = view.text_of(source);
+    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
+        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
+    }
+}
+
+/// "This creature has '{T}: Do nothing.'": a 2/2 Squelcher giving itself its card's first delayed ability (Hexing
+/// Squelcher's shape).
+static SQUELCHER: CardDef = CardDef {
+    name: "Mutate Test Squelcher",
+    cost: mana("{1}{R}"),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Goblin]),
+    power: Some(2),
+    toughness: Some(2),
+    statics: &[static_ability(Layer::Ability, itself, grant_first_delayed, "This creature has '{T}: Do nothing.'")],
+    delayed: &[ability(TAP, noop, "{T}: Do nothing.")],
+    ..CardDef::BLANK
+};
+
+/// "This creature gets +3/+3 as long as a card is exiled with it": its static ability reads its own exile (CR 607.2a,
+/// Valgavoth's shape).
+fn while_it_exiled(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected && !view.exiled_with(view.linked_to(source)).is_empty()
+}
+
+fn plus_three(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+    c.power = c.power.map(|p| p + 3);
+    c.toughness = c.toughness.map(|t| t + 3);
+}
+
+/// A 1/1 Keeper with that ability.
+static KEEPER: CardDef = CardDef {
+    name: "Mutate Test Keeper",
+    cost: mana("{1}{B}"),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Horror]),
+    power: Some(1),
+    toughness: Some(1),
+    statics: &[static_ability(Layer::PtModify, while_it_exiled, plus_three, "This creature gets +3/+3 as long as a card is exiled with it.")],
+    ..CardDef::BLANK
+};
+
 fn cx(game: &mut Game) -> Cx<'_> {
     Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
 }
 
 /// Your main phase with priority and an empty stack, every answer round-tripped through the game-log tree (`Game::verify`).
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &SOLDIER, &BEAST, &ELK, &CAT, &WOLF_FRONT, &TUCK, &VOID])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &SOLDIER, &BEAST, &ELK, &CAT, &WOLF_FRONT, &TUCK, &TUCK_BOTTOM, &VOID, &SQUELCHER, &KEEPER])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -206,6 +277,9 @@ fn put(g: &mut Game, def: &'static CardDef, owner: PlayerId, zone: Zone) -> Obje
     obj.timestamp = timestamp;
     let id = g.state.push_obj(obj);
     g.state.zone_push(zone, id);
+    if !def.statics.is_empty() {
+        g.state.see_statics();
+    }
     unask(g);
     id
 }
@@ -286,7 +360,8 @@ fn resolve_all(g: &mut Game, on_top: bool) {
             }
             // The owner orders a merged permanent's cards put into their library (CR 730.3a): here, as they are listed, reversed.
             RequestKind::DistributeCards { cards, destinations, .. } if destinations.first().is_some_and(|d| d.kind == DestinationKind::LibraryTop) => {
-                let order: Vec<ObjectId> = cards.iter().rev().copied().collect();
+                LIBRARY_ASKED.with(|a| a.set(a.get() + 1));
+                let order: Vec<ObjectId> = if REVERSE_LIBRARY.with(|r| r.get()) { cards.iter().rev().copied().collect() } else { cards.clone() };
                 g.answer(r.id, r.player, Answer::Placements { placements: vec![order], shuffle: false }).expect("a legal order")
             }
             other => panic!("unexpected {other:?}"),
@@ -300,6 +375,13 @@ fn resolve_all(g: &mut Game, on_top: bool) {
 fn settle(g: &mut Game) {
     unask(g);
     resolve_all(g, true);
+}
+
+thread_local! {
+    /// Whether the owner's order of a merged permanent's cards put into a library (CR 730.3a) reverses them as listed.
+    static REVERSE_LIBRARY: std::cell::Cell<bool> = const { std::cell::Cell::new(true) };
+    /// How many times that order was asked.
+    static LIBRARY_ASKED: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
 }
 
 /// A Bear on your battlefield since an earlier turn, and a Beast in your hand with {1}{G} to mutate it.
@@ -380,7 +462,7 @@ fn with_its_target_illegal_it_enters_as_a_creature() {
     settle(&mut g);
     let permanent = g.state.obj(spell).became.expect("it resolved");
     assert!(g.state.obj(permanent).zone.is(ZoneKind::Battlefield));
-    assert_eq!(g.state.obj(permanent).merged, 0);
+    assert!(g.state.merge_of(permanent).is_none());
     assert_eq!(g.chars(permanent).name, "Mutate Test Beast");
     assert!(!g.cards.get(g.chars(permanent).card).mutating, "its card's own values, not the mutating face");
     assert_eq!(g.state.player(YOU).life, life + 1, "the Bear's dies trigger alone: it didn't mutate");
@@ -439,14 +521,21 @@ fn every_component_goes_to_the_zone_it_goes_to() {
     assert!(back.iter().all(|&c| g.state.obj(c).zone == Zone::hand(YOU) && g.state.zone(Zone::hand(YOU)).contains(&c)));
 }
 
-/// CR 730.3a: put into its owner's library, the owner orders its cards, asked as they arrive.
-#[test]
-fn its_owner_orders_its_cards_put_into_a_library() {
+fn tuck_place(place: LibraryPlace) -> &'static CardDef {
+    match place {
+        LibraryPlace::Bottom => &TUCK_BOTTOM,
+        _ => &TUCK,
+    }
+}
+
+/// The merged Beast over Bear put into its owner's library at `place` by a resolving spell, the owner reversing the order
+/// they arrived in or not: the names of the cards where they went, in library order.
+fn tucked(place: LibraryPlace, reverse: bool) -> Vec<&'static str> {
     let (mut g, bear, beast) = bear_and_beast();
     cast_mutating(&mut g, beast, bear);
     resolve_all(&mut g, true);
     let below = g.state.zone(Zone::library(YOU)).len();
-    let tuck = put(&mut g, &TUCK, YOU, Zone::hand(YOU));
+    let tuck = put(&mut g, tuck_place(place), YOU, Zone::hand(YOU));
     add(&mut g, Mana::U, 1);
     let option = options(&mut g).into_iter().find(|o| o.source == Some(tuck)).expect("the instant is offered");
     let r = next(&mut g);
@@ -457,13 +546,30 @@ fn its_owner_orders_its_cards_put_into_a_library() {
         let pay = options.iter().find(|o| matches!(o.kind, ActionKind::ConfirmCasting | ActionKind::AssignMana)).expect("the pool pays").clone();
         g.answer(r.id, r.player, Answer::Act(Action::of(&pay))).expect("a legal answer");
     }
+    REVERSE_LIBRARY.with(|r| r.set(reverse));
+    LIBRARY_ASKED.with(|a| a.set(0));
     resolve_all(&mut g, true);
+    REVERSE_LIBRARY.with(|r| r.set(true));
+    assert_eq!(LIBRARY_ASKED.with(|a| a.get()), 1, "the owner was asked once (CR 730.3a)");
     let library = g.state.zone(Zone::library(YOU)).to_vec();
     assert_eq!(library.len(), below + 2);
-    let names: Vec<&str> = library[..2].iter().map(|&c| g.cards.get(g.state.obj(c).card).name).collect();
-    // They arrived the Beast (the permanent's topmost) first, then the Bear on top of it; the owner reversed that.
-    assert_eq!(names, vec!["Mutate Test Beast", "Mutate Test Bear"], "on top, in the order the owner chose");
-    assert!(g.history().all().iter().any(|r| matches!(r.event, Event::ZoneChange { to, .. } if to.is(ZoneKind::Library))));
+    let ends = if place == LibraryPlace::Bottom { &library[below..] } else { &library[..2] };
+    ends.iter().map(|&c| g.cards.get(g.state.obj(c).card).name).collect()
+}
+
+/// CR 730.3a: put on top of its owner's library, the owner orders its cards, and they stay in that order.
+#[test]
+fn its_owner_orders_its_cards_put_into_a_library() {
+    // They arrive the Beast (the permanent's topmost) first, then the Bear on top of it, as the question lists them.
+    assert_eq!(tucked(LibraryPlace::Top, true), vec!["Mutate Test Beast", "Mutate Test Bear"], "reversed, as the owner chose");
+    assert_eq!(tucked(LibraryPlace::Top, false), vec!["Mutate Test Bear", "Mutate Test Beast"], "as listed, as the owner chose");
+}
+
+/// CR 730.3a: put on the bottom, the owner's order holds there too.
+#[test]
+fn its_owner_orders_its_cards_put_on_the_bottom_of_a_library() {
+    assert_eq!(tucked(LibraryPlace::Bottom, true), vec!["Mutate Test Beast", "Mutate Test Bear"]);
+    assert_eq!(tucked(LibraryPlace::Bottom, false), vec!["Mutate Test Bear", "Mutate Test Beast"]);
 }
 
 /// CR 730.2a, 707.2: a copy of a merged permanent copies its merged values - the topmost component's characteristics and
@@ -480,7 +586,7 @@ fn a_copy_of_a_merged_permanent_has_the_merged_values_and_is_one_object() {
     assert_eq!(c.name, "Mutate Test Bear");
     assert!(c.has(Keyword::Trample), "the Beast's ability is copiable");
     assert_eq!(c.abilities().count(), 2);
-    assert_eq!(g.state.obj(token).merged, 0, "not a merged permanent");
+    assert!(g.state.merge_of(token).is_none(), "not a merged permanent");
     let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[token]);
     assert_eq!(gone.len(), 1, "one object");
 }
@@ -537,7 +643,7 @@ fn the_game_tree_moves_across_a_merge() {
     assert_eq!(g.chars(bear).name, "Mutate Test Beast");
     g.goto(before);
     assert!(g.state == state, "back above the merge");
-    assert_eq!(g.state.obj(bear).merged, 0);
+    assert!(g.state.merge_of(bear).is_none());
     assert_eq!(g.chars(bear).name, "Mutate Test Bear");
     g.goto(after);
     assert!(g.state == merged, "down again");
@@ -656,4 +762,103 @@ fn a_card_only_replacement_moves_only_the_card_components_of_a_token_merged_perm
     assert_eq!(g.chars(card).name, "Mutate Test Beast");
     let died = g.history().all().iter().filter(|r| matches!(r.event, Event::ZoneChange { from, to, .. } if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard))).count();
     assert_eq!(died, 1, "one permanent died");
+}
+
+/// A static ability of a component under another that gives its card's delayed ability gives that card's, not the topmost
+/// card's (CR 702.140e, 607.1): the layers name the card the ability is printed on (`LayerQuery::text_of`).
+#[test]
+fn a_component_under_another_gives_its_own_cards_delayed_ability() {
+    let mut g = game();
+    let squelcher = put(&mut g, &SQUELCHER, YOU, Zone::BATTLEFIELD);
+    let beast = put(&mut g, &BEAST, YOU, Zone::hand(YOU));
+    add(&mut g, Mana::G, 2);
+    cast_mutating(&mut g, beast, squelcher);
+    resolve_all(&mut g, true);
+    let c = g.chars(squelcher);
+    assert_eq!(c.name, "Mutate Test Beast");
+    let given = AbilityRef::delayed(g.cards.id_of(&SQUELCHER), 0);
+    assert!(c.abilities.contains(&Some(given)), "the Squelcher's own delayed ability: {:?}", c.abilities);
+    assert!(!c.abilities.contains(&Some(AbilityRef::delayed(g.cards.id_of(&BEAST), 0))), "never the Beast's, which has none");
+}
+
+/// A component's static ability under another reads what its own card exiled (CR 607.2a, 702.140e): Valgavoth's shape, its
+/// exiled cards kept after a mutation on top of it.
+#[test]
+fn a_component_under_another_reads_its_own_exiled_cards() {
+    let mut g = game();
+    let keeper = put(&mut g, &KEEPER, YOU, Zone::BATTLEFIELD);
+    let exiled = put(&mut g, &FILLER, THEM, Zone::exile(THEM));
+    let by = Linked { object: keeper, text: g.cards.id_of(&KEEPER), acquired: Acquired::OWN };
+    g.state.update_obj(exiled, |o| o.exiled = Some(ExileLink::new(by, Zone::graveyard(THEM), false)));
+    unask(&mut g);
+    assert_eq!(g.chars(keeper).power, Some(4));
+    let beast = put(&mut g, &BEAST, YOU, Zone::hand(YOU));
+    add(&mut g, Mana::G, 2);
+    cast_mutating(&mut g, beast, keeper);
+    resolve_all(&mut g, true);
+    assert_eq!(g.chars(keeper).power, Some(8), "the Beast's 5/5 and the Keeper's +3/+3 for its own exiled card");
+}
+
+/// CR 730.3c, 607.2a: exiled with an ability, every card the merged permanent became is linked to it, so "return the exiled
+/// cards" returns them all (Brutal Cathar, Portable Hole).
+#[test]
+fn every_component_is_exiled_with_the_ability_that_exiled_it() {
+    let (mut g, bear, beast) = bear_and_beast();
+    cast_mutating(&mut g, beast, bear);
+    resolve_all(&mut g, true);
+    let soldier = put(&mut g, &SOLDIER, THEM, Zone::BATTLEFIELD);
+    let by = Linked { object: soldier, text: g.cards.id_of(&SOLDIER), acquired: Acquired::OWN };
+    let gone = cantrip_api::Game::exile_with(&mut cx(&mut g), &[bear], by, false);
+    assert_eq!(gone.len(), 2);
+    assert!(gone.iter().all(|&c| g.state.obj(c).exiled.is_some_and(|l| l.is_by(by))), "both linked");
+    assert_eq!(cantrip_api::Query::exiled_with(&g, by).len(), 2);
+}
+
+/// CR 730.3, 700.4: a merged permanent's other cards come from the battlefield with it - a card put into a graveyard from
+/// the battlefield (`Event::moved_from`) - though only the permanent's own move is the permanent leaving; a token-topped one's
+/// card components are cards.
+#[test]
+fn the_other_components_are_put_into_the_graveyard_from_the_battlefield() {
+    let mut g = game();
+    let cat_card = g.cards.id_of(&CAT);
+    let cat = cantrip_api::Game::create_tokens(&mut cx(&mut g), cat_card, YOU, 1, false).expect("nothing is asked")[0];
+    let beast = put(&mut g, &BEAST, YOU, Zone::hand(YOU));
+    add(&mut g, Mana::G, 2);
+    cast_mutating(&mut g, beast, cat);
+    resolve_all(&mut g, false);
+    cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]);
+    let moves: Vec<Event> = g.history().all().iter().map(|r| r.event).filter(|e| matches!(e, Event::ZoneChange { old, to, .. } if *old == cat && to.is(ZoneKind::Graveyard))).collect();
+    assert_eq!(moves.len(), 2);
+    assert!(moves.iter().all(|e| e.moved_from() == Some(Zone::BATTLEFIELD)), "each from the battlefield");
+    let from_battlefield = moves.iter().filter(|e| matches!(e, Event::ZoneChange { from, .. } if from.is(ZoneKind::Battlefield))).count();
+    assert_eq!(from_battlefield, 1, "one permanent left");
+    let card_part = moves.iter().find_map(|e| match e { Event::ZoneChange { new, part: true, .. } => Some(*new), _ => None }).expect("the Beast came along");
+    assert!(!g.state.obj(card_part).token, "a card, though the permanent was a token");
+}
+
+/// CR 730.2e, 613.2b, 708.2: a card put under a face-down permanent leaves it face down, a 2/2 with no abilities: its
+/// face-down values apply over the merge (layer 1b over 1a), so it has none of the card's abilities and nothing it has
+/// triggers on its mutating. Turned face up, it has them.
+#[test]
+fn a_card_under_a_face_down_permanent_gives_nothing_while_it_is_face_down() {
+    let mut g = game();
+    let card = put(&mut g, &BEAR, YOU, Zone::hand(YOU));
+    let manifested = cantrip_api::Game::put_onto_battlefield_face_down(&mut cx(&mut g), card, YOU, FaceDown::Manifested, false)
+        .expect("nothing is asked")
+        .expect("it entered");
+    let beast = put(&mut g, &BEAST, YOU, Zone::hand(YOU));
+    add(&mut g, Mana::G, 2);
+    cast_mutating(&mut g, beast, manifested);
+    let life = g.state.player(YOU).life;
+    resolve_all(&mut g, false);
+    assert!(g.state.obj(manifested).face_down, "still face down");
+    let c = g.chars(manifested);
+    assert_eq!((c.power, c.toughness), (Some(2), Some(2)));
+    let beast_card = g.cards.id_of(&BEAST);
+    assert!(!c.has(Keyword::Trample) && !c.abilities().any(|a| a.card == beast_card), "none of the Beast's abilities while face down");
+    assert_eq!(g.state.player(YOU).life, life, "its mutate trigger isn't an ability it has");
+    crate::ops::turn_face_up(&mut cx(&mut g), manifested, YOU);
+    let c = g.chars(manifested);
+    assert_eq!(c.name, "Mutate Test Bear");
+    assert!(c.has(Keyword::Trample), "face up, the Beast's abilities");
 }

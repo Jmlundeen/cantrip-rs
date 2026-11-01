@@ -54,7 +54,13 @@ pub enum Event {
     /// `ability` says which it was, since an ability's source can itself be a spell on the stack ("when you cast this spell").
     BecameTarget { target: Target, by: ObjectId, controller: PlayerId, ability: bool },
     /// An object moved between zones. A token's creation comes from no zone (`Zone::GONE`).
-    ZoneChange { old: ObjectId, new: ObjectId, from: Zone, to: Zone, reason: ZoneReason },
+    ///
+    /// `part`: `new` is one of the merged permanent `old`'s components other than its topmost, put into `to` as `old` left the
+    /// battlefield (CR 730.3) - one permanent left, recorded by its own move, and each other card or token came along with it.
+    /// Its `from` is `Zone::GONE`, so what asks what left the battlefield sees the permanent once (the release notes: "one
+    /// creature died, three cards were put into the graveyard"); what asks where a card was put from asks
+    /// `Event::moved_from`, which says the battlefield.
+    ZoneChange { old: ObjectId, new: ObjectId, from: Zone, to: Zone, reason: ZoneReason, part: bool },
     /// Damage was dealt. `controller` and `kind.colors()` are the source's as it dealt it (CR 120.3, 609.7): "damage red sources
     /// you controlled dealt this turn" counts a source that has since changed controller or color, or left (Temple of
     /// Power's ruling), and a spell's or an ability's source by what it was on the stack or the battlefield then.
@@ -348,6 +354,18 @@ pub enum DrawReason {
 }
 
 impl Event {
+    /// Where the card or token a zone change put into its zone came from: its `from`, or the battlefield for a merged
+    /// permanent's component that came along with the permanent's move (`ZoneChange::part`, CR 730.3). What "a card is put
+    /// into a graveyard from the battlefield" asks of each card; "dies" asks the permanent's own move's `from`. None for any
+    /// other event.
+    pub fn moved_from(&self) -> Option<Zone> {
+        match *self {
+            Event::ZoneChange { part: true, .. } => Some(Zone::BATTLEFIELD),
+            Event::ZoneChange { from, .. } => Some(from),
+            _ => None,
+        }
+    }
+
     /// The player an event is about, where it is about one.
     pub fn player(&self) -> Option<PlayerId> {
         match *self {

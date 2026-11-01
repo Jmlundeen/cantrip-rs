@@ -99,7 +99,10 @@ pub fn ability_givers(cards: &CardTable, state: &GameState, log: &[Record], id: 
 /// after it entered (`EffectKind::RestoreCopy`), a resolved effect that gives an ability, or a static ability that gives
 /// other objects abilities. With none, every ability is of its object's own text, and nothing is worked out.
 pub fn acquisition_possible(cards: &CardTable, state: &GameState) -> bool {
-    state.effects.iter().any(|e| matches!(e.kind, EffectKind::RestoreCopy(_) | EffectKind::AddAbility(_))) || ability_granting_present(cards, state)
+    // A merged permanent's other components' abilities are printed on other cards than the text it has (CR 702.140e).
+    !state.merges.is_empty()
+        || state.effects.iter().any(|e| matches!(e.kind, EffectKind::RestoreCopy(_) | EffectKind::AddAbility(_)))
+        || ability_granting_present(cards, state)
 }
 
 /// Whether the ability in `slot` of `chars`, an object's characteristics, is surely one of the text it has (CR 607.5), with
@@ -290,11 +293,23 @@ struct View<'a> {
     /// `GKind::Granted`): as linked abilities know it (CR 607.5), what `linked_to` of that object answers. Its own and a copy
     /// effect's are the text the object has (`CardTable::linked_to`).
     asking: Option<Linked>,
+    /// The card the static ability being asked is printed on, where it is one of a merged permanent's components other than
+    /// the one it has now (CR 702.140e; `LayerQuery::text_of`), with `asking` that component's link.
+    text: Option<CardId>,
 }
 
 impl<'a> View<'a> {
     fn new(cards: &'a CardTable, state: &'a GameState, log: &'a [Record], stop: Layer) -> View<'a> {
-        View { cards, state, log, stop, stage: None, reads: None, pass: None, controllers: None, asking: None }
+        View { cards, state, log, stop, stage: None, reads: None, pass: None, controllers: None, asking: None, text: None }
+    }
+
+    /// This view, asking as a static ability printed on another component of a merged permanent (`by`, CR 702.140e) where it
+    /// is one: linked by that card, giving what that card lists.
+    fn as_text(&self, by: Option<(Linked, CardId)>) -> View<'a> {
+        match by {
+            Some((link, card)) => View { asking: Some(link), text: Some(card), ..*self },
+            None => *self,
+        }
     }
 
     /// An object with the layers before `stop` done, in the pass at hand or the position's.
@@ -330,6 +345,13 @@ impl LayerQuery for View<'_> {
         match self.asking {
             Some(by) if by.object == source => by,
             _ => self.cards.linked_to(self.state, source),
+        }
+    }
+
+    fn text_of(&self, source: ObjectId) -> CardId {
+        match (self.asking, self.text) {
+            (Some(by), Some(card)) if by.object == source => card,
+            _ => self.cards.current(self.state.obj(source)),
         }
     }
 
@@ -939,7 +961,18 @@ thread_local! {
 /// The object's own characteristic-defining abilities of `layer` (CR 604.3, 613.3): they apply first, and depend only on
 /// one another (CR 613.8a(c)).
 fn own_statics(cx: &Ctx, o: &ObjCtx, layer: Layer, chars: &mut Chars) {
-    let mut own = o.def.statics.iter().filter(|s| s.own && s.layer == layer).peekable();
+    // A merged permanent's other components' characteristic-defining abilities are its own too (CR 702.140e; the release
+    // notes: they "overwrite the characteristics from the topmost object"), each asked as its own card's.
+    let others: Vec<(CardId, Linked)> =
+        if o.sources.is_empty() { Vec::new() } else { cx.cards.texts_linked(cx.state, o.id).filter_map(|(c, l)| l.map(|l| (c, l))).collect() };
+    let mut own = o
+        .def
+        .statics
+        .iter()
+        .map(|st| (st, None))
+        .chain(others.iter().flat_map(|&(card, link)| cx.cards.get(card).statics.iter().map(move |st| (st, Some((link, card))))))
+        .filter(|(s, _)| s.own && s.layer == layer)
+        .peekable();
     if own.peek().is_none() {
         return;
     }
@@ -960,14 +993,14 @@ fn own_statics(cx: &Ctx, o: &ObjCtx, layer: Layer, chars: &mut Chars) {
     if defining {
         DEFINING.with(|d| d.borrow_mut().push(o.id));
     }
-    for st in own {
+    for (st, by) in own {
         if lost {
             if let Some((power, toughness)) = st.lost_pt {
                 chars.power = Some(power);
                 chars.toughness = Some(toughness);
             }
         } else {
-            (st.apply)(&view, o.id, chars);
+            (st.apply)(&view.as_text(by), o.id, chars);
         }
     }
     if defining {
@@ -1389,7 +1422,7 @@ enum GKind {
     /// A static ability of `source` (its own, or one an effect granted it) that applies to the objects it says; `first` is
     /// the first part of its effect (CR 613.6), itself unless it `continues` one, and then it applies to the objects that
     /// part applied to (`Snap::parts`), whatever its words say of them by now.
-    Static { source: ObjectId, st: &'static StaticDef, first: *const StaticDef, continues: bool },
+    Static { source: ObjectId, st: &'static StaticDef, first: *const StaticDef, continues: bool, by: Option<(Linked, CardId)> },
     /// A static ability `holder` was given that affects other objects (CR 613.1f, 613.7a). `ability` is the ability, where
     /// it was given in this very layer (layer 6): it applies only once `holder` has it.
     Given { holder: ObjectId, st: &'static StaticDef, ability: Option<AbilityRef>, by: Linked },
@@ -1524,14 +1557,15 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
         // Whether each still exists - its source has not lost it - is judged as the layer applies (`exists`).
         for (source, from, _) in list {
             // A merged permanent's other components' static abilities are its own (CR 702.140e), at its timestamp.
-            for text in cards.texts(state, state.obj(source)) {
+            for (text, link) in cards.texts_linked(state, source) {
                 let statics = cards.get(text).statics;
                 for (i, st) in statics.iter().enumerate() {
                     if st.own || st.layer != layer || st.from != from {
                         continue;
                     }
                     let first = &statics[first_part(statics, i)];
-                    let kind = GKind::Static { source, st, first, continues: st.continues };
+                    let by = link.map(|l| (l, text));
+                    let kind = GKind::Static { source, st, first, continues: st.continues, by };
                     entries.push(GEntry { kind, timestamp: state.obj(source).timestamp, seq: 0 });
                 }
             }
@@ -1635,12 +1669,12 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
 fn applies(view: &View, o: &ObjCtx, entry: &GEntry, snap: &Snap) -> bool {
     let id = o.id;
     match entry.kind {
-        GKind::Static { source, st, first, continues } => {
+        GKind::Static { source, st, first, continues, by } => {
             (o.on_battlefield || st.everywhere)
                 && if continues {
                     snap.parts.iter().any(|&(s, part)| s == source && std::ptr::eq(part, first))
                 } else {
-                    exists(view, source, id, snap) && (st.affects)(view, source, id, &snap.chars)
+                    exists(view, source, id, snap) && (st.affects)(&view.as_text(by), source, id, &snap.chars)
                 }
         }
         GKind::Given { holder, st, ability, by } => {
@@ -1707,7 +1741,7 @@ fn strippers_present(cards: &CardTable, state: &GameState) -> bool {
 /// What `entry` does to the object, which it applies to.
 fn apply_raw(view: &View, layer: Layer, id: ObjectId, entry: &GEntry, chars: &mut Chars) {
     match entry.kind {
-        GKind::Static { source, st, .. } => apply_static(st, view, source, id, chars),
+        GKind::Static { source, st, by, .. } => apply_static(st, &view.as_text(by), source, id, chars),
         GKind::Given { holder, st, by, .. } => apply_static(st, &View { asking: Some(by), ..*view }, holder, id, chars),
         GKind::Effect(e) => apply_effect(&e, layer, chars),
         GKind::Granted { st, by, .. } => (st.apply)(&View { asking: Some(by), ..*view }, id, chars),
@@ -2586,7 +2620,7 @@ pub fn ability_granting_present(cards: &CardTable, state: &GameState) -> bool {
 #[derive(Clone, Copy)]
 enum Control {
     /// A static ability of `source` ("you control enchanted creature"): its source's controller controls what it affects.
-    Static { source: ObjectId, st: &'static StaticDef },
+    Static { source: ObjectId, st: &'static StaticDef, by: Option<(Linked, CardId)> },
     /// A resolved effect: `to` controls `affected`.
     Effect { affected: ObjectId, to: PlayerId },
 }
@@ -2610,8 +2644,10 @@ pub fn control_order(cards: &CardTable, state: &GameState, log: &[Record]) -> Ve
     let mut entries: Vec<(u32, u8, Control)> = Vec::new();
     if state.statics_seen {
         for source in static_sources(cards, state).controllers.clone() {
-            for st in statics_of(cards, state, source).filter(|s| s.layer == Layer::Control) {
-                entries.push((state.obj(source).timestamp, 0, Control::Static { source, st }));
+            for (text, link) in cards.texts_linked(state, source) {
+                for st in cards.get(text).statics.iter().filter(|s| s.layer == Layer::Control) {
+                    entries.push((state.obj(source).timestamp, 0, Control::Static { source, st, by: link.map(|l| (l, text)) }));
+                }
             }
         }
     }
@@ -2635,12 +2671,12 @@ pub fn control_order(cards: &CardTable, state: &GameState, log: &[Record]) -> Ve
     let reach = |c: &Control, controllers: &std::collections::HashMap<ObjectId, PlayerId, Quick>| -> Vec<(ObjectId, PlayerId)> {
         match *c {
             Control::Effect { affected, to } => vec![(affected, to)],
-            Control::Static { source, st } => {
+            Control::Static { source, st, by } => {
                 let who = controllers.get(&source).copied().unwrap_or(state.obj(source).controller);
                 if !state.in_game(who) {
                     return Vec::new();
                 }
-                let view = View { controllers: Some(controllers), ..View::new(cards, state, log, Layer::Control) };
+                let view = View { controllers: Some(controllers), ..View::new(cards, state, log, Layer::Control) }.as_text(by);
                 objects
                     .iter()
                     .copied()

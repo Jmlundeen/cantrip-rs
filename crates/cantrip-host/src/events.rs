@@ -160,11 +160,14 @@ impl Tracker {
                 self.last_turn = turn;
                 out.push(Proto::Step { turn: turn.0, step, active: turn.1 });
             }
-            Event::ZoneChange { old, new, from, to, reason } => {
+            Event::ZoneChange { old, new, from, to, reason, part } => {
                 if to.is(ZoneKind::Gone) {
                     return;
                 }
-                if from.is(ZoneKind::Gone) {
+                // A merged permanent's other component came from the battlefield with the permanent (CR 730.3).
+                if part {
+                    out.push(Proto::Moved { old, new, from: Zone::BATTLEFIELD, to, reason });
+                } else if from.is(ZoneKind::Gone) {
                     let name = game.chars(new).name.to_string();
                     out.push(Proto::Created { object: new, controller: game.state.obj(new).controller, name });
                 } else {

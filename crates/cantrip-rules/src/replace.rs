@@ -291,11 +291,6 @@ fn card_of(cx: &Cx, id: ObjectId) -> CardId {
 /// The definitions `id`'s printed replacement and prevention effects come from (`source_card`), and, for a merged permanent,
 /// each of its other components' (CR 702.140e, `CardTable::texts`): a printed effect's index counts through them all, in
 /// this order.
-fn source_texts<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = &'static CardDef> + 'a {
-    source_text_ids(cx, id).map(|c| cx.cards().get(c))
-}
-
-/// The cards of `source_texts`.
 fn source_text_ids<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = CardId> + 'a {
     let entering = matches!(cx.entering, Some(w) if w.object == id);
     let first = source_card(cx, id);
@@ -304,19 +299,61 @@ fn source_text_ids<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = CardId>
     std::iter::once(first).chain(rest.into_iter().flatten())
 }
 
-/// `id`'s printed replacement effects (`source_texts`), numbered as `Candidate::index` names them.
-fn printed_replacements<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = &'static ReplacementDef> + 'a {
-    source_texts(cx, id).flat_map(|d| d.replacements.iter())
+/// The cards of `source_text_ids`, each with the link an effect printed on it is asked with (CR 607.1): none for the text the
+/// object has, a merged permanent's other component's own (`CardTable::component_link`), so that component's effect reads
+/// what its own card exiled or chose.
+fn source_texts_linked<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = (&'static CardDef, Option<Linked>)> + 'a {
+    source_text_ids(cx, id).enumerate().map(move |(i, c)| (cx.cards().get(c), (i > 0).then(|| cx.cards().component_link(cx.s(), id, c))))
 }
 
-/// `id`'s printed replacement effect `index` (`printed_replacements`).
+/// `id`'s printed replacement effects (`source_texts`), numbered as `Candidate::index` names them, each with its link.
+fn printed_replacements<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = (&'static ReplacementDef, Option<Linked>)> + 'a {
+    source_texts_linked(cx, id).flat_map(|(d, by)| d.replacements.iter().map(move |r| (r, by)))
+}
+
+/// `id`'s printed prevention effects, numbered through its definitions as `printed_replacements` are.
+fn printed_preventions<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = (&'static PreventionDef, Option<Linked>)> + 'a {
+    source_texts_linked(cx, id).flat_map(|(d, by)| d.preventions.iter().map(move |r| (r, by)))
+}
+
+fn nothing_applies(_: &dyn Query, _: &Asker, _: &Proposal) -> bool {
+    false
+}
+
+fn nothing_done(_: &dyn Query, _: &Asker, _: &mut Proposal) {}
+
+fn nothing_prevented(_: &dyn Query, _: &Asker, _: &DamageEvent) -> bool {
+    false
+}
+
+/// What a printed effect a candidate named is, once its source no longer has it - one of a merged permanent's components
+/// whose text an earlier part of the event changed: it applies to nothing and does nothing.
+static NO_REPLACEMENT: ReplacementDef = ReplacementDef {
+    hint: "",
+    kind: ReplacementKind::ZoneChange,
+    own_everywhere: false,
+    applies: nothing_applies,
+    apply: nothing_done,
+    then: None,
+    optional: None,
+    in_graveyard: false,
+};
+
+static NO_PREVENTION: PreventionDef = PreventionDef { hint: "", applies: nothing_prevented, amount: None };
+
+/// `id`'s printed replacement effect `index` (`printed_replacements`), and the link it is asked with.
 fn printed_replacement(cx: &Cx, id: ObjectId, index: u8) -> &'static ReplacementDef {
-    printed_replacements(cx, id).nth(index as usize).expect("a printed replacement effect a candidate named")
+    printed_replacements(cx, id).nth(index as usize).map_or(&NO_REPLACEMENT, |(r, _)| r)
 }
 
-/// `id`'s printed prevention effect `index`, numbered through its definitions as `printed_replacements` are.
-fn printed_prevention(cx: &Cx, id: ObjectId, index: u8) -> &'static PreventionDef {
-    source_texts(cx, id).flat_map(|d| d.preventions.iter()).nth(index as usize).expect("a printed prevention effect a candidate named")
+/// The link `id`'s printed replacement effect `index` is asked with (`printed_replacements`).
+fn printed_link(cx: &Cx, id: ObjectId, index: u8) -> Option<Linked> {
+    printed_replacements(cx, id).nth(index as usize).and_then(|(_, by)| by)
+}
+
+/// `id`'s printed prevention effect `index` (`printed_preventions`), and the link it is asked with.
+fn printed_prevention(cx: &Cx, id: ObjectId, index: u8) -> (&'static PreventionDef, Option<Linked>) {
+    printed_preventions(cx, id).nth(index as usize).unwrap_or((&NO_PREVENTION, None))
 }
 
 /// Whether any effect could apply to an event about `subject`: a permanent with replacements, or the subject's own
@@ -453,9 +490,9 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
         }
         // "You" for an ability of a card in a graveyard is its owner (CR 108.4a: it has no controller).
         let controller = if at == At::Graveyard { cx.s().obj(id).owner } else { controller_of(cx, id, proposal) };
-        let asker = Asker { source: id, controller, by: None, spell: false };
-        for (index, def) in printed_replacements(cx, id).enumerate() {
+        for (index, (def, by)) in printed_replacements(cx, id).enumerate() {
             let index = index as u8;
+            let asker = Asker { source: id, controller, by, spell: false };
             let functions = match at {
                 At::Field => !def.in_graveyard,
                 At::Own => def.own_everywhere,
@@ -475,8 +512,9 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
             && preventable
             && at == At::Field
         {
-            for (index, def) in source_texts(cx, id).flat_map(|d| d.preventions.iter()).enumerate() {
+            for (index, (def, by)) in printed_preventions(cx, id).enumerate() {
                 let index = index as u8;
+                let asker = Asker { source: id, controller, by, spell: false };
                 if !applied.contains(&(id, index, Origin::Prevention)) && (def.applies)(cx, &asker, d) {
                     found.push(Candidate { source: id, index, origin: Origin::Prevention });
                 }
@@ -656,7 +694,7 @@ fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
         Origin::ShieldCounter if matches!(proposal, Proposal::Damage(_)) => SHIELD_DAMAGE_HINT,
         Origin::ShieldCounter => SHIELD_DESTROY_HINT,
         Origin::Protection => PROTECTION_HINT,
-        Origin::Prevention => printed_prevention(cx, c.source, c.index).hint,
+        Origin::Prevention => printed_prevention(cx, c.source, c.index).0.hint,
         Origin::GrantedPrevention(timestamp) => match cx.s().effects.iter().find(|e| e.timestamp == timestamp).map(|e| e.kind) {
             Some(EffectKind::Prevention { card, index, .. }) => cx.cards().get(card).granted_preventions[index as usize].hint,
             _ => "",
@@ -672,7 +710,7 @@ fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
 fn prevents_all(cx: &Cx, c: &Candidate) -> bool {
     match c.origin {
         Origin::Protection => true,
-        Origin::Prevention => printed_prevention(cx, c.source, c.index).amount.is_none(),
+        Origin::Prevention => printed_prevention(cx, c.source, c.index).0.amount.is_none(),
         Origin::GrantedPrevention(timestamp) => cx
             .s()
             .effects
@@ -890,9 +928,9 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enterin
             // CR 615.1: a static ability's prevention, of all the damage or of as much as it says, of the damage as it now is
             // (CR 616.1f).
             Origin::Prevention => {
-                let asker = Asker { source, controller: controller_of(cx, source, proposal), by: None, spell: false };
+                let (def, by) = printed_prevention(cx, source, index);
+                let asker = Asker { source, controller: controller_of(cx, source, proposal), by, spell: false };
                 if let Proposal::Damage(d) = proposal {
-                    let def = printed_prevention(cx, source, index);
                     let amount = def.amount.map_or(d.amount, |how_much| how_much(&*cx, &asker, d).min(d.amount));
                     prevent(cx, d, amount, source);
                 }
@@ -950,7 +988,7 @@ fn apply_printed(cx: &mut Cx, proposal: &mut Proposal, source: ObjectId, index: 
     let def = printed_replacement(cx, source, index);
     let (apply, then) = (def.apply, def.then);
     let controller = printed_controller(cx, source, index, proposal);
-    let asker = Asker { source, controller, by: None, spell: false };
+    let asker = Asker { source, controller, by: printed_link(cx, source, index), spell: false };
     let before = *proposal;
     if !valid_redirection(&*cx, &before, |after| apply(&*cx, &asker, after)) {
         return;
@@ -1063,7 +1101,7 @@ fn reshape(cx: &Cx, c: &Candidate, proposal: &mut Proposal) {
     match c.origin {
         Origin::Printed => {
             let def = printed_replacement(cx, c.source, c.index);
-            let asker = Asker { source: c.source, controller: controller_of(cx, c.source, proposal), by: None, spell: false };
+            let asker = Asker { source: c.source, controller: controller_of(cx, c.source, proposal), by: printed_link(cx, c.source, c.index), spell: false };
             (def.apply)(cx, &asker, proposal);
         }
         Origin::Granted(timestamp) => {

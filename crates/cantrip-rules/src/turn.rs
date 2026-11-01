@@ -504,15 +504,18 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
         if obj.controller != player {
             continue;
         }
-        let card = obj.copied_card().unwrap_or(obj.card);
-        let asker = Asker { source: id, controller: player, by: None, spell: false };
-        // A scan once a turn of what is on the battlefield, for a card that has such a rule.
-        if !cx.card(card).turn_begin.is_empty() && cx.lost_all_abilities(id) {
+        // A scan once a turn of what is on the battlefield, for a card that has such a rule: of every definition it has, a
+        // merged permanent's other components' among them (CR 702.140e), each asked as its own card's.
+        let texts: Vec<(CardId, Option<Linked>)> = cx.cards().texts_linked(cx.s(), id).collect();
+        if texts.iter().any(|&(card, _)| !cx.card(card).turn_begin.is_empty()) && cx.lost_all_abilities(id) {
             continue;
         }
-        for rule in cx.card(card).turn_begin {
-            if (rule.applies)(&*cx, &asker, player) {
-                optional.push((id, rule));
+        for (card, by) in texts {
+            let asker = Asker { source: id, controller: player, by, spell: false };
+            for rule in cx.card(card).turn_begin {
+                if (rule.applies)(&*cx, &asker, player) {
+                    optional.push((id, rule));
+                }
             }
         }
     }
@@ -560,14 +563,15 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
     let mut untapping = Vec::new();
     // The permanents of the other players with an ability that untaps permanents during this untap step: a table lookup
     // per permanent, and nothing more in a game without one.
-    let mut others: Vec<(ObjectId, PlayerId, &'static CardDef)> = Vec::new();
+    let mut others: Vec<(ObjectId, PlayerId, &'static CardDef, Option<Linked>)> = Vec::new();
     for id in cx.s().battlefield().to_vec() {
         let obj = cx.s().obj(id);
         if obj.controller != active {
             // A merged permanent has its other components' rules too (CR 702.140e).
-            for def in cx.cards().texts(cx.s(), obj).map(|c| cx.card(c)) {
+            for (card, by) in cx.cards().texts_linked(cx.s(), id) {
+                let def = cx.card(card);
                 if !def.untap_in_others_untap_steps.is_empty() {
-                    others.push((id, obj.controller, def));
+                    others.push((id, obj.controller, def, by));
                 }
             }
             continue;
@@ -592,15 +596,15 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
     // A permanent of a player who isn't active is outside "doesn't untap during its controller's untap step" (CR 502.3,
     // 701.43a); a stun counter still replaces its untap (CR 122.1d, `ops::untap`). A source that has lost all its
     // abilities has no such rule (CR 613.1f).
-    others.retain(|&(id, _, _)| !cx.lost_all_abilities(id));
+    others.retain(|&(id, _, _, _)| !cx.lost_all_abilities(id));
     if !others.is_empty() {
         for id in cx.s().battlefield().to_vec() {
             let obj = cx.s().obj(id);
             if obj.controller == active || !obj.tapped {
                 continue;
             }
-            if others.iter().any(|&(source, controller, def)| {
-                let asker = Asker { source, controller, by: None, spell: false };
+            if others.iter().any(|&(source, controller, def, by)| {
+                let asker = Asker { source, controller, by, spell: false };
                 def.untap_in_others_untap_steps.iter().any(|rule| rule(&*cx, &asker, id))
             }) {
                 untapping.push(id);
@@ -1019,9 +1023,8 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
     // CR 509.1b: a static ability that limits who may block whom, of the blocker, of the attacker, or of another permanent
     // ("creatures you control with power 2 or less can't be blocked by ...", Delney, Streetwise Lookout).
     for &id in rule_sources {
-        let obj = cx.s().obj(id);
-        let card = obj.copied_card().unwrap_or(obj.card);
-        if !cx.card(card).block_rules.iter().all(|rule| rule(cx, id, blocker, attacker)) {
+        // Of every definition it has, a merged permanent's other components' among them (CR 702.140e).
+        if !cx.cards().texts(cx.s(), cx.s().obj(id)).all(|card| cx.card(card).block_rules.iter().all(|rule| rule(cx, id, blocker, attacker))) {
             return false;
         }
     }
@@ -1035,8 +1038,8 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
 fn maximum_blockers(cx: &Cx, attacker: ObjectId, rule_sources: &[ObjectId]) -> usize {
     let mut most = cx.chars(attacker).maximum_blockers();
     for &id in rule_sources {
-        let obj = cx.s().obj(id);
-        for limit in cx.card(obj.copied_card().unwrap_or(obj.card)).blocker_limits {
+        let limits: Vec<_> = cx.cards().texts(cx.s(), cx.s().obj(id)).flat_map(|card| cx.card(card).blocker_limits.iter().copied()).collect();
+        for limit in limits {
             if let Some(n) = limit(cx, id, attacker) {
                 most = most.min(n);
             }
@@ -1161,7 +1164,7 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().block_rules[obj.copied_card().unwrap_or(obj.card).0 as usize] && !cx.lost_all_abilities(id)
+            cx.cards().texts(cx.s(), obj).any(|card| cx.cards().block_rules[card.0 as usize]) && !cx.lost_all_abilities(id)
         })
         .collect();
     let mut allowed = Vec::new();
