@@ -1,0 +1,58 @@
+# Chevill, Bane of Monsters against Chevill (CR 603.4, 603.10a; the rulings: any bounty counter counts, whoever put it there, and
+# a Chevill leaving at the same time as a bounty permanent still sees it die). Bot1's Chevill (turn 1), Bot2's (turn 2).
+# Turn 3: Bot1's upkeep puts a counter on Bot2's Chevill (an opponent's, none yet). Turn 4: Bot2's upkeep puts one on Bot1's
+# Chevill - Bot2's own Chevill carrying a counter does not stop it, only Bot1's side would. Turn 5: Bot1's opponents control
+# a counter, so none is added (Bot2's Chevill stays at 1). Bot1's Chevill attacks, Bot2's blocks, and both die at once to
+# deathtouch: each player's Chevill sees the other's counter-bearing Chevill die as they leave together, so both gain 3 and
+# draw a card.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Chevill, Bane of Monsters
+Swamp x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Chevill, Bane of Monsters
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chevill, Bane of Monsters.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Chevill, Bane of Monsters.Cast
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Pass
+? Bot2.Battlefield.Chevill, Bane of Monsters.Counters.Bounty = 1
+? Bot1.Battlefield.Chevill, Bane of Monsters.Counters.Bounty = (absent)
+[T4 Bot2.Upkeep]
+Bot2.Pass
+Bot2.Pass
+? Bot1.Battlefield.Chevill, Bane of Monsters.Counters.Bounty = 1
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Pass
+? Bot2.Battlefield.Chevill, Bane of Monsters.Counters.Bounty = 1
+Bot1.Attack(Chevill, Bane of Monsters > Bot2)
+Bot2.Block(Chevill, Bane of Monsters > Chevill, Bane of Monsters)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Chevill, Bane of Monsters = (absent)
+Bot2.Battlefield.Chevill, Bane of Monsters = (absent)
+Bot1.Life = 23
+Bot2.Life = 23
+Bot1.Hand.Count = 7
+Bot2.Hand.Count = 7

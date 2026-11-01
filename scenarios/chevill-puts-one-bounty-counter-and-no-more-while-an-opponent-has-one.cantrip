@@ -1,0 +1,43 @@
+# Chevill, Bane of Monsters {B}{G} 1/3 deathtouch: "At the beginning of your upkeep, if your opponents control no permanents with
+# bounty counters on them, put a bounty counter on target creature or planeswalker an opponent controls" (CR 603.4, 122.1).
+# Bot2 has two Memnites. Bot1's turn-3 upkeep puts a counter on the first (the intervening if is true: none has one). A Memnite
+# without a counter then blocks and dies, which is no bounty death: Bot1 gains nothing. At turn 5's upkeep an opponent
+# controls a bounty counter, so no second one goes on it (it stays at 1, and Chevill's own side never counted).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Chevill, Bane of Monsters
+Swamp x20
+
+[Bot2 Deck]
+Memnite x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chevill, Bane of Monsters.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Target(Bot2.Battlefield.Memnite#1)
+Bot1.Pass
+Bot1.Pass
+? Bot2.Battlefield.Memnite#1.Counters.Bounty = 1
+? Bot2.Battlefield.Memnite#2.Counters.Bounty = (absent)
+Bot1.Attack(Chevill, Bane of Monsters > Bot2)
+Bot2.Block(Memnite#2 > Chevill, Bane of Monsters)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Battlefield.Memnite.Counters.Bounty = 1
+Bot2.Battlefield.Count = 1
+Bot2.Graveyard = Memnite
