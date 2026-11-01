@@ -774,6 +774,17 @@ pub static CAT: CardDef = CardDef {
     ..token!(Cat)
 };
 
+/// A 1/1 white Cat creature token with lifelink (CR 111). Cubwarden, Basri, Tomorrow's Champion and Liberated Livestock
+/// create this exact token.
+pub static CAT_LIFELINK: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Lifelink]),
+    ..token!(Cat)
+};
+
 /// The colorless Equipment artifact token named Axe, "Equipped creature gets +1/+0" and equip {2}: its name is "Axe"
 /// (CR 111.4), it has no mana cost or color, and its subtype is Equipment (CR 301.5). Dáin Ironfoot and Iron Hills
 /// Blacksmith create this exact token.
