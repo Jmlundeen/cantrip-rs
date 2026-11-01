@@ -13,6 +13,7 @@ mod look_counts;
 mod land_cant_be_sacrificed;
 mod lost_abilities;
 mod mana_ability_guards;
+mod merged_components;
 mod repeatable_mana;
 mod righteous_valkyrie_noncreature;
 mod search_any_number;
