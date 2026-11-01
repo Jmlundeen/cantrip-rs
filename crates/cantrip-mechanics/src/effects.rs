@@ -952,6 +952,26 @@ pub fn return_it_tapped_and_transformed(g: &mut dyn Game, item: &StackItem) -> R
     Ok(())
 }
 
+/// "Exile it" for a "when this dies" ability: the card the permanent became in the graveyard, if it is still there (CR 400.7e) -
+/// each card of a merged permanent, exiled together (CR 730.3c, 101.4). The objects now in exile; a replacement may have sent one
+/// elsewhere. Ancient Adamantoise, Cavalier of Thorns, Paramecia Coloniex and Serra Paragon print it.
+pub fn exile_what_it_became(g: &mut dyn Game, left: ObjectId) -> Vec<ObjectId> {
+    let cards = g.found_all_after_move(left);
+    g.exile_all(&cards).into_iter().filter(|&c| g.obj(c).zone.is(ZoneKind::Exile)).collect()
+}
+
+/// "Return it to the battlefield under its owner's control" for a "when this dies" ability: the card the permanent became in the
+/// graveyard, if it is still there (CR 400.7e) - each card of a merged permanent, together (CR 730.3c, 101.4) - tapped if
+/// `tapped`, each entering with `counters` (CR 122.6). The permanents that entered; a replacement may have kept one out. Hellcat,
+/// Retched Wretch, Pain 101, Unstoppable Slasher, persist and undying print it.
+pub fn return_what_it_became(g: &mut dyn Game, left: ObjectId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend> {
+    let cards: Vec<(ObjectId, PlayerId, bool)> = g.found_all_after_move(left).into_iter().map(|c| (c, g.obj(c).owner, tapped)).collect();
+    if cards.is_empty() {
+        return Ok(Vec::new());
+    }
+    Ok(g.put_all_onto_battlefield_with_counters(&cards, counters)?.into_iter().filter(|&c| g.is_on_battlefield(c)).collect())
+}
+
 /// "Untap this [permanent]" (CR 701.26): the ability's source. Basalt Monolith and Grim Monolith print it.
 pub fn untap_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.untap(item.object);

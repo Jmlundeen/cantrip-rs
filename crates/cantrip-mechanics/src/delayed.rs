@@ -119,8 +119,15 @@ pub fn sacrifice_subject(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 }
 
 /// "Exile it": the delayed ability's subject, if it is still the object it was on the battlefield (CR 603.7c, 400.7).
-/// Shallow Grave, Goryo's Vengeance and Corpse Dance print it at the next end step.
+/// Shallow Grave, Goryo's Vengeance and Corpse Dance print it at the next end step. A delayed ability that carries several
+/// objects (`at_next_end_step_about`: Vindictive Triumph, whose "it" is each card of a merged permanent it returned, CR 730.3c)
+/// exiles each that is still the object it was on the battlefield, together.
 pub fn exile_subject(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if item.subject == Target::None {
+        let carried: Vec<ObjectId> = g.event_objects(item).iter().copied().filter(|&c| is_live(g, c) && g.is_on_battlefield(c)).collect();
+        g.exile_all(&carried);
+        return Ok(());
+    }
     if let Target::Object(it) = item.subject
         && is_live(g, it)
         && g.is_on_battlefield(it)

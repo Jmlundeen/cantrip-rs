@@ -13,10 +13,7 @@ pub(crate) fn had_none(q: &dyn Query, asker: &Asker, kind: CounterKind) -> bool 
 /// The return: the card the permanent became in the graveyard, if it is still there (CR 400.7), enters with a counter of
 /// `kind` (CR 122.6) - each card of a merged permanent, together, each with its counter (CR 730.3c).
 pub(crate) fn returns(g: &mut dyn Game, item: &StackItem, kind: CounterKind) -> Result<(), Suspend> {
-    let cards: Vec<(ObjectId, PlayerId, bool)> = g.found_all_after_move(item.object).into_iter().map(|c| (c, g.obj(c).owner, false)).collect();
-    if !cards.is_empty() {
-        g.put_all_onto_battlefield_with_counters(&cards, &[(kind, 1)])?;
-    }
+    crate::effects::return_what_it_became(g, item.object, false, &[(kind, 1)])?;
     Ok(())
 }
 

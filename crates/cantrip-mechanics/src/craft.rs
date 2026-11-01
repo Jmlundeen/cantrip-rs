@@ -11,22 +11,26 @@
 use cantrip_api::*;
 
 /// "Return this card to the battlefield transformed under its owner's control" (CR 702.167a, 712.14a): the card the
-/// cost exiled, found where the cost put it (CR 400.7). Nothing if it has left exile since, or was a token, which
-/// ceased to exist there (CR 111.7, 704.5d); a card that is not a double-faced card stays in exile (CR 712.14a), as one
-/// that was only a copy of a craft card does (the craft rulings, 2023-11-10). Before it moves, the cards exiled as the
-/// materials are linked to it in exile, so the permanent it becomes has them from the moment it enters (CR 702.167c,
-/// `exiled_cards_used_to_craft`).
+/// cost exiled, found where the cost put it (CR 400.7) - each card a merged permanent became, the same done to each (CR
+/// 730.3c). Nothing if it has left exile since, or was a token, which ceased to exist there (CR 111.7, 704.5d); a card that
+/// is not a double-faced card stays in exile (CR 712.14a), as one that was only a copy of a craft card does (the craft
+/// rulings, 2023-11-10). Before it moves, the cards exiled as the materials are linked to it in exile, so the permanent it
+/// becomes has them from the moment it enters (CR 702.167c, `exiled_cards_used_to_craft`).
 fn return_transformed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    if !g.obj(card).zone.is(ZoneKind::Exile) || g.obj(card).token {
+    let cards: Vec<ObjectId> = g.found_all_after_move(item.object).into_iter().filter(|&c| g.obj(c).zone.is(ZoneKind::Exile) && !g.obj(c).token).collect();
+    if cards.is_empty() {
         return Ok(());
     }
     let materials = exiled_materials(g, item.object, item.ability);
-    // Linked to the craft card by its own text (CR 702.167c): the face it returns as is that card (CR 607.1b).
-    let by = Linked { object: card, text: g.linked_card(g.obj(card).card), acquired: Acquired::OWN };
-    g.link_exiled(&materials, by);
-    let owner = g.obj(card).owner;
-    g.put_onto_battlefield_transformed(card, owner, false)?;
+    // Only a double-faced card returns (CR 712.14a): the materials are linked to those, not to a card that stays in exile.
+    let returning: Vec<ObjectId> = cards.into_iter().filter(|&c| g.card(g.obj(c).card).back.is_some()).collect();
+    for card in returning {
+        // Linked to the craft card by its own text (CR 702.167c): the face it returns as is that card (CR 607.1b).
+        let by = Linked { object: card, text: g.linked_card(g.obj(card).card), acquired: Acquired::OWN };
+        g.link_exiled(&materials, by);
+        let owner = g.obj(card).owner;
+        g.put_onto_battlefield_transformed(card, owner, false)?;
+    }
     Ok(())
 }
 
