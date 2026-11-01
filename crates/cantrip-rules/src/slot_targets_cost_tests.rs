@@ -81,10 +81,22 @@ static SINGLE: CardDef = CardDef {
 static ENGINE: CardDef = CardDef {
     name: "Slot Test Engine",
     types: TypeSet::of(&[CardType::Artifact]),
-    abilities: &[ability(cost("{4}"), gain_three, "{4}: Up to two target creatures: you gain 3 life.").targets(&[up_to(2, creature)])],
-    own_cost_changes: &[less_if_yours],
+    abilities: &[ability(cost("{4}"), gain_three, "{4}: Up to two target creatures: you gain 3 life.")
+        .targets(&[up_to(2, creature)])
+        .cost_change(ability_less_if_yours)],
     ..CardDef::BLANK
 };
+
+/// `less_if_yours` as an ability's own change ("this ability costs {3} less to activate if it targets a permanent you
+/// control", CR 602.2b): a card's own changes are its spell's alone.
+fn ability_less_if_yours(q: &dyn Query, asker: &Asker, costed: Costed, targets: &[Target]) -> CostDelta {
+    less_if_yours(q, asker.source, asker.controller, costed, targets)
+}
+
+/// `less_for_each_yours` as an ability's own change.
+fn ability_less_for_each_yours(q: &dyn Query, asker: &Asker, costed: Costed, targets: &[Target]) -> CostDelta {
+    less_for_each_yours(q, asker.source, asker.controller, costed, targets)
+}
 
 fn player(_: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Player(_))
@@ -224,8 +236,8 @@ static GRAFT: CardDef = CardDef {
 };
 
 /// "This spell costs {3} less to cast if it was kicked."
-fn less_if_kicked(q: &dyn Query, spell: ObjectId, _: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    if matches!(costed, Costed::Spell(_)) && q.obj(spell).kicked > 0 { CostDelta::less(3) } else { CostDelta::NONE }
+fn less_if_kicked(q: &dyn Query, spell: ObjectId, _: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+    if q.obj(spell).kicked > 0 { CostDelta::less(3) } else { CostDelta::NONE }
 }
 
 /// {4} instant, kicker {1}: "This spell costs {3} less to cast if it was kicked. Target permanent: you gain 3 life."
@@ -276,8 +288,7 @@ static DIAL_MODES: ModalDef = modes(&[
 static DIAL: CardDef = CardDef {
     name: "Slot Test Dial",
     types: TypeSet::of(&[CardType::Artifact]),
-    abilities: &[modal_ability(cost("{4}"), &DIAL_MODES, "{4}: Choose one.")],
-    own_cost_changes: &[less_if_yours],
+    abilities: &[modal_ability(cost("{4}"), &DIAL_MODES, "{4}: Choose one.").cost_change(ability_less_if_yours)],
     ..CardDef::BLANK
 };
 
@@ -288,8 +299,9 @@ static X_CREATURES: [TargetSpec; 1] = [target(creature).counted()];
 static HIVE: CardDef = CardDef {
     name: "Slot Test Hive",
     types: TypeSet::of(&[CardType::Artifact]),
-    abilities: &[ability(cost("{X}{3}"), gain_three, "{X}{3}: X target creatures: you gain 3 life.").targets(&X_CREATURES)],
-    own_cost_changes: &[less_if_yours],
+    abilities: &[ability(cost("{X}{3}"), gain_three, "{X}{3}: X target creatures: you gain 3 life.")
+        .targets(&X_CREATURES)
+        .cost_change(ability_less_if_yours)],
     ..CardDef::BLANK
 };
 
@@ -314,12 +326,9 @@ static BULK: CardDef = CardDef {
 };
 
 /// Fireball's "This spell costs {1} more to cast for each target beyond the first."
-fn more_per_extra_target(_: &dyn Query, _: ObjectId, _: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta {
+fn more_per_extra_target(_: &dyn Query, _: ObjectId, _: PlayerId, _: Costed, targets: &[Target]) -> CostDelta {
     let chosen = targets.iter().filter(|t| **t != Target::None).count();
-    match costed {
-        Costed::Spell(_) => CostDelta::more(chosen.saturating_sub(1).min(255) as u8),
-        _ => CostDelta::NONE,
-    }
+    CostDelta::more(chosen.saturating_sub(1).min(255) as u8)
 }
 
 /// {1} sorcery: "This spell costs {1} more to cast for each target beyond the first. Any number of target creatures: you
@@ -381,8 +390,9 @@ static COVENANT: CardDef = CardDef {
 static GRID: CardDef = CardDef {
     name: "Slot Test Grid",
     types: TypeSet::of(&[CardType::Artifact]),
-    abilities: &[ability(cost("{9}"), gain_three, "{9}: Any number of target creatures: you gain 3 life.").targets(&ANY_CREATURES)],
-    own_cost_changes: &[less_for_each_yours],
+    abilities: &[ability(cost("{9}"), gain_three, "{9}: Any number of target creatures: you gain 3 life.")
+        .targets(&ANY_CREATURES)
+        .cost_change(ability_less_for_each_yours)],
     ..CardDef::BLANK
 };
 

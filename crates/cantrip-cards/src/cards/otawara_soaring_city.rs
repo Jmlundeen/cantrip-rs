@@ -16,8 +16,8 @@ pub static CARD: CardDef = CardDef {
         mana_ability(TAP, add(Mana::U), "{T}: Add {U}."),
         ability(cost("{3}{U}").and(DISCARD_THIS), cantrip_mechanics::effects::return_first_target_to_hand, "Channel \u{2014} {3}{U}, Discard this card: Return target artifact, creature, enchantment, or planeswalker to its owner's hand. This ability costs {1} less to activate for each legendary creature you control.")
             .targets(&[target(bounceable)])
-            .from(ZoneKind::Hand),
+            .from(ZoneKind::Hand)
+            .cost_change(channel::cheaper_per_legendary_creature),
     ],
-    own_cost_changes: &[channel::cheaper_per_legendary_creature],
     ..oracle::OTAWARA_SOARING_CITY
 };

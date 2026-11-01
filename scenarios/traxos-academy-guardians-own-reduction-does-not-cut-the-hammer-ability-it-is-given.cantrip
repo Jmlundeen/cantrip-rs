@@ -1,0 +1,64 @@
+# "This spell costs {2} less to cast if you've cast a noncreature spell this turn" is the cost of casting Traxos, Academy
+# Guardian alone (CR 601.2f): after five Moxen it is cast for {1}{U}, but it never cuts an activated ability of the
+# permanent (CR 602.2b). Equipped with Deconstruction Hammer - itself a noncreature spell cast that turn - Traxos has
+# "{3}, {T}, Sacrifice Deconstruction Hammer: Destroy target artifact or enchantment", which still costs {3}: two Moxen
+# cannot pay it, and a third mana (the Island) can, leaving nothing over.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Traxos, Academy Guardian
+Deconstruction Hammer
+Island x14
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Traxos, Academy Guardian.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Traxos, Academy Guardian)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Traxos, Academy Guardian.Activate(Bot2.Battlefield.Sol Ring; Mana: short)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Traxos, Academy Guardian.Activate(Bot2.Battlefield.Sol Ring)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Island
+Bot2.Graveyard = Sol Ring
+Bot1.Graveyard = Deconstruction Hammer

@@ -26,8 +26,8 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::B), "{T}: Add {B}."),
         ability(cost("{3}{B}").and(DISCARD_THIS), mill_then_return, "Channel \u{2014} {3}{B}, Discard this card: Mill three cards, then return a creature or planeswalker card from your graveyard to your hand. This ability costs {1} less to activate for each legendary creature you control.")
-            .from(ZoneKind::Hand),
+            .from(ZoneKind::Hand)
+            .cost_change(channel::cheaper_per_legendary_creature),
     ],
-    own_cost_changes: &[channel::cheaper_per_legendary_creature],
     ..oracle::TAKENUMA_ABANDONED_MIRE
 };

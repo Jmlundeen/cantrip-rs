@@ -27,9 +27,9 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::R), "{T}: Add {R}."),
         ability(cost("{3}{R}").and(DISCARD_THIS), two_hasty_spirits, "Channel \u{2014} {3}{R}, Discard this card: Create two 1/1 colorless Spirit creature tokens. They gain haste until end of turn. This ability costs {1} less to activate for each legendary creature you control.")
-            .from(ZoneKind::Hand),
+            .from(ZoneKind::Hand)
+            .cost_change(channel::cheaper_per_legendary_creature),
     ],
-    own_cost_changes: &[channel::cheaper_per_legendary_creature],
     ..oracle::SOKENZAN_CRUCIBLE_OF_DEFIANCE
 };
 

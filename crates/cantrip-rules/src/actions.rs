@@ -2687,17 +2687,15 @@ impl Query for AsFace<'_> {
 /// What activating the ability `index` of `source` (numbered as its options are) would cost `player` with each of
 /// `candidates` as its one target, the total as it is determined once the target is announced (CR 601.2c, 601.2f,
 /// 602.2b): for the menu row of an action whose cost depends on the target it would be announced with. Empty when
-/// nothing could change that cost (no cost changer on the battlefield, none of the ability's or card's own), which is
-/// nearly always, or when it is no activated ability with a mana cost.
+/// nothing could change that cost (no cost changer on the battlefield, none of the ability's own: a card's own "this
+/// spell costs less" is never its abilities'), which is nearly always, or when it is no activated ability with a mana cost.
 pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, index: u8, candidates: &[Target]) -> Vec<(ManaCost, u32)> {
     let Some(ability) = game.chars(source).abilities().nth(index as usize) else { return Vec::new() };
     let AbilityDef::Activated(def) = game.cards.ability(ability) else { return Vec::new() };
     let changers = game.state.battlefield().iter().any(|&id| {
         game.cards.texts(&game.state, game.state.obj(id)).any(|c| game.cards.cost_changes[c.0 as usize]) && !game.lost_all_abilities(id)
     });
-    let obj = game.state.obj(source);
-    let own = game.cards.texts(&game.state, obj).any(|card| !game.cards.get(card).own_cost_changes.is_empty());
-    if def.special_action || def.cost.mana.x > 0 || !(changers || own || def.cost_change.is_some()) {
+    if def.special_action || def.cost.mana.x > 0 || !(changers || def.cost_change.is_some()) {
         return Vec::new();
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
@@ -2920,14 +2918,11 @@ pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, option: &ActionOp
     }
 }
 
-/// The cost changes the object `id` carries itself (CR 601.2f): its card's, or a copy's, and a merged permanent's other
-/// components' (CR 702.140e), each with the link it is read with (`merge::AsText`).
-fn own_cost_changes(cx: &Cx, id: ObjectId) -> Vec<(CostChange, Option<Linked>)> {
+/// The cost changes the spell `id` being cast carries itself (CR 601.2f): its card's, or a copy's. Asked only of a spell
+/// (`deltas_watched`), which is never a merged permanent.
+fn own_cost_changes(cx: &Cx, id: ObjectId) -> &'static [CostChange] {
     let obj = cx.s().obj(id);
-    if cx.s().merge_of(id).is_none() {
-        return cx.card(obj.copied_card().unwrap_or(obj.card)).own_cost_changes.iter().map(|&c| (c, None)).collect();
-    }
-    cx.cards().texts_linked(cx.s(), id).flat_map(|(card, by)| cx.card(card).own_cost_changes.iter().map(move |&c| (c, by))).collect()
+    cx.card(obj.copied_card().unwrap_or(obj.card)).own_cost_changes
 }
 
 fn change_with(
@@ -3122,19 +3117,22 @@ fn deltas_watched(
     announced: Option<&Obj>,
     watching: Option<&Watching>,
 ) -> (u32, ManaCost, u32, u8, u32) {
-    // The thing costed is its own source for the changes it carries itself (affinity, channel's reduction).
+    // The thing costed is its own source for the changes it carries itself (affinity; an ability's own, channel's).
     let (id, ability) = match costed {
         Costed::Spell(id) => (id, None),
         // A special action is no activated ability (CR 116.1): no discount on abilities, and no ability's own change.
         Costed::SpecialAction(id, _) => (id, None),
         Costed::Ability(id, ability, by) => (id, Some((ability, by))),
     };
-    // A card's own changes are its spell's ("this spell costs {3} less ..."), never a special action's (CR 116.1): plotting
-    // or foretelling the card is not made cheaper by what makes the spell cheaper.
-    let own: Vec<(CostChange, Option<Linked>)> = match (face, costed) {
-        (_, Costed::SpecialAction(..)) => Vec::new(),
-        (Some(face), _) => cx.card(face).own_cost_changes.iter().map(|&c| (c, None)).collect(),
-        (None, _) => own_cost_changes(cx, id),
+    // A card's own changes are its spell's ("this spell costs {3} less to cast ...", CR 601.2f): asked only as it is cast,
+    // however it is cast (from exile once foretold or plotted, by an alternative cost), never for activating an ability of
+    // it or of the permanent it becomes, granted or printed (CR 602.2b: an ability's own reduction is that ability's,
+    // `ActivatedDef::cost_change`), and never for a special action (CR 116.1): plotting or foretelling the card is not
+    // made cheaper by what makes the spell cheaper.
+    let own: &[CostChange] = match (face, costed) {
+        (_, Costed::SpecialAction(..) | Costed::Ability(..)) => &[],
+        (Some(face), Costed::Spell(_)) => cx.card(face).own_cost_changes,
+        (None, Costed::Spell(_)) => own_cost_changes(cx, id),
     };
     // The ability's own change ("this ability costs ... less", power-up), asked for this ability alone.
     let ability_own = ability.and_then(|(a, by)| activated(cx, a).and_then(|d| d.cost_change).map(|change| (change, by)));
@@ -3193,11 +3191,8 @@ fn deltas_watched(
         least = least.max(delta.at_least);
         discount += delta.less_to_one as u32;
     };
-    for (change, link) in own {
-        match link {
-            Some(link) => add(change(&crate::merge::AsText { q, source: id, link }, id, player, costed, targets)),
-            None => add(change(q, id, player, costed, targets)),
-        }
+    for change in own {
+        add(change(q, id, player, costed, targets));
     }
     // Asked as the ability it is (CR 607.5).
     if let Some((change, by)) = ability_own {
@@ -4971,9 +4966,9 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             // The total cost is determined once the targets are announced (CR 601.2c, 601.2f, 602.2b), so a change that reads
             // them ("equip abilities that target this creature cost {2} less") is judged for each candidate a target announced
             // with the action could be: only those the cost could then be paid for are offered. Only where something could
-            // change the cost - a cost changer on the battlefield, or the ability's or card's own - since nearly nothing does;
+            // change the cost - a cost changer on the battlefield, or the ability's own - since nearly nothing does;
             // otherwise the cost is judged once, before any target is looked for.
-            let changes = |a: &Available| !a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty();
+            let changes = |a: &Available| !a.changers.is_empty() || def.cost_change.is_some();
             let each_target = a.is_some_and(|a| targets_with_activation(def) && !def.special_action && def.modal.is_none() && changes(a));
             // Targets chosen once it has begun, after its modes and X (CR 601.2b-c by way of 602.2b): offered if some legal
             // announcement of them could be paid for (`some_activation`).

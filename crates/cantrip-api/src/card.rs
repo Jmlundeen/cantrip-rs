@@ -3066,7 +3066,10 @@ pub struct CardDef {
     /// Its static abilities that make other things cost more or less (CR 601.2f), while it is on the battlefield.
     pub cost_changes: &'static [CostChange],
     /// A spell's own cost changes (CR 601.2f): "this spell costs {1} less to cast for each ..." (affinity, Embercleave).
-    /// They work wherever the spell is cast from, and the spell is their `source`.
+    /// They work wherever the spell is cast from, and the spell is their `source`. The core asks them only as the card is
+    /// cast (`Costed::Spell`), never for an ability of it or of its permanent, nor for a special action (CR 116.1), so a
+    /// change here need not look at what is costed: "this ability costs ... less to activate" (channel) is the ability's own
+    /// (`ActivatedDef::cost_change`).
     pub own_cost_changes: &'static [CostChange],
     /// The cost changes its resolving spells and abilities make for a duration (CR 611.2c, 601.2f): `EffectKind::SpellCostChange`
     /// names the nth. Not standing abilities: they function only while such an effect lasts.

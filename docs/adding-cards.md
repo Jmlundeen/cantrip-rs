@@ -399,7 +399,9 @@ shapes have an example:
   `g.add_effect(id, id, EffectKind::Harnessed, Duration::Indefinite)`, read by a static that grants the infinity ability
   (The Mind Stone). `Duration::UntilNextTurnOf(p)` is "until your next turn".
 - **Cost changes** are `CardDef.cost_changes` (Thalia-likes, Bilbo, Anointed Peacekeeper), a spell's own
-  `own_cost_changes` (affinity), and an ability's own `.cost_change(f)` ("this ability costs ... less", power-up). Each
+  `own_cost_changes` (affinity; asked by the core only as the card is cast, never for an ability of it or a special
+  action, so it needs no `Costed` check), and an ability's own `.cost_change(f)` ("this ability costs ... less",
+  channel, power-up). Each
   returns a `CostDelta`: `more(n)` generic, `less(n)` generic, `less_mana(cost)` for an amount that may be colored,
   whose colored part comes off that color and any excess off generic (CR 118.7), or `at_least(n)` for the least the total
   comes to once every increase and reduction is applied (Trinisphere, CR 601.2f). Each is also handed the targets announced for the
