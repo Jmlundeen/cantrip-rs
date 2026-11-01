@@ -355,6 +355,11 @@ public sealed class ScenarioPlayer
                 await _page.ClickAsync("Okay", "button");
                 return;
 
+            // A number chosen from a range (read ahead's chapter, CR 702.155b) is asked as a choice of modes, a button for each number.
+            case AnnounceAnswer chosen when state.Modes is { } numbers && numbers.Contains(chosen.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)):
+                await ClickButtonNamedAsync(chosen.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                return;
+
             case AnnounceAnswer announced:
                 for (int i = 0; i < announced.Value; i++)
                 {
