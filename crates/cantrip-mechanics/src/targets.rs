@@ -961,6 +961,18 @@ pub fn controlled_by_that_player(q: &dyn Query, id: ObjectId) -> bool {
     matches!(q.event_subject(), Target::Player(p) if on_battlefield(q, id) && q.controller(id) == p)
 }
 
+/// "Target artifact or enchantment that player controls" of "Whenever ... deal combat damage to a player, ..." (CR 603.12): an
+/// artifact or enchantment under the control of the trigger's subject (`controlled_by_that_player`). Leatherhead, Swamp
+/// Stalker and Feline Sovereign print it; a slot of up to one is `up_to_one(artifact_or_enchantment_that_player_controls)`.
+pub fn artifact_or_enchantment_that_player_controls(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    let Target::Object(id) = t else { return false };
+    if !controlled_by_that_player(q, id) {
+        return false;
+    }
+    let c = q.chars(id);
+    c.is(CardType::Artifact) || c.is(CardType::Enchantment)
+}
+
 /// "Target creature or planeswalker that's [color A] or [color B]" (CR 115.1, 105.2): a creature or planeswalker that is
 /// either color, or both. The color words are those of the targeting spell's own text (CR 612); `A` and `B` are `Color`s as
 /// `u8`. Devout Decree (black or red), Refute Destiny (green or blue), Terminal Criticism (blue or red) and, worded
