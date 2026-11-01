@@ -177,14 +177,16 @@ fn a_card_to_a_graveyard(_: &dyn Query, _: &Asker, proposal: &Proposal) -> bool 
     matches!(proposal, Proposal::ZoneChange(z) if z.is_card && z.to.is(ZoneKind::Graveyard))
 }
 
-fn exile_instead(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+fn exile_instead(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) {
     if let Proposal::ZoneChange(z) = proposal {
         z.to = Zone::exile(z.to.player);
+        z.exiled_with = Some(q.linked_to(asker));
     }
 }
 
 /// "If a card would be put into a graveyard from anywhere, exile it instead": a replacement effect for cards alone, which
-/// says nothing of tokens (CR 730.3e).
+/// says nothing of tokens (CR 730.3e), exiling each card with it (CR 607.2b, Valgavoth's shape), as every card of a merged
+/// permanent it moves is (CR 730.3d).
 static VOID: CardDef = CardDef {
     name: "Mutate Test Void",
     cost: mana("{2}{B}"),
@@ -722,7 +724,7 @@ fn transforming_a_merged_permanent_turns_its_double_faced_component() {
 #[test]
 fn a_card_only_replacement_moves_every_component_of_a_nontoken_merged_permanent() {
     let mut g = game();
-    put(&mut g, &VOID, THEM, Zone::BATTLEFIELD);
+    let void = put(&mut g, &VOID, THEM, Zone::BATTLEFIELD);
     let cat_card = g.cards.id_of(&CAT);
     let cat = cantrip_api::Game::create_tokens(&mut cx(&mut g), cat_card, YOU, 1, false).expect("nothing is asked")[0];
     let beast = put(&mut g, &BEAST, YOU, Zone::hand(YOU));
@@ -733,6 +735,7 @@ fn a_card_only_replacement_moves_every_component_of_a_nontoken_merged_permanent(
     let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]);
     assert_eq!(gone.len(), 2, "both components moved");
     assert!(gone.iter().all(|&c| g.state.obj(c).zone.is(ZoneKind::Exile)), "the token component is exiled with the card");
+    assert!(gone.iter().all(|&c| g.state.obj(c).exiled.is_some_and(|l| l.by == void)), "each exiled with the Void (CR 607.2b, 730.3d)");
     settle(&mut g);
     assert!(g.state.zone(Zone::graveyard(YOU)).is_empty(), "nothing was put into the graveyard");
     let exiled: Vec<&str> = g.state.zone(Zone::exile(YOU)).iter().map(|&c| g.chars(c).name).collect();
@@ -745,7 +748,7 @@ fn a_card_only_replacement_moves_every_component_of_a_nontoken_merged_permanent(
 #[test]
 fn a_card_only_replacement_moves_only_the_card_components_of_a_token_merged_permanent() {
     let mut g = game();
-    put(&mut g, &VOID, THEM, Zone::BATTLEFIELD);
+    let void = put(&mut g, &VOID, THEM, Zone::BATTLEFIELD);
     let cat_card = g.cards.id_of(&CAT);
     let cat = cantrip_api::Game::create_tokens(&mut cx(&mut g), cat_card, YOU, 1, false).expect("nothing is asked")[0];
     let beast = put(&mut g, &BEAST, YOU, Zone::hand(YOU));
@@ -759,6 +762,7 @@ fn a_card_only_replacement_moves_only_the_card_components_of_a_token_merged_perm
     let card = gone.iter().copied().find(|&c| !g.state.obj(c).token).expect("the card component");
     assert!(g.state.obj(token).zone.is(ZoneKind::Graveyard), "the token is put into the graveyard: the permanent died");
     assert!(g.state.obj(card).zone.is(ZoneKind::Exile), "the card is exiled instead");
+    assert!(g.state.obj(card).exiled.is_some_and(|l| l.by == void), "exiled with the Void (CR 607.2b)");
     assert_eq!(g.chars(card).name, "Mutate Test Beast");
     let died = g.history().all().iter().filter(|r| matches!(r.event, Event::ZoneChange { from, to, .. } if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard))).count();
     assert_eq!(died, 1, "one permanent died");
