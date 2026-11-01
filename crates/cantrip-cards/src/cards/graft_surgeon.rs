@@ -4,14 +4,8 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::THIS_DIES;
 use cantrip_oracle as oracle;
 
-/// "This creature enters with a +1/+1 counter on it" (CR 614.1c, 122.6).
-fn enter_with_counter(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::PlusOne as usize] += 1;
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    enters: Some(enter_with_counter),
+    enters: Some(cantrip_mechanics::effects::enters_with_a_counter::<{ CounterKind::PlusOne as usize }>),
     abilities: &[triggered(
         THIS_DIES,
         put_its_counters_on_target,

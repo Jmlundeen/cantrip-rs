@@ -63,6 +63,25 @@ pub fn discard_chosen_from_revealed_hand_of_kind(
     Ok(chosen)
 }
 
+/// `choose_from_revealed_hand_of_kind`, then the cards chosen are exiled (CR 701.13), together: "Target opponent reveals their hand.
+/// You choose [a card of `kind`] from it. Exile that card." Nothing is exiled when nothing was chosen. Cruelclaw's Heist,
+/// Intimidation Tactics and Biting-Palm Ninja print it. The cards exiled.
+pub fn exile_chosen_from_revealed_hand_of_kind(
+    g: &mut dyn Game,
+    item: &StackItem,
+    player: PlayerId,
+    kind: &'static str,
+    eligible: fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Vec<ObjectId>, Suspend> {
+    let chosen = choose_from_revealed_hand_of_kind(g, item, player, Purpose::Exile, kind, eligible)?;
+    Ok(g.exile_all(&chosen))
+}
+
+/// `exile_chosen_from_revealed_hand_of_kind` for "a nonland card": Cruelclaw's Heist and Biting-Palm Ninja print it.
+pub fn exile_chosen_nonland_from_revealed_hand(g: &mut dyn Game, item: &StackItem, player: PlayerId) -> Result<Vec<ObjectId>, Suspend> {
+    exile_chosen_from_revealed_hand_of_kind(g, item, player, "nonland", |q, c| !q.chars(c).is(CardType::Land))
+}
+
 /// "[Target opponent] reveals their hand. You choose a nonland card from it. That player discards that card." (CR 701.9a): the
 /// hand is revealed, and when no nonland card is there to take there is no choice to make, so none is asked (CR 608.2d), as for any
 /// `choose_from_revealed_hand`. Grief, Humiliate and

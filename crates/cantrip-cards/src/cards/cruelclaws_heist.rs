@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{gift, hand::choose_from_revealed_hand_of_kind, targets};
+use cantrip_mechanics::{gift, hand::exile_chosen_nonland_from_revealed_hand, targets};
 use cantrip_oracle as oracle;
 
 /// "Target opponent reveals their hand. You choose a nonland card from it. Exile that card. If the gift was promised, you
@@ -9,8 +9,7 @@ use cantrip_oracle as oracle;
 /// timing, for as long as that exiled card stays there (CR 400.7); it is given only to the card exiled (the new object).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = item.target(0).player() else { return Ok(()) };
-    let chosen = choose_from_revealed_hand_of_kind(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))?;
-    let exiled = g.exile_all(&chosen);
+    let exiled = exile_chosen_nonland_from_revealed_hand(g, item, opponent)?;
     if item.gift.is_some() {
         for card in exiled {
             g.allow_play(card, item.controller, PlayGrant { any_type: true, ..PlayGrant::CAST });

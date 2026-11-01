@@ -2,12 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, effects, targets};
 use cantrip_oracle as oracle;
 
-/// "Zack Fair enters with a +1/+1 counter on it" (CR 614.1c).
-fn enters_with_a_counter(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::PlusOne as usize] += 1;
-    Ok(())
-}
-
 /// The Equipment that was attached to `zack` as he left the battlefield (CR 701.3d, 704.5n): the attachments his leaving
 /// ended, which the history keeps as `Unattached` records made just before his own `ZoneChange` (he is the only permanent the
 /// sacrifice moves). One that left him on some earlier occasion has its `Unattached` record there, with the cost's payment
@@ -54,7 +48,7 @@ fn sacrifice_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(enters_with_a_counter),
+    enters: Some(cantrip_mechanics::effects::enters_with_a_counter::<{ CounterKind::PlusOne as usize }>),
     abilities: &[ability(
         cost("{1}").and(SACRIFICE_THIS),
         sacrifice_effect,
