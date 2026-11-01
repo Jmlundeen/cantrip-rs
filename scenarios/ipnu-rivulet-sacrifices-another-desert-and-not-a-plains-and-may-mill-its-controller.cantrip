@@ -1,0 +1,37 @@
+# The sacrifice is "a Desert": with Ipnu Rivulet, Shefet Dunes and a Plains in play, the Rivulet may sacrifice the Dunes
+# but not the Plains (refused), so the Rivulet stays, tapped. It targets its own controller, who mills four.
+
+[Bot1 Deck]
+Ipnu Rivulet
+Shefet Dunes
+Plains
+Mox Sapphire
+Mox Ruby
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ipnu Rivulet.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Shefet Dunes.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ipnu Rivulet.Activate(Ability: Sacrifice a Desert; Bot1)
+! Bot1.Choose(Plains)
+Bot1.Choose(Shefet Dunes)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ipnu Rivulet.Tapped = true
+Bot1.Battlefield.Shefet Dunes = (absent)
+Bot1.Battlefield.Plains.Tapped = false
+Bot1.Graveyard.Count = 5
