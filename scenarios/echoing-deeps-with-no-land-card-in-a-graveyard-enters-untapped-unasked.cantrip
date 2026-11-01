@@ -1,0 +1,31 @@
+# Echoing Deeps with no land card in any graveyard: its "you may" asks nothing (CR 707.2 needs a card to copy) and it enters
+# untapped as itself. The Masked Meower in the graveyard is a nonland card, so it is no candidate (a Cave filter that let it
+# in would ask). The refusal `! Bot1.Accept` shows no question was put; the other scenarios, with a land card there, ask.
+
+[Bot1 Deck]
+Mountain
+Masked Meower
+Llanowar Elves
+Echoing Deeps
+Forest x12
+
+[Bot2 Deck]
+Plains x7
+Llanowar Elves
+Plains x7
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Echoing Deeps.Play
+! Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Echoing Deeps; Mountain
+Bot1.Battlefield.Echoing Deeps.Tapped = false

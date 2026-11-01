@@ -1,0 +1,43 @@
+# Echoing Deeps "may have this land enter tapped as a copy of any land card in a graveyard, except it's a Cave in addition to
+# its other types" (CR 614.1c, 707.2, 707.9b). Bot1's graveyard holds an Island (discarded to a Masked Meower) and the
+# Meower, a nonland card that is no candidate; Bot2's holds a Swamp (the card its cleanup discarded at 8 cards), so there
+# are two candidates, and the choice is not a target: Bot1 picks the opponent's Swamp. The copy is a tapped Swamp that is also
+# a Cave, the Swamp card stays in its graveyard, and the copy has Swamp's mana ability, not Echoing Deeps' own.
+
+[Bot1 Deck]
+Mountain
+Masked Meower
+Island
+Echoing Deeps
+Forest x12
+
+[Bot2 Deck]
+Plains x7
+Swamp
+Plains x7
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Echoing Deeps.Play
+Bot1.Accept
+Bot1.Target(Bot2.Graveyard.Swamp)
+? Bot1.Battlefield.Swamp.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Mana = {B}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Swamp
+Bot1.Battlefield.Swamp.Tapped = true
+Bot1.Battlefield.Swamp.Subtypes = Cave; Swamp
+Bot1.Battlefield.Swamp.Types = Land
+Bot1.Battlefield.Swamp.Supertypes = Basic
+Bot1.Graveyard = Masked Meower; Island
+Bot2.Graveyard = Plains; Swamp

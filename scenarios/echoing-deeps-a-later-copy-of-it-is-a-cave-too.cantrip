@@ -1,0 +1,40 @@
+# Echoing Deeps' "except it's a Cave in addition to its other types" is part of its copy effect, so it becomes part of the
+# copy's copiable values (CR 707.9b): a Vesuva that later enters as a copy of the Echoing Deeps copying an Island is an
+# Island and a Cave too, not a plain Island. Each enters tapped, as it copies something.
+
+[Bot1 Deck]
+Mountain
+Masked Meower
+Island
+Echoing Deeps
+Vesuva
+Forest x11
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Echoing Deeps.Play
+Bot1.Accept
+Bot1.Target(Bot1.Graveyard.Island)
+? Bot1.Battlefield.Island.Subtypes = Cave; Island
+[T5 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Island)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Island; Island; Mountain
+Bot1.Battlefield.Island#1.Subtypes = Cave; Island
+Bot1.Battlefield.Island#1.Tapped = false
+Bot1.Battlefield.Island#2.Subtypes = Cave; Island
+Bot1.Battlefield.Island#2.Tapped = true
+Bot1.Graveyard = Masked Meower; Island
