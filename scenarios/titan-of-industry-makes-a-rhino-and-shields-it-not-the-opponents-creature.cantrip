@@ -1,0 +1,59 @@
+# Titan of Industry, modes 3 and 4. Exactly two modes are chosen (one or three are refused). Bot1 makes a 4/4 green Rhino Warrior,
+# then (the modes are followed in the order written, CR 608.2c) puts a shield counter on a creature it controls chosen as the
+# ability resolves: the Rhino, though Titan is the first listed; Bot2's Ornithopter is no choice and choosing none is refused
+# (CR 608.2d). Only the Rhino has the counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Titan of Industry
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x21
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: G)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Titan of Industry.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Modes(3)
+! Bot1.Modes(2; 3; 4)
+Bot1.Modes(3; 4)
+! Bot1.Choose()
+! Bot1.Choose(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Bot1.Battlefield.Rhino Warrior Token)
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Rhino Warrior Token.Power = 4
+Bot1.Battlefield.Rhino Warrior Token.Toughness = 4
+Bot1.Battlefield.Rhino Warrior Token.Colors = Green
+Bot1.Battlefield.Rhino Warrior Token.Subtypes = Rhino; Warrior
+Bot1.Battlefield.Rhino Warrior Token.Counters.Shield = 1
+Bot1.Battlefield.Titan of Industry.Counters.Shield = (absent)
+Bot2.Battlefield.Ornithopter.Counters.Shield = (absent)
+Bot1.Life = 20
+Bot2.Life = 20

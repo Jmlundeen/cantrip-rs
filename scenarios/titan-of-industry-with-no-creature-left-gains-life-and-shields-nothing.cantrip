@@ -1,0 +1,53 @@
+# Titan of Industry, modes 2 and 4 with no creature to shield. Bot2 exiles Titan with Swords to Plowshares in response to its enters
+# trigger (Bot1 gains 7 life), so as the trigger resolves Bot1 controls no creature: the shield counter goes nowhere (CR 608.2d) and the
+# life mode still has Bot1 gain 5 (20 + 7 + 5), a player being a legal target of the second mode (own player accepted).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Titan of Industry
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: G)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Titan of Industry.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(2; 4)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Titan of Industry)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile.Count = 1
+Bot1.Battlefield.Count = 4
+Bot1.Life = 32

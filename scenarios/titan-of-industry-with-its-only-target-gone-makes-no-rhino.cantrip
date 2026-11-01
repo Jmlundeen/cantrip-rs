@@ -1,0 +1,51 @@
+# Titan of Industry, modes 1 and 3 (the 2022-04-29 ruling). Bot1 targets Bot2's Black Lotus with the destroy mode; Bot2 sacrifices
+# the Lotus in response, so as the trigger resolves its only target is illegal and the ability doesn't resolve (CR 608.2b): the
+# Rhino mode, which has no target of its own, does nothing either.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Titan of Industry
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Island x21
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: G)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Titan of Industry.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1; 3)
+Bot1.Target(Bot2.Battlefield.Black Lotus)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: G)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard.Black Lotus.Colors.Count = 0
+Bot1.Battlefield.Rhino Warrior Token = (absent)
+Bot1.Battlefield.Count = 5
