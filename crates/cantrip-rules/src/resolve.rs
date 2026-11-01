@@ -670,7 +670,7 @@ fn send_spell(cx: &mut Cx, at: usize, to: CounterTo, reason: ZoneReason) {
     // Flashback's "instead of putting it anywhere else" (CR 702.34a) replaces a move to a hand or a library too, as the
     // replacement effects of the spell's own do (`its_own_exile`); a cast's "if that spell would be put into your
     // graveyard" does not.
-    let new = ops::move_together(cx, &[its_own_exile(cx, &item, ops::Moving::to(item.object, zone), reason)], reason)[0];
+    let new = ops::move_together(cx, &[its_own_exile(cx, &item, ops::Moving::to(item.object, zone), reason)], reason).first().copied().unwrap_or(item.object);
     if to == CounterTo::LibraryBottom && cx.s().obj(new).zone.is(ZoneKind::Library) {
         cx.st().zone_remove(zone, new);
         cx.st().zone_push(zone, new);

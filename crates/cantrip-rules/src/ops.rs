@@ -243,9 +243,13 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
 fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec<ObjectId>, Vec<ObjectId>) {
     // An object moves once however many times the batch names it: a permanent a spell targets twice ("destroy target
     // artifact and target creature" at an artifact creature, CR 115.3) is destroyed once (CR 400.7). The first move kept.
+    // And an object that has changed zones or ceased to exist since it was named is not moved at all: it became a new
+    // object with no memory of the old one, and an instruction to move the old one does nothing (CR 400.7) - every verb
+    // that moves objects comes here, so none can make a second copy of a card from a stale id.
     let distinct;
-    let moves = if moves.iter().enumerate().any(|(i, m)| moves[..i].iter().any(|n| n.id == m.id)) {
-        distinct = moves.iter().enumerate().filter(|&(i, m)| !moves[..i].iter().any(|n| n.id == m.id)).map(|(_, m)| *m).collect::<Vec<_>>();
+    let kept = |i: usize, m: &Moving| live(cx.s(), m.id) && !moves[..i].iter().any(|n| n.id == m.id);
+    let moves = if moves.iter().enumerate().any(|(i, m)| !kept(i, m)) {
+        distinct = moves.iter().enumerate().filter(|&(i, m)| kept(i, m)).map(|(_, m)| *m).collect::<Vec<_>>();
         &distinct[..]
     } else {
         moves
@@ -769,6 +773,8 @@ pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: Linked, until_leaves: boo
     if until_leaves && !crate::phasing::still_on_battlefield(cx.s(), by.object) {
         return Vec::new();
     }
+    // Only what is still the object it was is exiled (CR 400.7), so each new object is read with the zone it came from.
+    let cards = live_ones(cx, cards);
     let from: Vec<Zone> = cards.iter().map(|&c| cx.s().obj(c).zone).collect();
     let moves: Vec<Moving> = cards.iter().map(|&c| Moving::to(c, Zone::exile(cx.s().obj(c).owner))).collect();
     let new = move_together(cx, &moves, ZoneReason::Exile);
@@ -812,6 +818,8 @@ pub fn encode(cx: &mut Cx, card: ObjectId, creature: ObjectId) -> Option<ObjectI
 /// card in exile has no characteristics for a player who may not look at it; those who could see where it came from may
 /// (CR 406.3): its owner for a card from a hand, everyone for one from a public zone, nobody for one from a library.
 pub fn exile_face_down(cx: &mut Cx, cards: &[ObjectId], by: Option<Linked>) -> Vec<ObjectId> {
+    // Only what is still the object it was is exiled (CR 400.7), so each new object is read with where it came from.
+    let cards = &live_ones(cx, cards)[..];
     let from: Vec<Zone> = cards.iter().map(|&c| cx.s().obj(c).zone).collect();
     let owners: Vec<PlayerId> = cards.iter().map(|&c| cx.s().obj(c).owner).collect();
     let new = match by {
@@ -1069,8 +1077,10 @@ pub fn move_to(cx: &mut Cx, id: ObjectId, to: Zone) -> ObjectId {
     move_to_for(cx, id, to, ZoneReason::Other)
 }
 
+/// `move_to`, for a reason. The new object; `id` itself when nothing moved - it had already changed zones or ceased to exist
+/// (CR 400.7), or a replacement kept it where it is.
 pub fn move_to_for(cx: &mut Cx, id: ObjectId, to: Zone, reason: ZoneReason) -> ObjectId {
-    move_together(cx, &[Moving::to(id, to)], reason)[0]
+    move_together(cx, &[Moving::to(id, to)], reason).first().copied().unwrap_or(id)
 }
 
 /// The entering replacements an object about to enter has of its own (CR 614.12), applied to `entering`.
@@ -1625,7 +1635,7 @@ pub fn put_onto_battlefield_as(
     if entering.transformed && !transformed && instant_or_sorcery_entering(cx, id, true) {
         return Ok(id);
     }
-    Ok(move_together(cx, &[Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }], reason)[0])
+    Ok(move_together(cx, &[Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }], reason).first().copied().unwrap_or(id))
 }
 
 /// The continuous effects an effect putting `id` onto the battlefield gives it as it enters (`EntersAs`, CR 614.12, 613.1d,
@@ -1756,8 +1766,8 @@ pub fn put_onto_battlefield_attached(cx: &mut Cx, id: ObjectId, controller: Play
         entering.attach = Some(host);
     }
     let moves = vec![Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }];
-    let new = move_together(cx, &moves, ZoneReason::Other)[0];
-    Ok(Some(new).filter(|&n| cx.s().obj(n).zone.is(ZoneKind::Battlefield)))
+    let new = move_together(cx, &moves, ZoneReason::Other).first().copied();
+    Ok(new.filter(|&n| cx.s().obj(n).zone.is(ZoneKind::Battlefield)))
 }
 
 /// Transforms a permanent (CR 701.27a): its other face is up. The same object, so nothing about it is new (CR 712.18).

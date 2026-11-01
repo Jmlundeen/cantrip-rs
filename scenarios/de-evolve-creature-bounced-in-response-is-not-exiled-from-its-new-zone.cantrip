@@ -1,0 +1,65 @@
+# CR 400.7: De-evolve's threshold trigger goes on the stack at Bot2's upkeep; Bot2 returns the enchanted Memnite to its
+# owner's hand in response, and De-evolve goes to the graveyard (CR 704.5m). The trigger still resolves - eight cards in
+# Bot1's graveyard - but "exile enchanted creature" names the Memnite that left: the card in Bot1's hand is a new object
+# and is not exiled. (Before the core skipped stale objects in every move, this exiled a second Memnite and left the one
+# in hand as well.)
+# De-evolve {1}{B}: Enchantment — Aura
+#   Enchant creature
+#   Enchanted creature gets -4/-0, can't block, and is a Salamander. (It loses all other creature types.)
+#   Threshold — At the beginning of each upkeep, if there are seven or more cards in your graveyard, exile enchanted creature.
+
+[Bot1 Deck]
+De-evolve
+Thought Scour
+Thought Scour
+Memnite
+Black Lotus
+Mox Jet
+Mox Sapphire
+Swamp x20
+
+[Bot2 Deck]
+Unsummon
+Island x20
+
+[Opening]
+Chooser: Bot1
+
+[Actions]
+Bot1.DrawFirst
+Bot1.Keep
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.De-evolve.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = -3
+Bot1.Pass
+[T3 Bot2.Upkeep]
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Memnite)
+Bot2.Battlefield.Island.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Hand = Memnite; Swamp; Swamp; Swamp
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Hand = Memnite; Swamp; Swamp; Swamp
+Exile.Count = 0
+Bot1.Graveyard = De-evolve; Thought Scour; Swamp; Swamp; Thought Scour; Swamp; Swamp; Black Lotus
+Bot1.Battlefield = Mox Jet; Mox Sapphire

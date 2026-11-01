@@ -96,6 +96,8 @@ mod x_minimum_tests;
 #[cfg(test)]
 mod together_targets_tests;
 #[cfg(test)]
+mod stale_move_tests;
+#[cfg(test)]
 mod suspend_haste_tests;
 #[cfg(test)]
 mod entering_judged_tests;

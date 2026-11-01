@@ -680,11 +680,18 @@ pub trait Game: Query {
     /// put what they did not take there.
     fn put_into_graveyard(&mut self, objects: &[ObjectId]) -> Vec<ObjectId>;
     /// Moves an object to a zone (top of a library), returning the new object it becomes. Not for the battlefield:
-    /// entering it is `put_onto_battlefield`, which applies entering replacements.
+    /// entering it is `put_onto_battlefield`, which applies entering replacements. Something that is no longer the object
+    /// it was - it changed zones or ceased to exist - is not moved (CR 400.7), nor is a phased-out permanent (CR 702.26b):
+    /// then `object` itself is returned, still naming the zone it was last in: an "if you do" that reads only the answer's
+    /// zone is right only while that zone cannot be where it was sent (Creeping Chill's, from a graveyard to exile). Every
+    /// move verb of this trait skips an object that is no longer the object it was, so a card never guards a move by hand;
+    /// all but `move_together` and `move_together_revealed` skip a phased-out permanent too.
     fn move_to(&mut self, object: ObjectId, to: Zone) -> ObjectId;
     /// Moves several objects at once (CR 603.10a: a leaves-the-battlefield ability sees all of them leave), for a
     /// reason triggers can read (`MoveReason`: none that a verb of its own carries out, so a sacrifice is `sacrifice` or
-    /// `sacrifice_each`, which name who sacrifices, CR 701.21a). The new objects, in order.
+    /// `sacrifice_each`, which name who sacrifices, CR 701.21a). Something that is no longer the object it was is not moved
+    /// (CR 400.7). A phased-out permanent still is, which CR 702.26b forbids: a card moving permanents uses a named verb
+    /// (`exile_all`, `return_to_hand`, ...), which skips it. The new objects, in order, of what moved.
     fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: MoveReason) -> Vec<ObjectId>;
     /// `move_together` for the instruction that reveals the cards it moves ("reveal it, put it into your hand", "put the
     /// cards revealed this way into your hand and the rest into your graveyard", CR 701.20a): each is a card all players can
