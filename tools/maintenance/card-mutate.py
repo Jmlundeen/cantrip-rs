@@ -182,6 +182,10 @@ def main():
     finally:
         with open(path, "w", encoding="utf-8", newline="") as f:
             f.write(original)
+        # The corpus binary was last built from a mutant: build it again from the restored file, so a scenario run
+        # that uses the binary directly afterwards tests the card as it stands.
+        subprocess.run(["cargo", "build", "--profile", "cards", "-q", "-p", "cantrip-script", "--bin", "corpus"],
+                       cwd=ROOT, capture_output=True)
 
     minutes = (time.time() - started) / 60
     print(f"\n{results['caught']} caught, {results['survived']} survived, {results['no build']} did not build"
