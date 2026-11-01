@@ -1,0 +1,11 @@
+{
+  "name": "Righteous Valkyrie",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Angel Cleric",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Flying\nWhenever another Angel or Cleric you control enters, you gain life equal to that creature's toughness.\nAs long as you have at least 7 life more than your starting life total, creatures you control get +2/+2.",
+  "keywords": [
+    "Flying"
+  ]
+}

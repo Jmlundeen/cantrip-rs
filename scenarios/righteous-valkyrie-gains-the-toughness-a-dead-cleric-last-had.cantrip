@@ -1,0 +1,47 @@
+# Righteous Valkyrie at exactly 27 life (7 above the starting 20): a Blessed Ghoul entering is a 3/3 (1/1 plus the bonus). With
+# the trigger on the stack Bot1 Lightning Bolts its own Ghoul; the ability gains life equal to the toughness the Ghoul last had
+# on the battlefield, 3 (CR 608.2h and the ruling), not its printed 1 and not nothing: 30. The Valkyrie is still 4/6.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Righteous Valkyrie
+Blessed Ghoul
+Lightning Bolt
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Island x18
+
+[Life]
+Bot1: 27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Righteous Valkyrie.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Righteous Valkyrie.Power = 4
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Blessed Ghoul.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack = Righteous Valkyrie
+? Bot1.Battlefield.Blessed Ghoul.Toughness = 3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Blessed Ghoul)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Blessed Ghoul = (absent)
+Bot1.Life = 30
+Bot1.Battlefield.Righteous Valkyrie.Toughness = 6
+Bot1.Battlefield.Righteous Valkyrie.Keywords = Flying

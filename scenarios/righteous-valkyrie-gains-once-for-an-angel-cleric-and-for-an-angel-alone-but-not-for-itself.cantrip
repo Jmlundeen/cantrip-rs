@@ -1,0 +1,50 @@
+# Righteous Valkyrie at 20 life: it entering does nothing ("another"). A second Righteous Valkyrie, both an Angel and a Cleric,
+# triggers the first once, gaining 4 (its toughness; not twice, 28). On turn 3 a Segovian Angel (an Angel and no Cleric, 1/1)
+# triggers both Valkyries, 1 each (toughness 1): 26. The life stays below 27, so no creature gets +2/+2 (the Angel is 1/1).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Righteous Valkyrie
+Righteous Valkyrie
+Segovian Angel
+Plains x15
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Righteous Valkyrie.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Righteous Valkyrie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 24
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Segovian Angel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 26
+Bot1.Battlefield.Segovian Angel.Power = 1
+Bot1.Battlefield.Segovian Angel.Toughness = 1

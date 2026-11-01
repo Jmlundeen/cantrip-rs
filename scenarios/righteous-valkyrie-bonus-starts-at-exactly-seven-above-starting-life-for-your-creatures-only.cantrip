@@ -1,0 +1,60 @@
+# Righteous Valkyrie: "As long as you have at least 7 life more than your starting life total, creatures you control get +2/+2."
+# Bot1 starts at 26 (6 above the starting 20): the Valkyrie is a plain 2/4. Its Cleric (Blessed Ghoul 1/1) enters, the trigger
+# gains 1 (the Ghoul's toughness, 1: the +2/+2 is not on yet), and 27 is exactly 7 above: the Valkyrie is 4/6 and the Ghoul 3/3
+# (every creature, not only the Valkyrie). Bot2's own creatures (Memnite 1/1, a Blessed Ghoul 1/1) are not "creatures you
+# control" and Bot2's Ghoul entering, a Cleric Bot1 does not control, gains Bot1 nothing: Bot1 stays on 27.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Righteous Valkyrie
+Blessed Ghoul
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Blessed Ghoul
+Memnite
+Island x15
+
+[Life]
+Bot1: 26
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Righteous Valkyrie.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 26
+? Bot1.Battlefield.Righteous Valkyrie.Power = 2
+? Bot1.Battlefield.Righteous Valkyrie.Toughness = 4
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Blessed Ghoul.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack = Righteous Valkyrie
+? Bot1.Battlefield.Righteous Valkyrie.Power = 2
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Blessed Ghoul.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 27
+Bot1.Battlefield.Righteous Valkyrie.Power = 4
+Bot1.Battlefield.Righteous Valkyrie.Toughness = 6
+Bot1.Battlefield.Blessed Ghoul.Power = 3
+Bot1.Battlefield.Blessed Ghoul.Toughness = 3
+Bot2.Battlefield.Memnite.Power = 1
+Bot2.Battlefield.Memnite.Toughness = 1
+Bot2.Battlefield.Blessed Ghoul.Power = 1
+Bot2.Battlefield.Blessed Ghoul.Toughness = 1
