@@ -1,0 +1,50 @@
+# A phased-out permanent is treated as though it does not exist (CR 702.26b), so its menace counter cannot be removed (CR 101.3).
+# Biting-Palm Ninja, cast on turn 3 off three Moxen, connects for 3 on turn 5 with its menace counter; with the trigger on the stack
+# Bot1 casts Teferi's Protection off the same Moxen, and the Ninja phases out. The trigger asks nothing (! Bot1.Accept): Bot2's
+# hand is not revealed and keeps its Mox Sapphire, and the Ninja, phased out, keeps its counter.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Biting-Palm Ninja
+Teferi's Protection
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Biting-Palm Ninja.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Biting-Palm Ninja > Bot2)
+[T5 Bot1.CombatDamage]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut.Biting-Palm Ninja.Counters.Menace = 1
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Hand = Island; Island; Island; Island; Island; Island; Mox Sapphire
+Exile = Teferi's Protection
+Bot1.PhasedOut.Biting-Palm Ninja.Counters.Menace = 1

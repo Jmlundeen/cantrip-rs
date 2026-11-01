@@ -1,0 +1,40 @@
+# Biting-Palm Ninja is cast on turn 3 off three Moxen and attacks on turn 5 (it is a creature spell with no haste: it attacks
+# the next turn). Connecting for 3, Bot1 declines the "may" (CR 603.12): the menace counter stays on it and Bot2 reveals nothing and
+# loses no card.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Biting-Palm Ninja
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Biting-Palm Ninja.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Biting-Palm Ninja > Bot2)
+[T5 Bot1.CombatDamage]
+Bot1.Decline
+! Bot1.Choose
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Biting-Palm Ninja.Counters.Menace = 1
+Exile = 

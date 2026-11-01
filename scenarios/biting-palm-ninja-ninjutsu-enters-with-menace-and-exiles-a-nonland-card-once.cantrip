@@ -1,0 +1,69 @@
+# Biting-Palm Ninja's ninjutsu {2}{B} (CR 702.49a) is paid exactly on turn 3 with Mana Crypt's {C}{C} and Mox Jet's {B} (on turn
+# 1 the same cost minus its {B} is not offered), returning the unblocked Fanatical Firebrand; the Ninja enters tapped and
+# attacking with a menace counter (CR 122.1b, 614.1c), which gives it menace, and deals 3. Bot1 removes the counter: the reflexive
+# trigger (CR 603.12) has Bot2 reveal a hand of one land and one nonland card and Bot1 choose the nonland one to exile (the land
+# is not offered). On turn 5 it connects again with no counter left, so nothing is asked and Bot2's hand is untouched.
+# Mana Crypt wins its flip on turn 3 (die 1).
+
+[Bot1 Deck]
+Mox Ruby
+Fanatical Firebrand
+Biting-Palm Ninja
+Mana Crypt
+Mox Emerald
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Island x20
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[Bot1.Blockers]
+! Bot1.Hand.Biting-Palm Ninja.Activate(Ability: Ninjutsu; Mana: short)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Biting-Palm Ninja.Activate(Ability: Ninjutsu)
+Bot1.Choose(Fanatical Firebrand)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Mana = 
+? Bot1.Battlefield.Biting-Palm Ninja.Counters.Menace = 1
+? Bot1.Battlefield.Biting-Palm Ninja.Keywords = Menace
+[T3 Bot1.CombatDamage]
+Bot1.Accept
+! Bot1.Choose(Bot2.Hand.Island)
+Bot1.Choose(Mox Sapphire)
+[T3 Bot1.Main2]
+? Bot2.Hand.Mox Sapphire = (absent)
+[T5 Bot1.Main1]
+Bot1.Attack(Biting-Palm Ninja > Bot2)
+Bot1.Pass
+[T5 Bot1.CombatDamage]
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Exile = Mox Sapphire
+Bot1.Battlefield.Biting-Palm Ninja.Counters.Menace = (absent)

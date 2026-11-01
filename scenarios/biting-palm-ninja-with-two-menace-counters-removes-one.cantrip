@@ -1,0 +1,50 @@
+# "Remove a menace counter" is one counter: Biting-Palm Ninja, cast on turn 3 off three Moxen, is given a second menace counter on
+# turn 5 by Tezzeret's Gambit's proliferate (CR 701.34a; Bot1 pays 2 life for its {U/P}). It connects for 3, Bot1 removes a counter
+# and exiles Bot2's Mox Sapphire, and the Ninja keeps the other counter, and with it menace (CR 122.1b).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Biting-Palm Ninja
+Tezzeret's Gambit
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Biting-Palm Ninja.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot1.Target(Biting-Palm Ninja)
+? Bot1.Battlefield.Biting-Palm Ninja.Counters.Menace = 2
+Bot1.Attack(Biting-Palm Ninja > Bot2)
+[T5 Bot1.CombatDamage]
+Bot1.Accept
+Bot1.Choose(Mox Sapphire)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Exile = Mox Sapphire
+Bot1.Battlefield.Biting-Palm Ninja.Counters.Menace = 1
+Bot1.Battlefield.Biting-Palm Ninja.Keywords = Menace
