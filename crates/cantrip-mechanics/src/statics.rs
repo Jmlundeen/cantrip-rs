@@ -96,6 +96,14 @@ pub fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Char
     source == affected
 }
 
+/// How far a source's controller's life total is above the life total they started the game with (CR 103.4); negative below
+/// it. Elenda, Saint of Dusk and Righteous Valkyrie ask it for "at least N more than your starting life total".
+pub fn life_above_starting_life(q: &dyn LayerQuery, source: ObjectId) -> i32 {
+    let state = q.state();
+    let player = state.player(state.obj(source).controller);
+    player.life - player.starting_life
+}
+
 /// "... as long as you gained life this turn" (CR 611.3a, 119.3) as a static ability's `StaticDef::affects`: only the source itself,
 /// and only while its controller has gained life this turn. The layers ask again whenever characteristics are computed, so it
 /// turns on with the gain and off as the turn ends. Ulna Alley Shopkeep and Tenured Concocter print it.

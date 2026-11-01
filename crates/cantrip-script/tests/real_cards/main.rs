@@ -14,6 +14,7 @@ mod land_cant_be_sacrificed;
 mod lost_abilities;
 mod mana_ability_guards;
 mod repeatable_mana;
+mod righteous_valkyrie_noncreature;
 mod search_any_number;
 mod turn_face_up_by_effect;
 mod until_exile;

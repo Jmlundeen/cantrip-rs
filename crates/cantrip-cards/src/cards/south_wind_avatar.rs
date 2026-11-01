@@ -20,17 +20,9 @@ fn another_creature_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -
     }
 }
 
-/// "You gain life equal to its toughness": the toughness the creature last had on the battlefield (the ruling, CR 608.2h),
-/// or none to gain if it was not above zero.
-fn gain_its_toughness(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Object(creature) = item.subject else { return Ok(()) };
-    let toughness = g.chars(creature).toughness.unwrap_or_default();
-    effects::gain_life(g, item, i32::from(toughness).max(0))
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_dies), gain_its_toughness, "Whenever another creature you control dies, you gain life equal to its toughness."),
+        triggered(when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_dies), effects::gain_life_equal_to_subject_toughness, "Whenever another creature you control dies, you gain life equal to its toughness."),
         triggered(YOU_GAIN_LIFE, effects::each_opponent_loses_1_life, "Whenever you gain life, each opponent loses 1 life."),
     ],
     ..oracle::SOUTH_WIND_AVATAR

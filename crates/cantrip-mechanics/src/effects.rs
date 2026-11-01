@@ -638,6 +638,20 @@ pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspe
     Ok(())
 }
 
+/// "You gain life equal to its toughness" (CR 119.3, 608.2h) as a triggered ability's callback: the toughness of the trigger's
+/// subject (`StackItem::subject`, a permanent that entered or a creature that died) as the layers make it, or as it last
+/// existed on the battlefield if it has left. A permanent that is not a creature as the ability resolves has no toughness (CR 208.3) and
+/// gains nothing; neither does a toughness not above zero. South Wind Avatar ("that creature died") and Righteous Valkyrie
+/// ("that creature entered") print it.
+pub fn gain_life_equal_to_subject_toughness(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Target::Object(creature) = item.subject else { return Ok(()) };
+    let chars = g.chars(creature);
+    if !chars.is(CardType::Creature) {
+        return Ok(());
+    }
+    gain_life(g, item, i32::from(chars.toughness.unwrap_or_default()).max(0))
+}
+
 /// "You gain 3 life" as an ability's callback: the Food ability "{2}, {T}, Sacrifice this permanent: You gain 3 life." (CR 111.10b)
 /// of the Food token, Ygra, Eater of All's creatures, Nutrient Block and Spicy Oatmeal Pizza.
 pub fn gain_three_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
