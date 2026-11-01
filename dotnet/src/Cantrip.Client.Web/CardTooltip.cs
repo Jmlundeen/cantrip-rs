@@ -213,6 +213,11 @@ public sealed class CardTooltip : Canvas
         {
             lines.Add($"{card.Power}/{card.Toughness}" + (card.DamageMarked > 0 ? $", {card.DamageMarked} damage marked" : string.Empty));
         }
+        else if (card.PrintedPower is not null && card.PrintedToughness is not null)
+        {
+            // A noncreature permanent has no power or toughness (CR 208.3): the box its card prints, said as printed.
+            lines.Add($"Printed {card.PrintedPower}/{card.PrintedToughness}; no power or toughness while it isn't a creature");
+        }
 
         foreach (CounterView counter in card.Counters)
         {

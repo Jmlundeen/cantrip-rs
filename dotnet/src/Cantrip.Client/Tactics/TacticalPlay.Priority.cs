@@ -110,7 +110,7 @@ public sealed partial class TacticalPlay
             if (option.Kind != ActionKindView.ActivateAbility || needed <= 0
                 || Spent(client, option)
                 || client.Object(option.Source) is not { Zone: ZoneKindView.Battlefield } vehicle
-                || IsCreature(vehicle) || vehicle.Tapped || vehicle.Power is not > 0)
+                || IsCreature(vehicle) || vehicle.Tapped || vehicle.PrintedPower is not > 0)
             {
                 continue;
             }
@@ -132,7 +132,8 @@ public sealed partial class TacticalPlay
 
             // What the crew would have attacked with themselves, against what the Vehicle brings.
             int given = crew.Select(client.Object).OfType<ObjectView>().Where(CouldAttack).Sum(creature => creature.Power ?? 0);
-            int brings = (vehicle.Power ?? 0)
+            // Not a creature yet, it has no power (CR 208.3): what it brings is the box it prints.
+            int brings = (vehicle.PrintedPower ?? 0)
                 + ((keys & (Keywords.Flying | Keywords.Unblockable | Keywords.Menace | Keywords.Trample)) != 0 ? 1 : 0)
                 + (CardReading.AttackTrigger(CardReading.Text(vehicle)) ? 1 : 0);
 

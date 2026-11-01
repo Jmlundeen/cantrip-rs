@@ -350,6 +350,14 @@ pub fn cost_text(def: &CardDef) -> String {
 
 /// One printed card as a card to be read: its name, cost, type line, text and printed power and toughness, and its
 /// colors from its cost and color indicator (CR 202.2). No handle, no state.
+/// The power and toughness box `def` prints, both or none, where `shown`.
+fn printed_box(shown: bool, def: &CardDef) -> Option<(i32, i32)> {
+    match (shown, def.power, def.toughness) {
+        (true, Some(p), Some(t)) => Some((i32::from(p), i32::from(t))),
+        _ => None,
+    }
+}
+
 pub fn printed(def: &CardDef) -> ObjectView {
     ObjectView {
         handle: ViewHandle::NONE,
@@ -1206,6 +1214,9 @@ impl<'a> Projector<'a> {
         choices.sort_by(|a, b| a.key.cmp(&b.key));
 
         let effect = |kind: EffectKind| s.effects.iter().any(|e| e.affected == id && e.kind == kind);
+        // A noncreature permanent has no power or toughness (CR 208.3), but its face still prints the box (a Vehicle's): drawn
+        // as printed. Never for a face-down permanent, whose face is hidden (CR 708.2a).
+        let printed_pt = printed_box(on_battlefield && !obj.face_down && !c.is(CardType::Creature), def);
         let mut view = ObjectView {
             handle,
             zone: Some(zone_kind_view(zone.kind())),
@@ -1243,6 +1254,8 @@ impl<'a> Projector<'a> {
             suspected: on_battlefield && effect(EffectKind::Suspected),
             phased_out,
             station_pt: cantrip_oracle::station_pt(def.name).unwrap_or_default().to_string(),
+            printed_power: printed_pt.map(|(p, _)| p),
+            printed_toughness: printed_pt.map(|(_, t)| t),
             exerted: obj.marks.exerted_by.is_some(),
             saddled: game.is_saddled(id),
             goaded: effect(EffectKind::Goaded),

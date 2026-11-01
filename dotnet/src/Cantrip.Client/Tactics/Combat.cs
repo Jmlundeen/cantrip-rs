@@ -47,8 +47,9 @@ public sealed class Unit
         return new Unit
         {
             Handle = creature.Handle,
-            Power = Math.Max(creature.Power ?? 0, 0),
-            Toughness = creature.Toughness ?? 0,
+            // A Vehicle weighed as it would be crewed has no power yet (CR 208.3): the box it prints.
+            Power = Math.Max(creature.Power ?? creature.PrintedPower ?? 0, 0),
+            Toughness = creature.Toughness ?? creature.PrintedToughness ?? 0,
             Damage = creature.DamageMarked,
             Keys = keys,
             Worth = model.Worth(creature, keys),

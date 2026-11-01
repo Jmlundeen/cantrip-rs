@@ -480,8 +480,9 @@ public sealed class TacticalPermanentsTests
     {
         ObjectView vehicle = Artifact(handle, name, text);
         vehicle.Subtypes = ["Vehicle"];
-        vehicle.Power = power;
-        vehicle.Toughness = toughness;
+        // Not a creature, it has no power or toughness (CR 208.3): the server sends the box its card prints.
+        vehicle.PrintedPower = power;
+        vehicle.PrintedToughness = toughness;
         vehicle.SummoningSick = sick;
         return vehicle;
     }
@@ -775,6 +776,7 @@ public sealed class TacticalPermanentsTests
         // At three life, against a 3/3: staying home, the Copter would be no blocker on their turn, so it attacks.
         ObjectView copter = Vehicle(2, "Smuggler's Copter", 3, 3, Copter);
         copter.CardTypes = [CardTypeView.Artifact, CardTypeView.Creature];
+        (copter.Power, copter.Toughness, copter.PrintedPower, copter.PrintedToughness) = (3, 3, null, null);
 
         GameClient client = Seated([copter, Creature(5, "Bear", 3, 3, Them)], myLife: 3, step: TurnStepView.DeclareAttackers);
         var prompt = new DeclareAttackersPromptMessage { Player = Me, Eligible = [Handle(2)], AttackablePlayers = [Them] };

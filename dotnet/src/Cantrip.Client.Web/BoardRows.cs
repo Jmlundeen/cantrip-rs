@@ -222,7 +222,7 @@ public static class BoardRows
             .Append(card.Saddled ? 'D' : 'd')
             .Append(card.Goaded ? 'G' : 'g')
             .Append(card.Known ? 'K' : 'k').Append('|')
-            .Append(card.Power).Append('/').Append(card.Toughness).Append('|')
+            .Append(card.Power).Append('/').Append(card.Toughness).Append('/').Append(card.PrintedPower).Append('/').Append(card.PrintedToughness).Append('|')
             .Append(card.DamageMarked).Append('|')
             .AppendJoin(',', card.Counters.OrderBy(c => c.Name, StringComparer.Ordinal).Select(c => $"{c.Name}:{c.Count}")).Append('|')
             .AppendJoin(',', card.Colors).Append('|')

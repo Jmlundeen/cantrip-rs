@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 222;
+    public const int ProtocolVersion = 223;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -642,6 +642,18 @@ public sealed class ObjectView
     /// </summary>
     [Key(59)]
     public string StationPt { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The power and toughness box the card prints, for a noncreature permanent whose card prints one (a Vehicle until it
+    /// is crewed): drawn on its face as printed. Presentation, never a characteristic: a noncreature permanent has no power
+    /// or toughness (CR 208.3), so <see cref="Power"/> and <see cref="Toughness"/> are null. Null for anything else.
+    /// </summary>
+    [Key(63)]
+    public int? PrintedPower { get; set; }
+
+    /// <summary>The toughness of the box <see cref="PrintedPower"/> describes; null exactly when it is.</summary>
+    [Key(64)]
+    public int? PrintedToughness { get; set; }
 
     /// <summary>
     /// For a prototype card, its prototype's keyword line as printed, "Prototype {2}{R} — 3/2" (CR 702.160a, 718.1): part of

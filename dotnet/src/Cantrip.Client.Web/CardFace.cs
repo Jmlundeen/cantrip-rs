@@ -1391,16 +1391,25 @@ public static partial class CardFace
     /// (CR 306.5c), or a battle's defense (CR 310.4c). Null for a card whose body is its power and toughness, or none.
     /// </summary>
     public static string? BodyCounter(ObjectView card) =>
-        card.Power is not null && card.Toughness is not null ? null
+        PowerToughness(card) is not null ? null
         : card.CardTypes.Contains(CardTypeView.Planeswalker) ? CounterNames.Loyalty
         : card.CardTypes.Contains(CardTypeView.Battle) ? CounterNames.Defense
         : null;
 
+    /// <summary>
+    /// The power and toughness box the card's body shows: its own, or for a noncreature permanent, which has none
+    /// (CR 208.3), the box its card prints (a Vehicle's until it is crewed). Null for a card with no box.
+    /// </summary>
+    public static string? PowerToughness(ObjectView card) =>
+        card.Power is not null && card.Toughness is not null ? $"{card.Power}/{card.Toughness}"
+        : card.PrintedPower is not null && card.PrintedToughness is not null ? $"{card.PrintedPower}/{card.PrintedToughness}"
+        : null;
+
     private static string? Body(ObjectView card)
     {
-        if (card.Power is not null && card.Toughness is not null)
+        if (PowerToughness(card) is { } box)
         {
-            return $"{card.Power}/{card.Toughness}";
+            return box;
         }
 
         if (BodyCounter(card) is { } counter)
@@ -1424,7 +1433,7 @@ public static partial class CardFace
         int size = layout.BodyFontSize;
         float baseline = CapBaseline(CardAssets.Title, box, size);
 
-        if (card.Power is not null && card.Toughness is not null)
+        if (PowerToughness(card) is not null)
         {
             float x = Aligned(CardAssets.Title, body, size, box, layout.BodyAlignment);
             if (outerShadow.Alpha > 0)

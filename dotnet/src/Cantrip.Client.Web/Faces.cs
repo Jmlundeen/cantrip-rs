@@ -77,7 +77,7 @@ internal static class Faces
             .Append(card.ProducesMana ? 'P' : 'p').Append('|')
             .Append(card.FaceDownName).Append('|')
             // Only whether it has a body, which moves the damage marked and the counters, not what the body says.
-            .Append(card.Power is null ? '-' : 'P').Append(card.Toughness is null ? '-' : 'T').Append('|')
+            .Append(CardFace.PowerToughness(card) is null ? '-' : 'B').Append('|')
             .Append(card.DamageMarked).Append('|')
             .AppendJoin(',', Marked(card, body).OrderBy(c => c.Name, StringComparer.Ordinal).Select(c => $"{c.Name}:{c.Count}")).Append('|')
             .AppendJoin(',', card.Colors.Order()).Append('|')
