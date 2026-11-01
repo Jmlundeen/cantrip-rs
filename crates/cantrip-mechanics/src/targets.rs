@@ -829,6 +829,14 @@ pub fn permanent_of_subtype_you_control<const SUBTYPE: u16>(q: &dyn Query, asker
         && q.controller(id) == asker.controller
         && q.chars(id).has_subtype(crate::lands::word(q, asker.source, SUBTYPE)))
 }
+/// "Target [type], [type], or [type]" (CR 115.1, 205.3): a permanent on the battlefield, any controller's, with at least one of
+/// the creature types `subtypes` as the layers made it. Each type is read through the words of the text of the object that asks
+/// (CR 612.2). Phoenix Down (Skeleton, Spirit, Zombie) and Animal Sanctuary (Bird, Cat, Dog, Goat, Ox, Snake) print it.
+pub fn permanent_of_any_subtype(q: &dyn Query, asker: &Asker, t: Target, subtypes: &[Subtype]) -> bool {
+    let words = q.words(asker.source);
+    matches!(t, Target::Object(id) if on_battlefield(q, id)
+        && subtypes.iter().any(|&s| q.chars(id).has_subtype(words.subtype(s))))
+}
 /// "Target card from your graveyard" (CR 115.1): any card in the graveyard of the ability's controller, still the card that
 /// was there (CR 400.7). Eternal Witness, Emeritus of Abundance, Bala Ged Recovery, Cathartic Parting, Tamiyo, Collector of Tales
 /// and Quintorius Kand ("any number of target cards from your graveyard") print it.

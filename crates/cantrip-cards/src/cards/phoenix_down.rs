@@ -19,9 +19,7 @@ fn return_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Target Skeleton, Spirit, or Zombie" (CR 115.1, 205.3): a permanent with one of those creature types, as this artifact's
 /// text names them (CR 612.2).
 fn skeleton_spirit_or_zombie(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    let words = q.words(asker.source);
-    let types = [words.subtype(Subtype::Skeleton), words.subtype(Subtype::Spirit), words.subtype(Subtype::Zombie)];
-    matches!(t, Target::Object(id) if targets::permanent(q, id) && types.iter().any(|&s| q.chars(id).has_subtype(s)))
+    targets::permanent_of_any_subtype(q, asker, t, &[Subtype::Skeleton, Subtype::Spirit, Subtype::Zombie])
 }
 
 /// "Exile target Skeleton, Spirit, or Zombie."
