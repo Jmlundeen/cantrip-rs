@@ -1182,7 +1182,8 @@ impl GameState {
     }
 
     /// Keeps last-known information (CR 608.2h): an object's as it ceases to be that object, or a spell's as it becomes
-    /// cast (`StackItem::cast_known`). The row it is kept in.
+    /// cast (`StackItem::cast_known`); or an object as an event saw it, for the history (an attacker as it was declared,
+    /// `Event::Attacks::known`; a permanent as it entered, `Event::Entered::known`). The row it is kept in.
     pub fn last_known_push(&mut self, row: LastKnown) -> u32 {
         self.last_known.push(row);
         self.log(Undo::LastKnownPushed);
@@ -1779,7 +1780,7 @@ impl GameState {
     /// search's world: never on a real game, and not journalled, the journal's stored copies rewritten too. A row that
     /// showed the old card (`shows`: one an object left as it moved while hidden, a library card drawn or a hand card
     /// cast, CR 400.7) becomes its object's row in `rows`, as the new card. One that showed nothing of it - a face-down
-    /// object's (a face-down spell as it was cast, a face-down creature as it attacked, `Event::Attacks::known`, a card
+    /// object's (a face-down spell as it was cast, a face-down creature as it attacked, `Event::Attacks::known`, or as it entered, `Event::Entered::known`, a card
     /// cloaked from the library as it left) - holds the world's values as much as the game's, and stays.
     pub fn rebind_hidden_rows(&mut self, chain: &[ObjectId], rows: &[(ObjectId, LastKnown)], shows: impl Fn(&LastKnown) -> bool) {
         for row in self.hidden_rows_mut(chain) {

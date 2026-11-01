@@ -107,6 +107,8 @@ mod suspend_haste_tests;
 #[cfg(test)]
 mod entering_judged_tests;
 #[cfg(test)]
+mod entered_known_tests;
+#[cfg(test)]
 mod enters_attacking_tests;
 #[cfg(test)]
 mod enter_rules_tests;

@@ -180,8 +180,12 @@ pub enum Event {
     /// with it is there: `controller` and `types` are what it was as it entered, with the replacement effects and the
     /// continuous effects of the battlefield applied (CR 614.12, 613). "An artifact entered the battlefield under your
     /// control this turn" asks that of the history (`History::entered`), however the permanent has changed, left or changed
-    /// controllers since (a Mycosynth Lattice that came and went, a Darksteel Mutation). Only recorded; nothing triggers on it.
-    Entered { permanent: ObjectId, controller: PlayerId, types: TypeSet },
+    /// controllers since (a Mycosynth Lattice that came and went, a Darksteel Mutation). `known` is the last-known row
+    /// (`GameState::last_known`) that keeps all its characteristics as it entered, as `Attacks::known` does for an attacker:
+    /// "a Hero entered the battlefield under your control this turn" asks it (`history::Entered::chars`) of a creature
+    /// that has become a Hero, or stopped being one, since. `types` is that row's card types, kept beside it for the many
+    /// questions that ask only those (some whenever the layers apply). Only recorded; nothing triggers on it.
+    Entered { permanent: ObjectId, controller: PlayerId, types: TypeSet, known: u32 },
     /// A face-down permanent was turned face up (CR 708.7, 708.8) by `player`: the player who took the special action
     /// (CR 116.2b, 701.40b, 701.58b), or the controller of the spell or ability whose effect turned it up. The same
     /// object, now with its normal characteristics.

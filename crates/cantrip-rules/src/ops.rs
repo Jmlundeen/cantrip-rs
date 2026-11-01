@@ -696,8 +696,7 @@ fn move_together_seen(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> (Vec
     // What each permanent was as it entered (CR 603.6a, 614.12): judged once they are all there, as each one's continuous effects
     // reach the ones entering with it, and recorded with the moves so the history can say it however they change after.
     for permanent in entered {
-        let (controller, types) = (cx.controller(permanent), cx.chars(permanent).types);
-        events.push(Event::Entered { permanent, controller, types });
+        events.push(entered_event(cx, permanent));
     }
     cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then, seen_by_all: &seen }));
     for player in shuffled {
@@ -2091,6 +2090,17 @@ pub fn last_known_of(cx: &Cx, id: ObjectId) -> LastKnown {
     last_known_from(cx, id, &layers::source_chars(cx.cards(), cx.s(), &cx.g.log, id))
 }
 
+/// The history's record of `permanent` as it entered (CR 603.6a, 614.12), asked once every permanent entering with it is
+/// there: its controller and characteristics then, kept in a last-known row (`Event::Entered::known`) so
+/// `history::Entered::chars` says them however it changes after, as an attack's row does for the attacker.
+fn entered_event(cx: &mut Cx, permanent: ObjectId) -> Event {
+    let chars = cx.chars(permanent);
+    let row = last_known_from(cx, permanent, &chars);
+    let (controller, types) = (row.controller, row.types);
+    let known = cx.st().last_known_push(row);
+    Event::Entered { permanent, controller, types, known }
+}
+
 /// `last_known_of` with `id`'s characteristics `c` already worked out.
 pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
     LastKnown {
@@ -2416,8 +2426,7 @@ fn create_tokens_onto(
     // What each token was as it entered (CR 603.6a, 614.12): judged once they are all there, as the permanents that enter by
     // a move are, so the history says it of tokens too.
     for &permanent in &created {
-        let (controller, types) = (cx.controller(permanent), cx.chars(permanent).types);
-        events.push(Event::Entered { permanent, controller, types });
+        events.push(entered_event(cx, permanent));
     }
     cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then, seen_by_all: &[] }));
     Ok(created)

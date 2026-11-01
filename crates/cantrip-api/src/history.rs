@@ -86,13 +86,30 @@ pub struct Entered {
     pub permanent: ObjectId,
     /// Who controlled it as it entered.
     pub controller: PlayerId,
-    /// Its card types as it entered, with the replacement effects and the battlefield's continuous effects applied (CR 614.12).
+    /// Its card types as it entered, with the replacement effects and the battlefield's continuous effects applied (CR 614.12):
+    /// its last-known row's, kept here so the questions that ask only these need no row.
     pub types: TypeSet,
+    /// The last-known row that keeps it as it entered (`Event::Entered::known`).
+    pub known: u32,
 }
 
 impl Entered {
     pub fn is(&self, t: CardType) -> bool {
         self.types.has(t)
+    }
+
+    /// Its characteristics as it entered (CR 603.6a, 614.12), with the replacement effects and the battlefield's continuous
+    /// effects applied: "a Hero entered the battlefield under your control this turn" asks what it was then, whatever an
+    /// effect has made it since (a Maskwood Nexus that came down after it), wherever it has gone and whoever controls it.
+    /// The rest - its card - is this object's.
+    pub fn chars(&self, q: &dyn crate::Query) -> crate::Chars {
+        let c = q.chars(self.permanent);
+        let row = q.state().last_known.get(self.known as usize);
+        debug_assert!(row.is_some_and(|r| r.id == self.permanent), "an entry names its own last-known row");
+        match row {
+            Some(row) => c.as_known(row),
+            None => c,
+        }
     }
 }
 
@@ -361,10 +378,11 @@ impl<'a> History<'a> {
     }
 
     /// The permanents that entered the battlefield this turn, in order, as each was when it entered (CR 603.6a): the player who
-    /// controlled it and its card types then (`Event::Entered`), whatever has happened to it since.
+    /// controlled it and its card types then (`Event::Entered`), whatever has happened to it since; `Entered::chars` is all
+    /// its characteristics then.
     pub fn entered(&self) -> impl Iterator<Item = Entered> + 'a {
         self.this_turn().iter().filter_map(|r| match r.event {
-            Event::Entered { permanent, controller, types } => Some(Entered { permanent, controller, types }),
+            Event::Entered { permanent, controller, types, known } => Some(Entered { permanent, controller, types, known }),
             _ => None,
         })
     }
