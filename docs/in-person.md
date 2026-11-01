@@ -10,16 +10,27 @@ has its own entry point, its own server process and its own wire, and nothing in
 
 ## Device layouts
 
-- **Three devices.** One shared tablet lies between the players: seat 2's half at the top, turned to face seat 2, the
-  stack in the middle, seat 1's half at the bottom.
-- **Four devices.** Each player has a tablet of their own: that seat's half of the board, the stack, and both players'
-  life totals.
+- **Three devices.** One shared tablet lies between the players: seat 2's half at the top, turned to face seat 2, and
+  seat 1's half at the bottom, sharing the whole height.
+- **Four devices.** Each player has a tablet of their own: that seat's half of the board and both players' life totals.
 
-On the shared tablet the stack band is mirrored: the stack is drawn twice, one strip facing each player, so both read
-every spell and ability upright on the strip nearest them, in the same order, with the top of the stack at their right
-and a target arrow drawn from the strip nearer what it points at. A card can't read upright for two people facing each
-other, and one strip turned sideways reads well for neither; two strips cost the halves a little height, and a card held
-up to read is larger anyway. Either strip's cards are tapped as the battlefield's are.
+**The stack** is one window over the board (`InPerson/TabletStack.cs`), shown only while something is on it, so the
+halves never move as a spell is cast: over the line between the halves on the shared tablet, over the top of the half on
+a player's own. Its spells and abilities are an overlapping row, oldest at the left and the top of the stack whole at the
+right; each is turned to face the player who controls it and set off toward that player's side, so the row says whose
+is whose at a glance. A cap at the window's end says how much is on it and folds the window to just the caps, out of the
+way of the cards under it, and opens it again; the shared tablet has a cap at each end, the right-hand one turned for
+seat 2. A target arrow is drawn from the top of the stack. Its cards are tapped as the battlefield's are, and a spell
+turned for seat 2 is held up to read turned for them.
+
+**The turn** runs along each half's edge nearest the middle of the table, turned with the half
+(`InPerson/TabletPhaseStrip.cs`): whose turn and which, then a pill for each step, the current one filled - green on
+that half's player's turn, amber on the other's - and a dot under each step the table stops in this turn ("Stops",
+below).
+
+**Undo** is a button in the corner of the half of the player with priority, by their right hand. A tap sends the relay a
+`TableUndoMessage`, which it hands that player's phone (`SeatUndoMessage`); the phone takes back its last mana ability
+as its own Undo does, or says there is nothing to take back. A player's own tablet undoes only for that player.
 
 A seat's graveyard pile and, while it has cards in exile, its **Exile** button on a tablet's rail open a list of that
 pile over the seat's battlefield, turned with the half: every card as the public sees it (a card exiled face down is a
@@ -39,12 +50,17 @@ each column, and beside it exactly what the remote client shows both players of 
 whose pick it is and whether it is the first or the second from this grid, how many cards each player has drafted, the
 last picks in words (each naming the cards it took) and the pick clock, when there is one. Nothing more: no pool, and
 not the cube's pick order the draft tells each seat for its bots (`PublicGridMessage`). A pick just made is shown for a
-moment - its line lit on the grid it was taken from - before the grid moves on. A card is held up to read with a long
-press; a tap on a card picks nothing.
+moment - its line lit on the grid it was taken from - before the grid moves on. Each line's button carries an arrow drawn
+as a shape, not a glyph, which an iPad's browser has no font for.
 
-- **Two taps.** A row or a column is picked in two taps, so a stray touch takes nothing: the first lights the line and
-  chooses it (the line the pick clock would take, as the remote client's choice is), the second on the same button - or
-  **Take** - takes it.
+- **Reading a card.** A tap on a card of the grid holds it up to read at the screen's whole size, its height or its
+  width, whichever is the narrower for a card, until the next tap anywhere, which puts it down and does nothing else - a
+  layer over the grid takes it, so it picks no line under the card. A long press holds the card up too, until it is let
+  go. A tap on a card never picks.
+- **Choose, then Pick.** A row or a column is picked in two taps, so a stray touch takes nothing: the first lights the
+  line and chooses it (the line the pick clock would take, as the remote client's choice is), and **Pick** takes it.
+  The chosen line's button tapped again chooses it no longer. The table is not told of that: what it was last told
+  matters only to a pick clock running out, and an in-person table's clock is off unless the host turns it on.
 - **Only the picker.** Only the face in front of the player whose pick it is has its buttons live. The relay hands a line
   picked on a tablet (`TableLineMessage`) to the phone of the seat whose pick it is (`SeatLineMessage`), and the phone
   sends the table the very pick its own grid would (`GameClient.ChooseLine`, `GameClient.PickLine`), if the draft it has
@@ -68,6 +84,16 @@ The relay learns where the draft stands from the event itself, on the table's th
 that) and, whenever the table shows a seat the event, shows the relay what the event shows nobody's seat
 (`ViewFor(0)`): the grid draft with no pool, both players named. The relay sends the tablets that whenever it changes
 other than in the time left, and once more when the draft is over (`Grid` zero), and catches a late tablet up with it.
+
+## Stops
+
+At an in-person table a stop is the table's: each player sets their stops on their phone as at a remote table, and
+every player stops wherever anyone set one, as though all of them had set it, so each gets their chance to act there.
+A phone tells the relay its own stops when it is welcomed and whenever they change (`SeatStopsMessage`); the relay keeps
+each seat's and tells every device all of them (`TableStopsMessage`), a device joining later with its welcome. A phone
+is then stopped on its own turn wherever another player stops on an opponent's turn, and on another's turn wherever the
+player whose turn it is stops on their own (`TurnStops.ShareWith`); its Stops view shows its own stops as buttons and
+says where the opponent's stop it too. The tablets mark the steps the table stops in on each half's turn strip.
 
 ## Architecture
 
@@ -104,9 +130,14 @@ phone, right of the middle, and at a tablet's top right corner. Its script is `F
 no change to its viewport (`FullScreenTests` checks that).
 
 - **Android, iPad and desktop browsers** have the Fullscreen API. A tap asks for the whole screen
-  (`requestFullscreen`, which a browser grants only from a tap), then locks a tablet to landscape and a phone upright
-  with `screen.orientation.lock` where the browser allows one (Android's, once full screen; iPadOS and desktops have
-  none, and the page lays itself out for whichever way it is held). The corners turn inward while the page is full screen
+  (`requestFullscreen`, which a browser grants only from a tap), then locks a tablet to landscape and a phone sideways
+  for its games and upright for the draft and deck building, locked anew as the table moves between them
+  (`FullScreenButton.Landscape`), with `screen.orientation.lock` where the browser allows one (Android's, once full
+  screen; iPadOS and desktops have none, and the page lays itself out for whichever way it is held).
+- **No selecting.** A long press is how a card is held up to read, and a mobile browser takes the same press for
+  selecting the page: Safari lights it all and offers Copy, Translate and the rest. An in-person page has nothing to
+  select, so `FullScreen.js` turns selection, the touch callout and the context menu off on it (a text field keeps its
+  own). The corners turn inward while the page is full screen
   (**Exit full screen**), and the button follows the browser however full screen was left (`fullscreenchange`). It is
   not shown where the browser has no Fullscreen API, nor in an app opened from the Home Screen, which has the screen
   already.
@@ -263,7 +294,7 @@ on the table's thread, where the relay only takes a snapshot and queues messages
 ## The wire
 
 The relay and its devices speak MessagePack, in `Cantrip.Protocol.InPerson`, with unions and a version of their own
-(`InPersonProtocol.Version`, now 3). A device's hello also carries `PlayerView.ProtocolVersion`, since the public feed
+(`InPersonProtocol.Version`, now 4). A device's hello also carries `PlayerView.ProtocolVersion`, since the public feed
 wraps the ordinary server messages.
 
 A device sends a `DeviceClientMessage`:
@@ -275,6 +306,8 @@ A device sends a `DeviceClientMessage`:
 | 2 | `TapResultMessage` | `TapId`, `Used` |
 | 3 | `TableLineMessage` | `Decision` (the pick of the grid draft), `Line` (a row 0-2 or a column 3-5), `Take` (false chooses it) |
 | 8 | `ReentryRequestMessage` | none: a welcomed phone asks for a re-entry code |
+| 9 | `TableUndoMessage` | `Seat` (the player with priority, whose side Undo was tapped on) |
+| 10 | `SeatStopsMessage` | `Mine`, `Theirs` (a phone's own stops, as `TurnStepView`s) |
 
 The relay sends a `DeviceServerMessage`:
 
@@ -288,6 +321,8 @@ The relay sends a `DeviceServerMessage`:
 | 5 | `PublicGridMessage` | `Decision`, `Grid` (zero once the draft is over), `Grids`, `Pick`, `Active`, `Places` (the grid row by row, a place taken an unknown card), `Drafted` (each seat's count), `Recent`, `RecentCards`, `LastLine`, `PickLeftMs` |
 | 6 | `SeatLineMessage` | `Decision`, `Line`, `Take`: a line picked on a tablet, for the picker's phone |
 | 8 | `ReentryCodeMessage` | `Code` (good once, for the home-screen app the phone is being added as) |
+| 9 | `SeatUndoMessage` | none: a tablet's Undo, for the phone of the player with priority |
+| 10 | `TableStopsMessage` | `Seats` (each seat's `Seat`, `Mine` and `Theirs`, as its phone last said them) |
 
 The public feed never holds a prompt, a request id or a seat's handle, and the grid nothing a seat alone is shown. A phone acts on a `SeatTapMessage` only while
 its `RequestId` is the phone's prompt.
@@ -317,7 +352,8 @@ name a card in the phone's hand.
 `InPersonDraftTests` (browser, wall clock: `test.cmd /filter "FullyQualifiedName~InPersonDraftTests"`) drafts a short grid
 draft end to end on a real `InPersonHost`: both phones opened from their links, showing **Pick on the table**, and the
 tablets - one shared board, or one for each player - where every pick is made with a finger, chosen with one tap and
-taken with a second or with **Take**; the face of the player not picking is checked dead, each pick checked in the
+taken with **Pick**, the first pick's line tapped again to unchoose it and a card tapped to hold it up; the face of the
+player not picking is checked dead, each pick checked in the
 event's own record, and deck building follows on the phones. `InPersonGridTests` (Server.Tests) drives the relay and a
 real `DraftPod` through `ObservedTableEvent` with no socket: what the tablets are sent of the grid, and that a line goes
 to the picker's phone alone.

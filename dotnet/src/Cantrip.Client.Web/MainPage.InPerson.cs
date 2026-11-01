@@ -6,7 +6,7 @@ namespace Cantrip.Client.Web;
 
 /// <summary>
 /// A player's phone at an in-person table (docs/in-person.md, docs/web-client.md "In-person play"): this page, laid out
-/// for a phone held upright, and the taps made on the tablets acted on here as clicks. Nothing in this file runs unless
+/// for a phone held sideways, and the taps made on the tablets acted on here as clicks. Nothing in this file runs unless
 /// the page was opened with <c>?inperson=phone</c>; every other page - the remote client above all - never reaches past
 /// the first line of <see cref="AttachPhone"/>.
 /// <para>
@@ -56,7 +56,8 @@ public sealed partial class MainPage
 
     /// <summary>Every line from a tablet this page acted on, newest last, for the page's test state.</summary>
     private readonly List<SeatLineMessage> _tableLinesDone = [];
-    private DockButton _boardButton = null!;
+
+    /// <summary>Whether a player's battlefield is the view shown (MainPage.PhoneViews.cs), for the page's test state.</summary>
     private bool _boardShown;
     private Border _refusal = null!;
     private TextBlock _refusalText = null!;
@@ -66,7 +67,7 @@ public sealed partial class MainPage
     private static bool IsPhone => InPersonConfig.Role == InPersonRole.Phone;
 
     /// <summary>
-    /// Makes this page a phone, if it was opened as one: laid out upright, and listening for the taps the tablets send it.
+    /// Makes this page a phone, if it was opened as one: laid out sideways, and listening for the taps the tablets send it.
     /// Does nothing for any other page.
     /// </summary>
     private void AttachPhone()
@@ -78,6 +79,10 @@ public sealed partial class MainPage
 
         ApplyPhoneLayout();
         _phoneLink = new PhoneLink(TakeTableTap, TakeTableLine);
+        _phoneLink.Undo += TakeTableUndo;
+        _phoneLink.TableStops += TakeTableStops;
+        _stops.OwnChanged += SendStops;
+        SendStops();
 
         // Over the event's own deck building, which a phone's width squeezes, and over everything else of the page.
         _phoneDeck = new PhoneDeckBuilder();
@@ -91,8 +96,13 @@ public sealed partial class MainPage
         Grid.SetColumnSpan(_phonePick, 2);
         Root.Children.Add(_phonePick);
 
-        // At the top, right of the middle: clear of the player's rail on the left and the side panel's corner on the right.
-        _fullScreen = new FullScreenButton(landscape: false, (HorizontalAlignment.Center, VerticalAlignment.Top, new Thickness(100, 4, 4, 4)), insets => Root.Padding = insets, _phoneLink.AskReentry);
+        // At the foot of the strip down the left edge, under the drawer's tab. The phone is held upright for the draft and
+        // deck building and sideways for its games, and locked so where the browser can (FollowPhoneView).
+        _fullScreen = new FullScreenButton(landscape: false, (HorizontalAlignment.Left, VerticalAlignment.Bottom, new Thickness(6)), insets =>
+        {
+            Root.Padding = insets;
+            FillPhoneHand();
+        }, _phoneLink.AskReentry);
         _phoneLink.ReentryCode += _fullScreen.Reentry;
         Root.Children.Add(_fullScreen);
 
@@ -108,6 +118,7 @@ public sealed partial class MainPage
         SettleTableLine();
         _phoneDeck?.Follow(_gameClient);
         _phonePick?.Follow(_gameClient);
+        FollowPhoneView();
 
         if (_refusal.Visibility == Visibility.Visible && DateTime.UtcNow >= _refusalUntil)
         {
@@ -118,45 +129,14 @@ public sealed partial class MainPage
     // --- The layout ---
 
     /// <summary>
-    /// The phone's layout, upright: the dock over the hand along the bottom, a bar over them with the Board button, and the
-    /// table above showing this player's rail (life, mana pool, piles) with the stack and any choice floating over it. The
-    /// whole board - both halves, as the remote client draws it - is behind the Board button: the tablets show the public
-    /// board, and the phone's is for what only its owner may see on it (their face-down cards). The side panel starts
-    /// closed and opens over the table rather than beside it.
+    /// The phone's layout, sideways: the prompt down the right, one view beside it - the hand first - and a drawer from the
+    /// left edge for the others (MainPage.PhoneViews.cs). The side panel starts closed and opens over the view rather than
+    /// beside it.
     /// </summary>
     private void ApplyPhoneLayout()
     {
-        // The dock and the hand one over the other, rather than side by side, under a bar of the phone's own.
-        _bottom.ColumnDefinitions.Clear();
-        _bottom.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        _bottom.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        _bottom.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        foreach (FrameworkElement part in _bottom.Children.OfType<FrameworkElement>())
-        {
-            Grid.SetColumn(part, 0);
-            Grid.SetRow(part, part == _dock ? 1 : 2);
-        }
-
-        _dock.BorderThickness = new Thickness(0, 1, 0, 1);
-        _dock.HorizontalAlignment = HorizontalAlignment.Stretch;
-        _bottom.SizeChanged += (_, e) => FitDock(e.NewSize.Width);
-
-        _boardButton = new DockButton("Board", primary: false, fontSize: 13);
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(_boardButton, "Board");
-        _boardButton.Tooltip = "Show the whole board, as you may see it";
-        _boardButton.Clicked += () => ShowBoard(!_boardShown);
-        var bar = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Padding = new Thickness(12, 8, 12, 8),
-            Children = { _boardButton },
-        };
-        Grid.SetRow(bar, 0);
-        _bottom.Children.Add(bar);
-
-        // Closed, without touching the setting the remote client keeps; opened, it lies over the table, since beside it a
-        // phone's width would leave the table nothing.
+        // Closed, without touching the setting the remote client keeps; opened, it lies over the view, since beside it a
+        // phone's width would leave the view nothing.
         _sideOpen = false;
         _sideSlide.Stop();
         _sideSlot.Width = 0;
@@ -165,9 +145,20 @@ public sealed partial class MainPage
         Grid.SetColumnSpan(_sideSlot, 2);
         _sideSlot.HorizontalAlignment = HorizontalAlignment.Right;
 
+        // The stack's window in the middle of its view, rather than beside a rail.
+        _stackOverlay.HorizontalAlignment = HorizontalAlignment.Center;
+        _stackOverlay.Margin = new Thickness(0);
+        foreach (ResizeGrip grip in _stackGrips)
+        {
+            grip.Visibility = Visibility.Collapsed;
+        }
+
+        _stackGrips = [];
+
+        BuildPhoneViews();
         BuildRefusal();
-        ShowBoard(false);
         HideLongClocks();
+        Root.SizeChanged += (_, _) => FillPhoneHand();
     }
 
     /// <summary>
@@ -201,32 +192,6 @@ public sealed partial class MainPage
                 clock.Text = string.Empty;
             }
         });
-
-    /// <summary>The dock across the phone's whole width, whatever width the remote client's dock would take.</summary>
-    private void FitDock(double width)
-    {
-        if (width > 0)
-        {
-            _dock.MinWidth = width;
-            _dock.MaxWidth = width;
-        }
-    }
-
-    /// <summary>Shows the whole board, or only this player's rail with the stack and the choices over the table.</summary>
-    private void ShowBoard(bool shown)
-    {
-        _boardShown = shown;
-        _boardButton.On = shown;
-
-        // The opponent's half and the hairline under it take no height while hidden; this player's half keeps its rail.
-        _table.RowDefinitions[0].Height = shown ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
-        _table.RowDefinitions[1].Height = shown ? new GridLength(1) : new GridLength(0);
-        _opponentHalf.Panel.Visibility = shown ? Visibility.Visible : Visibility.Collapsed;
-        _myHalf.Scroll.Visibility = shown ? Visibility.Visible : Visibility.Collapsed;
-
-        _needsRedraw = true;
-        RedrawNow();
-    }
 
     // --- Taps from the tablets ---
 
@@ -400,10 +365,45 @@ public sealed partial class MainPage
         }
     }
 
-    /// <summary>The phone's word that a tap on the table did nothing: a line over the dock, and a buzz where the phone can.</summary>
-    private void Refuse()
+    // --- Undo on the tablets, and the table's stops ---
+
+    /// <summary>A tablet's Undo, tapped for this seat: this page's own Undo, or the word that there is nothing to take back.</summary>
+    private void TakeTableUndo()
     {
-        _refusalText.Text = "That tap on the table can't be used now.";
+        if (_gameClient is { IsOver: false } && _actions.Undo is not null)
+        {
+            OnUndoClick();
+        }
+        else
+        {
+            Refuse("There is no mana ability to take back now.");
+        }
+    }
+
+    /// <summary>This player's own stops, told to the table, which tells every device.</summary>
+    private void SendStops() =>
+        _phoneLink?.SendStops(new SeatStopsMessage { Mine = [.. _stops.Mine], Theirs = [.. _stops.Theirs] });
+
+    /// <summary>Every seat's stops as the relay said them, kept for <see cref="TurnStops.StopsAt"/>.</summary>
+    private IReadOnlyList<SeatStops> _tableStops = [];
+
+    /// <summary>
+    /// At an in-person table a stop is the table's (docs/in-person.md, "Stops"): every player gets their chance to act at a
+    /// stop anyone set, as though all of them had set it. This player is stopped on their own turn wherever another player
+    /// stops on an opponent's turn, and on another's turn wherever that player stops on their own (or a third, not the
+    /// active player, stops on an opponent's).
+    /// </summary>
+    private void TakeTableStops(TableStopsMessage message)
+    {
+        _tableStops = message.Seats;
+        _stops.ShareWith(OthersStopAt);
+        _needsRedraw = true;
+    }
+
+    /// <summary>The phone's word that a tap on the table did nothing: a line over the dock, and a buzz where the phone can.</summary>
+    private void Refuse(string why = "That tap on the table can't be used now.")
+    {
+        _refusalText.Text = why;
         _refusal.Visibility = Visibility.Visible;
         _refusalUntil = DateTime.UtcNow + RefusalShown;
         PhoneFeedback.Buzz();
@@ -427,8 +427,9 @@ public sealed partial class MainPage
             Child = _refusalText,
         };
 
-        // Over the bottom of the table, just above the dock, where the player is looking.
-        _table.Children.Add(_refusal);
-        Grid.SetRow(_refusal, 2);
+        // Over the foot of the view, beside the dock, where the player is looking, whichever view is up.
+        _refusal.Margin = new Thickness(DrawerStrip + 16, 0, 16, 16);
+        Grid.SetRowSpan(_refusal, 3);
+        Root.Children.Add(_refusal);
     }
 }

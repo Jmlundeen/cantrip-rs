@@ -95,6 +95,8 @@ internal sealed class PublicHost : IRulesHost
     {
         Viewer = 0,
         Turn = 1,
+        ActivePlayer = 1,
+        PriorityPlayer = 1,
         Objects =
         [
             new ObjectView { Handle = new(901), Zone = ZoneKindView.Battlefield, Owner = 1, CardId = "Mountain", Name = "Mountain" },

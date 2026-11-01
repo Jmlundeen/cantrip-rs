@@ -533,7 +533,8 @@ public sealed class PhoneDeckBuilder : Grid
 
     private void Preview(ObjectView card, int place)
     {
-        double width = Math.Min(320, Math.Max(200, ActualWidth - 48));
+        // As large as the screen allows, whichever of its height and width is the narrower for a card.
+        double width = Math.Floor(Math.Max(120, Math.Min(ActualWidth - 16, (ActualHeight - 16) / BoardRows.AspectRatio)));
         _previewCard.SetCellSize((float)width, BoardRows.CardHeight((float)width));
         _previewCard.Width = width;
         _previewCard.Height = BoardRows.CardHeight((float)width);

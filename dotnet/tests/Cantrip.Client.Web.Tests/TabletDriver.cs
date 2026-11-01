@@ -211,7 +211,21 @@ public sealed record TabletState(
     bool Animates = false,
     long ArtBytes = 0,
     long DurableBytes = 0,
-    long MomentBytes = 0);
+    long MomentBytes = 0,
+    bool StackShown = false,
+    bool StackCollapsed = false,
+    TabletBox? StackFold = null,
+    IReadOnlyList<TabletHalfState>? Halves = null,
+    IReadOnlyList<int>? Undos = null);
+
+/// <summary>A box on the tablet's page: its middle, width and height.</summary>
+public sealed record TabletBox(float X, float Y, float W, float H);
+
+/// <summary>
+/// A seat's half on a tablet: the step its turn strip shows, the steps it marks as the table's stops this turn, and whether
+/// its Undo is up (the seat has priority), with where it is.
+/// </summary>
+public sealed record TabletHalfState(int Seat, string Step, IReadOnlyList<string> Stops, bool Undo, TabletBox? UndoBox = null);
 
 /// <summary>
 /// A tablet's grid draft (InPerson/TabletDraft.cs): whether it is up, the grid of how many, the pick being made and whose,
@@ -223,7 +237,7 @@ public sealed record TabletGridState(bool Shown, int Grid, int Grids, int Decisi
 /// <summary>A tablet's grid draft, upright for <c>Seat</c> (zero on the shared board: for both, <c>Turned</c> to face seat 2 on their pick).</summary>
 public sealed record TabletFace(int Seat, bool Turned, string Status, string Seats, IReadOnlyList<string> Recent, IReadOnlyList<TabletGridButton> Buttons);
 
-/// <summary>A button of the grid: a line's ("Row 1", "Column 3", <c>Line</c> 0 to 5) or Take (<c>Line</c> -1).</summary>
+/// <summary>A button of the grid: a line's ("Row 1", "Column 3", <c>Line</c> 0 to 5) or Pick (<c>Line</c> -1).</summary>
 public sealed record TabletGridButton(string Label, int Line, bool Enabled, bool Chosen, float X, float Y, float W, float H);
 
 /// <summary>A line of the grid a tablet sent the relay: chosen, or taken.</summary>
@@ -232,7 +246,7 @@ public sealed record TabletLine(int Decision, int Line, bool Take);
 /// <summary>
 /// A card on a tablet: its name (empty for one nobody at the table may see), the middle and size of its box on the page,
 /// and where it is - <c>battlefield</c> on the half at the tablet's bottom edge, <c>opponent-battlefield</c> on the turned
-/// one, <c>stack</c> and <c>opponent-stack</c> (the shared board's band, once facing each player), <c>graveyard</c> or
+/// one, <c>stack</c> and <c>opponent-stack</c> (a spell on the stack, turned to face seat 2 for the latter), <c>graveyard</c> or
 /// <c>exile</c> in a pile's open list (<c>opponent-</c> on the turned half) - and whose half that is.
 /// </summary>
 public sealed record TabletCard(string Name, bool Visible, string Place, int Seat, int Handle, bool Tapped, float X, float Y, float W, float H);

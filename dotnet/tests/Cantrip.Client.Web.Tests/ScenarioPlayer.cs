@@ -140,7 +140,8 @@ public sealed class ScenarioPlayer
                 ["cantrip-stops-mine"] = stopsMine is null ? EveryStep : string.Join(",", stopsMine),
                 ["cantrip-stops-theirs"] = stopsTheirs is null ? EveryStep : string.Join(",", stopsTheirs),
             },
-            phone: phone);
+            phone: phone,
+            sideways: phone);
 
         GameClient? opponent = null;
         if (opponentThinks is not null)
@@ -981,10 +982,17 @@ public sealed class ScenarioPlayer
     /// Scrolls each open graveyard column - with the wheel, over a card of it in view - down and then up until the card is in
     /// view, as a person scrolls a long graveyard to the card they want. Null when no column brings it into view.
     /// </summary>
-    private async Task<CardState?> ScrollGraveyardsToAsync(int handle)
+    private Task<CardState?> ScrollGraveyardsToAsync(int handle) =>
+        ScrollToAsync(handle, place => place.EndsWith("graveyard", StringComparison.Ordinal));
+
+    /// <summary>
+    /// Scrolls whatever scrolling places of cards <paramref name="scrolls"/> names - with the wheel, over a card of each in
+    /// view - down and then up until the card is in view. Null when none brings it into view.
+    /// </summary>
+    private async Task<CardState?> ScrollToAsync(int handle, Func<string, bool> scrolls)
     {
         TableState state = await _page.SettledAsync();
-        List<string> places = [.. state.Cards.Where(c => c.Visible && c.Place.EndsWith("graveyard", StringComparison.Ordinal)).Select(c => c.Place).Distinct()];
+        List<string> places = [.. state.Cards.Where(c => c.Visible && scrolls(c.Place)).Select(c => c.Place).Distinct()];
         foreach (string place in places)
         {
             foreach (float delta in new[] { 120f, -120f })
@@ -1042,6 +1050,14 @@ public sealed class ScenarioPlayer
     private async Task ClickHandleAsync(int handle)
     {
         TableState state = await _page.SettledAsync();
+
+        // A choice of cards on a phone fills the screen a row at a time: a card further down is scrolled to, as a person
+        // swipes the window up to it.
+        if (_phone && !state.Cards.Any(c => c.Visible && c.Handle == handle) && state.Cards.Any(c => c.Handle == handle && c.Place == "choice"))
+        {
+            await ScrollToAsync(handle, place => place == "choice");
+            state = await _page.SettledAsync();
+        }
 
         // A phone shows the hand, the stack and its choices; a card it does not show is on the battlefield, on a tablet.
         if (_phone && !state.Cards.Any(c => c.Visible && c.Handle == handle))
@@ -1199,17 +1215,71 @@ public sealed class ScenarioPlayer
 
     /// <summary>
     /// The handles of cards on the battlefield that a person at the table would find on a tablet: read from the phone's own
-    /// Board, opened and shut again for it, since the phone does not publish the board it keeps hidden.
+    /// boards - each player's, opened from the drawer in turn - and the hand shown again after, since the phone does not
+    /// publish a board it is not showing.
     /// </summary>
     private async Task<List<int>> PhoneBoardHandlesAsync(Func<CardState, bool> which, int count)
     {
-        await _page.ClickAsync("Board", "button");
-        TableState shown = await _page.SettledAsync(s => s.InPerson?.Board == true);
-        await _page.PictureAsync($"phone-board-request-{_asking}");
-        List<int> handles = [.. shown.Cards.Where(c => c.Visible).Where(which).Select(c => c.Handle).Distinct().Take(count)];
-        await _page.ClickAsync("Board", "button");
-        await _page.SettledAsync(s => s.InPerson?.Board == false);
+        List<int> handles = [];
+        TableState shown = await _page.SettledAsync(s => s.InPerson is not null);
+        if (!_phoneViewsSeen)
+        {
+            await PhoneStopsAsync();
+        }
+
+        for (int board = 0; ; board++)
+        {
+            await _page.ClickAsync("Views", "button");
+            TableState drawer = await _page.SettledAsync(s => s.InPerson?.Drawer == true);
+            if (board == 0)
+            {
+                await _page.PictureAsync($"phone-drawer-request-{_asking}");
+            }
+
+            string[] boards = [.. drawer.Controls.Select(control => control.Label).Where(label => label.StartsWith("Board · ", StringComparison.Ordinal)).Distinct()];
+            if (board >= boards.Length)
+            {
+                await _page.ClickAsync("Hand", "button");
+                await _page.SettledAsync(s => s.InPerson?.View == "hand" && s.InPerson.Drawer == false);
+                break;
+            }
+
+            await _page.ClickAsync(boards[board], "button");
+            shown = await _page.SettledAsync(s => s.InPerson?.Board == true && s.InPerson.Drawer == false);
+            await _page.PictureAsync($"phone-board-request-{_asking}-{board + 1}");
+            handles.AddRange(shown.Cards.Where(c => c.Visible).Where(which).Select(c => c.Handle).Where(handle => !handles.Contains(handle)));
+        }
+
+        handles = [.. handles.Distinct().Take(count)];
         return handles.Count == count ? handles : throw new NotDrivenException($"{count} such cards on the board, with {handles.Count}", shown);
+    }
+
+    /// <summary>Whether the phone's Stops view has been visited, which is done once a game.</summary>
+    private bool _phoneViewsSeen;
+
+    /// <summary>
+    /// The phone's Stops view, from its drawer: a stop set and unset again with a finger, the view saying so each time, and
+    /// the hand shown again after - the stops left as the script set them.
+    /// </summary>
+    private async Task PhoneStopsAsync()
+    {
+        _phoneViewsSeen = true;
+        await _page.ClickAsync("Views", "button");
+        await _page.SettledAsync(s => s.InPerson?.Drawer == true);
+        await _page.ClickAsync("Stops", "button");
+        TableState stops = await _page.SettledAsync(s => s.InPerson?.View == "stops" && s.InPerson.Drawer == false);
+        await _page.PictureAsync($"phone-stops-request-{_asking}");
+        PhoneStopState upkeep = stops.InPerson!.Stops!.Single(stop => stop.Name == "Stop: Upkeep, their turn");
+        foreach (bool on in (bool[])[!upkeep.On, upkeep.On])
+        {
+            await _page.ClickAsync(upkeep.Name, "button");
+            await _page.SettledAsync(s => s.InPerson!.Stops!.Single(stop => stop.Name == upkeep.Name).On == on);
+        }
+
+        await _page.ClickAsync("Views", "button");
+        await _page.SettledAsync(s => s.InPerson?.Drawer == true);
+        await _page.ClickAsync("Hand", "button");
+        await _page.SettledAsync(s => s.InPerson?.View == "hand" && s.InPerson.Drawer == false);
     }
 
     /// <summary>

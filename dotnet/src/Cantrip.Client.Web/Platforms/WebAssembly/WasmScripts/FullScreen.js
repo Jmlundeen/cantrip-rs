@@ -3,7 +3,8 @@
 // gains no manifest, no meta tag and no change to its viewport.
 //
 // - Android, iPad and a desktop browser have the Fullscreen API: the page's button asks for it from its tap, then locks a
-//   tablet to landscape and a phone upright where the browser lets it (a phone's browser, once in full screen).
+//   tablet to landscape, and a phone sideways for its games and upright for the draft and deck building, where the
+//   browser lets it (a phone's browser, once in full screen).
 // - An iPhone has no Fullscreen API outside video. Its way to full screen is the page added to the Home Screen, opened
 //   as a web app: this file gives the page what iOS reads for that - a manifest of its own (inperson.webmanifest, never
 //   Uno's PWA manifest, which would install a service worker), apple-mobile-web-app-capable, a black-translucent status
@@ -137,6 +138,18 @@
         }).catch(() => { });
     };
 
+    // The lock changed while full screen: a phone turned sideways for its game, and upright again for deck building.
+    globalThis.cantripFullScreenLock = function (landscape) {
+        try {
+            const orientation = screen.orientation;
+            if (element() && orientation && typeof orientation.lock === "function") {
+                orientation.lock(landscape ? "landscape" : "portrait").catch(() => { });
+            }
+        } catch (e) {
+            // No lock here: the page lays itself out for whichever way it is held.
+        }
+    };
+
     globalThis.cantripFullScreenExit = function () {
         try {
             const left = document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen();
@@ -200,6 +213,23 @@
 
     if (!inPerson) {
         return;
+    }
+
+    // A long press is how a card is held up to read at the table, and a mobile browser takes the same press for selecting
+    // the page: Safari lights the whole page and offers Copy, Translate and the rest over it. Nothing of an in-person page
+    // is text to select or a link to share, so the browser is told so: no selection, no callout, no context menu. A field
+    // being typed in (a deck's name) keeps its own.
+    const typing = (target) => target instanceof Element && !!target.closest("input, textarea, [contenteditable='true']");
+    const noSelecting = document.createElement("style");
+    noSelecting.textContent = "html, body, body * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; "
+        + "-webkit-tap-highlight-color: transparent; } input, textarea, [contenteditable='true'] { -webkit-user-select: text; user-select: text; }";
+    document.head.appendChild(noSelecting);
+    for (const kind of ["selectstart", "contextmenu"]) {
+        document.addEventListener(kind, (event) => {
+            if (!typing(event.target)) {
+                event.preventDefault();
+            }
+        }, true);
     }
 
     const head = document.head;

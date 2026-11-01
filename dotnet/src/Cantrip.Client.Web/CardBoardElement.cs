@@ -32,7 +32,8 @@ public sealed class CardBoardElement : SKCanvasElement
         int? DamageShare = null,
         bool LowerLive = false,
         bool RaiseLive = false,
-        bool ShareCounters = false);
+        bool ShareCounters = false,
+        float Turn = 0f);
 
     private sealed class CellState
     {
@@ -733,7 +734,8 @@ public sealed class CardBoardElement : SKCanvasElement
         {
             ViewHandle handle = cell.Card.Handle;
             seen.Add(handle);
-            float targetAngle = cell.Tapped ? 90 : 0;
+            // Turned, a card lies upside down to face the player across the table from the board's bottom edge, tapped or not.
+            float targetAngle = (cell.Tapped ? 90 : 0) + cell.Turn;
 
             if (_cells.TryGetValue(handle, out CellState? state))
             {

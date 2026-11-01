@@ -14,8 +14,8 @@ namespace Cantrip.Client.Web.InPerson;
 /// cards each has drafted, the last picks in words and the pick clock (<see cref="PublicGridMessage"/>). Nothing else: no
 /// pool, nothing either seat alone sees.
 /// <para>
-/// A finger picks a line in two taps, so a stray touch takes nothing: the first lights the line and chooses it, the second
-/// - on the same button, or on Take - takes it. Only the player whose pick it is has the buttons live. Each tap goes to the relay (<see cref="TableLineMessage"/>), which hands it to that player's phone to send as
+/// A finger picks a line in two taps, so a stray touch takes nothing: the first lights the line and chooses it, and Pick
+/// takes it; the chosen line's button tapped again puts it back unchosen. Only the player whose pick it is has the buttons live. Each tap goes to the relay (<see cref="TableLineMessage"/>), which hands it to that player's phone to send as
 /// its own pick; the table judges it, and the grid moves on when the table says so.
 /// </para>
 /// <para>
@@ -141,7 +141,7 @@ public sealed class TabletDraft : Grid
         }
     }
 
-    /// <summary>A line's button tapped on a face: the line chosen, or - tapped again - taken.</summary>
+    /// <summary>A line's button tapped on a face: the line chosen, or - the chosen one tapped again - chosen no longer.</summary>
     private void LineTapped(Face face, int line)
     {
         if (!Live(face) || _grid is not { } grid || !HasCards(grid, line))
@@ -149,9 +149,12 @@ public sealed class TabletDraft : Grid
             return;
         }
 
+        // The table is not told: the line it was last told of matters only to a pick clock, which takes the line chosen
+        // when it runs out, and an in-person table's clock is off unless the host turned it on.
         if (_chosen == line && _chosenFor == grid.Decision)
         {
-            TakeChosen(face);
+            _chosen = null;
+            Show();
             return;
         }
 
@@ -230,12 +233,12 @@ public sealed class TabletDraft : Grid
 
         if (_sentFor == grid.Decision)
         {
-            return "Taking...";
+            return "Picking...";
         }
 
         if (_chosen is { } line && _chosenFor == grid.Decision)
         {
-            return $"{LineName(line)} chosen: tap it again, or Take, to take it.";
+            return $"{LineName(line)} chosen: Pick to take it, or tap it again to choose another.";
         }
 
         return grid.Pick == 1
@@ -250,7 +253,7 @@ public sealed class TabletDraft : Grid
 
     /// <summary>
     /// The draft as a test reads it, under the tablet's <c>grid</c>: the pick being made, and each face's seat, whether it is
-    /// turned, what it says and its buttons - each line's and Take's label, box, whether it is live and chosen.
+    /// turned, what it says and its buttons - each line's and Pick's label, box, whether it is live and chosen.
     /// </summary>
     public void WriteTest(Utf8JsonWriter json, UIElement page)
     {
@@ -318,7 +321,7 @@ public sealed class TabletDraft : Grid
         private readonly TabletDraft _draft;
         private readonly Canvas _picker = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         private readonly DockButton[] _lines = new DockButton[6];
-        private readonly DockButton _take = new("Take", primary: true, fontSize: 18) { MinHeight = 56, MinWidth = 200, HorizontalAlignment = HorizontalAlignment.Left };
+        private readonly DockButton _take = new("Pick", primary: true, fontSize: 18) { MinHeight = 56, MinWidth = 200, HorizontalAlignment = HorizontalAlignment.Left };
 
         public Face(TabletDraft draft, int seat)
         {
@@ -341,7 +344,7 @@ public sealed class TabletDraft : Grid
             _picker.Children.Add(Board);
             for (int line = 0; line < 6; line++)
             {
-                var button = new DockButton(line < 3 ? "▸" : "▾", primary: false, fontSize: 24).Filling();
+                var button = new DockButton(line < 3 ? "▸" : "▾", primary: false, fontSize: 24).Filling().Arrow(down: line >= 3, size: 20);
                 AutomationProperties.SetName(button, LineName(line));
                 int chosen = line;
                 button.Clicked += () => _draft.LineTapped(this, chosen);
@@ -353,7 +356,7 @@ public sealed class TabletDraft : Grid
             Children.Add(_picker);
             SizeChanged += (_, _) => _draft.Show();
 
-            AutomationProperties.SetName(_take, "Take");
+            AutomationProperties.SetName(_take, "Pick");
             _take.Clicked += () => _draft.TakeChosen(this);
             var side = new StackPanel
             {
@@ -398,9 +401,9 @@ public sealed class TabletDraft : Grid
 
         public StackPanel Recent { get; } = new() { Spacing = 4, Margin = new Thickness(0, 6, 0, 0) };
 
-        /// <summary>Every button on this face, with the label a test finds it by and its line (-1 for Take).</summary>
+        /// <summary>Every button on this face, with the label a test finds it by and its line (-1 for Pick).</summary>
         public IEnumerable<(DockButton Button, string Label, int Line)> Buttons() =>
-            [.. _lines.Select((button, line) => (button, LineName(line), line)), (_take, "Take", -1)];
+            [.. _lines.Select((button, line) => (button, LineName(line), line)), (_take, "Pick", -1)];
 
         /// <param name="shown">The grid drawn: the one being picked from, or the one a pick was just taken from.</param>
         /// <param name="now">The draft as it stands.</param>
@@ -460,8 +463,8 @@ public sealed class TabletDraft : Grid
             int count = _draft._chosen is { } chosen && _draft._chosenFor == now.Decision ? Places(chosen).Count(place => now.Places[place].Known) : 0;
             _take.Visibility = mine && _draft._held is null ? Visibility.Visible : Visibility.Collapsed;
             _take.Caption = count > 0 && _draft._chosen is { } taking
-                ? $"Take {LineName(taking).ToLowerInvariant()} ({count} card{(count == 1 ? string.Empty : "s")})"
-                : "Take";
+                ? $"Pick {LineName(taking).ToLowerInvariant()} ({count} card{(count == 1 ? string.Empty : "s")})"
+                : "Pick";
             _take.Enabled = live && count > 0;
 
             Recent.Children.Clear();

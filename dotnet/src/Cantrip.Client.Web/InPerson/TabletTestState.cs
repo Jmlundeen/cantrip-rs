@@ -40,6 +40,9 @@ public sealed partial class TabletPage
     /// <summary>The grid's lines picked and sent, newest last, for a test to read.</summary>
     private readonly List<TableLineMessage> _lines = [];
 
+    /// <summary>Every Undo this tablet sent, by the seat it was tapped for, under ?test.</summary>
+    private readonly List<int> _undos = [];
+
     /// <summary>Whether this tablet is fed by a test rather than a relay.</summary>
     private static bool FedByTest => ClientConfig.Test && InPersonConfig.Device is null;
 
@@ -125,6 +128,32 @@ public sealed partial class TabletPage
             json.WriteNumber("durableBytes", FaceCache.DurableBytes);
             json.WriteNumber("momentBytes", FaceCache.MomentBytes);
             _fullScreen.WriteTest(json, _root);
+            json.WriteBoolean("stackShown", _stack.Visibility == Visibility.Visible);
+            json.WriteBoolean("stackCollapsed", _stack.Collapsed);
+            WriteStackFold(json);
+            json.WriteStartArray("halves");
+            foreach (TabletHalf half in _halves)
+            {
+                json.WriteStartObject();
+                json.WriteNumber("seat", half.Seat);
+                json.WriteString("step", half.Phase.Current.ToString());
+                json.WriteStartArray("stops");
+                foreach (Cantrip.Protocol.TurnStepView step in half.Phase.Stops)
+                {
+                    json.WriteStringValue(step.ToString());
+                }
+
+                json.WriteEndArray();
+                json.WriteBoolean("undo", half.Undo.Visibility == Visibility.Visible);
+                if (half.Undo.Visibility == Visibility.Visible && half.Undo.ActualWidth > 0)
+                {
+                    WriteBox(json, half.Undo.TransformToVisual(_root).TransformBounds(new Rect(0, 0, half.Undo.ActualWidth, half.Undo.ActualHeight)), "undoBox");
+                }
+
+                json.WriteEndObject();
+            }
+
+            json.WriteEndArray();
 
             json.WriteStartArray("cards");
             if (board)
@@ -137,12 +166,16 @@ public sealed partial class TabletPage
                     }
 
                     TabletHalf? half = _halves.FirstOrDefault(each => each.Board == row || each.Pile.Board == row);
-                    string place = half is null ? (row == _stack.Board ? "stack" : "opponent-stack")
+                    string pile = half is null ? string.Empty
                         : half.Pile.Board == row ? (half.Turned ? "opponent-" : string.Empty) + (half.Pile.Open?.Zone == ZoneKindView.Exile ? "exile" : "graveyard")
                         : half.Turned ? "opponent-battlefield" : "battlefield";
                     GeneralTransform toPage = row.TransformToVisual(_root);
                     foreach ((ObjectView card, Rect box, bool visible, _, _) in row.Targets())
                     {
+                        // A spell on the stack is "opponent-stack" while it is turned to face seat 2 across the shared board.
+                        string place = half is not null ? pile
+                            : row.Placement(card.Handle) is { } placed && Math.Abs((((placed.Angle % 360f) + 360f) % 360f) - 180f) < 45f ? "opponent-stack"
+                            : "stack";
                         json.WriteStartObject();
                         json.WriteString("name", card.Known || card.FaceDown ? card.Name : string.Empty);
                         json.WriteString("faceDownName", card.FaceDownName);
@@ -256,6 +289,13 @@ public sealed partial class TabletPage
             }
 
             json.WriteEndArray();
+            json.WriteStartArray("undos");
+            foreach (int seat in _undos)
+            {
+                json.WriteNumberValue(seat);
+            }
+
+            json.WriteEndArray();
             _draft.WriteTest(json, _root);
             json.WriteEndObject();
         }
@@ -270,6 +310,23 @@ public sealed partial class TabletPage
         json.WriteBoolean("open", open);
         WriteBox(json, element.TransformToVisual(_root).TransformBounds(new Rect(0, 0, element.ActualWidth, element.ActualHeight)));
         json.WriteEndObject();
+    }
+
+    /// <summary>A box as an object of its own under a name: its middle, width and height.</summary>
+    private static void WriteBox(Utf8JsonWriter json, Rect box, string name)
+    {
+        json.WriteStartObject(name);
+        WriteBox(json, box);
+        json.WriteEndObject();
+    }
+
+    /// <summary>The stack window's fold, under <c>stackFold</c>: the first cap's button, where a finger folds the window.</summary>
+    private void WriteStackFold(Utf8JsonWriter json)
+    {
+        if (_stack.Toggles.FirstOrDefault() is { ActualWidth: > 0, XamlRoot: not null } toggle && _stack.Visibility == Visibility.Visible)
+        {
+            WriteBox(json, toggle.TransformToVisual(_root).TransformBounds(new Rect(0, 0, toggle.ActualWidth, toggle.ActualHeight)), "stackFold");
+        }
     }
 
     private static void WriteBox(Utf8JsonWriter json, Rect box)

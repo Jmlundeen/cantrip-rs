@@ -437,11 +437,18 @@ At an in-person table (`docs/in-person.md`) each player's phone is this page, op
 Everything the phone adds is in `MainPage.InPerson.cs` and `InPerson/PhoneLink.cs`, reached from one line in the
 constructor (`AttachPhone`), and does nothing on any other page: the remote client is unchanged by it.
 
-- **Layout.** Upright: the dock across the phone's width over the hand, a bar over them with the **Board** button, and
-  above them this player's rail (life, mana pool, piles) with the stack and any choice window floating beside it. The
-  whole board, both halves as the remote client draws them, is behind **Board**: the tablets show the public board, and
-  only the phone can show its owner what they alone may see there, such as their face-down cards. The side panel starts
-  closed, without touching the remote client's setting, and opens over the table. A clock with more than a day left is not
+- **Layout.** Sideways for the game (upright for the draft and deck building, "Full screen" below): the prompt - the
+  dock, with Undo at its top, scrolling if it must - down the right, a third of the width, and one view beside it
+  (`MainPage.PhoneViews.cs`). The public board is the tablets' to show, so the phone opens on the **Hand**, its cards as
+  large as lets every one show its name; a drawer that slides out from the strip down the left edge (its tab at the top,
+  the Fullscreen button at the foot) goes to the others: **Board** for each player's battlefield, as the remote client
+  draws a half - what only the phone can show its owner, such as their face-down cards; each player's public state, by
+  their name - their rail with their graveyard open beside it; **Stack**, its cards as tall as the view, shown by itself
+  while triggers are put in order there and the view before it shown again after; **Stops**, a button for each step and
+  turn (docs/in-person.md, "Stops"); and the log, settings and menu, the side panel, which starts closed without touching
+  the remote client's setting and opens over the view. The tab is lit while something is on the stack. A choice of cards
+  that are not on the board - a library searched, a scry, triggers to order - fills the whole phone, over the view and
+  the dock, its cards as tall as the screen leaves a row of them, scrolling down to more. A clock with more than a day left is not
   shown (`PlayerRail.HideClockOver` for the match clocks, the draft's, deck building's and the round's lines blanked):
   an in-person table's clocks are "off" as clocks of days and hours, not as none.
 - **The grid draft** is picked on the tablets (docs/in-person.md, "The grid draft"). The phone shows **Pick on the
@@ -478,14 +485,17 @@ constructor (`AttachPhone`), and does nothing on any other page: the remote clie
   screen". The test state's `fullScreen` (under `inPerson` on a phone) is what the button does (`enter`, `exit`,
   `homescreen`, `none`), its box and whether the explanation is up; `FullScreenTests` enters and leaves full screen on both
   pages in Chromium, plays the iPhone's Home Screen round trip, and checks the remote client has none of it.
-- **Testing.** Under `?test`, the test state's `inPerson` is the phone's Board, the taps waiting, every tap settled (used,
+- **Testing.** Under `?test`, the test state's `inPerson` is the phone's view (`view`: `hand`, `board:N`, `player:N`,
+  `stack`, `stops`; `board` while a battlefield is shown), whether the drawer is out, the Stops view's buttons, the taps waiting, every tap settled (used,
   held for its prompt) and the line up now; a test stands in for the relay by queueing taps on
   `globalThis.cantripTableTaps` (`o12@34;` the seat's object 12 for request 34, `p2@34;` player 2), since `cantripTest`
-  itself is a string. `ScenarioPlayer.PlayAsync(..., phone: true)` plays a scenario on a phone-sized touch page, tapping
-  the hand and the dock with a finger and tapping every permanent and player on the "tablet" through that queue, the table
+  itself is a string. `ScenarioPlayer.PlayAsync(..., phone: true)` plays a scenario on a phone-sized touch page held sideways, tapping
+  the hand and the dock with a finger, opening each player's Board from the drawer to find what is on the battlefield,
+  setting a stop in the Stops view and unsetting it, scrolling a choice of cards to the one it wants and tapping every permanent and player on the "tablet" through that queue, the table
   judging each answer against the script (`PhoneTests`: Bolt at a Tarmogoyf with the Mountain tapped at priority, Fireball
   at a player paid with lands tapped during the payment, Engineered Explosives' X planned with a land tapped as it is
-  announced, and the taps the phone must not use).
+  announced, Archdruid's Charm's search filling the phone, and the taps the phone must not use). Undo tapped on a tablet
+  and the stops shared through the relay are `InPersonRelayTests`'.
 
 ## Open
 

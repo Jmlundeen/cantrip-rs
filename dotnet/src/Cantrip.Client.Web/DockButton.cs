@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Shapes;
 using Windows.UI;
 
 namespace Cantrip.Client.Web;
@@ -57,6 +58,57 @@ public sealed class DockButton : Border
     {
         HorizontalAlignment = HorizontalAlignment.Stretch;
         _label.HorizontalAlignment = HorizontalAlignment.Center;
+        return this;
+    }
+
+    private Shape? _arrow;
+
+    /// <summary>
+    /// The caption replaced by an arrow drawn as a shape, pointing right or down: a glyph such as ▸ is not in every
+    /// device's fonts (an iPad's browser draws none for it), and a line's button with nothing on it says nothing.
+    /// Returns the button, so it composes.
+    /// </summary>
+    public DockButton Arrow(bool down, double size = 14)
+    {
+        double half = size / 2;
+        _arrow = new Polygon
+        {
+            Points = down
+                ? [new Windows.Foundation.Point(0, 0), new Windows.Foundation.Point(size, 0), new Windows.Foundation.Point(half, size * 0.62)]
+                : [new Windows.Foundation.Point(0, 0), new Windows.Foundation.Point(size * 0.62, half), new Windows.Foundation.Point(0, size)],
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            IsHitTestVisible = false,
+        };
+        Child = _arrow;
+        Restyle();
+        return this;
+    }
+
+    /// <summary>
+    /// The caption replaced by three bars drawn as a shape: the mark of a menu that slides out, which no font need have.
+    /// Returns the button, so it composes.
+    /// </summary>
+    public DockButton Bars(double size = 18)
+    {
+        var bars = new Microsoft.UI.Xaml.Media.GeometryGroup();
+        double thick = Math.Max(2, Math.Round(size / 7));
+        foreach (double at in (double[])[0, (size - thick) / 2, size - thick])
+        {
+            bars.Children.Add(new Microsoft.UI.Xaml.Media.RectangleGeometry { Rect = new Windows.Foundation.Rect(0, Math.Round(at), size, thick) });
+        }
+
+        _arrow = new Microsoft.UI.Xaml.Shapes.Path
+        {
+            Data = bars,
+            Width = size,
+            Height = size,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            IsHitTestVisible = false,
+        };
+        Child = _arrow;
+        Restyle();
         return this;
     }
 
@@ -165,6 +217,10 @@ public sealed class DockButton : Border
         Background = Theme.Brush(fill);
         BorderBrush = Theme.Brush(!_enabled ? DisabledBorder : _lit ? Theme.Ready : _on ? Theme.Accent : Theme.ControlBorder);
         _label.Color = accent ? Theme.FgOnAccent : _enabled ? Theme.Fg : Theme.FgMuted;
+        if (_arrow is not null)
+        {
+            _arrow.Fill = Theme.Brush(_label.Color);
+        }
     }
 
     private static Color Lightened(Color c, double by) => Color.FromArgb(

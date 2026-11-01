@@ -100,8 +100,8 @@ public sealed class PhonePickScreen : Grid
         _status.Text = draft.PackNumber == 0 ? string.Empty
             : _mine
                 ? draft.PickNumber == 1
-                    ? "Your pick. Tap a row or a column of the grid on the table, then tap it again to take it."
-                    : "Your pick from what is left. Tap a row or a column on the table, then tap it again to take it."
+                    ? "Your pick. Tap a row or a column of the grid on the table, then Pick to take it."
+                    : "Your pick from what is left. Tap a row or a column on the table, then Pick to take it."
                 : $"{picking} is picking.";
         _status.Foreground = Theme.Brush(_mine ? Theme.Accent : Theme.FgSoft);
         _counts.Text = $"Cards drafted: {string.Join("  ·  ", draft.Seats.OrderBy(seat => seat.Seat).Select(seat => $"{(seat.Seat == client.Seat ? "You" : seat.Name)} {seat.Drafted}"))}";
@@ -170,7 +170,8 @@ public sealed class PhonePickScreen : Grid
 
     private void Preview(ObjectView card, int place)
     {
-        double width = Math.Min(320, Math.Max(200, ActualWidth - 48));
+        // As large as the screen allows, whichever of its height and width is the narrower for a card.
+        double width = Math.Floor(Math.Max(120, Math.Min(ActualWidth - 16, (ActualHeight - 16) / BoardRows.AspectRatio)));
         _previewCard.SetCellSize((float)width, BoardRows.CardHeight((float)width));
         _previewCard.Width = width;
         _previewCard.Height = BoardRows.CardHeight((float)width);

@@ -15,7 +15,7 @@ namespace Cantrip.Client.Web.InPerson;
 /// the stack and the players are tapped to pick them.
 /// <para>
 /// The shared board (<c>side</c> absent) lies between the players: seat 2's half at the top, turned to face seat 2, the
-/// stack across the middle, seat 1's half at the bottom. A player's own board (<c>side=N</c>) is that seat's half, the
+/// stack over the middle while there is one, seat 1's half at the bottom. A player's own board (<c>side=N</c>) is that seat's half, the
 /// stack, and both life totals.
 /// </para>
 /// <para>
@@ -32,14 +32,11 @@ public sealed partial class TabletPage : UserControl
     /// <summary>How far a press may wander and still be a tap: a fingertip is not a mouse.</summary>
     private const double TapSlop = 18;
 
-    /// <summary>The share of the page's height the stack band takes.</summary>
-    private const double StackShare = 0.2;
+    /// <summary>How tall a card on the stack is drawn, as a share of the board's height.</summary>
+    private const float StackShare = 0.2f;
 
-    /// <summary>
-    /// The share the shared board's band takes: two strips, the stack once facing each player, so each strip is near what a
-    /// player's own board gives the stack whole.
-    /// </summary>
-    private const double SharedStackShare = 0.28;
+    /// <summary>What the stack window's caps and edges take of the board's width, beside its cards.</summary>
+    private const float StackChrome = 200f;
 
     private readonly Grid _root = new();
     private readonly FeedTransport _feed = new();
@@ -50,13 +47,17 @@ public sealed partial class TabletPage : UserControl
 
     /// <summary>The halves shown: on the shared board the bottom one first.</summary>
     private readonly List<TabletHalf> _halves = [];
-    private readonly TabletStack _stack = new();
-
     /// <summary>
-    /// On the shared board, the stack again, turned to face seat 2: the band is mirrored, each player reading every spell
-    /// and ability on it upright on the strip nearest them, in the same order, the top of the stack at their right.
+    /// The stack, one window over the board while anything is on it, each spell turned to face its controller and set off
+    /// toward their side.
     /// </summary>
-    private readonly TabletStack? _turnedStack;
+    private readonly TabletStack _stack = new(mirrored: InPersonConfig.Side == 0);
+
+    /// <summary>The board's grid, under the stack window, whose size the stack's cards are drawn at.</summary>
+    private Grid _board = null!;
+
+    /// <summary>Every seat's stops, as the relay last said them: shown with the turn on each half.</summary>
+    private IReadOnlyList<SeatStops> _tableStops = [];
     private readonly TargetArrowsElement _arrows = new();
     /// <summary>Cards flying between zones, unless the Animate cards setting is off (off by default on a device short of memory).</summary>
     private readonly CardFlights _flights = new() { Enabled = PlayerSettings.AnimateCards };
@@ -87,7 +88,6 @@ public sealed partial class TabletPage : UserControl
     public TabletPage()
     {
         _client = new GameClient(_feed);
-        _turnedStack = _side == 0 ? new TabletStack() : null;
         Content = _root;
         _root.Background = Theme.Brush(Theme.Window);
 
@@ -126,38 +126,29 @@ public sealed partial class TabletPage : UserControl
     /// <summary>The halves, the stack band and the layers over them, as the layout this tablet shows.</summary>
     private void BuildBoard()
     {
-        var board = new Grid();
+        var board = _board = new Grid();
         _root.Children.Add(board);
 
         if (_side == 0)
         {
+            // The halves share the whole height; the stack lies over the line between them while there is one.
             board.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            board.RowDefinitions.Add(new RowDefinition { Height = new GridLength(SharedStackShare / (1 - SharedStackShare) * 2, GridUnitType.Star) });
             board.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
             var top = new TabletHalf(seat: 2, turned: true);
             var bottom = new TabletHalf(seat: 1, turned: false);
-            var band = new Grid();
-            band.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            band.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            _turnedStack!.RenderTransformOrigin = new Point(0.5, 0.5);
-            _turnedStack.RenderTransform = new RotateTransform { Angle = 180 };
-            Grid.SetRow(_stack, 1);
-            band.Children.Add(_turnedStack);
-            band.Children.Add(_stack);
-            Grid.SetRow(band, 1);
-            Grid.SetRow(bottom, 2);
+            Grid.SetRow(bottom, 1);
             board.Children.Add(top);
-            board.Children.Add(band);
             board.Children.Add(bottom);
+            Grid.SetRowSpan(_stack, 2);
+            board.Children.Add(_stack);
             _halves.Add(bottom);
             _halves.Add(top);
         }
         else
         {
             board.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            board.RowDefinitions.Add(new RowDefinition { Height = new GridLength(StackShare, GridUnitType.Star) });
-            board.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1 - StackShare, GridUnitType.Star) });
+            board.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
             var lives = new Border
             {
@@ -167,11 +158,14 @@ public sealed partial class TabletPage : UserControl
             };
             board.Children.Add(lives);
 
+            // The stack over the top of the half, the opponent's side, while there is one.
             var mine = new TabletHalf(_side, turned: false);
-            Grid.SetRow(_stack, 1);
-            Grid.SetRow(mine, 2);
-            board.Children.Add(_stack);
+            Grid.SetRow(mine, 1);
             board.Children.Add(mine);
+            _stack.VerticalAlignment = VerticalAlignment.Top;
+            _stack.Margin = new Thickness(0, 44, 0, 0);
+            Grid.SetRow(_stack, 1);
+            board.Children.Add(_stack);
             _halves.Add(mine);
         }
 
@@ -187,13 +181,10 @@ public sealed partial class TabletPage : UserControl
                 e.Handled = true;
                 TapPlayer(seat);
             };
+            half.Undo.Clicked += () => Send(new TableUndoMessage { Seat = seat });
         }
 
         MakeTappable(_stack.Board, turned: false);
-        if (_turnedStack is not null)
-        {
-            MakeTappable(_turnedStack.Board, turned: true);
-        }
 
         _turnedInspector.RenderTransformOrigin = new Point(0.5, 0.5);
         _turnedInspector.RenderTransform = new RotateTransform { Angle = 180 };
@@ -266,11 +257,11 @@ public sealed partial class TabletPage : UserControl
 
     /// <summary>Every row of cards on this tablet.</summary>
     private IEnumerable<CardBoardElement> Boards() =>
-        [.. _halves.Select(half => half.Board), _stack.Board, .. _turnedStack is null ? [] : (CardBoardElement[])[_turnedStack.Board], .. _halves.Select(half => half.Pile.Board)];
+        [.. _halves.Select(half => half.Board), _stack.Board, .. _halves.Select(half => half.Pile.Board)];
 
     /// <summary>Whether a row of cards on this tablet is turned to face seat 2 across the shared board.</summary>
     private bool IsTurned(CardBoardElement board) =>
-        board == _turnedStack?.Board || _draft.IsTurned(board) || _halves.Any(half => half.Turned && (half.Board == board || half.Pile.Board == board));
+        _draft.IsTurned(board) || _halves.Any(half => half.Turned && (half.Board == board || half.Pile.Board == board));
 
     /// <summary>The cards held up are not drawn where they lie meanwhile.</summary>
     private void Conceal()
@@ -281,11 +272,7 @@ public sealed partial class TabletPage : UserControl
             half.Pile.Board.Concealed = half.Board.Concealed;
         }
 
-        _stack.Board.Concealed = _inspector.Concealed;
-        if (_turnedStack is not null)
-        {
-            _turnedStack.Board.Concealed = _turnedInspector.Concealed;
-        }
+        _stack.Board.Concealed = _inspector.Concealed ?? _turnedInspector.Concealed;
     }
 
     /// <summary>Takes in whatever the relay has sent, and draws the board again when anything changed.</summary>
@@ -339,6 +326,11 @@ public sealed partial class TabletPage : UserControl
 
             case PublicFeedMessage feed:
                 _feed.Feed(feed.Message);
+                break;
+
+            case TableStopsMessage stops:
+                _tableStops = stops.Seats;
+                _needsRedraw = true;
                 break;
 
             case PublicGridMessage grid:
@@ -399,11 +391,24 @@ public sealed partial class TabletPage : UserControl
         _phaseScreen.Visibility = Visibility.Collapsed;
         _root.UpdateLayout();
         LayOutHalves();
-        _stack.Show(_client.Zone(ZoneKindView.Stack, 0), TurnLine(view));
-        _turnedStack?.Show(_client.Zone(ZoneKindView.Stack, 0), TurnLine(view));
+        // The stack's cards a fifth of the board's height, each facing its controller: on the shared board seat 2's side is
+        // the top, turned; on a player's own board the opponent's side is the top, and nothing is turned.
+        int opponent = view.Players.Select(player => player.Seat).FirstOrDefault(seat => seat != _side);
+        _stack.Show(
+            _client.Zone(ZoneKindView.Stack, 0),
+            (float)_board.ActualHeight * StackShare,
+            (float)_board.ActualWidth - StackChrome,
+            turnedSeat: _side == 0 ? 2 : 0,
+            upSeat: _side == 0 ? 2 : opponent);
 
+        string turnLine = TurnLine(view);
         foreach (TabletHalf half in _halves)
         {
+            half.Phase.Show(view, turnLine, _tableStops);
+
+            // Undo on the side of the player with priority, for their phone to take back a mana ability.
+            half.Undo.Visibility = Connected && _client.Outcome is null && view.PriorityPlayer == half.Seat ? Visibility.Visible : Visibility.Collapsed;
+
             if (view.Players.FirstOrDefault(player => player.Seat == half.Seat) is { } player)
             {
                 UpdateRail(half, player, view);
@@ -438,26 +443,9 @@ public sealed partial class TabletPage : UserControl
             return winner is null ? "Game over" : $"Game over · {winner} wins";
         }
 
-        string turn = $"Turn {view.Turn} · {TabletLayout.NameOf(_client, view.ActivePlayer)}\n{StepName(view.Step)}";
-        return Connected ? turn : $"{turn}\nReconnecting…";
+        string turn = $"Turn {view.Turn} · {TabletLayout.NameOf(_client, view.ActivePlayer)}";
+        return Connected ? turn : $"{turn} · Reconnecting…";
     }
-
-    private static string StepName(TurnStepView step) => step switch
-    {
-        TurnStepView.Untap => "Untap",
-        TurnStepView.Upkeep => "Upkeep",
-        TurnStepView.Draw => "Draw",
-        TurnStepView.PrecombatMain => "Main 1",
-        TurnStepView.BeginCombat => "Beginning of combat",
-        TurnStepView.DeclareAttackers => "Declare attackers",
-        TurnStepView.DeclareBlockers => "Declare blockers",
-        TurnStepView.CombatDamage => "Combat damage",
-        TurnStepView.EndOfCombat => "End of combat",
-        TurnStepView.PostcombatMain => "Main 2",
-        TurnStepView.End => "End step",
-        TurnStepView.Cleanup => "Cleanup",
-        _ => step.ToString(),
-    };
 
     /// <summary>
     /// Both halves at one card size, the largest at which every half's rows fit its height and width; combat groups taken
@@ -662,21 +650,17 @@ public sealed partial class TabletPage : UserControl
             return;
         }
 
-        // On the shared board an arrow starts from the strip of the stack nearest what it points at.
-        SKRect? turnedSource = _turnedStack is null ? null : Box(_turnedStack.Board, stack[^1].Handle);
         List<(SKPoint From, SKPoint To)> arrows = [];
         foreach (SpellTargetView target in stack[^1].Targets)
         {
             TabletHalf? playerHalf = target.IsPlayer ? _halves.FirstOrDefault(half => half.Seat == target.Player) : null;
-            CardBoardElement? holder = target.IsPlayer ? null : Boards().Where(board => board != _stack.Board && board != _turnedStack?.Board)
+            CardBoardElement? holder = target.IsPlayer ? null : Boards().Where(board => board != _stack.Board)
                 .FirstOrDefault(board => Box(board, target.Object) is not null);
             SKRect? box = !target.StillLegal ? null
                 : playerHalf is { } half ? BoxOf(half.Rail.Avatar, new Rect(0, 0, half.Rail.Avatar.ActualWidth, half.Rail.Avatar.ActualHeight))
                 : target.IsPlayer ? null
                 : holder is not null ? Box(holder, target.Object) : Box(_stack.Board, target.Object);
-            bool towardsTop = target.IsPlayer ? playerHalf?.Turned == true : holder is not null && IsTurned(holder);
-            SKRect source = towardsTop && turnedSource is { } turned ? turned : upright;
-            var from = new SKPoint(source.MidX, source.MidY);
+            var from = new SKPoint(upright.MidX, upright.MidY);
             if (box is { } to)
             {
                 arrows.Add((from, TargetArrowsElement.Edge(to, from)));
@@ -749,6 +733,12 @@ public sealed partial class TabletPage : UserControl
             {
                 PutDown();
             }
+            else if (board == _draft.Board)
+            {
+                // A card of the draft's grid tapped is held up to read, filling the screen, until the next tap anywhere: its
+                // row or column is picked with the line's button.
+                LookAt(press.Board, press.Handle);
+            }
             else
             {
                 TapCard(press.Handle);
@@ -799,8 +789,19 @@ public sealed partial class TabletPage : UserControl
             return;
         }
 
+        // A spell on the stack turned to face seat 2 is held up for them, by the turned layer, as their half's cards are.
+        if (board == _stack.Board && Math.Abs((((angle % 360f) + 360f) % 360f) - 180f) < 45f)
+        {
+            turned = true;
+            angle -= 180f;
+        }
+
         CardInspector inspector = turned ? _turnedInspector : _inspector;
         CardTooltip tooltip = turned ? _turnedTooltip : _tooltip;
+
+        // The draft's cards are read at the screen's whole size, a card at a time; a card of the game's board is held up
+        // beside where it lies, leaving the rest of the board in view for the player across the table.
+        inspector.Fills = board == _draft.Board;
         inspector.Inspect(card, board.TransformToVisual(inspector).TransformBounds(box), angle);
         if (at is { } pressed)
         {
@@ -808,9 +809,32 @@ public sealed partial class TabletPage : UserControl
         }
     }
 
+    /// <summary>
+    /// A card held up by a tap rather than a press, until the next tap anywhere puts it down: what catches that tap, over
+    /// everything the card covers, so the tap that ends the look does nothing else - picks no row of the grid under it.
+    /// </summary>
+    private readonly Border _lookCatcher = new()
+    {
+        Background = new SolidColorBrush(Windows.UI.Color.FromArgb(150, 0, 0, 0)),
+        Visibility = Visibility.Collapsed,
+    };
+
+    /// <summary>Holds a card up by a tap: it stays up until the next tap.</summary>
+    private void LookAt(CardBoardElement board, ViewHandle handle)
+    {
+        if (board.Bounds(handle) is not { } box || board.Placement(handle) is not { } placed)
+        {
+            return;
+        }
+
+        Inspect(board, IsTurned(board), handle, box, placed.Angle, null);
+        _lookCatcher.Visibility = Visibility.Visible;
+    }
+
     /// <summary>Puts down whatever card is held up.</summary>
     private void PutDown()
     {
+        _lookCatcher.Visibility = Visibility.Collapsed;
         _inspector.Release();
         _turnedInspector.Release();
         _tooltip.Hide();
@@ -852,6 +876,10 @@ public sealed partial class TabletPage : UserControl
                 if (message is TableTapMessage tap)
                 {
                     _sent.Add(tap);
+                }
+                else if (message is TableUndoMessage undo)
+                {
+                    _undos.Add(undo.Seat);
                 }
             };
             _isConnected = () => true;

@@ -21,10 +21,18 @@ public sealed class TabletHalf : Grid
         ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
+        // The turn along the half's edge nearest the middle of the table: the top of its own frame, which the turned half
+        // turns to face the middle too.
+        RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        Phase = new TabletPhaseStrip(seat);
+        Grid.SetColumnSpan(Phase, 2);
+        Children.Add(Phase);
+
         // The rail at its own size where the half is tall enough, and shrunk whole where it is not - the shared board's
         // halves are half as tall as a remote table's - so its piles and counts are never cut off.
         Rail = new PlayerRail(showsHandFan: true);
-        Children.Add(new Border
+        var railBox = new Border
         {
             Background = Theme.Brush(Theme.RailIdle),
             BorderBrush = Theme.Brush(Theme.Line),
@@ -36,7 +44,9 @@ public sealed class TabletHalf : Grid
                 VerticalAlignment = VerticalAlignment.Top,
                 Child = Rail,
             },
-        });
+        };
+        Grid.SetRow(railBox, 1);
+        Children.Add(railBox);
 
         Board = new CardBoardElement(BoardRows.StandardCardWidth, BoardRows.CardHeight(BoardRows.StandardCardWidth)) { Slides = PlayerSettings.AnimateCards };
         Badges = new Canvas { IsHitTestVisible = false };
@@ -49,12 +59,29 @@ public sealed class TabletHalf : Grid
         Area.Children.Add(Badges);
         Area.SizeChanged += (_, e) => Area.Clip = new RectangleGeometry { Rect = new Windows.Foundation.Rect(0, 0, e.NewSize.Width, e.NewSize.Height) };
         Grid.SetColumn(Area, 1);
+        Grid.SetRow(Area, 1);
         Children.Add(Area);
 
         // A graveyard or exile opened from the rail lies over the battlefield, turned with the half.
         Pile = new TabletPile();
         Grid.SetColumn(Pile, 1);
+        Grid.SetRow(Pile, 1);
         Children.Add(Pile);
+
+        // Undo, in the corner of the half nearest its player's right hand, while that player has priority: the relay hands
+        // it to their phone, which takes back their last mana ability if it may (TableUndoMessage).
+        Undo = new DockButton("Undo", primary: false, fontSize: 16).Filling();
+        Undo.MinWidth = 110;
+        Undo.MinHeight = 48;
+        Undo.HorizontalAlignment = HorizontalAlignment.Right;
+        Undo.VerticalAlignment = VerticalAlignment.Bottom;
+        Undo.Margin = new Thickness(0, 0, 14, 14);
+        Undo.Visibility = Visibility.Collapsed;
+        Undo.Tooltip = "Take back the last mana ability";
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(Undo, "Undo");
+        Grid.SetColumn(Undo, 1);
+        Grid.SetRow(Undo, 1);
+        Children.Add(Undo);
 
         if (turned)
         {
@@ -70,6 +97,12 @@ public sealed class TabletHalf : Grid
     public bool Turned { get; }
 
     public PlayerRail Rail { get; }
+
+    /// <summary>The turn, its steps and the table's stops, along the half's edge nearest the middle.</summary>
+    public TabletPhaseStrip Phase { get; }
+
+    /// <summary>The seat's Undo, shown while it has priority.</summary>
+    public DockButton Undo { get; }
 
     public CardBoardElement Board { get; }
 

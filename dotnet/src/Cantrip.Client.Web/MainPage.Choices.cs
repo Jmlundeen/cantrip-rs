@@ -11,10 +11,35 @@ namespace Cantrip.Client.Web;
 /// </summary>
 public sealed partial class MainPage
 {
-    private const int ChoiceColumns = 5;
+    private const int DefaultChoiceColumns = 5;
     private const int ChoiceRows = 3;
     private const float ChoiceGap = 8f;
     private const float MinChoiceWidth = 380f;
+
+    /// <summary>
+    /// How many cards across the window is: five, or on a phone - where the window fills the screen - as many as fit at the
+    /// height the screen leaves a row of them, so the cards are as large as the phone allows.
+    /// </summary>
+    private int ChoiceColumns
+    {
+        get
+        {
+            if (!IsPhone || Root.ActualHeight <= 0)
+            {
+                return DefaultChoiceColumns;
+            }
+
+            float tall = MathF.Max(120f, ChoiceRoom());
+            float wide = MathF.Floor(tall * 63f / 88f);
+            float across = ChoiceWidth() - 28f - 14f;
+            return Math.Clamp((int)MathF.Floor((across + ChoiceGap) / (wide + ChoiceGap)), 3, 12);
+        }
+    }
+
+    /// <summary>How tall a phone leaves the window's cards: the screen, less the prompt over them and the buttons under them.</summary>
+    private float ChoiceRoom() =>
+        (float)(Root.ActualHeight - Root.Padding.Top - Root.Padding.Bottom) - 24f - (_choicePrompted ? 150f : 60f)
+        - (_choicePicked.Visibility == Visibility.Visible ? 90f : 0f);
 
     private Grid _choiceHost = null!;
     private TextBlock _choiceTitle = null!;
@@ -419,6 +444,12 @@ public sealed partial class MainPage
     /// </summary>
     private float ChoiceWidth()
     {
+        // A phone's window is the screen's whole width.
+        if (IsPhone && Root.ActualWidth > 0)
+        {
+            return (float)(Root.ActualWidth - Root.Padding.Left - Root.Padding.Right);
+        }
+
         float board = MathF.Max(0f, (float)_table.ActualWidth - BoardInset());
         float wanted = _choiceDragFrom is not null ? _choiceDragWidth : _choiceKept > 0f ? _choiceKept : board * 0.62f;
         return ClampChoiceWidth(wanted);
@@ -457,7 +488,7 @@ public sealed partial class MainPage
             grip.Visibility = _choiceCollapsed ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        _choiceHost.Margin = new Thickness(BoardInset(), 0, 0, 0);
+        _choiceHost.Margin = IsPhone ? new Thickness(0) : new Thickness(BoardInset(), 0, 0, 0);
         _choiceClose.Visibility = _choicePrompted ? Visibility.Collapsed : Visibility.Visible;
         _choiceHost.Width = _choiceCollapsed ? double.NaN : width;
 
@@ -468,7 +499,7 @@ public sealed partial class MainPage
         int rows = Math.Max(1, (_choiceCount + ChoiceColumns - 1) / ChoiceColumns);
         float above = _choicePicked.Visibility == Visibility.Visible ? MathF.Round(cardWidth * 0.75f * 88f / 63f) + 16f - 30f : 0f;
         float tall = (Math.Min(rows, ChoiceRows) * (cardHeight + ChoiceGap)) - ChoiceGap + (rows <= ChoiceRows ? _choiceHeadingsHeight : 0f);
-        float room = (float)_table.ActualHeight - 40f - (_choicePrompted ? 190f : 70f) - above;
+        float room = IsPhone ? ChoiceRoom() : (float)_table.ActualHeight - 40f - (_choicePrompted ? 190f : 70f) - above;
         _choiceScroll.Height = _choiceTall ?? MathF.Max(MathF.Min(cardHeight, room), MathF.Min(tall, room));
 
         float gridWidth = (ChoiceColumns * cardWidth) + ((ChoiceColumns - 1) * ChoiceGap);

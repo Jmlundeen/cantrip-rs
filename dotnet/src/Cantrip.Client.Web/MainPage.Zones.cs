@@ -166,7 +166,13 @@ public sealed partial class MainPage
 
     private float ClampGraveyardWidth(float width)
     {
-        float room = (float)_table.ActualWidth - (float)PlayerRail.RailWidth - MinBoardWidth;
+        // A phone's player view is the rail and the graveyard beside it, with no battlefield to leave room for.
+        float room = (float)_table.ActualWidth - (float)PlayerRail.RailWidth - (IsPhone ? 0f : MinBoardWidth);
+        if (IsPhone && _phoneView.View == PhoneView.Player && room > 0f)
+        {
+            return room;
+        }
+
         return Math.Clamp(
             width,
             PlayerSettings.MinGraveyardWidth,

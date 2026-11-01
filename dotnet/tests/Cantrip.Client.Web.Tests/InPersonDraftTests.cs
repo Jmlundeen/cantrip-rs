@@ -10,7 +10,7 @@ namespace Cantrip.Client.Web.Tests;
 /// In-person play's grid draft (docs/in-person.md, "The grid draft"), drafted by touch on the tablets: a real in-person
 /// server (<see cref="InPersonHost"/>) hosting a short grid draft, both players' phones at their seats showing "Pick on the
 /// table" with their pools, and the tablets - one shared board, or one for each player - where every row and column is
-/// picked with a finger: tapped once to choose it, and again (or Take) to take it. Each pick goes through the relay to the
+/// picked with a finger: tapped once to choose it, and Pick to take it. Each pick goes through the relay to the
 /// picker's phone, which sends it to the table as its own, and the table's record of the draft is checked after each.
 /// Then deck building, on the phones.
 /// </summary>
@@ -145,8 +145,10 @@ public sealed class InPersonDraftTests(WebClient web)
     /// <summary>
     /// Every pick of the draft made on a tablet: the face for the picker has its lines live, the other player's tablet none;
     /// the shared tablet's one face is turned to face seat 2 on seat 2's pick and upright for seat 1 on theirs. The first line with cards is tapped to choose it -
-    /// lit on the tablet, and chosen through the picker's phone - then taken, with a second tap on it on even picks and
-    /// with Take on odd ones. The table's draft must move on to the next pick, with the cards in the picker's pool.
+    /// lit on the tablet, and chosen through the picker's phone - then taken with Pick. On the first pick the line is tapped a
+    /// second time first, which chooses it no longer, and a third time to choose it again. A card of the grid tapped is held
+    /// up to read, filling the screen, and a tap anywhere puts it down without picking anything. The table's draft must move
+    /// on to the next pick, with the cards in the picker's pool.
     /// </summary>
     private static async Task PlayDraftAsync(EventStore store, string eventId, InPersonHost host, List<TabletDriver> tablets, List<TablePage> phones)
     {
@@ -203,9 +205,29 @@ public sealed class InPersonDraftTests(WebClient web)
 
             await phones[active - 1].SettledAsync(state => state.InPerson!.Lines?.Any(each => each.Decision == decision && each.Line == line.Line && !each.Take) == true);
 
-            TabletGridButton take = picks % 2 == 0
-                ? chosen.Grid!.Faces.Single(each => Picks(each, active)).Buttons.Single(button => button.Line == line.Line)
-                : chosen.Grid!.Faces.Single(each => Picks(each, active)).Buttons.Single(button => button.Line < 0);
+            if (picks == 0)
+            {
+                // The chosen line tapped again is chosen no longer, and Pick takes nothing; a third tap chooses it again.
+                await tablet.TapAsync(line.X, line.Y);
+                TabletState unchosen = await tablet.SettledAsync(state => state.Grid!.Faces.Single(each => Picks(each, active)).Buttons.All(button => !button.Chosen));
+                Assert.False(unchosen.Grid!.Faces.Single(each => Picks(each, active)).Buttons.Single(button => button.Line < 0).Enabled, "Pick is live with no line chosen.");
+                Assert.Equal(decision, Drafted(store, eventId).Decision);
+
+                // A card tapped is held up to read, the screen's size; a tap anywhere puts it down and picks nothing.
+                TabletCard card = unchosen.Cards.First(each => each.Place is "grid" or "opponent-grid" && each.Visible);
+                await tablet.TapAsync(card.X, card.Y);
+                await tablet.SettledAsync(state => state.Held > 0);
+                await tablet.PictureAsync("card-looked-at");
+                await tablet.TapAsync(line.X, line.Y);
+                await tablet.SettledAsync(state => state.Held == 0);
+                Assert.All((await tablet.SettledAsync()).Grid!.Faces.SelectMany(each => each.Buttons), button => Assert.False(button.Chosen, $"{button.Label} was chosen by the tap that put the card down."));
+
+                await tablet.TapAsync(line.X, line.Y);
+                chosen = await tablet.SettledAsync(state => state.Grid!.Faces.Single(each => Picks(each, active)).Buttons.Any(button => button.Line == line.Line && button.Chosen));
+            }
+
+            TabletGridButton take = chosen.Grid!.Faces.Single(each => Picks(each, active)).Buttons.Single(button => button.Line < 0);
+            Assert.StartsWith("Pick", take.Label, StringComparison.Ordinal);
             Assert.True(take.Enabled, $"{take.Label} is not live once {line.Label} is chosen.");
             await tablet.TapAsync(take.X, take.Y);
             if (picks == 0)

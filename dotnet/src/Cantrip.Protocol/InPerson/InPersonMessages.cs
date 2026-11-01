@@ -10,7 +10,7 @@ namespace Cantrip.Protocol.InPerson;
 public static class InPersonProtocol
 {
     /// <summary>The in-person wire's version, sent in every <see cref="DeviceHelloMessage"/>; a mismatch is refused.</summary>
-    public const int Version = 3;
+    public const int Version = 4;
 }
 
 /// <summary>What a device is at the table.</summary>
@@ -31,6 +31,8 @@ public enum DeviceRole
 [Union(2, typeof(TapResultMessage))]
 [Union(3, typeof(TableLineMessage))]
 [Union(8, typeof(ReentryRequestMessage))]
+[Union(9, typeof(TableUndoMessage))]
+[Union(10, typeof(SeatStopsMessage))]
 public abstract class DeviceClientMessage
 {
     public abstract string Describe();
@@ -155,6 +157,8 @@ public sealed class TableLineMessage : DeviceClientMessage
 [Union(5, typeof(PublicGridMessage))]
 [Union(6, typeof(SeatLineMessage))]
 [Union(8, typeof(ReentryCodeMessage))]
+[Union(9, typeof(SeatUndoMessage))]
+[Union(10, typeof(TableStopsMessage))]
 public abstract class DeviceServerMessage
 {
     public abstract string Describe();
@@ -358,4 +362,69 @@ public sealed class SeatLineMessage : DeviceServerMessage
     public bool Take { get; set; }
 
     public override string Describe() => $"seat line {Line} for pick {Decision}{(Take ? ", take" : ", choose")}";
+}
+
+/// <summary>
+/// A tablet's Undo, tapped on the side of the player with priority: the relay hands it to that player's phone
+/// (<see cref="SeatUndoMessage"/>), which takes back its last mana ability as its own Undo does, if it may. A player's
+/// own board undoes only for that player. Nothing about it is sent back to a tablet.
+/// </summary>
+[MessagePackObject]
+public sealed class TableUndoMessage : DeviceClientMessage
+{
+    /// <summary>The seat whose side the button was tapped on: the player with priority as the tablet was shown.</summary>
+    [Key(0)]
+    public int Seat { get; set; }
+
+    public override string Describe() => $"table undo for seat {Seat}";
+}
+
+/// <summary>A tablet's Undo, for the phone of the player it was tapped for: the phone's own Undo, if it has one now.</summary>
+[MessagePackObject]
+public sealed class SeatUndoMessage : DeviceServerMessage
+{
+    public override string Describe() => "seat undo";
+}
+
+/// <summary>
+/// The steps a phone's player has set stops in (docs/in-person.md, "Stops"): on their own turn and on the opponent's, as
+/// <see cref="TurnStepView"/> values. Sent on the phone's welcome and whenever they change; the relay tells every device
+/// (<see cref="TableStopsMessage"/>), since at an in-person table a stop is the table's: every player stops at it.
+/// </summary>
+[MessagePackObject]
+public sealed class SeatStopsMessage : DeviceClientMessage
+{
+    [Key(0)]
+    public List<TurnStepView> Mine { get; set; } = [];
+
+    [Key(1)]
+    public List<TurnStepView> Theirs { get; set; } = [];
+
+    public override string Describe() => $"stops: {Mine.Count} on own turn, {Theirs.Count} on the opponent's";
+}
+
+/// <summary>One seat's stops, as its phone last said them.</summary>
+[MessagePackObject]
+public sealed class SeatStops
+{
+    [Key(0)]
+    public int Seat { get; set; }
+
+    /// <summary>The steps of this seat's own turn it stops in.</summary>
+    [Key(1)]
+    public List<TurnStepView> Mine { get; set; } = [];
+
+    /// <summary>The steps of an opponent's turn it stops in.</summary>
+    [Key(2)]
+    public List<TurnStepView> Theirs { get; set; } = [];
+}
+
+/// <summary>Every seat's stops, as their phones last said them: for the phones to stop where anyone does, and the tablets to show.</summary>
+[MessagePackObject]
+public sealed class TableStopsMessage : DeviceServerMessage
+{
+    [Key(0)]
+    public List<SeatStops> Seats { get; set; } = [];
+
+    public override string Describe() => $"table stops for {Seats.Count} seats";
 }

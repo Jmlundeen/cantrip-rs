@@ -240,7 +240,7 @@ public sealed class PhaseTimelineControl : Border
 
     private Border StopRow(TurnStepView step, string text, bool mine)
     {
-        bool on = _stops.StopsAt(step, mine);
+        bool on = _stops.OwnStopAt(step, mine);
         Color tint = mine ? Theme.Mine : Theme.Theirs;
 
         // StopDot at 12: filled while on, a ring while off.

@@ -39,8 +39,11 @@ public sealed class TablePage : IAsyncDisposable
     /// </summary>
     public bool Phone { get; }
 
-    /// <summary>A phone held upright, as the in-person tests open one: a common handset's size in CSS pixels.</summary>
+    /// <summary>A phone held upright, as the in-person tests open one for the draft: a common handset's size in CSS pixels.</summary>
     public static readonly ViewportSize PhoneViewport = new() { Width = 390, Height = 844 };
+
+    /// <summary>The same phone held sideways, as a player holds it for their games.</summary>
+    public static readonly ViewportSize PhoneSideways = new() { Width = 844, Height = 390 };
 
     /// <summary>A click at a point, as a person makes it: a tap with a finger on a phone's page, the mouse's left button elsewhere.</summary>
     public Task TapAsync(float x, float y) => Phone ? Page.Touchscreen.TapAsync(x, y) : Page.Mouse.ClickAsync(x, y);
@@ -61,8 +64,9 @@ public sealed class TablePage : IAsyncDisposable
         string pictures,
         IReadOnlyDictionary<string, string>? settings = null,
         IReadOnlyDictionary<string, string>? storage = null,
-        bool phone = false) =>
-        OpenAsync(web.Browser, web.Site, query, pictures, settings, storage, phone: phone);
+        bool phone = false,
+        bool sideways = false) =>
+        OpenAsync(web.Browser, web.Site, query, pictures, settings, storage, phone: phone, sideways: sideways);
 
     /// <summary>
     /// Opens the client served from another site than the suite's own - one with more behind it, as the deck editor's
@@ -76,12 +80,13 @@ public sealed class TablePage : IAsyncDisposable
         IReadOnlyDictionary<string, string>? settings = null,
         IReadOnlyDictionary<string, string>? storage = null,
         IEnumerable<KeyValuePair<string, string>>? headers = null,
-        bool phone = false)
+        bool phone = false,
+        bool sideways = false)
     {
         // A phone's page is a phone's size even headed, on a touch screen, as a phone's browser lays it out.
         IBrowserContext context = await browser.NewContextAsync(new BrowserNewContextOptions
         {
-            ViewportSize = phone ? PhoneViewport
+            ViewportSize = phone ? sideways ? PhoneSideways : PhoneViewport
                 : WebClient.Headed ? ViewportSize.NoViewport : new ViewportSize { Width = WebClient.Width, Height = WebClient.Height },
             HasTouch = phone,
             IsMobile = phone,
@@ -342,7 +347,13 @@ public sealed record InPersonState(
     string Refusal,
     PhoneDeckState? Deck = null,
     PhoneDraftState? Draft = null,
-    IReadOnlyList<PhoneLineState>? Lines = null);
+    IReadOnlyList<PhoneLineState>? Lines = null,
+    string View = "",
+    bool Drawer = false,
+    IReadOnlyList<PhoneStopState>? Stops = null);
+
+/// <summary>A button of the phone's Stops view: its name ("Stop: Upkeep, my turn") and whether the stop is set.</summary>
+public sealed record PhoneStopState(string Name, bool On);
 
 /// <summary>
 /// A phone's screen during the grid draft (InPerson/PhonePickScreen.cs): whether it is up, whether the pick is this seat's,

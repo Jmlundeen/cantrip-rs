@@ -141,6 +141,9 @@ public sealed class InPersonRelay : IStepObserver
     private PublicGridMessage? _grid;
     private byte[] _gridSent = [];
 
+    // Each seat's stops, as its phone last said them: at an in-person table a stop is the table's, every player stopping at it.
+    private readonly SortedDictionary<int, SeatStops> _stops = [];
+
     public InPersonRelay(InPersonRelayOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -293,6 +296,12 @@ public sealed class InPersonRelay : IStepObserver
                     break;
                 case TableLineMessage line when device.As is { Role: DeviceRole.Tablet } tablet:
                     TableLine(tablet, line);
+                    break;
+                case TableUndoMessage undo when device.As is { Role: DeviceRole.Tablet } tablet:
+                    TableUndo(tablet, undo);
+                    break;
+                case SeatStopsMessage stops when device.As is { Role: DeviceRole.Phone } phone:
+                    TakeStops(phone.Seat, stops);
                     break;
                 case { } when device.As is null:
                     Refuse(device, ErrorCode.MembershipRequired, "A device says who it is first.");
@@ -529,6 +538,11 @@ public sealed class InPersonRelay : IStepObserver
             CatchUp(device);
         }
 
+        if (_stops.Count > 0)
+        {
+            device.Send(StopsMessage());
+        }
+
         PhaseChanged();
     }
 
@@ -633,6 +647,41 @@ public sealed class InPersonRelay : IStepObserver
 
         phone.Send(new SeatLineMessage { Decision = line.Decision, Line = line.Line, Take = line.Take });
     }
+
+    /// <summary>
+    /// A tablet's Undo: handed to the phone of the player with priority, the side it was tapped on, which takes back its last
+    /// mana ability if its own Undo may. A player's own board undoes only for that player; the table judges the answer.
+    /// </summary>
+    private void TableUndo(Identity tablet, TableUndoMessage undo)
+    {
+        if (_view is not { } view || _over is not null) return;
+        int seat = undo.Seat;
+        if (seat < 1 || seat > _phones.Count || seat != view.PriorityPlayer || (tablet.Side != 0 && tablet.Side != seat)) return;
+        _phones[seat - 1].Device?.Send(new SeatUndoMessage());
+    }
+
+    /// <summary>The most steps a seat's stops name on each side of the turn: every step there is, and no more.</summary>
+    private static readonly int MostStops = Enum.GetValues<TurnStepView>().Length;
+
+    /// <summary>A phone's stops, kept for its seat and told to every device: the phones stop where anyone does, the tablets show them.</summary>
+    private void TakeStops(int seat, SeatStopsMessage stops)
+    {
+        static List<TurnStepView>? Steps(List<TurnStepView>? steps) =>
+            steps is null || steps.Count > MostStops || steps.Any(step => !Enum.IsDefined(step)) ? null : [.. steps.Distinct().Order()];
+
+        if (Steps(stops.Mine) is not { } mine || Steps(stops.Theirs) is not { } theirs) return;
+        _stops[seat] = new SeatStops { Seat = seat, Mine = mine, Theirs = theirs };
+        TableStopsMessage message = StopsMessage();
+        foreach (RelayDevice device in _phones.Concat(_tablets.Select(each => each.Tablet)).Select(each => each.Device).OfType<RelayDevice>().ToList())
+        {
+            device.Send(message);
+        }
+    }
+
+    private TableStopsMessage StopsMessage() => new()
+    {
+        Seats = [.. _stops.Values.Select(each => new SeatStops { Seat = each.Seat, Mine = [.. each.Mine], Theirs = [.. each.Theirs] })],
+    };
 
     /// <summary>The places in the grid of a line: a row, 0 to 2, or a column, 3 to 5.</summary>
     private static IEnumerable<int> GridPlaces(int line) => line < 3

@@ -76,8 +76,14 @@ internal static partial class FullScreenBridge
     public static string? Reentry =>
         JSHost.GlobalThis.GetPropertyAsString("cantripReentry") is { Length: > 0 } code ? code : null;
 
-    /// <summary>Asks for the whole screen, from a tap: a tablet then locked to landscape, a phone upright, where allowed.</summary>
+    /// <summary>Asks for the whole screen, from a tap: then locked sideways or upright, where allowed.</summary>
     public static void Enter(bool landscape) => Call(() => EnterFullScreen(landscape));
+
+    /// <summary>
+    /// Locks the screen sideways or upright while the page is full screen, where the browser allows a lock (Android's);
+    /// nothing anywhere else, and nothing while the page is not full screen.
+    /// </summary>
+    public static void Lock(bool landscape) => Call(() => LockOrientation(landscape));
 
     public static void Exit() => Call(ExitFullScreen);
 
@@ -108,6 +114,9 @@ internal static partial class FullScreenBridge
     [JSImport("globalThis.cantripFullScreenEnter")]
     private static partial void EnterFullScreen(bool landscape);
 
+    [JSImport("globalThis.cantripFullScreenLock")]
+    private static partial void LockOrientation(bool landscape);
+
     [JSImport("globalThis.cantripFullScreenExit")]
     private static partial void ExitFullScreen();
 
@@ -135,7 +144,7 @@ public sealed class FullScreenButton : Grid
     private readonly Canvas _icon = new() { Width = 20, Height = 20 };
     private readonly Border _help;
     private readonly TextBlock _helpStatus;
-    private readonly bool _landscape;
+    private bool _landscape;
     private readonly Action<Thickness> _pad;
     private readonly Func<bool>? _askReentry;
     private readonly DispatcherTimer _follow = new() { Interval = TimeSpan.FromMilliseconds(250) };
@@ -143,10 +152,27 @@ public sealed class FullScreenButton : Grid
     private Thickness _insets = new(-1);
     private string? _code;
 
-    /// <param name="landscape">Whether the page is a tablet's, locked to landscape in full screen; a phone's is upright.</param>
+    /// <param name="landscape">Whether the page is locked sideways in full screen, rather than upright (<see cref="Landscape"/>).</param>
     /// <param name="corner">Where the button sits on the page, and how far it is kept from the edges.</param>
     /// <param name="pad">Pads the page by the safe-area insets, whenever they change.</param>
     /// <param name="askReentry">A phone's: asks the relay for a re-entry code, saying whether the ask went out.</param>
+    /// <summary>
+    /// Whether the page is held sideways in full screen: a tablet always, a phone for its games and upright for the draft and
+    /// deck building. Set anew, it locks the screen the new way at once where the browser allows it.
+    /// </summary>
+    public bool Landscape
+    {
+        get => _landscape;
+        set
+        {
+            if (value != _landscape)
+            {
+                _landscape = value;
+                FullScreenBridge.Lock(value);
+            }
+        }
+    }
+
     public FullScreenButton(bool landscape, (HorizontalAlignment Horizontal, VerticalAlignment Vertical, Thickness Margin) corner, Action<Thickness> pad, Func<bool>? askReentry = null)
     {
         _landscape = landscape;

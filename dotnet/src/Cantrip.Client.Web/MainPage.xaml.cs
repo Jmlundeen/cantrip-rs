@@ -1023,6 +1023,13 @@ public sealed partial class MainPage : Page
             widest = Math.Max(widest, child.DesiredSize.Width);
         }
 
+        // A phone's prompt is a column of its own down the right, as wide as a share of the phone.
+        if (IsPhone)
+        {
+            _dock.Width = PhoneDockWidth();
+            return;
+        }
+
         // The dock's padding either side and its hairline on the left.
         _dock.Width = Math.Max(DockWidth, Math.Ceiling(widest) + 32 + 1);
     }
@@ -1209,6 +1216,13 @@ public sealed partial class MainPage : Page
     private float ClampStackHeight(float height)
     {
         float room = _table is null || _table.ActualHeight <= 0 ? MaxStackHeight : (float)_table.ActualHeight - 40f - StackChrome;
+
+        // A phone's stack is a view of its own, its cards as tall as the view.
+        if (IsPhone && room > MinStackHeight)
+        {
+            return room;
+        }
+
         return Math.Clamp(height, MinStackHeight, MathF.Max(MinStackHeight, MathF.Min(MaxStackHeight, room)));
     }
 
@@ -1894,7 +1908,8 @@ public sealed partial class MainPage : Page
     /// </summary>
     private void SetHandHeight(float height)
     {
-        float most = MathF.Max(MinHandHeight, (float)Root.ActualHeight * 0.5f);
+        // Half the window at most; a phone's hand has the phone's whole height to itself (MainPage.PhoneViews.cs).
+        float most = MathF.Max(MinHandHeight, (float)Root.ActualHeight * (IsPhone ? 1f : 0.5f));
         height = MathF.Round(Math.Clamp(height, MinHandHeight, Root.ActualHeight > 0 ? most : float.MaxValue));
         if (height == _handHeight)
         {
@@ -2149,6 +2164,10 @@ public sealed partial class MainPage : Page
     {
         _stackItems = [.. stack];
         _stackOverlay.Visibility = stack.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        if (IsPhone)
+        {
+            FollowPhoneStack(stack.Count);
+        }
         _stackTitle.Text = stack.Count == 1 ? "Stack" : $"Stack  ·  {stack.Count}";
 
         // Open while triggers are being put on it, since that is where each one clicked goes.

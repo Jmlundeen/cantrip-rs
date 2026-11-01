@@ -519,6 +519,18 @@ public sealed partial class MainPage
         json.WriteStartObject("inPerson");
         json.WriteString("role", "phone");
         json.WriteBoolean("board", _boardShown);
+        json.WriteString("view", PhoneViewName());
+        json.WriteBoolean("drawer", _drawer?.Visibility == Visibility.Visible);
+        json.WriteStartArray("stops");
+        foreach ((string name, bool on) in _phoneStops?.Buttons() ?? [])
+        {
+            json.WriteStartObject();
+            json.WriteString("name", name);
+            json.WriteBoolean("on", on);
+            json.WriteEndObject();
+        }
+
+        json.WriteEndArray();
         json.WriteNumber("waiting", _tableTaps.Count);
         json.WriteStartArray("taps");
         foreach ((SeatTapMessage tap, bool used, bool held) in _tableTapsSettled)

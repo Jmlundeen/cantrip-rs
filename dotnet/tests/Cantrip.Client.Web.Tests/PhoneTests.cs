@@ -4,7 +4,7 @@ namespace Cantrip.Client.Web.Tests;
 
 /// <summary>
 /// A player's phone at an in-person table (docs/in-person.md, docs/web-client.md "In-person play"): the ordinary page opened
-/// with <c>?inperson=phone</c>, upright at a phone's size on a touch screen, with the battlefield on the tablets. Scenarios
+/// with <c>?inperson=phone</c>, held sideways at a phone's size on a touch screen, with the battlefield on the tablets. Scenarios
 /// played with Bot1 that phone (<see cref="ScenarioPlayer"/> with <c>phone</c>): the hand and the dock tapped with a finger,
 /// and every permanent and player tapped on a tablet instead, handed to the phone as the relay hands it a tap
 /// (<c>globalThis.cantripTableTaps</c>, the page's test-only stand-in for the relay). The table judges each answer against
@@ -38,6 +38,18 @@ public sealed class PhoneTests(WebClient web)
     public async Task Fireball_is_aimed_at_a_player_and_paid_for_with_lands_tapped_on_the_table()
     {
         const string name = "fireball-x-announced-on-the-page-and-paid-with-the-lands-planned-for-it-in-the-browser";
+        string? failure = await ScenarioPlayer.PlayAsync(web, Scenario(name), phone: true);
+        Assert.True(failure is null, $"{name}:\n{failure}");
+    }
+
+    /// <summary>
+    /// Archdruid's Charm searching the library for a creature: the search is a choice of cards, which fills the phone rather
+    /// than a corner of a view, and the creature is tapped in it with a finger.
+    /// </summary>
+    [Fact]
+    public async Task A_library_search_fills_the_phone()
+    {
+        const string name = "archdruids-charm-searches-for-a-creature-and-puts-it-into-the-hand";
         string? failure = await ScenarioPlayer.PlayAsync(web, Scenario(name), phone: true);
         Assert.True(failure is null, $"{name}:\n{failure}");
     }

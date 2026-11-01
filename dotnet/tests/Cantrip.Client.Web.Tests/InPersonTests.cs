@@ -72,14 +72,29 @@ public sealed class InPersonTests(WebClient web)
             tapped = await shared.SettledAsync(state => state.Taps.Count == 3);
             Assert.Equal((0, 2), (tapped.Taps[2].Object, tapped.Taps[2].Player));
 
-            // The shared board's band shows the stack once facing each player; either Bolt is the one spell.
-            TabletCard[] bolts = [.. tapped.Cards.Where(card => card.Name == "Lightning Bolt")];
-            Assert.Equal(["opponent-stack", "stack"], bolts.Select(card => card.Place).Order());
-            Assert.Single(bolts.Select(card => card.Handle).Distinct());
-            TabletCard bolt = bolts.Single(card => card.Place == "opponent-stack");
+            // The shared board shows the stack once, over the line between the halves: Bot1's Bolt upright, facing Bot1, and
+            // set off toward Bot1's half at the bottom.
+            TabletCard bolt = tapped.Cards.Single(card => card.Name == "Lightning Bolt");
+            Assert.Equal("stack", bolt.Place);
+            Assert.True(tapped.StackShown);
+            Assert.True(bolt.Y > TabletDriver.Height * 0.3f && bolt.Y < TabletDriver.Height * 0.7f, $"The stack is over the middle of the board, not at {bolt.Y}.");
             await shared.TapCardAsync(bolt);
             tapped = await shared.SettledAsync(state => state.Taps.Count == 4);
             Assert.Equal(bolt.Handle, tapped.Taps[3].Object);
+
+            // Each half shows the turn and its step, and Undo is on the side of the player with priority alone.
+            Assert.Equal(2, tapped.Halves!.Count);
+            Assert.All(tapped.Halves, half => Assert.Equal(tapped.Halves[0].Step, half.Step));
+            TabletHalfState priority = Assert.Single(tapped.Halves, half => half.Undo);
+            await shared.TapAsync(priority.UndoBox!.X, priority.UndoBox.Y);
+            await shared.SettledAsync(state => state.Undos?.SequenceEqual([priority.Seat]) == true);
+
+            // The stack folds to its caps, and opens again.
+            await shared.TapAsync(tapped.StackFold!.X, tapped.StackFold.Y);
+            TabletState folded = await shared.SettledAsync(state => state.StackCollapsed && !state.Cards.Any(card => card.Name == "Lightning Bolt"));
+            await shared.PictureAsync("stack-folded");
+            await shared.TapAsync(folded.StackFold!.X, folded.StackFold.Y);
+            tapped = await shared.SettledAsync(state => !state.StackCollapsed && state.Cards.Any(card => card.Name == "Lightning Bolt"));
 
             // A long press holds the card up to read, turned to face the player across from it, and taps nothing.
             await shared.PressAsync(goyf);
@@ -106,6 +121,9 @@ public sealed class InPersonTests(WebClient web)
             Assert.Contains("Bot1  20", board.Lives, StringComparison.Ordinal);
             Assert.Contains("Bot2  20", board.Lives, StringComparison.Ordinal);
 
+            // The stack lies over the board; folded, it leaves the creatures under it to be tapped.
+            await own.TapAsync(board.StackFold!.X, board.StackFold.Y);
+            board = await own.SettledAsync(state => state.StackCollapsed);
             TabletCard mine = board.Cards.First(card => card.Name == (side == 1 ? "Mountain" : "Tarmogoyf"));
             await own.TapCardAsync(mine);
             TabletState tapped = await own.SettledAsync(state => state.Taps.Count == 1);

@@ -26,12 +26,41 @@ public sealed class TurnStops
         _theirs = [.. (Recall(TheirsKey) ?? DefaultTheirs).Where(Stoppable)];
     }
 
+    /// <summary>Raised when where this player is stopped changes: their own stops, or the rest of the table's.</summary>
     public event Action? Changed;
+
+    /// <summary>Raised when this player's own stops change, and only then: what an in-person phone tells the table.</summary>
+    public event Action? OwnChanged;
 
     /// <summary>Whether anyone receives priority in the step, and so whether there is anything to stop for.</summary>
     public static bool Stoppable(TurnStepView step) => step is not (TurnStepView.Untap or TurnStepView.Cleanup);
 
-    public bool StopsAt(TurnStepView step, bool myTurn) => (myTurn ? _mine : _theirs).Contains(step);
+    /// <summary>
+    /// Whether this player is stopped in a step: by a stop of their own, or - at an in-person table, where a stop is the
+    /// table's (docs/in-person.md, "Stops") - by one another player there set (<see cref="ShareWith"/>).
+    /// </summary>
+    public bool StopsAt(TurnStepView step, bool myTurn) => OwnStopAt(step, myTurn) || (_table?.Invoke(step, myTurn) ?? false);
+
+    /// <summary>Whether this player set a stop of their own in a step: what the stop's toggle shows and changes.</summary>
+    public bool OwnStopAt(TurnStepView step, bool myTurn) => (myTurn ? _mine : _theirs).Contains(step);
+
+    /// <summary>The steps of this player's own turn they stop in, in turn order.</summary>
+    public IReadOnlyList<TurnStepView> Mine => [.. _mine.Order()];
+
+    /// <summary>The steps of an opponent's turn this player stops in, in turn order.</summary>
+    public IReadOnlyList<TurnStepView> Theirs => [.. _theirs.Order()];
+
+    private Func<TurnStepView, bool, bool>? _table;
+
+    /// <summary>
+    /// Stops this player at every stop the rest of the table set as well as their own: given, for a step and whether it is
+    /// this player's turn, whether someone else stops there. An in-person phone's, from the relay; null for none.
+    /// </summary>
+    public void ShareWith(Func<TurnStepView, bool, bool>? others)
+    {
+        _table = others;
+        Changed?.Invoke();
+    }
 
     public void Toggle(TurnStepView step, bool myTurn)
     {
@@ -42,6 +71,7 @@ public sealed class TurnStops
         }
 
         Store(myTurn ? MineKey : TheirsKey, set);
+        OwnChanged?.Invoke();
         Changed?.Invoke();
     }
 

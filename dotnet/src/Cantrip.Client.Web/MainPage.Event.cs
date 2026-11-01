@@ -721,7 +721,7 @@ public sealed partial class MainPage
         {
             bool row = line < 3;
             int cards = GridPlaces(line).Count(place => place < draft.Pile.Count && draft.Pile[place].Known);
-            var button = new DockButton(row ? "▸" : "▾", primary: _gridLine == line, fontSize: 22, enabled: mine && cards > 0).Filling();
+            var button = new DockButton(row ? "▸" : "▾", primary: _gridLine == line, fontSize: 22, enabled: mine && cards > 0).Filling().Arrow(down: !row, size: 16);
             button.Width = row ? RowButton : width;
             button.Height = row ? height : LineButton;
             AutomationProperties.SetName(button, LineName(line));

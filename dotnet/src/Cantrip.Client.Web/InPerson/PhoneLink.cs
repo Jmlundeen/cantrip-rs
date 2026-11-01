@@ -44,6 +44,24 @@ public sealed class PhoneLink
     /// <summary>Why the relay last refused this phone, or null.</summary>
     public string? Refused { get; private set; }
 
+    /// <summary>A tablet's Undo, tapped for this seat while it has priority.</summary>
+    public event Action? Undo;
+
+    /// <summary>Every seat's stops, as the relay last told them: at an in-person table every player stops at each.</summary>
+    public event Action<TableStopsMessage>? TableStops;
+
+    private SeatStopsMessage? _stops;
+
+    /// <summary>This seat's stops, for the table: sent now if the relay has welcomed the phone, and again on every welcome.</summary>
+    public void SendStops(SeatStopsMessage stops)
+    {
+        _stops = stops;
+        if (_connection is { IsConnected: true } connection && _welcomed)
+        {
+            connection.Send(stops);
+        }
+    }
+
     /// <summary>A re-entry code the relay sent (<see cref="AskReentry"/>), for the page to put in its address.</summary>
     public event Action<string>? ReentryCode;
 
@@ -139,7 +157,19 @@ public sealed class PhoneLink
                 {
                     FullScreenBridge.KeepTicket(ticket);
                 }
+                else if (_stops is not null)
+                {
+                    _connection?.Send(_stops);
+                }
 
+                break;
+
+            case SeatUndoMessage:
+                Undo?.Invoke();
+                break;
+
+            case TableStopsMessage stops:
+                TableStops?.Invoke(stops);
                 break;
 
             case ReentryCodeMessage code:

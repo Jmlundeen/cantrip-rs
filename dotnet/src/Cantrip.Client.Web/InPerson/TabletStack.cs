@@ -1,82 +1,155 @@
 using Cantrip.Protocol;
 using Microsoft.UI.Text;
+using Microsoft.UI.Xaml.Media;
 
 namespace Cantrip.Client.Web.InPerson;
 
 /// <summary>
-/// The stack across a tablet, between the halves on the shared board and over the seat's half on a player's own: a
-/// band as tall as the page gives it, the turn and the stack's count on its left, and the spells and abilities as an
-/// overlapping row, oldest at the left and the top of the stack whole at the right. Always there, empty or not, so the
-/// halves never move as a spell is cast. Its cards are tapped as a battlefield's are: a spell can be a target.
+/// The stack on a tablet: one window over the board, shown only while something is on the stack, so the halves keep the
+/// whole height and never move as a spell is cast. Its spells and abilities are an overlapping row, oldest at the left and
+/// the top of the stack whole at the right; each is turned to face the player who controls it and set off toward that
+/// player's side, so the row reads as whose is whose. Its caps say how much is on it and fold it to just them - one cap at
+/// each end on the shared board, the right-hand one turned for the player across the table. Its cards are tapped as a
+/// battlefield's are: a spell can be a target.
 /// </summary>
 public sealed class TabletStack : Grid
 {
-    /// <summary>The label column on the band's left.</summary>
-    private const double LabelWidth = PlayerRail.RailWidth;
-
-    /// <summary>How far the band keeps its cards from its edges.</summary>
+    /// <summary>How far the window keeps its cards from its edges.</summary>
     private const float Inset = 8f;
 
-    private readonly TextBlock _title;
-    private readonly TextBlock _turn;
-    private readonly TextBlock _empty;
-    private readonly Grid _cards;
+    /// <summary>How far a spell is set off toward its controller's side, as a share of a card's height.</summary>
+    private const float Offset = 0.16f;
 
-    public TabletStack()
+    private readonly List<(TextBlock Title, CollapseButton Toggle)> _caps = [];
+    private readonly Border _cards;
+    private bool _collapsed;
+
+    /// <param name="mirrored">The shared board's: a cap at each end, the right-hand one turned to face seat 2.</param>
+    public TabletStack(bool mirrored)
     {
-        Background = Theme.Brush(Theme.Bar);
-        BorderBrush = Theme.Brush(Theme.Line);
-        BorderThickness = new Thickness(0, 1, 0, 1);
-        ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(LabelWidth) });
-        ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        HorizontalAlignment = HorizontalAlignment.Center;
+        VerticalAlignment = VerticalAlignment.Center;
+        Visibility = Visibility.Collapsed;
 
-        var label = new StackPanel { Spacing = 4, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(16, 0, 12, 0) };
-        _title = new TextBlock { Text = "Stack", FontSize = 20, FontWeight = FontWeights.SemiBold, Foreground = Theme.Brush(Theme.Fg) };
-        _turn = new TextBlock { FontSize = 14, Foreground = Theme.Brush(Theme.FgSoft), TextWrapping = TextWrapping.WrapWholeWords };
-        label.Children.Add(_title);
-        label.Children.Add(_turn);
-        Children.Add(label);
-
-        _cards = new Grid();
-        Grid.SetColumn(_cards, 1);
-        Children.Add(_cards);
-
-        _empty = new TextBlock
+        var window = new Border
         {
-            Text = "Nothing on the stack",
-            FontSize = 15,
-            Foreground = Theme.Brush(Theme.FgMuted),
-            VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(Inset, 0, 0, 0),
+            Background = Theme.Brush(Theme.WithAlpha(Theme.Panel, 0.88)),
+            BorderBrush = Theme.Brush(Theme.ControlBorder),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(10),
+            Padding = new Thickness(6),
         };
-        _cards.Children.Add(_empty);
+        Children.Add(window);
+
+        var row = new Grid { ColumnSpacing = 4 };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        window.Child = row;
+
+        row.Children.Add(Cap(turned: false));
 
         Board = new CardBoardElement(60, 84)
         {
             Slides = PlayerSettings.AnimateCards,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(Inset, 0, 0, 0),
         };
-        _cards.Children.Add(Board);
+        _cards = new Border { Padding = new Thickness(Inset), Child = Board };
+        Grid.SetColumn(_cards, 1);
+        row.Children.Add(_cards);
+
+        if (mirrored)
+        {
+            FrameworkElement turned = Cap(turned: true);
+            Grid.SetColumn(turned, 2);
+            row.Children.Add(turned);
+        }
     }
 
     public CardBoardElement Board { get; }
 
-    /// <summary>Lays the stack out, oldest first as the view lists it, and says whose turn and step it is.</summary>
-    public void Show(IReadOnlyList<ObjectView> stack, string turn)
-    {
-        _title.Text = stack.Count == 0 ? "Stack" : $"Stack  ·  {stack.Count}";
-        _turn.Text = turn;
-        _empty.Visibility = stack.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    /// <summary>Whether the window is folded to its caps.</summary>
+    public bool Collapsed => _collapsed;
 
-        float height = MathF.Max(40f, (float)_cards.ActualHeight - (2f * Inset));
+    /// <summary>The window's caps, for a test to find its fold by: each one's box is the button.</summary>
+    public IEnumerable<CollapseButton> Toggles => _caps.Select(cap => cap.Toggle);
+
+    /// <summary>A cap: how much is on the stack, over the button that folds it, turned for the player across the table.</summary>
+    private FrameworkElement Cap(bool turned)
+    {
+        var title = new TextBlock
+        {
+            FontSize = 15,
+            FontWeight = FontWeights.SemiBold,
+            Foreground = Theme.Brush(Theme.Fg),
+            TextAlignment = TextAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center,
+        };
+        var toggle = new CollapseButton { Width = 44, Height = 40, HorizontalAlignment = HorizontalAlignment.Center };
+        _caps.Add((title, toggle));
+
+        var cap = new StackPanel
+        {
+            Spacing = 4,
+            Padding = new Thickness(6, 4, 6, 4),
+            VerticalAlignment = VerticalAlignment.Center,
+            Background = Theme.Brush(Windows.UI.Color.FromArgb(0, 0, 0, 0)),
+            Children = { title, toggle },
+        };
+        cap.Tapped += (_, e) =>
+        {
+            e.Handled = true;
+            Fold(!_collapsed);
+        };
+
+        if (turned)
+        {
+            cap.RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5);
+            cap.RenderTransform = new RotateTransform { Angle = 180 };
+        }
+
+        return cap;
+    }
+
+    /// <summary>Folds the window to its caps, or opens it again.</summary>
+    public void Fold(bool collapsed)
+    {
+        _collapsed = collapsed;
+        _cards.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
+
+        // The cards themselves too: folded, none of them is anywhere to be tapped, flown to or pointed from.
+        Board.Visibility = _cards.Visibility;
+        foreach ((_, CollapseButton toggle) in _caps)
+        {
+            toggle.Collapsed = collapsed;
+        }
+    }
+
+    /// <summary>
+    /// Lays the stack out, oldest first as the view lists it: shown only while there is something on it, each card turned
+    /// to face its controller and set off toward their side of the board.
+    /// </summary>
+    /// <param name="cardHeight">How tall a card on it is drawn.</param>
+    /// <param name="room">The most width the cards may take.</param>
+    /// <param name="turnedSeat">The seat whose side of the board is turned, to face them across the table; zero for none.</param>
+    /// <param name="upSeat">The seat whose side is toward the board's top edge; spells of every other seat go toward the bottom.</param>
+    public void Show(IReadOnlyList<ObjectView> stack, float cardHeight, float room, int turnedSeat, int upSeat)
+    {
+        Visibility = stack.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        foreach ((TextBlock title, _) in _caps)
+        {
+            title.Text = $"Stack\n{stack.Count}";
+        }
+
+        float height = MathF.Max(40f, MathF.Round(cardHeight));
         float width = MathF.Round(height * 63f / 88f);
+        float offset = MathF.Round(height * Offset);
         Board.SetCellSize(width, height);
-        Board.Height = height;
+        Board.Height = height + offset;
 
         // Each card whole while they fit; past that, closer together, the top of the stack still whole at the right.
-        float room = MathF.Max(width, (float)_cards.ActualWidth - (2f * Inset));
+        room = MathF.Max(width, room - (2f * Inset));
         float step = stack.Count <= 1 ? width : MathF.Min(width + 10f, (room - width) / (stack.Count - 1));
 
         List<CardBoardElement.BoardCell> cells = [];
@@ -84,7 +157,13 @@ public sealed class TabletStack : Grid
         for (int i = 0; i < stack.Count; i++)
         {
             float x = i * step;
-            cells.Add(new CardBoardElement.BoardCell(stack[i], x, 0, Tapped: false));
+            int controller = stack[i].Controller;
+            cells.Add(new CardBoardElement.BoardCell(
+                stack[i],
+                x,
+                controller == upSeat ? 0f : offset,
+                Tapped: false,
+                Turn: turnedSeat != 0 && controller == turnedSeat ? 180f : 0f));
             right = x + width;
         }
 

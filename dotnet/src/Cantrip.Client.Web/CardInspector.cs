@@ -109,6 +109,13 @@ public sealed class CardInspector : SKCanvasElement
     /// <summary>How many faces are held up: two for a double-faced card or a copy beside its own card, none while nothing is.</summary>
     public int FacesHeld => Held is null ? 0 : _faces.Count;
 
+    /// <summary>
+    /// Whether a close look fills the screen, as large as the window's height or width allows - whichever is the narrower
+    /// for the card - and in its middle: a phone or a tablet, held up to read at arm's length. Otherwise it is a
+    /// magnification beside where the card lies. Read as each look is laid out, so it may be set for the next.
+    /// </summary>
+    public bool Fills { get; set; }
+
     /// <summary>Raised when what is held up changes, so the boards stop or start drawing the card underneath.</summary>
     public event Action? HeldChanged;
 
@@ -182,6 +189,15 @@ public sealed class CardInspector : SKCanvasElement
     {
         float windowWidth = (float)ActualWidth;
         float windowHeight = (float)ActualHeight;
+
+        if (Fills)
+        {
+            float tall = windowHeight - (2f * CloseMargin);
+            float wide = windowWidth - (2f * CloseMargin);
+            return _landscape
+                ? new Pose(windowWidth / 2f, windowHeight / 2f, MathF.Max(1f, MathF.Min(tall, wide / AspectRatio)), 90f)
+                : new Pose(windowWidth / 2f, windowHeight / 2f, MathF.Max(1f, MathF.Min(tall / AspectRatio, wide / faces / FaceSpread)), 0f);
+        }
 
         if (_landscape)
         {

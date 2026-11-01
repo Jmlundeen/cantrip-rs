@@ -443,6 +443,87 @@ public sealed class InPersonRelayTests
     }
 
     [Fact]
+    public void A_tablets_undo_goes_to_the_phone_of_the_player_with_priority_alone()
+    {
+        RelayDevice alice = Phone(AliceTicket);
+        RelayDevice bob = Phone(BobTicket);
+        RelayDevice shared = Tablet();
+        RelayDevice bobsBoard = Tablet(side: 2);
+        Deal(PublicHost.Step([Priority(1, 1)]));
+        Drain(alice);
+        Drain(bob);
+
+        // Seat one has priority: their Undo reaches their phone; one for seat two, or from seat two's own board, nowhere.
+        _relay.Receive(shared, new TableUndoMessage { Seat = 1 });
+        Assert.IsType<SeatUndoMessage>(Assert.Single(Drain(alice)));
+        _relay.Receive(shared, new TableUndoMessage { Seat = 2 });
+        _relay.Receive(bobsBoard, new TableUndoMessage { Seat = 1 });
+        Assert.Empty(Drain(alice));
+        Assert.Empty(Drain(bob));
+
+        // A phone sends no Undo of its own to the table.
+        _relay.Receive(alice, new TableUndoMessage { Seat = 1 });
+        Assert.IsType<DeviceErrorMessage>(Assert.Single(Drain(alice)));
+    }
+
+    [Fact]
+    public void A_tablets_undo_before_any_game_does_nothing()
+    {
+        RelayDevice alice = Phone(AliceTicket);
+        RelayDevice tablet = Tablet();
+        _relay.Receive(tablet, new TableUndoMessage { Seat = 1 });
+        Assert.Empty(Drain(alice));
+    }
+
+    [Fact]
+    public void A_phones_stops_are_told_to_every_device_and_to_one_joining_later()
+    {
+        RelayDevice alice = Phone(AliceTicket);
+        RelayDevice bob = Phone(BobTicket);
+        RelayDevice tablet = Tablet();
+        Drain(tablet);
+
+        _relay.Receive(alice, new SeatStopsMessage
+        {
+            Mine = [TurnStepView.PostcombatMain, TurnStepView.PrecombatMain, TurnStepView.PrecombatMain],
+            Theirs = [TurnStepView.End],
+        });
+
+        foreach (RelayDevice device in (RelayDevice[])[alice, bob, tablet])
+        {
+            TableStopsMessage told = Assert.IsType<TableStopsMessage>(Assert.Single(Drain(device)));
+            SeatStops seat = Assert.Single(told.Seats);
+            Assert.Equal(1, seat.Seat);
+            Assert.Equal([TurnStepView.PrecombatMain, TurnStepView.PostcombatMain], seat.Mine);
+            Assert.Equal([TurnStepView.End], seat.Theirs);
+        }
+
+        _relay.Receive(bob, new SeatStopsMessage { Mine = [TurnStepView.Upkeep] });
+        TableStopsMessage both = Assert.IsType<TableStopsMessage>(Assert.Single(Drain(tablet)));
+        Assert.Equal([1, 2], both.Seats.Select(each => each.Seat));
+
+        // A tablet scanned later is told them with its welcome.
+        RelayDevice late = Tablet(side: 1);
+        Assert.Contains(Drain(late), message => message is TableStopsMessage { Seats.Count: 2 });
+    }
+
+    [Fact]
+    public void Stops_naming_no_step_are_not_taken_and_a_tablet_sends_none()
+    {
+        RelayDevice alice = Phone(AliceTicket);
+        RelayDevice tablet = Tablet();
+        Drain(tablet);
+
+        _relay.Receive(alice, new SeatStopsMessage { Mine = [(TurnStepView)99] });
+        Assert.Empty(Drain(alice));
+        Assert.Empty(Drain(tablet));
+
+        _relay.Receive(tablet, new SeatStopsMessage { Mine = [TurnStepView.Upkeep] });
+        Assert.IsType<DeviceErrorMessage>(Assert.Single(Drain(tablet)));
+        Assert.Empty(Drain(alice));
+    }
+
+    [Fact]
     public void Every_message_a_device_is_sent_goes_over_the_wire()
     {
         RelayDevice alice = Phone(AliceTicket);
