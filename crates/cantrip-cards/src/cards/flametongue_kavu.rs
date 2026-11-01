@@ -1,17 +1,11 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
-/// "It deals 4 damage to target creature": the ability's source is the Kavu, and the target is mandatory, so the Kavu
-/// itself is the target when it is the only creature.
-fn bolt(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 4);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(THIS_ENTERS, bolt, "When this creature enters, it deals 4 damage to target creature.")
+    // The target is mandatory, so the Kavu itself is the target when it is the only creature.
+    abilities: &[triggered(THIS_ENTERS, effects::damage_first_target::<4>, "When this creature enters, it deals 4 damage to target creature.")
         .targets(&[targets::CREATURE])],
     ..oracle::FLAMETONGUE_KAVU
 };

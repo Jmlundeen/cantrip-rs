@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, damage_target, hand, harmonize, targets};
+use cantrip_mechanics::{choose, effects, hand, harmonize, targets};
 use cantrip_oracle as oracle;
 
 /// "Draw a card, then you may discard a card. When you discard a nonland card this way, Glacial Dragonhunt deals 3 damage to
@@ -20,15 +20,9 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Glacial Dragonhunt deals 3 damage to target creature": the spell, as it last existed, is the source (CR 608.2h).
-fn damage_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 3);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], effect),
-    delayed: &[delayed_trigger(damage_creature, "When you discard a nonland card this way, Glacial Dragonhunt deals 3 damage to target creature.")
+    delayed: &[delayed_trigger(effects::damage_first_target::<3>, "When you discard a nonland card this way, Glacial Dragonhunt deals 3 damage to target creature.")
         .targets(&[targets::CREATURE])],
     ways: &[harmonize::way(mana("{4}{U}{R}"), "Harmonize {4}{U}{R}")],
     ..oracle::GLACIAL_DRAGONHUNT

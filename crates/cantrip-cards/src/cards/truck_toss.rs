@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "This spell costs {2} less to cast if you control a Vehicle" (CR 601.2f, 301.7): judged as the total cost is determined, once,
@@ -9,10 +9,4 @@ fn less_with_a_vehicle(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Cos
     if matches!(costed, Costed::Spell(_)) && vehicle { CostDelta::less(2) } else { CostDelta::NONE }
 }
 
-/// "Truck Toss deals 4 damage to any target."
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 4);
-    Ok(())
-}
-
-pub static CARD: CardDef = CardDef { spell: spell(&[targets::ANY], effect), own_cost_changes: &[less_with_a_vehicle], ..oracle::TRUCK_TOSS };
+pub static CARD: CardDef = CardDef { spell: spell(&[targets::ANY], effects::damage_first_target::<4>), own_cost_changes: &[less_with_a_vehicle], ..oracle::TRUCK_TOSS };

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "Whenever another Villain and/or artifact you control enters" (CR 603.6a): a permanent other than this one, under your
@@ -19,16 +19,10 @@ fn another_villain_or_artifact_enters(q: &dyn Query, me: &Asker, event: &Event) 
     }
 }
 
-/// "This creature deals 1 damage to target opponent."
-fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 1);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
         when_asked(EventMask::ZONE_CHANGE, another_villain_or_artifact_enters),
-        ping,
+        effects::damage_first_target::<1>,
         "Whenever another Villain and/or artifact you control enters, this creature deals 1 damage to target opponent.",
     )
     .targets(&[targets::OPPONENT])],

@@ -1,13 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, targets, trample_until_end_of_turn};
+use cantrip_mechanics::{effects, targets, trample_until_end_of_turn};
 use cantrip_oracle as oracle;
-
-/// "Konstrari Charm deals 6 damage to target creature with flying": nothing if the target is gone or no longer has flying as it
-/// resolves (CR 608.2b).
-fn six_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 6);
-    Ok(())
-}
 
 /// "Put two +1/+1 counters on target creature. It gains trample until end of turn." Both stop if the target is no longer legal
 /// (CR 608.2b).
@@ -26,7 +19,7 @@ fn add_colorless(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 static MODAL: ModalDef = modes(&[
-    mode(six_damage, "Konstrari Charm deals 6 damage to target creature with flying.").targets(&[targets::CREATURE_WITH_FLYING]),
+    mode(effects::damage_first_target::<6>, "Konstrari Charm deals 6 damage to target creature with flying.").targets(&[targets::CREATURE_WITH_FLYING]),
     mode(counters_and_trample, "Put two +1/+1 counters on target creature. It gains trample until end of turn.").targets(&[targets::CREATURE]),
     mode(add_colorless, "Add {C}{C}{C}."),
 ]);

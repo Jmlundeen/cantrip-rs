@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, effects, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// Mode 0: target player draws two cards.
@@ -11,12 +11,6 @@ fn draw_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Mode 1: destroy target artifact.
 fn destroy_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     cantrip_mechanics::destroy_target(g, item, 0);
-    Ok(())
-}
-
-/// Mode 2: Flame of Anor deals 5 damage to target creature.
-fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 5);
     Ok(())
 }
 
@@ -32,7 +26,7 @@ static MODAL: ModalDef = modes(&[
         .targets(&[targets::PLAYER]),
     mode(destroy_artifact, "Destroy target artifact.")
         .targets(&[targets::ARTIFACT]),
-    mode(damage, "Flame of Anor deals 5 damage to target creature.")
+    mode(effects::damage_first_target::<5>, "Flame of Anor deals 5 damage to target creature.")
         .targets(&[targets::CREATURE]),
 ])
     .up_to_if(has_a_wizard, 2);

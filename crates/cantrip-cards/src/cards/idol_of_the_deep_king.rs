@@ -2,14 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::attach::{attach_to_target, attached_object, equip};
 use cantrip_mechanics::statics::plus_pt;
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::{craft, damage_target, targets};
+use cantrip_mechanics::{craft, effects, targets};
 use cantrip_oracle as oracle;
-
-/// "When this artifact enters, it deals 2 damage to any target."
-fn two_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 2);
-    Ok(())
-}
 
 pub static BACK: CardDef = CardDef {
     abilities: &[
@@ -23,7 +17,7 @@ pub static BACK: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, two_damage, "When this artifact enters, it deals 2 damage to any target.").targets(&[targets::ANY]),
+        triggered(THIS_ENTERS, effects::damage_first_target::<2>, "When this artifact enters, it deals 2 damage to any target.").targets(&[targets::ANY]),
         craft::ability(mana("{2}{R}"), &craft::ARTIFACT, "Craft with artifact {2}{R}"),
     ],
     back: Some(&BACK),

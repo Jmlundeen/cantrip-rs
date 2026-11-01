@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets::{self, filters};
 use cantrip_mechanics::triggers::THIS_ENTERS_OR_ATTACKS;
-use cantrip_mechanics::{damage_target, tokens};
+use cantrip_mechanics::{effects, tokens};
 use cantrip_oracle as oracle;
 
 /// The 3/1 colorless Wall artifact creature token with defender named Stone Boulder (CR 111.4): its name is "Stone Boulder",
@@ -28,16 +28,10 @@ fn create_stone_boulder(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
     Ok(())
 }
 
-/// "This creature deals 4 damage to any target." Nothing if the target is no longer legal (CR 608.2b).
-fn four_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 4);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS_OR_ATTACKS, create_stone_boulder, "Whenever this creature enters or attacks, create a 3/1 colorless Wall artifact creature token with defender named Stone Boulder."),
-        ability(cost("{2}{R}").and(sacrifice(1, filters::artifact)), four_damage, "{2}{R}, Sacrifice an artifact: This creature deals 4 damage to any target.")
+        ability(cost("{2}{R}").and(sacrifice(1, filters::artifact)), effects::damage_first_target::<4>, "{2}{R}, Sacrifice an artifact: This creature deals 4 damage to any target.")
             .targets(&[targets::ANY]),
     ],
     ..oracle::STONE_GIANT_OF_HIGH_PASS

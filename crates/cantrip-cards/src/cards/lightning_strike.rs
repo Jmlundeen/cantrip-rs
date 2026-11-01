@@ -1,14 +1,8 @@
 use cantrip_api::*;
 use cantrip_oracle as oracle;
-use cantrip_mechanics::{damage_target, targets};
-
-/// "Lightning Strike deals 3 damage to any target."
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 3);
-    Ok(())
-}
+use cantrip_mechanics::{effects, targets};
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[targets::ANY], effect),
+    spell: spell(&[targets::ANY], effects::damage_first_target::<3>),
     ..oracle::LIGHTNING_STRIKE
 };

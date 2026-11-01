@@ -855,6 +855,15 @@ pub fn each_opponent_discards_a_card(g: &mut dyn Game, item: &StackItem) -> Resu
     Ok(())
 }
 
+/// "[Source] deals N damage to target [thing]" (CR 120.3): the source of the resolving item deals N damage to its first
+/// target, if that is still a legal target as it resolves (CR 608.2b); a source that has left its zone (sacrificed as a cost,
+/// discarded, dead) deals it as it last existed (CR 113.7a, 608.2h). Which targets are allowed is the card's own spell or
+/// ability. Lightning Bolt (any target, 3), Shock (2), Flametongue Kavu (creature, 4) and Hired Claw (opponent, 1) print it.
+pub fn damage_first_target<const N: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    crate::damage_target(g, item, 0, N);
+    Ok(())
+}
+
 /// "Target player discards N cards": their choice (CR 701.9), the player being the first target. Nothing if that player is
 /// no longer a legal target as it resolves (CR 608.2b): a modal spell whose other mode's target is still legal resolves
 /// without it (Kolaghan's Command). Demonic Pact ("target opponent"), Kolaghan's Command and Armus, Skin of Evil print it.

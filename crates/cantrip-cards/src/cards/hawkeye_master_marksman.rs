@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::THIS_BECOMES_TAPPED;
-use cantrip_mechanics::{damage_target, effects, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 const PAY: Question = Question::new(
@@ -25,12 +25,6 @@ fn becomes_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Explosive \u{2014} Hawkeye deals 2 damage to target player."
-fn explosive(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 2);
-    Ok(())
-}
-
 /// "Boomerang \u{2014} Discard a card, then draw a card."
 fn boomerang(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     effects::discard_then_draw(g, item, 1)
@@ -40,7 +34,7 @@ fn boomerang(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// on the stack (CR 603.3c) and carried out in the order printed (CR 700.2d).
 static MODAL: ModalDef = modes(&[
     mode(effects::first_target_cant_block_this_turn, "Net \u{2014} Target creature can't block this turn.").targets(&[targets::CREATURE]),
-    mode(explosive, "Explosive \u{2014} Hawkeye deals 2 damage to target player.").targets(&[targets::PLAYER]),
+    mode(effects::damage_first_target::<2>, "Explosive \u{2014} Hawkeye deals 2 damage to target player.").targets(&[targets::PLAYER]),
     mode(boomerang, "Boomerang \u{2014} Discard a card, then draw a card."),
 ])
 .up_to_that_many();

@@ -1,14 +1,8 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, effects, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
-/// Dead: "Dead deals 2 damage to target creature."
-fn dead(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 2);
-    Ok(())
-}
-
-pub static DEAD: CardDef = CardDef { spell: spell(&[targets::CREATURE], dead), ..oracle::DEAD };
+pub static DEAD: CardDef = CardDef { spell: spell(&[targets::CREATURE], effects::damage_first_target::<2>), ..oracle::DEAD };
 
 /// Gone: "Return target creature you don't control to its owner's hand."
 pub static GONE: CardDef = CardDef {

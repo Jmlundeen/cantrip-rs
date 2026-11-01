@@ -1,13 +1,8 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, targets, effects};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("Untap", "untap it?", "", "Untap", "Leave it tapped");
-
-fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 1);
-    Ok(())
-}
 
 /// "Whenever a creature enters": a creature under any player's control, and Blasting Station itself whenever it enters
 /// as a creature (CR 603.6a).
@@ -30,7 +25,7 @@ fn may_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        ability(TAP.and(sacrifice(1, targets::filters::creature)), ping, "{T}, Sacrifice a creature: Blasting Station deals 1 damage to any target.")
+        ability(TAP.and(sacrifice(1, targets::filters::creature)), effects::damage_first_target::<1>, "{T}, Sacrifice a creature: Blasting Station deals 1 damage to any target.")
             .targets(&[targets::ANY]),
         triggered(when(EventMask::ZONE_CHANGE, creature_enters), may_untap, "Whenever a creature enters, you may untap Blasting Station."),
     ],

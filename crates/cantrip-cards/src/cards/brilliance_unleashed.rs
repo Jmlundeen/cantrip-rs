@@ -1,12 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
-
-/// "Brilliance Unleashed deals 5 damage to target creature."
-fn damage_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 5);
-    Ok(())
-}
 
 /// "Target artifact card in your graveyard."
 fn artifact_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -40,7 +34,7 @@ fn return_the_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 
 /// "Choose one or both" (CR 700.2): the modes are carried out in the order printed (CR 608.2c).
 static MODAL: ModalDef = modes(&[
-    mode(damage_creature, "Brilliance Unleashed deals 5 damage to target creature.").targets(&[targets::CREATURE]),
+    mode(effects::damage_first_target::<5>, "Brilliance Unleashed deals 5 damage to target creature.").targets(&[targets::CREATURE]),
     mode(
         return_the_artifact,
         "Choose target artifact card in your graveyard. Return it to the battlefield if it's an artifact creature card. Otherwise, return it to the battlefield and it's a 3/3 Robot artifact creature with flying.",

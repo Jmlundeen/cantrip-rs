@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::retrace;
-use cantrip_mechanics::{damage_target, targets, tokens};
+use cantrip_mechanics::{effects, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// +1: Return up to one target land card from your graveyard to your hand.
@@ -8,12 +8,6 @@ fn return_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(land) = targets::object(g, item, 0) {
         g.return_to_hand(&[land]);
     }
-    Ok(())
-}
-
-/// -1: Wrenn and Six deals 1 damage to any target.
-fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 1);
     Ok(())
 }
 
@@ -46,7 +40,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), return_land, "+1: Return up to one target land card from your graveyard to your hand.")
             .targets(&[up_to_one(targets::land_card_in_your_graveyard)]),
-        ability(loyalty(-1), ping, "\u{2212}1: Wrenn and Six deals 1 damage to any target.")
+        ability(loyalty(-1), effects::damage_first_target::<1>, "\u{2212}1: Wrenn and Six deals 1 damage to any target.")
             .targets(&[targets::ANY]),
         ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"Instant and sorcery cards in your graveyard have retrace.\""),
     ],

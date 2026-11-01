@@ -1,18 +1,11 @@
 use cantrip_api::*;
 use cantrip_mechanics::{
     attach::equip_quality,
-    damage_target,
     effects,
     targets,
     triggers::THIS_ENTERS,
 };
 use cantrip_oracle as oracle;
-
-/// "When Mjölnir enters, it deals 4 damage to up to one target creature."
-fn four_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 4);
-    Ok(())
-}
 
 /// "Double all damage equipped creature would deal" (CR 614.1, 120.3): damage from the creature this Equipment is attached to,
 /// to anything, combat or not; damage dealt to it, or by another creature, is not changed.
@@ -46,7 +39,7 @@ fn two_damage_to_each_creature(g: &mut dyn Game, item: &StackItem) -> Result<(),
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, four_damage, "When Mjölnir enters, it deals 4 damage to up to one target creature.")
+        triggered(THIS_ENTERS, effects::damage_first_target::<4>, "When Mjölnir enters, it deals 4 damage to up to one target creature.")
             .targets(&[targets::CREATURE.optional()]),
         equip_quality(mana("{1}"), &[target(worthy_creature_you_control)], "Equip worthy {1}"),
         ability(cost("{2}{R}").and(DISCARD_THIS), two_damage_to_each_creature, "{2}{R}, Discard this card: It deals 2 damage to each creature.")

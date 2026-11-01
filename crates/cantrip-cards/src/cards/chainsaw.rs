@@ -1,14 +1,8 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
-
-/// When this Equipment enters, it deals 3 damage to up to one target creature.
-fn three_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 3);
-    Ok(())
-}
 
 /// "Whenever one or more creatures die" (CR 700.4, 603.2c): any creature put into a graveyard from the battlefield,
 /// asked of each card of the batch, and one trigger for the creatures that die together. It was a creature as it
@@ -41,7 +35,7 @@ fn plus_x_power(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, three_damage, "When this Equipment enters, it deals 3 damage to up to one target creature.")
+        triggered(THIS_ENTERS, effects::damage_first_target::<3>, "When this Equipment enters, it deals 3 damage to up to one target creature.")
             .targets(&[targets::CREATURE.between(0, 1)]),
         triggered(when(EventMask::ZONE_CHANGE, creature_dies), rev_counter, "Whenever one or more creatures die, put a rev counter on this Equipment.")
             .once_per_batch(),

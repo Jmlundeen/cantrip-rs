@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{casualty, choose_from_hand, damage_target, effects, players, targets, tokens};
+use cantrip_mechanics::{casualty, choose_from_hand, effects, players, targets, tokens};
 use cantrip_mechanics::triggers::THIS_DIES;
 use cantrip_oracle as oracle;
 
@@ -11,16 +11,10 @@ pub static DEVIL: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(1),
     toughness: Some(1),
-    abilities: &[triggered(THIS_DIES, devil_dies, "When this token dies, it deals 1 damage to any target.").targets(&[targets::ANY])],
+    abilities: &[triggered(THIS_DIES, effects::damage_first_target::<1>, "When this token dies, it deals 1 damage to any target.").targets(&[targets::ANY])],
     text: "When this token dies, it deals 1 damage to any target.",
     ..token!(Devil)
 };
-
-/// "It deals 1 damage to any target": dealt by the token as it last existed (CR 603.10a, 608.2h).
-fn devil_dies(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 1);
-    Ok(())
-}
 
 /// "The copy isn't legendary and has starting loyalty X" (CR 707.9b, 707.10f): the copy of the spell, a token as it resolves,
 /// with X as announced for this spell. X is announced no higher than a power can be (`i16::MAX`), so a loyalty holds it.

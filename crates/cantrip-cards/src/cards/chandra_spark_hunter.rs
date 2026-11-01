@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::crew::crew;
-use cantrip_mechanics::{damage_target, effects, haste_until_end_of_turn, targets, tokens, triggers};
+use cantrip_mechanics::{effects, haste_until_end_of_turn, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
 /// "Target Vehicle you control" (CR 115.1, 301.7): a permanent with the Vehicle subtype that its controller controls.
@@ -42,11 +42,6 @@ pub static VEHICLE: CardDef = CardDef {
     ..token!(Vehicle)
 };
 
-fn three_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 3);
-    Ok(())
-}
-
 /// The emblem: "Whenever an artifact you control enters, this emblem deals 3 damage to any target." The emblem is the damage's
 /// source (CR 114.4).
 pub static EMBLEM: CardDef = CardDef {
@@ -54,7 +49,7 @@ pub static EMBLEM: CardDef = CardDef {
     has_cost: false,
     abilities: &[triggered(
         triggers::ARTIFACT_YOU_CONTROL_ENTERS,
-        three_damage,
+        effects::damage_first_target::<3>,
         "Whenever an artifact you control enters, this emblem deals 3 damage to any target.",
     )
     .targets(&[targets::ANY])],

@@ -1,18 +1,11 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets::{self, is_nonland_permanent_card};
-use cantrip_mechanics::{choose, damage_target, tokens, top_of_library};
+use cantrip_mechanics::{choose, effects, tokens, top_of_library};
 use cantrip_oracle as oracle;
 
 /// +1: "Create a 1/1 green and white Kithkin creature token."
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create(g, item.controller, &tokens::KITHKIN, 1)?;
-    Ok(())
-}
-
-/// -2: "Ajani deals 4 damage to target tapped creature." A target that is no longer a tapped creature is illegal
-/// (CR 608.2b), and the ability does nothing.
-fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 4);
     Ok(())
 }
 
@@ -49,7 +42,8 @@ pub static EXTRA: &[&CardDef] = &[&tokens::KITHKIN];
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), plus_one, "+1: Create a 1/1 green and white Kithkin creature token."),
-        ability(loyalty(-2), minus_two, "\u{2212}2: Ajani deals 4 damage to target tapped creature.")
+        // A target that is no longer a tapped creature is illegal (CR 608.2b), and the ability does nothing.
+        ability(loyalty(-2), effects::damage_first_target::<4>,"\u{2212}2: Ajani deals 4 damage to target tapped creature.")
             .targets(&[targets::TAPPED_CREATURE]),
         ability(
             loyalty(-8),

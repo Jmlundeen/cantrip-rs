@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, effects, select, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{effects, select, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Another artifact" (CR 701.21a): an artifact permanent other than General Traag, the object whose text asks.
@@ -19,15 +19,8 @@ fn sacrifice_for_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
     Ok(())
 }
 
-/// "General Traag deals 4 damage to target creature" (CR 120.2b, 608.2b/h): the original source, including its last-known
-/// information, deals damage only to the still-legal target.
-fn deal_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 4);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, sacrifice_for_damage, "When General Traag enters, you may sacrifice another artifact. When you do, General Traag deals 4 damage to target creature.")],
-    delayed: &[delayed_trigger(deal_four, "When you do, General Traag deals 4 damage to target creature.").targets(&[targets::CREATURE])],
+    delayed: &[delayed_trigger(effects::damage_first_target::<4>, "When you do, General Traag deals 4 damage to target creature.").targets(&[targets::CREATURE])],
     ..oracle::GENERAL_TRAAG_HEART_OF_STONE
 };

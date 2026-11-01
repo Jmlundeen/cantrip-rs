@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::exile_top_card_play_until_end_of_next_turn;
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "A Goblin, Orc, or Army": the object has one of the three creature types as the layers make it (as it last existed, for one that
@@ -49,17 +49,11 @@ fn another_goblin_orc_or_army_you_control_dies(q: &dyn Query, me: &Asker, event:
     }
 }
 
-/// "The Great Goblin deals 2 damage to target opponent" (CR 120.3): if the target is still legal.
-fn deal_two_damage_to_target_opponent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 2);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
             when_asked(EventMask::COUNTERS, you_put_counters_on_a_goblin_orc_or_army_you_control),
-            deal_two_damage_to_target_opponent,
+            effects::damage_first_target::<2>,
             "Whenever you put one or more counters on a Goblin, Orc, or Army you control, The Great Goblin deals 2 damage to target opponent.",
         )
         .once_per_batch()

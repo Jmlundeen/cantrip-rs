@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::ask_library_order;
-use cantrip_mechanics::{damage_target, effects, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// One of "up to four target cards from your graveyard" (CR 115.1): a mode's target slots are one target each, so the
@@ -14,12 +14,6 @@ const UP_TO_ONE_CARD: TargetSpec = up_to_one(card_in_your_graveyard);
 /// Put a +1/+1 counter on target creature.
 fn counter_on_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     cantrip_mechanics::effects::plus_one_counter_on_target(g, item)
-}
-
-/// Bow of Nylea deals 2 damage to target creature with flying.
-fn two_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 2);
-    Ok(())
 }
 
 /// Put up to four target cards from your graveyard on the bottom of your library in any order (CR 401.4, 608.2b): the
@@ -39,7 +33,7 @@ fn bottom_in_any_order(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 static MODAL: ModalDef = modes(&[
     mode(counter_on_creature, "Put a +1/+1 counter on target creature.")
         .targets(&[targets::CREATURE]),
-    mode(two_damage, "Bow of Nylea deals 2 damage to target creature with flying.")
+    mode(effects::damage_first_target::<2>, "Bow of Nylea deals 2 damage to target creature with flying.")
         .targets(&[targets::CREATURE_WITH_FLYING]),
     mode(|g, item| effects::gain_life(g, item, 3), "You gain 3 life."),
     mode(bottom_in_any_order, "Put up to four target cards from your graveyard on the bottom of your library in any order.")

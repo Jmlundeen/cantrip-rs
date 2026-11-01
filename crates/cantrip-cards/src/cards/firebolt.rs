@@ -1,15 +1,10 @@
 use cantrip_api::*;
 use cantrip_mechanics::flashback;
 use cantrip_oracle as oracle;
-use cantrip_mechanics::{damage_target, targets};
-
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 2);
-    Ok(())
-}
+use cantrip_mechanics::{effects, targets};
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[targets::ANY], effect),
+    spell: spell(&[targets::ANY], effects::damage_first_target::<2>),
     ways: &[flashback::way(cost("{4}{R}"), "Flashback {4}{R}")],
     ..oracle::FIREBOLT
 };

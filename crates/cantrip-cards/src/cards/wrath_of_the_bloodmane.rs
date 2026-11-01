@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "This spell costs {1} less to cast if you control a legendary creature" (CR 601.2f): judged once, as the total cost
@@ -13,14 +13,8 @@ fn less_with_a_legend(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _
     if legend { CostDelta::less(1) } else { CostDelta::NONE }
 }
 
-/// "Wrath of the Bloodmane deals 4 damage to target creature or planeswalker." (CR 120.1.)
-fn deal_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 4);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[targets::CREATURE_OR_PLANESWALKER], deal_four),
+    spell: spell(&[targets::CREATURE_OR_PLANESWALKER], effects::damage_first_target::<4>),
     own_cost_changes: &[less_with_a_legend],
     ..oracle::WRATH_OF_THE_BLOODMANE
 };

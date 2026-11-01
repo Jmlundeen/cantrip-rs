@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::history::opponents_who_lost_life_this_turn;
-use cantrip_mechanics::{damage_target, lands, targets, triggers};
+use cantrip_mechanics::{effects, lands, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "Other creatures you control enter with an additional +1/+1 counter on them for each opponent who lost life this turn"
@@ -23,16 +23,10 @@ fn apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) {
     }
 }
 
-/// "Gev deals 1 damage to target opponent."
-fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 1);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggers::ward_life::<2>("Ward\u{2014}Pay 2 life."),
-        triggered(when_asked(EventMask::SPELL_CAST, triggers::subtype_spell_you_cast::<{ lands::sub(Subtype::Lizard) }>), ping, "Whenever you cast a Lizard spell, Gev deals 1 damage to target opponent.")
+        triggered(when_asked(EventMask::SPELL_CAST, triggers::subtype_spell_you_cast::<{ lands::sub(Subtype::Lizard) }>), effects::damage_first_target::<1>, "Whenever you cast a Lizard spell, Gev deals 1 damage to target opponent.")
             .targets(&[targets::OPPONENT]),
     ],
     replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "puts a +1/+1 counter on it for each opponent who lost life this turn")],

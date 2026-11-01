@@ -1,13 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::{self, gain_indestructible_until_end_of_turn};
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
-
-/// "Boros Charm deals 4 damage to target player or planeswalker": nothing if the target is no longer legal (CR 608.2b).
-fn four_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, 4);
-    Ok(())
-}
 
 /// "Permanents you control gain indestructible until end of turn": the permanents there are as it resolves, and only those
 /// (CR 611.2c).
@@ -30,7 +24,7 @@ fn double_strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 static MODAL: ModalDef = modes(&[
-    mode(four_damage, "Boros Charm deals 4 damage to target player or planeswalker.").targets(&[targets::PLAYER_OR_PLANESWALKER]),
+    mode(effects::damage_first_target::<4>, "Boros Charm deals 4 damage to target player or planeswalker.").targets(&[targets::PLAYER_OR_PLANESWALKER]),
     mode(indestructible, "Permanents you control gain indestructible until end of turn."),
     mode(double_strike, "Target creature gains double strike until end of turn.").targets(&[targets::CREATURE]),
 ]);
