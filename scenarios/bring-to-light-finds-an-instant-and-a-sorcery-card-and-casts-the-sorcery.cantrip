@@ -1,0 +1,49 @@
+# CR 205.2a: "a creature, instant, or sorcery card" takes an instant and a sorcery card as well. With two colors spent, a
+# mana value 1 instant (Lightning Bolt) is found and left in exile when the cast is declined; a second Bring to Light finds
+# a mana value 2 sorcery (Demonic Tutor), cast free as the spell resolves; it goes to the
+# graveyard as normal, not back to exile (the ruling).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Black Lotus
+Bring to Light
+Bring to Light
+Island
+Lightning Bolt
+Demonic Tutor
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Bring to Light.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Search(Lightning Bolt)
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Bring to Light.Cast
+Bot1.Search(Demonic Tutor)
+Bot1.Accept
+Bot1.Search(Island)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Lightning Bolt
+Bot1.Graveyard = Demonic Tutor; Bring to Light; Black Lotus; Bring to Light; Black Lotus
+Bot1.Shuffles = 3

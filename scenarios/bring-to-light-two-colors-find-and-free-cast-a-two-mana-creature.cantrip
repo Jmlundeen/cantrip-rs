@@ -1,0 +1,46 @@
+# Converge, CR 207.2c: {3}{G}{U} paid with green, blue and three more green mana spent only two colors (Bot1's Black Lotus
+# makes GGG), so the search takes a card of mana value 2 or less: a mana value 3 creature, a land and a mana value 1
+# artifact that is no creature (Sol Ring: CR 205.2a, none of the three types) are refused, Balduvian
+# Bears (exactly 2) is found, exiled and cast for free as the spell resolves (CR 608.2g, 118.9). It is Bot1's own library
+# that is searched: Bot2's Balduvian Bears stay in Bot2's library (CR 701.23).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Bring to Light
+Island x3
+Balduvian Bears
+Alaborn Trooper
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Swamp x7
+Balduvian Bears
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Bring to Light.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Search(Alaborn Trooper)
+! Bot1.Search(Island)
+! Bot1.Search(Sol Ring)
+Bot1.Search(Balduvian Bears)
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Balduvian Bears.Tapped = false
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Balduvian Bears; Mox Emerald; Mox Sapphire
+Bot1.Graveyard = Bring to Light; Black Lotus
+Bot1.Shuffles = 1
+Bot2.Library.Count = 11

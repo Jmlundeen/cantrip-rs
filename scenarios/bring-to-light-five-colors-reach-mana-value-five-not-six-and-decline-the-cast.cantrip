@@ -1,0 +1,46 @@
+# Converge, CR 207.2c: all five colors of mana spent (the five Moxen; {3}{G}{U} costs five) allow a card of mana value 5
+# or less: Blanchwood Treefolk (exactly 5) is found, Barbtooth Wurm (6) is refused. The cast is optional ("you may"):
+# declined, the card stays exiled (the ruling) and is not put into a hand.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Bring to Light
+Island
+Barbtooth Wurm
+Blanchwood Treefolk
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Bring to Light.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Search(Barbtooth Wurm)
+! Bot1.Search(Blanchwood Treefolk; Lightning Bolt)
+Bot1.Search(Blanchwood Treefolk)
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Blanchwood Treefolk
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot1.Graveyard = Bring to Light
+Bot1.Shuffles = 1
+Bot1.Hand = Island

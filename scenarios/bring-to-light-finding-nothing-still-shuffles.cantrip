@@ -1,0 +1,33 @@
+# CR 701.23b: with two colors spent the library holds only a mana value 3 creature, so nothing may be found; the search
+# is left empty, nothing is cast, and the spell finishes.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Bring to Light
+Island x3
+Alaborn Trooper
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Bring to Light.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Search(Alaborn Trooper)
+Bot1.Search()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard = Bring to Light; Black Lotus
+Bot1.Shuffles = 1
