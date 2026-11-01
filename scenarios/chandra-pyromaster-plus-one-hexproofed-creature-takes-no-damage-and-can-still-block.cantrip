@@ -1,0 +1,56 @@
+# Chandra, Pyromaster's +1 with its creature target made illegal before it resolves (CR 608.2b): in response, Bot2's Snakeskin Veil
+# gives the targeted Ornithopter hexproof. The ability still resolves for its legal target, Bot2 (18 after the turn 1 +1), but the
+# Ornithopter is dealt no damage and "that creature can't block this turn" does not apply to it: it blocks Bot1's Ornithopter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Chandra, Pyromaster
+Ornithopter
+Island x3
+Island x10
+
+[Bot2 Deck]
+Mox Emerald
+Ornithopter
+Snakeskin Veil
+Island x28
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chandra, Pyromaster.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot2.Battlefield.Ornithopter.Damage = 0
+? Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Blockers]
+Bot2.Block(Ornithopter > Ornithopter)
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot1.Battlefield.Chandra, Pyromaster.Counters.Loyalty = 6
+Combat.Blocks = Ornithopter > Ornithopter

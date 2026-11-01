@@ -1,0 +1,60 @@
+# Chandra, Pyromaster's +1 second target is a creature "that player or that planeswalker's controller controls": with a
+# planeswalker as the first target, the creature must be controlled by that planeswalker's controller. Turn 3: Bot1 targets Bot2's
+# Sarkhan, Fireblood (3 loyalty, 2 after the damage) and may not take its own Ornithopter, only Bot2's (1 damage on it). Turn 5: Bot1
+# targets its own Chandra (7 loyalty after the +1, 6 after her own damage) and now may take its own Ornithopter (1 damage) and not Bot2's.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Chandra, Pyromaster
+Ornithopter
+Island x3
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Sarkhan, Fireblood
+Ornithopter
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chandra, Pyromaster.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Sarkhan, Fireblood.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2.Battlefield.Sarkhan, Fireblood)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Sarkhan, Fireblood.Counters.Loyalty = 2
+? Bot2.Battlefield.Ornithopter.Damage = 1
+? Bot1.Battlefield.Ornithopter.Damage = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot1.Battlefield.Chandra, Pyromaster)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Chandra, Pyromaster.Counters.Loyalty = 6
+Bot1.Battlefield.Ornithopter.Damage = 1
+Bot2.Battlefield.Ornithopter.Damage = 0

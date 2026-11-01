@@ -1,0 +1,63 @@
+# Chandra, Pyromaster's -7 exiles the top ten cards of its controller's library, chooses an instant or sorcery card among them and copies it
+# three times; the copies may be cast free, any number of them. Three +1s (all aimed at Bot2: 17) bring her to 7 on turn 5; on turn 7
+# the -7 takes her last loyalty, she is gone before it resolves and it still resolves. The ten are a Mountain, a Lightning
+# Bolt, a Brainstorm and seven Islands: only the two instants are offered, Bolt is chosen, two of its three copies are
+# cast at Bot2 (6 damage, 11) and the third ceases to exist, the Bolt itself remaining exiled with the nine others.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Chandra, Pyromaster
+Island x4
+Island x3
+Mountain
+Lightning Bolt
+Brainstorm
+Island x7
+Island x10
+
+[Bot2 Deck]
+Island x31
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chandra, Pyromaster.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: top ten)
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+? Bot2.Life = 17
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: top ten)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mountain)
+! Bot1.Choose(Lightning Bolt; Brainstorm)
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 11
+Exile = Brainstorm; Island; Island; Island; Island; Island; Island; Island; Lightning Bolt; Mountain
+Bot1.Graveyard = Chandra, Pyromaster; Black Lotus
+Stack.Count = 0

@@ -1,0 +1,58 @@
+# Chandra, Pyromaster's +1 deals 1 damage to the target player and 1 to up to one target creature that player controls, and that
+# creature can't block this turn. Turn 1: the second target may be left out (Bot2 takes 1, 19), and Bot1's own Ornithopter is
+# refused as the second target while Bot2 is the first (the creature must be the player's). Turn 3: Bot2's Ornithopter is
+# targeted too (Bot2 18, the Ornithopter has 1 damage) and, attacked by Bot1's Ornithopter, it can't block; on turn 5 the
+# restriction is over and the same block is allowed (the refusal beside its positive control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Chandra, Pyromaster
+Ornithopter
+Island x3
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chandra, Pyromaster.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot2.Battlefield.Ornithopter.Damage = 1
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Blockers]
+! Bot2.Block(Ornithopter > Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Blockers]
+Bot2.Block(Ornithopter > Ornithopter)
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Chandra, Pyromaster.Counters.Loyalty = 7

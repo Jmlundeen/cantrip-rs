@@ -1,0 +1,49 @@
+# Chandra, Pyromaster's -7 with no instant or sorcery card among the ten exiled: the ten (a Mountain and nine Islands) are all exiled
+# and nothing is chosen, copied or cast. Three +1s bring her to 7 (Bot2 at 17); the -7 on turn 7 leaves it there.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Chandra, Pyromaster
+Island x4
+Island x3
+Mountain
+Island x9
+Island x10
+
+[Bot2 Deck]
+Island x31
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chandra, Pyromaster.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: +1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+? Bot2.Life = 17
+Bot1.Battlefield.Chandra, Pyromaster.Activate(Ability: top ten)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Exile.Count = 10
+Bot1.Graveyard = Chandra, Pyromaster; Black Lotus
+Stack.Count = 0
