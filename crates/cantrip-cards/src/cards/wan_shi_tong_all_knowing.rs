@@ -10,10 +10,12 @@ fn put_into_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "Whenever one or more cards are put into a library from anywhere" (CR 603.2c): cards, not tokens, and not moved within a
-/// library. Judged as the permanent was (CR 603.10a). One trigger for each library, which is the batch's `data[1]`.
+/// library. Judged as the permanent was (CR 603.10a). One trigger for each library, which is the batch's `data[1]`. The object
+/// that arrived is the card or token: a merged permanent's card components are cards though its topmost is a token, each arriving
+/// with its own event (CR 730.3, 730.3e).
 fn cards_into_a_library(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::ZoneChange { old, new, from, to, .. } if to.is(ZoneKind::Library) && !from.is(ZoneKind::Library) && !q.obj(*old).token => {
+        Event::ZoneChange { new, from, to, .. } if to.is(ZoneKind::Library) && !from.is(ZoneKind::Library) && !q.obj(*new).token => {
             Some(Fired { subject: Target::Object(*new), data: [0, to.player.0 as u32] })
         }
         _ => None,

@@ -31,29 +31,33 @@ fn threshold_before(q: &dyn Query, player: PlayerId) -> bool {
         >= 7
 }
 
-/// "Whenever a nontoken creature is put into your graveyard from the battlefield": the permanent as it left (CR 603.10a).
+/// "Whenever a nontoken creature is put into your graveyard from the battlefield": the permanent as it left (CR 603.10a). A merged
+/// permanent is one creature, whose own move triggers it once (its other components arrive from nowhere, CR 730.3); the ability
+/// is about the permanent, from which "that card" finds every card it became (CR 730.3c).
 fn nontoken_creature_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::ZoneChange { old, new, from, to, .. }
+        Event::ZoneChange { old, from, to, .. }
             if from.is(ZoneKind::Battlefield)
                 && *to == Zone::graveyard(q.controller(source))
                 && !q.obj(*old).token
                 && q.chars(*old).is(CardType::Creature)
                 && threshold_before(q, q.controller(source)) =>
         {
-            Fired::about(Target::Object(*new))
+            Fired::about(Target::Object(*old))
         }
         _ => None,
     }
 }
 
 /// "You may pay {1}. If you do, return that card to your hand." The offer is made even when the card has left the
-/// graveyard since (a new object, CR 400.7), which paying then buys nothing for.
+/// graveyard since (a new object, CR 400.7), which paying then buys nothing for. Every card of a merged permanent that is
+/// still in the graveyard is returned (CR 730.3c).
 fn pay_to_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Object(card) = item.subject else { return Ok(()) };
+    let Target::Object(creature) = item.subject else { return Ok(()) };
     let you = item.controller;
-    if g.may_pay(you, item.object, card, cost("{1}"), &RETURN)? && is_live(g, card) && g.obj(card).zone == Zone::graveyard(you) {
-        g.return_to_hand(&[card]);
+    if g.may_pay(you, item.object, creature, cost("{1}"), &RETURN)? {
+        let cards: Vec<ObjectId> = g.found_all_after_move(creature).into_iter().filter(|&c| g.obj(c).zone == Zone::graveyard(you)).collect();
+        g.return_to_hand(&cards);
     }
     Ok(())
 }

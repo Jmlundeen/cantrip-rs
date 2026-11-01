@@ -6,16 +6,18 @@ use cantrip_oracle as oracle;
 const ASK: Question = Question::new("TakeDamageInsteadOfReturn", "have it deal 3 damage to you?", "If you don't, the artifact card returns to its owner's hand", "Take 3 damage", "Let it return").amount(3).no_default();
 
 /// "Whenever a nontoken artifact is put into your graveyard from the battlefield": "your graveyard" is the owner's
-/// (CR 400.3), judged on the board as the artifact last existed (CR 603.10a). The card is the ability's subject.
+/// (CR 400.3), judged on the board as the artifact last existed (CR 603.10a). It is one artifact permanent when it was a merged
+/// permanent (its own move is the one that triggers it; its other components arrive from nowhere, CR 730.3), and the ability is
+/// about the permanent, from which "that card" finds every card it became (CR 730.3c).
 fn artifact_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::ZoneChange { old, new, from, to, .. }
+        Event::ZoneChange { old, from, to, .. }
             if from.is(ZoneKind::Battlefield)
                 && *to == Zone::graveyard(q.controller(source))
                 && !q.obj(*old).token
                 && q.chars(*old).is(CardType::Artifact) =>
         {
-            Fired::about(Target::Object(*new))
+            Fired::about(Target::Object(*old))
         }
         _ => None,
     }
@@ -29,11 +31,9 @@ fn return_unless_damaged(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
         g.damage(item.object, Target::Player(opponent), 3);
         return Ok(());
     }
-    if let Target::Object(card) = item.subject
-        && g.obj(card).zone == Zone::graveyard(item.controller)
-        && g.obj(card).became.is_none()
-    {
-        g.return_to_hand(&[card]);
+    if let Target::Object(artifact) = item.subject {
+        let cards: Vec<ObjectId> = g.found_all_after_move(artifact).into_iter().filter(|&c| g.obj(c).zone == Zone::graveyard(item.controller)).collect();
+        g.return_to_hand(&cards);
     }
     Ok(())
 }

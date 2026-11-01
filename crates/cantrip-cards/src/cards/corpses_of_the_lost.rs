@@ -21,13 +21,14 @@ fn skeleton_pirate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "If you descended this turn" (CR 700.11): a permanent card was put into the player's graveyard from anywhere this
-/// turn, whether or not it is still there. A token is not a card (CR 111.7).
+/// turn, whether or not it is still there. A token is not a card (CR 111.7): the object that arrived, which for a merged
+/// permanent with a token on top is each of its card components still (CR 730.3).
 fn descended_this_turn(q: &dyn Query, asker: &Asker) -> bool {
     q.history()
         .select(EventQuery::kind(EventMask::ZONE_CHANGE).to(ZoneKind::Graveyard).this_turn())
         .any(|r| {
-            matches!(r.event, Event::ZoneChange { old, new, to, .. }
-                if to == Zone::graveyard(asker.controller) && !q.obj(old).token && !q.obj(new).token && targets::is_permanent_card(&q.chars(new)))
+            matches!(r.event, Event::ZoneChange { new, to, .. }
+                if to == Zone::graveyard(asker.controller) && !q.obj(new).token && targets::is_permanent_card(&q.chars(new)))
         })
 }
 
