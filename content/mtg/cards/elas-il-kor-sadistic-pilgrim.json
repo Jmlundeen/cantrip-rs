@@ -1,0 +1,11 @@
+{
+  "name": "Elas il-Kor, Sadistic Pilgrim",
+  "manaCost": "{W}{B}",
+  "type": "Legendary Creature — Phyrexian Kor Cleric",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Deathtouch\nWhenever another creature you control enters, you gain 1 life.\nWhenever another creature you control dies, each opponent loses 1 life.",
+  "keywords": [
+    "Deathtouch"
+  ]
+}

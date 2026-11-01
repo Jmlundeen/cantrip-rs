@@ -1,0 +1,60 @@
+# Elas il-Kor's death trigger sees the creatures that die in the same event as Elas (CR 603.10a, ruling 2022-09-09): Bot2's
+# Pyroclasm kills Elas (2/2) and two Eager Cadets together, and Elas's ability triggers once for each Cadet, so Bot2 loses
+# exactly 2 (and not for Elas itself: "another"). Bot1 gains 1 for each Cadet entering.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Elas il-Kor, Sadistic Pilgrim
+Eager Cadet
+Eager Cadet
+Plains
+Plains x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Pyroclasm
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Elas il-Kor, Sadistic Pilgrim.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Eager Cadet.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Eager Cadet.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Life = 22
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Pyroclasm.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Battlefield.Elas il-Kor, Sadistic Pilgrim = (absent)
+Bot1.Graveyard = Eager Cadet; Eager Cadet; Elas il-Kor, Sadistic Pilgrim

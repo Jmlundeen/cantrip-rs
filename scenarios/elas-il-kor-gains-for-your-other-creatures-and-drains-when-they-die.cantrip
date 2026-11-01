@@ -1,0 +1,57 @@
+# Elas il-Kor gains its controller 1 life for each OTHER creature that enters under their control, and each opponent loses
+# 1 life for each other creature of theirs that dies. Elas entering gains nothing ("another"), Bot2's Dwarven Trader
+# entering and dying gains and drains nothing ("you control"), and Bot1's Eager Cadet entering gains exactly 1 and dying
+# costs Bot2 exactly 1 (CR 603.2, 700.4).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Elas il-Kor, Sadistic Pilgrim
+Eager Cadet
+Plains
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Dwarven Trader
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Elas il-Kor, Sadistic Pilgrim.Cast
+Bot1.Pass
+? Bot1.Life = 20
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Eager Cadet.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Life = 21
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Dwarven Trader.Cast
+Bot2.Pass
+? Bot1.Life = 21
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Dwarven Trader)
+Bot2.Pass
+? Bot2.Life = 20
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Eager Cadet)
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Battlefield.Elas il-Kor, Sadistic Pilgrim.Damage = 0
+Bot1.Graveyard = Eager Cadet
+Bot2.Graveyard = Lightning Bolt; Dwarven Trader; Lightning Bolt; Black Lotus
