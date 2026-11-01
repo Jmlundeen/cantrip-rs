@@ -1,0 +1,59 @@
+# Doom Foretold on turn 1. At Bot2's upkeep Bot2 controls no permanent at all, so it cannot sacrifice and the rest of the
+# ability happens in order: Bot2 discards a card (its choice) and loses 2 life, then Bot1 (the controller, not the player
+# whose upkeep it is) draws a card, gains 2 life and creates a 2/2 white Knight with vigilance, then sacrifices the
+# enchantment. CR 701.21a, 101.2, 608.2c.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Doom Foretold
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island
+Forest
+Mountain
+Swamp
+Plains
+Mox Emerald
+Black Lotus
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Doom Foretold.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 1
+[T2 Bot2.Upkeep]
+Bot2.Pass
+Bot2.Choose(Black Lotus)
+[T2 Bot2.Main1]
+? Bot1.Life = 22
+? Bot2.Life = 18
+? Bot1.Hand.Count = 2
+? Bot2.Graveyard = Black Lotus
+? Bot1.Battlefield.Knight Token.Power = 2
+? Bot1.Battlefield.Knight Token.Toughness = 2
+? Bot1.Battlefield.Knight Token.Keywords = Vigilance
+
+[Expect]
+Bot1.Battlefield.Doom Foretold = (absent)
+Bot1.Graveyard = Doom Foretold
+Bot1.Battlefield.Knight Token.Colors = White
+Bot2.Hand.Count = 7

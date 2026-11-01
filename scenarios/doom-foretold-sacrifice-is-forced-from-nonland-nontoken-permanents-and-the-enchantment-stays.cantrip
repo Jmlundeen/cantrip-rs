@@ -1,0 +1,86 @@
+# Doom Foretold on turn 3, when Bot2 controls a land (Plains), a Servo token and three nonland, nontoken permanents (Retrofitter
+# Foundry, Mox Pearl, Mox Jet). At Bot2's upkeep Bot2 must sacrifice one of the three (the land and the token are not offered),
+# so none of the "if that player can't" effects happen: no life lost or gained, no Knight, the enchantment stays. At Bot1's own
+# upkeep Bot1 (the controller) must sacrifice too, among four Moxen and the enchantment itself, never its Plains: it sacrifices
+# Doom Foretold for its own ability (the ruling), and having sacrificed, it draws nothing and makes no Knight. CR 701.21a,
+# 111.1, 608.2c.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Doom Foretold
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Retrofitter Foundry
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Retrofitter Foundry.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Retrofitter Foundry.Activate(Ability: Create)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Servo Token.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Doom Foretold.Cast
+Bot1.Pass
+[T4 Bot2.Upkeep]
+Bot2.Pass
+! Bot2.Choose(Plains)
+! Bot2.Choose(Servo Token)
+Bot2.Choose(Mox Jet)
+[T4 Bot2.Main1]
+? Bot2.Graveyard = Mox Jet
+? Bot2.Life = 20
+? Bot1.Life = 20
+? Bot1.Battlefield.Doom Foretold.Tapped = false
+[T5 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Choose(Plains)
+Bot1.Choose(Doom Foretold)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield = Mox Pearl; Plains; Retrofitter Foundry; Servo Token
+Bot2.Battlefield.Mox Jet = (absent)
+Bot1.Battlefield.Doom Foretold = (absent)
+Bot1.Graveyard = Doom Foretold
+Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Plains.Tapped = false
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Knight Token = (absent)

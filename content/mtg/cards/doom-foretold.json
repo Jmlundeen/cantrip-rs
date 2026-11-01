@@ -1,0 +1,6 @@
+{
+  "name": "Doom Foretold",
+  "manaCost": "{2}{W}{B}",
+  "type": "Enchantment",
+  "oracleText": "At the beginning of each player's upkeep, that player sacrifices a nonland, nontoken permanent of their choice. If that player can't, they discard a card, they lose 2 life, you draw a card, you gain 2 life, you create a 2/2 white Knight creature token with vigilance, then you sacrifice this enchantment."
+}
