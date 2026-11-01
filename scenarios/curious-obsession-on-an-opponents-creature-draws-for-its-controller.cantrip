@@ -1,0 +1,62 @@
+# Curious Obsession on an opponent's creature: the granted "Whenever this creature deals combat damage to a player, you may
+# draw a card" is the creature's ability, so "you" is its controller (CR 113.8, 603.3a): Bot2's enchanted Savannah Lions (3/2)
+# hits Bot1 on turn 4 and Bot2 draws (library 11 -> 10), Bot1 draws nothing. The end-step sacrifice is the Aura's
+# controller's: Bot1 attacked on turn 3 (Bot2 had no creature then), Bot2's turn 4 end step is not Bot1's, so the Aura is
+# still on the Lions on turn 5; on turn 5 Bot1 attacks with nothing and sacrifices it into its own graveyard.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Savannah Lions
+Curious Obsession
+Plains x16
+
+[Bot2 Deck]
+Plains
+Savannah Lions
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Savannah Lions > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Curious Obsession.Cast(Bot2.Battlefield.Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Savannah Lions.Power = 3
+[T3 Bot1.End]
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Savannah Lions > Bot1)
+[T4 Bot2.CombatDamage]
+Bot2.Pass
+Bot2.Accept
+[T4 Bot2.End]
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Curious Obsession.AttachedTo = Savannah Lions
+? Bot2.Library.Count = 10
+? Bot1.Library.Count = 11
+[T5 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 18
+Bot2.Library.Count = 10
+Bot1.Library.Count = 11
+Bot1.Battlefield.Curious Obsession = (absent)
+Bot1.Graveyard = Curious Obsession

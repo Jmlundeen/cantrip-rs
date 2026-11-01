@@ -1,0 +1,42 @@
+# Curious Obsession: the draw is "may" (CR 603.5): Savannah Lions (2/1) enchanted on turn 3 attacks as a 3/2 into an empty
+# board and hits Bot2 for 3, the trigger is declined, and Bot1 draws nothing (library stays 12, where accepting makes it 11).
+# The attack keeps the Aura through the end step.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Savannah Lions
+Curious Obsession
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Curious Obsession.Cast(Bot1.Battlefield.Savannah Lions)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Savannah Lions.Power = 3
+? Bot1.Battlefield.Savannah Lions.Toughness = 2
+Bot1.Attack(Savannah Lions > Bot2)
+Bot1.Pass
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Decline
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Library.Count = 12
+Bot1.Battlefield.Curious Obsession.AttachedTo = Savannah Lions

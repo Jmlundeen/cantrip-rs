@@ -1,0 +1,41 @@
+# Curious Obsession: "At the beginning of your end step, if you didn't attack with a creature this turn, sacrifice this Aura."
+# Bot1's Savannah Lions attacks on turn 3 BEFORE the Aura exists (the ruling: any creature that attacked counts, not only
+# the enchanted one, and the Aura asks the whole turn's history), so the Aura cast in the second main phase stays through
+# turn 3's end step. On turn 5 nothing attacks - turn 3's attack does not count - and the Aura is sacrificed (CR 603.4, 508.1).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Savannah Lions
+Curious Obsession
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Savannah Lions > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Curious Obsession.Cast(Bot1.Battlefield.Savannah Lions)
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.End]
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Curious Obsession.AttachedTo = Savannah Lions
+[T5 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Curious Obsession = (absent)
+Bot1.Graveyard = Curious Obsession

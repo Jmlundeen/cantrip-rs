@@ -1,0 +1,43 @@
+# Curious Obsession: enchanted creature gets +1/+1 and "Whenever this creature deals combat damage to a player, you may
+# draw a card." Savannah Lions (2/1) enchanted on turn 3 attacks as a 3/2 into an empty board: Bot2 loses exactly 3 (the
+# +1 is power), the trigger is accepted and Bot1 draws one card (library 12 -> 11), and the attack keeps the Aura through
+# the end step. Toughness 2 shown too.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Savannah Lions
+Curious Obsession
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Curious Obsession.Cast(Bot1.Battlefield.Savannah Lions)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Savannah Lions.Power = 3
+? Bot1.Battlefield.Savannah Lions.Toughness = 2
+Bot1.Attack(Savannah Lions > Bot2)
+Bot1.Pass
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Accept
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Library.Count = 11
+Bot1.Battlefield.Curious Obsession.AttachedTo = Savannah Lions

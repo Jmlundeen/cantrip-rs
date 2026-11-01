@@ -1,0 +1,48 @@
+# Curious Obsession: only combat damage dealt to a PLAYER draws. The enchanted Savannah Lions (3/2) is blocked by Bot2's
+# Elvish Mystic and damages the creature, not the player: no trigger (a refused Accept right after the damage), Bot2 stays at
+# 20, Bot1 draws nothing (library 12). The attack still counts as attacking, so the Aura stays through the end step.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Savannah Lions
+Curious Obsession
+Plains x16
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Curious Obsession.Cast(Bot1.Battlefield.Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Savannah Lions > Bot2)
+Bot2.Block(Elvish Mystic > Savannah Lions)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot1.Library.Count = 12
+Bot2.Battlefield.Elvish Mystic = (absent)
+Bot1.Battlefield.Curious Obsession.AttachedTo = Savannah Lions
