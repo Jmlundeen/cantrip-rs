@@ -11,16 +11,18 @@ fn mill_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "When this creature dies, you may exile it. When you do, ..." (CR 603.12): the card it became in the graveyard (CR 400.7)
-/// is exiled, and only if it really was does the reflexive ability trigger. Its target is chosen as that ability goes on
-/// the stack, so the Worm, now in exile, is not among the creature cards in the graveyard.
+/// "When this creature dies, you may exile it. When you do, ..." (CR 603.12): the card it became in the graveyard (CR 400.7;
+/// each card of a merged permanent, CR 730.3c) is exiled, and only if one really was does the reflexive ability trigger. Its
+/// target is chosen as that ability goes on the stack, so the Worm, now in exile, is not among the creature cards in the
+/// graveyard.
 fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
+    if g.found_all_after_move(item.object).is_empty() {
+        return Ok(());
+    }
     if !effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
-    let exiled = g.exile(card);
-    if g.obj(exiled).zone.is(ZoneKind::Exile) {
+    if !effects::exile_what_it_became(g, item.object).is_empty() {
         let this = g.card_id(&CARD);
         g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
     }

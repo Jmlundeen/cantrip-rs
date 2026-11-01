@@ -17,11 +17,10 @@ fn gain_deathtouch_and_return(g: &mut dyn Game, item: &StackItem) -> Result<(), 
 }
 
 /// "Return it to the battlefield tapped under its owner's control" (CR 110.2a, 400.7): the card as it is in the graveyard
-/// (the creature that died); a token is not a card and has ceased to exist, so there is nothing to return (the rulings).
+/// (the creature that died; each card of a merged permanent, together, CR 730.3c); a token is not a card and has ceased to exist,
+/// so there is nothing to return (the rulings).
 fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    let owner = g.obj(card).owner;
-    g.put_onto_battlefield(card, owner, true)?;
+    effects::return_what_it_became(g, item.object, true, &[])?;
     Ok(())
 }
 

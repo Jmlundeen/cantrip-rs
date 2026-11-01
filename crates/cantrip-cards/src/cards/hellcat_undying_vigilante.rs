@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::triggers::THIS_DIES;
 use cantrip_oracle as oracle;
 
@@ -6,20 +7,21 @@ use cantrip_oracle as oracle;
 /// abilities and gains haste." The card it became in the graveyard, if it is still there (CR 400.7), enters with the counter
 /// (CR 122.6). The effect is on the new object, with no duration, so it lasts as long as she stays on the battlefield
 /// (CR 611.2a); in layer 6 she loses all abilities, her own haste and this trigger among them, and then gains haste, which
-/// comes later (CR 613.1f, 613.7), so she does not return a second time.
+/// comes later (CR 613.1f, 613.7), so she does not return a second time. Each card of a merged permanent returns together, each
+/// with its counter and each changed so (CR 730.3c).
 fn return_changed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    let owner = g.obj(card).owner;
-    let hellcat = g.put_onto_battlefield_with_counters(card, owner, false, &[(CounterKind::PlusOne, 1)])?;
     // "She" is the permanent returned: a card kept from entering (Grafdigger's Cage, CR 101.2) or sent elsewhere (Containment
     // Priest, CR 614.1c) gets neither change where it is.
-    if !g.is_on_battlefield(hellcat) {
+    let returned = effects::return_what_it_became(g, item.object, false, &[(CounterKind::PlusOne, 1)])?;
+    if returned.is_empty() {
         return Ok(());
     }
     g.end_sentence();
     instruction(g, |g| {
-        g.add_effect(item.object, hellcat, EffectKind::LoseAllAbilities, Duration::Indefinite);
-        g.add_effect(item.object, hellcat, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+        for &hellcat in &returned {
+            g.add_effect(item.object, hellcat, EffectKind::LoseAllAbilities, Duration::Indefinite);
+            g.add_effect(item.object, hellcat, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+        }
     });
     Ok(())
 }

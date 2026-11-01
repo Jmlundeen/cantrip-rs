@@ -45,10 +45,13 @@ static AS_AURA: EntersAs = EntersAs { aura: true, abilities: &[0], ..EntersAs::N
 
 /// "When Old-Growth Troll dies, if it was a creature, return it to the battlefield. It's an Aura enchantment ...": it comes
 /// back under the control of the ability's controller, not its owner (the rulings), and stays in the graveyard when there is
-/// no Forest it could enchant (CR 303.4g). A token copy has ceased to exist and is not found there (CR 111.7, 400.7).
+/// no Forest it could enchant (CR 303.4g). A token copy has ceased to exist and is not found there (CR 111.7, 400.7). Each card of
+/// a merged permanent returns, together (CR 730.3c).
 fn return_as_aura(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    g.put_onto_battlefield_as(card, item.controller, item, &AS_AURA)?;
+    let cards: Vec<(ObjectId, PlayerId)> = g.found_all_after_move(item.object).into_iter().map(|c| (c, item.controller)).collect();
+    if !cards.is_empty() {
+        g.put_all_onto_battlefield_becoming(&cards, item, &AS_AURA, &[])?;
+    }
     Ok(())
 }
 

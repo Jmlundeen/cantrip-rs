@@ -9,11 +9,9 @@ fn had_no_counters(q: &dyn Query, asker: &Asker) -> bool {
 }
 
 /// "Return it to the battlefield tapped under its owner's control with two stun counters on it" (CR 400.7, 122.1d): the card
-/// it became in the graveyard, if it is still there.
+/// it became in the graveyard, if it is still there - each card of a merged permanent, together (CR 730.3c).
 fn return_stunned(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    let owner = g.obj(card).owner;
-    g.put_onto_battlefield_with_counters(card, owner, true, &[(CounterKind::Stun, 2)])?;
+    effects::return_what_it_became(g, item.object, true, &[(CounterKind::Stun, 2)])?;
     Ok(())
 }
 

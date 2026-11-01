@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::history;
+use cantrip_mechanics::{effects, history};
 use cantrip_oracle as oracle;
 
 /// "Once during each of your turns, you may play a land from your graveyard or cast a permanent spell with mana value 3 or
@@ -33,11 +33,10 @@ fn put_into_graveyard(_: &dyn Query, source: ObjectId, event: &Event) -> Option<
     }
 }
 
-/// "Exile it and you gain 2 life": the card is exiled if it is still in the graveyard it went to; the life is gained either way.
+/// "Exile it and you gain 2 life": the card (each card of a merged permanent, CR 730.3c) is exiled if it is still in the graveyard
+/// it went to; the life is gained either way.
 fn exile_and_gain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = g.found_after_move(item.object) {
-        g.exile(card);
-    }
+    effects::exile_what_it_became(g, item.object);
     g.gain_life(item.controller, 2);
     Ok(())
 }

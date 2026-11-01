@@ -8,11 +8,13 @@ pub static DREAD_WHISPERS: CardDef = CardDef { spell: spell(&[], effects::draw_a
 /// "When this creature dies, you may cast it from your graveyard as an Adventure until the end of your next turn": a
 /// permission (CR 601.3) for the card it became in the graveyard (CR 400.7), while it stays there, to cast it as Dread
 /// Whispers only (CR 715.3), paying its costs and at a sorcery's timing (ruling 2023-09-01). "Your graveyard": a Dreadknight
-/// someone else owned went to its owner's (CR 400.3), which is not the ability's controller's, and nothing is granted.
+/// someone else owned went to its owner's (CR 400.3), which is not the ability's controller's, and nothing is granted. Each card
+/// of a merged permanent may be cast so (CR 730.3c).
 fn may_cast_as_adventure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    if g.obj(card).zone == Zone::graveyard(item.controller) {
-        g.allow_play(card, item.controller, PlayGrant { adventure_only: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST });
+    for card in g.found_all_after_move(item.object) {
+        if g.obj(card).zone == Zone::graveyard(item.controller) {
+            g.allow_play(card, item.controller, PlayGrant { adventure_only: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST });
+        }
     }
     Ok(())
 }

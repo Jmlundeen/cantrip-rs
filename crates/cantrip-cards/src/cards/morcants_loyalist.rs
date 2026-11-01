@@ -4,10 +4,11 @@ use cantrip_mechanics::{lands, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "Another target Elf card from your graveyard" (CR 115.1, 601.2c): a card of your graveyard that is an Elf, other than this
-/// card itself (the new object it became, CR 400.7, in that graveyard as the trigger is put on the stack). "Elf" is a word of this card's text (CR 612).
+/// card itself (the new object it became, CR 400.7, in that graveyard as the trigger is put on the stack - every card of it, if it
+/// was a merged permanent, CR 730.3c). "Elf" is a word of this card's text (CR 612).
 fn another_elf_card_in_your_graveyard(q: &dyn Query, me: &Asker, t: Target) -> bool {
     targets::card_in_your_graveyard(q, me, t, &[])
-        && matches!(t, Target::Object(id) if q.found_after_move(me.source) != Some(id) && q.chars(id).has_subtype(q.words(me.source).subtype(Subtype::Elf)))
+        && matches!(t, Target::Object(id) if !q.found_all_after_move(me.source).contains(&id) && q.chars(id).has_subtype(q.words(me.source).subtype(Subtype::Elf)))
 }
 
 /// "When this creature dies, return another target Elf card from your graveyard to your hand." (CR 400.7: it becomes a new

@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::replacements::DAMAGE_TO_YOU_AND_YOUR_OTHER_PERMANENTS_IS_DEALT_TO_THIS;
 use cantrip_mechanics::triggers::{THIS_DIES, ward};
-use cantrip_mechanics::tokens;
+use cantrip_mechanics::{effects, tokens};
 use cantrip_oracle as oracle;
 
 /// "Damage isn't removed from this creature during cleanup steps" (CR 514.2): this permanent, and no other. A permanent
@@ -10,12 +10,11 @@ fn this_creature(_: &dyn Query, asker: &Asker, object: ObjectId) -> bool {
     object == asker.source
 }
 
-/// "When this creature dies, exile it and create ten tapped Treasure tokens." The card it became in the graveyard is
-/// exiled if it is still there (CR 400.7); the Treasures are made either way, under the ability's controller (CR 111.2).
+/// "When this creature dies, exile it and create ten tapped Treasure tokens." The card it became in the graveyard (each card, for a
+/// merged permanent, CR 730.3c) is exiled if it is still there (CR 400.7); the Treasures are made either way, under the
+/// ability's controller (CR 111.2).
 fn exile_it_and_make_treasures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = g.found_after_move(item.object) {
-        g.exile(card);
-    }
+    effects::exile_what_it_became(g, item.object);
     let treasure = g.card_id(&tokens::TREASURE);
     g.create_tokens(treasure, item.controller, 10, true)?;
     Ok(())

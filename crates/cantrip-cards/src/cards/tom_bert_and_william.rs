@@ -21,10 +21,12 @@ static AN_ARTIFACT: EntersAs = EntersAs { types: Some(TypeSet::of(&[CardType::Ar
 
 /// "Return them to the battlefield. They're an artifact": under the control of the player who controls this ability - the one who
 /// controlled the creature as it died (CR 603.3a, 603.10a) - since the text names no other (CR 110.2a); a card that has since left
-/// the graveyard is another object and returns nothing (CR 400.7).
+/// the graveyard is another object and returns nothing (CR 400.7). Each card of a merged permanent returns, together (CR 730.3c).
 fn return_as_an_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    g.put_onto_battlefield_as(card, item.controller, item, &AN_ARTIFACT)?;
+    let cards: Vec<(ObjectId, PlayerId)> = g.found_all_after_move(item.object).into_iter().map(|c| (c, item.controller)).collect();
+    if !cards.is_empty() {
+        g.put_all_onto_battlefield_becoming(&cards, item, &AN_ARTIFACT, &[])?;
+    }
     Ok(())
 }
 

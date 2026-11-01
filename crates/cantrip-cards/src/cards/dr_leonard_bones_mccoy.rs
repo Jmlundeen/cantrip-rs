@@ -17,20 +17,23 @@ fn watch_for_death(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "... at the beginning of the next end step" (CR 603.7): set up the second delayed ability about the card the
-/// dying creature became. Leaving its graveyard before then makes it a different object (CR 400.7).
+/// dying creature became - every card of it, if it was a merged permanent (CR 730.3c). Leaving its graveyard before then makes
+/// it a different object (CR 400.7).
 fn return_at_end_step(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = g.found_after_move(item.object) {
-        delayed::at_next_end_step(g, item, 1, Target::Object(card));
+    let cards = g.found_all_after_move(item.object);
+    if !cards.is_empty() {
+        delayed::at_next_end_step_about(g, item, 1, &cards);
     }
     Ok(())
 }
 
-/// "Return that card to the battlefield under its owner's control with a +1/+1 counter on it" (CR 603.7c, 122.6).
+/// "Return that card to the battlefield under its owner's control with a +1/+1 counter on it" (CR 603.7c, 122.6): each card the
+/// ability carries that is still the object it was, together.
 fn return_with_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Object(card) = item.subject else { return Ok(()) };
-    if !is_live(g, card) { return Ok(()) }
-    let owner = g.obj(card).owner;
-    g.put_onto_battlefield_with_counters(card, owner, false, &[(CounterKind::PlusOne, 1)])?;
+    let cards: Vec<(ObjectId, PlayerId, bool)> = g.event_objects(item).iter().copied().filter(|&c| is_live(g, c)).map(|c| (c, g.obj(c).owner, false)).collect();
+    if !cards.is_empty() {
+        g.put_all_onto_battlefield_with_counters(&cards, &[(CounterKind::PlusOne, 1)])?;
+    }
     Ok(())
 }
 
