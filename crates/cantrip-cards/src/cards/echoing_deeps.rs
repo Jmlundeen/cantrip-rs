@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::copy;
+use cantrip_mechanics::{copy, graveyards};
 use cantrip_oracle as oracle;
 
 /// "You may have this land enter tapped as a copy of any land card in a graveyard, except it's a Cave in addition to its
@@ -9,10 +9,7 @@ use cantrip_oracle as oracle;
 /// "enters" replacements and triggers apply as it enters (CR 614.12; the rulings). The card stays in the graveyard. If it copies
 /// nothing it enters untapped as itself (the rulings).
 fn enter_tapped_as_copy(g: &mut dyn Game, entry: &mut Entering) -> Result<(), Suspend> {
-    let cards: Vec<ObjectId> = g
-        .state()
-        .seats()
-        .flat_map(|p| g.state().zone(Zone::graveyard(p)).iter().copied())
+    let cards: Vec<ObjectId> = graveyards::cards_in_graveyards(g.state())
         .filter(|&id| g.chars(id).is(CardType::Land))
         .collect();
     copy::enter_tapped_as_copy_of_one_of(g, entry, &cards, |_, copy| copy)?;

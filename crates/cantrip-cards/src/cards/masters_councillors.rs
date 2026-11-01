@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::statics::itself;
 use cantrip_mechanics::triggers::YOU_DRAW_YOUR_SECOND_CARD;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "This creature gets +2/+0 for each graveyard with seven or more cards in it." (CR 613.4c, 404.1): every player's graveyard
@@ -12,13 +12,6 @@ fn plus_two_for_each_big_graveyard(view: &dyn LayerQuery, _: ObjectId, chars: &m
     chars.power = chars.power.map(|v| v + 2 * big);
 }
 
-/// "Target player mills three cards." (CR 701.17a): nothing if the target is gone (CR 608.2b).
-fn mill_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = targets::player(g, item, 0) else { return Ok(()) };
-    g.mill(player, 3);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     statics: &[static_ability(
         Layer::PtModify,
@@ -26,7 +19,7 @@ pub static CARD: CardDef = CardDef {
         plus_two_for_each_big_graveyard,
         "This creature gets +2/+0 for each graveyard with seven or more cards in it.",
     )],
-    abilities: &[triggered(YOU_DRAW_YOUR_SECOND_CARD, mill_three, "Whenever you draw your second card each turn, target player mills three cards.")
+    abilities: &[triggered(YOU_DRAW_YOUR_SECOND_CARD, effects::target_player_mills::<3>, "Whenever you draw your second card each turn, target player mills three cards.")
         .targets(&[targets::PLAYER])],
     ..oracle::MASTERS_COUNCILLORS
 };

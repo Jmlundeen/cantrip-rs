@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::copy;
+use cantrip_mechanics::{copy, graveyards};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new(
@@ -13,9 +13,7 @@ const ASK: Question = Question::new(
 /// Every creature card in every graveyard (CR 608.2d): chosen rather than targeted, so an opponent's graveyard is as available
 /// as your own.
 fn copyable(g: &dyn Game) -> Vec<ObjectId> {
-    g.state()
-        .seats()
-        .flat_map(|p| g.state().zone(Zone::graveyard(p)).iter().copied())
+    graveyards::cards_in_graveyards(g.state())
         .filter(|&id| g.chars(id).is(CardType::Creature))
         .collect()
 }

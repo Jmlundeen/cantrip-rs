@@ -16,14 +16,6 @@ fn you_sacrifice_a_permanent_at_level_two(q: &dyn Query, me: &Asker, event: &Eve
     if class::level(q, me.source) >= 2 { Fired::PLAIN } else { None }
 }
 
-/// "Target player mills two cards." (CR 701.17a)
-fn mill_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(player) = targets::player(g, item, 0) {
-        g.mill(player, 2);
-    }
-    Ok(())
-}
-
 /// "At the beginning of your end step", once the Class is level 3 (CR 716.2a).
 fn your_end_step_at_level_three(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     if class::level(q, me.source) >= 3 { triggers::your_end_step(q, me, event) } else { None }
@@ -71,7 +63,7 @@ pub static CARD: CardDef = CardDef {
         class::level_two("{1}{B}", "{1}{B}: Level 2"),
         triggered(
             when_asked(EventMask::ZONE_CHANGE, you_sacrifice_a_permanent_at_level_two),
-            mill_two,
+            effects::target_player_mills::<2>,
             "Whenever you sacrifice a permanent, target player mills two cards.",
         )
         .on_sacrifice()

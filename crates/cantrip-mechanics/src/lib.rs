@@ -42,6 +42,7 @@ pub mod flurry;
 pub mod gift;
 pub mod goad;
 pub mod goyf;
+pub mod graveyards;
 pub mod greatest_power;
 pub mod harness;
 pub mod hexproof_from;

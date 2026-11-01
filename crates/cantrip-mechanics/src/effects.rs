@@ -834,6 +834,16 @@ pub fn target_player_discards<const N: u32>(g: &mut dyn Game, item: &StackItem) 
     Ok(())
 }
 
+/// "Target player mills N cards" (CR 701.17a): the player the item targeted first, if it is still a legal target as it resolves
+/// (CR 608.2b). Breaking // Entering (eight), Ipnu Rivulet and Restless Reef (four), Masters & Councillors (three) and
+/// Scavenger's Talent (two) print it.
+pub fn target_player_mills<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(player) = crate::targets::player(g, item, 0) {
+        g.mill(player, N);
+    }
+    Ok(())
+}
+
 /// "Sacrifice this [permanent]" (CR 701.21a): the ability's source, sacrificed by the ability's controller - by no one when
 /// another player has gained control of it since. City of Traitors and Carnage, Crimson Chaos print it.
 pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

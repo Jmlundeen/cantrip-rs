@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::graveyards;
 use cantrip_mechanics::statics::{grant_activated_abilities_of, itself};
 use cantrip_oracle as oracle;
 
@@ -12,9 +13,7 @@ use cantrip_oracle as oracle;
 /// gave (CR 613.8a).
 fn graveyard_abilities(view: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     let s = view.state();
-    let cards: Vec<CardId> = s
-        .seats()
-        .flat_map(|p| s.zone(Zone::graveyard(p)).iter().copied())
+    let cards: Vec<CardId> = graveyards::cards_in_graveyards(s)
         .map(|card| view.chars(card))
         .filter(|card| card.is(CardType::Creature))
         .map(|card| card.card)
