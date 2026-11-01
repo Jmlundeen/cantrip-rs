@@ -1,0 +1,11 @@
+{
+  "name": "Altanak, the Thrice-Called",
+  "manaCost": "{5}{G}{G}",
+  "type": "Legendary Creature — Insect Beast",
+  "power": 9,
+  "toughness": 9,
+  "oracleText": "Trample\nWhenever Altanak becomes the target of a spell or ability an opponent controls, draw a card.\n{1}{G}, Discard this card: Return target land card from your graveyard to the battlefield tapped.",
+  "keywords": [
+    "Trample"
+  ]
+}

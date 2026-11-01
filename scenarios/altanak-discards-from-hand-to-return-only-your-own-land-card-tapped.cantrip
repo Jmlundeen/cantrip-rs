@@ -1,0 +1,56 @@
+# Altanak's "{1}{G}, Discard this card: Return target land card from your graveyard to the battlefield tapped" works from
+# the hand (CR 602.2) and its target is a land card in YOUR graveyard (CR 115.1): Bot2's Strip Mine, in Bot2's graveyard, is
+# refused while Bot1's Forest, put there by that Strip Mine, is taken. Ruby + Jet cannot pay the {G}; adding Emerald can,
+# leaving one mana (the cost is {1}{G}, not more). The land comes back tapped. On turn 5, with the Moxen and the Forest
+# untapped to pay, the second Altanak's ability is refused: the only card left in Bot1's graveyard is the discarded Altanak,
+# a creature card, not a land card, so there is no legal target (CR 602.2b, 601.2c).
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Jet
+Mox Emerald
+Altanak, the Thrice-Called
+Altanak, the Thrice-Called
+Island x12
+
+[Bot2 Deck]
+Strip Mine
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Forest; Ability: Destroy)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Altanak, the Thrice-Called.Activate(Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Altanak, the Thrice-Called.Activate(Bot2.Graveyard.Strip Mine)
+Bot1.Hand.Altanak, the Thrice-Called.Activate(Bot1.Graveyard.Forest; Spend: B, G)
+Bot1.Pass
+? Bot1.Mana = {R}
+Bot2.Pass
+? Bot1.Battlefield.Forest.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+! Bot1.Hand.Altanak, the Thrice-Called.Activate(Bot1.Graveyard.Altanak, the Thrice-Called)
+! Bot1.Hand.Altanak, the Thrice-Called.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Graveyard = Altanak, the Thrice-Called
+Bot2.Graveyard = Strip Mine
+Bot1.Hand = Altanak, the Thrice-Called; Island; Island; Island

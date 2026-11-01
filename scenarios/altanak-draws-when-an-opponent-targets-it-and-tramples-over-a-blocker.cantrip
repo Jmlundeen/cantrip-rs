@@ -1,0 +1,53 @@
+# Altanak (cast turn 1 off the Lotus and four Moxen) draws a card when Bot2's Lightning Bolt targets it on turn 2 (CR 603.2),
+# and on turn 3 attacks as a 9/9 trampler: Bot2's 0/2 Ornithopter blocks, and 2 of the 9 damage is assigned to it and the
+# other 7 trample over to Bot2 (CR 702.19b), leaving Bot2 at 13.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Ruby
+Altanak, the Thrice-Called
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Altanak, the Thrice-Called.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Altanak, the Thrice-Called)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+[T3 Bot1.Main1]
+Bot1.Attack(Altanak, the Thrice-Called > Bot2)
+Bot2.Block(Ornithopter > Altanak, the Thrice-Called)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Battlefield.Altanak, the Thrice-Called.Tapped = true
