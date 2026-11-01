@@ -1,6 +1,7 @@
 //! Earthbend N (CR 701.66a): "Target land you control becomes a 0/0 land creature with haste in addition to its other
 //! types. Put N +1/+1 counters on it. When that land dies or is put into exile, return it to the battlefield tapped under
-//! your control." Badgermole Cub, Ba Sing Se, Earthbender Ascension and Aang, at the Crossroads print it.
+//! your control." Badgermole Cub, Ba Sing Se, Earthbender Ascension, Aang, at the Crossroads and Dai Li Indoctrination
+//! print it.
 //!
 //! A card that earthbends lists `enters::<N>(text)` (or `TARGET` and `effect::<N>` for a spell or another ability) and
 //! `RETURN` as its first `delayed` ability: the delayed triggered ability earthbending creates (CR 603.7), which watches

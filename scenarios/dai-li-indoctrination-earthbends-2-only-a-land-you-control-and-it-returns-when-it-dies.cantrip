@@ -1,0 +1,46 @@
+# Dai Li Indoctrination, second mode: "Earthbend 2" (CR 701.66a). Bot2's Mountain is refused as the target; Bot1's Forest
+# becomes a 0/0 land creature with haste and two +1/+1 counters (2/2, still a land). Then Lightning Bolt kills the 2/2 Forest
+# and its delayed ability returns it to the battlefield tapped as a plain land (no counters, not a creature).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Dai Li Indoctrination
+Swamp x11
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dai Li Indoctrination.Cast
+Bot1.Modes(2)
+! Bot1.Target(Bot2.Battlefield.Mountain)
+Bot1.Target(Bot1.Battlefield.Forest)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Forest.Power = 2
+? Bot1.Battlefield.Forest.Toughness = 2
+? Bot1.Battlefield.Forest.Types = Land; Creature
+? Bot1.Battlefield.Forest.Keywords = Haste
+? Bot1.Battlefield.Forest.Counters.PlusOnePlusOne = 2
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Forest)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Forest.Types = Land
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Forest.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Mountain.Types = Land
