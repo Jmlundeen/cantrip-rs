@@ -1,0 +1,83 @@
+# Extraction Specialist's enters trigger returns a creature card with mana value 2 or less from its controller's own
+# graveyard (CR 115.1, 202.3): Bear Cub (exactly 2) is legal beside Elite Vanguard; Alpine Grizzly (3), Sol Ring (not a
+# creature) and Bot2's Devoted Hero (the other player's graveyard) are refused. The Cub can't block on turn 6 nor attack on
+# turn 7 (CR 509.1b, 508.1c) while Specialist, which attacks beside it with lifelink (CR 702.15b), stays under Bot1's
+# control (CR 611.2b).
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Entomb
+Entomb
+Entomb
+Entomb
+Extraction Specialist
+Bear Cub
+Elite Vanguard
+Alpine Grizzly
+Sol Ring
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Entomb
+Eager Cadet
+Plains
+Plains
+Plains
+Plains
+Devoted Hero
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Bear Cub)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Elite Vanguard)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Alpine Grizzly)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Sol Ring)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Devoted Hero)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Eager Cadet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Extraction Specialist.Cast
+Bot1.Pass
+! Bot1.Target(Alpine Grizzly)
+! Bot1.Target(Sol Ring)
+! Bot1.Target(Bot2.Graveyard.Devoted Hero)
+Bot1.Target(Bear Cub)
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Eager Cadet > Bot1)
+! Bot1.Block(Bear Cub > Eager Cadet)
+[T7 Bot1.Main1]
+! Bot1.Attack(Bear Cub > Bot2)
+Bot1.Attack(Extraction Specialist > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 17
+Bot1.Battlefield.Bear Cub.Tapped = false
+Bot1.Graveyard = Entomb; Sol Ring; Entomb; Alpine Grizzly; Entomb; Elite Vanguard; Entomb; Black Lotus
+Bot2.Graveyard = Entomb; Devoted Hero

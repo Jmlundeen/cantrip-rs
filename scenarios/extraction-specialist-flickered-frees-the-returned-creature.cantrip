@@ -1,0 +1,46 @@
+# Extraction Specialist flickered is a new object (CR 400.7): "for as long as you control this creature" was about the
+# object that left, so it is over, and the returned creature attacks at once. Bot1's Specialist returns Bear Cub on turn 3;
+# on turn 5 Ephemerate exiles and returns the Specialist (its new enters trigger has no target), and the Cub attacks: Bot2
+# 20 -> 18.
+
+[Bot1 Deck]
+Mox Jet
+Entomb
+Extraction Specialist
+Plains
+Plains
+Plains
+Ephemerate
+Bear Cub
+Plains x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Bear Cub)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Extraction Specialist.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.Extraction Specialist)
+Bot1.Pass
+Bot1.Attack(Bear Cub > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Bear Cub.Tapped = true
+Bot1.Battlefield.Extraction Specialist.Tapped = false
+Exile = Ephemerate

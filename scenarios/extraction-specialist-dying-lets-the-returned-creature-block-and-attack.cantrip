@@ -1,0 +1,67 @@
+# Once Extraction Specialist leaves the battlefield the creature it returned can attack and block as normal (the ruling; CR
+# 611.2b "for as long as you control this creature" is over). Bot1's Specialist returns Bear Cub on turn 3; Bot2 destroys
+# the Specialist with Go for the Throat on turn 4, then attacks with Eager Cadet, which Bear Cub blocks and kills (the Cub
+# survives, 1 damage on a 2/2). On turn 5 the Cub attacks too: Bot2 20 -> 18.
+
+[Bot1 Deck]
+Mox Jet
+Entomb
+Extraction Specialist
+Plains
+Plains
+Plains
+Plains
+Bear Cub
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Entomb
+Eager Cadet
+Go for the Throat
+Plains
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Bear Cub)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Plains)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Eager Cadet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Extraction Specialist.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Extraction Specialist)
+Bot2.Pass
+Bot2.Attack(Eager Cadet > Bot1)
+Bot1.Block(Bear Cub > Eager Cadet)
+[T5 Bot1.Main1]
+Bot1.Attack(Bear Cub > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot1.Battlefield.Bear Cub.Tapped = true
+Bot1.Graveyard = Extraction Specialist; Entomb
+Bot2.Graveyard = Eager Cadet; Go for the Throat; Entomb; Plains

@@ -1,0 +1,53 @@
+# "If Extraction Specialist leaves the battlefield before its ability resolves, the creature that is returned will be able to
+# attack and block as normal right away" (the ruling; CR 611.2b: a duration whose condition is false as the effect begins
+# does nothing). Bot2 holds up Go for the Throat and destroys the Specialist with its enters trigger on the stack; Bear Cub
+# still returns, and attacks on turn 5: Bot2 20 -> 18.
+
+[Bot1 Deck]
+Mox Jet
+Entomb
+Extraction Specialist
+Plains
+Plains
+Plains
+Plains
+Bear Cub
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Go for the Throat
+Plains x4
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Bear Cub)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Extraction Specialist.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Extraction Specialist)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Bear Cub > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Bear Cub.Tapped = true
+Bot1.Graveyard = Extraction Specialist; Entomb

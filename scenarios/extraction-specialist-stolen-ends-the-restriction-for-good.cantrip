@@ -1,0 +1,63 @@
+# "For as long as you control this creature" (CR 611.2b) ends the moment Bot1 stops controlling Extraction Specialist and
+# never comes back, though control returns. Bot2's Act of Treason takes the Specialist on turn 4 (Bot1 gets it back at the
+# end of the turn); with Bot2 controlling it Bear Cub blocks Eager Cadet, and on turn 5, with the Specialist Bot1's again,
+# the Cub attacks: Bot2 20 -> 18.
+
+[Bot1 Deck]
+Mox Jet
+Entomb
+Extraction Specialist
+Plains
+Plains
+Plains
+Plains
+Bear Cub
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Ruby
+Eager Cadet
+Act of Treason
+Plains
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Bear Cub)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Eager Cadet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Extraction Specialist.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Extraction Specialist)
+Bot2.Pass
+Bot2.Attack(Eager Cadet > Bot1)
+Bot1.Block(Bear Cub > Eager Cadet)
+[T5 Bot1.Main1]
+Bot1.Attack(Bear Cub > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot1.Battlefield.Bear Cub.Tapped = true
+Bot1.Battlefield.Extraction Specialist.Tapped = false
