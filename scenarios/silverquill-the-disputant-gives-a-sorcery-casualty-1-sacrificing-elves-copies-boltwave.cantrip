@@ -1,0 +1,58 @@
+# Silverquill, the Disputant gives sorceries casualty 1 as well as instants ("Each instant and sorcery spell you cast", CR
+# 702.153a, 604.1). Bot1 casts Llanowar Elves and Silverquill, then Boltwave (a sorcery: 3 damage to each opponent) with Mox
+# Ruby, and pays casualty by sacrificing the Elves. The casualty trigger copies Boltwave (CR 707.10): Bot2 takes 3 from the
+# copy and 3 from Boltwave, ending on 14. Bot1 takes none.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Ruby
+Llanowar Elves
+Silverquill, the Disputant
+Boltwave
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Silverquill, the Disputant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boltwave.Cast
+Bot1.Modes(Casualty 1)
+Bot1.Choose(Llanowar Elves)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 14
+Bot1.Graveyard = Boltwave; Llanowar Elves; Black Lotus
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Silverquill, the Disputant
+Stack.Count = 0
