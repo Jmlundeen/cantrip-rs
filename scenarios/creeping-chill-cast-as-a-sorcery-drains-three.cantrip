@@ -1,0 +1,39 @@
+# Cast from hand, Creeping Chill deals exactly 3 to the opponent and its controller gains exactly 3; it then sits in the
+# graveyard (it was not put there from a library, so its trigger never offers the exile: no second drain).
+
+[Bot1 Deck]
+Creeping Chill
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Creeping Chill.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Graveyard.Count = 1
+Exile.Count = 0

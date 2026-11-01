@@ -1,0 +1,6 @@
+{
+  "name": "Creeping Chill",
+  "manaCost": "{3}{B}",
+  "type": "Sorcery",
+  "oracleText": "Creeping Chill deals 3 damage to each opponent and you gain 3 life.\nWhen Creeping Chill is put into your graveyard from your library, you may exile it. If you do, Creeping Chill deals 3 damage to each opponent and you gain 3 life."
+}

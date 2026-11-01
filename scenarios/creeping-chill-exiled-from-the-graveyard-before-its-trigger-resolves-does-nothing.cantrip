@@ -1,0 +1,37 @@
+# With Creeping Chill's trigger on the stack Bot1 exiles the card with Cling to Dust: it is a new object in exile (CR 400.7),
+# so on resolution there is nothing to exile, no question is asked and no life changes (Bot1 only draws from Cling to Dust).
+
+[Bot1 Deck]
+Thought Scour
+Cling to Dust
+Mox Jet
+Mox Sapphire
+Island x3
+Creeping Chill
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cling to Dust.Cast(Bot1.Graveyard.Creeping Chill)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Exile = Creeping Chill
+Stack.Count = 0

@@ -1,0 +1,28 @@
+# Creeping Chill milled from Bot1's own library: its trigger (functioning from the graveyard) lets Bot1 exile it, and only
+# then it deals exactly 3 to Bot2 (not Bot1) and Bot1 gains 3. CR 113.6k, 608.2c.
+
+[Bot1 Deck]
+Thought Scour
+Island x6
+Creeping Chill
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Life = 23
+? Bot2.Life = 17
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 17
+Exile = Creeping Chill
+Bot1.Graveyard.Count = 2
