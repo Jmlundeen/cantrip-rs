@@ -212,10 +212,10 @@ pub struct Ask {
 /// A mana cost: generic, W U B R G C symbols, hybrid pairs (as mana numbers), Phyrexian W U B R G, X symbols.
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct CostObs {
-    pub generic: u8,
-    pub symbols: [u8; 6],
+    pub generic: u32,
+    pub symbols: [u32; 6],
     pub hybrid: Vec<(u8, u8)>,
-    pub phyrexian: [u8; 5],
+    pub phyrexian: [u32; 5],
     pub x: u8,
 }
 

@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// determined, the cards as they are in the graveyard. Only the cost of casting it. Its mana value stays 7 (CR 118.7).
 fn less_per_creature_card_in_your_graveyard(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let cards = q.state().zone(Zone::graveyard(player)).iter().filter(|&&id| q.chars(id).is(CardType::Creature)).count();
-    CostDelta::less(cards.min(255) as u8)
+    CostDelta::less(cards as u32)
 }
 
 /// "When this creature enters, any number of target opponents each discard a card. For each of those opponents who didn't

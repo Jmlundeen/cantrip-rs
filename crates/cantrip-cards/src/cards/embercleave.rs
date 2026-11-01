@@ -16,7 +16,7 @@ fn cheaper_per_attacker(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed,
         .iter()
         .filter(|a| q.is_on_battlefield(a.id) && q.controller(a.id) == player && q.chars(a.id).is(CardType::Creature))
         .count();
-    CostDelta::less(attackers.min(255) as u8)
+    CostDelta::less(attackers as u32)
 }
 
 pub static CARD: CardDef = CardDef {

@@ -308,7 +308,7 @@ static HIVE: CardDef = CardDef {
 /// "This spell costs {1} less to cast for each target you control."
 fn less_for_each_yours(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, targets: &[Target]) -> CostDelta {
     let yours = targets.iter().filter(|&&t| matches!(t, Target::Object(id) if q.obj(id).controller == player)).count();
-    CostDelta::less(yours.min(255) as u8)
+    CostDelta::less(yours as u32)
 }
 
 static ANY_CREATURES: [TargetSpec; 1] = [target(creature).between(0, TargetSpec::ANY_NUMBER)];
@@ -328,7 +328,7 @@ static BULK: CardDef = CardDef {
 /// Fireball's "This spell costs {1} more to cast for each target beyond the first."
 fn more_per_extra_target(_: &dyn Query, _: ObjectId, _: PlayerId, _: Costed, targets: &[Target]) -> CostDelta {
     let chosen = targets.iter().filter(|t| **t != Target::None).count();
-    CostDelta::more(chosen.saturating_sub(1).min(255) as u8)
+    CostDelta::more(chosen.saturating_sub(1) as u32)
 }
 
 /// {1} sorcery: "This spell costs {1} more to cast for each target beyond the first. Any number of target creatures: you

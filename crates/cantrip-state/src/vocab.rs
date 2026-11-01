@@ -251,10 +251,10 @@ impl ManaPool {
     }
 }
 
-/// Mana of each kind, a `u8` each: what one payment spent (`Event::ManaSpent`), what a spell's casting spent (`Obj::spent`)
-/// and what one activation produced (`Event::TappedForMana`). A pool has no limit (`ManaPool`), but one payment spends at most
-/// a cost's worth, and what an activation produced is read only for its kinds, so these stay narrow - the history holds
-/// one of them per such event. Past 255 a kind saturates.
+/// Mana of each kind, a `u8` each: what one payment spent from one source (`Event::ManaSpent`) and what one activation
+/// produced (`Event::TappedForMana`). These are read only for the source and the kinds (a spell's whole spending is
+/// `Obj::spent`, in 32 bits), so they stay narrow - the history holds one of them per such event. Past 255 a kind saturates
+/// (RX-5, "the mana a cast records").
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub struct ManaTally(pub [u8; 6]);
 
@@ -287,18 +287,18 @@ impl ManaTally {
 /// symbols. Snow ({S}) is not built.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub struct ManaCost {
-    pub generic: u8,
+    pub generic: u32,
     /// W U B R G C, as `Mana` orders them.
-    pub symbols: [u8; 6],
+    pub symbols: [u32; 6],
     /// Hybrid symbols (CR 107.4e): each paid with either of two types of mana. Two colors ({W/U}), or a color and
     /// colorless ({C/W}, a monocolored hybrid symbol whose other half is {C}).
     pub hybrid: [Option<(Mana, Mana)>; 6],
     /// Monocolored hybrid symbols with a generic half (CR 107.4e), {2/W} of each color, W U B R G: each paid with one mana
     /// of that color or two generic mana, chosen as the cost is announced (CR 601.2b, 118.13a); each counts 2 toward the
     /// mana value (CR 202.3f) and is its color (CR 202.2d).
-    pub twobrid: [u8; 5],
+    pub twobrid: [u32; 5],
     /// Phyrexian symbols (CR 107.4f) of each color, W U B R G: each paid with that color or 2 life.
-    pub phyrexian: [u8; 5],
+    pub phyrexian: [u32; 5],
     /// How many {X} symbols it has (CR 107.3): {X}{X} is 2.
     pub x: u8,
 }
@@ -307,11 +307,11 @@ impl ManaCost {
     pub const ZERO: ManaCost = ManaCost { generic: 0, symbols: [0; 6], hybrid: [None; 6], twobrid: [0; 5], phyrexian: [0; 5], x: 0 };
 
     pub fn mana_value(&self) -> u32 {
-        self.generic as u32
-            + self.symbols.iter().map(|&n| n as u32).sum::<u32>()
+        self.generic
+            + self.symbols.iter().sum::<u32>()
             + self.hybrid.iter().flatten().count() as u32
-            + 2 * self.twobrid.iter().map(|&n| n as u32).sum::<u32>()
-            + self.phyrexian.iter().map(|&n| n as u32).sum::<u32>()
+            + 2 * self.twobrid.iter().sum::<u32>()
+            + self.phyrexian.iter().sum::<u32>()
     }
 
     pub fn is_zero(&self) -> bool {
@@ -320,7 +320,7 @@ impl ManaCost {
 
     /// How many {2/W}-style symbols the cost has.
     pub fn twobrids(&self) -> u32 {
-        self.twobrid.iter().map(|&n| n as u32).sum()
+        self.twobrid.iter().sum()
     }
 
     /// The nonhybrid equivalent of its monocolored hybrid symbols (CR 601.2b): the symbols `generic` lists (by their order
@@ -331,10 +331,9 @@ impl ManaCost {
         for (i, &n) in self.twobrid.iter().enumerate() {
             for _ in 0..n {
                 if generic.get(at).copied().unwrap_or(false) {
-                    out.generic = out.generic.saturating_add(2);
+                    out.generic += 2;
                 } else {
-                    let colored = &mut out.symbols[Color::ALL[i].mana() as usize];
-                    *colored = colored.saturating_add(1);
+                    out.symbols[Color::ALL[i].mana() as usize] += 1;
                 }
                 at += 1;
             }
@@ -351,16 +350,16 @@ impl ManaCost {
     /// payment's view of it only.
     pub fn paid_with_any_color(&self) -> ManaCost {
         let mut paid = *self;
-        let mut generic = self.generic as u32;
+        let mut generic = self.generic;
         for i in 0..5 {
-            generic += self.symbols[i] as u32;
+            generic += self.symbols[i];
             paid.symbols[i] = 0;
         }
         // A hybrid symbol has a colored half, which any mana may now pay.
         generic += paid.hybrid.iter().flatten().count() as u32 + self.twobrids();
         paid.hybrid = [None; 6];
         paid.twobrid = [0; 5];
-        paid.generic = generic.min(255) as u8;
+        paid.generic = generic;
         paid
     }
 
@@ -373,12 +372,12 @@ impl ManaCost {
     /// mana (delve, improvise) is still held to the cost's own generic part.
     pub fn paid_with_any_type(&self) -> ManaCost {
         let mut paid = *self;
-        let symbols: u32 = self.symbols.iter().map(|&n| n as u32).sum();
+        let symbols: u32 = self.symbols.iter().sum();
         let hybrid = self.hybrid.iter().flatten().count() as u32 + self.twobrids();
         paid.symbols = [0; 6];
         paid.hybrid = [None; 6];
         paid.twobrid = [0; 5];
-        paid.generic = (self.generic as u32 + symbols + hybrid).min(255) as u8;
+        paid.generic = self.generic + symbols + hybrid;
         paid
     }
 
@@ -386,14 +385,14 @@ impl ManaCost {
     /// is that of its unlocked doors, CR 709.5).
     pub fn plus(&self, other: &ManaCost) -> ManaCost {
         let mut sum = *self;
-        sum.generic = sum.generic.saturating_add(other.generic);
-        sum.x = sum.x.saturating_add(other.x);
+        sum.generic += other.generic;
+        sum.x += other.x;
         for i in 0..6 {
-            sum.symbols[i] = sum.symbols[i].saturating_add(other.symbols[i]);
+            sum.symbols[i] += other.symbols[i];
         }
         for i in 0..5 {
-            sum.phyrexian[i] = sum.phyrexian[i].saturating_add(other.phyrexian[i]);
-            sum.twobrid[i] = sum.twobrid[i].saturating_add(other.twobrid[i]);
+            sum.phyrexian[i] += other.phyrexian[i];
+            sum.twobrid[i] += other.twobrid[i];
         }
         for pair in other.hybrid.iter().flatten() {
             if let Some(slot) = sum.hybrid.iter().position(|h| h.is_none()) {
@@ -404,17 +403,16 @@ impl ManaCost {
     }
 
     /// The cost paid `n` times over, each symbol `n` times (CR 603.12a: "you may pay {G} up to three times" is {G}{G} paid
-    /// twice). `None` when the result does not fit the cost's shape: a symbol count past a byte, or more hybrid symbols
-    /// than its slots hold. Never a smaller cost than `n` payments.
+    /// twice). `None` when the result does not fit the cost's shape: more {X} symbols than a byte counts, or more hybrid
+    /// symbols than its slots hold. Never a smaller cost than `n` payments.
     pub fn times(&self, n: u32) -> Option<ManaCost> {
-        let mul = |k: u8| u8::try_from(u32::from(k) * n).ok();
-        let mut out = ManaCost { generic: mul(self.generic)?, x: mul(self.x)?, hybrid: [None; 6], ..*self };
+        let mut out = ManaCost { generic: self.generic * n, x: u8::try_from(u32::from(self.x) * n).ok()?, hybrid: [None; 6], ..*self };
         for i in 0..6 {
-            out.symbols[i] = mul(self.symbols[i])?;
+            out.symbols[i] = self.symbols[i] * n;
         }
         for i in 0..5 {
-            out.phyrexian[i] = mul(self.phyrexian[i])?;
-            out.twobrid[i] = mul(self.twobrid[i])?;
+            out.phyrexian[i] = self.phyrexian[i] * n;
+            out.twobrid[i] = self.twobrid[i] * n;
         }
         let mut slot = 0;
         for _ in 0..n {
@@ -1604,8 +1602,7 @@ mod tests {
         assert_eq!(one.times(0).expect("fits").mana_value(), 0);
         assert!(one.times(7).is_none(), "seven hybrid symbols don't fit six slots");
         let g = ManaCost { symbols: [0, 0, 0, 0, 1, 0], ..ManaCost::ZERO };
-        assert_eq!(g.times(255).map(|c| c.symbols[Mana::G as usize]), Some(255));
-        assert!(g.times(256).is_none(), "past a byte");
+        assert_eq!(g.times(300).map(|c| c.symbols[Mana::G as usize]), Some(300), "past a byte");
     }
 
     /// CR 613.7, 613.8a(b): text changes chain whichever order they came in; a loop of two changes of one word applies the

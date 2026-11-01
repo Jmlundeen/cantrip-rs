@@ -4,12 +4,10 @@
 use cantrip_api::*;
 
 /// "This spell costs {1} less to cast for each instant and sorcery card in your graveyard" (CR 601.2f, 118.7a): counted as
-/// the cost is determined, the cards as they are in the graveyard. The count is clamped to a byte, which loses nothing: it
-/// reduces generic mana, and a cost's generic part is itself a byte (docs/rules-exceptions.md RX-5). Eddymurk Crab and The
-/// Dawning Archaic print it.
+/// the cost is determined, the cards as they are in the graveyard. Eddymurk Crab and The Dawning Archaic print it.
 pub fn for_each_instant_and_sorcery_in_your_graveyard(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let cards = q.state().zone(Zone::graveyard(player)).iter().filter(|&&id| q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)).count();
-    CostDelta::less(cards.min(255) as u8)
+    CostDelta::less(cards as u32)
 }
 
 /// "This spell costs {N} less to cast if you control a [subtype]" (CR 601.2f, 118.7a): judged once, as the total cost is
@@ -19,5 +17,5 @@ pub fn for_each_instant_and_sorcery_in_your_graveyard(q: &dyn Query, _: ObjectId
 /// Shell (Turtle), Truck Toss (Vehicle, {2}) and Geistlight Snare (Spirit) print it.
 pub fn less_if_you_control_subtype<const N: u8, const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let wanted = crate::lands::word(q, source, TYPE);
-    if q.permanents_of(player).into_iter().any(|id| q.chars(id).has_subtype(wanted)) { CostDelta::less(N) } else { CostDelta::NONE }
+    if q.permanents_of(player).into_iter().any(|id| q.chars(id).has_subtype(wanted)) { CostDelta::less(N as u32) } else { CostDelta::NONE }
 }

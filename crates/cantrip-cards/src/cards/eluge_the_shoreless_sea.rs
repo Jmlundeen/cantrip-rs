@@ -45,11 +45,7 @@ fn first_instant_or_sorcery_costs_less(q: &dyn Query, source: ObjectId, player: 
         .filter(|&&id| s.obj(id).controller == player && s.obj(id).counters(CounterKind::Flood) > 0 && q.chars(id).is(CardType::Land))
         .count();
     let mut less = ManaCost::ZERO;
-    // A cost's counts are u8 (KI-103). The {U} the cost does not absorb takes generic mana instead (CR 118.7c), so past the
-    // 255 {U} a reduction holds, the rest is a generic reduction: the same cost, up to 510 flooded lands.
-    let flooded = u32::try_from(flooded).unwrap_or(u32::MAX);
-    less.symbols[Mana::U as usize] = flooded.min(255) as u8;
-    less.generic = flooded.saturating_sub(255).min(255) as u8;
+    less.symbols[Mana::U as usize] = flooded as u32;
     CostDelta::less_mana(less)
 }
 

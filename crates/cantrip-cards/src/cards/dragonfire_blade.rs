@@ -15,7 +15,7 @@ fn plus_two_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 fn less_per_color_of_target(q: &dyn Query, _: &Asker, _: Costed, targets: &[Target]) -> CostDelta {
     // Its one target, the creature (equip's only slot).
     let colors: u32 = targets.iter().filter_map(|t| t.object()).map(|creature| q.chars(creature).colors.0.count_ones()).sum();
-    CostDelta::less(colors as u8)
+    CostDelta::less(colors)
 }
 
 pub static CARD: CardDef = CardDef {

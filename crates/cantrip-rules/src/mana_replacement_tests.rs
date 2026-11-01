@@ -317,7 +317,7 @@ fn payment_planning_counts_the_replaced_mana() {
     assert!(can_afford(&cx(&mut g), YOU, spell, &ManaCost { generic: 2, ..ManaCost::ZERO }));
     assert!(!can_afford(&cx(&mut g), YOU, spell, &ManaCost { generic: 3, ..ManaCost::ZERO }));
 
-    let green = |n: u8| {
+    let green = |n: u32| {
         let mut symbols = [0; 6];
         symbols[Mana::G as usize] = n;
         ManaCost { symbols, ..ManaCost::ZERO }

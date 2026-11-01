@@ -12,7 +12,7 @@ fn page(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// never below zero of it ({5} has five generic to give).
 fn cheaper_per_page_counter(q: &dyn Query, asker: &Asker, _: Costed, _: &[Target]) -> CostDelta {
     let source = asker.source;
-    CostDelta::less(q.state().obj(source).counters(CounterKind::Page).clamp(0, 255) as u8)
+    CostDelta::less(q.state().obj(source).counters(CounterKind::Page).max(0) as u32)
 }
 
 pub static CARD: CardDef = CardDef {

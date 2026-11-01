@@ -1,8 +1,9 @@
 //! Numbers past 255 that the rules set no limit on, over test cards: a spell with "any number of target creatures" chooses
 //! more than 250 of them (CR 115.1d) and every one is its target; "X target creatures" is X targets whatever X is (CR 601.2c);
 //! and a spell of mana value 260 is recorded as cast with mana value 260 (CR 202.3, 601.2i), which what asks about past casts
-//! reads; and a share of 300 of a divided total is kept whole (CR 601.2d). No printed card in the engine reaches such numbers
-//! on today's boards, so test cards do here.
+//! reads; a share of 300 of a divided total is kept whole (CR 601.2d); and an X of 300, announced for a spell or an activated
+//! ability, is 300 generic mana paid (CR 107.3, 601.2f, 602.2b) and 300 recorded as spent (CR 601.2h). No printed card in
+//! the engine reaches such numbers on today's boards, so test cards do here.
 
 use std::sync::OnceLock;
 
@@ -64,6 +65,28 @@ fn blast(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
+fn gain_x(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    g.gain_life(item.controller, i32::from(item.x));
+    Ok(())
+}
+
+/// An {X} sorcery: "You gain X life."
+static BOON: CardDef = CardDef {
+    name: "Probe Boon",
+    types: TypeSet::of(&[CardType::Sorcery]),
+    cost: ManaCost { x: 1, ..ManaCost::ZERO },
+    spell: spell(&[], gain_x),
+    ..CardDef::BLANK
+};
+
+/// An artifact: "{X}, {T}: You gain X life."
+static FOUNT: CardDef = CardDef {
+    name: "Probe Fount",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(cost("{X}").and(TAP), gain_x, "{X}, {T}: You gain X life.")],
+    ..CardDef::BLANK
+};
+
 /// A 400/400.
 static GIANT: CardDef = CardDef {
     name: "Probe Giant",
@@ -86,7 +109,7 @@ static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeS
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&VOLLEY, &SURGE, &WELL, &BLAST, &GIANT, &BEAR, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&VOLLEY, &SURGE, &WELL, &BLAST, &GIANT, &BEAR, &BOON, &FOUNT, &FILLER]))
 }
 
 /// A game in which Bot1 holds `card` on turn 1.
@@ -205,4 +228,82 @@ fn a_divided_share_of_300_is_dealt_whole() {
     });
     assert_eq!(held, Some(300), "the share was not kept whole");
     assert_eq!(game.state.obj(giant).damage, 300);
+}
+
+/// Puts a permanent of `name` onto Bot1's battlefield.
+fn put(game: &mut Game, name: &str) -> ObjectId {
+    let id = game.state.push_obj(Obj::new(table().find(name).unwrap(), PlayerId(0), Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, id);
+    id
+}
+
+/// Announces 300 for X and pays with the Probe Wells' mana: each Well tapped, then the pool's mana one at a time.
+fn announce_300_and_pay(request: &Request) -> Option<Answer> {
+    match &request.kind {
+        RequestKind::PayCosts { announcing: true, most, .. } => {
+            assert!(*most >= 300, "an X of 300 may be announced with 520 mana: {most}");
+            Some(Answer::Announce(300))
+        }
+        RequestKind::PayCosts { options, .. } => Some(Answer::Act(Action::of(
+            options
+                .iter()
+                .find(|o| o.kind == ActionKind::ConfirmCasting)
+                .or_else(|| options.iter().find(|o| o.kind == ActionKind::ActivateAbility))
+                .or_else(|| options.iter().find(|o| o.kind == ActionKind::AssignMana))
+                .unwrap_or_else(|| panic!("the mana to pay with: {request:?}")),
+        ))),
+        _ => None,
+    }
+}
+
+/// Probe Boon cast with X 300 from two Probe Wells (520 mana): 300 generic mana is paid, 220 left in the pool, 300 recorded
+/// as spent to cast it (CR 601.2h), and it gains 300 life.
+#[test]
+fn an_x_of_300_for_a_spell_pays_300_mana() {
+    let mut game = game("Probe Boon");
+    put(&mut game, "Probe Well");
+    put(&mut game, "Probe Well");
+    let mut spent = None;
+    cast(&mut game, "Probe Boon", |game, request| match &request.kind {
+        RequestKind::Priority { .. } if !game.state.stack.is_empty() => {
+            spent = Some(game.state.obj(game.state.stack.last().unwrap().object).spent.total());
+            None
+        }
+        _ => announce_300_and_pay(request),
+    });
+    assert_eq!(spent, Some(300), "the mana spent to cast it");
+    assert_eq!(game.state.player(PlayerId(0)).pool.total(), 220, "the mana left in the pool");
+    assert_eq!(game.state.player(PlayerId(0)).life, 320);
+}
+
+/// Probe Fount's "{X}, {T}" activated with X 300 from two Probe Wells: 300 generic mana is paid (CR 602.2b, 601.2f), 220
+/// left in the pool, and it gains 300 life.
+#[test]
+fn an_x_of_300_for_an_activated_ability_pays_300_mana() {
+    let mut game = game("Filler");
+    let fount = put(&mut game, "Probe Fount");
+    put(&mut game, "Probe Well");
+    put(&mut game, "Probe Well");
+    let mut activated = false;
+    for _ in 0..2000 {
+        game.run();
+        let settled = game.state.stack.is_empty() && matches!(game.pending().map(|r| &r.kind), Some(RequestKind::Priority { .. }));
+        if activated && settled {
+            break;
+        }
+        let request = game.pending().cloned().expect("the game goes on");
+        let reply = announce_300_and_pay(&request).unwrap_or_else(|| match &request.kind {
+            RequestKind::Priority { options } if request.player == PlayerId(0) && !activated && game.state.turn.step() == Step::PrecombatMain => {
+                activated = true;
+                let option = options.iter().find(|o| o.kind == ActionKind::ActivateAbility && o.source == Some(fount));
+                Answer::Act(Action::of(option.expect("Probe Fount's ability is offered")))
+            }
+            RequestKind::Priority { .. } => Answer::Pass,
+            other => panic!("unexpected question {other:?}"),
+        });
+        game.answer(request.id, request.player, reply).unwrap();
+    }
+    assert!(activated);
+    assert_eq!(game.state.player(PlayerId(0)).pool.total(), 220, "the mana left in the pool");
+    assert_eq!(game.state.player(PlayerId(0)).life, 320);
 }

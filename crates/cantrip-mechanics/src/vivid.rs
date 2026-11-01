@@ -18,5 +18,5 @@ pub fn count(q: &dyn Query, player: PlayerId) -> u8 {
 /// total cost is determined, for the player casting it; generic mana only (CR 118.7a), and colorless is no color. An
 /// `own_cost_changes` entry: Rime Chill and Wildvine Pummeler print it.
 pub fn cheaper_per_color(q: &dyn Query, _: ObjectId, caster: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
-    CostDelta::less(count(q, caster))
+    CostDelta::less(u32::from(count(q, caster)))
 }

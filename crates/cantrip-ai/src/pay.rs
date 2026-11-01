@@ -276,7 +276,7 @@ fn owed_symbols(owed: &ManaCost) -> (Vec<Vec<Mana>>, u32) {
             symbols.push(vec![colors[i]]);
         }
     }
-    (symbols, u32::from(owed.generic))
+    (symbols, owed.generic)
 }
 
 /// Whether the sources `used` (indices into `sources`) pay the symbols and the generic part, and the mana their taps add

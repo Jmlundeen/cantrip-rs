@@ -811,7 +811,7 @@ fn ward_discard_or_pay_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
     // The cost is either one: the payer is asked about the mana first, and about the discard if they decline or can't pay.
-    if g.may_pay(payer, item.object, by, Cost { mana: generic(N), ..Cost::NONE }, &WARD_PAY_OR_DISCARD)? || ward_discard_paid(g, item, by)? {
+    if g.may_pay(payer, item.object, by, Cost { mana: generic(N as u32), ..Cost::NONE }, &WARD_PAY_OR_DISCARD)? || ward_discard_paid(g, item, by)? {
         return Ok(());
     }
     g.counter_item(by, item.data[1] as usize);

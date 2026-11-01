@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// creature's power." The sacrifice is a cost (CR 601.2h), so the creature is gone when this resolves and X is its power
 /// as it last existed on the battlefield (CR 113.7a, 608.2h); the payment is asked even for {0} (CR 118.5).
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u8;
+    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u32;
     counter_unless_pays(g, item, 0, generic(power))?;
     Ok(())
 }

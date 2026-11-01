@@ -389,7 +389,7 @@ pub fn ward_matches(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fi
 fn ward_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
-    if !g.may_pay(payer, item.object, by, Cost { mana: generic(N), ..Cost::NONE }, &COUNTERED_UNLESS_PAID)? {
+    if !g.may_pay(payer, item.object, by, Cost { mana: generic(N as u32), ..Cost::NONE }, &COUNTERED_UNLESS_PAID)? {
         g.counter_item(by, item.data[1] as usize);
     }
     Ok(())

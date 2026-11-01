@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// mana only; a creature with negative power reduces nothing, and with no creatures there is no reduction.
 fn cheaper_by_greatest_power(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let greatest = greatest_power::among_creatures_you_control(q, player);
-    CostDelta::less(greatest.min(255) as u8)
+    CostDelta::less(u32::from(greatest))
 }
 
 /// "{T}: Add {G}{G}. You gain 2 life." A mana ability: the life is gained as it resolves.

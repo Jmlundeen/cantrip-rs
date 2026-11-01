@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// The announced target determines the equip cost (CR 601.2f, 602.2b); only generic mana is reduced (CR 118.7a).
 fn less_per_counter_on_target(q: &dyn Query, _: &Asker, _: Costed, targets: &[Target]) -> CostDelta {
     let counters = targets.iter().filter_map(|t| t.object())
-        .map(|creature| q.state().obj(creature).counters(CounterKind::PlusOne).clamp(0, 255) as u8).sum();
+        .map(|creature| q.state().obj(creature).counters(CounterKind::PlusOne).max(0) as u32).sum();
     CostDelta::less(counters)
 }
 

@@ -11,10 +11,10 @@ pub fn symbols_of(q: &dyn Query, id: ObjectId, color: Color) -> u32 {
         return 0;
     }
     let cost = q.card(values.card).cost;
-    cost.symbols[mana as usize] as u32
+    cost.symbols[mana as usize]
         + cost.hybrid.iter().flatten().filter(|(a, b)| *a == mana || *b == mana).count() as u32
-        + cost.phyrexian[mana as usize] as u32
-        + cost.twobrid[mana as usize] as u32
+        + cost.phyrexian[mana as usize]
+        + cost.twobrid[mana as usize]
 }
 
 /// "Your devotion to [color]" (CR 700.5): the mana symbols of `color` among the mana costs of permanents `player`

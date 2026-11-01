@@ -13,7 +13,7 @@ fn instants_and_sorceries_cost_the_equipped_creatures_power_less(q: &dyn Query, 
         return CostDelta::NONE;
     }
     let power = q.obj(source).attached_to.and_then(|creature| q.chars(creature).power).unwrap_or(0);
-    CostDelta::less(power.clamp(0, 255) as u8)
+    CostDelta::less(power.max(0) as u32)
 }
 
 /// "Mill six cards, then put all instant and sorcery cards from among them into your hand." (CR 701.17a, 701.17c, 608.2c): the

@@ -12,7 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.add_counters(creature, CounterKind::PlusOne, item.x as i16);
     }
     if targets::object(g, item, 1).is_some() {
-        let greatest = greatest_power::among_creatures_you_control(g, item.controller).min(255) as u8;
+        let greatest = u32::from(greatest_power::among_creatures_you_control(g, item.controller));
         counter_unless_pays(g, item, 1, generic(greatest))?;
     }
     Ok(())

@@ -15,7 +15,7 @@ fn costs_less_for_the_greatest_elemental(q: &dyn Query, spell: ObjectId, player:
         .map(|id| q.mana_value(id))
         .max()
         .unwrap_or(0);
-    CostDelta::less(greatest.min(255) as u8)
+    CostDelta::less(greatest)
 }
 
 /// "Return all non-Elemental creatures to their owners' hands" (CR 400.3, 101.4): every creature on the battlefield that is

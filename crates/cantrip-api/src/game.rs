@@ -52,11 +52,11 @@ pub struct CastTerms {
     /// Mana of any type may pay for it (CR 609.4b, 118.14).
     pub any_type: bool,
     /// Generic mana added to its cost (CR 601.2f).
-    pub more: u8,
+    pub more: u32,
     /// Generic mana taken off what an {X} in `instead` adds, as X is announced and before anything increases the cost, never
     /// below nothing (CR 107.3a, 118.7a): what a reduction of a cost paid instead leaves for X once the cost's own generic
     /// mana is gone (Aminatou, Veil Piercer's "its mana cost reduced by {4}" on The Meathook Massacre).
-    pub less: u8,
+    pub less: u32,
     /// Life paid with its cost (CR 118.9, 119.4): Bolas's Citadel's mana value.
     pub life: u8,
     /// "If that spell would be put into your graveyard, exile it instead" (CR 614.1a), as the effect's text words it: of any

@@ -18,7 +18,7 @@ fn less_per_instant_sorcery_or_adventure_in_your_graveyard(q: &dyn Query, _: Obj
             chars.is(CardType::Instant) || chars.is(CardType::Sorcery) || q.card(q.state().obj(id).card).adventure.is_some()
         })
         .count();
-    CostDelta::less(cards.min(255) as u8)
+    CostDelta::less(cards as u32)
 }
 
 /// The Adventure (CR 715): "Discard your hand, then draw two cards."

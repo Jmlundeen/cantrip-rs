@@ -10,7 +10,7 @@ fn pump_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 fn cost_reduction(q: &dyn Query, asker: &Asker, _: Costed, _: &[Target]) -> CostDelta {
     let lands = lands::differently_named_lands(q, asker.controller) as i32;
-    CostDelta::less(lands.min(255) as u8)
+    CostDelta::less(lands as u32)
 }
 
 pub static CARD: CardDef = CardDef {

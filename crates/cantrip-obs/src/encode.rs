@@ -987,7 +987,7 @@ pub fn encode(
             g.set(game::HYBRID, c.hybrid.len() as f32, 8.0);
             g.set(
                 game::PHYREXIAN,
-                c.phyrexian.iter().map(|&p| p as u32).sum::<u32>() as f32,
+                c.phyrexian.iter().sum::<u32>() as f32,
                 8.0,
             );
         };

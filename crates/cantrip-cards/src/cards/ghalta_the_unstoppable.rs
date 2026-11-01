@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// the card (CR 116.2).
 fn reduction(q: &dyn Query, _: ObjectId, p: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let x = greatest_power::among_creatures_you_control(q, p);
-    CostDelta::less(x.min(255) as u8)
+    CostDelta::less(u32::from(x))
 }
 
 pub static CARD: CardDef = CardDef {

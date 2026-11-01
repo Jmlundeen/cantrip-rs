@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// 118.7a): a generic reduction of the spell's casting cost, with the land count read as the total cost is determined.
 fn cost_reduction(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let count = lands::differently_named_lands(q, player);
-    CostDelta::less(count.min(255) as u8)
+    CostDelta::less(count as u32)
 }
 
 /// Create the two Romulans, then draw two cards and discard one (CR 111.1, 121.1, 701.9).

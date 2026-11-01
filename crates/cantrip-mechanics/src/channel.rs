@@ -15,5 +15,5 @@ pub fn cheaper_per_legendary_creature(q: &dyn Query, asker: &Asker, _: Costed, _
             chars.is(CardType::Creature) && chars.supertypes.legendary
         })
         .count();
-    CostDelta::less(legends.min(255) as u8)
+    CostDelta::less(legends as u32)
 }

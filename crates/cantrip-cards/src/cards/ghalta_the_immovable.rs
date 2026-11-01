@@ -15,8 +15,8 @@ fn less_by_greatest_toughness(q: &dyn Query, _: ObjectId, player: PlayerId, _: C
         .map(|c| c.toughness.unwrap_or(0))
         .max()
         .unwrap_or(0)
-        .clamp(0, u8::MAX as i16);
-    CostDelta::less(greatest as u8)
+        .max(0);
+    CostDelta::less(greatest as u32)
 }
 
 /// "Creatures you control can attack as though they didn't have defender" (CR 702.3b).

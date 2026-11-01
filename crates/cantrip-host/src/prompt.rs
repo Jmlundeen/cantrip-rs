@@ -336,7 +336,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
         }
         ActionKind::TapToPay | ActionKind::ExileToPay => {
             m.alternative = i32::from(o.index);
-            m.pays_up_to = if o.index == PAY_CONVOKE { 0 } else { i32::MAX.min(255) };
+            m.pays_up_to = if o.index == PAY_CONVOKE { 0 } else { i32::MAX };
             m.target_candidates = candidates;
         }
         _ => m.target_candidates = candidates,
@@ -826,9 +826,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 spell: source_handle(game, handles, *source),
                 total: total.to_string(),
                 remaining: remaining.to_string(),
-                remaining_generic: i32::from(remaining.generic),
+                remaining_generic: wire(remaining.generic),
                 remaining_colored: remaining_colored(remaining),
-                remaining_colorless: i32::from(remaining.symbols[Mana::C as usize]),
+                remaining_colorless: wire(remaining.symbols[Mana::C as usize]),
                 remaining_hybrid: remaining_hybrid(remaining),
                 options: options_messages(game, handles, options),
                 has_x: total.x > 0 || (*announcing && kicker.is_some()),
@@ -872,7 +872,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             subject: source_handle(game, handles, *subject),
             total: total.to_string(),
             remaining: remaining.to_string(),
-            remaining_generic: i32::from(remaining.generic),
+            remaining_generic: wire(remaining.generic),
             remaining_colored: remaining_colored(remaining),
             remaining_hybrid: remaining_hybrid(remaining),
             options: options_messages(game, handles, options),
@@ -1292,7 +1292,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         target_permanent: c.target.object().map_or(ViewHandle::NONE, |id| handles.handle(id)),
                         cost: c.cost.to_string(),
                         mana_value: c.cost.mana_value() as i32,
-                        generic: i32::from(c.cost.generic),
+                        generic: wire(c.cost.generic),
                     })
                     .collect(),
                 can_pay: if *can_pay == u16::MAX { -1 } else { i32::from(*can_pay) },

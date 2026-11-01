@@ -143,7 +143,7 @@ pub const fn mana(symbols: &str) -> ManaCost {
 }
 
 /// N generic mana, N worked out by the card: `generic(price)`.
-pub const fn generic(n: u8) -> ManaCost {
+pub const fn generic(n: u32) -> ManaCost {
     ManaCost { generic: n, ..ManaCost::ZERO }
 }
 
@@ -172,12 +172,12 @@ const fn parse_symbols(symbols: &str) -> (ManaCost, bool) {
             1 => match b[inner.0] {
                 b'T' => tap = true,
                 b'X' => c.x += 1,
-                b'0'..=b'9' => c.generic += b[inner.0] - b'0',
+                b'0'..=b'9' => c.generic += (b[inner.0] - b'0') as u32,
                 m => c.symbols[mana_of(m) as usize] += 1,
             },
             2 => {
                 assert!(b[inner.0].is_ascii_digit() && b[inner.0 + 1].is_ascii_digit(), "an unknown mana symbol");
-                c.generic += (b[inner.0] - b'0') * 10 + (b[inner.0 + 1] - b'0');
+                c.generic += ((b[inner.0] - b'0') * 10 + (b[inner.0 + 1] - b'0')) as u32;
             }
             3 => {
                 assert!(b[inner.0 + 1] == b'/', "an unknown mana symbol");

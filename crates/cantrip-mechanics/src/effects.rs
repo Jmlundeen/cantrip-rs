@@ -869,7 +869,7 @@ pub fn damage_first_target<const N: u16>(g: &mut dyn Game, item: &StackItem) -> 
 /// target as this resolves (CR 608.2b). Which spells may be targeted is the card's own. Mana Leak ({3}), Daze ({1}) and Spell
 /// Pierce ({2}) print it.
 pub fn counter_first_target_unless_pays<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    crate::counter_unless_pays(g, item, 0, generic(N))?;
+    crate::counter_unless_pays(g, item, 0, generic(N as u32))?;
     Ok(())
 }
 
@@ -937,7 +937,7 @@ pub fn destroy_and_its_controller_creates(g: &mut dyn Game, item: &StackItem, to
 /// cost paid as the ability is activated and the destroy needs a target. Cathar Commando, Outland Liberator (and its back
 /// face) and Shattered Acolyte print it with {1}, Kirk, Commanding Officer with {2}.
 pub const fn sacrifice_to_destroy_artifact_or_enchantment(generic_mana: u8, text: &'static str) -> AbilityDef {
-    ability(Cost { mana: generic(generic_mana), sacrifice_self: true, ..Cost::NONE }, destroy_first_target, text)
+    ability(Cost { mana: generic(generic_mana as u32), sacrifice_self: true, ..Cost::NONE }, destroy_first_target, text)
         .targets(&[crate::targets::ARTIFACT_OR_ENCHANTMENT])
 }
 

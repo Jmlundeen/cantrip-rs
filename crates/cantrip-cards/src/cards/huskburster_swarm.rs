@@ -10,7 +10,7 @@ fn less_per_creature_card_you_own_in_exile_and_graveyard(q: &dyn Query, _: Objec
         .flat_map(|zone| q.state().zone(zone).iter())
         .filter(|&&id| q.chars(id).is(CardType::Creature))
         .count();
-    CostDelta::less(cards.min(255) as u8)
+    CostDelta::less(cards as u32)
 }
 
 pub static CARD: CardDef = CardDef {

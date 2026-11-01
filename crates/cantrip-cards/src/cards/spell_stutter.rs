@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let faerie = g.words(item.object).subtype(Subtype::Faerie);
     let faeries = g.permanents_of(item.controller).into_iter().filter(|&p| g.chars(p).has_subtype(faerie)).count();
-    counter_unless_pays(g, item, 0, generic(2 + faeries as u8))?;
+    counter_unless_pays(g, item, 0, generic(2 + faeries as u32))?;
     Ok(())
 }
 

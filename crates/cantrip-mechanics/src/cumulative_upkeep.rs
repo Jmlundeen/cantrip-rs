@@ -133,7 +133,7 @@ fn pay(g: &mut dyn Game, item: &StackItem, payment: Payment, age: u32) -> Result
     let (payer, this) = (item.controller, item.object);
     let may = |g: &mut dyn Game, question: &'static Question| Ok(matches!(g.ask(payer, RequestKind::May { source: this, purpose: Purpose::Ask(question) })?, Answer::Yes));
     match payment {
-        // A mana cost keeps its width, a byte a symbol (docs/rules-exceptions.md, RX-5): a total past that is not offered.
+        // A total with more hybrid symbols than a cost holds is not offered (`ManaCost::times`).
         Payment::Mana(mana) => paid_if(g, mana.times(age), |g, total| g.may_pay(payer, this, this, Cost::mana(total), &PAY)),
         Payment::Life(life) => g.may_pay(payer, this, this, Cost { life: u32::from(life) * age, ..Cost::NONE }, &PAY),
         Payment::Sacrifice(filter) => g.may_pay(payer, this, this, Cost::sacrifice(age, filter), &SACRIFICE),

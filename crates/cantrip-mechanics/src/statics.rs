@@ -647,7 +647,7 @@ pub fn grant_delayed_ability(view: &dyn LayerQuery, source: ObjectId, chars: &mu
 /// can't attack you can still attack a planeswalker you control"). Ghostly Prison, Propaganda and Windborn Muse print it
 /// with {2}; Dáin, Lord of the Iron Hills with {1}, while its controller has an enduring story.
 pub fn attacking_you_costs<const N: u8>(_: &dyn Query, asker: &Asker, _: ObjectId, target: Target) -> Option<ManaCost> {
-    (target == Target::Player(asker.controller)).then_some(ManaCost { generic: N, ..ManaCost::ZERO })
+    (target == Target::Player(asker.controller)).then_some(ManaCost { generic: N as u32, ..ManaCost::ZERO })
 }
 
 /// "Creatures can't attack you or planeswalkers you control unless their controller pays {N} for each of those creatures"
@@ -655,7 +655,7 @@ pub fn attacking_you_costs<const N: u8>(_: &dyn Query, asker: &Asker, _: ObjectI
 /// they control costs {N} to declare; one attacking a battle costs nothing. Baird, Steward of Argive and Archon of
 /// Absolution print it with {1}.
 pub fn attacking_you_or_your_planeswalkers_costs<const N: u8>(q: &dyn Query, asker: &Asker, _: ObjectId, target: Target) -> Option<ManaCost> {
-    attacks_you_or_your_planeswalker(q, asker, target).then_some(ManaCost { generic: N, ..ManaCost::ZERO })
+    attacks_you_or_your_planeswalker(q, asker, target).then_some(ManaCost { generic: N as u32, ..ManaCost::ZERO })
 }
 
 /// Whether an attack on `target` is one on "you or planeswalkers you control" of an attack cost (CR 508.1d) or an attack

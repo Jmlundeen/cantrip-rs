@@ -84,7 +84,7 @@ fn affordable(game: &Game, player: PlayerId, options: &[ActionOption], cost: &Ma
         }
     }
     for mana in Mana::ALL {
-        let need = u32::from(cost.symbols[mana as usize]);
+        let need = cost.symbols[mana as usize];
         let take = need.min(have[mana as usize]);
         have[mana as usize] -= take;
         let short = need - take;
@@ -104,7 +104,7 @@ fn affordable(game: &Game, player: PlayerId, options: &[ActionOption], cost: &Ma
             return false;
         }
     }
-    have.iter().map(|&n| n as u32).sum::<u32>() + any >= cost.generic as u32
+    have.iter().map(|&n| n as u32).sum::<u32>() + any >= cost.generic
 }
 
 fn fill(random: &mut Random, option: &ActionOption) -> Action {

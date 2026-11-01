@@ -8,7 +8,7 @@ use cantrip_api::*;
 /// only as it is cast, and `instants_and_sorceries_you_cast_have_affinity_for_creatures` only of a spell.
 fn less_for_each_permanent(q: &dyn Query, player: PlayerId, counts: impl Fn(ObjectId) -> bool) -> CostDelta {
     let permanents = q.permanents_of(player).into_iter().filter(|&id| counts(id)).count();
-    CostDelta::less(permanents.min(255) as u8)
+    CostDelta::less(permanents as u32)
 }
 
 /// This spell costs {1} less to cast for each artifact you control.
@@ -32,7 +32,7 @@ pub fn for_artifact_creatures(q: &dyn Query, _: ObjectId, player: PlayerId, _: C
 pub fn for_land_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let wanted = crate::lands::word(q, source, TYPE);
     let lands = q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Land) && q.chars(id).subtypes.has(wanted)).count();
-    CostDelta::less(lands.min(255) as u8)
+    CostDelta::less(lands as u32)
 }
 
 /// "Affinity for [creature type]s" (CR 702.41a): this spell costs {1} less to cast for each permanent of that type you
@@ -42,7 +42,7 @@ pub fn for_land_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: P
 pub fn for_creature_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let wanted = crate::lands::word(q, source, TYPE);
     let creatures = q.permanents_of(player).into_iter().filter(|&id| q.chars(id).has_subtype(wanted)).count();
-    CostDelta::less(creatures.min(255) as u8)
+    CostDelta::less(creatures as u32)
 }
 
 /// "Affinity for creatures" (CR 702.41a): this spell costs {1} less to cast for each creature you control. Witherbloom, the

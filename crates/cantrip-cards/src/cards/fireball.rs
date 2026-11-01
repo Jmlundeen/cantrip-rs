@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// (CR 601.2c), so zero targets or one costs nothing more. Its mana value is its mana cost's alone (CR 202.3).
 fn more_per_extra_target(_: &dyn Query, _: ObjectId, _: PlayerId, _: Costed, targets: &[Target]) -> CostDelta {
     let chosen = targets.iter().filter(|t| **t != Target::None).count();
-    if chosen > 1 { CostDelta::more((chosen - 1).min(255) as u8) } else { CostDelta::NONE }
+    if chosen > 1 { CostDelta::more((chosen - 1) as u32) } else { CostDelta::NONE }
 }
 
 /// "Fireball deals X damage divided evenly, rounded down, among any number of targets": divided as it resolves, among the

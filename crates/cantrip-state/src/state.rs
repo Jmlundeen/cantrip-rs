@@ -775,10 +775,10 @@ impl GameState {
         player: PlayerId,
         restriction: Option<ManaRestriction>,
         mana: Mana,
-        n: u8,
+        n: u32,
         pick: ManaPick,
-        taken: &mut Vec<(ObjectId, Mana, u8)>,
-    ) -> u8 {
+        taken: &mut Vec<(ObjectId, Mana, u32)>,
+    ) -> u32 {
         let m = mana as usize;
         let mut left = n;
         for lasts in [ManaLasts::Step, ManaLasts::Combat, ManaLasts::Turn] {
@@ -786,11 +786,11 @@ impl GameState {
             while left > 0 && at < self.mana_from.len() {
                 let e = self.mana_from[at];
                 if e.player == player && e.restriction == restriction && e.lasts == lasts && e.pool.0[m] > 0 && pick.takes(e.source) {
-                    let take = e.pool.0[m].min(u32::from(left)) as u8;
+                    let take = e.pool.0[m].min(left);
                     left -= take;
                     taken.push((e.source, mana, take));
                     let mut after = e;
-                    after.pool.0[m] -= u32::from(take);
+                    after.pool.0[m] -= take;
                     if after.pool.is_empty() {
                         self.mana_from.remove(at);
                         self.log(Undo::ManaFromRemoved(at as u32, e));
@@ -814,7 +814,7 @@ impl GameState {
                 let lasting: u32 =
                     self.mana_from.iter().filter(|e| e.player == player && e.restriction.is_none() && e.lasts != ManaLasts::Step).map(|e| e.pool.0[m]).sum();
                 self.update_player(player, |p| {
-                    p.pool.0[m] -= u32::from(spent);
+                    p.pool.0[m] -= spent;
                     p.lasting.0[m] = lasting;
                 });
             }
@@ -864,16 +864,16 @@ impl GameState {
     }
 
     /// Spends up to `n` mana of one kind under `restriction` from `player`'s pool: the pool alone (`spend_mana`).
-    fn spend_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u8) -> u8 {
+    fn spend_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u32) -> u32 {
         let Some(at) = self.restricted_mana.iter().position(|r| r.player == player && r.restriction == restriction) else {
             return 0;
         };
-        let take = self.restricted_mana[at].pool.get(mana).min(u32::from(n)) as u8;
+        let take = self.restricted_mana[at].pool.get(mana).min(n);
         if take == 0 {
             return 0;
         }
         let old = self.restricted_mana.clone();
-        self.restricted_mana[at].pool.0[mana as usize] -= u32::from(take);
+        self.restricted_mana[at].pool.0[mana as usize] -= take;
         if self.restricted_mana[at].pool.is_empty() {
             self.restricted_mana.remove(at);
         }

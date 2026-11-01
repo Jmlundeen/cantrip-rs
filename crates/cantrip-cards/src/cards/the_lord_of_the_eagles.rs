@@ -14,8 +14,7 @@ fn less_per_flying_power(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed
         .map(|id| i32::from(q.chars(id).power.unwrap_or(0)))
         .sum();
     // A negative total (power can be below zero) reduces nothing: a cost never goes up from a reduction (CR 107.1b, 601.2f).
-    // The clamp at 255 loses nothing: the generic mana it reduces is itself a byte (docs/rules-exceptions.md RX-5).
-    CostDelta::less(total.clamp(0, 255) as u8)
+    CostDelta::less(total.max(0) as u32)
 }
 
 pub static CARD: CardDef = CardDef { own_cost_changes: &[less_per_flying_power], ..oracle::THE_LORD_OF_THE_EAGLES };

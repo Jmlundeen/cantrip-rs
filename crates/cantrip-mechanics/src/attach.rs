@@ -68,7 +68,7 @@ pub fn equip_targeting_this_costs_less<const N: u8>(q: &dyn Query, source: Objec
     let Costed::Ability(_, ability, _) = costed else { return CostDelta::NONE };
     let equip = q.activated_ability(ability).is_some_and(|d| d.equip);
     if equip && player == q.controller(source) && targets.contains(&Target::Object(source)) {
-        CostDelta::less(N)
+        CostDelta::less(N as u32)
     } else {
         CostDelta::NONE
     }

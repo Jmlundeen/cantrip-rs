@@ -113,9 +113,11 @@ mandatory actions while a player holds an unused response outside it (drawn afte
 
 **What the rules say.** A number in the game has no upper limit.
 
-**What the engine does instead, and why.** The engine keeps the widths it has today for mana costs, X, multikicker,
-splice, the mana a cast records, counters, power, toughness, damage and player counters (KI-103 and KI-104, closed by
-this decision), with no rollover handling. If one of them rolls over in a real game, an issue is opened then.
+**What the engine does instead, and why.** The engine keeps the widths it has today for X, multikicker, the mana one
+payment records from one source (`ManaTally`), counters, power, toughness, damage and player counters (KI-103 and KI-104,
+closed by this decision), with no rollover handling. If one of them rolls over in a real game, an issue is opened then.
+A mana cost is no longer part of this: its generic mana and each count of its symbols, the cost changes added to it and
+the mana a spell's casting spent (`Obj::spent`) are 32-bit, with plain arithmetic (2026-11-01).
 
 The same decision keeps today's capacities (KI-105, closed): an object's 32 abilities (`MAX_ABILITIES`), a copy's six
 abilities added by exceptions, four text-changing effects (`Words::MAX`), and the special actions given once layer 6 is

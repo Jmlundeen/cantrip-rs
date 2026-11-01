@@ -26,7 +26,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
                 let enter = if cost <= value {
                     true
                 } else {
-                    let diff = generic((cost - value) as u8);
+                    let diff = generic(cost - value);
                     g.may_pay(player, item.object, card, of_mana(diff), &ENTER)?
                 };
                 if enter {

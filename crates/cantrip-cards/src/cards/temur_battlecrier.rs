@@ -10,7 +10,7 @@ fn spells_cost_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: C
     if !matches!(costed, Costed::Spell(_)) || player != q.controller(source) || q.state().turn.active != player {
         return CostDelta::NONE;
     }
-    CostDelta::less(ferocious::count(q, player).min(u8::MAX as usize) as u8)
+    CostDelta::less(ferocious::count(q, player) as u32)
 }
 
 pub static CARD: CardDef = CardDef { cost_changes: &[spells_cost_less], ..oracle::TEMUR_BATTLECRIER };

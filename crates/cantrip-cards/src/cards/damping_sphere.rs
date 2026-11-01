@@ -21,7 +21,7 @@ fn one_colorless_instead(_: &dyn Query, _: &Asker, p: &mut Proposal) {
 /// and a mana cost's generic part are `u8`: 255 spells cast by hand in one turn is past practical scale.
 fn tax(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     match costed {
-        Costed::Spell(_) => CostDelta::more(u8::try_from(q.history().casts_by(player).count()).unwrap_or(u8::MAX)),
+        Costed::Spell(_) => CostDelta::more(q.history().casts_by(player).count() as u32),
         _ => CostDelta::NONE,
     }
 }
