@@ -527,6 +527,46 @@ pub fn look_at_top_onto_battlefield_then(
         Some(total) => crate::choose::cards_within_total(g, player, source, Purpose::PutOntoBattlefield, kind, looked.clone(), permitted, u32::from(most), total)?,
         None => crate::choose::cards_from_kind(g, player, source, Purpose::PutOntoBattlefield, kind, looked.clone(), permitted, u32::from(most), true)?,
     };
+    let arrived = enter_and_place(g, player, source, &looked, chosen, tapped, rest, then)?;
+    Ok(arrived)
+}
+
+/// `look_at_top_onto_battlefield` with the cards that may be put onto the battlefield told by a selection rule
+/// (`crate::select`: how many, of what quality, together how), asked with `choose::select`: "Look at the top seven cards of
+/// your library. Put up to X artifact and/or creature cards with mana value 3 or less from among them onto the battlefield.
+/// Put the rest on the bottom of your library in a random order." The cards looked at are all shown, those the rule allows
+/// chosen, and the chosen enter together under the player's control (CR 110.2a), `tapped` or not; the rest are placed as
+/// `rest` says (CR 608.2c). With nothing in the library nobody is asked. The permanents that arrived are returned. Kayla's
+/// Reconstruction prints it; the cards that name their cards by closure (`look_at_top_onto_battlefield`) print the same sequence.
+pub fn look_at_top_onto_battlefield_select(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    count: usize,
+    rule: Selection,
+    tapped: bool,
+    rest: Rest,
+) -> Result<Vec<ObjectId>, Suspend> {
+    let looked = top_of_library(g, player, count);
+    if looked.is_empty() {
+        return Ok(Vec::new());
+    }
+    g.look_at(player, &looked);
+    let chosen = crate::choose::select(g, player, source, Purpose::PutOntoBattlefield, looked.clone(), rule)?;
+    enter_and_place(g, player, source, &looked, chosen, tapped, rest, |_, _| Ok(()))
+}
+
+/// The chosen cards enter together (CR 110.2a), `then` runs, and the rest of the cards looked at are placed as `rest` says.
+fn enter_and_place(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    looked: &[ObjectId],
+    chosen: Vec<ObjectId>,
+    tapped: bool,
+    rest: Rest,
+    then: impl FnOnce(&mut dyn Game, &[ObjectId]) -> Result<(), Suspend>,
+) -> Result<Vec<ObjectId>, Suspend> {
     let arrived = if chosen.is_empty() {
         Vec::new()
     } else {
@@ -535,7 +575,7 @@ pub fn look_at_top_onto_battlefield_then(
     };
     then(g, &arrived)?;
     match rest {
-        Rest::BottomRandom => rest_to_bottom_in_random_order(g, player, &looked),
+        Rest::BottomRandom => rest_to_bottom_in_random_order(g, player, looked),
         Rest::BottomChosen => {
             let left: Vec<ObjectId> = looked.iter().copied().filter(|&c| is_live(g, c) && g.obj(c).zone == Zone::library(player)).collect();
             let order = ask_library_order(g, player, source, &left, DestinationKind::LibraryBottom)?;

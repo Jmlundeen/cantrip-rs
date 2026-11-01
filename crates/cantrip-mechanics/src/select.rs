@@ -78,6 +78,10 @@ fn artifact(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
     Verdict::each(choice, |card| q.chars(card).is(CardType::Artifact))
 }
 
+fn artifact_or_creature(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |card| q.chars(card).is(CardType::Artifact) || q.chars(card).is(CardType::Creature))
+}
+
 fn another_creature_or_artifact(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
     Verdict::each(choice, |id| id != choice.source && (q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Artifact)))
 }
@@ -160,6 +164,10 @@ pub const NONLAND: Part = part(&(nonland as SelectFn), 0, "");
 
 /// "An artifact card". Tinker, Goblin Engineer, Inventors' Fair and Transmute Artifact search for it.
 pub const ARTIFACT: Part = part(&(artifact as SelectFn), 0, "");
+
+/// "An artifact and/or creature card": an artifact card, a creature card, or both (an artifact creature). Kayla's Reconstruction
+/// puts them onto the battlefield and Skyship Weatherlight searches for them.
+pub const ARTIFACT_OR_CREATURE: Part = part(&(artifact_or_creature as SelectFn), 0, "");
 
 /// "Another creature or artifact": a creature or artifact permanent other than the object whose text asks (`Choice::source`).
 /// The Sackville-Bagginses and Automated Warfare System sacrifice one.
