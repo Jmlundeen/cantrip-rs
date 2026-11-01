@@ -1,0 +1,72 @@
+# "Whenever one or more creatures you control with mana value 3 or less enter, draw a card. This ability triggers only once each turn."
+# Turn 2: Bot2's Llanowar Elves (mana value 1) enters under the opponent's control: no draw. Turn 3: Alaborn Trooper (mana value 3, exactly the
+# limit) draws, and an Ornithopter the same turn does not draw again. Turn 5: Foot Soldiers (mana value 4, one past the limit) draws nothing and
+# does not use up the turn's one trigger, so the Ornithopter after it draws.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Tocasia's Welcome
+Alaborn Trooper
+Ornithopter
+Ornithopter
+Plains
+Foot Soldiers
+Plains x11
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tocasia's Welcome.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+? Bot1.Library.Count = 13
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Alaborn Trooper.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Library.Count = 11
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Library.Count = 11
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Foot Soldiers.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Library.Count = 10
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Library.Count = 9
+Bot1.Battlefield.Count = 9
+Stack.Count = 0
