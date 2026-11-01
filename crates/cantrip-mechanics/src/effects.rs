@@ -1046,10 +1046,11 @@ pub fn may_mill_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     Ok(())
 }
 
-/// "You may return this card from your graveyard to ..." (CR 113.6k): `ask_may` for a card that triggered from a zone it
+/// "You may [do something with] this card" (CR 113.6k): `ask_may` for a card that triggered from a zone it
 /// functions in, asked only while the card is still the object that triggered (CR 400.7). Once it has left, nothing is asked
-/// and the answer is no. Squee, Goblin Nabob and Vengevine ask it.
-pub fn ask_may_return_this_card(g: &mut dyn Game, item: &StackItem, purpose: Purpose) -> Result<bool, Suspend> {
+/// and the answer is no. Squee, Goblin Nabob and Vengevine ("you may return this card from your graveyard") and Creeping
+/// Chill ("you may exile it") ask it.
+pub fn ask_may_this_card(g: &mut dyn Game, item: &StackItem, purpose: Purpose) -> Result<bool, Suspend> {
     if !is_live(g, item.object) {
         return Ok(false);
     }
@@ -1058,11 +1059,11 @@ pub fn ask_may_return_this_card(g: &mut dyn Game, item: &StackItem, purpose: Pur
 
 const RETURN_TO_BATTLEFIELD: Question = Question::new("ReturnToBattlefield", "return it from your graveyard to the battlefield?", "", "Return it", "Leave it");
 
-/// "You may return this card from your graveyard to the battlefield" (CR 113.6k): `ask_may_return_this_card` with the
+/// "You may return this card from your graveyard to the battlefield" (CR 113.6k): `ask_may_this_card` with the
 /// question worded for the battlefield, and the card put onto the battlefield untapped under its controller on a yes.
 /// Nothing is asked once it is no longer the object that triggered (CR 400.7). Vengevine and Bloodghast print it.
 pub fn may_return_this_card_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if ask_may_return_this_card(g, item, Purpose::Ask(&RETURN_TO_BATTLEFIELD))? {
+    if ask_may_this_card(g, item, Purpose::Ask(&RETURN_TO_BATTLEFIELD))? {
         g.put_onto_battlefield(item.object, item.controller, false)?;
     }
     Ok(())

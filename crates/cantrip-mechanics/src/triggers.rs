@@ -1855,6 +1855,24 @@ fn put_into_a_graveyard_from_anywhere(_: &dyn Query, source: ObjectId, event: &E
         _ => None,
     }
 }
+
+/// "When this card is put into your graveyard from your library" (CR 603.6): its own
+/// move from its owner's library to its owner's graveyard, milled or otherwise, which can't trigger from the battlefield,
+/// so it functions from the graveyard it has just reached (CR 113.6k). Creeping Chill, Gaea's Blessing and Narcomoeba
+/// print it.
+pub const PUT_INTO_YOUR_GRAVEYARD_FROM_YOUR_LIBRARY: Trigger =
+    when(EventMask::ZONE_CHANGE, put_into_your_graveyard_from_your_library).functions_in(IN_A_GRAVEYARD);
+
+fn put_into_your_graveyard_from_your_library(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, from, to, .. }
+            if *new == source && *from == Zone::library(q.obj(*new).owner) && *to == Zone::graveyard(q.obj(*new).owner) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS_OR_BLOCKS: Trigger = when(EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0), this_attacks_or_blocks);
 pub const THIS_DEALT_DAMAGE: Trigger = when(EventMask::DAMAGE, this_dealt_damage);
