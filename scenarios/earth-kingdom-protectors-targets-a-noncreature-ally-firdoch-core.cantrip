@@ -1,0 +1,30 @@
+# Earth Kingdom Protectors targets "another target Ally you control" (CR 115.1, 205.3m, 702.73a): any Ally permanent, so Firdoch Core, a
+# Kindred Artifact - Shapeshifter with changeling and not a creature, is a legal target and gains indestructible.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Firdoch Core
+Earth Kingdom Protectors
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Earth Kingdom Protectors.Cast
+Bot1.Pass
+Bot1.Battlefield.Earth Kingdom Protectors.Activate(Bot1.Battlefield.Firdoch Core)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Earth Kingdom Protectors; Black Lotus
+Bot1.Battlefield.Firdoch Core.Keywords = Changeling; Indestructible
