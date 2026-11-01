@@ -13,3 +13,16 @@ pub fn for_each_instant_and_sorcery_in_your_graveyard(q: &dyn Query, _: ObjectId
     let cards = q.state().zone(Zone::graveyard(player)).iter().filter(|&&id| spell && (q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery))).count();
     CostDelta::less(cards.min(255) as u8)
 }
+
+/// "This spell costs {N} less to cast if you control a [subtype]" (CR 601.2f, 118.7a): judged once, as the total cost is
+/// determined, for the cost of casting it only ("this spell" is a spell), and counting only the caster's permanents. `TYPE` is
+/// `lands::sub(Subtype::Kithkin)` and so on; the type is a word of the spell's rules text, read through its words (CR 612.2), and a
+/// permanent has it when the layers made it that type. Mistmeadow Council (Kithkin), Visions of Villainy (Villain), Saved by the
+/// Shell (Turtle), Truck Toss (Vehicle, {2}) and Geistlight Snare (Spirit) print it.
+pub fn less_if_you_control_subtype<const N: u8, const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    if !matches!(costed, Costed::Spell(_)) {
+        return CostDelta::NONE;
+    }
+    let wanted = crate::lands::word(q, source, TYPE);
+    if q.permanents_of(player).into_iter().any(|id| q.chars(id).has_subtype(wanted)) { CostDelta::less(N) } else { CostDelta::NONE }
+}

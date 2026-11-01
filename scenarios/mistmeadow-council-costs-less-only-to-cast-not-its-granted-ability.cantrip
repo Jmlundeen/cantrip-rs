@@ -1,0 +1,60 @@
+# "This spell costs {1} less to cast if you control a Kithkin" (CR 601.2f) is a cost of casting the spell only. On the
+# battlefield the Council is a Kithkin itself, yet the "{3}, {T}, Sacrifice Deconstruction Hammer" ability the Hammer gives
+# it still costs {3}: three Moxen pay it exactly (the pool empty after), and the Sol Ring is destroyed.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mistmeadow Council
+Deconstruction Hammer
+Island x14
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mistmeadow Council.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Mistmeadow Council)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mistmeadow Council.Activate(Bot2.Battlefield.Sol Ring)
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island
+Bot2.Graveyard = Sol Ring
+Bot1.Graveyard = Deconstruction Hammer
+Bot1.Battlefield.Mistmeadow Council.Tapped = true

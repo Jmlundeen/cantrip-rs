@@ -1,14 +1,8 @@
 use cantrip_api::*;
-use cantrip_mechanics::counter_unless_pays;
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
-/// Counter target noncreature spell unless its controller pays {2} (CR 118.12).
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    counter_unless_pays(g, item, 0, mana("{2}"))?;
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[cantrip_mechanics::targets::NONCREATURE_SPELL], effect),
+    spell: spell(&[cantrip_mechanics::targets::NONCREATURE_SPELL], effects::counter_first_target_unless_pays::<2>),
     ..oracle::SPELL_PIERCE
 };

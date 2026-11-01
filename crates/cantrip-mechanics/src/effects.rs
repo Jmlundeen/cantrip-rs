@@ -864,6 +864,15 @@ pub fn damage_first_target<const N: u16>(g: &mut dyn Game, item: &StackItem) -> 
     Ok(())
 }
 
+/// "Counter target spell unless its controller pays {N}" (CR 701.6, 118.12): the spell that is the first target is countered
+/// unless its controller pays the generic cost, which they may make mana for while asked; nothing if it is no longer a legal
+/// target as this resolves (CR 608.2b). Which spells may be targeted is the card's own. Mana Leak ({3}), Daze ({1}) and Spell
+/// Pierce ({2}) print it.
+pub fn counter_first_target_unless_pays<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    crate::counter_unless_pays(g, item, 0, generic(N))?;
+    Ok(())
+}
+
 /// "Target player discards N cards": their choice (CR 701.9), the player being the first target. Nothing if that player is
 /// no longer a legal target as it resolves (CR 608.2b): a modal spell whose other mode's target is still legal resolves
 /// without it (Kolaghan's Command). Demonic Pact ("target opponent"), Kolaghan's Command and Armus, Skin of Evil print it.
