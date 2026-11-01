@@ -1,0 +1,51 @@
+# X = 3 with four eligible cards among the top seven, and only two taken: Alaborn Trooper (a creature, mana value 3, exactly at the
+# limit) and Skullclamp (an artifact that is not a creature): "up to X" allows fewer than the most. Axebane Beast (mana value 4, just
+# past it) cannot be taken. The remaining five go to the bottom in a random order, so Bot1 is not asked to arrange them, behind the
+# unlooked Ornithopter (an eighth card, eligible, never looked at). Paid with Black Lotus (WWW) and three Moxen. CR 202.3e, 401.4, 608.2c.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Emerald
+Kayla's Reconstruction
+Island
+Island
+Alaborn Trooper
+Axebane Beast
+Mox Pearl
+Mox Sapphire
+Skullclamp
+Island
+Island
+Ornithopter
+Island x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Kayla's Reconstruction.Cast(X: 3)
+Bot1.Pass
+! Bot1.Choose(Axebane Beast)
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Alaborn Trooper; Skullclamp)
+! Bot1.Arrange
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Alaborn Trooper; Mox Emerald; Mox Jet; Mox Ruby; Skullclamp
+Bot1.Library.Count = 12

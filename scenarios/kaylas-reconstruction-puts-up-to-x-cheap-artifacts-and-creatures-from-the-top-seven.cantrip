@@ -1,0 +1,52 @@
+# X = 2 with three eligible cards among the top seven (Alaborn Trooper, mana value 3, a creature; Mox Emerald, mana value 0, an artifact;
+# Sliver Construct, mana value 3, an artifact creature): two enter, so the limit X is pinned (a third is refused), the card past mana value 3
+# (Axebane Beast, 4) and the artifact past it (none) are not eligible, and the eighth card from the top (a second Alaborn Trooper) is not
+# looked at. The rest go to the bottom: the unlooked cards come first in the library. Bot2's library, holding an eligible card on top, is untouched.
+# CR 202.3e, 608.2c; the ruling: each card needs mana value 3 or less, not the total.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Kayla's Reconstruction
+Island
+Island
+Island
+Alaborn Trooper
+Axebane Beast
+Mox Emerald
+Island
+Barbarian Horde
+Plains
+Sliver Construct
+Alaborn Trooper
+Island x6
+
+[Bot2 Deck]
+Alaborn Trooper x10
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kayla's Reconstruction.Cast(X: 2)
+Bot1.Pass
+! Bot1.Choose(Alaborn Trooper; Mox Emerald; Sliver Construct)
+! Bot1.Choose(Axebane Beast)
+! Bot1.Choose(Island)
+Bot1.Choose(Alaborn Trooper; Sliver Construct)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Alaborn Trooper; Mox Jet; Mox Ruby; Sliver Construct
+Bot1.Library.Count = 12
+Bot1.Battlefield.Alaborn Trooper.Tapped = false
+Bot2.Library.Count = 13

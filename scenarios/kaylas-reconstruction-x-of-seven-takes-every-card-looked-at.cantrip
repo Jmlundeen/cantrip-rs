@@ -1,0 +1,47 @@
+# X = 7 (two Black Lotus and four Moxen pay {7}{W}{W}{W}) with seven eligible cards on top: all seven can be taken, so the number looked
+# at is seven and an X of seven is not cut down; a choice of all seven enters them together, the library keeps its eighth card (an Island)
+# and Bot1's untapped, summoning-sick creatures are not entered tapped. CR 608.2c, 202.3e.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Kayla's Reconstruction
+Alaborn Trooper x7
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kayla's Reconstruction.Cast(X: 7)
+Bot1.Pass
+Bot1.Choose(Alaborn Trooper#1; Alaborn Trooper#2; Alaborn Trooper#3; Alaborn Trooper#4; Alaborn Trooper#5; Alaborn Trooper#6; Alaborn Trooper#7)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 11
+Bot1.Battlefield.Alaborn Trooper#7.Tapped = false
+Bot1.Library = Island; Island; Island; Island; Island; Island; Island; Island
