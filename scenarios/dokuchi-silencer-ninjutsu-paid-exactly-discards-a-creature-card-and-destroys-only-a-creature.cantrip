@@ -1,0 +1,68 @@
+# Dokuchi Silencer: ninjutsu {1}{B} (CR 702.49a) is refused on turn 1 with {C}{G} (no {B}: the cost's colored pip) and paid
+# exactly on turn 3 with Blasted Landscape's {C} and Mox Jet's {B} (the pool ends empty), returning the unblocked Firebrand to
+# hand. The Silencer enters attacking Bot2 and deals 2; "you may discard a creature card" (the Firebrand, the only creature
+# card in hand) is accepted, and the reflexive trigger (CR 603.12) may target only a creature or planeswalker Bot2 controls:
+# not the Silencer (Bot1's own), not Bot2's Mox Pearl (an artifact), not Bot2's Forest. Llanowar Elves is destroyed and Savannah Lions survives.
+
+[Bot1 Deck]
+Mox Ruby
+Fanatical Firebrand
+Dokuchi Silencer
+Blasted Landscape
+Mox Emerald
+Mox Jet
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Pearl
+Savannah Lions
+Forest x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[Bot1.Blockers]
+! Bot1.Hand.Dokuchi Silencer.Activate(Ability: Ninjutsu; Mana: short)
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Blasted Landscape.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dokuchi Silencer.Activate(Ability: Ninjutsu)
+Bot1.Choose(Fanatical Firebrand)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Choose(Fanatical Firebrand)
+! Bot1.Target(Bot1.Battlefield.Dokuchi Silencer; Bot2.Battlefield.Mox Pearl; Bot2.Battlefield.Forest)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield = Forest; Mox Pearl; Savannah Lions
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Fanatical Firebrand
+Bot1.Battlefield.Dokuchi Silencer.Tapped = true

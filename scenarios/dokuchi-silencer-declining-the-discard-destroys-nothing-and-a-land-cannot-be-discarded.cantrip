@@ -1,0 +1,44 @@
+# Dokuchi Silencer: "you may discard a creature card". Cast on turn 1 off Mox Jet and Mox Ruby. On turn 3 it hits Bot2 with a
+# Firebrand and a Plains in hand: the Plains is refused (not a creature card), and choosing no card declines - the Firebrand
+# stays in hand and Bot2's Llanowar Elves is not destroyed (the "when you do" never happens, CR 603.12).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Dokuchi Silencer
+Fanatical Firebrand
+Plains
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dokuchi Silencer.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Dokuchi Silencer > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+! Bot1.Choose(Plains)
+Bot1.Choose()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot1.Hand.Fanatical Firebrand.Power = 1
+Bot1.Graveyard.Count = 0

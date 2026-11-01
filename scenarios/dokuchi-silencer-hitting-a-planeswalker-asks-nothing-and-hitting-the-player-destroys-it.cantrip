@@ -1,0 +1,48 @@
+# Dokuchi Silencer: only "combat damage to a player" triggers it (CR 120.3c: damage to a planeswalker is dealt to it). Black Lotus pays for the Silencer on turn 1;
+# Bot2 casts Liliana of the Veil on turn 2. On turn 3 the Silencer attacks Liliana (loyalty 3 - 2 = 1): nothing is asked
+# (! Bot1.Choose) and the Firebrand stays in hand. On turn 5 it attacks Bot2 and the discard is made; the reflexive
+# trigger's target, a planeswalker the player dealt the damage controls (CR 603.12), is Liliana, who is destroyed.
+
+[Bot1 Deck]
+Black Lotus
+Dokuchi Silencer
+Fanatical Firebrand
+Plains x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Dokuchi Silencer.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Dokuchi Silencer > Liliana of the Veil)
+Bot1.Pass
+! Bot1.Choose
+[T5 Bot1.Main1]
+Bot1.Attack(Dokuchi Silencer > Bot2)
+[T5 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Choose(Fanatical Firebrand)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Liliana of the Veil = (absent)
+Bot2.Graveyard = Liliana of the Veil
+Bot1.Graveyard = Fanatical Firebrand; Black Lotus

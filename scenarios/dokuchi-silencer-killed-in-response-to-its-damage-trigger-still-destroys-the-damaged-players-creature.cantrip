@@ -1,0 +1,47 @@
+# Dokuchi Silencer is Bolted in response to its combat damage trigger. The trigger still resolves; the discard is
+# made and "that player" is still Bot2 (the player dealt damage), so the reflexive trigger destroys Llanowar Elves (CR 603.12, 608.2b).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Dokuchi Silencer
+Fanatical Firebrand
+Plains x18
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dokuchi Silencer.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Dokuchi Silencer > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Dokuchi Silencer)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Fanatical Firebrand)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Fanatical Firebrand; Dokuchi Silencer
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
