@@ -6,12 +6,11 @@ use cantrip_oracle as oracle;
 /// negative power counts as negative (CR 107.1b treats only a negative total as 0) - taking off generic mana only. Only the
 /// cost of casting it: "this spell" is a spell. The reduction is capped at {255}, a cost's own width, far beyond the {7} of
 /// generic mana the card has.
-fn less_per_flying_power(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    let spell = matches!(costed, Costed::Spell(_));
+fn less_per_flying_power(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let total: i32 = q
         .permanents_of(player)
         .into_iter()
-        .filter(|&id| spell && q.chars(id).is(CardType::Creature) && q.chars(id).keywords.has(Keyword::Flying))
+        .filter(|&id| q.chars(id).is(CardType::Creature) && q.chars(id).keywords.has(Keyword::Flying))
         .map(|id| i32::from(q.chars(id).power.unwrap_or(0)))
         .sum();
     // A negative total (power can be below zero) reduces nothing: a cost never goes up from a reduction (CR 107.1b, 601.2f).

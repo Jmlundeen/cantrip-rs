@@ -5,10 +5,7 @@ use cantrip_oracle as oracle;
 
 /// Domain (an ability word): this spell costs {1} less to cast for each basic land type among lands you
 /// control.
-fn domain(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    if !matches!(costed, Costed::Spell(_)) {
-        return CostDelta::NONE;
-    }
+fn domain(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     CostDelta::less(cantrip_mechanics::domain::count(q, player))
 }
 

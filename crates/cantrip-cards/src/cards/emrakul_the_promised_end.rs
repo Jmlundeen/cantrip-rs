@@ -4,8 +4,8 @@ use cantrip_oracle as oracle;
 
 /// "This spell costs {1} less to cast for each card type among cards in your graveyard" (CR 601.2f, 118.7a): counted as the
 /// cost is determined, each type once however many cards have it. Only the cost of casting it; its mana value stays 13.
-fn less_per_card_type_in_your_graveyard(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    if matches!(costed, Costed::Spell(_)) { CostDelta::less(card_types_in_graveyard(q, player) as u8) } else { CostDelta::NONE }
+fn less_per_card_type_in_your_graveyard(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+    CostDelta::less(card_types_in_graveyard(q, player) as u8)
 }
 
 /// "When you cast this spell, you gain control of target opponent during that player's next turn. After that turn, that

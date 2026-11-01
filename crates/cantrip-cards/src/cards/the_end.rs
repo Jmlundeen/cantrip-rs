@@ -4,8 +4,8 @@ use cantrip_oracle as oracle;
 
 /// "This spell costs {2} less to cast if your life total is 5 or less" (CR 601.2f, 118.7): `player` is the one casting it,
 /// and only the cost of casting it, not of an ability. It changes only the total cost: the mana value stays 4.
-fn cheaper_at_five_life_or_less(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    if matches!(costed, Costed::Spell(_)) && q.state().player(player).life <= 5 {
+fn cheaper_at_five_life_or_less(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+    if q.state().player(player).life <= 5 {
         CostDelta::less(2)
     } else {
         CostDelta::NONE

@@ -4,24 +4,22 @@
 
 use cantrip_api::*;
 
-/// {1} less for each permanent `player` controls that `counts`, for a spell only: an ability's cost is not affinity's to change.
-fn less_for_each_permanent(q: &dyn Query, player: PlayerId, costed: Costed, counts: impl Fn(ObjectId) -> bool) -> CostDelta {
-    if !matches!(costed, Costed::Spell(_)) {
-        return CostDelta::NONE;
-    }
+/// {1} less for each permanent `player` controls that `counts`. Asked of a spell only: the core asks a card's own changes
+/// only as it is cast, and `instants_and_sorceries_you_cast_have_affinity_for_creatures` only of a spell.
+fn less_for_each_permanent(q: &dyn Query, player: PlayerId, counts: impl Fn(ObjectId) -> bool) -> CostDelta {
     let permanents = q.permanents_of(player).into_iter().filter(|&id| counts(id)).count();
     CostDelta::less(permanents.min(255) as u8)
 }
 
 /// This spell costs {1} less to cast for each artifact you control.
-pub fn for_artifacts(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    less_for_each_permanent(q, player, costed, |id| q.chars(id).is(CardType::Artifact))
+pub fn for_artifacts(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+    less_for_each_permanent(q, player, |id| q.chars(id).is(CardType::Artifact))
 }
 
 /// A spell costs {1} less to cast for each artifact creature you control (CR 702.41a). Borg Cube and Urza, Chief Artificer
 /// print affinity for artifact creatures.
-pub fn for_artifact_creatures(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    less_for_each_permanent(q, player, costed, |id| {
+pub fn for_artifact_creatures(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+    less_for_each_permanent(q, player, |id| {
         let c = q.chars(id);
         c.is(CardType::Artifact) && c.is(CardType::Creature)
     })
@@ -31,10 +29,7 @@ pub fn for_artifact_creatures(q: &dyn Query, _: ObjectId, player: PlayerId, cost
 /// `TYPE` being `lands::sub(Subtype::Forest)` and so on. The type is a word of the spell's rules text, read through its words
 /// (CR 612.2), and a land has it when the layers made it that type (a Forest is any land with the subtype, basic or not).
 /// Sapling Nursery prints affinity for Forests.
-pub fn for_land_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    if !matches!(costed, Costed::Spell(_)) {
-        return CostDelta::NONE;
-    }
+pub fn for_land_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let wanted = crate::lands::word(q, source, TYPE);
     let lands = q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Land) && q.chars(id).subtypes.has(wanted)).count();
     CostDelta::less(lands.min(255) as u8)
@@ -44,10 +39,7 @@ pub fn for_land_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: P
 /// control, `TYPE` being `lands::sub(Subtype::Lizard)` and so on. The type is a word of the spell's rules text, read through
 /// its words (CR 612.2), and a permanent has it when the layers made it that type (a changeling has every creature type).
 /// Scales of Shale prints affinity for Lizards.
-pub fn for_creature_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    if !matches!(costed, Costed::Spell(_)) {
-        return CostDelta::NONE;
-    }
+pub fn for_creature_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     let wanted = crate::lands::word(q, source, TYPE);
     let creatures = q.permanents_of(player).into_iter().filter(|&id| q.chars(id).has_subtype(wanted)).count();
     CostDelta::less(creatures.min(255) as u8)
@@ -55,8 +47,8 @@ pub fn for_creature_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, playe
 
 /// "Affinity for creatures" (CR 702.41a): this spell costs {1} less to cast for each creature you control. Witherbloom, the
 /// Balancer prints it for itself, and `instants_and_sorceries_you_cast` gives it to the spells of the same controller.
-pub fn for_creatures(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    less_for_each_permanent(q, player, costed, |id| q.chars(id).is(CardType::Creature))
+pub fn for_creatures(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+    less_for_each_permanent(q, player, |id| q.chars(id).is(CardType::Creature))
 }
 
 /// "Instant and sorcery spells you cast have affinity for creatures" (CR 702.41a, 702.41b, 604.1): a static ability of the

@@ -4,8 +4,8 @@ use cantrip_oracle as oracle;
 
 /// "This spell costs {3} less to cast if you control a creature with power 4 or greater" (CR 601.2f): judged as the total
 /// cost is determined, once, and generic mana only (CR 118.7a); losing the creature afterwards changes nothing paid.
-fn less_with_a_big_creature(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    if matches!(costed, Costed::Spell(_)) && ferocious::you_control(q, player) { CostDelta::less(3) } else { CostDelta::NONE }
+fn less_with_a_big_creature(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+    if ferocious::you_control(q, player) { CostDelta::less(3) } else { CostDelta::NONE }
 }
 
 /// "Change the target of target spell or ability with a single target" (CR 115.7a). The new target is chosen as this
