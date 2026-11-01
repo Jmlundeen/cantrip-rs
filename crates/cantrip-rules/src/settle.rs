@@ -1369,13 +1369,14 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                 }
                 found.append(&mut later);
             }
-            // Delayed abilities of "whenever [event] this turn" (CR 603.7b), each of which triggers on every match.
+            // Delayed abilities waiting for an event (CR 603.7): "whenever [event] this turn" (CR 603.7b), each of which
+            // triggers on every match, and "when [event]", "when you next" and "until", each used up by the first.
             if cx.s().delayed.iter().any(|d| d.when.is_event()) {
                 for d in cx.s().delayed.clone() {
                     // "You" in its trigger event is its own controller, the player who controlled the spell or ability that
                     // created it (CR 603.7d-e), whoever controls its source now and wherever the source has gone. So is "you"
-                    // in an intervening "if" (CR 603.4).
-                    let asker = Asker { source: d.source, controller: d.controller, by: delayed_link(cx, &d), spell: false };
+                    // in an intervening "if" (CR 603.4). Its event is asked of the object it watches (`Delayed::watched`).
+                    let asker = Asker { source: d.watched(), controller: d.controller, by: delayed_link(cx, &d), spell: false };
                     if d.when.is_event()
                         && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
                         // A delayed triggered mana ability never goes on the stack: it resolves as the mana ability that
@@ -1407,7 +1408,8 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                                 source: d.source,
                                 ability: d.ability,
                                 controller: d.controller,
-                                subject: if d.when == DelayedWhen::UntilEvent { d.subject } else { fired.subject },
+                                // "Until" and "when [event]" are about the object they were made for (CR 603.7c).
+                                subject: if matches!(d.when, DelayedWhen::UntilEvent | DelayedWhen::WhenEvent) { d.subject } else { fired.subject },
                                 data: fired.data,
                                 members: Span::default(),
                                 count: None,
@@ -1418,9 +1420,9 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                             t,
                             Again::new(),
                         ));
-                        // "Until" is used up by the event that ends the wait (CR 603.7b), and "when you next" by the event it
-                        // triggers on (CR 603.7b).
-                        if matches!(d.when, DelayedWhen::UntilEvent | DelayedWhen::NextThisTurn)
+                        // "Until" is used up by the event that ends the wait (CR 603.7b), and "when you next" and "when
+                        // [event]" by the event they trigger on (CR 603.7b).
+                        if d.when.once()
                             && let Some(at) = cx.s().delayed.iter().position(|x| *x == d)
                         {
                             cx.st().delayed_remove(at);
@@ -1601,7 +1603,9 @@ pub fn step_began(cx: &mut Cx, step: Step) {
             DelayedWhen::Step { step: s, on_turn_of } => (s == step && on_turn_of.is_none_or(|p| p == active), true),
             DelayedWhen::EachStep { step: s, on_turn_of } => (s == step && on_turn_of.is_none_or(|p| p == active), false),
             DelayedWhen::ExtraTurnStep { step: s, turn } => (s == step && cx.s().turn.extra == turn, true),
-            DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::NextThisTurn => (false, false),
+            DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::NextThisTurn | DelayedWhen::WhenEvent => {
+                (false, false)
+            }
         };
         if due {
             if used_up {

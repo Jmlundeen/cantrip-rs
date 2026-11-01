@@ -170,8 +170,13 @@ fn next_turn_taker(s: &mut GameState, after: PlayerId) -> PlayerId {
     }
     // "At the beginning of that turn's [step]" waits for one extra turn (CR 603.7): once that turn has ended without the
     // step, or will never be taken, the ability never triggers.
-    let stale = |d: &cantrip_state::Delayed, s: &GameState| {
-        matches!(d.when, DelayedWhen::ExtraTurnStep { turn, .. } if turn != extra && !s.extra_turns.iter().any(|t| t.id == turn))
+    // And a "when [event]" ability about an object that has since changed zones can never trigger again: that object is gone,
+    // and what it became is a new object the ability doesn't refer to (CR 400.7, 603.7c). The event that moved it was looked
+    // at for triggers as it happened, so dropping it now loses nothing.
+    let stale = |d: &cantrip_state::Delayed, s: &GameState| match d.when {
+        DelayedWhen::ExtraTurnStep { turn, .. } => turn != extra && !s.extra_turns.iter().any(|t| t.id == turn),
+        DelayedWhen::WhenEvent => s.obj(d.watched()).became.is_some(),
+        _ => false,
     };
     // So do the effects about that turn alone ("during that turn"): they last through its cleanup step, and end as the next turn
     // begins, or as it would have begun for a player who has left (CR 500.7, 800.4m).

@@ -4005,7 +4005,7 @@ fn waiting_mana_triggers(cx: &Cx) -> Vec<(Asker, &'static TriggeredDef)> {
             && t.mana_ability
         {
             let by = layers::given_link(cards, cx.s(), d.source, d.ability, d.acquired);
-            waiting.push((Asker { source: d.source, controller: d.controller, by, spell: false }, t));
+            waiting.push((Asker { source: d.watched(), controller: d.controller, by, spell: false }, t));
         }
     }
     waiting
@@ -9991,7 +9991,7 @@ fn delayed_mana_abilities(cx: &mut Cx, event: &Event, statics: &mut crate::settl
     for d in delayed {
         let AbilityDef::Triggered(t) = cx.cards().ability(d.ability) else { continue };
         // Asked as the ability that created it was acquired (CR 607.5).
-        let asker = Asker { source: d.source, controller: d.controller, by: layers::given_link(cx.cards(), cx.s(), d.source, d.ability, d.acquired), spell: false };
+        let asker = Asker { source: d.watched(), controller: d.controller, by: layers::given_link(cx.cards(), cx.s(), d.source, d.ability, d.acquired), spell: false };
         let Some(fired) = t.fires(&*cx, &asker, event) else { continue };
         if t.condition.is_some_and(|condition| !condition(&*cx, &asker))
             || statics.stop(
@@ -10002,14 +10002,15 @@ fn delayed_mana_abilities(cx: &mut Cx, event: &Event, statics: &mut crate::settl
         {
             continue;
         }
-        // "When you next" is used up by the event it triggers on (CR 603.7b).
-        if d.when == DelayedWhen::NextThisTurn
+        // "When you next" and "when [event]" are used up by the event they trigger on (CR 603.7b).
+        if d.when.once()
             && let Some(at) = cx.s().delayed.iter().position(|x| *x == d)
         {
             cx.st().delayed_remove(at);
         }
         let mut item = stack_item(StackKind::Triggered, d.source, d.ability, d.controller, &[]);
-        item.subject = fired.subject;
+        // "When [event]" is about the object it was made for (CR 603.7c).
+        item.subject = if d.when == DelayedWhen::WhenEvent { d.subject } else { fired.subject };
         item.data = fired.data;
         item.acquired = d.acquired;
         let outer = cx.mana_source.replace(d.source);

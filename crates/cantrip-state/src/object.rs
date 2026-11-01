@@ -1728,6 +1728,14 @@ pub enum DelayedWhen {
     UntilEvent,
     /// "Until your next turn, whenever [event]" (CR 603.7b, 611.2b): as `ThisTurn`, until that player's next turn begins.
     UntilNextTurnOf(PlayerId),
+    /// "When [that object does something], [effect]" with no stated duration (CR 603.7, 603.7b): a delayed triggered ability
+    /// that triggers once, the next time its `listens`/`matches` accept an event, whenever that is, and is then used up. Its
+    /// `matches` is asked of the object it watches, its `subject` (`Delayed::watched`), judged as it was for an event that
+    /// looks back (CR 603.10a); its source is the spell or the source of the ability that created it, and its controller the
+    /// player who controlled that spell or ability (CR 603.7d-e), whoever controls the watched object by then. Being a
+    /// triggered ability, it is stopped as any other is (Hushbringer, CR 603.2), and nothing the watched object loses or
+    /// gains changes it (CR 603.7c). Earthbend's "when that land dies or is put into exile, return it" (CR 701.66a).
+    WhenEvent,
     /// "When you next [event] this turn" (CR 603.7b): triggers once, the first time its `listens`/`matches` accept an event
     /// this turn, and is then used up; one that never triggers ends with the turn, as `ThisTurn` does. Each is its own
     /// ability: two made the same turn both trigger on the next such event (Doublecast's ruling). Doublecast, Teach by
@@ -1743,7 +1751,23 @@ pub enum DelayedWhen {
 impl DelayedWhen {
     /// Whether it triggers on events, as many times as they happen, rather than once at a step.
     pub fn is_event(self) -> bool {
-        matches!(self, DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::NextThisTurn)
+        matches!(self, DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::NextThisTurn | DelayedWhen::WhenEvent)
+    }
+
+    /// Whether the first event it triggers on uses it up (CR 603.7b): "until", "when you next" and "when [event]".
+    pub fn once(self) -> bool {
+        matches!(self, DelayedWhen::UntilEvent | DelayedWhen::NextThisTurn | DelayedWhen::WhenEvent)
+    }
+}
+
+impl Delayed {
+    /// The object whose events its ability's `matches` is asked about: the object a "when [event]" ability watches, its
+    /// `subject` (`DelayedWhen::WhenEvent`); for any other, its source.
+    pub fn watched(&self) -> ObjectId {
+        match (self.when, self.subject) {
+            (DelayedWhen::WhenEvent, Target::Object(id)) => id,
+            _ => self.source,
+        }
     }
 }
 

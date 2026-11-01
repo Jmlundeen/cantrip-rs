@@ -916,7 +916,11 @@ A delayed triggered ability waits as a `Delayed` record in the state, on no obje
 happens to the card it came from), or on events: each one this turn (`ThisTurn`), until an event (`UntilEvent`), until a
 player's next turn (`UntilNextTurnOf`), or the next one this turn (`NextThisTurn`: "when you next cast ... this turn", CR
 603.7b, used up by the event it triggers on and ended with the turn if none comes; two made in one turn both trigger on
-that event, Doublecast's ruling).
+that event, Doublecast's ruling), or the next one of an object it watches, whenever that comes (`WhenEvent`: "when that
+land dies or is put into exile, return it", earthbend, CR 701.66a; its `matches` is asked of its `subject`,
+`Delayed::watched`, it is stopped as any triggered ability is, and nothing the object loses or gains changes it, CR
+603.7c; dropped as a turn begins once that object has changed zones). Only the end of an "until" wait (`UntilEvent`) is
+no triggered ability (CR 610.3), so nothing stops it.
 
 An instruction to transform (CR 701.27) is `ops::transform`, which turns a double-faced permanent over and records
 `Event::Transformed`. An activated or triggered ability of a permanent that tries to transform that permanent does so only

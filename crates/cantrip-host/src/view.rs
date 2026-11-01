@@ -651,12 +651,18 @@ impl<'a> Projector<'a> {
         // and named for the object it came from (the words may say "that creature"). The other seat is told whose it is. So is
         // one that triggers at each such step for the rest of the game (paradigm, CR 702.192a): the card it came from may be
         // anywhere, or nowhere it can be seen; and one waiting for a step of an extra turn (Final Fortune's "at the beginning of
-        // that turn's end step, you lose the game"), whose spell is gone.
+        // that turn's end step, you lose the game"), whose spell is gone; and one waiting for an event of an object it watches
+        // ("when that land dies or is put into exile, return it", earthbend), which nothing on that object shows.
         for d in s.delayed.iter().filter(|d| {
             d.controller == p
                 && matches!(
                     d.when,
-                    DelayedWhen::ThisTurn | DelayedWhen::NextThisTurn | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::EachStep { .. } | DelayedWhen::ExtraTurnStep { .. }
+                    DelayedWhen::ThisTurn
+                        | DelayedWhen::NextThisTurn
+                        | DelayedWhen::UntilNextTurnOf(_)
+                        | DelayedWhen::EachStep { .. }
+                        | DelayedWhen::ExtraTurnStep { .. }
+                        | DelayedWhen::WhenEvent
                 )
         }) {
             let text = game.cards.ability(d.ability).text();
