@@ -1,0 +1,23 @@
+# Barkchannel Pathway is a modal double-faced card (CR 712.3) whose faces are both lands: one copy is played as its front
+# face (taps for {G}, not {U}), the other as its back face Tidechannel Pathway (taps for {U}, not {G}); neither enters
+# tapped. The pool is checked right after each activation; an exact pool pins each face's colour.
+
+[Bot1 Deck]
+Barkchannel Pathway
+Barkchannel Pathway
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Barkchannel Pathway.Play(Ability: #1)
+Bot1.Battlefield.Barkchannel Pathway.Activate
+? Bot1.Mana = {G}
+[T3 Bot1.Main1]
+Bot1.Hand.Barkchannel Pathway.Play(Ability: back face)
+Bot1.Battlefield.Tidechannel Pathway.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield = Barkchannel Pathway; Tidechannel Pathway

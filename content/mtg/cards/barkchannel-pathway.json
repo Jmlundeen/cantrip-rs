@@ -1,0 +1,11 @@
+{
+  "name": "Barkchannel Pathway",
+  "type": "Land",
+  "oracleText": "{T}: Add {G}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Tidechannel Pathway",
+    "type": "Land",
+    "oracleText": "{T}: Add {U}."
+  }
+}
