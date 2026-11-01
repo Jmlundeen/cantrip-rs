@@ -85,7 +85,10 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    a missing expectation or scenario, a citation, a comment, a `Closes` trailer, one commit per card), break-tested and
    committed in the slot, and passes the card ready to land - no fix agent for a scenario line it has already written.
    Only a finding that changes code goes back to the card agent (SendMessage, a fresh write token in the message, once
-   the reviewer has left), or to a fresh Sonnet agent when the author is gone; the reviewer confirms the fix the same
+   the reviewer has left), or to a fresh Sonnet agent when the author is gone. The message says to fold each fix into
+   the commit it belongs to (`git commit --fixup` and `git rebase -i --autosquash` run as `GIT_SEQUENCE_EDITOR=: git
+   rebase --autosquash -i origin/main`), so the slot still holds its Mechanics commits and one Card commit - a fix
+   stacked as a new Card commit costs the reviewer a restructuring round; the reviewer confirms the fix the same
    way, with a fresh token, and fixes any test-only remainder itself. **The reviewer's verdict is final:** the
    coordinator lands on it and does not review the card a second time - it reads the report for what it must act on
    (a code finding to dispatch, a core gap, a question only the user can answer) and checks only what landing needs.
