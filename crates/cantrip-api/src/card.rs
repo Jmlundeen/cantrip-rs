@@ -3837,7 +3837,19 @@ pub struct CardTable {
     /// choose it (CR 201.4: "a player may not choose the name of a token unless it's also the name of a card"). False
     /// for a name only a token or an emblem has.
     pub card_named: Vec<bool>,
+    /// The waiting abilities and effects cards list whose words refer to their own source (CR 609.7a, `names_its_source`),
+    /// read once from their text as the table is made, so no card declares it: sorted (`CardTable::names_its_source`).
+    pub source_named: Vec<Waiting>,
+    /// For each of the rules' abilities any card may have by its keyword (`KEYWORD_ABILITIES`: rebound's delayed ability,
+    /// madness's and miracle's triggers; `CardTable::ability`), whether its words refer to its source, read as `source_named`
+    /// is: rebound's "you may cast this card from exile" does (CR 702.88a, 609.7a).
+    pub keyword_source_named: [bool; KEYWORD_ABILITIES.len()],
 }
+
+/// The rules' abilities a card has by a keyword, named by an index of any card (`AbilityRef::rebound`, `madness`,
+/// `miracle`), with their definitions.
+pub const KEYWORD_ABILITIES: [(u8, &AbilityDef); 3] =
+    [(AbilityRef::REBOUND, &REBOUND_ABILITY), (AbilityRef::MADNESS, &MADNESS_ABILITY), (AbilityRef::MIRACLE, &MIRACLE_ABILITY)];
 
 /// What a triggered ability's trigger condition says about where its trigger event's object comes from, the part of a
 /// zone-change trigger condition its event can't show (`CardTable::looks_back`), read from the ability's own words as the
@@ -3860,6 +3872,175 @@ pub fn read_zone_words(text: &str) -> ZoneWords {
     let from_anywhere = condition.match_indices("from anywhere").any(|(at, w)| !condition[at + w.len()..].starts_with(" other than"));
     let leaves_graveyard = condition.match_indices("leave").any(|(at, _)| condition[at..].contains("graveyard"));
     ZoneWords { from_anywhere, leaves_graveyard }
+}
+
+/// Something that waits, made by a spell or ability, whose words may refer to the object that made it (CR 609.7a: "a source
+/// of your choice" may be "any object referred to by ... a replacement or prevention effect that's waiting to apply, or by a
+/// delayed triggered ability that's waiting to trigger (even if that object is no longer in the zone it used to be in)"):
+/// a delayed or reflexive triggered ability a card lists in its `delayed` (by its `AbilityRef`), or a replacement or
+/// prevention effect a card lists in its `granted_replacements` or `granted_preventions` (by card and index).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Waiting {
+    Delayed(AbilityRef),
+    Replacement(CardId, u8),
+    Prevention(CardId, u8),
+}
+
+/// The words Oracle text uses for the object a text is on, after "this": its card types, "permanent", "spell", "card" and
+/// the like, and a Room's "door" (CR 709.5); a capitalized word after "this" is a subtype ("this Aura", "this Vehicle",
+/// "this Saga"). "This turn", "this way", "this ability" and "this cost" are not among them.
+const SELF_WORDS: &[&str] = &[
+    "artifact", "battle", "creature", "enchantment", "instant", "kindred", "land", "planeswalker", "sorcery", "permanent", "spell", "card",
+    "token", "emblem", "door",
+];
+
+/// Words of a name that are never a short name on their own: Oracle shortens a legendary name to a part that names it.
+const NAME_STOP_WORDS: &[&str] = &["the", "of", "a", "an", "and", "at", "to", "in", "on", "from", "for", "with", "by", "&"];
+
+/// Whether `text` - the words of a delayed or reflexive triggered ability, or of a replacement or prevention effect a spell
+/// or ability makes - refers to its own source, the object a card's text is on (CR 609.7a), read as Oracle text words it
+/// (CR 201.5: a card's name in its own text means that object):
+///
+/// - "this" and a word for the object ("this creature", "this land", "this spell", "this card", "this permanent", "this
+///   door"), or a capitalized subtype ("this Aura", "this Vehicle", "this Saga");
+/// - the name of any face of its card (`names`), not after "named" (a name, not the object);
+/// - for a legendary card, the short name Oracle gives it (`short_name`: a capitalized phrase made of a face's name's words,
+///   "Aang" for Aang at the Crossroads, "Dragonhawk" for Dragonhawk, Fate's Tempest, "General Traag", "Minsc & Boo",
+///   "Lieutenant Sulu" for Lieutenant Hikaru Sulu); and a personal pronoun, which Oracle uses for a legendary character and only for its own (Red Hulk's "he deals damage
+///   equal to the number of +1/+1 counters on him"), not "he or she" or "his or her" (a player, in older wordings).
+///
+/// Parenthesized reminder text and quoted abilities (an ability given to an object, whose "this creature" is that object) are
+/// left out. "It" alone is never read as the source: Oracle uses it for an object the text has named before ("Return it to
+/// its owner's hand"), which a waiting ability names by what it is about (`subject`, `members`).
+pub fn names_its_source(text: &str, names: &[&str], legendary: bool) -> bool {
+    let text = unquoted(text);
+    let words: Vec<(usize, &str)> = word_spans(&text).collect();
+    let this = words.windows(2).any(|w| {
+        let (first, next) = (w[0].1, w[1].1.trim_end_matches("'s").trim_end_matches("\u{2019}s"));
+        first.eq_ignore_ascii_case("this")
+            && (SELF_WORDS.contains(&next) || next.chars().next().is_some_and(char::is_uppercase) && next.chars().skip(1).all(|c| c.is_lowercase() || c == '-'))
+    });
+    if this {
+        return true;
+    }
+    let named = |at: usize| text[..at].trim_end().ends_with("named");
+    let appears = |phrase: &str| {
+        text.match_indices(phrase).any(|(at, _)| {
+            let before = text[..at].chars().next_back();
+            let after = text[at + phrase.len()..].chars().next();
+            !before.is_some_and(char::is_alphanumeric) && !after.is_some_and(char::is_alphanumeric) && !named(at)
+        })
+    };
+    if names.iter().any(|name| !name.is_empty() && appears(name)) {
+        return true;
+    }
+    if !legendary {
+        return false;
+    }
+    if short_name(&text, &words, names) {
+        return true;
+    }
+    const PRONOUNS: &[&str] = &["he", "him", "his", "himself", "she", "her", "hers", "herself"];
+    words.iter().enumerate().any(|(i, &(_, w))| {
+        let lower = w.to_ascii_lowercase();
+        let player = |k: usize| words.get(k).is_some_and(|&(_, o)| o == "or") && words.get(k + 1).is_some_and(|&(_, p)| PRONOUNS.contains(&p.to_ascii_lowercase().as_str()));
+        let after_or = i >= 2 && words[i - 1].1 == "or" && PRONOUNS.contains(&words[i - 2].1.to_ascii_lowercase().as_str());
+        PRONOUNS.contains(&lower.as_str()) && !player(i + 1) && !after_or
+    })
+}
+
+/// Whether `text` (its `words`) calls a legendary card by a short name Oracle gives it: a capitalized phrase - capitalized
+/// words, with the stop words between them ("Minsc & Boo") - every word of which is a word of one of its `names`, in order
+/// ("Aang" for Aang at the Crossroads, "General Traag", "Lieutenant Sulu" for Lieutenant Hikaru Sulu, "Dr. McCoy"). A phrase
+/// starting a sentence leaves out its first word when that is not one of the name's ("Transform Aang", "When Dr. McCoy
+/// enters"). Not a phrase with any other capitalized word in it - another object's name ("Partner with Jacob Frye", "Sword of
+/// Kaldra", "create Karox Bladewing") - nor a token's ("create Boo, a legendary 1/1 red Hamster", "Mutagen tokens"), nor a
+/// creature, artifact, enchantment or land type alone ("Goblin" in Krenko of the Goblins' "Goblin you control").
+fn short_name(text: &str, words: &[(usize, &str)], names: &[&str]) -> bool {
+    fn key(word: &str) -> &str {
+        let word = word.trim_matches(|c: char| !c.is_alphanumeric() && c != '&');
+        word.strip_suffix("'s").or_else(|| word.strip_suffix("\u{2019}s")).unwrap_or(word)
+    }
+    let stop = |w: &str| NAME_STOP_WORDS.contains(&key(w).to_ascii_lowercase().as_str());
+    let capital = |w: &str| key(w).chars().next().is_some_and(char::is_uppercase);
+    let is_type = |w: &str| Subtype::named(key(w)).is_some_and(|t| !t.card_types().has(CardType::Planeswalker));
+    let name_words: Vec<Vec<&str>> = names.iter().map(|n| n.split(' ').map(key).filter(|w| !w.is_empty()).collect()).collect();
+    // Whether `phrase` (stop words left out) is made of one name's words, in order.
+    let of_a_name = |phrase: &[&str]| {
+        name_words.iter().any(|name| {
+            let mut at = 0;
+            phrase.iter().all(|w| match name[at..].iter().position(|n| n == w) {
+                Some(found) => {
+                    at += found + 1;
+                    true
+                }
+                None => false,
+            })
+        })
+    };
+    let mut i = 0;
+    while i < words.len() {
+        if !capital(words[i].1) || stop(words[i].1) {
+            i += 1;
+            continue;
+        }
+        // The phrase: capitalized words joined by spaces, and stop words between two of them.
+        let mut end = i + 1;
+        while end < words.len() && text[words[end - 1].0 + words[end - 1].1.len()..words[end].0].trim().is_empty() {
+            let w = words[end].1;
+            if capital(w) && !stop(w) {
+                end += 1;
+            } else if stop(w) && words.get(end + 1).is_some_and(|n| capital(n.1) && !stop(n.1)) && text[w.len() + words[end].0..words[end + 1].0].trim().is_empty() {
+                end += 2;
+            } else {
+                break;
+            }
+        }
+        let starts_sentence = text[..words[i].0].trim_end().chars().next_back().is_none_or(|c| matches!(c, '.' | '\n' | '\u{2014}' | ':' | '\u{2022}' | ';'));
+        let mut phrase: Vec<&str> = words[i..end].iter().map(|&(_, w)| key(w)).filter(|w| !stop(w)).collect();
+        if starts_sentence && phrase.len() > 1 && !of_a_name(&phrase[..1]) {
+            phrase.remove(0);
+        }
+        let before = words[..i].last().map(|&(_, w)| w.to_ascii_lowercase());
+        let after = words.get(end).map(|&(_, w)| w.to_ascii_lowercase());
+        let a_token = matches!(before.as_deref(), Some("create" | "creates" | "named")) || matches!(after.as_deref(), Some("token" | "tokens"));
+        if !phrase.is_empty() && of_a_name(&phrase) && !a_token && !(phrase.len() == 1 && is_type(phrase[0])) {
+            return true;
+        }
+        i = end;
+    }
+    false
+}
+
+/// `text` without its parenthesized reminder text and its quoted abilities.
+fn unquoted(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let (mut paren, mut quote) = (0u32, false);
+    for c in text.chars() {
+        match c {
+            '(' => paren += 1,
+            ')' => paren = paren.saturating_sub(1),
+            '"' => quote = !quote,
+            '\u{201c}' => quote = true,
+            '\u{201d}' => quote = false,
+            _ if paren == 0 && !quote => out.push(c),
+            _ => {}
+        }
+    }
+    out
+}
+
+/// The words of `text` and where each begins: runs of letters, digits, apostrophes and hyphens ("+1/+1" is two).
+fn word_spans(text: &str) -> impl Iterator<Item = (usize, &str)> {
+    let is_word = |c: char| c.is_alphanumeric() || c == '\'' || c == '\u{2019}' || c == '-' || c == '&';
+    let mut at = 0;
+    std::iter::from_fn(move || {
+        let rest = &text[at..];
+        let start = at + rest.find(is_word)?;
+        let len = text[start..].find(|c: char| !is_word(c)).unwrap_or(text.len() - start);
+        at = start + len;
+        Some((start, text[start..start + len].trim_end_matches(['\'', '\u{2019}'])))
+    })
 }
 
 /// What a zone-change trigger condition says that its event can't show (`read_zone_words`).
@@ -4255,6 +4436,8 @@ impl CardTable {
             fronts: Vec::new(),
             wholes: Vec::new(),
             printed: Vec::new(),
+            source_named: Vec::new(),
+            keyword_source_named: KEYWORD_ABILITIES.map(|(_, def)| matches!(def, AbilityDef::Triggered(t) if names_its_source(t.text, &[], false))),
         };
         let count = table.cards.len();
         table.printed = (0..count).map(|_| [std::sync::OnceLock::new(), std::sync::OnceLock::new()]).collect();
@@ -4304,7 +4487,90 @@ impl CardTable {
                 }
             }
         }
+        table.source_named = table.read_source_named();
         table
+    }
+
+    /// Every waiting ability and effect a card lists whose words refer to its source (`names_its_source`), sorted: its
+    /// delayed and reflexive triggered abilities (`CardDef::delayed`, by their text) and its granted replacement and
+    /// prevention effects (by `text`), read with the names of every face of its card - a double-faced card's other face, a
+    /// split card's or a Room's halves and the whole, an adventure, an omen, a bestowed or prepared face - and whether any
+    /// face is legendary.
+    fn read_source_named(&self) -> Vec<Waiting> {
+        /// A card and every face it brings (`CardDef::back`, `split`, `adventure`, `omen`, `bestow`, `prepare`).
+        fn faces(card: &'static CardDef, into: &mut Vec<&'static CardDef>) {
+            if into.iter().any(|f| std::ptr::eq(*f, card)) {
+                return;
+            }
+            into.push(card);
+            for face in [card.back, card.adventure, card.omen, card.bestow, card.prepare].into_iter().flatten() {
+                faces(face, into);
+            }
+            if let Some((left, right)) = card.split {
+                faces(left, into);
+                faces(right, into);
+            }
+        }
+        // Each definition's card, as the faces of every card that brings it: a face is named by the whole card's names.
+        let mut cards_of: std::collections::HashMap<usize, Vec<&'static CardDef>> = std::collections::HashMap::new();
+        for &card in &self.cards {
+            let mut group = Vec::new();
+            faces(card, &mut group);
+            for &face in &group {
+                let of = cards_of.entry(face as *const CardDef as usize).or_default();
+                for &f in &group {
+                    if !of.iter().any(|o| std::ptr::eq(*o, f)) {
+                        of.push(f);
+                    }
+                }
+            }
+        }
+        let mut named = Vec::new();
+        for (id, &card) in self.cards.iter().enumerate() {
+            let triggered = |a: &AbilityDef| matches!(a, AbilityDef::Triggered(_));
+            if !card.abilities.iter().chain(card.delayed).any(triggered) && card.granted_replacements.is_empty() && card.granted_preventions.is_empty() {
+                continue;
+            }
+            let id = CardId(id as u16);
+            let faces = &cards_of[&(card as *const CardDef as usize)];
+            let names: Vec<&str> = faces.iter().map(|f| f.name).collect();
+            let legendary = faces.iter().any(|f| f.supertypes.legendary);
+            // A delayed ability is any triggered ability a card lists: one in its `delayed`, or one of its `abilities` - the
+            // rules' own (`crate::intrinsic`: the untimely cleanup sacrifice) are the intrinsic card's.
+            let listed = card.abilities.iter().enumerate().map(|(i, a)| (i as u8, a));
+            let delayed = card.delayed.iter().enumerate().map(|(i, a)| (AbilityRef::DELAYED + i as u8, a));
+            for (index, ability) in listed.chain(delayed) {
+                if let AbilityDef::Triggered(t) = ability
+                    && names_its_source(t.text, &names, legendary)
+                {
+                    named.push(Waiting::Delayed(AbilityRef { card: id, index }));
+                }
+            }
+            for (i, r) in card.granted_replacements.iter().enumerate() {
+                if names_its_source(r.text, &names, legendary) {
+                    named.push(Waiting::Replacement(id, i as u8));
+                }
+            }
+            for (i, p) in card.granted_preventions.iter().enumerate() {
+                if names_its_source(p.text, &names, legendary) {
+                    named.push(Waiting::Prevention(id, i as u8));
+                }
+            }
+        }
+        named.sort_unstable();
+        named
+    }
+
+    /// Whether a waiting ability or effect refers to its own source (CR 609.7a), as its words were read when the table was
+    /// made (`read_source_named`, `keyword_source_named`): while it waits, that object may be chosen as "a source of your
+    /// choice" wherever it is now.
+    pub fn names_its_source(&self, waiting: Waiting) -> bool {
+        if let Waiting::Delayed(ability) = waiting
+            && let Some(at) = KEYWORD_ABILITIES.iter().position(|&(index, _)| index == ability.index)
+        {
+            return self.keyword_source_named[at];
+        }
+        self.source_named.binary_search(&waiting).is_ok()
     }
 
     pub fn get(&self, id: CardId) -> &'static CardDef {
@@ -4610,5 +4876,51 @@ mod tests {
         assert_eq!(zone_words("When this creature enters, choose target permanent card in your graveyard that was put there from anywhere this turn."), w(false, false));
         assert_eq!(zone_words("When this creature enters from anywhere other than a graveyard or exile, roll a 20-sided die."), w(false, false));
         assert_eq!(zone_words("When this creature leaves the battlefield, return the exiled card to its owner's graveyard."), w(false, false));
+    }
+
+    /// CR 609.7a: the forms Oracle text refers to its own object by, read from the words (`names_its_source`).
+    #[test]
+    fn a_text_names_its_source_as_oracle_words_it() {
+        let named = |text: &str, names: &[&str], legendary: bool| crate::names_its_source(text, names, legendary);
+        // "This" and a word for the object, or a capitalized subtype; not "this turn", "this way", "this ability".
+        assert!(named("Exile this permanent at the beginning of the next end step.", &["Nova Hellkite"], false));
+        assert!(named("When you do, this creature deals 2 damage to any target.", &["Dahar Master"], false));
+        assert!(named("you may cast a copy of this spell from exile", &["Restoration Seminar"], false));
+        assert!(named("Return this Aura to its owner's hand.", &["Probe"], false));
+        assert!(named("Put a +1/+1 counter on this Vehicle's target.", &["Probe"], false));
+        assert!(!named("Draw a card at the beginning of the next turn's upkeep if this ability resolved this turn.", &["Probe"], false));
+        assert!(!named("Return that card to the battlefield under its owner's control at the beginning of the next end step.", &["Flickerwisp"], false));
+        // The card's name or a face's; not a name after "named", nor the name inside another word.
+        assert!(named("When you do, Ill-Timed Explosion deals X damage to each creature.", &["Ill-Timed Explosion"], false));
+        assert!(named("If a permanent dealt damage by Torch the Tower would die this turn, exile it instead.", &["Torch the Tower"], false));
+        assert!(named("Transform Aang.", &["Aang, at the Crossroads", "Aang, Destined Savior"], true));
+        assert!(!named("Search your library for a card named Fog.", &["Fog"], false));
+        assert!(!named("Prevent all combat damage that would be dealt this turn.", &["Fog"], false));
+        assert!(!named("Create a Fogbank token.", &["Fog"], false));
+        // A legendary card's short name: a run of its name's words, not a stop word nor a creature type alone.
+        assert!(named("At the beginning of your next end step, Dragonhawk deals 2 damage to each opponent.", &["Dragonhawk, Fate's Tempest"], true));
+        assert!(named("When you do, General Traag deals 4 damage to target creature.", &["General Traag, Heart of Stone"], true));
+        assert!(named("When you do, Minsc & Boo deals X damage to any target.", &["Minsc & Boo, Timeless Heroes"], true));
+        assert!(named("Whenever Lieutenant Sulu becomes tapped, he explores.", &["Lieutenant Hikaru Sulu"], true));
+        assert!(named("Copy that spell if its mana value is at most Loki's power.", &["Loki Laufeyson"], true));
+        assert!(named("When Dr. McCoy enters, choose one.", &["Dr. Leonard \"Bones\" McCoy"], true));
+        assert!(named("Whenever Captain Kirk enters or attacks, choose one.", &["Captain James T. Kirk"], true));
+        assert!(!named("Create a 1/1 red Goblin creature token.", &["Goblin Warchief Rex"], true));
+        assert!(!named("Each Goblin you control gets +1/+0.", &["Krenko of the Goblins"], true));
+        // Not another object's name that shares a word, nor a token's.
+        assert!(!named("Partner with Jacob Frye", &["Evie Frye"], true));
+        assert!(!named("Attach Sword of Kaldra to it.", &["Shield of Kaldra"], true));
+        assert!(!named("At the beginning of your upkeep, you may create Boo, a legendary 1/1 red Hamster creature token.", &["Minsc & Boo, Timeless Heroes"], true));
+        assert!(!named("Create X Mutagen tokens.", &["Mutagen Man, Living Ooze"], true));
+        // A personal pronoun on a legendary card, which Oracle uses for the character itself; not a player's "he or she".
+        assert!(named("When you do, he deals damage equal to the number of +1/+1 counters on him to any other target.", &["Red Hulk"], true));
+        assert!(named("Return her to the battlefield transformed.", &["Tamiyo, Inquisitive Student"], true));
+        assert!(!named("If that permanent was a Liliana planeswalker, her controller loses 3 life.", &["Liliana's Defeat"], false));
+        assert!(!named("Target player discards a card of his or her choice.", &["Probe Legend"], true));
+        // "It" alone is the object the text named before (the waiting ability's subject), never read as its source; quoted
+        // abilities and reminder text are left out.
+        assert!(!named("Return it to its owner's hand.", &["Kolaghan Skirmisher"], false));
+        assert!(!named("Target creature gains \"When this creature dies, draw a card.\"", &["Probe"], false));
+        assert!(!named("Ward {1} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it.)", &["Probe"], false));
     }
 }

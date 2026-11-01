@@ -20,6 +20,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], effect),
-    granted_replacements: &[granted_replacement(ReplacementKind::ZoneChange, exile_instead_applies, cantrip_mechanics::replacements::exile_instead_apply_granted, "exile that card instead of putting it into your graveyard")],
+    granted_replacements: &[granted_replacement(ReplacementKind::ZoneChange, exile_instead_applies, cantrip_mechanics::replacements::exile_instead_apply_granted, "exile that card instead of putting it into your graveyard")
+        .text("If a card would be put into your graveyard from anywhere this turn, exile that card instead.")],
     ..oracle::YAWGMOTHS_WILL
 };

@@ -249,6 +249,10 @@ impl Query for AsText<'_> {
         self.q.linked_card(card)
     }
 
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.q.names_its_source(waiting)
+    }
+
     fn text_linked(&self, source: ObjectId) -> Linked {
         if source == self.source { self.link } else { self.q.text_linked(source) }
     }

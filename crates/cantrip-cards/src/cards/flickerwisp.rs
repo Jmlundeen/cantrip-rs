@@ -13,6 +13,6 @@ fn exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, exile, "When Flickerwisp enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.")
         .targets(&[targets::OTHER_PERMANENT])],
-    delayed: &[delayed_trigger(cantrip_mechanics::delayed::return_subject_to_battlefield, "Return the card exiled with Flickerwisp to the battlefield under its owner's control.")],
+    delayed: &[delayed_trigger(cantrip_mechanics::delayed::return_subject_to_battlefield, "Return that card to the battlefield under its owner's control at the beginning of the next end step.")],
     ..oracle::FLICKERWISP
 };

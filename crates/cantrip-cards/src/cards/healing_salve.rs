@@ -25,6 +25,6 @@ static MODAL: ModalDef = modes(&[
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef::MODAL),
     modal: Some(&MODAL),
-    granted_preventions: &[prevention::ANY_DAMAGE],
+    granted_preventions: &[prevention::ANY_DAMAGE.text("Prevent the next 3 damage that would be dealt to any target this turn.")],
     ..oracle::HEALING_SALVE
 };

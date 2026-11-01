@@ -45,6 +45,6 @@ pub static CARD: CardDef = CardDef {
         &MODAL,
         "When Venser enters, choose one \u{2014}\n\u{2022} Copy target instant or sorcery spell an opponent controls twice. You may choose new targets for the copies.\n\u{2022} Create two tokens that are copies of target permanent an opponent controls. They gain haste. At the beginning of the next end step, sacrifice them.",
     )],
-    delayed: &[delayed::SACRIFICE_CREATED],
+    delayed: &[delayed_trigger(delayed::sacrifice_created, "At the beginning of the next end step, sacrifice them.")],
     ..oracle::VENSER_FERVENT_FORGER
 };

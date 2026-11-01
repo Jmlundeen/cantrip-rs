@@ -34,6 +34,6 @@ pub static CARD: CardDef = CardDef {
         )
         .condition(a_card_was_exiled_this_turn),
     ],
-    delayed: &[delayed_trigger(delayed::return_subject_to_battlefield, "Return the card exiled with Ennis to the battlefield under its owner's control.")],
+    delayed: &[delayed_trigger(delayed::return_subject_to_battlefield, "Return that card to the battlefield under its owner's control at the beginning of the next end step.")],
     ..oracle::ENNIS_DEBATE_MODERATOR
 };

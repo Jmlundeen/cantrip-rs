@@ -25,7 +25,7 @@ pub static CARD: CardDef = CardDef {
     ],
     delayed: &[delayed_trigger(
         delayed::return_subject_to_battlefield,
-        "Return the card exiled with S.H.I.E.L.D. Flying Car to the battlefield under its owner's control.",
+        "Return that card to the battlefield under its owner's control at the beginning of the next end step.",
     )],
     ..oracle::S_H_I_E_L_D_FLYING_CAR
 };

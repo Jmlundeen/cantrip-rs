@@ -53,6 +53,7 @@ pub static CARD: CardDef = CardDef {
         "instead, each player returns a permanent they control to its owner's hand",
     )
     .then(each_returns)
-    .once()],
+    .once()
+    .text("The next time you would draw a card this turn, each player returns a permanent they control to its owner's hand instead.")],
     ..oracle::WORDS_OF_WIND
 };

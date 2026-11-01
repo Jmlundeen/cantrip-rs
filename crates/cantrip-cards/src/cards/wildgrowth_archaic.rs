@@ -36,6 +36,7 @@ pub static CARD: CardDef = CardDef {
         spell_enters,
         add_counters_per_color,
         "enters with X additional +1/+1 counters, where X is the number of colors of mana spent to cast it",
-    )],
+    )
+    .text("that creature enters with X additional +1/+1 counters on it, where X is the number of colors of mana spent to cast it.")],
     ..oracle::WILDGROWTH_ARCHAIC
 };

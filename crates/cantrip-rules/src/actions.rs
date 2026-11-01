@@ -236,6 +236,10 @@ impl Query for AsSpell<'_> {
         self.q.linked_card(card)
     }
 
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.q.names_its_source(waiting)
+    }
+
     fn text_linked(&self, source: ObjectId) -> Linked {
         self.q.text_linked(source)
     }
@@ -1915,6 +1919,10 @@ impl Query for Announcing<'_> {
         self.q.linked_card(card)
     }
 
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.q.names_its_source(waiting)
+    }
+
     fn text_linked(&self, source: ObjectId) -> Linked {
         self.q.text_linked(source)
     }
@@ -1992,6 +2000,10 @@ impl Watch<'_> {
 impl Query for Watch<'_> {
     fn linked_card(&self, card: CardId) -> CardId {
         self.q.linked_card(card)
+    }
+
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.q.names_its_source(waiting)
     }
 
     fn text_linked(&self, source: ObjectId) -> Linked {
@@ -2657,6 +2669,10 @@ struct AsFace<'a> {
 impl Query for AsFace<'_> {
     fn linked_card(&self, card: CardId) -> CardId {
         self.cx.linked_card(card)
+    }
+
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.cx.names_its_source(waiting)
     }
 
     fn text_linked(&self, source: ObjectId) -> Linked {
@@ -5794,6 +5810,10 @@ struct QueryAsFace<'a> {
 impl Query for QueryAsFace<'_> {
     fn linked_card(&self, card: CardId) -> CardId {
         self.q.linked_card(card)
+    }
+
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.q.names_its_source(waiting)
     }
 
     fn text_linked(&self, source: ObjectId) -> Linked {

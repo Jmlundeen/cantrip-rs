@@ -1554,6 +1554,10 @@ impl Query for Game {
         self.cards.linked_card(card)
     }
 
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.cards.names_its_source(waiting)
+    }
+
     fn text_linked(&self, source: ObjectId) -> Linked {
         self.cards.linked_to(&self.state, source)
     }
@@ -1594,6 +1598,10 @@ impl Query for Cx<'_> {
 
     fn linked_card(&self, card: CardId) -> CardId {
         self.g.cards.linked_card(card)
+    }
+
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.g.cards.names_its_source(waiting)
     }
 
     fn text_linked(&self, source: ObjectId) -> Linked {

@@ -36,6 +36,6 @@ static MODAL: ModalDef = modes(&[
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef::MODAL),
     modal: Some(&MODAL),
-    granted_replacements: &[EXILE_INSTEAD_OF_DYING],
+    granted_replacements: &[EXILE_INSTEAD_OF_DYING.text("If that creature would die this turn, exile it instead.")],
     ..oracle::PINECONE_STRIKE
 };

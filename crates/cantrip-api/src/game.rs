@@ -401,6 +401,10 @@ pub trait Query {
     /// The card a face's abilities are printed on, as linked abilities know it (CR 607.1, 607.1b): `CardTable::linked_card`.
     fn linked_card(&self, card: CardId) -> CardId;
 
+    /// Whether a waiting delayed triggered ability, or replacement or prevention effect, refers to its own source (CR 609.7a):
+    /// `CardTable::names_its_source`, read from its words once, as the card table was made.
+    fn names_its_source(&self, waiting: crate::Waiting) -> bool;
+
     /// A spell or ability on the stack, resolving or about to (`StackItem`), as linked abilities know it (CR 607.1, 607.5): its
     /// source, the card whose text it is printed in, and how its source acquired it (`StackItem::acquired`). What `exile_with` links and `exiled_with` asks for, from a resolving ability.
     fn linked(&self, item: &StackItem) -> Linked {

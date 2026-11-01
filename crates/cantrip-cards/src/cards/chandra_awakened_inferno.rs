@@ -60,7 +60,7 @@ pub static CARD: CardDef = CardDef {
         ability(loyalty_minus_x(), burn, "\u{2212}X: Chandra deals X damage to target creature or planeswalker. If a permanent dealt damage this way would die this turn, exile it instead.")
             .targets(&[targets::CREATURE_OR_PLANESWALKER]),
     ],
-    granted_replacements: &[EXILE_INSTEAD_OF_DYING],
+    granted_replacements: &[EXILE_INSTEAD_OF_DYING.text("If a permanent dealt damage this way would die this turn, exile it instead.")],
     ..oracle::CHANDRA_AWAKENED_INFERNO
 };
 

@@ -29,7 +29,7 @@ pub static CARD: CardDef = CardDef {
     ],
     // The 3+ striation (CR 721.2a): a triggered ability D-7 has while it has three or more charge counters.
     delayed: &[
-        delayed::SACRIFICE_CREATED,
+        delayed_trigger(delayed::sacrifice_created, "Sacrifice it at the beginning of the next end step."),
         triggered(triggers::BEGINNING_OF_YOUR_COMBAT, create_klingon, "At the beginning of combat on your turn, create a 2/1 red Klingon Warrior creature token with haste. Sacrifice it at the beginning of the next end step."),
     ],
     ..oracle::D_7_BATTLE_CRUISER

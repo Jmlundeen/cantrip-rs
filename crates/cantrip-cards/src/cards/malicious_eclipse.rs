@@ -21,6 +21,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], effect),
-    granted_replacements: &[granted_replacement(ReplacementKind::ZoneChange, would_die, exile_instead_apply_granted, "exiled instead of dying")],
+    granted_replacements: &[granted_replacement(ReplacementKind::ZoneChange, would_die, exile_instead_apply_granted, "exiled instead of dying")
+        .text("If a creature an opponent controls would die this turn, exile it instead.")],
     ..oracle::MALICIOUS_ECLIPSE
 };

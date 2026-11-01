@@ -18,6 +18,7 @@ const BLACK_OR_RED: GrantedPreventionDef = GrantedPreventionDef {
     of_it: None,
     applies: black_or_red_to_your_creatures,
     then: None,
+    text: "Prevent all damage that black and/or red sources would deal to creatures you control this turn.",
 };
 
 /// "You and permanents you control gain hexproof until end of turn." The permanents are those you control as it resolves,

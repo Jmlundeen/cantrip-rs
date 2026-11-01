@@ -35,6 +35,6 @@ pub static CARD: CardDef = CardDef {
         chapter(3, ecliptic_growl, "III \u{2014} Ecliptic Growl \u{2014} Draw a card if you control the creature with the greatest power or tied for the greatest power."),
     ],
     delayed: &[next_creature_counter::DELAYED],
-    granted_replacements: &[next_creature_counter::ENTERS_WITH_A_COUNTER],
+    granted_replacements: &[next_creature_counter::ENTERS_WITH_A_COUNTER.text("that creature enters with an additional +1/+1 counter on it.")],
     ..oracle::SUMMON_FENRIR
 };

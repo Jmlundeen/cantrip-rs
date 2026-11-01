@@ -38,6 +38,6 @@ pub static CARD: CardDef = CardDef {
     )
     .condition(cast_noncreature_this_turn)
     .targets(&[targets::CREATURE_YOU_CONTROL])],
-    delayed: &[delayed::SACRIFICE_CREATED],
+    delayed: &[delayed_trigger(delayed::sacrifice_created, "Sacrifice it at the beginning of the next end step.")],
     ..oracle::GRAY_AND_ADIRA_FOREVER_JOINED
 };

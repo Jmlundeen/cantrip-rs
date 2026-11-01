@@ -53,6 +53,6 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, exile_until_crowned, "When this creature enters, exile target creature an opponent controls until an opponent becomes the monarch.")
             .targets(&[cantrip_mechanics::targets::CREATURE_AN_OPPONENT_CONTROLS]),
     ],
-    delayed: &[triggered(when_asked(EventMask::BECAME_MONARCH, opponent_became_monarch), return_it, "Until an opponent becomes the monarch, the exiled card stays exiled.")],
+    delayed: &[triggered(when_asked(EventMask::BECAME_MONARCH, opponent_became_monarch), return_it, "Exile target creature an opponent controls until an opponent becomes the monarch.")],
     ..oracle::PALACE_JAILER
 };

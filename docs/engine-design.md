@@ -1083,27 +1083,41 @@ left it (CR 616.1f). There are three kinds besides protection's (CR 702.16e, `re
   `granted_preventions[index]` describes (any damage, combat damage: `cantrip_mechanics::prevention::ANY_DAMAGE`,
   `COMBAT_DAMAGE`). `Shield::All` prevents all of it while it lasts (Fog's "all combat damage that would be dealt this
   turn"); `Shield::Next(n)` is a shield (CR 615.7), reduced by what it prevents (`GameState::effect_set`) and gone at 0
-  (Healing Salve's "the next 3 damage that would be dealt to any target this turn"). The definition's `applies` is handed the
+  (Healing Salve's "the next 3 damage that would be dealt to any target this turn"); `Shield::NextTime` is "the next time
+  [a source] would deal damage ..., prevent that damage" (CR 615.8), which prevents every part of the one damage event it
+  first prevents some of and is used up once that event has been dealt (`replace::rest_of_preventions`), damage it prevents
+  none of leaving it waiting (CR 609.7b). The definition's `applies` is handed the
   object the effect is about, so one about no recipient can name the damage by its object: Maze of Ith's "all combat damage
   that would be dealt to and dealt by that creature" (`to: Target::None`, the creature the affected object, `of_it` how the
-  creature's face words it);
+  creature's face words it). "A source of your choice" (CR 609.7a) is chosen as the effect is made
+  (`cantrip_mechanics::prevention::choose_source`, from `damage_sources`: permanents, spells, objects the stack, waiting
+  replacement and prevention effects and delayed triggers refer to, face-up command-zone objects; a waiting effect or delayed
+  trigger refers to its own source only where its words do - read once, as the card table is made, from a delayed ability's
+  `text` and a granted effect's `text` (its Oracle words: `cantrip_api::names_its_source`, `CardTable::names_its_source`,
+  `Query::names_its_source`): "this" and a word for the object, a face's name, and for a legendary card the short name
+  Oracle gives it or a personal pronoun; never "it" alone, which is the object the text named before, the ability's subject;
+  `crates/cantrip-cards/tests/waiting_texts_match_oracle.rs` holds those words to the Oracle text) and is the object the effect
+  is about, a permanent spell chosen being the permanent it becomes too (`by_chosen_source`): Deflecting Palm's "the next time
+  a source of your choice would deal damage to you this turn" is `prevention::next_time_chosen_source_would_damage_you`.
+  The definition's `then` (`PreventionThen`) is the rest of the effect (CR 615.5: "If damage is prevented this way, Deflecting
+  Palm deals that much damage to that source's controller"): the damage event's `DamageBatch` keeps what each such effect
+  prevented of each part, and once the event has been dealt and announced - before state-based actions, and before the spell
+  or ability dealing it goes on - the effect's controller runs it once for the event, told every part (`Prevented`);
 - where two or more sources would deal damage to a shielded permanent or player at the same time (combat damage,
   `damage_together`), its player or controller chooses whose damage the shield prevents first (CR 615.7,
   `ops::order_for_shields`, a `ChooseCards` of the sources with `Purpose::PreventDamageFrom(left)`), asked whenever the
   shield would not cover all of it as assigned or a damage replacement on the board might make it more (Valley Flamecaller);
   the assignments then meet the shield in that order.
 
-None applies to damage that can't be prevented (CR 615.12): it would prevent nothing, and a shield is not reduced by it. A
+None applies to damage that can't be prevented (CR 615.12): it would prevent nothing, and a shield is not reduced by it; nor
+is the rest of an effect run (every printed one says "if damage is prevented this way" or counts the damage prevented). A
 player is not asked to order prevention effects that each prevent all the damage and use nothing up, since the order
-changes nothing. Each prevention that prevents something records `Event::DamagePrevented { source, target, amount, combat,
+changes nothing - one with a `then` is told what it prevented, so it is ordered. Each prevention that prevents something records `Event::DamagePrevented { source, target, amount, combat,
 by }` (CR 615.6, 615.13), protection's too, before what is left is dealt: what "if damage is prevented this way" (CR 615.5) would ask,
 and the scenario dump's `Prevented`. It is one record for each damage event an effect prevents some of, emitted as it is
 applied rather than with the damage batch, so a "whenever damage is prevented" trigger (CR 615.13: once each time an effect
-is applied to one or more simultaneous damage events) would need them batched first, and an additional effect "if damage is
-prevented this way" would make the order of prevention effects that each prevent it all matter, so the player would have to
-be asked again. Not built, because no card in content has one:
-"the next time a source would deal damage" (CR 615.8), a source of a player's choice (CR 615.9, 609.7), "prevent N of that
-damage" from a static ability (CR 615.10) and prevention with an additional effect (CR 615.5). The host shows a resolved
+is applied to one or more simultaneous damage events) would need them batched first. Not built, because no card in content
+has one: that trigger, and "prevent N of that damage" from a static ability (CR 615.10). The host shows a resolved
 prevention effect on the object it shields ("Prevent the next 3 damage that would be dealt to it this turn (Healing Salve)."),
 or beside the life total of the player it shields, or of its controller for damage to anyone.
 

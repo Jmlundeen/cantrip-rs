@@ -60,7 +60,7 @@ pub static CARD: CardDef = CardDef {
         chapter(3, chapter_three, "III \u{2014} Exile this Saga, then return it to the battlefield transformed under your control."),
     ],
     delayed: &[next_creature_counter::DELAYED],
-    granted_replacements: &[next_creature_counter::ENTERS_WITH_A_COUNTER],
+    granted_replacements: &[next_creature_counter::ENTERS_WITH_A_COUNTER.text("that creature enters with an additional +1/+1 counter on it.")],
     back: Some(&BACK),
     ..oracle::KUMANO_FACES_KAKKAZAN
 };

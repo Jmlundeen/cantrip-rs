@@ -25,6 +25,6 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, terror_from_the_deep, "Terror from the Deep \u{2014} When Mawloc enters, it fights up to one target creature an opponent controls. If that creature would die this turn, exile it instead.")
             .targets(&[targets::CREATURE_AN_OPPONENT_CONTROLS.optional()]),
     ],
-    granted_replacements: &[EXILE_INSTEAD_OF_DYING],
+    granted_replacements: &[EXILE_INSTEAD_OF_DYING.text("If that creature would die this turn, exile it instead.")],
     ..oracle::MAWLOC
 };

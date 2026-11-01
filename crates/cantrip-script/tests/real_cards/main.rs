@@ -17,5 +17,6 @@ mod merged_components;
 mod repeatable_mana;
 mod righteous_valkyrie_noncreature;
 mod search_any_number;
+mod source_of_your_choice_delayed;
 mod turn_face_up_by_effect;
 mod until_exile;

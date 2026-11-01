@@ -47,7 +47,7 @@ static MODAL: ModalDef = modes(&[
 pub static CARD: CardDef = CardDef {
     abilities: &[modal_triggered(triggers::THIS_ENTERS, &MODAL, "When Dr. McCoy enters, choose one — Return target non-Doctor permanent card from your graveyard to your hand; or choose up to one other target creature. When it dies this turn, return that card to the battlefield under its owner's control with a +1/+1 counter on it at the beginning of the next end step.")],
     delayed: &[
-        triggered(triggers::THIS_DIES, return_at_end_step, "When it dies this turn, return that card at the beginning of the next end step."),
+        triggered(triggers::THIS_DIES, return_at_end_step, "When it dies this turn, return that card to the battlefield under its owner's control with a +1/+1 counter on it at the beginning of the next end step."),
         delayed_trigger(return_with_counter, "Return that card to the battlefield under its owner's control with a +1/+1 counter on it."),
     ],
     ..oracle::DR_LEONARD_BONES_MCCOY

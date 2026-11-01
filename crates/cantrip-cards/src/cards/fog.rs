@@ -11,6 +11,6 @@ fn prevent_combat_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], prevent_combat_damage),
-    granted_preventions: &[prevention::COMBAT_DAMAGE],
+    granted_preventions: &[prevention::COMBAT_DAMAGE.text("Prevent all combat damage that would be dealt this turn.")],
     ..oracle::FOG
 };

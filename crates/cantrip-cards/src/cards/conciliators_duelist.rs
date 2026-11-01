@@ -32,6 +32,6 @@ pub static CARD: CardDef = CardDef {
         )
         .targets(&[targets::CREATURE.optional()]),
     ],
-    delayed: &[delayed_trigger(delayed::return_subject_to_battlefield, "Return the card exiled with Conciliator's Duelist to the battlefield under its owner's control.")],
+    delayed: &[delayed_trigger(delayed::return_subject_to_battlefield, "Return that card to the battlefield under its owner's control at the beginning of the next end step.")],
     ..oracle::CONCILIATORS_DUELIST
 };

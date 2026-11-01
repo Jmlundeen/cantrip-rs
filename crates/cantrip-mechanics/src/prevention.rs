@@ -3,8 +3,13 @@
 //! applies them (`EffectKind::Prevention`): ordered with the replacement effects of the same damage (CR 616.1), never to
 //! damage that can't be prevented (CR 615.12), and recorded as they prevent it (`Event::DamagePrevented`). A card lists
 //! the definition it uses in its `granted_preventions` and makes the effect with the index it has there.
+//!
+//! "The next time a source of your choice would deal damage to you this turn, prevent that damage" (CR 609.7a, 615.8) is
+//! `next_time_chosen_source_would_damage_you` with `FROM_CHOSEN_SOURCE`; the rest of such an effect ("if damage is prevented
+//! this way, ...", CR 615.5) is its definition's `then`, which the core runs once the damage event has been dealt.
 
 use cantrip_api::*;
+use crate::select::{Count, Selection};
 
 fn any(_: &dyn Query, _: &Asker, _: ObjectId, _: &DamageEvent) -> bool {
     true
@@ -16,11 +21,12 @@ fn combat(_: &dyn Query, _: &Asker, _: ObjectId, d: &DamageEvent) -> bool {
 
 /// Damage of any kind from any source, to whom the effect names: "prevent the next 3 damage that would be dealt to any
 /// target this turn" (Healing Salve; Bandage's next 1, Mending Hands' next 4).
-pub const ANY_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents the damage", damage: "damage", of_it: None, applies: any, then: None };
+/// The card gives its own words (`.text(..)`).
+pub const ANY_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents the damage", damage: "damage", of_it: None, applies: any, then: None, text: "" };
 
 /// Combat damage only (CR 510.2): "prevent all combat damage that would be dealt this turn" (Fog, Holy Day, Moment's
-/// Peace).
-pub const COMBAT_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents all combat damage", damage: "combat damage", of_it: None, applies: combat, then: None };
+/// Peace). The card gives its own words (`.text(..)`).
+pub const COMBAT_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents all combat damage", damage: "combat damage", of_it: None, applies: combat, then: None, text: "" };
 
 /// Makes the prevention effect the resolving spell or ability's card lists `index`th in its `granted_preventions`, of damage
 /// to `to` (`Target::None` for damage to anyone), until end of turn: all of it, or the next N (CR 615.7).
@@ -46,4 +52,127 @@ pub fn next_damage_to_target(g: &mut dyn Game, item: &StackItem, slot: usize, in
     }
     let target = g.state().target(item, slot);
     this_turn(g, item, target, index, Shield::Next(n));
+}
+
+/// The sources of damage a player may choose for "a source of your choice" (CR 609.7a): every permanent; every spell on the
+/// stack, and every object an object on the stack refers to - an ability's source, the objects it targets or is about -
+/// even one no longer in the zone it was in; every object a replacement or prevention effect waiting to apply refers to (the
+/// object it is about, and its source where its words refer to it: `Query::names_its_source`), and one a delayed triggered
+/// ability waiting to trigger refers to (the same); and every face-up object in the command zone. A source need not be able to deal damage to
+/// be chosen. Each once, permanents first. (A triggered ability's `StackItem::data` is numbers its card reads - a payer, a
+/// count, a stack position - never an object: the objects it is about are its subject and members.)
+pub fn damage_sources(q: &dyn Query) -> Vec<ObjectId> {
+    let s = q.state();
+    let mut sources: Vec<ObjectId> = s.battlefield().to_vec();
+    let mut add = |id: ObjectId| {
+        if !sources.contains(&id) {
+            sources.push(id);
+        }
+    };
+    for item in &s.stack {
+        add(item.object);
+        s.targets(item).iter().filter_map(|t| t.object()).for_each(&mut add);
+        s.members(item.members).iter().copied().for_each(&mut add);
+        if let Some(id) = item.subject.object() {
+            add(id);
+        }
+    }
+    // A waiting replacement or prevention effect refers to the object it is about, and to its source only where its text names
+    // it ("Deflecting Palm deals that much damage"): a resolved Fog's "prevent all combat damage" refers to no object.
+    for e in &s.effects {
+        let (about_it, names_source) = match e.kind {
+            EffectKind::Replacement { card, index } => (true, q.names_its_source(Waiting::Replacement(card, index))),
+            // About a player: its `affected` object is only its source.
+            EffectKind::ReplacementRule { card, index } => (false, q.names_its_source(Waiting::Replacement(card, index))),
+            // About the object damage to which it prevents, or one it names more than so (Maze of Ith's creature, the chosen
+            // source); one about no object - "all combat damage", damage to a player - has its source as `affected`.
+            EffectKind::Prevention { card, index, to, .. } => {
+                (to.object().is_some() || e.affected != e.source, q.names_its_source(Waiting::Prevention(card, index)))
+            }
+            // "The next time [it] would be destroyed this turn" (CR 701.19a, 614.8): of the permanent it is about.
+            EffectKind::RegenerationShield => (true, false),
+            _ => continue,
+        };
+        if about_it {
+            add(e.affected);
+        }
+        if names_source {
+            add(e.source);
+        }
+    }
+    // A waiting delayed triggered ability (CR 603.7): the objects it is about, and its source (CR 603.7d) only where its text
+    // names it ("Dragonhawk deals", "Exile this creature"): Flickerwisp's and Otherworldly Journey's "return that card" refer
+    // to the card, not the creature or the spell. The rules' own delayed abilities are asked the same: rebound's "you may cast
+    // this card from exile" refers to the exiled card (CR 702.88a), the untimely cleanup sacrifice only to its permanent.
+    for d in &s.delayed {
+        if q.names_its_source(Waiting::Delayed(d.ability)) {
+            add(d.source);
+        }
+        s.members(d.members).iter().copied().for_each(&mut add);
+        if let Some(id) = d.subject.object() {
+            add(id);
+        }
+    }
+    for &id in s.zone(Zone::COMMAND) {
+        if !s.obj(id).face_down {
+            add(id);
+        }
+    }
+    sources
+}
+
+/// "A source of your choice" (CR 609.7a): the spell or ability's controller chooses one of the sources `rule` allows among
+/// `damage_sources`, as it resolves (Deflecting Palm's ruling: "You choose a source of damage as Deflecting Palm resolves");
+/// it is not targeted. "A red source of your choice" is a rule with that quality, judged as the source is chosen (and again
+/// as it would deal damage, by the effect's `applies`: CR 609.7b). None when there is none to choose.
+pub fn choose_source(g: &mut dyn Game, item: &StackItem, rule: Selection) -> Result<Option<ObjectId>, Suspend> {
+    let sources = damage_sources(&*g);
+    Ok(crate::choose::select(g, item.controller, item.object, Purpose::Choose, sources, rule)?.first().copied())
+}
+
+/// Any source (`choose_source`): "a source of your choice".
+pub const SOURCE: Selection = Selection::new(Count::Exactly(1)).called("source");
+
+/// Whether damage is dealt by the source an effect is about, chosen as it was made (CR 609.7a): that object, or - where a
+/// permanent spell was chosen - the permanent it became as it resolved, "any damage dealt by that spell and any damage dealt
+/// by the permanent that spell becomes". Once the source has become another object any other way, the new object is not it
+/// (CR 400.7).
+pub fn by_chosen_source(q: &dyn Query, chosen: ObjectId, d: &DamageEvent) -> bool {
+    if d.source == chosen {
+        return true;
+    }
+    let was = q.obj(chosen);
+    // The permanent it became, even once that has left the battlefield and deals damage as it last existed (a dies trigger's):
+    // it keeps the zone it left from. What that permanent became in turn is another object.
+    was.zone.is(ZoneKind::Stack) && was.became == Some(d.source) && q.obj(d.source).zone.is(ZoneKind::Battlefield)
+}
+
+fn from_chosen_source(q: &dyn Query, _: &Asker, chosen: ObjectId, d: &DamageEvent) -> bool {
+    by_chosen_source(q, chosen, d)
+}
+
+/// Damage from the source the effect is about (`by_chosen_source`), to whom the effect names: "the next time a source of your
+/// choice would deal damage to you this turn, prevent that damage" (Haazda Shield Mate, Invulnerability, Pentagram of the
+/// Ages, Righteous Aura). A card whose effect does more (CR 615.5) gives it its `then`: Deflecting Palm's
+/// `GrantedPreventionDef { then: Some(..), ..FROM_CHOSEN_SOURCE }`. Each card gives its own words (`text`).
+pub const FROM_CHOSEN_SOURCE: GrantedPreventionDef = GrantedPreventionDef {
+    hint: "prevents the damage from the chosen source",
+    damage: "damage from the chosen source",
+    of_it: None,
+    applies: from_chosen_source,
+    then: None,
+    text: "",
+};
+
+/// "The next time a source of your choice would deal damage to you this turn, prevent that damage" (CR 609.7a, 615.8): the
+/// spell or ability's controller chooses a source as it resolves (`choose_source`, any source), and the effect watches for the
+/// next damage event in which it would deal damage to them - all of that damage is prevented, and the effect is used up
+/// once the event has been dealt. The card lists `FROM_CHOSEN_SOURCE` (or a definition of the same damage with its own
+/// `then`) `index`th in its `granted_preventions`. Deflecting Palm, Haazda Shield Mate, Invulnerability, Reverse Damage,
+/// Intervention Pact. The source chosen, if any.
+pub fn next_time_chosen_source_would_damage_you(g: &mut dyn Game, item: &StackItem, index: u8) -> Result<Option<ObjectId>, Suspend> {
+    let Some(source) = choose_source(g, item, SOURCE)? else { return Ok(None) };
+    let to = Target::Player(item.controller);
+    g.add_effect(item.object, source, EffectKind::Prevention { card: item.ability.card, index, to, shield: Shield::NextTime }, Duration::EndOfTurn);
+    Ok(Some(source))
 }

@@ -35,6 +35,7 @@ pub static CARD: CardDef = CardDef {
         creature_spell_enters,
         add_a_counter,
         "enters with an additional +1/+1 counter on it",
-    )],
+    )
+    .text("If you cast a creature spell this way, that creature enters with an additional +1/+1 counter on it.")],
     ..oracle::MIKEY_DON_PARTY_PLANNERS
 };

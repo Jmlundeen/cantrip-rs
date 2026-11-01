@@ -275,6 +275,10 @@ impl Query for Given<'_> {
         self.q.linked_card(card)
     }
 
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.q.names_its_source(waiting)
+    }
+
     fn text_linked(&self, source: ObjectId) -> Linked {
         self.q.text_linked(source)
     }
@@ -354,6 +358,10 @@ pub struct Reader<'a> {
 impl Query for Reader<'_> {
     fn linked_card(&self, card: CardId) -> CardId {
         self.cards.linked_card(card)
+    }
+
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.cards.names_its_source(waiting)
     }
 
     fn text_linked(&self, source: ObjectId) -> Linked {

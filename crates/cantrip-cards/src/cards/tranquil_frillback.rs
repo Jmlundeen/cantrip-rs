@@ -36,6 +36,6 @@ static MODAL: ModalDef = modes(&[
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, enters, "When this creature enters, you may pay {G} up to three times. When you pay this cost one or more times, choose up to that many \u{2014} Destroy target artifact or enchantment; or exile target player's graveyard; or you gain 4 life.")],
-    delayed: &[modal_delayed_trigger(&MODAL, "When you pay this cost one or more times, choose up to that many \u{2014} Destroy target artifact or enchantment; or exile target player's graveyard; or you gain 4 life.")],
+    delayed: &[modal_delayed_trigger(&MODAL, "When you pay this cost one or more times, choose up to that many \u{2014}\n\u{2022} Destroy target artifact or enchantment.\n\u{2022} Exile target player's graveyard.\n\u{2022} You gain 4 life.")],
     ..oracle::TRANQUIL_FRILLBACK
 };

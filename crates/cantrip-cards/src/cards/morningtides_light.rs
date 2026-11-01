@@ -35,6 +35,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::CREATURE.between(0, TargetSpec::ANY_NUMBER)], effect),
     delayed: &[delayed_trigger(return_tapped, "Return those cards to the battlefield tapped under their owners' control.")],
-    granted_preventions: &[prevention::ANY_DAMAGE],
+    granted_preventions: &[prevention::ANY_DAMAGE.text("Until your next turn, prevent all damage that would be dealt to you.")],
     ..oracle::MORNINGTIDES_LIGHT
 };

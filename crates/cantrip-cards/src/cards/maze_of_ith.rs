@@ -15,6 +15,7 @@ const TO_AND_BY: GrantedPreventionDef = GrantedPreventionDef {
     of_it: Some("to and dealt by it"),
     applies: combat_damage_to_and_by,
     then: None,
+    text: "Prevent all combat damage that would be dealt to and dealt by that creature this turn.",
 };
 
 /// "{T}: Untap target attacking creature. Prevent all combat damage that would be dealt to and dealt by that creature this

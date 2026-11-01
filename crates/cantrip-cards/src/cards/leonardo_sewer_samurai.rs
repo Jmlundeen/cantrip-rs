@@ -45,6 +45,7 @@ pub static CARD: CardDef = CardDef {
         spell_enters,
         add_a_finality_counter,
         "enters with a finality counter on it",
-    )],
+    )
+    .text("If you cast a spell this way, that creature enters with a finality counter on it.")],
     ..oracle::LEONARDO_SEWER_SAMURAI
 };

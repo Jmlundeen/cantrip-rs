@@ -334,6 +334,12 @@ pub struct GrantedReplacementDef {
     /// "The next time [an event] would happen this turn, ... instead" (CR 614.1a): the effect is used up by the one event it
     /// replaces, and ends as it applies; a second such effect waits for the next event.
     pub once: bool,
+    /// The effect's words, as its card's Oracle text prints them (the sentence that makes it, and what it does besides): what
+    /// tells whether it refers to its own source while it waits to apply (CR 609.7a, `CardTable::names_its_source`), as Torch
+    /// the Tower's "If a permanent dealt damage by Torch the Tower would die this turn, exile it instead" does. A shared
+    /// definition leaves it empty and each card using it gives its own (`.text(..)`); `crates/cantrip-cards/tests/
+    /// waiting_texts_match_oracle.rs` holds every card's to its Oracle text.
+    pub text: &'static str,
 }
 
 /// Whether a prevention effect applies to this damage (CR 615.1), judged on the board as it is and on the damage as the
@@ -382,6 +388,13 @@ pub struct GrantedPreventionDef {
     /// What the effect does besides preventing the damage (CR 615.5; see [`PreventionThen`]): "If damage is prevented this
     /// way, Deflecting Palm deals that much damage to that source's controller." None for an effect that only prevents.
     pub then: Option<PreventionThen>,
+    /// The effect's words, as its card's Oracle text prints them - the sentence that makes it and, for one with more to do,
+    /// the rest (CR 615.5): what tells whether it refers to its own source while it waits to apply (CR 609.7a: an object a
+    /// waiting prevention effect refers to; `CardTable::names_its_source`) - Deflecting Palm's "Deflecting Palm deals that
+    /// much damage" does, Fog's "Prevent all combat damage that would be dealt this turn" does not. A shared definition leaves
+    /// it empty and each card using it gives its own (`.text(..)`), held to its Oracle text by
+    /// `crates/cantrip-cards/tests/waiting_texts_match_oracle.rs`.
+    pub text: &'static str,
 }
 
 /// Damage a prevention effect prevented of one part of a damage event (CR 615.5): from `source` to `target`, `amount` of it

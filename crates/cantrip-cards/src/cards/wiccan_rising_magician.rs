@@ -27,7 +27,7 @@ pub static CARD: CardDef = CardDef {
     .targets(&[target(another_nonland_nontoken_permanent)])],
     delayed: &[delayed_trigger(
         delayed::return_subject_to_battlefield,
-        "Return the card exiled with Wiccan, Rising Magician to the battlefield under its owner's control.",
+        "Return that card to the battlefield under its owner's control at the beginning of the next end step.",
     )],
     ..oracle::WICCAN_RISING_MAGICIAN
 };

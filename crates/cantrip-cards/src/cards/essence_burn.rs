@@ -16,6 +16,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::creature_or_planeswalker_of_either_color::<{ Color::Black as u8 }, { Color::Green as u8 }>()], effect),
-    granted_replacements: &[EXILE_INSTEAD_OF_DYING],
+    granted_replacements: &[EXILE_INSTEAD_OF_DYING.text("If that permanent would die this turn, exile it instead.")],
     ..oracle::ESSENCE_BURN
 };

@@ -21,6 +21,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], effect),
-    granted_replacements: &[EXILE_INSTEAD_OF_DYING],
+    granted_replacements: &[EXILE_INSTEAD_OF_DYING.text("If a creature dealt damage this way would die this turn, exile it instead.")],
     ..oracle::ANGER_OF_THE_GODS
 };

@@ -118,6 +118,10 @@ mod tests {
             card
         }
 
+        fn names_its_source(&self, _: Waiting) -> bool {
+            false
+        }
+
         fn text_linked(&self, source: ObjectId) -> Linked {
             Linked {
                 object: source,

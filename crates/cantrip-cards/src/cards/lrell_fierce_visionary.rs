@@ -29,7 +29,7 @@ pub static CARD: CardDef = CardDef {
             "{2}, Sacrifice another creature or artifact: Surveil 1.",
         ),
     ],
-    delayed: &[delayed::SACRIFICE_CREATED],
+    delayed: &[delayed_trigger(delayed::sacrifice_created, "Sacrifice it at the beginning of the next end step.")],
     ..oracle::LRELL_FIERCE_VISIONARY
 };
 

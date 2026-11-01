@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::delayed::{self, SACRIFICE_CREATED};
+use cantrip_mechanics::delayed;
 use cantrip_mechanics::statics::{have_haste, your_creatures};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
@@ -30,6 +30,6 @@ pub static CARD: CardDef = CardDef {
     statics: &[static_ability(Layer::Ability, your_creatures, have_haste, "Creatures you control have haste.")],
     abilities: &[ability(cost("{4}{R}{R}, {T}"), copy_and_sacrifice, "{4}{R}{R}, {T}: Create a token that's a copy of target creature you control. Sacrifice it at the beginning of the next end step.")
         .targets(&[targets::CREATURE_YOU_CONTROL])],
-    delayed: &[SACRIFICE_CREATED],
+    delayed: &[delayed_trigger(delayed::sacrifice_created, "Sacrifice it at the beginning of the next end step.")],
     ..oracle::THE_FIRE_CRYSTAL
 };

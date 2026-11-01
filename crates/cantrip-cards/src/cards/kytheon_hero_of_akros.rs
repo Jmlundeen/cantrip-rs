@@ -65,7 +65,7 @@ pub static BACK: CardDef = CardDef {
         ability(loyalty(1), plus_one, "+1: Until your next turn, target creature gains indestructible. Untap that creature.").targets(&[targets::CREATURE]),
         ability(loyalty(0), zero, "0: Until end of turn, Gideon becomes a 4/4 Human Soldier creature with indestructible that's still a planeswalker. Prevent all damage that would be dealt to him this turn."),
     ],
-    granted_preventions: &[prevention::ANY_DAMAGE],
+    granted_preventions: &[prevention::ANY_DAMAGE.text("Prevent all damage that would be dealt to him this turn.")],
     ..oracle::GIDEON_BATTLE_FORGED
 };
 

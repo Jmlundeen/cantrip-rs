@@ -1048,7 +1048,7 @@ impl ReplacementDef {
 
 /// A replacement effect a resolving spell or ability makes for a while (CR 611.2), about the object it was made for.
 pub const fn granted_replacement(kind: ReplacementKind, applies: GrantedApplies, apply: GrantedApply, hint: &'static str) -> GrantedReplacementDef {
-    GrantedReplacementDef { hint, kind, applies, apply, then: None, once: false }
+    GrantedReplacementDef { hint, kind, applies, apply, then: None, once: false, text: "" }
 }
 
 impl GrantedReplacementDef {
@@ -1060,6 +1060,20 @@ impl GrantedReplacementDef {
     /// "The next time ... would ...": the effect ends as it applies, used up (CR 614.1a).
     pub const fn once(self) -> GrantedReplacementDef {
         GrantedReplacementDef { once: true, ..self }
+    }
+
+    /// The effect's words as its card's Oracle text prints them (`GrantedReplacementDef::text`): "If a creature dealt damage
+    /// this way would die this turn, exile it instead."
+    pub const fn text(self, text: &'static str) -> GrantedReplacementDef {
+        GrantedReplacementDef { text, ..self }
+    }
+}
+
+impl crate::GrantedPreventionDef {
+    /// The effect's words as its card's Oracle text prints them (`GrantedPreventionDef::text`): "Prevent all combat damage that
+    /// would be dealt this turn."
+    pub const fn text(self, text: &'static str) -> crate::GrantedPreventionDef {
+        crate::GrantedPreventionDef { text, ..self }
     }
 }
 

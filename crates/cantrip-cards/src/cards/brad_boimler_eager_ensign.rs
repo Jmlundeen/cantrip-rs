@@ -44,7 +44,8 @@ pub static CARD: CardDef = CardDef {
         counters_on_your_permanent,
         one_more_of_each_kind,
         "puts that many plus one of each of those kinds of counters instead",
-    )],
+    )
+    .text("if one or more counters would be put on a permanent you control, that many plus one of each of those kinds of counters are put on that permanent instead.")],
     ..oracle::BRAD_BOIMLER_EAGER_ENSIGN
 };
 

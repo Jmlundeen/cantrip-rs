@@ -22,6 +22,7 @@ const DEALT_BY: GrantedPreventionDef = GrantedPreventionDef {
     of_it: Some("dealt by it"),
     applies: damage_dealt_by,
     then: None,
+    text: "Prevent all damage that would be dealt by up to one target creature for as long as this Saga remains on the battlefield.",
 };
 
 /// Chapter II: "Prevent all damage that would be dealt by up to one target creature for as long as this Saga remains on the

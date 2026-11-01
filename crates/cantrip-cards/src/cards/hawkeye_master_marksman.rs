@@ -48,7 +48,7 @@ pub static CARD: CardDef = CardDef {
     )],
     delayed: &[modal_delayed_trigger(
         &MODAL,
-        "When you pay this cost one or more times, choose up to that many \u{2014} Net \u{2014} Target creature can't block this turn; Explosive \u{2014} Hawkeye deals 2 damage to target player; Boomerang \u{2014} Discard a card, then draw a card.",
+        "When you do, choose up to that many \u{2014}\n\u{2022} Net \u{2014} Target creature can't block this turn.\n\u{2022} Explosive \u{2014} Hawkeye deals 2 damage to target player.\n\u{2022} Boomerang \u{2014} Discard a card, then draw a card.",
     )],
     ..oracle::HAWKEYE_MASTER_MARKSMAN
 };

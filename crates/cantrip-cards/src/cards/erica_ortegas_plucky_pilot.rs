@@ -31,7 +31,7 @@ pub static CARD: CardDef = CardDef {
     )],
     delayed: &[delayed_trigger(
         lands::return_a_land,
-        "At the beginning of the next end step, return a land you control to its owner's hand.",
+        "Return a land you control to its owner's hand at the beginning of the next end step.",
     )],
     ..oracle::ERICA_ORTEGAS_PLUCKY_PILOT
 };
