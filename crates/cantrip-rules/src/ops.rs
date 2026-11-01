@@ -3179,6 +3179,7 @@ pub fn damage_result(cx: &mut Cx, source: ObjectId, target: Target, amount: u16,
     if !events.is_empty() {
         cx.emit_batch(&events, None);
     }
+    batch.rest_of_preventions(cx);
     result
 }
 
@@ -3203,6 +3204,7 @@ pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16
     }
     batch.finish(cx, &mut events);
     cx.emit_batch(&events, None);
+    batch.rest_of_preventions(cx);
     dealt
 }
 
@@ -3328,6 +3330,9 @@ pub struct DamageBatch {
     /// The permanents whose shield counter has applied to this event (CR 122.1c): one replacement for the simultaneous event
     /// (CR 120.4), so a second assignment of damage to the same permanent is prevented as well, and no second counter is removed.
     shielded: Vec<ObjectId>,
+    /// The prevention effects spells and abilities made that prevented some of its damage and have more to do once it has all
+    /// been dealt (CR 615.5, 615.8): `rest_of_preventions`.
+    prevented: Vec<replace::PreventionUse>,
 }
 
 /// A recipient's state before this damage event, and the damage actually dealt in it. Shared with the marked-damage
@@ -3420,6 +3425,16 @@ impl DamageBatch {
         self.gain_lifelink(cx);
     }
 
+    /// The rest of the prevention effects that prevented some of the event's damage (CR 615.5), once it has all been dealt and
+    /// announced: a "next time" effect is used up (CR 615.8), and one with more to do does it ("Deflecting Palm deals that
+    /// much damage to that source's controller"), before state-based actions are checked. Every caller of `finish` calls it
+    /// once the event is announced.
+    pub fn rest_of_preventions(&mut self, cx: &mut Cx) {
+        if !self.prevented.is_empty() {
+            replace::rest_of_preventions(cx, std::mem::take(&mut self.prevented));
+        }
+    }
+
     /// The life the event's sources with lifelink cause their controllers to gain (CR 120.3f), once the damage is all
     /// dealt: one gain for each source.
     fn gain_lifelink(&mut self, cx: &mut Cx) {
@@ -3454,7 +3469,7 @@ pub fn deal_damage_with(
     // instead") as well as how much; what is left is dealt to whomever they leave it with, by the same source. Protection,
     // infect, lifelink, deathtouch, loyalty and defense are judged against that recipient.
     let shielded = batch.shielded.iter().copied().find(|&id| target == Target::Object(id));
-    let event = replace::damage(cx, DamageEvent { source, target, amount, combat, heal_marked: false, shielded });
+    let event = replace::damage(cx, DamageEvent { source, target, amount, combat, heal_marked: false, shielded }, &mut batch.prevented);
     if let Some(id) = event.shielded
         && !batch.shielded.contains(&id)
     {

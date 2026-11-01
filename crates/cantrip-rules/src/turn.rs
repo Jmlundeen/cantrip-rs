@@ -1367,6 +1367,7 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
         .collect();
     batch.finish(cx, &mut events);
     cx.emit_batch(&events, None);
+    batch.rest_of_preventions(cx);
     Ok(())
 }
 

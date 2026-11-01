@@ -379,6 +379,38 @@ pub struct GrantedPreventionDef {
     /// object so. None for one about whom the damage is dealt to, or about no object.
     pub of_it: Option<&'static str>,
     pub applies: GrantedPreventionApplies,
+    /// What the effect does besides preventing the damage (CR 615.5; see [`PreventionThen`]): "If damage is prevented this
+    /// way, Deflecting Palm deals that much damage to that source's controller." None for an effect that only prevents.
+    pub then: Option<PreventionThen>,
+}
+
+/// Damage a prevention effect prevented of one part of a damage event (CR 615.5): from `source` to `target`, `amount` of it
+/// (more than 0), combat damage or not. "That much damage" is what was prevented, not what was proposed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Prevented {
+    pub source: ObjectId,
+    pub target: Target,
+    pub amount: u16,
+    pub combat: bool,
+}
+
+/// The rest of a prevention effect a spell or ability made (CR 615.5): "the prevention takes place at the time the original
+/// event would have happened; the rest of the effect takes place immediately afterward" - once the damage event it prevented
+/// damage of has been dealt and announced, before state-based actions are checked and before the spell or ability dealing
+/// that damage goes on resolving. Run once for that event, told what the effect prevented of each of its parts (every
+/// source and recipient the effect prevented damage of, in the order it did) and the object the effect is about
+/// (`ContinuousEffect::affected`: a chosen source). Never run where the effect prevented nothing, as of damage that can't be
+/// prevented (CR 615.12): every printed such effect says "if damage is prevented this way" or counts "the damage prevented
+/// this way". What it does, the effect's controller does (CR 609.1), as the effect's source - the spell, as it last existed
+/// (CR 608.2h) - deals the damage it deals. A question it asks that has no answer yet suspends the run, which is redone
+/// with the answer: it returns there, doing nothing more.
+pub type PreventionThen = fn(&mut dyn Game, &Asker, ObjectId, &[Prevented]);
+
+impl Prevented {
+    /// How much the effect prevented in all, of these parts: "that much damage".
+    pub fn total(parts: &[Prevented]) -> u32 {
+        parts.iter().map(|p| u32::from(p.amount)).sum()
+    }
 }
 
 fn never(_: &dyn Query, _: &Asker, _: &Proposal) -> bool {

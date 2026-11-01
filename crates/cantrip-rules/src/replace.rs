@@ -159,7 +159,7 @@ pub(crate) fn sent_instead(cx: &Cx, mut change: ZoneChange, instead: Zone) -> Zo
 /// `ops::entry_replacements` with the permanent judged as it would exist (`Cx::entering`).
 pub(crate) fn entry(cx: &mut Cx, change: ZoneChange, entering: &mut Entering) -> ZoneChange {
     let mut proposal = Proposal::ZoneChange(change);
-    apply_to(cx, &mut proposal, Some(entering));
+    apply_to(cx, &mut proposal, Some(entering), None);
     match proposal {
         Proposal::ZoneChange(change) => change,
         _ => unreachable!("an effect cannot change the kind of the event"),
@@ -713,11 +713,12 @@ fn prevents_all(cx: &Cx, c: &Candidate) -> bool {
     match c.origin {
         Origin::Protection => true,
         Origin::Prevention => printed_prevention(cx, c.source, c.index).0.amount.is_none(),
-        Origin::GrantedPrevention(timestamp) => cx
-            .s()
-            .effects
-            .iter()
-            .any(|e| e.timestamp == timestamp && matches!(e.kind, EffectKind::Prevention { shield: Shield::All, .. })),
+        // One with more to do (CR 615.5) is told what it prevented, so which one applies first changes what happens.
+        Origin::GrantedPrevention(timestamp) => cx.s().effects.iter().any(|e| {
+            e.timestamp == timestamp
+                && matches!(e.kind, EffectKind::Prevention { card, index, shield: Shield::All, .. }
+                    if cx.cards().get(card).granted_preventions[index as usize].then.is_none())
+        }),
         _ => false,
     }
 }
@@ -805,16 +806,17 @@ fn damage_recipient(q: &dyn Query, target: Target) -> bool {
 /// event (CR 616.1f), and none applies twice (CR 614.5), nor to an event that is part of what one of them made of an event
 /// it applied to already (`Cx::lineage`).
 fn apply(cx: &mut Cx, proposal: &mut Proposal) {
-    apply_to(cx, proposal, None);
+    apply_to(cx, proposal, None, None);
 }
 
-/// `apply`, to a permanent's entry with its own replacements still to apply (`Entering::own`) where `entry` is given. Each
-/// effect is its own text, its source's now, though a resolving ability's instructions made the event (`Cx::own_text`).
-fn apply_to(cx: &mut Cx, proposal: &mut Proposal, entry: Option<&mut Entering>) {
-    cx.own_text(false, |cx| apply_each(cx, proposal, entry));
+/// `apply`, to a permanent's entry with its own replacements still to apply (`Entering::own`) where `entry` is given; to
+/// damage, noting in `uses` the prevention effects that have more to do once its event has been dealt (`PreventionUse`).
+/// Each effect is its own text, its source's now, though a resolving ability's instructions made the event (`Cx::own_text`).
+fn apply_to(cx: &mut Cx, proposal: &mut Proposal, entry: Option<&mut Entering>, uses: Option<&mut Vec<PreventionUse>>) {
+    cx.own_text(false, |cx| apply_each(cx, proposal, entry, uses));
 }
 
-fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Entering>) {
+fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Entering>, mut uses: Option<&mut Vec<PreventionUse>>) {
     let mut applied: Vec<Applied> = cx.lineage.clone();
     loop {
         // An entering permanent is judged as it would exist with the changes of the replacements applied so far (CR 614.12).
@@ -946,14 +948,21 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
                 if let Proposal::Damage(d) = proposal {
                     let at = cx.s().effects.iter().position(|e| e.timestamp == timestamp).expect("the effect that applies");
                     let mut e = cx.s().effects[at];
+                    let as_applied = e;
                     let EffectKind::Prevention { card, index, to, shield } = e.kind else { unreachable!("a prevention effect") };
+                    let prevented = match shield {
+                        Shield::All | Shield::NextTime => d.amount,
+                        Shield::Next(left) => left.min(d.amount),
+                    };
+                    let part = Prevented { source: d.source, target: d.target, amount: prevented, combat: d.combat };
+                    prevent(cx, d, prevented, source);
                     match shield {
-                        Shield::All => prevent(cx, d, d.amount, source),
+                        // CR 615.8: "the next time" prevents all of the one event, and is used up once the event has been
+                        // dealt (`rest_of_preventions`): the event's other parts it applies to are prevented too.
+                        Shield::All | Shield::NextTime => {}
                         // CR 615.7: each 1 damage prevented reduces the shield by 1; once it is 0 the rest is dealt, and
                         // the effect is used up.
                         Shield::Next(left) => {
-                            let prevented = left.min(d.amount);
-                            prevent(cx, d, prevented, source);
                             if prevented == left {
                                 let effects_before = cx.s().effects.len();
                                 cx.st().effects_retain(|f| f.timestamp != timestamp);
@@ -965,6 +974,17 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
                                 e.kind = EffectKind::Prevention { card, index, to, shield: Shield::Next(left - prevented) };
                                 cx.st().effect_set(at, e);
                             }
+                        }
+                    }
+                    // CR 615.5: the rest of the effect, once the event has been dealt; and the use of a "next time" (CR 615.8).
+                    let then = cx.cards().get(card).granted_preventions[index as usize].then;
+                    if prevented > 0
+                        && (then.is_some() || shield == Shield::NextTime)
+                        && let Some(uses) = uses.as_deref_mut()
+                    {
+                        match uses.iter_mut().find(|u| u.effect.timestamp == timestamp) {
+                            Some(u) => u.parts.push(part),
+                            None => uses.push(PreventionUse { effect: as_applied, parts: vec![part] }),
                         }
                     }
                 }
@@ -1246,6 +1266,37 @@ fn damage_can_be_prevented(cx: &Cx, d: &DamageEvent) -> bool {
     crate::ops::damage_can_be_prevented(cx, d.source, d.combat)
 }
 
+/// A prevention effect a spell or ability made that has more to do once the damage event it prevented some of has been
+/// dealt (CR 615.5, 615.8): the effect as it was when it first applied to the event, and what it prevented of each part.
+/// Kept by the event (`ops::DamageBatch`) until then.
+pub(crate) struct PreventionUse {
+    effect: ContinuousEffect,
+    parts: Vec<Prevented>,
+}
+
+/// The rest of the prevention effects that prevented some of a damage event, once it has been dealt and announced, in the
+/// order they first applied to it (CR 615.5: "immediately afterward", before state-based actions and before the spell or
+/// ability that dealt it goes on resolving): a "next time" effect is used up by the event (CR 615.8), and an effect with more
+/// to do (`GrantedPreventionDef::then`) does it, its controller doing it (CR 609.1), told what it prevented.
+pub(crate) fn rest_of_preventions(cx: &mut Cx, uses: Vec<PreventionUse>) {
+    // Each effect's rest is its own text, its source's now, though a resolving ability's instructions dealt the damage
+    // (`Cx::own_text`).
+    cx.own_text(false, |cx| rest_of_each(cx, uses));
+}
+
+fn rest_of_each(cx: &mut Cx, uses: Vec<PreventionUse>) {
+    for PreventionUse { effect, parts } in uses {
+        let EffectKind::Prevention { card, index, shield, .. } = effect.kind else { continue };
+        if shield == Shield::NextTime {
+            used_up(cx, effect.timestamp);
+        }
+        if let Some(then) = cx.cards().get(card).granted_preventions[index as usize].then {
+            let asker = Asker { source: effect.source, controller: effect.controller, by: None, spell: false };
+            cx.acting_as(effect.controller, |cx| then(cx, &asker, effect.affected, &parts));
+        }
+    }
+}
+
 /// Prevents `amount` of the damage (CR 615.1) by the effect of `by`, and records it (CR 615.6, 615.13).
 fn prevent(cx: &mut Cx, d: &mut DamageEvent, amount: u16, by: ObjectId) {
     if amount == 0 {
@@ -1396,12 +1447,13 @@ pub fn token_batch(cx: &mut Cx, tokens: &[(CardId, Option<Copiable>, PlayerId)])
 /// Damage about to be dealt (CR 614.1a, 120.3): what remains of it once every effect has applied - how much, and whom it
 /// is dealt to, which a redirection ("is dealt to this creature instead") changes, after which the effects not yet
 /// applied are judged again against the new recipient and its controller orders them (CR 614.6, 616.1f).
-pub fn damage(cx: &mut Cx, event: DamageEvent) -> DamageEvent {
+/// The prevention effects with more to do once the event has been dealt are noted in `uses` (`rest_of_preventions`).
+pub(crate) fn damage(cx: &mut Cx, event: DamageEvent, uses: &mut Vec<PreventionUse>) -> DamageEvent {
     if !possible(cx, None) && shield_damage_applies(cx, &event).is_none() {
         return event;
     }
     let mut proposal = Proposal::Damage(event);
-    apply(cx, &mut proposal);
+    apply_to(cx, &mut proposal, None, Some(uses));
     match proposal {
         Proposal::Damage(event) => event,
         _ => unreachable!("an effect cannot change the kind of the event"),
@@ -1654,3 +1706,7 @@ mod tests {
         assert_eq!(link(exiled), Some(linked), "the effect exiling it links it");
     }
 }
+
+#[cfg(test)]
+#[path = "prevention_then_tests.rs"]
+mod prevention_then_tests;

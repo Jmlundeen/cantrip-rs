@@ -838,6 +838,8 @@ impl<'a> Projector<'a> {
         let how = match shield {
             Shield::All => format!("Prevent all {damage}"),
             Shield::Next(n) => format!("Prevent the next {n} {damage}"),
+            // CR 615.8: the next time it would be dealt, all of it.
+            Shield::NextTime => format!("Prevent the next {damage}"),
         };
         let to = match card.granted_preventions.get(index as usize)?.of_it {
             Some(of_it) if whom == "it" => format!(" {of_it}"),

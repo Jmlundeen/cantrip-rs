@@ -53,7 +53,7 @@ fn all_damage(_: &dyn Query, _: &Asker, _: ObjectId, _: &DamageEvent) -> bool {
 
 static SHIELD: CardDef = CardDef {
     name: "Departed damage shield probe",
-    granted_preventions: &[GrantedPreventionDef { hint: "prevent the next damage", damage: "damage", of_it: None, applies: all_damage }],
+    granted_preventions: &[GrantedPreventionDef { hint: "prevent the next damage", damage: "damage", of_it: None, applies: all_damage, then: None }],
     ..CardDef::BLANK
 };
 
@@ -103,6 +103,9 @@ fn game() -> (RulesGame, ObjectId) {
     let id = game.state.push_obj(Obj::new(cards.id_of(&SOURCE), YOU, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, id);
     game.state.update_player(LEFT, |p| p.lost = true);
+    // Turn 1, so damage can be prevented at all (`no_prevention_turn` starts at turn 0) and a shield left alone was not
+    // left alone for that reason.
+    game.state.update_turn(|t| t.number = 1);
     (game, id)
 }
 

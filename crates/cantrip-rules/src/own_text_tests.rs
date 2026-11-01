@@ -106,7 +106,7 @@ static SOURCE: CardDef = CardDef {
         replacement(ReplacementKind::ManaProduction, never, mana_apply, "Goblin mana, never"),
         replacement(ReplacementKind::ManaProduction, mana_only, mana_apply, "Goblin mana"),
     ],
-    granted_preventions: &[GrantedPreventionDef { hint: "Goblin shield", damage: "damage", of_it: None, applies: shielded }],
+    granted_preventions: &[GrantedPreventionDef { hint: "Goblin shield", damage: "damage", of_it: None, applies: shielded, then: None }],
     ..CardDef::BLANK
 };
 

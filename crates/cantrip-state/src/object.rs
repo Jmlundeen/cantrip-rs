@@ -1497,6 +1497,12 @@ pub enum Shield {
     All,
     /// The next N damage (CR 615.7): each 1 damage it prevents reduces it by 1, and once it is 0 the rest is dealt.
     Next(u16),
+    /// The next time the damage it watches for would be dealt, all of that damage (CR 615.8): "the next time a source of your
+    /// choice would deal damage to you this turn, prevent that damage". It prevents every part of the one damage event it
+    /// first prevents some of - simultaneous damage is one event however many recipients it has (CR 120.2) - and is used up
+    /// once that event has been dealt; later damage is dealt normally. Damage it prevents none of (damage that can't be
+    /// prevented, CR 615.12; damage another effect has prevented in full first, CR 616.1f) does not use it up (CR 609.7b).
+    NextTime,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
