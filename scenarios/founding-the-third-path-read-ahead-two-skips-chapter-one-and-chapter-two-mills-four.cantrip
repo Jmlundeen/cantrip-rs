@@ -1,0 +1,34 @@
+# Read ahead choosing 2 (CR 702.155a-b): Founding enters with two lore counters, chapter I (skipped) does not trigger - Opt, which it could
+# have cast free, is still in hand with no question asked - and chapter II targets Bot2, who mills exactly four cards.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Founding the Third Path
+Opt
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Founding the Third Path.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Number(2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Graveyard.Count = 4
+Bot2.Library.Count = 19
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Founding the Third Path.Counters.Lore = 2

@@ -1,0 +1,48 @@
+# Chapter III's "you may": declined, nothing is cast and no mana is paid - the Island stays untapped - while the target was still exiled
+# (CR 608.2c) and the copy ceased to exist; the Saga is sacrificed after its last chapter (CR 714.4). The copy's draw never happens (hand: one Island, plus the original Opt's draw).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Founding the Third Path
+Opt
+Dark Ritual
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Founding the Third Path.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Number(3)
+Bot1.Target(Opt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 1
+Bot1.Battlefield.Founding the Third Path = (absent)
+Bot1.Graveyard = Founding the Third Path; Dark Ritual
+Bot1.Hand.Count = 2

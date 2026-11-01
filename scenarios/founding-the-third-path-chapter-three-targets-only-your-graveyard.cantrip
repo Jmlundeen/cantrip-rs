@@ -1,0 +1,57 @@
+# Chapter III's "your graveyard": read ahead chose 2, so chapter II mills Bot2 four - an Opt among them - and on Bot1's next turn
+# chapter III may target only Bot1's own Opts (two, so the target is asked), not the one in Bot2's graveyard (CR 115.1). The copy is cast for {U} and draws; Bot2's
+# Opt stays in its graveyard (with the Island it discarded at its cleanup).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Island
+Founding the Third Path
+Opt
+Opt
+Island x24
+
+[Bot2 Deck]
+Island x7
+Opt
+Island x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Founding the Third Path.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Number(2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Target(Bot2.Graveyard.Opt)
+Bot1.Target(Bot1.Graveyard.Opt#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 1
+Bot2.Graveyard = Island; Island; Island; Island; Opt
+Bot1.Graveyard = Founding the Third Path; Black Lotus; Opt
+Bot1.Battlefield.Founding the Third Path = (absent)
+Bot1.Battlefield.Island.Tapped = true

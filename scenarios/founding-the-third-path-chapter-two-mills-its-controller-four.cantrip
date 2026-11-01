@@ -1,0 +1,31 @@
+# Chapter II's "target player" takes the controller too (CR 115.1): choosing 2 on read ahead, Bot1 targets itself and mills exactly four
+# cards of its own library (23 after the opening hand, 19 after the mill); Bot2's library is untouched.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Founding the Third Path
+Island x27
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Founding the Third Path.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Number(2)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 4
+Bot1.Library.Count = 19
+Bot2.Library.Count = 23

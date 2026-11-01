@@ -1,0 +1,56 @@
+# Read ahead choosing 3: chapter III triggers at once, exiles Opt from Bot1's graveyard (Black Lotus, also there, is no instant or sorcery
+# and is not a legal target), copies it and casts the copy for its own cost {U}, paid from the Island kept untapped (CR 707.12, 601.2f);
+# the copy resolves (Bot1 draws) and the Saga, on its last chapter, is sacrificed afterwards (CR 714.4). The original stays in exile.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Island
+Founding the Third Path
+Opt
+Dark Ritual
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Founding the Third Path.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Number(3)
+! Bot1.Target(Black Lotus)
+Bot1.Target(Opt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 1
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Founding the Third Path = (absent)
+Bot1.Graveyard = Founding the Third Path; Black Lotus; Dark Ritual
+Bot1.Hand.Count = 2

@@ -1,0 +1,43 @@
+# Browser
+# Read ahead choosing 1 (CR 702.155b): Founding the Third Path enters with one lore counter and chapter I triggers. It offers
+# an instant or sorcery with mana value 1 or 2 from the hand: Opt (1) is offered and cast for nothing (CR 118.9, 608.2g); Quick Study
+# (3) and Mox Ruby (not an instant or sorcery) are refused. Both mana sources were spent on Founding, so Opt really cost nothing.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Founding the Third Path
+Opt
+Quick Study
+Mox Ruby
+Island
+Island x20
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Founding the Third Path.Cast
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Read ahead: choose the chapter it starts on (it enters with that many lore counters)
+Bot1.Number(1)
+? Bot1.Battlefield.Founding the Third Path.Counters.Lore = 1
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Quick Study)
+! Bot1.Choose(Mox Ruby)
+Bot1.Choose(Opt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Opt
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Founding the Third Path.Counters.Lore = 1

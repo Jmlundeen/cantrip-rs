@@ -1,0 +1,34 @@
+# Chapter I's upper limit: Deduce (mana value 2, exactly the limit) is cast for nothing and resolves (a Clue is made), after read ahead
+# chose 1 (CR 702.155b). Bot2 holds an Opt in hand, which is no card of Bot1's hand to cast (the choice names only Bot1's cards).
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Founding the Third Path
+Deduce
+Island x25
+
+[Bot2 Deck]
+Opt
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Founding the Third Path.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Number(1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Deduce)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Deduce
+Bot1.Battlefield.Clue Token.ManaValue = 0
