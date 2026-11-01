@@ -375,6 +375,13 @@ pub fn creatures_attacked_with(q: &dyn Query, player: PlayerId) -> usize {
     seen.len()
 }
 
+/// "If you didn't attack with a creature this turn" (CR 508.1, 603.4) as an intervening "if" (`AbilityDef::condition`): no
+/// creature was declared as an attacker this turn by the ability's controller (`creatures_attacked_with`). Curious
+/// Obsession and See Red print it.
+pub fn you_didnt_attack_with_a_creature(q: &dyn Query, me: &Asker) -> bool {
+    creatures_attacked_with(q, me.controller) == 0
+}
+
 /// This combat's records (CR 506.1): those of this turn since its latest beginning of combat step began, so a second combat
 /// phase in a turn (CR 500.8) has its own; empty before the turn's first combat. Melee's "each opponent you attacked this
 /// combat" and Kytheon, Hero of Akros's "if Kytheon and at least two other creatures attacked this combat" ask it.
