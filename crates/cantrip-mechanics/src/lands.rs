@@ -554,6 +554,16 @@ pub fn power_and_toughness_are_lands_you_control(q: &dyn LayerQuery, source: Obj
     chars.toughness = Some(lands);
 }
 
+/// "Return target land card from your graveyard to the battlefield tapped" (Primal Witchstalker, Altanak, the Thrice-Called):
+/// the target at `slot`, if it is still a legal target (CR 608.2b), put onto the battlefield tapped (CR 110.5b) under its
+/// owner's control (CR 110.2a) - a card in your graveyard is your own.
+pub fn return_target_land_card_from_graveyard_tapped(g: &mut dyn Game, item: &StackItem, slot: usize) -> Result<(), Suspend> {
+    let Some(card) = crate::targets::object(g, item, slot) else { return Ok(()) };
+    let owner = g.obj(card).owner;
+    g.put_onto_battlefield(card, owner, true)?;
+    Ok(())
+}
+
 /// "Return all land cards from your graveyard to the battlefield tapped" (Aftermath Analyst, Lumra, Bellow of the Woods,
 /// Splendid Reclamation): every land card in `player`'s graveyard as this is done, put onto the battlefield together
 /// (CR 603.6a), tapped (CR 110.5b), under that player's control (CR 110.2a). Only that player's own graveyard is looked at.
