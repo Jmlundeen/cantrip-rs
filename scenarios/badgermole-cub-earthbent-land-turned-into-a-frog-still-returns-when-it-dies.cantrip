@@ -1,0 +1,42 @@
+# Earthbend's return is a delayed triggered ability (CR 701.66a, 603.7), no ability of the land: an effect that makes the
+# land lose its abilities doesn't stop it (CR 603.7c). Bot1's Badgermole Cub earthbends its Forest (a 1/1 land creature);
+# Bot2's Turn to Frog makes it a 1/1 Frog with no abilities (2 power with its +1/+1 counter), then Bolts it. The Forest
+# returns to the battlefield tapped under Bot1's control.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Badgermole Cub
+Forest x17
+
+[Bot2 Deck]
+Island
+Black Lotus
+Turn to Frog
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Turn to Frog.Cast(Bot1.Battlefield.Forest)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Forest.Power = 2
+? Bot1.Battlefield.Forest.Subtypes = Forest; Frog
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Forest)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Badgermole Cub
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Forest.Types = Land
+Bot2.Graveyard = Lightning Bolt; Turn to Frog; Black Lotus

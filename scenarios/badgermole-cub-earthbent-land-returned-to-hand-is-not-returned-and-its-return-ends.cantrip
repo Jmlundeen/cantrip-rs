@@ -1,0 +1,40 @@
+# Earthbend's delayed "When that land dies or is put into exile, return it to the battlefield tapped under your control"
+# (CR 701.66a) waits only for that land: going to a hand is neither dying nor being exiled (the card's ruling: "it will
+# not be returned"), and the card in hand is a new object it can never trigger for (CR 400.7, 603.7c). Bot1's Badgermole
+# Cub earthbends its Forest (a 1/1 land creature); Bot1 returns the Forest to its hand with Unsummon. The Forest stays
+# in Bot1's hand, and by Bot2's turn the delayed ability, which can never trigger, is gone.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Badgermole Cub
+Mox Sapphire
+Unsummon
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Forest.Power = 1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+
+[Expect]
+Stack.Count = 0
+Delayed.Count = 0
+Bot1.Battlefield = Mox Sapphire; Badgermole Cub
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Unsummon; Black Lotus

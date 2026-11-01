@@ -2,8 +2,9 @@
 # become a creature dies, an ability that triggers when it dies doesn't trigger"), and stops only what the dying causes
 # ("An ability that triggers on an event that causes a creature to die will still trigger. For example, an ability that
 # triggers 'whenever you sacrifice a creature' still triggers"; CR 701.21a).
-# Bot1's Badgermole Cub earthbends its Forest on turn 1: a 0/0 creature land with a +1/+1 counter and "When this land dies
-# or is put into exile, return it to the battlefield tapped". Bot2's Hushbringer comes down on turn 2. On turn 3 Bot1 pays
+# Bot1's Badgermole Cub earthbends its Forest on turn 1: a 0/0 creature land with a +1/+1 counter, watched by earthbend's
+# delayed triggered ability "When that land dies or is put into exile, return it to the battlefield tapped under your
+# control" (CR 603.7), which Hushbringer stops like any triggered ability. Bot2's Hushbringer comes down on turn 2. On turn 3 Bot1 pays
 # Baloth Prime's "{4}, Sacrifice a land: You gain 2 life" with that Forest: Baloth Prime's "Whenever you sacrifice a land"
 # triggers (a tapped 4/4 Beast, and the untap takes a stun counter off: 6, 5 at the untap step, 4), and the Forest's
 # return does not - it stays in the graveyard. Badgermole Cub's own game, where the Bolted Forest returns, is the control.

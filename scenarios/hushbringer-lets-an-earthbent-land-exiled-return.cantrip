@@ -1,7 +1,7 @@
 # Hushbringer stops creatures entering or dying from causing triggers, and nothing else (CR 603.2). Bot1's Badgermole Cub
 # earthbends its Forest; Bot2's Hushbringer arrives; on turn 4 Bot2 exiles the creature land with Swords to Plowshares.
-# Being exiled is not dying (CR 700.4), so "When this land dies or is put into exile, return it to the battlefield tapped"
-# triggers and the Forest comes back, tapped and a land only, and Bot1 gains 1 life for its power. The returning Forest is
+# Being exiled is not dying (CR 700.4), so earthbend's delayed "When that land dies or is put into exile, return it to the
+# battlefield tapped under your control" triggers and the Forest comes back, tapped and a land only, and Bot1 gains 1 life for its power. The returning Forest is
 # not a creature, so its entering is not stopped either.
 
 [Bot1 Deck]

@@ -1,0 +1,42 @@
+# Earthbend's return is a delayed triggered ability (CR 701.66a, 603.7), controlled by the player who earthbent (CR
+# 603.7e): "return it to the battlefield tapped under your control" returns the land to that player, whoever controls it
+# as it dies. Bot1's Badgermole Cub earthbends its Forest (a 1/1 land creature); Bot2 takes the Forest with Act of
+# Treason and Bolts it. The Forest returns tapped under Bot1's control, not Bot2's.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Badgermole Cub
+Forest x17
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Act of Treason
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Forest)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Forest.Power = 1
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Forest)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Badgermole Cub
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Forest.Types = Land
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Lightning Bolt; Act of Treason; Black Lotus

@@ -1,10 +1,11 @@
-//! Earthbend N (CR 701.66a): "Target land you control becomes a 0/0 creature with haste that's still a land. Put N
-//! +1/+1 counters on it. When it dies or is put into exile, return it to the battlefield tapped." Badgermole Cub prints
-//! it with 1.
+//! Earthbend N (CR 701.66a): "Target land you control becomes a 0/0 land creature with haste in addition to its other
+//! types. Put N +1/+1 counters on it. When that land dies or is put into exile, return it to the battlefield tapped under
+//! your control." Badgermole Cub, Ba Sing Se, Earthbender Ascension and Aang, at the Crossroads print it.
 //!
 //! A card that earthbends lists `enters::<N>(text)` (or `TARGET` and `effect::<N>` for a spell or another ability) and
-//! `RETURN` as its first `delayed` ability: the land is given that ability, standing for the delayed trigger that
-//! watches it.
+//! `RETURN` as its first `delayed` ability: the delayed triggered ability earthbending creates (CR 603.7), which watches
+//! the land (`DelayedWhen::WhenEvent`). It is no ability of the land: losing its abilities (Turn to Frog) doesn't stop it,
+//! and it is controlled by the earthbender, whoever controls the land when it dies (CR 603.7d-e).
 
 use crate::triggers::THIS_ENTERS;
 use cantrip_api::*;
@@ -13,7 +14,8 @@ use cantrip_api::*;
 pub const TARGET: TargetSpec = crate::targets::LAND_YOU_CONTROL;
 
 /// The land becomes a 0/0 creature with haste that's still a land, with no duration (CR 611.2a); it gets `N` +1/+1
-/// counters; and it is given `RETURN`, the delayed ability 0 of the card whose ability this is.
+/// counters; and `RETURN`, the delayed ability 0 of the card whose ability this is, is created, watching it: its source
+/// is this spell or this ability's source, its controller this spell or ability's (CR 603.7d-e).
 pub fn effect<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.target_legal(item, 0) {
         return Ok(());
@@ -21,15 +23,15 @@ pub fn effect<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
     let Target::Object(land) = item.target(0) else { return Ok(()) };
     let o = *g.obj(item.object);
     let card = o.copied_card().unwrap_or(o.card);
-    // "It becomes a 0/0 creature with haste" and the ability it gains: one instruction (`Game::one_instruction`).
+    // "It becomes a 0/0 land creature with haste": one instruction (`Game::one_instruction`).
     g.one_instruction(&mut |g| {
         g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
         crate::effects::gain_haste(g, item.object, land);
         g.add_effect(item.object, land, EffectKind::SetPt(0, 0), Duration::Indefinite);
-        g.add_effect(item.object, land, EffectKind::AddAbility(AbilityRef::delayed(card, 0)), Duration::Indefinite);
         Ok(())
     })?;
     g.add_counters(land, CounterKind::PlusOne, N);
+    g.delayed_trigger(DelayedWhen::WhenEvent, item.object, item.controller, AbilityRef::delayed(card, 0), Target::Object(land));
     Ok(())
 }
 
@@ -39,11 +41,12 @@ pub const fn enters<const N: i16>(text: &'static str) -> AbilityDef {
         .targets(&[TARGET])
 }
 
-/// "When this dies or is put into exile" (CR 700.4): leaving the battlefield for a graveyard or exile, judged as it was.
-fn dies_or_is_exiled(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+/// "When that land dies or is put into exile" (CR 700.4): the land it watches leaving the battlefield for a graveyard or
+/// exile, judged as it was (CR 603.10a).
+fn dies_or_is_exiled(_: &dyn Query, land: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { old, from, to, .. }
-            if *old == source && from.is(ZoneKind::Battlefield) && (to.is(ZoneKind::Graveyard) || to.is(ZoneKind::Exile)) =>
+            if *old == land && from.is(ZoneKind::Battlefield) && (to.is(ZoneKind::Graveyard) || to.is(ZoneKind::Exile)) =>
         {
             Fired::PLAIN
         }
@@ -51,12 +54,20 @@ fn dies_or_is_exiled(_: &dyn Query, source: ObjectId, event: &Event) -> Option<F
     }
 }
 
-/// Return it to the battlefield tapped, if it is still where it went.
+/// "Return it to the battlefield tapped under your control": the card the land became, if it is still where it went (CR
+/// 400.7e, 603.7c), under the ability's controller.
 fn return_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = g.found_after_move(item.object) {
+    if let Target::Object(land) = item.subject
+        && let Some(card) = g.found_after_move(land)
+    {
         g.put_onto_battlefield(card, item.controller, true)?;
     }
     Ok(())
 }
 
-pub const RETURN: AbilityDef = triggered(when(EventMask::ZONE_CHANGE, dies_or_is_exiled), return_tapped, "When this land dies or is put into exile, return it to the battlefield tapped.");
+/// The delayed triggered ability earthbending creates (`effect`), about the land (`StackItem::subject`).
+pub const RETURN: AbilityDef = triggered(
+    when(EventMask::ZONE_CHANGE, dies_or_is_exiled),
+    return_tapped,
+    "When that land dies or is put into exile, return it to the battlefield tapped under your control.",
+);

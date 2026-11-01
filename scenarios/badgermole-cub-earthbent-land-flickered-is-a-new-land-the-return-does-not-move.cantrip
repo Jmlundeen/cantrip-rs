@@ -1,0 +1,44 @@
+# Earthbend's delayed "When that land dies or is put into exile, return it to the battlefield tapped under your control"
+# (CR 701.66a) triggers when the land is exiled, but what it returns is the card in exile (CR 400.7e): a land that has
+# already come back is a new object, which the ability doesn't affect (CR 603.7c, 400.7). Bot1's Badgermole Cub
+# earthbends its Forest (a 1/1 land creature); Bot1 flickers the Forest with Ephemerate. The return triggers on the exile
+# and does nothing: the Forest that Ephemerate returned stays untapped, a land only, and nothing more comes back.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Badgermole Cub
+Mox Pearl
+Ephemerate
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Forest.Power = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Mox Pearl; Badgermole Cub
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Battlefield.Forest.Types = Land
+Exile = Ephemerate
+Delayed = Ephemerate
