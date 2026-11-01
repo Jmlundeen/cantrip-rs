@@ -240,6 +240,12 @@ public sealed class CardTooltip : Canvas
             lines.Add("Prototyped: its mana cost, color, power and toughness are its prototype's.");
         }
 
+        // Merged (CR 730.2, 702.140e): one permanent of several cards, the topmost's characteristics, every card's abilities.
+        if (card.MergedWith.Count > 0)
+        {
+            lines.Add($"Merged with {string.Join(", ", card.MergedWith.Select(part => part.Known ? part.Name : "a face-down card"))}: it has the topmost card's characteristics and every card's abilities.");
+        }
+
         foreach (PlayPermissionView permission in card.PlayPermissions)
         {
             lines.Add($"{permission.Text}.");

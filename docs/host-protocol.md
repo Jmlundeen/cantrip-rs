@@ -223,7 +223,7 @@ the view are the prototype's. A cast for a mutate cost (CR 702.140a) is the card
 with the same owner; as it resolves with that target legal its controller is asked a `ChooseModesPrompt` of "Put it on top" and
 "Put it under" (CR 702.140c). A merged permanent (CR 730.2) is one `ObjectView`, its topmost component's characteristics with
 every component's abilities, and `MergedWith` lists its other components, topmost first, each as printed (unknown while face down
-to the viewer). Assist (CR 702.132a) asks the caster a `May` with the verb `Assist` (a `ChoosePlayer`, verb
+to the viewer); the web client writes "Merged with <names>" over a merged permanent's art and in its tooltip. Assist (CR 702.132a) asks the caster a `May` with the verb `Assist` (a `ChoosePlayer`, verb
 `Assist`, with more than one other player), then `PayCostsPromptMessage`s with an `AssistStep`: `HelperActivates` and
 `CasterActivates` (a window for mana abilities closed by `ConfirmCasting`; `Remaining` is the whole of what is owed),
 `HelperAnnounces` (how much of the generic mana the chosen player pays, up to `MostAnnounced`), `HelperPays`, and `CasterPays`

@@ -592,6 +592,20 @@ fn target_words(game: &Game, target: Target) -> String {
     }
 }
 
+/// The question of where a mutating creature spell merges (CR 702.140c), naming the creature it merges with: its name, or for one
+/// with none (CR 708.2a) "the face-down creature" ("the nameless creature" if it is not face down), or "the creature" when the
+/// spell's target cannot be found.
+fn mutate_heading(game: &Game, source: ObjectId, target: Option<ObjectId>) -> String {
+    let creature = match target {
+        Some(id) if !game.name(id).is_empty() => game.name(id).to_string(),
+        Some(id) if game.obj(id).face_down => "the face-down creature".into(),
+        Some(_) => "the nameless creature".into(),
+        None => "the creature".into(),
+    };
+    let spell = game.name(source);
+    format!("Merge {spell} on top of or under {creature}: on top, the merged creature has {spell}'s characteristics; under, it keeps {creature}'s; either way it has the abilities of all its cards")
+}
+
 fn modes_detail(game: &Game, modes: &[Label], faces: bool) -> (String, bool) {
     if faces && modes.iter().any(|l| matches!(l, Label::Fused(_))) {
         return ("Only the face you choose is cast, with its own cost and mana value; fused, both halves are, for both costs".into(), false);
@@ -1099,7 +1113,18 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     "Choose which permission you cast it by".into()
                 } else if matches!(modes.first(), Some(Label::Mutate { .. })) {
                     // CR 702.140c: the merged creature has the topmost card's characteristics and every card's abilities.
-                    format!("Choose where {} merges: on top, the creature is it; under, the creature stays itself, and has its abilities either way", game.name(*source))
+                    // The creature it merges with is the mutating spell's one target (CR 702.140a).
+                    let target = game
+                        .state
+                        .stack
+                        .iter()
+                        .rev()
+                        .find(|i| i.kind == StackKind::Spell && i.object == *source)
+                        .and_then(|i| match game.state.targets(i).first() {
+                            Some(Target::Object(id)) => Some(*id),
+                            _ => None,
+                        });
+                    mutate_heading(game, *source, target)
                 } else if matches!(modes.first(), Some(Label::TargetSlot(..))) {
                     // Two instances of "target" hold the same object (CR 115.3): which one changes to the source (CR 115.7b).
                     format!("Choose which target to change to {}", game.name(*source))
@@ -1816,6 +1841,14 @@ mod tests {
         game.state.update_obj(hidden, |o| { o.face_down = true; o.marks.face_down_as = Some(values); });
         let PromptPayload::ChooseModesPromptMessage(p) = prompt(&game, &ask(vec![renamed], vec![hidden]), &mut handles).expect("a prompt").0 else { panic!("piles") };
         assert_eq!(p.modes, ["First pile: Renamed permanent", "Second pile: Face-down permanent"]);
+
+        // The creature a mutating spell merges with is named in the heading; one with no name (CR 708.2a) is described.
+        let heading = |target| mutate_heading(&game, hand[1], target);
+        assert!(heading(Some(renamed)).starts_with("Merge Lightning Bolt on top of or under Renamed permanent: "));
+        assert!(heading(Some(renamed)).contains("it keeps Renamed permanent's;"));
+        assert!(heading(Some(hidden)).starts_with("Merge Lightning Bolt on top of or under the face-down creature: "));
+        assert!(heading(Some(hidden)).contains("it keeps the face-down creature's;"));
+        assert!(heading(None).contains("under the creature:"));
     }
 
     /// A face-down pile and a face-up pile (CR 700.3): the separator is asked for the face-down pile in words that say so, and the one

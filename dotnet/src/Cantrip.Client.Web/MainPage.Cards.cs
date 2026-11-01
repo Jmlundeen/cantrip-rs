@@ -149,6 +149,11 @@ public sealed partial class MainPage
                 look = look with { Annotation = above is null ? owned : $"{above}\n{owned}" };
             }
 
+            if (MergedAnnotation(card) is { } merged)
+            {
+                look = look with { Annotation = look.Annotation is null ? merged : $"{look.Annotation}\n{merged}" };
+            }
+
             // A card in exile or a graveyard that may be played says until when, and a flashback that it is exiled after.
             if (PermissionAnnotation(card) is { } window)
             {
@@ -1037,6 +1042,16 @@ public sealed partial class MainPage
 
         return null;
     }
+
+    /// <summary>
+    /// What marks a merged permanent (CR 730.2), written over its art: it is one permanent of several cards, the topmost's
+    /// face drawn, and the other cards named, topmost first (a face-down one the viewer may not look at is "a face-down card").
+    /// Null for anything else.
+    /// </summary>
+    private static string? MergedAnnotation(ObjectView card) =>
+        card.Zone == ZoneKindView.Battlefield && card.MergedWith.Count > 0
+            ? $"Merged with {string.Join(", ", card.MergedWith.Select(part => part.Known ? part.Name : "a face-down card"))}"
+            : null;
 
     /// <summary>Who owns a permanent or spell its controller does not (CR 108.3), or null for one controlled by its owner.</summary>
     private static string? OwnedAnnotation(GameClient client, ObjectView card)
