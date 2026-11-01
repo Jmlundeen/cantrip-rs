@@ -1,0 +1,11 @@
+{
+  "name": "Cubwarden",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Cat",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "Mutate {2}{W}{W} (If you cast this spell for its mutate cost, put it over or under target non-Human creature you own. They mutate into the creature on top plus all abilities from under it.)\nLifelink\nWhenever this creature mutates, create two 1/1 white Cat creature tokens with lifelink.",
+  "keywords": [
+    "Lifelink"
+  ]
+}

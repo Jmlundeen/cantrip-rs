@@ -1,0 +1,50 @@
+# Browser
+# Mutate {2}{W}{W} (CR 702.140a) cast over Ornithopter, a non-Human creature Bot1 owns: Black Lotus's UUU and both Plains' WW pay
+# {2}{W}{W} with two of the blue for its generic, leaving one blue (so a cost of more white, or of another size, fails). Put on top (CR 702.140c), the merged creature is
+# Cubwarden's 3/5 with its lifelink and Ornithopter's flying (CR 702.140e), and "whenever this creature mutates" makes two 1/1
+# white Cat tokens with lifelink (CR 702.140d). Nothing entered the battlefield: there is one permanent for the two cards.
+
+[Bot1 Deck]
+Plains
+Plains
+Ornithopter
+Black Lotus
+Cubwarden
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+? Client.Bot1.Menu = Cast Cubwarden; Cast Cubwarden — Mutate {2}{W}{W}...
+? Bot1.Mana = {U}
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Merge Cubwarden on top of or under Ornithopter: on top, the merged creature has Cubwarden's characteristics; under, it keeps Ornithopter's; either way it has the abilities of all its cards
+? Client.Bot1.Prompt.Modes = Put it on top; Put it under
+Bot1.Modes(1)
+Bot1.Pass
+[Bot1.Main2]
+? Client.Bot1.Battlefield.Cubwarden.Annotation = Merged with Ornithopter
+
+[Expect]
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield = Cat Token; Cat Token; Cubwarden; Plains; Plains
+Bot1.Battlefield.Cubwarden.Power = 3
+Bot1.Battlefield.Cubwarden.Toughness = 5
+Bot1.Battlefield.Cubwarden.Keywords = ?; Flying; Lifelink
+Bot1.Battlefield.Cubwarden.Types = Creature
+Bot1.Battlefield.Cat Token#1.Power = 1
+Bot1.Battlefield.Cat Token#1.Toughness = 1
+Bot1.Battlefield.Cat Token#1.Colors = White
+Bot1.Battlefield.Cat Token#1.Keywords = Lifelink
+Bot1.Battlefield.Cat Token#2.Keywords = Lifelink
+Bot1.Graveyard = Black Lotus

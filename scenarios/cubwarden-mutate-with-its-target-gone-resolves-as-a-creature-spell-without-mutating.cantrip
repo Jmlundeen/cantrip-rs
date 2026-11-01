@@ -1,0 +1,40 @@
+# CR 702.140b: Cubwarden cast for its mutate cost over Ornithopter, which Bot2's Lightning Bolt kills in response. The target is
+# illegal on resolution, so the spell stops being a mutating creature spell and resolves as a creature spell: Cubwarden enters
+# as itself (its own 3/5, no Ornithopter flying), nothing mutated, so no Cat is made, and no over/under question is asked.
+
+[Bot1 Deck]
+Plains
+Plains
+Ornithopter
+Black Lotus
+Cubwarden
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Cubwarden; Plains; Plains
+Bot1.Battlefield.Cubwarden.Keywords = ?; Lifelink
+Bot1.Battlefield.Cubwarden.Power = 3
+Bot1.Graveyard.Count = 2

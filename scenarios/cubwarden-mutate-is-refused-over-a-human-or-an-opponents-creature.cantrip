@@ -1,0 +1,42 @@
+# Mutate targets "a non-Human creature with the same owner as this spell" (CR 702.140a). With only Benalish Hero (a Human) of
+# Bot1's and Bot2's Ornithopter (a non-Human Bot1 does not own) on the battlefield, the mutate cast is not offered, while the
+# plain cast is. Bot1's own Ornithopter then arrives and the same cast is offered (the positive control).
+
+[Bot1 Deck]
+Plains
+Plains
+Ornithopter
+Benalish Hero
+Black Lotus
+Cubwarden
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+! Bot1.Hand.Cubwarden.Cast(Ability: Mutate)
+! Bot1.Hand.Cubwarden.Cast(Bot2.Battlefield.Ornithopter; Ability: Mutate)
+! Bot1.Hand.Cubwarden.Cast(Benalish Hero; Ability: Mutate)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Cubwarden.Cast(Bot1.Battlefield.Ornithopter; Ability: Mutate)
+? Stack = Cubwarden
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Benalish Hero; Cat Token; Cat Token; Cubwarden; Plains; Plains
+Bot2.Battlefield = Ornithopter

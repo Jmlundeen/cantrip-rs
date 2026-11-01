@@ -1,0 +1,29 @@
+# Cubwarden cast for its mana cost {3}{W} is just a creature spell: it enters, nothing mutates, so the trigger never fires
+# and no Cat is made (CR 702.140d: "Whenever this creature mutates"). Ornithopter is on the battlefield and untouched.
+
+[Bot1 Deck]
+Plains
+Plains
+Ornithopter
+Black Lotus
+Cubwarden
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Cubwarden.Cast
+? Bot1.Mana =
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Cubwarden; Ornithopter; Plains; Plains
