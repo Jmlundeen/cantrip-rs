@@ -181,6 +181,25 @@ pub fn another_nontoken_you_control_enters<const TYPE: u8>(q: &dyn Query, me: &A
     }
 }
 
+/// "Whenever this permanent or another nontoken [subtype] you control enters" (CR 603.6a), `SUBTYPE` a `Subtype` as `u16`
+/// (`lands::sub`): the source itself, token or not, or another permanent with that type that is no token, under the
+/// source's controller's control as it entered. "Nontoken" qualifies only "another [subtype]". The type is read through the
+/// words of the source's text (CR 612.2). Fíli the Pathfinder (Dwarves) and Arahbo, the First Fang (Cats) print it.
+pub fn this_or_another_nontoken_of_subtype_you_control_enters<const SUBTYPE: u16>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if to.is(ZoneKind::Battlefield)
+                && (*new == me.source
+                    || (q.controller(*new) == me.controller
+                        && !q.obj(*new).token
+                        && q.chars(*new).has_subtype(crate::lands::word(q, me.source, SUBTYPE)))) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever a card leaves your graveyard" (CR 603.2c, 603.10a): each card leaving the ability's controller's graveyard is
 /// its own event, even when several leave together. The subject is the card as it was there; tokens and copies are not
 /// cards (CR 108.2, 111.6). Hologram Stalker prints it; Hardened Academic, Blastoneuron and Owlin Historian print "one or

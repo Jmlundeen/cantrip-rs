@@ -753,6 +753,15 @@ pub static DWARF: CardDef = CardDef {
     ..token!(Dwarf)
 };
 
+/// A 1/1 white Cat creature token (CR 111). Ocelot Pride and Arahbo, the First Fang create this exact token.
+pub static CAT: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    ..token!(Cat)
+};
+
 /// The colorless Equipment artifact token named Axe, "Equipped creature gets +1/+0" and equip {2}: its name is "Axe"
 /// (CR 111.4), it has no mana cost or color, and its subtype is Equipment (CR 301.5). Dáin Ironfoot and Iron Hills
 /// Blacksmith create this exact token.

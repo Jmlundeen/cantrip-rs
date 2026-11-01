@@ -4,21 +4,12 @@ use cantrip_mechanics::tokens;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
-/// The 1/1 white Cat creature token it makes.
-pub static CAT: CardDef = CardDef {
-    colors: Some(ColorSet::of(Color::White)),
-    types: TypeSet::of(&[CardType::Creature]),
-    power: Some(1),
-    toughness: Some(1),
-    ..token!(Cat)
-};
-
 /// Create a 1/1 white Cat creature token. Then, if you have the city's blessing, for each token you control that entered this
 /// turn, create a token that's a copy of it: the board is read once, after the Cat has arrived, so the Cat is copied and the
 /// copies are not; every copy enters at once (CR 603.6a).
 fn cats(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    tokens::create(g, you, &CAT, 1)?;
+    tokens::create(g, you, &tokens::CAT, 1)?;
     if !g.state().player(you).citys_blessing {
         return Ok(());
     }
@@ -38,4 +29,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::OCELOT_PRIDE
 };
 
-pub static EXTRA: &[&CardDef] = &[&CAT];
+pub static EXTRA: &[&CardDef] = &[&tokens::CAT];
