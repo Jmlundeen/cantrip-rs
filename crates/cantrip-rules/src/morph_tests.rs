@@ -906,3 +906,47 @@ fn a_ban_on_opponents_permanents_during_your_turn_holds_only_then() {
     take(&mut g, &option);
     assert!(!g.state.obj(yours).face_down);
 }
+
+/// CR 613.1f, 101.2: "can't be turned face up" is the source's static ability, so the source losing its abilities ends it -
+/// a Karlov Watchdog that loses all abilities no longer stops its opponents' face-down permanents being turned up, by the
+/// special action or by an effect.
+#[test]
+fn a_ban_ends_when_its_source_loses_its_abilities() {
+    let mut g = game();
+    let watcher = put(&mut g, &WATCHER, Zone::BATTLEFIELD);
+    g.state.update_obj(watcher, |o| o.controller = THEM);
+    g.state.see_statics();
+    let manifested = manifest(&mut g, &SKYWARDEN);
+    let other = manifest(&mut g, &SKYWARDEN);
+    add(&mut g, Mana::W, 5);
+    g.state.update_turn(|t| t.active = THEM);
+    reoffer(&mut g);
+    assert!(turn_up_option(&mut g, manifested, TurnUp::ManaCost).is_none(), "the Watcher's ban holds");
+    loses_all_abilities_now(&mut g, watcher);
+    crate::ops::turn_face_up(&mut cx(&mut g), other, THEM);
+    assert!(!g.state.obj(other).face_down, "an effect turns it up");
+    let option = turn_up_option(&mut g, manifested, TurnUp::ManaCost).expect("offered once the Watcher has no abilities");
+    take(&mut g, &option);
+    assert!(!g.state.obj(manifested).face_down);
+}
+
+/// CR 101.2, 701.58g: a cloaked sorcery card that can't be turned face up is not one that "would turn face up", so an effect
+/// that says to turn it face up neither turns it up nor has it revealed; once the ban ends, the same instruction reveals it
+/// and leaves it face down.
+#[test]
+fn a_cloaked_sorcery_that_cant_be_turned_face_up_is_not_revealed_by_an_effect() {
+    let mut g = game();
+    let card = put(&mut g, &CASTER, Zone::library(YOU));
+    let cloaked = cantrip_api::Game::put_onto_battlefield_face_down(&mut cx(&mut g), card, YOU, FaceDown::Cloaked, false)
+        .expect("nothing is asked")
+        .expect("it enters face down");
+    let revealed = |g: &Game| g.log.iter().any(|r| matches!(r.event, Event::Revealed { card, .. } if card == cloaked));
+    let aura = shroud(&mut g, cloaked);
+    crate::ops::turn_face_up(&mut cx(&mut g), cloaked, THEM);
+    assert!(g.state.obj(cloaked).face_down);
+    assert!(!revealed(&g));
+    unshroud(&mut g, aura);
+    crate::ops::turn_face_up(&mut cx(&mut g), cloaked, THEM);
+    assert!(g.state.obj(cloaked).face_down);
+    assert!(revealed(&g));
+}
