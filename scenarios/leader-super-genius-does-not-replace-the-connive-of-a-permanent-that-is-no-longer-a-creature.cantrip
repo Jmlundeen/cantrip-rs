@@ -1,0 +1,64 @@
+# Leader, Super-Genius: "If a creature you control would connive" - only a creature. Bot1's Red Room Recruit enters on turn 3, and
+# with its "it connives" ability on the stack Bot2 casts Swift Reconfiguration on it: the Recruit is a Vehicle artifact and no
+# creature (CR 205.1b). A permanent that is no creature still connives (CR 701.50a), but Leader does not replace it: Bot1 draws
+# only the connive's card (Forest) and discards it, with no card drawn first.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Leader, Super-Genius
+Mox Jet
+Mox Pearl
+Red Room Recruit
+Plains
+Savannah Lions
+Hill Giant
+Runeclaw Bear
+Forest
+Grizzly Bears
+Plains x9
+
+[Bot2 Deck]
+Plains
+Swift Reconfiguration
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Leader, Super-Genius.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Plains)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+? Bot1.Hand = Hill Giant; Mox Jet; Mox Pearl; Red Room Recruit; Runeclaw Bear; Savannah Lions
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Red Room Recruit.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swift Reconfiguration.Cast(Bot1.Battlefield.Red Room Recruit)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Red Room Recruit.Types = Artifact
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Forest)
+
+[Expect]
+Bot1.Hand = Hill Giant; Runeclaw Bear; Savannah Lions
+Bot1.Graveyard = Forest; Plains; Black Lotus
