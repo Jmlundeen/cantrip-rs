@@ -120,9 +120,11 @@ A mana cost is no longer part of this: its generic mana and each count of its sy
 the mana a spell's casting spent (`Obj::spent`) are 32-bit, with plain arithmetic (2026-11-01).
 
 The same decision keeps today's capacities (KI-105, closed): an object's 32 abilities (`MAX_ABILITIES`), a copy's six
-abilities added by exceptions, four text-changing effects (`Words::MAX`), and the special actions given once layer 6 is
-done taking the first free ability slot. A full list takes no more and never panics; a repeatable modal counts each mode
-to 15.
+abilities added by exceptions, and the special actions given once layer 6 is done taking the first free ability slot.
+Text-changing effects are no longer part of this: an object keeps every one (`Words`, 2026-11-01). A full list takes
+no more and never panics; a repeatable modal counts each mode to 15.
+
+Narrowed 2026-11-01 by jschibel: mana costs and text changes are exact; RX-5 now covers only what it still lists.
 
 ### RX-6: A player keeps after their seventh mulligan
 

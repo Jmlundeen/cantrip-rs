@@ -763,32 +763,93 @@ pub enum Word {
 /// timestamp order, each replacing every instance of one word with another. Card code names a word in its rules text
 /// through these (`Query::words`), so "a blue spell" asks `words.color(Color::Blue)` and reads red once that word was
 /// changed to red.
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Default, Debug)]
+///
+/// Every change is kept, however many an object gets: what a word reads as depends on all of them and their order
+/// (`word`), so none may be dropped or merged. The first `INLINE` are held in the value itself, as every real game's
+/// are, so reading and changing them touches nothing shared; the rest, past that, are interned (`TextChanges`): `more`
+/// names the list of the changes after the first `INLINE`, one entry per distinct such list ever made in the process, each
+/// keyed by the list it extends and the change added, so that two equal lists are always one value and `==` is the
+/// lists' equality. `Hash` hashes the changes themselves, never an entry's place, so a hash is the same in every process
+/// and run.
+#[derive(Clone, Copy, PartialEq, Eq, Default)]
 pub struct Words {
-    changes: [Option<(Word, Word)>; Words::MAX],
+    inline: [Option<(Word, Word)>; Words::INLINE],
+    /// 0 while the changes fit `inline`; else the `TextChanges` entry (`more - 1`) of the changes after them.
+    more: u32,
+}
+
+/// The interned lists of the text changes past a `Words`'s inline ones (entry `n - 1` for `more == n`): each the list it
+/// extends and one change more, with the whole list kept for reading. Entries are only ever added, so a `Words` stays good
+/// for the life of the process, through every undo and copy of a game.
+struct TextChanges {
+    lists: Vec<Box<[(Word, Word)]>>,
+    by_extension: std::collections::HashMap<(u32, Word, Word), u32>,
+}
+
+fn text_changes() -> &'static std::sync::RwLock<TextChanges> {
+    static TABLE: std::sync::OnceLock<std::sync::RwLock<TextChanges>> = std::sync::OnceLock::new();
+    TABLE.get_or_init(|| std::sync::RwLock::new(TextChanges { lists: Vec::new(), by_extension: std::collections::HashMap::new() }))
 }
 
 impl Words {
-    /// More text changes than any object gets; past it, the rest are not kept.
-    pub const MAX: usize = 4;
-    pub const NONE: Words = Words { changes: [None; Words::MAX] };
+    /// The changes held in the value itself; the rest are interned.
+    const INLINE: usize = 4;
+    pub const NONE: Words = Words { inline: [None; Words::INLINE], more: 0 };
 
     /// Whether the text is as printed.
     pub fn is_printed(&self) -> bool {
-        self.changes[0].is_none()
+        self.inline[0].is_none()
     }
 
     /// The text with every instance of `from` replaced by `to` (CR 612.1), after the changes made so far.
     pub fn changed(mut self, from: Word, to: Word) -> Words {
-        if let Some(slot) = self.changes.iter().position(|c| c.is_none()) {
-            self.changes[slot] = Some((from, to));
+        if self.more == 0
+            && let Some(slot) = self.inline.iter().position(|c| c.is_none())
+        {
+            self.inline[slot] = Some((from, to));
+            return self;
         }
-        self
+        let key = (self.more, from, to);
+        let table = text_changes();
+        if let Some(&n) = table.read().unwrap_or_else(|e| e.into_inner()).by_extension.get(&key) {
+            return Words { more: n, ..self };
+        }
+        let mut t = table.write().unwrap_or_else(|e| e.into_inner());
+        if let Some(&n) = t.by_extension.get(&key) {
+            return Words { more: n, ..self };
+        }
+        // An entry for each distinct list of changes past the inline ones ever made: 2^32 of them would take hundreds of
+        // gigabytes first (docs/known-issues.md, KI-150). Past that the change is not kept.
+        let Ok(n) = u32::try_from(t.lists.len() + 1) else { return self };
+        let mut list: Vec<(Word, Word)> = if self.more == 0 { Vec::new() } else { t.lists[self.more as usize - 1].to_vec() };
+        list.push((from, to));
+        t.lists.push(list.into_boxed_slice());
+        t.by_extension.insert(key, n);
+        Words { more: n, ..self }
     }
 
     /// Every change of `other` after these.
     pub fn then(self, other: Words) -> Words {
-        other.changes.into_iter().flatten().fold(self, |w, (from, to)| w.changed(from, to))
+        if other.more == 0 {
+            return other.inline.into_iter().flatten().fold(self, |w, (from, to)| w.changed(from, to));
+        }
+        let changes = other.with_changes(|c| c.to_vec());
+        changes.into_iter().fold(self, |w, (from, to)| w.changed(from, to))
+    }
+
+    /// The inline changes, in timestamp order.
+    fn inline_changes(&self) -> impl Iterator<Item = (Word, Word)> + '_ {
+        self.inline.iter().map_while(|c| *c)
+    }
+
+    /// `read` of every change, in timestamp order: collected, with the shared table read, only past the inline ones.
+    fn with_changes<T>(&self, read: impl FnOnce(&[(Word, Word)]) -> T) -> T {
+        let mut all: Vec<(Word, Word)> = self.inline_changes().collect();
+        if self.more != 0 {
+            let t = text_changes().read().unwrap_or_else(|e| e.into_inner());
+            all.extend_from_slice(&t.lists[self.more as usize - 1]);
+        }
+        read(&all)
     }
 
     /// The word printed as `printed`, as the text has it now. The changes apply in timestamp order (CR 613.7) unless one
@@ -797,11 +858,22 @@ impl Words {
     /// not yet applied whose word it is now, again and again, each change once. Two changes of the same word each take the
     /// other's word away, a loop applied in timestamp order: the earlier.
     pub fn word(&self, printed: Word) -> Word {
+        if self.more != 0 {
+            return self.with_changes(|changes| {
+                let mut word = printed;
+                let mut applied = vec![false; changes.len()];
+                while let Some(i) = (0..changes.len()).find(|&i| !applied[i] && changes[i].0 == word) {
+                    applied[i] = true;
+                    word = changes[i].1;
+                }
+                word
+            });
+        }
         let mut word = printed;
-        let mut applied = [false; Words::MAX];
-        while let Some(i) = (0..Words::MAX).find(|&i| !applied[i] && self.changes[i].is_some_and(|(from, _)| from == word)) {
+        let mut applied = [false; Words::INLINE];
+        while let Some(i) = (0..Words::INLINE).find(|&i| !applied[i] && self.inline[i].is_some_and(|(from, _)| from == word)) {
             applied[i] = true;
-            if let Some((_, to)) = self.changes[i] {
+            if let Some((_, to)) = self.inline[i] {
                 word = to;
             }
         }
@@ -839,6 +911,25 @@ impl Words {
             return printed;
         }
         printed.iter().fold(SubtypeSet::NONE, |set, s| set.with(self.subtype(s)))
+    }
+}
+
+impl std::hash::Hash for Words {
+    /// As the slice of every change hashes (its length, then each change), so that inline and interned changes hash alike.
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        if self.more != 0 {
+            return self.with_changes(|changes| changes.hash(state));
+        }
+        state.write_usize(self.inline_changes().count());
+        for change in self.inline_changes() {
+            change.hash(state);
+        }
+    }
+}
+
+impl fmt::Debug for Words {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.with_changes(|changes| f.debug_tuple("Words").field(&changes).finish())
     }
 }
 
@@ -1616,6 +1707,59 @@ mod tests {
         assert_eq!(Words::NONE.changed(elf, goblin).changed(goblin, elf).word(elf), elf);
     }
 
+    /// CR 612.1, 613.7: every text change an object gets is kept, however many: six changes chained one after another
+    /// take "Elf" through all six, and the same changes made again are the same words.
+    #[test]
+    fn every_text_change_is_kept() {
+        let chain = [Subtype::Elf, Subtype::Goblin, Subtype::Dragon, Subtype::Merfolk, Subtype::Zombie, Subtype::Vampire, Subtype::Wizard].map(Word::Subtype);
+        let changed = |n: usize| chain.windows(2).take(n).fold(Words::NONE, |w, pair| w.changed(pair[0], pair[1]));
+        let six = changed(6);
+        assert_eq!(six.word(chain[0]), chain[6], "the sixth change applies");
+        assert_eq!(six.word(chain[5]), chain[6]);
+        assert_eq!(changed(5).word(chain[0]), chain[5]);
+        assert_eq!(six, changed(6), "the same changes are the same words");
+        assert_ne!(six, changed(5));
+        let hash = |w: Words| {
+            use std::hash::{Hash, Hasher};
+            let mut h = std::collections::hash_map::DefaultHasher::new();
+            w.hash(&mut h);
+            h.finish()
+        };
+        assert_eq!(hash(six), hash(changed(6)));
+        // The hash is the changes', never the place of their list in the process's table, which depends on what was
+        // interned first: the same in every process and run.
+        let pairs: Vec<(Word, Word)> = chain.windows(2).map(|pair| (pair[0], pair[1])).collect();
+        let slice_hash = {
+            use std::hash::{Hash, Hasher};
+            let mut h = std::collections::hash_map::DefaultHasher::new();
+            pairs.as_slice().hash(&mut h);
+            h.finish()
+        };
+        assert_eq!(hash(six), slice_hash, "a list of changes hashes as the changes");
+        let three_hash = {
+            use std::hash::{Hash, Hasher};
+            let mut h = std::collections::hash_map::DefaultHasher::new();
+            pairs[..3].hash(&mut h);
+            h.finish()
+        };
+        assert_eq!(hash(changed(3)), three_hash, "changes held inline hash as the changes too");
+        assert_eq!(Words::NONE.then(six), six);
+        // Four changes fill the inline ones and a fifth is the first interned: the two lists are told apart, and each hashes as
+        // its changes. The same list reached another way (two changes, then the other four after them) is the same words.
+        assert_ne!(changed(4), changed(5));
+        let slice = |n: usize| {
+            use std::hash::{Hash, Hasher};
+            let mut h = std::collections::hash_map::DefaultHasher::new();
+            pairs[..n].hash(&mut h);
+            h.finish()
+        };
+        assert_eq!((hash(changed(4)), hash(changed(5))), (slice(4), slice(5)));
+        let rest = pairs[2..].iter().fold(Words::NONE, |w, &(from, to)| w.changed(from, to));
+        assert_eq!(changed(2).then(rest), six, "the same list by another route");
+        assert_eq!(hash(changed(2).then(rest)), hash(six));
+        assert!(!six.is_printed() && Words::NONE.is_printed());
+    }
+
     /// CR 609.4b: paid as though mana were of any color, {1}{R}{R/G}{C}{X} is paid as {3}{C}{X} - the colored and hybrid
     /// symbols by any mana, the {C} by colorless only - and its mana value is unchanged.
     #[test]
@@ -1691,3 +1835,4 @@ mod count_tests {
         assert_eq!(super::count_u32(usize::MAX), u32::MAX);
     }
 }
+

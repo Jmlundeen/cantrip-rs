@@ -83,10 +83,26 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-142](#ki-142-the-ai-encoder-cannot-tell-apart-options-that-differ-only-by-their-grant-or-a-companion-from-exiling-to-pay) | The AI encoder cannot tell apart options that differ only by their grant, or a companion from exiling to pay | Pri-3 | Open |
 | [KI-143](#ki-143-a-scenario-check-right-after-an-activation-can-read-the-pool-before-its-payment-finishes) | A scenario check right after an activation can read the pool before its payment finishes | Pri-2 | Open |
 | [KI-144](#ki-144-mathemagics-with-an-x-of-32-or-more-draws-at-most-4294967295-cards) | Mathemagics with an X of 32 or more draws at most 4,294,967,295 cards | Pri-3 | Won't fix: beyond practical scale |
+| [KI-150](#ki-150-text-changes-are-interned-for-at-most-4294967295-distinct-lists-in-a-process) | Text changes are interned for at most 4,294,967,295 distinct lists in a process | Pri-3 | Won't fix: beyond practical scale |
 | [KI-146](#ki-146-the-booster-drafts-dragged-pick-test-once-saw-the-pick-fly-from-the-pack) | The booster draft's dragged-pick test once saw the pick fly from the pack | Pri-3 | Suspected |
 | [KI-147](#ki-147-two-tablet-browser-tests-wait-forever-for-unos-splash-to-go) | Two tablet browser tests wait forever for Uno's splash to go | Pri-3 | Open |
 
 ## Issues
+
+### KI-150: Text changes are interned for at most 4,294,967,295 distinct lists in a process
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Won't fix: beyond practical scale | engine (`crates/cantrip-state/src/vocab.rs`, `Words`) | 2026-11-01, review of `Words` |
+
+**Notes.** An object's text changes (`Words`, CR 612) are every change it has, in order: the first four in the value
+itself, and those past four as a `u32` naming an interned list, one entry for each distinct such list the process has
+ever made, never freed. Past 2^32 - 1 entries a further change is not kept (the words stay as they were). Play cannot
+reach it: an entry is a list of at least one change and its key, so 2^32 of them take hundreds of gigabytes of memory,
+which no server or bot process holds; a game makes an entry only for a fifth or later text-changing effect on one object
+with a list not yet seen, which no real game has more than a handful of.
+
+**Scenarios.** None: `vocab::tests::every_text_change_is_kept` keeps six changes on one object.
 
 ### KI-149: No test reads a noncreature permanent's printed power and toughness off the wire
 
