@@ -1,0 +1,38 @@
+# "It also costs {1} less to cast if you control an enchantment": Bot1's Fang of Shigeki is an enchantment (and no Spirit), so two
+# Moxen pay for the Snare, aimed at a noncreature spell (Bot2's Mox Ruby). Bot2's Spirit does not reduce it. Bot2 has
+# only the Mox it is casting and declines nothing it could pay with: the Mox is countered.
+
+[Bot1 Deck]
+Mox Emerald
+Fang of Shigeki
+Mox Sapphire
+Mox Jet
+Geistlight Snare
+Island x2
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fang of Shigeki.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Geistlight Snare.Cast(Stack.Mox Ruby)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Geistlight Snare
+Bot2.Graveyard = Mox Ruby

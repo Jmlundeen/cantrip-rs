@@ -1,0 +1,6 @@
+{
+  "name": "Geistlight Snare",
+  "manaCost": "{2}{U}",
+  "type": "Instant",
+  "oracleText": "This spell costs {1} less to cast if you control a Spirit. It also costs {1} less to cast if you control an enchantment.\nCounter target spell unless its controller pays {3}."
+}

@@ -1,0 +1,49 @@
+# "This spell costs {1} less to cast if you control a Spirit": Bot1's Mausoleum Wanderer is a Spirit, so two Moxen pay for the
+# {2}{U} Snare (the pool is empty right after the cast: not one more, not one less) aimed at a creature spell. Bot2 pays the
+# {3} by tapping three Moxen while it resolves (its pool empty after: exactly {3}), so the Ornithopter is not countered.
+
+[Bot1 Deck]
+Island
+Mausoleum Wanderer
+Mox Sapphire
+Mox Ruby
+Geistlight Snare
+Island x2
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mausoleum Wanderer.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Geistlight Snare.Cast(Stack.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.PayCost
+? Bot2.Mana =
+
+[Expect]
+Bot1.Graveyard = Geistlight Snare
+Bot2.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Graveyard.Count = 0

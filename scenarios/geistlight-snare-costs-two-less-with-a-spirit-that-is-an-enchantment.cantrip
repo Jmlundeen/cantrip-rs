@@ -1,0 +1,37 @@
+# Ruling 2021-11-19: one permanent that is both an enchantment and a Spirit (Spirit of the Labyrinth) makes both reductions
+# apply, so the Snare costs {U}: one Mox pays it, the pool empty right after the cast.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Spirit of the Labyrinth
+Geistlight Snare
+Island x2
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Island x7
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Geistlight Snare.Cast(Stack.Mox Jet)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Geistlight Snare
+Bot2.Graveyard = Mox Jet
