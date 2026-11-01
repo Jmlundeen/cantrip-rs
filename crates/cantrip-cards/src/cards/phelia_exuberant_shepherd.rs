@@ -4,33 +4,26 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
-/// Exile it, then schedule the return at the next end step (CR 603.7), carrying the exiled card as the delayed
-/// ability's subject. The delayed ability exists whether or not anything was exiled (CR 603.7d).
+/// Exile it, then schedule the return at the next end step (CR 603.7), carrying the exiled cards - each card of a merged
+/// permanent (CR 730.3c) - as the delayed ability's objects. The delayed ability exists whether or not anything was exiled
+/// (CR 603.7d); a token that was exiled ceased to exist and is carried by nothing (CR 111.7).
 fn exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let mut subject = Target::None;
+    let mut cards = Vec::new();
     if let Some(permanent) = targets::object(g, item, 0) {
-        let exiled = g.exile(permanent);
-        if !g.obj(exiled).token && g.obj(exiled).zone.is(ZoneKind::Exile) {
-            subject = Target::Object(exiled);
-        }
+        cards = g.exile_all(&[permanent]).into_iter().filter(|&c| !g.obj(c).token && g.obj(c).zone.is(ZoneKind::Exile)).collect();
     }
-    delayed::at_next_end_step(g, item, 0, subject);
+    delayed::at_next_end_step_about(g, item, 0, &cards);
     Ok(())
 }
 
-/// Return that card under its owner's control; if it entered under the ability's controller, Phelia (if still on the
-/// battlefield) gets a +1/+1 counter.
+/// Return that card under its owner's control, together with the rest of the cards it carries; if it entered under the ability's
+/// controller, Phelia - still the permanent she was (CR 400.7) - gets one +1/+1 counter: the counter goes on Phelia, not on what
+/// returned, so it is not repeated for each card, and "if it entered under your control" is one check of the cards found (CR 730.3c).
 fn give_back(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Object(card) = item.subject else { return Ok(()) };
-    if g.obj(card).became.is_some() || !g.obj(card).zone.is(ZoneKind::Exile) {
-        return Ok(());
-    }
-    let owner = g.obj(card).owner;
-    let entered = g.put_onto_battlefield(card, owner, false)?;
-    if g.obj(entered).zone.is(ZoneKind::Battlefield)
-        && g.controller(entered) == item.controller
-        && targets::permanent(g, item.object)
-    {
+    let cards = cantrip_mechanics::library::still_exiled(g, g.event_objects(item));
+    let entering: Vec<(ObjectId, PlayerId)> = cards.into_iter().map(|c| (c, g.obj(c).owner)).collect();
+    let entered = g.put_all_onto_battlefield(&entering)?;
+    if entered.iter().any(|&e| g.obj(e).zone.is(ZoneKind::Battlefield) && g.controller(e) == item.controller) && targets::permanent(g, item.object) {
         g.add_counters(item.object, CounterKind::PlusOne, 1);
     }
     Ok(())

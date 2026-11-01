@@ -15,14 +15,10 @@ fn draw_then_each_player_loses_1(g: &mut dyn Game, item: &StackItem) -> Result<(
 }
 
 /// "Exile up to one target creature. Return that card to the battlefield under its owner's control at the beginning of the next
-/// end step" (CR 603.7): a delayed ability about the card exiled, which comes back as a new object (CR 400.7). A token exiled
-/// this way ceases to exist, so the card the ability finds is gone (CR 111.7).
+/// end step" (CR 603.7): a delayed ability about the card exiled - each card, for a merged permanent (CR 730.3c) - which comes
+/// back as a new object (CR 400.7). A token exiled this way ceases to exist, so the card the ability finds is gone (CR 111.7).
 fn exile_until_end_step(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let exiled = g.exile(creature);
-    if g.obj(exiled).zone.is(ZoneKind::Exile) {
-        delayed::at_next_end_step(g, item, 0, Target::Object(exiled));
-    }
+    delayed::exile_target_then_return_at_next_end_step(g, item, 0, 0);
     Ok(())
 }
 
