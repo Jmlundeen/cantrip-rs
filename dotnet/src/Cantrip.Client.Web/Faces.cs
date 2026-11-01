@@ -177,12 +177,22 @@ internal static class Faces
         bool wantsArt = card.Known && !card.FaceDown
             && CardFace.ArtNames(card).Any(name => !CardArt.Complete(name, CardFace.ArtPixels(card, width, PixelScale)));
 
-        FaceCache.Put(key, look, slug, picture, wantsArt, durable);
+        FaceCache.Put(key, look, slug, picture, wantsArt, durable, Held(card, width, height));
         Spent(DateTime.UtcNow - started);
         FacePerf.Drew(DateTime.UtcNow - started, durable);
         LastDrawn = DateTime.UtcNow;
         return picture;
     }
+
+    /// <summary>
+    /// What a face laid out now holds beyond its recording, in bytes, for <see cref="FaceCache"/> to charge it: on the GPU
+    /// the art it draws, which the recording keeps alive; under the software renderer the raster it is kept as, with the
+    /// art painted in.
+    /// </summary>
+    public static long Held(ObjectView card, float width, float height) =>
+        OnGpu
+            ? (card.Known && !card.FaceDown ? CardFace.ArtNames(card).Sum(CardArt.HeldBytes) : 0)
+            : 4L * (long)MathF.Ceiling(width * PixelScale) * (long)MathF.Ceiling(height * PixelScale);
 
     /// <summary>When a face was last laid out, so a picture of the page can wait until faces have stopped being made.</summary>
     public static DateTime LastDrawn { get; private set; } = DateTime.MinValue;
@@ -204,10 +214,17 @@ internal static class Faces
             return picture;
         }
 
+        var info = new SKImageInfo((int)MathF.Ceiling(width * PixelScale), (int)MathF.Ceiling(height * PixelScale), SKColorType.Rgba8888, SKAlphaType.Premul);
+        using SKSurface? surface = SKSurface.Create(info);
+        if (surface is null)
+        {
+            // No memory for the raster: the recording is the same face, only slower to show, and is kept rather than the
+            // frame failing.
+            return picture;
+        }
+
         using (picture)
         {
-            var info = new SKImageInfo((int)MathF.Ceiling(width * PixelScale), (int)MathF.Ceiling(height * PixelScale), SKColorType.Rgba8888, SKAlphaType.Premul);
-            using SKSurface surface = SKSurface.Create(info) ?? throw new InvalidOperationException("Could not create an offscreen Skia surface.");
             surface.Canvas.Clear(SKColors.Transparent);
             surface.Canvas.Scale(PixelScale);
             surface.Canvas.DrawPicture(picture);

@@ -38,7 +38,7 @@ public sealed class TabletHalf : Grid
             },
         });
 
-        Board = new CardBoardElement(BoardRows.StandardCardWidth, BoardRows.CardHeight(BoardRows.StandardCardWidth)) { Slides = true };
+        Board = new CardBoardElement(BoardRows.StandardCardWidth, BoardRows.CardHeight(BoardRows.StandardCardWidth)) { Slides = PlayerSettings.AnimateCards };
         Badges = new Canvas { IsHitTestVisible = false };
 
         // The rows never scroll on a tablet: a drag across a board would fight a tap on a card. They are fitted to the

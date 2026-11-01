@@ -45,15 +45,20 @@ public sealed class TabletDriver : IAsyncDisposable
     /// <summary>
     /// Opens a tablet with these query parameters - <c>side=N</c> for a player's own board, <c>art=...</c> for where its
     /// art is - and <c>inperson=tablet&amp;test</c>; a <c>#device=</c> fragment connects it to a relay instead of the test.
-    /// <paramref name="name"/> prefixes its pictures under <paramref name="pictures"/>.
+    /// <paramref name="name"/> prefixes its pictures under <paramref name="pictures"/>; <paramref name="init"/> is a script
+    /// run before the page's own, to make the browser a device of another kind.
     /// </summary>
-    public static async Task<TabletDriver> OpenAsync(WebClient web, string query, string pictures, string name, Uri? site = null)
+    public static async Task<TabletDriver> OpenAsync(WebClient web, string query, string pictures, string name, Uri? site = null, string? init = null)
     {
         IBrowserContext context = await web.Browser.NewContextAsync(new BrowserNewContextOptions
         {
             ViewportSize = new ViewportSize { Width = Width, Height = Height },
             HasTouch = true,
         });
+        if (init is not null)
+        {
+            await context.AddInitScriptAsync(init);
+        }
 
         IPage page = await context.NewPageAsync();
         var tablet = new TabletDriver(context, page, pictures, name);
@@ -200,7 +205,13 @@ public sealed record TabletState(
     IReadOnlyList<TabletPlayer> Players,
     IReadOnlyList<TabletTap> Taps,
     TabletGridState? Grid = null,
-    IReadOnlyList<TabletLine>? Lines = null);
+    IReadOnlyList<TabletLine>? Lines = null,
+    bool Constrained = false,
+    string ArtQuality = "",
+    bool Animates = false,
+    long ArtBytes = 0,
+    long DurableBytes = 0,
+    long MomentBytes = 0);
 
 /// <summary>
 /// A tablet's grid draft (InPerson/TabletDraft.cs): whether it is up, the grid of how many, the pick being made and whose,

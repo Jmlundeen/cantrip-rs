@@ -8,10 +8,16 @@ namespace Cantrip.Client.Web;
 /// Card illustrations fetched from the art service on demand, at the smallest of its fixed sizes that covers what is
 /// being drawn.
 /// <para>
-/// Three layers keep this from asking twice: decoded pictures held here for the session; one request at a time per card,
+/// Three layers keep this from asking twice: decoded pictures held here, the most recently used up to the device's budget
+/// (<see cref="DeviceClass.ArtBudget"/>); one request at a time per card,
 /// however many cards on screen share it; and the browser's own HTTP cache, which the art service's Cache-Control and
 /// ETag headers fill, so a reload - or a CDN in front of the service - is answered without it. A card with no art is
 /// remembered as such for the session, and a failed request is not retried for a while.
+/// </para>
+/// <para>
+/// A picture let go here is not taken from a face already drawn with it, whose recording keeps its pixels for as long as
+/// <see cref="FaceCache"/> keeps the face; it is only asked for again - of the browser's cache, first - when a face is
+/// drawn anew. One used in the last moment is never let go, so the art of a board larger than the budget is all kept.
 /// </para>
 /// </summary>
 public static class CardArt
@@ -21,6 +27,21 @@ public static class CardArt
 
     private static readonly HttpClient Http = new();
     private static readonly Dictionary<string, (SKBitmap Bitmap, int Size)> Have = new(StringComparer.Ordinal);
+
+    /// <summary>When each picture here was last asked for, to let the least recently used go first.</summary>
+    private static readonly Dictionary<string, DateTime> Used = new(StringComparer.Ordinal);
+
+    /// <summary>How much the pictures here hold, in bytes.</summary>
+    private static long _held;
+
+    /// <summary>How recently a picture was asked for to be held in use, and kept over the budget.</summary>
+    private static readonly TimeSpan InUse = TimeSpan.FromSeconds(2);
+
+    /// <summary>How many bytes the picture here for <paramref name="cardName"/> holds; zero when none is.</summary>
+    public static long HeldBytes(string cardName) => Have.TryGetValue(Slug(cardName), out var held) ? held.Bitmap.ByteCount : 0;
+
+    /// <summary>How much all the pictures here hold, in bytes.</summary>
+    public static long Bytes => _held;
 
     /// <summary>Each picture as an image to draw, made once and sharing its pixels, let go with the picture.</summary>
     private static readonly Dictionary<SKBitmap, SKImage> Images = new(ReferenceEqualityComparer.Instance);
@@ -53,7 +74,14 @@ public static class CardArt
     public static SKBitmap? Get(string cardName, int pixels)
     {
         _ = Fetch(cardName, pixels);
-        return Have.TryGetValue(Slug(cardName), out var held) ? held.Bitmap : null;
+        string slug = Slug(cardName);
+        if (!Have.TryGetValue(slug, out var held))
+        {
+            return null;
+        }
+
+        Used[slug] = DateTime.UtcNow;
+        return held.Bitmap;
     }
 
     /// <summary>
@@ -201,18 +229,16 @@ public static class CardArt
                 return;
             }
 
-            if (held.Bitmap is { } replaced)
+            if (held.Bitmap is not null)
             {
-                if (Images.Remove(replaced, out SKImage? image))
-                {
-                    image.Dispose();
-                }
-
-                replaced.Dispose();
+                Release(slug);
             }
 
             Have[slug] = (bitmap, size);
+            Used[slug] = DateTime.UtcNow;
+            _held += bitmap.ByteCount;
             FailedAt.Remove(slug);
+            MakeRoom();
             Changed?.Invoke(slug);
         }
         catch (Exception error) when (error is HttpRequestException or TaskCanceledException)
@@ -233,6 +259,47 @@ public static class CardArt
                 Fetching.Remove(slug);
             }
         }
+    }
+
+    /// <summary>
+    /// Lets the least recently used pictures go while more is held than the device's budget, until one used in the last
+    /// moment is reached - one just arrived among them - which with every one used since is kept over it.
+    /// </summary>
+    private static void MakeRoom()
+    {
+        if (_held <= DeviceClass.ArtBudget)
+        {
+            return;
+        }
+
+        DateTime now = DateTime.UtcNow;
+        foreach ((string slug, DateTime used) in Used.OrderBy(pair => pair.Value).ToList())
+        {
+            if (_held <= DeviceClass.ArtBudget || now - used < InUse)
+            {
+                return;
+            }
+
+            Release(slug);
+        }
+    }
+
+    /// <summary>Lets the picture here for a slug go, and the image made of it.</summary>
+    private static void Release(string slug)
+    {
+        if (!Have.Remove(slug, out var held))
+        {
+            return;
+        }
+
+        Used.Remove(slug);
+        _held -= held.Bitmap.ByteCount;
+        if (Images.Remove(held.Bitmap, out SKImage? image))
+        {
+            image.Dispose();
+        }
+
+        held.Bitmap.Dispose();
     }
 
     /// <summary>Who illustrated each picture, by slug, from where art is now; empty until it has come.</summary>

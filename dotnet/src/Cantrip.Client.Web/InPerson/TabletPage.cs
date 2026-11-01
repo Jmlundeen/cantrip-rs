@@ -58,7 +58,8 @@ public sealed partial class TabletPage : UserControl
     /// </summary>
     private readonly TabletStack? _turnedStack;
     private readonly TargetArrowsElement _arrows = new();
-    private readonly CardFlights _flights = new();
+    /// <summary>Cards flying between zones, unless the Animate cards setting is off (off by default on a device short of memory).</summary>
+    private readonly CardFlights _flights = new() { Enabled = PlayerSettings.AnimateCards };
 
     /// <summary>A card held up from an upright part of the board, and from the turned half: each reads upright to whoever is across from it.</summary>
     private readonly CardInspector _inspector = new();

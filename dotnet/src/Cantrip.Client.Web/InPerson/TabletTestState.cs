@@ -118,6 +118,12 @@ public sealed partial class TabletPage
             json.WriteNumber("flown", _flights.Launched);
             json.WriteString("lives", _lives.Text);
             json.WriteString("art", ClientConfig.ArtTemplate);
+            json.WriteBoolean("constrained", DeviceClass.Constrained);
+            json.WriteString("artQuality", PlayerSettings.ArtQuality.ToString());
+            json.WriteBoolean("animates", PlayerSettings.AnimateCards);
+            json.WriteNumber("artBytes", CardArt.Bytes);
+            json.WriteNumber("durableBytes", FaceCache.DurableBytes);
+            json.WriteNumber("momentBytes", FaceCache.MomentBytes);
             _fullScreen.WriteTest(json, _root);
 
             json.WriteStartArray("cards");

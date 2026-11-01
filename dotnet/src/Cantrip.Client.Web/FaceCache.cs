@@ -8,25 +8,37 @@ namespace Cantrip.Client.Web;
 /// by everything drawn on the face (<see cref="Faces.LookOf"/>) and the size it is laid out at, so two cards share a
 /// recording exactly when they would look the same.
 /// <para>
-/// A durable face - the card as it is, nothing on it (<see cref="Faces.IsDurable"/>) - is kept for the session and never
-/// let go to make room. The rest, faces of the moment, are kept most recently used first up to a memory budget. A face drawn with less art than it wanted
-/// is let go when more of the card's art arrives, so it is drawn again with it; one drawn with all it wanted is kept
-/// however much sharper the art that arrives later, which is for drawing the card larger.
+/// A durable face - the card as it is, nothing on it (<see cref="Faces.IsDurable"/>) - is kept while its own budget has
+/// room, and never let go for a face of the moment. The rest, faces of the moment, are kept most recently used first up to
+/// a budget of their own. Both budgets are the device's (<see cref="DeviceClass"/>), and each face is charged what it
+/// holds: its recording, the raster the software renderer keeps of it, and the art it draws, which its recording keeps
+/// alive however long <see cref="CardArt"/> keeps it. A durable face used in the last moment is never let go, so a board
+/// whose faces outgrow the budget keeps them all rather than drawing them over and over.
+/// </para>
+/// <para>
+/// A face drawn with less art than it wanted is let go when more of the card's art arrives, so it is drawn again with it;
+/// one drawn with all it wanted is kept however much sharper the art that arrives later, which is for drawing the card
+/// larger.
 /// </para>
 /// </summary>
 internal static class FaceCache
 {
-    /// <summary>
-    /// How much memory the faces of the moment may take, as their recordings count it; durable faces are not counted,
-    /// since they are never let go. The art and frames a recording draws are shared, and not counted in it.
-    /// </summary>
-    private const long Budget = 32L * 1024 * 1024;
+    /// <summary>How much memory the faces of the moment may take.</summary>
+    private static readonly long Budget = DeviceClass.MomentFaceBudget;
+
+    /// <summary>How much memory the durable faces may take.</summary>
+    private static readonly long DurableBudget = DeviceClass.DurableFaceBudget;
 
     /// <summary>
-    /// How much of the budget drawing ahead and warming may fill. They never make room by letting a face go, so the rest
+    /// How much of each budget drawing ahead and warming may fill. They never make room by letting a face go, so the rest
     /// stays for the faces in view.
     /// </summary>
-    private const long AheadBudget = Budget * 85 / 100;
+    private static readonly long AheadBudget = Budget * 85 / 100;
+
+    private static readonly long DurableAheadBudget = DurableBudget * 85 / 100;
+
+    /// <summary>How recently a durable face was used for it to be held in view, and kept over the budget.</summary>
+    private static readonly TimeSpan InUse = TimeSpan.FromSeconds(2);
 
     private static long _used;
     private static long _durableUsed;
@@ -36,7 +48,7 @@ internal static class FaceCache
 
     public static long MomentBytes => _used;
 
-    private static readonly Dictionary<string, (SKPicture Face, string Slug, string Look, bool WantsArt, bool Stale, bool Durable, LinkedListNode<string> Node)> Kept = new(StringComparer.Ordinal);
+    private static readonly Dictionary<string, (SKPicture Face, string Slug, string Look, bool WantsArt, bool Stale, bool Durable, long Bytes, DateTime Used, LinkedListNode<string> Node)> Kept = new(StringComparer.Ordinal);
     private static readonly LinkedList<string> Recent = new();
 
     /// <summary>The key of the face last drawn for each look at whatever size, for standing in while the size changes.</summary>
@@ -59,6 +71,7 @@ internal static class FaceCache
 
         Recent.Remove(held.Node);
         Recent.AddLast(held.Node);
+        Kept[key] = held with { Used = DateTime.UtcNow };
         return held.Face;
     }
 
@@ -79,23 +92,26 @@ internal static class FaceCache
 
     /// <summary>Keeps a face drawn under a key; <paramref name="look"/> is the key less the size it was drawn at.</summary>
     /// <param name="wantsArt">Whether it was drawn with less art than it wanted, and should be let go when more comes.</param>
-    /// <param name="durable">Whether it is kept for good (<see cref="Faces.IsDurable"/>) rather than while there is room.</param>
-    public static void Put(string key, string look, string slug, SKPicture face, bool wantsArt, bool durable)
+    /// <param name="durable">Whether it is the card as it is (<see cref="Faces.IsDurable"/>), kept under its own budget.</param>
+    /// <param name="held">What the face holds beyond its recording: its raster and its art (<see cref="Faces.Held"/>).</param>
+    public static void Put(string key, string look, string slug, SKPicture face, bool wantsArt, bool durable, long held = 0)
     {
         if (Kept.TryGetValue(key, out var old))
         {
-            Drop(key, old.Look, old.Node, old.Face, old.Durable);
+            Drop(key, old.Look, old.Node, old.Face, old.Durable, old.Bytes);
         }
 
-        Kept[key] = (face, slug, look, wantsArt, false, durable, Recent.AddLast(key));
+        long bytes = face.ApproximateBytesUsed + held;
+        DateTime now = DateTime.UtcNow;
+        Kept[key] = (face, slug, look, wantsArt, false, durable, bytes, now, Recent.AddLast(key));
         Latest[look] = key;
         if (!durable)
         {
-            _used += Bytes(face);
+            _used += bytes;
         }
         else
         {
-            _durableUsed += Bytes(face);
+            _durableUsed += bytes;
         }
 
         // The least recently used face of the moment goes first; a durable one is passed over, and so is the one just kept.
@@ -104,31 +120,45 @@ internal static class FaceCache
         {
             LinkedListNode<string> at = next;
             next = at.Next;
-            var held = Kept[at.Value];
-            if (!held.Durable && at.Value != key)
+            var each = Kept[at.Value];
+            if (!each.Durable && at.Value != key)
             {
-                Drop(at.Value, held.Look, at, held.Face, durable: false);
+                Drop(at.Value, each.Look, at, each.Face, durable: false, each.Bytes);
+            }
+        }
+
+        // Then the least recently used durable face, until one used in the last moment is reached: that one and every face
+        // used since are in view, and are kept over the budget rather than drawn again on every frame.
+        next = Recent.First;
+        while (_durableUsed > DurableBudget && next is not null)
+        {
+            LinkedListNode<string> at = next;
+            next = at.Next;
+            var each = Kept[at.Value];
+            if (now - each.Used < InUse)
+            {
+                break;
+            }
+
+            if (each.Durable)
+            {
+                Drop(at.Value, each.Look, at, each.Face, durable: true, each.Bytes);
             }
         }
     }
 
-    /// <summary>
-    /// Whether another face would still leave the faces in view their share of the budget. A durable face is never let
-    /// go, and takes nothing from it.
-    /// </summary>
-    public static bool HasRoomFor(bool durable) => durable || _used <= AheadBudget;
+    /// <summary>Whether another face would still leave the faces in view their share of its budget.</summary>
+    public static bool HasRoomFor(bool durable) => durable ? _durableUsed <= DurableAheadBudget : _used <= AheadBudget;
 
-    private static long Bytes(SKPicture picture) => picture.ApproximateBytesUsed;
-
-    private static void Drop(string key, string look, LinkedListNode<string> node, SKPicture face, bool durable)
+    private static void Drop(string key, string look, LinkedListNode<string> node, SKPicture face, bool durable, long bytes)
     {
         if (!durable)
         {
-            _used -= Bytes(face);
+            _used -= bytes;
         }
         else
         {
-            _durableUsed -= Bytes(face);
+            _durableUsed -= bytes;
         }
 
         Kept.Remove(key);
@@ -161,7 +191,7 @@ internal static class FaceCache
     {
         foreach ((string key, var held) in Kept.ToList())
         {
-            Drop(key, held.Look, held.Node, held.Face, held.Durable);
+            Drop(key, held.Look, held.Node, held.Face, held.Durable, held.Bytes);
         }
     }
 }

@@ -306,6 +306,24 @@ mipmapped once by the GPU, and a two-colour blend is a shader on the second fram
 
 Only under Uno's software renderer - a browser with no WebGL - is a recording rasterized once, at twice its size, and
 kept as that image, since replaying every face's operations on the CPU each frame would cost more than the layout.
+A raster that cannot be had (no memory for the surface) leaves the face a recording, slower to show, rather than failing
+the frame.
+
+**Memory.** What is kept is bounded by the device (`DeviceClass.cs`). Decoded art (`CardArt`) is kept most recently
+used first up to a byte budget; durable faces - the card as it is - up to one of their own, and faces of the moment up to
+a third (`FaceCache`). A face is charged what it keeps alive: on the GPU the art it draws, which its recording holds
+however long `CardArt` keeps it; under the software renderer its raster. Art let go from `CardArt` stays in every face
+drawn with it, and is asked for again - of the browser's cache first - only when a face is drawn anew. Nothing used in
+the last two seconds is let go, so a screen whose cards outgrow a budget keeps them all rather than drawing them over
+and over.
+
+A device is **constrained** when its browser says it has 4 GB of memory or less (`navigator.deviceMemory`, which Chrome,
+Edge and the Android browsers give; a browser that says nothing is not constrained). It keeps 24 MB of art, 32 MB of
+durable faces and 16 MB of the moment, against 256, 384 and 32 elsewhere, and until the player chooses otherwise draws
+art at Medium (256 px) with Animate cards off; elsewhere the defaults are High and on. A setting the player has saved is
+kept on any device. An in-person tablet, which has no settings panel, follows the same defaults, its flights and slides
+included. `TabletMemoryTests` drafts forty grids of distinct cards on a tablet that says 2 GB and holds it to its
+budgets (unbounded, the same draft keeps 66 MB of faces).
 
 Measured in the Release build against the image-per-face drawing it replaced, on `mystical-tutor-hands-over-a-search-of-a-long-library`:
 a face takes 1.7 ms to make rather than 11.4, and the faces kept take 138 KB rather than 30 MB. Hovering over a

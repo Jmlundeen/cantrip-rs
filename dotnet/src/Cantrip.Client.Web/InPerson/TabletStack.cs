@@ -53,7 +53,7 @@ public sealed class TabletStack : Grid
 
         Board = new CardBoardElement(60, 84)
         {
-            Slides = true,
+            Slides = PlayerSettings.AnimateCards,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(Inset, 0, 0, 0),

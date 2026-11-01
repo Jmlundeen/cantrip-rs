@@ -23,10 +23,13 @@ public static class PlayerSettings
     /// <summary>Raised after any preference changes, for whatever draws from it.</summary>
     public static event Action? Changed;
 
-    /// <summary>Cards turn as they tap and grow as they are held up to read. On by default.</summary>
+    /// <summary>
+    /// Cards turn as they tap, grow as they are held up to read, and fly between zones. On by default, but off on a device
+    /// short of memory (<see cref="DeviceClass"/>), which is short of time to draw them too.
+    /// </summary>
     public static bool AnimateCards
     {
-        get => LocalSettings.Flag(Prefix + "animate", true);
+        get => LocalSettings.Flag(Prefix + "animate", !DeviceClass.Constrained);
         set => Set("animate", value);
     }
 
@@ -60,11 +63,15 @@ public static class PlayerSettings
     /// <summary>The art quality changed: every face drawn is drawn with art of the wrong size for it now.</summary>
     public static event Action? ArtQualityChanged;
 
-    /// <summary>How large illustrations are fetched. The sharpest by default.</summary>
+    /// <summary>
+    /// How large illustrations are fetched. The sharpest by default; Medium on a device short of memory
+    /// (<see cref="DeviceClass"/>), a quarter of the pixels.
+    /// </summary>
     public static ArtQuality ArtQuality
     {
         // Read once and kept: art sizes are worked out for every face drawn, and each read of storage crosses into the page.
-        get => _artQuality ??= Enum.TryParse(LocalSettings.Text(Prefix + "art-quality"), out ArtQuality saved) ? saved : ArtQuality.High;
+        get => _artQuality ??= Enum.TryParse(LocalSettings.Text(Prefix + "art-quality"), out ArtQuality saved) ? saved
+            : DeviceClass.Constrained ? ArtQuality.Medium : ArtQuality.High;
         set
         {
             _artQuality = value;
