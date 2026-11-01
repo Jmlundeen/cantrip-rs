@@ -443,6 +443,12 @@ pub const fn another_creature_permanents(count: Count) -> Selection {
     Selection::of(count, &[ANOTHER_CREATURE]).called("other creature")
 }
 
+/// `count` of "a creature you control" (CR 608.2d), chosen as an effect resolves from the creatures their controller has: the
+/// caller lists those permanents. Titan of Industry's shield counter and Humiliate's +1/+1 counter are put on one.
+pub const fn creature_permanents(count: Count) -> Selection {
+    Selection::of(count, &[CREATURE]).called("creature you control")
+}
+
 /// `count` artifact cards: Tinker's and Goblin Engineer's one (`ARTIFACT_CARD`), and Trinket Mage's one with
 /// `mana_value_at_most(1)`.
 pub const fn artifact_cards(count: Count) -> Selection {

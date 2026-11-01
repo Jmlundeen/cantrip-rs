@@ -27,8 +27,8 @@ Bot2.Hand.Ornithopter.Cast
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Humiliate.Cast(Bot2)
-! Bot1.Target(Bot2.Battlefield.Ornithopter)
-Bot1.Target(Mother of Runes)
+! Bot1.Choose(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Mother of Runes)
 
 [Expect]
 Stack.Count = 0
