@@ -1045,6 +1045,15 @@ fn creature_card_with_mana_value_3_or_less_in_your_graveyard_filter(q: &dyn Quer
 /// Call a Surprise Witness and Leonardo's Technique print it.
 pub const CREATURE_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD: TargetSpec = target(creature_card_with_mana_value_3_or_less_in_your_graveyard_filter);
 
+fn instant_or_sorcery_card_with_mana_value_3_or_less_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard_with_mana_value_at_most(q, asker, t, &[CardType::Instant, CardType::Sorcery], 3)
+}
+
+/// "Target instant or sorcery card with mana value 3 or less from your graveyard" (CR 115.1, 202.3). Chandra, Acolyte of Flame,
+/// Goblin Dark-Dwellers and Seifer Almasy print it.
+pub const INSTANT_OR_SORCERY_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD: TargetSpec =
+    target(instant_or_sorcery_card_with_mana_value_3_or_less_in_your_graveyard_filter);
+
 /// The card types of a permanent card (CR 110.4a): those that can exist on the battlefield.
 pub const PERMANENT_CARD_TYPES: [CardType; 6] =
     [CardType::Artifact, CardType::Battle, CardType::Creature, CardType::Enchantment, CardType::Land, CardType::Planeswalker];

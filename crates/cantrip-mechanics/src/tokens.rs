@@ -1137,6 +1137,15 @@ pub static FRACTAL: CardDef = CardDef {
     ..token!(Fractal)
 };
 
+/// The 1/1 red Elemental creature token. Seasoned Pyromancer and Chandra, Acolyte of Flame make it.
+pub static ELEMENTAL_1_1_RED: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Red)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    ..token!(Elemental)
+};
+
 /// The 3/3 blue and red Elemental creature token with flying. Campus Composer's Aqueous Aria and Muse's Encouragement make it.
 pub static ELEMENTAL_3_3_BLUE_RED: CardDef = CardDef {
     colors: Some(ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Red).0)),

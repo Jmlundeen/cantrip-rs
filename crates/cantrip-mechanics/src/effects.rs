@@ -1376,7 +1376,7 @@ pub fn gain_lifelink_until_end_of_turn(g: &mut dyn Game, source: ObjectId, targe
 
 /// "It gains haste" with no duration (CR 611.2a, 613.1f): a layer 6 keyword for as long as the object stays the object it is
 /// (a new one, CR 400.7, has none). Anzrag's Rampage, Sneak Attack, Through the Breach, Emperor of Bones, Goryo's Vengeance,
-/// Earthbend and unearth print it.
+/// Earthbend, unearth and Chandra, Acolyte of Flame print it.
 pub fn gain_haste(g: &mut dyn Game, source: ObjectId, object: ObjectId) {
     g.add_effect(source, object, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
 }
@@ -1720,13 +1720,24 @@ pub fn three_counters_and_becomes(g: &mut dyn Game, item: &StackItem, kind: Subt
 /// (CR 107.3b, the rulings). A cast that cannot be completed is given up (CR 733.1). Dreadhorde Arcanist and The Dawning
 /// Archaic print it.
 pub fn may_cast_first_target_free_exiling_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    may_cast_first_target_exiling_it(g, item, Some(ManaCost::ZERO))
+}
+
+/// "You may cast [the target card] from your graveyard. If that spell would be put into your graveyard, exile it instead":
+/// `may_cast_first_target_free_exiling_it` with its costs paid (CR 601.2f-h), its mana cost or an alternative cost it has, and an
+/// {X} chosen as it is cast (the rulings). Chandra, Acolyte of Flame's last ability prints it.
+pub fn may_cast_first_target_exiling_it_paying_costs(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    may_cast_first_target_exiling_it(g, item, None)
+}
+
+fn may_cast_first_target_exiling_it(g: &mut dyn Game, item: &StackItem, instead: Option<ManaCost>) -> Result<(), Suspend> {
     let Some(card) = crate::targets::object(g, item, 0) else { return Ok(()) };
     if !g.could_cast_during_resolution(card) || !ask_may(g, item.controller, item.object, Purpose::Cast)? {
         return Ok(());
     }
     let ways = g.cast_ways_during_resolution(card);
     let way = crate::choose::cast_way(g, item.controller, card, ways)?.map(|w| w.way);
-    g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), exile_instead: ExileInstead::Spell, way, ..CastTerms::default() })?;
+    g.cast_during_resolution_as(card, CastTerms { instead, exile_instead: ExileInstead::Spell, way, ..CastTerms::default() })?;
     Ok(())
 }
 
