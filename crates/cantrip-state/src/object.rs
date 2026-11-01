@@ -1347,7 +1347,7 @@ pub enum EffectKind {
     /// static abilities that do the same (`PlayRule::ExtraLandPlays`): the number of lands a player can play is the sum
     /// (CR 305.2), compared with the lands they have already played this turn, however they were played (CR 305.2a/b), so
     /// a land play made before the effect began still leaves the new one. It counts only lands played, never lands put onto
-    /// the battlefield (CR 305.4). Explore, Urban Evolution, Scale the Heights, Kiora, the Crashing Wave's âˆ’1, Way of the
+    /// the battlefield (CR 305.4). Explore, Urban Evolution, Scale the Heights, Kiora, the Crashing Wave's −1, Way of the
     /// Paradox; "up to two" (Journey of Discovery) is 2, "X additional lands" (Nahiri's Lithoforming) is X, so the count is
     /// 32-bit. About the player, so it outlives its `affected` object, which is only the source.
     ExtraLandPlays(u32),

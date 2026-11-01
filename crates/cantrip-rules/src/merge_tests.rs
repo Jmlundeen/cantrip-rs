@@ -156,13 +156,34 @@ static TUCK: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn a_card_to_a_graveyard(_: &dyn Query, _: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::ZoneChange(z) if z.is_card && z.to.is(ZoneKind::Graveyard))
+}
+
+fn exile_instead(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::ZoneChange(z) = proposal {
+        z.to = Zone::exile(z.to.player);
+    }
+}
+
+/// "If a card would be put into a graveyard from anywhere, exile it instead": a replacement effect for cards alone, which
+/// says nothing of tokens (CR 730.3e).
+static VOID: CardDef = CardDef {
+    name: "Mutate Test Void",
+    cost: mana("{2}{B}"),
+    types: TypeSet::of(&[CardType::Enchantment]),
+    replacements: &[replacement(ReplacementKind::ZoneChange, a_card_to_a_graveyard, exile_instead, "exiles a card instead")],
+    text: "If a card would be put into a graveyard from anywhere, exile it instead.",
+    ..CardDef::BLANK
+};
+
 fn cx(game: &mut Game) -> Cx<'_> {
     Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
 }
 
 /// Your main phase with priority and an empty stack, every answer round-tripped through the game-log tree (`Game::verify`).
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &SOLDIER, &BEAST, &ELK, &CAT, &WOLF_FRONT, &TUCK])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &SOLDIER, &BEAST, &ELK, &CAT, &WOLF_FRONT, &TUCK, &VOID])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -587,4 +608,52 @@ fn transforming_a_merged_permanent_turns_its_double_faced_component() {
     assert!(c.has(Keyword::Trample));
     let values = cantrip_api::Query::copiable_values(&g, pup);
     assert_eq!(values.faces(), None, "a copy of it is single-faced (CR 730.2i)");
+}
+
+/// CR 730.3e: a replacement effect for a card put into a zone, saying nothing of tokens, applies to every component of a
+/// merged permanent that isn't a token, its token components included: the Beast on top of the Cat token dies, and both
+/// are exiled instead - none of them reaches the graveyard, and the Beast card is in exile.
+#[test]
+fn a_card_only_replacement_moves_every_component_of_a_nontoken_merged_permanent() {
+    let mut g = game();
+    put(&mut g, &VOID, THEM, Zone::BATTLEFIELD);
+    let cat_card = g.cards.id_of(&CAT);
+    let cat = cantrip_api::Game::create_tokens(&mut cx(&mut g), cat_card, YOU, 1, false).expect("nothing is asked")[0];
+    let beast = put(&mut g, &BEAST, YOU, Zone::hand(YOU));
+    add(&mut g, Mana::G, 2);
+    cast_mutating(&mut g, beast, cat);
+    resolve_all(&mut g, true);
+    assert!(!g.state.obj(cat).token, "its topmost component is a card");
+    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]);
+    assert_eq!(gone.len(), 2, "both components moved");
+    assert!(gone.iter().all(|&c| g.state.obj(c).zone.is(ZoneKind::Exile)), "the token component is exiled with the card");
+    settle(&mut g);
+    assert!(g.state.zone(Zone::graveyard(YOU)).is_empty(), "nothing was put into the graveyard");
+    let exiled: Vec<&str> = g.state.zone(Zone::exile(YOU)).iter().map(|&c| g.chars(c).name).collect();
+    assert_eq!(exiled, vec!["Mutate Test Beast"], "the Beast card is in exile; the Cat token ceased to exist there (CR 704.5d)");
+}
+
+/// CR 730.3e: a merged permanent that is a token, a card among its components, is put where it goes with its token
+/// components, and its card components are moved by the replacement effect for cards alone: the Cat token over the Beast
+/// dies, the token goes to the graveyard, and the Beast card is exiled instead.
+#[test]
+fn a_card_only_replacement_moves_only_the_card_components_of_a_token_merged_permanent() {
+    let mut g = game();
+    put(&mut g, &VOID, THEM, Zone::BATTLEFIELD);
+    let cat_card = g.cards.id_of(&CAT);
+    let cat = cantrip_api::Game::create_tokens(&mut cx(&mut g), cat_card, YOU, 1, false).expect("nothing is asked")[0];
+    let beast = put(&mut g, &BEAST, YOU, Zone::hand(YOU));
+    add(&mut g, Mana::G, 2);
+    cast_mutating(&mut g, beast, cat);
+    resolve_all(&mut g, false);
+    assert!(g.state.obj(cat).token, "its topmost component is a token");
+    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]);
+    assert_eq!(gone.len(), 2, "both components moved");
+    let token = gone.iter().copied().find(|&c| g.state.obj(c).token).expect("the token component");
+    let card = gone.iter().copied().find(|&c| !g.state.obj(c).token).expect("the card component");
+    assert!(g.state.obj(token).zone.is(ZoneKind::Graveyard), "the token is put into the graveyard: the permanent died");
+    assert!(g.state.obj(card).zone.is(ZoneKind::Exile), "the card is exiled instead");
+    assert_eq!(g.chars(card).name, "Mutate Test Beast");
+    let died = g.history().all().iter().filter(|r| matches!(r.event, Event::ZoneChange { from, to, .. } if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard))).count();
+    assert_eq!(died, 1, "one permanent died");
 }
