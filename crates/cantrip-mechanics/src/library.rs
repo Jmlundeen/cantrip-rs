@@ -884,6 +884,14 @@ pub fn exile_top_play_this_turn(g: &mut dyn Game, player: PlayerId, count: usize
     exile_top_may_play(g, player, count, player, grant)
 }
 
+/// "Exile the top card of your library. You may play it this turn" as a resolving ability's whole effect:
+/// `exile_top_play_this_turn` for the ability's controller, one card. An empty library exiles nothing. Laelia, the Blade Reforged,
+/// Emberheart Challenger, Experimental Synthesizer, Gwen Stacy's Ghost-Spider, Kirk, Commanding Officer and Chandra, Pyromaster print it.
+pub fn exile_top_card_play_this_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    exile_top_play_this_turn(g, item.controller, 1);
+    Ok(())
+}
+
 /// "Mill a card. You may play that card this turn" as a resolving ability's whole effect (CR 701.17, 601.3, 305.1): the card the
 /// mill put into the graveyard is the object that may be played, a land under the ordinary land-play rules, until the cleanup
 /// step (CR 514.2); with an empty library nothing is milled and nothing is granted. Tablet of Discovery and Ark of Hunger print it.

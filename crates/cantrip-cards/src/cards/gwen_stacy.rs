@@ -28,12 +28,6 @@ fn put_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Exile the top card of your library. You may play that card this turn."
-fn exile_top_play_this_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    library::exile_top_play_this_turn(g, item.controller, 1);
-    Ok(())
-}
-
 pub static BACK: CardDef = CardDef {
     abilities: &[
         triggered(
@@ -43,7 +37,7 @@ pub static BACK: CardDef = CardDef {
         ),
         ability(
             remove_counters_among(2, cantrip_mechanics::targets::filters::this_permanent),
-            exile_top_play_this_turn,
+            library::exile_top_card_play_this_turn,
             "Remove two counters from Ghost-Spider: Exile the top card of your library. You may play that card this turn.",
         ),
     ],

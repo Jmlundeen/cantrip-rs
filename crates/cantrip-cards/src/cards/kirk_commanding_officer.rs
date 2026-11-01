@@ -10,19 +10,11 @@ fn eight_power(q: &dyn Query, asker: &Asker) -> bool {
     creatures_have_total_power_at_least(q, asker.controller, 8)
 }
 
-/// "Exile the top card of your library. You may play that card this turn": it is exiled as the trigger resolves, whether
-/// or not its controller plays it, and stays playable - cast, or played as a land - until the cleanup step of this turn
-/// ends (CR 601.3, 305.1, 514.2). With an empty library nothing is exiled.
-fn exile_top_and_allow_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    library::exile_top_play_this_turn(g, item.controller, 1);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
             triggers::YOU_ATTACK,
-            exile_top_and_allow_play,
+            library::exile_top_card_play_this_turn,
             "Whenever you attack while creatures you control have total power 8 or greater, exile the top card of your library. You may play that card this turn.",
         )
         .only_if(eight_power),
