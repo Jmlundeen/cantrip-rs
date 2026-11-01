@@ -1,0 +1,51 @@
+# Sokka's Haiku counters a noncreature spell (Black Lotus), then draws, then mills three, then untaps Bot1's own tapped
+# Island, in that order (CR 608.2c). Bot1's library holds exactly two cards: draw first leaves one card to mill, so the
+# milling is cut short at one card and nobody has lost; milled first and then drawn, the empty library would be drawn from
+# and Bot1 would lose. The spell is Bot2's Black Lotus, so it is never on the battlefield. "Target spell" refuses the
+# Haiku itself (CR 115.5) and a permanent (the Island, which the land target then takes).
+
+[Bot1 Deck]
+Sokka's Haiku
+Black Lotus
+Mox Sapphire
+Mox Jet
+Island
+Island
+Island
+Plains
+Swamp
+
+[Bot2 Deck]
+Black Lotus
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {U}{U}{U}{U}{B}
+Bot1.Hand.Sokka's Haiku.Cast
+! Bot1.Target(Stack.Sokka's Haiku)
+! Bot1.Target(Bot1.Battlefield.Island)
+Bot1.Target(Stack.Black Lotus)
+Bot1.Target(Bot1.Battlefield.Island)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Black Lotus
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard.Count = 3
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 0
+Bot1.Battlefield.Island.Tapped = False

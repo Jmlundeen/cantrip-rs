@@ -1,0 +1,50 @@
+# Sokka's Haiku counters a creature spell (Elite Vanguard) and untaps the opponent's land: "target land" is any land, not
+# only your own, and a nonland permanent (Mox Pearl) is refused as that target. With a full library it mills exactly three
+# cards (CR 701.17), after drawing one.
+
+[Bot1 Deck]
+Sokka's Haiku
+Black Lotus
+Mox Sapphire
+Mox Jet
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Elite Vanguard
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Elite Vanguard.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sokka's Haiku.Cast
+Bot1.Target(Stack.Elite Vanguard)
+! Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Elite Vanguard
+Bot2.Battlefield.Island.Tapped = False
+Bot2.Battlefield.Mox Pearl.Tapped = True
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 8
+Bot1.Graveyard.Count = 5

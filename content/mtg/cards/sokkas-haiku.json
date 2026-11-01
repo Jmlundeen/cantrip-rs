@@ -1,0 +1,6 @@
+{
+  "name": "Sokka's Haiku",
+  "manaCost": "{3}{U}{U}",
+  "type": "Instant — Lesson",
+  "oracleText": "Counter target spell.\nDraw a card, then mill three cards.\nUntap target land."
+}
