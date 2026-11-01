@@ -5,13 +5,6 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("RemoveACounter", "remove a counter from her?", "When you do, destroy target artifact or enchantment that player controls", "Remove a counter", "Keep it");
 
-/// "Leatherhead enters with a hexproof counter on her" (CR 122.1b, 614.1c): a keyword counter that grants hexproof for as
-/// long as it is there.
-fn enters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::Hexproof as usize] += 1;
-    Ok(())
-}
-
 /// "A counter" names no kind (CR 118.3), so the choice is made for her controller in their favour: drawbacks first, then
 /// counters with no rules meaning, then the ones whose loss costs something, indestructible last of all.
 const SHED_ORDER: [CounterKind; 13] = [
@@ -75,7 +68,8 @@ fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(enters),
+    // "Leatherhead enters with a hexproof counter on her" (CR 122.1b, 614.1c).
+    enters: Some(cantrip_mechanics::effects::enters_with_a_counter::<{ CounterKind::Hexproof as usize }>),
     abilities: &[triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, remove_counter, "Whenever Leatherhead deals combat damage to a player, you may remove a counter from her. When you do, destroy target artifact or enchantment that player controls.")],
     delayed: &[delayed_trigger(destroy, "When you do, destroy target artifact or enchantment that player controls.")
         .targets(&[target(artifact_or_enchantment_of_the_attacked_player)])],

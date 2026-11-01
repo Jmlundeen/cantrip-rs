@@ -24,7 +24,7 @@ fn other_heroes_while_shielded(q: &dyn LayerQuery, source: ObjectId, affected: O
 /// hexproof" is a player keyword ability of the permanent, and "other Heroes you control have hexproof" a layer-6 static
 /// ability.
 pub static CARD: CardDef = CardDef {
-    enters: Some(effects::enters_with_a_shield_counter),
+    enters: Some(effects::enters_with_a_counter::<{ CounterKind::Shield as usize }>),
     player_keywords: &[PlayerKeywordRule { keyword: Keyword::Hexproof, applies: you_while_shielded }],
     statics: &[static_ability(
         Layer::Ability,

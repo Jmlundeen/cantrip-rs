@@ -19,10 +19,11 @@ pub fn enters_with_x_counters(_: &mut dyn Game, entering: &mut Entering) -> Resu
     Ok(())
 }
 
-/// "This creature enters with a shield counter on it" (CR 614.1c, 122.1c). Captain America, Super-Soldier, Dapper Shieldmate,
-/// Disciplined Duelist, Rhox Pummeler, Swooping Protector, Voice of the Vermin and Wingshield Agent print it.
-pub fn enters_with_a_shield_counter(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::Shield as usize] += 1;
+/// "This creature enters with a [kind] counter on it" (CR 614.1c, 122.1): `KIND` is `CounterKind::X as usize`. A shield counter
+/// (Captain America, Super-Soldier) or a keyword counter (CR 122.1b: Leatherhead, Swamp Stalker's hexproof, Biting-Palm Ninja's
+/// menace) are printed this way.
+pub fn enters_with_a_counter<const KIND: usize>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.counters[KIND] += 1;
     Ok(())
 }
 

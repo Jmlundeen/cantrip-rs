@@ -1102,7 +1102,7 @@ no regeneration (it is not tapped and its damage stays). Damage to it is prevent
 615.12), and a counter is removed either way. Damage dealt at once by several sources is one damage event (CR 120.4), so the counter
 applies to it once: `ops::DamageBatch::shielded` carries `DamageEvent::shielded` from one assignment to the next, and a second
 assignment to the same permanent is prevented without a second counter removed. A permanent that loses its abilities keeps it (the
-rulings), because it is a counter's, not an ability's. A card that enters with one is `effects::enters_with_a_shield_counter`.
+rulings), because it is a counter's, not an ability's. A card that enters with one is `effects::enters_with_a_counter::<{ CounterKind::Shield as usize }>`.
 
 ### Damage redirected, and damage that stays
 
