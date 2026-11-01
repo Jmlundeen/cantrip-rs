@@ -1,0 +1,58 @@
+# Chandra, Acolyte of Flame: "0: Put a loyalty counter on each red planeswalker you control." Bot1 controls Chandra (red),
+# Wrenn and Six (red and green: red, though not only red) and Narset, Parter of Veils (blue); Bot2 controls its own Wrenn and
+# Six. Chandra's 0 gives one counter to herself and to Bot1's Wrenn and Six only: not to the blue Narset, not to the opponent's
+# red Wrenn and Six (CR 306.5c, 122.1e, 105.2).
+# Chandra and Wrenn and Six come down on turn 1 off a Black Lotus, a Forest and a Mox Ruby; Narset on turn 3.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Chandra, Acolyte of Flame
+Wrenn and Six
+Narset, Parter of Veils
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Wrenn and Six
+Swamp x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Acolyte of Flame.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Wrenn and Six.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Narset, Parter of Veils.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Acolyte of Flame.Activate(Ability: loyalty counter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Chandra, Acolyte of Flame.Counters.Loyalty = 5
+Bot1.Battlefield.Wrenn and Six.Counters.Loyalty = 4
+Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 5
+Bot2.Battlefield.Wrenn and Six.Counters.Loyalty = 3

@@ -1,0 +1,51 @@
+# Chandra, Acolyte of Flame, the rulings: "If a card in your graveyard has {X} in its mana cost, X is considered to be 0 while you
+# target it with Chandra's last ability; however, once you begin to cast it, you choose a value for X. If this causes the mana
+# value to become greater than 3, you can still cast the spell." Fireball ({X}{R}) in the graveyard is mana value 1, so it may be
+# targeted; it is cast with X = 3 (mana value 4), {3}{R} paid in full, deals Bot2 3 and is exiled instead (CR 107.3, 601.2b).
+# Turn 1: Fireball is cast for X = 0 off the Mox Ruby, Chandra off the Black Lotus; turn 3 the -2.
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Fireball
+Chandra, Acolyte of Flame
+Mox Pearl
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fireball.Cast(X: 0)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Acolyte of Flame.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Acolyte of Flame.Activate(Bot1.Graveyard.Fireball; Ability: instant or sorcery)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept(X: 3)
+Bot1.Target(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Exile = Fireball
+Bot1.Mana =

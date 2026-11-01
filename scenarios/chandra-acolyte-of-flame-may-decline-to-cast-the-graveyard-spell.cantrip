@@ -1,0 +1,36 @@
+# Chandra, Acolyte of Flame: the -2 is "you may cast": declining leaves the targeted Lightning Bolt in the graveyard (not
+# exiled), the loyalty cost paid anyway (4 - 2 = 2) and Bot2 untouched by a second Bolt (20 - 3 from the first only).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Chandra, Acolyte of Flame
+Mountain x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Acolyte of Flame.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Acolyte of Flame.Activate(Bot1.Graveyard.Lightning Bolt; Ability: instant or sorcery)
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Chandra, Acolyte of Flame.Counters.Loyalty = 2
+Bot1.Graveyard = Black Lotus; Lightning Bolt
+Exile.Count = 0

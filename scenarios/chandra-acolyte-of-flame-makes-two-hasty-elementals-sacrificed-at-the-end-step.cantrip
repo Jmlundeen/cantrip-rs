@@ -1,0 +1,39 @@
+# Chandra, Acolyte of Flame: "0: Create two 1/1 red Elemental creature tokens. They gain haste. Sacrifice them at the beginning
+# of the next end step." Turn 1 Bot1 casts Chandra off a Black Lotus and makes the tokens; with haste both attack at once and
+# deal 2 (20 -> 18), they are still there in the second main phase, and are gone at the end step (CR 603.7c).
+
+[Bot1 Deck]
+Black Lotus
+Chandra, Acolyte of Flame
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Acolyte of Flame.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Acolyte of Flame.Activate(Ability: Elemental)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Attackers]
+Bot1.Attack(Elemental Token#1 > Bot2; Elemental Token#2 > Bot2)
+[T1 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Battlefield.Count = 4
+[T2 Bot2.Upkeep]
+? Bot1.Battlefield.Count = 2
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot2.Life = 18
+Bot1.Battlefield.Chandra, Acolyte of Flame.Counters.Loyalty = 4

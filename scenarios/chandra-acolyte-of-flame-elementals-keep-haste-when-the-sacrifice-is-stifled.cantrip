@@ -1,0 +1,36 @@
+# Chandra, Acolyte of Flame: "They gain haste" has no duration (CR 611.2a). Bot2 Stifles the delayed sacrifice at the end step of turn 3; on turn 5 the Elementals are still there, still with haste.
+
+[Bot1 Deck]
+Black Lotus
+Chandra, Acolyte of Flame
+Mountain x15
+
+[Bot2 Deck]
+Island
+Stifle
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Acolyte of Flame.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Acolyte of Flame.Activate(Ability: Elemental)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Elemental Token#1.Keywords = Haste
+[T3 Bot1.End]
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Stifle.Cast(Stack.Chandra, Acolyte of Flame)
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Delayed.Count = 0
+Bot1.Battlefield.Elemental Token#1.Keywords = Haste
+Bot1.Battlefield.Elemental Token#2.Keywords = Haste
+Bot2.Graveyard.Stifle.Colors = Blue

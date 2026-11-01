@@ -1,0 +1,74 @@
+# Chandra, Acolyte of Flame: "-2: You may cast target instant or sorcery card with mana value 3 or less from your graveyard. If
+# that spell would be put into your graveyard, exile it instead." Bot1's graveyard holds Fiery Temper (mana value 3, exactly the
+# limit) and Hidetsugu's Second Rite (4, just past it); Bot2's holds a Lightning Bolt (qualifies, but is not Bot1's). Only the
+# Temper may be targeted. Bot1 pays its {1}{R}{R} (the ability does not make it free), it hits Bot2 for 3 from the graveyard and
+# is exiled instead of returning there, while the Rite and Bot2's Bolt stay where they are. The three mana tapped for it are
+# spent: none is left floating, as it would be if the cast were free.
+# (Chandra is drawn on turn 3, the Mountain on turn 5.)
+# Turn 1: Lotus pays for Temper, the Mountain and the Moxen for the Rite. Turn 3 Chandra; turn 5 the -2 (4 - 2 = 2).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Ruby
+Mox Jet
+Fiery Temper
+Hidetsugu's Second Rite
+Chandra, Acolyte of Flame
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fiery Temper.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hidetsugu's Second Rite.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Chandra, Acolyte of Flame.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Battlefield.Chandra, Acolyte of Flame.Activate(Bot1.Graveyard.Hidetsugu's Second Rite; Ability: instant or sorcery)
+! Bot1.Battlefield.Chandra, Acolyte of Flame.Activate(Bot2.Graveyard.Lightning Bolt; Ability: instant or sorcery)
+Bot1.Battlefield.Chandra, Acolyte of Flame.Activate(Bot1.Graveyard.Fiery Temper; Ability: instant or sorcery)
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Chandra, Acolyte of Flame.Counters.Loyalty = 2
+Exile = Fiery Temper
+Bot1.Mana =
+Bot1.Graveyard = Hidetsugu's Second Rite; Black Lotus
+Bot2.Graveyard = Lightning Bolt
