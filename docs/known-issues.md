@@ -55,6 +55,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-116](#ki-116-a-resolutions-unless-pays-question-shows-only-the-mana-and-life-parts-of-its-cost) | A resolution's "unless pays" question shows only the mana and life parts of its cost | Pri-2 | Open |
 | [KI-148](#ki-148-a-waiting-when-event-delayed-trigger-is-shown-beside-its-controllers-life-not-on-the-object-it-watches) | A waiting "when [event]" delayed trigger is shown beside its controller's life, not on the object it watches | Pri-2 | Open |
 | [KI-149](#ki-149-no-test-reads-a-noncreature-permanents-printed-power-and-toughness-off-the-wire) | No test reads a noncreature permanent's printed power and toughness off the wire | Pri-2 | Open |
+| [KI-151](#ki-151-an-ability-on-the-stack-is-shown-with-its-printed-text-not-the-words-it-kept) | An ability on the stack is shown with its printed text, not the words it kept | Pri-2 | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Pri-3 | Fix queued |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Pri-3 | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Pri-3 | Open |
@@ -88,6 +89,20 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-147](#ki-147-two-tablet-browser-tests-wait-forever-for-unos-splash-to-go) | Two tablet browser tests wait forever for Uno's splash to go | Pri-3 | Open |
 
 ## Issues
+
+### KI-151: An ability on the stack is shown with its printed text, not the words it kept
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host (`crates/cantrip-host/src/view.rs`, `describe_ability`) | 2026-11-01, review of "an ability on the stack keeps its text" |
+
+**Notes.** An activated or triggered ability keeps its source's words as it was put on the stack (`StackItem::words`,
+CR 113.7a, 612.1), and resolves by them. The host's stack view describes the ability by its printed text, with no text
+change at all: an ability whose source's "Hero" was changed to "Elf" before it triggered still reads "Hero" on the
+stack. Rules are unaffected; a fix renders the ability's text through `changed_text(text, name, item.words)`.
+
+**Scenarios.**
+- none (display only); `avengers-assemble-end-step-trigger-keeps-hero-...` shows the state.
 
 ### KI-150: Text changes are interned for at most 4,294,967,295 distinct lists in a process
 
