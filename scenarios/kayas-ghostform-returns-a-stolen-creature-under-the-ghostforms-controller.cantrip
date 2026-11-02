@@ -1,0 +1,40 @@
+# "Return that card to the battlefield under YOUR control" (CR 303.4, 603.6c): Bot1 steals Bot2's Ornithopter with Act of
+# Treason, enchants it with Kaya's Ghostform (legal: Bot1 controls it) and Shocks it. It dies into its owner's (Bot2's)
+# graveyard, and comes back under Bot1's control, the Ghostform's controller, not under its owner's.
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Act of Treason
+Kaya's Ghostform
+Shock
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaya's Ghostform.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield =
+Bot2.Graveyard =
+Bot1.Graveyard = Kaya's Ghostform; Shock; Act of Treason; Black Lotus
