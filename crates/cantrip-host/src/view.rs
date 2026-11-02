@@ -443,6 +443,15 @@ impl<'a> Projector<'a> {
         visible.extend(extra.iter().copied().filter(|&id| {
             !is_ability_key(id) && id.index() < s.objects.len() && s.obj(id).zone.is(ZoneKind::Gone) && s.obj(id).became.is_none()
         }));
+        // An object a question names that has since become another (CR 400.7), shown as it last existed: "a source of your
+        // choice" may be a permanent that died while a delayed ability naming it waits (CR 609.7a). It is in no zone, so the
+        // board draws nothing of it; its view is there for the question's own list (`ZoneKindView::Gone`).
+        if let Some(request) = game.pending().filter(|r| s.sees_as(self.viewer, r.player)) {
+            let named = cantrip_engine::visibility::request_objects(&request);
+            visible.extend(extra.iter().copied().filter(|&id| {
+                !is_ability_key(id) && id.index() < s.objects.len() && s.obj(id).became.is_some() && named.contains(&id)
+            }));
+        }
         // Before anything is minted: whatever this viewer can no longer see loses its handle, so if it ever comes back
         // it comes back unrecognisable.
         handles.retain(|o| visible.contains(&o) || mentioned.contains(&o));
@@ -478,7 +487,7 @@ impl<'a> Projector<'a> {
         ordered.sort();
         let entries = stack_entries(s);
         for id in ordered {
-            let handle = handles.handle(id);
+            let handle = crate::prompt::offered_handle(game, handles, id);
             if is_ability_key(id) {
                 if let Some(StackEntry::Ability { item }) = entries.iter().find(|e| e.key() == id) {
                     let described = self.describe_ability(item, handle, handles);
@@ -1221,7 +1230,8 @@ impl<'a> Projector<'a> {
         let printed_pt = printed_box(on_battlefield && !obj.face_down && !c.is(CardType::Creature), def);
         let mut view = ObjectView {
             handle,
-            zone: Some(zone_kind_view(zone.kind())),
+            // An object that has become another is a former one (CR 400.7), whatever zone it is recorded in.
+            zone: Some(if obj.became.is_some() { ZoneKindView::Gone } else { zone_kind_view(zone.kind()) }),
             zone_owner: zone_owner(zone),
             kind: if obj.card_copy {
                 ObjectKindView::CardCopy

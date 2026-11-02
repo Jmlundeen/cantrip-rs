@@ -281,3 +281,10 @@ game the table hosts and is sent every command the table is sent. It speaks this
 The cards a host knows are the ones the native engine has ported (`docs/adding-cards.md`); a deck naming any other
 is refused at the deal. The decks under `decks/demo` and `decks/spike` are kept to ported cards, and
 `NativeHostGameTests` deals them through the real binary.
+
+**An object offered as it was.** "A source of your choice" (CR 609.7a) may be an object that has since become another by
+changing zones (CR 400.7): a permanent that died while a delayed ability naming it waits. A `ChooseCards` that offers one
+gives it a handle of its own - not the handle it passed to what it became (`HandleSpace::rebind`), which would answer a
+different object - and the view holds it as an `ObjectView` with `Zone` `Gone` (in no zone's `Contents`, so no board or
+pile draws it) for as long as the question is outstanding; the client lists it in the choice window with the other
+sources. Version 224.

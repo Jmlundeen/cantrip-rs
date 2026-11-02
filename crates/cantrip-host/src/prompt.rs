@@ -738,6 +738,13 @@ fn handles_of(handles: &mut HandleSpace, ids: &[ObjectId]) -> Vec<ViewHandle> {
     ids.iter().map(|&id| handles.handle(id)).collect()
 }
 
+/// The handle of an object a choice offers: the object as it was where it has become another (CR 400.7), so that the one
+/// offered is the one answered ("a source of your choice" may be a permanent that has since died, CR 609.7a). Any other
+/// object has the handle it has always had.
+pub fn offered_handle(game: &Game, handles: &mut HandleSpace, id: ObjectId) -> ViewHandle {
+    if id.index() < game.state.objects.len() && game.state.obj(id).became.is_some() { handles.former(id) } else { handles.handle(id) }
+}
+
 /// Blocks, (blocker, attacker), as the wire names them.
 fn blocks(handles: &mut HandleSpace, pairs: &[(ObjectId, ObjectId)]) -> Vec<BlockMessage> {
     pairs.iter().map(|&(blocker, attacker)| BlockMessage { blocker: handles.handle(blocker), attacker: handles.handle(attacker) }).collect()
@@ -928,7 +935,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 owner: seat(owner),
                 source: source_handle(game, handles, *source),
                 purpose: purpose_view(*purpose, opening),
-                cards: handles_of(handles, cards),
+                cards: cards.iter().map(|&id| offered_handle(game, handles, id)).collect(),
                 count: count_shown(rule.count, &verdict),
                 count_kind: count_kind_view(rule.count),
                 words: rule.words(&|id| game.cards.get(CardId(id as u16)).name.to_string()),
@@ -1474,7 +1481,7 @@ pub(crate) fn pile_selection(kind: &RequestKind) -> bool {
 /// the host's `Check` answers it for any other selection.
 pub fn verdict_of(game: &Game, request: &Request, selected: &[ObjectId], handles: &mut HandleSpace) -> Option<SelectionVerdictView> {
     let (cards, verdict) = selection_verdict(game, request, selected)?;
-    Some(SelectionVerdictView { complete: verdict.complete, addable: verdict.addable.ones().map(|i| handles.handle(cards[i])).collect(), complete_alone: Vec::new() })
+    Some(SelectionVerdictView { complete: verdict.complete, addable: verdict.addable.ones().map(|i| offered_handle(game, handles, cards[i])).collect(), complete_alone: Vec::new() })
 }
 
 /// The prompt's first verdict (`verdict_of` of none chosen), and for a question that takes one card at most, which of the
@@ -1487,7 +1494,7 @@ fn verdict_view(game: &Game, request: &Request, handles: &mut HandleSpace) -> Se
             let (cards, first) = selection_verdict(game, request, &[]).expect("a rule's question");
             for i in first.addable.ones() {
                 if selection_verdict(game, request, &[cards[i]]).is_some_and(|(_, v)| v.complete) {
-                    view.complete_alone.push(handles.handle(cards[i]));
+                    view.complete_alone.push(offered_handle(game, handles, cards[i]));
                 }
             }
         }

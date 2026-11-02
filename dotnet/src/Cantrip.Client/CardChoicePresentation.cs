@@ -277,6 +277,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         if (origins.Count == 0) return cards.Count == 0 ? "No cards" : "Cards";
         if (origins.Count > 1) return "Cards from multiple zones";
         PromptOriginView origin = origins[0];
+        if (origin.Zone == ZoneKindView.Gone) return "Objects that have left their zones";
         string name = origin.Owner == client.Seat ? "Your" : origin.Owner == 0 ? "The"
             : $"{client.View?.Players.FirstOrDefault(player => player.Seat == origin.Owner)?.Name ?? $"seat {origin.Owner}"}'s";
         string zone = origin.Zone switch

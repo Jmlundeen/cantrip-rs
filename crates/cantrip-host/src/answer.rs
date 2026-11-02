@@ -278,7 +278,7 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
         Answer::Cards(ids) if crate::prompt::pile_selection(&request.kind) => AnswerPayload::TargetsChosenAnswer(TargetsChosenAnswer {
             targets: ids.iter().map(|&id| wire_target(handles, Target::Object(id))).collect(),
         }),
-        Answer::Cards(ids) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer { cards: ids.iter().map(|&id| handles.handle(id)).collect() }),
+        Answer::Cards(ids) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer { cards: ids.iter().map(|&id| crate::prompt::offered_handle(game, handles, id)).collect() }),
         Answer::Act(action) => {
             let source = action.source.map_or(ViewHandle::NONE, |s| handles.handle(s));
             let mut a = TakeActionAnswer::new(crate::prompt::action_kind_view(action.kind), source);

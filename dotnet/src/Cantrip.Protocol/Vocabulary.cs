@@ -50,6 +50,12 @@ public enum ZoneKindView
     /// there until its owner takes it (CR 116.2g), and a revealed companion is shown to everyone.
     /// </summary>
     Sideboard = 7,
+
+    /// <summary>
+    /// An object that has become another by changing zones (CR 400.7), shown as it last existed where a question names it
+    /// ("a source of your choice", CR 609.7a). In no zone: no board or pile holds it, only that question's list.
+    /// </summary>
+    Gone = 8,
 }
 
 /// <summary>Card types (CR 205.2a).</summary>

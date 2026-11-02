@@ -64,6 +64,9 @@ pub enum ZoneKindView {
     Exile,
     Command,
     Sideboard,
+    /// An object that has become another by changing zones (CR 400.7), shown as it last existed where a question names it
+    /// ("a source of your choice", CR 609.7a): in no zone, so no board or pile holds it.
+    Gone,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]

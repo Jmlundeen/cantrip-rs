@@ -1604,8 +1604,11 @@ impl<'s> Run<'s> {
                 return fail(format!("line {}: not a choice of cards", step.line));
             };
             let addable: Vec<ObjectId> = verdict.addable.ones().map(|i| cards[i]).collect();
-            match self.objects(step, spec, &addable)?.first() {
-                Some(&id) => chosen.push(id),
+            // An object that has changed zones since (CR 400.7) may still be chosen as what it was, as "a source of your choice"
+            // may be (CR 609.7a: a Dragonhawk exiled while its waiting ability names it): named when no live object is.
+            let gone = || addable.iter().copied().find(|&id| !live(&self.game.state, id) && self.game.known_name(id).eq_ignore_ascii_case(spec.trim()));
+            match self.objects(step, spec, &addable)?.first().copied().or_else(gone) {
+                Some(id) => chosen.push(id),
                 None => return fail(format!("line {}: {spec} is not among the cards that may be chosen", step.line)),
             }
         }
