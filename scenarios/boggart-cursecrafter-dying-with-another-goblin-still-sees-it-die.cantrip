@@ -1,0 +1,59 @@
+# Boggart Cursecrafter: dying at the same time as another Goblin you control, its ability still triggers for that Goblin (the
+# 2025-11-17 ruling; a leaves-the-battlefield ability looks back, CR 603.10a). Bot1 has the Cursecrafter and a Feisty Spikeling
+# (a changeling, so a Goblin, CR 702.73a); Bot2's Wrath of God destroys both at once, and the Cursecrafter deals 1 to Bot2 for the
+# Spikeling, none for itself ("another").
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Boggart Cursecrafter
+Feisty Spikeling
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Wrath of God
+Plains
+Plains
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boggart Cursecrafter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Feisty Spikeling.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Feisty Spikeling; Boggart Cursecrafter
+? Stack = Boggart Cursecrafter
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Feisty Spikeling; Boggart Cursecrafter
