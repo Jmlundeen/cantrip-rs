@@ -124,7 +124,7 @@ public sealed partial class MainPage
         {
             _restoring = false;
             _resuming = null;
-            Say(refusal.Detail.Length > 0 ? refusal.Detail : "Could not reconnect to your seat.");
+            Say(refusal.Code == ErrorCode.ProtocolMismatch ? Refusal(refusal) : refusal.Detail.Length > 0 ? refusal.Detail : "Could not reconnect to your seat.");
         }
         else if (!client.IsConnected)
         {
@@ -132,6 +132,14 @@ public sealed partial class MainPage
             Say("Could not reconnect to your seat.");
         }
     }
+
+    /// <summary>
+    /// What a refusal says to the player: the server's words, except for a page older than the server's build, which has
+    /// already loaded again once (<see cref="TableMove.ReloadForNewBuild"/>) and still has the old one.
+    /// </summary>
+    private static string Refusal(ErrorMessage refusal) => refusal.Code == ErrorCode.ProtocolMismatch
+        ? "This page is an older version than the table's. Close it, then open the table's link or scan its code again."
+        : refusal.Detail;
 
     private async Task ReconnectAsync(MembershipMessage seat)
     {

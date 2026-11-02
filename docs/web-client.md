@@ -32,6 +32,11 @@ A seat ticket from a host such as the Discord bot comes after the hash, `#ticket
 ever holds it, or in the query as `?ticket=...`. It is a bearer credential, so `Ticket.js` takes it out of the address
 bar as the page loads, and a reload resumes from the membership it bought.
 
+A page older than the server's build - a tab the browser brought back without loading it, a home-screen app left
+running - is refused its seat ("Expected protocol"). It loads again once for the server's build, its ticket put back
+after the hash when it came with one (`TableMove.ReloadForNewBuild`, `Ticket.js`); a build that has already tried, kept
+in `sessionStorage` by its protocol version, says instead to close the page and open the table's link again.
+
 ## The shipping build
 
 `tools\play-release-build.cmd` plays a game in the Release build - compiled ahead of time to WebAssembly, which starts the

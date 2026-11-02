@@ -46,7 +46,7 @@ public sealed partial class MainPage
 
         if (client.View is null && client.Errors.Count > 0)
         {
-            Prompt("Could not join", client.Errors[^1].Detail);
+            Prompt("Could not join", Refusal(client.Errors[^1]));
             return;
         }
 

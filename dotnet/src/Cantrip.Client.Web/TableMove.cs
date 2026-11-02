@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices.JavaScript;
+using Cantrip.Protocol;
 
 namespace Cantrip.Client.Web;
 
@@ -10,6 +11,9 @@ public static partial class TableMove
 {
     [JSImport("globalThis.cantripGoToTable")]
     private static partial void GoToTable(string server, string ticket);
+
+    [JSImport("globalThis.cantripReloadForNewBuild")]
+    private static partial bool ReloadForBuild(int protocol, string? ticket);
 
     [JSImport("globalThis.cantripGoBack")]
     private static partial void GoBack(string page);
@@ -27,6 +31,22 @@ public static partial class TableMove
         catch (JSException)
         {
             // A page without the script stays where it is.
+        }
+    }
+
+    /// <summary>
+    /// Loads the page again for the server's build, when the server has refused this one as older (Ticket.js), with the
+    /// ticket it came with: true once it is on its way, false when this build has already tried once.
+    /// </summary>
+    public static bool ReloadForNewBuild(string? ticket)
+    {
+        try
+        {
+            return ReloadForBuild(PlayerView.ProtocolVersion, ticket);
+        }
+        catch (JSException)
+        {
+            return false;
         }
     }
 

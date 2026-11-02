@@ -45,3 +45,30 @@ globalThis.cantripGoBack = function (page) {
         window.location.assign(url.toString());
     }
 };
+
+// A page older than the table's server - kept by a tab the browser brought back without loading it, or by a home-screen
+// app left running - is refused its seat ("Expected protocol"), and loads again to fetch the server's build: with its
+// ticket after the hash, when it came with one, since the address no longer holds it. Once per build of the page, kept
+// in sessionStorage by its own protocol version, so a browser still handing out the old build is not reloaded forever.
+globalThis.cantripReloadForNewBuild = function (protocol, ticket) {
+    const key = "cantrip-reloaded-for-build";
+    try {
+        if (window.sessionStorage.getItem(key) === String(protocol)) {
+            return false;
+        }
+
+        window.sessionStorage.setItem(key, String(protocol));
+    } catch {
+        return false;
+    }
+
+    if (ticket) {
+        const url = new URL(window.location.href);
+        url.hash = "ticket=" + encodeURIComponent(ticket);
+        window.location.replace(url.toString());
+    } else {
+        window.location.reload();
+    }
+
+    return true;
+};

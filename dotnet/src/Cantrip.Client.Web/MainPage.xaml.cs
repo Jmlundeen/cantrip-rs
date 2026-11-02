@@ -1294,6 +1294,9 @@ public sealed partial class MainPage : Page
         }
     }
 
+    /// <summary>Whether this page, refused as older than the server's build, has tried loading again.</summary>
+    private bool _reloadingForBuild;
+
     /// <summary>Whether this page has set off for the table its seat was moved to.</summary>
     private bool _movedAway;
 
@@ -1304,6 +1307,16 @@ public sealed partial class MainPage : Page
 
     private void KeepSeat(GameClient client)
     {
+        // A page older than the server's build loads again for the new one, once (TableMove.ReloadForNewBuild).
+        if (!_reloadingForBuild && client.Errors.Any(e => e.Code == ErrorCode.ProtocolMismatch))
+        {
+            _reloadingForBuild = true;
+            if (TableMove.ReloadForNewBuild(ClientConfig.Ticket))
+            {
+                return;
+            }
+        }
+
         // A seat given up, or moved to another table, is not this tab's any more: forgotten, so it is neither resumed on a
         // reload nor chased when the connection closes; and a move is followed to the new table.
         if (client.Released is not null || client.Moved is not null)
