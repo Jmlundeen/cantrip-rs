@@ -728,6 +728,8 @@ from a stack object in the view, as `is_by_in` does.
 `TabletDriver.PictureAsync`, which waits for `.uno-loader` to leave the page. Both open a tablet with no relay
 (`TabletDriver.OpenAsync` with no `site`); the tablets of `InPersonDraftTests`, at a real relay, lose the splash and
 pass. So the tablet's screen-wake-lock check in the first test has not run in a browser yet; the iPhone app's has.
-A fix finds why the splash stays on a tablet fed by the test (or why `PictureAsync` should not wait on it there).
+A fix finds why the splash stays on a tablet fed by the test (or why `PictureAsync` should not wait on it there). It is
+intermittent, not certain: on 2026-11-01 the shared-board test passed in one run of five, with and without the tablet fed
+before the splash would go; the splash, when it stays, is marked `uno-keep-loader` and Uno's `removeLoading` never runs.
 
 **Scenarios.** None: browser tests.

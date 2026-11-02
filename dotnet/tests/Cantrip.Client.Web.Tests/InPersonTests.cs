@@ -86,14 +86,16 @@ public sealed class InPersonTests(WebClient web)
             Assert.True(tapped.TurnStrip is { Step.Length: > 0 }, "The tablet shows the turn.");
             Assert.Equal(tapped.TurnStrip!.Faces == 2, tapped.TurnStrip.Turned);
 
-            // Each seat's prompt down the side of its half, as its phone said it, and pressed from there: Bot1's Pass sent for
-            // Bot1's phone to press; Bot2 searching their library shows only that a choice is being made on their phone.
+            // One prompt, between the rails down the board's left edge, the asked player's as their phone said it, and pressed
+            // from there: Bot1 asked, upright, their Pass sent for Bot1's phone to press. Then Bot2 asked, searching their
+            // library: the same panel turned to face them, showing only that a choice is being made on their phone.
             await shared.FeedAsync(new TablePromptMessage
             {
                 Seat = 1,
                 Prompt = new PromptCard
                 {
                     Version = 4,
+                    Asking = true,
                     Title = "Your first main phase",
                     Detail = "Cast a spell",
                     Rows =
@@ -103,19 +105,25 @@ public sealed class InPersonTests(WebClient web)
                     ],
                 },
             });
-            await shared.FeedAsync(new TablePromptMessage { Seat = 2, Prompt = new PromptCard { Version = 2, Private = true } });
-            TabletState prompted = await shared.SettledAsync(state => state.Halves?.Count == 2 && state.Halves.All(half => half.Prompted));
-            await shared.PictureAsync("prompts");
-            TabletHalfState bot1 = prompted.Halves!.Single(half => half.Seat == 1);
-            TabletHalfState bot2 = prompted.Halves!.Single(half => half.Seat == 2);
-            Assert.Equal(("Your first main phase", false), (bot1.Title, bot1.Private));
-            Assert.True(bot2.Private);
-            Assert.Empty(bot2.Items);
-            Assert.True(bot1.PromptBox!.Y > TabletDriver.Height / 2f && bot1.PromptBox.X > TabletDriver.Width / 2f, "Bot1's prompt is by their right hand.");
-            Assert.True(bot2.PromptBox!.Y < TabletDriver.Height / 2f && bot2.PromptBox.X < TabletDriver.Width / 2f, "Bot2's prompt is by their right hand, across the table.");
+            await shared.FeedAsync(new TablePromptMessage { Seat = 2, Prompt = new PromptCard { Version = 2, Title = "Waiting for Bot1" } });
+            TabletState prompted = await shared.SettledAsync(state => state.Prompt is { Seat: 1, Prompted: true, Asking: true } && state.Rails?.Count == 2);
+            await shared.PictureAsync("prompt");
+            TabletPromptState bot1 = prompted.Prompt!;
+            Assert.Equal(("Your first main phase", false, false), (bot1.Title, bot1.Private, bot1.Turned));
+            TabletRail rail1 = prompted.Rails!.Single(rail => rail.Seat == 1);
+            TabletRail rail2 = prompted.Rails!.Single(rail => rail.Seat == 2);
+            Assert.True(rail1.X < TabletDriver.Width / 4f && rail2.X < TabletDriver.Width / 4f, "Both rails are down the left edge.");
+            Assert.True(rail2.Y < bot1.Box!.Y && bot1.Box.Y < rail1.Y, "The prompt is between the rails, seat 2's above it and seat 1's below.");
             TabletPromptItem pass = bot1.Items.Single(item => item.Text == "Pass");
             await shared.TapAsync(pass.X, pass.Y);
             await shared.SettledAsync(state => state.Presses?.SequenceEqual([new TabletPress(1, 4, 1)]) == true);
+
+            await shared.FeedAsync(new TablePromptMessage { Seat = 1, Prompt = new PromptCard { Version = 5, Title = "Waiting for Bot2" } });
+            await shared.FeedAsync(new TablePromptMessage { Seat = 2, Prompt = new PromptCard { Version = 3, Private = true, Asking = true } });
+            TabletState turned = await shared.SettledAsync(state => state.Prompt is { Seat: 2, Asking: true });
+            await shared.PictureAsync("prompt-turned");
+            Assert.True(turned.Prompt!.Private && turned.Prompt.Turned, "Bot2's private choice is shown turned to face them.");
+            Assert.Empty(turned.Prompt.Items);
 
             // The stack folds to its caps, and opens again.
             await shared.TapAsync(tapped.StackFold!.X, tapped.StackFold.Y);

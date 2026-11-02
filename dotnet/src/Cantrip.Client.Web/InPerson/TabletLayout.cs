@@ -5,9 +5,9 @@ using Microsoft.UI.Xaml.Media;
 namespace Cantrip.Client.Web.InPerson;
 
 /// <summary>
-/// One seat's half of a tablet's board: the seat's rail - name, life, hand count, mana, library and graveyard - beside
-/// its battlefield, laid out by <see cref="BoardRows"/> exactly as the remote client lays out a half, with the creatures
-/// against the edge nearest the other player. The shared tablet turns seat 2's half round (<see cref="Turned"/>) so it
+/// One seat's half of a tablet's board: its battlefield, laid out by <see cref="BoardRows"/> exactly as the remote client
+/// lays out a half, with the creatures against the edge nearest the other player, and the seat's rail - name, life, hand
+/// count, mana, library and graveyard - which the page puts down the board's edge. The shared tablet turns seat 2's half round (<see cref="Turned"/>) so it
 /// faces seat 2 across the table; every hit test and every place on the page goes through the turn, since the half is
 /// laid out and hit-tested in its own frame.
 /// </summary>
@@ -18,18 +18,14 @@ public sealed class TabletHalf : Grid
         Seat = seat;
         Turned = turned;
         Background = Theme.Brush(Theme.HalfIdle);
-        ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-        // The rail at its own size where the half is tall enough, and shrunk whole where it is not - the shared board's
-        // halves are half as tall as a remote table's - so its piles and counts are never cut off.
+        // The rail at its own size where there is room for it, and shrunk whole where there is not, so its piles and counts
+        // are never cut off. The tablet's page puts it in the column down the board's edge, with the other seat's and the
+        // prompt between them (TabletPage): it is not part of the half.
         Rail = new PlayerRail(showsHandFan: true);
-        var railBox = new Border
+        RailBox = new Border
         {
             Background = Theme.Brush(Theme.RailIdle),
-            BorderBrush = Theme.Brush(Theme.Line),
-            BorderThickness = new Thickness(0, 0, 1, 0),
             Child = new Viewbox
             {
                 Stretch = Stretch.Uniform,
@@ -38,7 +34,6 @@ public sealed class TabletHalf : Grid
                 Child = Rail,
             },
         };
-        Children.Add(railBox);
 
         Board = new CardBoardElement(BoardRows.StandardCardWidth, BoardRows.CardHeight(BoardRows.StandardCardWidth)) { Slides = PlayerSettings.AnimateCards };
         Badges = new Canvas { IsHitTestVisible = false };
@@ -50,23 +45,18 @@ public sealed class TabletHalf : Grid
         Area.Children.Add(new ArrivalsElement(Board));
         Area.Children.Add(Badges);
         Area.SizeChanged += (_, e) => Area.Clip = new RectangleGeometry { Rect = new Windows.Foundation.Rect(0, 0, e.NewSize.Width, e.NewSize.Height) };
-        Grid.SetColumn(Area, 1);
         Children.Add(Area);
 
         // A graveyard or exile opened from the rail lies over the battlefield, turned with the half.
         Pile = new TabletPile();
-        Grid.SetColumn(Pile, 1);
         Children.Add(Pile);
-
-        // The player's prompt down the half's right side, by their right hand: what their phone asks them, answered here.
-        Prompt = new TabletPromptPanel();
-        Grid.SetColumn(Prompt, 2);
-        Children.Add(Prompt);
 
         if (turned)
         {
             RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5);
             RenderTransform = new RotateTransform { Angle = 180 };
+            RailBox.RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5);
+            RailBox.RenderTransform = new RotateTransform { Angle = 180 };
         }
     }
 
@@ -78,8 +68,8 @@ public sealed class TabletHalf : Grid
 
     public PlayerRail Rail { get; }
 
-    /// <summary>The seat's prompt, as its phone said it, pressed from here.</summary>
-    public TabletPromptPanel Prompt { get; }
+    /// <summary>The rail in its frame, turned with the half, for the page to place beside the board.</summary>
+    public Border RailBox { get; }
 
     public CardBoardElement Board { get; }
 

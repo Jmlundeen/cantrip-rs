@@ -8,7 +8,7 @@ namespace Cantrip.Client.Web;
 
 /// <summary>
 /// A phone's views at an in-person table (docs/web-client.md, "In-person play"): the phone held sideways shows one view at a
-/// time beside the prompt, which is always on the right. The public board is the tablets' to show, so the phone does not
+/// time, the hand with the prompt under it (MainPage.PhoneHand.cs). The public board is the tablets' to show, so the phone does not
 /// spend its screen on it: it opens on the player's hand, and a drawer that slides out from the left edge goes to the
 /// others - each player's battlefield, each player's public state (life, counters, mana, piles and graveyard, by the
 /// player's name), the stack, and the stops.
@@ -185,6 +185,7 @@ public sealed partial class MainPage
         Root.Children.Insert(Root.Children.IndexOf(_sideSlot), _phoneStops);
 
         BuildDrawer();
+        BuildPhoneHand();
         ShowPhoneView(PhoneView.Hand, 0);
     }
 
@@ -414,8 +415,15 @@ public sealed partial class MainPage
     private int _phoneHandSizedFor = -1;
 
     /// <summary>
-    /// The hand's cards across the phone's whole width, laid over one another so each still shows half its width - its name
-    /// and cost - to be read and tapped: as large as that makes them, and no taller than the phone leaves over the prompt.
+    /// The share of a card's width each card of a long hand still shows where it lies under the next: its name's start and
+    /// its art's edge, enough to know it by and to put a thumb on.
+    /// </summary>
+    private const float PhoneHandShowing = 0.4f;
+
+    /// <summary>
+    /// The hand's cards across the phone's whole width, all in view at once: side by side while they fit, laid over one
+    /// another once they do not, each still showing <see cref="PhoneHandShowing"/> of its width, with room kept for the one
+    /// thumbed to to come out whole. As large as that makes them, and no taller than the phone leaves over the prompt.
     /// </summary>
     private void FillPhoneHand()
     {
@@ -428,7 +436,9 @@ public sealed partial class MainPage
         _phoneHandSizedFor = count;
         float tall = (float)(Root.ActualHeight - Root.Padding.Top - Root.Padding.Bottom - _dock.ActualHeight);
         float across = (float)(Root.ActualWidth - Root.Padding.Left - Root.Padding.Right - DrawerStrip) - (2f * HandMarginX);
-        float wide = across / (1f + (0.5f * Math.Max(0, count - 1)));
+        float apart = (across - (CardGap * Math.Max(0, count - 1))) / Math.Max(1, count);
+        float over = count < 2 ? across : across / (2f + (PhoneHandShowing * (count - 2)));
+        float wide = MathF.Max(apart, over);
         float fits = (wide * 88f / 63f) + (2f * HandMarginY) + 4f;
         SetHandHeight(MathF.Max(MinHandHeight, MathF.Min(tall, fits)));
     }

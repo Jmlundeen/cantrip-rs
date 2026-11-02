@@ -68,6 +68,29 @@ public sealed class TablePage : IAsyncDisposable
         });
     }
 
+    /// <summary>
+    /// A finger put down at the first point, drawn through the others a step at a time and lifted at the last, as a thumb is
+    /// drawn along a row: sent as the touch events themselves.
+    /// </summary>
+    public async Task SwipeAsync(IReadOnlyList<(float X, float Y)> through)
+    {
+        _cdp ??= await _context.NewCDPSessionAsync(Page);
+        static Dictionary<string, object> Point((float X, float Y) at) => new() { ["x"] = at.X, ["y"] = at.Y };
+        await _cdp.SendAsync("Input.dispatchTouchEvent", new Dictionary<string, object> { ["type"] = "touchStart", ["touchPoints"] = new[] { Point(through[0]) } });
+        for (int i = 1; i < through.Count; i++)
+        {
+            for (int part = 1; part <= 6; part++)
+            {
+                float t = part / 6f;
+                (float X, float Y) at = (through[i - 1].X + ((through[i].X - through[i - 1].X) * t), through[i - 1].Y + ((through[i].Y - through[i - 1].Y) * t));
+                await _cdp.SendAsync("Input.dispatchTouchEvent", new Dictionary<string, object> { ["type"] = "touchMove", ["touchPoints"] = new[] { Point(at) } });
+                await Task.Delay(16);
+            }
+        }
+
+        await _cdp.SendAsync("Input.dispatchTouchEvent", new Dictionary<string, object> { ["type"] = "touchEnd", ["touchPoints"] = Array.Empty<object>() });
+    }
+
     private ICDPSession? _cdp;
 
     /// <summary>Uncaught errors the page has thrown, which a test fails on.</summary>
@@ -376,7 +399,9 @@ public sealed record InPersonState(
     PhonePromptState? TablePrompt = null,
     IReadOnlyList<PhonePressState>? Presses = null,
     bool TurnedForPortrait = false,
-    int Pressed = 0);
+    int Pressed = 0,
+    int CardSheet = 0,
+    int Focused = 0);
 
 /// <summary>The prompt a phone last sent the tablets: its version, whether it is private, its title and its items.</summary>
 public sealed record PhonePromptState(int Version, bool Private, string Title, IReadOnlyList<PhonePromptItem> Items);

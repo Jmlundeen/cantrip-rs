@@ -216,7 +216,8 @@ public sealed record TabletState(
     bool StackCollapsed = false,
     TabletBox? StackFold = null,
     TabletTurnStrip? TurnStrip = null,
-    IReadOnlyList<TabletHalfState>? Halves = null,
+    TabletPromptState? Prompt = null,
+    IReadOnlyList<TabletRail>? Rails = null,
     IReadOnlyList<TabletPress>? Presses = null);
 
 /// <summary>A box on the tablet's page: its middle, width and height.</summary>
@@ -229,10 +230,14 @@ public sealed record TabletBox(float X, float Y, float W, float H);
 public sealed record TabletTurnStrip(string Step, int Faces, bool Turned, IReadOnlyList<string> Stops);
 
 /// <summary>
-/// A seat's half on a tablet and the prompt down its side, as the seat's phone said it: whether one has come, whether it is
-/// private, its title and version, where the panel is, and its items.
+/// The tablet's one prompt, between the rails, as the asked seat's phone said it: whose it is, whether one has come, whether
+/// that seat is being asked, whether it is private, its title and version, whether it is turned round for seat 2, where the
+/// panel is, and its items.
 /// </summary>
-public sealed record TabletHalfState(int Seat, bool Prompted, bool Private, string Title, int Version, IReadOnlyList<TabletPromptItem> Items, TabletBox? PromptBox = null);
+public sealed record TabletPromptState(int Seat, bool Prompted, bool Asking, bool Private, string Title, int Version, bool Turned, IReadOnlyList<TabletPromptItem> Items, TabletBox? Box = null);
+
+/// <summary>A seat's rail on a tablet and where it is drawn.</summary>
+public sealed record TabletRail(int Seat, float X, float Y, float W, float H);
 
 /// <summary>An item of a prompt on a tablet: its id, kind (Button, Toggle, Words), words, and where it is drawn.</summary>
 public sealed record TabletPromptItem(int Id, string Kind, string Text, bool Enabled, bool On, float X = 0, float Y = 0);

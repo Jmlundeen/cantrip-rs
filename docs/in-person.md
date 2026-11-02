@@ -30,8 +30,10 @@ then a pill for each step, the current one filled - green on the turn of the pla
 dot under each step the table stops in this turn ("Stops", below). While the stack's window is open it lies over the
 middle of the strip; folded, it leaves the strip clear.
 
-**Each player's prompt** runs down the right of their half, by their right hand and turned with the half
-(`InPerson/TabletPromptPanel.cs`; "The prompt on the table", below).
+**The players' rails and the prompt** share one column down the board's left edge: seat 2's rail at the top, turned to
+face them, seat 1's at the bottom, and between them the one prompt - the player's the table is waiting on - turned to face
+that player (`InPerson/TabletPromptPanel.cs`; "The prompt on the table", below). A player's own board has their rail at
+the top of the column and their prompt under it.
 
 A seat's graveyard pile and, while it has cards in exile, its **Exile** button on a tablet's rail open a list of that
 pile over the seat's battlefield, turned with the half: every card as the public sees it (a card exiled face down is a
@@ -48,10 +50,14 @@ prompt.
 
 The phone is for what only its player may see: the hand above all. Everything else a player does at a table in paper is
 done in plain view - a spell is revealed as it is cast, and may still be taken back; a target is pointed at; a mana
-ability is used; priority is passed; a stop is called. So a player's prompt is public, and it is shown on the tablets
-by that player's side of the board, where the targets and the mana are tapped, and answered there: a player casts from
-their hand on the phone, then looks at the board for the rest, without their eyes going back and forth.
+ability is used; priority is passed; a stop is called. So a player's prompt is public, and it is shown on the tablets,
+beside the board where the targets and the mana are tapped, and answered there: a player casts from their hand on the
+phone, then looks at the board for the rest, without their eyes going back and forth.
 
+- **One prompt.** Only one player is asked at a time, so the tablet shows one prompt, between the rails, edged in the
+  accent: the one whose phone has a question of the game's to answer (`PromptCard.Asking`), turned round on the shared
+  board when it is seat 2's. While nobody is asked - between one question and the next - the last one asked stays, so the
+  panel does not turn back and forth.
 - **What is shown.** The phone's dock as it stands: the toggles (Auto Pass, Pass Turn, Hold Priority), what is asked
   and the detail under it, an error the table gave, Undo while there is a mana ability to take back, and the dock's
   buttons and steppers ("-", "X = 2", "+"), each a finger's size. A button tapped on the tablet is pressed on the phone,
@@ -341,7 +347,7 @@ on the table's thread, where the relay only takes a snapshot and queues messages
 ## The wire
 
 The relay and its devices speak MessagePack, in `Cantrip.Protocol.InPerson`, with unions and a version of their own
-(`InPersonProtocol.Version`, now 5). A device's hello also carries `PlayerView.ProtocolVersion`, since the public feed
+(`InPersonProtocol.Version`, now 6). A device's hello also carries `PlayerView.ProtocolVersion`, since the public feed
 wraps the ordinary server messages.
 
 A device sends a `DeviceClientMessage`:
@@ -355,7 +361,7 @@ A device sends a `DeviceClientMessage`:
 | 8 | `ReentryRequestMessage` | none: a welcomed phone asks for a re-entry code |
 | 9 | `TablePressMessage` | `Seat`, `Version` (the prompt it was pressed on), `Item` (the item's id) |
 | 10 | `SeatStopsMessage` | `Mine`, `Theirs` (a phone's own stops, as `TurnStepView`s) |
-| 11 | `SeatPromptMessage` | `Prompt`: a `PromptCard` - `Version`, `Private`, `Title`, `Detail`, `Error`, `Rows` of `Items` (`Id`, `Kind`: button, toggle or words, `Text`, `Primary`, `Enabled`, `On`) |
+| 11 | `SeatPromptMessage` | `Prompt`: a `PromptCard` - `Version`, `Private`, `Title`, `Detail`, `Error`, `Rows` of `Items` (`Id`, `Kind`: button, toggle or words, `Text`, `Primary`, `Enabled`, `On`), `Asking` (the table waits on this player) |
 
 The relay sends a `DeviceServerMessage`:
 

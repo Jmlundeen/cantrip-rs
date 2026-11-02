@@ -439,8 +439,7 @@ constructor (`AttachPhone`), and does nothing on any other page: the remote clie
 
 - **Layout.** Sideways for the game (upright for the draft and deck building, "Full screen" below), one view at a time
   (`MainPage.PhoneViews.cs`). The public board is the tablets' to show, and each player's prompt is shown and answered
-  there too (docs/in-person.md, "The prompt on the table"), so the phone opens on the **Hand**: its cards across the
-  phone's whole width, laid over one another so each shows half of itself, with the prompt in a strip under them - what
+  there too (docs/in-person.md, "The prompt on the table"), so the phone opens on the **Hand** (below), with the prompt in a strip under it - what
   is asked on the left, Undo and the answers on the right, or under the words when they would take more than half the
   width, a long caption wrapping. A drawer that slides out from the strip down the left edge (its tab at the top, the
   Fullscreen button at the foot) goes to the others, each filling the screen with no prompt: **Board** for each player's
@@ -452,6 +451,17 @@ constructor (`AttachPhone`), and does nothing on any other page: the remote clie
   setting and opens over the view. The tab is lit while something is on the stack. A choice of cards that are not on the
   board - a library searched, a scry, triggers to order - fills the whole phone, its cards as tall as the screen leaves
   a row of them, scrolling down to more.
+- **The hand** (`MainPage.PhoneHand.cs`) is looked through, read and played without a slip of the thumb playing
+  anything. It is all in view across the phone's width, side by side while the cards fit and laid over one another once
+  they do not, each still showing two fifths of itself, as large as that and the height over the prompt allow. A thumb
+  drawn along it thumbs through it (`CardBoardElement.TouchScrubs`): the card under the thumb comes out whole, standing a
+  little proud of the others, and stays out once the thumb lifts; the row takes the finger rather than scrolling, and no
+  tooltip follows it - the phone shows no tooltips at all. A tap opens the card's **sheet** over the phone: the card as
+  tall as the screen, its place in the hand, its note, and what it can do now, a button for each, worded as the card's
+  menu words them ("Cast Lightning Bolt"), or that it can do nothing now; nothing is done until one is pressed, so a
+  card is never played by touching it. The sheet pages through the hand by a swipe across the card or the arrows beside
+  it, and shuts with Close or a tap off it, and by itself once its card leaves the hand or a choice fills the phone. A tap
+  that answers a question about the hand - a card to discard or choose, a target - answers it at once, as on every table.
 - **Reading a card.** A finger resting on any card the phone draws holds it up (`CardBoardElement.TouchHolds`), filling
   the screen - turned a quarter round while the phone is held sideways, its top toward the phone's own top
   (`screen.orientation.angle`), so it is read by turning the phone upright, as large as the phone's length makes it
@@ -496,19 +506,20 @@ constructor (`AttachPhone`), and does nothing on any other page: the remote clie
 - **Testing.** Under `?test`, the test state's `inPerson` is the phone's view (`view`: `hand`, `board:N`, `player:N`,
   `stack`, `stops`; `board` while a battlefield is shown), whether the drawer is out, the Stops view's buttons, the
   prompt it last sent the tablets (`tablePrompt`) and the presses it took from them, whether a card held up is turned
-  for portrait, the taps waiting, every tap settled (used,
+  for portrait, the hand's card thumbed to (`focused`) and the card whose sheet is open (`cardSheet`), the taps waiting, every tap settled (used,
   held for its prompt) and the line up now; a test stands in for the relay by queueing taps on
   `globalThis.cantripTableTaps` (`o12@34;` the seat's object 12 for request 34, `p2@34;` player 2), and presses of the
   prompt on `globalThis.cantripTablePresses` (`4:1;` item 1 of the prompt sent as version 4), since `cantripTest`
   itself is a string. `ScenarioPlayer.PlayAsync(..., phone: true)` plays a scenario on a phone-sized touch page held sideways, tapping
   the hand and the dock with a finger, passing and announcing X from the prompt as a tablet presses it, opening each
   player's Board from the drawer to find what is on the battlefield, setting a stop in the Stops view and unsetting it,
-  holding a card of the hand up with a resting finger and putting it down, scrolling a choice of cards to the one it wants and tapping every permanent and player on the "tablet" through that queue, the table
+  thumbing through the hand with a drawn finger and opening a card's sheet, paging it and shutting it, playing each card
+  from its sheet's button, holding a card of the hand up with a resting finger and putting it down, scrolling a choice of cards to the one it wants and tapping every permanent and player on the "tablet" through that queue, the table
   judging each answer against the script (`PhoneTests`: Bolt at a Tarmogoyf with the Mountain tapped at priority, Fireball
   at a player paid with lands tapped during the payment, Engineered Explosives' X planned with a land tapped as it is
   announced, Archdruid's Charm's search filling the phone, and the taps the phone must not use). The prompt shown on the
-  tablets and pressed from them, and the stops shared through the relay, are `InPersonRelayTests`'; the tablet's panels
-  and its one turn strip are `InPersonTests`'.
+  tablets and pressed from them, and the stops shared through the relay, are `InPersonRelayTests`'; the tablet's panels,
+  its one prompt between the rails and its one turn strip are `InPersonTests`'.
 
 ## Open
 

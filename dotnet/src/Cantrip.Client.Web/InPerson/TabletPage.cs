@@ -64,6 +64,12 @@ public sealed partial class TabletPage : UserControl
 
     /// <summary>Each seat's prompt, as the relay last said it.</summary>
     private readonly Dictionary<int, PromptCard> _prompts = [];
+
+    /// <summary>The one prompt the tablet shows, between the rails: the asked player's (<see cref="ShowPrompt"/>).</summary>
+    private readonly TabletPromptPanel _prompt = new();
+
+    /// <summary>The seat whose prompt is shown, or zero before any.</summary>
+    private int _promptSeat;
     private readonly TargetArrowsElement _arrows = new();
     /// <summary>Cards flying between zones, unless the Animate cards setting is off (off by default on a device short of memory).</summary>
     private readonly CardFlights _flights = new() { Enabled = PlayerSettings.AnimateCards };
@@ -129,11 +135,30 @@ public sealed partial class TabletPage : UserControl
         StartTestState();
     }
 
-    /// <summary>The halves, the stack band and the layers over them, as the layout this tablet shows.</summary>
+    /// <summary>
+    /// The halves, the stack band and the layers over them, as the layout this tablet shows; and down the board's left edge
+    /// the column of the players' rails with the one prompt between them (<see cref="ShowPrompt"/>).
+    /// </summary>
     private void BuildBoard()
     {
+        var page = new Grid();
+        page.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(TabletPromptPanel.PanelWidth) });
+        page.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        _root.Children.Add(page);
+
+        var side = new Grid
+        {
+            Background = Theme.Brush(Theme.RailIdle),
+            BorderBrush = Theme.Brush(Theme.Line),
+            BorderThickness = new Thickness(0, 0, 1, 0),
+        };
+        side.RowDefinitions.Add(new RowDefinition { Height = new GridLength(3, GridUnitType.Star) });
+        side.RowDefinitions.Add(new RowDefinition { Height = new GridLength(2, GridUnitType.Star) });
+        page.Children.Add(side);
+
         var board = _board = new Grid();
-        _root.Children.Add(board);
+        Grid.SetColumn(board, 1);
+        page.Children.Add(board);
 
         if (_side == 0)
         {
@@ -155,6 +180,15 @@ public sealed partial class TabletPage : UserControl
             board.Children.Add(_stack);
             _halves.Add(bottom);
             _halves.Add(top);
+
+            // Both rails down the left edge, seat 2's at the top turned to face them, and the prompt between, turned to
+            // face whichever player it asks: each player reads their own rail and their prompt at their side of it.
+            side.RowDefinitions.Add(new RowDefinition { Height = new GridLength(3, GridUnitType.Star) });
+            side.Children.Add(top.RailBox);
+            Grid.SetRow(_prompt, 1);
+            side.Children.Add(_prompt);
+            Grid.SetRow(bottom.RailBox, 2);
+            side.Children.Add(bottom.RailBox);
         }
         else
         {
@@ -181,6 +215,11 @@ public sealed partial class TabletPage : UserControl
             Grid.SetRow(_stack, 2);
             board.Children.Add(_stack);
             _halves.Add(mine);
+
+            // The player's rail down the left edge, and their prompt under it.
+            side.Children.Add(mine.RailBox);
+            Grid.SetRow(_prompt, 1);
+            side.Children.Add(_prompt);
         }
 
         foreach (TabletHalf half in _halves)
@@ -195,8 +234,16 @@ public sealed partial class TabletPage : UserControl
                 e.Handled = true;
                 TapPlayer(seat);
             };
-            half.Prompt.Pressed += (version, item) => Send(new TablePressMessage { Seat = seat, Version = version, Item = item });
         }
+
+        _prompt.RenderTransformOrigin = new Point(0.5, 0.5);
+        _prompt.Pressed += (version, item) =>
+        {
+            if (_promptSeat > 0)
+            {
+                Send(new TablePressMessage { Seat = _promptSeat, Version = version, Item = item });
+            }
+        };
 
         MakeTappable(_stack.Board, turned: false);
 
@@ -427,10 +474,9 @@ public sealed partial class TabletPage : UserControl
             _phaseStrip.RenderTransform = new RotateTransform { Angle = _phaseStrip.Faces == 2 ? 180 : 0 };
         }
 
+        ShowPrompt(view);
         foreach (TabletHalf half in _halves)
         {
-            half.Prompt.Show(_client.Outcome is null ? _prompts.GetValueOrDefault(half.Seat) : null, TabletLayout.NameOf(_client, half.Seat), Connected);
-
             if (view.Players.FirstOrDefault(player => player.Seat == half.Seat) is { } player)
             {
                 UpdateRail(half, player, view);
@@ -444,6 +490,33 @@ public sealed partial class TabletPage : UserControl
         _root.UpdateLayout();
         Fly();
         PaintArrows();
+    }
+
+    /// <summary>
+    /// The one prompt: the asked player's - the one whose phone has a question of the game's - turned to face them on the
+    /// shared board. Only one player is asked at a time; while nobody is, between one question and the next, the last one
+    /// asked stays, so the panel does not turn back and forth. A player's own board shows that player's.
+    /// </summary>
+    private void ShowPrompt(PlayerView view)
+    {
+        bool Asking(int seat) => _prompts.TryGetValue(seat, out PromptCard? prompt) && prompt.Asking;
+
+        if (_side != 0)
+        {
+            _promptSeat = _side;
+        }
+        else if (_promptSeat == 0 || !Asking(_promptSeat))
+        {
+            int asked = view.Players.Select(player => player.Seat).FirstOrDefault(seat => seat != _promptSeat && Asking(seat));
+            _promptSeat = asked != 0 ? asked
+                : _promptSeat != 0 ? _promptSeat
+                : view.PriorityPlayer != 0 ? view.PriorityPlayer
+                : view.ActivePlayer;
+        }
+
+        PromptCard? shown = _client.Outcome is null ? _prompts.GetValueOrDefault(_promptSeat) : null;
+        _prompt.Show(shown, TabletLayout.NameOf(_client, _promptSeat), Connected);
+        _prompt.RenderTransform = new RotateTransform { Angle = _side == 0 && _promptSeat == 2 ? 180 : 0 };
     }
 
     /// <summary>What a phase message says, before the game.</summary>

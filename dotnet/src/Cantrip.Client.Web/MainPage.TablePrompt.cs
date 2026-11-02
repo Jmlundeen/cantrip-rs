@@ -170,10 +170,13 @@ public sealed partial class MainPage
         card.Detail = _promptDetail.Visibility == Visibility.Visible ? _promptDetail.Text : string.Empty;
         card.Error = _errorLabel.Visibility == Visibility.Visible ? _errorLabel.Text : string.Empty;
 
+        // Whether the table is waiting on this player: the tablets show the prompt of the player being asked.
+        bool asking = _gameClient is { Prompt: not null, IsOver: false };
+        card.Asking = asking;
         if (hidden || _gameClient is { } client && NamesHiddenCard(client, card))
         {
             presses.Clear();
-            return new PromptCard { Private = true };
+            return new PromptCard { Private = true, Asking = asking };
         }
 
         return card;
@@ -238,6 +241,6 @@ public sealed partial class MainPage
 
     /// <summary>Everything a card says, as one string, to tell whether it changed.</summary>
     private static string Said(PromptCard card) =>
-        $"{card.Private}\u0001{card.Title}\u0001{card.Detail}\u0001{card.Error}\u0001"
+        $"{card.Private}|{card.Asking}\u0001{card.Title}\u0001{card.Detail}\u0001{card.Error}\u0001"
         + string.Join("\u0002", card.Rows.Select(row => string.Join("\u0003", row.Items.Select(item => $"{(int)item.Kind}|{item.Text}|{item.Primary}|{item.Enabled}|{item.On}"))));
 }

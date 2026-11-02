@@ -1291,6 +1291,7 @@ public sealed class ScenarioPlayer
         }
 
         (float x, float y) = ClickPoint(before, card);
+        await PhoneThumbThroughAsync(before);
         await _page.HoldAsync(x, y, TimeSpan.FromMilliseconds(800));
         await _page.SettledAsync(s => s.Held > 0 && s.InPerson?.TurnedForPortrait == true);
         await _page.PictureAsync($"phone-held-request-{_asking}");
@@ -1299,6 +1300,41 @@ public sealed class ScenarioPlayer
         if (after.InPerson?.TablePrompt?.Version != before.InPerson?.TablePrompt?.Version && after.Cards.Count(c => c.Place == "hand") != before.Cards.Count(c => c.Place == "hand"))
         {
             throw new Xunit.Sdk.XunitException("Putting a card held up on the phone down played it.");
+        }
+    }
+
+    /// <summary>
+    /// The phone's hand looked through without playing anything (MainPage.PhoneHand.cs): a thumb drawn along it from the
+    /// first card to the last brings each forward in turn, the last staying out once lifted, with no tooltip and no sheet;
+    /// then a card tapped opens its sheet, which pages to the next card and shuts again - the question where it was.
+    /// </summary>
+    private async Task PhoneThumbThroughAsync(TableState before)
+    {
+        List<CardState> hand = [.. before.Cards.Where(c => c.Visible && c.Place == "hand").OrderBy(c => c.X)];
+        if (hand.Count < 2)
+        {
+            return;
+        }
+
+        await _page.SwipeAsync([ClickPoint(before, hand[0]), (hand[^1].X, hand[^1].Y)]);
+        TableState thumbed = await _page.SettledAsync(s => s.InPerson?.Focused == hand[^1].Handle);
+        await _page.PictureAsync($"phone-thumbed-request-{_asking}");
+        if (thumbed.InPerson!.CardSheet != 0 || thumbed.Tooltip.Length > 0 || thumbed.RequestId != before.RequestId)
+        {
+            throw new Xunit.Sdk.XunitException($"Thumbing through the phone's hand did more than look: sheet {thumbed.InPerson.CardSheet}, tooltip \"{thumbed.Tooltip}\", request {before.RequestId} -> {thumbed.RequestId}.");
+        }
+
+        (float x, float y) = ClickPoint(thumbed, thumbed.Cards.First(c => c.Visible && c.Handle == hand[0].Handle));
+        await _page.TapAsync(x, y);
+        await _page.SettledAsync(s => s.InPerson?.CardSheet == hand[0].Handle);
+        await _page.PictureAsync($"phone-sheet-request-{_asking}");
+        await _page.ClickAsync("Next card", "button");
+        await _page.SettledAsync(s => s.InPerson?.CardSheet is > 0 and var shown && shown != hand[0].Handle);
+        await _page.ClickAsync("Close the card", "button");
+        TableState shut = await _page.SettledAsync(s => s.InPerson?.CardSheet == 0);
+        if (shut.RequestId != before.RequestId)
+        {
+            throw new Xunit.Sdk.XunitException("Looking at a card's sheet on the phone answered the question.");
         }
     }
 

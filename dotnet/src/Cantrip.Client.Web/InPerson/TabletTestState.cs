@@ -143,40 +143,50 @@ public sealed partial class TabletPage
 
             json.WriteEndArray();
             json.WriteEndObject();
-            json.WriteStartArray("halves");
-            foreach (TabletHalf half in _halves)
+            json.WriteStartObject("prompt");
+            PromptCard? prompt = _prompt.Shown;
+            json.WriteNumber("seat", _promptSeat);
+            json.WriteBoolean("prompted", prompt is not null);
+            json.WriteBoolean("asking", prompt?.Asking ?? false);
+            json.WriteBoolean("private", prompt?.Private ?? false);
+            json.WriteString("title", prompt?.Title ?? string.Empty);
+            json.WriteNumber("version", prompt?.Version ?? 0);
+            json.WriteBoolean("turned", _prompt.RenderTransform is RotateTransform { Angle: 180 });
+            if (_prompt.ActualWidth > 0)
+            {
+                WriteBox(json, _prompt.TransformToVisual(_root).TransformBounds(new Rect(0, 0, _prompt.ActualWidth, _prompt.ActualHeight)), "box");
+            }
+
+            json.WriteStartArray("items");
+            foreach ((PromptItem item, FrameworkElement shown) in _prompt.Items)
             {
                 json.WriteStartObject();
-                json.WriteNumber("seat", half.Seat);
-                PromptCard? prompt = half.Prompt.Shown;
-                json.WriteBoolean("prompted", prompt is not null);
-                json.WriteBoolean("private", prompt?.Private ?? false);
-                json.WriteString("title", prompt?.Title ?? string.Empty);
-                json.WriteNumber("version", prompt?.Version ?? 0);
-                if (half.Prompt.ActualWidth > 0)
+                json.WriteNumber("id", item.Id);
+                json.WriteString("kind", item.Kind.ToString());
+                json.WriteString("text", item.Text);
+                json.WriteBoolean("enabled", item.Enabled);
+                json.WriteBoolean("on", item.On);
+                if (shown.ActualWidth > 0)
                 {
-                    WriteBox(json, half.Prompt.TransformToVisual(_root).TransformBounds(new Rect(0, 0, half.Prompt.ActualWidth, half.Prompt.ActualHeight)), "promptBox");
+                    WriteBox(json, shown.TransformToVisual(_root).TransformBounds(new Rect(0, 0, shown.ActualWidth, shown.ActualHeight)));
                 }
 
-                json.WriteStartArray("items");
-                foreach ((PromptItem item, FrameworkElement shown) in half.Prompt.Items)
+                json.WriteEndObject();
+            }
+
+            json.WriteEndArray();
+            json.WriteEndObject();
+
+            json.WriteStartArray("rails");
+            foreach (TabletHalf half in _halves)
+            {
+                if (half.RailBox.ActualWidth > 0)
                 {
                     json.WriteStartObject();
-                    json.WriteNumber("id", item.Id);
-                    json.WriteString("kind", item.Kind.ToString());
-                    json.WriteString("text", item.Text);
-                    json.WriteBoolean("enabled", item.Enabled);
-                    json.WriteBoolean("on", item.On);
-                    if (shown.ActualWidth > 0)
-                    {
-                        WriteBox(json, shown.TransformToVisual(_root).TransformBounds(new Rect(0, 0, shown.ActualWidth, shown.ActualHeight)));
-                    }
-
+                    json.WriteNumber("seat", half.Seat);
+                    WriteBox(json, half.RailBox.TransformToVisual(_root).TransformBounds(new Rect(0, 0, half.RailBox.ActualWidth, half.RailBox.ActualHeight)));
                     json.WriteEndObject();
                 }
-
-                json.WriteEndArray();
-                json.WriteEndObject();
             }
 
             json.WriteEndArray();

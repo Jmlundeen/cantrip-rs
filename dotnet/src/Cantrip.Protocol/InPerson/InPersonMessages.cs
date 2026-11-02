@@ -10,7 +10,7 @@ namespace Cantrip.Protocol.InPerson;
 public static class InPersonProtocol
 {
     /// <summary>The in-person wire's version, sent in every <see cref="DeviceHelloMessage"/>; a mismatch is refused.</summary>
-    public const int Version = 5;
+    public const int Version = 6;
 }
 
 /// <summary>What a device is at the table.</summary>
@@ -421,6 +421,13 @@ public sealed class PromptCard
 
     [Key(5)]
     public List<PromptRow> Rows { get; set; } = [];
+
+    /// <summary>
+    /// Whether the table is waiting on this player: their phone has a question of the game's to answer. The tablets show
+    /// the prompt of the player being asked, turned to face them.
+    /// </summary>
+    [Key(6)]
+    public bool Asking { get; set; }
 }
 
 /// <summary>One line of a prompt's items.</summary>

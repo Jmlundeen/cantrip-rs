@@ -681,10 +681,11 @@ public sealed class InPersonRelay : IStepObserver
         if (text > MostPromptText) return;
 
         PromptCard kept = prompt.Private
-            ? new PromptCard { Version = prompt.Version, Private = true }
+            ? new PromptCard { Version = prompt.Version, Private = true, Asking = prompt.Asking }
             : new PromptCard
             {
                 Version = prompt.Version,
+                Asking = prompt.Asking,
                 Title = prompt.Title ?? string.Empty,
                 Detail = prompt.Detail ?? string.Empty,
                 Error = prompt.Error ?? string.Empty,

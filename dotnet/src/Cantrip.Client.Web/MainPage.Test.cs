@@ -548,6 +548,8 @@ public sealed partial class MainPage
         json.WriteEndArray();
         json.WriteString("refusal", _refusal.Visibility == Visibility.Visible ? _refusalText.Text : string.Empty);
         json.WriteBoolean("turnedForPortrait", _inspector.TurnedForPortrait);
+        json.WriteNumber("cardSheet", _sheetShows?.Value ?? 0);
+        json.WriteNumber("focused", _handBoard.Focused?.Value ?? 0);
         if (_tablePromptShown is { } prompt)
         {
             json.WriteStartObject("tablePrompt");
@@ -784,6 +786,8 @@ public sealed partial class MainPage
 
             string? kind = child switch
             {
+                // A card sheet's button on a phone (MainPage.PhoneHand.cs) is the row of the card's menu it stands for.
+                DockButton { Tag: CardMenu.RowIdentity } => "item",
                 DockButton or CollapseButton or BinButton => "button",
                 DockToggle => "toggle",
                 Border { Tag: SidePanel.TabTag } => "tab",
@@ -806,8 +810,8 @@ public sealed partial class MainPage
                 json.WriteStartObject();
                 json.WriteString("kind", kind);
                 json.WriteString("label", label);
-                json.WriteNumber("ability", kind == "item" && child is Border { Tag: CardMenu.RowIdentity identity } ? identity.Ability : -1);
-                json.WriteNumber("optionId", kind == "item" && child is Border { Tag: CardMenu.RowIdentity row } ? row.OptionId : 0);
+                json.WriteNumber("ability", kind == "item" && child.Tag is CardMenu.RowIdentity identity ? identity.Ability : -1);
+                json.WriteNumber("optionId", kind == "item" && child.Tag is CardMenu.RowIdentity row ? row.OptionId : 0);
                 WriteBox(json, target.TransformToVisual(Root).TransformBounds(new Rect(0, 0, target.ActualWidth, target.ActualHeight)));
                 json.WriteEndObject();
 

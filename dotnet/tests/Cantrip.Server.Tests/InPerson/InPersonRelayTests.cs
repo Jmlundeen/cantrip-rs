@@ -446,6 +446,7 @@ public sealed class InPersonRelayTests
     {
         Version = version,
         Private = @private,
+        Asking = true,
         Title = "Your first main phase",
         Detail = "Cast a spell",
         Rows =
@@ -475,6 +476,7 @@ public sealed class InPersonRelayTests
         Assert.Equal(1, shown.Seat);
         Assert.Equal("Your first main phase", shown.Prompt.Title);
         Assert.Equal(["Auto Pass", "Pass", "Resolve All", "X = 2"], shown.Prompt.Rows.SelectMany(row => row.Items).Select(item => item.Text));
+        Assert.True(shown.Prompt.Asking, "The tablets are told whom the table waits on.");
         Assert.Empty(Drain(alice));
 
         RelayDevice late = Tablet(side: 1);
@@ -496,6 +498,7 @@ public sealed class InPersonRelayTests
         _relay.Receive(alice, new SeatPromptMessage { Prompt = PassPrompt(5, @private: true) });
         TablePromptMessage shown = Assert.IsType<TablePromptMessage>(Assert.Single(Drain(tablet)));
         Assert.True(shown.Prompt.Private);
+        Assert.True(shown.Prompt.Asking, "A private choice still says the table waits on its player.");
         Assert.Equal(string.Empty, shown.Prompt.Title + shown.Prompt.Detail + shown.Prompt.Error);
         Assert.Empty(shown.Prompt.Rows);
 

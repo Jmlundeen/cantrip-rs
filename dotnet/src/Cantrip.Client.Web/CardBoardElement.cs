@@ -96,14 +96,44 @@ public sealed class CardBoardElement : SKCanvasElement
     /// <summary>How far a finger may wander and still tap or hold the card it came down on.</summary>
     private const double TouchSlop = 18;
 
+    /// <summary>
+    /// Whether a finger drawn along the row thumbs through it (a phone's hand at an in-person table): the card under the
+    /// finger is <see cref="Focused"/> as it goes, the row taking the finger rather than scrolling, and a finger that went
+    /// along the row is neither a tap nor a hold when it lifts. Wants <see cref="TouchHolds"/>.
+    /// </summary>
+    public bool TouchScrubs { get; set; }
+
+    /// <summary>The card a finger last thumbed to on a row that <see cref="TouchScrubs"/>; it stays so once the finger lifts.</summary>
+    public ViewHandle? Focused { get; private set; }
+
+    /// <summary><see cref="Focused"/> changed.</summary>
+    public event Action? FocusChanged;
+
+    /// <summary>Puts the thumbed-to card back among the others.</summary>
+    public void Unfocus() => SetFocused(null);
+
+    private void SetFocused(ViewHandle? handle)
+    {
+        if (handle != Focused)
+        {
+            Focused = handle;
+            FocusChanged?.Invoke();
+            Invalidate();
+        }
+    }
+
     /// <summary>A finger down on a card that has not yet become a tap or a hold, and whether it has become a hold.</summary>
     private (ViewHandle Handle, Point At, uint Pointer, bool Held)? _touch;
+
+    /// <summary>Whether the finger down on a row that <see cref="TouchScrubs"/> has gone along it, so is no tap.</summary>
+    private bool _scrubbing;
     private DispatcherTimer? _touchTimer;
 
     /// <summary>The finger's press let go of, wandered off or taken by a scroll: neither a tap nor a hold.</summary>
     private void ForgetTouch()
     {
         _touch = null;
+        _scrubbing = false;
         _touchTimer?.Stop();
     }
 
@@ -493,6 +523,16 @@ public sealed class CardBoardElement : SKCanvasElement
         if (TouchHolds && e.Pointer.PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Touch)
         {
             _touch = (handle, at, e.Pointer.PointerId, false);
+            _scrubbing = false;
+
+            // Thumbing through: the row keeps the finger, and the card under it comes forward at once.
+            if (TouchScrubs)
+            {
+                CapturePointer(e.Pointer);
+                e.Handled = true;
+                SetFocused(handle);
+            }
+
             if (_touchTimer is null)
             {
                 _touchTimer = new DispatcherTimer { Interval = TouchHoldAfter };
@@ -530,6 +570,24 @@ public sealed class CardBoardElement : SKCanvasElement
     /// <summary>Picks the pressed card up once the pointer has moved far enough with the button down, then carries it.</summary>
     private void OnPointerCarried(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
+        if (TouchScrubs && _touch is { } scrub && scrub.Pointer == e.Pointer.PointerId)
+        {
+            Point moved = e.GetCurrentPoint(this).Position;
+            if (!scrub.Held && !_scrubbing && (Math.Abs(moved.X - scrub.At.X) > TouchSlop || Math.Abs(moved.Y - scrub.At.Y) > TouchSlop))
+            {
+                _scrubbing = true;
+                _touchTimer?.Stop();
+            }
+
+            if (_scrubbing && CardAt(moved) is { } under)
+            {
+                SetFocused(under);
+            }
+
+            e.Handled = true;
+            return;
+        }
+
         if (_touch is { Held: false } touch && touch.Pointer == e.Pointer.PointerId)
         {
             Point moved = e.GetCurrentPoint(this).Position;
@@ -582,9 +640,15 @@ public sealed class CardBoardElement : SKCanvasElement
     {
         if (_touch is { } touch && touch.Pointer == e.Pointer.PointerId)
         {
+            bool scrubbed = _scrubbing;
             ForgetTouch();
             e.Handled = true;
-            if (!touch.Held && CardAt(e.GetCurrentPoint(this).Position) == touch.Handle)
+            if (TouchScrubs)
+            {
+                ReleasePointerCapture(e.Pointer);
+            }
+
+            if (!touch.Held && !scrubbed && CardAt(e.GetCurrentPoint(this).Position) == touch.Handle)
             {
                 CardClicked?.Invoke(touch.Handle);
             }

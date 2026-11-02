@@ -412,6 +412,12 @@ public sealed partial class MainPage
             return;
         }
 
+        _menu.Open(Root, _pointer, MenuItems(client, entries), abilities: [.. entries.Select(entry => entry[0].Option.AbilityIndex)], optionIds: [.. entries.Select(entry => entry[0].Option.OptionId)]);
+    }
+
+    /// <summary>A card's menu rows, each worded and with what choosing it does: one for each thing it offers.</summary>
+    private List<(string Text, Action OnChosen)> MenuItems(GameClient client, List<List<ManaRow>> entries)
+    {
         List<(string, Action)> items = [];
         foreach (var entry in entries)
         {
@@ -422,7 +428,7 @@ public sealed partial class MainPage
                     () => { Take(client, option, color, combination, sacrifice); RedrawNow(); }));
         }
 
-        _menu.Open(Root, _pointer, items, abilities: [.. entries.Select(entry => entry[0].Option.AbilityIndex)], optionIds: [.. entries.Select(entry => entry[0].Option.OptionId)]);
+        return items;
     }
 
     /// <summary>Whether auto-mana answers a card's menu: on by default or not, and Shift held turns it the other way.</summary>

@@ -268,6 +268,13 @@ public sealed partial class MainPage : Page
             board.CardClicked += handle =>
             {
                 NotePress(board);
+
+                // A phone's hand card tapped is looked at, with what it can do, before anything is done with it.
+                if (board == _handBoard && OpenCardSheet(handle))
+                {
+                    return;
+                }
+
                 OnCardClicked(handle);
             };
         }
@@ -475,8 +482,10 @@ public sealed partial class MainPage : Page
         {
             Windows.Foundation.Point at = e.GetCurrentPoint(Root).Position;
 
-            // A card held up is already the whole face, large; a box of the same words over it is in the way.
-            if (_inspector.Held is not null)
+            // A card held up is already the whole face, large; a box of the same words over it is in the way. A phone is
+            // touched, and a finger going along its cards is looking through them, not asking: a card is read there by
+            // tapping it or resting a finger on it (MainPage.PhoneHand.cs), never by a box that follows the finger.
+            if (_inspector.Held is not null || IsPhone)
             {
                 _tooltip.Hide();
                 return;
@@ -1643,6 +1652,10 @@ public sealed partial class MainPage : Page
         List<ObjectView> hand = InHandOrder([.. client.MyHand()]);
         _hand = hand;
         LayOutHand(client);
+        if (IsPhone)
+        {
+            FollowCardSheet(client);
+        }
         _handEmpty.Visibility = hand.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
         LayOutStack(client, [.. client.Zone(ZoneKindView.Stack, 0), .. StagedTriggers(client)]);
@@ -1959,25 +1972,25 @@ public sealed partial class MainPage : Page
 
         float available = viewportWidth - (2 * HandMarginX);
         int count = _hand.Count;
-        int hovered = _handBoard.Hovered is { } pointed ? _hand.FindIndex(card => card.Handle == pointed) : -1;
+        // A phone's hand is thumbed through rather than pointed along: the card the finger last went to comes out
+        // (MainPage.PhoneHand.cs), standing a little proud of the others.
+        ViewHandle? pulled = IsPhone ? _handBoard.Focused ?? _handBoard.Hovered : _handBoard.Hovered;
+        int hovered = pulled is { } pointed ? _hand.FindIndex(card => card.Handle == pointed) : -1;
 
-        // A phone is touched, never pointed at, so no card is pulled out and no room is kept for one: the cards share the
-        // whole width.
-        float step = IsPhone && count > 1
-            ? MathF.Min(HandCardWidth + CardGap, (available - HandCardWidth) / (count - 1))
-            : SpreadStep(count, available, HandCardWidth, HandCardWidth + CardGap);
+        float step = SpreadStep(count, available, HandCardWidth, HandCardWidth + CardGap);
         float reveal = MathF.Max(0f, HandCardWidth - step);
         float lying = ((count - 1) * step) + HandCardWidth;
 
         // Centred on the cards as they lie, but never so far right that pulling one out would push the last past the edge.
         float offset = HandMarginX + MathF.Max(0f, MathF.Min((available - lying) / 2f, available - lying - reveal));
         float top = (viewportHeight - HandCardHeight) / 2;
+        float proud = IsPhone ? MathF.Min(HandMarginY - 2f, MathF.Max(0f, top - 1f)) : 0f;
 
         List<CardBoardElement.BoardCell> cells = [];
         for (int i = 0; i < count; i++)
         {
             float x = offset + (i * step) + (hovered >= 0 && i > hovered ? reveal : 0f);
-            cells.Add(Cell(client, _hand[i], x, top, tapped: false));
+            cells.Add(Cell(client, _hand[i], x, i == hovered ? top - proud : top, tapped: false));
         }
 
         _handBoard.SetCells(cells);
