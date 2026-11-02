@@ -1,0 +1,72 @@
+# Coven counts different powers among the creatures you control: a declined search shuffles nothing, two 0-power
+# Ornithopters and the Farmhand are three creatures but two powers, and the opponent's 2-power Grizzly Bears does not
+# count, so the ability is refused; once Bot1's own Grizzly Bears makes three different powers it transforms, and the
+# transformed creature gains life from combat damage (CR 207.2c, 701.27a, 702.15b; the coven ruling of 2021-09-24).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Black Lotus
+Ambitious Farmhand
+Ornithopter
+Grizzly Bears
+Plains
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ambitious Farmhand.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Decline
+? Bot1.Shuffles = 0
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+! Bot1.Battlefield.Ambitious Farmhand.Activate(Ability: Transform)
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Ambitious Farmhand.Activate(Ability: Transform)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Seasoned Cathar.Transformed = true
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Seasoned Cathar > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 17
