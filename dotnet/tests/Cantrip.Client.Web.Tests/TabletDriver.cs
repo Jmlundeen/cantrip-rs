@@ -267,7 +267,10 @@ public sealed record TabletLine(int Decision, int Line, bool Take);
 /// one, <c>stack</c> and <c>opponent-stack</c> (a spell on the stack, turned to face seat 2 for the latter), <c>graveyard</c> or
 /// <c>exile</c> in a pile's open list (<c>opponent-</c> on the turned half) - and whose half that is.
 /// </summary>
-public sealed record TabletCard(string Name, bool Visible, string Place, int Seat, int Handle, bool Tapped, float X, float Y, float W, float H);
+public sealed record TabletCard(string Name, bool Visible, string Place, int Seat, int Handle, bool Tapped, float X, float Y, float W, float H, TabletPoint? FlewFrom = null);
+
+/// <summary>A point on the tablet's page: where a card last set off from.</summary>
+public sealed record TabletPoint(float X, float Y);
 
 /// <summary>A player's box on a tablet, which a tap picks them with.</summary>
 public sealed record TabletPlayer(int Seat, string Name, int Life, bool Turned, float X, float Y, float W, float H, IReadOnlyList<TabletPileSpot>? Piles = null);

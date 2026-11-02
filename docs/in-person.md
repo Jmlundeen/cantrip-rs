@@ -35,6 +35,10 @@ face them, seat 1's at the bottom, and between them the one prompt - the player'
 that player (`InPerson/TabletPromptPanel.cs`; "The prompt on the table", below). A player's own board has their rail at
 the top of the column and their prompt under it.
 
+**A card played from a phone** flies up out of the top of the phone as it leaves the hand, and onto the tablet from that
+player's edge of the board - the bottom for seat 1, the top for seat 2 on the shared tablet, the bottom of a player's own
+- to where it goes: the stack for a spell, the battlefield for a land. A card returned to a hand flies off at that edge.
+
 A seat's graveyard pile and, while it has cards in exile, its **Exile** button on a tablet's rail open a list of that
 pile over the seat's battlefield, turned with the half: every card as the public sees it (a card exiled face down is a
 back), the latest first, at the largest size that fits. A card in it is tapped as a permanent is - a creature card in a

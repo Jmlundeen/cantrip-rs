@@ -181,6 +181,18 @@ public sealed class InPersonTests(WebClient web)
         string? failure = await ScenarioPlayer.PlayAsync(web, ScenarioPath(Scenario), atTable: table);
         Assert.True(failure is null, $"{Scenario}:\n{failure}");
         await table.Tablets[0].PictureAsync("over");
+        await FlewInFromTheirSideAsync(table.Tablets[0]);
+    }
+
+    /// <summary>
+    /// Bot1's Mountain, played from their phone, flew onto the tablet from Bot1's side of it - the bottom edge, where they
+    /// sit - rather than from their rail.
+    /// </summary>
+    private static async Task FlewInFromTheirSideAsync(TabletDriver tablet)
+    {
+        TabletState state = await tablet.SettledAsync();
+        TabletCard mountain = state.Cards.First(card => card.Name == "Mountain" && card.Seat == 1);
+        Assert.True(mountain.FlewFrom is { } from && from.Y > TabletDriver.Height, $"Bot1's Mountain flew in from {mountain.FlewFrom}, not from below the tablet's bottom edge.");
     }
 
     /// <summary>
@@ -194,6 +206,7 @@ public sealed class InPersonTests(WebClient web)
         Assert.True(failure is null, $"{Scenario}:\n{failure}");
         await table.Tablets[0].PictureAsync("over");
         await table.Tablets[1].PictureAsync("over");
+        await FlewInFromTheirSideAsync(table.Tablets[0]);
     }
 
     /// <summary>

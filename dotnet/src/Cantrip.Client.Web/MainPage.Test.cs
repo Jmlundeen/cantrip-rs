@@ -550,6 +550,7 @@ public sealed partial class MainPage
         json.WriteBoolean("turnedForPortrait", _inspector.TurnedForPortrait);
         json.WriteNumber("cardSheet", _sheetShows?.Value ?? 0);
         json.WriteNumber("focused", _handBoard.Focused?.Value ?? 0);
+        json.WriteNumber("sentOff", _flights.SentOffFlown);
         if (_tablePromptShown is { } prompt)
         {
             json.WriteStartObject("tablePrompt");

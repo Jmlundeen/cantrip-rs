@@ -225,6 +225,7 @@ public sealed partial class MainPage
                 break;
             case [SheetItem only]:
                 _handBoard.Unfocus();
+                SendOffTheTop(handle);
                 only.OnChosen();
                 break;
             default:
@@ -232,6 +233,13 @@ public sealed partial class MainPage
                 break;
         }
     }
+
+    /// <summary>
+    /// A card played from the hand flies up out of the top of the phone as it leaves the hand, toward the table, where the
+    /// tablet flies it in from the player's side (TabletPage). A spell waiting on its targets or costs stays until then.
+    /// </summary>
+    private void SendOffTheTop(ViewHandle handle) =>
+        _flights.SendOff(handle, last => last with { Y = -(last.Width * BoardRows.AspectRatio) });
 
     private void CloseCardSheet()
     {
@@ -334,6 +342,11 @@ public sealed partial class MainPage
         }
 
         Action chosen = _sheetItems[index].OnChosen;
+        if (_sheetShows is { } played)
+        {
+            SendOffTheTop(played);
+        }
+
         CloseCardSheet();
         chosen();
     }

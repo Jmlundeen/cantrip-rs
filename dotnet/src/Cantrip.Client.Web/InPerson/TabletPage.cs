@@ -695,12 +695,22 @@ public sealed partial class TabletPage : UserControl
         _flights.Look(placed, (zone, owner) =>
         {
             TabletHalf? half = _halves.FirstOrDefault(each => each.Seat == owner);
+
+            // A hand is the player's phone, in their hands at their side of the table: a card played from it flies in
+            // from that edge of the board, and one returned to it flies off there.
+            if (zone == ZoneKindView.Hand && half is not null && half.Board.XamlRoot is not null && half.Board.ActualWidth > 0)
+            {
+                Point mid = half.Board.TransformToVisual(_root).TransformPoint(new Point(half.Board.ActualWidth / 2, 0));
+                float cardWidth = half.Board.CellWidth > 0 ? half.Board.CellWidth : 120f;
+                float off = cardWidth * 88f / 63f;
+                return new CardFlights.Pose((float)mid.X, half.Turned ? -off : (float)_root.ActualHeight + off, cardWidth, half.Turned ? 180f : 0f);
+            }
+
             FrameworkElement? pile = (zone, half) switch
             {
                 (_, null) => null,
                 (ZoneKindView.Library, { } h) => h.Rail.LibraryPile,
                 (ZoneKindView.Graveyard, { } h) => h.Rail.GraveyardPile,
-                (ZoneKindView.Hand, { } h) => h.Rail.HandFan,
                 _ => null,
             };
 

@@ -161,6 +161,24 @@ public sealed class CardFlights : SKCanvasElement
         Refresh();
     }
 
+    /// <summary>
+    /// Notes that a card is being played away from where it is - swiped up out of a phone's hand - so that when it next
+    /// leaves for somewhere not drawn here, it flies to where <paramref name="to"/> puts it from where it was last drawn,
+    /// and fades there, rather than to its zone's pile. Forgotten after a while, as a card played on is gone by then.
+    /// </summary>
+    public void SendOff(ViewHandle handle, Func<Pose, Pose> to)
+    {
+        if (_enabled)
+        {
+            _sentOff[handle] = (to, DateTime.UtcNow);
+        }
+    }
+
+    private readonly Dictionary<ViewHandle, (Func<Pose, Pose> To, DateTime At)> _sentOff = [];
+
+    /// <summary>How long a card sent off waits to leave: a spell's targets and costs are chosen first.</summary>
+    private static readonly TimeSpan SendOffFor = TimeSpan.FromSeconds(30);
+
     /// <summary>Notes a move the server reported, for the cards arriving from, or leaving for, a zone not drawn as cards.</summary>
     public void Moved(ObjectMovedEvent moved)
     {
@@ -273,8 +291,15 @@ public sealed class CardFlights : SKCanvasElement
         // The cards that left for a zone drawn only as a pile or a fan go to that pile or fan, and fade there.
         foreach ((ViewHandle handle, (ZoneKindView zone, int owner)) in _departures)
         {
-            if (_seen.Remove(handle, out Sighting? last) && _enabled && !settling && anchor(zone, owner) is { } pile)
+            Sighting? last = _seen.Remove(handle, out Sighting? seen) ? seen : null;
+            Pose? sent = _sentOff.Remove(handle, out var off) && last is not null && now - off.At < SendOffFor ? off.To(last.Pose) : null;
+            if (last is not null && _enabled && !settling && (sent ?? anchor(zone, owner)) is { } pile)
             {
+                if (sent is not null)
+                {
+                    SentOffFlown++;
+                }
+
                 Pose from = _flights.TryGetValue(handle, out Flight? flying) ? flying.Current : last.Pose;
                 Land(handle);
                 // Over everything laid out, and each after the last that left.
@@ -315,6 +340,9 @@ public sealed class CardFlights : SKCanvasElement
 
     /// <summary>How many cards have left for a pile, for drawing each over the ones that left before it.</summary>
     private long _leavings;
+
+    /// <summary>How many cards played away (<see cref="SendOff"/>) have flown off, for a test (?test).</summary>
+    public int SentOffFlown { get; private set; }
 
     /// <summary>How many cards have set off since the page opened, for a test to see that a move flew (?test).</summary>
     public int Launched { get; private set; }
@@ -388,6 +416,14 @@ public sealed class CardFlights : SKCanvasElement
             if (now - sighting.At > Memory && !_flights.ContainsKey(handle))
             {
                 _seen.Remove(handle);
+            }
+        }
+
+        foreach ((ViewHandle handle, (_, DateTime at)) in _sentOff.ToList())
+        {
+            if (now - at > SendOffFor)
+            {
+                _sentOff.Remove(handle);
             }
         }
 

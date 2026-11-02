@@ -463,7 +463,9 @@ constructor (`AttachPhone`), and does nothing on any other page: the remote clie
   others moved aside, standing a little proud of them, and it stays out once the thumb lifts; the row takes the finger
   rather than scrolling, and no tooltip follows it - the phone shows no tooltips at all. A card **swiped up** out of the
   hand (`CardFlicked`, a finger drawn up past `FlickDistance`, the card following it) is played: what it can do, when
-  that is one thing, or else its sheet. A finger **resting** on a hand card opens its **sheet** over the phone: the card
+  that is one thing, or else its sheet. A card played so, or from its sheet, flies up out of the top of the phone as it
+  leaves the hand (`CardFlights.SendOff`) - a spell waiting on its targets and costs stays until they are chosen - and
+  the tablet flies it in from the player's side. A finger **resting** on a hand card opens its **sheet** over the phone: the card
   as tall as the screen, its place in the hand, its note, and what it can do now, a button for each, worded as the card's
   menu words them ("Cast Lightning Bolt"), or that it can do nothing now; nothing is done until one is pressed, so a card
   is never played by touching it. The sheet pages through the hand by a swipe across the card or the arrows beside it,

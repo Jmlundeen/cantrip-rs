@@ -805,7 +805,14 @@ public sealed class ScenarioPlayer
                 if (state.InPerson is not null && state.Cards.FirstOrDefault(c => c.Visible && c.Place == "hand" && c.Handle == action.Source.Value) is { } held)
                 {
                     (float hx, float hy) = ClickPoint(state, held);
+                    int sentOff = state.InPerson.SentOff;
                     await _page.SwipeAsync([(hx, hy), (hx, hy - 90)]);
+
+                    // A land swiped up is played at once, and flies up out of the top of the phone as it leaves the hand.
+                    if (action.Kind == ActionKindView.PlayLand)
+                    {
+                        await _page.SettledAsync(s => s.InPerson?.SentOff > sentOff);
+                    }
                 }
                 else
                 {

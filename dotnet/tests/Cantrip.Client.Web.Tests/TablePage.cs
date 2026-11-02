@@ -401,7 +401,8 @@ public sealed record InPersonState(
     bool TurnedForPortrait = false,
     int Pressed = 0,
     int CardSheet = 0,
-    int Focused = 0);
+    int Focused = 0,
+    int SentOff = 0);
 
 /// <summary>The prompt a phone last sent the tablets: its version, whether it is private, its title and its items.</summary>
 public sealed record PhonePromptState(int Version, bool Private, string Title, IReadOnlyList<PhonePromptItem> Items);
