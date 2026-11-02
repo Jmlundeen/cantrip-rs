@@ -130,8 +130,9 @@ pub fn choose_source(g: &mut dyn Game, item: &StackItem, rule: Selection) -> Res
     Ok(crate::choose::select(g, item.controller, item.object, Purpose::Choose, sources, rule)?.first().copied())
 }
 
-/// Any source (`choose_source`): "a source of your choice".
-pub const SOURCE: Selection = Selection::new(Count::Exactly(1)).called("source");
+/// Any source (`choose_source`): "a source of your choice" - of damage, as the question is worded to its player ("choose a source
+/// of damage").
+pub const SOURCE: Selection = Selection::new(Count::Exactly(1)).called("source of damage");
 
 /// Whether damage is dealt by the source an effect is about, chosen as it was made (CR 609.7a): that object, or - where a
 /// permanent spell was chosen - the permanent it became as it resolved, "any damage dealt by that spell and any damage dealt
