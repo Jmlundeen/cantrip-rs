@@ -1,0 +1,47 @@
+# Lier gives flashback to instant and sorcery cards in the graveyard, judged as the card is there (CR 715.4): Bonecrusher Giant is
+# a creature card in the graveyard, though its Adventure Stomp is an instant, so it is not offered a flashback cast. Bot1 mills
+# Bonecrusher Giant and Leave // Chance with Faithless Looting; the split card (an instant and sorcery card, CR 709.4) is
+# flashed back as Leave and exiled, the Giant stays. Mana: Black Lotus and the Moxen.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Lier, Disciple of the Drowned
+Faithless Looting
+Bonecrusher Giant
+Leave // Chance
+Plains
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lier, Disciple of the Drowned.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Bonecrusher Giant; Leave // Chance)
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Bonecrusher Giant.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Leave // Chance.Cast(Ability: Leave: Flashback)
+Bot1.Target(Mox Emerald)
+
+[Expect]
+Turn = 3
+Exile = Leave // Chance
+Bot1.Hand = Mox Emerald
+Bot1.Graveyard = Faithless Looting; Bonecrusher Giant; Black Lotus
