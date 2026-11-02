@@ -1,0 +1,40 @@
+# Cubwarden mutated on top of Goldspan Dragon: the merged creature has the abilities of every component (CR 702.140e), so Goldspan's static still gives
+# Bot1's Treasures their two-mana ability, found on Goldspan's card though the top card is Cubwarden.
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Ruby
+Goldspan Dragon
+Black Lotus
+Cubwarden
+Mox Pearl
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Goldspan Dragon.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Goldspan Dragon; Ability: Mutate)
+Bot1.Pass
+Bot1.Modes(1)
+Bot1.Pass
+? Bot1.Battlefield.Cubwarden.Keywords = ?; Flying; Haste; Lifelink
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Cubwarden > Bot2)
+Bot1.Pass
+Bot1.Battlefield.Treasure Token#1.Activate(Ability: Add two; Color: Blue)
+? Bot1.Mana = {U}{U}
+[T1 Bot1.Main2]
+[Expect]
+Bot2.Life = 17
+
