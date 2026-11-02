@@ -163,34 +163,12 @@ catch (Exception error) when (error is IOException or InvalidOperationException 
 List<DeckList> standard = [];
 if (Directory.Exists(Path.Combine(decks, "standard")))
 {
-    int unplayable = 0;
-    List<string> illegal = [];
-    foreach (string path in Directory.GetFiles(Path.Combine(decks, "standard"), "*.txt").Order(StringComparer.Ordinal))
-    {
-        try
-        {
-            DeckList candidate = DeckList.Load(path);
-            candidate.Resolve([ContentCache.Get(content).Cards]);
-            DeckFormat standardFormat = DeckFormat.Find(DeckFormat.StandardKey)!;
-            IReadOnlyList<string> problems = Cantrip.Server.Decks.DeckValidation.Problems(Cantrip.Server.Decks.DeckValidation.Of(candidate, standardFormat), standardFormat,
-                Cantrip.Server.Decks.DeckCatalog.ByName(content), Cantrip.Server.Rules.RulesHostFactory.Native);
-            if (problems.Count > 0)
-            {
-                illegal.Add($"{candidate.Name}: {problems[0]}");
-                continue;
-            }
-
-            standard.Add(candidate);
-        }
-        catch (Exception error) when (error is IOException or InvalidOperationException or FormatException)
-        {
-            unplayable++;
-        }
-    }
-
-    Console.WriteLine($"{standard.Count} Standard deck(s) for the gauntlet{(unplayable == 0 ? string.Empty : $"; {unplayable} with cards the engine lacks left out")}"
-        + $"{(illegal.Count == 0 ? string.Empty : $"; {illegal.Count} not legal in Standard left out")}.");
-    foreach (string line in illegal) Console.WriteLine($"  {line}");
+    Cantrip.Server.Decks.FormatDecks.Loaded loaded = Cantrip.Server.Decks.FormatDecks.Load(
+        Path.Combine(decks, "standard"), DeckFormat.Find(DeckFormat.StandardKey)!, content);
+    standard = [.. loaded.Decks];
+    Console.WriteLine($"{standard.Count} Standard deck(s) for the gauntlet{(loaded.Unplayable == 0 ? string.Empty : $"; {loaded.Unplayable} with cards the engine lacks left out")}"
+        + $"{(loaded.Illegal.Count == 0 ? string.Empty : $"; {loaded.Illegal.Count} not legal in Standard left out")}.");
+    foreach (string line in loaded.Illegal) Console.WriteLine($"  {line}");
 }
 
 // Drafts, when there is somewhere to keep them.
@@ -280,6 +258,7 @@ if (EventStore.Configured(args) is { } data)
                 ContentRoot = content,
                 Store = store,
                 CubeDirectories = [cubes],
+                Decks = standard,
                 Ports = draftPorts,
                 Site = pages,
                 Art = art,

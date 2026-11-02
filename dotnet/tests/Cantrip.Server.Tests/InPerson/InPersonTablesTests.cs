@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text.Json;
 using Cantrip.Client.InPerson;
 using Cantrip.Protocol.InPerson;
+using Cantrip.Server;
 using Cantrip.Server.Events;
 using Cantrip.Server.InPerson;
 using Cantrip.TestKit;
@@ -51,11 +52,21 @@ public sealed class InPersonTablesTests : IDisposable
 
     private static readonly Uri Site = new("https://cantrip.example.com/");
 
+    /// <summary>Two of the Standard decks, as a host offers them.</summary>
+    private static readonly Lazy<IReadOnlyList<DeckList>> StandardDecks = new(() =>
+        [.. ((string[])["mono-red-aggro", "azorius-control"]).Select(name =>
+        {
+            DeckList deck = DeckList.Load(Path.Combine(RepoRoot.Path, "decks", "standard", name + ".txt"));
+            deck.Resolve([ContentCache.Get(RepoRoot.ContentRoot).Cards]);
+            return deck;
+        })]);
+
     private InPersonTables Tables(int mostGames = 2, int ports = 3) => new(new InPersonTablesOptions
     {
         ContentRoot = RepoRoot.ContentRoot,
         Store = _store,
         CubeDirectories = [Path.Combine(RepoRoot.Path, "docs", "cube-lists")],
+        Decks = StandardDecks.Value,
         Ports = FreePorts(ports),
         Site = Site,
         Art = Site,
@@ -67,6 +78,9 @@ public sealed class InPersonTablesTests : IDisposable
 
     private static SetupRequest Form(int layout = 3, string cube = "LSVCube", int packs = 2, params string[] names) =>
         new(names.Length == 0 ? ["Alice", "Bob"] : names, cube, packs, layout, false, null);
+
+    private static SetupRequest Constructed(params string[] decks) =>
+        new(["Alice", "Bob"], string.Empty, 0, 3, false, null, InPersonSetup.ConstructedMode, decks.Length == 0 ? ["mono-red-aggro", "azorius-control"] : decks);
 
     private static List<JsonElement> Devices(object state) =>
         [.. JsonSerializer.SerializeToElement(state).GetProperty("devices").EnumerateArray()];
@@ -89,6 +103,44 @@ public sealed class InPersonTablesTests : IDisposable
         EventRecord record = _store.LiveEvents().Single();
         Assert.All(record.Participants, participant => Assert.StartsWith("inperson-", participant.PlayerId, StringComparison.Ordinal));
         Assert.Equal("site", record.HostData[InPersonTables.HostedKey]);
+    }
+
+    [Fact]
+    public async Task A_constructed_table_holds_each_seat_for_its_deck_and_keeps_no_event()
+    {
+        await using InPersonTables tables = Tables();
+        CreatedInPersonTable created = await tables.CreateAsync(Constructed());
+
+        object state = tables.State(created.Id, created.Key)!;
+        JsonElement table = JsonSerializer.SerializeToElement(state).GetProperty("event");
+        Assert.Equal(("In person: Standard", "Seating"), (table.GetProperty("name").GetString(), table.GetProperty("stage").GetString()));
+        List<string> links = [.. Devices(state).Select(device => device.GetProperty("url").GetString()!)];
+        Assert.Equal(3, links.Count);
+        Assert.Empty(_store.LiveEvents());
+
+        // Each phone's ticket is its seat's at the table, and the relay knows the phone by it; a made-up one is nobody's.
+        foreach (string link in links.Take(2))
+        {
+            string ticket = link[(link.IndexOf("#ticket=", StringComparison.Ordinal) + "#ticket=".Length)..];
+            Assert.Equal(64, ticket.Length);
+            Assert.NotNull(tables.RelayFor(new DeviceHelloMessage { Ticket = ticket }));
+        }
+
+        Assert.Null(tables.RelayFor(new DeviceHelloMessage { Ticket = new string('0', 64) }));
+
+        Assert.True(await tables.CancelAsync(created.Id, created.Key));
+        Assert.Equal(0, tables.Count);
+    }
+
+    [Fact]
+    public async Task A_constructed_table_takes_only_two_of_the_decks_offered()
+    {
+        await using InPersonTables tables = Tables();
+        await Assert.ThrowsAsync<ArgumentException>(() => tables.CreateAsync(Constructed("mono-red-aggro")));
+        await Assert.ThrowsAsync<ArgumentException>(() => tables.CreateAsync(Constructed("mono-red-aggro", "no-such-deck")));
+        await Assert.ThrowsAsync<ArgumentException>(() => tables.CreateAsync(Constructed("mono-red-aggro", "../../decks/demo/1-black-red")));
+        await Assert.ThrowsAsync<ArgumentException>(() => tables.CreateAsync(Constructed() with { Mode = "sealed" }));
+        Assert.Equal(0, tables.Count);
     }
 
     [Fact]

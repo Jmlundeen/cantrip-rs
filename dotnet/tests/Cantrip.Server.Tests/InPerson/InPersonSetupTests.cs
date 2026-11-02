@@ -1,10 +1,12 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Cantrip.Client;
 using Cantrip.Client.InPerson;
 using Cantrip.Protocol;
 using Cantrip.Protocol.InPerson;
 using Cantrip.Server.Events;
+using Cantrip.Server.Host;
 using Cantrip.Server.InPerson;
 using Cantrip.TestKit;
 using Microsoft.AspNetCore.Http;
@@ -179,5 +181,71 @@ public sealed class InPersonSetupServerTests : IDisposable
         Assert.Equal([true, false, false, true], after.RootElement.GetProperty("devices").EnumerateArray().Select(device => device.GetProperty("connected").GetBoolean()));
         Assert.Equal("4", host.Pod!.Kept("inperson.layout"));
         Assert.Equal("off", host.Pod.Kept("inperson.clocks"));
+    }
+
+    [Fact]
+    public async Task The_form_starts_a_constructed_game_dealt_with_each_seats_deck_once_both_phones_sit()
+    {
+        DeckList[] decks = [.. ((string[])["mono-red-aggro", "azorius-control"]).Select(name =>
+        {
+            DeckList deck = DeckList.Load(Path.Combine(RepoRoot.Path, "decks", "standard", name + ".txt"));
+            deck.Resolve([ContentCache.Get(RepoRoot.ContentRoot).Cards]);
+            return deck;
+        })];
+        var rules = new CapturingRulesFactory();
+        await using InPersonHost host = await InPersonHost.StartAsync(new InPersonOptions
+        {
+            ContentRoot = RepoRoot.ContentRoot,
+            Store = new EventStore(Path.Combine(_data, "events")),
+            Decks = decks,
+            Port = 0,
+            TablePort = 0,
+            ListenAddress = "127.0.0.1",
+            ArtCache = Path.Combine(_data, "art"),
+            Rules = rules,
+        });
+        using var http = new HttpClient { BaseAddress = host.Site };
+
+        using (JsonDocument before = JsonDocument.Parse(await http.GetStringAsync("setup/api/state")))
+        {
+            Assert.Equal(["Azorius Control", "Mono-Red Aggro"], before.RootElement.GetProperty("decks").EnumerateArray().Select(deck => deck.GetProperty("title").GetString()));
+        }
+
+        HttpResponseMessage refused = await http.PostAsJsonAsync("setup/api/start",
+            new SetupRequest(["Alice", "Bob"], string.Empty, 0, 3, false, "127.0.0.1", InPersonSetup.ConstructedMode, ["mono-red-aggro", "no-such-deck"]));
+        Assert.Equal(HttpStatusCode.BadRequest, refused.StatusCode);
+
+        HttpResponseMessage started = await http.PostAsJsonAsync("setup/api/start",
+            new SetupRequest(["Alice", "Bob"], string.Empty, 0, 3, false, "127.0.0.1", InPersonSetup.ConstructedMode, ["mono-red-aggro", "azorius-control"]));
+        Assert.True(started.IsSuccessStatusCode, await started.Content.ReadAsStringAsync());
+        using JsonDocument state = JsonDocument.Parse(await started.Content.ReadAsStringAsync());
+        Assert.Equal("Seating", state.RootElement.GetProperty("event").GetProperty("stage").GetString());
+        List<string> links = [.. state.RootElement.GetProperty("devices").EnumerateArray().Select(device => device.GetProperty("url").GetString()!)];
+        Assert.Equal(3, links.Count);
+        Assert.Null(host.Pod);
+
+        // Each phone takes its seat by its link's ticket, as the page would, and the game is dealt with the decks chosen.
+        List<GameClient> phones = [];
+        foreach ((string link, string name) in links.Take(2).Zip(["Alice", "Bob"]))
+        {
+            string ticket = link[(link.IndexOf("#ticket=", StringComparison.Ordinal) + "#ticket=".Length)..];
+            var phone = new GameClient(await WebSocketTransport.ConnectAsync(new Uri($"ws://127.0.0.1:{host.Server!.Port}/game")));
+            phone.Join(name, 0, ticket);
+            phones.Add(phone);
+        }
+
+        DateTime deadline = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+        // The test's rules plays no game: the deal itself, with each seat's deck, is what is checked.
+        while (rules.Seats.Count < 2)
+        {
+            Assert.True(DateTime.UtcNow < deadline, "The game was never dealt: " + string.Join(" | ", phones.SelectMany(phone => phone.Errors).Select(error => $"{error.Code}: {error.Detail}")));
+            phones.ForEach(phone => phone.Pump());
+            await Task.Delay(20);
+        }
+
+        Assert.Equal(["Alice", "Bob"], rules.Seats.Select(seat => seat.Name));
+        Assert.Equal(decks[0].Entries.Sum(entry => entry.Copies), rules.Seats[0].Deck.Count);
+        Assert.Equal(decks[1].Entries.Sum(entry => entry.Copies), rules.Seats[1].Deck.Count);
+        Assert.Equal(decks[1].Sideboard.Sum(entry => entry.Copies), rules.Seats[1].Sideboard.Count);
     }
 }

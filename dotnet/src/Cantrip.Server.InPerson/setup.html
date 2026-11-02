@@ -43,7 +43,7 @@
 <body>
 <main>
   <h1>Cantrip in person</h1>
-  <p class="lede">Two players at one table: a phone each for hands and prompts, a tablet or two for the board.
+  <p class="lede">Two players at one table: a phone each for their hand and private choices, a tablet or two for the board and the prompts.
     This page is only served to this computer, since its codes seat whoever scans them.</p>
 
   <form id="setup" hidden>
@@ -51,9 +51,18 @@
       <label>Seat 1 <input type="text" id="name1" maxlength="32" value="Player 1" required></label>
       <label>Seat 2 <input type="text" id="name2" maxlength="32" value="Player 2" required></label>
     </div>
-    <div class="row">
+    <fieldset id="modes">
+      <legend>Play</legend>
+      <label><input type="radio" name="mode" value="grid" checked> A grid draft of a cube, then a game with the decks built</label>
+      <label id="mode-constructed" hidden><input type="radio" name="mode" value="constructed"> A constructed game: each player brings a <span id="mode-format">Constructed</span> deck</label>
+    </fieldset>
+    <div class="row" id="draft-choices">
       <label>Cube <select id="cube"></select></label>
       <label>Grids <input type="number" id="packs" min="1" max="60" value="18"></label>
+    </div>
+    <div class="row" id="deck-choices" hidden>
+      <label>Seat 1's deck <select id="deck1"></select></label>
+      <label>Seat 2's deck <select id="deck2"></select></label>
     </div>
     <fieldset>
       <legend>Devices</legend>
@@ -93,6 +102,7 @@ function fill(state) {
     if ($("setup").hidden) {
       $("cube").replaceChildren(...state.cubes.map(name => new Option(name, name, false, name === state.cube)));
       $("address").replaceChildren(...state.addresses.map(each => new Option(`${each.address} (${each.name})`, each.address, false, each.address === state.address)));
+      fillDecks(state);
       $("setup").hidden = false;
     }
     return;
@@ -148,17 +158,44 @@ $("setup").addEventListener("submit", async event => {
     layout: Number(document.querySelector("input[name=layout]:checked").value),
     clocks: $("clocks").checked,
     address: $("address").value,
+    mode: constructed() ? "constructed" : "grid",
+    decks: constructed() ? [$("deck1").value, $("deck2").value] : null,
   };
   try {
     const answer = await fetch("setup/api/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const result = await answer.json();
-    if (!answer.ok) $("error").textContent = result.error || "The draft could not be started.";
+    if (!answer.ok) $("error").textContent = result.error || "The table could not be started.";
     else fill(result);
   } catch (error) {
     $("error").textContent = String(error);
   }
   $("start").disabled = false;
 });
+
+// A grid draft of a cube, or a constructed game: each seat a deck of the format's, two different ones to begin with.
+function fillDecks(state) {
+  const decks = state.decks || [];
+  if (decks.length === 0) return;
+  $("mode-constructed").hidden = false;
+  $("mode-format").textContent = state.format || "Constructed";
+  const first = Math.floor(Math.random() * decks.length);
+  const second = decks.length > 1 ? (first + 1 + Math.floor(Math.random() * (decks.length - 1))) % decks.length : first;
+  [["deck1", first], ["deck2", second]].forEach(([id, chosen]) =>
+    $(id).replaceChildren(...decks.map((deck, i) => new Option(deck.title, deck.name, false, i === chosen))));
+}
+
+function constructed() {
+  return document.querySelector("input[name=mode]:checked").value === "constructed";
+}
+
+function showMode() {
+  const playing = constructed();
+  $("draft-choices").hidden = playing;
+  $("deck-choices").hidden = !playing;
+  $("start").textContent = playing ? "Start the game" : "Start the draft";
+}
+
+document.querySelectorAll("input[name=mode]").forEach(radio => radio.addEventListener("change", showMode));
 
 refresh();
 setInterval(refresh, 1000);

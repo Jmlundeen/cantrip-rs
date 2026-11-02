@@ -5,7 +5,8 @@ player's phone holds what only that player may see - the hand, a library search,
 public board, what anyone at the table may look at, and each player's prompt by their side of it, answered there. One machine runs the
 server; every other device browses to it over the local network or a phone's hotspot.
 
-The event is a two-player grid draft, then the games. The remote web client is unchanged by any of it: in-person play
+A table plays a two-player grid draft and then a game with the decks built, or a constructed game ("Constructed",
+below). The remote web client is unchanged by any of it: in-person play
 has its own entry point, its own server process and its own wire, and nothing in the remote client's path reads them.
 
 ## Device layouts
@@ -140,8 +141,9 @@ says where the opponent's stop it too. The tablets mark the steps the table stop
   device token the relay minted (`?inperson=tablet&side=N&art=...#device=D`); tablets talk only to the relay's
   `/inperson/socket`. A welcomed device keeps a resume id and a 256-bit proof for its tab, compared in constant time;
   scanning a QR code again takes the device's place over. A device's link opened again in the tab it was opened in - the way back for a page that has stuck - loads the page anew (`InPerson.js`, `Ticket.js`): the credential was taken out of the address on the first load, so the link differs from it only after its `#`, and a browser would only move to the fragment (`LinkAgainTests`).
-- **Setup.** A setup page, served on loopback only since its QR codes hold credentials, takes the players' names, the
-  cube, the packs and the layout, starts the draft and shows a QR code for each device and which are connected. Match
+- **Setup.** A setup page, served on loopback only since its QR codes hold credentials, takes the players' names, what
+  is played - a grid draft (the cube and the packs) or a constructed game (each seat's deck) - and the layout, starts
+  the table and shows a QR code for each device and which are connected. Match
   and pick clocks are off by default, since the players are at the same table; a checkbox on the page turns them on.
 - **Transport.** The devices speak plain WebSocket over the local network. That is accepted for a table whose devices
   share one room's network; the credentials still keep a stray device on it from taking a seat.
@@ -246,6 +248,24 @@ event, and a table clock of a week (`GameServerOptions.PlayerClock` must be more
 runs out), with deck building given four hours and the absences that forfeit a remote player (`NoShow`, `Away`) twelve,
 since a phone asleep on the table is not a player gone. The checkbox gives the event's usual clocks instead.
 
+## Constructed
+
+A constructed game is the other thing a table plays: each player brings a deck of the format's - Standard, any of the
+lists in `decks/standard` the engine can play and that are legal there, the same ones the bot's Standard gauntlet offers
+(`FormatDecks`) - and the two play one game. The setup form picks each seat's deck from a list of them, two different
+ones to begin with, chosen at random; nothing is drafted or built.
+
+There is no event: the table is an ordinary `GameServer` in the format (`GameServerOptions.Format`, which checks each
+deck as it is chosen and again as it is dealt), its decks the ones offered, each seat held for its player and the deck
+chosen by a ticket of the table's (`GameServer.Reserve`, `RequireTickets`), and its game dealt through the relay
+(`ObservedRulesFactory`) as a draft's games are (`ConstructedGame`, `InPersonSetup.ConstructedOptions`). A phone's link
+holds its seat's ticket, which seats it ready, and the game is dealt once both phones have sat down; until then the phone
+shows the table's lobby and the tablets say the table is waiting for both phones. A phone's re-entry code (its
+home-screen app's first launch, "Full screen") is traded for the same ticket, which takes the seat back from the browser
+tab once that tab's connection is gone. Nothing of a constructed game is kept in the data directory: it is one game, and
+another is set up again. The setup page and the hosted page's state say its stage as `Seating`, `Playing` and then
+`Complete`, with who won.
+
 ## Hosted in person
 
 The Discord bot's site hosts in-person tables too, on the cloud server behind its Cloudflare tunnel: anyone opens
@@ -253,8 +273,8 @@ The Discord bot's site hosts in-person tables too, on the cloud server behind it
 `Cantrip.Server.InPerson` and mounted by one call in the bot's `ClientSite` (`InPersonTables.Map`); docs/discord-bot.md,
 "In person", has the bot's side.
 
-- **The page.** `/inperson` (`hosted.html`, in the site's look) takes the two names, the cube, the grids, the layout and
-  the clocks; there is no address to pick, since the devices reach the public URL. Its API is
+- **The page.** `/inperson` (`hosted.html`, in the site's look) takes the two names, a grid draft's cube and grids or a
+  constructed game's two decks, the layout and the clocks; there is no address to pick, since the devices reach the public URL. Its API is
   `/inperson/api/choices`, `/inperson/api/start`, `/inperson/api/table` and `/inperson/api/cancel`; the relay's socket
   is `/inperson/socket`.
 - **A table already going.** Before showing the form the page looks for its visitor's open table - the signed-in

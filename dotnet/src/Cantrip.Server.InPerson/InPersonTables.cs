@@ -29,6 +29,9 @@ public sealed class InPersonTablesOptions
     /// <summary>Where the cube lists are: the only cubes a table may be drafted from.</summary>
     public required IReadOnlyList<string> CubeDirectories { get; init; }
 
+    /// <summary>The decks a constructed game offers each seat: the Standard decks (<see cref="Cantrip.Server.Decks.FormatDecks"/>); none offers no constructed game.</summary>
+    public IReadOnlyList<DeckList> Decks { get; init; } = [];
+
     /// <summary>
     /// The ports a table may take - the host's pool for its tables, shared with its other hosts: a port another table holds
     /// refuses, and the next is tried.
@@ -160,19 +163,20 @@ public sealed class InPersonTables : IAsyncDisposable
         owner is null ? [] : [.. _tables.Values.Where(table => table.Owner == owner).OrderBy(table => table.Opened).Select(table => table.Id)];
 
     /// <summary>
-    /// Makes the grid draft a form asks for and opens its table, <paramref name="owner"/>'s - a signed-in account, which
-    /// may then reach it from any browser - or nobody's. Throws <see cref="ArgumentException"/> for a form outside its
-    /// limits, <see cref="InPersonAlreadyHostingException"/> when the owner already has a table going, and
+    /// Makes the grid draft or the constructed game a form asks for and opens its table, <paramref name="owner"/>'s - a
+    /// signed-in account, which may then reach it from any browser - or nobody's. Throws <see cref="ArgumentException"/> for
+    /// a form outside its limits, <see cref="InPersonAlreadyHostingException"/> when the owner already has a table going, and
     /// <see cref="InPersonBusyException"/> when every table is being played or no port is free.
     /// </summary>
     public async Task<CreatedInPersonTable> CreateAsync(SetupRequest request, string? owner = null)
     {
-        InPersonSetup.Validate(request, Cubes());
+        InPersonSetup.Validate(request, Cubes(), [.. _options.Decks.Select(deck => deck.Name)]);
         await _gate.WaitAsync().ConfigureAwait(false);
         try
         {
             if (Mine(owner) is [{ } going, ..]) throw new InPersonAlreadyHostingException(going);
             if (_tables.Count >= _options.MostGames) throw Busy();
+            if (request.Constructed) return await CreateConstructedAsync(request, owner).ConfigureAwait(false);
 
             // Players of their own, never a name's: a name is anybody's to type, and a record it named would be someone else's.
             string players = "inperson-" + Hex(6);
@@ -204,7 +208,7 @@ public sealed class InPersonTables : IAsyncDisposable
             string id = Hex(8);
             string key = Hex(32);
             DateTimeOffset now = _options.TimeProvider.GetUtcNow();
-            var table = new Table(id, Hash(key), owner, pod, seating.Relay, server, server.Port, InPersonSetup.Links(seating, _options.Site, address, _options.Art), now);
+            var table = new Table(id, Hash(key), owner, pod, null, seating.Relay, server, server.Port, InPersonSetup.Links(seating, _options.Site, address, _options.Art), now);
             _tables[id] = table;
             _options.Log?.Invoke($"In person: table {id} (event {eventId}) opened on port {server.Port}; {_tables.Count} of {_options.MostGames} in play.");
             return new CreatedInPersonTable(id, key);
@@ -216,6 +220,42 @@ public sealed class InPersonTables : IAsyncDisposable
     }
 
     /// <summary>
+    /// Opens a constructed game's table on the first free port of the pool, each seat held for its player and deck. Nothing
+    /// of it is kept in the data directory: one game, set up again to play another. Called under the gate.
+    /// </summary>
+    private async Task<CreatedInPersonTable> CreateConstructedAsync(SetupRequest request, string? owner)
+    {
+        var game = new ConstructedGame(request.Names, [.. request.Decks!.Select(name => _options.Decks.First(deck => deck.Name == name))]);
+        (InPersonRelay relay, List<(int Side, string Token)> tablets) = InPersonSetup.SeatConstructed(game, request.Layout, _options.TimeProvider,
+            line => _options.Log?.Invoke($"In-person relay: {line}"));
+        GameServer? server = null;
+        foreach (int port in _options.Ports)
+        {
+            try
+            {
+                server = await GameServer.StartAsync(InPersonSetup.ConstructedOptions(game, relay, _options.Rules, port, _options.ContentRoot,
+                    _options.ListenAddress, _options.Art, request.Clocks, _options.TimeProvider)).ConfigureAwait(false);
+                break;
+            }
+            catch (IOException)
+            {
+                // Another table holds it: the next is tried.
+            }
+        }
+
+        if (server is null) throw Busy();
+        game.Reserve(server);
+        Uri address = _options.TableAddress?.Invoke(server.Port) ?? new Uri($"ws://{_options.PublicHost}:{server.Port}/game");
+        string id = Hex(8);
+        string key = Hex(32);
+        var table = new Table(id, Hash(key), owner, null, game, relay, server, server.Port,
+            InPersonSetup.Links(game.Seating(relay, tablets), _options.Site, address, _options.Art), _options.TimeProvider.GetUtcNow());
+        _tables[id] = table;
+        _options.Log?.Invoke($"In person: table {id} (a constructed game) opened on port {server.Port}; {_tables.Count} of {_options.MostGames} in play.");
+        return new CreatedInPersonTable(id, key);
+    }
+
+    /// <summary>
     /// What the creator's page shows of table <paramref name="id"/> - its event and its devices' codes - or null for no such
     /// table, or for one asked for with neither its key nor its <paramref name="owner"/>.
     /// </summary>
@@ -223,10 +263,10 @@ public sealed class InPersonTables : IAsyncDisposable
     {
         if (Creators(id, key, owner) is not { } table) return null;
         IReadOnlyList<DeviceStatus> statuses = table.Relay.Devices;
-        StatusEventDetail? detail = table.Detail;
+        (_, string line, string stage) = table.Status;
         return new
         {
-            @event = new { name = table.Pod.Name, stage = detail?.Event.Stage ?? string.Empty, detail = InPersonHost.PhaseLine(detail) },
+            @event = new { name = table.Name, stage, detail = line },
             welcomed = table.Relay.Welcomed,
             unclaimedMinutes = (int)_options.Unclaimed.TotalMinutes,
             devices = table.Devices.Select((device, i) => new
@@ -275,7 +315,7 @@ public sealed class InPersonTables : IAsyncDisposable
         int cancelled = 0;
         foreach (EventRecord record in _options.Store.LiveEvents().Where(record => record.HostData.GetValueOrDefault(HostedKey) == "site").ToList())
         {
-            if (_tables.Values.Any(table => table.Pod.EventId == record.Id)) continue;
+            if (_tables.Values.Any(table => table.Pod?.EventId == record.Id)) continue;
             try
             {
                 DraftPod.Open(_options.Store, record.Id, _library, _options.TimeProvider).Cancel("The site stopped while it was being played.");
@@ -344,6 +384,8 @@ public sealed class InPersonTables : IAsyncDisposable
             {
                 cubes,
                 cube = cubes.Contains("LSVCube") ? "LSVCube" : cubes.FirstOrDefault(),
+                decks = InPersonSetup.DeckChoices(_options.Decks).Select(deck => new { name = deck.Name, title = deck.Title }),
+                format = InPersonSetup.ConstructedFormat.Title,
                 mostPacks = InPersonSetup.MostPacks,
                 longestName = InPersonSetup.LongestName,
                 busy = _tables.Count >= _options.MostGames,
@@ -434,8 +476,8 @@ public sealed class InPersonTables : IAsyncDisposable
         }
         finally
         {
-            table.Pod.Cancel(why);
-            _options.Log?.Invoke($"In person: table {table.Id} (event {table.Pod.EventId}) closed. {why}");
+            table.Pod?.Cancel(why);
+            _options.Log?.Invoke($"In person: table {table.Id} ({(table.Pod is { } pod ? $"event {pod.EventId}" : "a constructed game")}) closed. {why}");
         }
     }
 
@@ -488,9 +530,14 @@ public sealed class InPersonTables : IAsyncDisposable
                     nextLook = now + TimeSpan.FromSeconds(1);
                     foreach (Table table in _tables.Values)
                     {
-                        StatusEventDetail? detail = board.Detail(table.Pod.EventId);
-                        table.Detail = detail;
-                        table.Relay.Phase(InPersonHost.PhaseOf(detail), InPersonHost.PhaseLine(detail));
+                        if (table.Pod is { } pod)
+                        {
+                            StatusEventDetail? detail = board.Detail(pod.EventId);
+                            table.Detail = detail;
+                        }
+
+                        (Cantrip.Protocol.TablePhase phase, string line, _) = table.Status;
+                        table.Relay.Phase(phase, line);
                     }
 
                     await SweepAsync().ConfigureAwait(false);
@@ -555,7 +602,8 @@ public sealed class InPersonTables : IAsyncDisposable
     /// <summary>What the creator's page asks with: the table and its key, in the request's body.</summary>
     private sealed record TableKey(string? Id, string? Key);
 
-    private sealed class Table(string id, byte[] keyHash, string? owner, DraftPod pod, InPersonRelay relay, GameServer server, int port, IReadOnlyList<DeviceLink> devices, DateTimeOffset opened)
+    /// <summary>A table being played: its draft's event, or its constructed game.</summary>
+    private sealed class Table(string id, byte[] keyHash, string? owner, DraftPod? pod, ConstructedGame? constructed, InPersonRelay relay, GameServer server, int port, IReadOnlyList<DeviceLink> devices, DateTimeOffset opened)
     {
         public string Id { get; } = id;
 
@@ -564,7 +612,16 @@ public sealed class InPersonTables : IAsyncDisposable
         /// <summary>The signed-in account that made it, which reaches it from any browser; null for nobody's.</summary>
         public string? Owner { get; } = owner;
 
-        public DraftPod Pod { get; } = pod;
+        public DraftPod? Pod { get; } = pod;
+
+        public ConstructedGame? Constructed { get; } = constructed;
+
+        public string Name => Pod?.Name ?? Constructed!.Name;
+
+        /// <summary>Where the table stands, for its tablets and its creator's page.</summary>
+        public (Cantrip.Protocol.TablePhase Phase, string Line, string Stage) Status => Constructed is { } game
+            ? game.Status(Server)
+            : (InPersonHost.PhaseOf(Detail), InPersonHost.PhaseLine(Detail), Detail?.Event.Stage ?? string.Empty);
 
         public InPersonRelay Relay { get; } = relay;
 

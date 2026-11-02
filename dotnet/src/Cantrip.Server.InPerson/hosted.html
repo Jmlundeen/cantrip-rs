@@ -12,6 +12,7 @@
   .ip-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .ip-form fieldset { border: 1px solid var(--line, #8884); border-radius: 8px; padding: 8px 12px 10px; margin: 0; }
   .ip-form fieldset label, .ip-check { display: flex; gap: 8px; align-items: center; font-weight: 400; }
+  .ip-form [hidden] { display: none !important; }
   .ip-devices { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 16px; }
   .ip-device { border: 1px solid var(--line, #8884); border-radius: 10px; padding: 14px; display: grid; gap: 8px; justify-items: center; text-align: center; }
   .ip-device h2 { font-size: 16px; margin: 0; }
@@ -52,9 +53,18 @@
       <label>Seat 1 <input type="text" id="name1" maxlength="32" value="Player 1" required></label>
       <label>Seat 2 <input type="text" id="name2" maxlength="32" value="Player 2" required></label>
     </div>
-    <div class="ip-two">
+    <fieldset id="modes">
+      <legend>Play</legend>
+      <label><input type="radio" name="mode" value="grid" checked> A grid draft of a cube, then a game with the decks built</label>
+      <label id="mode-constructed" hidden><input type="radio" name="mode" value="constructed"> A constructed game: each player brings a <span id="mode-format">Constructed</span> deck</label>
+    </fieldset>
+    <div class="ip-two" id="draft-choices">
       <label>Cube <select id="cube"></select></label>
       <label>Grids <input type="number" id="packs" min="1" max="60" value="18"></label>
+    </div>
+    <div class="ip-two" id="deck-choices" hidden>
+      <label>Seat 1's deck <select id="deck1"></select></label>
+      <label>Seat 2's deck <select id="deck2"></select></label>
     </div>
     <fieldset>
       <legend>Devices</legend>
@@ -154,6 +164,31 @@
     return null;
   }
 
+  // A grid draft of a cube, or a constructed game: each seat a deck of the format's, two different ones to begin with.
+  function fillDecks(state) {
+    const decks = state.decks || [];
+    if (decks.length === 0) return;
+    $("mode-constructed").hidden = false;
+    $("mode-format").textContent = state.format || "Constructed";
+    const first = Math.floor(Math.random() * decks.length);
+    const second = decks.length > 1 ? (first + 1 + Math.floor(Math.random() * (decks.length - 1))) % decks.length : first;
+    [["deck1", first], ["deck2", second]].forEach(([id, chosen]) =>
+      $(id).replaceChildren(...decks.map((deck, i) => new Option(deck.title, deck.name, false, i === chosen))));
+  }
+
+  function constructed() {
+    return document.querySelector("input[name=mode]:checked").value === "constructed";
+  }
+
+  function showMode() {
+    const playing = constructed();
+    $("draft-choices").hidden = playing;
+    $("deck-choices").hidden = !playing;
+    $("start").textContent = playing ? "Start the game" : "Start the draft";
+  }
+
+  document.querySelectorAll("input[name=mode]").forEach(radio => radio.addEventListener("change", showMode));
+
   async function choices() {
     try {
       const answer = await fetch("inperson/api/choices", { cache: "no-store" });
@@ -163,6 +198,7 @@
         filled = true;
         $("cube").replaceChildren(...state.cubes.map(name => new Option(name, name, false, name === state.cube)));
         $("packs").max = state.mostPacks;
+        fillDecks(state);
         $("rules").textContent = `A table nobody joins within ${state.unclaimedMinutes} minutes is closed. At most ${state.mostGames} in-person tables are played at once.`;
       }
 
@@ -301,6 +337,8 @@
       packs: Number($("packs").value),
       layout: Number(document.querySelector("input[name=layout]:checked").value),
       clocks: $("clocks").checked,
+      mode: constructed() ? "constructed" : "grid",
+      decks: constructed() ? [$("deck1").value, $("deck2").value] : null,
     };
     try {
       const answer = await fetch("inperson/api/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -309,7 +347,7 @@
         $("start").disabled = false;
         // The asker's table is already going: the page says so and offers it back.
         if (result.going) return start();
-        $("error").textContent = result.error || "The draft could not be started.";
+        $("error").textContent = result.error || "The table could not be started.";
         if (result.busy) busy(true);
         return;
       }

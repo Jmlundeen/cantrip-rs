@@ -127,25 +127,6 @@ public static class PlaySite
     private static SeatAnswer Seat(PlaySiteOptions options, ulong player, Seating? seating, string refusal) =>
         SeatAnswer.For(options.Client, options.Art, options.Access, player, null, null, seating?.Refusal ?? refusal);
 
-    /// <summary>
-    /// A deck as the list names it: its file's first comment up to a colon (<c># Mono-Red Aggro: a Standard meta deck</c>),
-    /// else its file name in words.
-    /// </summary>
-    internal static string Title(DeckList deck)
-    {
-        try
-        {
-            if (File.ReadLines(deck.Source).FirstOrDefault() is { } first && first.StartsWith('#'))
-            {
-                string title = first.TrimStart('#').Split(':', 2)[0].Trim();
-                if (title.Length > 0) return title;
-            }
-        }
-        catch (IOException)
-        {
-            // Named from the file instead.
-        }
-
-        return string.Join(' ', deck.Name.Split('-', StringSplitOptions.RemoveEmptyEntries).Select(word => char.ToUpperInvariant(word[0]) + word[1..]));
-    }
+    /// <summary>A deck as the list names it (<see cref="Cantrip.Server.Decks.FormatDecks.Title"/>).</summary>
+    internal static string Title(DeckList deck) => Cantrip.Server.Decks.FormatDecks.Title(deck);
 }

@@ -30,6 +30,9 @@ public sealed class InPersonOptions
     /// <summary>Where the cube lists are, for the setup page's choice of cube.</summary>
     public IReadOnlyList<string> CubeDirectories { get; init; } = [];
 
+    /// <summary>The decks a constructed game offers each seat: the Standard decks (<see cref="Cantrip.Server.Decks.FormatDecks"/>).</summary>
+    public IReadOnlyList<DeckList> Decks { get; init; } = [];
+
     /// <summary>The site's port: the client, the relay's socket and the setup page. Zero for any free port.</summary>
     public int Port { get; init; } = 5200;
 
@@ -51,15 +54,24 @@ public sealed class InPersonOptions
     public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
 }
 
-/// <summary>What the setup page's form asks for (docs/in-person.md, "Setup").</summary>
-public sealed record SetupRequest(IReadOnlyList<string> Names, string Cube, int Packs, int Layout, bool Clocks, string? Address);
+/// <summary>
+/// What the setup page's form asks for (docs/in-person.md, "Setup"): the players' names, the devices, clocks and the
+/// address, and what is played - a grid draft of a cube (<see cref="Mode"/> "grid" or null), or a constructed game with
+/// each seat's deck, by name, from the decks offered (<see cref="Mode"/> "constructed", <see cref="Decks"/>).
+/// </summary>
+public sealed record SetupRequest(IReadOnlyList<string> Names, string Cube, int Packs, int Layout, bool Clocks, string? Address,
+    string? Mode = null, IReadOnlyList<string>? Decks = null)
+{
+    /// <summary>Whether the form asks for a constructed game rather than a draft.</summary>
+    public bool Constructed => Mode == InPersonSetup.ConstructedMode;
+}
 
 /// <summary>
 /// In-person play's server (docs/in-person.md): one site, on every interface, serving the web client at its root, the
 /// relay's socket at <c>/inperson</c> and - to this computer alone - the setup page at <c>/setup</c>. The page starts a
-/// grid draft for two and shows a QR code for each device; the draft, deck building and the games are then played at an
-/// ordinary <c>GameServer</c> on the network, its every game dealt through an <see cref="ObservedRulesFactory"/> so the
-/// relay sees each step.
+/// grid draft for two, or a constructed game of two offered decks, and shows a QR code for each device; the draft, deck
+/// building and the games are then played at an ordinary <c>GameServer</c> on the network, its every game dealt through an
+/// <see cref="ObservedRulesFactory"/> so the relay sees each step.
 /// </summary>
 public sealed class InPersonHost : IAsyncDisposable
 {
@@ -101,7 +113,7 @@ public sealed class InPersonHost : IAsyncDisposable
     /// <summary>The table being played, or null before one is started.</summary>
     public GameServer? Server => _table?.Server;
 
-    /// <summary>The event being played, or null before one is started.</summary>
+    /// <summary>The event being played, or null before one is started or for a constructed game, which is none.</summary>
     public DraftPod? Pod => _table?.Pod;
 
     /// <summary>The devices' links, in the relay's order (<see cref="InPersonRelay.Devices"/>), or none before a table is started.</summary>
@@ -173,15 +185,21 @@ public sealed class InPersonHost : IAsyncDisposable
         }
     }
 
-    /// <summary>Makes the grid draft the setup page asked for and hosts it.</summary>
+    /// <summary>Makes the grid draft or the constructed game the setup page asked for and hosts it.</summary>
     public async Task StartTableAsync(SetupRequest request)
     {
-        InPersonSetup.Validate(request, Cubes());
+        InPersonSetup.Validate(request, Cubes(), [.. _options.Decks.Select(deck => deck.Name)]);
 
         await _starting.WaitAsync().ConfigureAwait(false);
         try
         {
             if (_table is not null) throw new InvalidOperationException("A table is already being played here.");
+            if (request.Constructed)
+            {
+                _table = await OpenConstructedAsync(request).ConfigureAwait(false);
+                return;
+            }
+
             string first = EventStore.ToId(request.Names[0]);
             string second = EventStore.ToId(request.Names[1]);
             if (second == first) second += "-2";
@@ -228,20 +246,16 @@ public sealed class InPersonHost : IAsyncDisposable
         int devices = pod.Kept(LayoutKey) == "4" ? 4 : 3;
         bool clocked = pod.Kept(ClocksKey) == "on";
 
-        string lan = address is { Length: > 0 } given && IPAddress.TryParse(given, out _) ? given
-            : LanAddress.Candidates().FirstOrDefault()?.Address.ToString() ?? "127.0.0.1";
+        string lan = Lan(address);
 
         InPersonSetup.Seating seating = InPersonSetup.Seat(pod, devices, _options.TimeProvider, line => _site.Logger.LogWarning("In-person relay: {Line}", line));
         InPersonRelay relay = seating.Relay;
 
-        int artPort = _options.TablePort == 0 ? 0 : _options.TablePort + 1;
-        string artCache = _options.ArtCache ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Cantrip", "art-cache");
-        WebApplication art = await ArtServer.StartAsync(new ArtStore(new ArtStoreOptions { ContentRoot = _options.ContentRoot, CacheDirectory = artCache }),
-            _options.ListenAddress, artPort).ConfigureAwait(false);
+        WebApplication art = await StartArtAsync().ConfigureAwait(false);
         GameServer server;
         try
         {
-            int servedArt = art.Urls.Select(each => new Uri(each).Port).First(port => port != 0);
+            int servedArt = ArtPort(art);
 
             // The tablets are shown the grid draft as both players see it, from the event on the table's thread.
             var observed = new ObservedTableEvent(pod, relay);
@@ -266,13 +280,61 @@ public sealed class InPersonHost : IAsyncDisposable
             throw;
         }
 
-        int sitePort = Site.Port;
-        // A tablet is sent no TableMessage, which tells a seat's page where art is: its link says.
-        List<DeviceLink> links = InPersonSetup.Links(seating, new Uri($"http://{lan}:{sitePort}/"), new Uri($"ws://{lan}:{server.Port}/game"),
-            new Uri($"http://{lan}:{art.Urls.Select(each => new Uri(each).Port).First(port => port != 0)}/"));
-        _site.Logger.LogInformation("In person: event {Event} at ws://{Address}:{Port}/game; devices at http://{Address}:{Site}/.", pod.EventId, lan, server.Port, lan, sitePort);
-        return new Table(pod, relay, server, art, links, lan);
+        List<DeviceLink> links = LinksFor(seating, lan, server, art);
+        _site.Logger.LogInformation("In person: event {Event} at ws://{Address}:{Port}/game; devices at http://{Address}:{Site}/.", pod.EventId, lan, server.Port, lan, Site.Port);
+        return new Table(pod, null, relay, server, art, links, lan);
     }
+
+    /// <summary>
+    /// Opens a constructed game's table: each seat held for its player and the deck the form chose, the game dealt as soon as
+    /// both phones have taken their seats. Nothing of it is kept in the data directory: it is one game, set up again to play
+    /// another.
+    /// </summary>
+    private async Task<Table> OpenConstructedAsync(SetupRequest request)
+    {
+        var game = new ConstructedGame(request.Names, [.. request.Decks!.Select(name => _options.Decks.First(deck => deck.Name == name))]);
+        string lan = Lan(request.Address ?? _options.Address);
+        (InPersonRelay relay, List<(int Side, string Token)> tablets) = InPersonSetup.SeatConstructed(game, request.Layout, _options.TimeProvider,
+            line => _site.Logger.LogWarning("In-person relay: {Line}", line));
+        WebApplication art = await StartArtAsync().ConfigureAwait(false);
+        GameServer server;
+        try
+        {
+            server = await GameServer.StartAsync(InPersonSetup.ConstructedOptions(game, relay, _options.Rules, _options.TablePort, _options.ContentRoot,
+                _options.ListenAddress, new Uri($"http://{lan}:{ArtPort(art)}/"), request.Clocks, _options.TimeProvider)).ConfigureAwait(false);
+            game.Reserve(server);
+        }
+        catch
+        {
+            await art.DisposeAsync().ConfigureAwait(false);
+            throw;
+        }
+
+        List<DeviceLink> links = LinksFor(game.Seating(relay, tablets), lan, server, art);
+        _site.Logger.LogInformation("In person: a constructed game at ws://{Address}:{Port}/game; devices at http://{Address}:{Site}/.", lan, server.Port, lan, Site.Port);
+        return new Table(null, game, relay, server, art, links, lan);
+    }
+
+    /// <summary>The address the devices reach this computer at: the one given, else the best on the network.</summary>
+    private static string Lan(string? address) => address is { Length: > 0 } given && IPAddress.TryParse(given, out _) ? given
+        : LanAddress.Candidates().FirstOrDefault()?.Address.ToString() ?? "127.0.0.1";
+
+    /// <summary>Card art, served beside the table on the port after its own.</summary>
+    private Task<WebApplication> StartArtAsync()
+    {
+        int artPort = _options.TablePort == 0 ? 0 : _options.TablePort + 1;
+        string artCache = _options.ArtCache ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Cantrip", "art-cache");
+        return ArtServer.StartAsync(new ArtStore(new ArtStoreOptions { ContentRoot = _options.ContentRoot, CacheDirectory = artCache }),
+            _options.ListenAddress, artPort);
+    }
+
+    private static int ArtPort(WebApplication art) => art.Urls.Select(each => new Uri(each).Port).First(port => port != 0);
+
+    /// <summary>
+    /// Each device's link. A tablet is sent no TableMessage, which tells a seat's page where art is: its link says.
+    /// </summary>
+    private List<DeviceLink> LinksFor(InPersonSetup.Seating seating, string lan, GameServer server, WebApplication art) =>
+        InPersonSetup.Links(seating, new Uri($"http://{lan}:{Site.Port}/"), new Uri($"ws://{lan}:{server.Port}/game"), new Uri($"http://{lan}:{ArtPort(art)}/"));
 
     /// <summary>What the setup page shows: the form's choices before a table is started, its devices after.</summary>
     internal object State()
@@ -287,6 +349,8 @@ public sealed class InPersonHost : IAsyncDisposable
                 started = false,
                 cubes,
                 cube = cubes.Contains("LSVCube") ? "LSVCube" : cubes.FirstOrDefault(),
+                decks = InPersonSetup.DeckChoices(_options.Decks).Select(deck => new { name = deck.Name, title = deck.Title }),
+                format = InPersonSetup.ConstructedFormat.Title,
                 addresses = (object[])[
                     .. _options.Address is { } given && addresses.All(each => each.Address.ToString() != given) ? [new { address = given, name = "given" }] : Array.Empty<object>(),
                     .. addresses.Select(each => new { address = each.Address.ToString(), name = each.Name }),
@@ -296,11 +360,11 @@ public sealed class InPersonHost : IAsyncDisposable
         }
 
         IReadOnlyList<DeviceStatus> statuses = table.Relay.Devices;
-        StatusEventDetail? detail = new EventStatusBoard(_options.Store).Detail(table.Pod.EventId);
+        (_, string line, string stage) = Status(table, new EventStatusBoard(_options.Store));
         return new
         {
             started = true,
-            @event = new { id = table.Pod.EventId, name = table.Pod.Name, stage = detail?.Event.Stage ?? string.Empty, detail = PhaseLine(detail) },
+            @event = new { id = table.Pod?.EventId ?? string.Empty, name = table.Pod?.Name ?? table.Constructed!.Name, stage, detail = line },
             address = table.Address,
             devices = table.Devices.Select((device, i) => new
             {
@@ -330,8 +394,8 @@ public sealed class InPersonHost : IAsyncDisposable
                     if (now >= nextPhase)
                     {
                         nextPhase = now + TimeSpan.FromSeconds(1);
-                        StatusEventDetail? detail = board.Detail(table.Pod.EventId);
-                        table.Relay.Phase(PhaseOf(detail), PhaseLine(detail));
+                        (TablePhase phase, string line, _) = Status(table, board);
+                        table.Relay.Phase(phase, line);
                     }
                 }
             }
@@ -350,6 +414,14 @@ public sealed class InPersonHost : IAsyncDisposable
                 break;
             }
         }
+    }
+
+    /// <summary>Where a table stands: its event's stage, or its constructed game's.</summary>
+    private static (TablePhase Phase, string Line, string Stage) Status(Table table, EventStatusBoard board)
+    {
+        if (table.Constructed is { } game) return game.Status(table.Server);
+        StatusEventDetail? detail = board.Detail(table.Pod!.EventId);
+        return (PhaseOf(detail), PhaseLine(detail), detail?.Event.Stage ?? string.Empty);
     }
 
     /// <summary>The table's phase as the event's stage says.</summary>
@@ -415,5 +487,6 @@ public sealed class InPersonHost : IAsyncDisposable
         return new SvgQRCode(data).GetGraphic(4, "#000000", "#ffffff", drawQuietZones: true, sizingMode: SvgQRCode.SizingMode.ViewBoxAttribute);
     }
 
-    private sealed record Table(DraftPod Pod, InPersonRelay Relay, GameServer Server, WebApplication Art, IReadOnlyList<DeviceLink> Devices, string Address);
+    /// <summary>A table being played: its draft's event, or its constructed game.</summary>
+    private sealed record Table(DraftPod? Pod, ConstructedGame? Constructed, InPersonRelay Relay, GameServer Server, WebApplication Art, IReadOnlyList<DeviceLink> Devices, string Address);
 }

@@ -41,8 +41,14 @@ if (repository is not null && WebClientFiles.Stale(client, repository) is { } st
     Console.Error.WriteLine(stale);
 }
 
+// The decks a constructed game offers: the Standard decks the engine can play, as the bot's gauntlet offers them.
+IReadOnlyList<Cantrip.Server.DeckList> decks = FindUp(Path.Combine("decks", "standard")) is { } standardDecks
+    ? Cantrip.Server.Decks.FormatDecks.Load(standardDecks, Cantrip.Server.InPerson.InPersonSetup.ConstructedFormat, content).Decks
+    : [];
+
 await using InPersonHost host = await InPersonHost.StartAsync(new InPersonOptions
 {
+    Decks = decks,
     ContentRoot = content,
     Store = new EventStore(data),
     ClientRoot = client,

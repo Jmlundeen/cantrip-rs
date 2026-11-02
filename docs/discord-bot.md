@@ -383,8 +383,8 @@ WebSocket through to a port while, and only while, an in-person table holds it (
 ## In person
 
 With a data directory and the bot serving the client, `/inperson` on its site is in-person play (docs/in-person.md,
-"Hosted in person"): anyone, signed in or not, sets up a grid draft for two players at one physical table and is shown a
-QR code for each phone and tablet. Its tables take the draft ports, as every other draft table does, and tell their
+"Hosted in person"): anyone, signed in or not, sets up a grid draft or a constructed game (each player one of the
+Standard gauntlet's decks) for two players at one physical table and is shown a QR code for each phone and tablet. Its tables take the draft ports, as every other draft table does, and tell their
 devices the bot's own art; the devices open the client at the site's address, their tables at
 `wss://.../table/{port}/game` through the proxy and the relay at `wss://.../inperson/socket`. At most
 `--in-person-games` (2) are played at once; a table no device comes to within 15 minutes, or every device has left for
