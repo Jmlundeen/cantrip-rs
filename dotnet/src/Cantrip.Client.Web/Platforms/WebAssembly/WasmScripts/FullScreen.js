@@ -40,10 +40,24 @@
 
     // The screen kept on while the page is full screen (the Screen Wake Lock API). One lock at a time: a request on its
     // way is not made twice, and a lock granted after full screen was left is let go at once.
+    //
+    // Safari does not always keep to the API: a lock it has let go may never say so ("release"), and a request may never
+    // be answered. So a lock is taken for gone once it says it is released, a request unanswered for a few seconds is
+    // taken for refused, and the lock is looked at again every few seconds as well as on every touch.
     let awake = null;
     let asking = false;
+    let askedAt = 0;
+    const AskFor = 5000;
     const wantsAwake = () => inPerson && document.visibilityState === "visible" && (!!element() || standalone());
     const keepAwake = () => {
+        if (awake && awake.released === true) {
+            awake = null;
+        }
+
+        if (asking && Date.now() - askedAt > AskFor) {
+            asking = false;
+        }
+
         if (!wantsAwake()) {
             if (awake) {
                 const held = awake;
@@ -59,6 +73,7 @@
         }
 
         asking = true;
+        askedAt = Date.now();
         let asked;
         try {
             asked = navigator.wakeLock.request("screen");
@@ -69,6 +84,12 @@
 
         Promise.resolve(asked).then((lock) => {
             asking = false;
+            if (awake && awake !== lock) {
+                // A request taken for refused was answered after all, beside a later one: one lock is enough.
+                Promise.resolve(lock.release()).catch(() => { });
+                return;
+            }
+
             awake = lock;
             lock.addEventListener("release", () => {
                 if (awake === lock) {
@@ -102,7 +123,13 @@
 
     if (inPerson) {
         document.addEventListener("visibilitychange", keepAwake);
-        document.addEventListener("pointerup", keepAwake, true);
+        window.addEventListener("pageshow", keepAwake);
+        window.addEventListener("focus", keepAwake);
+        for (const touch of ["pointerdown", "pointerup", "touchend", "click"]) {
+            document.addEventListener(touch, keepAwake, true);
+        }
+
+        setInterval(keepAwake, 15000);
         keepAwake();
     }
 

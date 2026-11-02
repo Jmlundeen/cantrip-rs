@@ -11,13 +11,15 @@ namespace Cantrip.Client.Web;
 /// card ever being played by a slip of the thumb.
 /// <list type="bullet">
 /// <item>The whole hand is in view at once, across the phone, each card showing at least its name's start.</item>
-/// <item>A thumb drawn along the hand thumbs through it: the card under the thumb comes out whole and stands proud of the
-/// others, and stays so once the thumb lifts. Nothing is played and no box of words follows the thumb.</item>
-/// <item>A tap opens the card's sheet: the card as large as the phone allows, beside what it can do now, each a button
-/// worded as its menu row is ("Cast Lightning Bolt", "Cycling {2}") - or that it can do nothing now. Nothing is done
-/// until one is pressed. The sheet pages through the hand by a swipe across the card or its arrows, and shuts with a tap
-/// off it or Close.</item>
-/// <item>A finger resting on a card still holds it up over the whole phone, turned to be read upright.</item>
+/// <item>A touch on a card, or a thumb drawn along the hand, brings the card under the thumb out whole, the others moved
+/// aside, standing proud of them; it stays so once the thumb lifts. Nothing is played and no box of words follows the
+/// thumb.</item>
+/// <item>A card swiped up out of the hand is played: what it can do, when that is one thing; its sheet, when it can do
+/// several (cast it or cycle it) or nothing now.</item>
+/// <item>A finger resting on a card opens its sheet: the card as large as the phone allows, beside what it can do now,
+/// each a button worded as its menu row is ("Cast Lightning Bolt", "Cycling {2}") - or that it can do nothing now.
+/// Nothing is done until one is pressed. The sheet pages through the hand by a swipe across the card or its arrows, and
+/// shuts with a tap off it or Close.</item>
 /// </list>
 /// A tap that answers a question about the hand - a card to discard, a card chosen for an effect, a target - answers it at
 /// once, as on every table: those are picked and confirmed, not played.
@@ -66,6 +68,8 @@ public sealed partial class MainPage
                 LayOutHand(client);
             }
         };
+
+        _handBoard.CardFlicked += PlayFromHand;
 
         // The hand is all in view at once and taken by the thumb along it: it never scrolls.
         _handScroll.HorizontalScrollMode = ScrollMode.Disabled;
@@ -178,8 +182,8 @@ public sealed partial class MainPage
     }
 
     /// <summary>
-    /// Opens the sheet on a card tapped in the hand, unless the tap answers a question about the hand, which it then does
-    /// instead: whether the sheet took the tap.
+    /// Opens the sheet on a hand card held or swiped up, unless the hand is answering a question - a card to discard, a
+    /// target - where a held card is held up to be read as any other is: whether the sheet opened.
     /// </summary>
     private bool OpenCardSheet(ViewHandle handle)
     {
@@ -194,6 +198,39 @@ public sealed partial class MainPage
         _sheet.Visibility = Visibility.Visible;
         FollowCardSheet(client);
         return true;
+    }
+
+    /// <summary>
+    /// Whether a tap on a hand card only brings it forward (<see cref="CardBoardElement.Focused"/>, done as the finger went
+    /// down): on a phone, unless the tap answers a question about the hand.
+    /// </summary>
+    private bool TapOnlyLooks(ViewHandle handle) =>
+        IsPhone && _gameClient is { } client && _hand.Exists(card => card.Handle == handle) && SheetItems(client, handle) is not null;
+
+    /// <summary>
+    /// A hand card swiped up: what it can do, when that is one thing; its sheet, to choose, when it can do several or
+    /// nothing now; and where the hand answers a question - a card to discard, a target - the card as a tap would pick it.
+    /// </summary>
+    private void PlayFromHand(ViewHandle handle)
+    {
+        if (!IsPhone || _gameClient is not { } client || !_hand.Exists(card => card.Handle == handle))
+        {
+            return;
+        }
+
+        switch (SheetItems(client, handle))
+        {
+            case null:
+                OnCardClicked(handle);
+                break;
+            case [SheetItem only]:
+                _handBoard.Unfocus();
+                only.OnChosen();
+                break;
+            default:
+                OpenCardSheet(handle);
+                break;
+        }
     }
 
     private void CloseCardSheet()

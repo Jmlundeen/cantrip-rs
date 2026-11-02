@@ -458,15 +458,18 @@ constructor (`AttachPhone`), and does nothing on any other page: the remote clie
   a row of them, scrolling down to more.
 - **The hand** (`MainPage.PhoneHand.cs`) is looked through, read and played without a slip of the thumb playing
   anything. It is all in view across the phone's width, side by side while the cards fit and laid over one another once
-  they do not, each still showing two fifths of itself, as large as that and the height over the prompt allow. A thumb
-  drawn along it thumbs through it (`CardBoardElement.TouchScrubs`): the card under the thumb comes out whole, standing a
-  little proud of the others, and stays out once the thumb lifts; the row takes the finger rather than scrolling, and no
-  tooltip follows it - the phone shows no tooltips at all. A tap opens the card's **sheet** over the phone: the card as
-  tall as the screen, its place in the hand, its note, and what it can do now, a button for each, worded as the card's
-  menu words them ("Cast Lightning Bolt"), or that it can do nothing now; nothing is done until one is pressed, so a
-  card is never played by touching it. The sheet pages through the hand by a swipe across the card or the arrows beside
-  it, and shuts with Close or a tap off it, and by itself once its card leaves the hand or a choice fills the phone. A tap
-  that answers a question about the hand - a card to discard or choose, a target - answers it at once, as on every table.
+  they do not, each still showing two fifths of itself, as large as that and the height over the prompt allow. A touch on
+  a card, or a thumb drawn along the hand (`CardBoardElement.TouchScrubs`), brings the card under the thumb out whole, the
+  others moved aside, standing a little proud of them, and it stays out once the thumb lifts; the row takes the finger
+  rather than scrolling, and no tooltip follows it - the phone shows no tooltips at all. A card **swiped up** out of the
+  hand (`CardFlicked`, a finger drawn up past `FlickDistance`, the card following it) is played: what it can do, when
+  that is one thing, or else its sheet. A finger **resting** on a hand card opens its **sheet** over the phone: the card
+  as tall as the screen, its place in the hand, its note, and what it can do now, a button for each, worded as the card's
+  menu words them ("Cast Lightning Bolt"), or that it can do nothing now; nothing is done until one is pressed, so a card
+  is never played by touching it. The sheet pages through the hand by a swipe across the card or the arrows beside it,
+  and shuts with Close or a tap off it, and by itself once its card leaves the hand or a choice fills the phone. A tap
+  that answers a question about the hand - a card to discard or choose, a target - answers it at once, as on every table
+  (a swipe up picks it too), and a finger resting on a card then holds it up to read, as below.
 - **Reading a card.** A finger resting on any card the phone draws holds it up (`CardBoardElement.TouchHolds`), filling
   the screen - turned a quarter round while the phone is held sideways, its top toward the phone's own top
   (`screen.orientation.angle`), so it is read by turning the phone upright, as large as the phone's length makes it
@@ -518,8 +521,9 @@ constructor (`AttachPhone`), and does nothing on any other page: the remote clie
   itself is a string. `ScenarioPlayer.PlayAsync(..., phone: true)` plays a scenario on a phone-sized touch page held sideways, tapping
   the hand and the dock with a finger, passing and announcing X from the prompt as a tablet presses it, opening each
   player's Board from the drawer to find what is on the battlefield, setting a stop in the Stops view and unsetting it,
-  thumbing through the hand with a drawn finger and opening a card's sheet, paging it and shutting it, playing each card
-  from its sheet's button, holding a card of the hand up with a resting finger and putting it down, scrolling a choice of cards to the one it wants and tapping every permanent and player on the "tablet" through that queue, the table
+  thumbing through the hand with a drawn finger and bringing a card forward with a tap, opening a card's sheet with a
+  resting finger, paging it and shutting it, playing each card by swiping it up (and from its sheet's row, where it can
+  do several things), holding a card of a board up with a resting finger and putting it down, scrolling a choice of cards to the one it wants and tapping every permanent and player on the "tablet" through that queue, the table
   judging each answer against the script (`PhoneTests`: Bolt at a Tarmogoyf with the Mountain tapped at priority, Fireball
   at a player paid with lands tapped during the payment, Engineered Explosives' X planned with a land tapped as it is
   announced, Archdruid's Charm's search filling the phone, and the taps the phone must not use). The prompt shown on the

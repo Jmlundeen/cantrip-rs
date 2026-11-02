@@ -799,7 +799,19 @@ public sealed class ScenarioPlayer
                 // `Menu` is the menu this action opens: none, for a card with one thing to do - never one an earlier card opened.
                 _lastMenu = string.Empty;
                 _lastTargeting = string.Empty;
-                await ClickHandleAsync(action.Source.Value);
+
+                // A phone's hand card is played by swiping it up out of the hand: done, for a card with one thing to do;
+                // its sheet, with a row for each, for a card with several (MainPage.PhoneHand.cs).
+                if (state.InPerson is not null && state.Cards.FirstOrDefault(c => c.Visible && c.Place == "hand" && c.Handle == action.Source.Value) is { } held)
+                {
+                    (float hx, float hy) = ClickPoint(state, held);
+                    await _page.SwipeAsync([(hx, hy), (hx, hy - 90)]);
+                }
+                else
+                {
+                    await ClickHandleAsync(action.Source.Value);
+                }
+
                 TableState after = await _page.SettledAsync();
 
                 // A known library top is also drawn on its pile. Clicking the pile opens the pane;
@@ -1253,6 +1265,11 @@ public sealed class ScenarioPlayer
             await _page.ClickAsync(boards[board], "button");
             shown = await _page.SettledAsync(s => s.InPerson?.Board == true && s.InPerson.Drawer == false);
             await _page.PictureAsync($"phone-board-request-{_asking}-{board + 1}");
+            if (!_phoneBoardHeld)
+            {
+                await PhoneBoardHoldAsync(shown);
+            }
+
             handles.AddRange(shown.Cards.Where(c => c.Visible).Where(which).Select(c => c.Handle).Where(handle => !handles.Contains(handle)));
         }
 
@@ -1279,64 +1296,85 @@ public sealed class ScenarioPlayer
     }
 
     /// <summary>
-    /// A card of the phone's hand held up by resting a finger on it: filling the phone, turned to be read with the phone
-    /// upright while it is held sideways, and still up once the finger is lifted; the next tap puts it down and plays nothing.
+    /// The phone's hand looked through without playing anything (MainPage.PhoneHand.cs): a thumb drawn along it from the
+    /// first card to the last brings each forward in turn, the last staying out once lifted, with no tooltip and no sheet;
+    /// a tap on the first brings it forward instead, and nothing more; then a finger resting on it opens its sheet, which
+    /// pages to the next card and shuts again - the question where it was throughout.
     /// </summary>
     private async Task PhoneHoldAsync()
     {
         TableState before = await _page.SettledAsync(s => s.InPerson?.View == "hand");
-        if (before.Cards.FirstOrDefault(card => card.Visible && card.Place == "hand") is not { } card)
-        {
-            return;
-        }
-
-        (float x, float y) = ClickPoint(before, card);
-        await PhoneThumbThroughAsync(before);
-        await _page.HoldAsync(x, y, TimeSpan.FromMilliseconds(800));
-        await _page.SettledAsync(s => s.Held > 0 && s.InPerson?.TurnedForPortrait == true);
-        await _page.PictureAsync($"phone-held-request-{_asking}");
-        await _page.TapAsync(x, y);
-        TableState after = await _page.SettledAsync(s => s.Held == 0);
-        if (after.InPerson?.TablePrompt?.Version != before.InPerson?.TablePrompt?.Version && after.Cards.Count(c => c.Place == "hand") != before.Cards.Count(c => c.Place == "hand"))
-        {
-            throw new Xunit.Sdk.XunitException("Putting a card held up on the phone down played it.");
-        }
-    }
-
-    /// <summary>
-    /// The phone's hand looked through without playing anything (MainPage.PhoneHand.cs): a thumb drawn along it from the
-    /// first card to the last brings each forward in turn, the last staying out once lifted, with no tooltip and no sheet;
-    /// then a card tapped opens its sheet, which pages to the next card and shuts again - the question where it was.
-    /// </summary>
-    private async Task PhoneThumbThroughAsync(TableState before)
-    {
         List<CardState> hand = [.. before.Cards.Where(c => c.Visible && c.Place == "hand").OrderBy(c => c.X)];
-        if (hand.Count < 2)
+        if (hand.Count == 0)
         {
             return;
         }
 
-        await _page.SwipeAsync([ClickPoint(before, hand[0]), (hand[^1].X, hand[^1].Y)]);
-        TableState thumbed = await _page.SettledAsync(s => s.InPerson?.Focused == hand[^1].Handle);
-        await _page.PictureAsync($"phone-thumbed-request-{_asking}");
-        if (thumbed.InPerson!.CardSheet != 0 || thumbed.Tooltip.Length > 0 || thumbed.RequestId != before.RequestId)
+        if (hand.Count > 1)
         {
-            throw new Xunit.Sdk.XunitException($"Thumbing through the phone's hand did more than look: sheet {thumbed.InPerson.CardSheet}, tooltip \"{thumbed.Tooltip}\", request {before.RequestId} -> {thumbed.RequestId}.");
+            await _page.SwipeAsync([ClickPoint(before, hand[0]), (hand[^1].X, hand[^1].Y)]);
+            TableState thumbed = await _page.SettledAsync(s => s.InPerson?.Focused == hand[^1].Handle);
+            await _page.PictureAsync($"phone-thumbed-request-{_asking}");
+            LookedOnly(thumbed, "Thumbing through the phone's hand");
+
+            (float tx, float ty) = ClickPoint(thumbed, thumbed.Cards.First(c => c.Visible && c.Handle == hand[0].Handle));
+            await _page.TapAsync(tx, ty);
+            LookedOnly(await _page.SettledAsync(s => s.InPerson?.Focused == hand[0].Handle), "A tap on a card of the phone's hand");
         }
 
-        (float x, float y) = ClickPoint(thumbed, thumbed.Cards.First(c => c.Visible && c.Handle == hand[0].Handle));
-        await _page.TapAsync(x, y);
+        TableState forward = await _page.SettledAsync();
+        (float x, float y) = ClickPoint(forward, forward.Cards.First(c => c.Visible && c.Handle == hand[0].Handle));
+        await _page.HoldAsync(x, y, TimeSpan.FromMilliseconds(800));
         await _page.SettledAsync(s => s.InPerson?.CardSheet == hand[0].Handle);
         await _page.PictureAsync($"phone-sheet-request-{_asking}");
-        await _page.ClickAsync("Next card", "button");
-        await _page.SettledAsync(s => s.InPerson?.CardSheet is > 0 and var shown && shown != hand[0].Handle);
+        if (hand.Count > 1)
+        {
+            await _page.ClickAsync("Next card", "button");
+            await _page.SettledAsync(s => s.InPerson?.CardSheet is > 0 and var shown && shown != hand[0].Handle);
+        }
+
         await _page.ClickAsync("Close the card", "button");
         TableState shut = await _page.SettledAsync(s => s.InPerson?.CardSheet == 0);
         if (shut.RequestId != before.RequestId)
         {
             throw new Xunit.Sdk.XunitException("Looking at a card's sheet on the phone answered the question.");
         }
+
+        void LookedOnly(TableState state, string what)
+        {
+            if (state.InPerson!.CardSheet != 0 || state.Tooltip.Length > 0 || state.RequestId != before.RequestId)
+            {
+                throw new Xunit.Sdk.XunitException($"{what} did more than look: sheet {state.InPerson.CardSheet}, tooltip \"{state.Tooltip}\", request {before.RequestId} -> {state.RequestId}.");
+            }
+        }
     }
+
+    /// <summary>
+    /// A card of a board on the phone held up by resting a finger on it: filling the phone, turned to be read with the phone
+    /// upright while it is held sideways, and still up once the finger is lifted; the next tap puts it down and plays nothing.
+    /// </summary>
+    private async Task PhoneBoardHoldAsync(TableState shown)
+    {
+        if (shown.Cards.FirstOrDefault(card => card.Visible && card.Place == "battlefield") is not { } card)
+        {
+            return;
+        }
+
+        _phoneBoardHeld = true;
+        (float x, float y) = ClickPoint(shown, card);
+        await _page.HoldAsync(x, y, TimeSpan.FromMilliseconds(800));
+        await _page.SettledAsync(s => s.Held > 0 && s.InPerson?.TurnedForPortrait == true);
+        await _page.PictureAsync($"phone-held-request-{_asking}");
+        await _page.TapAsync(x, y);
+        TableState after = await _page.SettledAsync(s => s.Held == 0);
+        if (after.RequestId != shown.RequestId)
+        {
+            throw new Xunit.Sdk.XunitException("Putting a card held up on the phone down answered the question.");
+        }
+    }
+
+    /// <summary>Whether a card of a board on the phone has been held up, which is done once a game.</summary>
+    private bool _phoneBoardHeld;
 
     /// <summary>Whether the phone's Stops view has been visited, which is done once a game.</summary>
     private bool _phoneViewsSeen;

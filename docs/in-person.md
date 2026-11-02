@@ -58,8 +58,8 @@ phone, then looks at the board for the rest, without their eyes going back and f
   accent: the one whose phone has a question of the game's to answer (`PromptCard.Asking`), turned round on the shared
   board when it is seat 2's. While nobody is asked - between one question and the next - the last one asked stays, so the
   panel does not turn back and forth.
-- **What is shown.** The phone's dock as it stands: the toggles (Auto Pass, Pass Turn, Hold Priority), what is asked
-  and the detail under it, an error the table gave, Undo while there is a mana ability to take back, and the dock's
+- **What is shown.** The phone's dock as it stands, but for its toggles (Auto Pass, Pass Turn, Hold Priority), which
+  are the player's own way of playing and set on the phone: what is asked and the detail under it, an error the table gave, Undo while there is a mana ability to take back, and the dock's
   buttons and steppers ("-", "X = 2", "+"), each a finger's size. A button tapped on the tablet is pressed on the phone,
   exactly as a finger on it there would; nothing on the tablet answers it, and the table judges what the phone sends.
   The phone shows the same prompt under its hand, so a player looking at their cards answers there instead.
@@ -185,7 +185,10 @@ no change to its viewport (`FullScreenTests` checks that).
 - **The screen stays on.** While an in-person page is full screen - by the Fullscreen API, or as an app opened from the
   Home Screen - it holds a screen wake lock (`navigator.wakeLock.request("screen")`), so a tablet or a phone does not go
   dark mid-game, and lets it go when full screen is left. A browser drops the lock whenever the page is hidden; the
-  script asks again when it is shown, and after a tap, where a browser wants one first. A browser without the Screen
+  script asks again when it is shown, and after a tap, where a browser wants one first. Safari does not always keep to
+  the API - a lock it lets go may never say so, a request may never be answered - so a lock that says it is released is
+  taken for gone, a request unanswered for five seconds is taken for refused, and the lock is looked at again every
+  fifteen seconds and on every touch. A browser without the Screen
   Wake Lock API (Safari before 16.4) sleeps as it is set to. `FullScreenTests` checks the lock with a stand-in for the
   API, which headless Chromium refuses.
 - **The notch and the home indicator.** With `viewport-fit=cover` the page lies under them; the script reads

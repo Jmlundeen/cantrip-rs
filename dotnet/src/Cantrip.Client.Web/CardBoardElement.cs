@@ -103,11 +103,29 @@ public sealed class CardBoardElement : SKCanvasElement
     /// </summary>
     public bool TouchScrubs { get; set; }
 
-    /// <summary>The card a finger last thumbed to on a row that <see cref="TouchScrubs"/>; it stays so once the finger lifts.</summary>
+    /// <summary>
+    /// The card a finger last touched or thumbed to on a row that <see cref="TouchScrubs"/>; it stays so once the finger
+    /// lifts.
+    /// </summary>
     public ViewHandle? Focused { get; private set; }
 
-    /// <summary><see cref="Focused"/> changed.</summary>
+    /// <summary>
+    /// How far a finger has drawn the <see cref="Focused"/> card up out of the row, on a row that <see cref="TouchScrubs"/>;
+    /// zero while it is not being drawn up.
+    /// </summary>
+    public float Lifted { get; private set; }
+
+    /// <summary><see cref="Focused"/> or <see cref="Lifted"/> changed.</summary>
     public event Action? FocusChanged;
+
+    /// <summary>
+    /// A card drawn up out of a row that <see cref="TouchScrubs"/> - swiped up off it - as far as <see cref="FlickDistance"/>
+    /// and let go: played, as a card is pushed forward onto the table.
+    /// </summary>
+    public event Action<ViewHandle>? CardFlicked;
+
+    /// <summary>How far up a finger draws a card for it to be <see cref="CardFlicked"/> when let go.</summary>
+    public const float FlickDistance = 44;
 
     /// <summary>Puts the thumbed-to card back among the others.</summary>
     public void Unfocus() => SetFocused(null);
@@ -127,6 +145,18 @@ public sealed class CardBoardElement : SKCanvasElement
 
     /// <summary>Whether the finger down on a row that <see cref="TouchScrubs"/> has gone along it, so is no tap.</summary>
     private bool _scrubbing;
+
+    /// <summary>Whether the finger down on a row that <see cref="TouchScrubs"/> is drawing its card up, so is no tap.</summary>
+    private bool _lifting;
+
+    private void SetLifted(float lifted)
+    {
+        if (lifted != Lifted)
+        {
+            Lifted = lifted;
+            FocusChanged?.Invoke();
+        }
+    }
     private DispatcherTimer? _touchTimer;
 
     /// <summary>The finger's press let go of, wandered off or taken by a scroll: neither a tap nor a hold.</summary>
@@ -134,7 +164,9 @@ public sealed class CardBoardElement : SKCanvasElement
     {
         _touch = null;
         _scrubbing = false;
+        _lifting = false;
         _touchTimer?.Stop();
+        SetLifted(0);
     }
 
     private void TouchHeld()
@@ -573,13 +605,29 @@ public sealed class CardBoardElement : SKCanvasElement
         if (TouchScrubs && _touch is { } scrub && scrub.Pointer == e.Pointer.PointerId)
         {
             Point moved = e.GetCurrentPoint(this).Position;
-            if (!scrub.Held && !_scrubbing && (Math.Abs(moved.X - scrub.At.X) > TouchSlop || Math.Abs(moved.Y - scrub.At.Y) > TouchSlop))
+            double across = moved.X - scrub.At.X;
+            double up = scrub.At.Y - moved.Y;
+
+            // Which way the finger first goes past the slop says what it is doing: up, drawing the card out to play it;
+            // any other way, thumbing along the row.
+            if (!scrub.Held && !_scrubbing && !_lifting && (Math.Abs(across) > TouchSlop || Math.Abs(up) > TouchSlop))
             {
-                _scrubbing = true;
                 _touchTimer?.Stop();
+                if (up > Math.Abs(across))
+                {
+                    _lifting = true;
+                }
+                else
+                {
+                    _scrubbing = true;
+                }
             }
 
-            if (_scrubbing && CardAt(moved) is { } under)
+            if (_lifting)
+            {
+                SetLifted((float)Math.Max(0, up));
+            }
+            else if (_scrubbing && CardAt(moved) is { } under)
             {
                 SetFocused(under);
             }
@@ -641,6 +689,8 @@ public sealed class CardBoardElement : SKCanvasElement
         if (_touch is { } touch && touch.Pointer == e.Pointer.PointerId)
         {
             bool scrubbed = _scrubbing;
+            bool flicked = _lifting && touch.At.Y - e.GetCurrentPoint(this).Position.Y >= FlickDistance;
+            bool lifted = _lifting;
             ForgetTouch();
             e.Handled = true;
             if (TouchScrubs)
@@ -648,7 +698,11 @@ public sealed class CardBoardElement : SKCanvasElement
                 ReleasePointerCapture(e.Pointer);
             }
 
-            if (!touch.Held && !scrubbed && CardAt(e.GetCurrentPoint(this).Position) == touch.Handle)
+            if (flicked)
+            {
+                CardFlicked?.Invoke(touch.Handle);
+            }
+            else if (!touch.Held && !scrubbed && !lifted && CardAt(e.GetCurrentPoint(this).Position) == touch.Handle)
             {
                 CardClicked?.Invoke(touch.Handle);
             }

@@ -100,16 +100,8 @@ public sealed partial class MainPage
             }
         }
 
-        foreach (DockToggle toggle in (DockToggle[])[_autoPassBox, _passTurnBox, _holdPriorityBox])
-        {
-            if (toggle.Visibility == Visibility.Visible)
-            {
-                DockToggle flipped = toggle;
-                Item(PromptItemKind.Toggle, toggle.Label, flipped.Flip, on: toggle.On);
-            }
-        }
-
-        EndRow();
+        // Auto Pass, Pass Turn and Hold Priority are the player's own way of playing, set on their phone: the tablet's one
+        // prompt has room only for what is asked.
         if (_undoButton.Visibility == Visibility.Visible)
         {
             Item(PromptItemKind.Button, "Undo", _undoButton.Press, enabled: _undoButton.Enabled);

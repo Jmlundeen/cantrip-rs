@@ -269,8 +269,9 @@ public sealed partial class MainPage : Page
             {
                 NotePress(board);
 
-                // A phone's hand card tapped is looked at, with what it can do, before anything is done with it.
-                if (board == _handBoard && OpenCardSheet(handle))
+                // A phone's hand card tapped is only brought forward to be looked at; it is played by a swipe up or from its
+                // sheet (MainPage.PhoneHand.cs).
+                if (board == _handBoard && TapOnlyLooks(handle))
                 {
                     return;
                 }
@@ -550,6 +551,12 @@ public sealed partial class MainPage : Page
     private void MakeInspectable(CardBoardElement board) =>
         board.CardInspected += (handle, box, angle) =>
         {
+            // A phone's hand card held opens its sheet: the card large, with what it can do.
+            if (board == _handBoard && OpenCardSheet(handle))
+            {
+                return;
+            }
+
             if (board.CardOf(handle) is { } card && board.XamlRoot is not null)
             {
                 _tooltip.Hide();
@@ -2003,7 +2010,9 @@ public sealed partial class MainPage : Page
         for (int i = 0; i < count; i++)
         {
             float x = offset + (i * step) + (hovered >= 0 && i > hovered ? reveal : 0f);
-            cells.Add(Cell(client, _hand[i], x, i == hovered ? top - proud : top, tapped: false));
+            // The card a finger draws up follows it, as far as the row's top.
+            float y = i == hovered ? MathF.Max(0f, top - proud - (IsPhone ? _handBoard.Lifted : 0f)) : top;
+            cells.Add(Cell(client, _hand[i], x, y, tapped: false));
         }
 
         _handBoard.SetCells(cells);
