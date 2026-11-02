@@ -8,11 +8,15 @@ fn cant_block(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
         && let Target::Player(p) = item.target(0)
     {
-        g.add_effect(item.object, item.object, EffectKind::CreaturesCantBlock(p), Duration::EndOfTurn);
+        g.add_lasting_rule(item, 0, Target::Player(p), Duration::EndOfTurn);
     }
     Ok(())
 }
 
+/// "Creatures [that player] controls" (CR 611.2c), asked as the rule is read: whoever controls them now.
+fn creatures_they_control(q: &dyn Query, _: &Asker, about: Target, id: ObjectId) -> bool {
+    q.chars(id).is(CardType::Creature) && about.player() == Some(q.controller(id))
+}
 /// Exile the top card of your library face down. You may look at and play that card this turn.
 fn exile_top_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
@@ -26,5 +30,6 @@ pub static CARD: CardDef = CardDef {
             .targets(&[targets::PLAYER]),
         triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, exile_top_and_play, "At the beginning of your upkeep, exile the top card of your library face down. You may look at and play that card this turn."),
     ],
+    lasting_rules: &[LastingRule { text: "Creatures target player controls can't block this turn.", rule: LastingRuleKind::CantBlock, applies: creatures_they_control }],
     ..oracle::HEADLINER_SCARLETT
 };
