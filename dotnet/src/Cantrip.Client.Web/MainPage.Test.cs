@@ -547,6 +547,41 @@ public sealed partial class MainPage
 
         json.WriteEndArray();
         json.WriteString("refusal", _refusal.Visibility == Visibility.Visible ? _refusalText.Text : string.Empty);
+        json.WriteBoolean("turnedForPortrait", _inspector.TurnedForPortrait);
+        if (_tablePromptShown is { } prompt)
+        {
+            json.WriteStartObject("tablePrompt");
+            json.WriteNumber("version", prompt.Version);
+            json.WriteBoolean("private", prompt.Private);
+            json.WriteString("title", prompt.Title);
+            json.WriteStartArray("items");
+            foreach (Cantrip.Protocol.InPerson.PromptItem item in prompt.Rows.SelectMany(row => row.Items))
+            {
+                json.WriteStartObject();
+                json.WriteNumber("id", item.Id);
+                json.WriteString("kind", item.Kind.ToString());
+                json.WriteString("text", item.Text);
+                json.WriteBoolean("primary", item.Primary);
+                json.WriteBoolean("enabled", item.Enabled);
+                json.WriteEndObject();
+            }
+
+            json.WriteEndArray();
+            json.WriteEndObject();
+        }
+
+        json.WriteNumber("pressed", _tablePressCount);
+        json.WriteStartArray("presses");
+        foreach ((int version, int item, bool used) in _tablePressesTaken)
+        {
+            json.WriteStartObject();
+            json.WriteNumber("version", version);
+            json.WriteNumber("item", item);
+            json.WriteBoolean("used", used);
+            json.WriteEndObject();
+        }
+
+        json.WriteEndArray();
         _phoneDeck?.WriteTest(json, Root);
         _fullScreen?.WriteTest(json, Root);
         _phonePick?.WriteTest(json, Root);
@@ -572,6 +607,20 @@ public sealed partial class MainPage
     /// </summary>
     private void InjectTableTaps()
     {
+        if (IsPhone && JSHost.GlobalThis.GetPropertyAsString("cantripTablePresses") is { Length: > 0 } pressed)
+        {
+            // Presses of the prompt's items on a tablet, as "4:1;" (item 1 of the prompt sent as version 4).
+            JSHost.GlobalThis.SetProperty("cantripTablePresses", string.Empty);
+            foreach (string entry in pressed.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                string[] parts = entry.Split(':');
+                if (parts.Length == 2 && int.TryParse(parts[0], out int version) && int.TryParse(parts[1], out int item))
+                {
+                    TakeTablePress(version, item);
+                }
+            }
+        }
+
         if (!IsPhone || JSHost.GlobalThis.GetPropertyAsString("cantripTableTaps") is not { Length: > 0 } queued)
         {
             return;

@@ -82,12 +82,40 @@ public sealed class InPersonTests(WebClient web)
             tapped = await shared.SettledAsync(state => state.Taps.Count == 4);
             Assert.Equal(bolt.Handle, tapped.Taps[3].Object);
 
-            // Each half shows the turn and its step, and Undo is on the side of the player with priority alone.
-            Assert.Equal(2, tapped.Halves!.Count);
-            Assert.All(tapped.Halves, half => Assert.Equal(tapped.Halves[0].Step, half.Step));
-            TabletHalfState priority = Assert.Single(tapped.Halves, half => half.Undo);
-            await shared.TapAsync(priority.UndoBox!.X, priority.UndoBox.Y);
-            await shared.SettledAsync(state => state.Undos?.SequenceEqual([priority.Seat]) == true);
+            // One turn strip, between the halves, read by the player whose turn it is: turned round only for seat 2.
+            Assert.True(tapped.TurnStrip is { Step.Length: > 0 }, "The tablet shows the turn.");
+            Assert.Equal(tapped.TurnStrip!.Faces == 2, tapped.TurnStrip.Turned);
+
+            // Each seat's prompt down the side of its half, as its phone said it, and pressed from there: Bot1's Pass sent for
+            // Bot1's phone to press; Bot2 searching their library shows only that a choice is being made on their phone.
+            await shared.FeedAsync(new TablePromptMessage
+            {
+                Seat = 1,
+                Prompt = new PromptCard
+                {
+                    Version = 4,
+                    Title = "Your first main phase",
+                    Detail = "Cast a spell",
+                    Rows =
+                    [
+                        new PromptRow { Items = [new PromptItem { Id = 0, Kind = PromptItemKind.Toggle, Text = "Auto Pass" }] },
+                        new PromptRow { Items = [new PromptItem { Id = 1, Kind = PromptItemKind.Button, Text = "Pass", Primary = true }] },
+                    ],
+                },
+            });
+            await shared.FeedAsync(new TablePromptMessage { Seat = 2, Prompt = new PromptCard { Version = 2, Private = true } });
+            TabletState prompted = await shared.SettledAsync(state => state.Halves?.Count == 2 && state.Halves.All(half => half.Prompted));
+            await shared.PictureAsync("prompts");
+            TabletHalfState bot1 = prompted.Halves!.Single(half => half.Seat == 1);
+            TabletHalfState bot2 = prompted.Halves!.Single(half => half.Seat == 2);
+            Assert.Equal(("Your first main phase", false), (bot1.Title, bot1.Private));
+            Assert.True(bot2.Private);
+            Assert.Empty(bot2.Items);
+            Assert.True(bot1.PromptBox!.Y > TabletDriver.Height / 2f && bot1.PromptBox.X > TabletDriver.Width / 2f, "Bot1's prompt is by their right hand.");
+            Assert.True(bot2.PromptBox!.Y < TabletDriver.Height / 2f && bot2.PromptBox.X < TabletDriver.Width / 2f, "Bot2's prompt is by their right hand, across the table.");
+            TabletPromptItem pass = bot1.Items.Single(item => item.Text == "Pass");
+            await shared.TapAsync(pass.X, pass.Y);
+            await shared.SettledAsync(state => state.Presses?.SequenceEqual([new TabletPress(1, 4, 1)]) == true);
 
             // The stack folds to its caps, and opens again.
             await shared.TapAsync(tapped.StackFold!.X, tapped.StackFold.Y);

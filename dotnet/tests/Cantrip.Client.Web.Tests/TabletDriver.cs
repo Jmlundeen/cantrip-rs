@@ -215,17 +215,30 @@ public sealed record TabletState(
     bool StackShown = false,
     bool StackCollapsed = false,
     TabletBox? StackFold = null,
+    TabletTurnStrip? TurnStrip = null,
     IReadOnlyList<TabletHalfState>? Halves = null,
-    IReadOnlyList<int>? Undos = null);
+    IReadOnlyList<TabletPress>? Presses = null);
 
 /// <summary>A box on the tablet's page: its middle, width and height.</summary>
 public sealed record TabletBox(float X, float Y, float W, float H);
 
 /// <summary>
-/// A seat's half on a tablet: the step its turn strip shows, the steps it marks as the table's stops this turn, and whether
-/// its Undo is up (the seat has priority), with where it is.
+/// The tablet's one turn strip: the step it shows, the seat it faces (the active player's on the shared board), whether it
+/// is turned round for seat 2, and the steps it marks as the table's stops this turn.
 /// </summary>
-public sealed record TabletHalfState(int Seat, string Step, IReadOnlyList<string> Stops, bool Undo, TabletBox? UndoBox = null);
+public sealed record TabletTurnStrip(string Step, int Faces, bool Turned, IReadOnlyList<string> Stops);
+
+/// <summary>
+/// A seat's half on a tablet and the prompt down its side, as the seat's phone said it: whether one has come, whether it is
+/// private, its title and version, where the panel is, and its items.
+/// </summary>
+public sealed record TabletHalfState(int Seat, bool Prompted, bool Private, string Title, int Version, IReadOnlyList<TabletPromptItem> Items, TabletBox? PromptBox = null);
+
+/// <summary>An item of a prompt on a tablet: its id, kind (Button, Toggle, Words), words, and where it is drawn.</summary>
+public sealed record TabletPromptItem(int Id, string Kind, string Text, bool Enabled, bool On, float X = 0, float Y = 0);
+
+/// <summary>A press of a prompt's item the tablet would have sent the relay.</summary>
+public sealed record TabletPress(int Seat, int Version, int Item);
 
 /// <summary>
 /// A tablet's grid draft (InPerson/TabletDraft.cs): whether it is up, the grid of how many, the pick being made and whose,

@@ -442,37 +442,115 @@ public sealed class InPersonRelayTests
         Assert.Empty(Drain(tablet));
     }
 
+    private static PromptCard PassPrompt(int version, bool @private = false) => new()
+    {
+        Version = version,
+        Private = @private,
+        Title = "Your first main phase",
+        Detail = "Cast a spell",
+        Rows =
+        [
+            new PromptRow { Items = [new PromptItem { Id = 0, Kind = PromptItemKind.Toggle, Text = "Auto Pass" }] },
+            new PromptRow
+            {
+                Items =
+                [
+                    new PromptItem { Id = 1, Kind = PromptItemKind.Button, Text = "Pass", Primary = true },
+                    new PromptItem { Id = 2, Kind = PromptItemKind.Button, Text = "Resolve All", Enabled = false },
+                    new PromptItem { Id = 3, Kind = PromptItemKind.Words, Text = "X = 2" },
+                ],
+            },
+        ],
+    };
+
     [Fact]
-    public void A_tablets_undo_goes_to_the_phone_of_the_player_with_priority_alone()
+    public void A_phones_prompt_is_shown_on_every_tablet_and_to_one_joining_later()
+    {
+        RelayDevice alice = Phone(AliceTicket);
+        RelayDevice tablet = Tablet();
+        Drain(tablet);
+
+        _relay.Receive(alice, new SeatPromptMessage { Prompt = PassPrompt(3) });
+        TablePromptMessage shown = Assert.IsType<TablePromptMessage>(Assert.Single(Drain(tablet)));
+        Assert.Equal(1, shown.Seat);
+        Assert.Equal("Your first main phase", shown.Prompt.Title);
+        Assert.Equal(["Auto Pass", "Pass", "Resolve All", "X = 2"], shown.Prompt.Rows.SelectMany(row => row.Items).Select(item => item.Text));
+        Assert.Empty(Drain(alice));
+
+        RelayDevice late = Tablet(side: 1);
+        Assert.Contains(Drain(late), message => message is TablePromptMessage { Seat: 1, Prompt.Version: 3 });
+
+        // A tablet sends no prompt of its own.
+        Drain(tablet);
+        _relay.Receive(tablet, new SeatPromptMessage { Prompt = PassPrompt(4) });
+        Assert.IsType<DeviceErrorMessage>(Assert.Single(Drain(tablet)));
+    }
+
+    [Fact]
+    public void A_private_prompt_reaches_the_tablets_with_nothing_in_it()
+    {
+        RelayDevice alice = Phone(AliceTicket);
+        RelayDevice tablet = Tablet();
+        Drain(tablet);
+
+        _relay.Receive(alice, new SeatPromptMessage { Prompt = PassPrompt(5, @private: true) });
+        TablePromptMessage shown = Assert.IsType<TablePromptMessage>(Assert.Single(Drain(tablet)));
+        Assert.True(shown.Prompt.Private);
+        Assert.Equal(string.Empty, shown.Prompt.Title + shown.Prompt.Detail + shown.Prompt.Error);
+        Assert.Empty(shown.Prompt.Rows);
+
+        // Nothing of it is pressed from a tablet either.
+        _relay.Receive(tablet, new TablePressMessage { Seat = 1, Version = 5, Item = 1 });
+        Assert.Empty(Drain(alice));
+    }
+
+    [Fact]
+    public void A_press_on_a_tablet_reaches_the_phone_only_for_the_prompt_it_was_made_on()
     {
         RelayDevice alice = Phone(AliceTicket);
         RelayDevice bob = Phone(BobTicket);
         RelayDevice shared = Tablet();
         RelayDevice bobsBoard = Tablet(side: 2);
-        Deal(PublicHost.Step([Priority(1, 1)]));
+        _relay.Receive(alice, new SeatPromptMessage { Prompt = PassPrompt(7) });
         Drain(alice);
         Drain(bob);
 
-        // Seat one has priority: their Undo reaches their phone; one for seat two, or from seat two's own board, nowhere.
-        _relay.Receive(shared, new TableUndoMessage { Seat = 1 });
-        Assert.IsType<SeatUndoMessage>(Assert.Single(Drain(alice)));
-        _relay.Receive(shared, new TableUndoMessage { Seat = 2 });
-        _relay.Receive(bobsBoard, new TableUndoMessage { Seat = 1 });
+        _relay.Receive(shared, new TablePressMessage { Seat = 1, Version = 7, Item = 1 });
+        SeatPressMessage pressed = Assert.IsType<SeatPressMessage>(Assert.Single(Drain(alice)));
+        Assert.Equal((7, 1), (pressed.Version, pressed.Item));
+        _relay.Receive(shared, new TablePressMessage { Seat = 1, Version = 7, Item = 0 });
+        Assert.IsType<SeatPressMessage>(Assert.Single(Drain(alice)));
+
+        // A prompt since replaced, a button that cannot be pressed, words, an item that is not there, a seat with no prompt,
+        // and another player's own board: nowhere.
+        _relay.Receive(shared, new TablePressMessage { Seat = 1, Version = 6, Item = 1 });
+        _relay.Receive(shared, new TablePressMessage { Seat = 1, Version = 7, Item = 2 });
+        _relay.Receive(shared, new TablePressMessage { Seat = 1, Version = 7, Item = 3 });
+        _relay.Receive(shared, new TablePressMessage { Seat = 1, Version = 7, Item = 9 });
+        _relay.Receive(shared, new TablePressMessage { Seat = 2, Version = 7, Item = 1 });
+        _relay.Receive(bobsBoard, new TablePressMessage { Seat = 1, Version = 7, Item = 1 });
         Assert.Empty(Drain(alice));
         Assert.Empty(Drain(bob));
 
-        // A phone sends no Undo of its own to the table.
-        _relay.Receive(alice, new TableUndoMessage { Seat = 1 });
+        // A phone presses nothing on the table.
+        _relay.Receive(alice, new TablePressMessage { Seat = 1, Version = 7, Item = 1 });
         Assert.IsType<DeviceErrorMessage>(Assert.Single(Drain(alice)));
     }
 
     [Fact]
-    public void A_tablets_undo_before_any_game_does_nothing()
+    public void A_prompt_too_large_to_show_is_not_taken()
     {
         RelayDevice alice = Phone(AliceTicket);
         RelayDevice tablet = Tablet();
-        _relay.Receive(tablet, new TableUndoMessage { Seat = 1 });
-        Assert.Empty(Drain(alice));
+        Drain(tablet);
+
+        PromptCard wordy = PassPrompt(1);
+        wordy.Detail = new string('x', 5000);
+        _relay.Receive(alice, new SeatPromptMessage { Prompt = wordy });
+        PromptCard crowded = PassPrompt(2);
+        crowded.Rows = [.. Enumerable.Range(0, 20).Select(_ => new PromptRow())];
+        _relay.Receive(alice, new SeatPromptMessage { Prompt = crowded });
+        Assert.Empty(Drain(tablet));
     }
 
     [Fact]

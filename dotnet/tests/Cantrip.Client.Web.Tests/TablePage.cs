@@ -48,6 +48,28 @@ public sealed class TablePage : IAsyncDisposable
     /// <summary>A click at a point, as a person makes it: a tap with a finger on a phone's page, the mouse's left button elsewhere.</summary>
     public Task TapAsync(float x, float y) => Phone ? Page.Touchscreen.TapAsync(x, y) : Page.Mouse.ClickAsync(x, y);
 
+    /// <summary>
+    /// A finger rested on a point for <paramref name="held"/> and lifted, as a long press is made: sent as the touch events
+    /// themselves, since Playwright's touch screen only taps.
+    /// </summary>
+    public async Task HoldAsync(float x, float y, TimeSpan held)
+    {
+        _cdp ??= await _context.NewCDPSessionAsync(Page);
+        await _cdp.SendAsync("Input.dispatchTouchEvent", new Dictionary<string, object>
+        {
+            ["type"] = "touchStart",
+            ["touchPoints"] = new[] { new Dictionary<string, object> { ["x"] = x, ["y"] = y } },
+        });
+        await Task.Delay(held);
+        await _cdp.SendAsync("Input.dispatchTouchEvent", new Dictionary<string, object>
+        {
+            ["type"] = "touchEnd",
+            ["touchPoints"] = Array.Empty<object>(),
+        });
+    }
+
+    private ICDPSession? _cdp;
+
     /// <summary>Uncaught errors the page has thrown, which a test fails on.</summary>
     public IReadOnlyList<string> Errors => _errors;
 
@@ -350,7 +372,20 @@ public sealed record InPersonState(
     IReadOnlyList<PhoneLineState>? Lines = null,
     string View = "",
     bool Drawer = false,
-    IReadOnlyList<PhoneStopState>? Stops = null);
+    IReadOnlyList<PhoneStopState>? Stops = null,
+    PhonePromptState? TablePrompt = null,
+    IReadOnlyList<PhonePressState>? Presses = null,
+    bool TurnedForPortrait = false,
+    int Pressed = 0);
+
+/// <summary>The prompt a phone last sent the tablets: its version, whether it is private, its title and its items.</summary>
+public sealed record PhonePromptState(int Version, bool Private, string Title, IReadOnlyList<PhonePromptItem> Items);
+
+/// <summary>An item of a phone's prompt for the tablets: its id, kind (Button, Toggle, Words), words, and whether it is the answer expected and can be pressed.</summary>
+public sealed record PhonePromptItem(int Id, string Kind, string Text, bool Primary, bool Enabled);
+
+/// <summary>A press from a tablet the phone took: the prompt's version, the item, and whether it was pressed.</summary>
+public sealed record PhonePressState(int Version, int Item, bool Used);
 
 /// <summary>A button of the phone's Stops view: its name ("Stop: Upkeep, my turn") and whether the stop is set.</summary>
 public sealed record PhoneStopState(string Name, bool On);

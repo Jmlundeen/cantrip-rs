@@ -116,6 +116,19 @@ public sealed class CardInspector : SKCanvasElement
     /// </summary>
     public bool Fills { get; set; }
 
+    /// <summary>
+    /// Whether a look that fills a screen wider than it is tall turns the card a quarter round, to be read with the device
+    /// turned upright: a phone held sideways for its game, whose card read upright would be no taller than the phone is
+    /// across. A card printed sideways (a split card, a battle) reads sideways, and is not turned.
+    /// </summary>
+    public bool TurnsForPortrait { get; set; }
+
+    /// <summary>How far a look turned for portrait turns, clockwise: -90 for a phone turned with its top to the left, 90 the other way.</summary>
+    public float PortraitTurn { get; set; } = -90f;
+
+    /// <summary>Whether the card held up is turned for portrait as it stands, for the page's test state.</summary>
+    public bool TurnedForPortrait => Held is not null && Fills && TurnsForPortrait && !_landscape && ActualWidth > ActualHeight;
+
     /// <summary>Raised when what is held up changes, so the boards stop or start drawing the card underneath.</summary>
     public event Action? HeldChanged;
 
@@ -192,11 +205,13 @@ public sealed class CardInspector : SKCanvasElement
 
         if (Fills)
         {
-            float tall = windowHeight - (2f * CloseMargin);
-            float wide = windowWidth - (2f * CloseMargin);
+            // Turned for portrait, the card's height runs along the screen's width.
+            bool turn = TurnsForPortrait && !_landscape && windowWidth > windowHeight;
+            float tall = (turn ? windowWidth : windowHeight) - (2f * CloseMargin);
+            float wide = (turn ? windowHeight : windowWidth) - (2f * CloseMargin);
             return _landscape
                 ? new Pose(windowWidth / 2f, windowHeight / 2f, MathF.Max(1f, MathF.Min(tall, wide / AspectRatio)), 90f)
-                : new Pose(windowWidth / 2f, windowHeight / 2f, MathF.Max(1f, MathF.Min(tall / AspectRatio, wide / faces / FaceSpread)), 0f);
+                : new Pose(windowWidth / 2f, windowHeight / 2f, MathF.Max(1f, MathF.Min(tall / AspectRatio, wide / faces / FaceSpread)), turn ? PortraitTurn : 0f);
         }
 
         if (_landscape)
@@ -299,7 +314,9 @@ public sealed class CardInspector : SKCanvasElement
         float height = pose.Width * AspectRatio;
         SKRect laid = face.CullRect;
         canvas.Save();
-        canvas.Translate(pose.X + (along * pose.Width), pose.Y);
+        // Side by side along the card's own width, which a turned card has running down the screen.
+        float radians = pose.Angle * MathF.PI / 180f;
+        canvas.Translate(pose.X + (along * pose.Width * MathF.Cos(radians)), pose.Y + (along * pose.Width * MathF.Sin(radians)));
         canvas.RotateDegrees(pose.Angle);
         canvas.Translate(-pose.Width / 2f, -height / 2f);
         canvas.Scale(pose.Width / laid.Width, height / laid.Height);

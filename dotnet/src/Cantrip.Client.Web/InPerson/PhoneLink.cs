@@ -44,8 +44,20 @@ public sealed class PhoneLink
     /// <summary>Why the relay last refused this phone, or null.</summary>
     public string? Refused { get; private set; }
 
-    /// <summary>A tablet's Undo, tapped for this seat while it has priority.</summary>
-    public event Action? Undo;
+    /// <summary>An item of this phone's prompt pressed on a tablet: the prompt's version, and the item.</summary>
+    public event Action<int, int>? Pressed;
+
+    private SeatPromptMessage? _prompt;
+
+    /// <summary>This seat's prompt, for the tablets: sent now if the relay has welcomed the phone, and again on every welcome.</summary>
+    public void SendPrompt(PromptCard prompt)
+    {
+        _prompt = new SeatPromptMessage { Prompt = prompt };
+        if (_connection is { IsConnected: true } connection && _welcomed)
+        {
+            connection.Send(_prompt);
+        }
+    }
 
     /// <summary>Every seat's stops, as the relay last told them: at an in-person table every player stops at each.</summary>
     public event Action<TableStopsMessage>? TableStops;
@@ -157,15 +169,23 @@ public sealed class PhoneLink
                 {
                     FullScreenBridge.KeepTicket(ticket);
                 }
-                else if (_stops is not null)
+                else
                 {
-                    _connection?.Send(_stops);
+                    if (_stops is not null)
+                    {
+                        _connection?.Send(_stops);
+                    }
+
+                    if (_prompt is not null)
+                    {
+                        _connection?.Send(_prompt);
+                    }
                 }
 
                 break;
 
-            case SeatUndoMessage:
-                Undo?.Invoke();
+            case SeatPressMessage press:
+                Pressed?.Invoke(press.Version, press.Item);
                 break;
 
             case TableStopsMessage stops:

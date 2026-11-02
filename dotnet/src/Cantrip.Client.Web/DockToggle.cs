@@ -74,6 +74,9 @@ public sealed class DockToggle : Border
 
     public bool On => _on;
 
+    /// <summary>What the box is labelled.</summary>
+    public string Label => _label.Text;
+
     /// <summary>What the box does, ending with its key, so it is written again when the key is rebound.</summary>
     public string Tooltip
     {

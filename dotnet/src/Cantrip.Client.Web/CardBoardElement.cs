@@ -85,6 +85,44 @@ public sealed class CardBoardElement : SKCanvasElement
     public event Action<ViewHandle, Rect, float>? CardInspected;
 
     /// <summary>
+    /// Whether a finger resting on a card holds it up to read (<see cref="CardInspected"/>), as a right-press does: a phone,
+    /// which has no right button. A touch then clicks its card only when let go before that, without wandering off it.
+    /// </summary>
+    public bool TouchHolds { get; set; }
+
+    /// <summary>How long a finger rests on a card before it holds the card up rather than tapping it.</summary>
+    private static readonly TimeSpan TouchHoldAfter = TimeSpan.FromMilliseconds(450);
+
+    /// <summary>How far a finger may wander and still tap or hold the card it came down on.</summary>
+    private const double TouchSlop = 18;
+
+    /// <summary>A finger down on a card that has not yet become a tap or a hold, and whether it has become a hold.</summary>
+    private (ViewHandle Handle, Point At, uint Pointer, bool Held)? _touch;
+    private DispatcherTimer? _touchTimer;
+
+    /// <summary>The finger's press let go of, wandered off or taken by a scroll: neither a tap nor a hold.</summary>
+    private void ForgetTouch()
+    {
+        _touch = null;
+        _touchTimer?.Stop();
+    }
+
+    private void TouchHeld()
+    {
+        _touchTimer?.Stop();
+        if (_touch is not { Held: false } touch)
+        {
+            return;
+        }
+
+        _touch = touch with { Held = true };
+        if (_cells.ContainsKey(touch.Handle) && Bounds(touch.Handle) is { } box)
+        {
+            CardInspected?.Invoke(touch.Handle, box, _cells[touch.Handle].Angle);
+        }
+    }
+
+    /// <summary>
     /// Where the press that raised the last click landed, in this element, and the modifiers held for it: the click is
     /// raised before the page hears of the press, so a menu opened by it asks here rather than there.
     /// </summary>
@@ -368,8 +406,10 @@ public sealed class CardBoardElement : SKCanvasElement
         };
         PointerMoved += OnPointerCarried;
         PointerReleased += OnPointerReleased;
+        PointerCanceled += (_, _) => ForgetTouch();
         PointerCaptureLost += (_, _) =>
         {
+            ForgetTouch();
             // A rectangle cut short draws nothing and picks nothing.
             if (_marqueeFrom is not null)
             {
@@ -448,6 +488,22 @@ public sealed class CardBoardElement : SKCanvasElement
             return;
         }
 
+        // A finger: a tap once it is let go, or a hold once it has rested. The pointer is not captured, so a drag across
+        // the row still scrolls it, and the scroll taking the finger lets the press go.
+        if (TouchHolds && e.Pointer.PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Touch)
+        {
+            _touch = (handle, at, e.Pointer.PointerId, false);
+            if (_touchTimer is null)
+            {
+                _touchTimer = new DispatcherTimer { Interval = TouchHoldAfter };
+                _touchTimer.Tick += (_, _) => TouchHeld();
+            }
+
+            _touchTimer.Stop();
+            _touchTimer.Start();
+            return;
+        }
+
         // The steps beside a damage share are taken before the card's own click.
         if (_cells[handle] is { DamageShare: { } share } state)
         {
@@ -474,6 +530,17 @@ public sealed class CardBoardElement : SKCanvasElement
     /// <summary>Picks the pressed card up once the pointer has moved far enough with the button down, then carries it.</summary>
     private void OnPointerCarried(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
+        if (_touch is { Held: false } touch && touch.Pointer == e.Pointer.PointerId)
+        {
+            Point moved = e.GetCurrentPoint(this).Position;
+            if (Math.Abs(moved.X - touch.At.X) > TouchSlop || Math.Abs(moved.Y - touch.At.Y) > TouchSlop)
+            {
+                ForgetTouch();
+            }
+
+            return;
+        }
+
         if (_marqueeFrom is { } start)
         {
             Point now = e.GetCurrentPoint(this).Position;
@@ -513,6 +580,18 @@ public sealed class CardBoardElement : SKCanvasElement
 
     private void OnPointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
+        if (_touch is { } touch && touch.Pointer == e.Pointer.PointerId)
+        {
+            ForgetTouch();
+            e.Handled = true;
+            if (!touch.Held && CardAt(e.GetCurrentPoint(this).Position) == touch.Handle)
+            {
+                CardClicked?.Invoke(touch.Handle);
+            }
+
+            return;
+        }
+
         if (_marqueeFrom is { } start)
         {
             Rect? drawn = _marquee;

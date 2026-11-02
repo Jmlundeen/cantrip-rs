@@ -325,6 +325,11 @@ public sealed class ScenarioPlayer
 
         switch (expected.Answer)
         {
+            // A phone's player passes from the tablet, where their prompt is too.
+            case PassAnswer when _phone:
+                await TablePressAsync(state, item => item.Primary);
+                return;
+
             case PassAnswer:
                 await _page.Page.Keyboard.PressAsync("Space");
                 return;
@@ -341,7 +346,7 @@ public sealed class ScenarioPlayer
                     await TableTapAsync($"o{source}");
                 }
 
-                await _page.ClickAsync("Okay", "button");
+                await TablePressAsync(await _page.SettledAsync(), item => item.Text == "Okay");
                 return;
 
             case AnnounceAnswer announced when _planX is { } plan:
@@ -1225,6 +1230,7 @@ public sealed class ScenarioPlayer
         if (!_phoneViewsSeen)
         {
             await PhoneStopsAsync();
+            await PhoneHoldAsync();
         }
 
         for (int board = 0; ; board++)
@@ -1252,6 +1258,48 @@ public sealed class ScenarioPlayer
 
         handles = [.. handles.Distinct().Take(count)];
         return handles.Count == count ? handles : throw new NotDrivenException($"{count} such cards on the board, with {handles.Count}", shown);
+    }
+
+    /// <summary>
+    /// A button of the phone's prompt pressed on a tablet, as the relay hands the phone a press: the one the phone last told
+    /// the tablets of that <paramref name="which"/> names, which the phone must press.
+    /// </summary>
+    private async Task TablePressAsync(TableState state, Func<PhonePromptItem, bool> which)
+    {
+        TableState sent = await _page.SettledAsync(s => s.InPerson?.TablePrompt is { Private: false } prompt && prompt.Items.Any(item => item.Kind == "Button" && item.Enabled && which(item)));
+        PhonePromptState prompt = sent.InPerson!.TablePrompt!;
+        PhonePromptItem item = prompt.Items.First(each => each.Kind == "Button" && each.Enabled && which(each));
+        int before = sent.InPerson.Pressed;
+        await _page.Page.EvaluateAsync("p => { globalThis.cantripTablePresses = (globalThis.cantripTablePresses ?? '') + p + ';'; }", $"{prompt.Version}:{item.Id}");
+        TableState pressed = await _page.SettledAsync(s => (s.InPerson?.Pressed ?? 0) > before);
+        if (pressed.InPerson!.Presses![^1] is not { Used: true })
+        {
+            throw new Xunit.Sdk.XunitException($"The phone did not press \"{item.Text}\" from the tablet (prompt {prompt.Version}, now {pressed.InPerson.TablePrompt?.Version}).");
+        }
+    }
+
+    /// <summary>
+    /// A card of the phone's hand held up by resting a finger on it: filling the phone, turned to be read with the phone
+    /// upright while it is held sideways, and still up once the finger is lifted; the next tap puts it down and plays nothing.
+    /// </summary>
+    private async Task PhoneHoldAsync()
+    {
+        TableState before = await _page.SettledAsync(s => s.InPerson?.View == "hand");
+        if (before.Cards.FirstOrDefault(card => card.Visible && card.Place == "hand") is not { } card)
+        {
+            return;
+        }
+
+        (float x, float y) = ClickPoint(before, card);
+        await _page.HoldAsync(x, y, TimeSpan.FromMilliseconds(800));
+        await _page.SettledAsync(s => s.Held > 0 && s.InPerson?.TurnedForPortrait == true);
+        await _page.PictureAsync($"phone-held-request-{_asking}");
+        await _page.TapAsync(x, y);
+        TableState after = await _page.SettledAsync(s => s.Held == 0);
+        if (after.InPerson?.TablePrompt?.Version != before.InPerson?.TablePrompt?.Version && after.Cards.Count(c => c.Place == "hand") != before.Cards.Count(c => c.Place == "hand"))
+        {
+            throw new Xunit.Sdk.XunitException("Putting a card held up on the phone down played it.");
+        }
     }
 
     /// <summary>Whether the phone's Stops view has been visited, which is done once a game.</summary>

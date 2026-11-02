@@ -6,9 +6,9 @@ using Microsoft.UI.Xaml.Shapes;
 namespace Cantrip.Client.Web.InPerson;
 
 /// <summary>
-/// The turn as a tablet shows it, along the edge of a seat's half nearest the middle of the table: whose turn it is, then a
-/// pill per step, the current one filled - green on the turn of the player this half is for, amber on the other's - and
-/// a dot under each step the table stops in this turn. At an in-person table a stop is the table's (docs/in-person.md,
+/// The turn as a tablet shows it, once, across the middle of the shared board and turned to face the player whose turn it
+/// is (over the top of a player's own board, facing them): whose turn it is, then a pill per step, the current one filled -
+/// green on the turn of the player it faces, amber on another's - and a dot under each step the table stops in this turn. At an in-person table a stop is the table's (docs/in-person.md,
 /// "Stops"): the active player's stops on their own turn and every other player's on an opponent's, as each phone said
 /// them (<see cref="TableStopsMessage"/>). Nothing on it is tapped: stops are set on the phones.
 /// </summary>
@@ -30,14 +30,15 @@ public sealed class TabletPhaseStrip : Border
         (TurnStepView.Cleanup, "Cleanup"),
     ];
 
-    private readonly int _seat;
+    private int _seat;
     private readonly TextBlock _turn;
     private readonly Dictionary<TurnStepView, (Border Pill, TextBlock Label, Ellipse Stop)> _steps = [];
 
-    /// <param name="seat">The seat whose half this strip runs along, whose turn is shown in their own colour.</param>
+    /// <param name="seat">The seat the strip faces, whose turn is shown in their own colour; zero to face the active player.</param>
     public TabletPhaseStrip(int seat)
     {
         _seat = seat;
+        Faces = seat;
         Background = Theme.Brush(Theme.Bar);
         BorderBrush = Theme.Brush(Theme.Line);
         BorderThickness = new Thickness(0, 0, 0, 1);
@@ -86,6 +87,9 @@ public sealed class TabletPhaseStrip : Border
     /// <summary>The steps marked as stops this turn, for a test.</summary>
     public IReadOnlyList<TurnStepView> Stops { get; private set; } = [];
 
+    /// <summary>The seat the strip faces as last shown: its own seat, or the active player's for one that follows the turn.</summary>
+    public int Faces { get; private set; }
+
     /// <summary>The turn as the view has it, and the stops each seat's phone set.</summary>
     /// <param name="turn">Whose turn and which, or how the game ended.</param>
     public void Show(PlayerView view, string turn, IReadOnlyList<SeatStops> stops)
@@ -93,7 +97,8 @@ public sealed class TabletPhaseStrip : Border
         _turn.Text = turn;
         Current = view.Step;
         int active = view.ActivePlayer;
-        bool mine = active == _seat;
+        Faces = _seat != 0 ? _seat : active;
+        bool mine = active == Faces;
         List<TurnStepView> stopping = [];
         int index = Array.FindIndex(Steps, each => each.Step == view.Step);
         for (int i = 0; i < Steps.Length; i++)

@@ -144,6 +144,9 @@ public sealed class InPersonRelay : IStepObserver
     // Each seat's stops, as its phone last said them: at an in-person table a stop is the table's, every player stopping at it.
     private readonly SortedDictionary<int, SeatStops> _stops = [];
 
+    // Each seat's prompt, as its phone last said it: shown on the tablets, and answered from them.
+    private readonly SortedDictionary<int, PromptCard> _prompts = [];
+
     public InPersonRelay(InPersonRelayOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -297,8 +300,11 @@ public sealed class InPersonRelay : IStepObserver
                 case TableLineMessage line when device.As is { Role: DeviceRole.Tablet } tablet:
                     TableLine(tablet, line);
                     break;
-                case TableUndoMessage undo when device.As is { Role: DeviceRole.Tablet } tablet:
-                    TableUndo(tablet, undo);
+                case TablePressMessage press when device.As is { Role: DeviceRole.Tablet } tablet:
+                    TablePress(tablet, press);
+                    break;
+                case SeatPromptMessage prompt when device.As is { Role: DeviceRole.Phone } phone:
+                    TakePrompt(phone.Seat, prompt.Prompt);
                     break;
                 case SeatStopsMessage stops when device.As is { Role: DeviceRole.Phone } phone:
                     TakeStops(phone.Seat, stops);
@@ -543,6 +549,14 @@ public sealed class InPersonRelay : IStepObserver
             device.Send(StopsMessage());
         }
 
+        if (identity.Role == DeviceRole.Tablet)
+        {
+            foreach ((int seat, PromptCard prompt) in _prompts)
+            {
+                device.Send(new TablePromptMessage { Seat = seat, Prompt = prompt });
+            }
+        }
+
         PhaseChanged();
     }
 
@@ -648,16 +662,64 @@ public sealed class InPersonRelay : IStepObserver
         phone.Send(new SeatLineMessage { Decision = line.Decision, Line = line.Line, Take = line.Take });
     }
 
+    /// <summary>The most rows, items and characters of words a phone's prompt may hold; a larger one is not shown.</summary>
+    private const int MostPromptRows = 16;
+    private const int MostPromptItems = 64;
+    private const int MostPromptText = 2000;
+
     /// <summary>
-    /// A tablet's Undo: handed to the phone of the player with priority, the side it was tapped on, which takes back its last
-    /// mana ability if its own Undo may. A player's own board undoes only for that player; the table judges the answer.
+    /// A phone's prompt, kept for its seat and shown on every tablet (docs/in-person.md, "The prompt on the table"). A private
+    /// one is kept with nothing in it, whatever the phone sent, so a tablet never shows any of it.
     /// </summary>
-    private void TableUndo(Identity tablet, TableUndoMessage undo)
+    private void TakePrompt(int seat, PromptCard? prompt)
     {
-        if (_view is not { } view || _over is not null) return;
-        int seat = undo.Seat;
-        if (seat < 1 || seat > _phones.Count || seat != view.PriorityPlayer || (tablet.Side != 0 && tablet.Side != seat)) return;
-        _phones[seat - 1].Device?.Send(new SeatUndoMessage());
+        if (prompt is null || prompt.Rows is null || prompt.Rows.Count > MostPromptRows) return;
+        if (prompt.Rows.Any(row => row?.Items is null) || prompt.Rows.Sum(row => row.Items.Count) > MostPromptItems) return;
+        if (prompt.Rows.SelectMany(row => row.Items).Any(item => item is null || !Enum.IsDefined(item.Kind))) return;
+        int text = (prompt.Title?.Length ?? 0) + (prompt.Detail?.Length ?? 0) + (prompt.Error?.Length ?? 0)
+            + prompt.Rows.SelectMany(row => row.Items).Sum(item => item.Text?.Length ?? 0);
+        if (text > MostPromptText) return;
+
+        PromptCard kept = prompt.Private
+            ? new PromptCard { Version = prompt.Version, Private = true }
+            : new PromptCard
+            {
+                Version = prompt.Version,
+                Title = prompt.Title ?? string.Empty,
+                Detail = prompt.Detail ?? string.Empty,
+                Error = prompt.Error ?? string.Empty,
+                Rows = [.. prompt.Rows.Select(row => new PromptRow
+                {
+                    Items = [.. row.Items.Select(item => new PromptItem
+                    {
+                        Id = item.Id,
+                        Kind = item.Kind,
+                        Text = item.Text ?? string.Empty,
+                        Primary = item.Primary,
+                        Enabled = item.Enabled,
+                        On = item.On,
+                    })],
+                })],
+            };
+        _prompts[seat] = kept;
+        foreach (RelayDevice tablet in Tablets())
+        {
+            tablet.Send(new TablePromptMessage { Seat = seat, Prompt = kept });
+        }
+    }
+
+    /// <summary>
+    /// A button or a toggle of a seat's prompt pressed on a tablet: handed to that seat's phone while the prompt it was
+    /// pressed on is still the one the phone last sent, and the item is one that can be pressed. A player's own board
+    /// presses only for that player; the table judges whatever the phone answers.
+    /// </summary>
+    private void TablePress(Identity tablet, TablePressMessage press)
+    {
+        int seat = press.Seat;
+        if (seat < 1 || seat > _phones.Count || (tablet.Side != 0 && tablet.Side != seat)) return;
+        if (!_prompts.TryGetValue(seat, out PromptCard? prompt) || prompt.Private || prompt.Version != press.Version) return;
+        if (!prompt.Rows.SelectMany(row => row.Items).Any(item => item.Id == press.Item && item.Kind != PromptItemKind.Words && item.Enabled)) return;
+        _phones[seat - 1].Device?.Send(new SeatPressMessage { Version = press.Version, Item = press.Item });
     }
 
     /// <summary>The most steps a seat's stops name on each side of the turn: every step there is, and no more.</summary>

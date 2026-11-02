@@ -10,7 +10,7 @@ namespace Cantrip.Protocol.InPerson;
 public static class InPersonProtocol
 {
     /// <summary>The in-person wire's version, sent in every <see cref="DeviceHelloMessage"/>; a mismatch is refused.</summary>
-    public const int Version = 4;
+    public const int Version = 5;
 }
 
 /// <summary>What a device is at the table.</summary>
@@ -31,8 +31,9 @@ public enum DeviceRole
 [Union(2, typeof(TapResultMessage))]
 [Union(3, typeof(TableLineMessage))]
 [Union(8, typeof(ReentryRequestMessage))]
-[Union(9, typeof(TableUndoMessage))]
+[Union(9, typeof(TablePressMessage))]
 [Union(10, typeof(SeatStopsMessage))]
+[Union(11, typeof(SeatPromptMessage))]
 public abstract class DeviceClientMessage
 {
     public abstract string Describe();
@@ -157,8 +158,9 @@ public sealed class TableLineMessage : DeviceClientMessage
 [Union(5, typeof(PublicGridMessage))]
 [Union(6, typeof(SeatLineMessage))]
 [Union(8, typeof(ReentryCodeMessage))]
-[Union(9, typeof(SeatUndoMessage))]
+[Union(9, typeof(SeatPressMessage))]
 [Union(10, typeof(TableStopsMessage))]
+[Union(11, typeof(TablePromptMessage))]
 public abstract class DeviceServerMessage
 {
     public abstract string Describe();
@@ -365,25 +367,136 @@ public sealed class SeatLineMessage : DeviceServerMessage
 }
 
 /// <summary>
-/// A tablet's Undo, tapped on the side of the player with priority: the relay hands it to that player's phone
-/// (<see cref="SeatUndoMessage"/>), which takes back its last mana ability as its own Undo does, if it may. A player's
-/// own board undoes only for that player. Nothing about it is sent back to a tablet.
+/// A phone's prompt as the table may see it (docs/in-person.md, "The prompt on the table"): what is asked and the buttons that
+/// answer it, sent whenever it changes, for the tablets to show on the player's side of the board and answer from there.
+/// At a table in paper what a player is doing is in plain view - a spell revealed as it is cast, a target pointed at, a
+/// stop called - so the prompt is public; only a choice among cards nobody else may see (a library searched, a scry, a
+/// card named) is not, and is sent as <see cref="PromptCard.Private"/> with nothing of it in the card.
 /// </summary>
 [MessagePackObject]
-public sealed class TableUndoMessage : DeviceClientMessage
+public sealed class SeatPromptMessage : DeviceClientMessage
 {
-    /// <summary>The seat whose side the button was tapped on: the player with priority as the tablet was shown.</summary>
+    [Key(0)]
+    public PromptCard Prompt { get; set; } = new();
+
+    public override string Describe() => $"seat prompt {Prompt.Version}{(Prompt.Private ? ", private" : "")}, {Prompt.Rows.Sum(row => row.Items.Count)} items";
+}
+
+/// <summary>A seat's prompt, as its phone last said it, for a tablet to show on that seat's side and answer from.</summary>
+[MessagePackObject]
+public sealed class TablePromptMessage : DeviceServerMessage
+{
     [Key(0)]
     public int Seat { get; set; }
 
-    public override string Describe() => $"table undo for seat {Seat}";
+    [Key(1)]
+    public PromptCard Prompt { get; set; } = new();
+
+    public override string Describe() => $"table prompt for seat {Seat}, {Prompt.Version}";
 }
 
-/// <summary>A tablet's Undo, for the phone of the player it was tapped for: the phone's own Undo, if it has one now.</summary>
+/// <summary>
+/// A prompt's words and its buttons, as a phone's dock shows them: a title and a detail line (written with mana symbols,
+/// "{2}{R}"), an error the table gave, and rows of items - the dock's toggles, then its buttons, a stepper's "-", value and
+/// "+" in a row of their own. <see cref="Version"/> grows with every change, so a press names the prompt it was made on.
+/// </summary>
 [MessagePackObject]
-public sealed class SeatUndoMessage : DeviceServerMessage
+public sealed class PromptCard
 {
-    public override string Describe() => "seat undo";
+    [Key(0)]
+    public int Version { get; set; }
+
+    /// <summary>A choice among cards only this player may see: nothing else of the prompt is sent.</summary>
+    [Key(1)]
+    public bool Private { get; set; }
+
+    [Key(2)]
+    public string Title { get; set; } = string.Empty;
+
+    [Key(3)]
+    public string Detail { get; set; } = string.Empty;
+
+    [Key(4)]
+    public string Error { get; set; } = string.Empty;
+
+    [Key(5)]
+    public List<PromptRow> Rows { get; set; } = [];
+}
+
+/// <summary>One line of a prompt's items.</summary>
+[MessagePackObject]
+public sealed class PromptRow
+{
+    [Key(0)]
+    public List<PromptItem> Items { get; set; } = [];
+}
+
+/// <summary>A button, a toggle or a word of a prompt; a button's or a toggle's <see cref="Id"/> is what a press names.</summary>
+[MessagePackObject]
+public sealed class PromptItem
+{
+    /// <summary>The item's place in its prompt, counted across every row; what <see cref="TablePressMessage.Item"/> names.</summary>
+    [Key(0)]
+    public int Id { get; set; }
+
+    [Key(1)]
+    public PromptItemKind Kind { get; set; }
+
+    [Key(2)]
+    public string Text { get; set; } = string.Empty;
+
+    /// <summary>The answer the prompt expects, drawn in the accent.</summary>
+    [Key(3)]
+    public bool Primary { get; set; }
+
+    [Key(4)]
+    public bool Enabled { get; set; } = true;
+
+    /// <summary>A toggle that is on, or a button held down.</summary>
+    [Key(5)]
+    public bool On { get; set; }
+}
+
+/// <summary>What a <see cref="PromptItem"/> is.</summary>
+public enum PromptItemKind
+{
+    Button = 0,
+    Toggle = 1,
+    Words = 2,
+}
+
+/// <summary>
+/// A button or a toggle of a seat's prompt pressed on a tablet: the relay hands it to that seat's phone
+/// (<see cref="SeatPressMessage"/>) if <see cref="Version"/> is still the prompt the phone last sent, and the phone presses
+/// that item of its own dock, as a finger on it would; the table judges the answer. A player's own board presses only for
+/// that player.
+/// </summary>
+[MessagePackObject]
+public sealed class TablePressMessage : DeviceClientMessage
+{
+    [Key(0)]
+    public int Seat { get; set; }
+
+    [Key(1)]
+    public int Version { get; set; }
+
+    [Key(2)]
+    public int Item { get; set; }
+
+    public override string Describe() => $"table press, seat {Seat}, item {Item} of prompt {Version}";
+}
+
+/// <summary>An item of this phone's prompt pressed on a tablet, for the prompt <see cref="Version"/> names.</summary>
+[MessagePackObject]
+public sealed class SeatPressMessage : DeviceServerMessage
+{
+    [Key(0)]
+    public int Version { get; set; }
+
+    [Key(1)]
+    public int Item { get; set; }
+
+    public override string Describe() => $"seat press, item {Item} of prompt {Version}";
 }
 
 /// <summary>

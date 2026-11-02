@@ -34,7 +34,21 @@ public sealed class SymbolText : Panel
         Wrap = wrap;
     }
 
-    public bool Wrap { get; }
+    private bool _wrap;
+
+    /// <summary>Whether the words wrap to the width they are given, rather than running on in one line.</summary>
+    public bool Wrap
+    {
+        get => _wrap;
+        set
+        {
+            if (_wrap != value)
+            {
+                _wrap = value;
+                InvalidateMeasure();
+            }
+        }
+    }
 
     public string Text
     {

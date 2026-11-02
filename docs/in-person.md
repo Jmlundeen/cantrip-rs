@@ -1,8 +1,8 @@
 # In-person play
 
 In-person play is two players at one physical table, each with a phone, and one or two tablets laid between them. A
-player's phone holds what only that player may see - the hand, a library search, a private choice - and every prompt
-that player answers. The tablets show the public board: what anyone at the table may look at. One machine runs the
+player's phone holds what only that player may see - the hand, a library search, a private choice. The tablets show the
+public board, what anyone at the table may look at, and each player's prompt by their side of it, answered there. One machine runs the
 server; every other device browses to it over the local network or a phone's hotspot.
 
 The event is a two-player grid draft, then the games. The remote web client is unchanged by any of it: in-person play
@@ -23,14 +23,14 @@ way of the cards under it, and opens it again; the shared tablet has a cap at ea
 seat 2. A target arrow is drawn from the top of the stack. Its cards are tapped as the battlefield's are, and a spell
 turned for seat 2 is held up to read turned for them.
 
-**The turn** runs along each half's edge nearest the middle of the table, turned with the half
-(`InPerson/TabletPhaseStrip.cs`): whose turn and which, then a pill for each step, the current one filled - green on
-that half's player's turn, amber on the other's - and a dot under each step the table stops in this turn ("Stops",
-below).
+**The turn** is shown once (`InPerson/TabletPhaseStrip.cs`): across the middle of the shared board, between the halves,
+turned to face the player whose turn it is; across the top of a player's own board, facing them. Whose turn and which,
+then a pill for each step, the current one filled - green on the turn of the player it faces, amber on another's - and a
+dot under each step the table stops in this turn ("Stops", below). While the stack's window is open it lies over the
+middle of the strip; folded, it leaves the strip clear.
 
-**Undo** is a button in the corner of the half of the player with priority, by their right hand. A tap sends the relay a
-`TableUndoMessage`, which it hands that player's phone (`SeatUndoMessage`); the phone takes back its last mana ability
-as its own Undo does, or says there is nothing to take back. A player's own tablet undoes only for that player.
+**Each player's prompt** runs down the right of their half, by their right hand and turned with the half
+(`InPerson/TabletPromptPanel.cs`; "The prompt on the table", below).
 
 A seat's graveyard pile and, while it has cards in exile, its **Exile** button on a tablet's rail open a list of that
 pile over the seat's battlefield, turned with the half: every card as the public sees it (a card exiled face down is a
@@ -40,8 +40,35 @@ shuts itself once the pile is empty.
 
 A target or a mana source on the battlefield is picked by tapping it on whichever tablet shows it. A player casting
 Lightning Bolt from their phone taps a Mountain on their own tablet to pay, then the opponent's Tarmogoyf on the
-opponent's tablet to target it. All feedback - which taps were taken, what is still asked - is on the acting player's
-phone; a tablet never shows anything of a private prompt.
+opponent's tablet to target it. Which taps were taken is the phone's to say; a tablet never shows anything of a private
+prompt.
+
+## The prompt on the table
+
+The phone is for what only its player may see: the hand above all. Everything else a player does at a table in paper is
+done in plain view - a spell is revealed as it is cast, and may still be taken back; a target is pointed at; a mana
+ability is used; priority is passed; a stop is called. So a player's prompt is public, and it is shown on the tablets
+by that player's side of the board, where the targets and the mana are tapped, and answered there: a player casts from
+their hand on the phone, then looks at the board for the rest, without their eyes going back and forth.
+
+- **What is shown.** The phone's dock as it stands: the toggles (Auto Pass, Pass Turn, Hold Priority), what is asked
+  and the detail under it, an error the table gave, Undo while there is a mana ability to take back, and the dock's
+  buttons and steppers ("-", "X = 2", "+"), each a finger's size. A button tapped on the tablet is pressed on the phone,
+  exactly as a finger on it there would; nothing on the tablet answers it, and the table judges what the phone sends.
+  The phone shows the same prompt under its hand, so a player looking at their cards answers there instead.
+- **What is not.** A choice among cards only the player may see - a library searched, a scry, cards looked at, a card
+  named by typing it - is shown on the tablet only as "Choosing on their phone", as a player in paper is seen looking
+  through their library. So is any prompt whose words name a card the table may not know of: one in a hand, a library or
+  a sideboard, or face down, that not every other player knows and that no card in plain view shares a name with
+  ("Cast Brainstorm for its miracle cost?" says what was drawn). The card being cast or activated is the exception: it
+  is revealed as it is in paper, even if it is then taken back. The phone decides, and sends a private prompt with
+  nothing of it in it; the relay keeps nothing of a private prompt either way.
+- **The wire.** The phone sends its prompt whenever it changes (`SeatPromptMessage`), numbered (`PromptCard.Version`);
+  the relay keeps each seat's and shows it on every tablet (`TablePromptMessage`), a tablet joining later with its
+  welcome. A press names the seat, the version and the item (`TablePressMessage`); the relay hands it to that seat's
+  phone (`SeatPressMessage`) only while the version is still the one the phone last sent and the item is a button or a
+  toggle that can be pressed, and a player's own board presses only for that player. The phone presses it only if the
+  version is still its own: a press made on a prompt since replaced does nothing.
 
 ## The grid draft
 
@@ -93,7 +120,7 @@ A phone tells the relay its own stops when it is welcomed and whenever they chan
 each seat's and tells every device all of them (`TableStopsMessage`), a device joining later with its welcome. A phone
 is then stopped on its own turn wherever another player stops on an opponent's turn, and on another's turn wherever the
 player whose turn it is stops on their own (`TurnStops.ShareWith`); its Stops view shows its own stops as buttons and
-says where the opponent's stop it too. The tablets mark the steps the table stops in on each half's turn strip.
+says where the opponent's stop it too. The tablets mark the steps the table stops in on the turn strip.
 
 ## Architecture
 
@@ -118,8 +145,8 @@ says where the opponent's stop it too. The tablets mark the steps the table stop
   and pick clocks are off by default, since the players are at the same table; a checkbox on the page turns them on.
 - **Transport.** The devices speak plain WebSocket over the local network. That is accepted for a table whose devices
   share one room's network; the credentials still keep a stray device on it from taking a seat.
-- **Strict tablets.** A tablet shows nothing of a private prompt: no highlighted candidates, no tap accepted or
-  refused, no hint of what is being chosen.
+- **Strict tablets.** A tablet shows a seat's prompt only as its phone sends it ("The prompt on the table"), and nothing
+  of a private one: no highlighted candidates, no tap accepted or refused, no hint of what is being chosen.
 
 ## Full screen
 
@@ -294,7 +321,7 @@ on the table's thread, where the relay only takes a snapshot and queues messages
 ## The wire
 
 The relay and its devices speak MessagePack, in `Cantrip.Protocol.InPerson`, with unions and a version of their own
-(`InPersonProtocol.Version`, now 4). A device's hello also carries `PlayerView.ProtocolVersion`, since the public feed
+(`InPersonProtocol.Version`, now 5). A device's hello also carries `PlayerView.ProtocolVersion`, since the public feed
 wraps the ordinary server messages.
 
 A device sends a `DeviceClientMessage`:
@@ -306,8 +333,9 @@ A device sends a `DeviceClientMessage`:
 | 2 | `TapResultMessage` | `TapId`, `Used` |
 | 3 | `TableLineMessage` | `Decision` (the pick of the grid draft), `Line` (a row 0-2 or a column 3-5), `Take` (false chooses it) |
 | 8 | `ReentryRequestMessage` | none: a welcomed phone asks for a re-entry code |
-| 9 | `TableUndoMessage` | `Seat` (the player with priority, whose side Undo was tapped on) |
+| 9 | `TablePressMessage` | `Seat`, `Version` (the prompt it was pressed on), `Item` (the item's id) |
 | 10 | `SeatStopsMessage` | `Mine`, `Theirs` (a phone's own stops, as `TurnStepView`s) |
+| 11 | `SeatPromptMessage` | `Prompt`: a `PromptCard` - `Version`, `Private`, `Title`, `Detail`, `Error`, `Rows` of `Items` (`Id`, `Kind`: button, toggle or words, `Text`, `Primary`, `Enabled`, `On`) |
 
 The relay sends a `DeviceServerMessage`:
 
@@ -321,10 +349,12 @@ The relay sends a `DeviceServerMessage`:
 | 5 | `PublicGridMessage` | `Decision`, `Grid` (zero once the draft is over), `Grids`, `Pick`, `Active`, `Places` (the grid row by row, a place taken an unknown card), `Drafted` (each seat's count), `Recent`, `RecentCards`, `LastLine`, `PickLeftMs` |
 | 6 | `SeatLineMessage` | `Decision`, `Line`, `Take`: a line picked on a tablet, for the picker's phone |
 | 8 | `ReentryCodeMessage` | `Code` (good once, for the home-screen app the phone is being added as) |
-| 9 | `SeatUndoMessage` | none: a tablet's Undo, for the phone of the player with priority |
+| 9 | `SeatPressMessage` | `Version`, `Item`: an item of the phone's prompt pressed on a tablet |
 | 10 | `TableStopsMessage` | `Seats` (each seat's `Seat`, `Mine` and `Theirs`, as its phone last said them) |
+| 11 | `TablePromptMessage` | `Seat`, `Prompt` (as its phone last sent it; a private one empty) |
 
-The public feed never holds a prompt, a request id or a seat's handle, and the grid nothing a seat alone is shown. A phone acts on a `SeatTapMessage` only while
+The public feed never holds a prompt, a request id or a seat's handle (a seat's prompt reaches a tablet only as its phone
+words it, in `TablePromptMessage`), and the grid nothing a seat alone is shown. A phone acts on a `SeatTapMessage` only while
 its `RequestId` is the phone's prompt.
 
 On the host's side, a step with a public view carries:

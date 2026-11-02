@@ -40,8 +40,8 @@ public sealed partial class TabletPage
     /// <summary>The grid's lines picked and sent, newest last, for a test to read.</summary>
     private readonly List<TableLineMessage> _lines = [];
 
-    /// <summary>Every Undo this tablet sent, by the seat it was tapped for, under ?test.</summary>
-    private readonly List<int> _undos = [];
+    /// <summary>Every press of a prompt's item this tablet sent, under ?test.</summary>
+    private readonly List<TablePressMessage> _presses = [];
 
     /// <summary>Whether this tablet is fed by a test rather than a relay.</summary>
     private static bool FedByTest => ClientConfig.Test && InPersonConfig.Device is null;
@@ -131,25 +131,51 @@ public sealed partial class TabletPage
             json.WriteBoolean("stackShown", _stack.Visibility == Visibility.Visible);
             json.WriteBoolean("stackCollapsed", _stack.Collapsed);
             WriteStackFold(json);
+            json.WriteStartObject("turnStrip");
+            json.WriteString("step", _phaseStrip.Current.ToString());
+            json.WriteNumber("faces", _phaseStrip.Faces);
+            json.WriteBoolean("turned", _phaseStrip.RenderTransform is RotateTransform { Angle: 180 });
+            json.WriteStartArray("stops");
+            foreach (Cantrip.Protocol.TurnStepView step in _phaseStrip.Stops)
+            {
+                json.WriteStringValue(step.ToString());
+            }
+
+            json.WriteEndArray();
+            json.WriteEndObject();
             json.WriteStartArray("halves");
             foreach (TabletHalf half in _halves)
             {
                 json.WriteStartObject();
                 json.WriteNumber("seat", half.Seat);
-                json.WriteString("step", half.Phase.Current.ToString());
-                json.WriteStartArray("stops");
-                foreach (Cantrip.Protocol.TurnStepView step in half.Phase.Stops)
+                PromptCard? prompt = half.Prompt.Shown;
+                json.WriteBoolean("prompted", prompt is not null);
+                json.WriteBoolean("private", prompt?.Private ?? false);
+                json.WriteString("title", prompt?.Title ?? string.Empty);
+                json.WriteNumber("version", prompt?.Version ?? 0);
+                if (half.Prompt.ActualWidth > 0)
                 {
-                    json.WriteStringValue(step.ToString());
+                    WriteBox(json, half.Prompt.TransformToVisual(_root).TransformBounds(new Rect(0, 0, half.Prompt.ActualWidth, half.Prompt.ActualHeight)), "promptBox");
+                }
+
+                json.WriteStartArray("items");
+                foreach ((PromptItem item, FrameworkElement shown) in half.Prompt.Items)
+                {
+                    json.WriteStartObject();
+                    json.WriteNumber("id", item.Id);
+                    json.WriteString("kind", item.Kind.ToString());
+                    json.WriteString("text", item.Text);
+                    json.WriteBoolean("enabled", item.Enabled);
+                    json.WriteBoolean("on", item.On);
+                    if (shown.ActualWidth > 0)
+                    {
+                        WriteBox(json, shown.TransformToVisual(_root).TransformBounds(new Rect(0, 0, shown.ActualWidth, shown.ActualHeight)));
+                    }
+
+                    json.WriteEndObject();
                 }
 
                 json.WriteEndArray();
-                json.WriteBoolean("undo", half.Undo.Visibility == Visibility.Visible);
-                if (half.Undo.Visibility == Visibility.Visible && half.Undo.ActualWidth > 0)
-                {
-                    WriteBox(json, half.Undo.TransformToVisual(_root).TransformBounds(new Rect(0, 0, half.Undo.ActualWidth, half.Undo.ActualHeight)), "undoBox");
-                }
-
                 json.WriteEndObject();
             }
 
@@ -289,10 +315,14 @@ public sealed partial class TabletPage
             }
 
             json.WriteEndArray();
-            json.WriteStartArray("undos");
-            foreach (int seat in _undos)
+            json.WriteStartArray("presses");
+            foreach (TablePressMessage press in _presses)
             {
-                json.WriteNumberValue(seat);
+                json.WriteStartObject();
+                json.WriteNumber("seat", press.Seat);
+                json.WriteNumber("version", press.Version);
+                json.WriteNumber("item", press.Item);
+                json.WriteEndObject();
             }
 
             json.WriteEndArray();

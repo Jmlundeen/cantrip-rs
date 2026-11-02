@@ -423,6 +423,8 @@ public sealed partial class MainPage : Page
             MakeInspectable(board);
         }
 
+        HoldCardsOnPhone();
+
         // A card known in an opponent's hand is read the same way, from the fan in their rail.
         if (_opponentHalf.Rail.HandFan is HandFanElement fan)
         {
@@ -550,6 +552,7 @@ public sealed partial class MainPage : Page
     private CardBoardElement PromptBoard(CardBoardElement board)
     {
         MakeInspectable(board);
+        board.TouchHolds = IsPhone;
         board.Concealed = _inspector.Concealed;
         _promptBoards.Add(board);
         return board;
@@ -1023,10 +1026,11 @@ public sealed partial class MainPage : Page
             widest = Math.Max(widest, child.DesiredSize.Width);
         }
 
-        // A phone's prompt is a column of its own down the right, as wide as a share of the phone.
+        // A phone's prompt is a strip under its hand, across the phone's width (MainPage.PhoneViews.cs).
         if (IsPhone)
         {
-            _dock.Width = PhoneDockWidth();
+            _dock.Width = double.NaN;
+            FitPhonePrompt();
             return;
         }
 
@@ -1917,7 +1921,13 @@ public sealed partial class MainPage : Page
         }
 
         _handHeight = height;
-        _bottom.MinHeight = height;
+
+        // A phone's strip holds the prompt under the hand too, and goes without the hand in a view of its own.
+        if (!IsPhone)
+        {
+            _bottom.MinHeight = height;
+        }
+
         _handScroll.Height = height - 1;
         _handBoard.SetCellSize(HandCardWidth, HandCardHeight);
         _needsRedraw = true;
@@ -1951,7 +1961,11 @@ public sealed partial class MainPage : Page
         int count = _hand.Count;
         int hovered = _handBoard.Hovered is { } pointed ? _hand.FindIndex(card => card.Handle == pointed) : -1;
 
-        float step = SpreadStep(count, available, HandCardWidth, HandCardWidth + CardGap);
+        // A phone is touched, never pointed at, so no card is pulled out and no room is kept for one: the cards share the
+        // whole width.
+        float step = IsPhone && count > 1
+            ? MathF.Min(HandCardWidth + CardGap, (available - HandCardWidth) / (count - 1))
+            : SpreadStep(count, available, HandCardWidth, HandCardWidth + CardGap);
         float reveal = MathF.Max(0f, HandCardWidth - step);
         float lying = ((count - 1) * step) + HandCardWidth;
 

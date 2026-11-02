@@ -41,6 +41,44 @@ public sealed partial class MainPage
     private PhoneStopsPanel _phoneStops = null!;
     private TextBlock _phoneStackEmpty = null!;
 
+    /// <summary>The hand's part of the strip at the foot of the page, over the prompt.</summary>
+    private FrameworkElement _phoneHandPart = null!;
+
+    /// <summary>The prompt's answers: Undo and the dock's buttons, at the prompt's right.</summary>
+    private StackPanel _phoneAnswers = null!;
+
+    /// <summary>The prompt's strip: the words, and the answers beside them or under them.</summary>
+    private Grid _phoneStrip = null!;
+
+    /// <summary>
+    /// The prompt's answers beside its words while they fit there, and under them, across the phone, when they would take
+    /// more than about half the width: a mode's whole text, say. A button's caption wraps rather than run off the phone.
+    /// Called as the dock is filled.
+    /// </summary>
+    private void FitPhonePrompt()
+    {
+        double room = Math.Max(160, Root.ActualWidth - Root.Padding.Left - Root.Padding.Right - DrawerStrip - 24);
+        foreach (UIElement child in _dockButtons.Children)
+        {
+            foreach (DockButton button in child is Panel panel ? panel.Children.OfType<DockButton>() : child is DockButton one ? [one] : [])
+            {
+                button.Wrapping(room);
+            }
+        }
+
+        _phoneAnswers.MaxWidth = room;
+        _phoneAnswers.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+        bool under = _phoneAnswers.DesiredSize.Width > room * 0.55;
+        Grid.SetRow(_phoneAnswers, under ? 1 : 0);
+        Grid.SetColumn(_phoneAnswers, under ? 0 : 1);
+        Grid.SetColumnSpan(_phoneAnswers, under ? 2 : 1);
+        _phoneAnswers.HorizontalAlignment = under ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+        if (!under)
+        {
+            _phoneAnswers.MaxWidth = room * 0.62;
+        }
+    }
+
     /// <summary>The seats and names the drawer's buttons were last made for, so they are made again only when those change.</summary>
     private string _drawerMadeFor = "-";
 
@@ -50,32 +88,48 @@ public sealed partial class MainPage
     /// </summary>
     private void BuildPhoneViews()
     {
-        // The dock leaves the bottom strip for a column of its own down the right, over the whole height.
+        // The prompt under the hand, across the phone's width: what is asked on the left, the answers on the right. The dock's
+        // column of toggles, words, error and buttons becomes a row of the words and the buttons, so it takes a strip of
+        // the height and leaves the rest to the cards.
         _bottom.Children.Remove(_dock);
-        UIElement content = _dock.Child;
+        var column = (StackPanel)_dock.Child;
         _dock.Child = null;
-        _dock.Child = new ScrollViewer
-        {
-            VerticalScrollMode = ScrollMode.Auto,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            HorizontalScrollMode = ScrollMode.Disabled,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            Content = content,
-        };
-        _dock.BorderThickness = new Thickness(1, 0, 0, 0);
-        _dock.Padding = new Thickness(12, 10, 12, 10);
-        _dock.HorizontalAlignment = HorizontalAlignment.Stretch;
-        Grid.SetColumn(_dock, 1);
-        Grid.SetRow(_dock, 0);
-        Grid.SetRowSpan(_dock, 3);
-        Root.Children.Insert(Root.Children.IndexOf(_sideSlot), _dock);
-
-        // Undo is the prompt's, at the top of the dock, rather than in a corner of a battlefield the phone may not be showing.
+        column.Children.Remove(_dockButtons);
+        column.Spacing = 3;
+        column.VerticalAlignment = VerticalAlignment.Center;
         ((Grid)_undoButton.Parent).Children.Remove(_undoButton);
-        _undoButton.Margin = new Thickness(0, 0, 0, 2);
+        _undoButton.Margin = new Thickness(0);
         _undoButton.HorizontalAlignment = HorizontalAlignment.Left;
-        _undoButton.VerticalAlignment = VerticalAlignment.Top;
-        ((StackPanel)content).Children.Insert(0, _undoButton);
+        _undoButton.VerticalAlignment = VerticalAlignment.Center;
+        _phoneAnswers = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Children = { _undoButton, _dockButtons },
+        };
+        var strip = _phoneStrip = new Grid { ColumnSpacing = 14, RowSpacing = 6 };
+        strip.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        strip.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        strip.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        strip.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        strip.Children.Add(column);
+        Grid.SetColumn(_phoneAnswers, 1);
+        strip.Children.Add(_phoneAnswers);
+        _dock.Child = strip;
+        _dock.BorderThickness = new Thickness(0, 1, 0, 0);
+        _dock.Padding = new Thickness(12, 6, 12, 6);
+        _dock.HorizontalAlignment = HorizontalAlignment.Stretch;
+        _dock.SizeChanged += (_, _) => FillPhoneHand();
+        _bottom.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        _bottom.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        _phoneHandPart = (FrameworkElement)_handScroll.Parent;
+        Grid.SetColumnSpan(_phoneHandPart, 2);
+        Grid.SetRow(_dock, 1);
+        Grid.SetColumn(_dock, 0);
+        Grid.SetColumnSpan(_dock, 2);
+        _bottom.Children.Add(_dock);
 
         // The view's own parts clear of the strip down the left edge.
         foreach (FrameworkElement part in (FrameworkElement[])[_table, _bottom, _phaseTimeline])
@@ -128,7 +182,7 @@ public sealed partial class MainPage
             Visibility = Visibility.Collapsed,
         };
         Grid.SetRowSpan(_phoneStops, 3);
-        Root.Children.Insert(Root.Children.IndexOf(_dock), _phoneStops);
+        Root.Children.Insert(Root.Children.IndexOf(_sideSlot), _phoneStops);
 
         BuildDrawer();
         ShowPhoneView(PhoneView.Hand, 0);
@@ -147,7 +201,7 @@ public sealed partial class MainPage
         AutomationProperties.SetName(_drawerTab, "Views");
         _drawerTab.Clicked += () => OpenDrawer(_drawer.Visibility != Visibility.Visible);
         Grid.SetRowSpan(_drawerTab, 3);
-        Root.Children.Insert(Root.Children.IndexOf(_dock), _drawerTab);
+        Root.Children.Insert(Root.Children.IndexOf(_sideSlot), _drawerTab);
 
         _drawerTurn = new TextBlock { FontSize = 12, Foreground = Theme.Brush(Theme.FgSoft), TextWrapping = TextWrapping.WrapWholeWords, Margin = new Thickness(4, 0, 4, 4) };
         _drawerList = new StackPanel { Spacing = 4 };
@@ -301,24 +355,30 @@ public sealed partial class MainPage
     };
 
     /// <summary>
-    /// Shows one view beside the prompt: the hand filling the phone's height; one player's battlefield; one player's public
-    /// state - their rail and their graveyard, opened beside it; the stack, its cards as large as the phone allows; or the
-    /// stops.
+    /// Shows one view: the hand across the phone's width with the prompt under it; one player's battlefield and nothing
+    /// else of theirs; one player's public state - their rail and their graveyard, opened beside it; the stack, its cards
+    /// as large as the phone allows; or the stops. Only the hand has the prompt: the prompt is on the table too, by the
+    /// player's side of the board, and every other view has the whole screen. The stack opened by itself for triggers to
+    /// be put in order keeps the prompt under it, since that is answered there.
     /// </summary>
     private void ShowPhoneView(PhoneView view, int seat)
     {
         _phoneView = (view, seat);
         int me = _gameClient?.Seat is > 0 and var known ? known : 1;
         bool hand = view == PhoneView.Hand;
+        bool prompt = hand || (view == PhoneView.Stack && _beforeOrdering is not null);
         bool table = view is PhoneView.Board or PhoneView.Player or PhoneView.Stack;
         bool mine = view is PhoneView.Board or PhoneView.Player && seat == me;
         bool theirs = view is PhoneView.Board or PhoneView.Player && seat != me;
         _boardShown = view == PhoneView.Board;
 
-        // The table's row, the timeline's and the hand's: the one the view is in takes the height.
+        // The table's row, the timeline's and the hand's with the prompt: the one the view is in takes the height.
         Root.RowDefinitions[0].Height = hand ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
-        Root.RowDefinitions[2].Height = hand ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
-        _bottom.Visibility = hand ? Visibility.Visible : Visibility.Collapsed;
+        Root.RowDefinitions[2].Height = hand ? new GridLength(1, GridUnitType.Star) : prompt ? GridLength.Auto : new GridLength(0);
+        _bottom.Visibility = prompt ? Visibility.Visible : Visibility.Collapsed;
+        _bottom.MinHeight = 0;
+        _bottom.RowDefinitions[0].Height = hand ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+        _phoneHandPart.Visibility = hand ? Visibility.Visible : Visibility.Collapsed;
         _table.Visibility = table ? Visibility.Visible : Visibility.Collapsed;
         _phoneStops.Visibility = view == PhoneView.Stops ? Visibility.Visible : Visibility.Collapsed;
 
@@ -328,10 +388,17 @@ public sealed partial class MainPage
         _opponentHalf.Panel.Visibility = theirs ? Visibility.Visible : Visibility.Collapsed;
         _myHalf.Panel.Visibility = mine ? Visibility.Visible : Visibility.Collapsed;
 
-        // A player's state is their rail with their graveyard beside it, in place of their battlefield.
+        // A board is the battlefield alone: who the player is, their life and their piles are the tablets' to show, and
+        // their own view's by name. A player's state is their rail with their graveyard beside it, in place of the battlefield.
+        bool board = view == PhoneView.Board;
         bool state = view == PhoneView.Player;
-        _opponentHalf.Scroll.Visibility = state ? Visibility.Collapsed : Visibility.Visible;
-        _myHalf.Scroll.Visibility = state ? Visibility.Collapsed : Visibility.Visible;
+        foreach (HalfViews half in (HalfViews[])[_opponentHalf, _myHalf])
+        {
+            half.Rail.Visibility = board ? Visibility.Collapsed : Visibility.Visible;
+            half.Panel.ColumnDefinitions[0].Width = new GridLength(board ? 0 : PlayerRail.RailWidth);
+            half.Scroll.Visibility = state ? Visibility.Collapsed : Visibility.Visible;
+        }
+
         if (state != _graveyardsOpen)
         {
             SetGraveyardsOpen(state);
@@ -347,9 +414,8 @@ public sealed partial class MainPage
     private int _phoneHandSizedFor = -1;
 
     /// <summary>
-    /// The hand's cards as large as the hand's view lets every one of them show: as tall as the phone while a few fit side
-    /// by side, and smaller as the hand grows, so each card laid over the next still shows half its width - its name and
-    /// cost - to be read and tapped.
+    /// The hand's cards across the phone's whole width, laid over one another so each still shows half its width - its name
+    /// and cost - to be read and tapped: as large as that makes them, and no taller than the phone leaves over the prompt.
     /// </summary>
     private void FillPhoneHand()
     {
@@ -360,8 +426,8 @@ public sealed partial class MainPage
 
         int count = _gameClient?.View is null ? 0 : _gameClient.MyHand().Count();
         _phoneHandSizedFor = count;
-        float tall = (float)(Root.ActualHeight - Root.Padding.Top - Root.Padding.Bottom);
-        float across = (float)(Root.ActualWidth - Root.Padding.Left - Root.Padding.Right - DrawerStrip - PhoneDockWidth()) - (2f * HandMarginX);
+        float tall = (float)(Root.ActualHeight - Root.Padding.Top - Root.Padding.Bottom - _dock.ActualHeight);
+        float across = (float)(Root.ActualWidth - Root.Padding.Left - Root.Padding.Right - DrawerStrip) - (2f * HandMarginX);
         float wide = across / (1f + (0.5f * Math.Max(0, count - 1)));
         float fits = (wide * 88f / 63f) + (2f * HandMarginY) + 4f;
         SetHandHeight(MathF.Max(MinHandHeight, MathF.Min(tall, fits)));
@@ -427,9 +493,6 @@ public sealed partial class MainPage
         _stackOverlay.Visibility = shown && count > 0 ? Visibility.Visible : Visibility.Collapsed;
         _phoneStackEmpty.Visibility = shown && count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
-
-    /// <summary>The prompt's column: a third of the phone's width, within what its buttons and words need.</summary>
-    private double PhoneDockWidth() => Math.Clamp(Math.Round((Root.ActualWidth - Root.Padding.Left - Root.Padding.Right) * 0.34), 240, 360);
 
     /// <summary>The phone's view for its test state: hand, board:N, player:N, stack or stops.</summary>
     private string PhoneViewName() => _phoneView.View switch

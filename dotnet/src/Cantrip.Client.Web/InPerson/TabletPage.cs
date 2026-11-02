@@ -56,8 +56,14 @@ public sealed partial class TabletPage : UserControl
     /// <summary>The board's grid, under the stack window, whose size the stack's cards are drawn at.</summary>
     private Grid _board = null!;
 
-    /// <summary>Every seat's stops, as the relay last said them: shown with the turn on each half.</summary>
+    /// <summary>Every seat's stops, as the relay last said them: shown with the turn.</summary>
     private IReadOnlyList<SeatStops> _tableStops = [];
+
+    /// <summary>The turn, once: between the halves of the shared board, turned to face the active player; over a player's own.</summary>
+    private readonly TabletPhaseStrip _phaseStrip = new(InPersonConfig.Side);
+
+    /// <summary>Each seat's prompt, as the relay last said it.</summary>
+    private readonly Dictionary<int, PromptCard> _prompts = [];
     private readonly TargetArrowsElement _arrows = new();
     /// <summary>Cards flying between zones, unless the Animate cards setting is off (off by default on a device short of memory).</summary>
     private readonly CardFlights _flights = new() { Enabled = PlayerSettings.AnimateCards };
@@ -131,22 +137,28 @@ public sealed partial class TabletPage : UserControl
 
         if (_side == 0)
         {
-            // The halves share the whole height; the stack lies over the line between them while there is one.
+            // The halves share the height, the turn between them facing the active player; the stack lies over the line
+            // between them while there is one.
             board.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            board.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             board.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
             var top = new TabletHalf(seat: 2, turned: true);
             var bottom = new TabletHalf(seat: 1, turned: false);
-            Grid.SetRow(bottom, 1);
+            Grid.SetRow(bottom, 2);
             board.Children.Add(top);
+            Grid.SetRow(_phaseStrip, 1);
+            _phaseStrip.RenderTransformOrigin = new Point(0.5, 0.5);
+            board.Children.Add(_phaseStrip);
             board.Children.Add(bottom);
-            Grid.SetRowSpan(_stack, 2);
+            Grid.SetRowSpan(_stack, 3);
             board.Children.Add(_stack);
             _halves.Add(bottom);
             _halves.Add(top);
         }
         else
         {
+            board.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             board.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             board.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
@@ -157,14 +169,16 @@ public sealed partial class TabletPage : UserControl
                 Child = _lives,
             };
             board.Children.Add(lives);
+            Grid.SetRow(_phaseStrip, 1);
+            board.Children.Add(_phaseStrip);
 
             // The stack over the top of the half, the opponent's side, while there is one.
             var mine = new TabletHalf(_side, turned: false);
-            Grid.SetRow(mine, 1);
+            Grid.SetRow(mine, 2);
             board.Children.Add(mine);
             _stack.VerticalAlignment = VerticalAlignment.Top;
-            _stack.Margin = new Thickness(0, 44, 0, 0);
-            Grid.SetRow(_stack, 1);
+            _stack.Margin = new Thickness(0, 12, 0, 0);
+            Grid.SetRow(_stack, 2);
             board.Children.Add(_stack);
             _halves.Add(mine);
         }
@@ -181,7 +195,7 @@ public sealed partial class TabletPage : UserControl
                 e.Handled = true;
                 TapPlayer(seat);
             };
-            half.Undo.Clicked += () => Send(new TableUndoMessage { Seat = seat });
+            half.Prompt.Pressed += (version, item) => Send(new TablePressMessage { Seat = seat, Version = version, Item = item });
         }
 
         MakeTappable(_stack.Board, turned: false);
@@ -333,6 +347,11 @@ public sealed partial class TabletPage : UserControl
                 _needsRedraw = true;
                 break;
 
+            case TablePromptMessage prompt when prompt.Seat > 0:
+                _prompts[prompt.Seat] = prompt.Prompt;
+                _needsRedraw = true;
+                break;
+
             case PublicGridMessage grid:
                 _draft.Take(grid);
                 _needsRedraw = true;
@@ -401,13 +420,16 @@ public sealed partial class TabletPage : UserControl
             turnedSeat: _side == 0 ? 2 : 0,
             upSeat: _side == 0 ? 2 : opponent);
 
-        string turnLine = TurnLine(view);
+        _phaseStrip.Show(view, TurnLine(view), _tableStops);
+        if (_side == 0)
+        {
+            // Read by the player whose turn it is: turned round for seat 2 across the table.
+            _phaseStrip.RenderTransform = new RotateTransform { Angle = _phaseStrip.Faces == 2 ? 180 : 0 };
+        }
+
         foreach (TabletHalf half in _halves)
         {
-            half.Phase.Show(view, turnLine, _tableStops);
-
-            // Undo on the side of the player with priority, for their phone to take back a mana ability.
-            half.Undo.Visibility = Connected && _client.Outcome is null && view.PriorityPlayer == half.Seat ? Visibility.Visible : Visibility.Collapsed;
+            half.Prompt.Show(_client.Outcome is null ? _prompts.GetValueOrDefault(half.Seat) : null, TabletLayout.NameOf(_client, half.Seat), Connected);
 
             if (view.Players.FirstOrDefault(player => player.Seat == half.Seat) is { } player)
             {
@@ -877,9 +899,9 @@ public sealed partial class TabletPage : UserControl
                 {
                     _sent.Add(tap);
                 }
-                else if (message is TableUndoMessage undo)
+                else if (message is TablePressMessage press)
                 {
-                    _undos.Add(undo.Seat);
+                    _presses.Add(press);
                 }
             };
             _isConnected = () => true;

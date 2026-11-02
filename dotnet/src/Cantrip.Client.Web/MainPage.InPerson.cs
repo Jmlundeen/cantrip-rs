@@ -79,7 +79,7 @@ public sealed partial class MainPage
 
         ApplyPhoneLayout();
         _phoneLink = new PhoneLink(TakeTableTap, TakeTableLine);
-        _phoneLink.Undo += TakeTableUndo;
+        _phoneLink.Pressed += TakeTablePress;
         _phoneLink.TableStops += TakeTableStops;
         _stops.OwnChanged += SendStops;
         SendStops();
@@ -119,11 +119,59 @@ public sealed partial class MainPage
         _phoneDeck?.Follow(_gameClient);
         _phonePick?.Follow(_gameClient);
         FollowPhoneView();
+        SendTablePrompt();
 
         if (_refusal.Visibility == Visibility.Visible && DateTime.UtcNow >= _refusalUntil)
         {
             _refusal.Visibility = Visibility.Collapsed;
         }
+    }
+
+    // --- A card held up ---
+
+    /// <summary>
+    /// What takes the next tap while a card is held up on a phone, to put it down and do nothing else: a finger has no
+    /// right button to let go of, so a card held up by resting a finger on it stays up until the screen is tapped again.
+    /// </summary>
+    private Border? _lookCatcher;
+
+    /// <summary>
+    /// A phone holds a card up by a finger resting on it, wherever cards are drawn, filling the screen: turned to be read
+    /// with the phone upright while it is held sideways for its game, as large as the phone's length makes it.
+    /// </summary>
+    private void HoldCardsOnPhone()
+    {
+        if (!IsPhone)
+        {
+            return;
+        }
+
+        foreach ((CardBoardElement board, _) in CardBoards())
+        {
+            board.TouchHolds = true;
+        }
+
+        _inspector.Fills = true;
+        _inspector.TurnsForPortrait = true;
+        _lookCatcher = new Border
+        {
+            Background = Theme.Brush(Windows.UI.Color.FromArgb(150, 0, 0, 0)),
+            Visibility = Visibility.Collapsed,
+        };
+        _lookCatcher.Tapped += (_, e) =>
+        {
+            e.Handled = true;
+            _inspector.Release();
+        };
+        Grid.SetRowSpan(_lookCatcher, 3);
+        Grid.SetColumnSpan(_lookCatcher, 2);
+        Root.Children.Insert(Root.Children.IndexOf(_inspector), _lookCatcher);
+        _inspector.HeldChanged += () =>
+        {
+            // Turned so its top is toward the phone's own top, whichever way the phone was turned sideways.
+            _inspector.PortraitTurn = FullScreenBridge.ScreenAngle() == 270 ? 90f : -90f;
+            _lookCatcher.Visibility = _inspector.Held is not null ? Visibility.Visible : Visibility.Collapsed;
+        };
     }
 
     // --- The layout ---
@@ -365,20 +413,7 @@ public sealed partial class MainPage
         }
     }
 
-    // --- Undo on the tablets, and the table's stops ---
-
-    /// <summary>A tablet's Undo, tapped for this seat: this page's own Undo, or the word that there is nothing to take back.</summary>
-    private void TakeTableUndo()
-    {
-        if (_gameClient is { IsOver: false } && _actions.Undo is not null)
-        {
-            OnUndoClick();
-        }
-        else
-        {
-            Refuse("There is no mana ability to take back now.");
-        }
-    }
+    // --- The table's stops ---
 
     /// <summary>This player's own stops, told to the table, which tells every device.</summary>
     private void SendStops() =>

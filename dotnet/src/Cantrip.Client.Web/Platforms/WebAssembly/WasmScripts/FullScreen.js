@@ -150,6 +150,24 @@
         }
     };
 
+    // How far the screen is turned from the device's natural way up: screen.orientation's angle, or iOS's older
+    // window.orientation (where -90 is 270), or 90 where neither says.
+    globalThis.cantripScreenAngle = function () {
+        try {
+            if (screen.orientation && typeof screen.orientation.angle === "number") {
+                return screen.orientation.angle;
+            }
+
+            if (typeof window.orientation === "number") {
+                return (window.orientation + 360) % 360;
+            }
+        } catch (e) {
+            // Neither: as a phone is most often turned.
+        }
+
+        return 90;
+    };
+
     globalThis.cantripFullScreenExit = function () {
         try {
             const left = document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen();

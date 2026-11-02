@@ -87,6 +87,22 @@ internal static partial class FullScreenBridge
 
     public static void Exit() => Call(ExitFullScreen);
 
+    /// <summary>
+    /// How far the screen is turned from the device's natural way up, in degrees (0, 90, 180 or 270): 90 for a phone turned
+    /// sideways with its top to the left, 270 with its top to the right. 90 where the browser does not say.
+    /// </summary>
+    public static int ScreenAngle()
+    {
+        try
+        {
+            return Angle();
+        }
+        catch (JSException)
+        {
+            return 90;
+        }
+    }
+
     /// <summary>Puts a phone's re-entry code in the address the icon about to be added to the Home Screen opens.</summary>
     public static void OfferHomeScreen(string code) => Call(() => OfferCode(code));
 
@@ -116,6 +132,9 @@ internal static partial class FullScreenBridge
 
     [JSImport("globalThis.cantripFullScreenLock")]
     private static partial void LockOrientation(bool landscape);
+
+    [JSImport("globalThis.cantripScreenAngle")]
+    private static partial int Angle();
 
     [JSImport("globalThis.cantripFullScreenExit")]
     private static partial void ExitFullScreen();

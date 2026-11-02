@@ -52,6 +52,29 @@ public sealed class DockButton : Border
     public event Action? Clicked;
 
     /// <summary>
+    /// The caption wraps to the button's width, the button no wider than <paramref name="widest"/>: a mode's whole text on a
+    /// phone or a tablet's panel, which a line of it would run off. Returns the button, so it composes.
+    /// </summary>
+    public DockButton Wrapping(double widest)
+    {
+        _label.Wrap = true;
+        MaxWidth = widest;
+        return this;
+    }
+
+    /// <summary>Whether this is the accent answer a prompt expects.</summary>
+    public bool Primary => _primary;
+
+    /// <summary>Presses the button as a finger on it would, if it can be pressed: an in-person tablet's press of it.</summary>
+    public void Press()
+    {
+        if (_enabled)
+        {
+            Clicked?.Invoke();
+        }
+    }
+
+    /// <summary>
     /// Stretches the button across its column with the caption centred. Returns the button, so it composes.
     /// </summary>
     public DockButton Filling()
