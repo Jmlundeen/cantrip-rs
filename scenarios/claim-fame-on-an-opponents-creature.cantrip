@@ -1,0 +1,38 @@
+# Fame (cast from the graveyard, discarded to Faithless Looting) targets any creature, an opponent's included: it gets +2/+0 and haste until end of turn (CR 115.1, 611.2a, 702.10).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Faithless Looting
+Wind Drake
+Claim // Fame
+Island x2
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Claim // Fame; Wind Drake)
+Bot1.Graveyard.Claim // Fame.Cast(Bot2.Battlefield.Ornithopter; Ability: Fame)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Power = 2
+? Bot2.Battlefield.Ornithopter.Keywords = Flying; Haste
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 2
+Exile = Claim // Fame
