@@ -498,7 +498,7 @@ public sealed class InPersonRelay : IStepObserver
         if (hello.InPersonVersion != InPersonProtocol.Version || hello.ProtocolVersion != PlayerView.ProtocolVersion)
         {
             Refuse(device, ErrorCode.ProtocolMismatch,
-                $"Expected in-person protocol {InPersonProtocol.Version} and protocol {PlayerView.ProtocolVersion}: reload the page.");
+                $"Expected in-person protocol {InPersonProtocol.Version} and protocol {PlayerView.ProtocolVersion}; this page speaks {hello.InPersonVersion} and {hello.ProtocolVersion}: reload the page.");
             return;
         }
 

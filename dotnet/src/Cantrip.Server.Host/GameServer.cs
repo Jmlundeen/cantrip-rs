@@ -800,7 +800,7 @@ public sealed class GameServer : IAsyncDisposable
     private static bool ProtocolMatches(Connection connection, int version)
     {
         if (version == PlayerView.ProtocolVersion) return true;
-        Refuse(connection, ErrorCode.ProtocolMismatch, $"Expected protocol {PlayerView.ProtocolVersion}.");
+        Refuse(connection, ErrorCode.ProtocolMismatch, $"Expected protocol {PlayerView.ProtocolVersion}; this page speaks {version}.");
         return false;
     }
     private static void SendMembership(Connection connection, Member member) => connection.Send(new MembershipMessage

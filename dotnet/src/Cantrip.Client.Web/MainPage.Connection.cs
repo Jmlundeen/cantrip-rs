@@ -138,7 +138,7 @@ public sealed partial class MainPage
     /// already loaded again once (<see cref="TableMove.ReloadForNewBuild"/>) and still has the old one.
     /// </summary>
     private static string Refusal(ErrorMessage refusal) => refusal.Code == ErrorCode.ProtocolMismatch
-        ? "This page is an older version than the table's. Close it, then open the table's link or scan its code again."
+        ? $"This page is an older version than the table's. Close it, then open the table's link or scan its code again. ({refusal.Detail})"
         : refusal.Detail;
 
     private async Task ReconnectAsync(MembershipMessage seat)
