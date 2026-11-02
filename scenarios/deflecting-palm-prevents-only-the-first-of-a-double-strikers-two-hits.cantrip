@@ -1,0 +1,46 @@
+# Deflecting Palm (CR 615.8): "the next time a source of your choice would deal damage to you this turn". Bot1 chooses Bot2's
+# Fencing Ace (double strike, 1/1) as it attacks. Its first-strike damage is the next time: prevented, and the Palm deals that
+# 1 damage to the Ace's controller, Bot2. The effect is then used up, so the regular damage 1 is dealt to Bot1: Bot1 19, Bot2 19.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Deflecting Palm
+Island x25
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Fencing Ace
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Fencing Ace.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Fencing Ace > Bot1)
+[T4 Bot2.DeclareBlockers]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deflecting Palm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Fencing Ace)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
+Prevented = 1 Fencing Ace > Bot1 by Deflecting Palm

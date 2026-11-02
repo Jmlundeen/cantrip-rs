@@ -1,0 +1,50 @@
+# Deflecting Palm (CR 615.5, 608.2h): "that source's controller". Bot1 chooses its own Memnite in response to Bot2's Act of
+# Treason, so Bot1 controls the source as it is chosen. Bot2 then controls it, untapped and with haste, and attacks Bot1 with it:
+# its 1 damage is prevented, and the Palm deals that 1 to the source's controller when the damage would be dealt - Bot2 (19),
+# not Bot1, who stays at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Memnite
+Deflecting Palm
+Island x25
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Mox Sapphire
+Act of Treason
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Memnite)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deflecting Palm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Tapped = false
+[T2 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 19
+Prevented = 1 Memnite > Bot1 by Deflecting Palm

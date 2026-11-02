@@ -1,0 +1,68 @@
+# Browser
+# Deflecting Palm (CR 609.7a, 615.8): Bot2's Dragonhawk has exiled a Lightning Bolt and set up "At the beginning of your next
+# end step, Dragonhawk deals 2 damage to each opponent ...". Bot1 Swords it into exile and then casts the Palm: the exiled
+# Dragonhawk - no longer on the battlefield - is still a source to choose, since the waiting delayed ability names it.
+# At Bot2's end step its 2 damage to Bot1 is prevented and the Palm deals 2 to Dragonhawk's controller, Bot2: 20 + 5 (Swords)
+# - 2 = 23. Bot1 stays at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Pearl
+Swords to Plowshares
+Deflecting Palm
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Black Lotus
+Dragonhawk, Fate's Tempest
+Plains
+Plains
+Plains
+Plains
+Lightning Bolt
+Plains x6
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dragonhawk, Fate's Tempest.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Exile = Lightning Bolt
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Dragonhawk, Fate's Tempest)
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt; Dragonhawk, Fate's Tempest
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deflecting Palm.Cast
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Deflecting Palm: choose a source of damage
+Bot1.Choose(Dragonhawk, Fate's Tempest)
+[T2 Bot2.End]
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 23
+Prevented = 2 Dragonhawk, Fate's Tempest > Bot1 by Deflecting Palm
