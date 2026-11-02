@@ -1,0 +1,58 @@
+# Chapter I leaves an Octopus, a Serpent and a Kraken where they are, and chapters II and III draw for each of them
+# attacking, but not for an attacking Ornithopter (CR 714.2c, 603.2, 205.3m).
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Black Lotus
+Black Lotus
+Summon: Leviathan
+Omen Hawker
+Loch Mare
+Kraken Hatchling
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Omen Hawker.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Loch Mare.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kraken Hatchling.Cast
+Bot1.Pass
+Bot1.Hand.Summon: Leviathan.Cast
+? Bot1.Mana =
+Bot1.Pass
+? Bot1.Battlefield.Kraken Hatchling.Power = 0
+? Bot1.Battlefield.Omen Hawker.Power = 1
+? Bot1.Battlefield.Loch Mare.Power = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Omen Hawker; Loch Mare; Kraken Hatchling > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Library.Count = 17
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Omen Hawker; Loch Mare; Kraken Hatchling; Ornithopter > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Library.Count = 13
