@@ -1,0 +1,41 @@
+# Tyvar's -2 may return any creature card with mana value 2 or less from the graveyard, not only one of the three it milled
+# (the ruling; CR 701.17a, 608.2c): Bot2's Shock killed Ornithopter on an earlier turn, the -2 mills three Islands, and
+# Ornithopter comes back.
+[Bot1 Deck]
+Island
+Ornithopter
+Mox Jet
+Mox Emerald
+Tyvar, Jubilant Brawler
+Island
+Island
+Island
+Island x20
+[Bot2 Deck]
+Mountain
+Shock
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Ornithopter
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tyvar, Jubilant Brawler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Tyvar, Jubilant Brawler.Activate(Ability: Mill)
+Bot1.Choose(Ornithopter)
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Graveyard = Island; Island; Island
