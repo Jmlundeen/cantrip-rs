@@ -1,0 +1,37 @@
+# Ensoul Artifact sets base power and toughness (CR 613.4b, layer 7b), so a pump that began before it still applies on
+# top (CR 613.4c; the ruling: "Effects that modify a creature's power and/or toughness ... will apply to the creature no
+# matter when they started to take effect"). Giant Growth makes Ornithopter 3/5 first; Ensoul Artifact then makes it 8/8,
+# not 5/5.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Ensoul Artifact
+Giant Growth
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ensoul Artifact.Cast(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 8
+Bot1.Battlefield.Ornithopter.Toughness = 8
