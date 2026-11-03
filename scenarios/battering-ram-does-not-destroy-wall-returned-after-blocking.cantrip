@@ -1,0 +1,45 @@
+# A Wall exiled and returned after blocking is a new object and is not destroyed by the delayed trigger (CR 400.7).
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Battering Ram
+Island x20
+
+[Bot2 Deck]
+Forest
+Wall of Wood
+Mox Pearl
+Ephemerate
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Battering Ram.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Wall of Wood.Cast
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Battering Ram.Keywords = Banding
+Bot1.Attack(Battering Ram > Bot2)
+Bot2.Block(Wall of Wood > Battering Ram)
+[T3 Bot1.Blockers]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ephemerate.Cast(Bot2.Battlefield.Wall of Wood)
+Bot2.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Wall of Wood.Toughness = 3
+Bot2.Graveyard =

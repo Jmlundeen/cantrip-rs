@@ -1,0 +1,41 @@
+# A non-Wall blocker survives combat and is not destroyed at end of combat (CR 603.2).
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Battering Ram
+Island x20
+
+[Bot2 Deck]
+Island
+Kraken Hatchling
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Battering Ram.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Kraken Hatchling.Cast
+Bot2.Pass
+[T2 Bot2.BeginCombat]
+? Bot1.Battlefield.Battering Ram.Keywords = (absent)
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Battering Ram.Keywords = Banding
+Bot1.Attack(Battering Ram > Bot2)
+Bot2.Block(Kraken Hatchling > Battering Ram)
+[T3 Bot1.Damage]
+? Bot2.Battlefield.Kraken Hatchling.Toughness = 4
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Kraken Hatchling.Toughness = 4
+Bot1.Battlefield.Battering Ram.Keywords = (absent)

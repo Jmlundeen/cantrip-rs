@@ -1,0 +1,52 @@
+# A Wall blocking the other member of a band also blocks Battering Ram, and is destroyed at end of combat (CR 702.22h, 603.2).
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Battering Ram
+Guerrilla Gorilla
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Wall of Ice
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Battering Ram.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Wall of Ice.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Battering Ram > Bot2; Guerrilla Gorilla > Bot2)
+Bot1.Choose(Guerrilla Gorilla)
+? Combat.Attackers = Battering Ram > Bot2 (band 1); Guerrilla Gorilla > Bot2 (band 1)
+Bot2.Block(Wall of Ice > Guerrilla Gorilla)
+[T3 Bot1.Blockers]
+? Combat.Blocks = Wall of Ice > Battering Ram; Wall of Ice > Guerrilla Gorilla
+[T3 Bot1.Damage]
+? Bot2.Battlefield.Wall of Ice.Toughness = 7
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Graveyard = Wall of Ice; Black Lotus
+Bot1.Battlefield.Battering Ram.Damage = 0

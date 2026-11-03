@@ -1,0 +1,48 @@
+# Both Walls blocking Battering Ram are destroyed by their delayed triggers at end of combat (CR 603.2, 603.7).
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Battering Ram
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Wall of Wood x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Battering Ram.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Wall of Wood.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wall of Wood.Cast
+Bot2.Pass
+[T2 Bot2.BeginCombat]
+? Bot1.Battlefield.Battering Ram.Keywords = (absent)
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Battering Ram.Keywords = Banding
+Bot1.Attack(Battering Ram > Bot2)
+Bot2.Block(Wall of Wood#1 > Battering Ram; Wall of Wood#2 > Battering Ram)
+[T3 Bot1.Damage]
+? Bot2.Battlefield.Wall of Wood#1.Toughness = 3
+? Bot2.Battlefield.Wall of Wood#2.Toughness = 3
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Graveyard = Wall of Wood; Wall of Wood
+Bot1.Battlefield.Battering Ram.Keywords = (absent)
