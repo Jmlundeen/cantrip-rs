@@ -1,0 +1,6 @@
+{
+  "name": "Horror of Horrors",
+  "manaCost": "{3}{B}{B}",
+  "type": "Enchantment",
+  "oracleText": "Sacrifice a Swamp: Regenerate target black creature. (The next time that creature would be destroyed this turn, instead tap it, remove it from combat, and heal all damage on it.)"
+}

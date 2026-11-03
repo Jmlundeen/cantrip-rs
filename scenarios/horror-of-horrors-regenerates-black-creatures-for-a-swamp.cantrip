@@ -1,0 +1,80 @@
+# Horror sacrifices a Swamp to regenerate a black creature, including an opponent's multicolored one, but refuses a colorless creature (CR 701.19a, 701.21a).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Horror of Horrors
+Muck Rats
+Swamp
+Bayou
+Savannah Lions
+Swamp x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Deathrite Shaman
+Memnite
+Shock x2
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Muck Rats.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Horror of Horrors.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Deathrite Shaman.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Muck Rats)
+! Bot1.Battlefield.Horror of Horrors.Activate(Bot2.Battlefield.Memnite)
+Bot1.Battlefield.Horror of Horrors.Activate(Bot1.Battlefield.Muck Rats)
+! Bot1.Choose()
+! Bot1.Choose(Mox Pearl)
+Bot1.Choose(Swamp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Muck Rats.Tapped = true
+? Bot1.Battlefield.Muck Rats.Damage = 0
+! Bot1.Battlefield.Horror of Horrors.Activate(Bot2.Battlefield.Deathrite Shaman)
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot2.Battlefield.Deathrite Shaman)
+! Bot1.Battlefield.Horror of Horrors.Activate(Bot1.Battlefield.Savannah Lions)
+Bot1.Battlefield.Horror of Horrors.Activate(Bot2.Battlefield.Deathrite Shaman)
+! Bot1.Choose(Bayou; Swamp)
+Bot1.Choose(Bayou)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Deathrite Shaman.Tapped = true
+Bot2.Battlefield.Deathrite Shaman.Damage = 0
+Bot1.Graveyard.Swamp.Colors = 
+Bot1.Graveyard.Bayou.Colors = 
