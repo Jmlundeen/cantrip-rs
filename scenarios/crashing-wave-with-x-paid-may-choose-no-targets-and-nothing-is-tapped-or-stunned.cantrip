@@ -1,0 +1,38 @@
+# "Up to X target creatures" includes none (CR 107.1c): Crashing Wave is cast with waterbend {1} (Memnite tapped), and Bot1 chooses no target even though Bot2's Phyrexian Walker
+# could be one. It resolves with nothing tapped, and no tapped creature of Bot2's to put the three stun counters on, so none go on the Walker.
+
+[Bot1 Deck]
+Island
+Island
+Memnite
+Crashing Wave
+Island x20
+
+[Bot2 Deck]
+Phyrexian Walker
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Phyrexian Walker.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Crashing Wave.Cast(X: 1; Convoke: Memnite)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Crashing Wave
+Bot1.Battlefield.Memnite.Tapped = true
+Bot2.Battlefield.Phyrexian Walker.Tapped = false
+Bot2.Battlefield.Phyrexian Walker.Counters.Stun = (absent)

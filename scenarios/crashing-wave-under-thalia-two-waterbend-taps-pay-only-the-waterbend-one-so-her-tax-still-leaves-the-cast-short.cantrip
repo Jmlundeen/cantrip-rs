@@ -1,0 +1,43 @@
+# Waterbend's taps are capped at the waterbend cost's generic mana (CR 701.67a-b), so a second tapper cannot pay Thalia's tax. Thalia,
+# Guardian of Thraben (Bot2's) makes Crashing Wave {1}{U}{U} plus waterbend {1}; Bot1 has only {U}{U} from two Islands and two
+# Memnites. One Memnite pays the waterbend {1}; the other may not, so Thalia's {1} goes unpaid and the cast is not offered
+# (`Mana: short`). Without the cap the second tap would pay the tax and it would be. The one-tapper case is
+# crashing-wave-under-thalia-the-waterbend-tap-cannot-pay-her-tax-so-the-cast-is-not-offered.
+
+[Bot1 Deck]
+Island
+Island
+Memnite
+Memnite
+Crashing Wave
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Thalia, Guardian of Thraben
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Crashing Wave.Cast(X: 1; Convoke: Memnite, Memnite; Mana: short)
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Memnite#1.Tapped = false
+Bot1.Battlefield.Memnite#2.Tapped = false

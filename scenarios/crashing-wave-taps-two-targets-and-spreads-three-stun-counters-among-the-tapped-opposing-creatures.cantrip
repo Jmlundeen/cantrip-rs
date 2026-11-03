@@ -1,0 +1,63 @@
+# Crashing Wave with waterbend {2}: Bot1 taps Memnite and Ornithopter to pay it (CR 701.67a), and taps Bot2's Grizzly Bears and Phyrexian Walker (up to X = 2 targets).
+# Then (CR 608.2c) the three stun counters are distributed, one at a time, among the tapped creatures Bot2 controls: two on the Bears, one on the Walker.
+# Bot1's own tapped Memnite and Ornithopter are no choice, and neither is Bot2's untapped Llanowar Elves. The pool is empty after the cast:
+# X = 2 took exactly two taps.
+
+[Bot1 Deck]
+Island
+Island
+Memnite
+Ornithopter
+Crashing Wave
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Llanowar Elves
+Grizzly Bears
+Phyrexian Walker
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Phyrexian Walker.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Crashing Wave.Cast(X: 2; Convoke: Memnite, Ornithopter)
+Bot1.Target(Bot2.Battlefield.Grizzly Bears; Bot2.Battlefield.Phyrexian Walker)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Grizzly Bears)
+Bot1.Choose(Grizzly Bears)
+Bot1.Choose(Phyrexian Walker)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Grizzly Bears.Tapped = true
+Bot2.Battlefield.Grizzly Bears.Counters.Stun = 2
+Bot2.Battlefield.Phyrexian Walker.Tapped = true
+Bot2.Battlefield.Phyrexian Walker.Counters.Stun = 1
+Bot2.Battlefield.Llanowar Elves.Tapped = false
+Bot2.Battlefield.Llanowar Elves.Counters.Stun = (absent)
+Bot1.Battlefield.Memnite.Tapped = true
+Bot1.Battlefield.Memnite.Counters.Stun = (absent)
+Bot1.Battlefield.Ornithopter.Counters.Stun = (absent)
+Bot1.Graveyard = Crashing Wave

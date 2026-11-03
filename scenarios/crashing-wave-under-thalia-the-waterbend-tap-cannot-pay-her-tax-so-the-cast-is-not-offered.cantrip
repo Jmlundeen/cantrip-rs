@@ -1,0 +1,39 @@
+# Waterbend's taps pay only the waterbend cost, never a tax on the spell (CR 701.67b). Thalia, Guardian of Thraben (Bot2's) makes
+# Crashing Wave {1}{U}{U} plus waterbend {1}; Bot1 has only {U}{U} from two Islands and Memnite to tap, which pays the waterbend {1} but
+# not Thalia's {1}: casting it is not offered (a refusal that holds because of the cost, `Mana: short`), and it is
+# not cast (the graveyard stays empty) with nothing tapped. The positive control is crashing-wave-under-thalia-pays-the-tax-with-mana-and-the-waterbend-with-a-tap.
+
+[Bot1 Deck]
+Island
+Island
+Memnite
+Crashing Wave
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Thalia, Guardian of Thraben
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Crashing Wave.Cast(X: 1; Convoke: Memnite; Mana: short)
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Memnite.Tapped = false

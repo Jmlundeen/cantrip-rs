@@ -1,0 +1,54 @@
+# The stun counters go on tapped creatures however they got tapped (CR 608.2d): Bot1's first Crashing Wave (waterbend {1} by tapping Memnite) taps Bot2's Grizzly Bears
+# and puts its three stun counters on it, and the second, X = 0 with no targets and nothing tapped to pay, finds the Bears already tapped and puts three more.
+# Bot2's untapped Llanowar Elves takes none. Black Lotus's {U}{U}{U} and two Islands pay {U}{U} twice, leaving {U}.
+
+[Bot1 Deck]
+Black Lotus
+Island
+Island
+Memnite
+Crashing Wave
+Crashing Wave
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Llanowar Elves
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Crashing Wave.Cast(X: 1; Convoke: Memnite)
+Bot1.Target(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Grizzly Bears.Counters.Stun = 3
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Crashing Wave.Cast(X: 0)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Grizzly Bears.Counters.Stun = 6
+Bot2.Battlefield.Llanowar Elves.Tapped = false
+Bot2.Battlefield.Llanowar Elves.Counters.Stun = (absent)
+Bot1.Graveyard = Crashing Wave; Crashing Wave; Black Lotus

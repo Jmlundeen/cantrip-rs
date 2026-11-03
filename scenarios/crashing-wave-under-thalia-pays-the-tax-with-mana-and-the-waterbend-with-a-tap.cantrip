@@ -1,0 +1,46 @@
+# Crashing Wave under Bot2's Thalia, Guardian of Thraben (noncreature spells cost {1} more): {1}{U}{U} from two Islands and a Mox Sapphire,
+# and waterbend {1} paid by tapping Memnite (CR 701.67b: the tap pays the waterbend cost, not the tax). Bot1 chooses no target, so it resolves
+# and nothing is tapped but Memnite; the pool is empty after. Positive control for the scenario where only the taps could pay the tax.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Memnite
+Crashing Wave
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Thalia, Guardian of Thraben
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Crashing Wave.Cast(X: 1; Convoke: Memnite)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Graveyard = Crashing Wave
+Bot1.Battlefield.Memnite.Tapped = true
+Bot2.Battlefield.Thalia, Guardian of Thraben.Tapped = false
