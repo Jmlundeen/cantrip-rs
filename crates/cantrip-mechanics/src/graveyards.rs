@@ -9,3 +9,20 @@ use cantrip_api::*;
 pub fn cards_in_graveyards(s: &GameState) -> impl Iterator<Item = ObjectId> + '_ {
     s.seats().flat_map(|p| s.zone(Zone::graveyard(p)).iter().copied())
 }
+
+/// Whether the card in a graveyard has a quality: the card itself, never the face it would be cast as, since a card has only its
+/// normal characteristics there (CR 715.4: Bonecrusher Giant is a creature card, though Stomp is an instant), and a split card has
+/// both halves' (CR 709.4: Leave // Chance is an instant and sorcery card). Iroh, Grand Lotus and Lier, Disciple of the Drowned
+/// ask it for "instant and sorcery card in your graveyard".
+pub fn card_is(q: &dyn Query, card: ObjectId, quality: impl Fn(&CardDef) -> bool) -> bool {
+    let printed = q.card(q.obj(card).card);
+    match printed.split {
+        Some((left, right)) => quality(left) || quality(right),
+        None => quality(printed),
+    }
+}
+
+/// An instant or sorcery card (the `quality` of `card_is`).
+pub fn instant_or_sorcery(def: &CardDef) -> bool {
+    def.is(CardType::Instant) || def.is(CardType::Sorcery)
+}

@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::graveyards::{card_is, instant_or_sorcery};
 use cantrip_mechanics::firebending;
 use cantrip_oracle as oracle;
 
@@ -6,21 +7,6 @@ use cantrip_oracle as oracle;
 fn yours_on_your_turn(q: &dyn Query, asker: &Asker, card: ObjectId, caster: PlayerId) -> bool {
     let you = asker.controller;
     caster == you && q.state().turn.active == you && q.obj(card).owner == you
-}
-
-/// Whether the card in the graveyard has a quality: the card itself, never the face it would be cast as, since a card has
-/// only its normal characteristics there (CR 715.4: Bonecrusher Giant is a creature card, though Stomp is an instant), and a
-/// split card has both halves' (CR 709.4: Leave // Chance is an instant and sorcery card).
-fn card_is(q: &dyn Query, card: ObjectId, quality: impl Fn(&CardDef) -> bool) -> bool {
-    let printed = q.card(q.obj(card).card);
-    match printed.split {
-        Some((left, right)) => quality(left) || quality(right),
-        None => quality(printed),
-    }
-}
-
-fn instant_or_sorcery(def: &CardDef) -> bool {
-    def.is(CardType::Instant) || def.is(CardType::Sorcery)
 }
 
 fn lesson(def: &CardDef) -> bool {
