@@ -1,5 +1,6 @@
-//! "This spell costs {1} less to cast for each ..." where the card is not affinity (CR 702.41a is the keyword, and only the cards
-//! that print the word use `affinity`): a cost reduction (CR 601.2f, 118.7) that counts a pool of the caster's.
+//! "This spell costs {1} less to cast for each ..." and "This ability costs {1} less to activate for each ..." where the card is not
+//! affinity (CR 702.41a is the keyword, and only the cards that print the word use `affinity`): a cost reduction (CR 601.2f, 118.7) that
+//! counts a pool of the caster's.
 
 use cantrip_api::*;
 
@@ -25,4 +26,13 @@ pub fn less_if_you_control_subtype<const N: u8, const TYPE: u16>(q: &dyn Query, 
 pub fn spells_you_cast(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, card_type: CardType, amount: u32) -> CostDelta {
     let Costed::Spell(spell) = costed else { return CostDelta::NONE };
     if player == q.controller(source) && q.chars(spell).is(card_type) { CostDelta::less(amount) } else { CostDelta::NONE }
+}
+
+/// "This ability costs {1} less to activate for each [subtype] you control" (CR 601.2f by way of 602.2b): the activated ability's own cost change
+/// (`ActivatedDef::cost_change`), asked as it is activated and counting only the permanents of the player activating it, as the layers
+/// have made them that type. Generic mana only (CostDelta::less never takes a colored symbol). `TYPE` is `lands::sub(Subtype::Island)` and so
+/// on, read as a word of the source's text (CR 612.2). The Lonely Mountain (Equipment) and Waterbending Scroll (Island) print it.
+pub fn ability_cheaper_per_subtype_you_control<const TYPE: u16>(q: &dyn Query, asker: &Asker, _: Costed, _: &[Target]) -> CostDelta {
+    let wanted = crate::lands::word(q, asker.source, TYPE);
+    CostDelta::less(crate::permanents_with_subtype_you_control(q, asker.controller, wanted) as u32)
 }
