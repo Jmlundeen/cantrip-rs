@@ -1,0 +1,51 @@
+# Mightstone gives attacking creatures on either side +1/+0, while creatures outside combat keep their printed stats.
+[Bot1 Deck]
+Mightstone
+Black Lotus
+Mox Pearl
+Memnite
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mightstone.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Memnite.Power = 1
+? Bot1.Battlefield.Memnite.Toughness = 1
+Bot1.Attack(Memnite > Bot2)
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Toughness = 1
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Memnite.Power = 1
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Memnite.Power = 1
+Bot2.Attack(Memnite > Bot1)
+? Bot2.Battlefield.Memnite.Power = 2
+? Bot2.Battlefield.Memnite.Toughness = 1
+? Bot1.Battlefield.Memnite.Power = 1
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Bot2.Battlefield.Memnite.Power = 1
