@@ -1,0 +1,6 @@
+{
+  "name": "Death Ward",
+  "manaCost": "{W}",
+  "type": "Instant",
+  "oracleText": "Regenerate target creature."
+}
