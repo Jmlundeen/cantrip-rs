@@ -1510,7 +1510,13 @@ What besides mana may pay a spell's total cost (CR 601.2f-h: convoke 702.51, del
 own `pay_with` together with what the permanents on the battlefield give it (`CardDef.grants_pay_with`: Ironheart, Clever
 Champion's "noncreature spells you cast have improvise", Chief Engineer's convoke, Teval's delve): `actions::pay_with`,
 read by the cast's payment (`Helpers::with`) and by the advice (`covers_total`, with the grantors found once per decision in
-`Available::grantors`). Several instances are redundant (CR 702.51d, 702.66c, 702.126c). "The next spell you cast this turn
+`Available::grantors`). The advice judges an artifact or creature that could make mana as either tapped for the cost or
+spent for its mana, never both (CR 601.2g-h): `TapFor` names what may be tapped (convoke's creatures, improvise's
+artifacts, and both for a waterbend cost, CR 701.67a, capped at the waterbend cost's own generic mana), and
+`available_as` makes being tapped for it one more alternative of each such permanent's mana sources - its own abilities, an
+altar that would sacrifice it, Urza that would tap it - so the existing search over alternatives decides, alike
+permanents counted together; one nothing else would spend is sure to be tapped (`Available::tapped`, taken off the cost
+by `less_taps`). Several instances are redundant (CR 702.51d, 702.66c, 702.126c). "The next spell you cast this turn
 has convoke" (Wand of the Worldsoul, Archway of Innovation's improvise) is not built.
 
 A cost change may set the least the total comes to (`CostDelta::at_least`: Trinisphere's "each spell that would cost less

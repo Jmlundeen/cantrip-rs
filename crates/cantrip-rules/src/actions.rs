@@ -5424,14 +5424,23 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             // (CR 602.2b): a seat handed it would cancel at the payment and be handed it again, forever.
             let owed = if def.special_action { special_action_cost(cx, player, id, ability, def) } else { def.cost.mana };
             // An {X} is judged at the least it may be announced as (CR 107.3a, 601.2b): 0, or 1 where X can't be 0.
-            let judged = at_least_x(owed, def.x_cant_be_zero).mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend;
+            let judged = at_least_x(owed, def.x_cant_be_zero).mana_value() > 0 && !def.tap_creatures_for_mana;
+            // Waterbend (CR 701.67a-b): each untapped artifact or creature may be tapped to pay {1} of the waterbend cost's
+            // generic mana - at the least X may be announced as, for "Waterbend {X}" - and together no more than that,
+            // whatever the total has besides (Anointed Peacekeeper's tax); one that could make mana is either (`TapFor`). The
+            // source of a {T} cost is tapped for that already, and its mana can't pay (CR 602.2b, 605.3b).
+            let bent = (judged && def.waterbend).then(|| {
+                let tap = TapFor { artifacts: true, creatures: true, convoke: false, cap: at_least_x(def.cost.mana, def.x_cant_be_zero).generic };
+                available_as(cx, player, def.cost.tap.then_some(id), ManaWindow::Payment, false, Some(tap))
+            });
             // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
             // Nor may it be spent for mana by another's ability (sacrificed to an altar, tapped by Urza) while paying it.
             let own = (judged
+                && bent.is_none()
                 && def.cost.tap
                 && (has_mana_source(cx, id, player) || available.get_or_init(|| self::available(cx, player)).spent.contains(&id)))
             .then(|| available_without(cx, player, Some(id), ManaWindow::Payment));
-            let a = judged.then(|| own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
+            let a = judged.then(|| bent.as_ref().or(own.as_ref()).unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
             // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
             let payment = if def.special_action { ManaPayment::Other } else { ability_payment(cx, id, chars.types, chars.subtypes, def.equip) };
             let covered = |a: &Available, owed: ManaCost, targets: &[Target]| {
@@ -9940,7 +9949,9 @@ fn activate(
         source,
         mana,
         &Helpers {
-            waterbend: if def.waterbend { u32::MAX } else { 0 },
+            // CR 701.67b: the tapping pays only the generic mana of the waterbend cost - its {X} as announced - and not a
+            // tax on it (Anointed Peacekeeper).
+            waterbend: if def.waterbend { def.cost.mana.generic + u32::from(item.x) * u32::from(def.cost.mana.x) } else { 0 },
             creatures: def.tap_creatures_for_mana,
             purpose: Paying::Activating(paying),
             ..Helpers::NONE
