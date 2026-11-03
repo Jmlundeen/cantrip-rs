@@ -1,0 +1,27 @@
+# Life loss is not damage and does not put vitality counters on Living Artifact (CR 119.3).
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Ornithopter
+Living Artifact
+Vampiric Tutor
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Living Artifact.Cast(Bot1.Battlefield.Island)
+Bot1.Hand.Living Artifact.Cast(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vampiric Tutor.Cast
+Bot1.Pass
+Bot1.Search(Island)
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Living Artifact.Counters.Vitality = (absent)

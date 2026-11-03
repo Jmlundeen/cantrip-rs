@@ -1,0 +1,6 @@
+{
+  "name": "Living Artifact",
+  "manaCost": "{G}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant artifact\nWhenever you're dealt damage, put that many vitality counters on this Aura.\nAt the beginning of your upkeep, you may remove a vitality counter from this Aura. If you do, you gain 1 life."
+}

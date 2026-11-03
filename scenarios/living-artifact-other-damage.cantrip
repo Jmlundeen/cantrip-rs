@@ -1,0 +1,42 @@
+# Damage to another player or a creature does not add vitality counters (CR 603.2).
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Ruby
+Ornithopter
+Living Artifact
+Shock
+Shock
+Island x20
+[Bot2 Deck]
+Grizzly Bears
+Mox Emerald
+Mox Emerald
+Island x20
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Living Artifact.Cast(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Living Artifact.Counters.Vitality = (absent)
+Bot2.Life = 18
+Bot2.Graveyard = Grizzly Bears

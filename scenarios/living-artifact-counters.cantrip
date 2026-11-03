@@ -1,0 +1,38 @@
+# Damage to the Aura's controller adds vitality counters even on an opponent's artifact; its controller may remove one at upkeep (CR 603.2, 122.1, 119.3).
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Living Artifact
+Shock
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Living Artifact.Cast(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot1)
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Living Artifact.Counters.Vitality = 2
+[T5 Bot1.Upkeep]
+Bot1.PayCost
+[T5 Bot1.Main1]
+? Bot1.Life = 19
+? Bot1.Battlefield.Living Artifact.Counters.Vitality = 1
+[T7 Bot1.Upkeep]
+Bot1.Decline
+[T7 Bot1.Main1]
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20
+Bot1.Battlefield.Living Artifact.Counters.Vitality = 1
+Bot1.Battlefield.Living Artifact.AttachedTo = Ornithopter

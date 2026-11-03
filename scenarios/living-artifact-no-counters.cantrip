@@ -1,0 +1,21 @@
+# With no vitality counter the optional cost cannot be paid, so no life is gained (CR 118.12).
+[Bot1 Deck]
+Mox Emerald
+Ornithopter
+Living Artifact
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Living Artifact.Cast(Ornithopter)
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Living Artifact.Counters.Vitality = (absent)
