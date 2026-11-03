@@ -1,0 +1,37 @@
+# Chaoslace changes either player's permanent to red alone, with no expiration (CR 105.3, 611.2a).
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Chaoslace
+Chaoslace
+Ornithopter
+Mountain
+Mountain
+Mountain x12
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Chaoslace.Cast(Bot2)
+! Bot1.Hand.Chaoslace.Cast(Bot2.Hand.Forest)
+Bot1.Hand.Chaoslace.Cast(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Colors = Red
+Bot1.Battlefield.Black Lotus.Activate(Color: R)
+Bot1.Hand.Chaoslace.Cast(Bot2.Battlefield.Llanowar Elves)
+[T4 Bot2.Main1]
+[Expect]
+Bot1.Battlefield.Ornithopter.Colors = Red
+Bot2.Battlefield.Llanowar Elves.Colors = Red

@@ -1,0 +1,21 @@
+# Chaoslace replaces both colors of a multicolored permanent with red, rather than adding red (CR 105.3).
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Gaddock Teeg
+Chaoslace
+Forest x12
+[Bot2 Deck]
+Island x16
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gaddock Teeg.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chaoslace.Cast(Bot1.Battlefield.Gaddock Teeg)
+[Expect]
+Bot1.Battlefield.Gaddock Teeg.Colors = Red

@@ -1,0 +1,6 @@
+{
+  "name": "Chaoslace",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Target spell or permanent becomes red. (Its mana symbols remain unchanged.)"
+}
