@@ -1363,6 +1363,16 @@ pub fn change_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
     g.change_target(item.target(0), item.controller)
 }
 
+/// "This source deals N damage to each creature and each player" (CR 608.2c, 120.4): all recipients
+/// are damaged together, including both players and creatures controlled by either. Pestilence and Encounter the Unknown print it.
+pub fn damage_each_creature_and_player<const N: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let mut hits: Vec<(ObjectId, Target, u16)> =
+        creatures_on_the_battlefield(g).into_iter().map(|id| (item.object, Target::Object(id), N)).collect();
+    hits.extend(g.state().apnap().map(|p| (item.object, Target::Player(p), N)));
+    g.damage_together(&hits);
+    Ok(())
+}
+
 /// "[This spell] deals `n` damage to each creature" (Pyroclasm, Fiery Confluence, Avengers Disassembled): one damage event
 /// for every creature on the battlefield as the effect is carried out (CR 608.2c), all dealt together.
 pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
