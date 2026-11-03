@@ -1,0 +1,32 @@
+# Two creature cards and two noncreature cards above Nether Shadow do not satisfy its upkeep condition (CR 603.4).
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Midnight Tilling
+Island
+Island
+Island
+Island
+Nether Shadow
+Grizzly Bears
+Hill Giant
+Shock
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Midnight Tilling.Cast
+Bot1.Pass
+Bot1.Arrange(Shock; Hill Giant; Grizzly Bears; Nether Shadow)
+Bot1.Choose()
+[T3 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Nether Shadow = (absent)
+Bot1.Graveyard = Midnight Tilling; Shock; Hill Giant; Grizzly Bears; Nether Shadow

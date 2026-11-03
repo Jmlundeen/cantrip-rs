@@ -1,0 +1,30 @@
+# A qualifying Shadow in Bot2's graveyard does not trigger during Bot1's upkeep (CR 603.4).
+[Bot1 Deck]
+Island x24
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Midnight Tilling
+Island x5
+Nether Shadow
+Grizzly Bears
+Hill Giant
+Wind Drake
+Island x20
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Midnight Tilling.Cast
+Bot2.Pass
+Bot2.Arrange(Wind Drake; Hill Giant; Grizzly Bears; Nether Shadow)
+Bot2.Choose()
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+! Bot2.Accept
+[T3 Bot1.Main1]
+[Expect]
+Bot2.Graveyard = Midnight Tilling; Wind Drake; Hill Giant; Grizzly Bears; Nether Shadow

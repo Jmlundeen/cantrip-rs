@@ -1,0 +1,11 @@
+{
+  "name": "Nether Shadow",
+  "manaCost": "{B}{B}",
+  "type": "Creature — Spirit",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Haste\nAt the beginning of your upkeep, if this card is in your graveyard with three or more creature cards above it, you may put this card onto the battlefield.",
+  "keywords": [
+    "Haste"
+  ]
+}

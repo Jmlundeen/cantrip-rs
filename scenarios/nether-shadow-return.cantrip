@@ -1,0 +1,37 @@
+# Nether Shadow may return during its controller's upkeep with three creature cards above it, and can attack immediately (CR 603.4, 702.10).
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Midnight Tilling
+Island
+Island
+Island
+Island
+Nether Shadow
+Grizzly Bears
+Hill Giant
+Wind Drake
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Midnight Tilling.Cast
+Bot1.Pass
+Bot1.Arrange(Wind Drake; Hill Giant; Grizzly Bears; Nether Shadow)
+Bot1.Choose()
+[T3 Bot1.Upkeep]
+Bot1.Decline
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Nether Shadow = (absent)
+[T5 Bot1.Upkeep]
+Bot1.Accept
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Nether Shadow > Bot2)
+[T5 Bot1.Main2]
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Nether Shadow.Power = 1
