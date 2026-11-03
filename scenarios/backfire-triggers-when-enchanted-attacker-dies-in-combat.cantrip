@@ -1,0 +1,45 @@
+# A 3/1 trampler deals two damage to the defending player through a 2/1 blocker while both creatures die; Backfire still deals two to its controller (CR 603.2, 113.7a).
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Backfire
+Savannah Lions
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Goblin Deathraiders
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Goblin Deathraiders.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Backfire.Cast(Bot2.Battlefield.Goblin Deathraiders)
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.BeginCombat]
+Bot2.Attack(Goblin Deathraiders > Bot1)
+Bot1.Block(Savannah Lions > Goblin Deathraiders)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Bot1.Graveyard = Backfire; Savannah Lions
+Bot2.Graveyard = Goblin Deathraiders

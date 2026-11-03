@@ -1,0 +1,48 @@
+# A stolen enchanted creature hits the Aura's controller and then dies in response; Backfire damages its last controller, not its owner (CR 608.2h, 113.7a).
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Act of Treason
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Savannah Lions
+Backfire
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Backfire.Cast(Bot2.Battlefield.Savannah Lions)
+? Bot2.Mana =
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Savannah Lions)
+Bot1.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Savannah Lions > Bot2)
+[T3 Bot1.Damage]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Savannah Lions)
+Bot1.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Bot2.Graveyard = Backfire; Savannah Lions

@@ -1,0 +1,33 @@
+# Backfire enchants an opponent's creature and deals its controller the damage it dealt the Aura's controller (CR 603.2).
+[Bot1 Deck]
+Mox Sapphire
+Backfire
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Savannah Lions
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Backfire.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot1.Hand.Backfire.Cast(Bot2.Battlefield.Savannah Lions)
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.BeginCombat]
+Bot2.Attack(Savannah Lions > Bot1)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Bot1.Battlefield.Backfire.AttachedTo = Savannah Lions

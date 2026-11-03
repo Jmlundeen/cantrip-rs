@@ -1,0 +1,50 @@
+# Backfire triggers when the enchanted Loot deals three noncombat damage, and deals three to Loot's controller (CR 603.2).
+[Bot1 Deck]
+Mox Sapphire
+Backfire
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Loot, the Pathfinder
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Loot, the Pathfinder.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Backfire.Cast(Bot2.Battlefield.Loot, the Pathfinder)
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Loot, the Pathfinder.Activate(Bot1; Ability: 3 damage)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 17

@@ -1,0 +1,6 @@
+{
+  "name": "Backfire",
+  "manaCost": "{U}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nWhenever enchanted creature deals damage to you, this Aura deals that much damage to that creature's controller."
+}
