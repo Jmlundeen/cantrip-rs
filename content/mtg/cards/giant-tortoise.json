@@ -1,0 +1,8 @@
+{
+  "name": "Giant Tortoise",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Turtle",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "This creature gets +0/+3 as long as it's untapped."
+}
