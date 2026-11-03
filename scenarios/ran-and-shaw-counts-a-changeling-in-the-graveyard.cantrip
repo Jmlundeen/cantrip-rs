@@ -1,0 +1,59 @@
+# Probe: two Lessons and a Changeling creature card (every creature type, CR 702.73a) in the graveyard: three Dragon and/or
+# Lesson cards, so Ran and Shaw copy themselves.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Changeling Wayfinder
+Firebending Lesson
+Firebending Lesson
+Mountain
+Mox Pearl
+Ran and Shaw
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Changeling Wayfinder.Cast
+Bot1.Decline
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot1.Battlefield.Changeling Wayfinder)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Changeling Wayfinder; Firebending Lesson; Firebending Lesson
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ran and Shaw.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ran and Shaw; Ran and Shaw

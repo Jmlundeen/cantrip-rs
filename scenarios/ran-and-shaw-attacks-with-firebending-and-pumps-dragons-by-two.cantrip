@@ -1,0 +1,47 @@
+# Ran and Shaw (4/4 flier, firebending 2) cast on turn 1 off a Mountain and four Moxen, attacks on turn 3: firebending adds {R}{R}
+# that last through combat, which with two untapped Moxen pay "{3}{R}: Dragons you control get +2/+0 until end of turn" -
+# Ran and Shaw is a Dragon, so it hits for 6 (20 - 6 = 14), and the ability is not offered with less mana. The pool is empty after.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Ran and Shaw
+Island
+Island x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ran and Shaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ran and Shaw > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} lasting {R}{R}
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Ran and Shaw.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ran and Shaw.Power = 6
+? Bot1.Battlefield.Ran and Shaw.Toughness = 4
+[T3 Bot1.Damage]
+
+[Expect]
+Bot2.Life = 14

@@ -1,0 +1,66 @@
+# Ran and Shaw (legendary 4/4 Dragon, flying, firebending 2): "When Ran and Shaw enter, if you cast them and there are three or
+# more Dragon and/or Lesson cards in your graveyard, create a token that's a copy of Ran and Shaw, except it's not legendary."
+# On turn 3 Bot1 kills Bot2's three Ornithopters with three Firebending Lessons (so three Lesson cards are in its graveyard),
+# and on turn 7 casts Ran and Shaw: the token copy enters too and, being not legendary, the legend rule leaves both (CR 704.5j).
+# The token was not cast, so its own enters trigger does nothing, and only the one copy is made.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Firebending Lesson
+Firebending Lesson
+Firebending Lesson
+Mountain
+Mox Pearl
+Ran and Shaw
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield =
+? Bot1.Graveyard = Firebending Lesson; Firebending Lesson; Firebending Lesson
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ran and Shaw.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ran and Shaw; Ran and Shaw

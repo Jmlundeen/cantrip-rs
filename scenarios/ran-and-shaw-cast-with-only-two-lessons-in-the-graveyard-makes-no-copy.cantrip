@@ -1,0 +1,56 @@
+# Ran and Shaw's enters trigger needs three or more Dragon and/or Lesson cards in YOUR graveyard (CR 603.4): with two Firebending
+# Lessons in Bot1's graveyard, casting Ran and Shaw on turn 5 makes no copy. The intervening "if" is false as it would trigger, so nothing goes on the stack.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Firebending Lesson
+Firebending Lesson
+Mox Pearl
+Mountain
+Ran and Shaw
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x21
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Firebending Lesson; Firebending Lesson
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ran and Shaw.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ran and Shaw
+Stack.Count = 0
