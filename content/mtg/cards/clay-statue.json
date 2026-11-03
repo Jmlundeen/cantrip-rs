@@ -1,0 +1,8 @@
+{
+  "name": "Clay Statue",
+  "manaCost": "{4}",
+  "type": "Artifact Creature — Golem",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "{2}: Regenerate this creature."
+}
