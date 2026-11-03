@@ -1,0 +1,45 @@
+# An opponent's blocking Wall is not a legal target; the companion scenario casts Glyph on a controlled blocking Wall (CR 115.1a).
+[Bot1 Deck]
+Memnite
+Mox Ruby
+Glyph of Destruction
+Mox Pearl
+Steel Wall
+Swamp x20
+
+[Bot2 Deck]
+Mox Pearl
+Steel Wall
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Steel Wall.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Bot2)
+Bot2.Block(Steel Wall > Memnite)
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Glyph of Destruction.Cast(Bot2.Battlefield.Steel Wall)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Steel Wall.Damage = 1
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+Bot1.Block(Bot1.Battlefield.Steel Wall > Bot2.Battlefield.Memnite)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Glyph of Destruction.Cast(Bot1.Battlefield.Steel Wall)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Steel Wall.Power = 10
+[T6 Bot2.Main2]
+[Expect]
+Bot1.Battlefield.Steel Wall.Damage = 0

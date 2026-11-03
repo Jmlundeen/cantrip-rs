@@ -1,0 +1,53 @@
+# Tamiyo's Safekeeping lets the Wall survive Glyph's destruction, exposing the prevention's expiration next turn (CR 611.2a, 702.12b).
+[Bot1 Deck]
+Mox Pearl
+Steel Wall
+Mox Ruby
+Glyph of Destruction
+Mox Emerald
+Tamiyo's Safekeeping
+Swamp x20
+
+[Bot2 Deck]
+Memnite
+Mox Ruby
+Shock x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Steel Wall.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+Bot1.Block(Steel Wall > Memnite)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Glyph of Destruction.Cast(Steel Wall)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Steel Wall)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Steel Wall.Damage = 0
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tamiyo's Safekeeping.Cast(Steel Wall)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Steel Wall.Toughness = 4
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Steel Wall)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Steel Wall.Damage = 2
