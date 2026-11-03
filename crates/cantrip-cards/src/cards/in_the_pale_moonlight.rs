@@ -15,20 +15,10 @@ fn chapter_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::investigate(g, item.controller)
 }
 
-/// "An artifact or creature" as the permanent chapter III may sacrifice (CR 115.1, 701.21a).
-fn artifact_or_creature(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
-    Verdict::each(choice, |id| {
-        let chars = q.chars(id);
-        chars.is(CardType::Artifact) || chars.is(CardType::Creature)
-    })
-}
-
 /// III: "You may sacrifice an artifact or creature. If you do, create two 2/2 black Romulan creature tokens" (CR 608.2c,
 /// 701.21a). Nothing is asked and nothing is created when there is nothing to sacrifice.
 fn chapter_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let rule = Selection::new(select::up_to(1))
-        .with(select::part(&(artifact_or_creature as SelectFn), 0, ""))
-        .called("artifact or creature");
+    let rule = select::artifact_or_creature_permanents(select::up_to(1));
     if !effects::may_sacrifice(g, item.controller, item.object, rule)?.is_empty() {
         tokens::create(g, item.controller, &tokens::ROMULAN, 2)?;
     }

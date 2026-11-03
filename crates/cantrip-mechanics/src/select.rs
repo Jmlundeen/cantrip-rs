@@ -165,8 +165,8 @@ pub const NONLAND: Part = part(&(nonland as SelectFn), 0, "");
 /// "An artifact card". Tinker, Goblin Engineer, Inventors' Fair and Transmute Artifact search for it.
 pub const ARTIFACT: Part = part(&(artifact as SelectFn), 0, "");
 
-/// "An artifact and/or creature card": an artifact card, a creature card, or both (an artifact creature). Kayla's Reconstruction
-/// puts them onto the battlefield and Skyship Weatherlight searches for them.
+/// "An artifact and/or creature card or permanent": one that is an artifact, a creature, or both (an artifact creature).
+/// Kayla's Reconstruction puts them onto the battlefield and Skyship Weatherlight searches for them.
 pub const ARTIFACT_OR_CREATURE: Part = part(&(artifact_or_creature as SelectFn), 0, "");
 
 /// "Another creature or artifact": a creature or artifact permanent other than the object whose text asks (`Choice::source`).
@@ -443,6 +443,12 @@ pub const fn creature_cards(count: Count) -> Selection {
 /// Automated Warfare System's "you may sacrifice" is `up_to(1)`.
 pub const fn another_creature_or_artifact_permanents(count: Count) -> Selection {
     Selection::of(count, &[ANOTHER_CREATURE_OR_ARTIFACT]).called("other creature or artifact")
+}
+
+/// `count` of "an artifact or creature" (CR 701.21a), chosen as an effect resolves: In the Pale Moonlight's chapter III and
+/// Buzzard-Wasp Colony's "you may sacrifice" is `up_to(1)`.
+pub const fn artifact_or_creature_permanents(count: Count) -> Selection {
+    Selection::of(count, &[ARTIFACT_OR_CREATURE]).called("artifact or creature")
 }
 
 /// `count` of "another creature" (CR 701.21a), chosen as an effect resolves: Bolg of the North's and Sephiroth, Fabled SOLDIER's
