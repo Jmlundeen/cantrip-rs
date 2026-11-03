@@ -1,0 +1,46 @@
+# The activation requires two white mana: one white and one black are insufficient (CR 602.2b).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Mox Jet
+Northern Paladin
+Muck Rats
+Swords to Plowshares
+Island x20
+[Bot2 Deck]
+Mox Jet
+Muck Rats
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Muck Rats.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Northern Paladin.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Muck Rats.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Muck Rats)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Northern Paladin.Activate(Bot2.Battlefield.Muck Rats; Mana: short)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Northern Paladin.Activate(Bot2.Battlefield.Muck Rats)
+? Bot1.Mana =
+[T5 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Muck Rats = (absent)
+Bot1.Battlefield.Northern Paladin.Tapped = true

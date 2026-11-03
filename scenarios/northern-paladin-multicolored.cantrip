@@ -1,0 +1,46 @@
+# Northern Paladin can target a multicolored black permanent but cannot target a white nonblack permanent (CR 105.2b).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Mox Jet
+Northern Paladin
+Muck Rats
+Island
+Island x20
+[Bot2 Deck]
+Mox Jet
+Deathrite Shaman
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Muck Rats.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Northern Paladin.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+! Bot1.Battlefield.Northern Paladin.Activate(Bot1.Battlefield.Northern Paladin)
+Bot1.Battlefield.Northern Paladin.Activate(Bot2.Battlefield.Deathrite Shaman)
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Deathrite Shaman = (absent)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Northern Paladin.Activate(Bot1.Battlefield.Muck Rats)
+? Bot1.Mana =
+[T5 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Muck Rats = (absent)
+Bot2.Graveyard = Deathrite Shaman

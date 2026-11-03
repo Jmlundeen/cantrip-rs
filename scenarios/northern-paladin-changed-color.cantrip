@@ -1,0 +1,47 @@
+# Mind Bend changes the color word black to red, so only the red creature is a legal target (CR 612.1).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl x2
+Mox Sapphire
+Northern Paladin
+Mind Bend
+Island x20
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Muck Rats
+Goblin Welder
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Northern Paladin.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mind Bend.Cast(Bot1.Battlefield.Northern Paladin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Black)
+Bot1.Colors(Red)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Muck Rats.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Goblin Welder.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+! Bot1.Battlefield.Northern Paladin.Activate(Bot2.Battlefield.Muck Rats)
+Bot1.Battlefield.Northern Paladin.Activate(Bot2.Battlefield.Goblin Welder)
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Muck Rats.Toughness = 1
+Bot2.Battlefield.Goblin Welder = (absent)
