@@ -1,0 +1,6 @@
+{
+  "name": "Thoughtlace",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Target spell or permanent becomes blue. (Mana symbols on that permanent remain unchanged.)"
+}

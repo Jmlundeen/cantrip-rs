@@ -1,0 +1,27 @@
+# An activated ability is not a spell or permanent, though its source is a legal permanent target (CR 112.1, 113.1).
+[Bot1 Deck]
+Plains
+Mother of Runes
+Island x20
+
+[Bot2 Deck]
+Thoughtlace
+Mox Sapphire
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mother of Runes.Activate(Mother of Runes)
+! Bot2.Hand.Thoughtlace.Cast(Stack.Mother of Runes)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Thoughtlace.Cast(Bot1.Battlefield.Mother of Runes)
+? Bot2.Mana =
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Colors = Blue

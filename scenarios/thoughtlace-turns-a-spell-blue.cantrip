@@ -1,0 +1,30 @@
+# Thoughtlace makes a creature spell blue, allowing Pyroblast to counter it (CR 611.2a).
+[Bot1 Deck]
+Thoughtlace
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Pyroblast
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thoughtlace.Cast(Stack.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyroblast.Cast
+Bot1.Modes(1)
+Bot1.Target(Stack.Ornithopter)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Pyroblast; Ornithopter; Thoughtlace

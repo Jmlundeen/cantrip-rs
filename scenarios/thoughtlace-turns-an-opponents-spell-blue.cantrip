@@ -1,0 +1,36 @@
+# Thoughtlace makes an opponent's red noncreature spell blue, so Pyroblast counters it before it deals damage (CR 611.2a).
+[Bot1 Deck]
+Thoughtlace
+Mox Sapphire
+Mox Ruby
+Pyroblast
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thoughtlace.Cast(Stack.Lightning Bolt)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyroblast.Cast
+Bot1.Modes(1)
+Bot1.Target(Stack.Lightning Bolt)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,32 @@
+# Thoughtlace makes the Bolt blue alone, so protection from white does not stop its damage to Black Knight (CR 105.3, 702.16b, 702.16e).
+[Bot1 Deck]
+Thoughtlace
+Lightning Bolt
+Mox Sapphire
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Black Knight
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: B)
+Bot2.Hand.Black Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Black Knight)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thoughtlace.Cast(Stack.Lightning Bolt)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Black Knight; Black Lotus

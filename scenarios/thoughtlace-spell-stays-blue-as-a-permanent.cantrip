@@ -1,0 +1,20 @@
+# An effect changing a permanent spell's color continues on the permanent it becomes (CR 400.7a).
+[Bot1 Deck]
+Thoughtlace
+Mox Sapphire
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thoughtlace.Cast(Stack.Ornithopter)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Colors = Blue
