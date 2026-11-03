@@ -1,0 +1,42 @@
+# With two prevention shields, the affected player chooses the capped Conservator effect by its hint (CR 616.1).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Conservator
+Healing Salve
+Island x20
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Conservator.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Prevent the next 3 damage)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Conservator.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot1.Replace(prevents up to 2 damage)
+[Expect]
+Bot1.Life = 20
+Prevented = 2 Lightning Bolt > Bot1 by Conservator; 1 Lightning Bolt > Bot1 by Healing Salve

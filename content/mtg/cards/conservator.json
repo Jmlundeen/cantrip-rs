@@ -1,0 +1,6 @@
+{
+  "name": "Conservator",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "{3}, {T}: Prevent the next 2 damage that would be dealt to you this turn."
+}
