@@ -1,0 +1,41 @@
+# Joo Dee, One of Many: "{B}, {T}: Surveil 1. Create a token that's a copy of this creature, then sacrifice an artifact or creature.
+# Activate only as a sorcery." Bot1 controls only Joo Dee (the Black Lotus that cast it is gone): she is summoning-sick on turn 1
+# but {T} is still refused then (CR 302.6), and in the turn-3 main phase the surveil puts the top Mountain into the graveyard, the
+# copy is made, and the sacrifice must be one of the two (the ruling): Bot1 sacrifices the token, so the tapped original stays.
+# The copy was made before the sacrifice, or the sacrifice could not have been the token.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Joo Dee, One of Many
+Swamp
+Swamp
+Swamp
+Swamp
+Mountain
+Mountain
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp#1.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Joo Dee, One of Many.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Joo Dee, One of Many.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Joo Dee, One of Many.Activate
+Bot1.Arrange(| Mountain)
+Bot1.Choose(Bot1.Battlefield.Joo Dee, One of Many#2)
+
+[Expect]
+Bot1.Graveyard = Mountain; Black Lotus
+Bot1.Battlefield = Joo Dee, One of Many; Swamp
+Bot1.Battlefield.Joo Dee, One of Many.Tapped = true
+Bot1.Battlefield.Swamp.Tapped = true
+Bot1.Library.Count = 11

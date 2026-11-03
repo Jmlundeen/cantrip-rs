@@ -1,0 +1,38 @@
+# Joo Dee, One of Many: "then sacrifice an artifact or creature" is any artifact, not only a creature. Bot1 sacrifices Mox Ruby,
+# keeping both Joo Dees (the original tapped, the copy untapped and summoning-sick); the surveil keeps the Mountain on top
+# (CR 701.25a), and the {B} was paid exactly by Mox Jet, which is not tapped again.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Joo Dee, One of Many
+Swamp x4
+Mountain
+Mountain
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Joo Dee, One of Many.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Joo Dee, One of Many.Activate
+Bot1.Arrange(Mountain |)
+Bot1.Choose(Bot1.Battlefield.Mox Ruby)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Graveyard = Mox Ruby
+Bot1.Battlefield = Joo Dee, One of Many; Joo Dee, One of Many; Mox Jet
+Bot1.Battlefield.Joo Dee, One of Many#1.Tapped = true
+Bot1.Battlefield.Joo Dee, One of Many#2.Tapped = false
+Bot1.Battlefield.Joo Dee, One of Many#2.SummoningSick = true
+Bot1.Library.Count = 12
