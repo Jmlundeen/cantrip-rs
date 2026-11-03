@@ -818,7 +818,7 @@ pub fn damage_each_opponent_and_gain_life(g: &mut dyn Game, item: &StackItem, n:
 /// as the ability resolves, or as it last existed if it has left the battlefield (CR 608.2h), with no target and no
 /// retest of the trigger condition. The damage is dealt by the ability's source, as it last existed if it has left
 /// (CR 113.7a); none is dealt to a player who has left the game (CR 102.1, 120.1, 800.4a), which the core's damage sees to. Rampaging
-/// Ferocidon, Tetsuko Umezawa, Pursuer (1), Dingus Egg and Psychic Venom (2) print it.
+/// Ferocidon, Tetsuko Umezawa, Pursuer, Ankh of Mishra (1), Dingus Egg and Psychic Venom (2) print it.
 pub fn ping_subject_controller<const N: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(subject) = item.subject.object() {
         let controller = g.controller(subject);
