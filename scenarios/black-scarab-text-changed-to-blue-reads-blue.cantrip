@@ -1,0 +1,54 @@
+# Sleight of Mind changes both of Black Scarab's "black" words to "blue" (CR 612.1): an opponent's black permanent no longer
+# turns the +2/+2 on, an opponent's blue permanent does, a blue creature can't block the enchanted creature and a black one can.
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Memnite
+Black Scarab
+Sleight of Mind
+Island x20
+[Bot2 Deck]
+Mox Jet
+Hired Poisoner
+Aegis Turtle
+Island
+Island x20
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Scarab.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Hired Poisoner.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Memnite.Power = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.Black Scarab)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+Bot1.Colors(Blue)
+? Bot1.Battlefield.Memnite.Power = 1
+? Bot1.Battlefield.Memnite.Toughness = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aegis Turtle.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Memnite.Power = 3
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Bot2)
+! Bot2.Block(Aegis Turtle > Memnite)
+Bot2.Block(Hired Poisoner > Memnite)
+[T5 Bot1.Main2]
+[Expect]
+Bot2.Graveyard.Hired Poisoner.Power = 1
+Bot2.Life = 20
