@@ -1,0 +1,65 @@
+# "When this creature enters, create a Clue token" (CR 111.10f): each cast of the 1/3 Forecasting Fortune Teller makes one Clue for its own controller -
+# Bot1's on turn 1, Bot2's on turn 2, not Bot1's second one. Bot1 cracks its Clue ({2}, Sacrifice: Draw a card) with Mox Ruby and Mox Pearl: it is
+# gone and Bot1 holds one more card; Bot2's Clue is left alone.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Forecasting Fortune Teller
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Forecasting Fortune Teller
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Forecasting Fortune Teller.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Clue Token.Subtypes = Clue
+? Bot1.Battlefield.Clue Token.Token = true
+? Bot1.Battlefield.Forecasting Fortune Teller.Power = 1
+? Bot1.Battlefield.Forecasting Fortune Teller.Toughness = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Forecasting Fortune Teller.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Clue Token.Subtypes = Clue
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Clue Token.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Clue Token = (absent)
+Bot2.Battlefield.Clue Token.Subtypes = Clue
