@@ -1,0 +1,37 @@
+# Chub Toad blocks one member of an attacking band and so blocks both (CR 702.22h), but it blocks once: its "whenever this
+# creature blocks" triggers once (CR 509.3a), so it is 3/3, not 5/5.
+
+[Bot1 Deck]
+Plains
+Memnite
+Benalish Hero
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Chub Toad
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Chub Toad.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Benalish Hero > Bot2; Memnite > Bot2)
+Bot1.Choose(Memnite)
+Bot2.Block(Chub Toad > Benalish Hero)
+? Combat.Blocks.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Chub Toad.Power = 3
+? Bot2.Battlefield.Chub Toad.Toughness = 3
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Chub Toad.Power = 3
+Bot2.Battlefield.Chub Toad.Toughness = 3
