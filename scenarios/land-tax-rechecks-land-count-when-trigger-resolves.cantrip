@@ -1,0 +1,48 @@
+# Land Tax does not trigger at equal land counts, and its intervening condition is checked again after Embrace the Paradox catches up in response (CR 603.4).
+[Bot1 Deck]
+Forest
+Mox Pearl
+Land Tax
+Black Lotus
+Embrace the Paradox
+Mox Sapphire
+Plains
+Forest
+Island x20
+
+[Bot2 Deck]
+Forest x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Land Tax.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Upkeep]
+? Stack.Count = 0
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Upkeep]
+? Stack.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Embrace the Paradox.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Plains)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Shuffles = 0

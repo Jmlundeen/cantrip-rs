@@ -1,0 +1,36 @@
+# Declining Land Tax does not search; accepting and finding nothing still shuffles, and equal land counts prevent the upkeep trigger (CR 603.4, 701.24a).
+[Bot1 Deck]
+Mox Pearl
+Land Tax
+Plains x25
+
+[Bot2 Deck]
+Forest x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Land Tax.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Bot1.Shuffles = 0
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Search()
+? Bot1.Shuffles = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Upkeep]
+? Stack.Count = 0
+[Expect]
+Bot1.Shuffles = 1
+Bot1.Battlefield.Plains.Tapped = false
+Bot2.Battlefield.Forest.Tapped = false

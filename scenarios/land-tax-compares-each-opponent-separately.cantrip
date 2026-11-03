@@ -1,0 +1,37 @@
+# Two opponents each have one land: their lands are not summed; a second land for one opponent enables Land Tax (CR 603.4).
+[Bot1 Deck]
+Mox Pearl
+Land Tax
+Plains x20
+
+[Bot2 Deck]
+Forest x25
+
+[Bot3 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Land Tax.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot3.Main1]
+Bot3.Hand.Island.Play
+[T4 Bot1.Upkeep]
+? Stack.Count = 0
+[T5 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T7 Bot1.Upkeep]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Accept
+Bot1.Search(Plains)
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Shuffles = 1
+Bot1.Hand.Plains#1.Colors =

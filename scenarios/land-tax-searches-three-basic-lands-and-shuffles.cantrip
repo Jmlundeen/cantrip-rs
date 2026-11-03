@@ -1,0 +1,41 @@
+# With fewer lands at upkeep, Land Tax may find three basics including snow basics, reveal them, put them in hand, and shuffle (CR 603.4, 701.23a, 701.24a).
+[Bot1 Deck]
+Mox Pearl
+Land Tax
+Memnite x5
+Snow-Covered Plains
+Plains
+Swamp
+Forest
+Tundra
+Island x20
+
+[Bot2 Deck]
+Forest x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Land Tax.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Shuffles = 0
+! Bot1.Search(Tundra)
+! Bot1.Search(Snow-Covered Plains; Plains; Swamp; Forest)
+Bot1.Search(Snow-Covered Plains; Plains; Swamp)
+? Bot1.Shuffles = 1
+? Bot1.Revealed = Plains; Snow-Covered Plains; Swamp
+? Bot2.Library.Count = 22
+? Bot2.Hand.Count = 7
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Hand.Snow-Covered Plains.Colors = 
+Bot1.Hand.Plains.Colors = 
+Bot1.Hand.Swamp.Colors = 
+Bot1.Shuffles = 1
