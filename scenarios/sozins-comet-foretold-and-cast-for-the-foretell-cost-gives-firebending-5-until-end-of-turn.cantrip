@@ -1,0 +1,54 @@
+# Sozin's Comet ("Each creature you control gains firebending 5 until end of turn"; foretell {2}{R}): foretold on turn 1 for exactly {2}
+# (Mountain and Mox Ruby, the pool ending empty). On turn 3 it is refused with only two mana to hand (Mountain, Mox Ruby), then cast from exile for {2}{R}
+# paid exactly with those and Mox Jet. Both Ornithopters gain firebending 5 and attack: ten {R} in the pool that
+# last through combat, none lost between steps. On turn 5 the Ornithopter attacks without the Comet and adds no mana.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Sozin's Comet
+Ornithopter
+Ornithopter
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sozin's Comet.Foretell
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Exile.Sozin's Comet.Cast(Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Exile.Sozin's Comet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+Bot1.Attack(Ornithopter#1; Ornithopter#2 > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}{R}{R}{R}{R}{R}{R}{R}{R} lasting {R}{R}{R}{R}{R}{R}{R}{R}{R}{R}
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Count = 5
