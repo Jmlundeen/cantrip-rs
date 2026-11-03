@@ -1,0 +1,6 @@
+{
+  "name": "Deathgrip",
+  "manaCost": "{B}{B}",
+  "type": "Enchantment",
+  "oracleText": "{B}{B}: Counter target green spell."
+}

@@ -1,0 +1,44 @@
+# Deathgrip counters an opponent's green spell for exactly two black mana (CR 701.6a).
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Deathgrip
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Island x20
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Deathgrip.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Deathgrip.Activate(Stack.Grizzly Bears)
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+! Bot1.Battlefield.Deathgrip.Activate(Stack.Ornithopter)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Deathgrip.Activate(Stack.Llanowar Elves)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Black Lotus
+Bot2.Graveyard = Grizzly Bears; Black Lotus
+Bot2.Battlefield.Grizzly Bears = (absent)
