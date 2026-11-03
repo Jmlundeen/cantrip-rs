@@ -1,0 +1,49 @@
+# Cat-Gator ({6}{B}, lifelink): "When this creature enters, it deals damage equal to the number of Swamps you control to any target"
+# (CR 205.3i, 120.3). Bot1 controls a Swamp and Bayou (a Swamp Forest) on turn 3 and Bot2 a Swamp of its own, which does not count,
+# so Bot2 is dealt 2, not 3, and Cat-Gator's lifelink gains Bot1 that much (CR 702.15b). A land is no target ("any target" is a
+# creature, player, planeswalker or battle).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Swamp
+Bayou
+Cat-Gator
+Island
+Island x13
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Bayou.Activate(Ability: {B})
+Bot1.Hand.Cat-Gator.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Swamp)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 22
+Bot1.Battlefield.Cat-Gator.Keywords = Lifelink
