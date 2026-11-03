@@ -359,6 +359,17 @@ pub fn destroy_all_creatures_no_regen(g: &mut dyn Game, _: &StackItem) -> Result
     Ok(())
 }
 
+/// "Destroy all [subtype]" as a spell's whole effect, `SUBTYPE` a `Subtype` as `u16` (`lands::sub`): every permanent on the
+/// battlefield with the subtype as the spell resolves, whoever controls it, destroyed at once (CR 701.8a, 608.2c, 101.4), the
+/// subtype read through the words of the spell's text (CR 612.2), so a text change ("Plains" to "Islands") changes what it
+/// destroys. Flashfires (Plains), Tsunami and Boil (Islands) and Acid Rain (Forests) print it.
+pub fn destroy_all_of_subtype<const SUBTYPE: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let word = g.words(item.object).subtype(crate::lands::printed(SUBTYPE));
+    let doomed: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.chars(id).has_subtype(word)).collect();
+    g.destroy_all(&doomed);
+    Ok(())
+}
+
 /// "Target creature can't block this turn" (CR 509.1b, 611.2a): the resolving object's first target, if it is still legal (CR
 /// 608.2b), can't block until end of turn - an effect on the creature, not an ability it gains. Zirda, the Dawnwaker, Aragorn,
 /// King of Gondor (up to one target) and Hawkeye, Master Marksman print it.
