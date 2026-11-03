@@ -930,6 +930,18 @@ pub fn destroy_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
     Ok(())
 }
 
+const MAY_DESTROY_TARGET: Question = Question::new("Destroy", "destroy the targeted permanent?", "", "Destroy it", "Don't destroy");
+
+/// "You may destroy target [permanent]" (CR 701.8, 608.2b, 603.3d): the target is chosen as the ability goes on the stack and
+/// the "may" is asked as it resolves, only if the first target is still legal. Aura Shards and Reclamation Sage print it.
+pub fn may_destroy_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(permanent) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    if ask_may(g, item.controller, item.object, Purpose::Ask(&MAY_DESTROY_TARGET))? {
+        g.destroy(permanent);
+    }
+    Ok(())
+}
+
 /// "Destroy target [permanent]. Its controller creates a [token]" (CR 701.8, 608.2h): the ability's first target, its
 /// controller read before the destroy, and the token created whether or not it was destroyed (indestructible, regenerated);
 /// an illegal target creates nothing (CR 608.2b). Stroke of Midnight and Bovine Intervention print it.
