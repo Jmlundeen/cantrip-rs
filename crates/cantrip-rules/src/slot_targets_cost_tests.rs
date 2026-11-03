@@ -197,6 +197,37 @@ static PROMISE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The slot after a divided triggered slot: a permanent, judged with the targets the slots before it chose (CR 601.2c) -
+/// here only once the divided slot has chosen one, so a later slot asked without the divided slot's targets has no
+/// candidate and the ability is removed (CR 603.3d).
+fn permanent_after_the_divided_slot(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    !q.chosen_targets().is_empty() && permanent(q, asker, t)
+}
+
+/// Magma Opus's combination of divided targets and a subsequent slot (CR 601.2c-d, 115.3).
+/// Arc Lightning uses the same division rule with no subsequent slot.
+static SPLIT_AND_PAIR: CardDef = CardDef {
+    name: "Slot Test Split And Pair", has_cost: true, cost: ManaCost { generic: 1, ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[target(permanent).between(1, 2), target(permanent).between(2, 2)], gain_three),
+    divide: Some(Divide { total: 2, of_x: None }),
+    ..CardDef::BLANK
+};
+
+/// "When this creature enters, you gain 3 life, 2 damage divided as you choose among one or two target permanents, and
+/// two target permanents": a triggered ability whose divided slot is followed by another, which sees the divided slot's
+/// targets and may choose one of them again (CR 603.3d, 601.2c-d, 115.3).
+static SPLIT_AND_PAIR_TRIGGER: CardDef = CardDef {
+    name: "Slot Test Split And Pair Trigger", has_cost: true, cost: ManaCost::ZERO,
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[triggered(cantrip_mechanics::triggers::THIS_ENTERS, gain_three, "When this creature enters, divided damage and a pair.")
+        .targets(&[target(permanent).between(1, 2), target(permanent_after_the_divided_slot).between(2, 2)])
+        .divide(Divide { total: 2, of_x: None })],
+    ..CardDef::BLANK
+};
+
 static ONE_OR_TWO: [TargetSpec; 1] = [target(permanent).between(1, 2)];
 
 /// {4} sorcery: "This spell costs {3} less to cast if it targets a permanent you control. You gain 3 life, 2 divided as you
@@ -398,7 +429,7 @@ static GRID: CardDef = CardDef {
 
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &TOWN, &PAIR, &SINGLE, &ENGINE, &CHOICE, &SWARM, &STRIKE, &DOUBLE, &PROMISE, &SPLIT, &RITE, &GRAFT, &SURGE, &WINGS, &WINGS_AURA, &DIAL, &HIVE, &BULK, &VOLLEY, &PAIRS, &COVENANT, &GRID])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&SPLIT_AND_PAIR, &SPLIT_AND_PAIR_TRIGGER, &FILLER, &BEAR, &TOWN, &PAIR, &SINGLE, &ENGINE, &CHOICE, &SWARM, &STRIKE, &DOUBLE, &PROMISE, &SPLIT, &RITE, &GRAFT, &SURGE, &WINGS, &WINGS_AURA, &DIAL, &HIVE, &BULK, &VOLLEY, &PAIRS, &COVENANT, &GRID])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -736,4 +767,78 @@ fn a_spell_whose_x_is_paid_in_life_is_offered_for_the_x_whose_targets_make_it_af
     assert!(offered(&mut g, covenant).is_some(), "X 1, paid in life, at the caster's Bear: {{1}} (CR 601.2b-d, 601.2f)");
     let (mut g, covenant, _, _) = board(&COVENANT, false);
     assert!(offered(&mut g, covenant).is_none(), "only the opponent's Bear: {{4}}");
+}
+
+#[test]
+fn divided_targets_are_followed_by_later_slots_and_survive_undo_redo() {
+    let (mut g, spell, yours, theirs) = board(&SPLIT_AND_PAIR, true);
+    let option = offered(&mut g, spell).expect("both slots have legal targets");
+    let r = next(&mut g);
+    answer(&mut g, &r, Answer::Act(Action::of(&option)));
+    let divide = next(&mut g);
+    assert!(matches!(divide.kind, RequestKind::ChooseDividedTargets { total: 2, .. }));
+    let before = g.at;
+    answer(&mut g, &divide, Answer::Divided(vec![(Target::Object(yours), 2)]));
+    let later = next(&mut g);
+    let RequestKind::ChooseTarget { candidates, least, count, .. } = &later.kind else { panic!("later slot was skipped: {:?}", later.kind) };
+    assert_eq!((*least, *count), (2, 2));
+    assert!(candidates.contains(&Target::Object(yours)), "one permanent may be targeted by both slots (CR 115.3)");
+    answer(&mut g, &later, Answer::Targets(vec![Target::Object(yours), Target::Object(theirs)]));
+    let after_targets = next(&mut g);
+    let after = g.at;
+    let check = |g: &Game| {
+        let item = g.state.stack.last().unwrap();
+        assert_eq!(g.state.targets(item), &[Target::Object(yours), Target::Object(yours), Target::Object(theirs)]);
+        assert_eq!(g.state.spec_of(item), &[0, 1, 1]);
+        assert_eq!(g.state.shares(item), &[2, 0, 0]);
+    };
+    check(&g);
+    g.goto(before);
+    assert!(matches!(g.pending().unwrap().kind, RequestKind::ChooseDividedTargets { .. }));
+    g.goto(after);
+    check(&g);
+    let life = g.state.player(YOU).life;
+    pay_and_resolve(&mut g, after_targets);
+    assert_eq!(g.state.player(YOU).life, life + 3);
+}
+
+#[test]
+fn a_triggered_ability_asks_the_slots_after_its_divided_slot_and_keeps_them_through_undo_redo() {
+    let mut g = game();
+    let theirs = put(&mut g, &BEAR, THEM, Zone::BATTLEFIELD);
+    let yours = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let creature = put(&mut g, &SPLIT_AND_PAIR_TRIGGER, YOU, Zone::hand(YOU));
+    let option = priority_options(&mut cx(&mut g), YOU).into_iter().find(|o| o.source == Some(creature)).expect("the creature is offered");
+    let r = next(&mut g);
+    answer(&mut g, &r, Answer::Act(Action::of(&option)));
+    let mut r = next(&mut g);
+    while matches!(r.kind, RequestKind::Priority { .. }) {
+        answer(&mut g, &r, Answer::Pass);
+        r = next(&mut g);
+    }
+    let divide = r;
+    assert!(matches!(divide.kind, RequestKind::ChooseDividedTargets { total: 2, .. }), "got {:?}", divide.kind);
+    let before = g.at;
+    answer(&mut g, &divide, Answer::Divided(vec![(Target::Object(yours), 2)]));
+    let later = next(&mut g);
+    let RequestKind::ChooseTarget { candidates, least, count, .. } = &later.kind else { panic!("later slot was skipped: {:?}", later.kind) };
+    assert_eq!((*least, *count), (2, 2));
+    assert!(candidates.contains(&Target::Object(yours)), "one permanent may be targeted by both slots (CR 115.3)");
+    answer(&mut g, &later, Answer::Targets(vec![Target::Object(yours), Target::Object(theirs)]));
+    let after_targets = next(&mut g);
+    let after = g.at;
+    let check = |g: &Game| {
+        let item = g.state.stack.last().unwrap();
+        assert_eq!(g.state.targets(item), &[Target::Object(yours), Target::Object(yours), Target::Object(theirs)]);
+        assert_eq!(g.state.spec_of(item), &[0, 1, 1]);
+        assert_eq!(g.state.shares(item), &[2, 0, 0]);
+    };
+    check(&g);
+    g.goto(before);
+    assert!(matches!(g.pending().unwrap().kind, RequestKind::ChooseDividedTargets { .. }));
+    g.goto(after);
+    check(&g);
+    let life = g.state.player(YOU).life;
+    pay_and_resolve(&mut g, after_targets);
+    assert_eq!(g.state.player(YOU).life, life + 3);
 }
