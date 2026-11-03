@@ -753,9 +753,11 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     let kind = RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, can_pay };
     let attacks = loop {
         // A declaration whose costs are not paid is taken back (CR 508.1, 733): the game returns to the moment before it,
-        // the mana abilities activated while paying undone, and the attackers are declared again.
+        // the mana abilities activated while paying undone but those that may not be (`takeback`), and the attackers are
+        // declared again.
         let mark = cx.s().mark();
         let log_mark = cx.g.log.len();
+        let since = crate::takeback::since(cx.g);
         // An active player who has left declares nothing, and the turn goes on without them (CR 800.4j).
         let Some(Answer::Attack(attacks)) = cx.ask_rule(active, kind.clone())? else { return Ok(()) };
         // CR 508.1e: the bands among them, announced before they tap.
@@ -781,8 +783,7 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
             match actions::pay_mana_with(cx, active, source, total, &helpers) {
                 Ok(_) => {}
                 Err(Stop::Cancel) => {
-                    cx.st().revert(mark);
-                    cx.g.log.truncate(log_mark);
+                    crate::takeback::take_back(cx, mark, log_mark, since);
                     continue;
                 }
                 Err(stop) => return Err(stop),
@@ -791,8 +792,7 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
         // CR 508.1j: the optional costs are paid with the rest. A creature to be tapped that a mana ability tapped, or that is
         // gone, can't be: the declaration is illegal and taken back (CR 508.1, 733.1).
         if !options.iter().all(|o| o.tapped == ObjectId::NONE || enlistable_now(cx, active, o.tapped)) {
-            cx.st().revert(mark);
-            cx.g.log.truncate(log_mark);
+            crate::takeback::take_back(cx, mark, log_mark, since);
             continue;
         }
         for o in &options {

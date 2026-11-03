@@ -1,0 +1,46 @@
+# CR 733.1: "Players may not reverse actions that moved cards to a library ... or caused a library to be shuffled." Phyrexian
+# Altar's mana ability is activated while Grizzly Bears is paid for, sacrificing Blightsteel Colossus, which is revealed and
+# shuffled into the library instead of going to the graveyard. Then the cast is taken back: the Bears go back to the hand,
+# but the Altar's activation is not reversed - the Colossus stays in the library and the Altar's {G} in the pool.
+
+[Bot1 Deck]
+Blightsteel Colossus
+Show and Tell
+Phyrexian Altar
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Grizzly Bears
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Blightsteel Colossus)
+Bot2.Choose(Island)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Altar.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Phyrexian Altar.Activate(Sacrifice: Blightsteel Colossus; Color: Green)
+Bot1.Cancel
+? Bot1.Mana = {G}
+? Bot1.Library.Count = 11
+? Bot1.Hand = Grizzly Bears
+
+[Expect]
+Stack.Count = 0
+Bot1.Library.Count = 11
+Bot1.Hand = Grizzly Bears
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Phyrexian Altar
+Bot1.Graveyard = Show and Tell; Black Lotus

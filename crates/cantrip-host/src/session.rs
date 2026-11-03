@@ -10,7 +10,9 @@
 //! run in progress (a spell being announced and paid for) appear when it completes, which is also what the C# engine
 //! tells: nothing about an announcement is told until the spell is paid for. The views say no more than the events: while
 //! a run is in progress, every seat but the one answering keeps the view it was last sent, so an opponent sees no spell
-//! being announced, no land tapped to pay for it, and nothing when a cast that cannot be paid for is taken back.
+//! being announced, no land tapped to pay for it, and nothing when a cast that cannot be paid for is taken back - but the
+//! mana abilities activated for it that are not reversed (CR 733.1, `cantrip_rules`' take-back: a card drawn, a Spirit
+//! Guide exiled from the hand), which are the game's from then on and told with the next step like anything else.
 
 use std::collections::{HashMap, HashSet};
 use std::panic::AssertUnwindSafe;

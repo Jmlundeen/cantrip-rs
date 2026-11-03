@@ -3043,7 +3043,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
         return Vec::new();
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), takeback: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     // The ability asked as it is (CR 607.5): its own cost change reads its own links.
     let by = cx.link_of_nth(source, index as usize);
@@ -3097,7 +3097,7 @@ pub fn cast_face_of(game: &crate::Game, card: ObjectId, index: u8) -> &'static C
 
 /// A copy of the position (no tree) to ask the rules of, through a frame's view, for a menu row's advice.
 fn advice_game(game: &crate::Game) -> crate::Game {
-    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() }
+    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), takeback: Default::default() }
 }
 
 /// What `player` would be offered at this priority with a thousand mana of every type in their pool: what a script's refusal
@@ -8153,6 +8153,7 @@ fn cast(
         any,
         abilities_closed: assisted.is_some(),
         assist: if assisted.is_some() { AssistStep::CasterPays } else { AssistStep::None },
+        mana_ability: false,
     };
     let (mut spent, mut restrictions) = pay_mana_used(cx, player, spell, owed, &helpers)?;
     // The mana the assisting player spent was spent to cast it too (CR 601.2h, 106.6).
@@ -8805,14 +8806,14 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
     }
     let mark = cx.s().mark();
     let log_mark = cx.g.log.len();
+    let since = crate::takeback::since(cx.g);
     // CR 707.12: it is a copy of the card that is cast, and the card stays where it is. A cast given up reverts the copy too.
     let card = if terms.copy { ops::copy_card(cx, card, player) } else { card };
     let by = CastBy { alternative, paid_by, ..CastBy::default() };
     match cast(cx, player, card, way, &[], terms, by, true) {
         Ok(()) => Ok(true),
         Err(Stop::Cancel) => {
-            cx.st().revert(mark);
-            cx.g.log.truncate(log_mark);
+            crate::takeback::take_back(cx, mark, log_mark, since);
             Ok(false)
         }
         Err(stop) => Err(stop),
@@ -8869,11 +8870,11 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
     let Some(player) = cx.resolving().map(|i| i.controller) else { return Ok(false) };
     let mark = cx.s().mark();
     let log_mark = cx.g.log.len();
+    let since = crate::takeback::since(cx.g);
     match cast(cx, player, card, WAY_TRANSFORMED, &[], CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() }, CastBy::default(), true) {
         Ok(()) => Ok(true),
         Err(Stop::Cancel) => {
-            cx.st().revert(mark);
-            cx.g.log.truncate(log_mark);
+            crate::takeback::take_back(cx, mark, log_mark, since);
             Ok(false)
         }
         Err(stop) => Err(stop),
@@ -10024,7 +10025,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
     if !changers {
         return None;
     }
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), takeback: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);
@@ -10130,9 +10131,13 @@ pub fn activate_mana(
     // Asked as the ability it is (CR 607.5): one an effect gave the source reads only its own links - its colors, its
     // restriction, its costs and its effect.
     let by = if index < PLAYER_MANA_ABILITY { cx.link_of_nth(source, index as usize) } else { None };
+    // Recorded for a take-back of the action it is activated during, which may not reverse it (`takeback`, CR 733.1).
+    let run = crate::takeback::begin(cx.g, crate::takeback::Activation { player, source, index, color, colorless, targets: sacrifice.to_vec() });
     // A mana ability activated while an ability resolves (paying a cost it asks for) is its own text, its source's now, as are
     // the triggered mana abilities it triggers (`Cx::own_text`).
-    cx.own_text(false, |cx| activate_mana_as(cx, player, source, index, color, colorless, sacrifice, by))
+    let done = cx.own_text(false, |cx| activate_mana_as(cx, player, source, index, color, colorless, sacrifice, by));
+    crate::takeback::end(cx.g, run, done.is_ok());
+    done
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -10191,7 +10196,7 @@ fn activate_mana_as(
     }
     // A mana ability's own mana cost (Chromatic Star's {1}) is paid like any other (CR 605.3a, 601.2g).
     if mana != ManaCost::ZERO {
-        pay_mana_with(cx, player, source, mana, &Helpers { purpose: Paying::Activating(paying), ..Helpers::NONE })?;
+        pay_mana_with(cx, player, source, mana, &Helpers { purpose: Paying::Activating(paying), mana_ability: true, ..Helpers::NONE })?;
     }
     if late {
         chosen = choose_permanents(cx, player, source, &def.cost, Some(CostFor::ManaAbility), by)?;
@@ -10298,6 +10303,7 @@ fn produce(cx: &mut Cx, player: PlayerId, source: ObjectId, held: &[crate::Produ
         for m in Mana::ALL {
             let n = result.mana.get(m);
             if n > 0 {
+                crate::takeback::produced(cx.g, source);
                 cx.st().add_mana(result.to, m, n, source, result.restriction, result.lasts);
                 produced.0[m as usize] += n;
             }
@@ -10976,20 +10982,20 @@ fn spendable(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> Ma
 
 /// Takes `spent` out of the pool, restricted mana first (it is what the C# engine prefers spending), each unit's source
 /// pushed onto `taken`. What the mana taken does to what it pays for (`ManaRestriction::effects`).
-fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, spent: &[u32; 6], taken: &mut Vec<(ObjectId, Mana, u32)>) -> u8 {
+fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, spent: &[u32; 6], taken: &mut Vec<(ObjectId, Mana, u32)>, record: bool) -> u8 {
     let restricted = restricted_for(cx, player, source, purpose);
     let mut used = 0u8;
     for mana in Mana::ALL {
         let mut need = spent[mana as usize];
         for (restriction, _) in &restricted {
-            let take = cx.st().spend_mana(player, Some(*restriction), mana, need, cantrip_state::ManaPick::Any, taken);
+            let take = crate::takeback::spend(cx, player, Some(*restriction), mana, need, cantrip_state::ManaPick::Any, taken, record);
             if take > 0 {
                 used |= restriction.effects();
             }
             need -= take;
         }
         if need > 0 {
-            cx.st().spend_mana(player, None, mana, need, cantrip_state::ManaPick::Any, taken);
+            crate::takeback::spend(cx, player, None, mana, need, cantrip_state::ManaPick::Any, taken, record);
         }
     }
     used
@@ -11035,11 +11041,14 @@ pub(crate) struct Helpers<'a> {
     pub abilities_closed: bool,
     /// Which step of a payment with assist this is (CR 702.132a), for the question to say.
     pub assist: AssistStep,
+    /// A mana ability's payment of its own mana cost (CR 605.3a): what it does is recorded, step by step, for a take-back
+    /// that keeps the ability to pay it again as it was (`takeback::Step`).
+    pub mana_ability: bool,
 }
 
 impl Helpers<'static> {
     pub const NONE: Helpers<'static> =
-        Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, attackers: &[], life: 0, any: AnyMana::No, abilities_closed: false, assist: AssistStep::None };
+        Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, attackers: &[], life: 0, any: AnyMana::No, abilities_closed: false, assist: AssistStep::None, mana_ability: false };
 }
 
 /// What a mana payment is for, as far as restricted mana is concerned (CR 106.6): see `payment_for`.
@@ -11201,7 +11210,18 @@ pub(crate) fn pay_mana_with(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 }
 
 /// `pay_mana_with`, and what the mana spent does to what it paid for (`ManaRestriction::effects`, CR 106.6).
-pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
+pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
+    if !helpers.mana_ability {
+        return pay_mana_inner(cx, player, source, total, helpers);
+    }
+    // A mana ability's payment of its own mana cost is recorded step by step, for a take-back that keeps it (`takeback`).
+    crate::takeback::begin_paying(cx.g);
+    let paid = pay_mana_inner(cx, player, source, total, helpers);
+    crate::takeback::end_paying(cx.g);
+    paid
+}
+
+fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
     // A Phyrexian symbol not yet announced is announced now, each paid with its color or 2 life (CR 107.4f), before any mana
     // ability is activated to pay it, and its life is paid with the mana. A cost to attack is the one that gets here so
     // (CR 508.1h-j: the total is determined, then mana abilities are activated, then all of it is paid): a spell's or an
@@ -11239,7 +11259,32 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
     let mut bent: u32 = 0;
     // The mana spent, unit by unit, with the source of each (CR 106.3).
     let mut taken: Vec<(ObjectId, Mana, u32)> = Vec::new();
-    loop {
+    let record = helpers.mana_ability;
+    // A mana ability activated again as a take-back keeps it (`takeback`, CR 733.1) pays as it paid then: the same mana
+    // abilities activated, the same mana spent, and nothing asked.
+    let scripted = if record { crate::takeback::scripted_payment(cx.g).ok() } else { None };
+    if let Some(steps) = &scripted {
+        for step in steps.clone().unwrap_or_default() {
+            match step {
+                crate::takeback::Step::Activate(a) => {
+                    crate::takeback::step(cx.g, crate::takeback::Step::Activate(a.clone()));
+                    activate_mana(cx, a.player, a.source, a.index, a.color, a.colorless, &a.targets)?;
+                }
+                crate::takeback::Step::Spend { restriction, mana, n, source: from } => {
+                    let got = crate::takeback::spend(cx, player, restriction, mana, n, cantrip_state::ManaPick::From(from), &mut taken, true);
+                    if got < n {
+                        crate::takeback::script_failed(cx.g);
+                        return Err(Stop::Cancel);
+                    }
+                    if let Some(r) = restriction {
+                        used |= r.effects();
+                    }
+                    paid.0[mana as usize] += got;
+                }
+            }
+        }
+    }
+    while scripted.is_none() {
         let mut cost = owed;
         cost.generic = cost.generic.saturating_sub(generic_paid);
         let left = convoked(&cost, &convoking);
@@ -11285,7 +11330,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
             }
         }
         let spend_pool = |cx: &mut Cx, paid: &mut ManaPool, used: &mut u8, taken: &mut Vec<(ObjectId, Mana, u32)>, spent: [u32; 6]| {
-            *used |= take_mana(cx, player, source, helpers.purpose, &spent, taken);
+            *used |= take_mana(cx, player, source, helpers.purpose, &spent, taken, record);
             for mana in Mana::ALL {
                 paid.0[mana as usize] += spent[mana as usize];
             }
@@ -11319,11 +11364,19 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, least: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life + u32::from(life), governs: "", assist: helpers.assist };
         // The player assisting pays for a spell that is not theirs to take back (CR 702.132a).
         let answer = cx.ask_core(player, ask, helpers.assist != AssistStep::HelperPays)?;
+        if record {
+            crate::takeback::asked_paying(cx.g);
+        }
         match answer {
             Answer::Act(action) => match action.kind {
                 ActionKind::ActivateAbility => {
                     let from = action.source.expect("source");
-                    activate_mana(cx, player, from, action.index, action.color, action.mana == Some(Mana::C), &action.targets)?;
+                    let (index, color, colorless) = (action.index, action.color, action.mana == Some(Mana::C));
+                    if record {
+                        let act = crate::takeback::Activation { player, source: from, index, color, colorless, targets: action.targets.clone() };
+                        crate::takeback::step(cx.g, crate::takeback::Step::Activate(act));
+                    }
+                    activate_mana(cx, player, from, index, color, colorless, &action.targets)?;
                 }
                 ActionKind::AssignMana => {
                     let mana = action.mana.expect("mana");
@@ -11332,7 +11385,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
                         // to the options, which offer no other.
                         Some(r) => {
                             used |= r.effects();
-                            cx.st().spend_mana(player, Some(r), mana, 1, cantrip_state::ManaPick::Any, &mut taken);
+                            crate::takeback::spend(cx, player, Some(r), mana, 1, cantrip_state::ManaPick::Any, &mut taken, record);
                         }
                         // Mana of the source the option names, or of none a rule tells apart (CR 106.3).
                         None => {
@@ -11340,7 +11393,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
                                 Some(from) => cantrip_state::ManaPick::From(from),
                                 None => cantrip_state::ManaPick::Except(&told),
                             };
-                            cx.st().spend_mana(player, None, mana, 1, pick, &mut taken);
+                            crate::takeback::spend(cx, player, None, mana, 1, pick, &mut taken, record);
                         }
                     }
                     paid.0[mana as usize] += 1;
@@ -11620,13 +11673,10 @@ fn pay_during_resolution(
                 let from = action.source.expect("source");
                 // A mana ability whose activation is taken back (its cost found unpayable once its mana is paid) is undone,
                 // and the payer asked again.
-                let (mark, log_mark) = (cx.s().mark(), cx.g.log.len());
+                let (mark, log_mark, since) = (cx.s().mark(), cx.g.log.len(), crate::takeback::since(cx.g));
                 match activate_mana(cx, payer, from, action.index, action.color, action.mana == Some(Mana::C), &action.targets) {
                     Ok(()) => refused = false,
-                    Err(Stop::Cancel) => {
-                        cx.st().revert(mark);
-                        cx.g.log.truncate(log_mark);
-                    }
+                    Err(Stop::Cancel) => crate::takeback::take_back(cx, mark, log_mark, since),
                     Err(stop) => return Err(stop),
                 }
             }
@@ -11649,7 +11699,7 @@ fn pay_during_resolution(
                 x = x.map(|n| n.saturating_sub(1));
             }
             ActionKind::PayCost => {
-                let (mark, log_mark, asked) = (cx.s().mark(), cx.g.log.len(), cx.cursor);
+                let (mark, log_mark, asked, since) = (cx.s().mark(), cx.g.log.len(), cx.cursor, crate::takeback::since(cx.g));
                 match pay_announced(cx, payer, source, cost, total, life, x.unwrap_or(0)) {
                     // Without an X, what was paid is how many the variable part took (`may_pay_counted`), if it has one.
                     Ok(taken) => return Ok(Some(x.unwrap_or(taken))),
@@ -11658,8 +11708,7 @@ fn pay_during_resolution(
                     // again until something changes (a mana ability, X), so no seat that pays when it can loops.
                     Err(Stop::Cancel) => {
                         refused = cx.cursor == asked;
-                        cx.st().revert(mark);
-                        cx.g.log.truncate(log_mark);
+                        crate::takeback::take_back(cx, mark, log_mark, since);
                     }
                     Err(stop) => return Err(stop),
                 }

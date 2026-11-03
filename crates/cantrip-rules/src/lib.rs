@@ -5,6 +5,9 @@
 
 pub mod tree;
 mod actions;
+mod takeback;
+#[cfg(test)]
+mod takeback_tests;
 #[cfg(test)]
 mod as_transforms_tests;
 #[cfg(test)]
@@ -236,6 +239,9 @@ pub struct Game {
     /// 113.7a). Off while the engine asks other abilities - triggers, replacement effects, state triggers, durations -
     /// in the middle of them: those are their own text, the source's now. Bookkeeping of a call, not of the game.
     pub(crate) own_text: std::cell::Cell<bool>,
+    /// What the run under way has done with mana abilities, for taking an action back without reversing the ones that may
+    /// not be (`takeback`, CR 733.1). Bookkeeping of a run, not of the game.
+    pub(crate) takeback: takeback::Takeback,
 }
 
 /// When the state triggers judge a change that records no event (CR 603.8: a state trigger "triggers as soon as the game
@@ -297,6 +303,7 @@ impl Clone for Game {
             check: StateCheck::NONE,
             spells_as_cast: Default::default(),
             own_text: Default::default(),
+            takeback: Default::default(),
         }
     }
 }
@@ -412,7 +419,7 @@ impl Game {
             t.priority = chooser;
         });
 
-        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() };
+        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), takeback: Default::default() };
         // CR 103.2b: the companion chosen as the deck was built is revealed once the starting player is known, if the starting
         // deck - the library as dealt - fulfils its condition; one that doesn't is a sideboard card, and nothing is said of it.
         for (p, id) in companions {
@@ -490,6 +497,8 @@ impl Game {
                 frame.log_mark = log_mark;
             }
             let before = if self.verifying(mark.0) { Some(self.state.clone()) } else { None };
+            self.takeback.reset();
+            let objects_mark = self.state.objects.len();
 
             let kind = self.state.agenda[at].kind;
             let (flow, asked_at) = {
@@ -590,9 +599,10 @@ impl Game {
                     return;
                 }
                 Err(Stop::Cancel) => {
-                    // Everything the announcement did is undone (CR 733.1), and the frame goes.
-                    self.state.revert(mark);
-                    self.log.truncate(log_mark as usize);
+                    // Everything the announcement did is undone (CR 733.1) but the mana abilities that may not be
+                    // (`takeback`), and the frame goes.
+                    let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+                    takeback::take_back(&mut cx, mark, log_mark as usize, takeback::Since::frame(objects_mark));
                     self.state.frame_remove(at);
                 }
             }
@@ -831,7 +841,7 @@ impl Game {
         let state = self.state.clone_with_journal_from(floor);
         let root = self.tree.next();
         let tree = tree::Tree::rooted(root, (state.mark(), self.log.len()));
-        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default() }
+        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), takeback: Default::default() }
     }
 
     /// Gives the game's generator another seed (`GameState::reseed`): a fork for search that must not shuffle or roll
@@ -1148,6 +1158,10 @@ impl<'a> Cx<'a> {
     /// left the game, whether before or as it is asked (a concession at this point of the run), for the action ends with them
     /// and no one makes it (CR 800.4a, 800.4d, 800.4j). The procedure goes on as the player's leaving requires.
     pub(crate) fn ask_rule(&mut self, player: PlayerId, kind: RequestKind) -> R<Option<Answer>> {
+        // A mana ability activated again as a take-back keeps it (`takeback`) is answered as it was.
+        if takeback::replaying(self.g) {
+            return self.ask_core(player, kind, false).map(Some);
+        }
         self.concessions_here();
         if self.g.state.player(player).lost {
             return Ok(None);
@@ -1156,6 +1170,16 @@ impl<'a> Cx<'a> {
     }
 
     pub fn ask_core(&mut self, player: PlayerId, kind: RequestKind, may_cancel: bool) -> R<Answer> {
+        // A mana ability activated again as a take-back keeps it (`takeback`, CR 733.1): the answer it was given then.
+        if let Ok(scripted) = takeback::scripted_answer(self.g) {
+            loops::asked(&mut self.g.state, &kind);
+            let Some(answer) = scripted else { return Err(Stop::Cancel) };
+            takeback::asked(self.g, &answer);
+            if Self::shows(&kind) {
+                self.shown(player, &kind);
+            }
+            return Ok(answer);
+        }
         // A real choice, asked or answered on a re-run, ends a run of passes (`loops`; RX-4).
         // A player who conceded at this point of the run leaves the game here, on every replay (`Game::concede`).
         let any_conceded = !self.g.state.agenda[self.frame].conceded.is_empty();
@@ -1199,10 +1223,8 @@ impl<'a> Cx<'a> {
         loops::asked(&mut self.g.state, &kind);
         if let Some(answer) = replay {
             self.cursor += 1;
-            if matches!(
-                kind,
-                RequestKind::DistributeCards { .. } | RequestKind::SearchLibrary { .. } | RequestKind::ChooseCards { .. } | RequestKind::ChooseName { .. } | RequestKind::ChooseTarget { .. }
-            ) {
+            takeback::asked(self.g, &answer);
+            if Self::shows(&kind) {
                 self.shown(player, &kind);
             }
             return Ok(answer);
@@ -1221,6 +1243,14 @@ impl<'a> Cx<'a> {
         // The position the question is asked in: a run that goes on past it is wound back to here (`Game::run`).
         self.asked_at = Some((self.g.state.mark(), self.g.log.len()));
         Err(Stop::Suspend)
+    }
+
+    /// Whether a question shows its player the cards it names (`shown`).
+    fn shows(kind: &RequestKind) -> bool {
+        matches!(
+            kind,
+            RequestKind::DistributeCards { .. } | RequestKind::SearchLibrary { .. } | RequestKind::ChooseCards { .. } | RequestKind::ChooseName { .. } | RequestKind::ChooseTarget { .. }
+        )
     }
 
     /// The hidden cards a question showed its player, recorded as it is answered (`Event::Shown`): the cards a scry,
@@ -1510,6 +1540,7 @@ impl<'a> Cx<'a> {
             return;
         }
         let source = self.mana_source();
+        takeback::produced(self.g, source);
         self.g.state.add_mana(player, mana, amount, source, None, lasts);
     }
 
@@ -2413,6 +2444,7 @@ impl cantrip_api::Game for Cx<'_> {
             return;
         }
         let source = self.mana_source();
+        takeback::produced(self.g, source);
         self.g.state.add_mana(player, mana, amount, source, None, ManaLasts::Step);
     }
 
@@ -2441,6 +2473,7 @@ impl cantrip_api::Game for Cx<'_> {
             return;
         }
         let source = self.mana_source();
+        takeback::produced(self.g, source);
         self.g.state.add_mana(player, mana, amount, source, Some(restriction), ManaLasts::Step);
     }
 

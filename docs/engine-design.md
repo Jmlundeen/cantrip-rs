@@ -1419,6 +1419,40 @@ printed does), refused by a card-table test (`every_activated_ability_has_a_cost
 such a cast or activation `TappedAfterMana`, and the web client's payment caption for it says to tap a creature for
 mana while none is tapped; one that leaves none is still taken back after it is paid.
 
+### Taking back an illegal action
+
+A cast or an activation given up part way, or one whose payment cannot be completed, is an illegal action: "the entire
+action is reversed and any payments already made are canceled" (CR 733.1), and so are the mana abilities its player
+activated while making it - "unless mana from those abilities or from any triggered mana abilities they caused to trigger
+was spent on another mana ability that wasn't reversed. Players may not reverse actions that moved cards to a library,
+moved cards from a library to any zone other than the stack, caused a library to be shuffled, or caused cards from a library
+to be revealed." Beside it is the owner's ruling: **an undo never reveals information**. A mana ability whose activation
+made hidden information known - a card drawn (Chromatic Sphere), a card leaving a hand, a library, the outside of the game
+or face-down exile (Elvish Spirit Guide's exile, a discarded hand), a card moved into a library, a reveal, a look, a search,
+a card a question showed, a shuffle, a scry - is not reversed; one that only moved a card into a hidden zone (returned to a
+hand) is. Every place that takes an action back goes through `takeback::take_back`: the Act frame's cancel in `Game::run`,
+a cast during a resolution, a mana ability given up while an "unless pays" cost is paid, and a declaration of attackers
+whose cost is not paid.
+
+The journal undoes in order only, so the action cannot be taken out from under a mana ability that stays. Instead the
+action is reverted whole, as any run is, and each mana ability that stays is activated again exactly as it was: the
+same ability of the same source, with the answers its player gave it then, and paid with exactly the mana it was paid with
+- its payment of its own mana cost is replayed step by step (`takeback::Step`: the mana abilities activated for it, the
+mana spent, by source and restriction), asking nothing. While it is, the cards the action itself had moved out of their
+zones (the spell, from the hand or the top of a library) are set aside and then put back where they were, so a draw draws
+the card it drew from under a spell cast from a library, and a discarded hand is the hand it was. Everything the replay
+does is the game's, journalled as any run's writes are: its events in the history (the `Drew`, the `AbilityActivated`),
+the triggers it caused waiting to be put on the stack (CR 603.3), its mana in the pool (CR 106.4) and its costs paid (the
+Sphere sacrificed). So the game-log tree moves through it as through anything else, a search included.
+
+Which stay is read from what happened, never from a card: each frame's run keeps a trail of the mana abilities activated
+in it (`takeback::Trail`: what each was asked, its span of the history, the answers it took, its payments and the sources
+whose mana it added), cleared as each run begins. One stays when its own events reveal; one whose mana paid for one that
+stays (a Mountain's {R} for the Sphere's {1}), or that made an object one that stays went on to move, stays with it; a
+mana ability still under way when the action was given up is part of the action, and goes. CR 733.1's "may" reverse is the
+engine's to take for the player: what stays is what may not be reversed, and the player may activate again any of the rest.
+The table's courtesy undo of a mana ability (`cantrip_engine::undo`) was already offered only for one that showed nothing.
+
 ### Costs that depend on the targets
 
 The total cost of a spell or ability is determined once its modes, X and targets are announced (CR 601.2b-c, 601.2f,
@@ -2284,7 +2318,8 @@ follows CR 508.1: the question carries each attack's cost (`RequestKind::Declare
 added up, so two Ghostly Prisons ask {4} a creature, and `can_pay`, advice on the mana the player could pay); the chosen
 creatures are tapped (508.1f); the total is locked in (508.1h) and paid with the mana abilities offered while it is owed
 (508.1i-j, `PayCosts` with the `attackers` it pays for). A payment given up (or one that cannot be completed) makes the
-declaration illegal: everything since it is reverted, mana abilities included (CR 733), and attackers are declared again.
+declaration illegal: everything since it is reverted, mana abilities included but those that may not be (CR 733; "Taking
+back an illegal action"), and attackers are declared again.
 Requirements on a declaration of attackers are counted as CR 508.1d says, as blocks are (below): `turn::attack_rules` puts
 one `RequiredAttack` per source in the question's `AttackRules` - each instance of "attacks each combat if able"
 (`Chars::must_attack` counts them, printed or gained in layer 6), two for each player who goaded the creature (attack; attack
@@ -2588,7 +2623,8 @@ prepared again or phasing in prepared before then creates a fresh copy and never
 Casting the copy consumes the preparation (CR 722.3c, 601.2i). The copy's old object keeps its `prepared_from` link
 through the shared casting procedure; its permanent remains prepared throughout announcement and payment, and after the
 as-cast observations and the completed cast record the live original permanent loses preparation, before cast triggers
-are collected. Cancelling reverts the whole announcement, including mana abilities. A copy cast by a stolen permanent's
+are collected. Cancelling reverts the whole announcement, including the mana abilities but those that may not be
+(see "Taking back an illegal action"). A copy cast by a stolen permanent's
 current controller is controlled by its caster (CR 601.2a), not its exile zone's owner.
 
 ### Graveyard order

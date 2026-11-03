@@ -185,7 +185,9 @@ fn a_chosen_card_a_mana_ability_took_from_the_hand_is_chosen_again_from_the_card
 }
 
 /// (b) A mana ability activated while paying discards the only card that could pay: the cost announced can't be paid, and the
-/// cast is taken back (CR 601.2h, 733.1) - the probe back in hand, the discard undone, nothing cast.
+/// cast is taken back (CR 601.2h, 733.1) - the probe back in hand, nothing cast. The mana ability is not: its discard took a
+/// card out of the hand, which no undo hides again (the owner's ruling beside CR 733.1), so the card stays discarded, the
+/// Changer tapped and its {C}{C}{C}{C}{C} in the pool.
 #[test]
 fn the_cast_is_taken_back_when_too_few_cards_could_pay_once_the_mana_is_paid() {
     let (mut game, probe, fodder) = game(&["Hand Exile Probe", "Hand Exile Fodder A"], 0);
@@ -195,5 +197,7 @@ fn the_cast_is_taken_back_when_too_few_cards_could_pay_once_the_mana_is_paid() {
     assert!(!cast_recorded(&game));
     assert!(game.state.stack.is_empty());
     assert!(game.state.zone(Zone::hand(ME)).contains(&probe));
-    assert!(game.state.zone(Zone::hand(ME)).contains(&fodder[0]));
+    assert!(!game.state.zone(Zone::hand(ME)).contains(&fodder[0]), "the discard stands");
+    assert!(holds(&game, Zone::graveyard(ME), "Hand Exile Fodder A"));
+    assert_eq!(game.state.player(ME).pool.0[Mana::C as usize], 5, "the Changer's mana stays in the pool");
 }

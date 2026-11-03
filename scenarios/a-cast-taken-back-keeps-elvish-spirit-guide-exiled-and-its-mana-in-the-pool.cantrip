@@ -1,0 +1,34 @@
+# CR 733.1 with the owner's ruling: a cast taken back does not take back a mana ability activated for it that made hidden
+# information known. Elvish Spirit Guide's "Exile this card from your hand: Add {G}" is activated while Grizzly Bears is
+# paid for, then the cast is taken back: the Guide was revealed and left the hand, so it stays exiled and its {G} stays in
+# the pool, while Grizzly Bears goes back to the hand and the Moxen, never tapped, stay untapped.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Elvish Spirit Guide
+Grizzly Bears
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Elvish Spirit Guide.Activate
+Bot1.Cancel
+? Bot1.Mana = {G}
+? Exile = Elvish Spirit Guide
+? Bot1.Hand = Grizzly Bears; Island; Island; Island
+
+[Expect]
+Exile = Elvish Spirit Guide
+Bot1.Revealed = Elvish Spirit Guide
+Bot1.Hand = Grizzly Bears; Island; Island; Island
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Mox Jet.Tapped = false
+Stack.Count = 0
