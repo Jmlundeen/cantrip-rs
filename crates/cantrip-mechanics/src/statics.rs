@@ -196,6 +196,13 @@ pub(crate) fn subtype_word(view: &dyn LayerQuery, source: ObjectId, n: u16) -> O
     Subtype::ALL.into_iter().find(|&s| s as u16 == n).map(|printed| view.words(source).subtype(printed))
 }
 
+/// "[Color] creatures" (CR 613.1f, layer 6/7): every creature, under either controller, that is the color `C` (a `Color` as `u8`)
+/// as the earlier layers made it, the color read through the words of the source's text (CR 612.2). Crusade (white) and
+/// Gauntlet of Might (red) print it.
+pub fn creatures_of_color<const C: u8>(q: &dyn LayerQuery, source: ObjectId, _: ObjectId, so_far: &Chars) -> bool {
+    so_far.is(CardType::Creature) && so_far.colors.has(q.words(source).color(Color::ALL[C as usize]))
+}
+
 /// "Other [subtype]s" (CR 613.1f): all other permanents of the text's type, under either controller.
 /// Lord of Atlantis and Zombie Master use this with Merfolk and Zombie respectively.
 pub fn other_of_subtype<const SUBTYPE: u16>(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {

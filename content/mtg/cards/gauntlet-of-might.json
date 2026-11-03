@@ -1,0 +1,6 @@
+{
+  "name": "Gauntlet of Might",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "Red creatures get +1/+1.\nWhenever a Mountain is tapped for mana, its controller adds an additional {R}."
+}
