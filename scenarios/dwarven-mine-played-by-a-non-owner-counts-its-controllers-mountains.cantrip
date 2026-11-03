@@ -1,0 +1,48 @@
+# Probe: Dwarven Mine played by a player who doesn't own it counts that player's Mountains (CR 614.12: "you" is the
+# player it will enter under, CR 305.1). Bot1 mills Bot2's Dwarven Mine under Dauthi Voidwalker (exiled with a void
+# counter), plays three Mountains, then plays the Mine from exile. Bot1 controls three other Mountains, Bot2 none: it
+# enters untapped and makes a Dwarf for Bot1.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Black Lotus
+Dauthi Voidwalker
+Mox Sapphire
+Thought Scour
+Mountain
+Mountain
+Island x14
+
+[Bot2 Deck]
+Island x7
+Dwarven Mine
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Dauthi Voidwalker.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Dwarven Mine)
+Bot1.Exile.Dwarven Mine.Play
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Dwarven Mine.Tapped = false
+Bot1.Battlefield.Dwarf Token.Power = 1
