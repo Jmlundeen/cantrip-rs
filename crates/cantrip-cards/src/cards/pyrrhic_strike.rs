@@ -9,11 +9,6 @@ fn destroy_its_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     Ok(())
 }
 
-/// "Target creature with mana value 3 or greater" (CR 115.1, 202.3), asked as the spell is cast and again as it resolves
-/// (CR 608.2b).
-fn creature_mv3_or_greater(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) >= 3)
-}
 
 /// "Choose one. If this spell's additional cost was paid, choose both instead." (CR 700.2): with the blight paid, both
 /// modes, each with its own target (CR 700.2c; the same artifact creature may be the target of both, CR 601.2c), done in
@@ -22,7 +17,7 @@ static MODAL: ModalDef = modes(&[
     mode(destroy_its_target, "Destroy target artifact or enchantment.")
         .targets(&[targets::ARTIFACT_OR_ENCHANTMENT]),
     mode(destroy_its_target, "Destroy target creature with mana value 3 or greater.")
-        .targets(&[target(creature_mv3_or_greater)]),
+        .targets(&[target(targets::creature_with_mana_value_at_least::<3>)]),
 ])
 .when_paid(2, 2);
 

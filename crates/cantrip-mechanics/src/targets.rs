@@ -769,6 +769,12 @@ pub fn creature_with_mana_value_at_most<const N: u32>(q: &dyn Query, asker: &Ask
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
 }
 
+/// "Target creature with mana value `N` or greater" (CR 115.1, 202.3: X in a mana cost is 0 on the battlefield), whoever
+/// controls it. Epic Downfall and Pyrrhic Strike (3) print it.
+pub fn creature_with_mana_value_at_least<const N: u32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) >= N)
+}
+
 /// "Target artifact, enchantment, or creature with power `N` or greater" (CR 115.1): the power condition belongs to the
 /// creature alone, so an artifact or enchantment of any size (an artifact creature too) is a legal target. Exorcise and Make
 /// Your Move print it (4).
