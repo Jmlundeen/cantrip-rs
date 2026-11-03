@@ -1,0 +1,71 @@
+# Mode 1: "Create a token that's a copy of target creature you control, except it's not legendary and it's a 4/4 Hero in addition to its other
+# types" (CR 707.2, 707.9b, 111.1). Bot1's Ty Lee, Chi Blocker (a legendary 2/1 Human Performer Ally) is copied: the token is a 4/4 Hero Ally Human
+# Performer, and since it is not legendary the legend rule (CR 704.5j) leaves both on the battlefield; the original stays a legendary 2/1 - a 3/2 until end of turn, its prowess having triggered on the Production (CR 702.108a), as the token that did not yet exist did not. The
+# token's own enters trigger (the ruling: the copy's enters abilities trigger) is asked for a target, and Bot1 chooses none. An opponent's
+# Memnite and Bot1's own Mox Pearl (not a creature) are refused as targets of this mode.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Ty Lee, Chi Blocker
+Ember Island Production
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ty Lee, Chi Blocker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ember Island Production.Cast
+Bot1.Modes(1)
+! Bot1.Target(Bot2.Battlefield.Memnite)
+! Bot1.Target(Bot1.Battlefield.Mox Pearl)
+Bot1.Target(Bot1.Battlefield.Ty Lee, Chi Blocker)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ty Lee, Chi Blocker#1.Power = 3
+Bot1.Battlefield.Ty Lee, Chi Blocker#1.Toughness = 2
+Bot1.Battlefield.Ty Lee, Chi Blocker#1.Supertypes = Legendary
+Bot1.Battlefield.Ty Lee, Chi Blocker#2.Power = 4
+Bot1.Battlefield.Ty Lee, Chi Blocker#2.Toughness = 4
+Bot1.Battlefield.Ty Lee, Chi Blocker#2.Subtypes = Ally; Hero; Human; Performer
+Bot1.Battlefield.Ty Lee, Chi Blocker#2.Supertypes = (absent)
+Bot2.Battlefield.Memnite.Power = 1

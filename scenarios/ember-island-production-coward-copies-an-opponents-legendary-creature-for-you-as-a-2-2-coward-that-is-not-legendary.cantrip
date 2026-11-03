@@ -1,0 +1,54 @@
+# Mode 2: "Create a token that's a copy of target creature an opponent controls, except it's not legendary and it's a 2/2 Coward in addition to
+# its other types" (CR 707.2, 707.9b, 111.1). Bot2's legendary Agent Maria Hill (2/1) is copied: Bot1 controls a 2/2 Coward Hero Human Spy token that is
+# not legendary (Bot2's original keeps its supertype and its 2/1, and is not affected by the legend rule: they have different controllers anyway).
+# Bot1's own Memnite is refused as the target of this mode.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Memnite
+Ember Island Production
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Agent Maria Hill
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Agent Maria Hill.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ember Island Production.Cast
+Bot1.Modes(2)
+! Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Target(Bot2.Battlefield.Agent Maria Hill)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Agent Maria Hill.Power = 2
+Bot1.Battlefield.Agent Maria Hill.Toughness = 2
+Bot1.Battlefield.Agent Maria Hill.Subtypes = Coward; Hero; Human; Spy
+Bot1.Battlefield.Agent Maria Hill.Supertypes = (absent)
+Bot2.Battlefield.Agent Maria Hill.Toughness = 1
+Bot2.Battlefield.Agent Maria Hill.Supertypes = Legendary
+Bot1.Battlefield.Memnite.Power = 1
