@@ -1,0 +1,6 @@
+{
+  "name": "Animate Wall",
+  "manaCost": "{W}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant Wall\nEnchanted Wall can attack as though it didn't have defender."
+}

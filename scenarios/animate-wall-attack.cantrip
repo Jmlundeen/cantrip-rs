@@ -1,0 +1,40 @@
+# Animate Wall permits its enchanted Wall to attack despite defender (CR 702.3b).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Steel Wall
+Steel Wall
+Animate Wall
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Steel Wall.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Steel Wall.Cast
+[T3 Bot1.DeclareAttackers]
+! Bot1.Attack(Steel Wall#1 > Bot2)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Animate Wall.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Hand.Animate Wall.Cast(Bot1.Battlefield.Steel Wall#1)
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.DeclareAttackers]
+! Bot1.Attack(Steel Wall#2 > Bot2)
+Bot1.Attack(Steel Wall#1 > Bot2)
+? Combat.Attackers = Steel Wall > Bot2
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Animate Wall.AttachedTo = Steel Wall
+Bot1.Battlefield.Steel Wall#1.Tapped = true
+Bot1.Battlefield.Steel Wall#2.Tapped = false

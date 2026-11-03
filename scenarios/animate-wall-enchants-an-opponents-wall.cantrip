@@ -1,0 +1,29 @@
+# Animate Wall may enchant an opponent's Wall, which its controller may then attack with.
+[Bot1 Deck]
+Mox Pearl
+Animate Wall
+Island x18
+
+[Bot2 Deck]
+Mox Ruby
+Steel Wall
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Steel Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Animate Wall.Cast(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Steel Wall > Bot1)
+? Combat.Attackers = Steel Wall > Bot1
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Animate Wall.AttachedTo = Steel Wall
+Bot2.Battlefield.Steel Wall.Tapped = true
