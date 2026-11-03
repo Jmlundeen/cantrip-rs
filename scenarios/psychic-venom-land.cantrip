@@ -1,0 +1,38 @@
+# Psychic Venom enchants a land and deals two damage to its controller when that land becomes tapped (CR 702.5a, 603.2, 120.3).
+
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Psychic Venom
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Psychic Venom.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Hand.Psychic Venom.Cast(Bot1.Battlefield.Island)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Psychic Venom.AttachedTo = Island
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Battlefield.Island#1.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20

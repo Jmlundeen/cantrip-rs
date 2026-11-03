@@ -1,0 +1,6 @@
+{
+  "name": "Psychic Venom",
+  "manaCost": "{1}{U}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant land\nWhenever enchanted land becomes tapped, this Aura deals 2 damage to that land's controller."
+}

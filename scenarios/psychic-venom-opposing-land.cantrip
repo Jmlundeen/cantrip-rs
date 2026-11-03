@@ -1,0 +1,25 @@
+# The enchanted land's controller, not the Aura's controller, takes the damage.
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Psychic Venom
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Psychic Venom.Cast(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Psychic Venom.AttachedTo = Island
+Bot2.Battlefield.Island.Activate
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
