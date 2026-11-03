@@ -1,0 +1,11 @@
+{
+  "name": "Wall of Water",
+  "manaCost": "{1}{U}{U}",
+  "type": "Creature — Wall",
+  "power": 0,
+  "toughness": 5,
+  "oracleText": "Defender (This creature can't attack.)\n{U}: This creature gets +1/+0 until end of turn.",
+  "keywords": [
+    "Defender"
+  ]
+}

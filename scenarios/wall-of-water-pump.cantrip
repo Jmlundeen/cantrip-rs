@@ -1,0 +1,44 @@
+# Defender prevents attacking, and the blue ability gives +1/+0 only until end of turn (CR 702.3b, 611.2a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Wall of Water
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Wall of Water.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Wall of Water.Activate(Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Wall of Water.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wall of Water.Power = 1
+? Bot1.Battlefield.Wall of Water.Toughness = 5
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Wall of Water.Power = 0
+! Bot1.Attack(Wall of Water > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Wall of Water.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Wall of Water.Power = 1
+Bot1.Battlefield.Wall of Water.Toughness = 5
