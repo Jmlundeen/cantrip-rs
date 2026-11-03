@@ -52,6 +52,7 @@ pub mod hideaway_play;
 pub mod cleave;
 pub mod craft;
 pub mod crew;
+pub mod coven;
 pub mod devoid;
 pub mod double;
 pub mod devotion;
