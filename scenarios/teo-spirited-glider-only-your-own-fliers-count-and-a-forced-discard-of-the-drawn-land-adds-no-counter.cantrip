@@ -1,0 +1,68 @@
+# Teo, Spirited Glider: "Whenever one or more creatures you control with flying attack, draw a card, then discard a card." No trigger when a creature
+# without flying attacks alone (turn 3: Memnite, library stays 12) nor when the opponent's flier does (turn 4: Bot2's Ornithopter attacks, library stays
+# 12). One flier alone is enough (turn 5: Teo attacks alone): with the hand empty (the card drawn for the turn was a land, played) the draw comes
+# first and that card is the one discarded, a Forest, a land: no +1/+1 counter and no target is asked, hand empty, library 10 (11 after the turn draw).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Teo, Spirited Glider
+Memnite
+Island
+Plains
+Mountain
+Forest
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x7
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Teo, Spirited Glider.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Memnite > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 12
+? Bot1.Hand.Count = 0
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Attack(Ornithopter > Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Library.Count = 12
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Teo, Spirited Glider > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Forest)
+
+[Expect]
+Bot1.Library.Count = 10
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Forest
+Bot1.Battlefield.Teo, Spirited Glider.Power = 1
+Bot1.Battlefield.Memnite.Power = 1

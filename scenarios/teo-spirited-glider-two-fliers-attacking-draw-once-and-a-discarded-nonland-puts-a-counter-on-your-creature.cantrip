@@ -1,0 +1,63 @@
+# Teo, Spirited Glider, 1/4 flying: "Whenever one or more creatures you control with flying attack, draw a card, then discard a card. When you discard a
+# nonland card this way, put a +1/+1 counter on target creature you control." Turn 3 Bot1 attacks with Teo and Ornithopter (two fliers) and Memnite (a
+# non-flier): one trigger for the batch, so one card drawn (Island on top, after the Lightning Bolt it drew for the turn). Hand: Bolt and Island. Bolt
+# is discarded, a nonland card, so the counter's target is chosen: Bot2's Phyrexian Walker (an opponent's creature) is refused, Bot1's Ornithopter is
+# taken and becomes 1/3 (from 0/2), Teo and Memnite staying as they were. Library 13 -> 12 (turn draw) -> 11, exactly one more card.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Teo, Spirited Glider
+Ornithopter
+Memnite
+Lightning Bolt
+Island
+Island x11
+
+[Bot2 Deck]
+Phyrexian Walker
+Island x7
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Teo, Spirited Glider.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Phyrexian Walker.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 1
+? Bot1.Library.Count = 12
+Bot1.Attack(Teo, Spirited Glider; Ornithopter; Memnite > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 11
+Bot1.Choose(Lightning Bolt)
+! Bot1.Target(Bot2.Battlefield.Phyrexian Walker)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Teo, Spirited Glider.Toughness = 4
+Bot1.Battlefield.Teo, Spirited Glider.Power = 1
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Hand.Count = 1
+Bot1.Graveyard = Lightning Bolt
