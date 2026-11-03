@@ -1,12 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::statics::plus_pt;
+use cantrip_mechanics::statics::{have_reach, plus_pt};
 use cantrip_oracle as oracle;
-
-/// "Equipped creature ... has reach" (CR 702.17, 613.1f) as a static ability's `StaticDef::apply`.
-fn have_reach(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Reach);
-}
 
 /// "It deals 1 damage to each opponent" (CR 120.3, 102.2): the equipped creature, as it last existed if it has left (CR 113.7a),
 /// is the source; each opponent of the Equipment's controller still in the game takes one event, all dealt together (CR 120.2).

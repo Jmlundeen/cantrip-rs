@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::statics::plus_pt;
+use cantrip_mechanics::statics::{have_reach, plus_pt};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::{history, targets};
 use cantrip_oracle as oracle;
@@ -19,11 +19,6 @@ fn shoot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.end_sentence();
     g.destroy_all(&dragons);
     Ok(())
-}
-
-/// "Equipped creature ... has reach" (CR 702.17a, 613.1f).
-fn have_reach(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Reach);
 }
 
 pub static CARD: CardDef = CardDef {

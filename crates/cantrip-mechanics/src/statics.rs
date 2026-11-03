@@ -287,6 +287,11 @@ pub fn have_flying(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Flying);
 }
 
+/// "... has reach" (CR 702.17, layer 6). Web, Hawkeye's Bow and The Black Arrow grant it.
+pub fn have_reach(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Reach);
+}
+
 /// "... has first strike" (CR 702.7, layer 6) as a static ability's `StaticDef::apply`. Razorkin Needlehead and Skilled
 /// Battlecarver print it.
 pub fn have_first_strike(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

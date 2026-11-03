@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics::{grant_delayed_ability, plus_pt};
+use cantrip_mechanics::statics::{grant_delayed_ability, have_reach, plus_pt};
 use cantrip_mechanics::{attach, targets, tokens};
 use cantrip_oracle as oracle;
 
@@ -29,7 +29,7 @@ pub static CARD: CardDef = CardDef {
             Layer::Ability,
             enchanted_permanent_if_creature,
             |q, source, chars| {
-                chars.keywords = chars.keywords.with(Keyword::Reach);
+                have_reach(q, source, chars);
                 grant_delayed_ability(q, source, chars);
             },
             "As long as enchanted permanent is a creature, it gets +1/+3 and has reach and \"{T}: Add {G}{G}.\"",
