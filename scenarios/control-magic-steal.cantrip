@@ -1,0 +1,33 @@
+# Control Magic enchants a creature and its controller controls that creature (CR 702.5a, 613.1b).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Control Magic
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Control Magic.Cast(Bot1.Battlefield.Island)
+Bot1.Hand.Control Magic.Cast(Bot2.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Control Magic.AttachedTo = Grizzly Bears
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Grizzly Bears = (absent)
