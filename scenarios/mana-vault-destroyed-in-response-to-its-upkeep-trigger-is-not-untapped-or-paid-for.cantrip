@@ -1,4 +1,4 @@
-# Bot1's tapped Mana Vault (tapped for mana on turn 1) triggers in the turn-3 upkeep; in response Bot2 Disenchants it. The trigger resolves with no Vault left: Bot1 is not asked to pay {4},
+# Bot1's tapped Mana Vault (tapped for mana on turn 1) triggers in the turn-3 upkeep; in response Bot2 Disenchants it. The trigger resolves with no Vault left: Bot1 cannot afford {4},
 # nothing untaps, and with no Vault there is no draw-step damage (the life total stays 20).
 
 [Bot1 Deck]

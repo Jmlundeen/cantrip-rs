@@ -1,20 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
-const UNTAP: Question = Question::new("UntapSource", "pay {cost} to untap {subject}?", "", "Pay {cost}", "Leave it tapped");
-
-/// You may pay {4}. If you do, untap this artifact. Nobody untaps what has left the battlefield.
+/// You may pay {4}. If you do, untap this artifact (CR 608.2c, 701.26).
 fn pay_to_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let vault = item.object;
-    if !targets::permanent(g, vault) {
-        return Ok(());
-    }
-    if g.may_pay(item.controller, vault, vault, cost("{4}"), &UNTAP)? && targets::permanent(g, vault) {
-        g.untap(vault);
-    }
-    Ok(())
+    effects::may_pay_to_untap_self(g, item, cost("{4}"))
 }
 
 /// It deals 1 damage to you: dealt by the permanent, and still dealt by one that has left, off the status it last had.

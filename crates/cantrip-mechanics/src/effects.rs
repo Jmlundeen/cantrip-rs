@@ -1082,6 +1082,18 @@ pub fn return_what_it_became(g: &mut dyn Game, left: ObjectId, tapped: bool, cou
     Ok(g.put_all_onto_battlefield_with_counters(&cards, counters)?.into_iter().filter(|&c| g.is_on_battlefield(c)).collect())
 }
 
+/// "You may pay [cost]. If you do, untap this [permanent]" (CR 608.2c, 701.26).
+/// Brass Man and Mana Vault print this; the payment is offered even if the source has left.
+pub fn may_pay_to_untap_self(g: &mut dyn Game, item: &StackItem, payment: Cost) -> Result<(), Suspend> {
+    static QUESTION: Question = Question::new("UntapSource", "pay {cost} to untap {subject}?", "", "Pay {cost}", "Decline");
+    let paid = g.may_pay(item.controller, item.object, item.object, payment, &QUESTION)?;
+    g.end_sentence();
+    if paid && crate::targets::permanent(g, item.object) {
+        g.untap(item.object);
+    }
+    Ok(())
+}
+
 /// "Untap this [permanent]" (CR 701.26): the ability's source. Basalt Monolith and Grim Monolith print it.
 pub fn untap_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.untap(item.object);
