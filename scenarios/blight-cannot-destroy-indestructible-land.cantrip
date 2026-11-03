@@ -1,0 +1,25 @@
+# Blight triggers when Darksteel Citadel taps, but destruction leaves the indestructible land and its Aura intact (CR 702.12b).
+[Bot1 Deck]
+Blight
+Mox Jet x2
+Swamp x20
+[Bot2 Deck]
+Darksteel Citadel
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Darksteel Citadel.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Blight.Cast(Bot2.Battlefield.Darksteel Citadel)
+? Bot1.Mana =
+[T4 Bot2.Main1]
+Bot2.Battlefield.Darksteel Citadel.Activate
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot2.Battlefield.Darksteel Citadel.Tapped = true
+Bot1.Battlefield.Blight.AttachedTo = Darksteel Citadel

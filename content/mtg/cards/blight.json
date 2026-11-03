@@ -1,0 +1,6 @@
+{
+  "name": "Blight",
+  "manaCost": "{B}{B}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant land\nWhen enchanted land becomes tapped, destroy it."
+}

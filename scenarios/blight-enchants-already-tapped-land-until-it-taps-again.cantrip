@@ -1,0 +1,26 @@
+# Enchanting an already tapped land does not trigger Blight; tapping it after untapping does (CR 603.2, 701.8a).
+[Bot1 Deck]
+Blight
+Swamp
+Mox Jet
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Blight.Cast(Bot1.Battlefield.Swamp)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blight.AttachedTo = Swamp
+? Bot1.Battlefield.Swamp.Tapped = true
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Swamp.Tapped = false
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Blight; Swamp

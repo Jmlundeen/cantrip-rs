@@ -1,0 +1,37 @@
+# Removing Blight in response does not remove its trigger; the land that became tapped is still destroyed (CR 113.7a, 701.8a).
+[Bot1 Deck]
+Blight
+Mox Jet x2
+Swamp x20
+[Bot2 Deck]
+Island
+Disenchant
+Mox Emerald
+Mox Pearl
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Blight.Cast(Bot2.Battlefield.Island)
+? Bot1.Mana =
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Blight)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Blight
+? Bot2.Battlefield.Island.Tapped = true
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot2.Graveyard = Island; Disenchant
+Bot1.Graveyard = Blight
