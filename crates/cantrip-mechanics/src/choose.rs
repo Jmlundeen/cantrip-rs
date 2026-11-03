@@ -422,7 +422,14 @@ pub const TAP_OR_UNTAP: &[&str] = &["Tap", "Untap", "Do nothing"];
 /// resolves its controller chooses Tap, Untap or Do nothing (CR 608.2d); nothing if the target is no longer legal (CR
 /// 608.2b). `card` is the card (the face) whose `labels` are `TAP_OR_UNTAP`. Sewer-veillance Cam and Iceberg Titan print it.
 pub fn may_tap_or_untap_target(g: &mut dyn Game, item: &StackItem, card: CardId) -> Result<(), Suspend> {
-    let Some(permanent) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    may_tap_or_untap_target_in_slot(g, item, card, 0)
+}
+
+/// `may_tap_or_untap_target` for the target in `slot`, for a spell with several ("you may tap or untap target permanent, then
+/// you may tap or untap another target permanent"): each slot is judged and chosen on its own (CR 608.2b, 608.2d). Hidden
+/// Strings prints it twice.
+pub fn may_tap_or_untap_target_in_slot(g: &mut dyn Game, item: &StackItem, card: CardId, slot: usize) -> Result<(), Suspend> {
+    let Some(permanent) = crate::targets::object(g, item, slot) else { return Ok(()) };
     match one_of(g, item.controller, item.object, vec![Label::Card(card, 0), Label::Card(card, 1), Label::Card(card, 2)])? {
         0 => g.tap(permanent),
         1 => g.untap(permanent),
