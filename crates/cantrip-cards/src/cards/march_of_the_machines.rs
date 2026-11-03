@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics::creature_too;
+use cantrip_mechanics::statics::{base_mana_value, creature_too};
 use cantrip_oracle as oracle;
 
 /// "Each noncreature artifact is an artifact creature with power and toughness each equal to its mana value." One ability,
@@ -19,18 +19,10 @@ fn noncreature_artifact(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, so_far: &C
     so_far.is(CardType::Artifact) && !so_far.is(CardType::Creature)
 }
 
-/// "... with power and toughness each equal to its mana value" (CR 613.4b, layer 7b; CR 202.3: a token or a card with no
-/// mana cost has mana value 0).
-fn mana_value_size(q: &dyn LayerQuery, _: ObjectId, affected: ObjectId, chars: &mut Chars) {
-    let value = q.mana_value(affected, &q.chars(affected)) as i16;
-    chars.power = Some(value);
-    chars.toughness = Some(value);
-}
-
 pub static CARD: CardDef = CardDef {
     statics: &[
         static_ability(Layer::Type, noncreature_artifact, creature_too, TEXT),
-        static_ability_for_each(Layer::PtSet, noncreature_artifact, mana_value_size, TEXT).continues(),
+        static_ability_for_each(Layer::PtSet, noncreature_artifact, base_mana_value, TEXT).continues(),
     ],
     ..oracle::MARCH_OF_THE_MACHINES
 };

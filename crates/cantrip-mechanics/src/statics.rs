@@ -637,6 +637,14 @@ pub fn enchantment_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.types = chars.types.with(CardType::Enchantment);
 }
 
+/// Set power and toughness each to the affected permanent's mana value (CR 613.4b, 202.3).
+/// Animate Artifact, March of the Machines and Opalescence use this operation.
+pub fn base_mana_value(q: &dyn LayerQuery, _: ObjectId, affected: ObjectId, chars: &mut Chars) {
+    let value = q.mana_value(affected, &q.chars(affected)).min(i16::MAX as u32) as i16;
+    chars.power = Some(value);
+    chars.toughness = Some(value);
+}
+
 /// "Has base power and toughness P/T" (CR 613.4b, layer 7b) as a static ability's `apply`: it sets the power and toughness
 /// the counters and effects that modify them (layer 7c) then apply to. Humility and Eaten by Piranhas (1/1), Hexdrinker (4/4
 /// and 6/6), Kaito's Ninja (3/4), Puppet Crafting (5/5), Wrecking Ball Arm (7/7) and a station card's striation (Wurmwall
