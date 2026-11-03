@@ -1,0 +1,36 @@
+# The cast trigger is independent of the spell that set it off: with the red spell countered, the trigger still resolves and its controller may pay {1} to gain 1 life (CR 603.2, 608.2b).
+[Bot1 Deck]
+Iron Star
+Mox Sapphire
+Mox Sapphire
+Mox Pearl
+Counterspell
+Island x20
+[Bot2 Deck]
+Mox Ruby
+Shock
+Island x20
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Iron Star.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+Bot1.Hand.Counterspell.Cast(Stack.Shock)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Shock
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 21
+Bot1.Mana =

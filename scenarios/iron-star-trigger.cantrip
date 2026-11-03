@@ -1,0 +1,53 @@
+# Iron Star can be declined for an opponent's red spell and paid for a multicolored red spell to gain one life (CR 603.2, 119.3).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Iron Star
+Lightning Helix
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Ancestral Recall
+Shock
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Iron Star.Cast
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+? Stack = Ancestral Recall
+[T3 Bot1.Main1]
+? Bot1.Life = 18
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 17
