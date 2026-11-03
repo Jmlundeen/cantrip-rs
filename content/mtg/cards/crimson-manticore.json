@@ -1,0 +1,11 @@
+{
+  "name": "Crimson Manticore",
+  "manaCost": "{2}{R}{R}",
+  "type": "Creature — Manticore",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying\n{R}, {T}: This creature deals 1 damage to target attacking or blocking creature.",
+  "keywords": [
+    "Flying"
+  ]
+}

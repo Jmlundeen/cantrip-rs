@@ -1,0 +1,46 @@
+# The ability requires red: white mana cannot pay, while red mana on the next turn can (CR 107.4a).
+[Bot1 Deck]
+Crimson Manticore
+Black Lotus
+Mox Pearl
+Mox Ruby
+Ageless Guardian
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Crimson Manticore.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ageless Guardian.Cast
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Mox Ruby.Activate
+[T5 Bot1.Main1]
+Bot1.Attack(Ageless Guardian > Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Crimson Manticore.Activate(Bot1.Battlefield.Ageless Guardian; Mana: short)
+[T7 Bot1.Main1]
+Bot1.Attack(Ageless Guardian > Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Crimson Manticore.Activate(Bot1.Battlefield.Ageless Guardian)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ageless Guardian.Damage = 1
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Crimson Manticore.Tapped = true
