@@ -827,6 +827,13 @@ pub const NONBASIC_LAND_AN_OPPONENT_CONTROLS: TargetSpec = target(nonbasic_land_
 /// "Target land you control". Earthbend (Badgermole Cub) and Sea Drake print it.
 pub const LAND_YOU_CONTROL: TargetSpec = target(land_you_control_filter);
 
+fn basic_land_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    land_you_control_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).supertypes.basic)
+}
+/// "Enchant basic land you control" (CR 303.4, 205.4a): a land under the Aura's controller's control with the basic supertype,
+/// judged as the Aura is cast and again as it resolves (CR 608.2b). Dimensional Exile and Ossification print it.
+pub const BASIC_LAND_YOU_CONTROL: TargetSpec = target(basic_land_you_control_filter);
+
 /// "Target [creature type] you control" (CR 115.1, 109.5, 205.3m): a permanent on the battlefield under the ability's controller's
 /// control that has the creature type `SUBTYPE` (`lands::sub`) as the layers made it, a changeling included. The type is read
 /// through the words of the text of the card that asks (CR 612.2). Ashling's Command (Elemental), Bejeweled Warg (Wolf), Dwarven
