@@ -1,0 +1,6 @@
+{
+  "name": "Animate Artifact",
+  "manaCost": "{3}{U}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant artifact\nAs long as enchanted artifact isn't a creature, it's an artifact creature with power and toughness each equal to its mana value."
+}

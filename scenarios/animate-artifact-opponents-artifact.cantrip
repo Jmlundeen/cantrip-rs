@@ -1,0 +1,35 @@
+# An opponent's noncreature artifact becomes a creature too; the Aura does not animate other artifacts (CR 613.1d, 613.1g).
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Animate Artifact
+Island x20
+[Bot2 Deck]
+Island
+Sol Ring
+Island x20
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Animate Artifact.Cast(Bot2.Battlefield.Sol Ring)
+? Bot1.Mana =
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Animate Artifact.AttachedTo = Sol Ring
+Bot2.Battlefield.Sol Ring.Types = Artifact; Creature
+Bot2.Battlefield.Sol Ring.Power = 1
+Bot2.Battlefield.Sol Ring.Toughness = 1
+Bot1.Battlefield.Mox Pearl.Types = Artifact

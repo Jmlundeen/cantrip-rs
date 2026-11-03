@@ -1,0 +1,28 @@
+# Animate Artifact makes a noncreature artifact a creature with power and toughness equal to its mana value (CR 613.1d, 613.1g).
+[Bot1 Deck]
+Sol Ring
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Animate Artifact
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Animate Artifact.Cast(Bot1.Battlefield.Sol Ring)
+? Bot1.Mana =
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Animate Artifact.AttachedTo = Sol Ring
+Bot1.Battlefield.Sol Ring.Types = Artifact; Creature
+Bot1.Battlefield.Sol Ring.Power = 1
+Bot1.Battlefield.Sol Ring.Toughness = 1
