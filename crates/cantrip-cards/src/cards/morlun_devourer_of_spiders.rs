@@ -14,7 +14,7 @@ fn deal_x_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(enters_with_x_counters),
+    enters: Some(enters_with_x_counters::<{ CounterKind::PlusOne as usize }>),
     abilities: &[triggered(THIS_ENTERS, deal_x_damage, "When Morlun enters, he deals X damage to target opponent.").targets(&[targets::OPPONENT])],
     ..oracle::MORLUN_DEVOURER_OF_SPIDERS
 };

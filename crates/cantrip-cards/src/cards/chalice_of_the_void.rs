@@ -1,12 +1,6 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
-
-/// "This artifact enters with X charge counters on it" (CR 614.1c): the X it was cast with; put onto the battlefield
-/// without being cast, X is 0 (CR 107.3).
-fn enters_with_x_charge_counters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::Charge as usize] += entering.x as i16;
-    Ok(())
-}
 
 /// "Whenever a player casts a spell with mana value equal to the number of charge counters on this artifact": any
 /// player's spell, its mana value read on the stack, X as announced (CR 202.3e), against the counters there are as it is
@@ -30,7 +24,7 @@ fn counter_that_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(enters_with_x_charge_counters),
+    enters: Some(effects::enters_with_x_counters::<{ CounterKind::Charge as usize }>),
     abilities: &[triggered(
         when(EventMask::SPELL_CAST, spell_of_equal_mana_value),
         counter_that_spell,

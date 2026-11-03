@@ -11,7 +11,7 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(cantrip_mechanics::effects::enters_with_x_counters),
+    enters: Some(cantrip_mechanics::effects::enters_with_x_counters::<{ CounterKind::PlusOne as usize }>),
     abilities: &[
         ability(cost("{4}"), grow, "{4}: Put a +1/+1 counter on this creature."),
         ability(remove_counters(CounterKind::PlusOne, 1), effects::damage_first_target::<1>, "Remove a +1/+1 counter from this creature: It deals 1 damage to any target.")

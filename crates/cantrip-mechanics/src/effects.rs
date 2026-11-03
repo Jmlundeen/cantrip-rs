@@ -23,10 +23,12 @@ pub fn counters_on(q: &dyn Query, object: ObjectId) -> u32 {
     CounterKind::ALL.iter().map(|&kind| o.counters(kind) as u32).sum()
 }
 
-/// "This creature enters with X +1/+1 counters on it" (CR 614.1c), for the X it was cast with; put onto the battlefield
-/// without being cast, X is 0. Walking Ballista, Guiding Hydra and the ravenous creatures print it.
-pub fn enters_with_x_counters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::PlusOne as usize] += entering.x as i16;
+/// "This permanent enters with X [kind] counters on it" (CR 614.1c, 122.1), for the X it was cast with; put onto the battlefield
+/// without being cast, X is 0 (CR 107.3). `KIND` is `CounterKind::X as usize`. Walking Ballista, Guiding Hydra and the ravenous
+/// creatures print it with +1/+1 counters, Chalice of the Void with charge counters and Nissa, Steward of Elements with loyalty
+/// counters.
+pub fn enters_with_x_counters<const KIND: usize>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.counters[KIND] += entering.x as i16;
     Ok(())
 }
 
@@ -179,13 +181,14 @@ pub fn pump_other_creatures_you_control(g: &mut dyn Game, item: &StackItem, powe
     others
 }
 
-/// "Creatures you control gain haste until end of turn" (CR 611.2, 611.2c, 702.10): the creatures `item`'s controller controls as
-/// it resolves, and no creature that enters later. Bitter Reunion and Ingris Stingerquill print it.
-pub fn creatures_you_control_gain_haste(g: &mut dyn Game, item: &StackItem) {
+/// "Creatures you control gain [a keyword] until end of turn" (CR 611.2, 611.2c, 702): the creatures `item`'s controller controls
+/// as it resolves, and no creature that enters later. Bitter Reunion and Ingris Stingerquill print it with haste, Deafening
+/// Clarion with lifelink.
+pub fn creatures_you_control_gain(g: &mut dyn Game, item: &StackItem, keyword: Keyword) {
     let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     instruction(g, |g| {
         for id in creatures {
-            crate::haste_until_end_of_turn(g, item.object, id);
+            gain_until_end_of_turn(g, item.object, id, keyword);
         }
     });
 }

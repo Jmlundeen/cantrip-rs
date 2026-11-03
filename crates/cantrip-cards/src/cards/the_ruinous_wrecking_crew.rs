@@ -49,7 +49,7 @@ static MODAL: ModalDef = modes(&[
 .up_to_that_many();
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(effects::enters_with_x_counters),
+    enters: Some(effects::enters_with_x_counters::<{ CounterKind::PlusOne as usize }>),
     abilities: &[modal_triggered(THIS_ENTERS, &MODAL, "When The Ruinous Wrecking Crew enters, choose up to X —")],
     ..oracle::THE_RUINOUS_WRECKING_CREW
 };

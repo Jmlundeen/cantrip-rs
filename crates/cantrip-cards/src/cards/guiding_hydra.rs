@@ -24,7 +24,7 @@ fn share(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(effects::enters_with_x_counters),
+    enters: Some(effects::enters_with_x_counters::<{ CounterKind::PlusOne as usize }>),
     abilities: &[triggered(BEGINNING_OF_YOUR_COMBAT, share, "At the beginning of combat on your turn, you may remove a +1/+1 counter from this creature. If you do, put a +1/+1 counter on each other creature you control.")],
     ..oracle::GUIDING_HYDRA
 };
