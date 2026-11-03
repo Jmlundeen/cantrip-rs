@@ -1,0 +1,67 @@
+# Mountainwalk stops a colorless blocker only while the defender controls a Mountain; protection also prevents white targeting and blocking.
+# The same colorless blocker is legal before the Mountain, and Swords to Plowshares can target another creature.
+[Bot1 Deck]
+Mountain Yeti
+Black Lotus
+Mox Pearl
+Memnite
+Mountain x20
+
+[Bot2 Deck]
+Black Lotus
+Savannah Lions
+Memnite
+Ornithopter
+Swords to Plowshares
+Mountain
+Plains
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mountain Yeti.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+! Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Mountain Yeti)
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Memnite)
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Mountain Yeti > Bot2)
+! Bot2.Block(Savannah Lions > Mountain Yeti)
+Bot2.Block(Memnite > Mountain Yeti)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Mountain Yeti.Damage = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Attack(Mountain Yeti > Bot2)
+! Bot2.Block(Ornithopter > Mountain Yeti)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Mountain Yeti.Power = 3
+Bot1.Battlefield.Mountain Yeti.Toughness = 3
+Bot2.Graveyard.Memnite.Colors = 
+Bot1.Exile.Memnite.Power = 1

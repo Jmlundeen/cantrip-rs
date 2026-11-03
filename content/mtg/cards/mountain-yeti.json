@@ -1,0 +1,11 @@
+{
+  "name": "Mountain Yeti",
+  "manaCost": "{2}{R}{R}",
+  "type": "Creature — Yeti",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Mountainwalk (This creature can't be blocked as long as defending player controls a Mountain.)\nProtection from white",
+  "keywords": [
+    "Mountainwalk"
+  ]
+}

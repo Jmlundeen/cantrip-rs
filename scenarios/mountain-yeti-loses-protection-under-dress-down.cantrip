@@ -1,0 +1,35 @@
+# Dress Down removes Mountain Yeti's protection ability, allowing a white spell to target it (CR 613.1f, 702.16b).
+[Bot1 Deck]
+Mountain Yeti
+Black Lotus
+Mox Ruby
+Mountain x20
+
+[Bot2 Deck]
+Dress Down
+Swords to Plowshares
+Black Lotus
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mountain Yeti.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Dress Down.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Mountain Yeti)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Exile.Mountain Yeti.Power = 3
+Bot1.Life = 23
