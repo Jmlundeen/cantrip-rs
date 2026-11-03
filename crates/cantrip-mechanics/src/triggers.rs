@@ -422,6 +422,16 @@ pub fn this_dealt_damage(_: &dyn Query, source: ObjectId, event: &Event) -> Opti
     }
 }
 
+/// "Whenever a source deals damage to this [permanent]" (CR 120.2, 603.2): any source, creature or not, whoever controls it,
+/// and the source is the trigger's subject (`Target::Object`) for "that source's controller"; damage of zero is not dealt. Rona,
+/// Tolarian Obliterator, Phyrexian Obliterator and Reaper of Sheoldred print it. The `listens` mask is `EventMask::DAMAGE`.
+pub fn a_source_deals_damage_to_this(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: dealer, target: Target::Object(hurt), amount, .. } if *hurt == source && *amount > 0 => Fired::about(Target::Object(*dealer)),
+        _ => None,
+    }
+}
+
 /// "Whenever you sacrifice [a permanent]" (CR 701.21a): the permanent `player` sacrificed, as it last was on the
 /// battlefield, for the card to judge the quality it names. The ability is `.on_sacrifice()`, and looks back as any ability
 /// that triggers on a sacrifice does (CR 603.10a). Tireless Tracker (a Clue) and Biotech Specialist (an artifact) print it.
@@ -448,6 +458,13 @@ pub fn this_attacks_or_blocks(_: &dyn Query, source: ObjectId, event: &Event) ->
 /// Dragonhawk, Fate's Tempest and Dread Osseosaur print it. The `listens` mask is `ZONE_CHANGE` and `ATTACKS`.
 pub fn this_enters_or_attacks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     this_enters(q, source, event).or_else(|| this_attacks(q, source, event))
+}
+
+/// "When this permanent enters and when you sacrifice it" (CR 603.2, 603.6a, 701.21a): one triggered ability with two conditions,
+/// its own entering the battlefield, or its controller sacrificing it, read as it last was on the battlefield. The ability is
+/// `.on_sacrifice()`, which looks back (CR 603.10a). Carrot Cake and Heaped Harvest print it. The `listens` mask is `ZONE_CHANGE`.
+pub fn this_enters_or_you_sacrifice_it(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    this_enters(q, asker.source, event).or_else(|| if sacrificed_by(q, asker.controller, event) == Some(asker.source) { Fired::PLAIN } else { None })
 }
 
 /// "Whenever this creature attacks" where the ability is about whom it attacks: the player attacked, or the
@@ -1905,6 +1922,7 @@ fn put_into_your_graveyard_from_your_library(q: &dyn Query, source: ObjectId, ev
 }
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS_OR_BLOCKS: Trigger = when(EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0), this_attacks_or_blocks);
+pub const A_SOURCE_DEALS_DAMAGE_TO_THIS: Trigger = when(EventMask::DAMAGE, a_source_deals_damage_to_this);
 pub const THIS_DEALT_DAMAGE: Trigger = when(EventMask::DAMAGE, this_dealt_damage);
 pub const DEALS_COMBAT_DAMAGE_TO_A_CREATURE: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_a_creature);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
@@ -1927,6 +1945,7 @@ fn a_player_casts_their_second_spell(_: &dyn Query, _: ObjectId, event: &Event) 
 }
 
 pub const A_PLAYER_CASTS_THEIR_SECOND_SPELL: Trigger = when(EventMask::SPELL_CAST, a_player_casts_their_second_spell);
+pub const THIS_ENTERS_OR_YOU_SACRIFICE_IT: Trigger = when_asked(EventMask::ZONE_CHANGE, this_enters_or_you_sacrifice_it);
 pub const THIS_ENTERS_OR_ATTACKS: Trigger = when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0), this_enters_or_attacks);
 pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);
 pub const EQUIPPED_CREATURE_ATTACKS: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks);
