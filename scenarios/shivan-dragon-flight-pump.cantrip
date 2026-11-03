@@ -1,0 +1,58 @@
+# Shivan Dragon flies over a ground creature and gets only +1/+0 for red mana until end of turn (CR 702.9b, 611.2a).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Shivan Dragon
+Mountain
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Shivan Dragon.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Shivan Dragon.Activate(Mana: short)
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Shivan Dragon.Activate
+? Bot1.Mana = {U}
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shivan Dragon.Power = 6
+? Bot1.Battlefield.Shivan Dragon.Toughness = 5
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Shivan Dragon > Bot2)
+! Bot2.Block(Grizzly Bears > Shivan Dragon)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Shivan Dragon.Power = 5
+Bot1.Battlefield.Shivan Dragon.Toughness = 5

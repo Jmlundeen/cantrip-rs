@@ -1,0 +1,11 @@
+{
+  "name": "Shivan Dragon",
+  "manaCost": "{4}{R}{R}",
+  "type": "Creature — Dragon",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Flying\n{R}: This creature gets +1/+0 until end of turn.",
+  "keywords": [
+    "Flying"
+  ]
+}
