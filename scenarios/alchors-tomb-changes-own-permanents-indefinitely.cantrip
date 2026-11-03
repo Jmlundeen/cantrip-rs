@@ -1,0 +1,67 @@
+# The Tomb changes only a permanent its controller controls, paying {2} and tapping; its colors persist after it leaves (CR 611.2a).
+[Bot1 Deck]
+Alchor's Tomb
+Black Lotus
+Mox Pearl
+Merfolk of the Pearl Trident
+Island
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Plains
+Mox Pearl
+Disenchant
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Merfolk of the Pearl Trident.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Alchor's Tomb.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Alchor's Tomb.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Alchor's Tomb.Activate(Bot1.Battlefield.Merfolk of the Pearl Trident)
+? Bot1.Mana =
+Bot1.Colors(Red)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Merfolk of the Pearl Trident.Colors = Red
+? Bot1.Battlefield.Alchor's Tomb.Tapped = true
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Merfolk of the Pearl Trident.Colors = Red
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Alchor's Tomb.Activate(Bot1.Battlefield.Island)
+? Bot1.Mana =
+Bot1.Colors(Blue)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Island.Colors = Blue
+[T6 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Alchor's Tomb)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Merfolk of the Pearl Trident.Colors = Red
+Bot1.Battlefield.Island.Colors = Blue
+Bot2.Battlefield.Ornithopter.Colors = (absent)
+Bot1.Graveyard = Alchor's Tomb; Black Lotus
