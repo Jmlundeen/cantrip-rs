@@ -1,0 +1,66 @@
+# The Sergeant gives other friendly Kobold creatures +0/+1 and trample; a grown Kobold tramples over a blocker, and the effects end when the Sergeant dies (CR 611.3b, 702.19b).
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Kobold Drill Sergeant
+Crimson Kobolds
+Memnite
+Giant Growth
+Crookshank Kobolds
+Island x20
+
+[Bot2 Deck]
+Crimson Kobolds
+Memnite
+Mox Ruby
+Shock
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Crimson Kobolds.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kobold Drill Sergeant.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Crimson Kobolds.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Crimson Kobolds.Power = 0
+? Bot1.Battlefield.Crimson Kobolds.Toughness = 2
+? Bot1.Battlefield.Kobold Drill Sergeant.Power = 1
+? Bot1.Battlefield.Kobold Drill Sergeant.Toughness = 2
+? Bot1.Battlefield.Kobold Drill Sergeant.Keywords = (absent)
+? Bot1.Battlefield.Memnite.Toughness = 1
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+? Bot2.Battlefield.Crimson Kobolds.Toughness = 1
+? Bot2.Battlefield.Crimson Kobolds.Keywords = (absent)
+Bot1.Hand.Crookshank Kobolds.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Crookshank Kobolds.Toughness = 2
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Crimson Kobolds)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Crimson Kobolds > Bot2)
+Bot2.Block(Memnite > Crimson Kobolds)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Kobold Drill Sergeant)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Crimson Kobolds.Power = 0
+Bot1.Battlefield.Crimson Kobolds.Toughness = 1
+Bot1.Battlefield.Crimson Kobolds.Keywords = (absent)
+Bot1.Graveyard.Kobold Drill Sergeant.Power = 1

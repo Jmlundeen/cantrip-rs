@@ -1,0 +1,8 @@
+{
+  "name": "Kobold Drill Sergeant",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Kobold Soldier",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Other Kobold creatures you control get +0/+1 and have trample."
+}
