@@ -1,0 +1,6 @@
+{
+  "name": "Golgothian Sylex",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "{1}, {T}: Each nontoken permanent with a name originally printed in the Antiquities expansion is sacrificed by its controller."
+}

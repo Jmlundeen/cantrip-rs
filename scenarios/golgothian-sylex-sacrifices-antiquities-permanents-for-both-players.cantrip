@@ -1,0 +1,44 @@
+# The activated ability sacrifices all nontoken Antiquities-named permanents controlled by either player, including the Sylex itself, but leaves other permanents (CR 701.21a).
+
+[Bot1 Deck]
+Golgothian Sylex
+Black Lotus
+Mox Pearl
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Golgothian Sylex.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Golgothian Sylex.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Golgothian Sylex.Tapped = true
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Graveyard = Golgothian Sylex; Ornithopter; Black Lotus
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Mox Ruby.Tapped = false

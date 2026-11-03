@@ -1,0 +1,45 @@
+# A token copy of Antiquities' Ornithopter survives the Sylex, while the original and Sylex are sacrificed (CR 701.21a).
+
+[Bot1 Deck]
+Golgothian Sylex
+Kiki-Jiki, Mirror Breaker
+Black Lotus x3
+Ornithopter
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Golgothian Sylex.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+? Bot1.Mana = {G}
+Bot1.Pass
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Golgothian Sylex.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Graveyard.Ornithopter.Power = 0
