@@ -1,0 +1,6 @@
+{
+  "name": "Pyrotechnics",
+  "manaCost": "{4}{R}",
+  "type": "Sorcery",
+  "oracleText": "Pyrotechnics deals 4 damage divided as you choose among any number of targets."
+}

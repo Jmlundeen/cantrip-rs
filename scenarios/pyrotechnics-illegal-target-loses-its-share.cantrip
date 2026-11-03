@@ -1,0 +1,36 @@
+# Shock removes one target in response; the other still receives its original three damage (CR 608.2b).
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Pyrotechnics
+Ornithopter
+Island x20
+[Bot2 Deck]
+Mox Ruby
+Shock
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pyrotechnics.Cast
+Bot1.Divide(Bot1.Battlefield.Ornithopter: 1; Bot2: 3)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Pyrotechnics; Ornithopter; Black Lotus
