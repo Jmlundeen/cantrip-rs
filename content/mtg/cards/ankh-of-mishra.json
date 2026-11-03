@@ -1,0 +1,6 @@
+{
+  "name": "Ankh of Mishra",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "Whenever a land enters, this artifact deals 2 damage to that land's controller."
+}
