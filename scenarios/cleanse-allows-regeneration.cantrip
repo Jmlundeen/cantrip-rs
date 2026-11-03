@@ -1,0 +1,39 @@
+# A regeneration shield replaces Cleanse's destruction of one black creature; another black creature dies (CR 701.19a).
+[Bot1 Deck]
+Cleanse
+Black Lotus
+Mox Pearl
+Plains x20
+[Bot2 Deck]
+Muck Rats
+Zodiac Rat
+Black Lotus
+Mox Emerald
+Yavimaya Hollow
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Muck Rats.Cast
+Bot2.Hand.Zodiac Rat.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cleanse.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Muck Rats; Ability: Regenerate)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot2.Battlefield.Muck Rats.Tapped = true
+Bot2.Graveyard = Zodiac Rat; Black Lotus
+Bot1.Graveyard = Cleanse; Black Lotus

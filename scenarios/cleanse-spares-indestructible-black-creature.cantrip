@@ -1,0 +1,39 @@
+# Cleanse destroys one black creature while a second gains indestructible in response and survives (CR 702.12b, 701.8a).
+[Bot1 Deck]
+Cleanse
+Black Lotus
+Mox Pearl
+Plains x20
+[Bot2 Deck]
+Muck Rats
+Zodiac Rat
+Black Lotus
+Mox Pearl
+Divine Resilience
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Muck Rats.Cast
+Bot2.Hand.Zodiac Rat.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cleanse.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Divine Resilience.Cast
+Bot2.Target(Bot2.Battlefield.Muck Rats)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot2.Battlefield.Muck Rats.Power = 1
+Bot2.Graveyard = Zodiac Rat; Divine Resilience; Black Lotus
+Bot1.Graveyard = Cleanse; Black Lotus

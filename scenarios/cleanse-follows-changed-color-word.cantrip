@@ -1,0 +1,40 @@
+# Sleight of Mind changes Cleanse on the stack to destroy white creatures, not black ones (CR 612.1, 608.2).
+[Bot1 Deck]
+Cleanse
+Sleight of Mind
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Muck Rats
+Mother of Runes
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Muck Rats.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cleanse.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Stack.Cleanse)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+Bot1.Colors(White)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Muck Rats.Power = 1
+Bot2.Graveyard = Mother of Runes; Black Lotus

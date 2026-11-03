@@ -1,0 +1,6 @@
+{
+  "name": "Cleanse",
+  "manaCost": "{2}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all black creatures."
+}

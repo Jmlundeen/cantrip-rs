@@ -1,0 +1,46 @@
+# Cleanse destroys each player's black creatures, including a multicolored creature, while white and colorless creatures and a black enchantment survive (CR 701.8a).
+[Bot1 Deck]
+Cleanse
+Black Lotus x2
+Mox Jet
+Mox Pearl
+Muck Rats
+Phyrexian Arena
+Plains x20
+[Bot2 Deck]
+Deathrite Shaman
+Mox Emerald
+Ornithopter
+Mox Pearl
+Mother of Runes
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Muck Rats.Cast
+Bot1.Hand.Phyrexian Arena.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cleanse.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Cleanse; Muck Rats; Black Lotus; Black Lotus
+Bot2.Graveyard = Deathrite Shaman
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Mother of Runes.Power = 1
+Bot1.Battlefield.Phyrexian Arena.Types = Enchantment
