@@ -2080,6 +2080,10 @@ impl cantrip_api::Game for Cx<'_> {
         static_rules::counters_banned(self, self.cards(), object, controller, kind)
     }
 
+    fn entering_chars(&mut self, entering: &Entering) -> Chars {
+        ops::as_it_would_exist(self, entering).chars
+    }
+
     fn put_onto_battlefield_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend> {
         ops::put_onto_battlefield_with(self, &[(object, controller, tapped)], ZoneReason::Other, counters)
             .map(|v| v.first().copied().unwrap_or(object))

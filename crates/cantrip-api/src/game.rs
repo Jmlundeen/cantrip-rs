@@ -4,7 +4,7 @@
 
 use cantrip_state::*;
 
-use crate::card::{CounterTo, EntersAs, FaceDown, LibraryPlace, TurnUp, WayDef};
+use crate::card::{CounterTo, Entering, EntersAs, FaceDown, LibraryPlace, TurnUp, WayDef};
 use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef, CauseKind, PlayerCounter, TriggeredDef};
 use crate::chars::Chars;
 use crate::history::{History, Record};
@@ -764,6 +764,15 @@ pub trait Game: Query {
     /// of a permanent entering as its own replacement is applied, it is judged as it would exist on the battlefield
     /// (CR 614.12), which is how riot learns that the +1/+1 counter it chose can't be put on it (its ruling).
     fn counters_banned(&self, object: ObjectId, controller: PlayerId, kind: CounterKind) -> bool;
+    /// The characteristics of the permanent `entering` would be on the battlefield (CR 614.12): "taking into account
+    /// replacement effects that have already modified how it enters the battlefield ..., continuous effects from the
+    /// permanent's own static abilities that would apply to it once it's on the battlefield, and continuous effects that
+    /// already exist and would apply to the permanent" - the copy effect it enters with (`Entering::copy`, CR 707.9), the
+    /// face, the controller and the counters it has so far, and every static ability that would apply to it there. What a
+    /// replacement that modifies how it enters reads of it, as it applies: Spark Double's "it enters with an additional
+    /// +1/+1 counter on it if it's a creature", judged once it has chosen what it copies (CR 616.1c, its 2019-05-03
+    /// ruling) - a copy of Sol Ring under March of the Machines is a creature.
+    fn entering_chars(&mut self, entering: &Entering) -> Chars;
     /// Puts an object onto the battlefield tapped and attacking `defender` (CR 508.4, 702.49a): attacking, but never
     /// declared as an attacker, so nothing that watches attackers being declared sees it. Outside combat it is just
     /// tapped. The object enters with `counters` as well (CR 122.6, 614.1c: Grim Reaper's finality counter), none for most.

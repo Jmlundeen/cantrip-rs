@@ -440,7 +440,10 @@ only the candidates the host's verdict on those picked says may be added.
   all once one sends it elsewhere (`ops::rejudge_entering`), its own replacements read off what it enters as - so `Query::chars` and `Query::lost_all_abilities` of the entering object answer as it would be
   there ("creatures your opponents control enter tapped" taps a Forest Life and Limb would make a creature; Containment
   Priest exiles a card entering transformed into a creature) - asked only where a replacement effect could apply
-  (`replace::possible`) or a counter ban could limit its counters. A resolved effect that sets a land's
+  (`replace::possible`) or a counter ban could limit its counters. A card's own replacement that must judge it so while it
+  applies - a copy replacement's exception, decided on the copy it has just chosen (CR 616.1c, 707.9b: Spark Double's "an
+  additional +1/+1 counter on it if it's a creature", a copy of Sol Ring under March of the Machines getting it) - asks
+  `Game::entering_chars(&Entering)`, the same `as_it_would_exist` over the entry as it stands. A resolved effect that sets a land's
   subtype ("target land becomes an Island until end of turn") has no `EffectKind` yet; the copiable values a copy effect gave
   such a land other than abilities stay: CR 305.7 lists copiable effects among the sources of the abilities it loses,
   against the abilities other effects granted, which it keeps.
