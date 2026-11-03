@@ -1,0 +1,6 @@
+{
+  "name": "Divine Offering",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Destroy target artifact. You gain life equal to its mana value."
+}

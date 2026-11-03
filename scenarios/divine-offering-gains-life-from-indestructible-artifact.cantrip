@@ -1,0 +1,30 @@
+# An opponent's indestructible Darksteel Myr survives destruction, but its mana value still gives the caster three life (CR 702.12b, 608.2h).
+[Bot1 Deck]
+Divine Offering
+Mox Pearl
+Mox Sapphire
+Island x20
+[Bot2 Deck]
+Darksteel Myr
+Black Lotus
+Island x20
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Darksteel Myr.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Divine Offering.Cast(Bot2.Battlefield.Island)
+Bot1.Hand.Divine Offering.Cast(Bot2.Battlefield.Darksteel Myr)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 23
+Bot2.Battlefield.Darksteel Myr.Power = 0
+Bot2.Battlefield.Island.Tapped = false

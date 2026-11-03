@@ -1,0 +1,39 @@
+# Phyrexian Metamorph copies Sol Ring, so its mana value is one on the battlefield but four in the graveyard; Divine Offering gains one life (CR 608.2h, 707.2).
+[Bot1 Deck]
+Sol Ring
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Phyrexian Metamorph
+Divine Offering
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Sol Ring)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sol Ring#2.ManaValue = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Divine Offering.Cast(Bot1.Battlefield.Sol Ring#2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 21
+Bot1.Graveyard = Divine Offering; Phyrexian Metamorph; Black Lotus
+Bot1.Battlefield.Sol Ring.ManaValue = 1
