@@ -7,12 +7,13 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 }
 
 /// Spells your opponents cast with the chosen name cost {2} more to cast. Activated abilities of sources with the
-/// chosen name cost {2} more to activate unless they're mana abilities (CR 601.2f, 602.2b): the rules ask this only of
-/// the abilities that use the stack.
+/// chosen name cost {2} more to activate unless they're mana abilities (CR 601.2f, 602.2b): the core asks it of mana
+/// abilities too (CR 605.3), and this card leaves them alone (CR 605.1a).
 fn tax(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     let Some(chosen) = q.state().chosen_card(q.text_linked(source)) else { return CostDelta::NONE };
     let (object, spell) = match costed {
         Costed::Spell(id) => (id, true),
+        Costed::Ability(_, ability, _) if q.activated_ability(ability).is_none_or(|d| d.is_mana_ability()) => return CostDelta::NONE,
         Costed::Ability(id, ..) => (id, false),
         // Plotting and the other special actions are no activated abilities (CR 116.1).
         Costed::SpecialAction(..) => return CostDelta::NONE,

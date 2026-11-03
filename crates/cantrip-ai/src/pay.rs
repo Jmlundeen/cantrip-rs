@@ -207,7 +207,15 @@ fn keep_score(game: &Game, option: &ActionOption, kinds: &[Mana]) -> (u8, u8, u8
             || !c.mana.is_zero()
             || d.text.contains("damage to you")
             || d.text.contains("Exert")
-    }) || source.is_some_and(|s| game.stays_tapped(s));
+    }) || source.is_some_and(|s| game.stays_tapped(s))
+        // A mana cost the cost changes in play give it (CR 601.2f by way of 602.2b, 605.3: Gloom's {3} on a white
+        // enchantment's free tap): it costs mana now, as a filter land's does.
+        || source.is_some_and(|s| {
+            option.index < PLAYER_MANA_ABILITY
+                && activation_costs(game, game.state.obj(s).controller, s, option.index, &[Target::None])
+                    .first()
+                    .is_some_and(|&(c, life)| !c.is_zero() || life > 0)
+        });
     let utility = source.is_some_and(|s| {
         game.chars(s)
             .abilities()

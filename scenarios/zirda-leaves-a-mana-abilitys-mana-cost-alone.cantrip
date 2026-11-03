@@ -1,0 +1,34 @@
+# Zirda, the Dawnwaker's "Abilities you activate that aren't mana abilities cost {2} less to activate" leaves a mana ability
+# alone, though the cost changes apply to mana abilities (CR 605.3, 602.2b, 601.2f): its own words except them (CR 605.1a).
+# Crystal Quarry's "{5}, {T}: Add {W}{U}{B}{R}{G}" is paid from {U}{U}{U}{U}{U}{U} out of two Black Lotuses with Zirda out: all
+# five are paid, so one {U} is left beside the five colors (a reduction of {2} would leave three).
+
+[Bot1 Deck]
+Crystal Quarry
+Black Lotus
+Black Lotus
+Black Lotus
+Zirda, the Dawnwaker
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Crystal Quarry.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Zirda, the Dawnwaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+? Bot1.Mana = {U}{U}{U}{U}{U}{U}
+Bot1.Battlefield.Crystal Quarry.Activate(Ability: {5})
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Crystal Quarry.Tapped = true
+Bot1.Mana = {W}{U}{U}{B}{R}{G}

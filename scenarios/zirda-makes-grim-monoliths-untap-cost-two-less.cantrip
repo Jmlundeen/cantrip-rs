@@ -1,0 +1,35 @@
+# Zirda, the Dawnwaker's "Abilities you activate that aren't mana abilities cost {2} less to activate" takes exactly {2} off
+# an ability that has more generic mana than that (CR 601.2f, 118.7): Grim Monolith's "{4}: Untap Grim Monolith" costs {2}.
+# The Monolith's {C}{C}{C} and the {U} left from a Black Lotus pay it, and two of the four are left (a reduction of {3} would
+# leave three).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Zirda, the Dawnwaker
+Grim Monolith
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Zirda, the Dawnwaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Grim Monolith.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Grim Monolith.Activate(Ability: Add)
+? Bot1.Mana = {U}{C}{C}{C}
+Bot1.Battlefield.Grim Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Grim Monolith.Tapped = false
+Bot1.Mana = {U}{C}

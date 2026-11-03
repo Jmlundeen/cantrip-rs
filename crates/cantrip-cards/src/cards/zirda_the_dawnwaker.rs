@@ -3,11 +3,12 @@ use cantrip_mechanics::{companion, effects, targets};
 use cantrip_oracle as oracle;
 
 /// "Abilities you activate that aren't mana abilities cost {2} less to activate. This effect can't reduce the mana in
-/// that cost to less than one mana" (CR 601.2f, 118.7): the core asks only non-mana abilities, whatever the zone they
-/// are activated from. Mana abilities are not priced this way (they are paid as the cost they are part of is), and a special
-/// action is no ability (CR 116.1): `Costed::Ability` alone.
+/// that cost to less than one mana" (CR 601.2f, 118.7): any activated ability its controller activates, from whatever zone,
+/// that isn't a mana ability (CR 605.1a). The core asks the changes of mana abilities too (CR 605.3), so the exception is
+/// this card's to make; a special action is no ability (CR 116.1): `Costed::Ability` alone.
 fn two_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    if matches!(costed, Costed::Ability(..)) && player == q.controller(source) { CostDelta::less_to_one(2) } else { CostDelta::NONE }
+    let Costed::Ability(_, ability, _) = costed else { return CostDelta::NONE };
+    if player == q.controller(source) && q.activated_ability(ability).is_some_and(|d| !d.is_mana_ability()) { CostDelta::less_to_one(2) } else { CostDelta::NONE }
 }
 
 /// "Companion - Each permanent card in your starting deck has an activated ability" (CR 702.139a, 602.1): a mana ability is

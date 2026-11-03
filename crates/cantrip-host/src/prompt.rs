@@ -300,6 +300,18 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                 {
                     m.description = format!("{} (costs {cost})", m.description);
                 }
+                // A total the cost changes in play make other than the printed cost, for an ability whose cost no target
+                // decides (CR 601.2f by way of 602.2b, 605.3: Gloom's {3} more on a white enchantment's abilities, its mana
+                // abilities included): the row says what it costs now.
+                if !d.special_action && !(o.targets_required == 1 && !o.target_candidates.is_empty() && !d.is_mana_ability()) {
+                    let player = game.state.obj(src).controller;
+                    if let Some(&(total, life)) = activation_costs(game, player, src, o.index, &[Target::None]).first()
+                        && (total != d.cost.mana || life > 0)
+                    {
+                        let total = if life > 0 { format!("{total} and {life} life") } else { total.to_string() };
+                        m.description = if m.description.is_empty() { format!("costs {total}") } else { format!("{} (costs {total})", m.description) };
+                    }
+                }
                 if d.is_mana_ability() {
                     // What it adds as the replacement effects on a tap for mana leave it (CR 106.12b), where any would change
                     // it and the row can say it; else what it lists.

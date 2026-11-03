@@ -1860,6 +1860,8 @@ fn mana_ability_options(cx: &Cx, player: PlayerId, window: ManaWindow, options: 
 /// question `tappable_for_mana` asks).
 fn mana_ability_options_as(cx: &Cx, player: PlayerId, window: ManaWindow, options: &mut Vec<ActionOption>, judged: Judged) {
     let forbidders = static_rules::activation_forbidders(cx);
+    // What changes the costs of the abilities judged, read once (empty, so unallocated, in nearly every game).
+    let changers = if judged == Judged::Nested { Vec::new() } else { cost_change_sources(cx) };
     for &id in cx.s().battlefield() {
         if cx.s().obj(id).controller != player {
             continue;
@@ -1889,9 +1891,16 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, window: ManaWindow, option
             // A mana ability with a mana cost of its own (Sunken Ruins' {U/B}) is not offered when that cost cannot be
             // paid by the other sources, its own {T} not among them (CR 605.3a, 602.2b, 609.4b) - unless it is judged
             // for what mana abilities could tap (`Judged::Nested`), where asking what the player can pay would ask it again.
-            if def.cost.mana.x == 0 && def.cost.mana.mana_value() > 0 && judged != Judged::Nested {
+            // The cost judged is the total, with what changes it (CR 601.2f by way of 602.2b and 605.3): under Gloom, a white
+            // enchantment's "{T}: Add {W}" costs {3}.
+            let total = if def.cost.mana.x == 0 && judged != Judged::Nested {
+                mana_ability_cost(cx, &changers, player, id, ability, by, def)
+            } else {
+                def.cost.mana
+            };
+            if total.x == 0 && total.mana_value() > 0 && judged != Judged::Nested {
                 let a = available_without(cx, player, def.cost.tap.then_some(id), ManaWindow::Payment);
-                let mut cost = def.cost.mana;
+                let mut cost = total;
                 if static_rules::spend_any_color_for(cx, player, id, SpendingFor::Activating) {
                     cost = cost.paid_with_any_color();
                 }
@@ -2949,6 +2958,25 @@ fn cost_change_sources(cx: &Cx) -> Vec<ObjectId> {
         .collect()
 }
 
+/// Whether anything could change what activating the ability `def` costs (CR 601.2f by way of 602.2b): a permanent with a
+/// cost change, or the ability's own. Asked without allocating, as every mana ability's activation asks it.
+fn cost_changes_possible(cx: &Cx, def: &ActivatedDef) -> bool {
+    def.cost_change.is_some()
+        || cx.s().battlefield().iter().any(|&id| cx.cards().texts(cx.s(), cx.s().obj(id)).any(|c| cx.cards().cost_changes[c.0 as usize]) && !cx.lost_all_abilities(id))
+}
+
+/// The total mana cost of activating the mana ability `ability` of `source` (CR 601.2f by way of 602.2b and 605.3): its
+/// printed mana cost, its {X} as 0, with the changes `changers` make and its own, as the advice judges it. A reduction by
+/// hybrid mana is taken at its first halves, as `change_parts` takes it; the activation announces and splits them
+/// (`activate_mana_as`).
+fn mana_ability_cost(cx: &Cx, changers: &[ObjectId], player: PlayerId, source: ObjectId, ability: AbilityRef, by: Option<Linked>, def: &ActivatedDef) -> ManaCost {
+    let printed = ManaCost { x: 0, ..def.cost.mana };
+    if changers.is_empty() && def.cost_change.is_none() {
+        return printed;
+    }
+    change_with(cx, changers, player, Costed::Ability(source, ability, by), printed, None, &[])
+}
+
 /// Whether a cost change a resolved spell or ability made still lasts (CR 611.2c, `EffectKind::SpellCostChange`): read from
 /// the effects in play, which nearly never hold one.
 fn lasting_changes(cx: &Cx) -> bool {
@@ -3993,6 +4021,8 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: 
 /// alternative of what would (its own abilities, the abilities that would tap or sacrifice it).
 fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaWindow, defer: bool, tap: Option<TapFor>) -> Available {
     let mut fixed = cx.s().player(player).pool.0;
+    // What changes costs, read once for every mana ability judged (empty, so unallocated, in nearly every game).
+    let changers = cost_change_sources(cx);
     let mut restricted: Vec<(ManaRestriction, [u32; 6], u32)> = Vec::new();
     for (restriction, pool) in cx.s().restricted_of(player) {
         if restriction == ManaRestriction::GainsHaste {
@@ -4081,7 +4111,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
                     fixed,
                     flex,
                     unknown: true,
-                    changers: cost_change_sources(cx),
+                    changers: changers.clone(),
                     grantors: pay_with_grantors(cx),
                     restricted,
                     any_color: false,
@@ -4099,7 +4129,9 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
                 k: u32::from(def.adds_any),
                 types: if def.adds_any > 0 { any_types(cx, id, player, def, by) } else { 0 },
                 restriction: def.restricted.filter(|&r| r != ManaRestriction::GainsHaste).map(|r| restriction_from(cx, id, r, by)),
-                cost: ManaCost { x: 0, ..def.cost.mana },
+                // Its total cost, with what changes the cost to activate it (CR 601.2f by way of 602.2b and 605.3): Gloom's
+                // tax makes a white enchantment's free tap cost {3}, a source that is then judged as one that costs mana.
+                cost: mana_ability_cost(cx, &changers, player, id, ability, by, def),
                 source: ability_payment(cx, id, chars.types, chars.subtypes, false),
                 extra: [0; 6],
                 produced: 0,
@@ -4288,7 +4320,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
         fixed,
         flex,
         unknown: false,
-        changers: cost_change_sources(cx),
+        changers,
         grantors: pay_with_grantors(cx),
         restricted,
         any_color: static_rules::spend_any_color_always(cx, &spenders, player),
@@ -10348,6 +10380,24 @@ fn activate_mana_as(
         mana.x = 0;
         cx.st().update_obj(source, |o| o.x = n);
     }
+    // CR 601.2f by way of 602.2b and 605.3: the total cost, with what increases or reduces the cost to activate abilities
+    // (Gloom's "{3} more", Forensic Gadgeteer's "{1} less"), determined before any of it is paid and locked in: a mana ability
+    // is activated as any other activated ability is, so the changes apply to it as to the others ("unless they're mana
+    // abilities" is the changes' own to say). Life a change adds (CR 118.8) is payable only with that much life, the
+    // cost's own included (CR 119.4, 118.3), or the activation is taken back.
+    let added_life = if cost_changes_possible(cx, def) {
+        let costed = Costed::Ability(source, ability, by);
+        announce_hybrids(cx, player, source, costed, &mut mana, &[], AnyMana::No)?;
+        let split = announce_reduction(cx, player, source, costed, &mana, &[], AnyMana::No)?;
+        let (cost, life, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, mana, None, &[], &split);
+        mana = at_least(cost, least);
+        if life > 0 && i64::from(payable_life_for(cx, player, Some(CostFor::ManaAbility))) < i64::from(life) + i64::from(def.cost.life) {
+            return Err(Stop::Cancel);
+        }
+        life
+    } else {
+        0
+    };
     note_activation(cx, source, index as usize, def);
     // How it was given, read before any cost moves the source (CR 113.7a).
     let granted = Grant::of(granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
@@ -10377,6 +10427,9 @@ fn activate_mana_as(
     pay_permanents(cx, player, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card), acquired }), &mut tapped);
     ops::tap_together_with(cx, &mut tapped, &[]);
     pay_life_and_counters(cx, player, source, &def.cost);
+    if added_life > 0 {
+        ops::change_life(cx, player, -life_paid(added_life));
+    }
     if def.cost.sacrifice_self {
         ops::sacrifice(cx, player, &[source]);
     }

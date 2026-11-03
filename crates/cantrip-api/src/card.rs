@@ -378,7 +378,7 @@ pub enum Costed {
     /// The card that is being cast.
     Spell(ObjectId),
     /// The permanent (or card) whose ability is being activated, which of its abilities, and that ability as linked abilities
-    /// know it where an effect gave it the object (`Asker::by`, CR 607.5).
+    /// know it where an effect gave it the object (`Asker::by`, CR 607.5). A mana ability too (CR 605.3, 602.2b).
     Ability(ObjectId, AbilityRef, Option<Linked>),
     /// The object a special action with a cost is taken for (CR 116.2), and the ability-shaped entry that is the action:
     /// plotting a card (CR 116.2k, 702.170a: "plotting cards from your hand costs {2} less"), suspending, foretelling,
@@ -3147,7 +3147,9 @@ pub struct CardDef {
     /// "Each player can't cast more than this many spells each turn" (CR 101.2), while it is on the battlefield; 0 for
     /// no such limit. Archon of Emeria, High Noon, Rule of Law.
     pub cast_limit: u8,
-    /// Its static abilities that make other things cost more or less (CR 601.2f), while it is on the battlefield.
+    /// Its static abilities that make other things cost more or less (CR 601.2f), while it is on the battlefield. Asked of
+    /// every activated ability, mana abilities included (CR 605.3, 602.2b): a change that leaves mana abilities alone ("unless
+    /// they're mana abilities", "that aren't mana abilities") says so itself (`ActivatedDef::is_mana_ability`).
     pub cost_changes: &'static [CostChange],
     /// A spell's own cost changes (CR 601.2f): "this spell costs {1} less to cast for each ..." (affinity, Embercleave).
     /// They work wherever the spell is cast from, and the spell is their `source`. The core asks them only as the card is
