@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::exile_top_card_play_until_end_of_next_turn;
-use cantrip_mechanics::{effects, targets};
+use cantrip_mechanics::{effects, lands, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "A Goblin, Orc, or Army": the object has one of the three creature types as the layers make it (as it last existed, for one that
@@ -30,22 +30,15 @@ fn you_put_counters_on_a_goblin_orc_or_army_you_control(q: &dyn Query, me: &Aske
     }
 }
 
-/// "Whenever another Goblin, Orc, or Army you control dies" (CR 700.4, 603.10a), looked back on: a creature other than this one that
-/// was one of the three, under this ability's controller's control, as it last was on the battlefield (a Great Goblin dying with it
-/// sees it die).
+/// "Whenever another Goblin, Orc, or Army you control dies" (CR 700.4, 603.10a), looked back on: a permanent other than this one, a
+/// creature or not (CR 109.2, 205.3), that was one of the three, under this ability's controller's control, as it last was on the
+/// battlefield (a Great Goblin dying with it sees it die). The three are words of this card's text (CR 612).
 fn another_goblin_orc_or_army_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::ZoneChange { old, from, to, .. }
-            if *old != me.source
-                && from.is(ZoneKind::Battlefield)
-                && to.is(ZoneKind::Graveyard)
-                && q.chars(*old).is(CardType::Creature)
-                && q.obj(*old).controller == me.controller
-                && is_a_goblin_orc_or_army(q, me.source, *old) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
+        Event::ZoneChange { old, .. } if *old == me.source => None,
+        _ => triggers::of_subtype_you_control_dies::<{ lands::sub(Subtype::Goblin) }>(q, me, event)
+            .or_else(|| triggers::of_subtype_you_control_dies::<{ lands::sub(Subtype::Orc) }>(q, me, event))
+            .or_else(|| triggers::of_subtype_you_control_dies::<{ lands::sub(Subtype::Army) }>(q, me, event)),
     }
 }
 

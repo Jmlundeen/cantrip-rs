@@ -1,0 +1,47 @@
+# The Great Goblin: "another Goblin, Orc, or Army you control" is a permanent of one of those types. Bot1's Mox Jet is a noncreature
+# permanent that is none of them; Bot2's Disenchant destroys it and nothing is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+The Great Goblin
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Disenchant
+Plains
+Plains
+Plains x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Great Goblin.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Mox Jet)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Mox Jet; Black Lotus
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 0

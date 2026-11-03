@@ -1,0 +1,53 @@
+# The Great Goblin: "Whenever you put one or more counters on a Goblin, Orc, or Army you control" - counters of several kinds put on
+# one permanent at once are one event (CR 603.2c). Bot1's Guide of Souls banks three energy as the Great Goblin and two Ornithopters
+# enter, and when the Great Goblin attacks alone on turn 3 Bot1 pays it to put two +1/+1 counters and a flying counter on him at
+# once: the ability triggers once, for 2 damage, and the 5/4 Great Goblin deals 5 unblocked. Bot2 is at 13.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Ruby
+Guide of Souls
+The Great Goblin
+Ornithopter
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Guide of Souls.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Great Goblin.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.BeginCombat]
+? Bot1.Energy = 3
+? Bot2.Life = 20
+Bot1.Attack(The Great Goblin)
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Energy = 0
+Bot1.Battlefield.The Great Goblin.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.The Great Goblin.Counters.Flying = 1
+Bot2.Life = 13
+Stack.Count = 0

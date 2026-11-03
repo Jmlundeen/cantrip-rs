@@ -1,0 +1,52 @@
+# The Great Goblin: "Whenever another Goblin, Orc, or Army you control dies". Bot1's Dreadhorde Invasion amasses Zombies 1 in its
+# turn-3 upkeep: a Zombie Army token - an Army, neither a Goblin nor an Orc - gets a +1/+1 counter, and the Great Goblin deals 2
+# damage to Bot2. Bot2's Lightning Bolt kills the Army on turn 4 and the top card of Bot1's library is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+The Great Goblin
+Dreadhorde Invasion
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Great Goblin.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dreadhorde Invasion.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Life = 18
+? Bot1.Battlefield.Zombie Army Token.Subtypes = Army; Zombie
+? Exile.Count = 0
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Zombie Army Token)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 1
+Bot1.Graveyard = Black Lotus

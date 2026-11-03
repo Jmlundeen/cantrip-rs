@@ -1,0 +1,44 @@
+# The Great Goblin: "Whenever another Goblin, Orc, or Army you control dies". Bot1's Orcish Lumberjack is an Orc and neither a Goblin
+# nor an Army; Bot2's Lightning Bolt kills it on turn 2 and the top card of Bot1's library is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+The Great Goblin
+Orcish Lumberjack
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Great Goblin.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Orcish Lumberjack.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Orcish Lumberjack)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 1
+Bot1.Graveyard = Orcish Lumberjack; Black Lotus
