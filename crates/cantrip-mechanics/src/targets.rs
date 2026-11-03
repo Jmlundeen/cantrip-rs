@@ -732,6 +732,15 @@ pub const OTHER_PERMANENT: TargetSpec = target(other_permanent_filter);
 
 /// "Target permanent you control". Harmless Offering and Deceiver Exarch print it.
 pub const PERMANENT_YOU_CONTROL: TargetSpec = target(permanent_you_control_filter);
+
+fn another_permanent_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    t != Target::Object(asker.source) && permanent_you_control_filter(q, asker, t)
+}
+
+/// "Another target permanent you control" (CR 115.1, 109.5): a permanent its controller controls, other than the source itself.
+/// Rescue Girl, First Responder and North Pole Patrol print it.
+pub const ANOTHER_PERMANENT_YOU_CONTROL: TargetSpec = target(another_permanent_you_control_filter);
+
 /// "Target nonland permanent". Banishing Knack and Boomerang Basics print it.
 pub const NONLAND_PERMANENT: TargetSpec = target(nonland_permanent_filter);
 
