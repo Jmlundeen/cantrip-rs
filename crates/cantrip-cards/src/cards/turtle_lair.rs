@@ -6,10 +6,7 @@ use cantrip_oracle as oracle;
 /// "Target Ninja or Turtle" (CR 115.1, 205.3): a permanent on the battlefield with either subtype (CR 109.2: a subtype
 /// description without "card" means a permanent, creature or not). The words are the land's own (CR 612).
 fn ninja_or_turtle(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if targets::permanent(q, id) && {
-            let chars = q.chars(id);
-            chars.has_subtype(q.words(asker.source).subtype(Subtype::Ninja)) || chars.has_subtype(q.words(asker.source).subtype(Subtype::Turtle))
-        })
+    targets::permanent_of_any_subtype(q, asker, t, &[Subtype::Ninja, Subtype::Turtle])
 }
 
 pub static CARD: CardDef = CardDef {
