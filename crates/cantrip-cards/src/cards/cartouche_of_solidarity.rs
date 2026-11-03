@@ -21,17 +21,6 @@ fn enchanted_creature_gets_1_1_apply_1(
     chars.keywords = chars.keywords.with(Keyword::FirstStrike);
 }
 
-/// "Enchanted creature gets +1/+1 and has first strike." (CR 604.1).
-fn enchanted_creature_gets_1_1_apply_0(
-    _: &dyn LayerQuery,
-    _: ObjectId,
-    chars: &mut Chars,
-) {
-    let (p, t) = (1i16, 1i16);
-    chars.power = chars.power.map(|v| v.saturating_add(p));
-    chars.toughness = chars.toughness.map(|v| v.saturating_add(t));
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
@@ -50,7 +39,7 @@ pub static CARD: CardDef = CardDef {
         static_ability(
                 Layer::PtModify,
                 attach::attached_object,
-                enchanted_creature_gets_1_1_apply_0,
+                cantrip_mechanics::statics::plus_pt::<1, 1>,
                 "Enchanted creature gets +1/+1 and has first strike.",
             )
             .continues(),
