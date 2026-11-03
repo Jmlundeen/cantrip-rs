@@ -111,6 +111,13 @@ pub fn itself_while_you_gained_life(q: &dyn LayerQuery, source: ObjectId, affect
     source == affected && q.history().life_gained(q.state().obj(source).controller) > 0
 }
 
+/// "... as long as you've drawn two or more cards this turn" (CR 611.3a) as a static ability's `StaticDef::affects`: only the source
+/// itself, and only while its controller has drawn two or more cards this turn. The layers ask again whenever characteristics are
+/// computed, so it turns on with the second draw and off as the turn ends. Foggy Swamp Hunters and June, Bounty Hunter print it.
+pub fn itself_while_you_drew_two_or_more(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected && q.history().drawn(q.state().obj(source).controller) >= 2
+}
+
 /// "Delirium - This creature gets/has ... as long as there are four or more card types among cards in your graveyard"
 /// (CR 207.2c, 604.1, 611.3a) as a static ability's `StaticDef::affects`: only the source itself, and only while four or more
 /// card types are among the cards in its controller's graveyard, each judged as the layers make it (the types are asked
@@ -331,6 +338,12 @@ pub fn have_hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// `your_spells_of_types` as its `affects`. Samut, Tyrant of Naktamun prints it.
 pub fn have_split_second(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::SplitSecond);
+}
+
+/// "... can't be blocked" (CR 509.1b, layer 6) as a static ability's `StaticDef::apply`. Waterlogged Hulk's descend and June, Bounty
+/// Hunter's two draws print it.
+pub fn have_cant_be_blocked(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::CantBeBlocked);
 }
 
 /// "... has menace" (CR 702.111, layer 6) as a static ability's `StaticDef::apply`. Carnage Interpreter, Elenda, Saint of Dusk

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::crew::crew;
-use cantrip_mechanics::statics::itself;
+use cantrip_mechanics::statics::{have_cant_be_blocked, itself};
 use cantrip_mechanics::targets::is_permanent_card;
 use cantrip_mechanics::craft;
 use cantrip_oracle as oracle;
@@ -20,7 +20,7 @@ fn unblockable_with_eight(q: &dyn LayerQuery, source: ObjectId, chars: &mut Char
     let s = q.state();
     let permanents = s.zone(Zone::graveyard(s.obj(source).controller)).iter().filter(|&&c| is_permanent_card(&q.chars(c))).count();
     if permanents >= 8 {
-        chars.keywords = chars.keywords.with(Keyword::CantBeBlocked);
+        have_cant_be_blocked(q, source, chars);
     }
 }
 
