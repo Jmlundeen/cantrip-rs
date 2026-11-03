@@ -1,0 +1,67 @@
+# Jandor's Ring takes the last card of a multiple-card draw, requires it still in hand, and ignores draws from earlier turns (CR 701.9a, 121.1).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Jandor's Ring
+Ancestral Recall
+Island
+Forest
+Mountain
+Plains
+Memnite
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Jandor's Ring.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Upkeep]
+! Bot1.Battlefield.Jandor's Ring.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Forest; Island; Mountain; Plains
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Jandor's Ring.Activate
+! Bot1.Choose(Forest)
+! Bot1.Choose(Mountain)
+Bot1.Choose(Plains)
+? Bot1.Mana =
+? Bot1.Battlefield.Jandor's Ring.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Forest; Island; Memnite; Mountain
+? Bot1.Graveyard.Plains.Colors = 
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Jandor's Ring.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Jandor's Ring.Activate
+[Expect]
+Bot1.Hand = Forest; Island; Memnite; Mountain
+Bot1.Graveyard.Plains.Colors = 
