@@ -33,10 +33,10 @@ Bot2.Pass
 [T7 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Bullseye, Death Dealer.Activate(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
 Bot1.Choose(Lightning Bolt)
-Bot1.Battlefield.Mountain.Activate
-Bot1.Battlefield.Mountain.Activate
-Bot1.Battlefield.Mountain.Activate
 ? Bot1.Graveyard = Lightning Bolt
 Bot1.Pass
 Bot2.Pass

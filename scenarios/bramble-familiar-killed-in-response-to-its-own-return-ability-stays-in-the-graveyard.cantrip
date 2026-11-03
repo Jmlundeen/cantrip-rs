@@ -27,9 +27,9 @@ Bot1.Battlefield.Forest#2.Activate
 Bot1.Hand.Bramble Familiar.Cast
 [T5 Bot1.Main1]
 Bot1.Battlefield.Bramble Familiar.Activate(Ability: Return)
-Bot1.Choose(Island)
 Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Forest#2.Activate
+Bot1.Choose(Island)
 Bot2.Battlefield.Mountain.Activate
 Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bramble Familiar)
 [T5 Bot1.Main2]

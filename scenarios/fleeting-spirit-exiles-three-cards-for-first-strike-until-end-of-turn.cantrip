@@ -44,8 +44,8 @@ Bot1.Pass
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Fleeting Spirit.Activate(Ability: Exile three)
-Bot1.Choose(Island; Island; Island)
 Bot1.Battlefield.Plains.Activate
+Bot1.Choose(Island; Island; Island)
 Bot1.Pass
 ? Bot1.Mana = {U}
 [T3 Bot1.Main2]

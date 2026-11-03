@@ -556,8 +556,21 @@ enum Judged {
 }
 
 /// `paid` is what the cost is paid for, which a static ability may forbid some payments for (`CardDef::cost_bans`).
+///
+/// The parts the mana abilities activated before the costs are paid could make payable (CR 601.2g-h: a Lotus Petal sacrificed
+/// for mana is in the graveyard by the time an escape cost exiles from it) are refused only when those abilities could not
+/// change them (`ManaFeed`); otherwise they are left to the payment, which judges them once the mana is paid and takes the
+/// cast or activation back if they still can't be (CR 601.2h, 733.1). A mana ability's own cost, and one judged for what mana
+/// abilities could tap (`Judged::Nested`), are judged as they stand.
 fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost, judged: Judged, paid: Option<CostFor>, by: Option<Linked>) -> bool {
     let obj = cx.s().obj(source);
+    let feed = std::cell::OnceCell::new();
+    let fed = || -> ManaFeed {
+        if judged == Judged::Nested || paid == Some(CostFor::ManaAbility) {
+            return ManaFeed::NONE;
+        }
+        *feed.get_or_init(|| mana_feed(cx, controller))
+    };
     // A creature's {T} ability needs it under its controller's control since their turn began, unless it has haste or the
     // ability may be activated as though it had (CR 302.6).
     if cost.tap
@@ -582,8 +595,9 @@ fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost
     if cost.put_counters.is_some_and(|(kind, n)| n > 0 && banned(kind)) {
         return false;
     }
-    // Energy is paid from the payer's counters (CR 107.14, 118.3): payable only with at least that many.
-    if cx.s().player(controller).energy() < cost.energy || !can_pay_life_for(cx, controller, cost.life, paid) {
+    // Energy is paid from the payer's counters (CR 107.14, 118.3): payable only with at least that many. Both are judged
+    // again once the mana is paid (`rest_payable`).
+    if (cx.s().player(controller).energy() < cost.energy || !can_pay_life_for(cx, controller, cost.life, paid)) && !fed().opaque {
         return false;
     }
     // CR 101.2, 701.21a: a permanent a static ability says can't be sacrificed for this cost can't pay "sacrifice this".
@@ -606,6 +620,11 @@ fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost
     }
     if let Some(variable) = cost.variable
         && !variable_payable(cx, source, controller, variable, paid)
+        && !match variable {
+            VariableCost::ExileFromGraveyardWithTypes(_) => fed().graveyard_may_grow(),
+            VariableCost::DiscardOneOrMore(_) => fed().hand_may_grow(),
+            _ => false,
+        }
     {
         return false;
     }
@@ -623,32 +642,37 @@ fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost
     if !cost.discard.is_none() {
         let asker = Asker { source, controller, by, spell: false };
         let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(controller)).iter().copied().filter(|&c| c != source).collect();
-        if !discards_payable(cx, &asker, &hand, &cost.discard) {
+        // A card a mana ability could put into the hand may be any card: it may pay any instruction.
+        if !discards_payable(cx, &asker, &hand, &cost.discard) && !fed().hand_covers(hand.len(), cost.discard.count() as usize) {
             return false;
         }
     }
     if let Some((n, filter)) = cost.exile_from_hand {
         let asker = Asker { source, controller, by, spell: false };
         let hand = cx.s().zone(Zone::hand(controller)).iter().filter(|&&c| c != source && filter(cx, &asker, c)).count();
-        if hand < n as usize {
+        if hand < n as usize && !fed().hand_covers(hand, n as usize) {
             return false;
         }
     }
-    if cost.exile_from_graveyard > 0 && graveyard_exiles(cx, controller, source, cost, by).len() < cost.exile_from_graveyard as usize {
-        return false;
+    if cost.exile_from_graveyard > 0 {
+        let have = graveyard_exiles(cx, controller, source, cost, by).len();
+        if have < cost.exile_from_graveyard as usize && !fed().graveyard_covers(have, cost.exile_from_graveyard as usize) {
+            return false;
+        }
     }
-    // Collect evidence N (CR 701.59a): payable only if the graveyard's cards, the source apart, add up to N.
+    // Collect evidence N (CR 701.59a): payable only if the graveyard's cards, the source apart, add up to N - or a mana
+    // ability could put more there.
     if cost.collect_evidence > 0 {
         let total: u32 = cx.s().zone(Zone::graveyard(controller)).iter().filter(|&&c| c != source).map(|&c| cx.mana_value(c)).sum();
-        if total < cost.collect_evidence as u32 {
+        if total < cost.collect_evidence as u32 && !fed().evidence_covers(total, cost.collect_evidence as u32) {
             return false;
         }
     }
     // Exiling cards with N or more mana symbols of a color among their costs: payable only if the graveyard's cards of that
-    // color, the source apart, have that many between them.
+    // color, the source apart, have that many between them - or a mana ability could put more there.
     if let Some((color, n)) = cost.exile_symbols {
         let total: u32 = symbol_exiles(cx, controller, source, color).iter().map(|&c| cx.mana_symbols(c, color)).sum();
-        if total < n as u32 {
+        if total < n as u32 && !fed().graveyard_may_grow() {
             return false;
         }
     }
@@ -1185,6 +1209,9 @@ fn choose_hand_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Co
     let asker = Asker { source, controller: player, by, spell: false };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect();
+    if eligible.len() < usize::from(n) {
+        return Err(Stop::Cancel);
+    }
     let ask = RequestKind::choose_cards(source, Purpose::ExileToPay, hand, eligible, u32::from(n), false, "");
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
@@ -1206,6 +1233,10 @@ fn choose_evidence(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost)
     } else {
         return Ok(Vec::new());
     };
+    // Too little to exile is a cost that can't be paid (CR 601.2h, 701.59a): the cast or activation is taken back.
+    if values.iter().map(|&v| u32::from(v)).sum::<u32>() < u32::from(minimum) {
+        return Err(Stop::Cancel);
+    }
     let ask = RequestKind::CollectEvidence { source, cards, values, minimum, symbols };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
@@ -1236,6 +1267,10 @@ fn choose_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
         return choose_evidence(cx, player, source, cost);
     }
     let eligible = graveyard_exiles(cx, player, source, cost, None);
+    // Too few to exile is a cost that can't be paid (CR 601.2h): the cast or activation is taken back (CR 733.1).
+    if eligible.len() < usize::from(cost.exile_from_graveyard) {
+        return Err(Stop::Cancel);
+    }
     let ask = RequestKind::choose_cards(source, Purpose::ExileToPay, cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect(), eligible, u32::from(cost.exile_from_graveyard), false, "");
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
@@ -1303,6 +1338,119 @@ fn tappable_for_mana(cx: &Cx, player: PlayerId) -> Vec<ObjectId> {
         }
     }
     out
+}
+
+/// What the mana abilities a player could activate while paying a cost (CR 601.2g) could add, before the rest of that cost is
+/// paid (CR 601.2h), to the zones a cost takes cards from: at most `graveyard` cards put into their graveyard, and at most
+/// `hand` into their hand, by what those abilities' costs sacrifice, discard or return (Lotus Petal, Ashnod's Altar; not Lion's
+/// Eye Diamond, activated only as an instant, so never while a cost is paid); `opaque` where an ability's own effect does more than its listing says, which may be anything (Gemstone
+/// Mine sacrifices itself, The Great Henge gains life). Each is an upper bound: a cost judged against it is offered where it
+/// could become payable, and the payment, after the mana abilities, refuses it if it did not.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+struct ManaFeed {
+    graveyard: u32,
+    /// The most mana value those cards could have between them in the graveyard (collect evidence's measure, CR 701.59a).
+    evidence: u32,
+    hand: u32,
+    opaque: bool,
+}
+
+impl ManaFeed {
+    /// Nothing a mana ability could do changes a cost: what a mana ability's own cost is judged with.
+    const NONE: ManaFeed = ManaFeed { graveyard: 0, evidence: 0, hand: 0, opaque: false };
+
+    fn graveyard_may_grow(&self) -> bool {
+        self.opaque || self.graveyard > 0
+    }
+
+    fn hand_may_grow(&self) -> bool {
+        self.opaque || self.hand > 0
+    }
+
+    /// Whether `have` cards in the graveyard and what the mana abilities could add could come to `need`.
+    fn graveyard_covers(&self, have: usize, need: usize) -> bool {
+        self.opaque || self.graveyard > 0 && have + self.graveyard as usize >= need
+    }
+
+    /// Whether `have` mana value among the graveyard's cards and what the mana abilities could add could come to `need`.
+    fn evidence_covers(&self, have: u32, need: u32) -> bool {
+        self.opaque || self.evidence > 0 && have + self.evidence >= need
+    }
+
+    /// Whether `have` cards in the hand and what the mana abilities could add could come to `need`.
+    fn hand_covers(&self, have: usize, need: usize) -> bool {
+        self.opaque || self.hand > 0 && have + self.hand as usize >= need
+    }
+}
+
+/// What the mana abilities `player` could activate while paying a cost could feed it (`ManaFeed`): each card a cost of theirs
+/// could put into `player`'s graveyard or hand counted once - a nontoken permanent they own that one sacrifices or returns
+/// (a token is no card, CR 108.2b, 111.1), and every card in their hand where one discards.
+fn mana_feed(cx: &Cx, player: PlayerId) -> ManaFeed {
+    let mut options = Vec::new();
+    mana_ability_options_as(cx, player, ManaWindow::Payment, &mut options, Judged::Nested);
+    if options.is_empty() {
+        return ManaFeed::NONE;
+    }
+    let mut feed = ManaFeed::NONE;
+    let (mut graveyard, mut hand): (Vec<ObjectId>, Vec<ObjectId>) = (Vec::new(), Vec::new());
+    let card_of = |id: ObjectId| {
+        let o = cx.s().obj(id);
+        !o.token && o.owner == player
+    };
+    let owned_permanents = || cx.permanents_of(player).into_iter().filter(|&id| card_of(id));
+    for o in &options {
+        let Some(source) = o.source else { continue };
+        let def = if o.index >= PLAYER_MANA_ABILITY {
+            cx.s()
+                .effects
+                .iter()
+                .filter_map(|e| match e.kind {
+                    EffectKind::PlayerManaAbility(a) if e.controller == player => Some(a),
+                    _ => None,
+                })
+                .nth(usize::from(o.index - PLAYER_MANA_ABILITY))
+                .and_then(|a| activated(cx, a))
+        } else if cx.s().obj(source).zone.is(ZoneKind::Battlefield) {
+            cx.chars(source).abilities().nth(o.index as usize).and_then(|a| activated(cx, a))
+        } else {
+            // One that functions from the hand (Elvish Spirit Guide's), numbered among its card's printed abilities.
+            match cx.card(cx.s().obj(source).card).abilities.get(o.index as usize) {
+                Some(AbilityDef::Activated(a)) => Some(a),
+                _ => None,
+            }
+        };
+        let Some(def) = def else {
+            feed.opaque = true;
+            continue;
+        };
+        let cost = &def.cost;
+        feed.opaque |= def.mana.is_some() || cost.variable.is_some();
+        if cost.sacrifice_self && cx.s().obj(source).zone.is(ZoneKind::Battlefield) && card_of(source) {
+            graveyard.push(source);
+        }
+        if cost.return_self && cx.s().obj(source).zone.is(ZoneKind::Battlefield) && card_of(source) {
+            hand.push(source);
+        }
+        match cost.permanents.map(|p| p.action) {
+            Some(PermanentAction::Sacrifice) if !cost.tap_permanents => graveyard.extend(owned_permanents()),
+            Some(PermanentAction::ReturnToHand) => hand.extend(owned_permanents()),
+            _ => {}
+        }
+        if cost.discard_hand || !cost.discard.is_none() {
+            graveyard.extend(cx.s().zone(Zone::hand(player)).iter().copied());
+        }
+    }
+    for list in [&mut graveyard, &mut hand] {
+        list.sort_unstable();
+        list.dedup();
+    }
+    feed.graveyard = count_u32(graveyard.len());
+    // A card's mana value in the graveyard is its card's (a permanent's may differ: a copy, a transformed face, CR 202.3b):
+    // the greater of the two, as an upper bound.
+    feed.evidence = graveyard.iter().map(|&id| cx.mana_value(id).max(cx.card(cx.s().obj(id).card).cost.mana_value())).sum();
+    feed.hand = count_u32(hand.len());
+    feed
 }
 
 /// Whether a cost's permanents are chosen once its mana is paid (CR 601.2h): those that must be tapped, which a mana
@@ -6876,8 +7024,23 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
         }
     }
     cost = convoked(&cost, &creatures);
-    cost.generic = cost.generic.saturating_sub(generic);
-    if no_mana { cost.is_zero() } else { a.covers_for(&as_paid(cost), &spell_kind(cx, a, card, def)) }
+    let covers = |cost: ManaCost| if no_mana { cost.is_zero() } else { a.covers_for(&as_paid(cost), &spell_kind(cx, a, card, def)) };
+    if covers(ManaCost { generic: cost.generic.saturating_sub(generic), ..cost }) {
+        return true;
+    }
+    // Delve exiles from the graveyard as the total cost is paid (CR 702.66a, 601.2h), after the mana abilities (CR 601.2g):
+    // the cards they could put there could pay for generic mana too (a Lotus Petal sacrificed for its mana is one more card
+    // to exile). The payment refuses what they did not.
+    if with.delve {
+        let feed = mana_feed(cx, player);
+        if feed.opaque {
+            return covers(ManaCost { generic: 0, ..cost });
+        }
+        if feed.graveyard > 0 {
+            return covers(ManaCost { generic: cost.generic.saturating_sub(generic + feed.graveyard), ..cost });
+        }
+    }
+    false
 }
 
 /// The most of `generic` generic mana of the spell `def` (the card `card`) any player in the game other than `caster` could
@@ -7639,8 +7802,10 @@ fn cast(
             if less_each > 0 { there } else { there.min(u32::from(u16::MAX)) }
         } else if let Some(more) = def.kicker.and_then(|k| k.extra).filter(|_| def.kicker.is_some_and(|k| k.multi)) {
             // A multikicker whose cost is more than mana (Squad--Exile four cards from your graveyard): announced as many
-            // times as its whole cost can be paid (CR 601.2b, 118.3), the kicker's mana apart, which the payment judges as it
-            // does for any multikicker, and no more than a count of it holds (`Cost::most_times`).
+            // times as its whole cost could be paid (CR 601.2b, 118.3), the kicker's mana apart, which the payment judges as it
+            // does for any multikicker, and no more than a count of it holds (`Cost::most_times`). What could be paid counts
+            // what the mana abilities activated before the costs are paid could add (CR 601.2g-h, `can_pay_other`); the payment
+            // refuses a count that still can't be.
             let paid_with = extra;
             (1..=more.most_times()).take_while(|&n| can_pay_other(cx, spell, player, &paid_with.and(more.times(n as u8)))).count() as u32
         } else {
@@ -7860,15 +8025,11 @@ fn cast(
     };
 
     // CR 601.2f-h: permanents the cost names are chosen, the mana paid, then the rest of the cost; an additional
-    // cost's choices come once the mana is paid (CR 601.2h), as the C# engine asks them, and so do tapped permanents
-    // (web-slinging's), which a mana ability activated while paying may have tapped (CR 601.2g).
+    // cost's choices come once the mana is paid (CR 601.2h), and so do tapped permanents (web-slinging's), which a mana
+    // ability activated while paying may have tapped (CR 601.2g), and the cards the cost discards or exiles from a hand or a
+    // graveyard, which one may have put there (a Lotus Petal sacrificed for mana is a card an escape cost may exile).
     let late = permanents_after_mana(&cost);
     let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, spell, &cost, Some(CostFor::Spell), None)? };
-    let discards = choose_discards(cx, player, spell, &cost, None)?;
-    let mut exiles = choose_exiles(cx, player, spell, &cost)?;
-    let (way_sacrifices, way_exiles, way_discards) = choose_variable(cx, player, spell, &cost, variable_n(&cost, &item), Some(CostFor::Spell))?;
-    exiles.extend(way_exiles);
-    let hand_exiles = choose_hand_exiles(cx, player, spell, &cost, None)?;
     // CR 702.119a: emerge's mana comes down by the mana value of what was just chosen to be sacrificed. Nothing has
     // moved yet, so the permanents are still there to be read.
     if cost.emerge {
@@ -7901,7 +8062,6 @@ fn cast(
         creatures: false,
         no_mana,
         purpose: Paying::Casting,
-        reserved: &exiles,
         attackers: &[],
         life: life_owed,
         any,
@@ -7928,6 +8088,11 @@ fn cast(
     if late {
         chosen = choose_permanents(cx, player, spell, &cost, Some(CostFor::Spell), None)?;
     }
+    let discards = choose_discards(cx, player, spell, &cost, None)?;
+    let mut exiles = choose_exiles(cx, player, spell, &cost)?;
+    let (way_sacrifices, way_exiles, way_discards) = choose_variable(cx, player, spell, &cost, variable_n(&cost, &item), Some(CostFor::Spell))?;
+    exiles.extend(way_exiles);
+    let hand_exiles = choose_hand_exiles(cx, player, spell, &cost, None)?;
     let extra_chosen = choose_permanents(cx, player, spell, &extra, Some(CostFor::Spell), None)?;
     let beheld = choose_behold(cx, player, spell, &cost)?;
     let (extra_beheld, announced) = choose_behold_of(cx, player, spell, &extra)?;
@@ -8839,11 +9004,12 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, ab
     };
     // A condition on the modal definition may allow more modes than its printed default.
     let mut most = max.max(modal.most(cx, &asker, 0));
-    // An escalate cost whose parts other than mana the player cannot pay (a discard: CR 702.120a, 118.3) narrows the range
-    // to one they can, as a multikicker's is. Its mana is not judged here: the total is only determined once the targets
-    // are announced (CR 601.2c, 601.2f), and what increases or reduces it may read them, so a count it would refuse here
-    // could be paid (Helm of Awakening). The payment refuses mana the player cannot pay, and the cast is taken back
-    // (CR 601.2h, 733.1).
+    // An escalate cost whose parts other than mana the player could not pay (a discard: CR 702.120a, 118.3) narrows the range
+    // to what they could: judged with what the mana abilities they may activate before the costs are paid could add (CR
+    // 601.2g-h, `can_pay_other`: a card Chromatic Sphere draws may be discarded), and refused by the payment if it still can't
+    // be. Its mana is not judged here: the total is only determined once the targets are announced (CR 601.2c, 601.2f), and
+    // what increases or reduces it may read them, so a count it would refuse here could be paid (Helm of Awakening). The
+    // payment refuses mana the player cannot pay, and the cast is taken back (CR 601.2h, 733.1).
     if modal.escalate.is_some() {
         let payable = |cx: &Cx, n: u8| {
             let first_n = (0..usize::from(n)).fold(0u32, |mask, i| modal.with(mask, i));
@@ -9509,11 +9675,10 @@ fn activate(
 
     // CR 601.2g-h by way of 602.2b: the permanents the cost names are chosen with the rest of the cost, before the mana,
     // except tapped ones ("return a tapped creature you control"), chosen once the mana is paid, as a spell's are
-    // (`cast`): a mana ability activated while paying may have tapped them.
+    // (`cast`): a mana ability activated while paying may have tapped them. So are the cards it discards or exiles from
+    // the graveyard: one may have put them there.
     let late = permanents_after_mana(&whole);
     let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, source, &whole, paid, by)? };
-    let discards = choose_discards(cx, player, source, &whole, by)?;
-    let exiles = choose_exiles(cx, player, source, &whole)?;
     let counter = choose_counter_kind(cx, player, source, &whole)?;
     pay_mana_with(
         cx,
@@ -9530,6 +9695,8 @@ fn activate(
     if late {
         chosen = choose_permanents(cx, player, source, &whole, paid, by)?;
     }
+    let discards = choose_discards(cx, player, source, &whole, by)?;
+    let exiles = choose_exiles(cx, player, source, &whole)?;
     // The creatures a crew or saddle cost taps, once the mana is paid (CR 601.2g-h by way of 602.2b), as a spell's are
     // (`cast`): a mana ability activated while paying a cost increase (Anointed Peacekeeper's) may have tapped one, and a
     // tapped creature can't pay the cost.
@@ -9791,11 +9958,10 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     let (mana, _, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, printed, None, &[], &split);
     let mana = at_least(mana, least);
     // The rest of the cost is chosen with it (CR 601.2h by way of 602.2b): permanents (tapped ones once the mana is paid),
-    // cards to discard or exile.
+    // and once the mana is paid the cards to discard or exile, which a mana ability activated while paying (CR 601.2g) may
+    // have put in the hand or graveyard.
     let late = permanents_after_mana(&whole);
     let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, source, &whole, None, None)? };
-    let discards = choose_discards(cx, player, source, &whole, None)?;
-    let exiles = choose_exiles(cx, player, source, &whole)?;
     let tappers = choose_tappers(cx, player, source, &whole)?;
     let counter = choose_counter_kind(cx, player, source, &whole)?;
     if mana != ManaCost::ZERO {
@@ -9804,6 +9970,8 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     if late {
         chosen = choose_permanents(cx, player, source, &whole, None, None)?;
     }
+    let discards = choose_discards(cx, player, source, &whole, None)?;
+    let exiles = choose_exiles(cx, player, source, &whole)?;
     if whole.blight > 0 && blight_candidates(cx, player).is_empty() {
         return Err(Stop::Cancel);
     }
@@ -10752,8 +10920,6 @@ pub(crate) struct Helpers<'a> {
     /// What the mana pays for (CR 106.6): casting `source`, a spell (CR 601.2g), activating one of its abilities (CR
     /// 602.2b, 605.3a), or anything else.
     pub purpose: Paying,
-    /// Cards another part of the cost was already chosen to exile (escape's), which delve may not also exile.
-    pub reserved: &'a [ObjectId],
     /// The attacking creatures whose cost to attack this pays (CR 508.1h-j), for the question to name.
     pub attackers: &'a [ObjectId],
     /// The life the total cost asks besides its mana (CR 119.4, 601.2h), paid with it once the mana is: for the question to
@@ -10771,7 +10937,7 @@ pub(crate) struct Helpers<'a> {
 
 impl Helpers<'static> {
     pub const NONE: Helpers<'static> =
-        Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, reserved: &[], attackers: &[], life: 0, any: AnyMana::No, abilities_closed: false, assist: AssistStep::None };
+        Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, attackers: &[], life: 0, any: AnyMana::No, abilities_closed: false, assist: AssistStep::None };
 }
 
 /// What a mana payment is for, as far as restricted mana is concerned (CR 106.6): see `payment_for`.
@@ -10895,7 +11061,7 @@ fn pay_candidates(
     let mut out: Vec<ActionOption> = Vec::new();
     if helpers.with.delve && due.generic > 0 {
         for &id in cx.s().zone(Zone::graveyard(player)) {
-            if id != source && !helpers.reserved.contains(&id) && !delved.contains(&id) {
+            if id != source && !delved.contains(&id) {
                 out.push(ActionOption::on(ActionKind::ExileToPay, id, PAY_DELVE));
             }
         }
@@ -11438,11 +11604,6 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     // A cost paid as a spell or ability resolves is paid for no cast or activation (CR 118.12): nothing that forbids paying
     // for those touches it (Yasharn, Implacable Earth's ruling).
     let chosen = choose_permanents(cx, payer, source, cost, None, None)?;
-    let discards = choose_discards(cx, payer, source, cost, None)?;
-    let exiles = choose_exiles(cx, payer, source, cost)?;
-    let hand_exiles = choose_hand_exiles(cx, payer, source, cost, None)?;
-    let (sacrifices, variable_exiles, variable_discards) = choose_variable(cx, payer, source, cost, u32::from(x), None)?;
-    let taken = u16::try_from(sacrifices.len() + variable_exiles.len() + variable_discards.cards.len()).unwrap_or(u16::MAX);
     let tappers = choose_tappers(cx, payer, source, cost)?;
     let counter = choose_counter_kind(cx, payer, source, cost)?;
     let beheld = choose_behold(cx, payer, source, cost)?;
@@ -11450,7 +11611,18 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     let removed = choose_counters_among(cx, payer, source, cost)?;
     if total != ManaCost::ZERO {
         pay_mana(cx, payer, source, total)?;
+        // A mana ability activated while paying (CR 605.3a) may have spent the energy or life the rest needs (CR 118.3).
+        if !rest_payable(cx, payer, u32::from(cost.energy), life, None) {
+            return Err(Stop::Cancel);
+        }
     }
+    // The cards discarded or exiled from a hand or a graveyard are chosen once the mana is paid: a mana ability activated
+    // while paying may have put them there (CR 605.3a, 601.2g-h).
+    let discards = choose_discards(cx, payer, source, cost, None)?;
+    let exiles = choose_exiles(cx, payer, source, cost)?;
+    let hand_exiles = choose_hand_exiles(cx, payer, source, cost, None)?;
+    let (sacrifices, variable_exiles, variable_discards) = choose_variable(cx, payer, source, cost, u32::from(x), None)?;
+    let taken = u16::try_from(sacrifices.len() + variable_exiles.len() + variable_discards.cards.len()).unwrap_or(u16::MAX);
     if life > 0 {
         ops::change_life(cx, payer, -life_paid(life));
     }

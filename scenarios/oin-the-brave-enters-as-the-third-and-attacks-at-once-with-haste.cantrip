@@ -30,8 +30,8 @@ Bot1.Attack(Óin the Brave)
 [T3 Bot1.Main1]
 ? Bot1.Hand = Plains; Island; Island; Swamp
 Bot1.Battlefield.Óin the Brave.Activate
-Bot1.Choose(Plains)
 Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Plains)
 Bot1.Pass
 [T3 Bot1.Main2]
 

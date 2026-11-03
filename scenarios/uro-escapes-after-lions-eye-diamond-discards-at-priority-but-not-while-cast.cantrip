@@ -1,0 +1,50 @@
+# Lion's Eye Diamond's mana ability is activated only as an instant, so never while a spell is being cast (its ruling, CR
+# 601.2g, 605.3a), unlike Lotus Petal's. With Uro, Titan of Nature's Wrath and two other cards in the graveyard and two
+# Islands in hand, the Diamond's "Discard your hand, Sacrifice this artifact" would make five other cards, but it can't be
+# activated while Uro is cast by escape (CR 702.138a), so the escape is not offered - with mana to spare or not. Activated at
+# priority first, the hand and the Diamond are in the graveyard and its {U}{U}{U} floats beside Black Lotus's {G}{G}{G}: the
+# escape is then offered, paid and exiles all five.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Uro, Titan of Nature's Wrath
+Lotus Petal
+Lion's Eye Diamond
+Island
+Island
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Hand.Uro, Titan of Nature's Wrath.Cast
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+Bot1.Choose()
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+? Bot1.Graveyard.Count = 3
+? Bot1.Hand = Island; Island
+! Bot1.Graveyard.Uro, Titan of Nature's Wrath.Cast(Ability: Escape)
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Blue)
+? Bot1.Graveyard.Count = 6
+? Bot1.Mana = {U}{U}{U}{G}{G}{G}
+Bot1.Graveyard.Uro, Titan of Nature's Wrath.Cast(Ability: Escape)
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield = Mox Emerald; Mox Sapphire; Uro, Titan of Nature's Wrath; Island
+Exile.Count = 5
+Bot1.Graveyard.Count = 0

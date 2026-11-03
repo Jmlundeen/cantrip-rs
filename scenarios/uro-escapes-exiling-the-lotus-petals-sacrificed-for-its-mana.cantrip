@@ -1,0 +1,48 @@
+# Mana abilities are activated before the costs are paid (CR 601.2g-h): Uro, Titan of Nature's Wrath is cast by escape
+# (CR 702.138a) with only three other cards in the graveyard, and the two Lotus Petals sacrificed for its mana while it is
+# cast are in the graveyard by the time "Exile five other cards from your graveyard" is paid - five other cards. The escape
+# is offered, Uro escapes and stays (its sacrifice trigger sees it escaped), and every card in the graveyard is exiled.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Uro, Titan of Nature's Wrath
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Hand.Uro, Titan of Nature's Wrath.Cast
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+? Bot1.Mana = {U}{U}{U}{U}
+? Bot1.Graveyard.Count = 4
+Bot1.Graveyard.Uro, Titan of Nature's Wrath.Cast(Ability: Escape)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield = Island; Mox Emerald; Mox Sapphire; Uro, Titan of Nature's Wrath
+Exile.Count = 5
+Bot1.Graveyard.Count = 0

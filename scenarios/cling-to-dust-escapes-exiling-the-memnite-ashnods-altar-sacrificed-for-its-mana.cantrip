@@ -1,0 +1,63 @@
+# Mana abilities are activated before the costs are paid (CR 601.2g-h), and Ashnod's Altar's sacrifice is a cost of one:
+# Faithless Looting (Black Lotus) puts Black Lotus, itself and two Mountains in Bot1's graveyard, and Ashnod's Altar is cast
+# beside a Memnite. On turn 3 Cling to Dust exiles Bot2's Island (Bot1 draws) and is in the graveyard with four other cards.
+# On turn 5, with {B}{U} floating, its escape ({3}{B}, exile five other cards) is offered all the same: the Altar sacrificing
+# Memnite for {C}{C} while it is cast pays the rest of the mana and makes Memnite the fifth card to exile. It exiles Bot2's
+# Swamp, a noncreature card, and Bot1 draws again.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Memnite
+Faithless Looting
+Cling to Dust
+Ashnod's Altar
+Mountain
+Mountain
+Island x13
+
+[Bot2 Deck]
+Swamp x7
+Island
+Swamp x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mountain#1; Mountain#2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashnod's Altar.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Jet; Mox Ruby; Memnite; Ashnod's Altar
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cling to Dust.Cast(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 5
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island#1.Activate
+? Bot1.Mana = {U}{B}
+Bot1.Graveyard.Cling to Dust.Cast(Bot2.Graveyard.Swamp; Ability: Escape)
+Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: Memnite)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Ashnod's Altar; Island; Island
+Bot1.Graveyard = Cling to Dust
+Bot1.Hand.Count = 2
+Exile.Count = 7
+Bot1.Mana = 

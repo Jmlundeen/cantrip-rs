@@ -1,0 +1,36 @@
+# Delve exiles cards as the total cost is paid (CR 702.66a, 601.2h), after the mana abilities (CR 601.2g): with five
+# Lotus Petals in the graveyard, no mana in the pool and one Lotus Petal left, Gurmag Angler ({6}{B}) is cast - the Petal
+# sacrificed for its {B} is the sixth card to exile for the {6}. The cast is offered though five cards and one mana are
+# short of it before the Petal is sacrificed.
+
+[Bot1 Deck]
+Lotus Petal x6
+Gurmag Angler
+Island x13
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+[Bot1.Main2]
+? Bot1.Mana = 
+? Bot1.Graveyard.Count = 5
+Bot1.Hand.Gurmag Angler.Cast(Delve: 6)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Gurmag Angler
+Bot1.Graveyard.Count = 0
+Exile.Count = 6

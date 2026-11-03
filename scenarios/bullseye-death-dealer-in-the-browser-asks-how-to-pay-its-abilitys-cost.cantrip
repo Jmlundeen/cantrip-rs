@@ -37,10 +37,10 @@ Bot1.Battlefield.Bullseye, Death Dealer.Activate(Bot2)
 ? Client.Bot1.Prompt.Detail = Paid as you activate it, with the rest of its cost
 ? Client.Bot1.Prompt.Modes = Sacrifice an artifact; Discard a nonland card
 Bot1.Modes(Discard a nonland card)
-Bot1.Choose(Lightning Bolt)
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Lightning Bolt)
 Bot1.Pass
 Bot2.Pass
 

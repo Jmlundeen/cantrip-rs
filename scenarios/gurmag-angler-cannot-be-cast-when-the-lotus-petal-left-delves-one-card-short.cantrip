@@ -1,0 +1,31 @@
+# The control for Gurmag Angler delving a Lotus Petal sacrificed for its mana (CR 702.66a, 601.2g-h): with four Lotus
+# Petals in the graveyard and one left, sacrificing it for {B} makes five cards to exile for the {6}, one short, so the
+# cast is not offered - and would be with mana to spare.
+
+[Bot1 Deck]
+Lotus Petal x5
+Gurmag Angler
+Island x13
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+[Bot1.Main2]
+? Bot1.Mana = 
+? Bot1.Graveyard.Count = 4
+! Bot1.Hand.Gurmag Angler.Cast(Mana: short)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Lotus Petal
+Bot1.Hand = Gurmag Angler; Island

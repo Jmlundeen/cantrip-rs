@@ -1394,9 +1394,13 @@ fingerprint per priority with something on the stack but the first two of each r
 
 ### Casting: when a cost's choices are made
 
-A spell's costs are chosen and paid in the order of CR 601.2b-h, as the C# engine asked them: the permanents a cost
-sacrifices or returns, its discards and exiles are chosen before the mana is paid, an additional cost's choices after
-it. A cost of tapped permanents (`PermanentCost::tapped`, web-slinging's "return a tapped creature you control", CR
+A spell's costs are chosen and paid in the order of CR 601.2b-h: the permanents a cost sacrifices or returns are chosen
+before the mana is paid, an additional cost's choices after it, and so are the cards a cost discards or exiles from a hand
+or a graveyard, since a mana ability activated while paying may have put them there (CR 601.2g-h: a Lotus Petal sacrificed
+for an escape cost's mana is a card it may exile). Those parts are offered while the mana abilities the player could
+activate as the cost is paid could make them payable (`actions::ManaFeed`: the cards their costs could sacrifice, discard
+or return, and anything at all where an ability's own effect does more than its listing says), and refused by the payment,
+with the cast taken back (CR 733.1), where they did not; delve counts those cards too. A cost of tapped permanents (`PermanentCost::tapped`, web-slinging's "return a tapped creature you control", CR
 702.188a) is chosen once the mana is paid, since mana abilities come first (CR 601.2g) and one of them may have tapped
 the creature (Spider-Sense's ruling): it is offered while a creature is tapped or a mana ability its controller could
 activate would tap one, its own {T} or Springleaf Drum's, and a payment that leaves none tapped can't be completed, so

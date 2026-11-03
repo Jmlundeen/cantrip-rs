@@ -1,0 +1,39 @@
+# The control for Uro escaping with the Lotus Petals sacrificed for its mana (CR 601.2g-h, 702.138a): with three other
+# cards in the graveyard and one Lotus Petal left, sacrificing it while Uro is cast would leave only four other cards for
+# "Exile five other cards from your graveyard", so the escape is not offered at all, with mana to spare or not.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Uro, Titan of Nature's Wrath
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Hand.Uro, Titan of Nature's Wrath.Cast
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+? Bot1.Graveyard.Count = 4
+! Bot1.Graveyard.Uro, Titan of Nature's Wrath.Cast(Ability: Escape)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Lotus Petal; Mox Emerald; Mox Sapphire
+Bot1.Graveyard = Lotus Petal; Black Lotus; Uro, Titan of Nature's Wrath; Lotus Petal
+Exile.Count = 0
