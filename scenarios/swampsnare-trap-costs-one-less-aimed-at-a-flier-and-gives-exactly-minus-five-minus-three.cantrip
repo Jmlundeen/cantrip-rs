@@ -1,0 +1,53 @@
+# "This spell costs {1} less to cast if it targets a creature with flying" and "Enchanted creature gets -5/-3". Bot2's Serra Angel (4/4
+# flying) is the target, so Swampsnare Trap costs {1}{B}: Mox Jet and Mox Ruby pay it exactly, nothing floats and Mox Pearl stays untapped.
+# The Angel is -1/1 (a power one off in either direction or a toughness one off would show), alive, and still has flying.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Swampsnare Trap
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Serra Angel
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Serra Angel.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Serra Angel.Power = 4
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Swampsnare Trap.Cast(Bot2.Battlefield.Serra Angel)
+? Bot1.Mana =
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Serra Angel.Power = -1
+? Bot2.Battlefield.Serra Angel.Toughness = 1
+
+[Expect]
+Bot2.Battlefield.Serra Angel.Keywords = Flying; Vigilance

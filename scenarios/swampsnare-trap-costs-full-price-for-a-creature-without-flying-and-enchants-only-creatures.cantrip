@@ -1,0 +1,50 @@
+# Swampsnare Trap aimed at a creature without flying costs the full {2}{B}: with only two Moxen on the table (nothing else could pay)
+# {1}{B} does not cast it, and a Mox is no creature to enchant even with {2}{B} floating. Mox Pearl then makes three, the Trap is cast on
+# Bot2's Hill Giant (3/3 with no flying) for all of them, and the Giant, -2/0, is put into the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Swampsnare Trap
+Island x16
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Hill Giant
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Hill Giant.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Swampsnare Trap.Cast(Bot2.Battlefield.Hill Giant; Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Swampsnare Trap.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Hand.Swampsnare Trap.Cast(Bot2.Battlefield.Hill Giant)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Hill Giant

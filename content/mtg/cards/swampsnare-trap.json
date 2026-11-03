@@ -1,0 +1,6 @@
+{
+  "name": "Swampsnare Trap",
+  "manaCost": "{2}{B}",
+  "type": "Enchantment — Aura",
+  "oracleText": "This spell costs {1} less to cast if it targets a creature with flying.\nEnchant creature\nEnchanted creature gets -5/-3."
+}
