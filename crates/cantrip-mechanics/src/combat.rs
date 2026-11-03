@@ -99,3 +99,10 @@ pub fn create_attacking(g: &mut dyn Game, you: PlayerId, token: CardId, tapped: 
     }
     Ok(made)
 }
+
+/// "Enchanted creature ... can't be blocked by more than one creature" (CR 509.1b): `blocker_limits` rule of an
+/// Aura, with no "has" a rule of the Aura's, not an ability the creature gains (CR 113.1a); a creature that loses all its
+/// abilities is still under it (CR 613.1f). Alpha Authority and Meltstrider's Resolve print it.
+pub fn one_blocker_at_most(q: &dyn Query, source: ObjectId, attacker: ObjectId) -> Option<usize> {
+    (q.obj(source).attached_to == Some(attacker)).then_some(1)
+}

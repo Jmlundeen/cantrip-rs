@@ -1,12 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, fight, statics::plus_pt, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{attach::attached_object, combat::one_blocker_at_most, fight, statics::plus_pt, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
-
-/// "Enchanted creature ... can't be blocked by more than one creature" (CR 509.1b): no "has", so a rule of the Aura's, not
-/// an ability the creature gains (CR 113.1a); a creature that loses all its abilities is still under it (CR 613.1f).
-fn one_blocker_at_most(q: &dyn Query, source: ObjectId, attacker: ObjectId) -> Option<usize> {
-    (q.obj(source).attached_to == Some(attacker)).then_some(1)
-}
 
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE_YOU_CONTROL),
