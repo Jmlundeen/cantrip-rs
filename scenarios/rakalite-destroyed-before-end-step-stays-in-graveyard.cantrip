@@ -1,0 +1,61 @@
+# Destroying Rakalite after its ability resolves leaves it in the graveyard when the delayed
+# trigger resolves; it is a new object after changing zones (CR 400.7). Its prevention shield persists (CR 611.2a).
+[Bot1 Deck]
+Rakalite
+Black Lotus
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Island x20
+
+[Bot2 Deck]
+Disenchant
+Lightning Bolt
+Mountain
+Mox Pearl
+Mox Sapphire
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Rakalite.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Rakalite.Activate(Bot1)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Rakalite)
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 18
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Rakalite; Black Lotus; Black Lotus
