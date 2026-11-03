@@ -1,0 +1,38 @@
+# The enchanted Bears deal combat damage to two blockers at once: that is one damage event, so Spirit Link triggers once
+# and gains the whole two life (CR 603.2c, 510.2).
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Grizzly Bears
+Spirit Link
+Island x20
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spirit Link.Cast(Bot1.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears)
+Bot2.Block(Ornithopter > Grizzly Bears; Ornithopter#2 > Grizzly Bears)
+Bot1.AssignDamage(Grizzly Bears > Ornithopter: 1; Grizzly Bears > Ornithopter#2: 1)
+[T3 Bot1.CombatDamage]
+? Stack.Count = 1
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 22
+Bot2.Battlefield = Ornithopter; Ornithopter
