@@ -1,0 +1,41 @@
+# Artificial Evolution changes the Team's Wall to Elf; it can destroy an Elf rather than a Wall (CR 612.1).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Dwarven Demolition Team
+Artificial Evolution
+Llanowar Elves
+Steel Wall
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dwarven Demolition Team.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Steel Wall.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Dwarven Demolition Team)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wall)
+Bot1.Modes(Elf)
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Dwarven Demolition Team.Activate(Steel Wall)
+Bot1.Battlefield.Dwarven Demolition Team.Activate(Llanowar Elves)
+[Expect]
+Bot1.Battlefield.Llanowar Elves = (absent)
+Bot1.Battlefield.Steel Wall.Types = Artifact; Creature

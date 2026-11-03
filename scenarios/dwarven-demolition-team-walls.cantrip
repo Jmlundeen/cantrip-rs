@@ -1,0 +1,39 @@
+# The Team destroys a Wall controlled by either player, but cannot target a non-Wall (CR 115.1c, 701.8a).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Dwarven Demolition Team
+Steel Wall
+Ornithopter
+Island x20
+[Bot2 Deck]
+Mox Pearl
+Steel Wall
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dwarven Demolition Team.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Steel Wall.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Dwarven Demolition Team.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Dwarven Demolition Team.Activate(Bot2.Battlefield.Steel Wall)
+? Bot1.Battlefield.Dwarven Demolition Team.Tapped = true
+! Bot1.Battlefield.Dwarven Demolition Team.Activate(Bot1.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Steel Wall = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dwarven Demolition Team.Activate(Bot1.Battlefield.Steel Wall)
+[Expect]
+Bot1.Battlefield.Steel Wall = (absent)
+Bot2.Battlefield.Steel Wall = (absent)
+Bot1.Battlefield.Ornithopter.Power = 0

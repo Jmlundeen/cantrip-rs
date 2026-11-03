@@ -1,0 +1,8 @@
+{
+  "name": "Dwarven Demolition Team",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Dwarf",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}: Destroy target Wall."
+}
