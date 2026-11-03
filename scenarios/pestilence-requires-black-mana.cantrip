@@ -1,0 +1,33 @@
+# One red mana cannot activate Pestilence; one black mana pays exactly (CR 602.2b, 107.4).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Pestilence
+Memnite
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pestilence.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Pestilence.Activate(Mana: short)
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Pestilence.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
+Bot1.Battlefield.Memnite = (absent)

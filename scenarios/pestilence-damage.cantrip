@@ -1,0 +1,42 @@
+# Each Pestilence activation deals 1 damage to every creature and player; it is sacrificed at end step when no creatures remain (CR 120.3, 603.4).
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Pestilence
+Ornithopter
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pestilence.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Pestilence.Types = Enchantment
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Pestilence.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+? Bot2.Life = 19
+? Bot1.Battlefield.Ornithopter.Damage = 1
+? Bot2.Battlefield.Ornithopter.Damage = 1
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Pestilence.Activate
+[T4 Bot2.Main1]
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Bot1.Battlefield.Pestilence = (absent)
+Bot1.Battlefield.Ornithopter = (absent)
+Bot2.Battlefield.Ornithopter = (absent)

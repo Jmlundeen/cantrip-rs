@@ -1,0 +1,27 @@
+# An until-end-of-turn land creature is still a creature as the end step begins (CR 514.2, 603.4).
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Pestilence
+Inkmoth Nexus
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Inkmoth Nexus.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pestilence.Cast
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: Add)
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: becomes)
+[T1 Bot1.End]
+? Bot1.Battlefield.Inkmoth Nexus.Power = 1
+? Stack.Count = 0
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Pestilence.Types = Enchantment
+? Bot1.Battlefield.Inkmoth Nexus.Power = (absent)
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Pestilence = (absent)

@@ -1,0 +1,30 @@
+# Pestilence's intervening condition is checked again after a creature is created in response (CR 603.4).
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Ruby
+Pestilence
+Secure the Wastes
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pestilence.Cast
+[T1 Bot1.End]
+? Stack.Count = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Secure the Wastes.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+[Expect]
+Bot1.Battlefield.Pestilence.Types = Enchantment
+Bot1.Battlefield.Warrior Token.Toughness = 1
