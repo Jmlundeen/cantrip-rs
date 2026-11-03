@@ -3,6 +3,15 @@
 
 use cantrip_api::*;
 
+/// Counter the spell carried as the trigger's subject (CR 701.6, 400.7).
+/// Chalice of the Void and Presence of the Master use this.
+pub fn counter_subject_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(spell) = item.subject {
+        g.counter(spell);
+    }
+    Ok(())
+}
+
 fn you_control_source(q: &dyn Query, e: &ContinuousEffect) -> bool {
     q.is_on_battlefield(e.source) && q.controller(e.source) == e.controller
 }

@@ -5,10 +5,7 @@ use cantrip_oracle as oracle;
 /// "Whenever a player casts a creature spell": any player's, read as it stands on the stack. The spell rides along as
 /// the trigger's subject ("that spell").
 fn creature_spell_cast(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { spell, .. } if q.chars(*spell).is(CardType::Creature) => Fired::about(Target::Object(*spell)),
-        _ => None,
-    }
+    cantrip_mechanics::triggers::player_casts_spell_of_type(q, event, CardType::Creature)
 }
 
 /// Each player returns all cards with the same name as that spell from their graveyard to the battlefield, in one

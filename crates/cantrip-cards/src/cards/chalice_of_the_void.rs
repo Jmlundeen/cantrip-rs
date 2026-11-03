@@ -14,20 +14,11 @@ fn spell_of_equal_mana_value(q: &dyn Query, source: ObjectId, event: &Event) -> 
     }
 }
 
-/// "Counter that spell" (CR 701.6): the spell that was cast, still on the stack; one that has left it is gone (CR 400.7),
-/// and one that can't be countered stays.
-fn counter_that_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(spell) = item.subject {
-        g.counter(spell);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     enters: Some(effects::enters_with_x_counters::<{ CounterKind::Charge as usize }>),
     abilities: &[triggered(
         when(EventMask::SPELL_CAST, spell_of_equal_mana_value),
-        counter_that_spell,
+        effects::counter_subject_spell,
         "Whenever a player casts a spell with mana value equal to the number of charge counters on this artifact, counter that spell.",
     )],
     ..oracle::CHALICE_OF_THE_VOID

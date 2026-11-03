@@ -1128,6 +1128,15 @@ pub fn repartee(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
 /// Repartee, "whenever you cast an instant or sorcery spell that targets a creature": see `repartee`.
 pub const REPARTEE: Trigger = when_asked(EventMask::SPELL_CAST, repartee);
 
+/// A player casts a spell of the given type; capture that spell as the subject (CR 603.2).
+/// Bloodbond March checks creatures and Presence of the Master checks enchantments.
+pub fn player_casts_spell_of_type(q: &dyn Query, event: &Event, kind: CardType) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, .. } if q.chars(*spell).is(kind) => Fired::about(Target::Object(*spell)),
+        _ => None,
+    }
+}
+
 /// "Whenever a player casts a noncreature spell" (CR 603.2, 601.2i): any player's, the ability's controller included, read as
 /// the spell stands on the stack. The ability is about the player who cast it (`StackItem::subject`). Magebane Lizard and Mai,
 /// Scornful Striker print it.
