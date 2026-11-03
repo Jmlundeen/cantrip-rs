@@ -1,0 +1,34 @@
+# Tranquility destroys enchantments controlled by both players, including creatures, and leaves other permanents (CR 701.8a).
+[Bot1 Deck]
+Mox Emerald
+Black Lotus
+Fang of Shigeki
+Tranquility
+Ornithopter
+Island x20
+[Bot2 Deck]
+Mox Emerald
+Fang of Shigeki
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fang of Shigeki.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fang of Shigeki.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Tranquility.Cast
+? Bot1.Mana =
+Bot1.Pass
+[Expect]
+Bot1.Graveyard = Tranquility; Fang of Shigeki; Black Lotus
+Bot2.Graveyard = Fang of Shigeki
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Power = 0

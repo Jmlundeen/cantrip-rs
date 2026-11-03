@@ -1,0 +1,6 @@
+{
+  "name": "Tranquility",
+  "manaCost": "{2}{G}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all enchantments."
+}
