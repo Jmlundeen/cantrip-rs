@@ -1,0 +1,46 @@
+# The Cave of Two Lovers, chapter II: "Search your library for a Mountain or Cave card, reveal it, put it into your hand, then
+# shuffle" - a Mountain card answers as well as a Cave (CR 701.23, 205.3i). Turn 3: with a Forest (refused), a Promising Vein and a
+# Mountain in the library, Bot1 takes the Mountain, which is revealed and goes to the hand.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+The Cave of Two Lovers
+Island
+Island
+Island
+Forest
+Promising Vein
+Mountain
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Cave of Two Lovers.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Forest)
+Bot1.Search(Mountain)
+? Bot1.Revealed = Mountain
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Mountain
+Bot1.Library.Promising Vein.Colors.Count = 0

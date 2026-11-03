@@ -1,0 +1,65 @@
+# The Cave of Two Lovers: "I - Create two 1/1 white Ally creature tokens. II - Search your library for a Mountain or Cave card, reveal it,
+# put it into your hand, then shuffle. III - Earthbend 3." Chapter I (turn 1): exactly two Ally tokens. Chapter II (turn 3): the Forest in the
+# library is no answer (a refusal), Promising Vein (a Cave) is found. Chapter III (turn 5): the Mountain becomes a 3/3 haste land
+# creature with three +1/+1 counters, and the Saga, with its last chapter's ability done, is sacrificed (CR 714.4).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+The Cave of Two Lovers
+Island
+Island
+Island
+Forest
+Promising Vein
+Mountain
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Cave of Two Lovers.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ally Token#1.Power = 1
+? Bot1.Battlefield.Ally Token#2.Toughness = 1
+? Bot1.Battlefield.The Cave of Two Lovers.Counters.Lore = 1
+[T3 Bot1.Main1]
+? Bot1.Battlefield.The Cave of Two Lovers.Counters.Lore = 2
+? Bot1.Hand.Count = 3
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Forest)
+Bot1.Search(Promising Vein)
+? Bot1.Hand.Promising Vein.Colors.Count = 0
+? Bot1.Hand.Count = 4
+? Bot1.Revealed = Promising Vein
+Bot1.Hand.Promising Vein.Play
+[T5 Bot1.Main1]
+Bot1.Target(Mountain)
+? Bot1.Battlefield.The Cave of Two Lovers.Counters.Lore = 3
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mountain.Power = 3
+? Bot1.Battlefield.Mountain.Toughness = 3
+? Bot1.Battlefield.Mountain.Counters.PlusOnePlusOne = 3
+? Bot1.Battlefield.Mountain.Types = Land; Creature
+? Bot1.Battlefield.Mountain.Keywords = Haste
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Bot1.Graveyard = The Cave of Two Lovers
+Bot1.Hand.Count = 4
