@@ -1,0 +1,34 @@
+# Livonya cannot be blocked while the defending player controls a legendary land;
+# the same blocker can block the other attacker (CR 702.14c).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Livonya Silone
+Memnite
+Island x20
+
+[Bot2 Deck]
+Eiganjo, Seat of the Empire
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Livonya Silone.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Eiganjo, Seat of the Empire.Play
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Livonya Silone > Bot2; Bot1.Battlefield.Memnite > Bot2)
+! Bot2.Block(Bot2.Battlefield.Memnite > Livonya Silone)
+Bot2.Block(Bot2.Battlefield.Memnite > Bot1.Battlefield.Memnite)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Livonya Silone.Damage = 0

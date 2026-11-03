@@ -1,0 +1,12 @@
+{
+  "name": "Livonya Silone",
+  "manaCost": "{2}{R}{R}{G}{G}",
+  "type": "Legendary Creature — Human Warrior",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "First strike; legendary landwalk (This creature can't be blocked as long as defending player controls a legendary land.)",
+  "keywords": [
+    "FirstStrike",
+    "LegendaryLandwalk"
+  ]
+}
