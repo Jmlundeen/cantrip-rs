@@ -1,0 +1,40 @@
+# Protection from red does not prevent a white creature from blocking Repentant
+# Blacksmith; the creatures deal lethal combat damage to each other (CR 702.16f).
+[Bot1 Deck]
+Repentant Blacksmith
+Mox Pearl
+Mox Sapphire
+Plains x20
+
+[Bot2 Deck]
+Savannah Lions
+Mox Pearl
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Repentant Blacksmith.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Repentant Blacksmith > Bot2)
+Bot2.Block(Savannah Lions > Repentant Blacksmith)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Repentant Blacksmith
+Bot2.Graveyard = Savannah Lions
+Bot2.Life = 20

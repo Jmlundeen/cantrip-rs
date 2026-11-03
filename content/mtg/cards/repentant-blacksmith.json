@@ -1,0 +1,8 @@
+{
+  "name": "Repentant Blacksmith",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Protection from red"
+}

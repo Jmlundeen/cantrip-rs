@@ -1,0 +1,29 @@
+# Sleight of Mind changes the Blacksmith's protection from red to blue (CR 612.2).
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Repentant Blacksmith
+Sleight of Mind
+Island x20
+[Bot2 Deck]
+Island x25
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Repentant Blacksmith.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Repentant Blacksmith.ProtectionFrom = Red
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.Repentant Blacksmith)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+Bot1.Colors(Blue)
+[Expect]
+Bot1.Battlefield.Repentant Blacksmith.ProtectionFrom = Blue
