@@ -285,7 +285,7 @@ pub fn cant_gain_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId
     })
 }
 
-/// Whether `player` can't lose life (CR 119.8): a static ability of a permanent on the battlefield with its abilities says so
+/// Whether `player` can't lose life (CR 119.8): a static ability of a permanent with its abilities, or of an emblem, says so
 /// (`CardDef::cant_lose_life`: Platinum Emperion's "your life total can't change"). Asked only when a player would lose or
 /// pay life.
 pub fn cant_lose_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> bool {
@@ -628,12 +628,14 @@ pub fn block_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)]) -> Vec<Requ
     required
 }
 
-/// Whether a static ability of a permanent on the battlefield with its abilities (CR 613.1f) says `test` of its own rules.
-/// Asked only where the rules need the answer - a player about to lose or win, damage to a player, counters about to be put -
-/// so the battlefield is searched then.
+/// Whether a static ability of a permanent with its abilities (CR 613.1f), or an emblem in the command zone
+/// (CR 114.4), says `test` of its own rules. Gideon of the Trials and Platinum Angel both forbid losing and winning.
+/// Asked only when the rules need the answer: losing or winning, damage, or counters about to be put.
 fn any_static<R: Copy + 'static>(q: &dyn Query, cards: &'static CardTable, rules: fn(&CardDef) -> &'static [R], test: impl Fn(R, &Asker) -> bool) -> bool {
     let s = q.state();
-    s.battlefield().iter().any(|&id| {
+    // As in `actions::given`, commanders have no functioning abilities here (CR 113.6); emblems have no types.
+    let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| cards.get(cards.current(s.obj(id))).types == TypeSet::NONE);
+    s.battlefield().iter().chain(emblems).any(|&id| {
         let obj = s.obj(id);
         cards.texts_linked(s, id).any(|(card, by)| {
             let list = rules(cards.get(card));
@@ -689,7 +691,7 @@ pub fn cost_banned(q: &dyn Query, cards: &'static CardTable, player: PlayerId, p
     any_static(q, cards, |d| d.cost_bans, |rule, asker| rule(q, asker, player, paid_for, payment))
 }
 
-/// Whether a static ability of a permanent on the battlefield says the permanent `id` doesn't untap during its controller's
+/// Whether a static ability of a permanent or of an emblem says the permanent `id` doesn't untap during its controller's
 /// untap step (CR 502.3, `CardDef::untap_bans`: Intruder Alarm, Infinite Coursework). No ability of `id`'s, so it holds
 /// whatever abilities `id` has lost (CR 613.1f); its own "doesn't untap" is `Keyword::DoesNotUntap`.
 pub fn untap_banned(q: &dyn Query, cards: &'static CardTable, id: ObjectId) -> bool {
@@ -728,16 +730,16 @@ pub fn untap_step_skips(q: &dyn Query, cards: &'static CardTable, id: ObjectId, 
 }
 
 /// Whether the permanent `id` can't become untapped (CR 101.2, 701.26b): a resolved effect says so
-/// (`EffectKind::CantBecomeUntapped`: Spider-Woman, Secret Agent), or a static ability of a permanent on the battlefield with
-/// its abilities does (`CardDef::cant_become_untapped`: Frozen in Ice, Blossombind). No ability of `id`'s, so it holds
+/// (`EffectKind::CantBecomeUntapped`: Spider-Woman, Secret Agent), or a static ability of a permanent with its abilities, or
+/// of an emblem, does (`CardDef::cant_become_untapped`: Frozen in Ice, Blossombind). No ability of `id`'s, so it holds
 /// whatever abilities `id` has lost (CR 613.1f). Asked only where a tapped permanent would untap.
 pub fn cant_become_untapped(q: &dyn Query, cards: &'static CardTable, id: ObjectId) -> bool {
     q.state().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantBecomeUntapped)
         || any_static(q, cards, |d| d.cant_become_untapped, |rule, asker| rule(q, asker, id))
 }
 
-/// Whether the face-down permanent `id` can't be turned face up (CR 101.2, 708.7): a static ability of a permanent on the
-/// battlefield says so (`CardDef::face_up_bans`: Unable to Scream's enchanted creature, Karlov Watchdog's "permanents your
+/// Whether the face-down permanent `id` can't be turned face up (CR 101.2, 708.7): a static ability of a permanent or of
+/// an emblem says so (`CardDef::face_up_bans`: Unable to Scream's enchanted creature, Karlov Watchdog's "permanents your
 /// opponents control ... during your turn"). No ability of `id`'s, so it holds whatever abilities `id` has lost (CR 613.1f).
 /// Asked where a face-down permanent would be turned face up - as its special actions are offered (CR 116.2b) and as it is
 /// turned up, by them or by an effect - so it stops every way, and lifts the moment the ban does.
@@ -747,8 +749,8 @@ pub fn cant_be_turned_face_up(q: &dyn Query, cards: &'static CardTable, id: Obje
 
 /// Whether the permanent `id` can't be sacrificed (CR 101.2, 701.21a), for any reason and by anyone: it has "this permanent
 /// can't be sacrificed" (`Keyword::CantBeSacrificed`, printed or granted, so losing its abilities ends it), a resolved effect
-/// says so (`EffectKind::CantBeSacrificed`, which it keeps whatever abilities it loses), or a static ability of a permanent on
-/// the battlefield does (`CardDef::sacrifice_bans`: Assault Suit's equipped creature). Asked only where a sacrifice would be
+/// says so (`EffectKind::CantBeSacrificed`, which it keeps whatever abilities it loses), or a static ability of a permanent or
+/// of an emblem does (`CardDef::sacrifice_bans`: Assault Suit's equipped creature). Asked only where a sacrifice would be
 /// made, chosen or paid.
 pub fn cant_be_sacrificed(q: &dyn Query, cards: &'static CardTable, id: ObjectId) -> bool {
     q.chars(id).has(Keyword::CantBeSacrificed)
