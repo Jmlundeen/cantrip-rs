@@ -1,0 +1,54 @@
+# Rooftop Percher's "up to two target cards" is at most two (CR 115.1): with three cards in graveyards (Bot1's Bolt and Bot2's
+# two), choosing all three is refused; two are exiled, the third stays where it was, and the 3 life is gained.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Lightning Bolt
+Rooftop Percher
+Forest x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt#1.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Rooftop Percher.Cast
+! Bot1.Target(Bot1.Graveyard.Lightning Bolt; Bot2.Graveyard.Lightning Bolt#1; Bot2.Graveyard.Lightning Bolt#2)
+Bot1.Target(Bot1.Graveyard.Lightning Bolt; Bot2.Graveyard.Lightning Bolt#1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Lightning Bolt; Lightning Bolt
+Exile.Count = 2
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 1
+Bot1.Life = 17
+Bot2.Life = 17
