@@ -1,0 +1,55 @@
+# Other Zombies gain swampwalk and regeneration, while Zombie Master does not grant either to itself (CR 702.14c, 701.19a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Mox Jet
+Zombie Master
+Walking Corpse
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Grizzly Bears
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Zombie Master.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Walking Corpse.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+! Bot1.Battlefield.Zombie Master.Activate
+! Bot1.Battlefield.Ornithopter.Activate
+Bot1.Battlefield.Walking Corpse.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Zombie Master > Bot2; Walking Corpse > Bot2; Ornithopter > Bot2)
+! Bot2.Block(Grizzly Bears > Walking Corpse)
+Bot2.Block(Grizzly Bears > Zombie Master; Ornithopter > Ornithopter)
+[T3 Bot1.EndCombat]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Zombie Master.Damage = 2
+Bot1.Battlefield.Walking Corpse.Damage = 0

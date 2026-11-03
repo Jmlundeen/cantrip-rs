@@ -1,0 +1,43 @@
+# An opponent's Zombie gains both abilities; a Swamp and a blocker make swampwalk observable (CR 702.14c, 701.19a).
+[Bot1 Deck]
+Black Lotus
+Swamp
+Zombie Master
+Ornithopter
+Go for the Throat
+Mox Jet
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Walking Corpse
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Zombie Master.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Walking Corpse.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Walking Corpse > Bot1)
+! Bot1.Block(Ornithopter > Walking Corpse)
+[T4 Bot2.Main2]
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Walking Corpse.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Go for the Throat.Cast(Bot2.Battlefield.Walking Corpse)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 18
+Bot2.Battlefield.Walking Corpse.Damage = 0
+Bot2.Battlefield.Walking Corpse.Tapped = true

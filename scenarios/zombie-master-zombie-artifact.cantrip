@@ -1,0 +1,35 @@
+# A noncreature Zombie receives regeneration but not swampwalk; Firdoch Core has changeling (CR 702.73a).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Jet
+Zombie Master
+Firdoch Core
+Island x20
+[Bot2 Deck]
+Black Lotus
+Abrade
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Zombie Master.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Firdoch Core.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Firdoch Core.Activate(Ability: Regenerate)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Abrade.Cast
+Bot2.Modes(Destroy target artifact)
+Bot2.Target(Bot1.Battlefield.Firdoch Core)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Firdoch Core.Tapped = true
+Bot1.Battlefield.Firdoch Core.Keywords = Changeling
