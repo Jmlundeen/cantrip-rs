@@ -1,0 +1,42 @@
+# Blessing pumps its enchanted creature until end of turn for white mana (CR 611.2a).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Ornithopter
+Blessing
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+! Bot1.Hand.Blessing.Cast(Bot1.Battlefield.Mox Ruby)
+Bot1.Hand.Blessing.Cast(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Blessing.Activate(Mana: short)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Blessing.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Blessing.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2

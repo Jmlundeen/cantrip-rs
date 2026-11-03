@@ -1,0 +1,6 @@
+{
+  "name": "Blessing",
+  "manaCost": "{W}{W}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\n{W}: Enchanted creature gets +1/+1 until end of turn."
+}
