@@ -1,0 +1,63 @@
+# Icy Manipulator taps artifacts, creatures, and lands on either side for {1} and tapping it (CR 602.2b, 701.26a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Icy Manipulator
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Rancor
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Icy Manipulator.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Icy Manipulator.Activate(Bot2)
+Bot1.Battlefield.Icy Manipulator.Activate(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Tapped = true
+? Bot1.Battlefield.Icy Manipulator.Tapped = true
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+! Bot1.Battlefield.Icy Manipulator.Activate(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Rancor.Cast(Bot2.Battlefield.Grizzly Bears)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Icy Manipulator.Activate(Bot2.Battlefield.Rancor)
+Bot1.Battlefield.Icy Manipulator.Activate(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Island.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Icy Manipulator.Activate(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Grizzly Bears.Tapped = true
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Icy Manipulator.Activate(Bot1.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mox Pearl.Tapped = true

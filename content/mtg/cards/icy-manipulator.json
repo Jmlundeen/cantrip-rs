@@ -1,0 +1,6 @@
+{
+  "name": "Icy Manipulator",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "{1}, {T}: Tap target artifact, creature, or land."
+}
