@@ -1,0 +1,54 @@
+# An artifact can still deal damage to a player while Treefolk is on the battlefield (CR 615.1).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald x2
+Mox Ruby
+Mox Pearl
+Argothian Treefolk
+Pyrite Spellbomb
+Forest x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Pyrite Spellbomb
+Lightning Bolt
+Mountain
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Argothian Treefolk.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Pyrite Spellbomb.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Pyrite Spellbomb.Activate(Bot2; Ability: 2 damage)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Argothian Treefolk.Damage = 0

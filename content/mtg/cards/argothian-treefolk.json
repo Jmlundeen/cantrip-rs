@@ -1,0 +1,8 @@
+{
+  "name": "Argothian Treefolk",
+  "manaCost": "{3}{G}{G}",
+  "type": "Creature — Treefolk",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "Prevent all damage that would be dealt to this creature by artifact sources."
+}

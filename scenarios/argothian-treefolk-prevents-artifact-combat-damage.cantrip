@@ -1,0 +1,42 @@
+# Treefolk prevents combat damage from the artifact creature blocking it, while dealing lethal damage back (CR 615.1).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald x2
+Argothian Treefolk
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Alpha Myr
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Argothian Treefolk.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Alpha Myr.Cast
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Argothian Treefolk > Bot2)
+Bot2.Block(Alpha Myr > Argothian Treefolk)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Argothian Treefolk.Damage = 0
+Bot2.Graveyard = Alpha Myr; Black Lotus

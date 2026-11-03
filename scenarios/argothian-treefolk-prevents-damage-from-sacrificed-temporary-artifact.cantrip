@@ -1,0 +1,52 @@
+# A creature made into an artifact sacrifices itself to deal damage; its last battlefield characteristics make that damage prevented (CR 113.7a, 615.1).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald x2
+Argothian Treefolk
+Forest x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Fanatical Firebrand
+Stone by Sunlight
+Mountain x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Argothian Treefolk.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Fanatical Firebrand.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Stone by Sunlight.Cast
+Bot2.Modes(Until end of turn)
+Bot2.Target(Bot2.Battlefield.Fanatical Firebrand)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Fanatical Firebrand.Types = Creature; Artifact
+Bot2.Battlefield.Fanatical Firebrand.Activate(Bot1.Battlefield.Argothian Treefolk)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Argothian Treefolk.Damage = 0
+Bot2.Graveyard = Fanatical Firebrand; Stone by Sunlight
