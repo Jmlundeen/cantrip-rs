@@ -1,0 +1,41 @@
+# Goblin Balloon Brigade gains flying for the turn and evades a ground blocker (CR 702.9b, 611.2a).
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Goblin Balloon Brigade
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Balloon Brigade.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Goblin Balloon Brigade.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Goblin Balloon Brigade > Bot2)
+! Bot2.Block(Grizzly Bears > Goblin Balloon Brigade)
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Mox Ruby.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+! Bot1.Battlefield.Goblin Balloon Brigade.Activate(Mana: short)
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Goblin Balloon Brigade.Keywords = (absent)

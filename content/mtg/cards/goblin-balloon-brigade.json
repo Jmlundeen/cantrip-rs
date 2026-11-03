@@ -1,0 +1,8 @@
+{
+  "name": "Goblin Balloon Brigade",
+  "manaCost": "{R}",
+  "type": "Creature — Goblin Warrior",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{R}: This creature gains flying until end of turn."
+}
