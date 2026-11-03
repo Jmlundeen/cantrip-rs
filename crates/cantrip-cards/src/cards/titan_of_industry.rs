@@ -1,15 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::{counters, targets, tokens};
+use cantrip_mechanics::{counters, effects, targets, tokens};
 use cantrip_oracle as oracle;
-
-/// Mode 2: "Target player gains 5 life" (CR 119.3), nothing if the player is no longer a legal target (CR 608.2b).
-fn gain_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(player) = targets::player(g, item, 0) {
-        g.gain_life(player, 5);
-    }
-    Ok(())
-}
 
 /// Mode 3: "Create a 4/4 green Rhino Warrior creature token" (CR 111.1), under the ability's controller.
 fn rhino(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -28,7 +20,7 @@ fn shield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// targets (CR 700.2c).
 static MODAL: ModalDef = modes(&[
     mode(cantrip_mechanics::effects::destroy_first_target, "Destroy target artifact or enchantment.").targets(&[targets::ARTIFACT_OR_ENCHANTMENT]),
-    mode(gain_five, "Target player gains 5 life.").targets(&[targets::PLAYER]),
+    mode(effects::target_player_gains::<5>, "Target player gains 5 life.").targets(&[targets::PLAYER]),
     mode(rhino, "Create a 4/4 green Rhino Warrior creature token."),
     mode(shield, "Put a shield counter on a creature you control."),
 ])

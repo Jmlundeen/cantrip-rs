@@ -699,6 +699,23 @@ pub fn each_player_may_discard_hand_and_draw_seven(g: &mut dyn Game, item: &Stac
     Ok(())
 }
 
+/// "Target player gains N life" (CR 119.3, 608.2b): the first targeted player gains N life if still legal. Healing Salve,
+/// Kenrith, the Returned King and Titan of Industry print it.
+pub fn target_player_gains<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(player) = crate::targets::player(g, item, 0) {
+        g.gain_life(player, N);
+    }
+    Ok(())
+}
+
+/// "Target player gains X life": Alabaster Potion and Stream of Life (also prepared by Infirmary Healer).
+pub fn target_player_gains_x_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(player) = crate::targets::player(g, item, 0) {
+        g.gain_life(player, i32::from(item.x));
+    }
+    Ok(())
+}
+
 /// "You gain N life" (CR 119.3). Zuran Orb and Inventor's Fair print it (two and one).
 pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspend> {
     g.gain_life(item.controller, n);

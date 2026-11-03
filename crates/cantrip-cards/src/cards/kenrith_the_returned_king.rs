@@ -26,14 +26,6 @@ fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     effects::plus_one_counter_on_target(g, item)
 }
 
-/// "{2}{W}: Target player gains 5 life."
-fn gain_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(player) = targets::player(g, item, 0) {
-        g.gain_life(player, 5);
-    }
-    Ok(())
-}
-
 /// "{4}{B}: Put target creature card from a graveyard onto the battlefield under its owner's control."
 fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
@@ -46,7 +38,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{R}"), all_gain, "{R}: All creatures gain trample and haste until end of turn."),
         ability(cost("{1}{G}"), counter, "{1}{G}: Put a +1/+1 counter on target creature.").targets(&[targets::CREATURE]),
-        ability(cost("{2}{W}"), gain_five, "{2}{W}: Target player gains 5 life.").targets(&[targets::PLAYER]),
+        ability(cost("{2}{W}"), effects::target_player_gains::<5>, "{2}{W}: Target player gains 5 life.").targets(&[targets::PLAYER]),
         ability(cost("{3}{U}"), |g, item| Ok(effects::target_player_draws(g, item, 0, 1)), "{3}{U}: Target player draws a card.").targets(&[targets::PLAYER]),
         ability(cost("{4}{B}"), reanimate, "{4}{B}: Put target creature card from a graveyard onto the battlefield under its owner's control.")
             .targets(&[targets::CREATURE_CARD_IN_A_GRAVEYARD]),
