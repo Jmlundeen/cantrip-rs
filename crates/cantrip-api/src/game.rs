@@ -837,7 +837,7 @@ pub trait Game: Query {
     /// Makes these permanents, just put onto the battlefield, attack `defender` (CR 508.4): attacking, but never declared as
     /// attackers, so nothing that watches attackers being declared sees them. Each one the rules keep out of combat
     /// (`create_tokens_attacking`'s limits: no combat, not a creature, a defender that can't be attacked) only stays where it
-    /// is. Tokens made by `create_token_copies_tapped` first, so a copy's attack is chosen after the tokens are created.
+    /// is. A copy that enters attacking is made by `create_token_copies_attacking` instead, so that it is attacking as its entry is matched.
     fn enter_attacking(&mut self, entered: &[ObjectId], defender: Target);
     /// Creates token copies entering attacking (CR 508.4, 707.2), tapped only when `tapped`. If `defender` is absent,
     /// each token's controller chooses what it attacks as it enters. Attacking state is visible to ETB abilities.

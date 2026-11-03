@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{blight, combat, effects, targets, triggers};
+use cantrip_mechanics::{blight, effects, targets, triggers};
 use cantrip_oracle as oracle;
 
 const BLIGHT_ONE: Question = Question::new("BlightOne", "blight 1?", "", "Blight 1", "Don't");
@@ -41,16 +41,13 @@ pub static EXCEPTION: CardDef = CardDef {
 /// "You may blight 1. If you do, create a tapped and attacking token that's a copy of the blighted creature, except it has 'At
 /// the beginning of the end step, sacrifice this token.'" (CR 701.68a, 707.2, 707.9a, 111.1, 508.4): the copy is of the
 /// creature that was blighted, as it is now, counters not copied (CR 707.2), and is created tapped (CR 110.5b). It was not
-/// declared as an attacker, so nothing that triggers on attackers sees it, and its controller chooses what it attacks (CR 508.4).
+/// declared as an attacker, so nothing that triggers on attackers sees it, and its controller chooses what it attacks as it
+/// enters, so it is attacking when its own entry is matched (CR 508.4).
 fn blight_and_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(blighted) = blight::may_in_effect(g, item.controller, item.object, 1, &BLIGHT_ONE)? else { return Ok(()) };
     let exception = AbilityRef { card: g.card_id(&EXCEPTION), index: 0 };
     let values = g.copiable_values(blighted).with_ability(exception);
-    let defender = combat::choose_attack_target(g, item.controller, item.object)?;
-    let tokens = g.create_token_copies_tapped(values, item.controller, 1, true)?;
-    if let Some(defender) = defender {
-        g.enter_attacking(&tokens, defender);
-    }
+    g.create_token_copies_attacking(values, item.controller, 1, true, None)?;
     Ok(())
 }
 
