@@ -1,0 +1,8 @@
+{
+  "name": "Kobold Taskmaster",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Kobold",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Other Kobold creatures you control get +1/+0."
+}

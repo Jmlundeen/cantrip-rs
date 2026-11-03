@@ -1,0 +1,55 @@
+# Kobold Taskmaster gives other Kobold creatures its controller controls +1/+0, excluding itself,
+# opposing Kobolds and its controller's non-Kobold creatures. Two Taskmasters enhance each other (CR 604.1).
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Kobold Taskmaster
+Crimson Kobolds
+Ornithopter
+Kobold Taskmaster
+Mountain
+Mountain x15
+
+[Bot2 Deck]
+Crookshank Kobolds
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Crimson Kobolds.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kobold Taskmaster.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kobold Taskmaster.Power = 1
+? Bot1.Battlefield.Kobold Taskmaster.Toughness = 2
+? Bot1.Battlefield.Crimson Kobolds.Power = 1
+? Bot1.Battlefield.Crimson Kobolds.Toughness = 1
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T2 Bot2.Main1]
+Bot2.Hand.Crookshank Kobolds.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Crookshank Kobolds.Power = 0
+? Bot2.Battlefield.Crookshank Kobolds.Toughness = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kobold Taskmaster.Cast
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Kobold Taskmaster#1.Power = 2
+Bot1.Battlefield.Kobold Taskmaster#1.Toughness = 2
+Bot1.Battlefield.Kobold Taskmaster#2.Power = 2
+Bot1.Battlefield.Crimson Kobolds.Power = 2
+Bot2.Battlefield.Crookshank Kobolds.Power = 0
