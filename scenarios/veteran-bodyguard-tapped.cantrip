@@ -1,0 +1,31 @@
+# A tapped Veteran Bodyguard does not redirect damage from an unblocked creature (CR 614.1a).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl x2
+Veteran Bodyguard
+Island x20
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Veteran Bodyguard.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Veteran Bodyguard > Bot2)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Grizzly Bears > Bot1)
+[T4 Bot2.EndCombat]
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Veteran Bodyguard.Damage = 0
+Bot1.Battlefield.Veteran Bodyguard.Tapped = true

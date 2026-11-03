@@ -1,0 +1,52 @@
+# An untapped Veteran Bodyguard takes damage from an unblocked creature instead of its controller (CR 614.1a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Veteran Bodyguard
+Mox Ruby
+Shock
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Grizzly Bears
+Shock
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Veteran Bodyguard.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Grizzly Bears#1 > Bot1; Grizzly Bears#2 > Bot1)
+Bot1.Block(Veteran Bodyguard > Grizzly Bears#1)
+[T4 Bot2.EndCombat]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Bot1.Battlefield.Veteran Bodyguard.Damage = 4

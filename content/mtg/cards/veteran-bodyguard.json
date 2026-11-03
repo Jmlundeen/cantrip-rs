@@ -1,0 +1,8 @@
+{
+  "name": "Veteran Bodyguard",
+  "manaCost": "{3}{W}{W}",
+  "type": "Creature — Human",
+  "power": 2,
+  "toughness": 5,
+  "oracleText": "As long as this creature is untapped, all damage that would be dealt to you by unblocked creatures is dealt to this creature instead."
+}

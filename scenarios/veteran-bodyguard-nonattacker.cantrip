@@ -1,0 +1,32 @@
+# Damage from a nonattacking creature is not redirected (CR 614.1a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Veteran Bodyguard
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Orcish Bowmasters
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Veteran Bodyguard.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Orcish Bowmasters.Cast
+Bot2.Target(Bot1)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Veteran Bodyguard.Damage = 0

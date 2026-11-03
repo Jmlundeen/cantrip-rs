@@ -1,0 +1,45 @@
+# A blocked creature's trample damage reaches the player while another unblocked creature's damage is redirected (CR 702.19b).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Veteran Bodyguard
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Goblin Deathraiders
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Veteran Bodyguard.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Goblin Deathraiders.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Goblin Deathraiders > Bot1; Grizzly Bears > Bot1)
+Bot1.Block(Ornithopter > Goblin Deathraiders)
+[T4 Bot2.EndCombat]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Veteran Bodyguard.Damage = 2
