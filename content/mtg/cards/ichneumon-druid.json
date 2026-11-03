@@ -1,0 +1,8 @@
+{
+  "name": "Ichneumon Druid",
+  "manaCost": "{1}{G}{G}",
+  "type": "Creature — Human Druid",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Whenever an opponent casts an instant spell other than the first instant spell that player casts each turn, this creature deals 4 damage to that player."
+}

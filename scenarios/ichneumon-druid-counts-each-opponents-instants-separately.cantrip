@@ -1,0 +1,41 @@
+# Each opponent's first instant is free; each player's second in the same turn deals 4 to that player (CR 603.2).
+[Bot1 Deck]
+Black Lotus
+Ichneumon Druid
+Forest x20
+[Bot2 Deck]
+Black Lotus
+Shock
+Shock
+Mountain x20
+[Bot3 Deck]
+Black Lotus
+Shock
+Shock
+Mountain x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Ichneumon Druid.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot3.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+? Bot2.Life = 20
+Bot3.Battlefield.Black Lotus.Activate(Color: Red)
+Bot3.Hand.Shock.Cast(Bot1)
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot3.Life = 20
+Bot2.Hand.Shock.Cast(Bot1)
+Bot3.Hand.Shock.Cast(Bot1)
+[T3 Bot3.Main2]
+[Expect]
+Bot1.Life = 12
+Bot2.Life = 16
+Bot3.Life = 16

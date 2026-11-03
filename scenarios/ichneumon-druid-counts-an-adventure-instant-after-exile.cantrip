@@ -1,0 +1,31 @@
+# Petty Theft was an instant as cast; after it goes on an Adventure, the later Shock is still the second instant (CR 715.3).
+[Bot1 Deck]
+Black Lotus
+Ichneumon Druid
+Mox Pearl
+Forest x20
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Brazen Borrower
+Shock
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Ichneumon Druid.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Brazen Borrower.Cast(Mox Pearl; Ability: Adventure)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 20
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+[T2 Bot2.Main2]
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 18
