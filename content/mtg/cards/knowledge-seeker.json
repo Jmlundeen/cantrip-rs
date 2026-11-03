@@ -1,0 +1,11 @@
+{
+  "name": "Knowledge Seeker",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Fox Spirit",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Vigilance\nWhenever you draw your second card each turn, put a +1/+1 counter on this creature.\nWhen this creature dies, create a Clue token. (It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")",
+  "keywords": [
+    "Vigilance"
+  ]
+}

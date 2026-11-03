@@ -1,0 +1,63 @@
+# Knowledge Seeker, 2/1 Vigilance: "Whenever you draw your second card each turn, put a +1/+1 counter on this creature" (CR 121.1, 603.2). Cast on
+# turn 1 with Black Lotus. Bot2's own second card on turn 2 (Opt) gives it nothing. On turn 3 the draw step's card is Bot1's first (no counter), the
+# first Opt's the second (one counter, a 3/2) and the second Opt's the third (no second counter). It attacks with vigilance: still untapped.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Knowledge Seeker
+Opt
+Opt
+Island
+Island
+Island x3
+Plains x14
+
+[Bot2 Deck]
+Island
+Opt
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Knowledge Seeker.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Opt.Cast
+Bot2.Arrange(Island |)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Knowledge Seeker.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Knowledge Seeker.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Island |)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Knowledge Seeker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Island |)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Knowledge Seeker.Counters.PlusOnePlusOne = 1
+Bot1.Attack(Knowledge Seeker > Bot2)
+? Bot1.Battlefield.Knowledge Seeker.Tapped = false
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Knowledge Seeker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Knowledge Seeker.Power = 3
+Bot1.Battlefield.Knowledge Seeker.Toughness = 2
+Bot1.Battlefield.Knowledge Seeker.Tapped = false
+Bot2.Life = 17
