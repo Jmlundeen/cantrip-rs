@@ -1,0 +1,52 @@
+# Evil Eye stops its controller's non-Eye creature attacking, but not the opponent's; the Eye itself may attack.
+# Only a Wall can block it, while another creature can block a different Eye (CR 508.1c, 509.1b).
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Black Lotus
+Evil Eye of Orms-by-Gore
+Ornithopter
+Universal Automaton
+Mox Pearl
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Steel Wall
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Evil Eye of Orms-by-Gore.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Universal Automaton.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Steel Wall.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter > Bot1)
+? Combat.Attackers = Ornithopter > Bot1
+[T5 Bot1.DeclareAttackers]
+! Bot1.Attack(Ornithopter > Bot2)
+Bot1.Attack(Evil Eye of Orms-by-Gore > Bot2; Universal Automaton > Bot2)
+! Bot2.Block(Ornithopter > Evil Eye of Orms-by-Gore)
+Bot2.Block(Steel Wall > Evil Eye of Orms-by-Gore; Ornithopter > Universal Automaton)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Evil Eye of Orms-by-Gore.Tapped = true

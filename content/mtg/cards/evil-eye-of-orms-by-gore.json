@@ -1,0 +1,8 @@
+{
+  "name": "Evil Eye of Orms-by-Gore",
+  "manaCost": "{4}{B}",
+  "type": "Creature — Eye",
+  "power": 3,
+  "toughness": 6,
+  "oracleText": "Non-Eye creatures you control can't attack.\nThis creature can't be blocked except by Walls."
+}
