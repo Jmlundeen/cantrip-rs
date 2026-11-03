@@ -1,0 +1,51 @@
+# Resurrection returns its controller's creature card to the battlefield, while opposing and noncreature cards are ineligible (CR 115.1a, 400.3).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Black Lotus
+Ornithopter
+Shock
+Shock
+Resurrection
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Resurrection.Cast(Bot2.Graveyard.Ornithopter)
+! Bot1.Hand.Resurrection.Cast(Bot1.Graveyard.Shock)
+Bot1.Hand.Resurrection.Cast(Bot1.Graveyard.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot2.Graveyard = Ornithopter
