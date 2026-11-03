@@ -1,0 +1,6 @@
+{
+  "name": "Avoid Fate",
+  "manaCost": "{G}",
+  "type": "Instant",
+  "oracleText": "Counter target instant or Aura spell that targets a permanent you control."
+}

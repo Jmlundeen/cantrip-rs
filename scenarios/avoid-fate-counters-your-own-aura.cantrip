@@ -1,0 +1,29 @@
+# An Aura spell targeting your own permanent is legal even when you control the spell; Avoid Fate counters it.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Ornithopter
+Rancor
+Avoid Fate
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Avoid Fate.Cast(Stack.Rancor)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Avoid Fate; Rancor
+Bot1.Battlefield.Ornithopter.Power = 0

@@ -1,0 +1,37 @@
+# A sorcery targeting your creature cannot be countered by Avoid Fate; an instant on the same creature can.
+
+[Bot1 Deck]
+Mox Emerald
+Ornithopter
+Avoid Fate
+Forest x17
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Flame Slash
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Flame Slash.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Avoid Fate.Cast(Stack.Flame Slash)
+Bot1.Hand.Avoid Fate.Cast(Stack.Lightning Bolt)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Avoid Fate
+Bot2.Graveyard = Flame Slash; Lightning Bolt
