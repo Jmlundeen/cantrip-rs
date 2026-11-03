@@ -1,0 +1,48 @@
+# A stolen Onulet dies under Bot1’s control and its owner Bot2 receives the card; Bot1 gains the life.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mox Ruby
+Mox Jet
+Mox Pearl
+Vengeful Possession
+Diabolic Edict
+Island x4
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Onulet
+Forest x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Onulet.Cast
+? Bot2.Mana =
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Vengeful Possession.Cast(Bot2.Battlefield.Onulet)
+Bot1.Pass
+Bot1.Choose()
+? Bot1.Battlefield.Onulet.Power = 2
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Diabolic Edict.Cast(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Onulet; Black Lotus
+Bot1.Life = 22
+Bot2.Life = 20
+Bot1.Graveyard = Diabolic Edict; Vengeful Possession
+Bot1.Battlefield = Mountain; Mox Jet; Mox Pearl; Mox Ruby; Swamp

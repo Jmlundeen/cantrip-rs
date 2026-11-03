@@ -1,0 +1,8 @@
+{
+  "name": "Onulet",
+  "manaCost": "{3}",
+  "type": "Artifact Creature — Construct",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature dies, you gain 2 life."
+}

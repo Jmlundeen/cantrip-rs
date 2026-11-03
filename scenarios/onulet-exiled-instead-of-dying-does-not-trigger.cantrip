@@ -1,0 +1,62 @@
+# Rest in Peace exiles the first Onulet, so it does not trigger. After Disenchant removes it, a second Onulet dies and gains its controller two life.
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain
+Lightning Bolt
+Disenchant
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Black Lotus
+Onulet
+Black Lotus
+Onulet
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Onulet.Cast
+? Bot2.Mana =
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Onulet)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Rest in Peace)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Onulet.Cast
+? Bot2.Mana =
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Onulet)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 22
+Exile = Black Lotus; Lightning Bolt; Onulet; Rest in Peace
