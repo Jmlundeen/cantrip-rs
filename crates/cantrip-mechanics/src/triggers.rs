@@ -804,6 +804,23 @@ pub const fn ward_collect_evidence<const N: u8>(text: &'static str) -> AbilityDe
     triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_collect_evidence_effect::<N>, text).ward()
 }
 
+fn ward_waterbend_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Target::Object(by) = item.subject else { return Ok(()) };
+    let payer = PlayerId(item.data[0] as u8);
+    // The payer pays {N} and may tap their untapped artifacts and creatures, each for one generic mana of it (CR 701.67a-b).
+    if !g.may_pay(payer, item.object, by, Cost::waterbend(u32::from(N), 0), &crate::COUNTERED_UNLESS_PAID)? {
+        g.counter_item(by, item.data[1] as usize);
+    }
+    Ok(())
+}
+
+/// Ward--Waterbend {N} (CR 702.21a, 701.67): "Whenever this becomes the target of a spell or ability an opponent controls,
+/// counter it unless that player pays {N}. They can tap their artifacts and creatures to help. Each one pays for {1}."
+/// The Unagi of Kyoshi Island prints it with 4.
+pub const fn ward_waterbend<const N: u8>(text: &'static str) -> AbilityDef {
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_waterbend_effect::<N>, text).ward()
+}
+
 /// Whether the player whose spell or ability targeted pays ward's discard cost (CR 118.12a): a player with no card in hand
 /// cannot pay and is not asked, nor is one whom the ward's controller's abilities can't make discard (CR 101.2; Tamiyo,
 /// Collector of Tales's ruling: "something happens unless you discard" can't be paid); one who can is asked whether to, and
