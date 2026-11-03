@@ -1,0 +1,67 @@
+# Buzzard-Wasp Colony (2/2): "Whenever another creature you control dies, if it had counters on it" (CR 700.4, 603.4). Bot2's Heirloom
+# Auntie (it enters with two -1/-1 counters) is Bolted and dies, but it is not Bot1's; then Bot1's own Ornithopter, with no counters,
+# is Bolted and dies. Neither trigger goes on the stack, and the Colony stays a plain 2/2 with no counters.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Ruby
+Buzzard-Wasp Colony
+Lightning Bolt
+Lightning Bolt
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Heirloom Auntie
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buzzard-Wasp Colony.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Battlefield.Mox Jet#3.Activate
+Bot2.Hand.Heirloom Auntie.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Heirloom Auntie)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Heirloom Auntie = (absent)
+? Stack =
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter = (absent)
+? Stack =
+
+[Expect]
+Bot1.Battlefield.Buzzard-Wasp Colony.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Buzzard-Wasp Colony.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Buzzard-Wasp Colony.Power = 2
+Bot1.Battlefield.Buzzard-Wasp Colony.Toughness = 2

@@ -1,0 +1,31 @@
+# Buzzard-Wasp Colony: the sacrifice is a "may" - Bot1 declines with a Mox Jet and the Colony itself to choose, so nothing is
+# sacrificed and, with no "if you do", no card is drawn (CR 608.2c).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Buzzard-Wasp Colony
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Buzzard-Wasp Colony.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+
+[Expect]
+Bot1.Battlefield.Mox Jet#1.Tapped = true
+Bot1.Battlefield.Mox Jet#2.Tapped = false
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 1

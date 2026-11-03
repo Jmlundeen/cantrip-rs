@@ -1,0 +1,33 @@
+# Buzzard-Wasp Colony: "When this creature enters, you may sacrifice an artifact or creature. If you do, draw a card" (CR 608.2c,
+# 701.21a). It is cast with Black Lotus and two Mox Jets; Bot1 sacrifices one Mox Jet and draws a card. Two permanents are refused
+# (it is one); the other Mox Jet and the Colony stay.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Buzzard-Wasp Colony
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Buzzard-Wasp Colony.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mox Jet#1; Mox Jet#2)
+Bot1.Choose(Mox Jet#1)
+
+[Expect]
+Bot1.Battlefield.Mox Jet#1 = (absent)
+Bot1.Battlefield.Buzzard-Wasp Colony.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 2

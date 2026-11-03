@@ -1,0 +1,56 @@
+# Buzzard-Wasp Colony (2/2): "Whenever another creature you control dies, if it had counters on it, put its counters on this
+# creature" (CR 700.4, 603.10a, 122.6). Azula Always Lies puts a +1/+1 counter on Bot1's Ornithopter and Lightning Bolt kills it; the
+# counter it had as it last was on the battlefield lands on the Colony, which grows to 3/3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Ruby
+Buzzard-Wasp Colony
+Azula Always Lies
+Lightning Bolt
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buzzard-Wasp Colony.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Azula Always Lies.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Buzzard-Wasp Colony.Power = 2
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Buzzard-Wasp Colony.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Buzzard-Wasp Colony.Power = 3
+Bot1.Battlefield.Buzzard-Wasp Colony.Toughness = 3

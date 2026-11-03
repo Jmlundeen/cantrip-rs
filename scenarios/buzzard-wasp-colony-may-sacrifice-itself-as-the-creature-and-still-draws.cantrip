@@ -1,0 +1,32 @@
+# Buzzard-Wasp Colony: "an artifact or creature" is not "another", so the Colony is itself a creature it may sacrifice as it enters
+# (CR 701.21a): the card is still drawn (CR 608.2c), and the two Mox Jets that cast it stay.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Buzzard-Wasp Colony
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Buzzard-Wasp Colony.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Buzzard-Wasp Colony)
+
+[Expect]
+Bot1.Battlefield.Buzzard-Wasp Colony = (absent)
+Bot1.Battlefield.Mox Jet#1.Tapped = true
+Bot1.Battlefield.Mox Jet#2.Tapped = false
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 2
