@@ -616,6 +616,11 @@ pub fn damage_cant_be_prevented(_: &dyn Query, _: &Asker, _: ObjectId, _: bool) 
     true
 }
 
+/// "This creature ... as long as it's untapped" (CR 604.1): Giant Tortoise and Illusion Spinners.
+pub fn itself_while_untapped(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected && !q.state().obj(source).tapped
+}
+
 /// "Gets +P/+T" (CR 613.4c): the power and toughness change of an Equipment's, Aura's or permanent's static ability, as the
 /// `apply` of a `Layer::PtModify` static (a negative number is a minus). Cori-Steel Cutter, Embercleave, Grafted Wargear,
 /// Doc Ock's Tentacles and the other plain "+N/+M" statics print it.
