@@ -1,0 +1,8 @@
+{
+  "name": "Beetle-Headed Merchants",
+  "manaCost": "{4}{B}",
+  "type": "Creature — Human Citizen",
+  "power": 5,
+  "toughness": 4,
+  "oracleText": "Whenever this creature attacks, you may sacrifice another creature or artifact. If you do, draw a card and put a +1/+1 counter on this creature."
+}

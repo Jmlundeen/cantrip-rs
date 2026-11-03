@@ -1,0 +1,42 @@
+# Beetle-Headed Merchants: the sacrifice may be an artifact (a Mox Jet) as well as a creature; the card and the counter come for it,
+# and the Aegis Turtle stays (CR 701.21a, 608.2c).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Mox Sapphire
+Beetle-Headed Merchants
+Aegis Turtle
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Beetle-Headed Merchants.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aegis Turtle.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Beetle-Headed Merchants)
+Bot1.Pass
+Bot1.Choose(Mox Jet#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mox Jet#1 = (absent)
+Bot1.Battlefield.Aegis Turtle.Tapped = false
+Bot1.Battlefield.Beetle-Headed Merchants.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Beetle-Headed Merchants.Power = 6
+Bot1.Graveyard.Count = 2
+Bot1.Hand.Count = 3
+Bot2.Life = 14

@@ -1,0 +1,46 @@
+# Beetle-Headed Merchants (5/4) attacks with an Aegis Turtle and three artifacts beside it and Bot1 sacrifices the Turtle (CR 701.21a): a
+# card is drawn and a +1/+1 counter lands on the Merchants (CR 608.2c), so it deals 6, not 5. The Merchants themselves are no choice
+# ("another"), though they are a creature there to be chosen; the Moxen and the Turtle stay unless picked. Two permanents are refused: it is one.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Mox Sapphire
+Beetle-Headed Merchants
+Aegis Turtle
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Beetle-Headed Merchants.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aegis Turtle.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Beetle-Headed Merchants)
+Bot1.Pass
+! Bot1.Choose(Beetle-Headed Merchants)
+! Bot1.Choose(Aegis Turtle; Mox Jet#1)
+Bot1.Choose(Aegis Turtle)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Aegis Turtle = (absent)
+Bot1.Battlefield.Mox Jet#1.Tapped = false
+Bot1.Battlefield.Beetle-Headed Merchants.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Beetle-Headed Merchants.Power = 6
+Bot1.Battlefield.Beetle-Headed Merchants.Toughness = 5
+Bot1.Graveyard.Count = 2
+Bot1.Hand.Count = 3
+Bot2.Life = 14
