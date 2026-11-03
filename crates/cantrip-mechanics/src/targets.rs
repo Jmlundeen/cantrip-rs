@@ -1074,6 +1074,15 @@ pub fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target, types: &[
     }
 }
 
+fn creature_card_in_your_graveyard_with_mana_value_x_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard(q, asker, t, &[CardType::Creature]) && matches!(t, Target::Object(id) if mana_value_is_x(q, id))
+}
+
+/// "Target creature card in your graveyard with mana value X" (CR 107.3a, 202.3, 115.1): the slot of an ability with {X} in
+/// its cost, `.targets_after_x()` (CR 601.2b-c), judged again on resolution with its own announced X (`mana_value_is_x`). Likeness
+/// Looter and Lazav, the Multifarious print it.
+pub const CREATURE_CARD_IN_YOUR_GRAVEYARD_WITH_MANA_VALUE_X: TargetSpec = target(creature_card_in_your_graveyard_with_mana_value_x_filter);
+
 /// `card_in_your_graveyard` with "mana value N or less" (CR 202.3, `Query::mana_value`; X is 0 in a graveyard,
 /// CR 202.3e). Unearth, Carnage, Crimson Chaos, Sevinne's Reclamation and Helping Hand print it.
 pub fn card_in_your_graveyard_with_mana_value_at_most(q: &dyn Query, asker: &Asker, t: Target, types: &[CardType], max: u32) -> bool {
