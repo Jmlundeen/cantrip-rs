@@ -1,0 +1,31 @@
+# Detonate destroys an opponent's one-mana artifact and deals that controller one damage (CR 701.8a, 120.3).
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Detonate
+Island x17
+
+[Bot2 Deck]
+Sol Ring
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Detonate.Cast(X: 1)
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Sol Ring
+Bot1.Graveyard = Detonate
+Bot1.Life = 20
+Bot2.Life = 19

@@ -1,0 +1,43 @@
+# The destroyed artifact's last controller, rather than its owner, takes the damage (CR 608.2h).
+[Bot1 Deck]
+Island
+Mountain
+Island
+Dack Fayden
+Island x3
+Mountain x12
+
+[Bot2 Deck]
+Mox Ruby
+Sol Ring
+Detonate
+Mountain x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Battlefield.Dack Fayden.Activate(Ability: Gain control; Bot2.Battlefield.Sol Ring)
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Detonate.Cast(X: 1)
+Bot2.Target(Bot1.Battlefield.Sol Ring)
+? Bot2.Mana =
+[T6 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Detonate; Sol Ring
+Bot1.Life = 19
+Bot2.Life = 20

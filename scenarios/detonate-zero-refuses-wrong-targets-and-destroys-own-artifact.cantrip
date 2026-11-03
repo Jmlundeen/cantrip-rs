@@ -1,0 +1,30 @@
+# X zero costs {R}, refuses a land and a one-mana artifact, and can destroy its controller's zero-mana artifact (CR 107.3a).
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Ruby
+Detonate
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Detonate.Cast(X: 0)
+! Bot1.Target(Mountain)
+! Bot1.Target(Sol Ring)
+Bot1.Target(Bot1.Battlefield.Mox Ruby)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Detonate; Mox Ruby
+Bot1.Battlefield = Mountain; Sol Ring
+Bot1.Life = 20
+Bot2.Life = 20

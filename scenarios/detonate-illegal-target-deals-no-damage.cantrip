@@ -1,0 +1,45 @@
+# Returning the targeted artifact in response makes Detonate's only target illegal, so it deals no damage (CR 608.2b).
+# A second copy resolves on a legal target to exercise the spell's effect.
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Detonate
+Detonate
+Island x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Gingerbrute
+Unsummon
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Gingerbrute.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Detonate.Cast(X: 1)
+Bot1.Target(Bot2.Battlefield.Gingerbrute)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Gingerbrute)
+[T3 Bot1.Main2]
+? Bot2.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Detonate.Cast(X: 0)
+Bot1.Target(Bot1.Battlefield.Mox Ruby)
+? Bot1.Mana =
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Detonate; Mox Ruby; Detonate
+Bot2.Graveyard = Unsummon
+Bot1.Life = 20
+Bot2.Life = 20

@@ -1,0 +1,25 @@
+# A regeneration shield from Welding Jar cannot save the artifact Detonate destroys (CR 701.19a).
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Welding Jar
+Detonate
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Welding Jar.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Detonate.Cast(X: 0)
+Bot1.Target(Mox Ruby)
+Bot1.Battlefield.Welding Jar.Activate(Mox Ruby)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Detonate; Mox Ruby; Welding Jar
+Bot1.Battlefield = Mountain
+Bot1.Life = 20

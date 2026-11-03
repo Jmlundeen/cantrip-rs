@@ -1,0 +1,6 @@
+{
+  "name": "Detonate",
+  "manaCost": "{X}{R}",
+  "type": "Sorcery",
+  "oracleText": "Destroy target artifact with mana value X. It can't be regenerated. Detonate deals X damage to that artifact's controller."
+}
