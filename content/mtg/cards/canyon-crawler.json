@@ -1,0 +1,11 @@
+{
+  "name": "Canyon Crawler",
+  "manaCost": "{4}{B}{B}",
+  "type": "Creature — Spider Beast",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Deathtouch\nWhen this creature enters, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\nSwampcycling {2} ({2}, Discard this card: Search your library for a Swamp card, reveal it, put it into your hand, then shuffle.)",
+  "keywords": [
+    "Deathtouch"
+  ]
+}

@@ -1,0 +1,33 @@
+# Canyon Crawler costs {4}{B}{B}; Black Lotus (BBB), Mox Jet, Mox Ruby and Mox Sapphire pay for it on turn 1. It has deathtouch, and
+# when it enters it creates a Food token (CR 111.10b), an artifact under its controller's control.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Canyon Crawler
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Canyon Crawler.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Canyon Crawler; Food Token
+Bot1.Battlefield.Canyon Crawler.Keywords = Deathtouch
+Bot1.Battlefield.Food Token.Types = Artifact
