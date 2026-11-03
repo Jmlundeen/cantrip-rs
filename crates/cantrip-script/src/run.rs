@@ -1094,8 +1094,11 @@ impl<'s> Run<'s> {
             (RequestKind::PayCosts { assist: AssistStep::HelperAnnounces, .. }, None) => {
                 self.assisting = Some(Casting::new(request.player, None, spend_of(step)?));
             }
+            // `Bot1.PayCost(Convoke: Memnite, Ornithopter)`: the artifacts and creatures tapped to pay a waterbend cost (CR 701.67a).
             (RequestKind::UnlessPays { .. }, Some(ActionKind::PayCost)) => {
-                self.casting = Some(Casting::new(request.player, None, spend_of(step)?));
+                let mut casting = Casting::new(request.player, None, spend_of(step)?);
+                casting.plan.convoke = names_of(step, "Convoke");
+                self.casting = Some(casting);
             }
             (_, Some(ActionKind::ActivateAbility)) => {
                 if self.casting.is_some() {
