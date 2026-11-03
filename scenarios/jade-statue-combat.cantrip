@@ -1,0 +1,46 @@
+# Jade Statue animates only during combat as a 3/6 Golem artifact creature and reverts after combat (CR 611.2a, 500.1).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Jade Statue
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jade Statue.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Jade Statue.Activate
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Jade Statue.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jade Statue.Types = Artifact; Creature
+? Bot1.Battlefield.Jade Statue.Subtypes = Golem
+? Bot1.Battlefield.Jade Statue.Power = 3
+? Bot1.Battlefield.Jade Statue.Toughness = 6
+Bot1.Attack(Jade Statue > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Jade Statue.Types = Artifact
+Bot1.Battlefield.Jade Statue.Power = (absent)

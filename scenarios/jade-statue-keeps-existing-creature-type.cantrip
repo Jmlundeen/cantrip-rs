@@ -1,0 +1,51 @@
+# Donatello makes Jade Statue a Robot; its own animation replaces that creature type with Golem until end of combat (CR 205.1b).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Jade Statue
+Donatello, Mutant Mechanic
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Donatello, Mutant Mechanic.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jade Statue.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Donatello, Mutant Mechanic.Activate(Jade Statue)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jade Statue.Subtypes = Robot
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Jade Statue.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jade Statue.Subtypes = Golem
+? Bot1.Battlefield.Jade Statue.Power = 6
+? Bot1.Battlefield.Jade Statue.Toughness = 9
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jade Statue.Subtypes = Robot
+Bot1.Battlefield.Jade Statue.Power = 3
+Bot1.Battlefield.Jade Statue.Toughness = 3
