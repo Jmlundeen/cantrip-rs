@@ -1,23 +1,18 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, sacrifice_chosen, targets, tokens};
+use cantrip_mechanics::{choose, sacrifice_chosen, select, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// +2: "Discard up to two cards, then draw that many cards." The cards are discarded together (CR 701.9) and as many
 /// are drawn as were discarded, so choosing none draws none.
 fn plus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
-    let answer = choose::cards(g, item.controller, item.object, Purpose::Discard, hand.clone(), 2, true)?;
-    let chosen: Vec<ObjectId> = hand.into_iter().filter(|c| answer.contains(c)).collect();
+    let chosen = choose::select(g, item.controller, item.object, Purpose::Discard, hand, select::cards(select::up_to(2)))?;
     if chosen.is_empty() {
         return Ok(());
     }
-    g.discard_together(&chosen);
-    g.draw(item.controller, chosen.len() as u32);
+    let discarded = g.discard_together(&chosen);
+    g.draw(item.controller, discarded.len() as u32);
     Ok(())
-}
-
-fn artifact_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard(q, asker, t, &[CardType::Artifact])
 }
 
 fn is_artifact(c: &Chars) -> bool {
@@ -78,7 +73,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(2), plus_two, "+2: Discard up to two cards, then draw that many cards."),
         ability(loyalty(-2), minus_two, "\u{2212}2: Sacrifice an artifact. If you do, return target artifact card from your graveyard to the battlefield.")
-            .targets(&[target(artifact_card_in_your_graveyard)]),
+            .targets(&[targets::ARTIFACT_CARD_IN_YOUR_GRAVEYARD]),
         ability(loyalty(-10), make_emblem, "\u{2212}10: You get an emblem with \"Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at the beginning of the next end step.\""),
     ],
     ..oracle::DARETTI_SCRAP_SAVANT

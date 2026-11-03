@@ -2,11 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
-/// "Target artifact card in your graveyard."
-fn artifact_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard(q, asker, t, &[CardType::Artifact])
-}
-
 /// "It's a 3/3 Robot artifact creature with flying": what a card that was not an artifact creature enters as (CR 614.12, 205.1b,
 /// 613.1d, 613.4b), from the moment it enters, so what watches creatures enter sees it. It keeps its other card types (a land
 /// stays a land), loses its creature types and is a Robot.
@@ -39,7 +34,7 @@ static MODAL: ModalDef = modes(&[
         return_the_artifact,
         "Choose target artifact card in your graveyard. Return it to the battlefield if it's an artifact creature card. Otherwise, return it to the battlefield and it's a 3/3 Robot artifact creature with flying.",
     )
-    .targets(&[target(artifact_card_in_your_graveyard)]),
+    .targets(&[targets::ARTIFACT_CARD_IN_YOUR_GRAVEYARD]),
 ])
 .choose(1, 2);
 

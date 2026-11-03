@@ -41,6 +41,7 @@ Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Sapphire#2.Activate
 ! Bot1.Target(Island)
 ! Bot1.Target(Black Lotus)
+! Bot1.Target(Sol Ring; Mox Jet; Mox Pearl)
 Bot1.Target(Sol Ring)
 Bot1.Pass
 Bot2.Pass

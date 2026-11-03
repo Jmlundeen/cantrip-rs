@@ -42,6 +42,18 @@ Bot1.Battlefield.Mox Jet.Activate
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Does Machines.ClassLevel = 2
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Mox Sapphire#1.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Mox Sapphire#2.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Mox Jet.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Mox Pearl.Counters.PlusOnePlusOne = (absent)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Mox Sapphire#1.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Mox Sapphire#2.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Mox Jet.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Mox Pearl.Counters.PlusOnePlusOne = (absent)
 [T5 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Does Machines.Activate(Ability: Level 3)

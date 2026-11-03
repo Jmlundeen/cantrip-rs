@@ -2,10 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::targets::{self, card_in_your_graveyard};
 use cantrip_oracle as oracle;
 
-fn artifact_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    card_in_your_graveyard(q, asker, t, &[CardType::Artifact])
-}
-
 fn enchantment_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     card_in_your_graveyard(q, asker, t, &[CardType::Enchantment])
 }
@@ -22,7 +18,7 @@ fn return_those_cards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 /// "Choose up to two." (CR 700.2): the modes only name their targets, a card of that type in your graveyard each (CR 700.2c); the
 /// instruction before them is done once to all of them (`ModalDef::shared`).
 static MODAL: ModalDef = modes(&[
-    mode(no_effect, "Target artifact card.").targets(&[target(artifact_card_in_your_graveyard)]),
+    mode(no_effect, "Target artifact card.").targets(&[targets::ARTIFACT_CARD_IN_YOUR_GRAVEYARD]),
     mode(no_effect, "Target creature card.").targets(&[targets::CREATURE_CARD_IN_YOUR_GRAVEYARD]),
     mode(no_effect, "Target enchantment card.").targets(&[target(enchantment_card_in_your_graveyard)]),
     mode(no_effect, "Target land card.").targets(&[targets::LAND_CARD_IN_YOUR_GRAVEYARD]),

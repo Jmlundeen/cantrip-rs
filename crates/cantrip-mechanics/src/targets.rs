@@ -1118,6 +1118,14 @@ pub fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target, types: &[
     }
 }
 
+/// "Target artifact card from your graveyard" (CR 115.1, 404.1): Argivian Archaeologist,
+/// Call Damage Control, Daretti, Scrap Savant, Does Machines, Emry and Brilliance Unleashed use the same restriction.
+fn artifact_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard(q, asker, t, &[CardType::Artifact])
+}
+
+pub const ARTIFACT_CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(artifact_card_in_your_graveyard);
+
 fn creature_card_in_your_graveyard_with_mana_value_x_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     card_in_your_graveyard(q, asker, t, &[CardType::Creature]) && matches!(t, Target::Object(id) if mana_value_is_x(q, id))
 }

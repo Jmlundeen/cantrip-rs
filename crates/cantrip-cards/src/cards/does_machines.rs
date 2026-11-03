@@ -12,11 +12,6 @@ fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Target artifact cards from your graveyard" (CR 115.1), up to two.
-fn artifact_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard(q, asker, t, &[CardType::Artifact])
-}
-
 /// "Return up to two target artifact cards from your graveyard to your hand": the ones still legal, together.
 fn return_artifacts(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let returning = targets::legal_objects(g, item);
@@ -43,7 +38,7 @@ pub static CARD: CardDef = CardDef {
         class::level_three("{4}{U}", "{4}{U}: Level 3"),
         triggered(THIS_ENTERS, loot, "When this Class enters, mill two cards, draw two cards, then discard two cards."),
         triggered(class::BECOMES_LEVEL_TWO, return_artifacts, "When this Class becomes level 2, return up to two target artifact cards from your graveyard to your hand.")
-            .targets(&[up_to(2, artifact_card_in_your_graveyard)]),
+            .targets(&[up_to(2, targets::ARTIFACT_CARD_IN_YOUR_GRAVEYARD.filter)]),
         triggered(when(EventMask::STEP_BEGAN, combat_at_level_three), effects::three_counters_and_becomes_robot, "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it isn't a creature, it becomes a 0/0 Robot creature in addition to its other types.")
             .targets(&[targets::ARTIFACT_YOU_CONTROL]),
     ],

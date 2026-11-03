@@ -1,5 +1,5 @@
 # Four Moxen pay for Daretti, Scrap Savant on turn 1. His +2 discards up to two cards and draws that many: Bot1 discards
-# Mox Emerald and an Island (loyalty 5). On turn 3 his -2 has Bot1 sacrifice an artifact of their choice (Mox Pearl, of
+# Mox Emerald and an Island (loyalty 5) on turn 3, with a third card refused. On turn 5 his -2 sacrifices a Mox Pearl (of
 # four) and, since they did, return the Mox Emerald from the graveyard to the battlefield (loyalty 3).
 
 [Bot1 Deck]
@@ -25,17 +25,22 @@ Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Daretti, Scrap Savant.Cast
+[T3 Bot1.Main1]
 Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mox Emerald; Island; Island#2)
 Bot1.Choose(Mox Emerald; Island)
-[T1 Bot1.Main2]
+[T3 Bot1.Main2]
 ? Bot1.Graveyard = Island; Mox Emerald
 ? Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 5
-[T3 Bot1.Main1]
+[T5 Bot1.Main1]
 Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Sacrifice an artifact; Bot1.Graveyard.Mox Emerald)
 Bot1.Choose(Mox Pearl)
-[T3 Bot1.Main2]
+[T5 Bot1.Main2]
 ? Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 3
 
 [Expect]
 Bot1.Graveyard = Mox Pearl; Island
 Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 3
+Bot1.Battlefield.Mox Emerald.Tapped = false

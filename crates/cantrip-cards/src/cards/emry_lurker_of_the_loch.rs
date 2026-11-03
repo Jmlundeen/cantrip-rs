@@ -9,9 +9,6 @@ fn mill_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn artifact_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    cantrip_mechanics::targets::card_in_your_graveyard(q, asker, t, &[CardType::Artifact])
-}
 
 /// {T}: choose target artifact card in your graveyard. You may cast that card this turn: it stays in the graveyard, and
 /// costs and timing are as usual (CR 601.3).
@@ -27,7 +24,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, mill_four, "When Emry, Lurker of the Loch enters, mill four cards."),
         ability(TAP, allow_cast, "{T}: Choose target artifact card in your graveyard. You may cast that card this turn.")
-            .targets(&[target(artifact_card_in_your_graveyard)]),
+            .targets(&[targets::ARTIFACT_CARD_IN_YOUR_GRAVEYARD]),
     ],
     ..oracle::EMRY_LURKER_OF_THE_LOCH
 };
