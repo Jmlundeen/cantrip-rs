@@ -1,0 +1,11 @@
+{
+  "name": "Pixie Queen",
+  "manaCost": "{2}{G}{G}",
+  "type": "Creature — Faerie",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying\n{G}{G}{G}, {T}: Target creature gains flying until end of turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

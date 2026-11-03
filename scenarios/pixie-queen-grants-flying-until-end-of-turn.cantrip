@@ -1,0 +1,67 @@
+# Pixie Queen flies and gives either player's creature flying for one turn by paying {G}{G}{G} and tapping (CR 702.9b, 611.2a).
+[Bot1 Deck]
+Pixie Queen
+Black Lotus
+Mox Pearl
+Mox Emerald x3
+Memnite
+Forest x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pixie Queen.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+! Bot1.Battlefield.Pixie Queen.Activate(Bot1.Battlefield.Mox Pearl)
+Bot1.Battlefield.Pixie Queen.Activate(Bot1.Battlefield.Memnite)
+? Bot1.Mana =
+? Bot1.Battlefield.Pixie Queen.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Keywords = Flying
+Bot1.Attack(Memnite > Bot2)
+! Bot2.Block(Memnite > Bot1.Battlefield.Memnite)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Pixie Queen.Activate(Bot2.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Keywords = Flying
+[T6 Bot2.Main1]
+? Bot2.Battlefield.Memnite.Keywords = (absent)
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Pixie Queen > Bot2)
+! Bot2.Block(Memnite > Pixie Queen)
+[T7 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Memnite.Keywords = (absent)
+Bot1.Battlefield.Pixie Queen.Keywords = Flying
