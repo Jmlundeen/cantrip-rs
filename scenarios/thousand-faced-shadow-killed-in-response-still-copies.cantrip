@@ -1,0 +1,46 @@
+# The Shadow is killed with its trigger on the stack: it was attacking as it last existed, so the intervening "if it's attacking" still holds as the trigger resolves and the copy is made (CR 603.4, 608.2h, 506.4).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Ornithopter
+Ornithopter
+Grizzly Bears
+Thousand-Faced Shadow
+Island x20
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ornithopter#1; Ornithopter#2; Grizzly Bears > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thousand-Faced Shadow.Activate(Ability: Ninjutsu)
+Bot1.Choose(Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Thousand-Faced Shadow)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Thousand-Faced Shadow; Black Lotus; Black Lotus
+Bot1.Battlefield.Grizzly Bears#2.Token = true
+Bot1.Battlefield.Grizzly Bears#2.Tapped = true
+Combat.Attackers.Count = 3

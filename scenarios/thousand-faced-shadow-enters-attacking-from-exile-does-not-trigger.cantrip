@@ -1,0 +1,39 @@
+# Flickered while Kira Nerys attacks, the Shadow returns from exile tapped and attacking: it is attacking as it enters, but not from your hand, so it does not trigger (CR 603.2, 603.4, 508.4, 614.1a).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Kira Nerys, Firebrand
+Thousand-Faced Shadow
+Ornithopter
+Ephemerate
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thousand-Faced Shadow.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kira Nerys, Firebrand.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Kira Nerys, Firebrand; Ornithopter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.Thousand-Faced Shadow)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Thousand-Faced Shadow.Tapped = true
+Bot1.Battlefield.Thousand-Faced Shadow.Power = 2
+Bot1.Battlefield.Count = 5
+Combat.Attackers.Count = 3
+Stack.Count = 0
