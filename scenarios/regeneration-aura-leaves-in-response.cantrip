@@ -1,0 +1,42 @@
+# The ability uses the Aura's last known attachment when the Aura is destroyed before resolution (CR 303.4m, 608.2h).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Regeneration
+Shock
+Island x20
+[Bot2 Deck]
+Black Lotus
+Disenchant
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Regeneration.Cast(Bot1.Battlefield.Grizzly Bears)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Regeneration.Activate
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Regeneration)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Grizzly Bears)
+[T2 Bot2.End]
+[Expect]
+Bot1.Battlefield.Regeneration = (absent)
+Bot1.Battlefield.Grizzly Bears.Tapped = true
+Bot1.Battlefield.Grizzly Bears.Damage = 0

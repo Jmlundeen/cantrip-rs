@@ -1,0 +1,46 @@
+# Regeneration enchants a creature and its green ability shields that creature from destruction this turn (CR 702.5a, 701.19a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Regeneration
+Shock
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Regeneration.Cast(Bot1.Battlefield.Island)
+Bot1.Hand.Regeneration.Cast(Bot1.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Regeneration.AttachedTo = Grizzly Bears
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Regeneration.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Tapped = true
+Bot1.Battlefield.Grizzly Bears.Damage = 0
