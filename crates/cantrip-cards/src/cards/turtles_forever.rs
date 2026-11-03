@@ -28,7 +28,7 @@ fn search_reveal_and_split(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
     let found = if let Answer::Cards(cards) = g.ask(you, request)? { cards } else { Vec::new() };
     g.searched(you, you);
     g.reveal(you, &found);
-    let taken = choose::opponent_chooses(g, you, item.object, found.clone(), 2)?;
+    let taken = choose::opponent_chooses(g, you, item.object, Purpose::PutIntoHand, found.clone(), 2)?;
     let (from_outside, from_library): (Vec<ObjectId>, Vec<ObjectId>) = taken.iter().partition(|&&card| outside.contains(&card));
     g.bring_into_hand_revealed(&from_outside);
     let moves: Vec<(ObjectId, Zone)> = from_library.iter().map(|&card| (card, Zone::hand(you))).collect();

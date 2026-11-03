@@ -13,7 +13,7 @@ fn reveal_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     g.reveal(you, &revealed);
-    let taken = choose::opponent_chooses_one(g, you, item.object, revealed.clone())?.unwrap_or(revealed[0]);
+    let taken = choose::opponent_chooses_one(g, you, item.object, Purpose::PutIntoHand, revealed.clone())?.unwrap_or(revealed[0]);
     g.return_to_hand_revealed(&[taken]);
     for &other in &revealed {
         if other != taken {

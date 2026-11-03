@@ -13,7 +13,7 @@ fn reveal_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     };
     g.reveal(you, &[first, second]);
-    if let Some(card) = choose::opponent_chooses_one(g, you, item.object, vec![first, second])? {
+    if let Some(card) = choose::opponent_chooses_one(g, you, item.object, Purpose::PutIntoHand, vec![first, second])? {
         g.bring_into_hand_revealed(&[card]);
     }
     Ok(())
