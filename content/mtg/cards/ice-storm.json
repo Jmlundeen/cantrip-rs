@@ -1,0 +1,6 @@
+{
+  "name": "Ice Storm",
+  "manaCost": "{2}{G}",
+  "type": "Sorcery",
+  "oracleText": "Destroy target land."
+}
