@@ -1,0 +1,65 @@
+# Ty Lee, Artful Acrobat {2}{R} (prowess): "Whenever Ty Lee attacks, you may pay {1}. When you do, target creature can't block this turn."
+# Turn 3: Ty Lee attacks and Bot1 pays {1} (Mox Jet); Ty Lee herself is also a legal target, so Bot1 is asked, and an Ornithopter is
+# the one chosen. Bot2's refused block shows it can't block; Ty Lee deals 3 (20 -> 17). Turn 5: Bot1 declines, nothing is paid and no
+# trigger follows, so the Ornithopter blocks and dies to Ty Lee's 3 damage, Bot2 staying at 17.
+
+[Bot1 Deck]
+Ty Lee, Artful Acrobat
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ty Lee, Artful Acrobat.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ty Lee, Artful Acrobat > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.PayCost
+! Bot1.Target(Mox Jet)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+! Bot2.Block(Ornithopter > Ty Lee, Artful Acrobat)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Bot2.Battlefield.Count = 1
+[T5 Bot1.Main1]
+Bot1.Attack(Ty Lee, Artful Acrobat > Bot2)
+Bot1.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+Bot2.Block(Ornithopter > Ty Lee, Artful Acrobat)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield.Mox Jet.Tapped = false
