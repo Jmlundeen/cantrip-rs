@@ -1917,10 +1917,16 @@ pub fn plus_one_counter_on_target(g: &mut dyn Game, item: &StackItem) -> Result<
 /// chosen. `put_its_counters_on_target` is the ability's own source; Donatello, Mutant Mechanic's is the artifact that died.
 pub fn put_counters_of_on_target(g: &mut dyn Game, item: &StackItem, from: ObjectId) -> Result<(), Suspend> {
     let Some(target) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    put_counters_of_on(g, from, target);
+    Ok(())
+}
+
+/// The counters `from` had as it last existed put on `target`, every kind together as one event (CR 122.6, 603.10a): Donatello,
+/// Mutant Mechanic's target and Buzzard-Wasp Colony's own permanent are `target`.
+pub fn put_counters_of_on(g: &mut dyn Game, from: ObjectId, target: ObjectId) {
     let counters = g.obj(from).counter_array();
     let puts: Vec<(ObjectId, CounterKind, i16)> = CounterKind::ALL.into_iter().map(|kind| (target, kind, counters[kind as usize])).collect();
     g.add_counters_together(&puts);
-    Ok(())
 }
 
 /// "When this creature dies, put its counters on [up to one] target creature" (see `put_counters_of_on_target`). Essence
