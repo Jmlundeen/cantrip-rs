@@ -1,0 +1,59 @@
+# Both blockers and Sengir Vampire die simultaneously; both death triggers still go on the stack (CR 603.10a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Sengir Vampire
+Mox Ruby
+Shock
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Wind Drake
+Wind Drake
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Sengir Vampire.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot2.Hand.Wind Drake.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Wind Drake.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Sengir Vampire > Bot2)
+Bot2.Block(Wind Drake#1 > Sengir Vampire; Wind Drake#2 > Sengir Vampire)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard.Sengir Vampire.Power = 4
+Bot2.Graveyard.Wind Drake#1.Power = 2
+Bot2.Graveyard.Wind Drake#2.Power = 2

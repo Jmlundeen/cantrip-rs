@@ -1,0 +1,63 @@
+# Sengir Vampire flies over ground creatures and gets a counter when a creature it damaged dies (CR 702.9b, 603.2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Sengir Vampire
+Mox Ruby
+Shock
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Wind Drake
+Grizzly Bears
+Mox Emerald
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Sengir Vampire.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Wind Drake.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Sengir Vampire > Bot2)
+! Bot2.Block(Grizzly Bears > Sengir Vampire)
+Bot2.Block(Wind Drake > Sengir Vampire)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Sengir Vampire.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Sengir Vampire.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Sengir Vampire.Power = 5
+Bot2.Graveyard = Grizzly Bears; Wind Drake; Black Lotus
