@@ -1,0 +1,6 @@
+{
+  "name": "Aladdin's Ring",
+  "manaCost": "{8}",
+  "type": "Artifact",
+  "oracleText": "{8}, {T}: This artifact deals 4 damage to any target."
+}
