@@ -1,0 +1,34 @@
+# An enchanted attacking creature's combat damage to the defending Enchanted Being is prevented (CR 615.1).
+[Bot1 Deck]
+Forest
+Black Lotus
+Grizzly Bears
+Rancor
+Island x18
+
+[Bot2 Deck]
+Black Lotus
+Enchanted Being
+Plains x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Rancor.Cast(Grizzly Bears)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Enchanted Being.Cast
+? Bot2.Mana =
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot2.Block(Enchanted Being > Grizzly Bears)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Enchanted Being.Damage = 0
+Bot1.Graveyard = Grizzly Bears; Black Lotus
+Bot2.Life = 18
+Prevented = 2 Grizzly Bears > Enchanted Being by Enchanted Being

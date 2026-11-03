@@ -1,0 +1,8 @@
+{
+  "name": "Enchanted Being",
+  "manaCost": "{1}{W}{W}",
+  "type": "Creature — Human",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Prevent all combat damage that would be dealt to this creature by enchanted creatures."
+}
