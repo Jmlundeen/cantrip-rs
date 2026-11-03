@@ -1,0 +1,8 @@
+{
+  "name": "Scavenging Ghoul",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Zombie",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "At the beginning of each end step, put a corpse counter on this creature for each creature that died this turn.\nRemove a corpse counter from this creature: Regenerate this creature."
+}
