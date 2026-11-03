@@ -1,0 +1,57 @@
+# Sleight of Mind changes both instances of red to blue: protection and the opposing-permanent condition follow the new word (CR 612.2).
+[Bot1 Deck]
+Ivory Guardians
+Black Lotus x2
+Mox Sapphire
+Sleight of Mind
+Plains x20
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Boros Swiftblade
+Mox Sapphire
+Merfolk of the Pearl Trident
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ivory Guardians.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Boros Swiftblade.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ivory Guardians.Power = 4
+? Bot1.Battlefield.Ivory Guardians.ProtectionFrom = Red
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.Ivory Guardians)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+Bot1.Colors(Blue)
+? Bot1.Battlefield.Ivory Guardians.Power = 3
+? Bot1.Battlefield.Ivory Guardians.ProtectionFrom = Blue
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Merfolk of the Pearl Trident.Cast
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Ivory Guardians.Power = 4
+Bot1.Battlefield.Ivory Guardians.Toughness = 4
+Bot1.Battlefield.Ivory Guardians.ProtectionFrom = Blue

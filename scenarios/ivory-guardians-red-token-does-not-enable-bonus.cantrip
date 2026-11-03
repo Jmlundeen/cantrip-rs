@@ -1,0 +1,59 @@
+# A red token, a green creature and colorless permanents do not enable the bonus; a nontoken red creature does (CR 604.1).
+
+[Bot1 Deck]
+Ivory Guardians
+Black Lotus x2
+Plains x20
+
+[Bot2 Deck]
+Kher Keep
+Mox Ruby
+Sol Ring
+Mountain
+Fanatical Firebrand
+Mox Emerald
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ivory Guardians.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Kher Keep.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ivory Guardians.Power = 3
+[T4 Bot2.Main1]
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Kher Keep.Activate(Ability: Create)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Kobolds of Kher Keep.Token = true
+? Bot1.Battlefield.Ivory Guardians.Power = 3
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Fanatical Firebrand.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ivory Guardians.Power = 4
+Bot1.Battlefield.Ivory Guardians.Toughness = 4

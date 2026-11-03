@@ -1,0 +1,76 @@
+# Two Guardians each grant +1/+1 when an opponent controls red nontoken permanents; a second red permanent does not multiply either bonus, protection refuses a red spell, and a white Aura can enchant a Guardian (CR 702.16b, 613.1g).
+
+[Bot1 Deck]
+Ivory Guardians x2
+Black Lotus x4
+Ornithopter
+Sentinel's Eyes
+Plains x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Fanatical Firebrand x2
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ivory Guardians.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ivory Guardians.Power = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Fanatical Firebrand.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ivory Guardians.Power = 4
+? Bot1.Battlefield.Ivory Guardians.Toughness = 4
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Fanatical Firebrand.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ivory Guardians.Power = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ivory Guardians.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ivory Guardians#1.Power = 5
+? Bot1.Battlefield.Ivory Guardians#2.Toughness = 5
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ivory Guardians#1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sentinel's Eyes.Cast(Bot1.Battlefield.Ivory Guardians#1)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ivory Guardians#1.Power = 6
+Bot1.Battlefield.Ivory Guardians#2.Power = 5
+Bot1.Graveyard.Ornithopter.Power = 0

@@ -1,0 +1,48 @@
+# A controller's red permanent does not satisfy its own Guardian, but activates the opponent's Guardian, whose bonus applies to both players' Guardians (CR 109.5, 604.1).
+
+[Bot1 Deck]
+Ivory Guardians
+Black Lotus x2
+Mox Ruby
+Fanatical Firebrand
+Plains x20
+
+[Bot2 Deck]
+Ivory Guardians
+Black Lotus x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ivory Guardians.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ivory Guardians.Power = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ivory Guardians.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ivory Guardians.Power = 4
+Bot1.Battlefield.Ivory Guardians.Toughness = 4
+Bot2.Battlefield.Ivory Guardians.Power = 4
+Bot2.Battlefield.Ivory Guardians.Toughness = 4
