@@ -1,0 +1,20 @@
+# Deathlace makes a creature spell black and the effect carries to the permanent it becomes (CR 400.7a, 611.2a).
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Llanowar Elves
+Deathlace
+Island x16
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Deathlace.Cast(Stack.Llanowar Elves)
+? Bot1.Mana =
+[T1 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Colors = Black

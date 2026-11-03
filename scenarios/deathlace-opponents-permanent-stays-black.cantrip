@@ -1,0 +1,24 @@
+# Deathlace can target an opponent's green permanent, replacing its color without a turn limit (CR 611.2a, 613.1e).
+[Bot1 Deck]
+Mox Jet
+Deathlace
+Island x18
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Deathlace.Cast(Bot2)
+! Bot1.Hand.Deathlace.Cast(Bot2.Hand.Forest)
+Bot1.Hand.Deathlace.Cast(Bot2.Battlefield.Llanowar Elves)
+? Bot1.Mana =
+[T4 Bot2.Main1]
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Colors = Black

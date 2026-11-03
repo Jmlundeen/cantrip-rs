@@ -1,0 +1,34 @@
+# Returning the sole target to its owner's hand makes Deathlace fail to resolve; a second copy colors a legal permanent (CR 608.2b).
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Llanowar Elves
+Deathlace
+Deathlace
+Island x15
+[Bot2 Deck]
+Mox Sapphire
+Unsummon
+Island x18
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Deathlace.Cast(Bot1.Battlefield.Llanowar Elves)
+? Bot1.Mana =
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Deathlace.Cast(Bot1.Battlefield.Mox Emerald)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Hand.Llanowar Elves.Colors = Green
+Bot1.Battlefield.Mox Emerald.Colors = Black
+Bot1.Graveyard = Deathlace; Deathlace
