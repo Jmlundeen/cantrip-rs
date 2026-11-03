@@ -1,0 +1,39 @@
+# Waterbend {2} is two generic mana, each a tap of an untapped artifact or creature (CR 701.67a-b): with only Memnite to tap (Black Lotus is sacrificed and the Island spent on the
+# Lesson's {3}{U}) paying is not offered, though Bot1 would decline anyway, and a card is discarded: an Island, so the three drawn cards are all in hand.
+
+[Bot1 Deck]
+Black Lotus
+Island
+Memnite
+Waterbending Lesson
+Island
+Island
+Island
+Mox Jet
+Mox Pearl
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Waterbending Lesson.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.PayCost
+Bot1.Choose(Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Hand.Mox Jet.Power = (absent)
+Bot1.Graveyard = Waterbending Lesson; Island; Black Lotus
+Bot1.Battlefield.Memnite.Tapped = false

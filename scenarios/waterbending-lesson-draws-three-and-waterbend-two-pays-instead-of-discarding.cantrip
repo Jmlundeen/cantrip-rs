@@ -1,0 +1,42 @@
+# Waterbending Lesson: draw three cards (Mox Jet, Mox Pearl, Mox Ruby), then Bot1 may waterbend {2} (CR 701.67a-b) instead of discarding: Memnite and Ornithopter are tapped for it
+# and nothing is discarded, so the hand holds the two Islands left and the three drawn. Black Lotus and the Island pay the Lesson's {3}{U} first, so only the tapping pays the waterbend.
+
+[Bot1 Deck]
+Black Lotus
+Island
+Memnite
+Ornithopter
+Waterbending Lesson
+Island
+Island
+Mox Jet
+Mox Pearl
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Waterbending Lesson.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost(Convoke: Memnite, Ornithopter)
+? Bot1.Mana =
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Hand.Mox Jet.Power = (absent)
+Bot1.Graveyard = Waterbending Lesson; Black Lotus
+Bot1.Battlefield.Memnite.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
