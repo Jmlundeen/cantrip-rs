@@ -24,3 +24,31 @@ pub fn put_on_creature_you_control(g: &mut dyn Game, item: &StackItem, kind: Cou
     }
     Ok(())
 }
+
+/// "Distribute `n` `kind` counters among any number of `among`" (CR 122.1, 608.2d): as the effect resolves, its controller decides
+/// where each of the `n` counters goes, one at a time, among the creatures listed, not targeting them. A creature may get several and
+/// the rest none; all `n` go on (a lone creature is taken without a question), and with none listed nothing is distributed. They are put
+/// on together (CR 101.4: one event, so a "one or more counters" ability triggers once). It is not 601.2d's distribution among targets,
+/// which is fixed as the spell is cast (`counters_divided`). Crashing Wave (three stun counters among tapped creatures its
+/// controller's opponents control), Feast of the Victorious Dead and Blessing of Frost print it with +1/+1 counters among creatures
+/// their controller controls.
+pub fn distribute(g: &mut dyn Game, controller: PlayerId, source: ObjectId, among: &[ObjectId], kind: CounterKind, n: u8) -> Result<(), Suspend> {
+    let mut puts: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
+    for _ in 0..n {
+        let chosen = match among {
+            [] => return Ok(()),
+            [only] => Some(*only),
+            _ => {
+                let rule = select::Selection::of(select::exactly(1), &[select::CREATURE]).called("creature");
+                choose::select(g, controller, source, Purpose::PutCounters(kind, 1), among.to_vec(), rule)?.first().copied()
+            }
+        };
+        let Some(creature) = chosen else { continue };
+        match puts.iter_mut().find(|(object, ..)| *object == creature) {
+            Some((.., counters)) => *counters += 1,
+            None => puts.push((creature, kind, 1)),
+        }
+    }
+    g.add_counters_together(&puts);
+    Ok(())
+}
