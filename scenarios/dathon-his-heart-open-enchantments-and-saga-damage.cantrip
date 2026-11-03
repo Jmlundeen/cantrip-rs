@@ -47,11 +47,13 @@ Bot1.Hand.Authority of the Consuls.Cast
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Pass
 Bot1.Pass
+? Bot1.Hand.Count = 3
 Bot1.Hand.Kumano Faces Kakkazan.Cast
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Pass
 Bot1.Pass
 Bot1.Pass
+? Bot1.Hand.Count = 3
 ! Bot1.Battlefield.Dathon, His Heart Open.Activate(Bot2.Battlefield.Authority of the Consuls; Ability: {2})
 ! Bot1.Battlefield.Dathon, His Heart Open.Activate(Bot1.Battlefield.Mox Emerald; Ability: {2})
 Bot1.Battlefield.Dathon, His Heart Open.Activate(Kumano Faces Kakkazan; Ability: {2})

@@ -2016,6 +2016,17 @@ pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
 pub const ANOTHER_CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, another_creature_dies);
 pub const CREATURE_YOU_CONTROL_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_dies);
 pub const ANOTHER_CREATURE_YOU_CONTROL_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_dies);
+/// "Whenever you cast an enchantment spell" (CR 603.2): the spell is the subject. Verduran Enchantress and Dathon, His Heart Open print it.
+pub fn you_cast_an_enchantment(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. }
+            if *player == me.controller && q.chars(*spell).is(CardType::Enchantment) => Fired::about(Target::Object(*spell)),
+        _ => None,
+    }
+}
+
+pub const ENCHANTMENT_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_an_enchantment);
+
 pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, artifact_spell_you_cast);
 pub const CREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, creature_spell_you_cast);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player_subject);
