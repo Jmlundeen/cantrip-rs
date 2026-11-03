@@ -1,0 +1,44 @@
+# A player with 0 card(s) left mills what remains and does not lose by drawing (CR 701.17a).
+[Bot1 Deck]
+Millstone
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Island
+Island
+Forest
+Plains
+Swamp x20
+
+[Bot2 Deck]
+Mountain x7
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Millstone.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Millstone.Activate(Bot1.Battlefield.Mox Pearl)
+Bot1.Battlefield.Millstone.Activate(Bot2)
+? Bot1.Mana =
+? Bot1.Battlefield.Millstone.Tapped = true
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+[Expect]
+Bot2.Library.Count = 0
+Bot2.Graveyard.Count = 0
+Result = InProgress

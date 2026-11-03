@@ -1,0 +1,6 @@
+{
+  "name": "Millstone",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "{2}, {T}: Target player mills two cards."
+}
