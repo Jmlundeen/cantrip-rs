@@ -1,0 +1,60 @@
+# "{T}: Untap another target permanent you control" (CR 701.26b, 115.1): the target is any other permanent of Bot1's. Turn 3: Mox Sapphire (an artifact), tapped
+# for mana, is untapped by Patrol and taps for mana again ({U}{U} in all). Turn 5: Ornithopter (a creature) attacks and is untapped after combat. Patrol itself
+# is refused as its own target (another), and so are Bot2's tapped Mox Jet and Bot2's own Memnite (you control).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+North Pole Patrol
+Ornithopter
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Memnite
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.North Pole Patrol.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}
+! Bot1.Battlefield.North Pole Patrol.Activate(North Pole Patrol; Ability: Untap)
+! Bot1.Battlefield.North Pole Patrol.Activate(Bot2.Battlefield.Mox Jet; Ability: Untap)
+! Bot1.Battlefield.North Pole Patrol.Activate(Bot2.Battlefield.Memnite; Ability: Untap)
+? Bot2.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.North Pole Patrol.Activate(Bot1.Battlefield.Mox Sapphire; Ability: Untap)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}{U}
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+? Bot1.Battlefield.Ornithopter.Tapped = true
+[T5 Bot1.Main2]
+Bot1.Battlefield.North Pole Patrol.Activate(Bot1.Battlefield.Ornithopter; Ability: Untap)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.North Pole Patrol.Tapped = true
