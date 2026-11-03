@@ -1,0 +1,53 @@
+# Lo and Li, Twin Tutors: "Lesson spells you control have lifelink." The search finds the Lesson (Ozai's Cruelty) rather than the
+# Noble (Mai) beside it. On turn 3 Bot1 casts a Lightning Bolt and then the Cruelty at Bot2: Bot2 takes 3 and 2, and Bot1 gains 2,
+# the Lesson spell's damage alone (22), not the Bolt's, which is no Lesson. Bot2 also discards the two cards the Cruelty asks.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Lo and Li, Twin Tutors
+Lightning Bolt
+Swamp
+Mai, Scornful Striker
+Ozai's Cruelty
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lo and Li, Twin Tutors.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Ozai's Cruelty)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+? Bot2.Life = 17
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ozai's Cruelty.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 15
+Bot2.Hand.Count = 5

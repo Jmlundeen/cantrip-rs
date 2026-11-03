@@ -1,0 +1,68 @@
+# Lo and Li, Twin Tutors: "When Lo and Li enter, search your library for a Lesson or Noble card, reveal it, put it into your hand,
+# then shuffle." Bot1's library holds a Noble (Mai, Scornful Striker), a Lesson (Ozai's Cruelty) and Swamps; the Swamp is no find
+# (the refusal) and Mai is taken. Bot2's hand and library hold a Mai and an Ozai's Cruelty too, and they stay where they are: a
+# search is of the searcher's own library and goes to their own hand. "Noble creatures you control ... have lifelink": on turn 5 Mai
+# and Lo and Li (a Human Advisor, not a Noble) both attack Bot2's empty board for 2 each, and Bot1 gains 2, Mai's alone (22).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Lo and Li, Twin Tutors
+Swamp
+Swamp
+Swamp
+Mai, Scornful Striker
+Ozai's Cruelty
+Swamp x10
+
+[Bot2 Deck]
+Mai, Scornful Striker
+Ozai's Cruelty
+Island x5
+Island
+Island
+Mai, Scornful Striker
+Ozai's Cruelty
+Island x8
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lo and Li, Twin Tutors.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Swamp)
+Bot1.Search(Mai, Scornful Striker)
+? Bot1.Hand.Count = 2
+? Bot2.Hand.Count = 7
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mai, Scornful Striker.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Mai, Scornful Striker > Bot2; Lo and Li, Twin Tutors > Bot2)
+[T5 Bot1.End]
+? Bot1.Life = 22
+? Bot2.Life = 16
+
+[Expect]
+Bot1.Life = 22
+Bot2.Hand = Island; Island; Island; Island; Island; Mai, Scornful Striker; Ozai's Cruelty
+Bot2.Library = Mai, Scornful Striker; Ozai's Cruelty; Island; Island; Island; Island; Island; Island; Island; Island
+Bot1.Library.Mai, Scornful Striker = (absent)
+Bot1.Revealed = Mai, Scornful Striker
+Bot1.Battlefield.Mai, Scornful Striker.Keywords = FirstStrike; Lifelink
+Bot1.Battlefield.Lo and Li, Twin Tutors.Keywords = (absent)
