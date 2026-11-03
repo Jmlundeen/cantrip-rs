@@ -1,0 +1,30 @@
+# Clone copies Plague Rats, so its current name counts and both characteristic-defining abilities see two creatures (CR 707.2).
+[Bot1 Deck]
+Black Lotus
+Plague Rats
+Plague Rats
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Clone
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Plague Rats.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Clone.Cast
+Bot2.Accept
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Plague Rats.Power = 2
+Bot1.Battlefield.Plague Rats.Toughness = 2
+Bot2.Battlefield.Plague Rats.Power = 2
+Bot2.Battlefield.Plague Rats.Toughness = 2
+Bot1.Hand.Plague Rats.Power = 2
+Bot1.Hand.Plague Rats.Toughness = 2
