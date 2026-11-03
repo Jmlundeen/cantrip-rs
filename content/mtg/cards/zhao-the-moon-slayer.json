@@ -1,0 +1,11 @@
+{
+  "name": "Zhao, the Moon Slayer",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Creature — Human Soldier",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Menace\nNonbasic lands enter tapped.\n{7}: Put a conqueror counter on Zhao.\nAs long as Zhao has a conqueror counter on him, nonbasic lands are Mountains. (They lose all other land types and abilities and have \"{T}: Add {R}.\")",
+  "keywords": [
+    "Menace"
+  ]
+}

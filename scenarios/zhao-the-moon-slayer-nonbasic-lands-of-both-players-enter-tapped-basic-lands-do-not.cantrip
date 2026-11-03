@@ -1,0 +1,41 @@
+# Zhao, the Moon Slayer {1}{R} (2/2 menace): "Nonbasic lands enter tapped." Of every player: on turn 1 Bot1's Mutavault enters tapped and
+# offers no mana (the land's own "{T}: Add {C}" is refused), and on turn 2 so does Bot2's. A basic Island Bot1 plays on turn 3 enters
+# untapped and taps for {U} at once, while the Mutavault, untapped by then, taps for {C}.
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Jet
+Zhao, the Moon Slayer
+Island
+Island x15
+
+[Bot2 Deck]
+Mutavault
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zhao, the Moon Slayer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mutavault.Play
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+[T2 Bot2.Main1]
+Bot2.Hand.Mutavault.Play
+! Bot2.Battlefield.Mutavault.Activate(Ability: Add {C})
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+? Bot1.Mana = {U}
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+? Bot1.Mana = {U}{C}
+
+[Expect]
+Bot1.Battlefield.Mutavault.Tapped = true
+Bot1.Battlefield.Island.Tapped = true
+Bot2.Battlefield.Mutavault.Tapped = true
+Bot1.Battlefield.Zhao, the Moon Slayer.Keywords = Menace
