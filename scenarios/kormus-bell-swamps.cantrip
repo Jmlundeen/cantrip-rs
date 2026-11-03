@@ -1,0 +1,39 @@
+# Kormus Bell makes Swamps on both sides black 1/1 creatures while they remain lands, and leaves Islands alone (CR 613.1d, 613.1e, 613.4b).
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Emerald
+Kormus Bell
+Island x20
+
+[Bot2 Deck]
+Swamp
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Kormus Bell.Cast
+? Bot1.Mana =
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Battlefield.Swamp.Types = Land; Creature
+? Bot1.Battlefield.Swamp.Colors = Black
+? Bot1.Battlefield.Swamp.Power = 1
+? Bot1.Battlefield.Swamp.Toughness = 1
+? Bot2.Battlefield.Swamp.Types = Land; Creature
+? Bot2.Battlefield.Swamp.Colors = Black
+? Bot2.Battlefield.Swamp.Power = 1
+? Bot2.Battlefield.Swamp.Toughness = 1
+? Bot1.Battlefield.Island.Types = Land
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Swamp > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19

@@ -1,0 +1,6 @@
+{
+  "name": "Kormus Bell",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "All Swamps are 1/1 black creatures that are still lands."
+}

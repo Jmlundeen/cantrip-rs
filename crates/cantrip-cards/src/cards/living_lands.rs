@@ -1,28 +1,19 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics::{base_pt, creature_too};
+use cantrip_mechanics::lands;
+use cantrip_mechanics::statics::{all_of_subtype, base_pt, creature_too};
 use cantrip_oracle as oracle;
-
-/// "All Forests are 1/1 creatures that are still lands." (CR 604.1).
-fn all_forests_1_1_creatures_affects(
-    q: &dyn LayerQuery,
-    source: ObjectId,
-    _: ObjectId,
-    so_far: &Chars,
-) -> bool {
-    (*so_far).has_subtype(q.words(source).subtype(Subtype::Forest))
-}
 
 pub static CARD: CardDef = CardDef {
     statics: &[
         static_ability(
             Layer::Type,
-            all_forests_1_1_creatures_affects,
+            all_of_subtype::<{ lands::sub(Subtype::Forest) }>,
             creature_too,
             "All Forests are 1/1 creatures that are still lands.",
         ),
         static_ability(
                 Layer::PtSet,
-                all_forests_1_1_creatures_affects,
+                all_of_subtype::<{ lands::sub(Subtype::Forest) }>,
                 base_pt::<1, 1>,
                 "All Forests are 1/1 creatures that are still lands.",
             )

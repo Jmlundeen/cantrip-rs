@@ -203,6 +203,13 @@ pub fn creatures_of_color<const C: u8>(q: &dyn LayerQuery, source: ObjectId, _: 
     so_far.is(CardType::Creature) && so_far.colors.has(q.words(source).color(Color::ALL[C as usize]))
 }
 
+/// "All [subtype]s" (CR 613.1f): every permanent, under either controller, that is the subtype `SUBTYPE` (a `Subtype` as `u16`,
+/// `lands::sub`) as the earlier layers made it, the type read through the words of the source's text (CR 612.2). Living Lands
+/// (Forests) and Kormus Bell (Swamps) print it.
+pub fn all_of_subtype<const SUBTYPE: u16>(q: &dyn LayerQuery, source: ObjectId, _: ObjectId, so_far: &Chars) -> bool {
+    subtype_word(q, source, SUBTYPE).is_some_and(|word| so_far.has_subtype(word))
+}
+
 /// "Other [subtype]s" (CR 613.1f): all other permanents of the text's type, under either controller.
 /// Lord of Atlantis and Zombie Master use this with Merfolk and Zombie respectively.
 pub fn other_of_subtype<const SUBTYPE: u16>(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {

@@ -1,0 +1,25 @@
+# Urborg makes the green Dryad Arbor a Swamp; Kormus Bell sets it to black, preserving its other types (CR 613.1d, 613.1e).
+[Bot1 Deck]
+Dryad Arbor
+Black Lotus
+Mox Emerald
+Kormus Bell
+Island x20
+[Bot2 Deck]
+Urborg, Tomb of Yawgmoth
+Island x20
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Kormus Bell.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Urborg, Tomb of Yawgmoth.Play
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Dryad Arbor.Colors = Black
+Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
+Bot1.Battlefield.Dryad Arbor.Power = 1
+Bot1.Battlefield.Dryad Arbor.Toughness = 1
