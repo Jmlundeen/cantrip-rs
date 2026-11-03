@@ -525,6 +525,13 @@ pub fn power_or_last_known(q: &dyn Query, id: ObjectId) -> i16 {
     }
 }
 
+fn nonartifact_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    (CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if !q.chars(id).is(CardType::Artifact))
+}
+
+/// "Target nonartifact creature" (CR 115.1): Go for the Throat and Ashnod's Transmogrant.
+pub const NONARTIFACT_CREATURE: TargetSpec = target(nonartifact_creature_filter);
+
 fn artifact_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Artifact))
 }
