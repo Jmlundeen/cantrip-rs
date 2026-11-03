@@ -11,17 +11,6 @@ fn enchanted_creature_gets_2_0_apply_1(
     chars.keywords = chars.keywords.with(Keyword::Trample);
 }
 
-/// "Enchanted creature gets +2/+0 and has trample." (CR 604.1).
-fn enchanted_creature_gets_2_0_apply_0(
-    _: &dyn LayerQuery,
-    _: ObjectId,
-    chars: &mut Chars,
-) {
-    let (p, t) = (2i16, 0i16);
-    chars.power = chars.power.map(|v| v.saturating_add(p));
-    chars.toughness = chars.toughness.map(|v| v.saturating_add(t));
-}
-
 /// "When this Aura is put into a graveyard from the battlefield, draw a card." (CR 608.2, 121.1).
 fn draw_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
@@ -46,7 +35,7 @@ pub static CARD: CardDef = CardDef {
         static_ability(
                 Layer::PtModify,
                 attach::attached_object,
-                enchanted_creature_gets_2_0_apply_0,
+                cantrip_mechanics::statics::plus_pt::<2, 0>,
                 "Enchanted creature gets +2/+0 and has trample.",
             )
             .continues(),
