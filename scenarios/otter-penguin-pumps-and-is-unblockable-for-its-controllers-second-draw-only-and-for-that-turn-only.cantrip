@@ -1,0 +1,66 @@
+# Otter-Penguin {1}{U}, 2/1: "Whenever you draw your second card each turn, this creature gets +1/+2 until end of turn and can't be blocked this turn" (CR 121.1, 611.2).
+# Bot2's own second card on turn 2 (Opt) does nothing: still a 2/1. Turn 3: the draw step's card is the first, Opt's the second (3/3, can't be blocked: Bot2's
+# Memnite may not block, and the 3 damage lands, Bot2 at 17), and the second Opt's the third (no second +1/+2, still 3/3). Turn 5 the effect is over: 2/1, blockable.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Otter-Penguin
+Opt
+Opt
+Island
+Island
+Island
+Plains x13
+
+[Bot2 Deck]
+Memnite
+Opt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Otter-Penguin.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Opt.Cast
+Bot2.Arrange(Island |)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Otter-Penguin.Power = 2
+? Bot1.Battlefield.Otter-Penguin.Toughness = 1
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Otter-Penguin.Power = 2
+? Bot1.Battlefield.Otter-Penguin.Toughness = 1
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Plains |)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Otter-Penguin.Power = 3
+? Bot1.Battlefield.Otter-Penguin.Toughness = 3
+? Bot1.Battlefield.Otter-Penguin.CantBeBlocked = true
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Plains |)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Otter-Penguin.Power = 3
+? Bot1.Battlefield.Otter-Penguin.Toughness = 3
+Bot1.Attack(Otter-Penguin > Bot2)
+! Bot2.Block(Memnite > Otter-Penguin)
+[T3 Bot1.Main2]
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Otter-Penguin.Power = 2
+? Bot1.Battlefield.Otter-Penguin.Toughness = 1
+? Bot1.Battlefield.Otter-Penguin.CantBeBlocked = (absent)
+
+[Expect]
+Bot2.Life = 17

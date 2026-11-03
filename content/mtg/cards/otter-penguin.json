@@ -1,0 +1,8 @@
+{
+  "name": "Otter-Penguin",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Otter Bird",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Whenever you draw your second card each turn, this creature gets +1/+2 until end of turn and can't be blocked this turn."
+}
