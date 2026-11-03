@@ -1,0 +1,40 @@
+# Northern Air Temple: "Whenever another Shrine you control enters, each opponent loses 1 life and you gain 1 life." Bot1's second
+# Temple (legendary: the legend rule keeps one of the two, CR 704.5j) makes two triggers: the first Temple's, for another Shrine
+# entering (1), and the second Temple's own "enters" (X is 1 by the time it resolves, as only one Temple is left). Bot2 loses
+# 1 + 1 = 2 more (19, 17) and Bot1 gains 2 (21, 23); the first Temple's trigger resolves although it was the one put into the graveyard.
+
+[Bot1 Deck]
+Swamp
+Northern Air Temple
+Northern Air Temple
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Northern Air Temple.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+? Bot2.Life = 19
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Northern Air Temple.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Northern Air Temple)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield = Northern Air Temple; Swamp
+Bot1.Graveyard = Northern Air Temple

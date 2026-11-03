@@ -1,0 +1,6 @@
+{
+  "name": "Northern Air Temple",
+  "manaCost": "{B}",
+  "type": "Legendary Enchantment — Shrine",
+  "oracleText": "When Northern Air Temple enters, each opponent loses X life and you gain X life, where X is the number of Shrines you control.\nWhenever another Shrine you control enters, each opponent loses 1 life and you gain 1 life."
+}
