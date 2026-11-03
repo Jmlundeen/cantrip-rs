@@ -1,0 +1,82 @@
+# Wartime Protestors {3}{R} (Human Rebel Ally 4/4, haste): "Whenever another Ally you control enters, put a +1/+1 counter on that creature
+# and it gains haste until end of turn." Turn 1: entering itself gives it nothing, and neither does Ornithopter (not an Ally). Turn 2:
+# Bot2's Invasion Reinforcements is an Ally under the other player, so it gets no counter. Turn 3: Bot1's Invasion Reinforcements and the
+# Ally token it makes are two Allies: each gets a +1/+1 counter (2/2 each) and haste, so the token attacks the turn it enters for 2 (Bot2
+# 20 -> 18). Turn 5: the haste has ended (the counter stays).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Wartime Protestors
+Ornithopter
+Invasion Reinforcements
+Island x20
+
+[Bot2 Deck]
+Invasion Reinforcements
+Mox Pearl
+Plains
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wartime Protestors.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wartime Protestors.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Invasion Reinforcements.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Invasion Reinforcements.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Invasion Reinforcements.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Invasion Reinforcements.Power = 2
+? Bot1.Battlefield.Ally Token.Power = 2
+? Bot1.Battlefield.Ally Token.Keywords = Haste
+Bot1.Attack(Ally Token > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ally Token.Keywords = (absent)
+Bot1.Battlefield.Ally Token.Power = 2
+Bot1.Battlefield.Invasion Reinforcements.Keywords = Flash
+Bot1.Battlefield.Wartime Protestors.Power = 4
+Bot2.Battlefield.Invasion Reinforcements.Power = 1

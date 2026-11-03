@@ -1,0 +1,11 @@
+{
+  "name": "Wartime Protestors",
+  "manaCost": "{3}{R}",
+  "type": "Creature — Human Rebel Ally",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Haste\nWhenever another Ally you control enters, put a +1/+1 counter on that creature and it gains haste until end of turn.",
+  "keywords": [
+    "Haste"
+  ]
+}
