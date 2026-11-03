@@ -1,0 +1,49 @@
+# Mongoose Lizard (5/6 menace): "When this creature enters, it deals 1 damage to any target." Cast on turn 3 from a Mountain,
+# three Moxen and Mana Crypt ({4}{R}{R}). The target question refuses Bot2's Mox Jet (an artifact, not a creature) and takes
+# Bot2's Ornithopter (0/2), which survives with exactly 1 damage marked (not 0, not 2).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mana Crypt
+Mongoose Lizard
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Ornithopter
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Mongoose Lizard.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Damage = 1
+Bot2.Life = 20
+Bot1.Battlefield.Mongoose Lizard.Power = 5
+Bot1.Battlefield.Mongoose Lizard.Toughness = 6

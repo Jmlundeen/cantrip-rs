@@ -1,0 +1,38 @@
+# "Any target" includes a player on your own side: Mongoose Lizard's enters trigger aimed at Bot1 itself takes Bot1 from 20 to
+# 19 (exactly 1) and leaves Bot2 at 20.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mana Crypt
+Mongoose Lizard
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Mongoose Lizard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20

@@ -1,0 +1,38 @@
+# Mongoose Lizard's enters trigger takes a player too ("any target"): Bot1 aims it at Bot2, who goes from 20 to 19 (exactly 1)
+# while Bot1 stays at 20. Cast on turn 3 from a Mountain, three Moxen and Mana Crypt ({4}{R}{R}).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mana Crypt
+Mongoose Lizard
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Mongoose Lizard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
