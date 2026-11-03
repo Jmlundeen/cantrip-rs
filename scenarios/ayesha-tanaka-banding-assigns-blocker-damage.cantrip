@@ -1,0 +1,55 @@
+# Ayesha bands with Ornithopter and assigns the blocker's damage to herself, leaving her partner alive (CR 702.22k).
+[Bot1 Deck]
+Ayesha Tanaka
+Mox Pearl
+Gleemox
+Mox Sapphire
+Lotus Petal
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Hand.Ayesha Tanaka.Cast
+? Bot1.Mana =
+Bot1.Pass
+
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ayesha Tanaka > Bot2; Ornithopter > Bot2)
+Bot1.Choose(Ornithopter)
+Bot2.Block(Ulvenwald Oddity > Ayesha Tanaka)
+[T3 Bot1.Blockers]
+? Combat.Blocks = Ulvenwald Oddity > Ayesha Tanaka; Ulvenwald Oddity > Ornithopter
+Bot1.AssignDamage(Ulvenwald Oddity > Ayesha Tanaka: 4)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ayesha Tanaka; Lotus Petal
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 2
+Bot2.Life = 20

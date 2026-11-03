@@ -1,0 +1,58 @@
+# Ayesha refuses a creature ability, then counters an opponent's sacrificed Crypt ability (CR 113.7a).
+[Bot1 Deck]
+Ayesha Tanaka
+Mox Pearl
+Gleemox
+Mox Sapphire
+Lotus Petal
+Plains x20
+
+[Bot2 Deck]
+Tormod's Crypt
+Mox Pearl
+Mother of Runes
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Hand.Ayesha Tanaka.Cast
+? Bot1.Mana =
+Bot1.Pass
+
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mother of Runes.Activate(Bot2.Battlefield.Mother of Runes)
+! Bot1.Battlefield.Ayesha Tanaka.Activate(Stack.Mother of Runes)
+Bot2.Colors(Red)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Tormod's Crypt.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Tormod's Crypt.Activate(Bot1)
+Bot1.Battlefield.Ayesha Tanaka.Activate(Stack.Tormod's Crypt)
+Bot1.Pass
+Bot2.Pass
+Bot2.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Lotus Petal
+Bot2.Graveyard = Tormod's Crypt
+Bot1.Battlefield.Ayesha Tanaka.Tapped = true

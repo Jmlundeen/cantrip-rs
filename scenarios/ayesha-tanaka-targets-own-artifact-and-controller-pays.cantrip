@@ -1,0 +1,46 @@
+# Ayesha can target her controller's artifact ability; paying {W} lets it resolve (CR 118.1).
+[Bot1 Deck]
+Ayesha Tanaka
+Mox Pearl
+Gleemox
+Mox Sapphire
+Lotus Petal
+Tormod's Crypt
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Hand.Ayesha Tanaka.Cast
+? Bot1.Mana =
+Bot1.Pass
+
+Bot1.Hand.Tormod's Crypt.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tormod's Crypt.Activate(Bot2)
+Bot1.Battlefield.Ayesha Tanaka.Activate(Stack.Tormod's Crypt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard =
+Exile = Island
+Bot1.Battlefield.Ayesha Tanaka.Tapped = true

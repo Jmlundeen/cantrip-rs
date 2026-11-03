@@ -1,0 +1,69 @@
+# Target legality is checked before the payer sacrifices Lattice for mana, not again after the payment choice (CR 608.2b, 605.3a).
+[Bot1 Deck]
+Ayesha Tanaka
+Mox Pearl
+Gleemox
+Mox Sapphire
+Lotus Petal
+Plains x20
+
+[Bot2 Deck]
+Mother of Runes
+Ashnod's Altar
+Mycosynth Lattice
+March of the Machines
+Black Lotus x5
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Hand.Ayesha Tanaka.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Ashnod's Altar.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Mycosynth Lattice.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.March of the Machines.Cast
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mother of Runes.Activate(Bot2.Battlefield.Mother of Runes)
+Bot1.Battlefield.Ayesha Tanaka.Activate(Stack.Mother of Runes)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Ashnod's Altar.Activate(Sacrifice: Mycosynth Lattice)
+Bot2.Decline
+[T6 Bot2.Main2]
+[Expect]
+Bot2.Battlefield.Mother of Runes.ProtectionFrom = (absent)
+Bot2.Battlefield.Mycosynth Lattice = (absent)
