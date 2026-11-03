@@ -1,0 +1,71 @@
+# The old controller gives Jihad away in response to its state trigger and cannot sacrifice it when that trigger resolves (CR 701.21a).
+[Bot1 Deck]
+Mox Pearl x2
+Mox Sapphire
+Mox Ruby x2
+Black Lotus
+Valley Floodcaller
+Jihad
+Harmless Offering
+Lightning Bolt
+Plains x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Jihad.Cast
+? Bot1.Mana =
+Bot1.Colors(Green)
+Bot1.ChoosePlayer(Bot2)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Jihad)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Jihad.ChosenPlayer = 2
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Jihad.ChosenPlayer = 2
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 4

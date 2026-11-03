@@ -1,0 +1,66 @@
+# After Jihad changes controller it still tracks the originally chosen player and keeps boosting white creatures.
+[Bot1 Deck]
+Jihad
+Black Lotus
+Mox Pearl
+Mox Ruby
+Savannah Lions
+Harmless Offering
+Mox Sapphire
+Plains x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Pearl
+Savannah Lions
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Jihad.Cast
+? Bot1.Mana =
+Bot1.Colors(Green)
+Bot1.ChoosePlayer(Bot2)
+? Bot1.Battlefield.Jihad.ChosenColor = Green
+? Bot1.Battlefield.Jihad.ChosenPlayer = 2
+? Bot1.Battlefield.Savannah Lions.Power = 4
+? Bot1.Battlefield.Savannah Lions.Toughness = 2
+? Bot2.Battlefield.Savannah Lions.Power = 4
+? Bot2.Battlefield.Savannah Lions.Toughness = 2
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Jihad)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Jihad.ChosenPlayer = 2
+Bot2.Battlefield.Jihad.ChosenColor = Green
+Bot1.Battlefield.Savannah Lions.Power = 4
+Bot2.Battlefield.Savannah Lions.Toughness = 2

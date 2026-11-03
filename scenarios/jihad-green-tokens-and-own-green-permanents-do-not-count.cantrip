@@ -1,0 +1,47 @@
+# Bot2's green token and Bot1's green permanent do not satisfy Jihad's nontoken condition; the enchantment is sacrificed (CR 603.8).
+[Bot1 Deck]
+Jihad
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Ajani, Outland Chaperone
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ajani, Outland Chaperone.Cast
+Bot2.Pass
+Bot2.Battlefield.Ajani, Outland Chaperone.Activate(Ability: Kithkin)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Jihad.Cast
+? Bot1.Mana =
+Bot1.Colors(Green)
+Bot1.ChoosePlayer(Bot2)
+? Bot1.Battlefield.Jihad.ChosenColor = Green
+? Bot2.Battlefield.Kithkin Token.Power = 1
+? Bot2.Battlefield.Kithkin Token.Toughness = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Jihad; Black Lotus
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot2.Battlefield.Kithkin Token.Token = true
+Bot2.Battlefield.Kithkin Token.Colors = Green; White
+Bot2.Battlefield.Kithkin Token.Power = 1
+Bot2.Battlefield.Kithkin Token.Toughness = 1
