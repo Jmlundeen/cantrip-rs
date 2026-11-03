@@ -1,0 +1,38 @@
+# The ability can target its controller's attacking creature and deals it exactly one damage (CR 115.1, 120.3).
+[Bot1 Deck]
+D'Avenant Archer
+Black Lotus
+Mox Pearl
+Mox Ruby
+Ageless Guardian
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.D'Avenant Archer.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ageless Guardian.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Ageless Guardian > Bot2)
+Bot1.Battlefield.D'Avenant Archer.Activate(Bot1.Battlefield.Ageless Guardian)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ageless Guardian.Damage = 1
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.D'Avenant Archer.Tapped = true

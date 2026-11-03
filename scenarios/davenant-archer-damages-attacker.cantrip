@@ -1,0 +1,42 @@
+# The Archer taps to deal one damage to an opposing attacker and cannot target an uninvolved creature (CR 115.1, 120.3).
+[Bot1 Deck]
+D'Avenant Archer
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Ageless Guardian
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.D'Avenant Archer.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ageless Guardian.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Ageless Guardian > Bot1)
+! Bot1.Battlefield.D'Avenant Archer.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.D'Avenant Archer.Activate(Bot2.Battlefield.Ageless Guardian)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ageless Guardian.Damage = 1
+? Bot1.Battlefield.D'Avenant Archer.Tapped = true
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Battlefield.Ornithopter.Damage = 0

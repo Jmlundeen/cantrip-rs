@@ -1,0 +1,8 @@
+{
+  "name": "D'Avenant Archer",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Human Soldier Archer",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "{T}: This creature deals 1 damage to target attacking or blocking creature."
+}
