@@ -1,0 +1,65 @@
+# The Carpet prevents damage from attacking ground creatures, but not an attacking flier or a nonattacking creature.
+# Firebrand deals its damage while other creatures are attacking; the shield also expires at end of turn.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Al-abara's Carpet
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Suntail Hawk
+Memnite x2
+Mox Ruby
+Fanatical Firebrand
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Al-abara's Carpet.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Al-abara's Carpet.Activate(Mana: short)
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Fanatical Firebrand.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Suntail Hawk.Cast
+[T4 Bot2.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Al-abara's Carpet.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot2.Attack(Memnite#1 > Bot1; Memnite#2 > Bot1; Suntail Hawk > Bot1)
+Bot2.Battlefield.Fanatical Firebrand.Activate(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+? Bot1.Life = 18
+[T6 Bot2.Main1]
+Bot2.Attack(Memnite#1 > Bot1; Memnite#2 > Bot1; Suntail Hawk > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 15
