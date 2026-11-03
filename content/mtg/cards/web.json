@@ -1,0 +1,6 @@
+{
+  "name": "Web",
+  "manaCost": "{G}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature (Target a creature as you cast this. This card enters attached to that creature.)\nEnchanted creature gets +0/+2 and has reach. (It can block creatures with flying.)"
+}
