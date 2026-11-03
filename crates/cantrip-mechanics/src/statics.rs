@@ -357,6 +357,17 @@ pub fn plus_one_plus_one_per_artifact_you_control(view: &dyn LayerQuery, source:
     chars.toughness = chars.toughness.map(|v| v + n);
 }
 
+/// "Enchanted creature gets +1/+1 for each enchantment you control" (CR 613.4c, layer 7c): "you" is the controller of the source,
+/// the Aura (CR 109.5), counted as the earlier layers left every permanent, the Aura itself among them. Ethereal Armor and Tempest
+/// Technique print it.
+pub fn plus_one_plus_one_per_enchantment_you_control(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let state = view.state();
+    let you = state.obj(source).controller;
+    let n = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Enchantment)).count() as i16;
+    chars.power = chars.power.map(|v| v + n);
+    chars.toughness = chars.toughness.map(|v| v + n);
+}
+
 /// "[This creature]'s power is equal to the number of creatures you control" (CR 604.3, layer 7a): a characteristic-defining
 /// ability, the creature itself among those counted if it is one. Adeline, Resplendent Cathar and Esgaroth Garrison print it.
 pub fn power_is_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
