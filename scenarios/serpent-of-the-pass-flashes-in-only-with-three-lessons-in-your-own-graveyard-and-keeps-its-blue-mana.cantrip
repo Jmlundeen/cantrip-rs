@@ -1,0 +1,71 @@
+# Serpent of the Pass, 6/5, {5}{U}{U}: "If there are three or more Lesson cards in your graveyard, you may cast this spell as though it had
+# flash." Turn 1 Faithless Looting (a Moxen turn, then {R}) draws Accumulate Wisdom and Airbending Lesson and discards both: two Lessons in Bot1's
+# graveyard, a third one (Firebending Lesson) is Bot2's, cast at Bot2's turn 2 on its own Ornithopter - an opponent's Lesson does not count. With
+# 3 noncreature, nonland cards in Bot1's graveyard (Looting and the two Lessons) the Serpent costs {2}{U}{U} and four mana is in Bot1's pool, yet
+# at the end of turn 2 it is refused: two Lessons are not three. On turn 3 Entomb puts Firebending Lesson in Bot1's graveyard: exactly three
+# Lessons, five noncreature, nonland cards, so the Serpent costs {U}{U} (the generic mana all gone, the blue never taken off). At the end of
+# turn 4 it flashes in for exactly Mox Sapphire and the Island - any fewer Lessons-or-spells counted and it would be refused short.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Faithless Looting
+Serpent of the Pass
+Island
+Accumulate Wisdom
+Airbending Lesson
+Entomb
+Firebending Lesson
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Firebending Lesson
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Accumulate Wisdom; Airbending Lesson)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Faithless Looting; Airbending Lesson; Accumulate Wisdom
+? Bot2.Graveyard = Ornithopter; Firebending Lesson
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Serpent of the Pass.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Firebending Lesson)
+[T4 Bot2.End]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Serpent of the Pass.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Serpent of the Pass.Power = 6
+Bot1.Hand.Serpent of the Pass = (absent)

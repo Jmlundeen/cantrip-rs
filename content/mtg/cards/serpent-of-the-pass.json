@@ -1,0 +1,8 @@
+{
+  "name": "Serpent of the Pass",
+  "manaCost": "{5}{U}{U}",
+  "type": "Creature — Serpent",
+  "power": 6,
+  "toughness": 5,
+  "oracleText": "If there are three or more Lesson cards in your graveyard, you may cast this spell as though it had flash.\nThis spell costs {1} less to cast for each noncreature, nonland card in your graveyard."
+}

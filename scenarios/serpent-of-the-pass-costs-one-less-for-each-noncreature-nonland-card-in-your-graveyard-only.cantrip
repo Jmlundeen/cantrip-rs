@@ -1,0 +1,63 @@
+# Serpent of the Pass, {5}{U}{U}: "This spell costs {1} less to cast for each noncreature, nonland card in your graveyard." Bot1's graveyard on turn 3
+# holds Faithless Looting, Entomb and Accumulate Wisdom (three: it costs {2}{U}{U}, four mana) beside an Island and an Ornithopter, a land and a creature
+# card that do not count; Bot2's graveyard holds a Lightning Bolt, an opponent's card that does not count either. Exactly four taps (Sapphire, Island,
+# Jet, Ruby) cast it and leave the pool empty: had the land, the creature or the Bolt counted, the cost would be {U}{U} or {1}{U}{U} and mana would
+# be left in the pool; had one fewer counted, four taps would not pay and the cast would not happen. Only one Lesson is there, so there is no flash
+# (Bot1 casts it on its own turn).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Faithless Looting
+Entomb
+Serpent of the Pass
+Island
+Ornithopter
+Island
+Accumulate Wisdom
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Accumulate Wisdom)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Lightning Bolt
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Graveyard = Entomb; Accumulate Wisdom; Faithless Looting; Ornithopter; Island
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Serpent of the Pass.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Serpent of the Pass.Toughness = 5
+Bot1.Graveyard = Entomb; Accumulate Wisdom; Faithless Looting; Ornithopter; Island
