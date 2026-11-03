@@ -1,6 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::statics::{have_reach, plus_pt};
+use cantrip_mechanics::triggers::ATTACHED_PERMANENT_BECOMES_TAPPED;
 use cantrip_oracle as oracle;
 
 /// "It deals 1 damage to each opponent" (CR 120.3, 102.2): the equipped creature, as it last existed if it has left (CR 113.7a),
@@ -15,7 +16,7 @@ fn ping_each_opponent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            when(EventMask::TAPPED, cantrip_mechanics::triggers::attached_permanent_becomes_tapped),
+            ATTACHED_PERMANENT_BECOMES_TAPPED,
             ping_each_opponent,
             "Whenever equipped creature becomes tapped, it deals 1 damage to each opponent.",
         ),

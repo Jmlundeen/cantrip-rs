@@ -46,7 +46,7 @@ pub fn subtype_an_opponent_controls_becomes_tapped<const SUBTYPE: u16>(q: &dyn Q
 }
 
 /// Whenever the attached permanent becomes tapped (CR 701.26a, 603.2), by any means; the permanent is the subject.
-/// Psychic Venom and Hawkeye's Bow print this trigger for an enchanted land and equipped creature respectively.
+/// Psychic Venom, Blight and Hawkeye's Bow print this trigger for an enchanted land and equipped creature respectively.
 pub fn attached_permanent_becomes_tapped(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::Tapped { permanent } if q.attached_to(source) == Some(*permanent) => Fired::about(Target::Object(*permanent)),
@@ -1945,6 +1945,7 @@ pub const PLUS_ONE_COUNTERS_PUT_ON_THIS: Trigger = when(EventMask::COUNTERS, plu
 pub const THIS_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, this_enters);
 pub const THIS_ENTERS_UNTAPPED: Trigger = when(EventMask::ZONE_CHANGE, this_enters_untapped);
 pub const THIS_BECOMES_TAPPED: Trigger = when(EventMask::TAPPED, this_becomes_tapped);
+pub const ATTACHED_PERMANENT_BECOMES_TAPPED: Trigger = when(EventMask::TAPPED, attached_permanent_becomes_tapped);
 pub const THIS_ENTERS_IF_CAST: Trigger = when(EventMask::ZONE_CHANGE, this_enters_if_cast);
 pub const LANDFALL: Trigger = when_asked(EventMask::ZONE_CHANGE, landfall);
 pub const YOU_UNLOCK_THIS_RIGHT_DOOR: Trigger = when(EventMask::DOOR_UNLOCKED, you_unlock_this_right_door);
