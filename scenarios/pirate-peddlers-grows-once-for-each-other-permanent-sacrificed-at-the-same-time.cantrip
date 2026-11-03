@@ -1,0 +1,51 @@
+# "Whenever you sacrifice another permanent, put a +1/+1 counter on this creature." Pitiless Carnage makes Bot1 sacrifice three
+# Moxen at once (CR 701.21a): each is a sacrifice and each triggers the Peddlers (CR 603.2c), so it gets three counters (2/2 -> 5/5).
+# The Peddlers stays on the battlefield and the Mox that paid for it is not among the sacrificed. It has deathtouch.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Pirate Peddlers
+Pitiless Carnage
+Mox Emerald
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pirate Peddlers.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Pirate Peddlers.Keywords = Deathtouch
+? Bot1.Battlefield.Pirate Peddlers.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pitiless Carnage.Cast
+Bot1.Choose(Mox Ruby; Mox Pearl; Mox Sapphire)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Pirate Peddlers.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Pirate Peddlers.Power = 5
+Bot1.Battlefield.Pirate Peddlers.Toughness = 5

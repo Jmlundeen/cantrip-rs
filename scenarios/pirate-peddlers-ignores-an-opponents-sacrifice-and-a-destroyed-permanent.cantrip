@@ -1,0 +1,52 @@
+# "Whenever YOU sacrifice another permanent": Bot2 sacrificing its own Lotus Petal, as Bot1's Peddlers watches, gives it nothing; nor
+# does a permanent of Bot1's that is destroyed (Disenchant on its Mox) rather than sacrificed. Bot1's own Lotus Petal, sacrificed for
+# mana, gives exactly one counter, so the Peddlers is 3/3 and not the 2/2 it was.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Pirate Peddlers
+Lotus Petal
+Island x15
+
+[Bot2 Deck]
+Lotus Petal
+Disenchant
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pirate Peddlers.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Lotus Petal.Activate(Color: White)
+? Bot1.Battlefield.Pirate Peddlers.Power = 2
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Pearl)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Pirate Peddlers.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Pirate Peddlers.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Pirate Peddlers.Power = 3
+Bot1.Graveyard = Lotus Petal; Mox Pearl
