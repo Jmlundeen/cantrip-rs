@@ -1,0 +1,33 @@
+# The instant also prevents combat damage to its target, without preventing damage that creature deals (CR 615.1).
+
+[Bot1 Deck]
+Indestructible Aura
+Mox Pearl
+Memnite
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+Bot1.Block(Memnite > Memnite)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Indestructible Aura.Cast(Bot1.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Memnite.Damage = 0
+Bot2.Graveyard.Memnite.Power = 1

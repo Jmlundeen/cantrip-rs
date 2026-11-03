@@ -1,0 +1,47 @@
+# The instant prevents multiple damage events to its target this turn, but a later turn's damage destroys it (CR 615.1, 514.2).
+
+[Bot1 Deck]
+Indestructible Aura
+Mox Pearl
+Memnite
+Island x20
+
+[Bot2 Deck]
+Mox Ruby x2
+Lightning Bolt x3
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Indestructible Aura.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Hand.Indestructible Aura.Cast(Bot1.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Memnite.Damage = 0
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Memnite.Damage = 0
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard.Memnite.Power = 1

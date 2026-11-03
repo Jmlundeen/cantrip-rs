@@ -1,0 +1,43 @@
+# The instant may target an opponent's creature and prevents a Bolt, but does not stop Cut Down from destroying it (CR 615.1, 701.8a).
+
+[Bot1 Deck]
+Indestructible Aura
+Mox Pearl
+Mox Ruby
+Lightning Bolt
+Black Lotus
+Cut Down
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Indestructible Aura.Cast(Bot2.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Damage = 0
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Cut Down.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard.Memnite.Power = 1
+Bot1.Graveyard.Indestructible Aura.Colors = White
