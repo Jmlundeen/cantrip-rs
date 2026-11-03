@@ -1,0 +1,41 @@
+# A boosted Giant leaves before its ability resolves: its last known power keeps a toughness-three target legal (CR 608.2h).
+[Bot1 Deck]
+Mox Ruby
+Black Lotus x2
+Stone Giant
+Phyrexian Walker
+Giant Growth
+Island x20
+[Bot2 Deck]
+Black Lotus
+Go for the Throat
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Stone Giant.Cast
+Bot1.Hand.Phyrexian Walker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Stone Giant)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Stone Giant.Activate(Bot1.Battlefield.Phyrexian Walker)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Stone Giant)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Phyrexian Walker.Keywords = Flying
+[T3 Bot1.End]
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Stone Giant = (absent)
+Bot1.Battlefield.Phyrexian Walker = (absent)

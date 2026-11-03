@@ -1,0 +1,29 @@
+# A power bonus lets Stone Giant target itself when its power exceeds its toughness (CR 115.1c).
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Stone Giant
+Monstrous Rage
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Stone Giant.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Monstrous Rage.Cast(Bot1.Battlefield.Stone Giant)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Stone Giant.Activate(Bot1.Battlefield.Stone Giant)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Stone Giant.Keywords = Flying; Trample
+[T3 Bot1.End]
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Stone Giant = (absent)

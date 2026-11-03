@@ -1,0 +1,40 @@
+# Stone Giant lifts a controlled creature with toughness below its power, then destroys it at end step (CR 602.2, 603.7).
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Black Lotus
+Stone Giant
+Phyrexian Walker
+Grizzly Bears
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Phyrexian Walker.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Stone Giant.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Stone Giant.Activate(Bot2.Battlefield.Ornithopter)
+! Bot1.Battlefield.Stone Giant.Activate(Bot1.Battlefield.Phyrexian Walker)
+! Bot1.Battlefield.Stone Giant.Activate(Bot1.Battlefield.Stone Giant)
+Bot1.Battlefield.Stone Giant.Activate(Bot1.Battlefield.Grizzly Bears)
+? Bot1.Battlefield.Stone Giant.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Keywords = Flying
+[T3 Bot1.End]
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Grizzly Bears = (absent)
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot1.Graveyard = Grizzly Bears; Black Lotus; Black Lotus

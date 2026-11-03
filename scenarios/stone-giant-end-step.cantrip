@@ -1,0 +1,32 @@
+# A creature lifted during an end step loses flying in cleanup and dies at the next end step (CR 514.2, 603.7b).
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Black Lotus
+Stone Giant
+Grizzly Bears
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Stone Giant.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+[T3 Bot1.End]
+Bot1.Battlefield.Stone Giant.Activate(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Keywords = Flying
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Grizzly Bears.Keywords = (absent)
+[T4 Bot2.End]
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Grizzly Bears = (absent)
+Bot1.Graveyard = Grizzly Bears; Black Lotus; Black Lotus

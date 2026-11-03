@@ -1,0 +1,38 @@
+# A creature lifted in response to Act of Treason is still destroyed after its controller changes (CR 603.7c).
+[Bot1 Deck]
+Mox Ruby
+Black Lotus x2
+Stone Giant
+Grizzly Bears
+Island x20
+[Bot2 Deck]
+Black Lotus
+Act of Treason
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Stone Giant.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Battlefield.Stone Giant.Activate(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Keywords = Flying
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Grizzly Bears.Keywords = Flying; Haste
+[T4 Bot2.End]
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Grizzly Bears; Black Lotus; Black Lotus
+Bot2.Battlefield.Grizzly Bears = (absent)
