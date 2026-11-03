@@ -196,6 +196,19 @@ pub(crate) fn subtype_word(view: &dyn LayerQuery, source: ObjectId, n: u16) -> O
     Subtype::ALL.into_iter().find(|&s| s as u16 == n).map(|printed| view.words(source).subtype(printed))
 }
 
+/// "Other [subtype]s" (CR 613.1f): all other permanents of the text's type, under either controller.
+/// Lord of Atlantis and Zombie Master use this with Merfolk and Zombie respectively.
+pub fn other_of_subtype<const SUBTYPE: u16>(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    affected != source && subtype_word(q, source, SUBTYPE).is_some_and(|word| so_far.has_subtype(word))
+}
+
+/// "Have [basic land type]walk" (CR 702.14, 612.2): Lord of Atlantis and Zombie Master name Island and Swamp.
+pub fn have_landwalk<const SUBTYPE: u16>(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    if let Some(walk) = subtype_word(q, source, SUBTYPE).and_then(Keyword::landwalk) {
+        chars.keywords = chars.keywords.with(walk);
+    }
+}
+
 /// "[Subtype]s you control" (CR 613.1f, layer 6) as `StaticDef::affects`, `SUBTYPE` a `Subtype` as `u16` (`lands::sub`): every
 /// permanent under the source's controller's control that is that creature type as the earlier layers made it, the source
 /// itself among them, the type read through the words of the source's text (CR 612.2). Corpses of the Lost (Skeletons) and

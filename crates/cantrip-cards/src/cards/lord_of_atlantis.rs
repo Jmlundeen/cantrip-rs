@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics::plus_pt;
+use cantrip_mechanics::{lands, statics::{self, plus_pt}};
 use cantrip_oracle as oracle;
 
 /// "Other Merfolk get +1/+1 and have islandwalk." One static ability, one effect in two layers (CR 613.6): islandwalk in
@@ -10,22 +10,10 @@ use cantrip_oracle as oracle;
 /// of its text (CR 612).
 const TEXT: &str = "Other Merfolk get +1/+1 and have islandwalk.";
 
-fn other_merfolk(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    affected != source && so_far.has_subtype(q.words(source).subtype(Subtype::Merfolk))
-}
-
-/// "... have islandwalk" (layer 6): the landwalk of the land type the Lord's text names, Island unless a text-changing
-/// effect replaced it with another basic land type (CR 612.2: Trait Doctoring's Swamp makes it swampwalk).
-fn islandwalk(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    if let Some(walk) = Keyword::landwalk(q.words(source).subtype(Subtype::Island)) {
-        chars.keywords = chars.keywords.with(walk);
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     statics: &[
-        static_ability(Layer::Ability, other_merfolk, islandwalk, TEXT),
-        static_ability(Layer::PtModify, other_merfolk, plus_pt::<1, 1>, TEXT).continues(),
+        static_ability(Layer::Ability, statics::other_of_subtype::<{ lands::sub(Subtype::Merfolk) }>, statics::have_landwalk::<{ lands::sub(Subtype::Island) }>, TEXT),
+        static_ability(Layer::PtModify, statics::other_of_subtype::<{ lands::sub(Subtype::Merfolk) }>, plus_pt::<1, 1>, TEXT).continues(),
     ],
     ..oracle::LORD_OF_ATLANTIS
 };
