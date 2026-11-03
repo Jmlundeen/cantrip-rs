@@ -1,0 +1,6 @@
+{
+  "name": "Waterbending Scroll",
+  "manaCost": "{1}{U}",
+  "type": "Artifact",
+  "oracleText": "{6}, {T}: Draw a card. This ability costs {1} less to activate for each Island you control."
+}

@@ -1,0 +1,69 @@
+# Waterbending Scroll, "This ability costs {1} less to activate for each Island you control." Bot1 casts it on turn 1 (two of its five Moxen). Turn 2
+# Bot2 plays an Island: it is not Bot1's, so on turn 3, after Bot1 plays its own Island, the ability costs {5} (one less), paid with five Moxen: the pool
+# is empty after it (a {4} cost would leave one mana behind, a {6} could not be paid by them). Turn 5 Bot1 plays a Tundra, which is a Plains Island, not
+# an "Island" by name: two Islands, {4}, paid with four of the Moxen, the fifth untouched.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Waterbending Scroll
+Plains
+Island
+Tundra
+Plains x20
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Waterbending Scroll.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Waterbending Scroll.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Island.Tapped = false
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Waterbending Scroll.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+? Bot1.Battlefield.Tundra.Tapped = false
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Waterbending Scroll.Tapped = true

@@ -1,0 +1,49 @@
+# Waterbending Scroll, "{6}, {T}: Draw a card. This ability costs {1} less to activate for each Island you control." With no Island the ability costs all of {6}.
+# Bot1 casts it on turn 1 with two Moxen, and pays the {6} with Black Lotus's three and three more Moxen: six sources, so the pool is empty
+# after it, a {5} cost would leave one mana behind. The Scroll is tapped and Bot1 draws (hand 0 -> 1).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Black Lotus
+Waterbending Scroll
+Island x20
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Waterbending Scroll.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Waterbending Scroll.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Waterbending Scroll.Tapped = true
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Mana =
