@@ -1,0 +1,6 @@
+{
+  "name": "Mana Matrix",
+  "manaCost": "{6}",
+  "type": "Artifact",
+  "oracleText": "Instant and enchantment spells you cast cost {2} less to cast."
+}
