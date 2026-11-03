@@ -1,0 +1,8 @@
+{
+  "name": "Cyclopean Mummy",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Zombie",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "When this creature dies, exile it."
+}

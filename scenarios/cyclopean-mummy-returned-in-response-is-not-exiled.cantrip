@@ -1,0 +1,57 @@
+# Returning Mummy from the graveyard before its own trigger resolves makes a new object that the trigger cannot exile (CR 400.7).
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Black Lotus
+Cyclopean Mummy
+Wall of Wood
+Dose of Dawnglow
+Swamp x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cyclopean Mummy.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wall of Wood.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cyclopean Mummy)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard.Cyclopean Mummy.Power = 2
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dose of Dawnglow.Cast(Bot1.Graveyard.Cyclopean Mummy)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Wall of Wood)
+Bot1.Pass
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Battlefield.Cyclopean Mummy.Power = 2
+Bot1.Battlefield.Wall of Wood.Counters.MinusOneMinusOne = 2
+Exile =

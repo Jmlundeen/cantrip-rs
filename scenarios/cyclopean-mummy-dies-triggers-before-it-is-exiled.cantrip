@@ -1,0 +1,39 @@
+# Mummy reaches the graveyard and triggers Blood Artist before its own ability exiles it (CR 700.4, 603.2).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Cyclopean Mummy
+Blood Artist
+Swamp x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Blood Artist.Cast
+Bot1.Pass
+Bot1.Hand.Cyclopean Mummy.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cyclopean Mummy)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard.Cyclopean Mummy.Power = 2
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+[Expect]
+Exile = Cyclopean Mummy
+Bot1.Life = 21
+Bot2.Life = 19
