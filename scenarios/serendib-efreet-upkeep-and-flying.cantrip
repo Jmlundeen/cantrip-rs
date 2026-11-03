@@ -1,0 +1,44 @@
+# Serendib Efreet deals exactly one damage to its controller on their upkeep, not the opponent's;
+# its flying prevents a ground creature blocking, while another flyer can block (CR 503.1, 702.9b).
+
+[Bot1 Deck]
+Serendib Efreet
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Serendib Efreet.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+? Bot1.Life = 20
+? Bot2.Life = 20
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Life = 19
+? Bot2.Life = 20
+Bot1.Attack(Serendib Efreet)
+! Bot2.Block(Llanowar Elves > Serendib Efreet)
+Bot2.Block(Ornithopter > Serendib Efreet)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter

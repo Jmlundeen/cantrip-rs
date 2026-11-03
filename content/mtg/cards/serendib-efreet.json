@@ -1,0 +1,11 @@
+{
+  "name": "Serendib Efreet",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Efreet",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Flying\nAt the beginning of your upkeep, this creature deals 1 damage to you.",
+  "keywords": [
+    "Flying"
+  ]
+}
