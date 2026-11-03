@@ -1,0 +1,51 @@
+# Yue, the Moon Spirit, "You may cast a noncreature spell from your hand without paying its mana cost": the other answer to the "may". Bot1 casts Yue on turn 1 with four
+# Moxen and on turn 3 pays {5} with taps of its five Moxen for the ability, then declines to cast the Lightning Bolt in its hand: it stays there, Bot2 is
+# untouched, and the cost is spent all the same, Yue and the Moxen tapped and the pool empty.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Yue, the Moon Spirit
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Yue, the Moon Spirit.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Yue, the Moon Spirit.Activate(Convoke: Mox Sapphire, Mox Jet, Mox Ruby, Mox Pearl, Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+
+[Expect]
+Bot1.Hand = Island; Lightning Bolt
+Bot1.Graveyard.Count = 0
+Bot2.Life = 20
+Bot1.Mana =
+Bot1.Battlefield.Yue, the Moon Spirit.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = true
+Stack.Count = 0
