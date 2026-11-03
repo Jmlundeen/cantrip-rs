@@ -1,0 +1,35 @@
+# "Any number of target creatures" includes zero (CR 107.1c, 601.2d): Fire Covenant may be cast choosing no targets even
+# while Bot2 has a creature. X is 2, so 2 life is paid but no damage is dealt. It used to demand at least one
+# target, so the empty division was refused. Bot2's Ornithopter is a legal target left unchosen.
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Fire Covenant
+Swamp x15
+[Bot2 Deck]
+Forest
+Ornithopter
+Forest x15
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fire Covenant.Cast(X: 2)
+Bot1.Divide()
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 18
+Bot1.Graveyard = Fire Covenant
+Bot2.Battlefield.Ornithopter.Damage = 0

@@ -1,0 +1,24 @@
+# "Any number of target creatures" includes zero (CR 107.1c, 601.2d), as Fury's trigger allows: Pyrokinesis may be cast
+# choosing no targets even while Bot2 has a creature, and then deals no damage. It used to demand at least one target, so
+# the empty division was refused and the cast could not be made. Bot2's Ornithopter is a legal target left unchosen.
+[Bot1 Deck]
+Pyrokinesis
+Lightning Bolt
+Mountain x15
+[Bot2 Deck]
+Ornithopter
+Island x16
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Pyrokinesis.Cast(Ability: Exile)
+Bot1.Divide()
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Graveyard = Pyrokinesis
+Bot2.Battlefield.Ornithopter.Damage = 0
+Exile = Lightning Bolt

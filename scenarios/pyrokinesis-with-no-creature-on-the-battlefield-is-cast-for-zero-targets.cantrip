@@ -1,0 +1,27 @@
+# "Any number of target creatures" includes zero (CR 107.1c, 601.2d), so with no creature on the battlefield Pyrokinesis is
+# still a legal cast, choosing no targets, and it resolves dealing no damage. (It used to be withheld because it needed at
+# least one target, and the bots that tried it gave up and tried again for ever.)
+#
+# On turn 1 nothing is on the battlefield; Bot1 exiles Lightning Bolt to cast it. Pyrokinesis goes to the graveyard.
+
+[Bot1 Deck]
+Pyrokinesis
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Bot2 Deck]
+Forest x17
+
+[Actions]
+Bot1.Hand.Pyrokinesis.Cast(Ability: Exile)
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Pyrokinesis
+Exile = Lightning Bolt
+Bot1.Life = 20
+Bot2.Life = 20
