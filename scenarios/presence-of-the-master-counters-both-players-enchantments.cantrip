@@ -1,0 +1,61 @@
+# Casting an enchantment creature triggers Presence for either player; ordinary artifact creatures and an enchantment returned from the graveyard are unaffected (CR 603.2).
+[Bot1 Deck]
+Presence of the Master
+Black Lotus
+Mox Pearl
+Mox Emerald
+Fang of Shigeki
+Memnite
+Mox Jet
+Reanimate
+Island x20
+
+[Bot2 Deck]
+Forest
+Fang of Shigeki
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Presence of the Master.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fang of Shigeki.Cast
+? Stack = Presence of the Master; Fang of Shigeki
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Fang of Shigeki
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fang of Shigeki.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Fang of Shigeki; Black Lotus
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Fang of Shigeki)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Presence of the Master.Types = Enchantment
+Bot1.Battlefield.Memnite.Types = Artifact; Creature
+Bot2.Battlefield.Memnite.Types = Artifact; Creature
+Bot1.Graveyard = Reanimate; Black Lotus
+Bot1.Battlefield.Fang of Shigeki.Types = Enchantment; Creature
+Bot2.Graveyard = Fang of Shigeki

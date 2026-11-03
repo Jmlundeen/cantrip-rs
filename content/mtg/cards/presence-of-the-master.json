@@ -1,0 +1,6 @@
+{
+  "name": "Presence of the Master",
+  "manaCost": "{3}{W}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a player casts an enchantment spell, counter it."
+}
