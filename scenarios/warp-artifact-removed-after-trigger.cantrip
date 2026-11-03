@@ -1,0 +1,29 @@
+# Destroying the Aura after its upkeep ability triggers does not stop the damage (CR 113.7a, 608.2h).
+[Bot1 Deck]
+Mox Jet x2
+Warp Artifact
+Island x20
+[Bot2 Deck]
+Black Lotus
+Disenchant
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Warp Artifact.Cast(Bot2.Battlefield.Ornithopter)
+[T4 Bot2.Upkeep]
+? Stack.Count = 1
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Disenchant.Cast(Warp Artifact)
+[T4 Bot2.Main1]
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Warp Artifact
+Bot2.Graveyard = Disenchant; Black Lotus

@@ -1330,7 +1330,7 @@ pub fn each_end_step(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
 }
 
 /// The upkeep of the enchanted permanent's controller (CR 503.1a, 303.4), with that player as the subject. Super Intelligence
-/// enchants a creature and Cursed Land enchants a land; the enchant ability decides which permanent the Aura can be attached to.
+/// enchants a creature, Cursed Land a land, and Warp Artifact an artifact; the enchant ability restricts the host.
 pub fn enchanted_permanents_controllers_upkeep(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::StepBegan { step: Step::Upkeep } => {

@@ -1,0 +1,28 @@
+# The Aura deals 1 damage to the enchanted artifact's controller at their upkeep, not the opponent's (CR 603.2).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Ornithopter
+Warp Artifact
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Warp Artifact.Cast(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+[T2 Bot2.Main1]
+? Bot1.Life = 20
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20
