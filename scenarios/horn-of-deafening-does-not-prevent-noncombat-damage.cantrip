@@ -1,0 +1,46 @@
+# The Horn prevents only combat damage: the targeted Fanatical Firebrand can still deal noncombat damage with its ability (CR 615.1).
+
+[Bot1 Deck]
+Horn of Deafening
+Black Lotus
+Mox Pearl
+Mox Ruby
+Sol Ring
+Fanatical Firebrand
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Horn of Deafening.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Horn of Deafening.Activate(Bot1.Battlefield.Fanatical Firebrand)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard.Fanatical Firebrand.Power = 1

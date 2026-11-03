@@ -1,0 +1,45 @@
+# The Horn prevents an opponent's attacking creature from dealing combat damage for this turn; the same attacker deals damage next turn (CR 615.1, 514.2).
+
+[Bot1 Deck]
+Horn of Deafening
+Black Lotus
+Mox Pearl
+Sol Ring
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Horn of Deafening.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Horn of Deafening.Activate(Bot2.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot1.Life = 20
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19

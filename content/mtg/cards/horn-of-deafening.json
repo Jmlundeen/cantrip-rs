@@ -1,0 +1,6 @@
+{
+  "name": "Horn of Deafening",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "{2}, {T}: Prevent all combat damage that would be dealt by target creature this turn."
+}
