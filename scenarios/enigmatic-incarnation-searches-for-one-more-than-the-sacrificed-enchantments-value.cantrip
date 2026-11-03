@@ -1,0 +1,38 @@
+# The search is for mana value 1 plus the sacrificed enchantment's own: sacrificing Sylvan Library (mana value 2, cast before
+# Enigmatic Incarnation, whose own is 4) finds a Gray Ogre (3), and neither a Llanowar Elves (1) nor a Grizzly Bears (2)
+# (CR 608.2c, 701.21a, 202.3, 400.7).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald x3
+Enigmatic Incarnation
+Sylvan Library
+Fang of Shigeki
+Gray Ogre
+Llanowar Elves
+Grizzly Bears
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Sylvan Library.Cast
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Enigmatic Incarnation.Cast
+[T1 Bot1.End]
+Bot1.Choose(Sylvan Library)
+! Bot1.Search(Llanowar Elves)
+! Bot1.Search(Grizzly Bears)
+Bot1.Search(Gray Ogre)
+
+[Expect]
+Bot1.Battlefield.Gray Ogre.Power = 2
+Bot1.Battlefield.Llanowar Elves = (absent)
+Bot1.Graveyard = Sylvan Library; Black Lotus
