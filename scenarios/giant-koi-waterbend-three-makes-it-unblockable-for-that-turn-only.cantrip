@@ -1,0 +1,78 @@
+# Giant Koi, "Waterbend {3}: This creature can't be blocked this turn" (CR 701.67a-b, 509.1b, 611.2). Bot1 casts the 5/7 on turn 1 with
+# Black Lotus and three Moxen (all six mana). On turn 3 it pays {3} with three taps of its Moxen alone: the pool is empty and the Bears
+# may not block, so Bot2 takes 5. On turn 5 it pays one Mox's mana and taps two others: exactly {3} again (the pool empty, nothing but
+# those three Moxen used), and the Bears still may not block (Bot2 takes 5 more). On turn 7 it pays nothing: the effect over, the Bears block.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Giant Koi
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Giant Koi.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Giant Koi.Activate(Convoke: Mox Sapphire, Mox Jet, Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Giant Koi.CantBeBlocked = true
+Bot1.Attack(Giant Koi > Bot2)
+! Bot2.Block(Grizzly Bears > Giant Koi)
+[T5 Bot1.Main1]
+? Bot2.Life = 15
+? Bot1.Battlefield.Giant Koi.CantBeBlocked = (absent)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Giant Koi.Activate(Convoke: Mox Sapphire, Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Giant Koi.Tapped = false
+Bot1.Attack(Giant Koi > Bot2)
+! Bot2.Block(Grizzly Bears > Giant Koi)
+[T7 Bot1.DeclareAttackers]
+? Bot2.Life = 10
+Bot1.Attack(Giant Koi > Bot2)
+Bot2.Block(Grizzly Bears > Giant Koi)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 10
+Bot2.Battlefield.Grizzly Bears = (absent)
+Bot1.Battlefield.Giant Koi.Damage = 2

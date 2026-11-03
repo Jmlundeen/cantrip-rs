@@ -1,0 +1,28 @@
+# Giant Koi's islandcycling {2} (CR 702.29e): paid exactly with Mana Crypt's {C}{C} and discarding the Koi from the hand, it finds the Island
+# in the library and puts it into the hand, the Koi in the graveyard. With only Blasted Landscape's {C} it is not offered.
+
+[Bot1 Deck]
+Blasted Landscape
+Mana Crypt
+Giant Koi
+Plains x4
+Island
+Plains x12
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Blasted Landscape.Play
+! Bot1.Hand.Giant Koi.Activate(Ability: Islandcycling; Mana: short)
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Giant Koi.Activate(Ability: Islandcycling)
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Search(Island)
+
+[Expect]
+Bot1.Graveyard.Giant Koi.Colors = Blue
+Bot1.Hand = Island; Plains; Plains; Plains; Plains
