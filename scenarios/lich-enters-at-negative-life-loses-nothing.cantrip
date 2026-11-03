@@ -1,0 +1,44 @@
+# A second Lich entering while its controller is at -2 life makes them lose no life: "lose life equal to your life
+# total" with a negative total is zero (CR 107.1b), never a gain the first Lich would turn into draws.
+[Bot1 Deck]
+Lich x2
+Black Lotus x2
+Mox Jet x2
+Mox Pearl
+Island x20
+[Bot2 Deck]
+Mountain
+Shock
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Lich.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot1.Choose(Mox Jet#1; Mox Pearl)
+[T3 Bot1.Main1]
+? Bot1.Life = -2
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lich.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+[Expect]
+Result = InProgress
+Bot1.Life = -2
+Bot1.Hand.Count = 1
+Bot1.Battlefield = Lich; Lich; Mox Jet
