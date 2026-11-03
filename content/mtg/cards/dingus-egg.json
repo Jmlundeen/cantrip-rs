@@ -1,0 +1,6 @@
+{
+  "name": "Dingus Egg",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "Whenever a land is put into a graveyard from the battlefield, this artifact deals 2 damage to that land's controller."
+}

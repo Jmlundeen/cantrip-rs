@@ -1,0 +1,24 @@
+# Dingus Egg deals two damage to each destroyed land's controller, including the sacrificed Strip Mine's controller (CR 603.2, 120.3).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Dingus Egg
+Strip Mine
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Strip Mine.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dingus Egg.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot1.Battlefield.Strip Mine.Activate(Bot2.Battlefield.Island; Ability: Destroy)
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18

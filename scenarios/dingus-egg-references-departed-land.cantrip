@@ -1,0 +1,48 @@
+# Vicious Rivalry removes Egg and animated Mutavault together; the pending trigger refers to that land, which Palm can choose (CR 609.7a).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Emerald
+Dingus Egg
+Mutavault
+Vicious Rivalry
+Island x20
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Deflecting Palm
+Island x20
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dingus Egg.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mutavault.Activate(Ability: Add)
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Vicious Rivalry.Cast(X: 4)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot2.Hand.Deflecting Palm.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Mutavault)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 14
+Bot2.Life = 20
