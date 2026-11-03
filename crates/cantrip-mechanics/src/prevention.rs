@@ -28,6 +28,15 @@ pub const ANY_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "preve
 /// Peace). The card gives its own words (`.text(..)`).
 pub const COMBAT_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents all combat damage", damage: "combat damage", of_it: None, applies: combat, then: None, text: "" };
 
+fn dealt_by(_: &dyn Query, _: &Asker, source: ObjectId, d: &DamageEvent) -> bool {
+    d.source == source
+}
+
+/// Damage of any kind whose source is the object the effect is about (CR 615.1, 120.1): "prevent all damage that would be
+/// dealt by [that creature]". Once that object has left the zone it was in it is a new object (CR 400.7), which the effect
+/// is not about. Old Fat Spider Can't See Me and Gideon of the Trials (+1) print it. The card gives its own words (`.text(..)`).
+pub const DAMAGE_DEALT_BY: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents all damage dealt by that permanent", damage: "damage", of_it: Some("dealt by it"), applies: dealt_by, then: None, text: "" };
+
 /// Makes the prevention effect the resolving spell or ability's card lists `index`th in its `granted_preventions`, of damage
 /// to `to` (`Target::None` for damage to anyone), until end of turn: all of it, or the next N (CR 615.7).
 pub fn this_turn(g: &mut dyn Game, item: &StackItem, to: Target, index: u8, shield: Shield) {
