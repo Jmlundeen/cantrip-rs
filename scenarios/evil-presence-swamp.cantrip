@@ -1,0 +1,24 @@
+# Evil Presence enchants a land and makes it a Swamp with black mana instead of its old basic land ability (CR 303.4, 305.7).
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Evil Presence
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Evil Presence.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Hand.Evil Presence.Cast(Bot2.Battlefield.Island)
+? Bot1.Mana =
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+? Bot2.Mana = {B}
+[Expect]
+Bot1.Battlefield.Evil Presence.AttachedTo = Island
+Bot2.Battlefield.Island.Subtypes = Swamp

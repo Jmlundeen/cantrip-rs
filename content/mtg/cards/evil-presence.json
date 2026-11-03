@@ -1,0 +1,6 @@
+{
+  "name": "Evil Presence",
+  "manaCost": "{B}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant land\nEnchanted land is a Swamp."
+}
