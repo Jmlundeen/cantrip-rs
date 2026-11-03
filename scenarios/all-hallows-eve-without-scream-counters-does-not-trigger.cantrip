@@ -1,0 +1,15 @@
+# Chrome Mox exiles All Hallow's Eve without counters; its intervening condition prevents an upkeep trigger (CR 603.4).
+[Bot1 Deck]
+Chrome Mox
+All Hallow's Eve
+Swamp x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Chrome Mox.Cast
+Bot1.Choose(All Hallow's Eve)
+[T3 Bot1.Upkeep]
+? Stack =
+[T3 Bot1.Main1]
+[Expect]
+Exile = All Hallow's Eve
