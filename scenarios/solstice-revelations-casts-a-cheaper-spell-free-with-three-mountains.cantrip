@@ -1,0 +1,41 @@
+# Solstice Revelations with three Mountains (turn 5): Grizzly Bears (mana value 2, less than 3) exiled after the Forest is cast free
+# and enters the battlefield; the Forest stays in exile and Bot1's hand does not gain the Bears.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Solstice Revelations
+Island
+Mountain
+Island
+Forest
+Grizzly Bears
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Solstice Revelations.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Grizzly Bears; Mountain; Mountain; Mountain; Mox Jet; Mox Ruby; Mox Sapphire
+Bot1.Exile.Forest.Colors.Count = 0
+Bot1.Graveyard = Solstice Revelations

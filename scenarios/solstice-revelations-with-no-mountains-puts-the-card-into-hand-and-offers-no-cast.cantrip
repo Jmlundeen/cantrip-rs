@@ -1,0 +1,36 @@
+# Solstice Revelations ("cast it free if the spell's mana value is less than the number of Mountains you control"): with no Mountains
+# nothing is less, so on turn 1, off three Moxen, it exiles the Forest on top (a land, which stays in exile) and then Lightning Bolt
+# (mana value 1), which goes into Bot1's hand with no cast offered (the refused Accept shows it).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Solstice Revelations
+Island
+Island
+Island
+Forest
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Solstice Revelations.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Bot1.Hand.Lightning Bolt.Colors.Count = 1
+Bot1.Exile.Forest.Colors.Count = 0
+Bot1.Graveyard = Solstice Revelations
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire

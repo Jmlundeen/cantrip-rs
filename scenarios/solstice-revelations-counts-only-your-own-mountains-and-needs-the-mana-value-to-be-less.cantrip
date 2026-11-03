@@ -1,0 +1,42 @@
+# Solstice Revelations: "less than the number of Mountains you control" - strictly less, and only Mountains Bot1 controls. Bot1 has two
+# Mountains and Bot2 one more, so Grizzly Bears (mana value 2, equal to Bot1's two, below the three on the table) goes into Bot1's
+# hand with no cast offered.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Solstice Revelations
+Island
+Island
+Forest
+Grizzly Bears
+Island x15
+
+[Bot2 Deck]
+Mountain
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Solstice Revelations.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Bot1.Hand.Grizzly Bears.Colors.Count = 1
+Bot1.Battlefield.Count = 5
+Bot2.Battlefield.Count = 1

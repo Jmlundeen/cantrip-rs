@@ -1,0 +1,55 @@
+# Solstice Revelations' flashback {6}{R}: cast on turn 1 (one Mountain: the Lightning Bolt, mana value 1, is not less, so goes to hand), then on turn 3 from the
+# graveyard for seven mana (two Mountains and five Moxen, the pool empty after), it is exiled afterwards. Two Mountains: the
+# Ornithopter (mana value 0) exiled after the Forest is cast free.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Solstice Revelations
+Forest
+Lightning Bolt
+Mountain
+Forest
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Solstice Revelations.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Solstice Revelations
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Solstice Revelations.Cast(Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Mana =
+Bot1.Graveyard =
+Bot1.Exile.Solstice Revelations.Colors.Count = 1
+Bot1.Battlefield.Ornithopter.Power = 0
