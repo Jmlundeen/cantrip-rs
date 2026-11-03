@@ -1,0 +1,47 @@
+# Glyph watches an opponent's Wall: Shock grants no life, but an attacking creature's damage does (CR 603.7b).
+[Bot1 Deck]
+Memnite
+Mox Pearl
+Glyph of Life
+Mox Ruby
+Mox Ruby
+Shock
+Shock
+Island x20
+[Bot2 Deck]
+Steel Wall
+Mox Jet
+Island x20
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby#1.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Steel Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Glyph of Life.Cast(Bot2.Battlefield.Steel Wall)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Shock#1.Cast(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+? Bot2.Battlefield.Steel Wall.Damage = 2
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Bot2)
+Bot2.Block(Steel Wall > Memnite)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 18
+Bot2.Battlefield.Steel Wall.Damage = 3

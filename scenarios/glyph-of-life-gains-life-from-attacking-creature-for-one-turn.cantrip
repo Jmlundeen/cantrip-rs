@@ -1,0 +1,46 @@
+# Glyph of Life watches damage to the chosen Wall from an attacking creature this turn (CR 603.7b).
+# The Wall still takes 4 damage, and a second attack next turn cycle causes no additional life gain.
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Wall of Mist
+Glyph of Life
+Memnite
+Island x20
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wall of Mist.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Attack(Ulvenwald Oddity > Bot1)
+Bot1.Block(Wall of Mist > Ulvenwald Oddity)
+[T2 Bot2.Blockers]
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Glyph of Life.Cast(Bot1.Battlefield.Memnite)
+Bot1.Hand.Glyph of Life.Cast(Bot1.Battlefield.Wall of Mist)
+? Bot1.Mana =
+[T2 Bot2.Main2]
+? Bot1.Life = 24
+? Bot1.Battlefield.Wall of Mist.Damage = 4
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ulvenwald Oddity > Bot1)
+Bot1.Block(Wall of Mist > Ulvenwald Oddity)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield.Wall of Mist.Damage = 4

@@ -1,0 +1,55 @@
+# Whenever the chosen Wall is dealt damage by an attacking creature, Glyph of Life triggers once for the damage dealt at once
+# (CR 603.2c, 120.2): Benalish Hero (1) and Guerrilla Gorilla (2) attack as a band and Wall of Mist blocks the band, so the Wall
+# is dealt 3 in one combat damage event. Bot1 gains 3 life in one trigger, and Blech, Loafing Pest ("whenever you gain life")
+# gets one +1/+1 counter, not two (one per attacker).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Benalish Hero
+Guerrilla Gorilla
+Blech, Loafing Pest
+Glyph of Life
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Wall of Mist
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Wall of Mist.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Blech, Loafing Pest.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Glyph of Life.Cast(Bot2.Battlefield.Wall of Mist)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Benalish Hero > Bot2; Guerrilla Gorilla > Bot2)
+Bot1.Choose(Guerrilla Gorilla)
+Bot2.Block(Wall of Mist > Benalish Hero)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Battlefield.Wall of Mist.Damage = 3
+Bot1.Battlefield.Blech, Loafing Pest.Counters.PlusOnePlusOne = 1

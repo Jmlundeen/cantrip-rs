@@ -1,0 +1,41 @@
+# Damage to the chosen Wall from a creature that is not attacking gains no life; attacking creature damage does (CR 603.2).
+[Bot1 Deck]
+Black Lotus
+Prodigal Sorcerer
+Mox Jet
+Steel Wall
+Mox Pearl
+Glyph of Life
+Island
+Island x20
+[Bot2 Deck]
+Memnite
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Prodigal Sorcerer.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Steel Wall.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+Bot1.Block(Steel Wall > Memnite)
+[T4 Bot2.Blockers]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Glyph of Life.Cast(Bot1.Battlefield.Steel Wall)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Prodigal Sorcerer.Activate(Bot1.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+? Bot1.Battlefield.Steel Wall.Damage = 1
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Steel Wall.Damage = 2
