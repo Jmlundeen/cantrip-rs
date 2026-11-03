@@ -1,0 +1,44 @@
+# Magical Hack changes Lifeblood's Mountain to Island, so an opposing Mountain no longer triggers it and an Island does (CR 612.2).
+[Bot1 Deck]
+Lifeblood
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Magical Hack
+Plains x20
+[Bot2 Deck]
+Mountain
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lifeblood.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magical Hack.Cast(Bot1.Battlefield.Lifeblood)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Mountain)
+Bot1.Modes(Island)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 20
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Life = 21

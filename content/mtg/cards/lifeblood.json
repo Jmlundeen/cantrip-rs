@@ -1,0 +1,6 @@
+{
+  "name": "Lifeblood",
+  "manaCost": "{2}{W}{W}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a Mountain an opponent controls becomes tapped, you gain 1 life."
+}

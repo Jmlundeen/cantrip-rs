@@ -1,0 +1,49 @@
+# Lifeblood gains one life when an opponent's Mountain taps, but not when its controller's Mountain or an opponent's Island taps (CR 603.2, 119.3).
+
+[Bot1 Deck]
+Lifeblood
+Black Lotus
+Mox Pearl
+Mountain
+Plains x20
+
+[Bot2 Deck]
+Mountain
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lifeblood.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 21
+? Bot2.Life = 20
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 21
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20

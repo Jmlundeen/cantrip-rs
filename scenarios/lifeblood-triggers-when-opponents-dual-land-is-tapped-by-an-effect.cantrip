@@ -1,0 +1,43 @@
+# Lifeblood sees an opponent's Taiga as a Mountain when Skateboard taps it, then triggers again when its controller taps it for mana (CR 603.2).
+
+[Bot1 Deck]
+Lifeblood
+Skateboard
+Black Lotus
+Mox Pearl
+Plains x20
+
+[Bot2 Deck]
+Taiga
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lifeblood.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Taiga.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Skateboard.Cast
+? Bot1.Mana =
+Bot1.Target(Bot2.Battlefield.Taiga)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+[T4 Bot2.Main1]
+Bot2.Battlefield.Taiga.Activate(Ability: {R})
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
