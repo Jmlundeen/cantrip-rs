@@ -2007,3 +2007,18 @@ pub fn return_exiled_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), S
     g.return_to_hand(&exiled);
     Ok(())
 }
+
+/// "Permanents your opponents control lose hexproof and indestructible until end of turn" (CR 611.2c, 702.11, 702.12): the permanents
+/// those opponents control as the ability resolves, and only those, so one that arrives later keeps both. Shadowspear and The Fire
+/// Nation Drill print it.
+pub fn opponents_permanents_lose_hexproof_and_indestructible(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let lost = Keywords::of(&[Keyword::Hexproof, Keyword::Indestructible]);
+    let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
+    let permanents: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| opponents.contains(&g.controller(id))).collect();
+    instruction(g, |g| {
+        for permanent in permanents {
+            g.add_effect(item.object, permanent, EffectKind::LoseKeywords(lost), Duration::EndOfTurn);
+        }
+    });
+    Ok(())
+}
