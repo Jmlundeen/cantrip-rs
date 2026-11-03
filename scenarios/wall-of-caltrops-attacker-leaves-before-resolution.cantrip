@@ -1,0 +1,48 @@
+# The attacker leaves the battlefield before Caltrops's trigger resolves: no creature is blocking "that creature" any more,
+# so the intervening condition is false and Caltrops does not gain banding (CR 603.4, 506.4).
+[Bot1 Deck]
+Wall of Caltrops
+Steel Wall
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Island x20
+[Bot2 Deck]
+Hill Giant
+Black Lotus
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wall of Caltrops.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Steel Wall.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Hill Giant.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Hill Giant > Bot1)
+Bot1.Block(Wall of Caltrops > Hill Giant; Steel Wall > Hill Giant)
+? Stack.Count = 1
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Hill Giant)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Hill Giant; Lightning Bolt; Black Lotus
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Battlefield.Wall of Caltrops.Keywords = Defender
