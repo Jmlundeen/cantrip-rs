@@ -1,0 +1,6 @@
+{
+  "name": "Copper Tablet",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "At the beginning of each player's upkeep, this artifact deals 1 damage to that player."
+}

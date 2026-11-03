@@ -1,0 +1,33 @@
+# A pending upkeep trigger still deals damage from Copper Tablet after it is destroyed (CR 113.7a, 608.2h).
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Copper Tablet
+Island x20
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Abrade
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Copper Tablet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T4 Bot2.Upkeep]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Abrade.Cast
+Bot2.Modes(Destroy target artifact)
+Bot2.Target(Bot1.Battlefield.Copper Tablet)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+[Expect]
+Bot1.Battlefield.Copper Tablet = (absent)
+Bot1.Life = 19
+Bot2.Life = 18
