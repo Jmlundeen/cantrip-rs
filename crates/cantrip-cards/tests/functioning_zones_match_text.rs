@@ -92,7 +92,10 @@ fn condition_zones(condition: &str, text: &str, name: &str) -> ZoneKinds {
     }
     let mut zones = ZoneKinds::NONE;
     for (words, zone) in [("your graveyard", ZoneKind::Graveyard), ("your hand", ZoneKind::Hand), ("exile", ZoneKind::Exile)] {
-        if !put_into.contains(zone) && (text.contains(&format!("this card from {words}")) || text.contains(&format!("this card is in {words}"))) {
+        if !put_into.contains(zone)
+            && (text.contains(&format!("this card from {words}")) || text.contains(&format!("this card is in {words}"))
+                || zone == ZoneKind::Exile && text.contains("if this card is exiled"))
+        {
             zones = zones.with(zone);
         }
     }
@@ -104,6 +107,8 @@ fn condition_zones(condition: &str, text: &str, name: &str) -> ZoneKinds {
 fn the_reader_reads_the_printed_forms() {
     let both = ZoneKinds(ON_THE_STACK.0 | ON_THE_BATTLEFIELD.0);
     for (text, name, zones) in [
+        ("At the beginning of your upkeep, if this card is exiled with a scream counter on it, remove a scream counter from it.", "All Hallow's Eve", ZoneKinds::of(&[ZoneKind::Exile])),
+        ("When this card is exiled, you gain 1 life.", "Test", ON_THE_BATTLEFIELD),
         ("When you cast this spell, take an extra turn after this one.", "Emrakul, the Aeons Torn", ON_THE_STACK),
         ("When you do, copy this spell for each creature sacrificed this way.", "Plumb the Forbidden", ON_THE_STACK),
         ("Cascade", "Bloodbraid Elf", ON_THE_STACK),
