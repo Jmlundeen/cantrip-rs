@@ -1,0 +1,6 @@
+{
+  "name": "Armageddon",
+  "manaCost": "{3}{W}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all lands."
+}

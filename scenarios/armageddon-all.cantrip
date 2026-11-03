@@ -1,0 +1,30 @@
+# Armageddon destroys lands controlled by both players (CR 701.8a).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Pearl
+Armageddon
+Island x20
+
+[Bot2 Deck]
+Mountain
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Armageddon.Cast
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Armageddon; Island; Black Lotus
+Bot2.Graveyard = Mountain
+Bot1.Battlefield.Mox Pearl.Tapped = true
