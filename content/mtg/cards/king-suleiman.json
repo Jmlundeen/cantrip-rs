@@ -1,0 +1,8 @@
+{
+  "name": "King Suleiman",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Noble",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}: Destroy target Djinn or Efreet."
+}

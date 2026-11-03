@@ -1,0 +1,55 @@
+# Suleiman taps to destroy either a Djinn or an Efreet, including one's own; a creature of another subtype is illegal (CR 701.8a, 115.1).
+
+[Bot1 Deck]
+King Suleiman
+Mox Pearl
+Mox Sapphire
+Exhibition Tidecaller
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Bloodfire Expert
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.King Suleiman.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Bloodfire Expert.Cast
+? Bot2.Mana =
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Exhibition Tidecaller.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.King Suleiman.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.King Suleiman.Activate(Bot1.Battlefield.Exhibition Tidecaller)
+? Bot1.Battlefield.King Suleiman.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Exhibition Tidecaller.Power = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.King Suleiman.Activate(Bot2.Battlefield.Bloodfire Expert)
+? Bot1.Battlefield.King Suleiman.Tapped = true
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard.Bloodfire Expert.Power = 3
+Bot1.Battlefield.Ornithopter.Power = 0
