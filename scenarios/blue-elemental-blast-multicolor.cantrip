@@ -1,0 +1,31 @@
+# Blue Elemental Blast destroys a multicolored permanent that is red (CR 105.2b).
+
+[Bot1 Deck]
+Mox Sapphire
+Blue Elemental Blast
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Goblin Deathraiders
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Goblin Deathraiders.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Blue Elemental Blast.Cast
+Bot1.Modes(Destroy target red permanent)
+Bot1.Target(Bot2.Battlefield.Goblin Deathraiders)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Goblin Deathraiders
