@@ -1,0 +1,65 @@
+# Angelic Voices gives your artifact creatures +1/+1, loses the bonus for your nonwhite nonartifact creature,
+# and regains it when that creature dies; an opponent's green creature neither stops nor receives the bonus.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Angelic Voices
+Ornithopter
+Mox Emerald
+Llanowar Elves
+Watchwolf
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mox Emerald
+Llanowar Elves
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Angelic Voices.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Watchwolf.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Watchwolf.Power = 4
+Bot1.Battlefield.Watchwolf.Toughness = 4
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Battlefield.Llanowar Elves.Toughness = 1
