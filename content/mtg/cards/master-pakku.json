@@ -1,0 +1,8 @@
+{
+  "name": "Master Pakku",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Creature — Human Advisor Ally",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nWhenever Master Pakku becomes tapped, target player mills X cards, where X is the number of Lesson cards in your graveyard. (They put the top X cards of their library into their graveyard.)"
+}

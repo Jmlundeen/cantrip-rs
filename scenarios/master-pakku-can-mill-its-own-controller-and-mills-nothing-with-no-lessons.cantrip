@@ -1,0 +1,55 @@
+# Master Pakku, 1/3: "target player mills X cards, where X is the number of Lesson cards in your graveyard" (CR 701.17a, 205.3k). The target need not be an
+# opponent: Bot1 targets itself, and a creature (Pakku itself) is refused as a target. Turn 3, no Lesson in Bot1's graveyard: X is 0 and
+# nothing is milled (library 12 before and after). Turn 5, Entomb puts Accumulate Wisdom there first: X is 1 and Bot1 mills one card from its own
+# library, an Island (10 left).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Master Pakku
+Entomb
+Island
+Island
+Island
+Island
+Accumulate Wisdom
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Master Pakku.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 13
+Bot1.Attack(Master Pakku > Bot2)
+! Bot1.Target(Master Pakku)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 13
+? Bot1.Graveyard =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Accumulate Wisdom)
+Bot1.Attack(Master Pakku > Bot2)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Library.Count = 10
+Bot1.Graveyard = Island; Entomb; Accumulate Wisdom

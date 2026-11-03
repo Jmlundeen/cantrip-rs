@@ -1,0 +1,77 @@
+# Master Pakku {1}{U}, 1/3 Prowess: "Whenever Master Pakku becomes tapped, target player mills X cards, where X is the number of Lesson cards in YOUR
+# graveyard" (CR 701.17a, 205.3k). Casting Entomb (a noncreature spell) on turn 1 gives prowess +1/+1 until end of turn (2/4, back to 1/3 next turn). Entomb
+# puts Accumulate Wisdom (a Lesson) into Bot1's graveyard. Turn 3: attacking taps Pakku, X is 1, and Bot2 mills exactly one card: its Airbending Lesson.
+# Turn 5, a second Entomb having put Airbending Lesson in Bot1's graveyard, X is 2 - not 3, for the Lesson now in Bot2's own graveyard stays uncounted -
+# so Bot2 mills exactly two more cards, Mountain and Forest, with its turn-4 draw (Swamp) between.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Master Pakku
+Entomb
+Entomb
+Island
+Island
+Island
+Accumulate Wisdom
+Airbending Lesson
+Island x9
+
+[Bot2 Deck]
+Island x7
+Plains
+Airbending Lesson
+Swamp
+Mountain
+Forest
+Island x8
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Master Pakku.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Master Pakku.Power = 1
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Master Pakku.Power = 2
+? Bot1.Battlefield.Master Pakku.Toughness = 4
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Accumulate Wisdom)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Master Pakku.Power = 1
+? Bot1.Battlefield.Master Pakku.Toughness = 3
+Bot1.Attack(Master Pakku > Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Airbending Lesson
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Airbending Lesson)
+Bot1.Attack(Master Pakku > Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Entomb; Airbending Lesson; Entomb; Accumulate Wisdom
+Bot2.Graveyard = Forest; Mountain; Airbending Lesson
+Bot2.Library.Count = 8
