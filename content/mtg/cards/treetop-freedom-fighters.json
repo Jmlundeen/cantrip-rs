@@ -1,0 +1,11 @@
+{
+  "name": "Treetop Freedom Fighters",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Human Rebel Ally",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Haste\nWhen this creature enters, create a 1/1 white Ally creature token.",
+  "keywords": [
+    "Haste"
+  ]
+}

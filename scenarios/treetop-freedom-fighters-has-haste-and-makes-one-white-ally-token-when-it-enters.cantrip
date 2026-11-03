@@ -1,0 +1,43 @@
+# Treetop Freedom Fighters {2}{R} is a 2/1 Human Rebel Ally with haste. "When this creature enters, create a 1/1 white Ally creature
+# token." Bot1 casts it on turn 1: exactly one 1/1 white Ally token (the token has no haste, so the Fighters are the only
+# creature that can attack, prompted at once and dealing 2), and the Fighters themselves are not summoning sick.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Pearl
+Treetop Freedom Fighters
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Treetop Freedom Fighters.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ally Token.Power = 1
+? Bot1.Battlefield.Ally Token.Toughness = 1
+? Bot1.Battlefield.Ally Token.Colors = White
+? Bot1.Battlefield.Ally Token.SummoningSick = true
+? Bot1.Battlefield.Treetop Freedom Fighters.Keywords = Haste
+? Bot1.Battlefield.Treetop Freedom Fighters.Power = 2
+? Bot1.Battlefield.Treetop Freedom Fighters.Toughness = 1
+Bot1.Attack(Treetop Freedom Fighters > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Mountain; Mox Jet; Mox Pearl; Treetop Freedom Fighters; Ally Token
