@@ -1,0 +1,62 @@
+# Flash (CR 702.8a): Bot1 casts The Unagi of Kyoshi Island ({3}{U}{U}, paid exactly by the Island and four Moxen: nothing is left in the pool) in response to Bot2's Brainstorm, on Bot2's turn.
+# Bot2's turn draw was its first card of the turn and Brainstorm's draws start with its second, so the Unagi's trigger happens once, not for each of Brainstorm's three: Bot1 draws two
+# cards, ending with its Brainstorm and those two. On Bot1's own turn its Brainstorm is a second draw too (after the draw step) but it is no opponent's: nothing is drawn for it.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+The Unagi of Kyoshi Island
+Brainstorm
+Mountain
+Forest
+Island x20
+
+[Bot2 Deck]
+Island
+Brainstorm
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Unagi of Kyoshi Island.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Island; Island)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mountain; Forest)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.The Unagi of Kyoshi Island.Power = 5
+Bot1.Hand.Count = 4
