@@ -1,0 +1,63 @@
+# Watery Grasp, "Enchant creature" and "Waterbend {5}: Enchanted creature's owner shuffles it into their library." Bot1 enchants Bot2's Grizzly Bears on turn 3 with one Mox (a Mox is
+# refused as the target: it is no creature) and pays the {5} with five taps, four more Moxen and its Memnite, so the pool is empty
+# and nothing else is tapped. The Bears go from the battlefield to Bot2's library (15 -> 16 cards, not its graveyard) and the Grasp, left with nothing to
+# enchant, goes to Bot1's graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Memnite
+Watery Grasp
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Watery Grasp.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Hand.Watery Grasp.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Library.Count = 15
+Bot1.Battlefield.Watery Grasp.Activate(Ability: Waterbend; Convoke: Mox Jet, Mox Ruby, Mox Pearl, Mox Emerald, Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Grizzly Bears = (absent)
+Bot2.Graveyard =
+Bot2.Library.Count = 16
+Bot1.Graveyard = Watery Grasp
