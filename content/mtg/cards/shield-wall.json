@@ -1,0 +1,6 @@
+{
+  "name": "Shield Wall",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Creatures you control get +0/+2 until end of turn."
+}
