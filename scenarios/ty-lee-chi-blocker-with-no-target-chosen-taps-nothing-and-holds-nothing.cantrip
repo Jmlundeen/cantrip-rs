@@ -1,0 +1,40 @@
+# "Up to one target creature": Bot1 chooses none with Bot2's Memnite in play, so nothing is tapped and nothing is held (CR 601.2c, 115.1).
+# Memnite stays untapped and Ty Lee has changed nothing.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Ty Lee, Chi Blocker
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ty Lee, Chi Blocker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Tapped = false
+
+[Expect]
+Bot2.Battlefield.Memnite.Tapped = false
+Bot1.Battlefield.Ty Lee, Chi Blocker.Tapped = false

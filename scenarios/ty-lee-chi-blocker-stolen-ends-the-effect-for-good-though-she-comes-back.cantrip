@@ -1,0 +1,68 @@
+# "For as long as you control Ty Lee" (CR 611.2b), the rulings: if another player gains control of her the effect ends, and regaining control
+# won't make it resume. Memnite, tapped by her trigger on turn 2, is still tapped in Bot2's untap step on turn 4 (Bot1 controls her). Bot2's
+# Act of Treason takes her that turn and gives her back at its end; Memnite stays tapped through turn 4 and untaps in Bot2's turn 6 untap
+# step, though Bot1 controls Ty Lee again.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Ty Lee, Chi Blocker
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Memnite
+Act of Treason
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ty Lee, Chi Blocker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Tapped = true
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Memnite.Tapped = true
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Ty Lee, Chi Blocker)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Ty Lee, Chi Blocker.Tapped = false
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ty Lee, Chi Blocker.Tapped = false
+? Bot2.Battlefield.Memnite.Tapped = true
+[T6 Bot2.Main1]
+? Bot2.Battlefield.Memnite.Tapped = false
+
+[Expect]
+Bot2.Battlefield.Memnite.Tapped = false

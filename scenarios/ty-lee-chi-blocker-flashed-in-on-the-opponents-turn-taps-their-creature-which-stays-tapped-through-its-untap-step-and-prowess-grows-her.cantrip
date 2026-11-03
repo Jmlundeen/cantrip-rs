@@ -1,0 +1,63 @@
+# Flash (CR 702.8a): Bot1 casts Ty Lee, Chi Blocker ({2}{U}, paid by three Moxen) on Bot2's turn 2 with Bot2's Memnite on the battlefield; her
+# trigger taps it and it "doesn't untap during its controller's untap step for as long as you control Ty Lee" (CR 502.3, 611.2b): it is still
+# tapped on Bot2's turn 4 after the untap step, though Bot2's Mox Ruby, tapped the same turn, is untapped. Prowess (CR 702.108a): Bot1's
+# Lightning Bolt on turn 3 makes her a 3/2 until end of turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ty Lee, Chi Blocker
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ty Lee, Chi Blocker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Battlefield.Ty Lee, Chi Blocker.Power = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ty Lee, Chi Blocker.Power = 3
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Memnite.Tapped = true
+? Bot2.Battlefield.Mox Ruby.Tapped = false
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Ty Lee, Chi Blocker.Power = 2

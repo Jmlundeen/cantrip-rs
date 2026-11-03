@@ -1,0 +1,55 @@
+# "For as long as you control Ty Lee" (CR 611.2b), the ruling: if Ty Lee is gone before her ability resolves, the creature is still tapped but
+# the duration is over before it begins, so it untaps normally. Bot2 Bolts Ty Lee in response to the trigger: Memnite is tapped when the
+# trigger resolves, and untaps in Bot2's untap step on turn 4.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Ty Lee, Chi Blocker
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Memnite
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ty Lee, Chi Blocker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ty Lee, Chi Blocker)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Ty Lee, Chi Blocker
+? Bot2.Battlefield.Memnite.Tapped = true
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Memnite.Tapped = true
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Memnite.Tapped = false
+
+[Expect]
+Bot2.Battlefield.Memnite.Tapped = false
