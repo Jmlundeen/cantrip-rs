@@ -1,0 +1,27 @@
+# Oasis can protect an opponent's creature: one of Lightning Bolt's three damage is prevented (CR 115.1c, 615.7).
+[Bot1 Deck]
+Oasis
+Mox Ruby
+Lightning Bolt
+Island x20
+[Bot2 Deck]
+Steel Wall
+Mox Pearl
+Island x20
+[Actions]
+Bot1.Hand.Oasis.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Oasis.Activate(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Steel Wall.Damage = 2

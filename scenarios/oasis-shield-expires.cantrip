@@ -1,0 +1,28 @@
+# An unused Oasis shield expires at cleanup; Lightning Bolt deals all three damage on the next turn (CR 514.2, 615.7).
+[Bot1 Deck]
+Oasis
+Island x20
+[Bot2 Deck]
+Steel Wall
+Mox Pearl
+Mox Ruby
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Oasis.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Oasis.Activate(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Steel Wall)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot2.Battlefield.Steel Wall.Damage = 3
