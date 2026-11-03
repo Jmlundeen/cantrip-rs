@@ -1329,10 +1329,9 @@ pub fn each_end_step(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
     }
 }
 
-/// "At the beginning of the upkeep of enchanted creature's controller" (CR 503.1a, 303.4): the upkeep step began on the turn
-/// of whoever controls the permanent the source is attached to, that player the trigger's subject ("that player"). Super
-/// Intelligence prints it, and so do Essence Flare, Maddening Wind and One Thousand Lashes.
-pub fn enchanted_creatures_controllers_upkeep(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+/// The upkeep of the enchanted permanent's controller (CR 503.1a, 303.4), with that player as the subject. Super Intelligence
+/// enchants a creature and Cursed Land enchants a land; the enchant ability decides which permanent the Aura can be attached to.
+pub fn enchanted_permanents_controllers_upkeep(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::StepBegan { step: Step::Upkeep } => {
             let host = q.obj(source).attached_to?;
@@ -1993,7 +1992,7 @@ pub const YOUR_SECOND_MAIN_PHASE: Trigger = when_asked(EventMask::STEP_BEGAN, yo
 pub const EACH_OPPONENTS_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, each_opponents_upkeep);
 pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, beginning_of_your_combat);
 pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);
-pub const ENCHANTED_CREATURES_CONTROLLERS_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, enchanted_creatures_controllers_upkeep);
+pub const ENCHANTED_PERMANENTS_CONTROLLERS_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, enchanted_permanents_controllers_upkeep);
 pub const EACH_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, each_upkeep);
 pub const EACH_PLAYERS_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, each_players_upkeep);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
