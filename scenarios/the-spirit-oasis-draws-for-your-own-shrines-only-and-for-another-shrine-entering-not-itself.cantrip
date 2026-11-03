@@ -1,0 +1,69 @@
+# The Spirit Oasis {2}{U}: "When this enters, draw a card for each Shrine you control. Whenever another Shrine you control enters, draw a card." It is the
+# only Shrine there is, so a second one is a second Oasis, and the legend rule applies. Turn 1 Bot1's Oasis enters: it draws exactly one card (library 11 ->
+# 10): itself counts for the first ability, and the second does not trigger for itself. Turn 2 Bot2's own Oasis enters and Bot2 draws one: an opponent's
+# Shrine neither triggers Bot1's Oasis (library still 10) nor, on turn 3, counts. Turn 3 (library 9 after the draw step) Bot1's second Oasis enters: the
+# legend rule has Bot1 keep the first and the new one goes to the graveyard (704.5j) before the abilities are put on the stack; the first's "another Shrine
+# enters" draws one and the new one's enters draws one for the Shrine left, Bot2's uncounted: two cards (library 7, not 6).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+The Spirit Oasis
+The Spirit Oasis
+Island
+Island
+Island x11
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+The Spirit Oasis
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Spirit Oasis.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 10
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.The Spirit Oasis.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Library.Count = 11
+? Bot1.Library.Count = 10
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 9
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Spirit Oasis.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(The Spirit Oasis)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Library.Count = 7
+Bot1.Graveyard = The Spirit Oasis
+Bot2.Library.Count = 11
