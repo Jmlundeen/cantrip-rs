@@ -1,0 +1,59 @@
+# "As long as there's a Lesson card in your graveyard" (CR 205.3k, 611.3a): the 1/2 First-Time Flyer is a 2/3 once Entomb puts Accumulate Wisdom
+# (a Lesson) into Bot1's graveyard, and stays a 2/3 with a second Lesson there (+1/+1 once, not for each), and is a 1/2 again as Tormod's Crypt
+# exiles the graveyard. The Flyer has flying (CR 702.9).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Tormod's Crypt
+First-Time Flyer
+Entomb
+Entomb
+Accumulate Wisdom
+Airbending Lesson
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Tormod's Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.First-Time Flyer.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.First-Time Flyer.Power = 1
+? Bot1.Battlefield.First-Time Flyer.Toughness = 2
+? Bot1.Battlefield.First-Time Flyer.Keywords = Flying
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Accumulate Wisdom)
+? Bot1.Battlefield.First-Time Flyer.Power = 2
+? Bot1.Battlefield.First-Time Flyer.Toughness = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Airbending Lesson)
+? Bot1.Battlefield.First-Time Flyer.Power = 2
+? Bot1.Battlefield.First-Time Flyer.Toughness = 3
+Bot1.Battlefield.Tormod's Crypt.Activate(Target: Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.First-Time Flyer.Power = 1
+Bot1.Battlefield.First-Time Flyer.Toughness = 2

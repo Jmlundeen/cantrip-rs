@@ -1,0 +1,11 @@
+{
+  "name": "First-Time Flyer",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Human Pilot Ally",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Flying\nThis creature gets +1/+1 as long as there's a Lesson card in your graveyard.",
+  "keywords": [
+    "Flying"
+  ]
+}
