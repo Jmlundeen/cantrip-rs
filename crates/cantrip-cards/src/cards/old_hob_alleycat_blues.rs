@@ -16,14 +16,6 @@ fn create_mutant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Destroy it": the tokens the delayed ability carries that are still those objects, so still on the battlefield (CR 603.7c, 400.7).
-/// An indestructible one stays, and the ability does not trigger again (CR 603.7).
-fn destroy_created(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let created: Vec<ObjectId> = g.event_objects(item).iter().copied().filter(|&id| is_live(g, id)).collect();
-    g.destroy_all(&created);
-    Ok(())
-}
-
 fn attacking_creature_token(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     (targets::ATTACKING_CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).token)
 }
@@ -44,7 +36,7 @@ pub static CARD: CardDef = CardDef {
         ),
         ability(cost("{1}{W}"), protect, "{1}{W}: Target attacking creature token gains indestructible until end of turn.").targets(&[target(attacking_creature_token)]),
     ],
-    delayed: &[delayed_trigger(destroy_created, "Destroy it.")],
+    delayed: &[delayed_trigger(delayed::destroy_carried, "Destroy it.")],
     ..oracle::OLD_HOB_ALLEYCAT_BLUES
 };
 

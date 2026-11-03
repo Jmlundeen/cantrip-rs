@@ -129,6 +129,14 @@ pub fn at_next_end_step_about(g: &mut dyn Game, item: &StackItem, ability: u8, c
     );
 }
 
+/// "Destroy it at the beginning of the next end step": destroy the carried objects that are still
+/// permanents (CR 603.7c, 400.7, 701.8). Glyph of Destruction and Old Hob, Alleycat Blues use it.
+pub fn destroy_carried(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let objects = g.event_objects(item).to_vec();
+    g.destroy_all(&objects);
+    Ok(())
+}
+
 /// "Sacrifice them": the objects the delayed ability carries (`at_next_end_step_about`) that are still on the battlefield
 /// as the objects they were (CR 603.7c, 400.7), sacrificed in one action by this ability's controller (CR 603.7d-e), who
 /// can't sacrifice one another player controls now (CR 701.21a).
