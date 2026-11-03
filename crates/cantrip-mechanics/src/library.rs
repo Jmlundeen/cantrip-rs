@@ -473,6 +473,47 @@ pub fn look_at_top(
     Ok(taken)
 }
 
+/// `look_at_top` with the cards that may be taken told by a selection rule (`crate::select`: how many, of what quality), asked
+/// with `choose::select`: "Look at the top four cards of your library. You may reveal a creature card with mana value 3 or less
+/// from among them and put it into your hand. Put the rest on the bottom of your library in a random order." The cards looked at
+/// are all shown; the cards the rule allows can be chosen; `reveal` reveals the chosen ones as they go to the hand (CR 701.20a);
+/// the others are placed as `rest` says (CR 401.4). With nothing in the library nobody is asked. The cards taken, as they are in
+/// the hand. Recruitment Officer, Gavony Dawnguard and There's Coffee in that Nebula print it.
+pub fn look_at_top_select(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    count: usize,
+    rule: Selection,
+    reveal: bool,
+    rest: Rest,
+) -> Result<Vec<ObjectId>, Suspend> {
+    let looked = top_of_library(g, player, count);
+    if looked.is_empty() {
+        return Ok(Vec::new());
+    }
+    g.look_at(player, &looked);
+    let purpose = if reveal { Purpose::Reveal } else { Purpose::PutIntoHand };
+    let chosen = crate::choose::select(g, player, source, purpose, looked.clone(), rule)?;
+    let taken = if chosen.is_empty() {
+        chosen
+    } else if reveal {
+        g.reveal(player, &chosen);
+        g.return_to_hand_revealed(&chosen)
+    } else {
+        g.return_to_hand(&chosen)
+    };
+    match rest {
+        Rest::BottomRandom => rest_to_bottom_in_random_order(g, player, &looked),
+        Rest::BottomChosen => {
+            let left: Vec<ObjectId> = looked.iter().copied().filter(|&c| is_live(g, c) && g.obj(c).zone == Zone::library(player)).collect();
+            let order = ask_library_order(g, player, source, &left, DestinationKind::LibraryBottom)?;
+            g.arrange_library(player, &[], &order);
+        }
+    }
+    Ok(taken)
+}
+
 /// "Look at the top `count` cards of your library. Put up to `most` [`kind`] cards [with total mana value N or less]
 /// from among them onto the battlefield. Put the rest on the bottom of your library in a random order [or
 /// `Rest::BottomChosen`: "in any order"]." (CR 401.2, 401.4): the player sees every card looked at (a smaller library
