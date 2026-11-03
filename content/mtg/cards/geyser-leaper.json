@@ -1,0 +1,11 @@
+{
+  "name": "Geyser Leaper",
+  "manaCost": "{4}{U}",
+  "type": "Creature — Human Warrior Ally",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Flying\nWaterbend {4}: Draw a card, then discard a card. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)",
+  "keywords": [
+    "Flying"
+  ]
+}

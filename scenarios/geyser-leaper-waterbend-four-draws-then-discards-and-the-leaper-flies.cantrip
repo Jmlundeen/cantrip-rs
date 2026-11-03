@@ -1,0 +1,66 @@
+# "Waterbend {4}: Draw a card, then discard a card" (CR 701.67a-b, 121.1, 701.9). With Bot1's hand empty, the order is shown: the card drawn
+# is the one discarded (discarding first would find no card and leave the Island in hand). The Leaper (4/3 Flying) is itself tapped for
+# its own cost with Memnite and Ornithopter, and one Mox Sapphire mana pays the last {1}: exactly {4}, nothing else tapped. On turn 3, with
+# Mox Pearl in hand and an Island drawn, Bot1 chooses which to discard: it keeps the Island.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Geyser Leaper
+Memnite
+Ornithopter
+Island
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Geyser Leaper.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Geyser Leaper.Keywords = Flying
+? Bot1.Battlefield.Geyser Leaper.Power = 4
+? Bot1.Battlefield.Geyser Leaper.Toughness = 3
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Geyser Leaper.Activate(Convoke: Memnite, Ornithopter, Geyser Leaper)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+? Bot1.Hand.Count = 0
+? Bot1.Graveyard.Count = 2
+? Bot1.Graveyard = Island; Black Lotus
+? Bot1.Battlefield.Geyser Leaper.Tapped = true
+[T3 Bot1.Main1]
+? Bot1.Hand = Mox Pearl
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Geyser Leaper.Activate(Convoke: Memnite, Ornithopter, Geyser Leaper)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mox Pearl)
+
+[Expect]
+Bot1.Hand = Island
+Bot1.Graveyard = Mox Pearl; Island; Black Lotus
+Bot1.Mana =
+Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Battlefield.Mox Ruby.Tapped = false
