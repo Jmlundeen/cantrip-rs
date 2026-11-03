@@ -1,0 +1,11 @@
+# A starting deck holding a card of mana value less than three (Grizzly Bears, 2) does not meet Keruga's companion condition, so Keruga is not Bot1's companion (CR 702.139a).
+[Bot1 Deck]
+Grizzly Bears
+Island x20
+[Bot1 Companion]
+Keruga, the Macrosage
+[Bot2 Deck]
+Island x20
+[Actions]
+[Expect]
+Bot1.Companion =
