@@ -1,0 +1,23 @@
+# With no white creatures controlled by the target, Jovial Evil deals no damage (CR 120.8).
+[Bot1 Deck]
+Black Lotus
+Jovial Evil
+Swamp x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Jovial Evil.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard.Jovial Evil.Colors = Black

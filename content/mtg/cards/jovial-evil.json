@@ -1,0 +1,6 @@
+{
+  "name": "Jovial Evil",
+  "manaCost": "{2}{B}",
+  "type": "Sorcery",
+  "oracleText": "Jovial Evil deals X damage to target opponent, where X is twice the number of white creatures that player controls."
+}
