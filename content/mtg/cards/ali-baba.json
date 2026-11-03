@@ -1,0 +1,8 @@
+{
+  "name": "Ali Baba",
+  "manaCost": "{R}",
+  "type": "Creature — Human Rogue",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{R}: Tap target Wall."
+}

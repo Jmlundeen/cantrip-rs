@@ -1,0 +1,71 @@
+# Ali Baba taps its own Wall on the turn it enters, then taps both players' Walls while tapped from attacking.
+# A non-Wall is refused, and each activation costs exactly one red mana.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Wall of Wood
+Ali Baba
+Black Lotus
+Steel Wall
+Mountain x13
+
+[Bot2 Deck]
+Mox Pearl
+Steel Wall
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wall of Wood.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ali Baba.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Ali Baba.Activate(Bot1.Battlefield.Ali Baba)
+Bot1.Battlefield.Ali Baba.Activate(Bot1.Battlefield.Wall of Wood)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wall of Wood.Tapped = true
+! Bot1.Battlefield.Ali Baba.Activate(Bot1.Battlefield.Wall of Wood; Mana: short)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Steel Wall.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Ali Baba > Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Ali Baba.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Ali Baba.Activate(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Steel Wall.Tapped = true
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Ali Baba.Activate(Bot1.Battlefield.Steel Wall)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Steel Wall.Tapped = true
+? Bot1.Battlefield.Ali Baba.Tapped = true
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Ali Baba.Activate(Bot1.Battlefield.Wall of Wood; Mana: short)
+? Bot1.Mana = {G}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Steel Wall.Tapped = true
+Bot2.Battlefield.Steel Wall.Tapped = true
