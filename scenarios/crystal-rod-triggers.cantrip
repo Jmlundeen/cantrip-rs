@@ -1,0 +1,47 @@
+# Crystal Rod triggers for a multicolored blue spell cast by an opponent, and its controller may pay one to gain one life (CR 603.2, 119.3).
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Black Lotus
+Crystal Rod
+Wind Drake
+Mox Emerald
+Llanowar Elves
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Proctor of Potential
+Island x20
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Crystal Rod.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+! Bot1.Accept
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Proctor of Potential.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.PayCost
+? Bot1.Mana =
+? Bot1.Life = 21
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Wind Drake.Cast
+Bot1.Decline
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
