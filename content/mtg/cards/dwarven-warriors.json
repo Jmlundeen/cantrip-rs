@@ -1,0 +1,8 @@
+{
+  "name": "Dwarven Warriors",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Dwarf Warrior",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}: Target creature with power 2 or less can't be blocked this turn."
+}

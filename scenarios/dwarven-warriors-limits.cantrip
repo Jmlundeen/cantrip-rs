@@ -1,0 +1,51 @@
+# The Warriors target a creature of power at most two until end of turn, even if its power later rises (CR 611.2a, 115.1c).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Mox Ruby
+Dwarven Warriors
+Grizzly Bears
+Hill Giant
+Giant Growth
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Dwarven Warriors.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hill Giant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Dwarven Warriors.Activate(Bot1.Battlefield.Hill Giant)
+! Bot1.Battlefield.Dwarven Warriors.Activate(Bot1.Battlefield.Mox Emerald)
+Bot1.Battlefield.Dwarven Warriors.Activate(Bot1.Battlefield.Grizzly Bears)
+? Bot1.Battlefield.Dwarven Warriors.Tapped = true
+! Bot1.Battlefield.Dwarven Warriors.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.CantBeBlocked = true
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 5
+? Bot1.Battlefield.Grizzly Bears.CantBeBlocked = true
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Grizzly Bears.CantBeBlocked = (absent)
+Bot1.Battlefield.Dwarven Warriors.Activate(Bot2.Battlefield.Ornithopter)
+[Expect]
+Bot2.Battlefield.Ornithopter.CantBeBlocked = true
