@@ -1,0 +1,6 @@
+{
+  "name": "Greed",
+  "manaCost": "{3}{B}",
+  "type": "Enchantment",
+  "oracleText": "{B}, Pay 2 life: Draw a card."
+}

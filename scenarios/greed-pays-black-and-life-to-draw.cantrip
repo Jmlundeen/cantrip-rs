@@ -1,0 +1,42 @@
+# Greed needs black mana and two life, then draws exactly one card for its controller (CR 602.2b, 121.1).
+# Blue mana alone cannot pay the activation; on the next turn Mox Jet pays it.
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Greed
+Island
+Island
+Island
+Swamp
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Greed.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Greed.Activate(Mana: short)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Greed.Activate
+? Bot1.Mana =
+? Bot1.Life = 18
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot1.Hand = Island; Island; Island; Swamp; Forest
+Bot1.Library.Count = 20
