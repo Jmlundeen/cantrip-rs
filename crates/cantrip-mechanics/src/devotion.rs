@@ -1,16 +1,14 @@
-//! Devotion (CR 700.5), an ability word's measure: Thassa's Oracle, Nykthos, Shrine to Nyx.
+//! Devotion (CR 700.5), a count cards read: Thassa's Oracle, Nykthos, Shrine to Nyx, Setessan Petitioner.
 use cantrip_api::*;
 
 /// Mana symbols of `color` in a permanent's or spell's mana cost (CR 700.5, 202.2; Namor the Sub-Mariner counts a spell's): hybrid ({U/R}, {2/U}) and Phyrexian symbols of the
 /// color each count once, numeric and other colors' symbols not. A copy counts the cost it copies (CR 707.2, 700.5a),
-/// none if it has none (CR 707.9b).
+/// none if it has none (CR 707.9b); a Room permanent counts its unlocked doors alone (CR 709.5).
 pub fn symbols_of(q: &dyn Query, id: ObjectId, color: Color) -> u32 {
     let mana = color.mana();
-    let values = q.copiable_values(id);
-    if values.has_no_cost() {
-        return 0;
-    }
-    let cost = q.card(values.card).cost;
+    // The mana cost the object has now: a copy's is the one it copies, none if it has none (CR 707.9b), and a Room
+    // permanent's is its unlocked doors' alone (CR 709.5).
+    let cost = q.mana_cost(id);
     cost.symbols[mana as usize]
         + cost.hybrid.iter().flatten().filter(|(a, b)| *a == mana || *b == mana).count() as u32
         + cost.phyrexian[mana as usize]

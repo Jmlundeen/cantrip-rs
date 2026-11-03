@@ -1,0 +1,35 @@
+# Nykthos, Shrine to Nyx counts only the unlocked door of a Room (CR 709.5, 700.5): Unholy Annex // Ritual Chamber cast as
+# Unholy Annex ({2}{B}), Ritual Chamber ({3}{B}{B}) locked, has the mana cost {2}{B} alone, so devotion to black is 1 and
+# Nykthos adds {B}, not {B}{B}{B}.
+
+[Bot1 Deck]
+Nykthos, Shrine to Nyx
+Black Lotus
+Unholy Annex // Ritual Chamber
+Mox Jet
+Swamp
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Nykthos, Shrine to Nyx.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Activate(Ability: {2}; Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Tapped = true

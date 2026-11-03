@@ -1,0 +1,52 @@
+# Nykthos, Shrine to Nyx counts the mana cost a copy copies, not its own card's (CR 700.5, 700.5a, 707.2): Phyrexian
+# Metamorph ({3}{U/P}) entering as a copy of Llanowar Elves has the mana cost {G}, so devotion to green is 2 (the Elves and
+# the copy) and devotion to blue 0. Nykthos adds {G}{G} on turn 3 and nothing on turn 5.
+
+[Bot1 Deck]
+Nykthos, Shrine to Nyx
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Llanowar Elves
+Phyrexian Metamorph
+Island
+Island x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Nykthos, Shrine to Nyx.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+? Bot1.Battlefield.Llanowar Elves#2.Types = Creature; Artifact
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Activate(Ability: {2}; Color: Green)
+? Bot1.Mana = {G}{G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Activate(Ability: {2}; Color: Blue)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield = Llanowar Elves; Llanowar Elves; Mox Emerald; Mox Sapphire; Nykthos, Shrine to Nyx
+Bot1.Life = 20

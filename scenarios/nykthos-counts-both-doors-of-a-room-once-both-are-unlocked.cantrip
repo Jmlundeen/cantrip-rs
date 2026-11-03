@@ -1,0 +1,71 @@
+# Nykthos, Shrine to Nyx counts both doors of Unholy Annex // Ritual Chamber once both are unlocked (CR 709.5, 700.5): the Room's
+# mana cost is {2}{B} and {3}{B}{B} together, three black symbols, so Nykthos adds {B}{B}{B}. Setup is the door-unlocking line of
+# room-unlock-the-other-door-is-a-sorcery-speed-special-action-that-triggers-and-renames-it, then Nykthos on turn 7.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Mox Jet
+Mox Jet
+Mox Jet
+Nykthos, Shrine to Nyx
+Swamp
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Unholy Annex.Doors = Unholy Annex
+? Bot1.Battlefield.Unholy Annex.ManaValue = 3
+# Four sources, {3}{B}{B} owed: refused for cost, in a main phase with an empty stack.
+! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door; Mana: short)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.BeginCombat]
+# Five sources, but not a main phase.
+! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+[T4 Bot2.Main1]
+# Five sources, but Bot2's turn.
+! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+? Stack.Count = 1
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.Doors = Unholy Annex; Ritual Chamber
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.ManaValue = 8
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.Colors = Black
+? Bot1.Battlefield.Demon Token.Power = 6
+[T7 Bot1.Main1]
+Bot1.Hand.Nykthos, Shrine to Nyx.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Activate(Ability: {2}; Color: Black)
+? Bot1.Mana = {B}{B}{B}
+
+[Expect]
+Bot1.Battlefield = Demon Token; Mox Jet; Mox Jet; Mox Jet; Nykthos, Shrine to Nyx; Swamp; Swamp; Unholy Annex // Ritual Chamber
+Bot1.Life = 18
+Bot2.Life = 18

@@ -1,0 +1,55 @@
+# Nykthos, Shrine to Nyx counts each Phyrexian symbol and each monocolored hybrid symbol with a generic half once toward devotion
+# to its color (CR 700.5, 107.4e, 107.4f): Wildgrowth Archaic's {2/G}{2/G} is devotion to green 2, and Norn's Annex's
+# {3}{W/P}{W/P} devotion to white 2 (its {3} counts for nothing), whether a {W/P} was paid with white mana or with life.
+# Nykthos adds {G}{G} on turn 3 and {W}{W} on turn 5.
+
+[Bot1 Deck]
+Nykthos, Shrine to Nyx
+Mox Emerald
+Mox Emerald
+Mox Pearl
+Black Lotus
+Wildgrowth Archaic
+Norn's Annex
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Nykthos, Shrine to Nyx.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Wildgrowth Archaic.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Norn's Annex.Cast
+# The first {W/P} paid with 2 life, the second with white mana.
+Bot1.Modes(1)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Activate(Ability: {2}; Color: Green)
+? Bot1.Mana = {G}{G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Activate(Ability: {2}; Color: White)
+? Bot1.Mana = {W}{W}
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Emerald; Mox Pearl; Norn's Annex; Nykthos, Shrine to Nyx; Wildgrowth Archaic
+Bot1.Life = 18
