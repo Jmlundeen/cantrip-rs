@@ -1,0 +1,6 @@
+{
+  "name": "Tunnel",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Destroy target Wall. It can't be regenerated."
+}

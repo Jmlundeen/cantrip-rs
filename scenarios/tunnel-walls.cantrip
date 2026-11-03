@@ -1,0 +1,42 @@
+# Tunnel destroys either player's Wall, even through a regeneration shield, and rejects a non-Wall (CR 701.8a, 701.19c).
+[Bot1 Deck]
+Yavimaya Hollow
+Mox Emerald
+Mox Ruby
+Wall of Wood
+Tunnel
+Tunnel
+Island x20
+[Bot2 Deck]
+Mox Emerald
+Wall of Wood
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Yavimaya Hollow.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wall of Wood.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wall of Wood.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Yavimaya Hollow.Activate(Bot1.Battlefield.Wall of Wood; Ability: Regenerate)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Tunnel.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Tunnel.Cast(Bot1.Battlefield.Wall of Wood)
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tunnel.Cast(Bot2.Battlefield.Wall of Wood)
+? Bot1.Mana =
+Bot1.Pass
+[Expect]
+Bot1.Graveyard = Tunnel; Tunnel; Wall of Wood
+Bot2.Graveyard = Wall of Wood
+Bot2.Battlefield.Ornithopter.Power = 0
