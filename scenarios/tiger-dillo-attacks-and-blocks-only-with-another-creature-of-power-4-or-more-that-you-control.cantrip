@@ -1,0 +1,88 @@
+# Tiger-Dillo (a 4/3): "This creature can't attack or block unless you control another creature with power 4 or greater." Turn 3: Bot1
+# controls Tiger-Dillo, an Ornithopter (the attacker that keeps the prompt coming) and a Hill Giant (power 3, just short), while Bot2
+# controls an Alpine Grizzly (power 4, the other side's): Tiger-Dillo is refused as an attacker (it is no "another", its own power 4
+# does not count) and, on turn 4, as a blocker of Bot2's Alpine Grizzly, which the Hill Giant blocks instead (both die). Turn 5: Bot1
+# casts its own Alpine Grizzly (power exactly 4); on turn 6 Tiger-Dillo blocks Bot2's Grizzly Bears, and on turn 7 it attacks for 4.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Emerald
+Tiger-Dillo
+Ornithopter
+Alpine Grizzly
+Hill Giant
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Alpine Grizzly
+Grizzly Bears
+Island x2
+Island x22
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tiger-Dillo.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Alpine Grizzly.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Attack(Tiger-Dillo > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Attack(Alpine Grizzly > Bot1)
+! Bot1.Block(Tiger-Dillo > Alpine Grizzly)
+Bot1.Block(Hill Giant > Alpine Grizzly)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack()
+[T6 Bot2.Main1]
+Bot2.Attack(Grizzly Bears > Bot1)
+Bot1.Block(Tiger-Dillo > Grizzly Bears)
+[T7 Bot1.Main1]
+Bot1.Attack(Tiger-Dillo > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 20
+Bot1.Graveyard = Hill Giant
+Bot2.Graveyard = Grizzly Bears; Alpine Grizzly
