@@ -1,0 +1,49 @@
+# Flying restricts blockers, and Cockatrice destroys its non-Wall blocker at end of combat (CR 702.9b, 603.7c).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Cockatrice
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Serra Angel
+Raging Goblin
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Cockatrice.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Serra Angel.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Raging Goblin.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Cockatrice > Bot2)
+! Bot2.Block(Raging Goblin > Cockatrice)
+Bot2.Block(Serra Angel > Cockatrice)
+[T3 Bot1.EndCombat]
+? Bot2.Battlefield.Serra Angel.Damage = 2
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Serra Angel; Black Lotus
+Bot1.Graveyard = Cockatrice; Black Lotus

@@ -1,0 +1,35 @@
+# Cockatrice does not destroy a Wall that blocks it (CR 603.2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Cockatrice
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Consulate Skygate
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Cockatrice.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Consulate Skygate.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Cockatrice > Bot2)
+Bot2.Block(Consulate Skygate > Cockatrice)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Consulate Skygate.Damage = 2
+Bot1.Battlefield.Cockatrice.Damage = 0

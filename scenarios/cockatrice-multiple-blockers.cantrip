@@ -1,0 +1,44 @@
+# Two non-Wall blockers each trigger Cockatrice, even when combat damage kills it (CR 603.2, 603.7c).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Cockatrice
+Island x20
+[Bot2 Deck]
+Black Lotus x2
+Mox Pearl x2
+Serra Angel x2
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Cockatrice.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Serra Angel.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Serra Angel.Cast
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Cockatrice > Bot2)
+Bot2.Block(Serra Angel#1 > Cockatrice; Serra Angel#2 > Cockatrice)
+[T5 Bot1.EndCombat]
+? Bot2.Battlefield.Serra Angel#1.Toughness = 4
+? Bot2.Battlefield.Serra Angel#2.Toughness = 4
+[T5 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Serra Angel#1 = (absent)
+Bot2.Battlefield.Serra Angel#2 = (absent)
