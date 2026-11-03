@@ -1,0 +1,77 @@
+# Honest Work: "Enchant creature an opponent controls. When this Aura enters, tap enchanted creature and remove all counters from it. Enchanted
+# creature loses all abilities and is a Citizen with base power and toughness 1/1 and "{T}: Add {C}" named Humble Merchant." Bot2's Serra
+# Angel (Angel, 4/4, flying, vigilance) got a +1/+1 counter from Snakeskin Veil on turn 2 (a 5/5 on turn 3, the ? lines). On turn 3 Bot1's Aura
+# may not enchant Bot1's own Memnite, and enchants the Angel: tapped, no counter, no flying or vigilance, a 1/1 Citizen (the Angel type gone,
+# still a creature) named Humble Merchant. On turn 4 it untaps like any creature and taps for {C} - the mana ability it was given, though
+# it lost its own abilities - and for nothing else.
+
+[Bot1 Deck]
+Mox Sapphire
+Memnite
+Honest Work
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Emerald
+Serra Angel
+Snakeskin Veil
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: W)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Serra Angel.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Serra Angel)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Serra Angel.Counters.PlusOnePlusOne = 1
+? Bot2.Battlefield.Serra Angel.Power = 5
+? Bot2.Battlefield.Serra Angel.Tapped = false
+? Bot2.Battlefield.Serra Angel.Keywords = Flying; Vigilance
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Honest Work.Cast(Bot1.Battlefield.Memnite)
+Bot1.Hand.Honest Work.Cast(Bot2.Battlefield.Serra Angel)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Humble Merchant.Tapped = true
+? Bot2.Battlefield.Humble Merchant.Counters.PlusOnePlusOne = (absent)
+? Bot2.Battlefield.Humble Merchant.Keywords = (absent)
+? Bot2.Battlefield.Humble Merchant.Power = 1
+? Bot2.Battlefield.Humble Merchant.Toughness = 1
+? Bot2.Battlefield.Humble Merchant.Types = Creature
+? Bot2.Battlefield.Humble Merchant.Subtypes = Citizen
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Humble Merchant.Tapped = false
+Bot2.Battlefield.Humble Merchant.Activate
+
+[Expect]
+Bot2.Mana = {C}
+Bot2.Battlefield.Humble Merchant.Tapped = true
+Bot2.Battlefield.Humble Merchant.Subtypes = Citizen
