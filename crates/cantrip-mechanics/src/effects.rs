@@ -1338,6 +1338,14 @@ pub fn return_first_target_to_battlefield(g: &mut dyn Game, item: &StackItem) ->
     Ok(())
 }
 
+/// "This source deals damage to any target and damage to you" (CR 608.2b-c, 120.4b): one instruction, both hits simultaneous.
+/// Psionic Blast and Spicy Oatmeal Pizza use this recipe; the resolving item has one mandatory target.
+pub fn damage_target_and_you<const TARGET: u16, const YOU: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let target = g.state().target(item, 0);
+    g.damage_together(&[(item.object, target, TARGET), (item.object, Target::Player(item.controller), YOU)]);
+    Ok(())
+}
+
 /// "[This source] deals `damage` damage to [a target] and you gain `life` life" (CR 120.3, 119.1): the first target, if it is
 /// still legal (CR 608.2b), is dealt the damage by the resolving object (as it last was if it has left, CR 113.7a). The gain,
 /// a fixed amount that does not use the target, is made whenever this resolves: an item with that target alone never resolves

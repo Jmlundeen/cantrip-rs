@@ -1,0 +1,29 @@
+# Master of Barbs sees Pizza's damage to both opponents at once and triggers once (CR 603.2c).
+[Bot1 Deck]
+Black Lotus
+Spicy Oatmeal Pizza
+Island x20
+[Bot2 Deck]
+Island x20
+[Bot3 Deck]
+Black Lotus
+Master of Barbs
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Black Lotus.Cast
+Bot3.Battlefield.Black Lotus.Activate(Color: Red)
+Bot3.Hand.Master of Barbs.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Spicy Oatmeal Pizza.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Target(Bot2)
+[T4 Bot1.Main2]
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 16
+Bot3.Battlefield.Master of Barbs.Power = 3
