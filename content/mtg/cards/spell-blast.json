@@ -1,0 +1,6 @@
+{
+  "name": "Spell Blast",
+  "manaCost": "{X}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target spell with mana value X. (For example, if that spell's mana cost is {3}{U}{U}, X is 5.)"
+}

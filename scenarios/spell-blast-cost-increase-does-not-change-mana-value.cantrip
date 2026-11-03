@@ -1,0 +1,43 @@
+# Thalia makes Shock cost {1}{R}, but its mana value remains one for Spell Blast (CR 202.3, 601.2f).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire x3
+Thalia, Guardian of Thraben
+Spell Blast
+Island x20
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Shock
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Hand.Spell Blast.Cast(X: 1)
+Bot1.Target(Shock)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Shock
+Bot1.Graveyard = Spell Blast; Black Lotus

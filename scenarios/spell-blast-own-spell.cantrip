@@ -1,0 +1,20 @@
+# Spell Blast can counter its controller's creature spell of mana value zero (CR 202.3, 701.6a).
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Spell Blast
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Spell Blast.Cast(X: 0)
+Bot1.Target(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+[Expect]
+Bot1.Graveyard = Spell Blast; Ornithopter
+Bot1.Battlefield.Ornithopter = (absent)

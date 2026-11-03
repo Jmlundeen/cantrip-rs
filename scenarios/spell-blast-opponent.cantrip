@@ -1,0 +1,33 @@
+# Spell Blast counters an opponent's one-mana instant, and cannot choose a spell with the wrong mana value (CR 202.3, 701.6a).
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Spell Blast
+Island x20
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Shock
+Island x20
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Spell Blast.Cast(X: 1)
+! Bot1.Target(Ornithopter)
+! Bot1.Target(Bot1)
+Bot1.Target(Shock)
+? Bot1.Mana =
+Bot1.Pass
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Shock
+Bot1.Graveyard = Spell Blast

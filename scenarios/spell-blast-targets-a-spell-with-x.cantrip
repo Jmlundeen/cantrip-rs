@@ -1,0 +1,28 @@
+# Mind Twist with X=2 has mana value 3 on the stack, so Spell Blast needs X=3 to counter it (CR 202.3e).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Spell Blast
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mind Twist
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Mind Twist.Cast(Bot1; X: 2)
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spell Blast.Cast(X: 3)
+Bot1.Target(Mind Twist)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Graveyard = Mind Twist; Black Lotus
+Bot1.Graveyard = Spell Blast; Black Lotus
