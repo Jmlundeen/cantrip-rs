@@ -1,0 +1,43 @@
+# Red Elemental Blast counters its controller's multicolored blue spell (CR 700.2, 701.6a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Aegis Turtle
+Proctor of Potential
+Red Elemental Blast
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aegis Turtle.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Proctor of Potential.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Red Elemental Blast.Cast
+! Bot1.Modes(Count: 0)
+! Bot1.Modes(1; 2)
+Bot1.Modes(1)
+! Bot1.Target(Bot1.Battlefield.Aegis Turtle)
+Bot1.Target(Stack.Proctor of Potential)
+? Bot1.Mana = {U}{U}
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Red Elemental Blast; Proctor of Potential; Black Lotus

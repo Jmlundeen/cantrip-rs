@@ -1,0 +1,6 @@
+{
+  "name": "Red Elemental Blast",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Counter target blue spell.\n• Destroy target blue permanent."
+}
