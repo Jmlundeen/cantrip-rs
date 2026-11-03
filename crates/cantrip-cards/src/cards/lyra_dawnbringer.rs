@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::lands;
-use cantrip_mechanics::statics::{other_of_subtype_you_control, plus_pt};
+use cantrip_mechanics::statics::{have_lifelink, other_of_subtype_you_control, plus_pt};
 use cantrip_oracle as oracle;
 
 /// "Other Angels you control get +1/+1 and have lifelink." One static ability in two layers (CR 613.6): lifelink in layer 6
@@ -8,13 +8,9 @@ use cantrip_oracle as oracle;
 /// Angel as the layers have it so far, the type read through the words of this card's text (CR 612).
 const TEXT: &str = "Other Angels you control get +1/+1 and have lifelink.";
 
-fn apply(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Lifelink);
-}
-
 pub static CARD: CardDef = CardDef {
     statics: &[
-        static_ability(Layer::Ability, other_of_subtype_you_control::<{ lands::sub(Subtype::Angel) }>, apply, TEXT),
+        static_ability(Layer::Ability, other_of_subtype_you_control::<{ lands::sub(Subtype::Angel) }>, have_lifelink, TEXT),
         static_ability(Layer::PtModify, other_of_subtype_you_control::<{ lands::sub(Subtype::Angel) }>, plus_pt::<1, 1>, TEXT).continues(),
     ],
     ..oracle::LYRA_DAWNBRINGER

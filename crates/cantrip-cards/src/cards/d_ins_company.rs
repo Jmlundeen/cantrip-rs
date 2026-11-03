@@ -1,13 +1,9 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{look_at_top, Rest};
 use cantrip_mechanics::lands;
-use cantrip_mechanics::statics::itself_while_you_control_another;
+use cantrip_mechanics::statics::{have_lifelink, itself_while_you_control_another};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
-
-fn lifelink(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Lifelink);
-}
 
 /// "When this creature enters, look at the top four cards of your library. You may reveal a Dwarf or Equipment card from among
 /// them and put it into your hand. Put the rest on the bottom of your library in a random order." The creature type is read
@@ -34,6 +30,6 @@ pub static CARD: CardDef = CardDef {
         look,
         "When this creature enters, look at the top four cards of your library. You may reveal a Dwarf or Equipment card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.",
     )],
-    statics: &[static_ability(Layer::Ability, itself_while_you_control_another::<{ lands::sub(Subtype::Dwarf) }>, lifelink, "This creature has lifelink as long as you control another Dwarf.")],
+    statics: &[static_ability(Layer::Ability, itself_while_you_control_another::<{ lands::sub(Subtype::Dwarf) }>, have_lifelink, "This creature has lifelink as long as you control another Dwarf.")],
     ..oracle::D_INS_COMPANY
 };
