@@ -1,0 +1,40 @@
+# Foggy Swamp Hunters: "you've drawn" is its controller's draws (CR 611.3a). Bot2 controls it, having drawn one card on turn 2.
+# On turn 3 Bot1 draws two cards (its draw step and a Gitaxian Probe), and Bot2's Hunters has neither Lifelink nor Menace.
+
+[Bot1 Deck]
+Gitaxian Probe
+Swamp x19
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Foggy Swamp Hunters
+Swamp x15
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Foggy Swamp Hunters.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Foggy Swamp Hunters.Keywords = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 18
+? Bot1.Hand.Count = 8
+? Bot2.Battlefield.Foggy Swamp Hunters.Keywords = (absent)
+
+[Expect]
+Bot1.Life = 18

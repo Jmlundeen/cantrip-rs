@@ -1,0 +1,8 @@
+{
+  "name": "Foggy Swamp Hunters",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Human Ranger Ally",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "As long as you've drawn two or more cards this turn, this creature has lifelink and menace. (It can't be blocked except by two or more creatures.)"
+}

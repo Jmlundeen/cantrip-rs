@@ -1,0 +1,48 @@
+# Foggy Swamp Hunters: "As long as you've drawn two or more cards this turn, this creature has lifelink and menace" (CR 611.3a). Bot1 casts it
+# on turn 1 with four Moxen, having drawn nothing (no draw on the first turn): no keywords. One Gitaxian Probe draws the first card, still
+# none (one short of two); the second draws the second card, and Lifelink and Menace are there (exactly two). On turn 3 its draw step
+# is a single draw, so they are gone again: the turn is over.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Foggy Swamp Hunters
+Gitaxian Probe
+Gitaxian Probe
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Foggy Swamp Hunters.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Foggy Swamp Hunters.Keywords = (absent)
+Bot1.Hand.Gitaxian Probe#1.Cast(Bot2)
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 18
+? Bot1.Battlefield.Foggy Swamp Hunters.Keywords = (absent)
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 16
+? Bot1.Battlefield.Foggy Swamp Hunters.Keywords = Lifelink; Menace
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Foggy Swamp Hunters.Keywords = (absent)
+
+[Expect]
+Bot1.Life = 16
