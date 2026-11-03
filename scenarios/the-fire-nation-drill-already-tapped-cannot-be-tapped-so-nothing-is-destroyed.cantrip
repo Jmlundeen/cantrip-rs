@@ -1,0 +1,57 @@
+# The Fire Nation Drill: "you may tap it. When you do, ..." (CR 603.12). Bot2 flashes in a Pestermite in response to the enters
+# trigger and taps the Drill with its own trigger. When the Drill's trigger resolves the Drill is already tapped, so it cannot be
+# tapped and nothing is asked (the refusal); no reflexive trigger is created and Bot2's Pestermite (power 1, a legal target) lives.
+
+[Bot1 Deck]
+Mox Jet x2
+Mox Ruby
+Mox Sapphire
+The Fire Nation Drill
+Island x15
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Pearl x2
+Pestermite
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Fire Nation Drill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Pestermite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Bot1.Battlefield.The Fire Nation Drill)
+Bot1.Pass
+Bot2.Pass
+Bot2.Modes(Tap)
+? Bot1.Battlefield.The Fire Nation Drill.Tapped = true
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.The Fire Nation Drill.Tapped = true
+Bot2.Battlefield.Pestermite.Toughness = 1
+Stack.Count = 0

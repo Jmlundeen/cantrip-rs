@@ -1,0 +1,49 @@
+# The Fire Nation Drill: "When this enters, you may tap it." Bot2 Disenchants the Drill in response to the trigger. The Drill is
+# a new object in the graveyard by the time the trigger resolves (CR 400.7), so it cannot be tapped and nothing is asked (the
+# refusal): no reflexive trigger is created (CR 603.12).
+
+[Bot1 Deck]
+Mox Jet x2
+Mox Ruby
+Mox Sapphire
+The Fire Nation Drill
+Island x15
+
+[Bot2 Deck]
+Mox Pearl x2
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Fire Nation Drill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.The Fire Nation Drill)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = The Fire Nation Drill
+Bot2.Graveyard = Disenchant
+Stack.Count = 0

@@ -1,0 +1,37 @@
+# The Fire Nation Drill: Crew 2 needs creatures with total power 2 or more (CR 702.122a). Bot1's only creature is a Llanowar Elves
+# (power 1), so crewing is refused and the Elves stay untapped.
+
+[Bot1 Deck]
+Mox Emerald
+Llanowar Elves
+Mox Jet x2
+Mox Sapphire
+Mox Pearl
+The Fire Nation Drill
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Fire Nation Drill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T5 Bot1.Main1]
+! Bot1.Battlefield.The Fire Nation Drill.Activate(Ability: Crew)
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Tapped = false

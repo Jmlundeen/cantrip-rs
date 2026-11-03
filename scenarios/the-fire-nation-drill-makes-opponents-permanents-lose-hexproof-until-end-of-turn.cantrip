@@ -1,0 +1,57 @@
+# The Fire Nation Drill: "{1}: Permanents your opponents control lose hexproof and indestructible until end of turn." Bot2's
+# Gladecover Scout has hexproof, so Bot1's Lightning Bolt cannot target it (the refusal); after Bot1 pays {1} for the Drill's
+# ability and it resolves, the Scout can be targeted and the Bolt kills it.
+
+[Bot1 Deck]
+Mox Jet x2
+Mox Sapphire
+Mox Pearl
+Mox Ruby x2
+Lightning Bolt
+The Fire Nation Drill
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Gladecover Scout
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Gladecover Scout.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Fire Nation Drill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Battlefield.Mox Ruby#1.Activate
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Gladecover Scout)
+Bot1.Battlefield.The Fire Nation Drill.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Gladecover Scout)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield.Gladecover Scout = (absent)
+Bot2.Graveyard = Gladecover Scout
+Bot1.Graveyard = Lightning Bolt
+Stack.Count = 0
+Bot1.Mana =

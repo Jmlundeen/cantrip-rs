@@ -1,0 +1,51 @@
+# The Fire Nation Drill: "destroy target creature with power 4 or less" - power 5 is one too many. Bot2's Cobblebrute (5/2) is
+# the only creature, so the reflexive trigger has no legal target and is removed from the stack (CR 603.3d). The Drill still
+# became tapped (the "you may tap it" had no need of a target) and the Cobblebrute survives.
+
+[Bot1 Deck]
+Mox Jet x2
+Mox Ruby
+Mox Sapphire
+The Fire Nation Drill
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Cobblebrute
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cobblebrute.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Fire Nation Drill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield.Cobblebrute.Toughness = 2
+Bot1.Battlefield.The Fire Nation Drill.Tapped = true
+Stack.Count = 0

@@ -1,0 +1,62 @@
+# The Fire Nation Drill: Crew 2 and trample. Bot1 casts the Drill on turn 3 (declining to tap it) and on turn 5 taps its Grizzly Bears (power 2,
+# enough for Crew 2) to make it a creature and attacks. Bot2's Grizzly Bears (2/2) blocks; the 6/3 Drill with trample assigns 2
+# to the blocker and the other 4 to the player (CR 702.19b).
+
+[Bot1 Deck]
+Mox Jet x2
+Mox Emerald
+Mox Sapphire
+The Fire Nation Drill
+Grizzly Bears
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Fire Nation Drill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T5 Bot1.Main1]
+Bot1.Battlefield.The Fire Nation Drill.Activate(Ability: Crew)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Fire Nation Drill.Keywords = Trample
+Bot1.Attack(The Fire Nation Drill > Bot2)
+Bot1.Pass
+Bot2.Block(Grizzly Bears > The Fire Nation Drill)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Damage]
+
+[Expect]
+Bot2.Life = 16
+Bot2.Battlefield.Grizzly Bears = (absent)
+Bot1.Battlefield.The Fire Nation Drill.Power = 6
+Bot1.Battlefield.The Fire Nation Drill.Toughness = 3

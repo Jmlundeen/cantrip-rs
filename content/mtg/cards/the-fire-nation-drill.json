@@ -1,0 +1,11 @@
+{
+  "name": "The Fire Nation Drill",
+  "manaCost": "{2}{B}{B}",
+  "type": "Legendary Artifact — Vehicle",
+  "power": 6,
+  "toughness": 3,
+  "oracleText": "Trample\nWhen The Fire Nation Drill enters, you may tap it. When you do, destroy target creature with power 4 or less.\n{1}: Permanents your opponents control lose hexproof and indestructible until end of turn.\nCrew 2",
+  "keywords": [
+    "Trample"
+  ]
+}

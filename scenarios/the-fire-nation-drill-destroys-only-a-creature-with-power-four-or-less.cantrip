@@ -1,0 +1,66 @@
+# The Fire Nation Drill: "target creature with power 4 or less". Bot2's Craw Wurm (6/4) is not a legal target, so the Drill's
+# only legal target is Bot1's own Grizzly Bears (power 2), so they are chosen automatically and destroyed while it survives.
+
+[Bot1 Deck]
+Mox Jet x2
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+The Fire Nation Drill
+Grizzly Bears
+Island x14
+
+[Bot2 Deck]
+Mox Emerald x2
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Craw Wurm
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Craw Wurm.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Fire Nation Drill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield.Craw Wurm.Tapped = false
+Bot1.Battlefield.Grizzly Bears = (absent)
+Bot1.Graveyard = Grizzly Bears
+Stack.Count = 0
