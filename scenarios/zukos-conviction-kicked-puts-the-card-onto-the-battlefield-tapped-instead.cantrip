@@ -1,0 +1,44 @@
+# Zuko's Conviction kicked ({B} + {4}, CR 702.33): the creature card goes onto the battlefield tapped INSTEAD of to the hand
+# (never both). Bot1's Ornithopter is bolted on turn 1; on turn 3 it pays {B}{4} from five Moxen
+# (Jet, Ruby, Sapphire, Pearl, Emerald). The Ornithopter returns tapped under Bot1's control and its hand does not gain it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Lightning Bolt
+Zuko's Conviction
+Mox Pearl
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Zuko's Conviction.Cast(Bot1.Graveyard.Ornithopter; Kicked: 1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Hand.Count = 0
+Bot1.Mana =
+Bot1.Graveyard = Zuko's Conviction; Lightning Bolt

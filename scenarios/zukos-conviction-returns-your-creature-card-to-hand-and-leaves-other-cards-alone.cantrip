@@ -1,0 +1,52 @@
+# Zuko's Conviction ({B} instant): return target creature card from YOUR graveyard to your hand. Bot1's Ornithopter is bolted
+# on turn 1; Bot2's own Ornithopter is in its graveyard from turn 2. Refused as targets: Bot2's Ornithopter (not your graveyard),
+# the Lightning Bolt in Bot1's graveyard (not a creature card). Unkicked (only {B} paid), the Ornithopter returns to Bot1's hand,
+# not the battlefield, and Bot2's graveyard is untouched.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Lightning Bolt
+Zuko's Conviction
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Ornithopter; Lightning Bolt
+? Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Zuko's Conviction.Cast(Bot2.Graveyard.Ornithopter)
+! Bot1.Hand.Zuko's Conviction.Cast(Bot1.Graveyard.Lightning Bolt)
+Bot1.Hand.Zuko's Conviction.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Mox Pearl; Mox Sapphire; Ornithopter
+Bot1.Battlefield = Mox Jet; Mox Ruby
+Bot1.Graveyard = Zuko's Conviction; Lightning Bolt
+Bot2.Graveyard = Ornithopter; Lightning Bolt
