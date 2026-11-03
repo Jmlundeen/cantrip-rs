@@ -1,0 +1,39 @@
+# Grapeshot Catapult taps to deal exactly one damage to a flying creature on either side (CR 602.2, 120.3).
+# A nonflying creature is refused, and the Catapult cannot pay its tap cost again until it untaps.
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Grapeshot Catapult
+Ornithopter
+Memnite
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grapeshot Catapult.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Grapeshot Catapult.Activate(Bot1.Battlefield.Memnite)
+Bot1.Battlefield.Grapeshot Catapult.Activate(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+? Bot1.Battlefield.Grapeshot Catapult.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Damage = 1
+! Bot1.Battlefield.Grapeshot Catapult.Activate(Bot2.Battlefield.Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Grapeshot Catapult.Activate(Bot2.Battlefield.Ornithopter)
+[T5 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Ornithopter.Damage = 1
+Bot1.Battlefield.Grapeshot Catapult.Tapped = true
+Bot1.Battlefield.Memnite.Damage = 0

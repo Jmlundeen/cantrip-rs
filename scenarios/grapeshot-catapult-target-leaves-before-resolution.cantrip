@@ -1,0 +1,42 @@
+# Removing the targeted flyer in response makes the ability fail to resolve (CR 608.2b).
+# A later activation against a legal flyer resolves normally.
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Grapeshot Catapult
+Ornithopter
+Memnite
+Island x20
+[Bot2 Deck]
+Unsummon
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grapeshot Catapult.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Grapeshot Catapult.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Unsummon.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Hand.Ornithopter.Colors =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Grapeshot Catapult.Activate(Bot1.Battlefield.Ornithopter)
+[T5 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Ornithopter.Damage = 1
+Bot1.Battlefield.Grapeshot Catapult.Tapped = true
+Bot1.Battlefield.Memnite.Damage = 0
