@@ -1,0 +1,39 @@
+# Unsummon makes the target illegal after the sacrifice; another Transmogrant later works on the returned creature (CR 608.2b).
+[Bot1 Deck]
+Ashnod's Transmogrant x2
+Mox Pearl x2
+Plains x20
+[Bot2 Deck]
+Dryad Arbor
+Mox Sapphire
+Unsummon
+Island x20
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Ashnod's Transmogrant.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Ashnod's Transmogrant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Dryad Arbor.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ashnod's Transmogrant#1.Activate(Bot2.Battlefield.Dryad Arbor)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Bot2.Battlefield.Dryad Arbor)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Hand.Dryad Arbor.Colors = Green
+[T4 Bot2.Main1]
+Bot2.Hand.Dryad Arbor.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ashnod's Transmogrant.Activate(Bot2.Battlefield.Dryad Arbor)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Dryad Arbor.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Dryad Arbor.Types = Land; Creature; Artifact
+Bot1.Graveyard = Ashnod's Transmogrant; Ashnod's Transmogrant

@@ -1,0 +1,37 @@
+# Giant-Sized Flying Ant taps Transmogrant, so it cannot pay its tap cost; after untapping it sacrifices itself and works (CR 107.5).
+[Bot1 Deck]
+Ashnod's Transmogrant
+Mox Pearl
+Dryad Arbor
+Plains x20
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Giant-Sized Flying Ant
+Island x20
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ashnod's Transmogrant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Giant-Sized Flying Ant.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(1)
+Bot2.Target(Bot1.Battlefield.Ashnod's Transmogrant)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Battlefield.Ashnod's Transmogrant.Activate(Bot1.Battlefield.Dryad Arbor)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ashnod's Transmogrant.Activate(Bot1.Battlefield.Dryad Arbor)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Dryad Arbor.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Dryad Arbor.Types = Land; Creature; Artifact
+Bot1.Graveyard = Ashnod's Transmogrant

@@ -1,0 +1,36 @@
+# Transmogrant sacrifices itself to add a counter and artifact type; Hexmage removes the counter but not that type (CR 611.2a, 701.21a).
+[Bot1 Deck]
+Black Lotus
+Vampire Hexmage
+Ashnod's Transmogrant
+Dryad Arbor
+Ornithopter
+Swamp x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vampire Hexmage.Cast
+Bot1.Hand.Ashnod's Transmogrant.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Ashnod's Transmogrant.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Ashnod's Transmogrant.Activate(Bot1.Battlefield.Dryad Arbor)
+? Bot1.Graveyard = Ashnod's Transmogrant; Black Lotus
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dryad Arbor.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Dryad Arbor.Types = Land; Creature; Artifact
+Bot1.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Dryad Arbor)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Dryad Arbor.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Dryad Arbor.Types = Land; Creature; Artifact
+Bot1.Battlefield.Dryad Arbor.Power = 1

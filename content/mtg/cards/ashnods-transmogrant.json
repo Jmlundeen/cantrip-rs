@@ -1,0 +1,6 @@
+{
+  "name": "Ashnod's Transmogrant",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "{T}, Sacrifice this artifact: Put a +1/+1 counter on target nonartifact creature. That creature becomes an artifact in addition to its other types."
+}
