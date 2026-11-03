@@ -1,0 +1,40 @@
+# Blood Moon makes Darksteel Citadel a Mountain on the battlefield; its last known type determines the damage when destroyed (CR 608.2h).
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Volcanic Eruption
+Island x15
+
+[Bot2 Deck]
+Darksteel Citadel
+Black Lotus
+Blood Moon
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Darksteel Citadel.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Blood Moon.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Volcanic Eruption.Cast(X: 1)
+! Bot1.Target(Bot1.Battlefield.Island)
+Bot1.Target(Darksteel Citadel)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
+Bot2.Graveyard = Darksteel Citadel; Black Lotus

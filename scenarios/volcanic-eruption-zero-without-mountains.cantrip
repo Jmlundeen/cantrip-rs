@@ -1,0 +1,21 @@
+# X can be zero with no Mountains on the battlefield; no player takes damage (CR 107.3a).
+[Bot1 Deck]
+Volcanic Eruption
+Black Lotus
+Island x15
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Volcanic Eruption.Cast(X: 0)
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Volcanic Eruption; Black Lotus
