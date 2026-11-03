@@ -1,0 +1,32 @@
+# Marble Priest's prevention does not cover noncombat damage: Lightning Bolt deals three
+# and destroys it (CR 615.1, 704.5g).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Marble Priest
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Marble Priest.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Marble Priest)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Marble Priest; Black Lotus
+Bot2.Graveyard = Lightning Bolt

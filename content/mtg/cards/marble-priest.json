@@ -1,0 +1,8 @@
+{
+  "name": "Marble Priest",
+  "manaCost": "{5}",
+  "type": "Artifact Creature — Cleric",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "All Walls able to block this creature do so.\nPrevent all combat damage that would be dealt to this creature by Walls."
+}
