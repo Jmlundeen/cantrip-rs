@@ -1,0 +1,45 @@
+# Factory may pump an opponent's Assembly-Worker; the creature stays on the battlefield to show
+# that the +1/+1 effect ends at cleanup (CR 611.2a, 514.2). An Ornithopter is not a legal target.
+[Bot1 Deck]
+Mishra's Factory
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Foundry Assembler
+Black Lotus
+Mox Pearl
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mishra's Factory.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Foundry Assembler.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Mishra's Factory.Activate(Bot1.Battlefield.Ornithopter; Ability: Target Assembly-Worker)
+Bot1.Battlefield.Mishra's Factory.Activate(Bot2.Battlefield.Foundry Assembler; Ability: Target Assembly-Worker)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Foundry Assembler.Power = 4
+? Bot2.Battlefield.Foundry Assembler.Toughness = 4
+? Bot1.Battlefield.Mishra's Factory.Tapped = true
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Foundry Assembler.Power = 3
+Bot2.Battlefield.Foundry Assembler.Toughness = 3

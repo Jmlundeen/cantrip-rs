@@ -1,0 +1,64 @@
+# Factory becomes a 2/2 Assembly-Worker artifact creature while staying a land and retains its abilities.
+# A newly played creature cannot tap for its abilities, but on its controller's next turn it can
+# tap for mana or pump itself; animation and the pump end at cleanup (CR 302.6, 514.2).
+[Bot1 Deck]
+Mishra's Factory
+Mox Pearl
+Black Lotus
+Firdoch Core
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mishra's Factory.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mishra's Factory.Activate(Ability: {1})
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mishra's Factory.Types = Land; Artifact; Creature
+? Bot1.Battlefield.Mishra's Factory.Subtypes = Assembly-Worker
+? Bot1.Battlefield.Mishra's Factory.Power = 2
+? Bot1.Battlefield.Mishra's Factory.Toughness = 2
+! Bot1.Battlefield.Mishra's Factory.Activate(Ability: Add {C})
+! Bot1.Battlefield.Mishra's Factory.Activate(Bot1.Battlefield.Mishra's Factory; Ability: Target Assembly-Worker)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Mishra's Factory.Types = Land
+? Bot1.Battlefield.Mishra's Factory.Subtypes = (absent)
+Bot1.Battlefield.Mishra's Factory.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+? Bot1.Battlefield.Mishra's Factory.Tapped = true
+Bot1.Battlefield.Mishra's Factory.Activate(Ability: {1})
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mishra's Factory.Power = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mishra's Factory.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Mishra's Factory.Activate(Bot1.Battlefield.Ornithopter; Ability: Target Assembly-Worker)
+! Bot1.Battlefield.Mishra's Factory.Activate(Bot1.Battlefield.Firdoch Core; Ability: Target Assembly-Worker)
+Bot1.Battlefield.Mishra's Factory.Activate(Bot1.Battlefield.Mishra's Factory; Ability: Target Assembly-Worker)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mishra's Factory.Power = 3
+? Bot1.Battlefield.Mishra's Factory.Toughness = 3
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Mishra's Factory.Types = Land
+Bot1.Battlefield.Mishra's Factory.Subtypes = (absent)

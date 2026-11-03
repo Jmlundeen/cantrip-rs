@@ -1,0 +1,28 @@
+# A second animation keeps the Avatar type gained after the first animation (CR 205.1b).
+[Bot1 Deck]
+Mishra's Factory
+Black Lotus
+Enter the Avatar State
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mishra's Factory.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mishra's Factory.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Enter the Avatar State.Cast(Bot1.Battlefield.Mishra's Factory)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mishra's Factory.Subtypes = Assembly-Worker; Avatar
+Bot1.Battlefield.Mishra's Factory.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mishra's Factory.Subtypes = Assembly-Worker; Avatar
