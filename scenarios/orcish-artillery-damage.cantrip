@@ -1,0 +1,40 @@
+# Orcish Artillery deals 2 damage to its target and 3 to its controller, and does nothing if its sole target becomes illegal (CR 608.2b, 120.3).
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Ruby
+Orcish Artillery
+Shock
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Orcish Artillery.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Orcish Artillery.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Orcish Artillery.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Orcish Artillery.Activate(Bot2)
+? Bot1.Mana =
+[T5 Bot1.Main2]
+? Bot1.Life = 17
+? Bot2.Life = 18
+[T7 Bot1.Main1]
+Bot1.Battlefield.Orcish Artillery.Activate(Bot1)
+[T7 Bot1.Main2]
+[Expect]
+Bot1.Life = 12
+Bot2.Life = 18
