@@ -1,0 +1,61 @@
+# Great Defender adds the target's mana value only to toughness, on either player's creature and only for the turn (CR 611.2a).
+[Bot1 Deck]
+Black Lotus
+Grizzly Bears
+Mox Pearl
+Great Defender x3
+Memnite
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Mountain
+Hill Giant
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+[T1 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Great Defender.Cast(Mox Pearl)
+Bot1.Hand.Great Defender.Cast(Bot1.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+? Bot1.Battlefield.Grizzly Bears.Toughness = 4
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Grizzly Bears.Toughness = 2
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Hill Giant.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Great Defender.Cast(Bot2.Battlefield.Hill Giant)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Hill Giant.Power = 3
+? Bot2.Battlefield.Hill Giant.Toughness = 7
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Hill Giant.Toughness = 3
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Great Defender.Cast(Bot1.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Memnite.Toughness = 1
+Bot2.Battlefield.Hill Giant.Toughness = 3
+Bot1.Battlefield.Grizzly Bears.Toughness = 2

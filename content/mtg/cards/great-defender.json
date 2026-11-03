@@ -1,0 +1,6 @@
+{
+  "name": "Great Defender",
+  "manaCost": "{W}",
+  "type": "Instant",
+  "oracleText": "Target creature gets +0/+X until end of turn, where X is its mana value."
+}
