@@ -1,0 +1,6 @@
+{
+  "name": "Ivory Tower",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "At the beginning of your upkeep, you gain X life, where X is the number of cards in your hand minus 4."
+}

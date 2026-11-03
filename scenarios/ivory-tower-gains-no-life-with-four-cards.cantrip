@@ -1,0 +1,23 @@
+# One Dark Ritual leaves a five-card hand in response to the upkeep trigger; with four cards left it gains no life (CR 608.2h).
+[Bot1 Deck]
+Swamp
+Ivory Tower
+Dark Ritual
+Dark Ritual
+Swamp x20
+[Bot2 Deck]
+Swamp x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Ivory Tower.Cast
+? Bot1.Mana =
+[T3 Bot1.Upkeep]
+? Bot1.Hand.Count = 5
+? Stack.Count = 1
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Swamp; Ivory Tower

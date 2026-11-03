@@ -1,0 +1,19 @@
+# Ivory Tower gains one life at its controller's upkeep with five cards in hand, counting that hand only (CR 603.2).
+[Bot1 Deck]
+Island
+Ivory Tower
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ivory Tower.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+? Bot1.Life = 20
+? Bot2.Hand.Count = 8
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
