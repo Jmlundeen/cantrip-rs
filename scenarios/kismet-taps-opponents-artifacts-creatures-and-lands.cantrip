@@ -1,0 +1,56 @@
+# Kismet makes opposing artifacts, creatures, and lands enter tapped, but not its controller's
+# permanents or the opponent's noncreature enchantment (CR 614.1d).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Kismet
+Mox Ruby
+Ornithopter
+Island
+Island x20
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Crimson Kobolds
+Authority of the Consuls
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kismet.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Island.Tapped = false
+? Bot1.Battlefield.Mox Ruby.Tapped = false
+? Bot1.Battlefield.Ornithopter.Tapped = false
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Crimson Kobolds.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Plains.Tapped = true
+? Bot2.Battlefield.Mox Pearl.Tapped = true
+? Bot2.Battlefield.Ornithopter.Tapped = true
+? Bot2.Battlefield.Crimson Kobolds.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Authority of the Consuls.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Authority of the Consuls.Tapped = false
+Bot1.Battlefield.Ornithopter.Tapped = false
