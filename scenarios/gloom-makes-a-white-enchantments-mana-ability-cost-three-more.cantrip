@@ -1,0 +1,53 @@
+# Gloom's "Activated abilities of white enchantments cost {3} more to activate" taxes a mana ability too: a mana ability is
+# activated as any other activated ability is (CR 605.3, 602.2b), so the increase is part of its total cost (CR 601.2f).
+# Enchanted Evening makes Giada, Font of Hope a white enchantment, and her "{T}: Add {W}" then costs {3}: with an empty pool
+# and nothing else to tap it is not offered (refused while the mana is short), and with {U}{U}{U} from a Black Lotus it is
+# paid with all three, leaving only her {W}, which may be spent only on an Angel spell. Gloom is cast last, so it taxes
+# neither Enchanted Evening nor Giada.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Enchanted Evening
+Giada, Font of Hope
+Gloom
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Enchanted Evening.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Giada, Font of Hope.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Gloom.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Mana =
+! Bot1.Battlefield.Giada, Font of Hope.Activate(Mana: short)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+? Bot1.Mana = {U}{U}{U}
+Bot1.Battlefield.Giada, Font of Hope.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Giada, Font of Hope.Tapped = true
+Bot1.Mana = {W} (AngelSpells)

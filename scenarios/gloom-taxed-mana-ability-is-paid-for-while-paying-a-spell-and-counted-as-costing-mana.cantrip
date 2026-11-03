@@ -1,0 +1,60 @@
+# Gloom's {3} more on a white enchantment's mana ability, where it is activated while paying a spell and where the player's
+# mana is judged (CR 605.3a, 602.2b, 601.2f-g). Enchanted Evening makes White Auracite a white enchantment, and its
+# "{T}: Add {W}" then costs {3}. On turn 5, with only the Auracite to make mana, Sol Ring is not offered: the Auracite's
+# {W} costs three mana there is no way to make (refused while the mana is short). Once a Black Lotus is out, Sol Ring is cast
+# and its {1} paid by activating the Auracite, whose {3} is paid in turn by sacrificing the Lotus for {U}{U}{U}: every
+# mana is spent, and nothing is left in the pool. Gloom is cast last, so it taxes neither Enchanted Evening nor the Auracite;
+# Bot2 controls only lands, so the Auracite's trigger has no target.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Enchanted Evening
+White Auracite
+Gloom
+Sol Ring
+Black Lotus
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Enchanted Evening.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.White Auracite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Gloom.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Mana =
+! Bot1.Hand.Sol Ring.Cast(Mana: short)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.White Auracite.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Enchanted Evening; Gloom; Sol Ring; White Auracite
+Bot1.Battlefield.White Auracite.Tapped = true
+Bot1.Mana =

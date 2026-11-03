@@ -1,0 +1,36 @@
+# Gloom's "Activated abilities of white enchantments cost {3} more" means white enchantment permanents (CR 109.2): Touch the
+# Spirit Realm's channel ability, activated from the hand, is the ability of a white enchantment card and no permanent, so it
+# costs {1}{W} alone. Two Black Lotuses make {W}{W}{W} and {B}{B}{B}: Gloom takes {2}{B}, and the channel is paid from
+# the {W}{B}{B} left, leaving {B} (with the tax, {4}{W}, it could not be paid at all).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Gloom
+Touch the Spirit Realm
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Gloom.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {W}{B}{B}
+Bot1.Hand.Touch the Spirit Realm.Activate(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana = {B}
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Ornithopter
+Bot1.Graveyard = Touch the Spirit Realm; Black Lotus; Black Lotus

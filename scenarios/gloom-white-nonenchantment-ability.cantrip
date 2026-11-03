@@ -1,0 +1,32 @@
+# Gloom taxes white enchantments, not the activated ability of a white creature (CR 109.2, 602.2b).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Spectacular Spider-Man
+Gloom
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Spectacular Spider-Man.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Gloom.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Spectacular Spider-Man.Activate(Ability: gains flying)
+? Bot1.Mana = {U}{U}
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Spectacular Spider-Man.Keywords = Flash; Flying

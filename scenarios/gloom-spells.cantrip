@@ -1,0 +1,37 @@
+# Gloom adds three generic mana to a white spell, but not a red spell (CR 601.2f).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Pearl
+Mox Ruby
+Gloom
+Savannah Lions
+Shock
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Gloom.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+? Bot1.Mana =
+[T1 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Savannah Lions.Power = 2
+Bot2.Life = 18
