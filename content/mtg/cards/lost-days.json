@@ -1,0 +1,6 @@
+{
+  "name": "Lost Days",
+  "manaCost": "{4}{U}",
+  "type": "Instant — Lesson",
+  "oracleText": "The owner of target creature or enchantment puts it into their library second from the top or on the bottom. You create a Clue token. (It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")"
+}

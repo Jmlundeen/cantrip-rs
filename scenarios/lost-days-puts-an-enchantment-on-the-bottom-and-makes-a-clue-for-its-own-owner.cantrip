@@ -1,0 +1,40 @@
+# Lost Days {4}{U} (CR 115.1, 701.24, 111.10f): the target may be an enchantment as well as a creature. Bot1 targets its own Rancor (an Aura, so an
+# enchantment) and, as its owner, chooses the bottom of its library: Plains, Swamp, then Rancor below them. The Ornithopter Rancor enchanted stays.
+# Lost Days is a spell, so the caster still gets the Clue. Lotus pays UUU, Mox Sapphire and Mox Jet the rest.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Ornithopter
+Rancor
+Lost Days
+Plains
+Swamp
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lost Days.Cast(Bot1.Battlefield.Rancor)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(On the bottom)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Library = Plains; Swamp; Rancor
+Bot1.Battlefield = Mox Emerald; Ornithopter; Mox Sapphire; Mox Jet; Clue Token
+Bot1.Battlefield.Clue Token.Subtypes = Clue
+Bot1.Graveyard = Lost Days; Black Lotus

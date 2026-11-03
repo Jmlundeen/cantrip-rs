@@ -1,0 +1,41 @@
+# Lost Days (CR 608.2b): a spell whose only target is illegal on resolution does not resolve, so nothing is put into a library and no Clue is made.
+# Bot1 targets Bot2's Memnite; Bot2 answers with Lightning Bolt on its own Memnite. Memnite goes to Bot2's graveyard and Bot1 has no Clue.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Lost Days
+Island x17
+
+[Bot2 Deck]
+Memnite
+Mox Ruby
+Lightning Bolt
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lost Days.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Memnite; Lightning Bolt
+Bot1.Battlefield.Clue Token = (absent)
+Bot1.Graveyard = Lost Days; Black Lotus

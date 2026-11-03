@@ -1,0 +1,57 @@
+# Lost Days {4}{U} (CR 108.3, 701.24, 111.10f): "The owner of target creature or enchantment puts it into their library second from the top or on the
+# bottom. You create a Clue token." Bot1 takes Bot2's Memnite with Mind Control on turn 3, then casts Lost Days on it on turn 5: Bot2, its OWNER, not
+# the caster who controls it, chooses and picks second from the top, so Bot2's library of three Plains becomes Plains, Memnite, Plains, Plains. The Clue is
+# Bot1's, the caster's: not Bot2's, the owner's. A land (Bot2's Plains) is refused as the target.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mind Control
+Lost Days
+Island x14
+
+[Bot2 Deck]
+Memnite
+Plains x11
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Control.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mind Control.AttachedTo = Memnite
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Lost Days.Cast(Bot2.Battlefield.Plains)
+Bot1.Hand.Lost Days.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot2.Modes(Second from the top)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Library = Plains; Memnite; Plains; Plains
+Bot1.Battlefield.Clue Token.Subtypes = Clue
+Bot2.Battlefield.Clue Token = (absent)
+Bot1.Battlefield.Memnite = (absent)
+Bot1.Graveyard = Mind Control; Lost Days; Black Lotus
