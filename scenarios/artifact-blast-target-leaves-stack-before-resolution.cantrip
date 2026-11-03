@@ -1,0 +1,36 @@
+# Counterspell removes the artifact spell before Artifact Blast resolves; a second Blast counters a later artifact (CR 608.2b).
+[Bot1 Deck]
+Mox Ruby x2
+Artifact Blast x2
+Mountain x20
+[Bot2 Deck]
+Mox Sapphire x2
+Counterspell
+Ornithopter
+Memnite
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Artifact Blast.Cast(Stack.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard.Ornithopter.Power = 0
+Bot2.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Artifact Blast.Cast(Stack.Memnite)
+? Bot1.Mana =
+[Expect]
+Bot2.Graveyard = Memnite; Counterspell; Ornithopter
+Bot1.Graveyard = Artifact Blast; Artifact Blast

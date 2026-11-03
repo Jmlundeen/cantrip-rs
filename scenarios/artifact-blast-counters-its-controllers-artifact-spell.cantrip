@@ -1,0 +1,17 @@
+# Artifact Blast can target its controller's artifact spell, moving both spells to their graveyard (CR 115.1a, 701.6a).
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Artifact Blast
+Mountain x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Artifact Blast.Cast(Stack.Mox Pearl)
+? Bot1.Mana =
+[Expect]
+Bot1.Graveyard = Artifact Blast; Mox Pearl
+Bot1.Battlefield = Mox Ruby

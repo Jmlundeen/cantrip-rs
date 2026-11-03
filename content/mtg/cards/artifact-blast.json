@@ -1,0 +1,6 @@
+{
+  "name": "Artifact Blast",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Counter target artifact spell."
+}
