@@ -1,0 +1,40 @@
+# After Nightmare loses its abilities, its base stats and temporary modifiers determine its power and toughness (CR 613.1f, 613.1g).
+[Bot1 Deck]
+Swamp
+Black Lotus
+Black Lotus
+Nightmare
+Mox Sapphire
+Mox Sapphire
+Fresh Start
+Mox Emerald
+Giant Growth
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Nightmare.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Nightmare)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Fresh Start.Cast(Nightmare)
+[T5 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Nightmare.Power = -2
+Bot1.Battlefield.Nightmare.Toughness = 3

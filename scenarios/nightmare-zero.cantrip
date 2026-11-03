@@ -1,0 +1,20 @@
+# With no Swamps, Nightmare has zero toughness and dies as a state-based action (CR 704.5f).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Nightmare
+Island x20
+[Bot2 Deck]
+Swamp
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Nightmare.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+[Expect]
+Bot1.Battlefield.Nightmare = (absent)
+Bot1.Graveyard = Nightmare; Black Lotus; Black Lotus

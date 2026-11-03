@@ -1,0 +1,43 @@
+# Nightmare counts its controller's Swamps in every zone, updates as that count changes, and flies over ground creatures (CR 604.3, 702.9).
+[Bot1 Deck]
+Swamp
+Badlands
+Black Lotus
+Black Lotus
+Nightmare
+Nightmare
+Island x20
+[Bot2 Deck]
+Swamp
+Black Lotus
+Grizzly Bears
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+? Bot1.Hand.Nightmare#1.Power = 1
+? Bot1.Hand.Nightmare#1.Toughness = 1
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Nightmare.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Nightmare.Power = 1
+? Bot1.Battlefield.Nightmare.Toughness = 1
+Bot1.Hand.Badlands.Play
+? Bot1.Battlefield.Nightmare.Power = 2
+? Bot1.Battlefield.Nightmare.Toughness = 2
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Nightmare > Bot2)
+! Bot2.Block(Grizzly Bears > Nightmare)
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Life = 18
+Bot1.Hand.Nightmare.Power = 2
+Bot1.Hand.Nightmare.Toughness = 2
