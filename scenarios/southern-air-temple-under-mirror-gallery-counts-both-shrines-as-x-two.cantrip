@@ -1,0 +1,71 @@
+# Southern Air Temple: "When Southern Air Temple enters, put X +1/+1 counters on each creature you control, where X is the
+# number of Shrines you control." X is counted as the ability resolves (CR 608.2h). Under Mirror Gallery the legend rule
+# doesn't apply (CR 704.5j), so a second Temple stays beside the first: as it enters, the first Temple's "another Shrine"
+# trigger adds one counter and the second Temple's own trigger X = 2, two Shrines, so Bot1's Ornithopter, with one counter from
+# the first Temple, ends with four. Bot2's Ornithopter gets none.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mirror Gallery
+Ornithopter
+Southern Air Temple
+Southern Air Temple
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Battlefield.Mox Pearl#5.Activate
+Bot1.Hand.Mirror Gallery.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Southern Air Temple.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Southern Air Temple.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Pearl; Mox Pearl; Mox Pearl; Mox Pearl; Mirror Gallery; Ornithopter; Southern Air Temple; Southern Air Temple
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 4
+Bot2.Battlefield.Ornithopter.Power = 0
