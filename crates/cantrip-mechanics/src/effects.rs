@@ -716,6 +716,16 @@ pub fn target_player_gains_x_life(g: &mut dyn Game, item: &StackItem) -> Result<
     Ok(())
 }
 
+/// "When this creature dies, you gain N life" (CR 700.4, 603.10a, 119.3).
+/// Onulet and Haywire Mite use this death trigger.
+pub const fn dies_gain_life<const N: i32>(text: &'static str) -> AbilityDef {
+    triggered(crate::triggers::THIS_DIES, gain_life_amount::<N>, text)
+}
+
+fn gain_life_amount<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    gain_life(g, item, N)
+}
+
 /// "You gain N life" (CR 119.3). Zuran Orb and Inventor's Fair print it (two and one).
 pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspend> {
     g.gain_life(item.controller, n);
