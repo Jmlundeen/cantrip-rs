@@ -1,0 +1,85 @@
+# Ward {2} (CR 702.21a): Bot2's first Lightning Bolt at Benevolent River Spirit is countered when Bot2 does not pay {2} (the Spirit has no
+# damage), the second is paid for with two Moxen and resolves (3 damage on a 4/5, which lives). Flying (CR 702.9b): on turn 5 the Spirit
+# attacks into Bot2's Memnite and Ornithopter; only the flying Ornithopter may block it (and dies to its 4 power).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Black Lotus
+Island
+Benevolent River Spirit
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Memnite
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Mountain
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Benevolent River Spirit.Cast(Convoke: Mox Pearl, Mox Jet, Mox Ruby, Ornithopter, Black Lotus)
+Bot1.Pass
+Bot1.Pass
+Bot1.Arrange(Island; Island |)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Benevolent River Spirit)
+Bot2.Pass
+Bot2.Decline
+? Bot1.Battlefield.Benevolent River Spirit.Damage = 0
+? Bot2.Graveyard.Count = 1
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Benevolent River Spirit)
+Bot2.PayCost
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Benevolent River Spirit.Damage = 3
+[T5 Bot1.Main1]
+Bot1.Attack(Benevolent River Spirit > Bot2)
+! Bot2.Block(Memnite > Benevolent River Spirit)
+Bot2.Block(Ornithopter > Benevolent River Spirit)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter = (absent)
+Bot2.Battlefield.Memnite.Tapped = false
+Bot1.Battlefield.Benevolent River Spirit.Damage = 0
+Bot2.Life = 20

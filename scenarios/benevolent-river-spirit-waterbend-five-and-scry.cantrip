@@ -1,0 +1,57 @@
+# Benevolent River Spirit's additional cost "waterbend {5}" (CR 701.67a-b, 601.2f) is paid beside its {U}{U}: the Island and Mox Sapphire pay
+# the {U}{U}, and four Moxen-and-Lotus artifacts plus Ornithopter (a creature that came this turn: waterbend is no {T} cost, so
+# summoning sickness is no matter) are tapped for the five generic mana. The pool is empty right after the cast, so nothing
+# was left over and nothing was short. The enters trigger scries 2: Lightning Bolt stays on top and Counterspell goes to the bottom.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Black Lotus
+Island
+Benevolent River Spirit
+Lightning Bolt
+Counterspell
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Benevolent River Spirit.Cast(Convoke: Mox Pearl, Mox Jet, Mox Ruby, Ornithopter, Black Lotus)
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt | Counterspell)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Benevolent River Spirit.Power = 4
+Bot1.Battlefield.Benevolent River Spirit.Toughness = 5
+Bot1.Battlefield.Benevolent River Spirit.Keywords = Flying
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Black Lotus.Tapped = true
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Library.Count = 22

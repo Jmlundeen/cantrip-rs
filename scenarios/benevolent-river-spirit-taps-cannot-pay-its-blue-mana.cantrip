@@ -1,0 +1,40 @@
+# Waterbend lets tapped artifacts and creatures pay generic mana of the waterbend cost only (CR 701.67a-b), never the {U}{U} of the
+# spell's own cost. With one blue source (an Island), and six artifacts and creatures to tap, none of them making blue mana, Benevolent River Spirit is not
+# offered, though the sources and taps number more than its total cost of seven.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Ornithopter
+Benevolent River Spirit
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Benevolent River Spirit.Cast(Mana: short)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Benevolent River Spirit = (absent)
+Bot1.Hand.Benevolent River Spirit.Power = 4

@@ -1,0 +1,47 @@
+# Waterbend {5} (CR 701.67a-b) means five generic mana, each one payable by tapping an untapped artifact or creature, and nothing pays
+# for more of it. With Island and Mox Sapphire for the {U}{U} and only four artifacts and creatures (three Moxen and Ornithopter)
+# to tap, Benevolent River Spirit is not offered; casting Mox Emerald supplies the fifth and it is, and it resolves. The pool is
+# empty right after the cast, so exactly five taps paid it.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Island
+Mox Emerald
+Benevolent River Spirit
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Benevolent River Spirit.Cast(Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Benevolent River Spirit.Cast(Convoke: Mox Pearl, Mox Jet, Mox Ruby, Ornithopter, Mox Emerald)
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Benevolent River Spirit.Power = 4
+Bot1.Battlefield.Mox Emerald.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
