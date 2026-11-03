@@ -1,0 +1,31 @@
+# Four cards in the chosen player's hand cause no damage at upkeep (CR 120.3).
+# The choice is left unanswered: the harness takes the first candidate in turn order, which would be Bot1 were the
+# controller among them, so Bot2's damage at its first upkeep shows only an opponent may be chosen.
+
+[Bot1 Deck]
+Mox Ruby
+Black Vise
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Black Vise.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+? Bot2.Life = 17
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 17

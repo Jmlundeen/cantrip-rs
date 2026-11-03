@@ -1,0 +1,51 @@
+# A stolen animated Black Vise exiled under Kaya's Ghostform returns under the Aura controller. Its new controller chooses an opponent, including the Vise's owner (CR 614.1c).
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Act of Treason
+Kaya's Ghostform
+Swords to Plowshares
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Black Vise
+Ensoul Artifact
+Island x20
+[Bot3 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Black Vise.Cast
+Bot2.ChoosePlayer(Bot1)
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Ensoul Artifact.Cast(Bot2.Battlefield.Black Vise)
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+[T4 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Black Vise)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaya's Ghostform.Cast(Bot1.Battlefield.Black Vise)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Black Vise)
+Bot1.ChoosePlayer(Bot2)
+[T8 Bot2.Main1]
+[Expect]
+Bot1.Battlefield.Black Vise.Types = Artifact
+Bot2.Life = 19
+Bot3.Life = 20

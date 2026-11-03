@@ -1,0 +1,25 @@
+# Black Vise damages only the chosen opponent for cards in hand beyond four (CR 603.2, 120.3).
+
+[Bot1 Deck]
+Mox Ruby
+Black Vise
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Black Vise.Cast
+? Bot1.Mana =
+Bot1.ChoosePlayer(Bot3)
+[T3 Bot3.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot3.Life = 17
