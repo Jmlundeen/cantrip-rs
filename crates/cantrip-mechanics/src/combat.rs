@@ -2,6 +2,12 @@
 
 use cantrip_api::*;
 
+/// "This creature can't be blocked by creatures with power 3 or greater" (CR 509.1b): check current power
+/// when blockers are declared. Amrou Kithkin and April O'Neil, Kunoichi Trainee print it.
+pub fn power_three_or_greater_cant_block(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
+    source != attacker || q.chars(blocker).power.unwrap_or(0) < 3
+}
+
 /// "[This creature] can't be blocked this turn except by creatures with haste" (CR 509.1b): the restriction on the creature `on`,
 /// as an attacker, that only a creature with haste as blockers are declared may block it. It says nothing of its blocking, nor of
 /// a block already made. A card lists `EXCEPT_BY_HASTE` in its `lasting_block_rules` and the resolved ability adds
