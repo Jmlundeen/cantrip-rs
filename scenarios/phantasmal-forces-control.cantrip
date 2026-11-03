@@ -1,0 +1,39 @@
+# The original controller cannot sacrifice Phantasmal Forces after an opponent gains control in response to its upkeep trigger (CR 701.21a).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Phantasmal Forces
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Old Man of the Sea
+Giant Growth
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phantasmal Forces.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Old Man of the Sea.Cast
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Old Man of the Sea)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Phantasmal Forces)
+Bot2.Pass
+Bot1.Decline
+[T5 Bot1.Main1]
+[Expect]
+Bot2.Battlefield.Phantasmal Forces.Power = 4

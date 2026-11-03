@@ -1,0 +1,49 @@
+# Phantasmal Forces flies over a ground blocker, remains after paying {U}, and is sacrificed when the cost cannot be paid (CR 702.9, 118.12).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Phantasmal Forces
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Grizzly Bears
+Disenchant
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phantasmal Forces.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+? Bot1.Mana =
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Phantasmal Forces > Bot2)
+! Bot2.Block(Grizzly Bears > Phantasmal Forces)
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Sapphire)
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+! Bot1.PayCost
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Phantasmal Forces = (absent)
+Bot1.Graveyard = Phantasmal Forces; Mox Sapphire; Black Lotus

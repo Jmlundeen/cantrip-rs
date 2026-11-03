@@ -1,0 +1,11 @@
+{
+  "name": "Phantasmal Forces",
+  "manaCost": "{3}{U}",
+  "type": "Creature — Illusion",
+  "power": 4,
+  "toughness": 1,
+  "oracleText": "Flying\nAt the beginning of your upkeep, sacrifice this creature unless you pay {U}.",
+  "keywords": [
+    "Flying"
+  ]
+}
