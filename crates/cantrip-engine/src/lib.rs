@@ -329,6 +329,27 @@ mod tests {
         }
     }
 
+    /// A waterbend cost (CR 701.67a-b) is paid by a spell's required additional cost and by a cost paid as a spell or ability
+    /// resolves (`Game::may_pay`): the one place a cost's `waterbend` is read when a spell is cast is `additional_cost`, so
+    /// one anywhere else - an alternative cost, an optional or a chosen additional cost, an activated ability's - would be
+    /// paid for nothing. An activated ability's waterbend is its own (`ActivatedDef::waterbend`), a kicker's `Kicker::waterbend`.
+    #[test]
+    fn a_waterbend_cost_is_only_a_required_additional_cost() {
+        for def in &cards().cards {
+            for way in def.ways {
+                assert!(way.cost.waterbend == ManaCost::ZERO, "{}: an alternative cost's waterbend would be paid for nothing", def.name);
+            }
+            for cost in def.optional_cost.map(|o| o.cost).into_iter().chain(def.additional_choice.iter().map(|c| c.cost)) {
+                assert!(cost.waterbend == ManaCost::ZERO, "{}: an optional or chosen cost's waterbend would be paid for nothing", def.name);
+            }
+            for ability in def.abilities.iter().chain(def.delayed.iter()) {
+                if let AbilityDef::Activated(a) = ability {
+                    assert!(a.cost.waterbend == ManaCost::ZERO, "{}: an activated ability's waterbend is `ActivatedDef::waterbend`", def.name);
+                }
+            }
+        }
+    }
+
     /// The ways of an activated ability's cost that names a choice (`ActivatedDef::cost_choice`) are chosen as it is
     /// announced, after the mana of the whole cost is judged: none carries mana, which the choice would otherwise skip.
     #[test]

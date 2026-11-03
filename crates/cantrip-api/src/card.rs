@@ -753,6 +753,12 @@ impl TargetSpec {
 #[derive(Clone, Copy)]
 pub struct Cost {
     pub mana: ManaCost,
+    /// A waterbend cost beside `mana` (CR 701.67a-b): "waterbend {5}" pays {5} as the rest of the cost's mana is paid, an untapped
+    /// artifact or creature tapped for each generic mana of it, which no other mana of the cost may be paid with. Its {X} is
+    /// announced with the spell's (CR 107.3a). Part of the total cost the spell or ability asks (`Cost::total_mana`), so a
+    /// payment that cannot offer the tapping cannot pay it (`resolution_parts`). Spirit Water Revival's kicker is
+    /// `Kicker::waterbend`; this is a cost that must be paid: Benevolent River Spirit, Waterbending Lesson, ward--waterbend.
+    pub waterbend: ManaCost,
     /// {T} (CR 107.5).
     pub tap: bool,
     pub sacrifice_self: bool,
@@ -1027,6 +1033,7 @@ impl Cost {
     pub fn is_tap_only(&self) -> bool {
         let Cost {
             mana,
+            waterbend,
             tap,
             sacrifice_self,
             sacrifice_granter,
@@ -1065,6 +1072,8 @@ impl Cost {
             materials,
         } = *self;
         tap && mana.is_zero() && mana.x == 0
+            && waterbend.is_zero()
+            && waterbend.x == 0
             && !sacrifice_self
             && !sacrifice_granter
             && !discard_self
@@ -1112,9 +1121,12 @@ impl Cost {
             for i in 0..6 {
                 c.mana.symbols[i] += self.mana.symbols[i];
             }
+            c.waterbend.generic += self.waterbend.generic;
+            c.waterbend.x += self.waterbend.x;
         }
         if n == 0 {
             c.mana = ManaCost::ZERO;
+            c.waterbend = ManaCost::ZERO;
         }
         c.life = self.life * u32::from(n);
         c.energy = self.energy.saturating_mul(n);
@@ -1169,6 +1181,8 @@ impl Cost {
             i += 1;
         }
         c.mana.x += other.mana.x;
+        c.waterbend.generic += other.waterbend.generic;
+        c.waterbend.x += other.waterbend.x;
         c.tap |= other.tap;
         c.sacrifice_self |= other.sacrifice_self;
         c.sacrifice_granter |= other.sacrifice_granter;
@@ -1267,6 +1281,7 @@ impl Cost {
     pub const NONE: Cost =
         Cost {
             mana: ManaCost::ZERO,
+            waterbend: ManaCost::ZERO,
             tap: false,
             sacrifice_self: false,
             sacrifice_granter: false,
@@ -1305,6 +1320,21 @@ impl Cost {
             tap_to_reduce: false,
             materials: None,
         };
+
+    /// "Waterbend {N}" (CR 701.67a-b): `generic` generic mana, each of which an untapped artifact or creature tapped may pay, and
+    /// `x` of them times X where it is "waterbend {X}" (an additional cost's X is announced with the spell, CR 107.3a).
+    pub const fn waterbend(generic: u32, x: u8) -> Cost {
+        Cost { waterbend: ManaCost { generic, x, ..ManaCost::ZERO }, ..Cost::NONE }
+    }
+
+    /// The mana the whole cost asks for: `mana` and the waterbend cost's generic mana, which are paid together (CR 701.67b).
+    /// {X} is the number of X symbols, announced as the spell's own are.
+    pub const fn total_mana(&self) -> ManaCost {
+        let mut m = self.mana;
+        m.generic += self.waterbend.generic;
+        m.x += self.waterbend.x;
+        m
+    }
 
     pub const fn sacrifice(count: u32, filter: ObjectFilter) -> Cost {
         Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::Sacrifice, tapped: false }), ..Cost::NONE }

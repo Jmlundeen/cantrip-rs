@@ -2876,6 +2876,8 @@ fn offer_costed(
     option: &mut ActionOption,
     covered: impl Fn(&[Target], &Earlier) -> bool,
 ) -> bool {
+    // CR 107.3a: the {X} of a waterbend cost an additional cost has is announced with the spell's own.
+    let x_symbols = x_symbols + def.additional_cost.map_or(0, |c| c.waterbend.x);
     let changes = !a.changers.is_empty() || !def.own_cost_changes.is_empty() || lasting_changes(cx);
     if !changes {
         return covered(&[], &Earlier::NONE) && offer_spell(cx, asker, def, option);
@@ -3233,7 +3235,9 @@ pub fn cast_total(game: &crate::Game, player: PlayerId, option: &ActionOption) -
         n if n > 0 && (n as usize) <= whole.ways.len() => whole.ways[n as usize - 1].cost.mana,
         _ => face.cost,
     };
-    let base = add_cost(base, face.additional_cost.map_or(ManaCost::ZERO, |extra| extra.mana));
+    let extra = face.additional_cost.map_or(ManaCost::ZERO, |extra| extra.total_mana());
+    let mut base = add_cost(base, extra);
+    base.x += extra.x;
     if base.x > 0 {
         return None;
     }
@@ -3728,7 +3732,7 @@ fn least_cost_parts(
     let mut cost = at_least_x(base, def.x_cant_be_zero);
     // The X announced, where it is more than the least (CR 107.3a, 601.2b).
     let more_x = u32::from(earlier.x.saturating_sub(least_x(def.x_cant_be_zero)));
-    cost.generic += more_x * u32::from(base.x);
+    cost.generic += more_x * (u32::from(base.x) + u32::from(def.additional_cost.map_or(0, |c| c.waterbend.x)));
     // The kicker, the optional additional cost and the cards spliced onto it, where they are announced (CR 601.2b, 601.2f).
     if let Some(k) = def.kicker.filter(|_| earlier.kicks > 0) {
         cost = kicker_total(cost, k, earlier.kicks);
@@ -3739,6 +3743,8 @@ fn least_cost_parts(
     cost = add_cost(cost, earlier.splice);
     if let Some(extra) = def.additional_cost {
         cost = add_cost(cost, extra.mana);
+        // A waterbend cost (CR 701.67a-b) is mana too, its X at the least X announced (CR 107.3a).
+        cost.generic += extra.waterbend.generic + u32::from(extra.waterbend.x) * u32::from(least_x(def.x_cant_be_zero));
     }
     // CR 601.2b: an additional cost that is one of several ("behold a Jace or pay {1}") costs at least the mana of the
     // cheapest of them that can be paid otherwise.
@@ -4603,6 +4609,14 @@ fn casts_with_any_color(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId
 /// spell (`spell_kind`), spent as though it were mana of any color where a static ability lets `player` do so for it
 /// (`casts_with_any_color`, CR 609.4b).
 fn spell_covers(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: &ManaCost) -> bool {
+    let bending;
+    let a = match waterbend_tap(def) {
+        Some(tap) => {
+            bending = a.tapping(cx, player, tap);
+            &bending
+        }
+        None => a,
+    };
     let payment = spell_kind(cx, a, card, def);
     if casts_with_any_color(cx, a, player, card, def) { a.covers_for(&cost.paid_with_any_color(), &payment) } else { a.covers_for(cost, &payment) }
 }
@@ -7255,6 +7269,35 @@ fn pay_with(cx: &Cx, grantors: &[ObjectId], player: PlayerId, spell: ObjectId, d
     with
 }
 
+/// How many of the generic mana of a waterbend cost (CR 701.67a-b) of `generic` the artifacts and creatures `payer` has untapped
+/// could pay right now, a tap for {1} each. It judges against the board as it is now, during resolution: every untapped artifact
+/// and creature counts, whether or not it has a mana ability (none has been used yet, and the payer may use one instead), up to
+/// `generic`.
+fn bendable(cx: &Cx, payer: PlayerId, generic: u32) -> u32 {
+    if generic == 0 {
+        return 0;
+    }
+    let taps = cx
+        .permanents_of(payer)
+        .into_iter()
+        .filter(|&id| !cx.s().obj(id).tapped)
+        .filter(|&id| {
+            let chars = cx.chars(id);
+            chars.is(CardType::Artifact) || chars.is(CardType::Creature)
+        })
+        .count() as u32;
+    generic.min(taps)
+}
+
+/// The artifacts and creatures a spell's waterbend cost (CR 701.67a-b) may have tapped for it (advice, CR 601.2g-h): each pays {1}
+/// of the waterbend cost's generic mana and together no more than that, never a tax on it (CR 701.67b); one that could make
+/// mana is judged with being tapped for it as one more alternative (`TapFor`, `Available::tapping`). An X in the waterbend
+/// cost is judged at the least it may be announced as (CR 107.3a), as an activated ability's is.
+fn waterbend_tap(def: &CardDef) -> Option<TapFor> {
+    let w = def.additional_cost.map(|c| c.waterbend).filter(|w| w.generic > 0 || w.x > 0)?;
+    Some(TapFor { artifacts: true, creatures: true, convoke: false, cap: w.generic + u32::from(w.x) * u32::from(least_x(def.x_cant_be_zero)) })
+}
+
 /// Whether a spell's total cost could be paid (advice, CR 601.2g-h): by the mana at hand, with what else may pay for it
 /// (convoke's creatures, delve's graveyard, improvise's artifacts) each paying their share, or by those alone when no
 /// mana may be spent on it. A permanent that could make mana is either tapped for the spell or spent for its mana, never
@@ -7265,6 +7308,15 @@ fn pay_with(cx: &Cx, grantors: &[ObjectId], player: PlayerId, spell: ObjectId, d
 fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, exiled: u8, any: AnyMana) -> bool {
     let no_mana = def.keywords.has(Keyword::CantSpendManaToCast);
     let with = pay_with(cx, &a.grantors, player, card, def, face_of(cx, card, def));
+    // A waterbend cost's taps (CR 701.67a-b), beside the mana: what a spell's convoke or improvise does is judged below.
+    let bending;
+    let a = match waterbend_tap(def).filter(|_| !no_mana && !with.improvise && !with.convoke) {
+        Some(tap) => {
+            bending = a.tapping(cx, player, tap);
+            &bending
+        }
+        None => a,
+    };
     let any = if any == AnyMana::No && casts_with_any_color(cx, a, player, card, def) { AnyMana::Color } else { any };
     let as_paid = |cost: ManaCost| any.view(&cost);
     // Assist (CR 702.132a): another player may pay generic mana of it - as much as the one who could pay the most.
@@ -7951,6 +8003,9 @@ fn cast(
     // What the permission adds (CR 118.8): a permanent's permission's, retrace's discard (CR 702.81a).
     let mut extra = def.additional_cost.unwrap_or(Cost::NONE).and(by.additional);
     cost.mana = add_cost(cost.mana, extra.mana);
+    // CR 701.67a-b: a waterbend cost is mana paid with the rest, its taps helping with its generic mana (below); its {X} is
+    // announced with the spell's own (CR 107.3a).
+    cost.mana.generic += extra.waterbend.generic;
 
     // CR 601.2b: a modal spell's modes are chosen first (CR 700.2), each adding its cost (spree, escalate) - unless how
     // many it chooses is defined by whether its optional additional cost is paid or it is kicked, which is announced in
@@ -8024,7 +8079,7 @@ fn cast(
         (Some(instead), _) => instead.x,
         (None, Some(x)) => x,
         (None, None) => way_x,
-    };
+    } + extra.waterbend.x;
     let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } | VariableCost::SacrificeWithPowerX(_) | VariableCost::BlightX));
     // "This spell costs {1} less to cast for each permanent sacrificed this way": generic mana off for each one announced.
     let less_each = match extra.variable {
@@ -8318,7 +8373,9 @@ fn cast(
     // it may come to (Trinisphere), after every increase and reduction, before the total is locked in and paid.
     cost.mana = at_least(cost.mana, least);
     // CR 701.67b: the tapping pays only the generic mana of the waterbend cost, whatever else the total has.
-    let waterbend = def.kicker.filter(|k| k.waterbend).map_or(0, |k| k.cost.generic * u32::from(item.kicked));
+    let waterbend = def.kicker.filter(|k| k.waterbend).map_or(0, |k| k.cost.generic * u32::from(item.kicked))
+        + extra.waterbend.generic
+        + extra.waterbend.x as u32 * u32::from(item.x);
     // CR 702.180b, 601.2h: the creature is tapped as the total cost is paid. It is tapped before the mana is, since a cost
     // may be paid in any order, so it cannot also be tapped for mana: the tap it was chosen for is its own.
     if let Some(creature) = reducer {
@@ -11808,6 +11865,15 @@ fn pay_during_resolution(
     if !resolution_parts(cost) {
         return Ok(None);
     }
+    // CR 701.67a-b: a waterbend cost is mana paid with the rest, which the payer may tap untapped artifacts and creatures for
+    // ({1} each, only for its generic mana, `Helpers::waterbend`): its mana joins the total, and it stays named for the payment.
+    let folded;
+    let cost = if cost.waterbend.generic > 0 {
+        folded = Cost { mana: add_cost(cost.mana, cost.waterbend), ..*cost };
+        &folded
+    } else {
+        cost
+    };
     // "Pay X life" (CR 119.4) is paid with the X chosen; without an {X} to choose it, X is 0.
     let life_of = |x: Option<u16>| if cost.pay_x_life { cost.life + u32::from(x.unwrap_or(0)) } else { cost.life };
     if !can_pay_life(cx, payer, life_of(x)) {
@@ -11847,7 +11913,10 @@ fn pay_during_resolution(
         // Mana spent as though it were mana of any color where a rule lets the payer for this payment (CR 609.4b), as the
         // payment itself asks (`pay_mana_used`, `spending_for`): no spell is cast and no ability activated by it.
         let any_color = static_rules::spend_any_color_for(cx, payer, source, SpendingFor::Other);
-        let remaining = uncovered(&pool, &if any_color { total.paid_with_any_color() } else { total });
+        // What is left once the artifacts and creatures that could be tapped for a waterbend cost have paid their share.
+        let bent = bendable(cx, payer, cost.waterbend.generic);
+        let judged = ManaCost { generic: total.generic - bent.min(total.generic), ..total };
+        let remaining = uncovered(&pool, &if any_color { judged.paid_with_any_color() } else { judged });
         let life_payable = can_pay_life(cx, payer, life);
         // Paying is judged exactly, on what is there now: the mana abilities have had their chance by the time the payer
         // asks to pay (CR 605.3a, 601.2g-h). Only the mana abilities themselves are offered on what they could feed the rest of
@@ -11858,7 +11927,7 @@ fn pay_during_resolution(
         if may_become && mana_asked {
             options = mana_options_while_paying(cx, payer, source, Paying::Other);
         }
-        if payable && !refused && (total == ManaCost::ZERO || pool_pays(&pool, &total, payable_life(cx, payer) - life_paid(life), any_color)) {
+        if payable && !refused && (judged == ManaCost::ZERO || pool_pays(&pool, &judged, payable_life(cx, payer) - life_paid(life), any_color)) {
             options.push(ActionOption::simple(ActionKind::PayCost));
         }
         if let (Some(n), Some(most)) = (x, times) {
@@ -11991,7 +12060,8 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     let blighted = choose_blight(cx, payer, source, cost, 0)?;
     let removed = choose_counters_among(cx, payer, source, cost)?;
     if total != ManaCost::ZERO {
-        pay_mana(cx, payer, source, total)?;
+        // CR 701.67b: the tapping a waterbend cost allows pays only its generic mana.
+        pay_mana_with(cx, payer, source, total, &Helpers { waterbend: cost.waterbend.generic, ..Helpers::NONE })?;
         // A mana ability activated while paying (CR 605.3a) may have spent the energy or life the rest needs (CR 118.3).
         if !rest_payable(cx, payer, u32::from(cost.energy), life, None) {
             return Err(Stop::Cancel);
@@ -12053,6 +12123,7 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
 fn resolution_parts(cost: &Cost) -> bool {
     let Cost {
         mana: _,
+        waterbend,
         life: _,
         energy: _,
         tap: _,
@@ -12090,7 +12161,15 @@ fn resolution_parts(cost: &Cost) -> bool {
         tap_to_reduce,
         materials,
     } = *cost;
-    !sacrifice_granter && loyalty.is_none() && !exert && !emerge && !tap_to_reduce && materials.is_none() && put_self_into_library.is_none()
+    // A waterbend cost's {X} is announced with a spell's (CR 107.3a), which a payment during a resolution has none of.
+    waterbend.x == 0
+        && !sacrifice_granter
+        && loyalty.is_none()
+        && !exert
+        && !emerge
+        && !tap_to_reduce
+        && materials.is_none()
+        && put_self_into_library.is_none()
 }
 
 /// Whether the parts of a resolution's cost other than mana and life could be paid now (CR 118.3), `x` the X chosen: the
