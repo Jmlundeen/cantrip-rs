@@ -1,0 +1,46 @@
+# An ability whose only target leaves the battlefield fails to resolve; a later activation protects the returned card (CR 608.2b).
+[Bot1 Deck]
+Argivian Blacksmith
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Plains x20
+[Bot2 Deck]
+Steel Wall
+Mox Pearl
+Mox Sapphire
+Unsummon
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Argivian Blacksmith.Cast
+? Bot1.Mana =
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Argivian Blacksmith.Activate(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Bot2.Battlefield.Steel Wall)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Hand.Steel Wall.Colors =
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Argivian Blacksmith.Activate(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Steel Wall.Damage = 1

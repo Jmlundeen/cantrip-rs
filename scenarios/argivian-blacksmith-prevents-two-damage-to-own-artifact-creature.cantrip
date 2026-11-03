@@ -1,0 +1,39 @@
+# The tap ability targets an artifact creature, prevents exactly two damage, and its shield is consumed (CR 615.7).
+[Bot1 Deck]
+Argivian Blacksmith
+Black Lotus
+Mox Ruby x2
+Steel Wall
+Lightning Bolt x2
+Plains x20
+[Bot2 Deck]
+Island x24
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Argivian Blacksmith.Cast
+? Bot1.Mana =
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Steel Wall.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Argivian Blacksmith.Activate(Bot1.Battlefield.Argivian Blacksmith)
+! Bot1.Battlefield.Argivian Blacksmith.Activate(Bot1.Battlefield.Mox Ruby#1)
+Bot1.Battlefield.Argivian Blacksmith.Activate(Bot1.Battlefield.Steel Wall)
+? Bot1.Battlefield.Argivian Blacksmith.Tapped = true
+? Bot1.Mana =
+! Bot1.Battlefield.Argivian Blacksmith.Activate(Bot1.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Steel Wall.Damage = 1
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Steel Wall; Lightning Bolt; Lightning Bolt; Black Lotus
