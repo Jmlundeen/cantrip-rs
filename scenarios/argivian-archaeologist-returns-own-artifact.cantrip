@@ -1,0 +1,48 @@
+# The Archaeologist returns an artifact card from its controller's graveyard, not the opponent's or a land; its ability costs two white mana and tapping (CR 602.2, 115.1c).
+[Bot1 Deck]
+Black Lotus
+Argivian Archaeologist
+Plains
+Island
+Plains
+Opt
+Plains x14
+
+[Bot2 Deck]
+Black Lotus
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Argivian Archaeologist.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Island.Activate
+! Bot1.Battlefield.Argivian Archaeologist.Activate(Bot1.Graveyard.Black Lotus; Mana: short)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+! Bot1.Battlefield.Argivian Archaeologist.Activate(Bot2.Graveyard.Black Lotus)
+! Bot1.Battlefield.Argivian Archaeologist.Activate(Bot1.Graveyard.Opt)
+! Bot1.Battlefield.Argivian Archaeologist.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Argivian Archaeologist.Activate(Bot1.Graveyard.Black Lotus)
+? Bot1.Mana =
+? Bot1.Battlefield.Argivian Archaeologist.Tapped = true
+
+[Expect]
+Bot1.Hand = Black Lotus; Plains; Plains; Plains; Plains; Plains
+Bot2.Graveyard = Island; Island; Black Lotus
