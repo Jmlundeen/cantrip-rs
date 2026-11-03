@@ -1,0 +1,54 @@
+# War Balloon {2}{R} (flying Vehicle 4/3, crew 3): "{1}: Put a fire counter on this Vehicle. As long as this Vehicle has three or more fire
+# counters on it, it's an artifact creature." Turn 1: Bot1 casts it with three Moxen and puts the first fire counter on it with the fourth
+# ({1}). Turn 3: a second counter leaves it a plain artifact (two is not three), the third makes it an artifact creature (flying 4/3) that
+# attacks for 4 (Bot2 20 -> 16).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+War Balloon
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.War Balloon.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.War Balloon.Activate(Ability: {1}: Put a fire counter on this Vehicle.)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.War Balloon.Counters.Fire = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.War Balloon.Activate(Ability: {1}: Put a fire counter on this Vehicle.)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.War Balloon.Counters.Fire = 2
+? Bot1.Battlefield.War Balloon.Types = Artifact
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.War Balloon.Activate(Ability: {1}: Put a fire counter on this Vehicle.)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.War Balloon.Types = Artifact; Creature
+Bot1.Attack(War Balloon > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.War Balloon.Counters.Fire = 3
+Bot1.Battlefield.War Balloon.Power = 4

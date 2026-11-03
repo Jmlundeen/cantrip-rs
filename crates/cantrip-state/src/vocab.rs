@@ -1245,6 +1245,7 @@ counter_kinds! {
     Matrix = 59, "matrix", "Matrix";
     Scream = 60, "scream", "Scream";
     Vitality = 61, "vitality", "Vitality";
+    Fire = 62, "fire", "Fire";
 }
 
 impl CounterKind {
