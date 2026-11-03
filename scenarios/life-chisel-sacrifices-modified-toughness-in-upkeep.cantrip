@@ -1,0 +1,55 @@
+# Life Chisel sacrifices the pumped Ornithopter as a cost and gains its last-known toughness, 5, only in its controller's upkeep (CR 608.2h, 602.5).
+[Bot1 Deck]
+Life Chisel
+Black Lotus
+Mox Pearl
+Mox Emerald
+Ornithopter
+Giant Growth
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Life Chisel.Cast
+? Bot1.Mana =
+[T1 Bot1.Main2]
+! Bot1.Battlefield.Life Chisel.Activate
+[T2 Bot2.Upkeep]
+Bot2.Pass
+! Bot1.Battlefield.Life Chisel.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Toughness = 5
+Bot1.Battlefield.Life Chisel.Activate(Sacrifice: Bot1.Battlefield.Ornithopter)
+! Bot1.Choose(Bot2.Battlefield.Ornithopter)
+! Bot1.Choose(Bot1.Battlefield.Mox Pearl)
+Bot1.Choose(Bot1.Battlefield.Ornithopter)
+? Bot1.Graveyard = Ornithopter; Giant Growth; Black Lotus
+? Bot1.Life = 20
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 25
+! Bot1.Battlefield.Life Chisel.Activate
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Life = 25
+Bot2.Battlefield.Ornithopter.Toughness = 2
