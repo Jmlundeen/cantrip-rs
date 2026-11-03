@@ -1,0 +1,8 @@
+{
+  "name": "Amrou Kithkin",
+  "manaCost": "{W}{W}",
+  "type": "Creature — Kithkin",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "This creature can't be blocked by creatures with power 3 or greater."
+}

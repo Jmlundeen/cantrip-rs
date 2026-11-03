@@ -1,0 +1,49 @@
+# Amrou Kithkin cannot be blocked by power three, but power two can block it and power three can block another attacker (CR 509.1b).
+[Bot1 Deck]
+Plains
+Plains
+Amrou Kithkin
+Savannah Lions
+Plains x17
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Hill Giant
+Forest
+Grizzly Bears
+Forest x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Hill Giant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Amrou Kithkin.Cast
+? Bot1.Mana =
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Savannah Lions.Cast
+[T7 Bot1.BeginCombat]
+Bot1.Attack(Amrou Kithkin > Bot2; Savannah Lions > Bot2)
+! Bot2.Block(Hill Giant > Amrou Kithkin)
+Bot2.Block(Grizzly Bears > Amrou Kithkin; Hill Giant > Savannah Lions)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Savannah Lions; Amrou Kithkin
+Bot2.Life = 20
