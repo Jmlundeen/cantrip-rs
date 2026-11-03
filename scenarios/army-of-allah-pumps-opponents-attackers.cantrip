@@ -1,0 +1,38 @@
+# Army of Allah affects all attacking creatures, including the opponent's, but not creatures that are not attacking; its bonus ends at cleanup (CR 611.2c, 514.2).
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Army of Allah
+Plains x17
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.BeginCombat]
+Bot2.Attack(Ornithopter#1 > Bot1; Ornithopter#2 > Bot1)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Army of Allah.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter#1.Power = 2
+? Bot2.Battlefield.Ornithopter#1.Toughness = 2
+? Bot2.Battlefield.Ornithopter#2.Power = 2
+? Bot2.Battlefield.Ornithopter#3.Power = 0
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 16
+Bot2.Battlefield.Ornithopter#1.Power = 0
+Bot2.Battlefield.Ornithopter#1.Toughness = 2

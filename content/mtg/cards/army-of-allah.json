@@ -1,0 +1,6 @@
+{
+  "name": "Army of Allah",
+  "manaCost": "{1}{W}{W}",
+  "type": "Instant",
+  "oracleText": "Attacking creatures get +2/+0 until end of turn."
+}
