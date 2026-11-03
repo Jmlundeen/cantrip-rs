@@ -1,0 +1,43 @@
+# Darkness prevents combat damage from both players' creatures this turn; on a later turn the shield has expired (CR 615.1, 611.2a).
+[Bot1 Deck]
+Plains
+Swamp
+Bofur, Reliable Guardian
+Darkness
+Island x14
+
+[Bot2 Deck]
+Forest
+Dragon Sniper
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Dragon Sniper.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Attack(Bofur, Reliable Guardian > Bot2)
+Bot2.Block(Dragon Sniper > Bofur, Reliable Guardian)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Darkness.Cast
+? Bot1.Mana =
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Bofur, Reliable Guardian.Damage = 0
+? Bot2.Battlefield.Dragon Sniper.Damage = 0
+? Bot1.Life = 20
+? Prevented = 1 Bofur, Reliable Guardian > Dragon Sniper by Darkness; 1 Dragon Sniper > Bofur, Reliable Guardian by Darkness
+[T5 Bot1.Main1]
+Bot1.Attack(Bofur, Reliable Guardian > Bot2)
+Bot2.Block(Dragon Sniper > Bofur, Reliable Guardian)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Bofur, Reliable Guardian; Darkness
+Bot2.Graveyard = Dragon Sniper
+Bot1.Life = 21

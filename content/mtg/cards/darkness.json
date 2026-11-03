@@ -1,0 +1,6 @@
+{
+  "name": "Darkness",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "Prevent all combat damage that would be dealt this turn."
+}
