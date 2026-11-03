@@ -1,0 +1,46 @@
+# Another controlled creature does not prevent a nontargeting Pyroclasm or Fanatical Firebrand's targeted ability (CR 615.1).
+[Bot1 Deck]
+Bronze Horse
+Black Lotus x2
+Mox Pearl
+Mox Ruby
+Wall of Earth
+Island x20
+[Bot2 Deck]
+Fanatical Firebrand
+Pyroclasm
+Mox Ruby
+Mox Pearl
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bronze Horse.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Fanatical Firebrand.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wall of Earth.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Fanatical Firebrand.Activate(Bot1.Battlefield.Bronze Horse)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Bronze Horse.Damage = 1
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Pyroclasm.Cast
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Bronze Horse.Damage = 3
+Bot1.Battlefield.Wall of Earth.Damage = 2

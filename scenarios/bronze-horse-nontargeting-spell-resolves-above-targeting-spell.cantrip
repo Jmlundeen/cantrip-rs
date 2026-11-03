@@ -1,0 +1,44 @@
+# Fire Magic does not target Bronze Horse, even while a Bolt targeting it remains below on the stack; Fire deals one and the Bolt is prevented (CR 615.1).
+[Bot1 Deck]
+Bronze Horse
+Black Lotus x2
+Mox Pearl
+Mox Ruby
+Wall of Earth
+Island x20
+[Bot2 Deck]
+Lightning Bolt
+Fire Magic
+Mox Ruby x2
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bronze Horse.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wall of Earth.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bronze Horse)
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Fire Magic.Cast
+Bot2.Modes(Fire)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Bronze Horse.Damage = 1
+? Bot1.Battlefield.Wall of Earth.Damage = 1
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Bronze Horse.Damage = 1

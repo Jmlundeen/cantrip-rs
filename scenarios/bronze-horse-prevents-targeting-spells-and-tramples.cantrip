@@ -1,0 +1,47 @@
+# With another creature, a targeted Flame Slash and an opponent's Bolt deal no damage to Bronze Horse; its trample deals three past a 1/1 blocker (CR 615.1, 702.19b).
+[Bot1 Deck]
+Bronze Horse
+Black Lotus x2
+Mox Pearl
+Mox Ruby
+Ornithopter
+Flame Slash
+Island x20
+[Bot2 Deck]
+Memnite
+Mox Ruby
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bronze Horse.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Flame Slash.Cast(Bot1.Battlefield.Bronze Horse)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bronze Horse.Damage = 0
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Bronze Horse > Bot2)
+Bot2.Block(Memnite > Bronze Horse)
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bronze Horse)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Bronze Horse.Damage = 0
+Bot2.Graveyard = Lightning Bolt; Memnite

@@ -1,0 +1,11 @@
+{
+  "name": "Bronze Horse",
+  "manaCost": "{7}",
+  "type": "Artifact Creature — Horse",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Trample\nAs long as you control another creature, prevent all damage that would be dealt to this creature by spells that target it.",
+  "keywords": [
+    "Trample"
+  ]
+}

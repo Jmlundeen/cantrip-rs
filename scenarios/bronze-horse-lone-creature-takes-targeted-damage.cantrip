@@ -1,0 +1,30 @@
+# Bronze Horse alone is not another creature, and the opponent's creature does not enable prevention (CR 615.1).
+[Bot1 Deck]
+Bronze Horse
+Black Lotus x2
+Mox Pearl
+Island x20
+[Bot2 Deck]
+Memnite
+Mox Ruby
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bronze Horse.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bronze Horse)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Bronze Horse.Damage = 3
+Bot2.Battlefield.Memnite.Power = 1
