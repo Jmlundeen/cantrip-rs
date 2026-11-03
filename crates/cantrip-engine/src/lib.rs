@@ -286,6 +286,7 @@ pub fn label_text_in(table: &'static CardTable, label: &Label) -> &'static str {
         Label::Miracle(m) => cards().get(m.granter).granted_miracles.get(m.index as usize).map_or("", |g| g.text),
         Label::ManaCost => "Pay its mana cost",
         Label::AlternativeCost(card, i) => cards().get(card).spell_alternatives.get(i as usize).map_or("", |a| a.text),
+        Label::LastingAlternativeCost(card, i) => cards().get(card).lasting_spell_alternatives.get(i as usize).map_or("", |a| a.text),
         Label::Way(card, i) => cards().get(card).ways.get(i as usize).map_or("", |w| w.text),
         Label::CastPermission { own: true, .. } => "Its own permission",
         Label::CastPermission { by: Some(card), .. } => cards().get(card).name,

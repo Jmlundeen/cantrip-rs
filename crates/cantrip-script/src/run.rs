@@ -2765,6 +2765,11 @@ fn modes_the_source_could_offer(game: &Game, source: ObjectId) -> Vec<&'static s
         out.extend(face.spell_alternatives.iter().map(|a| a.text));
         out.extend(face.labels.iter().copied());
     }
+    // The alternative costs resolved spells and abilities gave a player's next spell (CR 611.2c), whatever card it is.
+    out.extend(game.state.effects.iter().filter_map(|e| match e.kind {
+        EffectKind::SpellAlternative { card, index, .. } => game.cards.get(card).lasting_spell_alternatives.get(index as usize).map(|a| a.text),
+        _ => None,
+    }));
     out
 }
 

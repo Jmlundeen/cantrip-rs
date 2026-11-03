@@ -8479,8 +8479,12 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
             choices.push((Label::Way(printed, n - 1), n, None));
         }
         for &a in &alternatives {
-            let k = a.grant.ability.as_spell_alternative().unwrap_or(0) as u8;
-            choices.push((Label::AlternativeCost(a.grant.ability.card, k), way, Some(a)));
+            // A permanent's alternative cost and one a resolved spell or ability gave (CR 611.2c) are in two lists of the card.
+            let label = match a.grant.ability.as_lasting_spell_alternative() {
+                Some(k) => Label::LastingAlternativeCost(a.grant.ability.card, k as u8),
+                None => Label::AlternativeCost(a.grant.ability.card, a.grant.ability.as_spell_alternative().unwrap_or(0) as u8),
+            };
+            choices.push((label, way, Some(a)));
         }
         // Its mana cost alone is no choice to ask about; an alternative cost is announced, even the only one (CR 601.2b).
         let chosen = match choices.len() {

@@ -1094,6 +1094,17 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         Label::CastPermission { own: true, .. } => "By its own permission: the permanent it becomes is sacrificed at the beginning of the next cleanup step".into(),
                         Label::CastPermission { by: Some(card), .. } => format!("By {}'s permission: it isn't sacrificed", game.cards.get(*card).name),
                         Label::CastPermission { by: None, .. } => "As an instant or with flash: it isn't sacrificed".into(),
+                        // An alternative cost a resolved spell or ability gave the asked player's next spell (CR 611.2c), in the
+                        // words its effect was made with (CR 612.1), as the pending effect beside their life says it.
+                        Label::LastingAlternativeCost(card, index) => game
+                            .state
+                            .effects
+                            .iter()
+                            .find_map(|e| match e.kind {
+                                EffectKind::SpellAlternative { card: c, index: i, player: p, words } if c == *card && i == *index && p == request.player => Some(words),
+                                _ => None,
+                            })
+                            .map_or_else(|| label_text(l).to_string(), |words| crate::text::changed_text(label_text(l), game.cards.get(*card).name, words)),
                         // The face-down pile's cards are not the chooser's to see, only how many there are (CR 700.3).
                         Label::FaceDownPile { count } if *count > 0 => format!("{}: {count} {}", label_text(l), if *count == 1 { "card" } else { "cards" }),
                         Label::Pile { cards, .. } | Label::FaceUpPile { cards } if !cards.is_empty() => format!("{}: {}", label_text(l), cards.iter()

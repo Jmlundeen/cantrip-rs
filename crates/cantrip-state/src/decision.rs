@@ -1507,6 +1507,9 @@ pub enum Label {
     /// The `u8`th alternative cost a permanent of this card gives the spells a player casts (CR 118.9:
     /// `CardDef::spell_alternatives`), to pay rather than the mana cost.
     AlternativeCost(CardId, u8),
+    /// The `u8`th of a card's `lasting_spell_alternatives` (CR 611.2c, 118.9): an alternative cost a resolved spell or ability
+    /// of that card gave the next spell a player casts, to pay rather than the mana cost.
+    LastingAlternativeCost(CardId, u8),
     /// The `u8`th of a card's own alternative ways to be cast (`CardDef::ways`, CR 118.9): evoke, Force of Will's.
     Way(CardId, u8),
     /// One instance of the word "target" on a spell or ability (CR 115.3), named by its slot's text, with what it holds:

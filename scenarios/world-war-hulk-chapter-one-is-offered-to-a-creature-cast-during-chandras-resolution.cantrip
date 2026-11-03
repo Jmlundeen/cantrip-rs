@@ -1,0 +1,67 @@
+# Browser
+# World War Hulk's chapter I applies to a spell cast while another ability resolves (CR 608.2g, 118.9): Chandra, Torch of
+# Defiance's +1 exiles Hill Giant and Bot1 casts it, choosing between its mana cost and the free cast. The choice names the
+# free cast in the chapter's own words, read from the card's lasting alternatives (not its permanents' ones, which it has
+# none of: an empty caption). Every mana source is spent on Chandra, so Hill Giant on the battlefield was cast for free.
+
+[Bot1 Deck]
+Forest
+Mountain
+Black Lotus
+Mox Ruby
+Mox Emerald
+World War Hulk
+Chandra, Torch of Defiance
+Mountain
+Forest
+Island
+Hill Giant
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.World War Hulk.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Client.Bot1.Prompt.Modes = Pay its mana cost; The next red or green creature spell you cast this turn can be cast without paying its mana cost.
+Bot1.Modes(The next red or green creature spell you cast this turn can be cast without paying its mana cost.)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Hill Giant.Power = 3
+Bot2.Life = 20

@@ -524,7 +524,7 @@ fn resolve(game: &mut RulesGame) {
         let answer = match request.kind {
             RequestKind::Priority { .. } => Answer::Pass,
             RequestKind::ChooseModes { modes, eligible, .. } => {
-                let picked = eligible.iter().copied().find(|&i| matches!(modes[i as usize], Label::Way(..) | Label::AlternativeCost(..)));
+                let picked = eligible.iter().copied().find(|&i| matches!(modes[i as usize], Label::Way(..) | Label::AlternativeCost(..) | Label::LastingAlternativeCost(..)));
                 Answer::Modes(vec![picked.or(eligible.first().copied()).expect("a mode")])
             }
             RequestKind::PayCosts { options, .. } => {
