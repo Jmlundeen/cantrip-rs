@@ -8,11 +8,8 @@ use cantrip_oracle as oracle;
 fn targets_you_or_yours(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     let Target::Object(spell) = t else { return false };
     let Some(item) = q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == spell) else { return false };
-    q.state().targets(item).iter().any(|&aimed| match aimed {
-        Target::Player(p) => p == asker.controller,
-        Target::Object(id) => cantrip_mechanics::targets::permanent(q, id) && q.controller(id) == asker.controller,
-        _ => false,
-    })
+    q.state().targets(item).contains(&Target::Player(asker.controller))
+        || cantrip_mechanics::targets::spell_targets_permanent_controlled_by(q, item, asker.controller)
 }
 
 /// Counter target spell that targets you or a permanent you control. Draw a card. A spell whose only target has become

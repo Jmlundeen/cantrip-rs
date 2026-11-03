@@ -514,6 +514,14 @@ pub fn permanents_targeted_as_cast(q: &dyn Query, spell: ObjectId) -> Vec<Object
     objects_targeted_as_cast(q, spell).into_iter().filter(|&id| permanent(q, id)).collect()
 }
 
+/// Whether this spell currently targets a permanent `player` controls (CR 115.1, 608.2b).
+/// Avoid Fate and Hindering Light check this both when cast and when their targets are rechecked.
+pub fn spell_targets_permanent_controlled_by(q: &dyn Query, item: &StackItem, player: PlayerId) -> bool {
+    q.state().targets(item).iter().any(|target| {
+        target.object().is_some_and(|id| permanent(q, id) && q.controller(id) == player)
+    })
+}
+
 /// "[This permanent]'s power" read by an ability of it: the power it has now, or the power it last had on the battlefield
 /// once it has left (CR 608.2h, 113.7a); zero for one with none. Ouroboroid's "where X is Ouroboroid's power" and Loki
 /// Laufeyson's "less than or equal to Loki's power" read it.
