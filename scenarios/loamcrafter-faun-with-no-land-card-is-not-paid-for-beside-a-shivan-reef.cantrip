@@ -1,0 +1,30 @@
+# Loamcrafter Faun's "you may discard one or more land cards" is a cost paid as its trigger resolves, with no mana in it, so no
+# mana ability may be activated for it (CR 601.2g, 605.3a): with no land card left in hand, paying is not offered though Bot1
+# controls a Shivan Reef, a mana ability whose own effect the engine can't see past. Bot1 declines and nothing triggers.
+
+[Bot1 Deck]
+Shivan Reef
+Black Lotus
+Loamcrafter Faun
+Lightning Bolt
+Brainstorm
+Lightning Bolt
+Brainstorm
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shivan Reef.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Loamcrafter Faun.Cast
+! Bot1.PayCost
+Bot1.Decline
+! Bot1.Target
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Brainstorm; Lightning Bolt; Brainstorm
+Bot1.Battlefield = Shivan Reef; Loamcrafter Faun
+Stack.Count = 0

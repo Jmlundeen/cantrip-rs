@@ -1,0 +1,34 @@
+# "If Mox Diamond would enter, you may discard a land card instead. If you do, put Mox Diamond onto the battlefield" is a cost
+# paid as the replacement applies, with no mana in it, so no mana ability may be activated for it (CR 601.2g, 605.3a): with
+# only Legion Leadership in hand (an instant on its front face, so no land card in hand, CR 712.8a) paying is not offered,
+# though Bot1 has a Shivan Reef, a mana ability whose own effect (its damage) the engine can't see past. Mox Diamond is put
+# into the graveyard (CR 614.12a), and no seat that pays whenever it may is stuck asking again.
+
+[Bot1 Deck]
+Shivan Reef
+Mox Diamond
+Legion Leadership
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Emerald
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shivan Reef.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Diamond.Cast
+Bot1.Pass
+! Bot1.PayCost
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Diamond
+Bot1.Hand = Legion Leadership

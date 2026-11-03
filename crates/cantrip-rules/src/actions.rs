@@ -563,10 +563,18 @@ enum Judged {
 /// cast or activation back if they still can't be (CR 601.2h, 733.1). A mana ability's own cost, and one judged for what mana
 /// abilities could tap (`Judged::Nested`), are judged as they stand.
 fn can_pay_other_as(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost, judged: Judged, paid: Option<CostFor>, by: Option<Linked>) -> bool {
+    can_pay_other_fed(cx, source, controller, cost, judged, paid, by, true)
+}
+
+/// `can_pay_other_as`, counting what the mana abilities could feed the cost only where `feeds`: not for a cost judged once
+/// they have had their chance (a resolution's, as the payer asks to pay it), nor for one whose payment includes no mana, which
+/// gives them none (CR 601.2g, 605.3a).
+#[allow(clippy::too_many_arguments)]
+fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost, judged: Judged, paid: Option<CostFor>, by: Option<Linked>, feeds: bool) -> bool {
     let obj = cx.s().obj(source);
     let feed = std::cell::OnceCell::new();
     let fed = || -> ManaFeed {
-        if judged == Judged::Nested || paid == Some(CostFor::ManaAbility) {
+        if !feeds || judged == Judged::Nested || paid == Some(CostFor::ManaAbility) {
             return ManaFeed::NONE;
         }
         *feed.get_or_init(|| mana_feed(cx, controller))
@@ -1203,12 +1211,13 @@ fn choose_discards(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost,
 }
 
 /// Chooses the cards a cost exiles from the hand (CR 601.2h, 118.9), always asked, even when the choice is forced: the
-/// hand is shown, and the cards that pass the filter are the ones that may be chosen.
-fn choose_hand_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, by: Option<Linked>) -> R<Vec<ObjectId>> {
+/// hand is shown, and the cards that pass the filter are the ones that may be chosen - none another cost of the same payment
+/// already took (`taken`): one card pays one cost (CR 601.2h, 118.3).
+fn choose_hand_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, by: Option<Linked>, taken: &[ObjectId]) -> R<Vec<ObjectId>> {
     let Some((n, filter)) = cost.exile_from_hand else { return Ok(Vec::new()) };
     let asker = Asker { source, controller: player, by, spell: false };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect();
+    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && !taken.contains(&c) && filter(cx, &asker, c)).collect();
     if eligible.len() < usize::from(n) {
         return Err(Stop::Cancel);
     }
@@ -1220,14 +1229,14 @@ fn choose_hand_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Co
 }
 
 /// Collect evidence N (CR 701.59a): the cards, with total mana value N or more, that a cost exiles from the graveyard;
-/// always asked.
-fn choose_evidence(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
+/// always asked. None of `taken`, the cards another cost of the same payment exiles, is among them (CR 601.2h, 118.3).
+fn choose_evidence(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, taken: &[ObjectId]) -> R<Vec<ObjectId>> {
     let (cards, values, minimum, symbols) = if let Some((color, n)) = cost.exile_symbols {
-        let cards = symbol_exiles(cx, player, source, color);
+        let cards: Vec<ObjectId> = symbol_exiles(cx, player, source, color).into_iter().filter(|c| !taken.contains(c)).collect();
         let values: Vec<u8> = cards.iter().map(|&c| cx.mana_symbols(c, color).min(255) as u8).collect();
         (cards, values, n, Some(color))
     } else if cost.collect_evidence > 0 {
-        let cards: Vec<ObjectId> = cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect();
+        let cards: Vec<ObjectId> = cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source && !taken.contains(&c)).collect();
         let values: Vec<u8> = cards.iter().map(|&c| cx.mana_value(c).min(255) as u8).collect();
         (cards, values, cost.collect_evidence, None)
     } else {
@@ -1261,21 +1270,29 @@ fn graveyard_exiles(cx: &Cx, player: PlayerId, source: ObjectId, cost: &Cost, by
         .collect()
 }
 
-/// Chooses the cards a cost exiles from the graveyard (CR 601.2h), always asked, even when the choice is forced.
-fn choose_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
-    if cost.exile_from_graveyard == 0 {
-        return choose_evidence(cx, player, source, cost);
+/// Chooses the cards a cost exiles from the graveyard (CR 601.2h), always asked, even when the choice is forced: a number of
+/// them (escape's), then the cards collect evidence or a count of mana symbols takes. One card pays one cost (CR 118.3): none
+/// another part of the same payment took (`taken`, and the first part's for the second) may be chosen.
+fn choose_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, taken: &[ObjectId]) -> R<Vec<ObjectId>> {
+    let mut out = Vec::new();
+    if cost.exile_from_graveyard > 0 {
+        let eligible: Vec<ObjectId> = graveyard_exiles(cx, player, source, cost, None).into_iter().filter(|c| !taken.contains(c)).collect();
+        // Too few to exile is a cost that can't be paid (CR 601.2h): the cast or activation is taken back (CR 733.1).
+        if eligible.len() < usize::from(cost.exile_from_graveyard) {
+            return Err(Stop::Cancel);
+        }
+        let shown = cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect();
+        let ask = RequestKind::choose_cards(source, Purpose::ExileToPay, shown, eligible, u32::from(cost.exile_from_graveyard), false, "");
+        match cx.ask_core(player, ask, true)? {
+            Answer::Cards(cards) => out = cards,
+            _ => return Err(Stop::Cancel),
+        }
     }
-    let eligible = graveyard_exiles(cx, player, source, cost, None);
-    // Too few to exile is a cost that can't be paid (CR 601.2h): the cast or activation is taken back (CR 733.1).
-    if eligible.len() < usize::from(cost.exile_from_graveyard) {
-        return Err(Stop::Cancel);
+    if cost.collect_evidence > 0 || cost.exile_symbols.is_some() {
+        let apart: Vec<ObjectId> = taken.iter().chain(&out).copied().collect();
+        out.extend(choose_evidence(cx, player, source, cost, &apart)?);
     }
-    let ask = RequestKind::choose_cards(source, Purpose::ExileToPay, cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect(), eligible, u32::from(cost.exile_from_graveyard), false, "");
-    match cx.ask_core(player, ask, true)? {
-        Answer::Cards(cards) => Ok(cards),
-        _ => Err(Stop::Cancel),
-    }
+    Ok(out)
 }
 
 /// Pays the exile part of a cost: the chosen cards, together. Returns the cards as they are in exile, new objects
@@ -1384,8 +1401,8 @@ impl ManaFeed {
 }
 
 /// What the mana abilities `player` could activate while paying a cost could feed it (`ManaFeed`): each card a cost of theirs
-/// could put into `player`'s graveyard or hand counted once - a nontoken permanent they own that one sacrifices or returns
-/// (a token is no card, CR 108.2b, 111.1), and every card in their hand where one discards.
+/// could put into `player`'s graveyard or hand counted once - the cards a permanent they control that one sacrifices or
+/// returns represents (`cards_represented`), and every card in their hand where one discards.
 fn mana_feed(cx: &Cx, player: PlayerId) -> ManaFeed {
     let mut options = Vec::new();
     mana_ability_options_as(cx, player, ManaWindow::Payment, &mut options, Judged::Nested);
@@ -1394,11 +1411,7 @@ fn mana_feed(cx: &Cx, player: PlayerId) -> ManaFeed {
     }
     let mut feed = ManaFeed::NONE;
     let (mut graveyard, mut hand): (Vec<ObjectId>, Vec<ObjectId>) = (Vec::new(), Vec::new());
-    let card_of = |id: ObjectId| {
-        let o = cx.s().obj(id);
-        !o.token && o.owner == player
-    };
-    let owned_permanents = || cx.permanents_of(player).into_iter().filter(|&id| card_of(id));
+    let owned_permanents = || cx.permanents_of(player).into_iter();
     for o in &options {
         let Some(source) = o.source else { continue };
         let def = if o.index >= PLAYER_MANA_ABILITY {
@@ -1426,15 +1439,20 @@ fn mana_feed(cx: &Cx, player: PlayerId) -> ManaFeed {
         };
         let cost = &def.cost;
         feed.opaque |= def.mana.is_some() || cost.variable.is_some();
-        if cost.sacrifice_self && cx.s().obj(source).zone.is(ZoneKind::Battlefield) && card_of(source) {
+        if cost.sacrifice_self && cx.s().obj(source).zone.is(ZoneKind::Battlefield) {
             graveyard.push(source);
         }
-        if cost.return_self && cx.s().obj(source).zone.is(ZoneKind::Battlefield) && card_of(source) {
+        if cost.return_self && cx.s().obj(source).zone.is(ZoneKind::Battlefield) {
             hand.push(source);
         }
-        match cost.permanents.map(|p| p.action) {
-            Some(PermanentAction::Sacrifice) if !cost.tap_permanents => graveyard.extend(owned_permanents()),
-            Some(PermanentAction::ReturnToHand) => hand.extend(owned_permanents()),
+        // The permanents its cost may take: its option's candidates (`mana_ability_options_as`), or for tapped ones, chosen
+        // once its own mana is paid, any it controls.
+        let takes = |p: &PermanentCost| -> Vec<ObjectId> {
+            if p.tapped { owned_permanents().collect() } else { o.target_candidates.iter().filter_map(|t| t.object()).collect() }
+        };
+        match cost.permanents {
+            Some(p) if p.action == PermanentAction::Sacrifice && !cost.tap_permanents => graveyard.extend(takes(&p)),
+            Some(p) if p.action == PermanentAction::ReturnToHand => hand.extend(takes(&p)),
             _ => {}
         }
         if cost.discard_hand || !cost.discard.is_none() {
@@ -1445,12 +1463,37 @@ fn mana_feed(cx: &Cx, player: PlayerId) -> ManaFeed {
         list.sort_unstable();
         list.dedup();
     }
-    feed.graveyard = count_u32(graveyard.len());
-    // A card's mana value in the graveyard is its card's (a permanent's may differ: a copy, a transformed face, CR 202.3b):
-    // the greater of the two, as an upper bound.
-    feed.evidence = graveyard.iter().map(|&id| cx.mana_value(id).max(cx.card(cx.s().obj(id).card).cost.mana_value())).sum();
-    feed.hand = count_u32(hand.len());
+    for &id in &graveyard {
+        let (cards, value) = cards_represented(cx, player, id);
+        feed.graveyard += cards;
+        feed.evidence += value;
+    }
+    feed.hand = hand.iter().map(|&id| cards_represented(cx, player, id).0).sum();
     feed
+}
+
+/// How many cards an object of `player`'s would put into their graveyard or hand as it leaves, and the most mana value they
+/// could have there between them: none for a token (a token is no card, CR 108.2b, 111.1), or for a card another player owns,
+/// which goes to its owner's zone (CR 400.3); every component of a merged permanent (CR 730.3), so a card mutated onto a
+/// token is still one. A card's mana value in a graveyard is its card's, which a permanent's may differ from (a copy, a
+/// transformed face, CR 202.3b): both are counted, as an upper bound.
+fn cards_represented(cx: &Cx, player: PlayerId, id: ObjectId) -> (u32, u32) {
+    let o = cx.s().obj(id);
+    let printed = |card: CardId| cx.card(card).cost.mana_value();
+    let Some(merge) = cx.s().merge_of(id) else {
+        return if o.token || o.owner != player { (0, 0) } else { (1, cx.mana_value(id).max(printed(o.card))) };
+    };
+    let (mut cards, mut value) = (0, cx.mana_value(id));
+    if !merge.own_token && o.owner == player {
+        cards += 1;
+        value += printed(o.card);
+    }
+    // A component's owner is not kept apart from the permanent's: each nontoken one is counted, as an upper bound.
+    for part in merge.parts.iter().filter(|p| !p.token) {
+        cards += 1;
+        value += printed(part.card);
+    }
+    (cards, value)
 }
 
 /// Whether a cost's permanents are chosen once its mana is paid (CR 601.2h): those that must be tapped, which a mana
@@ -1670,9 +1713,10 @@ fn ask_cards(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Purpose, 
 /// What a variable cost takes, chosen as the cost is chosen (CR 601.2h): the permanents to sacrifice, the cards to exile,
 /// or the cards to discard. `x` is the X announced for `SacrificeX`; `paid` is what the cost is paid for
 /// (`variable_candidates`).
-fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x: u32, paid: Option<CostFor>) -> R<(Vec<ObjectId>, Vec<ObjectId>, Discarding)> {
+/// None of `taken`, the cards another cost of the same payment discards or exiles, is a candidate (CR 601.2h, 118.3).
+fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x: u32, paid: Option<CostFor>, taken: &[ObjectId]) -> R<(Vec<ObjectId>, Vec<ObjectId>, Discarding)> {
     let Some(variable) = cost.variable else { return Ok((Vec::new(), Vec::new(), Discarding::default())) };
-    let candidates = variable_candidates(cx, source, player, variable, paid, None);
+    let candidates: Vec<ObjectId> = variable_candidates(cx, source, player, variable, paid, None).into_iter().filter(|c| !taken.contains(c)).collect();
     if let VariableCost::DiscardOneOrMore(_) = variable {
         // The hand shown, the cards that pass the filter eligible, as many as the payer likes but one at least: none chosen
         // gives the payment up. Each card pays an instruction that names a characteristic of it (CR 701.9c).
@@ -8088,11 +8132,16 @@ fn cast(
     if late {
         chosen = choose_permanents(cx, player, spell, &cost, Some(CostFor::Spell), None)?;
     }
+    // One card pays one cost (CR 601.2h, 118.3): what a part takes from the hand or the graveyard is not offered to the next.
     let discards = choose_discards(cx, player, spell, &cost, None)?;
-    let mut exiles = choose_exiles(cx, player, spell, &cost)?;
-    let (way_sacrifices, way_exiles, way_discards) = choose_variable(cx, player, spell, &cost, variable_n(&cost, &item), Some(CostFor::Spell))?;
+    let mut taken: Vec<ObjectId> = hand_chosen.iter().chain(&discards.cards).copied().collect();
+    let mut exiles = choose_exiles(cx, player, spell, &cost, &taken)?;
+    taken.extend(&exiles);
+    let (way_sacrifices, way_exiles, way_discards) = choose_variable(cx, player, spell, &cost, variable_n(&cost, &item), Some(CostFor::Spell), &taken)?;
+    taken.extend(way_exiles.iter().chain(&way_discards.cards));
     exiles.extend(way_exiles);
-    let hand_exiles = choose_hand_exiles(cx, player, spell, &cost, None)?;
+    let hand_exiles = choose_hand_exiles(cx, player, spell, &cost, None, &taken)?;
+    taken.extend(&hand_exiles);
     let extra_chosen = choose_permanents(cx, player, spell, &extra, Some(CostFor::Spell), None)?;
     let beheld = choose_behold(cx, player, spell, &cost)?;
     let (extra_beheld, announced) = choose_behold_of(cx, player, spell, &extra)?;
@@ -8108,7 +8157,8 @@ fn cast(
     let extra_blighted = choose_blight(cx, player, spell, &extra, u32::from(item.x))?;
     let removed = choose_counters_among(cx, player, spell, &cost)?;
     let extra_removed = choose_counters_among(cx, player, spell, &extra)?;
-    let (extra_sacrifices, extra_exiles, extra_variable_discards) = choose_variable(cx, player, spell, &extra, variable_n(&extra, &item), Some(CostFor::Spell))?;
+    let (extra_sacrifices, extra_exiles, extra_variable_discards) = choose_variable(cx, player, spell, &extra, variable_n(&extra, &item), Some(CostFor::Spell), &taken)?;
+    taken.extend(extra_exiles.iter().chain(&extra_variable_discards.cards));
     // An optional cost that sacrifices one or more: how many were is how many times it was paid (Plumb the Forbidden's
     // linked trigger reads it).
     if matches!(extra.variable, Some(VariableCost::SacrificeOneOrMore(_))) {
@@ -8136,7 +8186,7 @@ fn cast(
         apart.extend(&these);
         option_chosen.push(these);
     }
-    let extra_evidence = choose_exiles(cx, player, spell, &extra)?;
+    let extra_evidence = choose_exiles(cx, player, spell, &extra, &taken)?;
     let hand_exiled = match extra.exile_from_hand_for_less {
         Some(for_less) => confirm_hand_exiles(cx, player, spell, for_less, &hand_chosen, &hand_could)?,
         None => Vec::new(),
@@ -9696,7 +9746,7 @@ fn activate(
         chosen = choose_permanents(cx, player, source, &whole, paid, by)?;
     }
     let discards = choose_discards(cx, player, source, &whole, by)?;
-    let exiles = choose_exiles(cx, player, source, &whole)?;
+    let exiles = choose_exiles(cx, player, source, &whole, &[])?;
     // The creatures a crew or saddle cost taps, once the mana is paid (CR 601.2g-h by way of 602.2b), as a spell's are
     // (`cast`): a mana ability activated while paying a cost increase (Anointed Peacekeeper's) may have tapped one, and a
     // tapped creature can't pay the cost.
@@ -9971,7 +10021,7 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
         chosen = choose_permanents(cx, player, source, &whole, None, None)?;
     }
     let discards = choose_discards(cx, player, source, &whole, None)?;
-    let exiles = choose_exiles(cx, player, source, &whole)?;
+    let exiles = choose_exiles(cx, player, source, &whole, &[])?;
     if whole.blight > 0 && blight_candidates(cx, player).is_empty() {
         return Err(Stop::Cancel);
     }
@@ -10103,7 +10153,7 @@ fn activate_mana_as(
         pay_discards(cx, &hand);
     }
     // "Exile a card from your graveyard" (Rubble Rouser): chosen and exiled as any ability's cost is (CR 602.2b, 601.2h).
-    let exiles = choose_exiles(cx, player, source, &def.cost)?;
+    let exiles = choose_exiles(cx, player, source, &def.cost, &[])?;
     pay_exiles(cx, &exiles);
     pay_permanents(cx, player, &def.cost, &chosen, Some(Linked { object: source, text: cx.g.cards.linked_card(ability.card), acquired }), &mut tapped);
     ops::tap_together_with(cx, &mut tapped, &[]);
@@ -11458,6 +11508,8 @@ fn pay_during_resolution(
     // The cost paid the number of times chosen so far, changed only to a number the cost's shape holds that many times over
     // (`ManaCost::times`); once, it is the cost itself.
     let mut times_total = cost.mana;
+    // A payment refused without a question since the position last changed (`ActionKind::PayCost` below).
+    let mut refused = false;
     loop {
         // The cost as X now stands: each {X} is X generic mana (CR 107.3f).
         let total = match x {
@@ -11477,14 +11529,17 @@ fn pay_during_resolution(
         let any_color = static_rules::spend_any_color_for(cx, payer, source, SpendingFor::Other);
         let remaining = uncovered(&pool, &if any_color { total.paid_with_any_color() } else { total });
         let life_payable = can_pay_life(cx, payer, life);
-        let payable = life_payable && resolution_rest_payable(cx, payer, source, cost, x.unwrap_or(0));
-        if payable {
-            if total != ManaCost::ZERO || x.is_some() {
-                options = mana_options_while_paying(cx, payer, source, Paying::Other);
-            }
-            if total == ManaCost::ZERO || pool_pays(&pool, &total, payable_life(cx, payer) - life_paid(life), any_color) {
-                options.push(ActionOption::simple(ActionKind::PayCost));
-            }
+        // Paying is judged exactly, on what is there now: the mana abilities have had their chance by the time the payer
+        // asks to pay (CR 605.3a, 601.2g-h). Only the mana abilities themselves are offered on what they could feed the rest of
+        // the cost, and only where the payment includes mana, which is what gives them a chance at all.
+        let mana_asked = total != ManaCost::ZERO || x.is_some();
+        let payable = life_payable && resolution_rest_payable(cx, payer, source, cost, x.unwrap_or(0), false);
+        let may_become = payable || mana_asked && life_payable && resolution_rest_payable(cx, payer, source, cost, x.unwrap_or(0), true);
+        if may_become && mana_asked {
+            options = mana_options_while_paying(cx, payer, source, Paying::Other);
+        }
+        if payable && !refused && (total == ManaCost::ZERO || pool_pays(&pool, &total, payable_life(cx, payer) - life_paid(life), any_color)) {
+            options.push(ActionOption::simple(ActionKind::PayCost));
         }
         if let (Some(n), Some(most)) = (x, times) {
             // The number of times: from 1 to `most`, and no more than the cost's shape holds that many times over.
@@ -11495,7 +11550,7 @@ fn pay_during_resolution(
                 options.push(ActionOption::simple(ActionKind::DecreaseX));
             }
         } else if let Some(n) = x
-            && (payable || cost.pay_x_life || cost.variable.is_some())
+            && (may_become || cost.pay_x_life || cost.variable.is_some())
         {
             if n < MOST_X_PAID {
                 options.push(ActionOption::simple(ActionKind::IncreaseX));
@@ -11515,7 +11570,7 @@ fn pay_during_resolution(
                 // and the payer asked again.
                 let (mark, log_mark) = (cx.s().mark(), cx.g.log.len());
                 match activate_mana(cx, payer, from, action.index, action.color, action.mana == Some(Mana::C), &action.targets) {
-                    Ok(()) => {}
+                    Ok(()) => refused = false,
                     Err(Stop::Cancel) => {
                         cx.st().revert(mark);
                         cx.g.log.truncate(log_mark);
@@ -11525,6 +11580,7 @@ fn pay_during_resolution(
             }
             // A number of times moves only to one the cost's shape holds (the options offer no other).
             ActionKind::IncreaseX | ActionKind::DecreaseX if times.is_some() => {
+                refused = false;
                 let n = x.unwrap_or(1);
                 let to = if action.kind == ActionKind::IncreaseX { n.saturating_add(1) } else { n.saturating_sub(1) };
                 if let Some(t) = cost.mana.times(u32::from(to)).filter(|_| to >= 1) {
@@ -11532,15 +11588,24 @@ fn pay_during_resolution(
                     times_total = t;
                 }
             }
-            ActionKind::IncreaseX => x = x.map(|n| n + 1),
-            ActionKind::DecreaseX => x = x.map(|n| n.saturating_sub(1)),
+            ActionKind::IncreaseX => {
+                refused = false;
+                x = x.map(|n| n + 1);
+            }
+            ActionKind::DecreaseX => {
+                refused = false;
+                x = x.map(|n| n.saturating_sub(1));
+            }
             ActionKind::PayCost => {
-                let (mark, log_mark) = (cx.s().mark(), cx.g.log.len());
+                let (mark, log_mark, asked) = (cx.s().mark(), cx.g.log.len(), cx.cursor);
                 match pay_announced(cx, payer, source, cost, total, life, x.unwrap_or(0)) {
                     // Without an X, what was paid is how many the variable part took (`may_pay_counted`), if it has one.
                     Ok(taken) => return Ok(Some(x.unwrap_or(taken))),
-                    // A choice given up: nothing was paid, and the payer is asked again.
+                    // A choice given up: nothing was paid, and the payer is asked again. A payment the engine refused
+                    // without asking the payer anything would be refused again on the same position: paying is not offered
+                    // again until something changes (a mana ability, X), so no seat that pays when it can loops.
                     Err(Stop::Cancel) => {
+                        refused = cx.cursor == asked;
                         cx.st().revert(mark);
                         cx.g.log.truncate(log_mark);
                     }
@@ -11619,9 +11684,11 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     // The cards discarded or exiled from a hand or a graveyard are chosen once the mana is paid: a mana ability activated
     // while paying may have put them there (CR 605.3a, 601.2g-h).
     let discards = choose_discards(cx, payer, source, cost, None)?;
-    let exiles = choose_exiles(cx, payer, source, cost)?;
-    let hand_exiles = choose_hand_exiles(cx, payer, source, cost, None)?;
-    let (sacrifices, variable_exiles, variable_discards) = choose_variable(cx, payer, source, cost, u32::from(x), None)?;
+    let exiles = choose_exiles(cx, payer, source, cost, &[])?;
+    let mut taken: Vec<ObjectId> = discards.cards.iter().chain(&exiles).copied().collect();
+    let hand_exiles = choose_hand_exiles(cx, payer, source, cost, None, &taken)?;
+    taken.extend(&hand_exiles);
+    let (sacrifices, variable_exiles, variable_discards) = choose_variable(cx, payer, source, cost, u32::from(x), None, &taken)?;
     let taken = u16::try_from(sacrifices.len() + variable_exiles.len() + variable_discards.cards.len()).unwrap_or(u16::MAX);
     if life > 0 {
         ops::change_life(cx, payer, -life_paid(life));
@@ -11714,7 +11781,10 @@ fn resolution_parts(cost: &Cost) -> bool {
 /// parts that name the source ("tap this", "sacrifice this", "discard this card") only while it is where they need it and
 /// its payer's, and the rest as an activated ability's cost is judged (`can_pay_activation`). {T} here is no activated
 /// ability's, so summoning sickness (CR 302.6) has no say.
-fn resolution_rest_payable(cx: &Cx, payer: PlayerId, source: ObjectId, cost: &Cost, x: u16) -> bool {
+///
+/// `feeds`: whether what the mana abilities could feed the cost counts (`can_pay_other_fed`) - only while the payer may still
+/// activate them for its mana.
+fn resolution_rest_payable(cx: &Cx, payer: PlayerId, source: ObjectId, cost: &Cost, x: u16, feeds: bool) -> bool {
     let obj = cx.s().obj(source);
     let live = live(cx.s(), source);
     let yours_on_battlefield = live && obj.zone.is(ZoneKind::Battlefield) && obj.controller == payer;
@@ -11742,7 +11812,7 @@ fn resolution_rest_payable(cx: &Cx, payer: PlayerId, source: ObjectId, cost: &Co
     {
         return false;
     }
-    can_pay_activation(cx, source, payer, &Cost { tap: false, life: 0, mana: ManaCost::ZERO, ..*cost }, None, None)
+    can_pay_other_fed(cx, source, payer, &Cost { tap: false, life: 0, mana: ManaCost::ZERO, ..*cost }, Judged::Activation, None, None, feeds)
 }
 
 /// Whether an object is somewhere it can be found by its id: still the same object.

@@ -1,0 +1,61 @@
+# One card pays one cost (CR 601.2h, 118.3): Deadly Cover-Up is cast by the escape Underworld Breach gives it ("exile three
+# other cards from your graveyard", CR 702.138a) with exactly three other cards in the graveyard - Griselbrand, Faithless
+# Looting and Black Lotus - and collect evidence 6 chosen too (CR 701.59a). Escape takes all three, so the evidence has
+# nothing left to exile, not the Griselbrand escape exiled: the cast is taken back (CR 733.1), nothing exiled. Cast again
+# without collecting evidence, escape exiles the three and the Cover-Up resolves.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Faithless Looting
+Black Lotus
+Underworld Breach
+Swamp
+Swamp
+Deadly Cover-Up
+Griselbrand
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Deadly Cover-Up)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+? Bot1.Graveyard.Count = 4
+Bot1.Graveyard.Deadly Cover-Up.Cast(Ability: Escape)
+Bot1.Modes(Collect evidence)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Choose(Griselbrand; Faithless Looting; Black Lotus)
+? Bot1.Graveyard.Count = 4
+? Exile.Count = 0
+? Stack.Count = 0
+Bot1.Graveyard.Deadly Cover-Up.Cast(Ability: Escape)
+Bot1.Modes(Cast without)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Choose(Griselbrand; Faithless Looting; Black Lotus)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile.Count = 3
+Bot1.Graveyard = Deadly Cover-Up

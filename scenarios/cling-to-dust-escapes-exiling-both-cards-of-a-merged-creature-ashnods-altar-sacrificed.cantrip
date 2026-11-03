@@ -1,0 +1,61 @@
+# A merged permanent that leaves puts every card it is made of into the zone (CR 730.3), and Ashnod's Altar's sacrifice is
+# the cost of a mana ability, activated before the costs are paid (CR 601.2g-h). Cubwarden mutates under Ornithopter (its two
+# Cats are tokens, no cards); Cling to Dust exiles Bot2's Island and draws, and two Lotus Petals are sacrificed at priority,
+# so Cling is in the graveyard with three other cards. Its escape ({3}{B}, exile five other cards) is offered all the same:
+# the Altar sacrificing the merged Ornithopter for {C}{C} while it is cast puts two cards there, the fourth and fifth.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Black Lotus
+Cubwarden
+Mox Pearl
+Mox Jet
+Ashnod's Altar
+Cling to Dust
+Lotus Petal
+Lotus Petal
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot1.Modes(2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ashnod's Altar.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cling to Dust.Cast(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+? Bot1.Mana = {B}{B}
+? Bot1.Graveyard = Lotus Petal; Lotus Petal; Cling to Dust; Black Lotus
+Bot1.Graveyard.Cling to Dust.Cast(Bot2.Graveyard.Island; Ability: Escape)
+Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Cling to Dust
+Exile.Count = 7
+Bot1.Mana = 

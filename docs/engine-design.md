@@ -1400,7 +1400,12 @@ or a graveyard, since a mana ability activated while paying may have put them th
 for an escape cost's mana is a card it may exile). Those parts are offered while the mana abilities the player could
 activate as the cost is paid could make them payable (`actions::ManaFeed`: the cards their costs could sacrifice, discard
 or return, and anything at all where an ability's own effect does more than its listing says), and refused by the payment,
-with the cast taken back (CR 733.1), where they did not; delve counts those cards too. A cost of tapped permanents (`PermanentCost::tapped`, web-slinging's "return a tapped creature you control", CR
+with the cast taken back (CR 733.1), where they did not; delve counts those cards too. A cost with no mana in it gives the mana
+abilities no chance (CR 601.2g, 605.3a), and a resolution's payment (`pay_during_resolution`) offers them on what they could
+feed it but judges paying exactly, on what is there when the payer asks to pay; a payment the engine refuses there without a
+question is not offered again until a mana ability or X changes the position. One card pays one cost (CR 118.3): what one
+part of a payment discards or exiles from a hand or a graveyard (escape's cards, delve's, the cards exiled from a hand for
+less) is not offered to the next (collect evidence, a count of mana symbols, a variable exile). A cost of tapped permanents (`PermanentCost::tapped`, web-slinging's "return a tapped creature you control", CR
 702.188a) is chosen once the mana is paid, since mana abilities come first (CR 601.2g) and one of them may have tapped
 the creature (Spider-Sense's ruling): it is offered while a creature is tapped or a mana ability its controller could
 activate would tap one, its own {T} or Springleaf Drum's, and a payment that leaves none tapped can't be completed, so

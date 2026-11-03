@@ -1,0 +1,59 @@
+# Axebane Ferox's "Ward-Collect evidence 4" is a cost paid as the ward trigger resolves, with no mana in it, so no mana
+# ability may be activated for it (CR 601.2g, 605.3a): with only Black Lotus (mana value 0) in Bot2's graveyard, paying is not
+# offered though Bot2 controls a Shivan Reef, a mana ability whose own effect the engine can't see past (CR 701.59b: with too
+# little, evidence can't be collected at all). The ward counters the Bolt aimed at the Ferox, the top spell, and the other two
+# resolve; nothing is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Axebane Ferox
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Shivan Reef
+Lightning Strike
+Lightning Bolt
+Lightning Bolt
+Shivan Reef
+Mountain x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Axebane Ferox.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Shivan Reef.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Strike.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Axebane Ferox)
+! Bot2.PayCost
+Bot2.Decline
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Axebane Ferox.Damage = 0
+? Bot2.Graveyard = Lightning Strike; Lightning Bolt; Lightning Bolt; Black Lotus
+
+[Expect]
+Bot1.Life = 14
+Exile =
