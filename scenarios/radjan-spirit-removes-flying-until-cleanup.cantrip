@@ -1,0 +1,46 @@
+# Radjan Spirit can remove flying from either player's creature, and the effect ends at cleanup (CR 611.2a, 514.2).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Radjan Spirit
+Ornithopter
+Forest
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Radjan Spirit.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Radjan Spirit.Activate(Bot1.Battlefield.Forest)
+Bot1.Battlefield.Radjan Spirit.Activate(Bot2.Battlefield.Ornithopter)
+? Bot1.Battlefield.Radjan Spirit.Tapped = true
+? Bot1.Mana =
+! Bot1.Battlefield.Radjan Spirit.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Keywords = (absent)
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+[T5 Bot1.Main1]
+Bot1.Battlefield.Radjan Spirit.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = (absent)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Radjan Spirit.Activate(Bot1.Battlefield.Radjan Spirit)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Radjan Spirit.Tapped = true
+Bot1.Battlefield.Ornithopter.Keywords = Flying

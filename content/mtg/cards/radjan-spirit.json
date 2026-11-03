@@ -1,0 +1,8 @@
+{
+  "name": "Radjan Spirit",
+  "manaCost": "{3}{G}",
+  "type": "Creature — Spirit",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "{T}: Target creature loses flying until end of turn."
+}
