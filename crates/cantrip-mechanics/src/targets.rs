@@ -135,12 +135,14 @@ fn creature_with_power_four_or_greater_filter(q: &dyn Query, asker: &Asker, t: T
 /// "Target creature with power 4 or greater" (CR 115.1) as the layers give the power now, so a counter or an effect moves a
 /// creature in and out of range. Bring Down, Big Game Hunter, Command Decision and Stone by Sunlight print it.
 pub const CREATURE_WITH_POWER_4_OR_GREATER: TargetSpec = target(creature_with_power_four_or_greater_filter);
-fn creature_with_power_two_or_less_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).power.is_some_and(|v| v <= 2))
+/// "Target creature with power `N` or less" (CR 115.1, 208.1) as the layers give the power now, so a counter or an effect moves a
+/// creature in and out of range, judged as it is chosen and again as the spell or ability resolves (CR 608.2b). A creature with no
+/// power cannot be one. Escape Tunnel and Silverquill Charm (2), Petty Revenge (3) and The Fire Nation Drill (4) print it.
+pub fn creature_with_power_at_most<const N: i16>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).power.is_some_and(|v| v <= N))
 }
-/// "Target creature with power 2 or less" (CR 115.1) as the layers give the power now, so a counter or an effect moves a creature
-/// in and out of range. Escape Tunnel and Silverquill Charm print it.
-pub const CREATURE_WITH_POWER_2_OR_LESS: TargetSpec = target(creature_with_power_two_or_less_filter);
+/// "Target creature with power 2 or less". Escape Tunnel and Silverquill Charm print it.
+pub const CREATURE_WITH_POWER_2_OR_LESS: TargetSpec = target(creature_with_power_at_most::<2>);
 /// "A creature with flying" (CR 702.9) as the layers give it now: a creature on the battlefield that has flying. Pick Your Poison
 /// sacrifices one; `CREATURE_WITH_FLYING` is the target slot. Bow of Nylea and Konstrari Charm print the target.
 pub fn has_flying_creature(q: &dyn Query, id: ObjectId) -> bool {
