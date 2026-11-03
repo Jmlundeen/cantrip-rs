@@ -1,0 +1,45 @@
+# Bot2 copies Cocoon's zero-counter upkeep trigger. The copy cannot sacrifice Bot1's Aura, but gives its creature a
+# counter and flying; the original trigger then sacrifices the Aura and gives another counter.
+
+[Bot1 Deck]
+Mox Emerald
+Memnite
+Cocoon
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Return the Favor
+Island x21
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cocoon.Cast(Bot1.Battlefield.Memnite)
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Cocoon.Counters.Pupa = (absent)
+[T9 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Return the Favor.Cast
+Bot2.Modes(Copy target)
+Bot2.Target(Stack.Cocoon)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cocoon.AttachedTo = Memnite
+? Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Memnite.Keywords = Flying
+Bot1.Graveyard.Cocoon.Colors = Green

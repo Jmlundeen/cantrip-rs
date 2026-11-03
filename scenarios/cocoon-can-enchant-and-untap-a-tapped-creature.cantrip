@@ -1,0 +1,38 @@
+# Cocoon can enchant an already tapped Llanowar Elves; Quirion Ranger can untap it despite the untap-step restriction.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Quirion Ranger
+Cocoon
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quirion Ranger.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Cocoon.Cast(Bot1.Battlefield.Llanowar Elves)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Tapped = true
+? Bot1.Battlefield.Cocoon.Counters.Pupa = 3
+Bot1.Battlefield.Quirion Ranger.Activate(Bot1.Battlefield.Llanowar Elves)
+Bot1.Choose(Forest)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Cocoon.Counters.Pupa = 3
