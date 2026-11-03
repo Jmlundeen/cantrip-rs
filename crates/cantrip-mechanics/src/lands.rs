@@ -3,7 +3,8 @@
 //! types as `Subtype`'s discriminant (`sub(Subtype::Plains)`), because a function pointer cannot capture them.
 //!
 //! The "enters tapped" part of a land is `mana::enters_tapped`, `mana::enters_tapped_unless_pay_two_life` (shock lands) or
-//! `enters_tapped_unless_you_control`, `enters_tapped_unless_you_control_either` or
+//! `enters_tapped_unless_you_control`, `enters_tapped_unless_you_control_three_or_more_other`,
+//! `enters_tapped_unless_you_control_either` or
 //! `enters_tapped_unless_opponents_control` below; the card sets it in `enters`.
 
 use crate::library::{ask_may_search, find_to_battlefield, find_to_hand, find_to_top, search_to_battlefield, Find};
@@ -61,6 +62,23 @@ pub fn chosen_color(q: &dyn Query, asker: &Asker) -> ColorSet {
 pub fn enters_tapped_unless_you_control<const TYPE: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let land_type = word(g, entering.object, TYPE);
     if !controls_land_type(g, entering.controller, land_type) {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
+/// "This land enters tapped unless you control three or more other [land type]s" (CR 614.12, 614.1d): read on the battlefield as
+/// it is while the land enters, through the layers, so the land itself is not counted, and only `entering.controller`'s
+/// permanents are (the land may be played or put onto the battlefield by a player who does not own it). Dwarven Mine
+/// (Mountains), Mystic Sanctuary (Islands) and Witch's Cottage (Swamps) print it.
+pub fn enters_tapped_unless_you_control_three_or_more_other<const TYPE: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    let land_type = word(g, entering.object, TYPE);
+    let others = g
+        .permanents_of(entering.controller)
+        .into_iter()
+        .filter(|&id| g.obj(id).became.is_none() && g.chars(id).has_subtype(land_type))
+        .count();
+    if others < 3 {
         entering.tapped = true;
     }
     Ok(())
