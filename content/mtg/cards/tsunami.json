@@ -1,0 +1,6 @@
+{
+  "name": "Tsunami",
+  "manaCost": "{3}{G}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all Islands."
+}

@@ -1,0 +1,34 @@
+# Tsunami destroys both players' Islands, including a dual land, and leaves a Forest (CR 205.3i, 701.8a).
+[Bot1 Deck]
+Island
+Forest
+Black Lotus
+Mox Emerald
+Tsunami
+Island x20
+[Bot2 Deck]
+Island
+Tundra
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Tundra.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tsunami.Cast
+? Bot1.Mana =
+Bot1.Pass
+[Expect]
+Bot1.Graveyard = Tsunami; Island; Black Lotus
+Bot2.Graveyard.Count = 2
+Bot2.Battlefield.Island = (absent)
+Bot2.Battlefield.Tundra = (absent)
+Bot1.Battlefield.Forest.Tapped = false
