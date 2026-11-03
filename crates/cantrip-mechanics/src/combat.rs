@@ -106,3 +106,17 @@ pub fn create_attacking(g: &mut dyn Game, you: PlayerId, token: CardId, tapped: 
 pub fn one_blocker_at_most(q: &dyn Query, source: ObjectId, attacker: ObjectId) -> Option<usize> {
     (q.obj(source).attached_to == Some(attacker)).then_some(1)
 }
+
+/// "During combat" (CR 506.1): any step of the combat phase, beginning of combat through end of combat. Yuriko, Blade of the
+/// Mighty ("During combat, players can't cast spells") and Jade Statue print it.
+pub fn during_combat(q: &dyn Query) -> bool {
+    matches!(
+        q.state().turn.step(),
+        Step::BeginCombat | Step::DeclareAttackers | Step::DeclareBlockers | Step::CombatDamage | Step::EndOfCombat
+    )
+}
+
+/// "Activate only during combat" (CR 602.5b, 506.1): the activation condition form of `during_combat`. Jade Statue prints it.
+pub fn activate_only_during_combat(q: &dyn Query, _: &Asker) -> bool {
+    during_combat(q)
+}

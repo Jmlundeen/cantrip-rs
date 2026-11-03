@@ -1,14 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, triggers};
+use cantrip_mechanics::{combat::during_combat, effects, triggers};
 use cantrip_oracle as oracle;
-
-/// "During combat": any of the combat phase's steps, beginning of combat through end of combat (CR 506.1).
-fn during_combat(q: &dyn Query) -> bool {
-    matches!(
-        q.state().turn.step(),
-        Step::BeginCombat | Step::DeclareAttackers | Step::DeclareBlockers | Step::CombatDamage | Step::EndOfCombat
-    )
-}
 
 /// "During combat, players can't cast spells" (CR 101.2, 601.3): every player, from every zone, a cast an effect offers
 /// during resolution included.
