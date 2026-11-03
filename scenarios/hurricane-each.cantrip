@@ -1,0 +1,36 @@
+# Hurricane deals X damage to each player and each flying creature, but not a ground creature (CR 120.3).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Ornithopter
+Hurricane
+Grizzly Bears
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hurricane.Cast(X: 1)
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Damage = 0
+Bot1.Life = 19
+Bot2.Life = 19
+Bot1.Battlefield.Ornithopter.Damage = 1
+Bot2.Battlefield.Ornithopter.Damage = 1

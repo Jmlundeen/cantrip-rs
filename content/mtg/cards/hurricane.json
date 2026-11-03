@@ -1,0 +1,6 @@
+{
+  "name": "Hurricane",
+  "manaCost": "{X}{G}",
+  "type": "Sorcery",
+  "oracleText": "Hurricane deals X damage to each creature with flying and each player."
+}
