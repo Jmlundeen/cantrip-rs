@@ -1,0 +1,8 @@
+{
+  "name": "Citanul Druid",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Human Druid",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Whenever an opponent casts an artifact spell, put a +1/+1 counter on this creature."
+}
