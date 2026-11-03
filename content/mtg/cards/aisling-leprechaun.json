@@ -1,0 +1,8 @@
+{
+  "name": "Aisling Leprechaun",
+  "manaCost": "{G}",
+  "type": "Creature — Faerie",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Whenever this creature blocks or becomes blocked by a creature, that creature becomes green. (This effect lasts indefinitely.)"
+}

@@ -1,0 +1,32 @@
+# When Aisling Leprechaun becomes blocked, its triggered ability changes the blocker from colorless to green
+# before combat damage, and the effect remains on a later turn (CR 603.2, 611.2a).
+
+[Bot1 Deck]
+Forest
+Aisling Leprechaun
+Forest x18
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Aisling Leprechaun.Cast
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Aisling Leprechaun > Bot2)
+Bot2.Block(Ornithopter > Aisling Leprechaun)
+? Bot2.Battlefield.Ornithopter.Colors = (absent)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Colors = Green
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Colors = Green

@@ -1,0 +1,46 @@
+# Another creature blocking does not trigger Aisling; when Aisling blocks the same attacker on a later turn,
+# it becomes green indefinitely, even after Aisling dies (CR 603.2, 611.2a).
+
+[Bot1 Deck]
+Forest
+Aisling Leprechaun
+Ornithopter
+Forest x18
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Silvercoat Lion
+Plains x17
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Aisling Leprechaun.Cast
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Silvercoat Lion.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Silvercoat Lion > Bot1)
+Bot1.Block(Ornithopter > Silvercoat Lion)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Silvercoat Lion.Colors = White
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Silvercoat Lion > Bot1)
+Bot1.Block(Aisling Leprechaun > Silvercoat Lion)
+? Bot2.Battlefield.Silvercoat Lion.Colors = White
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Silvercoat Lion.Colors = Green
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Aisling Leprechaun; Ornithopter
+Bot2.Battlefield.Silvercoat Lion.Colors = Green
