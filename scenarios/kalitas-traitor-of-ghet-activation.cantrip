@@ -1,0 +1,45 @@
+# "Sacrifice another Vampire or Zombie": with only Kalitas (a Vampire, not another) and an Ornithopter (neither) Kalitas can't be activated; once Bot1 has the Zombie Kalitas made, {2}{B} and that Zombie - not the Ornithopter, not Kalitas - put two +1/+1 counters on Kalitas (CR 602.2b, 701.21a, 122.1a).
+[Bot1 Deck]
+Black Lotus x2
+Mox Jet
+Mox Ruby
+Kalitas, Traitor of Ghet
+Lightning Bolt
+Ornithopter
+Island x20
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kalitas, Traitor of Ghet.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Battlefield.Kalitas, Traitor of Ghet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot1.Battlefield.Kalitas, Traitor of Ghet.Activate
+! Bot1.Choose(Ornithopter)
+! Bot1.Choose(Kalitas, Traitor of Ghet)
+Bot1.Choose(Zombie Token)
+? Bot1.Mana =
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Kalitas, Traitor of Ghet.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Kalitas, Traitor of Ghet.Power = 5
+Bot1.Battlefield.Zombie Token = (absent)
+Bot1.Battlefield.Ornithopter.Toughness = 2
