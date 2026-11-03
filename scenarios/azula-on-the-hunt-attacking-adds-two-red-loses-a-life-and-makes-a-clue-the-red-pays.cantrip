@@ -1,0 +1,48 @@
+# Azula, On the Hunt (cast turn 1 off four Moxen): attacking on turn 3 triggers Firebending 2 ({R}{R} that lasts until end of combat, CR 702.189a) and
+# "you lose 1 life and create a Clue token" (CR 119.3, 111.10f): Bot1 goes to 19 and has a Clue, and the unblocked 4/3 deals 4. The {R}{R} pays for the Clue's
+# {2} during combat, so Bot1 draws. Nothing happened before the attack: no Clue and 20 life at the end of turn 1 (the trigger is on attacking, not entering).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Azula, On the Hunt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Azula, On the Hunt.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+? Bot1.Battlefield.Clue Token = (absent)
+[T3 Bot1.Main1]
+Bot1.Attack(Azula, On the Hunt > Bot2)
+[T3 Bot1.Damage]
+? Bot1.Mana = {R}{R} lasting {R}{R}
+? Bot1.Life = 19
+Bot1.Battlefield.Clue Token.Activate
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+? Bot1.Hand.Count = 4
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 16
+Bot1.Battlefield.Clue Token = (absent)

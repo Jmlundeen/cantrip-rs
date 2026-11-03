@@ -1,0 +1,8 @@
+{
+  "name": "Azula, On the Hunt",
+  "manaCost": "{3}{B}",
+  "type": "Legendary Creature — Human Noble",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Firebending 2 (Whenever this creature attacks, add {R}{R}. This mana lasts until end of combat.)\nWhenever Azula attacks, you lose 1 life and create a Clue token. (It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")"
+}
