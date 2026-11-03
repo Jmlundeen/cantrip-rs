@@ -2,18 +2,10 @@ use cantrip_api::*;
 use cantrip_mechanics::{channel, haste_until_end_of_turn, tokens};
 use cantrip_oracle as oracle;
 
-/// The 1/1 colorless Spirit creature token this card makes (CR 111.1): no abilities of its own.
-static SPIRIT: CardDef = CardDef {
-    types: TypeSet::of(&[CardType::Creature]),
-    power: Some(1),
-    toughness: Some(1),
-    ..token!(Spirit)
-};
-
 /// "Create two 1/1 colorless Spirit creature tokens. They gain haste until end of turn" (CR 111.1, 611.2): both tokens,
 /// created together, gain haste from this ability's source.
 fn two_hasty_spirits(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let spirits = tokens::create(g, item.controller, &SPIRIT, 2)?;
+    let spirits = tokens::create(g, item.controller, &tokens::SPIRIT_1_1_COLORLESS, 2)?;
     g.end_sentence();
     instruction(g, |g| {
         for spirit in spirits {
@@ -33,4 +25,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::SOKENZAN_CRUCIBLE_OF_DEFIANCE
 };
 
-pub static EXTRA: &[&CardDef] = &[&SPIRIT];
+pub static EXTRA: &[&CardDef] = &[&tokens::SPIRIT_1_1_COLORLESS];
