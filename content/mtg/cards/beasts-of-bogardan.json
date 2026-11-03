@@ -1,0 +1,8 @@
+{
+  "name": "Beasts of Bogardan",
+  "manaCost": "{4}{R}",
+  "type": "Creature — Beast",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Protection from red\nThis creature gets +1/+1 as long as an opponent controls a nontoken white permanent."
+}
