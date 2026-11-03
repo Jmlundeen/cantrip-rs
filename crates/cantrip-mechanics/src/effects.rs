@@ -2022,3 +2022,20 @@ pub fn opponents_permanents_lose_hexproof_and_indestructible(g: &mut dyn Game, i
     });
     Ok(())
 }
+
+/// "You may pay [cost]. If you do, return this card from your graveyard to the battlefield [with counters on it]" (CR 118.12,
+/// 603.4, 122.6): the payment is chosen as the ability resolves, and the card returns as a new object under its owner's control. Once the
+/// card is no longer the object that triggered (CR 400.7) nothing is asked and nothing returns. The card is asked of its own
+/// graveyard, so the ability functions only there (CR 113.6m). Forsaken Miner and Wolfbat print it.
+pub fn may_pay_to_return_this_to_the_battlefield(
+    g: &mut dyn Game,
+    item: &StackItem,
+    price: Cost,
+    question: &'static Question,
+    counters: &[(CounterKind, i16)],
+) -> Result<(), Suspend> {
+    if is_live(g, item.object) && g.may_pay(item.controller, item.object, item.object, price, question)? {
+        g.put_onto_battlefield_with_counters(item.object, item.controller, false, counters)?;
+    }
+    Ok(())
+}

@@ -1,17 +1,13 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers;
+use cantrip_mechanics::{effects, triggers};
 use cantrip_oracle as oracle;
 
-const RETURN: Question =
+static RETURN: Question =
     Question::new("ReturnToBattlefield", "pay {cost} to return {subject} from your graveyard to the battlefield?", "", "Pay {cost}", "Leave it");
 
-/// "You may pay {B}. If you do, return this card from your graveyard to the battlefield." The payment is chosen as the
-/// ability resolves; once this card is no longer the object that triggered (CR 400.7) nothing is asked and nothing returns.
+/// "You may pay {B}. If you do, return this card from your graveyard to the battlefield."
 fn pay_to_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if is_live(g, item.object) && g.may_pay(item.controller, item.object, item.object, cost("{B}"), &RETURN)? {
-        g.put_onto_battlefield(item.object, item.controller, false)?;
-    }
-    Ok(())
+    effects::may_pay_to_return_this_to_the_battlefield(g, item, cost("{B}"), &RETURN, &[])
 }
 
 pub static CARD: CardDef = CardDef {
