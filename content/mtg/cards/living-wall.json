@@ -1,0 +1,11 @@
+{
+  "name": "Living Wall",
+  "manaCost": "{4}",
+  "type": "Artifact Creature — Wall",
+  "power": 0,
+  "toughness": 6,
+  "oracleText": "Defender (This creature can't attack.)\n{1}: Regenerate this creature.",
+  "keywords": [
+    "Defender"
+  ]
+}

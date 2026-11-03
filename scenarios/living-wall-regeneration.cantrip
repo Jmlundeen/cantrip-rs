@@ -1,0 +1,42 @@
+# Living Wall cannot attack and its {1} ability shields it from destruction, tapping it instead (CR 702.3, 701.19a).
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Living Wall
+Ornithopter
+Island x20
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Disenchant
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Living Wall.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Living Wall)
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Living Wall.Activate
+? Bot1.Mana =
+[T2 Bot2.End]
+? Bot1.Battlefield.Living Wall.Tapped = true
+[T3 Bot1.DeclareAttackers]
+! Bot1.Attack(Living Wall > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Living Wall.Toughness = 6
+Bot2.Graveyard = Disenchant
