@@ -1,0 +1,46 @@
+# Each opposing Forest that becomes tapped triggers Lifetap, but your own does not (CR 603.2, 119.3).
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Sapphire
+Lifetap
+Island x20
+[Bot2 Deck]
+Forest
+Forest
+Island x20
+[Bot3 Deck]
+Forest
+Island x20
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Lifetap.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+? Bot1.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+[T3 Bot3.Main1]
+? Bot1.Life = 21
+Bot3.Hand.Forest.Play
+Bot3.Battlefield.Forest.Activate
+[T5 Bot2.Main1]
+? Bot1.Life = 22
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+[T6 Bot3.Main1]
+? Bot1.Life = 24
+Bot3.Hand.Island.Play
+Bot3.Battlefield.Island.Activate
+[T7 Bot1.Main1]
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 20
+Bot3.Life = 20

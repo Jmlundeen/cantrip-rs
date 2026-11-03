@@ -1,0 +1,6 @@
+{
+  "name": "Lifetap",
+  "manaCost": "{U}{U}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a Forest an opponent controls becomes tapped, you gain 1 life."
+}
