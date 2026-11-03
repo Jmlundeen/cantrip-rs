@@ -1,0 +1,54 @@
+# Circle of Protection: Black's shield rechecks the source's color as it would deal damage (CR 609.7b): Bot1 chooses Mondo
+# Gecko while Bot2 has made it black, then Bot2 makes it red, and its combat damage is not prevented.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Circle of Protection: Black
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mondo Gecko
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Circle of Protection: Black.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Mondo Gecko.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mondo Gecko.Activate
+Bot2.Colors(Black)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Mondo Gecko.Colors = Black
+[T4 Bot2.BeginCombat]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Circle of Protection: Black.Activate
+Bot1.Choose(Mondo Gecko)
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Mondo Gecko.Activate
+Bot2.Colors(Red)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Mondo Gecko.Colors = Red
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Mondo Gecko > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
