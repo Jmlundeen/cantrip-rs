@@ -1,0 +1,95 @@
+# Epic Downfall: "Exile target creature with mana value 3 or greater" (CR 701.13a, 202.3). On turn 1 Bot1 exiles its own Pearled Unicorn
+# (mana value 3, exactly the limit): any creature's controller will do. On turn 3 Bot2's Grizzly Bears (mana value 2, just under) and a
+# Mox Pearl (not a creature) are refused as targets, and Bot2's Pearled Unicorn is exiled while the Bears stay.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Pearled Unicorn
+Epic Downfall
+Epic Downfall
+Swamp x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Emerald
+Pearled Unicorn
+Grizzly Bears
+Swamp x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pearled Unicorn.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Epic Downfall.Cast(Bot1.Battlefield.Pearled Unicorn)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Pearled Unicorn = (absent)
+? Exile = Pearled Unicorn
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Mox Pearl#3.Activate
+Bot2.Hand.Pearled Unicorn.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl#4.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Epic Downfall.Cast(Bot2.Battlefield.Grizzly Bears)
+! Bot1.Hand.Epic Downfall.Cast(Bot2.Battlefield.Mox Pearl#1)
+Bot1.Hand.Epic Downfall.Cast(Bot2.Battlefield.Pearled Unicorn)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Grizzly Bears; Mox Emerald; Mox Pearl; Mox Pearl; Mox Pearl; Mox Pearl
+Bot1.Battlefield.Count = 5
+Exile = Pearled Unicorn; Pearled Unicorn

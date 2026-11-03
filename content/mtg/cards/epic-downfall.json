@@ -1,0 +1,6 @@
+{
+  "name": "Epic Downfall",
+  "manaCost": "{1}{B}",
+  "type": "Sorcery",
+  "oracleText": "Exile target creature with mana value 3 or greater."
+}
