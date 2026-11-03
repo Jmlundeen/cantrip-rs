@@ -1,0 +1,43 @@
+# Two blue mana cannot pay the white symbol; adding white mana permits activation (CR 107.4a).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Sapphire
+Savannah Lions
+Greater Realm of Preservation
+Black Lotus
+Island x20
+[Bot2 Deck]
+Black Lotus
+Carrion Screecher
+Swamp x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Greater Realm of Preservation.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Carrion Screecher.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+! Bot1.Battlefield.Greater Realm of Preservation.Activate(Mana: short)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Greater Realm of Preservation.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Bot2.Battlefield.Carrion Screecher)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20

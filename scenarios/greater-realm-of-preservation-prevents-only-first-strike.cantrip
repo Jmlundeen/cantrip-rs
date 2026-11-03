@@ -1,0 +1,38 @@
+# The shield prevents the first hit from a red double striker, then the second hit is dealt (CR 615.8).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Greater Realm of Preservation
+Island x20
+[Bot2 Deck]
+Black Lotus
+Twinscroll Shaman
+Mountain x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Greater Realm of Preservation.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Twinscroll Shaman.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Twinscroll Shaman > Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Greater Realm of Preservation.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Greater Realm of Preservation)
+Bot1.Choose(Bot2.Battlefield.Twinscroll Shaman)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 19
+Prevented = 1 Twinscroll Shaman > Bot1 by Greater Realm of Preservation

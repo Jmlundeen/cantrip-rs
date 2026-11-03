@@ -1,0 +1,38 @@
+# A shield chosen in an earlier turn expires before that black creature deals damage (CR 514.2).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Greater Realm of Preservation
+Island x20
+[Bot2 Deck]
+Black Lotus
+Carrion Screecher
+Swamp x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Greater Realm of Preservation.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Carrion Screecher.Cast
+[T2 Bot2.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Greater Realm of Preservation.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Bot2.Battlefield.Carrion Screecher)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Carrion Screecher > Bot1)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 17
