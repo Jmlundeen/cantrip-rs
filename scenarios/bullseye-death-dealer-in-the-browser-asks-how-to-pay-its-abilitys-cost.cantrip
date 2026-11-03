@@ -1,0 +1,50 @@
+# Browser
+# Bot1 activates Bullseye, Death Dealer's "{3}, {T}, Sacrifice an artifact or discard a nonland card: Bullseye deals 2 damage
+# to any target." in the browser (CR 602.2b, 601.2b, 118.3). With the Moxen and Lightning Bolt both there, it is asked which way
+# to pay its ability's cost - under a title and a detail that say so, not that a spell being cast has an additional cost - and
+# discards Lightning Bolt. Bot1 casts Bullseye on turn 1 off the Moxen and declines its enter trigger.
+
+[Bot1 Deck]
+Bullseye, Death Dealer
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Lightning Bolt
+Mountain x21
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Bullseye, Death Dealer.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Modes(Neither)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Bullseye, Death Dealer.Activate(Bot2)
+? Client.Bot1.Prompt.Title = Choose how to pay its ability's cost
+? Client.Bot1.Prompt.Detail = Paid as you activate it, with the rest of its cost
+? Client.Bot1.Prompt.Modes = Sacrifice an artifact; Discard a nonland card
+Bot1.Modes(Discard a nonland card)
+Bot1.Choose(Lightning Bolt)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Bullseye, Death Dealer.Tapped = true

@@ -617,6 +617,11 @@ fn modes_detail(game: &Game, modes: &[Label], faces: bool) -> (String, bool) {
     if matches!(modes.first(), Some(Label::CastPermission { .. })) {
         return ("More than one permission lets you cast it now; the one you cast it by decides whether it is sacrificed".into(), false);
     }
+    // "Sacrifice an artifact or discard a nonland card" in an ability's cost (CR 602.2b, 601.2b): one of them is paid as it is
+    // activated, with the rest of its cost.
+    if matches!(modes.first(), Some(Label::AbilityExtra(..))) {
+        return ("Paid as you activate it, with the rest of its cost".into(), false);
+    }
     // The Phyrexian symbols paid with life (CR 107.4f): what is not chosen is paid with mana.
     if let Some(&Label::PayLife(color)) = modes.first()
         && modes.iter().all(|l| matches!(l, Label::PayLife(_)))
@@ -1127,6 +1132,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     "Choose which type of mana to add".into()
                 } else if matches!(modes.first(), Some(Label::ManaCost)) {
                     "Choose how to pay for it".into()
+                } else if matches!(modes.first(), Some(Label::AbilityExtra(..))) {
+                    // The ways of paying an activated ability's own cost (CR 602.2b, 601.2b): not an additional cost, and no cast.
+                    "Choose how to pay its ability's cost".into()
                 } else if matches!(modes.first(), Some(Label::CastPermission { .. })) {
                     "Choose which permission you cast it by".into()
                 } else if matches!(modes.first(), Some(Label::Mutate { .. })) {
