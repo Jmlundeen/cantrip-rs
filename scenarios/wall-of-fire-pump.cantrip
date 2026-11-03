@@ -1,0 +1,44 @@
+# Defender prevents attacking, and the red ability gives +1/+0 only until end of turn (CR 702.3b, 611.2a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Wall of Fire
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wall of Fire.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Wall of Fire.Activate(Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Wall of Fire.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wall of Fire.Power = 1
+? Bot1.Battlefield.Wall of Fire.Toughness = 5
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Wall of Fire.Power = 0
+! Bot1.Attack(Wall of Fire > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Wall of Fire.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Wall of Fire.Power = 1
+Bot1.Battlefield.Wall of Fire.Toughness = 5
