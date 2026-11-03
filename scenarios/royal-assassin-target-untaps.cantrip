@@ -1,0 +1,33 @@
+# A tapped target untapped in response becomes illegal, so the ability does not destroy it (CR 608.2b).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Royal Assassin
+Vow to Erebor
+Island
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Royal Assassin.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Royal Assassin.Activate(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Vow to Erebor.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Royal Assassin.Tapped = true

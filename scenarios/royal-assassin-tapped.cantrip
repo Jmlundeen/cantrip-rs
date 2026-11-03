@@ -1,0 +1,51 @@
+# Royal Assassin taps to destroy tapped creatures controlled by either player, but cannot target untapped creatures or lands (CR 115.1c, 701.8a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Royal Assassin
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Royal Assassin.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Royal Assassin.Activate(Bot1.Battlefield.Royal Assassin)
+! Bot1.Battlefield.Royal Assassin.Activate(Bot2.Battlefield.Grizzly Bears)
+Bot1.Battlefield.Llanowar Elves.Activate
+! Bot1.Battlefield.Royal Assassin.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Royal Assassin.Activate(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Llanowar Elves; Black Lotus
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Grizzly Bears > Bot1)
+Bot1.Battlefield.Royal Assassin.Activate(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Grizzly Bears; Black Lotus
+Bot1.Battlefield.Royal Assassin.Tapped = true
