@@ -1,0 +1,6 @@
+{
+  "name": "Eternal Warrior",
+  "manaCost": "{R}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nEnchanted creature has vigilance."
+}
