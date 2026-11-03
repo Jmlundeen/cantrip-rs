@@ -1,0 +1,36 @@
+# Crusade gives both players' white creatures, including a multicolored one, +1/+1 but leaves green creatures unchanged (CR 604.1, 613.1g).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Proctor of Potential
+Crusade
+Island x20
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Plains
+Healer's Hawk
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Proctor of Potential.Cast
+Bot1.Hand.Crusade.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healer's Hawk.Cast
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Proctor of Potential.Power = 4
+Bot1.Battlefield.Proctor of Potential.Toughness = 2
+Bot2.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Grizzly Bears.Toughness = 2
+Bot2.Battlefield.Healer's Hawk.Power = 2
+Bot2.Battlefield.Healer's Hawk.Toughness = 2

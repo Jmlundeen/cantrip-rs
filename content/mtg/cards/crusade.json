@@ -1,0 +1,6 @@
+{
+  "name": "Crusade",
+  "manaCost": "{W}{W}",
+  "type": "Enchantment",
+  "oracleText": "White creatures get +1/+1."
+}
