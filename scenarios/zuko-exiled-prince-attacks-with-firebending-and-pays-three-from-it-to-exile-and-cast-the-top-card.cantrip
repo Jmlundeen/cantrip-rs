@@ -1,0 +1,63 @@
+# Zuko, Exiled Prince {3}{R} (4/3) cast on turn 1 off four Moxen. Turn 3, before combat, {3} (Jet, Sapphire, Pearl) exiles the top card
+# of Bot1's library, a Mountain, which "you may play that card this turn": a land is played from exile as the land drop. Attacking
+# then adds {R}{R}{R} (firebending 3) that lasts through combat, and those three pay {3} again at once: the exiled Lightning Bolt is
+# cast with the Mox Ruby and takes 3 off Bot2 beside Zuko's 4 (20 - 7 = 13). Bot2's library is untouched and the pool is empty after.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Zuko, Exiled Prince
+Island
+Island
+Mountain
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Zuko, Exiled Prince.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Zuko, Exiled Prince.Activate(Ability: {3})
+Bot1.Pass
+Bot2.Pass
+? Exile = Mountain
+Bot1.Exile.Mountain.Play
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Zuko, Exiled Prince > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}{R} lasting {R}{R}{R}
+Bot1.Battlefield.Zuko, Exiled Prince.Activate(Ability: {3})
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T3 Bot1.Damage]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Mountain.Tapped = false
