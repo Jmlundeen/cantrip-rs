@@ -1,0 +1,8 @@
+{
+  "name": "Ley Druid",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Human Druid",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}: Untap target land."
+}
