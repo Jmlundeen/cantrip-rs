@@ -1,0 +1,6 @@
+{
+  "name": "Hell Swarm",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "All creatures get -1/-0 until end of turn."
+}
