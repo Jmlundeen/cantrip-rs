@@ -1129,3 +1129,243 @@ fn a_world_deals_anew_a_face_down_creature_whose_attack_kept_it_as_declared() {
     assert_eq!(world.state.last_known(from).expect("a row").name, "");
     assert_eq!(declared(&world), real, "the world's attacker as declared is the real one's: nothing of its face");
 }
+
+/// Bot1's face-down Ainok Tracker (cast by morph, CR 702.37c), a non-Human 2/2 it owns, with Cubwarden mutated on top of
+/// it (CR 702.140c): the merged permanent is face up (CR 730.2e), but its own card stays face down under Cubwarden, and Bot2
+/// has never seen what it is. Bot1 then has priority in its main phase.
+const MUTATED_OVER_A_MORPH: &str = "
+[Bot1 Deck]
+Plains
+Black Lotus
+Ainok Tracker
+Plains
+Cubwarden
+Mox Pearl
+Mox Jet
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ainok Tracker.Cast(Ability: Morph)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cubwarden.Cast(#1; Ability: Mutate)
+Bot1.Pass
+Bot1.Modes(1)
+[Handover Bot1.Pass]
+";
+
+/// Cubwarden mutated over Ornithopter (on top: two Cat tokens), then Snapdax over a Cat token (a token's own component, CR
+/// 730.2d); Bot2 Ousts Snapdax (its card into Bot1's library second from the top, the token gone, CR 730.3) and Unsummons
+/// Cubwarden (both its cards into Bot1's hand).
+const MERGED_LEAVE: &str = "
+[Bot1 Deck]
+Plains
+Plains
+Ornithopter
+Black Lotus
+Cubwarden
+Mox Pearl
+Mox Jet
+Snapdax, Apex of the Hunt
+Mox Ruby
+Island x14
+
+[Bot2 Deck]
+Plains
+Oust
+Island
+Unsummon
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Snapdax, Apex of the Hunt.Cast(Bot1.Battlefield.Cat Token#1; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+[T6 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Oust.Cast(Bot1.Battlefield.Snapdax, Apex of the Hunt)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Cubwarden)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Hand = Cubwarden; Ornithopter
+Bot1.Battlefield = Cat Token; Mox Jet; Mox Pearl; Mox Ruby; Plains; Plains
+";
+
+/// Cubwarden mutated over Ornithopter (on top), then Snapdax under them (a mutate over a merged permanent, CR 702.140c);
+/// Teferi's Protection phases the merged permanent out (CR 702.26), and it phases in on Bot1's next turn.
+const MERGED_PHASING: &str = "
+[Bot1 Deck]
+Plains
+Plains
+Ornithopter
+Black Lotus
+Cubwarden
+Mox Pearl
+Mox Jet
+Snapdax, Apex of the Hunt
+Mox Ruby
+Teferi's Protection
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Snapdax, Apex of the Hunt.Cast(Bot1.Battlefield.Cubwarden; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(2)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut.Cubwarden.Power = 3
+[T9 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Cubwarden.Power = 3
+";
+
+/// Cubwarden mutated under Bot1's face-down Ainok Tracker: the merged permanent stays face down (CR 730.2e).
+fn mutated_under_a_morph() -> String {
+    MUTATED_OVER_A_MORPH.replace("Bot1.Modes(1)\n[Handover Bot1.Pass]", "Bot1.Modes(2)\n[Handover Bot1.Pass]")
+}
+
+/// Every mutate scenario, and the games above, at every node of their games: a world dealt for either seat, in Decklist
+/// mode, holds each player's registered deck exactly - every card of every zone, and every component of a merged permanent
+/// (CR 730.2), counted once. A merged card counted twice or not at all (a mutating spell is in no zone once it merged, CR
+/// 702.140c; the components of a merged permanent that left are new objects of cards it held, CR 730.3) would leave the deal
+/// a card over or short.
+#[test]
+fn worlds_hold_every_card_of_a_merged_permanent_once() {
+    let fronts = |g: &Game, id: CardId| g.cards.fronts[id.0 as usize].unwrap_or(id);
+    // Each owner's cards in the game, by front face: tokens and copies left out.
+    let held = |g: &Game| -> Vec<Vec<CardId>> {
+        let s = &g.state;
+        let mut out = vec![Vec::new(); s.players.len()];
+        for zone in &s.zones {
+            for &id in zone {
+                let o = s.obj(id);
+                if o.became.is_some() || o.card_copy {
+                    continue;
+                }
+                match s.merge_of(id) {
+                    Some(m) => {
+                        if !m.own_token {
+                            out[o.owner.0 as usize].push(fronts(g, o.card));
+                        }
+                        for p in m.parts.iter().filter(|p| !p.token) {
+                            out[o.owner.0 as usize].push(fronts(g, p.card));
+                        }
+                    }
+                    None if !o.token => out[o.owner.0 as usize].push(fronts(g, o.card)),
+                    None => {}
+                }
+            }
+        }
+        for cards in &mut out {
+            cards.sort();
+        }
+        out
+    };
+    let mut paths: Vec<PathBuf> = std::fs::read_dir(root().join("scenarios"))
+        .expect("scenarios")
+        .filter_map(|e| e.ok().map(|e| e.path()))
+        .filter(|p| p.extension().is_some_and(|x| x == "cantrip") && std::fs::read_to_string(p).is_ok_and(|t| t.contains("Ability: Mutate")))
+        .collect();
+    paths.sort();
+    assert!(paths.len() >= 10, "the mutate scenarios: {paths:?}");
+    let mut games: Vec<(String, GameScript)> = paths.iter().map(|p| (p.display().to_string(), GameScript::load(p).expect("parses"))).collect();
+    for (name, text) in [("merged leave", MERGED_LEAVE.to_string()), ("merged phasing", MERGED_PHASING.to_string()), ("under a morph", mutated_under_a_morph())] {
+        games.push((name.to_string(), GameScript::parse(&text, name).expect("parses")));
+    }
+    let mut worlds = 0;
+    for (name, script) in &games {
+        let mut game = cantrip_script::run(script).map_err(|f| f.report).unwrap_or_else(|r| panic!("{name}: {r}")).game;
+        game.verify = true;
+        for node in game.tree.path(game.at) {
+            game.goto(node);
+            let real = held(&game);
+            for seat in game.state.seats().collect::<Vec<_>>() {
+                let mut world = game.fork_for_search();
+                world.reseed(5);
+                determinize(&mut world, &Knowledge::of(&game, seat), seat, InfoMode::Decklist, prior(), &mut Rng::new(5));
+                assert_eq!(held(&world), real, "{name}: a world for {seat:?} holds other cards than the decks");
+                worlds += 1;
+            }
+        }
+    }
+    assert!(worlds > 100, "{worlds} worlds");
+}
+
