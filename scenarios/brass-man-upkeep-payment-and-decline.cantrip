@@ -1,0 +1,48 @@
+# Brass Man stays tapped during untap, then its upkeep trigger lets its controller decline or pay {1} to untap it (CR 502.3, 603.2).
+[Bot1 Deck]
+Brass Man
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brass Man.Cast
+? Bot1.Mana =
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Attack(Brass Man > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Brass Man.Tapped = true
+[T5 Bot1.Upkeep]
+? Bot1.Battlefield.Brass Man.Tapped = true
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Brass Man.Tapped = true
+! Bot1.Battlefield.Brass Man.Activate
+[T7 Bot1.Upkeep]
+? Bot1.Battlefield.Brass Man.Tapped = true
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+? Bot1.Mana =
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Brass Man.Tapped = false
+Bot1.Attack(Brass Man > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Brass Man.Tapped = true
+Bot2.Life = 18

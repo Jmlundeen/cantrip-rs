@@ -1,0 +1,32 @@
+# The upkeep ability still offers payment after Brass Man is destroyed in response (CR 113.7a, 608.2c).
+[Bot1 Deck]
+Mox Pearl
+Brass Man
+Plains x18
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brass Man.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Brass Man)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+? Bot1.Mana =
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Brass Man
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot2.Graveyard = Lightning Bolt
