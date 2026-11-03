@@ -1,0 +1,37 @@
+# A blue and black permanent is blue, while a red creature is not; the caster may destroy their own permanent (CR 105.2b).
+[Bot1 Deck]
+Black Lotus
+Island
+Mountain
+Baleful Strix
+Active Volcano
+Mountain x15
+
+[Bot2 Deck]
+Mountain
+Mountain Bandit
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Mountain Bandit.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Active Volcano.Cast
+Bot1.Modes(Destroy target blue permanent)
+! Bot1.Target(Bot2.Battlefield.Mountain Bandit)
+Bot1.Target(Bot1.Battlefield.Baleful Strix)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Graveyard = Active Volcano; Baleful Strix; Black Lotus
+Bot2.Battlefield.Mountain Bandit.Power = 1

@@ -1,0 +1,22 @@
+# The Island mode can return an opponent's Island to its owner (CR 115.1a, 400.3).
+[Bot1 Deck]
+Mountain
+Active Volcano
+Mountain x20
+[Bot2 Deck]
+Island
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Active Volcano.Cast
+Bot1.Modes(Return target Island to its owner's hand)
+Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Island = (absent)
+Bot2.Hand.Count = 8
+Bot1.Graveyard = Active Volcano

@@ -1,0 +1,6 @@
+{
+  "name": "Active Volcano",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Destroy target blue permanent.\n• Return target Island to its owner's hand."
+}

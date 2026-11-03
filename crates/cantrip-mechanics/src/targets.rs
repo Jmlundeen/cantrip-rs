@@ -1015,6 +1015,19 @@ pub const fn creature_or_planeswalker_of_either_color<const A: u8, const B: u8>(
     target(creature_or_planeswalker_of_either_color_filter::<A, B>)
 }
 
+/// "Target [color] permanent" (CR 115.1, 105.2): a permanent on the battlefield that is that color, alone or among others. The
+/// color word is that of the targeting spell's own text (CR 612); `C` is a `Color` as `u8`. Active Volcano and Red Elemental
+/// Blast (blue) print it.
+fn permanent_of_color_filter<const C: u8>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if on_battlefield(q, id)
+        && q.chars(id).colors.has(q.words(asker.source).color(Color::ALL[C as usize])))
+}
+
+/// "Target [color] permanent": see `permanent_of_color_filter`. Used as `targets::permanent_of_color::<{ Color::Blue as u8 }>()`.
+pub const fn permanent_of_color<const C: u8>() -> TargetSpec {
+    target(permanent_of_color_filter::<C>)
+}
+
 /// "Target [color] creature" (CR 115.1, 105.2): a creature of that color, alone or among others. The color word is that of
 /// the targeting spell's own text (CR 612); `C` is a `Color` as `u8`. Dark Betrayal prints it; Deathmark and Rending Volley
 /// print two colors, built on it.

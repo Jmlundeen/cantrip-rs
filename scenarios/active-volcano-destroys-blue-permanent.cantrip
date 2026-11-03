@@ -1,0 +1,33 @@
+# Active Volcano requires exactly one mode when both have legal targets, and destroys a blue permanent while refusing a colorless one (CR 700.2, 115.1a, 701.8a).
+[Bot1 Deck]
+Mountain
+Active Volcano
+Ornithopter
+Mountain x17
+
+[Bot2 Deck]
+Island
+Delver of Secrets
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Delver of Secrets.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Active Volcano.Cast
+! Bot1.Modes(Count: 0)
+! Bot1.Modes(1; 2)
+Bot1.Modes(Destroy target blue permanent)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Delver of Secrets)
+? Bot1.Mana =
+
+[Expect]
+Bot2.Graveyard = Delver of Secrets
+Bot1.Battlefield.Ornithopter.Power = 0
