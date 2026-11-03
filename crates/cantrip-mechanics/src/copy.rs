@@ -2,8 +2,9 @@
 
 use cantrip_api::*;
 
-/// What a permanent that may enter as a copy asks (CR 707.2): yes, and what it copies is chosen next.
-const COPY_AS_ENTERS: Question =
+/// What a permanent that may enter as a copy asks (CR 707.2): yes, and what it copies is chosen next. Spark Double asks it
+/// through `enter_as_copy_of_one_of` too.
+pub const COPY_AS_ENTERS: Question =
     Question::new("CopyAsEnters", "enter as a copy?", "You choose what it copies next. If you don't, it enters as itself", "Choose a copy", "Enter as itself");
 
 /// "You may have this [permanent] enter as a copy of any [permanent that passes `eligible`] on the battlefield, except
