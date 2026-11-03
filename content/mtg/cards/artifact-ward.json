@@ -1,0 +1,6 @@
+{
+  "name": "Artifact Ward",
+  "manaCost": "{W}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nEnchanted creature can't be blocked by artifact creatures.\nPrevent all damage that would be dealt to enchanted creature by artifact sources.\nEnchanted creature can't be the target of abilities from artifact sources."
+}

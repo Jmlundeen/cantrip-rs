@@ -1,0 +1,43 @@
+# Grim Bauble's triggered ability cannot target the warded creature, but can target another creature (CR 115.1d).
+[Bot1 Deck]
+Mox Pearl x2
+Isamaru, Hound of Konda
+Artifact Ward
+Ornithopter x2
+Plains x20
+
+[Bot2 Deck]
+Mox Jet
+Grim Bauble
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Artifact Ward.Cast(Bot1.Battlefield.Isamaru, Hound of Konda)
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Grim Bauble.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot2.Target(Bot1.Battlefield.Isamaru, Hound of Konda)
+Bot2.Target(Bot1.Battlefield.Ornithopter#1)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Isamaru, Hound of Konda.Toughness = 2

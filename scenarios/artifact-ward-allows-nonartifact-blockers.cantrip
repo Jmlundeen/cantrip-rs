@@ -1,0 +1,47 @@
+# Artifact Ward enchants a creature, forbids artifact blockers and permits a nonartifact blocker (CR 702.5a, 509.1b).
+[Bot1 Deck]
+Mox Pearl x2
+Isamaru, Hound of Konda
+Artifact Ward
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Alpha Myr
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Artifact Ward.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Hand.Artifact Ward.Cast(Bot1.Battlefield.Isamaru, Hound of Konda)
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Alpha Myr.Cast
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Isamaru, Hound of Konda > Bot2)
+! Bot2.Block(Alpha Myr > Isamaru, Hound of Konda)
+Bot2.Block(Llanowar Elves > Isamaru, Hound of Konda)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Isamaru, Hound of Konda.Damage = 1
+Bot1.Battlefield.Artifact Ward.AttachedTo = Isamaru, Hound of Konda
+Bot2.Battlefield.Alpha Myr.Tapped = false

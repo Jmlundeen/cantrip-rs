@@ -1,0 +1,45 @@
+# Artifact Ward prevents the enchanted blocker taking combat damage from an artifact creature (CR 615.1).
+[Bot1 Deck]
+Mox Pearl x2
+Isamaru, Hound of Konda
+Artifact Ward
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Alpha Myr
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Artifact Ward.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Hand.Artifact Ward.Cast(Bot1.Battlefield.Isamaru, Hound of Konda)
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Alpha Myr.Cast
+Bot2.Pass
+[T4 Bot2.BeginCombat]
+Bot2.Attack(Alpha Myr > Bot1)
+Bot1.Block(Isamaru, Hound of Konda > Alpha Myr)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Battlefield.Isamaru, Hound of Konda.Damage = 0
+Bot2.Graveyard = Alpha Myr; Black Lotus

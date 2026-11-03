@@ -1,0 +1,40 @@
+# Ward can enchant an opponent's creature and prevents damage from its own controller's artifact creature (CR 615.1).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Alpha Myr
+Artifact Ward
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Isamaru, Hound of Konda
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Alpha Myr.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Isamaru, Hound of Konda.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Artifact Ward.Cast(Bot2.Battlefield.Isamaru, Hound of Konda)
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Alpha Myr > Bot2)
+Bot2.Block(Isamaru, Hound of Konda > Alpha Myr)
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Isamaru, Hound of Konda.Damage = 0
+Bot1.Graveyard = Alpha Myr; Black Lotus
+Bot1.Battlefield.Artifact Ward.AttachedTo = Isamaru, Hound of Konda
