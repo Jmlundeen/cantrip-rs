@@ -1,0 +1,41 @@
+# Flying prevents a ground blocker; damage to a creature does not trigger discard, but damage to an opponent does (CR 702.9b, 603.2).
+
+[Bot1 Deck]
+Black Lotus
+Hypnotic Specter
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Ornithopter
+Mountain
+Island x20
+
+[Dice]
+1; 1; 1; 1; 1
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Hypnotic Specter.Cast
+? Bot1.Mana =
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Hypnotic Specter > Bot2)
+! Bot2.Block(Grizzly Bears > Hypnotic Specter)
+Bot2.Block(Ornithopter > Hypnotic Specter)
+[T3 Bot1.Main2]
+? Bot2.Hand.Count = 5
+? Bot2.Graveyard = Ornithopter; Black Lotus
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Hypnotic Specter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Hand.Count = 5
+Bot2.Graveyard.Count = 3

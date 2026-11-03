@@ -1,0 +1,25 @@
+# Burn Together makes the Specter deal noncombat damage, then sacrifices it; its damage trigger still makes the opponent discard (CR 603.2, 113.7a).
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Hypnotic Specter
+Callous Sell-Sword
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Hypnotic Specter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Callous Sell-Sword.Cast(Ability: Burn Together)
+Bot1.Target(Hypnotic Specter)
+Bot1.Target(Bot2)
+[T1 Bot1.Main2]
+[Expect]
+Bot2.Life = 18
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 1
+Bot1.Graveyard = Hypnotic Specter; Black Lotus

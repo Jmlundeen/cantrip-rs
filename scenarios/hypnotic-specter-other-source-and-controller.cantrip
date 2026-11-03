@@ -1,0 +1,39 @@
+# Another creature's damage to an opponent and the Specter's damage to its controller do not trigger it (CR 603.2).
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Hypnotic Specter
+Memnite
+Callous Sell-Sword x2
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Hypnotic Specter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Callous Sell-Sword.Cast(Ability: Burn Together)
+Bot1.Target(Memnite)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Hand.Count = 7
+? Bot2.Graveyard.Count = 0
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Callous Sell-Sword.Cast(Ability: Burn Together)
+Bot1.Target(Hypnotic Specter)
+Bot1.Target(Bot1)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 19
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 1
+Bot1.Graveyard.Count = 3

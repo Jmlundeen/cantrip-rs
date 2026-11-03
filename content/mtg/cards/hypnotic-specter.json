@@ -1,0 +1,11 @@
+{
+  "name": "Hypnotic Specter",
+  "manaCost": "{1}{B}{B}",
+  "type": "Creature — Specter",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying\nWhenever this creature deals damage to an opponent, that player discards a card at random.",
+  "keywords": [
+    "Flying"
+  ]
+}
