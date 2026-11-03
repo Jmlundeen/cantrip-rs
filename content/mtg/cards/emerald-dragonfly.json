@@ -1,0 +1,11 @@
+{
+  "name": "Emerald Dragonfly",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Insect",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying\n{G}{G}: This creature gains first strike until end of turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

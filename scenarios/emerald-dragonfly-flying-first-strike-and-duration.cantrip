@@ -1,0 +1,53 @@
+# The flying Dragonfly cannot be blocked by a ground creature; with first strike it kills a flying 1/1 before it can deal damage. Its gained first strike ends in cleanup (CR 702.9b, 702.7b, 514.2).
+
+[Bot1 Deck]
+Emerald Dragonfly
+Mox Emerald
+Mox Pearl
+Forest
+Forest x20
+
+[Bot2 Deck]
+Suntail Hawk
+Mox Pearl
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Emerald Dragonfly.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Suntail Hawk.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Emerald Dragonfly.Activate(Mana: short)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Emerald Dragonfly.Activate
+? Bot1.Mana = {W}
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Emerald Dragonfly > Bot2)
+! Bot2.Block(Memnite > Emerald Dragonfly)
+Bot2.Block(Suntail Hawk > Emerald Dragonfly)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Emerald Dragonfly.Damage = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Emerald Dragonfly.Keywords = Flying
+Bot2.Graveyard = Suntail Hawk
