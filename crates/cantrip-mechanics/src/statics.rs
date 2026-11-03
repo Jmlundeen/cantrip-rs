@@ -586,6 +586,25 @@ pub fn plus_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, char
 pub const CREATURES_YOU_CONTROL_GET_PLUS_ONE: StaticDef =
     static_ability(Layer::PtModify, your_creatures, plus_pt::<1, 1>, "Creatures you control get +1/+1.");
 
+/// "... is a creature in addition to its other types" (CR 205.1b, 613.1d, layer 4) as a static ability's `apply`: the type is
+/// added and every other type is kept. Ensoul Artifact, March of the Machines, Opalescence, Phoenix Fleet Airship and a station
+/// card's striation print it.
+pub fn creature_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.types = chars.types.with(CardType::Creature);
+}
+
+/// "... is an artifact in addition to its other types" (CR 205.1b, 613.1d, layer 4): `creature_too` for artifact. Mycosynth
+/// Lattice prints it.
+pub fn artifact_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.types = chars.types.with(CardType::Artifact);
+}
+
+/// "... is an enchantment in addition to its other types" (CR 205.1b, 613.1d, layer 4): `creature_too` for enchantment. Enchanted
+/// Evening prints it.
+pub fn enchantment_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.types = chars.types.with(CardType::Enchantment);
+}
+
 /// "Has base power and toughness P/T" (CR 613.4b, layer 7b) as a static ability's `apply`: it sets the power and toughness
 /// the counters and effects that modify them (layer 7c) then apply to. Humility and Eaten by Piranhas (1/1), Hexdrinker (4/4
 /// and 6/6), Kaito's Ninja (3/4), Puppet Crafting (5/5), Wrecking Ball Arm (7/7) and a station card's striation (Wurmwall

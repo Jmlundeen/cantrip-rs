@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::creature_too;
 use cantrip_oracle as oracle;
 
 /// "Each other non-Aura enchantment is a creature in addition to its other types and has base power and base toughness
@@ -13,11 +14,6 @@ const TEXT: &str =
 /// "Each other non-Aura enchantment", as the layers before have it.
 fn other_non_aura_enchantment(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
     affected != source && so_far.is(CardType::Enchantment) && !so_far.has_subtype(Subtype::Aura)
-}
-
-/// "... is a creature in addition to its other types" (CR 613.1d, layer 4).
-fn creature_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.types = chars.types.with(CardType::Creature);
 }
 
 /// "... has base power and base toughness each equal to its mana value" (CR 613.4b, layer 7b; CR 202.3: a token or a

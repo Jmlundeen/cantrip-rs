@@ -1,16 +1,11 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::artifact_too;
 use cantrip_oracle as oracle;
 
 /// "All permanents" (CR 110.1): every permanent on the battlefield, Mycosynth Lattice itself among them. Spells and cards
 /// elsewhere are no permanents, so they don't become artifacts (the ruling).
 fn all_permanents(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, _: &Chars) -> bool {
     true
-}
-
-/// "... are artifacts in addition to their other types" (CR 205.1b, 613.1d, layer 4). An Aura made an artifact stays an
-/// Aura; one that also becomes a creature (March of the Machines) can't enchant anything (CR 303.4d, the ruling).
-fn artifact_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.types = chars.types.with(CardType::Artifact);
 }
 
 /// "All cards that aren't on the battlefield, spells, and permanents": every object in every zone (the ruling: "everything,

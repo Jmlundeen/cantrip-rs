@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{copy::create_token_copy_of_it, crew::crew, history::permanents_sacrificed_this_turn, triggers::YOUR_END_STEP};
+use cantrip_mechanics::{statics::creature_too, copy::create_token_copy_of_it, crew::crew, history::permanents_sacrificed_this_turn, triggers::YOUR_END_STEP};
 use cantrip_oracle as oracle;
 
 const NAME: &str = "Phoenix Fleet Airship";
@@ -25,11 +25,6 @@ fn itself_with_eight_airships(q: &dyn LayerQuery, source: ObjectId, affected: Ob
         && state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && q.chars(id).name == NAME).count() >= 8
 }
 
-/// "This Vehicle is an artifact creature" (CR 301.7, 613.1d, layer 4): a creature in addition to its other types.
-fn artifact_creature(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.types = chars.types.with(CardType::Creature);
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
@@ -43,7 +38,7 @@ pub static CARD: CardDef = CardDef {
     statics: &[static_ability(
         Layer::Type,
         itself_with_eight_airships,
-        artifact_creature,
+        creature_too,
         "As long as you control eight or more permanents named Phoenix Fleet Airship, this Vehicle is an artifact creature.",
     )],
     ..oracle::PHOENIX_FLEET_AIRSHIP

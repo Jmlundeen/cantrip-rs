@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::creature_too;
 use cantrip_oracle as oracle;
 
 /// "Each noncreature artifact is an artifact creature with power and toughness each equal to its mana value." One ability,
@@ -16,11 +17,6 @@ const TEXT: &str = "Each noncreature artifact is an artifact creature with power
 /// "Each noncreature artifact", as the layers before have it.
 fn noncreature_artifact(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, so_far: &Chars) -> bool {
     so_far.is(CardType::Artifact) && !so_far.is(CardType::Creature)
-}
-
-/// "... is an artifact creature" (CR 205.1b, 613.1d, layer 4).
-fn creature_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.types = chars.types.with(CardType::Creature);
 }
 
 /// "... with power and toughness each equal to its mana value" (CR 613.4b, layer 7b; CR 202.3: a token or a card with no

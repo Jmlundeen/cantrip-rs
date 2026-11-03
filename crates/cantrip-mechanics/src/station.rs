@@ -40,9 +40,7 @@ pub fn charged<const N: i16>(view: &dyn LayerQuery, source: ObjectId, affected: 
 }
 
 /// "[P/T]" in a striation (CR 721.2b), layer 4: it is a creature in addition to its other types.
-pub fn is_a_creature(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.types = chars.types.with(CardType::Creature);
-}
+pub use crate::statics::creature_too as is_a_creature;
 
 /// The abilities of a striation (CR 721.2a), layer 6: the ability at `INDEX` of the station card's `delayed` list. A
 /// permanent that copies the station card has it too, read from its own charge counters (ruling 2025-07-25).
