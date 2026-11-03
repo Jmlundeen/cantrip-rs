@@ -1,0 +1,54 @@
+# City adds white mana immediately; Healing Salve cast in response resolves before the City's damage trigger (CR 605.3b, 603.3).
+[Bot1 Deck]
+City of Brass
+Healing Salve
+Island x20
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.City of Brass.Play
+Bot1.Battlefield.City of Brass.Activate(Color: White)
+? Bot1.Mana = {W}
+? Bot1.Battlefield.City of Brass.Tapped = true
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Life = 22
+[T3 Bot1.Main1]
+Bot1.Battlefield.City of Brass.Activate(Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+[T5 Bot1.Main1]
+Bot1.Battlefield.City of Brass.Activate(Color: Black)
+? Bot1.Mana = {B}
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+[T7 Bot1.Main1]
+Bot1.Battlefield.City of Brass.Activate(Color: Red)
+? Bot1.Mana = {R}
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+[T9 Bot1.Main1]
+Bot1.Battlefield.City of Brass.Activate(Color: Green)
+? Bot1.Mana = {G}
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot1.Graveyard = Island; Healing Salve

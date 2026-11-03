@@ -1,0 +1,27 @@
+# An opponent's Pestermite taps City without its mana ability, and City damages its own controller (CR 603.2, 120.3).
+[Bot1 Deck]
+City of Brass
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Pestermite
+Island x20
+
+[Actions]
+Bot1.Hand.City of Brass.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Pestermite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Bot1.Battlefield.City of Brass)
+Bot2.Modes(Tap)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.City of Brass.Tapped = true
+Bot1.Life = 19
+Bot2.Life = 20
