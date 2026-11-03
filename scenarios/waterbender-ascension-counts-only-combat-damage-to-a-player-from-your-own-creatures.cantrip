@@ -1,0 +1,63 @@
+# Waterbender Ascension: "Whenever a creature you control deals combat damage to a player, ..." Bot1's two Memnites attack Bot2's Ajani Resolute
+# (loyalty 2) on turn 3 and kill it: combat damage to a planeswalker is not damage to a player (CR 510.1b, 120.3c), so no quest counter. On turn 4
+# Bot2's Memnite hits Bot1: a creature, but not one Bot1 controls, so still none.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Waterbender Ascension
+Memnite
+Memnite
+Island x20
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ajani Resolute
+Memnite
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Waterbender Ascension.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Memnite > Bot2.Battlefield.Ajani Resolute; Memnite > Bot2.Battlefield.Ajani Resolute)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+? Bot2.Graveyard = Ajani Resolute
+? Bot2.Life = 20
+? Bot1.Battlefield.Waterbender Ascension.Counters.Quest = (absent)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+[T4 Bot2.CombatDamage]
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Waterbender Ascension.Counters.Quest = (absent)
+Bot1.Hand.Count = 3

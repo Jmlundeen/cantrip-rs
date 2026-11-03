@@ -1,0 +1,76 @@
+# Waterbender Ascension, "Waterbend {4}: Target creature can't be blocked this turn" (CR 701.67a-b, 509.1b, 611.2). Bot1 casts the enchantment and a
+# Grizzly Bears on turn 1 with four Moxen. On turn 3 it pays {4} with one Mox's mana and three taps of its other Moxen: nothing is left in the pool and
+# the Bears, which could also have been tapped, are untapped. The target is a Mox, which is no creature and is refused, or Bot1's own Bears, accepted
+# (any creature will do, not just an opponent's). Bot2's Bears may not block them, and the Bears' damage puts the first
+# quest counter on the enchantment. On turn 5 the effect has worn off: Bot2's Bears block.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Ruby
+Waterbender Ascension
+Grizzly Bears
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Waterbender Ascension.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Waterbender Ascension.Activate(Bot1.Battlefield.Mox Ruby; Ability: Waterbend; Convoke: Mox Jet, Mox Emerald, Mox Ruby)
+Bot1.Battlefield.Waterbender Ascension.Activate(Bot1.Battlefield.Grizzly Bears; Ability: Waterbend; Convoke: Mox Jet, Mox Emerald, Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Grizzly Bears.Tapped = false
+Bot1.Attack(Grizzly Bears > Bot2)
+! Bot2.Block(Grizzly Bears > Bot1.Battlefield.Grizzly Bears)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot1.Battlefield.Waterbender Ascension.Counters.Quest = 1
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot2.Block(Grizzly Bears > Bot1.Battlefield.Grizzly Bears)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Waterbender Ascension.Counters.Quest = 1

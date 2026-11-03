@@ -1,0 +1,83 @@
+# Waterbender Ascension: "Whenever a creature you control deals combat damage to a player, put a quest counter on this enchantment. Then if it has four
+# or more quest counters on it, draw a card." Bot1 casts it on turn 1 with two Moxen and four Memnites (1/1, {0}). On turn 3 the four Memnites hit Bot2: four
+# triggers, one per creature, and the counters go 1, 2, 3 with no card drawn and 4 with the first (the card is drawn after the counter is on, the "Then": a
+# draw first would miss it). Turn 5 a fifth Memnite joins them: all five hit, counters 5 to 9, and each of those five draws too, so "four or more" is not
+# "exactly four".
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Waterbender Ascension
+Memnite
+Memnite
+Memnite
+Memnite
+Memnite
+Island x20
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Waterbender Ascension.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 0
+Bot1.Attack(Memnite; Memnite; Memnite; Memnite)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Waterbender Ascension.Counters.Quest = 1
+? Bot1.Hand.Count = 0
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Waterbender Ascension.Counters.Quest = 2
+? Bot1.Hand.Count = 0
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Waterbender Ascension.Counters.Quest = 3
+? Bot1.Hand.Count = 0
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Waterbender Ascension.Counters.Quest = 4
+? Bot1.Hand.Count = 1
+? Bot2.Life = 16
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Attack(Memnite; Memnite; Memnite; Memnite; Memnite)
+[T5 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Waterbender Ascension.Counters.Quest = 9
+Bot1.Hand.Count = 7
+Bot2.Life = 11

@@ -1,0 +1,71 @@
+# Waterbender Ascension's "Then if it has four or more quest counters on it, draw a card" reads the enchantment as it last existed once it
+# has left the battlefield (CR 608.2h). Bot1's four Memnites put it at four counters on turn 3 (drawing one card). On turn 5 a lone
+# Memnite connects, and Bot2 Disenchants the Ascension in response to the trigger: no counter can be put on it (it is in the graveyard,
+# CR 122.6), but it last had four, so Bot1 still draws - 3 cards in hand before, 4 after.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Waterbender Ascension
+Memnite
+Memnite
+Memnite
+Memnite
+Island x20
+
+[Bot2 Deck]
+Disenchant
+Plains x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Waterbender Ascension.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Memnite; Memnite; Memnite; Memnite)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Waterbender Ascension.Counters.Quest = 4
+? Bot1.Hand.Count = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Attack(Memnite)
+[T5 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Waterbender Ascension)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Waterbender Ascension
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Waterbender Ascension
+Bot1.Hand.Count = 4
