@@ -504,7 +504,10 @@ pub const TAP_AN_UNTAPPED_CREATURE: Cost = Cost::tap_untapped(1, untapped_creatu
 /// own source, even when it is a creature ("another"). Station (CR 702.184a) and Tyvar, the Pummeler print it.
 pub const TAP_ANOTHER_UNTAPPED_CREATURE: Cost = Cost::tap_untapped(1, another_untapped_creature_you_control);
 
-fn another_untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+/// "Another untapped creature you control" (CR 118.3): an untapped creature under the asker's control other than the ability's
+/// own source, the filter of `TAP_ANOTHER_UNTAPPED_CREATURE` and of a cost that taps several (`Cost::tap_untapped(3, ..)`; Voyager
+/// Glidecar).
+pub fn another_untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
     id != asker.source && untapped_creature_you_control(q, asker, id)
 }
 

@@ -1003,12 +1003,21 @@ pub fn you_cast_a_spell(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fire
     }
 }
 
-/// "Whenever you cast a spell with mana value 4 or greater" (CR 603.2, 601.2i, 202.3): a spell cast, not copied (CR 707.10), by this
+/// "Whenever you cast a spell with mana value N or greater" (CR 603.2, 601.2i, 202.3): a spell cast, not copied (CR 707.10), by this
 /// permanent's controller, with the mana value it has on the stack - the X chosen for it counts (CR 202.3e). Spider Manifestation,
-/// Kulrath Mystic and Tanufel Rimespeaker print it.
-pub fn you_cast_a_spell_with_mana_value_4_or_greater(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+/// Kulrath Mystic and Tanufel Rimespeaker print it with 4 (`YOU_CAST_A_SPELL_WITH_MANA_VALUE_4_OR_GREATER`), Up the Beanstalk with 5.
+pub fn you_cast_a_spell_with_mana_value_at_least<const N: u32>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { spell, player, .. } if *player == me.controller && q.mana_value(*spell) >= 4 => Fired::PLAIN,
+        Event::SpellCast { spell, player, .. } if *player == me.controller && q.mana_value(*spell) >= N => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "Whenever this [permanent] becomes the target of a spell or ability" (CR 603.2, 115.10): the permanent itself becoming a target,
+/// of whoever's spell or ability. Phantasmal Image's copy exception and Treacherous Blessing print it.
+pub fn this_becomes_the_target(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::BecameTarget { target: Target::Object(id), .. } if *id == source => Fired::PLAIN,
         _ => None,
     }
 }
@@ -1917,7 +1926,8 @@ pub const YOU_ATTACK: Trigger = when_asked(EventMask::ATTACKERS_DECLARED, you_at
 pub const INSTANT_OR_SORCERY_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_instant_or_sorcery);
 pub const YOU_CAST_A_SPELL: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell);
 pub const YOU_CAST_A_SPELL_WITH_MANA_VALUE_4_OR_GREATER: Trigger =
-    when_asked(EventMask::SPELL_CAST, you_cast_a_spell_with_mana_value_4_or_greater);
+    when_asked(EventMask::SPELL_CAST, you_cast_a_spell_with_mana_value_at_least::<4>);
+pub const THIS_BECOMES_THE_TARGET_OF_A_SPELL_OR_ABILITY: Trigger = when(EventMask::BECAME_TARGET, this_becomes_the_target);
 pub const NONCREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast);
 pub const YOU_CAST_A_SPELL_FROM_EXILE: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell_from_exile);
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);

@@ -1,20 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects;
+use cantrip_mechanics::{effects, triggers};
 use cantrip_oracle as oracle;
-
-/// "When this creature becomes the target of a spell or ability, sacrifice it."
-fn targeted(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::BecameTarget { target: Target::Object(id), .. } if *id == source => Fired::PLAIN,
-        _ => None,
-    }
-}
 
 /// The ability the copy's exception adds (CR 707.9b). Not a card anyone plays: a definition for the exception's
 /// ability to be referred to by.
 pub static EXCEPTION: CardDef = CardDef {
     name: "Phantasmal Image (copy exception)",
-    abilities: &[triggered(when(EventMask::BECAME_TARGET, targeted), effects::sacrifice_self, "When this creature becomes the target of a spell or ability, sacrifice it.")],
+    abilities: &[triggered(triggers::THIS_BECOMES_THE_TARGET_OF_A_SPELL_OR_ABILITY, effects::sacrifice_self, "When this creature becomes the target of a spell or ability, sacrifice it.")],
     ..CardDef::BLANK
 };
 
