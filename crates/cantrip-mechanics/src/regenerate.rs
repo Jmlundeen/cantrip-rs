@@ -10,6 +10,12 @@ pub fn this(g: &mut dyn Game, item: &StackItem) {
     }
 }
 
+/// "Regenerate this creature" as a whole ability effect (CR 701.19a): Scavenging Ghoul and Golgari Grave-Troll.
+pub fn this_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    this(g, item);
+    Ok(())
+}
+
 /// "Regenerate target permanent" (CR 701.19a): a regeneration shield on it until end of turn, if it is still a legal
 /// target. Welding Jar and Yavimaya Hollow print it.
 pub fn target(g: &mut dyn Game, item: &StackItem, slot: usize) {
