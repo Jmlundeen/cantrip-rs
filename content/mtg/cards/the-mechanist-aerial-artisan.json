@@ -1,0 +1,8 @@
+{
+  "name": "The Mechanist, Aerial Artisan",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Human Artificer Ally",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Whenever you cast a noncreature spell, create a Clue token. (It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")\n{T}: Until end of turn, target artifact token you control becomes a 3/1 Construct artifact creature with flying."
+}

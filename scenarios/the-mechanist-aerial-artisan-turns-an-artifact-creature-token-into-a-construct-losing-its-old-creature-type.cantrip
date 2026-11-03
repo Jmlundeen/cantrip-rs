@@ -1,0 +1,48 @@
+# The Mechanist, Aerial Artisan: "target artifact token you control becomes a 3/1 Construct artifact creature with flying." Turn 3 Pia's Thopter (a 1/1
+# Thopter artifact creature token with flying, an artifact token already a creature) is the target: it is a 3/1 Construct afterwards - the Construct creature
+# type replaces Thopter (the text does not say it is still a Thopter) and its base power and toughness are 3/1, set over the 1/1 - and still an artifact
+# creature with flying, until the end of turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+The Mechanist, Aerial Artisan
+Pia, Determined Rebuilder
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Mechanist, Aerial Artisan.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pia, Determined Rebuilder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Thopter Token.Subtypes = Thopter
+Bot1.Battlefield.The Mechanist, Aerial Artisan.Activate(Bot1.Battlefield.Thopter Token)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Thopter Token.Subtypes = Construct
+Bot1.Battlefield.Thopter Token.Power = 3
+Bot1.Battlefield.Thopter Token.Toughness = 1
+Bot1.Battlefield.Thopter Token.Types = Artifact; Creature

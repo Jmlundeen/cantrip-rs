@@ -1,0 +1,59 @@
+# The Mechanist, Aerial Artisan {2}{U}, 1/3: "Whenever you cast a noncreature spell, create a Clue token." Turn 1: three Moxen (noncreature spells, but cast
+# before the Mechanist is on the battlefield) and then the Mechanist and an Ornithopter (creature spells): no Clue. Turn 2 Bot2 casts a Lightning Bolt (an
+# opponent's noncreature spell): none for Bot1. Turn 3 Bot1 casts a Lightning Bolt, and a Mox Pearl: one Clue for each (two in all), made as the spell
+# is cast, before it resolves - so Bot2 is at 17 only once the first Clue is there too.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+The Mechanist, Aerial Artisan
+Ornithopter
+Lightning Bolt
+Mox Pearl
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Mechanist, Aerial Artisan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Clue Token = (absent)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 17
+? Bot1.Battlefield.Clue Token = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+? Bot1.Battlefield.Clue Token.Subtypes = Clue
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Mox Pearl.Types = Artifact

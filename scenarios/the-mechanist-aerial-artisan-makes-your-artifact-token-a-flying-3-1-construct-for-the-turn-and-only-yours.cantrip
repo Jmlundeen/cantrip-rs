@@ -1,0 +1,73 @@
+# The Mechanist, Aerial Artisan: "{T}: Until end of turn, target artifact token you control becomes a 3/1 Construct artifact creature with flying."
+# Bot2 has a Clue (from its Forecasting Fortune Teller); Bot1 gets one on turn 3 by casting a Lightning Bolt. Bot2's Clue (not yours) and Bot1's Mox Jet (an
+# artifact but no token) are refused as targets, Bot1's Clue taken: a 3/1 Artifact Creature Clue Construct with flying, still a Clue, until the turn
+# ends - on turn 4 it is just a Clue again. On turn 5, under Bot1's control since the turn began, the Mechanist makes it a 3/1 flyer again and it attacks:
+# Bot2 takes exactly 3 (20 - 3 from the Bolt - 3 = 14).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+The Mechanist, Aerial Artisan
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Mox Sapphire
+Forecasting Fortune Teller
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Mechanist, Aerial Artisan.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Forecasting Fortune Teller.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Clue Token.Subtypes = Clue
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+! Bot1.Battlefield.The Mechanist, Aerial Artisan.Activate(Bot2.Battlefield.Clue Token)
+! Bot1.Battlefield.The Mechanist, Aerial Artisan.Activate(Bot1.Battlefield.Mox Jet)
+Bot1.Battlefield.The Mechanist, Aerial Artisan.Activate(Bot1.Battlefield.Clue Token)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Clue Token.Power = 3
+? Bot1.Battlefield.Clue Token.Toughness = 1
+? Bot1.Battlefield.Clue Token.Types = Artifact; Creature
+? Bot1.Battlefield.Clue Token.Subtypes = Clue; Construct
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Clue Token.Types = Artifact
+? Bot1.Battlefield.Clue Token.Subtypes = Clue
+[T5 Bot1.Main1]
+Bot1.Battlefield.The Mechanist, Aerial Artisan.Activate(Bot1.Battlefield.Clue Token)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Clue Token > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Clue Token.Power = 3
