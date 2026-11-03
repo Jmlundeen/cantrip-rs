@@ -1,0 +1,26 @@
+# Regeneration costs black mana, not white (CR 602.2b).
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Pearl
+Drudge Skeletons
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Drudge Skeletons.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+! Bot1.Battlefield.Drudge Skeletons.Activate(Mana: short)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Drudge Skeletons.Activate
+? Bot1.Mana =
+[Expect]
+Bot1.Battlefield.Drudge Skeletons.Power = 1

@@ -1,0 +1,37 @@
+# Drudge Skeletons pays one black to regenerate, replacing destruction by tapping and removing damage (CR 701.19a).
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Pearl
+Drudge Skeletons
+Island x20
+[Bot2 Deck]
+Black Lotus
+Shock
+Shock
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Drudge Skeletons.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Drudge Skeletons)
+Bot2.Pass
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Drudge Skeletons.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Drudge Skeletons.Tapped = true
+? Bot1.Battlefield.Drudge Skeletons.Damage = 0
+[Expect]
+Bot1.Battlefield.Drudge Skeletons.Tapped = true
+Bot1.Battlefield.Drudge Skeletons.Damage = 0
