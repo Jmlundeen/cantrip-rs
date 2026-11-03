@@ -1,0 +1,35 @@
+# Camel does not prevent Desert damage while blocking rather than attacking (CR 615.1).
+[Bot1 Deck]
+Mox Pearl
+Camel
+Ornithopter
+Plains x17
+
+[Bot2 Deck]
+Scavenger Grounds
+Black Lotus
+Mox Sapphire
+Applied Geometry
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Camel.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Scavenger Grounds.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Applied Geometry.Cast(Bot2.Battlefield.Scavenger Grounds)
+[T4 Bot2.BeginCombat]
+Bot2.Attack(Scavenger Grounds#2 > Bot1)
+Bot1.Block(Camel > Scavenger Grounds#2)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Camel
+Bot1.Battlefield.Ornithopter.Toughness = 2

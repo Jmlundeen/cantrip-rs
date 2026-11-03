@@ -1,0 +1,37 @@
+# An attacking creature outside Camel’s band is not protected from Desert damage (CR 615.1).
+[Bot1 Deck]
+Mox Pearl
+Camel
+Memnite
+Plains x17
+
+[Bot2 Deck]
+Scavenger Grounds
+Black Lotus
+Mox Sapphire
+Applied Geometry
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Camel.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Scavenger Grounds.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Applied Geometry.Cast(Bot2.Battlefield.Scavenger Grounds)
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Camel > Bot2; Memnite > Bot2)
+Bot1.Choose()
+Bot2.Block(Scavenger Grounds#2 > Memnite)
+[T3 Bot1.EndCombat]
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Camel.Toughness = 1
+Bot1.Graveyard = Memnite
