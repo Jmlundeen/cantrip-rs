@@ -1,0 +1,23 @@
+use cantrip_api::*;
+use cantrip_mechanics::{attach, effects, statics, targets};
+use cantrip_oracle as oracle;
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        ability(
+            cost("{W}"),
+            effects::attached_creature_gets::<0, 1>,
+            "{W}: Enchanted creature gets +0/+1 until end of turn.",
+        ),
+    ],
+    statics: &[
+        static_ability(
+            Layer::PtModify,
+            attach::attached_object,
+            statics::plus_pt::<0, 2>,
+            "Enchanted creature gets +0/+2.",
+        ),
+    ],
+    enchant: Some(targets::CREATURE),
+    ..oracle::HOLY_ARMOR
+};
