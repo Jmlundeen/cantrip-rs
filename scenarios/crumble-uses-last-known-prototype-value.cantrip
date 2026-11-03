@@ -1,0 +1,29 @@
+# Crumble uses the last-known mana value of a prototyped artifact on the battlefield, not its printed value in the graveyard (CR 608.2h, 718.4).
+[Bot1 Deck]
+Forest
+Crumble
+Forest x18
+
+[Bot2 Deck]
+Black Lotus
+Goring Warplow
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Goring Warplow.Cast(Ability: Prototype)
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+! Bot1.Hand.Crumble.Cast(Bot1.Battlefield.Forest)
+Bot1.Hand.Crumble.Cast(Bot2.Battlefield.Goring Warplow)
+? Bot1.Mana =
+
+[Expect]
+Bot2.Graveyard = Goring Warplow; Black Lotus
+Bot2.Life = 22
+Bot1.Life = 20

@@ -1,0 +1,29 @@
+# A regeneration shield cannot save the artifact from Crumble, and its controller still gains its mana value (CR 701.19c).
+[Bot1 Deck]
+Forest
+Crumble
+Forest x18
+
+[Bot2 Deck]
+Black Lotus
+Mind Stone
+Welding Jar
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Welding Jar.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Mind Stone.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Crumble.Cast(Bot2.Battlefield.Mind Stone)
+Bot1.Pass
+Bot2.Battlefield.Welding Jar.Activate(Bot2.Battlefield.Mind Stone)
+
+[Expect]
+Bot2.Graveyard = Mind Stone; Welding Jar; Black Lotus
+Bot2.Life = 22

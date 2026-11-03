@@ -1,0 +1,6 @@
+{
+  "name": "Crumble",
+  "manaCost": "{G}",
+  "type": "Instant",
+  "oracleText": "Destroy target artifact. It can't be regenerated. That artifact's controller gains life equal to its mana value."
+}

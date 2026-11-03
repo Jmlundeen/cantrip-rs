@@ -1,0 +1,41 @@
+# If the target is sacrificed in response, Crumble does nothing, including life gain; a second copy resolves on a legal artifact (CR 608.2b).
+[Bot1 Deck]
+Forest
+Mox Emerald
+Crumble
+Crumble
+Forest x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mind Stone
+Mind Stone
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot2.Hand.Mind Stone.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Crumble.Cast(Bot2.Battlefield.Mind Stone#1)
+Bot1.Pass
+Bot2.Battlefield.Mind Stone#2.Activate(Ability: Add)
+Bot2.Battlefield.Mind Stone#1.Activate(Ability: Draw a card)
+[T3 Bot1.Main1]
+? Bot2.Life = 20
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Crumble.Cast(Bot2.Battlefield.Mind Stone)
+? Bot1.Mana =
+
+[Expect]
+Bot2.Life = 22
+Bot2.Graveyard = Mind Stone; Mind Stone; Black Lotus

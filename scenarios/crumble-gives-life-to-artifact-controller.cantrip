@@ -1,0 +1,34 @@
+# Crumble gives life to the artifact's controller at destruction, even when another player owns it (CR 608.2h).
+[Bot1 Deck]
+Forest
+Black Lotus
+Act of Treason
+Crumble
+Forest x16
+
+[Bot2 Deck]
+Black Lotus
+Alpha Myr
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Alpha Myr.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Alpha Myr)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Crumble.Cast(Bot1.Battlefield.Alpha Myr)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
+Bot2.Graveyard = Alpha Myr; Black Lotus
