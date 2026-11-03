@@ -1,0 +1,6 @@
+{
+  "name": "Natural Selection",
+  "manaCost": "{G}",
+  "type": "Instant",
+  "oracleText": "Look at the top three cards of target player's library, then put them back in any order. You may have that player shuffle."
+}

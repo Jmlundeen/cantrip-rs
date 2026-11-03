@@ -1,0 +1,28 @@
+# Natural Selection rearranges exactly the top three of its controller's library and can decline the shuffle (CR 608.2c).
+[Bot1 Deck]
+Mox Emerald
+Natural Selection
+Island
+Island
+Island
+Island
+Island
+Shock
+Lightning Bolt
+Giant Growth
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Natural Selection.Cast(Bot1.Battlefield.Mox Emerald)
+Bot1.Hand.Natural Selection.Cast(Bot1)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Arrange(Giant Growth; Lightning Bolt; Shock)
+Bot1.Decline
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Island; Giant Growth
+Bot1.Shuffles = 0
