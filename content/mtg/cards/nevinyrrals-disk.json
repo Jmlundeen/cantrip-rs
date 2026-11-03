@@ -1,0 +1,6 @@
+{
+  "name": "Nevinyrral's Disk",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "This artifact enters tapped.\n{1}, {T}: Destroy all artifacts, creatures, and enchantments."
+}
