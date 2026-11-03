@@ -1,8 +1,8 @@
-# Any number of modes may be chosen for a spell with escalate, each beyond the first adding its cost (CR 702.120a, 601.2b);
-# the engine offers as many as the player could pay for, and Robber of the Rich's permission is part of what pays (CR 609.4b,
-# 601.2h). Bot2's Collective Brutality, exiled by the Robber on turn 1, costs {1}{B}. Bot1 has no black mana, only a Mox
-# Sapphire and a Mox Pearl spent as though they were black, and still chooses two modes, discarding an Island for the
-# escalate cost: the reveal, and the drain at Bot2.
+# Any number of modes may be chosen for a spell with escalate, each beyond the first adding its cost (CR 702.120a, 601.2b),
+# and Robber of the Rich's permission is part of what pays the total (CR 609.4b, 601.2h). Bot2's Collective Brutality,
+# exiled by the Robber on turn 1, costs {1}{B}. Bot1 has no black mana, only a Mox Sapphire and a Mox Pearl spent as though
+# they were black, and still chooses two modes, discarding an Island for the escalate cost: the reveal, and the drain at
+# Bot2.
 
 [Bot1 Deck]
 Mountain

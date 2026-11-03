@@ -1,0 +1,39 @@
+# Collective Brutality escalated once with Helm of Awakening out and one Swamp to pay with: Helm takes {1} off its {1}{B},
+# so it costs {B} (CR 601.2f), and two modes - drain and the reveal, with the escalate discard of an Island - can be chosen
+# and paid for (CR 601.2b, 702.120a). The choice of modes is not judged against the cost before its reductions. The Moxen
+# pay for Helm, so the Swamp is all the mana left for Brutality.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Helm of Awakening
+Swamp
+Collective Brutality
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Helm of Awakening.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(1; 3)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Choose(Island)
+[T1 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Collective Brutality; Island
+Bot1.Hand.Count = 1
+Bot1.Life = 22
+Bot2.Life = 18

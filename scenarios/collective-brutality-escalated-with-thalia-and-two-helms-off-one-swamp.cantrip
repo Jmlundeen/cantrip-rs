@@ -1,0 +1,46 @@
+# Collective Brutality escalated once under a cost increase and two reductions: Thalia, Guardian of Thraben adds {1} to its
+# {1}{B} and two Helms of Awakening take {2} off, increases first (CR 601.2f), so it costs {B} and the one Swamp pays for
+# two modes, drain and the reveal, with the escalate discard of an Island (CR 601.2b, 702.120a). The modes are judged
+# against the total with every change, not the printed cost.
+# Turn 1 builds the board off two Black Lotuses (Helm {2} and the second Helm {1} off one, Thalia {W} once both Helms are
+# out off the other) and plays the Swamp; Brutality is cast on turn 3, after the Island it discards is drawn, with the
+# Swamp the only mana Bot1 has.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Helm of Awakening
+Helm of Awakening
+Thalia, Guardian of Thraben
+Swamp
+Collective Brutality
+Island x10
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: W)
+Bot1.Hand.Helm of Awakening.Cast
+Bot1.Hand.Helm of Awakening.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: W)
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(1; 3)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Choose(Island)
+[T3 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Collective Brutality; Island; Black Lotus; Black Lotus
+Bot1.Battlefield.Count = 4
+Bot1.Hand.Count = 0
+Bot1.Life = 22
+Bot2.Life = 18

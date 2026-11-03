@@ -8837,13 +8837,17 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, ab
     } else {
         Vec::new()
     };
-    // An escalate cost the player cannot pay narrows the range to one they can.
     // A condition on the modal definition may allow more modes than its printed default.
     let mut most = max.max(modal.most(cx, &asker, 0));
+    // An escalate cost whose parts other than mana the player cannot pay (a discard: CR 702.120a, 118.3) narrows the range
+    // to one they can, as a multikicker's is. Its mana is not judged here: the total is only determined once the targets
+    // are announced (CR 601.2c, 601.2f), and what increases or reduces it may read them, so a count it would refuse here
+    // could be paid (Helm of Awakening). The payment refuses mana the player cannot pay, and the cast is taken back
+    // (CR 601.2h, 733.1).
     if modal.escalate.is_some() {
         let payable = |cx: &Cx, n: u8| {
             let first_n = (0..usize::from(n)).fold(0u32, |mask, i| modal.with(mask, i));
-            can_afford(cx, player, source, &any.view(&modal_cost(modal, first_n, base))) && can_pay_other(cx, source, player, &escalate_cost(modal, first_n))
+            can_pay_other(cx, source, player, &escalate_cost(modal, first_n))
         };
         while most > least.max(1) && !payable(cx, most) {
             most -= 1;

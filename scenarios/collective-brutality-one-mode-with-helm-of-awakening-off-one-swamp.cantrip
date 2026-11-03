@@ -1,0 +1,36 @@
+# The control for collective-brutality-escalated-with-helm-of-awakening-off-one-swamp: the same board, Collective
+# Brutality cast for one mode, drain, off the one Swamp - {B} once Helm of Awakening takes {1} off (CR 601.2f) - with no
+# escalate discard, so both Islands stay in hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Helm of Awakening
+Swamp
+Collective Brutality
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Helm of Awakening.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(3)
+Bot1.Target(Bot2)
+[T1 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Collective Brutality
+Bot1.Hand.Count = 2
+Bot1.Life = 22
+Bot2.Life = 18
