@@ -1,0 +1,58 @@
+# A shield chosen a turn early expires before Alpha Myr attacks; a fresh shield prevents its next attack (CR 611.2a, 615.8).
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Circle of Protection: Artifacts
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Alpha Myr
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Circle of Protection: Artifacts.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Alpha Myr.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Circle of Protection: Artifacts.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Alpha Myr)
+[T4 Bot2.BeginCombat]
+Bot2.Attack(Alpha Myr > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 18
+[T6 Bot2.BeginCombat]
+Bot2.Attack(Alpha Myr > Bot1)
+[T6 Bot2.Blockers]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Circle of Protection: Artifacts.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Alpha Myr)
+[T6 Bot2.Main2]
+[Expect]
+Bot1.Life = 18
+Prevented = 2 Alpha Myr > Bot1 by Circle of Protection: Artifacts

@@ -1,0 +1,63 @@
+# A temporarily artifact double striker deals two combat hits; the Circle prevents only the first, and refuses a nonartifact source (CR 609.7b, 615.8).
+[Bot1 Deck]
+Mox Pearl x2
+Mox Sapphire
+Circle of Protection: Artifacts
+Savannah Lions
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Fencing Ace
+Stone by Sunlight
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Circle of Protection: Artifacts.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Fencing Ace.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Stone by Sunlight.Cast
+Bot2.Modes(Until end of turn)
+Bot2.Target(Fencing Ace)
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Circle of Protection: Artifacts.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Savannah Lions)
+! Bot1.Choose()
+! Bot1.Choose(Fencing Ace; Bot2.Battlefield.Mox Pearl)
+Bot1.Choose(Fencing Ace)
+[T4 Bot2.BeginCombat]
+Bot2.Attack(Fencing Ace > Bot1)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 19
+Prevented = 1 Fencing Ace > Bot1 by Circle of Protection: Artifacts

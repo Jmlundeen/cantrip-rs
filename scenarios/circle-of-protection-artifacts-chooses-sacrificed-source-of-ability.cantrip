@@ -1,0 +1,47 @@
+# The Circle can choose an artifact sacrificed to activate its ability and prevent the pending damage (CR 609.7a, 615.8).
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Circle of Protection: Artifacts
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Pyrite Spellbomb
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Circle of Protection: Artifacts.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Pyrite Spellbomb.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Pyrite Spellbomb.Activate(Bot1; Ability: 2 damage)
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Circle of Protection: Artifacts.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Pyrite Spellbomb)
+Bot1.Pass
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 20
+Prevented = 2 Pyrite Spellbomb > Bot1 by Circle of Protection: Artifacts
