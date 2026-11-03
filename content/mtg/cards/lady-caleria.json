@@ -1,0 +1,8 @@
+{
+  "name": "Lady Caleria",
+  "manaCost": "{3}{G}{G}{W}{W}",
+  "type": "Legendary Creature — Elf Archer",
+  "power": 3,
+  "toughness": 6,
+  "oracleText": "{T}: Lady Caleria deals 3 damage to target attacking or blocking creature."
+}

@@ -1,0 +1,68 @@
+# Lady Caleria taps to deal 3 damage to an attacking or blocking creature, including her controller's; creatures outside combat are not legal targets (CR 506.3, 120.3).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Gleemox
+Mox Sapphire
+Mox Jet
+Lady Caleria
+Ageless Guardian
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Ageless Guardian x2
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lady Caleria.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ageless Guardian.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ageless Guardian.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ageless Guardian.Cast
+Bot1.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ageless Guardian#1 > Bot1)
+! Bot1.Battlefield.Lady Caleria.Activate(Bot2.Battlefield.Ageless Guardian#2)
+! Bot1.Battlefield.Lady Caleria.Activate(Bot2.Battlefield.Memnite)
+! Bot1.Battlefield.Lady Caleria.Activate(Bot2.Battlefield.Mox Pearl)
+Bot1.Battlefield.Lady Caleria.Activate(Bot2.Battlefield.Ageless Guardian#1)
+? Bot1.Battlefield.Lady Caleria.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ageless Guardian#1.Damage = 3
+! Bot1.Battlefield.Lady Caleria.Activate(Bot2.Battlefield.Ageless Guardian#1)
+[T4 Bot2.Main2]
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Ageless Guardian#2 > Bot1)
+Bot1.Block(Bot1.Battlefield.Ageless Guardian > Bot2.Battlefield.Ageless Guardian#2)
+Bot1.Battlefield.Lady Caleria.Activate(Bot1.Battlefield.Ageless Guardian)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ageless Guardian.Damage = 3
+[T6 Bot2.Main2]
+[Expect]
+Bot1.Graveyard.Ageless Guardian.Power = 1
+Bot2.Battlefield.Ageless Guardian#2.Damage = 1
