@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, effects};
+use cantrip_mechanics::{choose, effects, history};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -16,7 +16,7 @@ fn from_a_graveyard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fi
         return None;
     }
     let cast_from_graveyard = *reason == ZoneReason::Resolve
-        && q.history().cast_of(*old).is_some_and(|c| c.from == ZoneKind::Graveyard);
+        && history::cast_from_graveyard(q.history(), *old).is_some();
     if from.is(ZoneKind::Graveyard) || cast_from_graveyard { Fired::about(Target::Object(*new)) } else { None }
 }
 

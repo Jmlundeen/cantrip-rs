@@ -21,6 +21,30 @@ pub fn put_plus_one_counter_on_this_turn(history: History<'_>, player: PlayerId,
         .any(|record| matches!(record.event, Event::CountersPut { kind: CounterKind::PlusOne, amount, by, .. } if amount > 0 && by == player))
 }
 
+/// How the spell on the stack as `spell` was cast, if it was cast from a graveyard (CR 601.2i, 400.7): the cast the history
+/// holds, kept only when its `from` is a graveyard (the graveyard of the spell's owner, CR 404.1). A copy was not cast, and a
+/// permanent put onto the battlefield was never a spell, so neither has one. A trigger matching the entry of a permanent
+/// asks it of the spell that resolved (`ZoneChange::old`), the history as it was just before the entry. Twilight Diviner and
+/// Prized Amalgam print "cast from a graveyard".
+pub fn cast_from_graveyard<'a>(history: History<'a>, spell: ObjectId) -> Option<&'a Cast> {
+    history.cast_of(spell).filter(|cast| cast.from == ZoneKind::Graveyard)
+}
+
+/// The cast from a graveyard of the spell `permanent` entered the battlefield as (CR 608.3, 400.7), once the entry is in the
+/// history: the spell is the object of the resolution that put `permanent` onto the battlefield (`cast_from_graveyard`).
+/// Nothing for a permanent that was not a spell as it entered. Prized Amalgam asks it as its delayed trigger's condition
+/// is checked as it resolves (CR 603.4).
+pub fn cast_from_graveyard_as_it_entered<'a>(history: History<'a>, permanent: ObjectId) -> Option<&'a Cast> {
+    history
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).reason(ZoneReason::Resolve))
+        .rev()
+        .find_map(|r| match r.event {
+            Event::ZoneChange { old, new, .. } if new == permanent => Some(old),
+            _ => None,
+        })
+        .and_then(|spell| cast_from_graveyard(history, spell))
+}
+
 /// An opponent was dealt noncombat damage this turn (CR 120.2). Grim Repriser and Whiplash Wordsmith ask this
 /// same question, from an activated ability's condition and a static ability's layers respectively.
 pub fn opponent_dealt_noncombat_damage_this_turn(history: History<'_>, state: &GameState, player: PlayerId) -> bool {
