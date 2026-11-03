@@ -1,0 +1,46 @@
+# Granite Gargoyle flies over ground creatures and gets +0/+1 for the turn for red mana (CR 702.9b, 611.2a).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Ruby
+Granite Gargoyle
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Granite Gargoyle.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Granite Gargoyle.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Granite Gargoyle.Power = 2
+? Bot1.Battlefield.Granite Gargoyle.Toughness = 3
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Granite Gargoyle > Bot2)
+! Bot2.Block(Grizzly Bears > Granite Gargoyle)
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Mox Ruby.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+! Bot1.Battlefield.Granite Gargoyle.Activate(Mana: short)
+
+[Expect]
+Bot1.Battlefield.Granite Gargoyle.Power = 2
+Bot1.Battlefield.Granite Gargoyle.Toughness = 2
+Bot2.Life = 18
