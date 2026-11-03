@@ -100,13 +100,20 @@ public sealed class CardChoiceCaptionTests
             "Strategic Betrayal: choose up to 1 card to cast without paying its mana cost",
             CardChoicePresentation.Describe(client, Choice(CardChoicePurposeView.CastFree, 1, true, giant), []).Title);
 
-        ChooseCardsPromptMessage copies = Choice(CardChoicePurposeView.CastCopyFree, 1, true, giant);
+        ChooseCardsPromptMessage copies = Choice(CardChoicePurposeView.CastCopyFreeWithin, 1, true, giant);
         copies.MaximumManaValue = 4;
         CardChoicePresentation shown = CardChoicePresentation.Describe(client, copies, []);
         Assert.Equal(
             "Strategic Betrayal: choose up to 1 copy to cast without paying its mana cost (total mana value 4 or less left to spend)",
             shown.Title);
         Assert.Equal("Cast nothing", shown.Confirm);
+
+        // A budget used up is still said (Uldaros Theorix); a copy limited by count has none to say (Baron Helmut Zemo).
+        copies.MaximumManaValue = 0;
+        Assert.EndsWith("(total mana value 0 or less left to spend)", CardChoicePresentation.Describe(client, copies, []).Title);
+        Assert.Equal(
+            "Strategic Betrayal: choose up to 1 copy to cast without paying its mana cost",
+            CardChoicePresentation.Describe(client, Choice(CardChoicePurposeView.CastCopyFree, 1, true, giant), []).Title);
 
         Assert.Equal(
             "Strategic Betrayal: choose up to 1 card to cast, paying its costs",

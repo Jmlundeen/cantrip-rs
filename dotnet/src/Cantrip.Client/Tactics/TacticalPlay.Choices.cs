@@ -949,7 +949,7 @@ public sealed partial class TacticalPlay
 
         // "You may cast it": a card chosen once this step and offered again was not cast - its cost could not be paid,
         // its mode had no target - and choosing it again only asks the same question again.
-        if (prompt.Purpose is CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree or CardChoicePurposeView.Play)
+        if (prompt.Purpose is CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree or CardChoicePurposeView.CastCopyFreeWithin or CardChoicePurposeView.Play)
         {
             ranked.RemoveAll(card => _offered.Contains(card.Value));
             take = Math.Min(take, ranked.Count);

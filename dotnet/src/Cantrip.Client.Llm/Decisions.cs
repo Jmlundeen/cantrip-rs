@@ -1444,7 +1444,7 @@ public sealed class Decisions
         string many = prompt.AnyNumber ? "any number of"
             : prompt.UpTo ? $"up to {prompt.Count}" : prompt.Count.ToString(CultureInfo.InvariantCulture);
         string where = Where(client, prompt);
-        string budget = prompt.MaximumManaValue > 0 || prompt.Purpose == CardChoicePurposeView.CastCopyFree
+        string budget = prompt.MaximumManaValue > 0 || prompt.Purpose == CardChoicePurposeView.CastCopyFreeWithin
             ? $" The spells you cast this way have a total mana value of at most {prompt.MaximumManaValue} left."
             : string.Empty;
 
@@ -1477,7 +1477,7 @@ public sealed class Decisions
             CardChoicePurposeView.Keep => $"{source}: choose the{kind} one to keep. The rest are sacrificed.",
             CardChoicePurposeView.Cast => $"{source}: choose {many}{kind} card(s) to cast{where}. You pay each one's costs.",
             CardChoicePurposeView.CastFree => $"{source}: choose {many}{kind} card(s) to cast{where} without paying their mana costs.",
-            CardChoicePurposeView.CastCopyFree =>
+            CardChoicePurposeView.CastCopyFree or CardChoicePurposeView.CastCopyFreeWithin =>
                 $"{source}: choose {many}{kind} {(prompt.Count == 1 ? "copy" : "copies")} to cast{where} without paying their mana costs. The copies cease to exist if not cast.{budget}",
             CardChoicePurposeView.Play => $"{source}: choose {many}{kind} card(s) you may play this turn. The card's text says whether you pay its costs.",
             CardChoicePurposeView.Vote => $"{source}: cast your vote.",

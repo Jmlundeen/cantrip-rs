@@ -41,7 +41,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             // A cast says what it costs and what is cast: the cards chosen from may be in any zone, and a copy is not the card.
             CardChoicePurposeView.Cast => "cast, paying its costs",
             CardChoicePurposeView.CastFree => "cast without paying its mana cost",
-            CardChoicePurposeView.CastCopyFree => "cast without paying its mana cost",
+            CardChoicePurposeView.CastCopyFree or CardChoicePurposeView.CastCopyFreeWithin => "cast without paying its mana cost",
             _ => Action(context?.Action ?? ActionFor(prompt.Purpose)),
         };
         // Without the server's word, judged as the server judges it (PromptPresentation): the purposes that only pay, or a
@@ -55,7 +55,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         // Behold and blight name the cost in their own verb ("to behold", "to blight"): "to pay for it" would add nothing.
         if (cost && prompt.Purpose is not (CardChoicePurposeView.Behold or CardChoicePurposeView.Blight)) verb += " to pay for it";
         ZoneKindView? table = ChoiceTable(client, prompt);
-        bool copies = prompt.Purpose == CardChoicePurposeView.CastCopyFree;
+        bool copies = prompt.Purpose is CardChoicePurposeView.CastCopyFree or CardChoicePurposeView.CastCopyFreeWithin;
         // Behold (CR 701.4a) is a permanent you control or a card in your hand.
         string one = prompt.Purpose == CardChoicePurposeView.Behold ? "permanent or card" : copies ? "copy" : permanents ? "permanent" : "card";
         // The type the asking card narrowed the choice to ("a creature to exile"), the word "card" kept for a card in a zone
@@ -69,7 +69,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         string article = "aeiou".Contains(kind[0], StringComparison.OrdinalIgnoreCase) ? "an" : "a";
         // "Any number of": every one of several that may be chosen, as the rules text says when it does not name a count.
         bool anyNumber = prompt.AnyNumber;
-        string budget = prompt.MaximumManaValue > 0 || prompt.Purpose == CardChoicePurposeView.CastCopyFree ? $" (total mana value {prompt.MaximumManaValue} or less left to spend)" : string.Empty;
+        string budget = prompt.MaximumManaValue > 0 || prompt.Purpose == CardChoicePurposeView.CastCopyFreeWithin ? $" (total mana value {prompt.MaximumManaValue} or less left to spend)" : string.Empty;
         // Cards brought into the game from outside it (CR 400.11b: North Wind Avatar) are the chooser's sideboard, which only they
         // may look at: the caption says where they come from, since nothing on the table shows it.
         bool outside = prompt.Cards.Count > 0 && prompt.Cards.All(card => client.Object(card)?.Zone == ZoneKindView.Sideboard);
@@ -194,7 +194,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.PutOntoBattlefield => picked.Count == 0 ? "Put nothing" : "Put onto the battlefield",
             CardChoicePurposeView.PutIntoHand => picked.Count == 0 ? "Take nothing"
                 : forAnother ? "Put into their hand" : "Put into your hand",
-            CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree => picked.Count == 0 ? "Cast nothing" : "Cast selected",
+            CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree or CardChoicePurposeView.CastCopyFreeWithin => picked.Count == 0 ? "Cast nothing" : "Cast selected",
             CardChoicePurposeView.OrderSimultaneous => "Apply next",
             CardChoicePurposeView.Destroy => picked.Count == 1 ? "Destroy it" : $"Destroy {picked.Count}",
             CardChoicePurposeView.Vote => picked.Count == 1 ? "Vote for it" : "Vote",
@@ -306,7 +306,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.Untap => PromptActionView.Untap,
         CardChoicePurposeView.PutOntoBattlefield => PromptActionView.PutOntoBattlefield,
         CardChoicePurposeView.PutIntoHand => PromptActionView.PutIntoHand,
-        CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree => PromptActionView.Cast,
+        CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree or CardChoicePurposeView.CastCopyFreeWithin => PromptActionView.Cast,
         CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap or CardChoicePurposeView.Enlist => PromptActionView.Tap,
         CardChoicePurposeView.OrderSimultaneous => PromptActionView.OrderReplacement,
         CardChoicePurposeView.Destroy => PromptActionView.Destroy,

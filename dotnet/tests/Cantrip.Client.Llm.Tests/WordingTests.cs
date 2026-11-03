@@ -120,7 +120,7 @@ public sealed class WordingTests
             {
                 Player = Me,
                 Source = Handle(9),
-                Purpose = CardChoicePurposeView.CastCopyFree,
+                Purpose = CardChoicePurposeView.CastCopyFreeWithin,
                 Cards = [Handle(3), Handle(4)],
                 Verdict = new() { Addable = [Handle(3)] },
                 Count = 1,
@@ -134,6 +134,30 @@ public sealed class WordingTests
         Assert.Contains("without paying", heading, StringComparison.Ordinal);
         Assert.Contains("at most 4", heading, StringComparison.Ordinal);
         Assert.DoesNotContain("graveyard", heading, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_free_cast_of_copies_limited_by_count_says_no_mana_value_budget()
+    {
+        var chooser = new ScriptedChooser([0]);
+        ObjectView giant = In(Card(3, "Bonecrusher Giant", "{2}{R}"), ZoneKindView.Exile, Me);
+
+        new Decisions(chooser).Answer(
+            Seated(giant),
+            new ChooseCardsPromptMessage
+            {
+                Player = Me,
+                Source = Handle(9),
+                Purpose = CardChoicePurposeView.CastCopyFree,
+                Cards = [Handle(3), Handle(4)],
+                Verdict = new() { Addable = [Handle(3)] },
+                Count = 3,
+                CountKind = CountKindView.UpTo,
+            });
+
+        string heading = chooser.Asked[0].Heading;
+        Assert.Contains("without paying", heading, StringComparison.Ordinal);
+        Assert.DoesNotContain("mana value", heading, StringComparison.Ordinal);
     }
 
     [Fact]

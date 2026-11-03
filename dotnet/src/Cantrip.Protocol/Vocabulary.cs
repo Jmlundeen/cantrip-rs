@@ -313,7 +313,7 @@ public enum CardChoicePurposeView
     /// <summary>The chosen card is cast as the effect resolves without paying its mana cost; choosing nothing declines (Etali, Improvisation Capstone, ripple).</summary>
     CastFree = 24,
 
-    /// <summary>A copy of the chosen card is cast as the effect resolves without paying its mana cost (CR 707.12); choosing nothing declines (Uldaros Theorix).</summary>
+    /// <summary>A copy of the chosen card is cast as the effect resolves without paying its mana cost (CR 707.12); choosing nothing declines (Baron Helmut Zemo, the casts limited by count).</summary>
     CastCopyFree = 25,
 
     /// <summary>Up to one untapped creature you control is tapped as part of casting, and its power (the prompt's <c>Powers</c>) comes off the generic mana of the total cost; choosing nothing pays the full cost (harmonize, CR 702.180).</summary>
@@ -365,6 +365,9 @@ public enum CardChoicePurposeView
     /// creatures.
     /// </summary>
     Choose = 37,
+
+    /// <summary>A copy of the chosen card is cast as the effect resolves without paying its mana cost (CR 707.12), the casts together limited to a total mana value left to spend, the prompt's <c>MaximumManaValue</c> (possibly 0): Uldaros Theorix. <see cref="CastCopyFree"/> has no such budget.</summary>
+    CastCopyFreeWithin = 38,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

@@ -286,6 +286,10 @@ pub enum CardChoicePurposeView {
     /// Objects chosen as an effect resolves, not targeted, that nothing happens to yet (CR 608.2d): Spry and Mighty's two
     /// creatures.
     Choose,
+    /// A copy cast without paying its mana cost, the casts together limited to a total mana value left to spend
+    /// (`MaximumManaValue`, possibly 0): Uldaros Theorix. `CastCopyFree` is a copy cast for free with no such budget
+    /// (Baron Helmut Zemo limits the casts by count).
+    CastCopyFreeWithin,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
