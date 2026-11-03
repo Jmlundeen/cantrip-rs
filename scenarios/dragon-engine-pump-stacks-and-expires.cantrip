@@ -1,0 +1,52 @@
+# Dragon Engine pays {2} per activation, gains +1/+0 for each, and loses the bonus at cleanup (CR 602.2, 611.2a, 514.2).
+[Bot1 Deck]
+Island
+Black Lotus
+Dragon Engine
+Sol Ring
+Mox Pearl
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Dragon Engine.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Dragon Engine.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Engine.Power = 2
+? Bot1.Battlefield.Dragon Engine.Toughness = 3
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Dragon Engine.Power = 1
+? Bot1.Battlefield.Dragon Engine.Toughness = 3
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Dragon Engine.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Dragon Engine.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Engine.Power = 3
+? Bot1.Battlefield.Dragon Engine.Toughness = 3
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Dragon Engine.Power = 1
+Bot1.Battlefield.Dragon Engine.Toughness = 3
