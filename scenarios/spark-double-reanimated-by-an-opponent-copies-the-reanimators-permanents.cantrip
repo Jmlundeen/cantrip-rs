@@ -1,0 +1,44 @@
+# Probe: Spark Double reanimated from its owner's graveyard by an opponent (Animate Dead) enters under the reanimator's
+# control, so "a creature or planeswalker you control" is one the reanimator controls (CR 614.12, 110.2). Bot2's Spark
+# Double dies as a 0/0 on turn 2; Bot2 then has an Ornithopter, Bot1 a Memnite. Animate Dead returns Spark Double for
+# Bot1: the only legal copy is Bot1's Memnite.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Memnite
+Animate Dead
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+Spark Double
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Spark Double.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Animate Dead.Cast(Bot2.Graveyard.Spark Double)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[Expect]
+Bot1.Battlefield.Memnite#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter = (absent)

@@ -1,0 +1,41 @@
+# Whether Spark Double "is a creature" is judged on Spark Double as it enters (its rulings; CR 614.12), not on the
+# copied card's printed types. Under March of the Machines, Bot1's Sol Ring is a 1/1 artifact creature; Spark Double
+# enters as a copy of Sol Ring, a noncreature artifact that March makes a creature as it enters, so it gets the
+# additional +1/+1 counter and is a 2/2.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Black Lotus
+March of the Machines
+Spark Double
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.March of the Machines.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spark Double.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[Expect]
+Bot1.Battlefield.Sol Ring#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Sol Ring#2.Power = 2
