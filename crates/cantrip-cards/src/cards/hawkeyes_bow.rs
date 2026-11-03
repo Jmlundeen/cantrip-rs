@@ -8,15 +8,6 @@ fn have_reach(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Reach);
 }
 
-/// "Whenever equipped creature becomes tapped" (CR 701.26a, 603.2): the creature this Equipment is attached to is tapped, by any
-/// path that taps it. The creature is the trigger's subject, the source of the damage.
-fn equipped_creature_becomes_tapped(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Tapped { permanent } if q.attached_to(source) == Some(*permanent) => Fired::about(Target::Object(*permanent)),
-        _ => None,
-    }
-}
-
 /// "It deals 1 damage to each opponent" (CR 120.3, 102.2): the equipped creature, as it last existed if it has left (CR 113.7a),
 /// is the source; each opponent of the Equipment's controller still in the game takes one event, all dealt together (CR 120.2).
 fn ping_each_opponent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -29,7 +20,7 @@ fn ping_each_opponent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            when(EventMask::TAPPED, equipped_creature_becomes_tapped),
+            when(EventMask::TAPPED, cantrip_mechanics::triggers::attached_permanent_becomes_tapped),
             ping_each_opponent,
             "Whenever equipped creature becomes tapped, it deals 1 damage to each opponent.",
         ),

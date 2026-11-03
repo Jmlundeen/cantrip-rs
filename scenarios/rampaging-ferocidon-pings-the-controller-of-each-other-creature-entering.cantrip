@@ -31,6 +31,7 @@ Bot1.Battlefield.Black Lotus.Activate(Color: Red)
 Bot1.Hand.Rampaging Ferocidon.Cast
 Bot1.Pass
 Bot1.Battlefield.Plains.Activate
+? Bot1.Battlefield.Rampaging Ferocidon.Keywords = Menace
 ? Bot1.Life = 20
 ? Stack.Count = 0
 Bot1.Hand.Healer's Hawk.Cast
@@ -47,5 +48,6 @@ Bot1.Attack(Healer's Hawk > Bot2)
 [T3 Bot1.Main2]
 
 [Expect]
+Bot1.Battlefield.Rampaging Ferocidon.Keywords = Menace
 Bot1.Life = 19
 Bot2.Life = 18

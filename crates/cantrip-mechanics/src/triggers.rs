@@ -33,6 +33,15 @@ pub fn this_becomes_tapped(_: &dyn Query, source: ObjectId, event: &Event) -> Op
     }
 }
 
+/// Whenever the attached permanent becomes tapped (CR 701.26a, 603.2), by any means; the permanent is the subject.
+/// Psychic Venom and Hawkeye's Bow print this trigger for an enchanted land and equipped creature respectively.
+pub fn attached_permanent_becomes_tapped(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Tapped { permanent } if q.attached_to(source) == Some(*permanent) => Fired::about(Target::Object(*permanent)),
+        _ => None,
+    }
+}
+
 /// "Whenever another creature or planeswalker you control enters" (CR 603.6a): a different permanent that entered
 /// the battlefield under this source's controller's control, and is a creature or planeswalker as it entered. Liliana
 /// the Faultless and Liliana the Repentant print it.

@@ -15,6 +15,6 @@ fn another_creature_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Op
 
 pub static CARD: CardDef = CardDef {
     cant_gain_life: &[players_cant_gain_life],
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, another_creature_enters), ping_subject_controller, "Whenever another creature enters, this creature deals 1 damage to that creature's controller.")],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, another_creature_enters), ping_subject_controller::<1>, "Whenever another creature enters, this creature deals 1 damage to that creature's controller.")],
     ..oracle::RAMPAGING_FEROCIDON
 };

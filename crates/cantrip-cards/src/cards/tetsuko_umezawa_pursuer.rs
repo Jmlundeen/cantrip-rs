@@ -23,7 +23,7 @@ pub static CARD: CardDef = CardDef {
         PROWESS,
         triggered(
             when_asked(EventMask::BLOCKS, small_opponent_creature_blocks),
-            ping_subject_controller,
+            ping_subject_controller::<1>,
             "Whenever a creature an opponent controls with power or toughness 1 or less blocks, Tetsuko Umezawa deals 1 damage to that creature's controller.",
         ),
     ],
