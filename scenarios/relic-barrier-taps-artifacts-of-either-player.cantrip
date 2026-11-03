@@ -1,0 +1,48 @@
+# Relic Barrier can tap either player's artifact, including an already tapped one, but cannot target a land without the artifact type (CR 115.1c, 701.26a).
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Relic Barrier
+Forest
+Island x20
+[Bot2 Deck]
+Mox Pearl
+Island x20
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Relic Barrier.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Relic Barrier.Activate(Bot1.Battlefield.Forest)
+Bot1.Battlefield.Relic Barrier.Activate(Bot1.Battlefield.Mox Ruby)
+? Bot1.Battlefield.Relic Barrier.Tapped = true
+? Bot1.Mana =
+! Bot1.Battlefield.Relic Barrier.Activate(Bot1.Battlefield.Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Ruby.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Relic Barrier.Activate(Bot2.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Mox Pearl.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Relic Barrier.Activate(Bot2.Battlefield.Mox Pearl)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Relic Barrier.Tapped = true
