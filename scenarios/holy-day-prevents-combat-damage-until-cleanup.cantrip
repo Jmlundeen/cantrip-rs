@@ -1,0 +1,48 @@
+# Holy Day prevents combat damage to both creatures and a player, but not Shock's noncombat damage; on a later turn
+# the same blocked creatures deal damage normally (CR 615.1, 514.2).
+[Bot1 Deck]
+Plains
+Memnite
+Holy Day
+Island x20
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Memnite
+Shock
+Island x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Grizzly Bears > Bot1; Memnite > Bot1)
+Bot1.Block(Memnite > Grizzly Bears)
+[T4 Bot2.Blockers]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Holy Day.Cast
+? Bot1.Mana =
+[T4 Bot2.Main2]
+? Bot1.Life = 18
+? Bot1.Battlefield.Memnite.Damage = 0
+? Bot2.Battlefield.Grizzly Bears.Damage = 0
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Grizzly Bears > Bot1)
+Bot1.Block(Memnite > Grizzly Bears)
+[T6 Bot2.Main2]
+[Expect]
+Bot1.Life = 18
+Bot1.Graveyard = Memnite; Holy Day
+Bot2.Battlefield.Grizzly Bears.Damage = 1
+Prevented = 2 Grizzly Bears > Memnite by Holy Day; 1 Memnite > Bot1 by Holy Day; 1 Memnite > Grizzly Bears by Holy Day
