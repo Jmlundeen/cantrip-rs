@@ -1,0 +1,11 @@
+{
+  "name": "Flexible Waterbender",
+  "manaCost": "{3}{U}",
+  "type": "Creature — Human Warrior Ally",
+  "power": 2,
+  "toughness": 5,
+  "oracleText": "Vigilance\nWaterbend {3}: This creature has base power and toughness 5/2 until end of turn. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)",
+  "keywords": [
+    "Vigilance"
+  ]
+}

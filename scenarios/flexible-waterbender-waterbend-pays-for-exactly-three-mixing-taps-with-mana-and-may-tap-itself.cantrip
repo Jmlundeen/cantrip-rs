@@ -1,0 +1,63 @@
+# "Waterbend {3}" (CR 701.67a-b) pays exactly {3}: a tap pays {1} each, mana the rest, and the Flexible Waterbender itself is an untapped creature
+# Bot1 may tap. On turn 1, with the Moxen tapped for the Waterbender, Memnite, Ornithopter and
+# the Waterbender itself are tapped to pay it, making it a 5/2 although it is tapped. On turn 3 the effect has worn off (2/5), and one mana from
+# Mox Jet with two taps pays {3} exactly: the pool is empty afterwards and Mox Sapphire, Ruby and Pearl stay untapped - the activation takes no
+# more than its cost.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Flexible Waterbender
+Memnite
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Flexible Waterbender.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Flexible Waterbender.Activate(Convoke: Memnite, Ornithopter, Flexible Waterbender)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Flexible Waterbender.Power = 5
+? Bot1.Battlefield.Flexible Waterbender.Toughness = 2
+? Bot1.Battlefield.Flexible Waterbender.Tapped = true
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Flexible Waterbender.Power = 2
+? Bot1.Battlefield.Flexible Waterbender.Toughness = 5
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Flexible Waterbender.Activate(Convoke: Memnite, Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Flexible Waterbender.Power = 5
+Bot1.Battlefield.Flexible Waterbender.Toughness = 2
+Bot1.Battlefield.Flexible Waterbender.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Memnite.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
