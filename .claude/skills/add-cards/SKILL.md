@@ -51,8 +51,9 @@ Three layers, kept apart by the compiler (`cantrip-api` is all a card can see):
   call `move_together` for a rules action that has a verb: use `destroy_all`/`destroy_all_no_regen`, `sacrifice`,
   `exile_all`, `return_to_hand`, `put_into_library(.., LibraryPlace::..)`, `mill`, `discard_together`, `discard_hand`,
   `library::search`/`library::find_to_*`;
-- shuffle or randomise by hand (`put_into_library(.., LibraryPlace::BottomInRandomOrder)`, `bottom_in_random_order`,
-  `library::random_of`);
+- shuffle or order a library by hand (`put_into_library(.., LibraryPlace::BottomInRandomOrder)`,
+  `bottom_in_random_order`): use `library::rest_to_bottom_in_random_order` or a shuffle. A pick "at random" from a list
+  (a card from a hand, an opponent) is `library::random_of`;
 - loop over players or objects for something the rules make simultaneous (`damage_together`,
   `each_opponent_loses_life`, `each_opponent_sacrifices`, `destroy_all`, `exile_all`) - a model built for one object
   is not copied for several;

@@ -32,9 +32,9 @@ NEVER, LOOK = "NEVER", "LOOK"
 LINE_CHECKS = [
     (NEVER, r"\b(?:unwrap|expect)\(|\b(?:panic|unreachable|todo|unimplemented)!",
      "a card never crashes (CLAUDE.md): `let ... else { return Ok(()) }`, or an answer the engine already checked"),
-    (NEVER, r"(?<!rest_to_)\bbottom_in_random_order\b|\bBottomInRandomOrder\b|\blibrary::random_of\b",
-     "shuffling or randomising by hand: the verb that does it (`library::rest_to_bottom_in_random_order`, a shuffle)"
-     " or `g.choose_at_random`"),
+    (NEVER, r"(?<!rest_to_)\bbottom_in_random_order\b|\bBottomInRandomOrder\b",
+     "ordering a library by hand: the verb that does it (`library::rest_to_bottom_in_random_order`, a shuffle);"
+     " a pick at random from a list is `library::random_of`"),
     (NEVER, r"\bchoose::(?:card|cards|card_from|cards_from|cards_from_kind)\(|\bsearch_library\(|\blibrary::Find\b|\blibrary::search_to_\w+\(",
      "an older choice or search kept for existing cards: a selection rule (`cantrip_mechanics::select`) asked with"
      " `choose::select`, `library::search` or `library::find_to_*`"),
