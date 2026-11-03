@@ -1,0 +1,8 @@
+{
+  "name": "Ramses Overdark",
+  "manaCost": "{2}{U}{U}{B}{B}",
+  "type": "Legendary Creature — Human Assassin",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "{T}: Destroy target enchanted creature."
+}

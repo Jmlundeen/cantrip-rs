@@ -1,0 +1,82 @@
+# Removing the Aura in response makes the target illegal, so Ramses does not destroy it; a later activation destroys an enchanted creature.
+[Bot1 Deck]
+Ramses Overdark
+Black Lotus
+Mox Jet
+Gleemox
+Mox Pearl
+Memnite
+Escape Velocity
+Mountain
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Disenchant
+Memnite
+Ornithopter
+Mountain
+Escape Velocity
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ramses Overdark.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Escape Velocity.Cast(Bot2.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Escape Velocity.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Ramses Overdark.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Ramses Overdark.Activate(Bot2.Battlefield.Memnite)
+? Bot1.Battlefield.Ramses Overdark.Tapped = true
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot2.Battlefield.Escape Velocity)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Memnite.Power = 1
+! Bot1.Battlefield.Ramses Overdark.Activate(Bot1.Battlefield.Memnite)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ramses Overdark.Activate(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Escape Velocity; Memnite; Black Lotus
+Bot2.Graveyard = Disenchant; Escape Velocity
+Bot2.Battlefield.Ornithopter.Power = 0
