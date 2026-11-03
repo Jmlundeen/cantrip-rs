@@ -1,0 +1,6 @@
+{
+  "name": "Braingeyser",
+  "manaCost": "{X}{U}{U}",
+  "type": "Sorcery",
+  "oracleText": "Target player draws X cards."
+}

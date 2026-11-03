@@ -1,0 +1,41 @@
+# Braingeyser draws exactly X cards for the chosen player (CR 121.1).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Braingeyser
+Braingeyser
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire#1.Activate
+! Bot1.Hand.Braingeyser.Cast(Bot1.Battlefield.Ornithopter; X: 2)
+Bot1.Hand.Braingeyser.Cast(Bot2; X: 2)
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+? Bot2.Hand.Count = 9
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Braingeyser.Cast(Bot1; X: 1)
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot2.Hand.Count = 7
+Bot1.Graveyard = Braingeyser; Braingeyser; Black Lotus
