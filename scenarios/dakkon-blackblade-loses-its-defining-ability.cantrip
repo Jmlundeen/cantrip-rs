@@ -1,0 +1,48 @@
+# With its ability removed Dakkon has no printed numeric power or toughness; a temporary +3/+3 keeps it alive while Fresh Start applies -5/-0 (CR 208.5, 613.1f, 613.4c).
+[Bot1 Deck]
+Dakkon Blackblade
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Giant Growth
+Fresh Start
+Island x16
+
+[Actions]
+? Bot1.Hand.Dakkon Blackblade.Power = 0
+? Bot1.Hand.Dakkon Blackblade.Toughness = 0
+Bot1.Hand.Plains.Play
+? Bot1.Hand.Dakkon Blackblade.Power = 1
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dakkon Blackblade.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot2.Hand.Giant Growth.Cast(Bot1.Battlefield.Dakkon Blackblade)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Fresh Start.Cast(Bot1.Battlefield.Dakkon Blackblade)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Dakkon Blackblade.Power = -2
+Bot1.Battlefield.Dakkon Blackblade.Toughness = 3

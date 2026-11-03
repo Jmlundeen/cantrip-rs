@@ -1,0 +1,42 @@
+# Losing the last land makes Dakkon 0/0, so it dies, and its graveyard characteristics still count lands (CR 604.3, 704.5f).
+[Bot1 Deck]
+Dakkon Blackblade
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Strip Mine
+Island x19
+
+[Actions]
+? Bot1.Hand.Dakkon Blackblade.Power = 0
+? Bot1.Hand.Dakkon Blackblade.Toughness = 0
+Bot1.Hand.Plains.Play
+? Bot1.Hand.Dakkon Blackblade.Power = 1
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dakkon Blackblade.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Plains; Ability: Destroy target land)
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Dakkon Blackblade.Power = 0
+? Bot1.Graveyard.Dakkon Blackblade.Toughness = 0
+Bot1.Hand.Plains.Play
+
+[Expect]
+Bot1.Graveyard = Dakkon Blackblade; Plains; Black Lotus
+Bot1.Graveyard.Dakkon Blackblade.Power = 1
+Bot1.Graveyard.Dakkon Blackblade.Toughness = 1

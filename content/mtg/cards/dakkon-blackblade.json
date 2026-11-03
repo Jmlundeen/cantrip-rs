@@ -1,0 +1,8 @@
+{
+  "name": "Dakkon Blackblade",
+  "manaCost": "{2}{W}{U}{U}{B}",
+  "type": "Legendary Creature — Human Warrior",
+  "power": "*",
+  "toughness": "*",
+  "oracleText": "Dakkon Blackblade's power and toughness are each equal to the number of lands you control."
+}

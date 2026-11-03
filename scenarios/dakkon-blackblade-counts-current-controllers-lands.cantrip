@@ -1,0 +1,53 @@
+# Dakkon's characteristic-defining ability works in all zones, counts lands on the battlefield, and changes with control (CR 604.3, 613.4a).
+[Bot1 Deck]
+Dakkon Blackblade
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island
+Black Lotus
+Act of Treason
+Island x17
+
+[Actions]
+? Bot1.Hand.Dakkon Blackblade.Power = 0
+? Bot1.Hand.Dakkon Blackblade.Toughness = 0
+Bot1.Hand.Plains.Play
+? Bot1.Hand.Dakkon Blackblade.Power = 1
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dakkon Blackblade.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+? Bot1.Battlefield.Dakkon Blackblade.Power = 1
+? Bot1.Battlefield.Dakkon Blackblade.Toughness = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Dakkon Blackblade.Power = 2
+? Bot1.Battlefield.Dakkon Blackblade.Toughness = 2
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Dakkon Blackblade)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Dakkon Blackblade.Power = 1
+? Bot2.Battlefield.Dakkon Blackblade.Toughness = 1
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Dakkon Blackblade.Power = 2
+Bot1.Battlefield.Dakkon Blackblade.Toughness = 2
