@@ -1,0 +1,8 @@
+{
+  "name": "Keldon Warlord",
+  "manaCost": "{2}{R}{R}",
+  "type": "Creature — Human Barbarian",
+  "power": "*",
+  "toughness": "*",
+  "oracleText": "Keldon Warlord's power and toughness are each equal to the number of non-Wall creatures you control."
+}
