@@ -1,0 +1,31 @@
+# Soul Net sees both creatures die with it, and each trigger offers payment (CR 603.6c, 119.3).
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Soul Net
+Ornithopter
+Ornithopter
+Vicious Rivalry
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Soul Net.Cast
+? Bot1.Mana = {B}{B}
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Vicious Rivalry.Cast(X: 1)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.PayCost
+Bot1.Decline
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Soul Net = (absent)
+Bot1.Graveyard.Count = 6

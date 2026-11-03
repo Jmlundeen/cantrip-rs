@@ -1,0 +1,6 @@
+{
+  "name": "Soul Net",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "Whenever a creature dies, you may pay {1}. If you do, you gain 1 life."
+}

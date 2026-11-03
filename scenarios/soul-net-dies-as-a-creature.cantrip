@@ -1,0 +1,33 @@
+# Soul Net animated as a creature sees itself die and its ability resolves from last known information (CR 603.10a).
+[Bot1 Deck]
+Soul Net
+Mind Transfer Protocol
+Vicious Rivalry
+Black Lotus x3
+Island
+Island x20
+[Bot2 Deck]
+Island x25
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot1.Hand.Soul Net.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mind Transfer Protocol.Cast(Bot1.Battlefield.Soul Net)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Soul Net.Power = 4
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vicious Rivalry.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Soul Net = (absent)
