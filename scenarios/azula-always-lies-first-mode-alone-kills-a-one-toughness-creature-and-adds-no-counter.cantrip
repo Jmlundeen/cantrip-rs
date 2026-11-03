@@ -1,0 +1,50 @@
+# Azula Always Lies with only the first mode: Bot2's Coral Merfolk (2/1) gets -1/-1 and dies as a 1/0 (CR 704.5f). The second mode, not chosen,
+# puts no counter on Bot1's Ornithopter.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Ornithopter
+Azula Always Lies
+Island x16
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Emerald
+Coral Merfolk
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Coral Merfolk.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Azula Always Lies.Cast
+Bot1.Modes(1)
+Bot1.Target(Coral Merfolk)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Coral Merfolk
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)

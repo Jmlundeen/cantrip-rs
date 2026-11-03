@@ -1,0 +1,43 @@
+# Azula Always Lies with only the second mode (CR 700.2): "target creature" may be an opponent's, so Bot2's Ornithopter gets the +1/+1 counter,
+# and the first mode, not chosen, shrinks nothing: Bot1's own Ornithopter stays a 0/2.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Ornithopter
+Azula Always Lies
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Azula Always Lies.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Power = 1
+? Bot2.Battlefield.Ornithopter.Toughness = 3
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

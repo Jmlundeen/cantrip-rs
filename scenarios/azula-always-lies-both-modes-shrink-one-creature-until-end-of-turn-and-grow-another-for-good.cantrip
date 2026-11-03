@@ -1,0 +1,53 @@
+# Azula Always Lies cast for {1}{B} (Mox Jet, Mox Ruby) with both modes (CR 700.2): Bot2's Ornithopter (0/2) gets -1/-1 until end of turn
+# (CR 611.2a) and Bot1's Ornithopter, a second target of its own (CR 700.2c), gets a +1/+1 counter that stays. Each mode names one creature of
+# either player, so the shrink on the opponent's and the counter on one's own both resolve. In turn 2 the shrink has ended and the counter has not. Choosing no mode is refused, and both is accepted beside it ("choose one or both").
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Ornithopter
+Azula Always Lies
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Azula Always Lies.Cast
+! Bot1.Modes(Count: 0)
+Bot1.Modes(1; 2)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Power = -1
+? Bot2.Battlefield.Ornithopter.Toughness = 1
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+
+[Expect]
+Bot1.Graveyard = Azula Always Lies
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter.Power = 1
