@@ -1,0 +1,51 @@
+# Fortified Area gives only its controller's Walls +1/+0 and banding. A blocking Wall lets its controller assign
+# an attacker's combat damage, including past lethal, saving the Wall and preventing trample (CR 702.22j).
+[Bot1 Deck]
+Black Lotus
+Fortified Area
+Mox Pearl
+Steel Wall
+Memnite
+Plains x20
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Mox Jet
+Steel Wall
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Steel Wall.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Fortified Area.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Steel Wall.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Steel Wall.Power = 1
+? Bot1.Battlefield.Steel Wall.Toughness = 4
+? Bot1.Battlefield.Memnite.Power = 1
+? Bot2.Battlefield.Steel Wall.Power = 0
+? Bot2.Battlefield.Steel Wall.Toughness = 4
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Attack(Ulvenwald Oddity > Bot1)
+Bot1.Block(Steel Wall > Ulvenwald Oddity; Memnite > Ulvenwald Oddity)
+[T2 Bot2.Blockers]
+Bot1.AssignDamage(Ulvenwald Oddity > Memnite: 4)
+[T2 Bot2.Main2]
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Memnite; Black Lotus
+Bot1.Battlefield.Steel Wall.Damage = 0
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 2

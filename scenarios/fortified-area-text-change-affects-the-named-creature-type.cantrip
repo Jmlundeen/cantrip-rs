@@ -1,0 +1,37 @@
+# Artificial Evolution changes Fortified Area's Wall word to Elf, moving both its effects (CR 612.1).
+[Bot1 Deck]
+Black Lotus
+Fortified Area
+Steel Wall
+Llanowar Elves
+Mox Sapphire
+Mox Emerald
+Artificial Evolution
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Steel Wall.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Fortified Area.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Steel Wall.Power = 1
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Fortified Area)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wall)
+Bot1.Modes(Elf)
+[Expect]
+Bot1.Battlefield.Steel Wall.Power = 0
+Bot1.Battlefield.Steel Wall.Toughness = 4
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = Banding
