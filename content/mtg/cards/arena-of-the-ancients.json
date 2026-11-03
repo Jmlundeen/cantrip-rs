@@ -1,0 +1,6 @@
+{
+  "name": "Arena of the Ancients",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "Legendary creatures don't untap during their controllers' untap steps.\nWhen this artifact enters, tap all legendary creatures."
+}

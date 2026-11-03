@@ -1,0 +1,68 @@
+# Arena's entry trigger taps both players' legendary creatures but not a nonlegendary creature or legendary artifact; it stops untapping during untap steps while a nonlegendary creature untaps normally, and a spell can still untap a legendary creature (CR 603.6a, 502.3).
+[Bot1 Deck]
+Mox Pearl
+Isamaru, Hound of Konda
+Black Lotus
+Arena of the Ancients
+Ornithopter
+Mox Amber
+Vow to Erebor
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Isamaru, Hound of Konda
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Amber.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Isamaru, Hound of Konda.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Arena of the Ancients.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Isamaru, Hound of Konda.Tapped = false
+? Bot2.Battlefield.Isamaru, Hound of Konda.Tapped = false
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Isamaru, Hound of Konda.Tapped = true
+? Bot2.Battlefield.Isamaru, Hound of Konda.Tapped = true
+? Bot1.Battlefield.Mox Amber.Tapped = false
+? Bot2.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Mox Amber.Activate(Color: White)
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Isamaru, Hound of Konda.Tapped = true
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Mox Amber.Tapped = false
+? Bot1.Battlefield.Isamaru, Hound of Konda.Tapped = true
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Amber.Activate(Color: White)
+Bot1.Hand.Vow to Erebor.Cast(Bot1.Battlefield.Isamaru, Hound of Konda)
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Isamaru, Hound of Konda.Tapped = false
+Bot2.Battlefield.Isamaru, Hound of Konda.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Mox Amber.Tapped = true
