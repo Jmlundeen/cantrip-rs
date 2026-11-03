@@ -1,0 +1,33 @@
+# A player allowed one more draw may draw from the Enchantress (CR 121.2b, 603.2).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Mox Sapphire
+Spirit of the Labyrinth
+Verduran Enchantress
+Swift Reconfiguration
+Shock
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Verduran Enchantress.Cast
+? Bot1.Mana =
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Swift Reconfiguration.Cast(Bot1.Battlefield.Verduran Enchantress)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Accept
+[Expect]
+Bot1.Hand = Shock

@@ -1,0 +1,43 @@
+# The Enchantress triggers on its controller's enchantment casts and allows drawing or declining (CR 603.2, 121.1).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Verduran Enchantress
+Fang of Shigeki
+Shapers' Sanctuary
+Ornithopter
+Shock
+Island x20
+[Bot2 Deck]
+Mox Emerald
+Fang of Shigeki
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Verduran Enchantress.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Fang of Shigeki.Cast
+Bot1.Pass
+Bot1.Accept
+? Bot1.Hand = Shapers' Sanctuary; Shock
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Shapers' Sanctuary.Cast
+Bot1.Pass
+Bot1.Decline
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fang of Shigeki.Cast
+? Stack.Count = 1
+Bot2.Pass
+[Expect]
+Bot1.Hand = Shock
