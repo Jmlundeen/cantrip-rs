@@ -163,6 +163,9 @@ fn scenarios_that_once_failed_record() {
             "emrakul-the-promised-end-costs-one-less-for-each-card-type-in-your-graveyard",
             "emrakul-the-promised-end-controls-the-next-turn-then-gives-an-extra-one-and-is-protected-from-instants",
             "emrakul-the-promised-end-countered-still-controls-the-next-turn-and-gives-an-extra-one",
+            // "A source of your choice" chosen as a creature that has left the battlefield while a delayed ability naming
+            // it waits (CR 609.7a, 400.7): the observation holds it as it last existed, so the answer has a ref.
+            "deflecting-palm-chooses-a-dead-dragonhawk-whose-delayed-burn-waits",
         ]
         .iter()
         .map(|n| {

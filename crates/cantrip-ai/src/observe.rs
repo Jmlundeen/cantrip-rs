@@ -2,13 +2,14 @@
 //! knowledge says of the hidden cards, and nothing else.
 //!
 //! Objects are numbered canonically: by place (each seat's library, hand, graveyard, exile and sideboard, then the
-//! battlefield, phased-out permanents, the stack and the command zone), a library, a graveyard and the stack by
+//! battlefield, phased-out permanents, the stack and the command zone, then what a question the seat answers names that
+//! has since become another object), a library, a graveyard and the stack by
 //! position, any other zone by what is visible of each object, refs left out. Where two objects look alike the order
 //! they came into the zone breaks the tie, which every player saw. No engine id is in an observation.
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 
-use cantrip_engine::visibility::{StackEntry, ability_key, deferred, knows_face, looks_into, observable, request_objects, stack_entries};
+use cantrip_engine::visibility::{StackEntry, ability_key, deferred, is_ability_key, knows_face, looks_into, observable, request_objects, stack_entries};
 use cantrip_engine::*;
 use cantrip_obs::*;
 use cantrip_obs::Count;
@@ -55,6 +56,25 @@ pub fn observe_indexed(game: &Game, knowledge: &Knowledge, seat: PlayerId, mode:
         slots.push(Slot { id: entry.key(), stack: Some((i, entry)), obs: view.stacked(i, &entry, &none) });
     }
     view.place(Zone::COMMAND, &none, &mut slots);
+    // An object the question this seat answers names that has since become another (CR 400.7), as it last existed: "a source
+    // of your choice" may be a permanent that left while a delayed ability naming it waits (CR 609.7a), and the answer names
+    // it. It is in no zone, so it is placed where the observation keeps what is in none (`place_of`); only one the seat could
+    // see where it last was (a permanent, a spell, a public card, a hand it may look into), face down only as the seat knew
+    // it (`View::visible`) - the host shows such an object the same way, for the question's own list.
+    if !extra.is_empty() {
+        let mut gone: Vec<(Vec<u8>, u32, Slot)> = extra
+            .iter()
+            .copied()
+            .filter(|&id| !is_ability_key(id) && id.index() < s.objects.len() && s.obj(id).became.is_some() && (view.full || looks_into(s, seat, s.obj(id).zone)))
+            .map(|id| {
+                let obs = ObjectObs::Visible(Box::new(view.visible(id, place_of(Zone::GONE), None, &none)));
+                (cantrip_obs_bytes(&obs), id.index() as u32, Slot { id, stack: None, obs })
+            })
+            .collect();
+        // Alike ones in the order they came to be, which every player saw.
+        gone.sort_by(|a, b| (&a.0, a.1).cmp(&(&b.0, b.1)));
+        slots.extend(gone.into_iter().map(|(_, _, slot)| slot));
+    }
 
     // The refs: to what the seat sees, by index; anything else is out of its sight.
     let refs: HashMap<ObjectId, u32> = slots
@@ -430,7 +450,8 @@ fn place_of(zone: Zone) -> Place {
         ZoneKind::Battlefield => (ZoneObs::Battlefield, 0),
         ZoneKind::PhasedOut => (ZoneObs::PhasedOut, 0),
         ZoneKind::Stack => (ZoneObs::Stack, 0),
-        // Nothing observed is gone; a token that left the battlefield is out of the command zone's way.
+        // What is in no zone - a token that left the battlefield, an object a question names that has become another - is
+        // out of the command zone's way.
         ZoneKind::Command | ZoneKind::Gone => (ZoneObs::Command, 0),
     };
     Place { zone: zone_obs, player }
