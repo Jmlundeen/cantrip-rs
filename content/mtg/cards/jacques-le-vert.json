@@ -1,0 +1,8 @@
+{
+  "name": "Jacques le Vert",
+  "manaCost": "{1}{R}{G}{W}",
+  "type": "Legendary Creature — Human Warrior",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Green creatures you control get +0/+2."
+}
