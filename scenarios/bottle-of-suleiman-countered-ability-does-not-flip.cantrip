@@ -1,0 +1,54 @@
+# Stifle counters the first sacrificed Bottle's ability before resolution. The second Bottle gets the first fixed coin
+# result (a win), proving the first activation did not consume a flip; its sacrifice remains paid.
+
+[Bot1 Deck]
+Black Lotus x2
+Mox Pearl
+Mox Sapphire
+Bottle of Suleiman x2
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Stifle
+Island x18
+
+[Dice]
+1; 2
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bottle of Suleiman.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Bottle of Suleiman.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bottle of Suleiman#1.Activate
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Stifle.Cast(Stack.Bottle of Suleiman)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Bottle of Suleiman.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Djinn Token.Power = 5
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard = Stifle

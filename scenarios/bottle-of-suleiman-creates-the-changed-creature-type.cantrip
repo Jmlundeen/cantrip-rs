@@ -1,0 +1,38 @@
+# Text-changing the Bottle before its sacrifice changes the token type it creates (CR 612.2a, 608.2h).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Bottle of Suleiman
+Artificial Evolution
+Island x20
+[Bot2 Deck]
+Island x20
+[Dice]
+1
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bottle of Suleiman.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Bottle of Suleiman)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Djinn)
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bottle of Suleiman.Activate
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Elf Token.Power = 5
+Bot1.Battlefield.Elf Token.Toughness = 5
+Bot1.Battlefield.Elf Token.Subtypes = Elf
+Bot1.Battlefield.Elf Token.Keywords = Flying
+Bot1.Battlefield.Elf Token.Colors = (absent)

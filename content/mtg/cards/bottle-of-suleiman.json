@@ -1,0 +1,6 @@
+{
+  "name": "Bottle of Suleiman",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "{1}, Sacrifice this artifact: Flip a coin. If you win the flip, create a 5/5 colorless Djinn artifact creature token with flying. If you lose the flip, this artifact deals 5 damage to you."
+}

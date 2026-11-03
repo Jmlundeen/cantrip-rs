@@ -1,0 +1,39 @@
+# With a lost coin flip, the Bottle is sacrificed for one mana and deals 5 damage to its controller.
+# The cost is paid while the ability is on the stack; the result happens on resolution.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Bottle of Suleiman
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Dice]
+2
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bottle of Suleiman.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Bottle of Suleiman.Activate(Mana: short)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bottle of Suleiman.Activate
+? Bot1.Mana =
+? Bot1.Graveyard = Bottle of Suleiman; Black Lotus
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 15
+Bot2.Life = 20
+Bot1.Battlefield = Mox Pearl
