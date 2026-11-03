@@ -729,3 +729,10 @@ pub fn shares_creature_type(a: SubtypeSet, b: SubtypeSet) -> bool {
 pub fn subtype_spell<const SUBTYPE: u16>(q: &dyn Query, asker: &Asker, card: ObjectId) -> bool {
     q.chars(card).has_subtype(crate::lands::word(q, asker.source, SUBTYPE))
 }
+
+/// "You may activate abilities of creatures you control as though those creatures had haste" (CR 302.6): the creatures their
+/// controller controls, the source included (`activate_as_though_haste: &[statics::creatures_you_control_as_though_haste]`).
+/// Shang-Chi, Master of Kung Fu and Tyvar, Jubilant Brawler print it.
+pub fn creatures_you_control_as_though_haste(q: &dyn Query, asker: &Asker, creature: ObjectId) -> bool {
+    q.controller(creature) == asker.controller && q.chars(creature).is(CardType::Creature)
+}
