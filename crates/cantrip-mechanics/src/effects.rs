@@ -1103,6 +1103,17 @@ pub fn ask_may(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Pu
     Ok(g.ask(player, RequestKind::May { source, purpose })? == Answer::Yes)
 }
 
+const PAY_TO_GAIN_LIFE: Question = Question::new("GainLife", "pay {cost} to gain 1 life?", "", "Pay {cost}", "Don't pay");
+
+/// "You may pay [cost]. If you do, you gain 1 life." (CR 608.2d, 118.12, 119.3) as the ability resolves: its controller is asked
+/// whether to pay `cost`, and gains 1 life only if they did. Farmstead and Ivory Cup print it.
+pub fn may_pay_to_gain_life(g: &mut dyn Game, item: &StackItem, cost: Cost) -> Result<(), Suspend> {
+    if g.may_pay(item.controller, item.object, item.object, cost, &PAY_TO_GAIN_LIFE)? {
+        g.gain_life(item.controller, 1);
+    }
+    Ok(())
+}
+
 /// "[Player] may cast [card] without paying its mana cost" as the effect resolves (CR 608.2g, 118.9): `player` casts it then
 /// or not at all, its timing waived, X 0 (CR 107.3b), its additional costs paid. Nothing is asked when they could not cast
 /// it at all (a land, no legal target for them, split second on the stack); asked, they may decline, and a cast they give

@@ -1061,6 +1061,16 @@ pub fn noncreature_spell_you_cast_about_it(q: &dyn Query, me: &Asker, event: &Ev
     }
 }
 
+/// "Whenever a player casts a [color] spell" (CR 603.2, 601.2i): any player's, this permanent's controller's own included,
+/// judged on the spell as it stands on the stack once cast. `COLOR` is a `Color` as `u8`, a word of this permanent's own text
+/// (CR 612.2). Kor Firewalker (red) and Ivory Cup (white) print it.
+pub fn a_player_casts_a_spell_of_color<const COLOR: u8>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, .. } if q.chars(*spell).colors.has(q.words(me.source).color(Color::ALL[COLOR as usize])) => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a spell that targets a creature you control" (CR 603.2, 601.2c): a question about the spell as it is
 /// cast, whose targets are public from the moment it was announced. One trigger for the spell however many of the creatures it
 /// targets (CR 603.2c is about events: one cast is one event). A copy is not cast (CR 707.10), so it sets nothing off; a spell
