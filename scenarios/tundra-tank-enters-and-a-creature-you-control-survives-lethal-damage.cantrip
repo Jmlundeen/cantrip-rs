@@ -1,0 +1,44 @@
+# Tundra Tank: "When this Vehicle enters, target creature you control gains indestructible until end of turn." The Vehicle is
+# not a creature, so the Grizzly Bears are the only target and are chosen automatically. Bot1 then bolts its own Bears: three damage
+# is lethal for a 2/2, but they are indestructible (CR 704.5g does not destroy them) and stay on the battlefield.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Grizzly Bears
+Tundra Tank
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tundra Tank.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Toughness = 2
+Bot1.Graveyard = Lightning Bolt
+Stack.Count = 0

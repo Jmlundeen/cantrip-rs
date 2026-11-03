@@ -1,0 +1,8 @@
+{
+  "name": "Tundra Tank",
+  "manaCost": "{2}{B}",
+  "type": "Artifact — Vehicle",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Firebending 1 (Whenever this creature attacks, add {R}. This mana lasts until end of combat.)\nWhen this Vehicle enters, target creature you control gains indestructible until end of turn.\nCrew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)"
+}

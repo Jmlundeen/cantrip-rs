@@ -1,0 +1,38 @@
+# Tundra Tank (4/4, crew 1, firebending 1): a Llanowar Elves, power exactly 1, crews it (CR 702.122a). The Tank entered on turn 1
+# and attacks on turn 3: its firebending adds {R} that stays in the pool through combat (CR 702.189a), and Bot2 takes 4.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Llanowar Elves
+Tundra Tank
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tundra Tank.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tundra Tank.Activate(Ability: Crew)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Tundra Tank > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R} lasting {R}
+[T3 Bot1.Damage]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Llanowar Elves.Tapped = true
