@@ -1,0 +1,8 @@
+{
+  "name": "Fire Nation Engineer",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Human Artificer",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Raid — At the beginning of your end step, if you attacked this turn, put a +1/+1 counter on another target creature or Vehicle you control."
+}

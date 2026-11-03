@@ -1,0 +1,51 @@
+# Fire Nation Engineer: "Raid - At the beginning of your end step, if you attacked this turn, put a +1/+1 counter on another target creature
+# or Vehicle you control." On turn 3 Bot1 attacks with its Ornithopter: at the end step the Engineer itself, Bot2's Ornithopter and a Mox are
+# refused as targets, and Smuggler's Copter, a Vehicle that is no creature, gets one counter (not two). On turn 5 nothing attacks, so the
+# turn-3 attack does not count and the counter stays one.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Fire Nation Engineer
+Smuggler's Copter
+Ornithopter
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Ornithopter
+Island x23
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Fire Nation Engineer.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.End]
+! Bot1.Target(Bot1.Battlefield.Fire Nation Engineer)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Bot1.Battlefield.Smuggler's Copter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Smuggler's Copter.Counters.PlusOnePlusOne = 1
+[T5 Bot1.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Smuggler's Copter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Fire Nation Engineer.Power = 2
