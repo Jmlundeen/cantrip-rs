@@ -122,11 +122,44 @@ pub fn determinize_owned(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: I
     };
     let visible = observable(game, seat, &extra);
     let sees = |id: ObjectId| visible.contains(&id) && knows_face(s, seat, id);
-    // What each row became from, and the rows the seat was shown at some point.
+    // Merged permanents (CR 730.2): the mutating spells each merged with, in the order they merged, and the place among its
+    // components of its topmost one (0 for its own card, CR 730.2a); and the objects the components other than the
+    // topmost became as it left (CR 730.3), in the order of its components.
+    let mut merged: HashMap<ObjectId, (Vec<ObjectId>, usize)> = HashMap::new();
+    let mut parted: HashMap<ObjectId, Vec<ObjectId>> = HashMap::new();
+    for record in &game.log {
+        match record.event {
+            Event::Mutated { permanent, spell, on_top } => {
+                let (spells, top) = merged.entry(permanent).or_default();
+                spells.push(spell);
+                if on_top {
+                    *top = spells.len();
+                }
+            }
+            Event::ZoneChange { old, new, part: true, .. } => parted.entry(old).or_default().push(new),
+            _ => {}
+        }
+    }
+    let spells: HashSet<ObjectId> = merged.values().flat_map(|(spells, _)| spells.iter().copied()).collect();
+    let parts: HashSet<ObjectId> = parted.values().flatten().copied().collect();
+    // What each row became from, and the rows the seat was shown at some point. A merged permanent is the object it was
+    // before it merged (CR 730.2c), not the spell that merged with it, though the spell's row names it (`Obj::became`); as
+    // it leaves, each component's new object is that component's card, the topmost the one the permanent became.
     let mut from: HashMap<ObjectId, ObjectId> = HashMap::new();
     for (i, o) in s.objects.iter().enumerate() {
-        if let Some(b) = o.became {
+        if let Some(b) = o.became
+            && !spells.contains(&ObjectId(i as u32))
+        {
             from.insert(b, ObjectId(i as u32));
+        }
+    }
+    for (&permanent, (merged_spells, top)) in &merged {
+        let Some(became) = s.obj(permanent).became else { continue };
+        let sources: Vec<ObjectId> = std::iter::once(permanent).chain(merged_spells.iter().copied()).collect();
+        from.insert(became, sources[*top]);
+        let others = sources.iter().enumerate().filter(|&(i, _)| i != *top).map(|(_, &source)| source);
+        for (&part, source) in parted.get(&permanent).into_iter().flatten().zip(others) {
+            from.insert(part, source);
         }
     }
     let mut shown: HashSet<ObjectId> = HashSet::new();
@@ -161,7 +194,35 @@ pub fn determinize_owned(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: I
     for slot in 0..s.zones.len() {
         for &id in &s.zones[slot] {
             let o = s.obj(id);
-            if o.token || o.card_copy || !live(s, id) {
+            if !live(s, id) {
+                continue;
+            }
+            // The other components of a merged permanent (CR 730.2): each card that merged with it was a spell on the
+            // stack, face up (CR 702.140c), so the seat knows it, as it knows the card wherever it goes.
+            let merge = s.merge_of(id);
+            if merge.is_some()
+                && let Some((merged_spells, _)) = merged.get(&id)
+            {
+                for &spell in merged_spells {
+                    let part = s.obj(spell);
+                    if part.token || part.card_copy {
+                        continue;
+                    }
+                    let mut root = spell;
+                    while let Some(&p) = from.get(&root) {
+                        root = p;
+                    }
+                    let origin = match s.obj(root).zone.kind() {
+                        ZoneKind::Library => Origin::Library,
+                        ZoneKind::Sideboard => Origin::Sideboard,
+                        _ => continue,
+                    };
+                    accounted.entry((part.owner, origin)).or_default().push(front(game, part.card));
+                }
+            }
+            // Its own card is a token only while its own component is one (CR 730.2d): the row's `token` is its topmost
+            // component's.
+            if merge.map_or(o.token, |m| m.own_token) || o.card_copy {
                 continue;
             }
             rows.push(id);
@@ -218,7 +279,7 @@ pub fn determinize_owned(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: I
                 Origin::Library => Zone::library(p),
                 Origin::Sideboard => Zone::sideboard(p),
             };
-            let dealt: Vec<CardId> = roots(s, zone).map(|id| front(game, s.obj(id).card)).collect();
+            let dealt: Vec<CardId> = roots(s, zone, &parts).map(|id| front(game, s.obj(id).card)).collect();
             let mut list = if p == seat || mode == InfoMode::Decklist {
                 dealt
             } else if origin == Origin::Library && !prior.is_empty() {
@@ -335,12 +396,13 @@ pub fn determinize_owned(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: I
     }
 }
 
-/// The cards dealt into a zone: its rows that no other row became, tokens and copies left out.
-fn roots(s: &GameState, zone: Zone) -> impl Iterator<Item = ObjectId> + '_ {
+/// The cards dealt into a zone: its rows that no other row became, tokens and copies left out, and the components a merged
+/// permanent left as (`parts`, CR 730.3), which are cards of it.
+fn roots<'a>(s: &'a GameState, zone: Zone, parts: &'a HashSet<ObjectId>) -> impl Iterator<Item = ObjectId> + 'a {
     let became: HashSet<ObjectId> = s.objects.iter().filter_map(|o| o.became).collect();
     (0..s.objects.len() as u32).map(ObjectId).filter(move |&id| {
         let o = s.obj(id);
-        o.zone == zone && !o.token && !o.card_copy && !became.contains(&id)
+        o.zone == zone && !o.token && !o.card_copy && !became.contains(&id) && !parts.contains(&id)
     })
 }
 
