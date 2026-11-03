@@ -1,0 +1,47 @@
+# Artificial Evolution changes Juggernaut’s Wall restriction to Bear; a Wall can block while a Bear cannot (CR 612.1).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Artificial Evolution
+Juggernaut
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Wall of Wood
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Juggernaut.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Juggernaut)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wall)
+Bot1.Modes(Bear)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Wall of Wood.Cast
+[T3 Bot1.DeclareAttackers]
+! Bot1.Attack()
+Bot1.Attack(Juggernaut > Bot2)
+! Bot2.Block(Grizzly Bears > Juggernaut)
+Bot2.Block(Wall of Wood > Juggernaut)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Juggernaut.Damage = 0
+Bot2.Graveyard = Wall of Wood; Black Lotus
+Bot2.Life = 20

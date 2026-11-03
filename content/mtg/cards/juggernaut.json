@@ -1,0 +1,8 @@
+{
+  "name": "Juggernaut",
+  "manaCost": "{4}",
+  "type": "Artifact Creature — Juggernaut",
+  "power": 5,
+  "toughness": 3,
+  "oracleText": "This creature attacks each combat if able.\nThis creature can't be blocked by Walls."
+}

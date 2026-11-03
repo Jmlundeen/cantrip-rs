@@ -1,0 +1,36 @@
+# Juggernaut must attack if able and cannot be blocked by a Wall, while another creature can block it (CR 508.1d, 509.1b).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Juggernaut
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Wall of Wood
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Juggernaut.Cast
+? Bot1.Mana =
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Wall of Wood.Cast
+[T3 Bot1.DeclareAttackers]
+! Bot1.Attack()
+Bot1.Attack(Juggernaut > Bot2)
+! Bot2.Block(Wall of Wood > Juggernaut)
+Bot2.Block(Grizzly Bears > Juggernaut)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Juggernaut.Damage = 2
+Bot2.Graveyard = Grizzly Bears; Black Lotus
+Bot2.Life = 20
