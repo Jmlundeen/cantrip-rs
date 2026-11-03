@@ -94,16 +94,57 @@ pub fn cast_barred(cx: &Cx, player: PlayerId) -> ZoneKinds {
     barred
 }
 
-/// The permanents on the battlefield with a static ability that forbids casting spells with certain qualities
-/// (`CardDef::spell_rules`, CR 101.2, 601.3), with their controllers: empty, so unallocated, in nearly every game.
-pub fn spell_forbidders(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef, Option<Linked>)> {
-    sources(cx, |d| !d.spell_rules.is_empty()).collect()
+/// What forbids one player to cast spells with certain qualities now (CR 101.2, 601.3), whatever zone they are cast from:
+/// the static abilities of permanents on the battlefield that do (`CardDef::spell_rules`: Gaddock Teeg, Deafening Silence),
+/// with their controllers, and the rule of the game that a player can't cast a legendary instant or sorcery spell unless
+/// they control a legendary creature or a legendary planeswalker (CR 205.4e), which forbids nothing to a player who does.
+/// Empty, so unallocated, in a game where the player controls a legend and nothing else forbids.
+pub struct SpellBans {
+    forbidders: Vec<(ObjectId, PlayerId, &'static CardDef, Option<Linked>)>,
+    /// The player controls no legendary creature and no legendary planeswalker (CR 205.4e).
+    legendless: bool,
+    /// A static ability that functions outside the battlefield exists (`layers::statics_everywhere`), so that a spell may be
+    /// other than the card where it is (`actions::SpellsAsCast`). Asked only where CR 205.4e is all that could forbid.
+    everywhere: bool,
 }
 
-/// Whether one of `forbidders` (`spell_forbidders`) forbids `player` to cast `spell`, read through `q`: the card seen as the
+impl SpellBans {
+    /// Nothing forbids the player any spell for its qualities.
+    pub fn is_empty(&self) -> bool {
+        self.forbidders.is_empty() && !self.legendless
+    }
+
+    /// Only CR 205.4e could forbid one, and then only a spell that is a legendary instant or sorcery; and no static ability
+    /// that functions outside the battlefield could make a spell other than the card where it is.
+    pub fn legendary_only_and_local(&self) -> bool {
+        self.forbidders.is_empty() && !self.everywhere
+    }
+}
+
+/// What forbids `player` to cast spells with certain qualities now (`SpellBans`): the player's legends read as they are now
+/// (CR 205.4e: "controls a legendary creature or a legendary planeswalker", each a permanent with both qualities).
+pub fn spell_bans(cx: &Cx, player: PlayerId) -> SpellBans {
+    let legendless = !cx.s().battlefield().iter().any(|&id| {
+        cx.s().obj(id).controller == player && {
+            let chars = cx.chars(id);
+            chars.supertypes.legendary && (chars.is(CardType::Creature) || chars.is(CardType::Planeswalker))
+        }
+    });
+    let forbidders: Vec<_> = sources(cx, |d| !d.spell_rules.is_empty()).collect();
+    let everywhere = legendless && forbidders.is_empty() && crate::layers::statics_everywhere(cx.cards(), cx.s());
+    SpellBans { forbidders, legendless, everywhere }
+}
+
+/// Whether a spell with characteristics `chars` is a legendary instant or sorcery spell (CR 205.4e).
+pub fn legendary_instant_or_sorcery(chars: &Chars) -> bool {
+    chars.supertypes.legendary && (chars.is(CardType::Instant) || chars.is(CardType::Sorcery))
+}
+
+/// Whether `bans` (`spell_bans`, made for `player`) forbid `player` to cast `spell`, read through `q`: the card seen as the
 /// face it would be cast as (CR 601.3e), or the spell on the stack once its proposal is complete (CR 601.6).
-pub fn spell_forbidden(q: &dyn Query, forbidders: &[(ObjectId, PlayerId, &'static CardDef, Option<Linked>)], player: PlayerId, spell: ObjectId) -> bool {
-    forbidders.iter().any(|&(id, controller, def, by)| def.spell_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller, by, spell: false }, player, spell)))
+pub fn spell_forbidden(q: &dyn Query, bans: &SpellBans, player: PlayerId, spell: ObjectId) -> bool {
+    (bans.legendless && legendary_instant_or_sorcery(&q.chars(spell)))
+        || bans.forbidders.iter().any(|&(id, controller, def, by)| def.spell_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller, by, spell: false }, player, spell)))
 }
 
 /// The permanents on the battlefield with a static ability that keeps cards in some zones from entering the battlefield

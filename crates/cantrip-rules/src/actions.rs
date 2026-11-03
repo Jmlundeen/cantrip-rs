@@ -345,12 +345,18 @@ impl Query for WithWords<'_> {
 }
 
 /// The casts among `options`, and the suspends among them (CR 702.62a: "any time you could begin to cast this card"), that a
-/// static ability forbids for the qualities of the spell each would cast (CR 101.2, 601.3: Gaddock Teeg, Deafening Silence),
-/// judged on that spell on the stack under its caster, the face it is cast as alone (CR 601.2a, 601.3e, 709.3a, 715.3a,
+/// static ability forbids for the qualities of the spell each would cast (CR 101.2, 601.3: Gaddock Teeg, Deafening Silence), or
+/// the rule of the game does (CR 205.4e: a legendary instant or sorcery, while its caster controls no legendary creature or
+/// planeswalker), judged on that spell on the stack under its caster, the face it is cast as alone (CR 601.2a, 601.3e, 709.3a, 715.3a,
 /// 712.8a, `ops::as_cast`): what an effect makes it there as their spell (Arcane Adaptation's "creature spells you control")
 /// is what the ban reads. Judged only where such a ban exists, each face once.
 fn casts_forbidden_on_the_stack(cx: &mut Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
-    let forbidders = static_rules::spell_forbidders(cx);
+    // Nothing to judge where nothing is cast and no card's ability is activated from outside the battlefield (suspend).
+    let away = |o: &ActionOption| o.source.is_some_and(|card| !cx.s().obj(card).zone.is(ZoneKind::Battlefield));
+    if !options.iter().any(|o| o.kind == ActionKind::CastSpell || (o.kind == ActionKind::ActivateAbility && away(o))) {
+        return;
+    }
+    let forbidders = static_rules::spell_bans(cx, player);
     if forbidders.is_empty() {
         return;
     }
@@ -387,10 +393,28 @@ fn suspends(cx: &Cx, card: ObjectId, index: u8) -> bool {
         && cx.chars(card).abilities().nth(index as usize).and_then(|ability| activated(cx, ability)).is_some_and(|def| def.timing == Timing::AsCast)
 }
 
-/// Whether one of `forbidders` (`static_rules::spell_forbidders`) forbids `player` to cast `card` as `face` (`None`: the card
-/// itself), judged on the spell it would be on the stack under them (CR 101.2, 601.3, 601.3e, `ops::as_cast`).
-fn forbidden_as_cast(cx: &mut Cx, forbidders: &[(ObjectId, PlayerId, &'static CardDef, Option<Linked>)], card: ObjectId, face: Option<CardId>, player: PlayerId) -> bool {
-    ops::as_cast(cx, card, face, player, |cx| static_rules::spell_forbidden(&*cx, forbidders, player, card))
+/// Whether `bans` (`static_rules::spell_bans`, made for `player`) forbid `player` to cast `card` as `face` (`None`: the card
+/// itself), judged on the spell it would be on the stack under them (CR 101.2, 601.3, 601.3e, `ops::as_cast`). Where only
+/// CR 205.4e could forbid it and the spell could be nothing but the face where the card is (`SpellsAsCast`: no static
+/// ability that functions outside the battlefield, no characteristic-defining ability of its own, no effect on the card
+/// where it is that the spell would not have, CR 400.7), it is read there, with nothing put on the stack.
+fn forbidden_as_cast(cx: &mut Cx, bans: &static_rules::SpellBans, card: ObjectId, face: Option<CardId>, player: PlayerId) -> bool {
+    if bans.is_empty() {
+        return false;
+    }
+    if bans.legendary_only_and_local()
+        && !own_characteristic_defining(cx, card)
+        && !cx.s().effects.iter().any(|e| e.affected == card)
+    {
+        let cx: &Cx = cx;
+        let _face_up = layers::judged_face_up(cx.s(), card);
+        let chars = match face {
+            Some(face) => layers::chars_as_face(cx.cards(), cx.s(), &cx.g.log, card, face),
+            None => cx.chars(card),
+        };
+        return static_rules::legendary_instant_or_sorcery(&chars);
+    }
+    ops::as_cast(cx, card, face, player, |cx| static_rules::spell_forbidden(&*cx, bans, player, card))
 }
 
 /// The casts among `options` judged as the spells they would be (CR 601.2a-c): a spell is put on the stack before its modes
@@ -8016,8 +8040,10 @@ fn cast(
     }
 
     // CR 601.6: the proposal (CR 601.2a-d) is complete; a spell with qualities a static ability forbids now (its X announced,
-    // CR 202.3e) may not be cast, and the cast is taken back.
-    let forbidders = static_rules::spell_forbidders(cx);
+    // CR 202.3e), or a legendary instant or sorcery while its caster controls no legendary creature or planeswalker now (CR
+    // 205.4e), may not be cast, and the cast is taken back. Once the proposal is legal, nothing that happens as its costs
+    // are paid (a legend sacrificed for mana, CR 601.2g) takes it back.
+    let forbidders = static_rules::spell_bans(cx, player);
     if !forbidders.is_empty() && static_rules::spell_forbidden(&*cx, &forbidders, player, spell) {
         return Err(Stop::Cancel);
     }
@@ -8477,11 +8503,15 @@ pub fn could_cast_during_resolution(cx: &mut Cx, card: ObjectId, player: PlayerI
 /// sum of theirs, CR 702.102c, 709.4b) is a way too, from a hand only: the ruling has a fuse card cast from a hand without
 /// paying its mana cost cast fused.
 ///
-/// A static ability that forbids casting spells with some qualities (CR 101.2, 601.3) and what may be targeted are judged on
+/// A static ability that forbids casting spells with some qualities (CR 101.2, 601.3), the legendary spell restriction (CR
+/// 205.4e) and what may be targeted are judged on
 /// the spell each would be on the stack (CR 601.3e, `ops::as_cast`).
 pub fn cast_ways_during_resolution(cx: &mut Cx, card: ObjectId, player: PlayerId) -> Vec<CastWay> {
     let ways = cast_ways_where_it_is(cx, card, player);
-    let forbidders = if ways.is_empty() { Vec::new() } else { static_rules::spell_forbidders(cx) };
+    if ways.is_empty() {
+        return ways;
+    }
+    let forbidders = static_rules::spell_bans(cx, player);
     let mut kept = Vec::with_capacity(ways.len());
     for way in ways {
         let face = cast_face_id(cx, card, way.way);
@@ -8497,7 +8527,7 @@ pub fn cast_ways_during_resolution(cx: &mut Cx, card: ObjectId, player: PlayerId
 
 /// The card's own ways that cast it face down (morph, megamorph, disguise: CR 702.37c, 702.168b) that no static ability among
 /// `forbidders` forbids `player` to cast it by, judged on the face-down spell it would be (CR 601.3, 708.4, `ops::as_cast`).
-fn face_down_ways_allowed(cx: &mut Cx, card: ObjectId, player: PlayerId, forbidders: &[(ObjectId, PlayerId, &'static CardDef, Option<Linked>)]) -> Vec<u8> {
+fn face_down_ways_allowed(cx: &mut Cx, card: ObjectId, player: PlayerId, forbidders: &static_rules::SpellBans) -> Vec<u8> {
     let whole = cx.card(cx.s().obj(card).card);
     let mut allowed = Vec::new();
     for n in 1..=whole.ways.len() as u8 {
@@ -8670,7 +8700,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
         // The card itself and the face-down spell its morph or disguise would cast are judged apart (CR 601.3, 708.4): a ban
         // on the one need not be on the other.
         let (whole_forbidden, face_down_allowed) = if way == 0 && whole.ways.iter().any(|w| w.kind.face_down()) {
-            let forbidders = static_rules::spell_forbidders(cx);
+            let forbidders = static_rules::spell_bans(cx, player);
             let whole_forbidden = (!forbidders.is_empty() && forbidden_as_cast(cx, &forbidders, card, None, player)) || !targets_as_cast(cx, card, 0, player);
             (whole_forbidden, face_down_ways_allowed(cx, card, player, &forbidders))
         } else {
@@ -8781,7 +8811,7 @@ pub fn could_cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> 
         return false;
     }
     // A ban on spells like it is judged on the back face as the spell it would be (CR 601.3e, 712.8a, `ops::as_cast`).
-    let forbidders = static_rules::spell_forbidders(cx);
+    let forbidders = static_rules::spell_bans(cx, player);
     if !forbidders.is_empty() && forbidden_as_cast(cx, &forbidders, card, cast_face_id(cx, card, WAY_TRANSFORMED), player) {
         return false;
     }
