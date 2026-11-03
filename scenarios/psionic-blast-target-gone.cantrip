@@ -1,0 +1,29 @@
+# With its only target gone, Psionic Blast does not resolve and deals no damage to its controller (CR 608.2b).
+[Bot1 Deck]
+Black Lotus
+Psionic Blast
+Island x20
+[Bot2 Deck]
+Mountain
+Memnite
+Lightning Bolt
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Psionic Blast.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 20
+Bot2.Battlefield.Memnite = (absent)
+Bot1.Graveyard = Psionic Blast; Black Lotus

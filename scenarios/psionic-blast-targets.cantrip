@@ -1,0 +1,35 @@
+# Psionic Blast deals four to its target and two to its controller, including when its controller is targeted (CR 115.4, 120.3).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Psionic Blast
+Psionic Blast
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Blue)
+! Bot1.Hand.Psionic Blast.Cast(Bot1.Battlefield.Island)
+Bot1.Hand.Psionic Blast.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+? Bot1.Life = 18
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Psionic Blast.Cast(Bot1)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 12
+Bot2.Life = 16

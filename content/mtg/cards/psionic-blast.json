@@ -1,0 +1,6 @@
+{
+  "name": "Psionic Blast",
+  "manaCost": "{2}{U}",
+  "type": "Instant",
+  "oracleText": "Psionic Blast deals 4 damage to any target and 2 damage to you."
+}
