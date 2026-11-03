@@ -723,18 +723,19 @@ fn nonbasic_land(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, so_far: &Chars) -
     so_far.is(CardType::Land) && !so_far.supertypes.basic
 }
 
-/// "... are Mountains" (CR 305.7, layer 4): the land's subtype is set to Mountain, the word of the source's text (CR 612).
-/// It loses its other land types and the abilities of its rules text, and has "{T}: Add {R}" (CR 305.6); its name and
-/// supertypes stay (the cards' rulings).
-fn mountains(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    chars.set_land_subtypes(SubtypeSet::NONE.with(view.words(source).subtype(Subtype::Mountain)));
+/// Set a land to the subtype named in the source's text (CR 305.7, 612.2). Evil Presence,
+/// Spreading Seas, Harbinger of the Seas, Blood Moon and Magus of the Moon use this operation.
+pub fn set_land_type<const SUBTYPE: u16>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    if let Some(word) = subtype_word(view, source, SUBTYPE) {
+        chars.set_land_subtypes(SubtypeSet::NONE.with(word));
+    }
 }
 
 /// "Nonbasic lands are Mountains." (CR 305.7, 613.1d): Blood Moon and Magus of the Moon print it. Applied in layer 4 to
 /// every nonbasic land, whoever controls it, it goes on applying when its source loses its abilities in layer 6 (CR 613.6,
 /// Magus of the Moon's ruling), and a land with an ability of its own that changes land types (Urborg) loses that ability
 /// to it first (CR 613.8a, `sets_land_subtypes`).
-pub const NONBASIC_LANDS_ARE_MOUNTAINS: StaticDef = sets_land_subtypes(nonbasic_land, mountains, "Nonbasic lands are Mountains.");
+pub const NONBASIC_LANDS_ARE_MOUNTAINS: StaticDef = sets_land_subtypes(nonbasic_land, set_land_type::<{ crate::lands::sub(Subtype::Mountain) }>, "Nonbasic lands are Mountains.");
 
 /// "... are every basic land type in addition to their other types" (CR 305.7, 205.1b, layer 4): the land keeps its land
 /// types and rules text and gains Plains, Island, Swamp, Mountain and Forest, and with them each one's mana ability (CR
