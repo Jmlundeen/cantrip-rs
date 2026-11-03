@@ -1,0 +1,22 @@
+# The Aura can enchant its controller's land and damages that player at their upkeep (CR 702.5a, 503.1a).
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Island
+Cursed Land
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cursed Land.Cast(Bot1.Battlefield.Island)
+[T3 Bot1.Main1]
+? Bot1.Life = 19
+[T4 Bot2.Main1]
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20

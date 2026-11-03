@@ -1,0 +1,6 @@
+{
+  "name": "Cursed Land",
+  "manaCost": "{2}{B}{B}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant land\nAt the beginning of the upkeep of enchanted land's controller, this Aura deals 1 damage to that player."
+}
