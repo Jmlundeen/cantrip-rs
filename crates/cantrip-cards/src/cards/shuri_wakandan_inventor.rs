@@ -5,8 +5,7 @@ use cantrip_oracle as oracle;
 /// "Artifact spells you cast cost {1} less to cast" (CR 601.2f): only its controller's spells, judged on the spell's own
 /// characteristics as it is cast; a generic reduction takes only the generic part (CR 118.7c). Abilities are not spells.
 fn artifact_spells_cost_one_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    let Costed::Spell(spell) = costed else { return CostDelta::NONE };
-    if player == q.controller(source) && q.chars(spell).is(CardType::Artifact) { CostDelta::less(1) } else { CostDelta::NONE }
+    cantrip_mechanics::cost_reduction::spells_you_cast(q, source, player, costed, CardType::Artifact, 1)
 }
 
 /// "Target artifact you control" (CR 115.1).

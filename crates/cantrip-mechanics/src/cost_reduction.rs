@@ -19,3 +19,10 @@ pub fn less_if_you_control_subtype<const N: u8, const TYPE: u16>(q: &dyn Query, 
     let wanted = crate::lands::word(q, source, TYPE);
     if q.permanents_of(player).into_iter().any(|id| q.chars(id).has_subtype(wanted)) { CostDelta::less(N as u32) } else { CostDelta::NONE }
 }
+
+/// "[Type] spells you cast cost {N} less to cast" (CR 601.2f, 118.7): Planar Gate
+/// reduces its controller's creature spells by {2}; Shuri, Wakandan Inventor reduces artifact spells by {1}.
+pub fn spells_you_cast(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, card_type: CardType, amount: u32) -> CostDelta {
+    let Costed::Spell(spell) = costed else { return CostDelta::NONE };
+    if player == q.controller(source) && q.chars(spell).is(card_type) { CostDelta::less(amount) } else { CostDelta::NONE }
+}
