@@ -1,0 +1,44 @@
+# Wolfbat: only the second card drawn each turn counts. On turn 3 Bot1 has drawn exactly one card (the draw step) with the
+# Wolfbat in its graveyard: nothing triggers and nothing is asked. A Wolfbat on the battlefield does not use the ability
+# (CR 113.6m); the second Wolfbat is cast and stays, and the stack is empty.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Wolfbat
+Wolfbat
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wolfbat.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Wolfbat)
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Wolfbat; Lightning Bolt
+? Stack.Count = 0
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wolfbat.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Wolfbat; Lightning Bolt
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Wolfbat
+Stack.Count = 0

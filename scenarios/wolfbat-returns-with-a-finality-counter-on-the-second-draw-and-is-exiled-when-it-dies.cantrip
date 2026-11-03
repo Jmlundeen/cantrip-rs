@@ -1,0 +1,64 @@
+# Wolfbat (2/2 flier): "Whenever you draw your second card each turn, you may pay {B}. If you do, return this card from your
+# graveyard to the battlefield with a finality counter on it." Bot1 bolts its own Wolfbat on turn 1. On turn 3 the draw step is
+# the first card; Ancestral Recall draws three, the second of which triggers the Wolfbat once (not again for the third). With only
+# the Mox Ruby's {R} in the pool the payment is refused (it is {B}, not {1}); Bot1 taps Mox Jet, pays {B} and the {R} is left. The
+# Wolfbat returns with a finality counter. Bot2 then bolts it again on turn 4:
+# a creature with a finality counter that would die is exiled instead (CR 122.1h).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Wolfbat
+Lightning Bolt
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wolfbat.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Wolfbat)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Wolfbat; Lightning Bolt
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.PayCost
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.PayCost
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Wolfbat.Counters.Finality = 1
+? Bot1.Graveyard = Ancestral Recall; Lightning Bolt
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Wolfbat)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Wolfbat
+Bot1.Battlefield.Wolfbat = (absent)
+Bot1.Graveyard = Ancestral Recall; Lightning Bolt
