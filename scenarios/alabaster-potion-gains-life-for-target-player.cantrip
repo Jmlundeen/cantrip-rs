@@ -1,0 +1,41 @@
+# The life mode targets a player, not a creature, and gains exactly X life (CR 119.3, 700.2).
+[Bot1 Deck]
+Alabaster Potion
+Mox Pearl
+Gleemox
+Mox Ruby
+Mox Jet
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Alabaster Potion.Cast(X: 2)
+! Bot1.Modes(Count: 0)
+! Bot1.Modes(Target player gains X life; Prevent the next X damage)
+Bot1.Modes(Target player gains X life)
+! Bot1.Target(Ornithopter)
+! Bot1.Target(Count: 2)
+Bot1.Target(Bot2)
+? Bot1.Mana =
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 22

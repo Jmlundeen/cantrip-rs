@@ -1,0 +1,6 @@
+{
+  "name": "Alabaster Potion",
+  "manaCost": "{X}{W}{W}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Target player gains X life.\n• Prevent the next X damage that would be dealt to any target this turn."
+}

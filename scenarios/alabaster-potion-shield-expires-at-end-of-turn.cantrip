@@ -1,0 +1,40 @@
+# An unused X=2 shield on Bot1 expires at cleanup, so a Bolt next turn deals all three damage (CR 514.2, 615.3).
+[Bot1 Deck]
+Alabaster Potion
+Mox Pearl
+Gleemox
+Mox Ruby
+Mox Jet
+Plains x22
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Alabaster Potion.Cast(X: 2)
+Bot1.Modes(Prevent the next X damage)
+Bot1.Target(Bot1)
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Prevented = (absent)
