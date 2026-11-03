@@ -1,0 +1,44 @@
+# Planar Gate discounts Gingerbrute's spell, not its activated ability (CR 601.2f, 602.2b).
+[Bot1 Deck]
+Planar Gate
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Pearl
+Gingerbrute
+Mind Stone
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Planar Gate.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Gingerbrute.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gingerbrute.Activate(Ability: can't be blocked)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mind Stone.Cast
+? Bot1.Mana = {W}
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Gingerbrute.Power = 1

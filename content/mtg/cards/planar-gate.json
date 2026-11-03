@@ -1,0 +1,6 @@
+{
+  "name": "Planar Gate",
+  "manaCost": "{6}",
+  "type": "Artifact",
+  "oracleText": "Creature spells you cast cost {2} less to cast."
+}

@@ -1,0 +1,48 @@
+# Two Planar Gates reduce Glass Golem, an artifact creature, from {5} to {1}; the
+# last mana is paid exactly (CR 601.2f).
+[Bot1 Deck]
+Planar Gate
+Planar Gate
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Glass Golem
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Planar Gate.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Planar Gate.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Glass Golem.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Planar Gate#1.Types = Artifact
+Bot1.Battlefield.Planar Gate#2.Types = Artifact
+Bot1.Battlefield.Glass Golem.Types = Artifact; Creature
