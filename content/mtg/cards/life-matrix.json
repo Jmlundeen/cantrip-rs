@@ -1,0 +1,6 @@
+{
+  "name": "Life Matrix",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "{4}, {T}: Put a matrix counter on target creature and that creature gains \"Remove a matrix counter from this creature: Regenerate this creature.\" Activate only during your upkeep."
+}

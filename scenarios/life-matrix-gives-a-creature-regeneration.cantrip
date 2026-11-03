@@ -1,0 +1,65 @@
+# Life Matrix works only during its controller's upkeep, pays four mana and taps, and gives a creature
+# a matrix counter and an activated regeneration ability (CR 701.19a). A noncreature is not a legal target.
+[Bot1 Deck]
+Life Matrix
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Life Matrix.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Life Matrix.Activate(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Life Matrix.Activate(Bot1.Battlefield.Mox Pearl)
+Bot1.Battlefield.Life Matrix.Activate(Bot1.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.Matrix = 1
+? Bot1.Battlefield.Life Matrix.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Battlefield.Ornithopter.Activate(Ability: Remove a matrix counter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Battlefield.Ornithopter.Counters.Matrix = (absent)
