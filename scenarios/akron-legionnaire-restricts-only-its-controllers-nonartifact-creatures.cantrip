@@ -1,0 +1,49 @@
+# Akron Legionnaire prevents its controller's Savannah Lions from attacking, while itself and an artifact creature may attack; the opponent's Lions may attack on the next turn (CR 508.1c).
+[Bot1 Deck]
+Black Lotus x3
+Mox Pearl
+Akron Legionnaire
+Ornithopter
+Savannah Lions
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Savannah Lions
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot1.Hand.Akron Legionnaire.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+! Bot1.Attack(Savannah Lions > Bot2)
+Bot1.Attack(Akron Legionnaire > Bot2; Ornithopter > Bot2)
+[T4 Bot2.BeginCombat]
+Bot2.Attack(Savannah Lions > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 12

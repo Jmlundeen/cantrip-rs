@@ -1,0 +1,50 @@
+# Each Legionnaire is exempt by name from both Legionnaires' restrictions, so both can attack (CR 508.1c).
+[Bot1 Deck]
+Black Lotus x3
+Akron Legionnaire
+Savannah Lions
+Black Lotus x2
+Akron Legionnaire
+Black Lotus
+Savannah Lions
+Plains x20
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot1.Hand.Akron Legionnaire.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot1.Hand.Akron Legionnaire.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T9 Bot1.BeginCombat]
+Bot1.Attack(Akron Legionnaire#1 > Bot2; Akron Legionnaire#2 > Bot2)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 4

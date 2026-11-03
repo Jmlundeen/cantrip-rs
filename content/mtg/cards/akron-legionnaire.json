@@ -1,0 +1,8 @@
+{
+  "name": "Akron Legionnaire",
+  "manaCost": "{6}{W}{W}",
+  "type": "Creature — Giant Soldier",
+  "power": 8,
+  "toughness": 4,
+  "oracleText": "Except for creatures named Akron Legionnaire and artifact creatures, creatures you control can't attack."
+}
