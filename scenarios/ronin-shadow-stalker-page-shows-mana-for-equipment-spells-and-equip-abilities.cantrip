@@ -1,0 +1,33 @@
+# Browser
+# What the page shows of Ronin, Shadow Stalker's two mana, "Spend this mana only to cast Equipment spells or activate equip
+# abilities" (CR 106.6, 702.6a), and that a person can spend it where it may go. Turn 1 Black Lotus casts Ronin; Ronin's menu words
+# its mana ability, and paid with 2 life it adds {W}{W}, a chip "equipment spells & equip abilities" in the pool. Both pay Bark of
+# Doran's {1}{W}, and the pool is empty after.
+
+[Bot1 Deck]
+Black Lotus
+Ronin, Shadow Stalker
+Bark of Doran
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ronin, Shadow Stalker.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ronin, Shadow Stalker.Activate(Color: White)
+? Client.Bot1.Mana = 2 White (equipment spells & equip abilities)
+? Bot1.Life = 18
+Bot1.Hand.Bark of Doran.Cast(Spend: W EquipmentSpellsOrEquipAbilities, W EquipmentSpellsOrEquipAbilities)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Mana =
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield = Bark of Doran; Ronin, Shadow Stalker
+Bot1.Graveyard = Black Lotus
