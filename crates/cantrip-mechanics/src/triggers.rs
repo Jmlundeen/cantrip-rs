@@ -1032,6 +1032,18 @@ pub fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> O
     }
 }
 
+/// "Whenever you cast a noncreature spell, ... that spell's ..." (CR 603.2, 601.2i): the same trigger as
+/// `noncreature_spell_you_cast`, with the spell as the ability's subject so the effect can read it ("that spell's mana
+/// value"). Chrome Host Seedshark, Shark Typhoon and Thor, God of Thunder print it.
+pub fn noncreature_spell_you_cast_about_it(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. } if *player == me.controller && !q.chars(*spell).is(CardType::Creature) => {
+            Fired::about(Target::Object(*spell))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a spell that targets a creature you control" (CR 603.2, 601.2c): a question about the spell as it is
 /// cast, whose targets are public from the moment it was announced. One trigger for the spell however many of the creatures it
 /// targets (CR 603.2c is about events: one cast is one event). A copy is not cast (CR 707.10), so it sets nothing off; a spell
@@ -1929,6 +1941,7 @@ pub const YOU_CAST_A_SPELL_WITH_MANA_VALUE_4_OR_GREATER: Trigger =
     when_asked(EventMask::SPELL_CAST, you_cast_a_spell_with_mana_value_at_least::<4>);
 pub const THIS_BECOMES_THE_TARGET_OF_A_SPELL_OR_ABILITY: Trigger = when(EventMask::BECAME_TARGET, this_becomes_the_target);
 pub const NONCREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast);
+pub const NONCREATURE_SPELL_YOU_CAST_ABOUT_IT: Trigger = when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast_about_it);
 pub const YOU_CAST_A_SPELL_FROM_EXILE: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell_from_exile);
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
 pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);

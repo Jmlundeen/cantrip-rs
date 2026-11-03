@@ -22,16 +22,6 @@ fn shark(g: &mut dyn Game, controller: PlayerId, size: u32) -> Result<(), Suspen
     Ok(())
 }
 
-/// "Whenever you cast a noncreature spell": the ability is about the spell.
-fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { spell, player, .. } if *player == me.controller && !q.chars(*spell).is(CardType::Creature) => {
-            Fired::about(Target::Object(*spell))
-        }
-        _ => None,
-    }
-}
-
 /// "... where X is that spell's mana value": the spell's as the ability resolves, or as it last was on the stack if it has
 /// left (CR 608.2h: the ability resolves even if that spell is countered) - an {X} in its cost counting as the X announced (CR 202.3e).
 fn shark_of_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -49,7 +39,7 @@ fn shark_of_cycling(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast),
+            triggers::NONCREATURE_SPELL_YOU_CAST_ABOUT_IT,
             shark_of_spell,
             "Whenever you cast a noncreature spell, create an X/X blue Shark creature token with flying, where X is that spell's mana value.",
         ),
