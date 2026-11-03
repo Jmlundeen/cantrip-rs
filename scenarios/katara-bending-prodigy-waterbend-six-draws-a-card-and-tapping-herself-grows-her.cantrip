@@ -1,0 +1,50 @@
+# Katara's "Waterbend {6}: Draw a card" (CR 701.67a-b) paid exactly with six taps and no mana: Mox Sapphire, Jet and Ruby, Memnite, Ornithopter
+# and Katara herself (an untapped creature of Bot1's). The pool is empty, Mox Pearl is left untapped and Bot1 holds the drawn card. Tapped as
+# her controller's end step begins, she gets a +1/+1 counter, though she did not attack.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Katara, Bending Prodigy
+Memnite
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Katara, Bending Prodigy.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Katara, Bending Prodigy.Activate(Convoke: Mox Sapphire, Mox Jet, Mox Ruby, Memnite, Ornithopter, Katara, Bending Prodigy)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Hand.Count = 2
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+? Bot1.Battlefield.Katara, Bending Prodigy.Tapped = true
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Katara, Bending Prodigy.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Count = 2

@@ -1,0 +1,49 @@
+# Katara, Bending Prodigy: "At the beginning of your end step, if Katara is tapped, put a +1/+1 counter on her" (CR 603.4). Bot1 casts her on
+# turn 1: she ends that turn untapped (no counter, 2/3). On turn 3 she attacks and is tapped at Bot1's end step: one counter, a 3/4 (not two).
+# Through Bot2's turn 4 she stays tapped at its end step, but it is not Bot1's: still one counter. On turn 5 she does not attack and is untapped
+# at Bot1's end step: still one counter after turn 5.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Katara, Bending Prodigy
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Katara, Bending Prodigy.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Katara, Bending Prodigy.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Katara, Bending Prodigy.Power = 2
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Katara, Bending Prodigy > Bot2)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Katara, Bending Prodigy.Tapped = true
+? Bot1.Battlefield.Katara, Bending Prodigy.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Katara, Bending Prodigy.Power = 3
+? Bot1.Battlefield.Katara, Bending Prodigy.Toughness = 4
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Katara, Bending Prodigy.Tapped = false
+? Bot1.Battlefield.Katara, Bending Prodigy.Counters.PlusOnePlusOne = 1
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Katara, Bending Prodigy.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Katara, Bending Prodigy.Power = 3
+Bot2.Life = 18
