@@ -1,0 +1,44 @@
+# The Troll pays {R} for one shield that replaces one destruction (CR 701.19a).
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Ruby
+Mox Jet
+Uthden Troll
+Shock
+Shock
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Uthden Troll.Cast
+? Bot1.Mana =
+[T1 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Uthden Troll.Activate(Mana: short)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Uthden Troll.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Uthden Troll)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Uthden Troll.Tapped = true
+? Bot1.Battlefield.Uthden Troll.Damage = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Uthden Troll)
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Uthden Troll = (absent)
+Bot1.Graveyard = Uthden Troll; Shock; Shock; Black Lotus

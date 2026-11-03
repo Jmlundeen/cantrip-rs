@@ -1,0 +1,38 @@
+# The ability creates no shield if its Troll left the battlefield before it resolved (CR 400.7, 611.2a).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Ruby
+Uthden Troll
+Uthden Troll
+Shock
+Shock
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Uthden Troll.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Uthden Troll.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Uthden Troll)
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Uthden Troll.Cast
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Uthden Troll)
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Uthden Troll = (absent)
+Bot1.Graveyard = Uthden Troll; Shock; Black Lotus; Uthden Troll; Shock; Black Lotus

@@ -1,0 +1,28 @@
+# An unused regeneration shield expires at cleanup before the next turn's lethal damage (CR 701.19a, 514.2).
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Uthden Troll
+Shock
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Uthden Troll.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Uthden Troll.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Uthden Troll)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Uthden Troll = (absent)
+Bot1.Graveyard = Uthden Troll; Shock; Black Lotus
