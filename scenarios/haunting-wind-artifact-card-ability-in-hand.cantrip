@@ -1,0 +1,31 @@
+# An artifact card in hand is not an artifact permanent; its landcycling does not trigger Haunting Wind (CR 109.2, 702.29e).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mana Crypt
+Haunting Wind
+Kree Sentinel
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Haunting Wind.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Kree Sentinel.Activate(Ability: Basic landcycling)
+Bot1.Search(Island)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard.Kree Sentinel.Colors = Red

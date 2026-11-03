@@ -1,0 +1,6 @@
+{
+  "name": "Haunting Wind",
+  "manaCost": "{3}{B}",
+  "type": "Enchantment",
+  "oracleText": "Whenever an artifact becomes tapped or a player activates an artifact's ability without {T} in its activation cost, this enchantment deals 1 damage to that artifact's controller."
+}
