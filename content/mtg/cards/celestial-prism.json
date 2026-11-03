@@ -1,0 +1,6 @@
+{
+  "name": "Celestial Prism",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "{2}, {T}: Add one mana of any color."
+}

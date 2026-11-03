@@ -1,0 +1,30 @@
+# Celestial Prism costs two mana and tapping to add one mana of a chosen color (CR 605.1a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Island
+Celestial Prism
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Celestial Prism.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Celestial Prism.Activate(Mana: short)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Celestial Prism.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Celestial Prism.Tapped = true
+Bot1.Mana = {R}
