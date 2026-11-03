@@ -1,0 +1,54 @@
+# Blue mana alone cannot pay for the red activation; red pays exactly (CR 107.4a, 602.2b).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Ruby
+Dragon Whelp
+Mox Sapphire
+Island x20
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Dragon Whelp.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Dragon Whelp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Whelp.Power = 3
+? Bot1.Battlefield.Dragon Whelp.Toughness = 3
+Bot1.Battlefield.Dragon Whelp.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dragon Whelp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Whelp.Power = 5
+Bot1.Battlefield.Mox Ruby#2.Activate
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Dragon Whelp.Power = 2
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Dragon Whelp.Activate(Mana: short)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Dragon Whelp.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Dragon Whelp.Power = 3

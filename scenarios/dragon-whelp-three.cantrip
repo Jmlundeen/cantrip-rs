@@ -1,0 +1,51 @@
+# Three activations pump Dragon Whelp only this turn; its flying prevents a ground creature blocking it (CR 611.2a, 702.9b).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Ruby
+Dragon Whelp
+Island x20
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Dragon Whelp.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Dragon Whelp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Whelp.Power = 3
+? Bot1.Battlefield.Dragon Whelp.Toughness = 3
+Bot1.Battlefield.Dragon Whelp.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dragon Whelp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Whelp.Power = 5
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Dragon Whelp.Power = 2
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Dragon Whelp.Activate
+? Bot1.Mana =
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Dragon Whelp > Bot2)
+! Bot2.Block(Grizzly Bears > Dragon Whelp)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Dragon Whelp.Power = 2
+Bot2.Life = 18

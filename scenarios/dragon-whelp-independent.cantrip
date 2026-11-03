@@ -1,0 +1,44 @@
+# Activations of another Dragon Whelp do not count toward this one's delayed sacrifice (CR 113.2c).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Ruby
+Dragon Whelp
+Dragon Whelp
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Dragon Whelp.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Dragon Whelp.Cast
+? Bot1.Mana = {R}
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Dragon Whelp#1.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dragon Whelp#1.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dragon Whelp#1.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dragon Whelp#2.Activate
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 0
+[T2 Bot2.Main1]
+[Expect]
+Bot1.Battlefield.Dragon Whelp#1.Power = 2
+Bot1.Battlefield.Dragon Whelp#2.Power = 2

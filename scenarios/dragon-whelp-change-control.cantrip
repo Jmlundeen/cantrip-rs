@@ -1,0 +1,55 @@
+# A player cannot sacrifice Dragon Whelp after an opponent takes control of it (CR 701.21a).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Ruby
+Dragon Whelp
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Old Man of the Sea
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Dragon Whelp.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Old Man of the Sea.Cast
+[T3 Bot1.End]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Dragon Whelp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Whelp.Power = 3
+? Bot1.Battlefield.Dragon Whelp.Toughness = 3
+Bot1.Battlefield.Dragon Whelp.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dragon Whelp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Whelp.Power = 5
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Dragon Whelp.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon Whelp.Power = 6
+[T4 Bot2.Main1]
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Dragon Whelp)
+[T5 Bot1.Main1]
+[Expect]
+Bot2.Battlefield.Dragon Whelp.Power = 2
+Bot1.Graveyard = Black Lotus; Black Lotus
