@@ -1,0 +1,50 @@
+# Convoke may tap a creature that has a mana ability (CR 702.51a, 601.2g-h): Avacyn's Pilgrim is green and makes {W}, so its
+# mana pays only generic mana, but tapped for convoke it pays one of Siege Wurm's {G}. With a Forest for the other {G} and
+# five Ornithopters for the {5}, the {5}{G}{G} is paid exactly: the cast must be offered, though counting the Pilgrim as a
+# mana source alone leaves a {G} unpaid. With four Ornithopters it is not offered: the Pilgrim taps for convoke or for its
+# {W}, never both.
+[Bot1 Deck]
+Forest
+Avacyn's Pilgrim
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Siege Wurm
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Avacyn's Pilgrim.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Hand.Siege Wurm.Cast(Mana: short)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Siege Wurm.Cast(Convoke: Avacyn's Pilgrim, Ornithopter, Ornithopter, Ornithopter, Ornithopter, Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Siege Wurm.Damage = 0
+Bot1.Battlefield.Avacyn's Pilgrim.Tapped = true

@@ -3859,6 +3859,49 @@ pub struct Available {
     /// The permanents a mana ability that can be activated again would spend (`Repeat`: sacrifice or tap): one whose own {T}
     /// is in a cost being paid stays for it, so its mana is worked out without it (`available_without`).
     spent: Vec<ObjectId>,
+    /// The permanent left out of it (`available_without`), for `Available::tapping` to leave out too.
+    skip: Option<ObjectId>,
+    /// The artifacts and creatures to be tapped for the cost judged rather than make mana for it (`TapFor`), each sure to be
+    /// (none of its mana abilities would spend it), by the colors whose symbols it may pay besides generic mana (a bit for
+    /// each `Color`, convoke's creatures): those that could make mana instead are `complex` sources, one of whose
+    /// alternatives is being tapped for it (`Alternative::taps`). Empty but for a cost something may pay that way.
+    tapped: [u32; 32],
+    /// The most generic mana of the cost the permanents tapped for it may pay together (`TapFor::cap`).
+    tap_cap: u32,
+}
+
+/// What may be tapped to pay for part of the cost being judged rather than make mana for it (CR 601.2h): untapped artifacts
+/// for improvise (CR 702.126a) and waterbend (CR 701.67a), untapped creatures for convoke (CR 702.51a) and waterbend. Each
+/// pays {1}, or a convoke creature one mana of one of its colors, and together no more than `cap` of the generic mana:
+/// waterbend's taps only the waterbend cost's own, never a tax on it (CR 701.67b). A permanent tapped or sacrificed for mana
+/// can't then be tapped for it, mana abilities being activated before the cost is paid (CR 601.2g-h): one that could make
+/// mana is judged with being tapped for it as one more of its alternatives (`available_as`).
+#[derive(Clone, Copy)]
+struct TapFor {
+    artifacts: bool,
+    creatures: bool,
+    convoke: bool,
+    cap: u32,
+}
+
+impl TapFor {
+    /// A spell's own convoke and improvise, and those it is given (`pay_with`).
+    fn spell(with: PayWith) -> TapFor {
+        TapFor { artifacts: with.improvise, creatures: with.convoke, convoke: with.convoke, cap: u32::MAX }
+    }
+
+    /// What tapping `id` for it would pay: the colors whose symbols it may pay besides generic mana (a creature's own, for
+    /// convoke - an artifact creature is one too, which pays more than improvise would), or `None` where it can't be tapped
+    /// for it.
+    fn payer(&self, cx: &Cx, id: ObjectId, chars: &Chars) -> Option<ColorSet> {
+        if cx.s().obj(id).tapped {
+            return None;
+        }
+        if self.creatures && chars.is(CardType::Creature) {
+            return Some(if self.convoke { chars.colors } else { ColorSet::NONE });
+        }
+        (self.artifacts && chars.is(CardType::Artifact)).then_some(ColorSet::NONE)
+    }
 }
 
 /// One mana ability a source could be activated for, as the advice counts it: what it adds - fixed mana, and `k` mana of
@@ -3877,9 +3920,27 @@ struct Alternative {
     produced: u32,
     /// Its cost has {T} (CR 107.5): it taps its source, as an ability that taps an untapped permanent would.
     tapped: bool,
+    /// Not mana: the source tapped for the cost being judged (`TapFor`), paying {1} of it or a symbol of these colors.
+    taps: Option<ColorSet>,
 }
 
 impl Alternative {
+    /// The source tapped for the cost being judged (`TapFor::payer`) rather than making mana.
+    fn tapping(colors: ColorSet) -> Alternative {
+        Alternative {
+            fixed: [0; 6],
+            k: 0,
+            types: 0,
+            restriction: None,
+            cost: ManaCost::ZERO,
+            source: ManaPayment::Other,
+            extra: [0; 6],
+            produced: 0,
+            tapped: true,
+            taps: Some(colors),
+        }
+    }
+
     /// The mana it adds (before what its tap triggers) with `chosen` the type of its `k`.
     fn made(&self, chosen: Option<usize>) -> [u32; 6] {
         let mut made = self.fixed;
@@ -3922,13 +3983,15 @@ pub fn available(cx: &Cx, player: PlayerId) -> Available {
 /// What `player` has to pay with, `skip` apart: a permanent whose own {T} is in the cost being paid cannot also be
 /// tapped for mana to pay it (CR 602.2b, 605.3b).
 fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaWindow) -> Available {
-    available_as(cx, player, skip, window, false)
+    available_as(cx, player, skip, window, false, None)
 }
 
 /// `available_without`. `defer`: each source's own abilities are kept until those that could tap it are known
 /// (`Repeat::Tap`); without it they are counted as they are found, and finding such an ability starts over with it - so a
-/// board with none pays nothing for them.
-fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaWindow, defer: bool) -> Available {
+/// board with none pays nothing for them. `tap`: what may be tapped for the cost judged rather than make mana for it - each
+/// such permanent sure to be tapped for it where none of its mana abilities would spend it, and otherwise one more
+/// alternative of what would (its own abilities, the abilities that would tap or sacrifice it).
+fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaWindow, defer: bool, tap: Option<TapFor>) -> Available {
     let mut fixed = cx.s().player(player).pool.0;
     let mut restricted: Vec<(ManaRestriction, [u32; 6], u32)> = Vec::new();
     for (restriction, pool) in cx.s().restricted_of(player) {
@@ -3974,6 +4037,10 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
     let mut kept: Vec<Alternative> = Vec::new();
     let mut own: Vec<(ObjectId, usize, usize)> = Vec::new();
     let mut spent: Vec<ObjectId> = Vec::new();
+    // The permanents that may be tapped for the cost (`tap`), with what each pays; and those whose tap is already one
+    // alternative of a source's.
+    let mut payers: Vec<(ObjectId, ColorSet)> = Vec::new();
+    let mut placed: Vec<ObjectId> = Vec::new();
     for &id in cx.s().battlefield() {
         if cx.s().obj(id).controller != player || skip == Some(id) {
             continue;
@@ -3981,6 +4048,8 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
         let chars = cx.chars(id);
         // Each mana ability the source could be activated for now: alternatives, of which one is (CR 605.3b).
         alternatives.clear();
+        // Some alternative neither taps nor sacrifices it (Prismite's): it could make that mana and be tapped for the cost.
+        let mut keeps = false;
         let given = layers::acquisition_possible(cx.cards(), cx.s());
         for (index, ability) in chars.abilities().enumerate() {
             // Asked as the ability it is (CR 607.5): one an effect gave the source reads only its own links.
@@ -4020,6 +4089,9 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
                     linked,
                     complex: Vec::new(),
                     spent: Vec::new(),
+                    skip,
+                    tapped: [0; 32],
+                    tap_cap: 0,
                 };
             }
             let mut alternative = Alternative {
@@ -4032,6 +4104,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
                 extra: [0; 6],
                 produced: 0,
                 tapped: false,
+                taps: None,
             };
             // Mana of a type chosen from none is no mana (Thespian's Stage copying Sunken Citadel has no chosen color).
             if alternative.types == 0 {
@@ -4080,12 +4153,21 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
             }
             if let Some(repeat) = Repeat::of(&def.cost, def.colors_from_sacrifice) {
                 if !defer && matches!(repeat, Repeat::Tap(..)) {
-                    return available_as(cx, player, skip, window, true);
+                    return available_as(cx, player, skip, window, true, tap);
                 }
                 repeatable.push((alternative, id, repeat, by));
                 continue;
             }
+            keeps |= !def.cost.tap && !def.cost.sacrifice_self;
             alternatives.push(alternative);
+        }
+        // Tapped for the cost, or for its mana: one alternative more of a source whose every mana ability spends it.
+        if let Some(colors) = tap.and_then(|t| t.payer(cx, id, &chars)) {
+            payers.push((id, colors));
+            if !alternatives.is_empty() && !keeps {
+                alternatives.push(Alternative::tapping(colors));
+                placed.push(id);
+            }
         }
         if !defer {
             account(&alternatives, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
@@ -4132,9 +4214,13 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
             if skip == Some(target) || own.iter().any(|&(id, from, to)| id == target && kept[from..to].iter().all(|a| a.tapped)) {
                 continue;
             }
-            let outlets = tapping(target);
+            let mut outlets = tapping(target);
             if !outlets.is_empty() {
                 spent.push(target);
+                if let Some(&(_, colors)) = payers.iter().find(|&&(p, _)| p == target && !placed.contains(&p)) {
+                    outlets.push(Alternative::tapping(colors));
+                    placed.push(target);
+                }
                 account(&outlets, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
             }
         }
@@ -4150,7 +4236,7 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
             if skip == Some(target) {
                 continue;
             }
-            let outlets: Vec<Alternative> = repeatable
+            let mut outlets: Vec<Alternative> = repeatable
                 .iter()
                 .filter_map(|&(a, source, repeat, by)| match repeat {
                     Repeat::Sacrifice(cost, p, from_it) if pays_permanents(cx, &cost, &p, &Asker { source, controller: player, by, spell: false }, target, Some(CostFor::ManaAbility)) => {
@@ -4169,6 +4255,10 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
                 continue;
             }
             spent.push(target);
+            if let Some(&(_, colors)) = payers.iter().find(|&&(p, _)| p == target && !placed.contains(&p)) {
+                outlets.push(Alternative::tapping(colors));
+                placed.push(target);
+            }
             match units.iter_mut().find(|(alike, _)| *alike == outlets) {
                 Some((_, n)) => *n += 1,
                 None => units.push((outlets, 1)),
@@ -4186,6 +4276,13 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
             account(&outlets, n, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
         }
     }
+    // The rest are tapped for the cost: nothing else would spend them.
+    let mut tapped = [0u32; 32];
+    for &(id, colors) in &payers {
+        if !placed.contains(&id) {
+            tapped[colors.0 as usize] += 1;
+        }
+    }
     let spenders = static_rules::any_color_spenders(cx);
     Available {
         fixed,
@@ -4199,6 +4296,9 @@ fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, window: ManaW
         linked,
         complex,
         spent,
+        skip,
+        tapped,
+        tap_cap: tap.map_or(0, |t| t.cap),
     }
 }
 
@@ -4527,8 +4627,9 @@ impl Available {
         if !self.complex.is_empty() {
             return self.exact(cost, Some(payment));
         }
+        let cost = &self.less_taps(cost);
         if !self.restricted.iter().any(|(r, ..)| r.may_pay(payment)) {
-            return self.covers(cost);
+            return self.covers_left(cost);
         }
         let mut with = Available {
             fixed: self.fixed,
@@ -4542,6 +4643,9 @@ impl Available {
             linked: self.linked.clone(),
             complex: Vec::new(),
             spent: Vec::new(),
+            skip: None,
+            tapped: [0; 32],
+            tap_cap: 0,
         };
         for (r, fixed, flex) in &self.restricted {
             if r.may_pay(payment) {
@@ -4551,7 +4655,28 @@ impl Available {
                 with.flex[ANY_COLOR as usize] += flex;
             }
         }
-        with.covers(cost)
+        with.covers_left(cost)
+    }
+
+    /// The same, with the artifacts and creatures `tap` names to be tapped for the cost (`available_as`).
+    fn tapping(&self, cx: &Cx, player: PlayerId, tap: TapFor) -> Available {
+        available_as(cx, player, self.skip, ManaWindow::Payment, false, Some(tap))
+    }
+
+    /// What of `cost` is left once the permanents sure to be tapped for it (`tapped`) pay what they may of it: each {1} of its
+    /// generic mana, no more than `tap_cap` together, or a convoke creature a symbol of one of its colors, as many symbols
+    /// as there can be (`convoked`). Mana pays the rest; it could pay whatever they did, so this is the best they can do.
+    fn less_taps(&self, cost: &ManaCost) -> ManaCost {
+        if self.tapped == [0; 32] {
+            return *cost;
+        }
+        if self.tapped[1..] == [0; 31] {
+            let mut left = *cost;
+            left.generic -= left.generic.min(self.tapped[0]).min(self.tap_cap);
+            return left;
+        }
+        let creatures: Vec<ColorSet> = (0..32u8).flat_map(|c| std::iter::repeat_n(ColorSet(c), self.tapped[c as usize] as usize)).collect();
+        convoked(cost, &creatures)
     }
 
     /// How much mana of no restriction it could pay at most (advice): the pool's and what the mana abilities add, less
@@ -4678,6 +4803,9 @@ impl Available {
             linked: self.linked.clone(),
             complex: Vec::new(),
             spent: Vec::new(),
+            skip: None,
+            tapped: self.tapped,
+            tap_cap: self.tap_cap,
         }
     }
 
@@ -4688,6 +4816,14 @@ impl Available {
         }
         if !self.complex.is_empty() {
             return self.exact(cost, None);
+        }
+        self.covers_left(&self.less_taps(cost))
+    }
+
+    /// `covers` with no `complex` sources, for what the permanents tapped for the cost leave of it (`less_taps`).
+    fn covers_left(&self, cost: &ManaCost) -> bool {
+        if self.unknown || cost.mana_value() == 0 {
+            return true;
         }
         if self.linked.is_empty() {
             return self.covers_with(cost, self.fixed);
@@ -4840,6 +4976,10 @@ impl Search<'_> {
     /// pay instead.
     fn within(&self, choice: Option<(Alternative, Option<usize>)>, types: u8) -> u32 {
         let Some((a, chosen)) = choice else { return 0 };
+        // Tapped for the cost: {1} of its generic mana, or a symbol of the colors it may pay.
+        if let Some(colors) = a.taps {
+            return u32::from(types == 63 || types & colors.0 != 0);
+        }
         let made = a.made(chosen);
         let own = if a.restriction.is_none_or(|r| self.may_pay(r) || (types == 63 && self.pays_activation(r))) {
             (0..6).filter(|&m| types & (1 << m) != 0).map(|m| made[m]).fold(0u32, u32::saturating_add)
@@ -4868,6 +5008,12 @@ impl Search<'_> {
                 }
             }
             n = with.linked.iter().filter(|&&(mask, _)| mask as usize & types != 0).fold(n, |n, &(_, k)| n.saturating_add(k));
+            // The permanents tapped for the cost, as `within` counts one.
+            for (colors, &k) in with.tapped.iter().enumerate().filter(|&(_, &k)| k > 0) {
+                if types == 63 || types & colors != 0 {
+                    n = n.saturating_add(k);
+                }
+            }
             *held = n;
         }
         held
@@ -4920,6 +5066,10 @@ impl Search<'_> {
         let Some((a, chosen)) = choice.filter(|_| n > 0) else { return next };
         for (types, held) in next.held.iter_mut().enumerate() {
             *held = held.saturating_add(self.within(choice, types as u8).saturating_mul(n));
+        }
+        if let Some(colors) = a.taps {
+            next.with.tapped[colors.0 as usize] += n;
+            return next;
         }
         if !a.cost.is_zero() {
             next.costed.push((a, chosen, n));
@@ -5042,7 +5192,7 @@ impl Search<'_> {
             }
             supply.push(Supply { stage, types: a.produces(chosen), restriction: None, n: a.produced });
         }
-        Demand::of(self.cost, u32::MAX, self.payment.copied(), &mut demand);
+        Demand::of(&leaf.with.less_taps(self.cost), u32::MAX, self.payment.copied(), &mut demand);
         supply.retain(|s| s.n > 0 && s.types != 0);
         demand.retain(|d| d.n > 0);
         transports(&supply, &demand)
@@ -7066,7 +7216,8 @@ fn pay_with(cx: &Cx, grantors: &[ObjectId], player: PlayerId, spell: ObjectId, d
 
 /// Whether a spell's total cost could be paid (advice, CR 601.2g-h): by the mana at hand, with what else may pay for it
 /// (convoke's creatures, delve's graveyard, improvise's artifacts) each paying their share, or by those alone when no
-/// mana may be spent on it. A permanent that is a mana source is counted as that, not twice. `exiled` is how many
+/// mana may be spent on it. A permanent that could make mana is either tapped for the spell or spent for its mana, never
+/// both (`TapFor`), each way judged (`Available::tapping`). `exiled` is how many
 /// cards another part of the cost exiles from the graveyard, which delve cannot also use. `any`: what mana the permission
 /// it is cast by lets pay it (CR 609.4b), out of what is left once the others have paid their share.
 #[allow(clippy::too_many_arguments)]
@@ -7081,26 +7232,26 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
         return a.covers_for(&as_paid(cost), &spell_kind(cx, a, card, def));
     }
     let mut cost = cost;
-    let mut creatures: Vec<ColorSet> = Vec::new();
     let mut generic: u32 = 0;
     if with.delve {
         let gy = cx.s().zone(Zone::graveyard(player)).iter().filter(|&&c| c != card).count();
         generic += gy.saturating_sub(exiled as usize) as u32;
     }
-    if with.improvise || with.convoke {
-        for id in cx.permanents_of(player) {
-            if cx.s().obj(id).tapped || (!no_mana && has_mana_source(cx, id, player)) {
-                continue;
-            }
-            let chars = cx.chars(id);
-            if with.improvise && chars.is(CardType::Artifact) {
-                generic += 1;
-            } else if with.convoke && chars.is(CardType::Creature) {
-                creatures.push(chars.colors);
-            }
+    let tapping;
+    let a = if with.improvise || with.convoke {
+        let tap = TapFor::spell(with);
+        if no_mana {
+            // No mana is made for it: every artifact and creature that may be is tapped for it.
+            let creatures: Vec<ColorSet> = cx.permanents_of(player).into_iter().filter_map(|id| tap.payer(cx, id, &cx.chars(id))).collect();
+            cost = convoked(&cost, &creatures);
+            a
+        } else {
+            tapping = a.tapping(cx, player, tap);
+            &tapping
         }
-    }
-    cost = convoked(&cost, &creatures);
+    } else {
+        a
+    };
     let covers = |cost: ManaCost| if no_mana { cost.is_zero() } else { a.covers_for(&as_paid(cost), &spell_kind(cx, a, card, def)) };
     if covers(ManaCost { generic: cost.generic.saturating_sub(generic), ..cost }) {
         return true;
@@ -12421,10 +12572,13 @@ mod tests {
             linked: Vec::new(),
             complex,
             spent: Vec::new(),
+            skip: None,
+            tapped: [0; 32],
+            tap_cap: 0,
         }
     }
     fn adds(fixed: [u32; 6]) -> Alternative {
-        Alternative { fixed, k: 0, types: 0, restriction: None, cost: ManaCost::ZERO, source: ManaPayment::Other, extra: [0; 6], produced: 0, tapped: false }
+        Alternative { fixed, k: 0, types: 0, restriction: None, cost: ManaCost::ZERO, source: ManaPayment::Other, extra: [0; 6], produced: 0, tapped: false, taps: None }
     }
     fn one(mana: Mana, n: u32) -> [u32; 6] {
         let mut out = [0; 6];
