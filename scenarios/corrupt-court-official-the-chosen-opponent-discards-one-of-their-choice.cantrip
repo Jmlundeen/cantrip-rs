@@ -1,0 +1,46 @@
+# Corrupt Court Official: when it enters, target opponent discards a card (CR 701.9), their choice. The target is an opponent, never its
+# controller (refused), and with two opponents the one chosen discards: Bot2 discards the Plains it picks, and Bot3 loses nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Corrupt Court Official
+Swamp x20
+
+[Bot2 Deck]
+Plains
+Island x23
+
+[Bot3 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Corrupt Court Official.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+! Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot2.Choose(Plains)
+? Bot2.Hand.Count = 6
+? Bot2.Graveyard = Plains
+? Bot3.Hand.Count = 7
+? Bot1.Battlefield.Corrupt Court Official.Power = 1
+
+[Expect]
+Bot2.Hand.Count = 6
+Bot2.Graveyard = Plains
+Bot3.Graveyard.Count = 0
