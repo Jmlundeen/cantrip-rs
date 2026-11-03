@@ -1500,17 +1500,29 @@ pub fn target_creature_gains_indestructible(g: &mut dyn Game, item: &StackItem) 
     Ok(())
 }
 
-/// "This creature gains indestructible until end of turn. Tap it." (CR 702.12b, 611.2a, 701.26a): if the ability's source is
-/// still on the battlefield as the permanent it was (CR 400.7), it gains the keyword for the rest of the turn, then it is
-/// tapped. The tap is the ability's own instruction, not its cost, so the ability can be activated while it is tapped
-/// already (Underrealm Lich's ruling). Iron-Shield Elf and Underrealm Lich print it.
-pub fn this_gains_indestructible_then_tap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+/// "This creature gains [a keyword] until end of turn. Tap it." (CR 611.2a, 701.26a): if the ability's source is still on the
+/// battlefield as the permanent it was (CR 400.7), it gains the keyword for the rest of the turn, then it is tapped. The tap is
+/// the ability's own instruction, not its cost, so the ability can be activated while it is tapped already (Underrealm Lich's
+/// ruling). The two wrappers below are the fn pointers an ability's effect takes.
+pub fn this_gains_then_tap(g: &mut dyn Game, item: &StackItem, keyword: Keyword) -> Result<(), Suspend> {
     let creature = item.object;
     if crate::targets::permanent(g, creature) {
-        gain_indestructible_until_end_of_turn(g, creature, creature);
+        gain_until_end_of_turn(g, creature, creature, keyword);
         g.tap(creature);
     }
     Ok(())
+}
+
+/// "This creature gains indestructible until end of turn. Tap it." (CR 702.12b): `this_gains_then_tap` for indestructible.
+/// Iron-Shield Elf and Underrealm Lich print it.
+pub fn this_gains_indestructible_then_tap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    this_gains_then_tap(g, item, Keyword::Indestructible)
+}
+
+/// "This creature gains hexproof until end of turn. Tap it." (CR 702.11b): `this_gains_then_tap` for hexproof. Dream Trawler
+/// prints it.
+pub fn this_gains_hexproof_then_tap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    this_gains_then_tap(g, item, Keyword::Hexproof)
 }
 
 /// "`target` becomes a [creature type] in addition to its other types until end of turn" (CR 205.1b, 611.2a, 613.1d): a layer 4
