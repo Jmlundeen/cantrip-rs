@@ -1,0 +1,12 @@
+{
+  "name": "Fire Navy Trebuchet",
+  "manaCost": "{2}{B}",
+  "type": "Artifact Creature — Wall",
+  "power": 0,
+  "toughness": 4,
+  "oracleText": "Defender, reach\nWhenever you attack, create a 2/1 colorless Construct artifact creature token with flying named Ballistic Boulder that's tapped and attacking. Sacrifice that token at the beginning of the next end step.",
+  "keywords": [
+    "Defender",
+    "Reach"
+  ]
+}

@@ -1,0 +1,40 @@
+# Fire Navy Trebuchet: "Defender, reach. Whenever you attack, create a 2/1 colorless Construct artifact creature token with flying named
+# Ballistic Boulder that's tapped and attacking. Sacrifice that token at the beginning of the next end step." On turn 3 two Ornithopters (0
+# power) attack, which is one attack: one Boulder, tapped and attacking, hits for 2 (18, not 16), and is gone at the end step. The Trebuchet,
+# a defender, does not attack. On turn 5 nothing attacks and no Boulder comes.
+
+[Bot1 Deck]
+Black Lotus
+Fire Navy Trebuchet
+Ornithopter
+Ornithopter
+Swamp
+Swamp x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Fire Navy Trebuchet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+[T3 Bot1.Damage]
+? Bot1.Battlefield.Ballistic Boulder.Tapped = true
+? Bot1.Battlefield.Ballistic Boulder.Power = 2
+? Bot1.Battlefield.Ballistic Boulder.Toughness = 1
+? Bot1.Battlefield.Ballistic Boulder.Keywords = Flying
+? Bot2.Life = 18
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ballistic Boulder.Tapped = true
+[T5 Bot1.Main1]
+? Bot1.Battlefield = Fire Navy Trebuchet; Ornithopter; Ornithopter; Swamp
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Count = 4
