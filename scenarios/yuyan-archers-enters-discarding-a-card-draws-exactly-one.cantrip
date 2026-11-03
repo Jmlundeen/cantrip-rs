@@ -1,0 +1,33 @@
+# Yuyan Archers {1}{R} (3/1 reach): "When this creature enters, you may discard a card. If you do, draw a card." Bot1 casts it with two
+# Moxen, discards the Memnite it chooses and draws exactly one card (CR 701.9, 121.1): the hand is Lightning Bolt and two Mountains
+# again, and the Memnite is in the graveyard. The Archers have reach.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Yuyan Archers
+Lightning Bolt
+Memnite
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Yuyan Archers.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Memnite
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Yuyan Archers.Keywords = Reach

@@ -1,0 +1,11 @@
+{
+  "name": "Yuyan Archers",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Human Archer",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "Reach\nWhen this creature enters, you may discard a card. If you do, draw a card.",
+  "keywords": [
+    "Reach"
+  ]
+}
