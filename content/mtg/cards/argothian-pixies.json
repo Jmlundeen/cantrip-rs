@@ -1,0 +1,8 @@
+{
+  "name": "Argothian Pixies",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Faerie",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "This creature can't be blocked by artifact creatures.\nPrevent all damage that would be dealt to this creature by artifact creatures."
+}

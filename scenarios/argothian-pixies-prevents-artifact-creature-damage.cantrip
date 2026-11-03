@@ -1,0 +1,40 @@
+# The Pixies prevent noncombat damage from their controller's Walking Ballista and combat damage from an opposing Memnite.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Argothian Pixies
+Walking Ballista
+Forest x16
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Argothian Pixies.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Walking Ballista.Activate(Bot1.Battlefield.Argothian Pixies; Ability: Remove)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Argothian Pixies.Damage = 0
+[T4 Bot2.Main1]
+Bot2.Attack(Memnite > Bot1)
+Bot1.Block(Argothian Pixies > Memnite)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Argothian Pixies.Damage = 0
+Bot2.Graveyard = Memnite
