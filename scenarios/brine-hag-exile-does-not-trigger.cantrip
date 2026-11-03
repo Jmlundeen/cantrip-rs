@@ -1,0 +1,90 @@
+# Exiling a damaged Hag is not dying; a second Hag later dies and changes its damaging creature (CR 700.4).
+[Bot1 Deck]
+Brine Hag
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Gleemox
+Walking Ballista
+Brine Hag
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Walking Ballista
+Path to Exile
+Shock
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brine Hag.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Walking Ballista.Activate(Bot1.Battlefield.Brine Hag; Ability: Remove)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Path to Exile.Cast(Bot1.Battlefield.Brine Hag)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+? Bot2.Battlefield.Walking Ballista.Power = 1
+? Bot2.Battlefield.Walking Ballista.Toughness = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Brine Hag.Cast
+? Bot1.Mana =
+[T6 Bot2.Main1]
+Bot1.Battlefield.Walking Ballista.Activate(Bot1.Battlefield.Brine Hag; Ability: Remove)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Brine Hag)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Walking Ballista.Power = 1
+Bot2.Battlefield.Walking Ballista.Toughness = 1
+Bot1.Battlefield.Walking Ballista.Power = 1
+Bot1.Battlefield.Walking Ballista.Toughness = 3
+Bot1.Graveyard = Brine Hag; Black Lotus
+Exile = Brine Hag
