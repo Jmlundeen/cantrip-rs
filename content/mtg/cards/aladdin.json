@@ -1,0 +1,8 @@
+{
+  "name": "Aladdin",
+  "manaCost": "{2}{R}{R}",
+  "type": "Creature — Human Rogue",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{1}{R}{R}, {T}: Gain control of target artifact for as long as you control this creature."
+}

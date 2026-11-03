@@ -1,0 +1,58 @@
+# Aladdin takes one artifact per activation, retains the first while taking a second, and loses both when it dies (CR 611.2a).
+[Bot1 Deck]
+Black Lotus x3
+Mox Pearl
+Aladdin
+Mountain x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aladdin.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Aladdin.Activate(Bot2.Battlefield.Mox Jet)
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Mox Jet.Types = Artifact
+? Bot2.Battlefield.Mox Sapphire.Types = Artifact
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Aladdin.Activate(Bot2.Battlefield.Mox Sapphire)
+? Bot1.Mana =
+Bot1.Pass
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Mox Jet.Types = Artifact
+? Bot1.Battlefield.Mox Sapphire.Types = Artifact
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Aladdin)
+Bot2.Pass
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Aladdin; Black Lotus; Black Lotus; Black Lotus
+Bot2.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire

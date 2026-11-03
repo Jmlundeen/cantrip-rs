@@ -1,0 +1,49 @@
+# A creature temporarily made an artifact remains under Aladdin's controller after that type effect ends (CR 611.2a).
+[Bot1 Deck]
+Black Lotus x2
+Mox Pearl
+Mox Jet
+Aladdin
+Stone by Sunlight
+Mountain x20
+
+[Bot2 Deck]
+Mox Pearl
+Savannah Lions
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aladdin.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Stone by Sunlight.Cast
+Bot1.Modes(Until end of turn)
+Bot1.Target(Bot2.Battlefield.Savannah Lions)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Aladdin.Activate(Bot2.Battlefield.Savannah Lions)
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.Main1]
+[Expect]
+Bot1.Battlefield.Savannah Lions.Types = Creature
+Bot2.Battlefield = Mox Pearl

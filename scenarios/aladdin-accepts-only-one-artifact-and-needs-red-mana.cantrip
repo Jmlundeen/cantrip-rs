@@ -1,0 +1,46 @@
+# Aladdin needs two red mana even with three mana available, and targets an artifact, including its controller's (CR 602.2b, 115.1c).
+[Bot1 Deck]
+Black Lotus x2
+Mox Pearl x2
+Mox Ruby
+Aladdin
+Ornithopter
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aladdin.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Aladdin.Activate(Mana: short)
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+! Bot1.Battlefield.Aladdin.Activate(Aladdin)
+Bot1.Battlefield.Aladdin.Activate(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Battlefield.Aladdin.Tapped = true
