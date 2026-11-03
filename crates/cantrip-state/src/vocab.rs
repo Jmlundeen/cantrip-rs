@@ -1242,6 +1242,7 @@ counter_kinds! {
     Promotion = 56, "promotion", "Promotion";
     Bounty = 57, "bounty", "Bounty";
     Pupa = 58, "pupa", "Pupa";
+    Matrix = 59, "matrix", "Matrix";
 }
 
 impl CounterKind {
