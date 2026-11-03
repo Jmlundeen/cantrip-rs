@@ -1,0 +1,8 @@
+{
+  "name": "Merchant of Many Hats",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Human Peasant Ally",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{2}{B}: Return this card from your graveyard to your hand."
+}

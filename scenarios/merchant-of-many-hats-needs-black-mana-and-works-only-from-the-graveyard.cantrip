@@ -1,0 +1,47 @@
+# Merchant of Many Hats: "{2}{B}: Return this card from your graveyard to your hand" works only from the graveyard (CR 113.6m) and
+# needs the {B}. On the battlefield it is refused with {B}{W}{R} in the pool, which would pay it; once Lightning Bolt has killed it,
+# {W}{R}{U} (three mana, the generic amount met, no black, and no source of black left to add one) is refused, so it stays there.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Merchant of Many Hats
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Merchant of Many Hats.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {W}{B}{R}
+! Bot1.Battlefield.Merchant of Many Hats.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Merchant of Many Hats)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Graveyard.Merchant of Many Hats.Activate(Mana: short)
+
+[Expect]
+Bot1.Graveyard = Merchant of Many Hats; Black Lotus
+Bot1.Hand.Count = 3

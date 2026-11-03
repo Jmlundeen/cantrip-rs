@@ -1,0 +1,67 @@
+# Merchant of Many Hats: "{2}{B}: Return this card from your graveyard to your hand." Both players' Merchants die to Lightning Bolt on
+# turn 2. On turn 3 Bot1 pays {B} and {W} (two of the three: the refusal, the amount one short), then {R} as well and pays exactly
+# {2}{B}, leaving the pool empty: its Merchant is in its hand, and Bot2's stays in Bot2's graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Merchant of Many Hats
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Gleemox
+Merchant of Many Hats
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Merchant of Many Hats.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Gleemox.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Merchant of Many Hats.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Merchant of Many Hats)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Gleemox.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Merchant of Many Hats)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Merchant of Many Hats
+? Bot2.Graveyard = Merchant of Many Hats; Lightning Bolt; Lightning Bolt
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Graveyard.Merchant of Many Hats.Activate(Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Merchant of Many Hats.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Hand = Merchant of Many Hats; Swamp; Swamp; Swamp; Swamp
+Bot2.Graveyard = Merchant of Many Hats; Lightning Bolt; Lightning Bolt
