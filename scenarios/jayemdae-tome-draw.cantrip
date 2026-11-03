@@ -1,0 +1,34 @@
+# Jayemdae Tome costs four mana and tapping it to draw one card (CR 602.2b, 121.1).
+# The fourth Mox remains in hand until the three-mana refusal, so it cannot pay early.
+[Bot1 Deck]
+Mox Emerald x4
+Jayemdae Tome
+Black Lotus
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Jayemdae Tome.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+! Bot1.Battlefield.Jayemdae Tome.Activate(Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Jayemdae Tome.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Jayemdae Tome.Tapped = true
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Hand.Count = 3
