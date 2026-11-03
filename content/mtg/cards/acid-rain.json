@@ -1,0 +1,6 @@
+{
+  "name": "Acid Rain",
+  "manaCost": "{3}{U}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all Forests."
+}

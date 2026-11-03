@@ -1,0 +1,43 @@
+# Acid Rain destroys both players' Forests, including a dual land, while an Island survives (CR 701.8a).
+[Bot1 Deck]
+Acid Rain
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Forest
+Island
+Island x20
+
+[Bot2 Deck]
+Tropical Island
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Tropical Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Acid Rain.Cast
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Pearl; Mox Jet; Mox Ruby; Island
+Bot1.Graveyard = Acid Rain; Forest
+Bot2.Battlefield =
+Bot2.Graveyard = Tropical Island
+LeftBattlefield = Forest; Tropical Island
