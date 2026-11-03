@@ -1,0 +1,39 @@
+# The Healer can shield an opponent; an unused shield expires at cleanup, so a later Shock deals both damage (CR 615.7, 514.2).
+[Bot1 Deck]
+Samite Healer
+Mox Pearl
+Mox Ruby
+Shock
+Shock
+Plains
+Mountain
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Samite Healer.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Samite Healer.Activate(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+[T5 Bot1.Main1]
+Bot1.Battlefield.Samite Healer.Activate(Bot2)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Prevented = 1 Shock > Bot2 by Samite Healer
