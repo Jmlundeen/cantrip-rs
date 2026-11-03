@@ -1,0 +1,6 @@
+{
+  "name": "Bad Moon",
+  "manaCost": "{1}{B}",
+  "type": "Enchantment",
+  "oracleText": "Black creatures get +1/+1."
+}
