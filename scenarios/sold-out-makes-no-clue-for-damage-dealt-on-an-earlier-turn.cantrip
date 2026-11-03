@@ -1,0 +1,60 @@
+# "If it was dealt damage THIS turn": Bot1's Shock hurts Bot2's Hill Giant on turn 3, but on turn 4 (the Giant's damage has been removed at
+# cleanup, and the turn is another) Sold Out exiles it with no Clue.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Shock
+Sold Out
+Island x13
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Hill Giant
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Hill Giant.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Hill Giant)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Hill Giant.Damage = 2
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Hill Giant.Damage = 0
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sold Out.Cast(Bot2.Battlefield.Hill Giant)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Hill Giant
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire

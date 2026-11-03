@@ -1,0 +1,6 @@
+{
+  "name": "Sold Out",
+  "manaCost": "{3}{B}",
+  "type": "Instant",
+  "oracleText": "Exile target creature. If it was dealt damage this turn, create a Clue token. (It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")"
+}
