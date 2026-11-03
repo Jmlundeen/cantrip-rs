@@ -1,0 +1,8 @@
+{
+  "name": "Abomination",
+  "manaCost": "{3}{B}{B}",
+  "type": "Creature — Horror",
+  "power": 2,
+  "toughness": 6,
+  "oracleText": "Whenever this creature blocks or becomes blocked by a green or white creature, destroy that creature at end of combat."
+}

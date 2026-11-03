@@ -1,0 +1,43 @@
+# Abomination blocks the green and white 1/5 Grizzled Leotau: it survives damage but is destroyed at end of combat (CR 603.7, 701.8a).
+[Bot1 Deck]
+Abomination
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Swamp x20
+[Bot2 Deck]
+Grizzled Leotau
+Black Lotus
+Mox Pearl
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Abomination.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzled Leotau.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Grizzled Leotau > Bot1)
+Bot1.Block(Abomination > Grizzled Leotau)
+[T4 Bot2.Damage]
+? Bot2.Battlefield.Grizzled Leotau.Toughness = 5
+[T4 Bot2.Main2]
+[Expect]
+Bot2.Graveyard = Grizzled Leotau; Black Lotus
+Bot1.Battlefield.Abomination.Damage = 1

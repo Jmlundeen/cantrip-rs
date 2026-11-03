@@ -1,0 +1,39 @@
+# Abomination attacks beside Grizzly Bears; Wall of Ice blocks the Bears, so Abomination does not destroy it.
+[Bot1 Deck]
+Abomination
+Grizzly Bears
+Black Lotus
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Swamp
+Swamp x20
+[Bot2 Deck]
+Wall of Ice
+Black Lotus
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Abomination.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Wall of Ice.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Abomination > Bot2; Grizzly Bears > Bot2)
+Bot2.Block(Wall of Ice > Grizzly Bears)
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Wall of Ice.Damage = 2
+Bot2.Life = 18

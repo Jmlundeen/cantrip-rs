@@ -1,0 +1,42 @@
+# Two different qualifying blockers each cause a delayed destruction; both survive Abomination's combat damage.
+[Bot1 Deck]
+Abomination
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Swamp x20
+[Bot2 Deck]
+Wall of Ice
+Fortified Rampart
+Black Lotus
+Black Lotus
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Abomination.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot2.Hand.Wall of Ice.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Fortified Rampart.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Abomination > Bot2)
+Bot2.Block(Wall of Ice > Abomination; Fortified Rampart > Abomination)
+[T3 Bot1.Damage]
+? Bot2.Battlefield.Wall of Ice.Toughness = 7
+? Bot2.Battlefield.Fortified Rampart.Toughness = 6
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Battlefield.Wall of Ice = (absent)
+Bot2.Battlefield.Fortified Rampart = (absent)
+Bot2.Graveyard = Fortified Rampart; Wall of Ice; Black Lotus; Black Lotus

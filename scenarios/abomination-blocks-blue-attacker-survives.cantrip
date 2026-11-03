@@ -1,0 +1,43 @@
+# Abomination blocks the blue 0/4 Kraken Hatchling: it survives combat damage and is not destroyed at end of combat (CR 603.7, 701.8a).
+[Bot1 Deck]
+Abomination
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Swamp x20
+[Bot2 Deck]
+Kraken Hatchling
+Black Lotus
+Mox Pearl
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Abomination.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Kraken Hatchling.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Kraken Hatchling > Bot1)
+Bot1.Block(Abomination > Kraken Hatchling)
+[T4 Bot2.Damage]
+? Bot2.Battlefield.Kraken Hatchling.Toughness = 4
+[T4 Bot2.Main2]
+[Expect]
+Bot2.Battlefield.Kraken Hatchling.Damage = 2
+Bot1.Battlefield.Abomination.Damage = 0
