@@ -1,0 +1,43 @@
+# June, Bounty Hunter with only the draw step's card drawn this turn (one short of two) can be blocked: Bot2's Grizzly Bears blocks her,
+# and the two 2/2 creatures kill each other.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+June, Bounty Hunter
+Gitaxian Probe
+Swamp x3
+Swamp x13
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Grizzly Bears
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.June, Bounty Hunter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(June, Bounty Hunter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot2.Block(Grizzly Bears > June, Bounty Hunter)
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = June, Bounty Hunter
+Bot2.Graveyard = Grizzly Bears

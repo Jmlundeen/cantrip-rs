@@ -1,0 +1,47 @@
+# June, Bounty Hunter: "{1}, Sacrifice another creature: Create a Clue token. Activate only during your turn." June alone is refused
+# (the sacrifice must be another creature, not she herself); Grizzly Bears is cast on turn 3 and, with {1} in a Mox untapped,
+# the ability is refused in Bot2's turn 4 (only during your turn) and works in turn 5: Bears are sacrificed, a Clue is made,
+# and the mana paid exactly {1} (the pool is empty).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+June, Bounty Hunter
+Grizzly Bears
+Swamp x2
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.June, Bounty Hunter.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.June, Bounty Hunter.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+! Bot1.Battlefield.June, Bounty Hunter.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.June, Bounty Hunter.Activate
+Bot1.Choose(Bot1.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Grizzly Bears
+Bot1.Battlefield = Clue Token; June, Bounty Hunter; Mox Emerald; Mox Jet; Mox Ruby; Swamp
