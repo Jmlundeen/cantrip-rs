@@ -547,6 +547,15 @@ pub fn count_you_control(q: &dyn LayerQuery, source: ObjectId, counts: &dyn Fn(&
     q.state().battlefield().iter().filter(|&&id| q.controller(id) == controller && counts(&q.chars(id))).count() as i16
 }
 
+/// Power and toughness each equal the number of a land subtype you control (CR 604.3, 613.4a).
+/// Nightmare counts Swamps and Eluge, the Shoreless Sea counts Islands; the subtype is read through the source's text.
+pub fn power_and_toughness_are_subtype_you_control<const SUBTYPE: u16>(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let subtype = q.words(source).subtype(printed(SUBTYPE));
+    let n = count_you_control(q, source, &|c| c.has_subtype(subtype));
+    chars.power = Some(n);
+    chars.toughness = Some(n);
+}
+
 /// "The number of differently named lands you control" (CR 201.2a-b): count the largest set of lands whose names do not
 /// overlap, including split cards and Rooms with multiple names, so the count is the true largest set whatever the order of the
 /// lands. Emil, Vastlands Roamer, Astute Terraformer, Branching Timeline, Cloak and Phaser and Deep Space Scan print it.

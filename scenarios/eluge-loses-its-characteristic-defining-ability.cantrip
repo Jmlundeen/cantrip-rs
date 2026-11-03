@@ -1,0 +1,37 @@
+# Fresh Start removes Eluge's characteristic-defining ability; Giant Growth keeps it alive to show both stars become zero (CR 208.5, 613.1f, 613.1g).
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Eluge, the Shoreless Sea
+Mox Sapphire
+Fresh Start
+Mox Emerald
+Giant Growth
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Eluge, the Shoreless Sea)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Fresh Start.Cast(Eluge, the Shoreless Sea)
+[T5 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Eluge, the Shoreless Sea.Power = -2
+Bot1.Battlefield.Eluge, the Shoreless Sea.Toughness = 3

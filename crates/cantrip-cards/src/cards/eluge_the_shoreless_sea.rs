@@ -2,16 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{lands, targets, triggers};
 use cantrip_oracle as oracle;
 
-/// "Eluge's power and toughness are each equal to the number of Islands you control" (CR 604.3, 613.4a): a
-/// characteristic-defining ability, in every zone (the ruling); "you" is its controller, its owner off the battlefield.
-/// Island is read through the words of Eluge's text (CR 612).
-fn islands_you_control(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let island = q.words(source).subtype(Subtype::Island);
-    let n = lands::count_you_control(q, source, &|c| c.subtypes.has(island));
-    chars.power = Some(n);
-    chars.toughness = Some(n);
-}
-
 /// "Put a flood counter on target land. It's an Island in addition to its other types for as long as it has a flood
 /// counter on it" (CR 122.1, 305.7, 611.2b): the land type is added in layer 4 and keeps the land's others; an Island has
 /// "{T}: Add {U}" (CR 305.6). It lasts as long as the counter does, Eluge gone or not (the ruling), and never begins if
@@ -50,7 +40,7 @@ fn first_instant_or_sorcery_costs_less(q: &dyn Query, source: ObjectId, player: 
 }
 
 pub static CARD: CardDef = CardDef {
-    statics: &[characteristic_defining(Layer::PtDefine, islands_you_control, "Eluge's power and toughness are each equal to the number of Islands you control.").lost_pt(0, 0)],
+    statics: &[characteristic_defining(Layer::PtDefine, lands::power_and_toughness_are_subtype_you_control::<{ lands::sub(Subtype::Island) }>, "Eluge's power and toughness are each equal to the number of Islands you control.").lost_pt(0, 0)],
     abilities: &[triggered(
         triggers::THIS_ENTERS_OR_ATTACKS,
         flood,
