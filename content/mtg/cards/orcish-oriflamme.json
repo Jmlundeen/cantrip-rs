@@ -1,0 +1,6 @@
+{
+  "name": "Orcish Oriflamme",
+  "manaCost": "{3}{R}",
+  "type": "Enchantment",
+  "oracleText": "Attacking creatures you control get +1/+0."
+}

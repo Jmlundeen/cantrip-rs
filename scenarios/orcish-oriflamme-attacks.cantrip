@@ -1,0 +1,46 @@
+# Orcish Oriflamme gives only its controller's attacking creatures +1/+0 while they attack (CR 613.1g).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Orcish Oriflamme
+Grizzly Bears
+Island x20
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Orcish Oriflamme.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Attack(Grizzly Bears > Bot2)
+[T3 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Grizzly Bears.Power = 3
+? Bot1.Battlefield.Grizzly Bears.Toughness = 2
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Grizzly Bears > Bot1)
+[T4 Bot2.DeclareBlockers]
+? Bot2.Battlefield.Grizzly Bears.Power = 2
+? Bot2.Battlefield.Grizzly Bears.Toughness = 2
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 17
