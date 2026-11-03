@@ -1,0 +1,53 @@
+# Each one-mana activation gives Carrion Ants +1/+1; the bonuses stack and expire at end of turn.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Carrion Ants
+Island
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Carrion Ants.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Carrion Ants.Activate(Mana: short)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Carrion Ants.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Carrion Ants.Power = 1
+? Bot1.Battlefield.Carrion Ants.Toughness = 2
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Carrion Ants.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Carrion Ants.Power = 2
+? Bot1.Battlefield.Carrion Ants.Toughness = 3
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Carrion Ants.Power = 0
+? Bot1.Battlefield.Carrion Ants.Toughness = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Carrion Ants.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Carrion Ants.Power = 1
+? Bot1.Battlefield.Carrion Ants.Toughness = 2
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Carrion Ants.Power = 0
+Bot1.Battlefield.Carrion Ants.Toughness = 1

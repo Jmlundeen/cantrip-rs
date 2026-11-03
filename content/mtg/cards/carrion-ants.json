@@ -1,0 +1,8 @@
+{
+  "name": "Carrion Ants",
+  "manaCost": "{2}{B}{B}",
+  "type": "Creature — Insect",
+  "power": 0,
+  "toughness": 1,
+  "oracleText": "{1}: This creature gets +1/+1 until end of turn."
+}
