@@ -1,0 +1,6 @@
+{
+  "name": "Sandstorm",
+  "manaCost": "{G}",
+  "type": "Instant",
+  "oracleText": "Sandstorm deals 1 damage to each attacking creature."
+}
