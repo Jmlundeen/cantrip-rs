@@ -1,0 +1,61 @@
+# Hog-Monkey: "Exhaust - {5}: Put two +1/+1 counters on this creature" costs exactly {5} (four sources are refused, the fifth pays it) and
+# can be activated once only (CR 702.177a): a second try on turn 5 with five Moxen untapped is refused. With the counters it is a legal
+# target of its own "At the beginning of combat on your turn, target creature you control with a +1/+1 counter on it gains menace until
+# end of turn": it has menace in the turn-3 combat and not in Bot2's turn, though the counters stay.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Hog-Monkey
+Swamp x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hog-Monkey.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Hog-Monkey.Power = 3
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Hog-Monkey.Activate(Ability: Exhaust; Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Hog-Monkey.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hog-Monkey.Power = 5
+? Bot1.Battlefield.Hog-Monkey.Toughness = 4
+? Bot1.Battlefield.Hog-Monkey.Keywords = (absent)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Hog-Monkey.Keywords = Menace
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Hog-Monkey.Keywords = (absent)
+? Bot1.Battlefield.Hog-Monkey.Power = 5
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Hog-Monkey.Activate
+
+[Expect]
+Bot1.Battlefield.Hog-Monkey.Power = 5

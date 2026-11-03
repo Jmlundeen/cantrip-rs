@@ -1,0 +1,71 @@
+# Hog-Monkey: "target creature you control with a +1/+1 counter on it". Bot1 controls the Monkey (no counter) and a Grizzly Bears given a
+# counter by its own Snakeskin Veil; Bot2 controls a Grizzly Bears with a counter of its own. At the turn-3 combat the trigger asks for no
+# target, because only Bot1's Bears is one (the Monkey has no counter; the other side's Bears is not "you control"): the Bears gain menace,
+# the Monkey and Bot2's Bears do not.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Hog-Monkey
+Grizzly Bears
+Snakeskin Veil
+Swamp x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Gleemox
+Grizzly Bears
+Snakeskin Veil
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hog-Monkey.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Gleemox.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Gleemox.Activate(Color: Green)
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 3
+? Bot2.Battlefield.Grizzly Bears.Power = 3
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Grizzly Bears.Keywords = Hexproof; Menace
+? Bot1.Battlefield.Hog-Monkey.Keywords = (absent)
+? Bot2.Battlefield.Grizzly Bears.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield.Hog-Monkey.Power = 3
