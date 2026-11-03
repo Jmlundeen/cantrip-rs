@@ -1,0 +1,76 @@
+# Rough Rhino Cavalry (5/5, firebending 2, "Exhaust - {8}: Put two +1/+1 counters on this creature. It gains trample until end of
+# turn"): cast on turn 1 off five Moxen, it attacks on turn 3. Firebending adds {R}{R} that last through combat, and with the
+# Mountain and five Moxen untapped that is exactly {8}: the pool is empty after paying. It becomes a 7/7 with trample, blocked by
+# Bot2's 0/2 Ornithopter it tramples over for 5. On turn 5 the exhaust ability is not offered again, even with the mana.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Rough Rhino Cavalry
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rough Rhino Cavalry.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Rough Rhino Cavalry > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} lasting {R}{R}
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Rough Rhino Cavalry.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Rough Rhino Cavalry.Power = 7
+? Bot1.Battlefield.Rough Rhino Cavalry.Toughness = 7
+? Bot1.Battlefield.Rough Rhino Cavalry.Keywords = Trample
+Bot2.Block(Ornithopter > Rough Rhino Cavalry)
+[T3 Bot1.Main2]
+? Bot2.Life = 15
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Attack(Rough Rhino Cavalry > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} lasting {R}{R}
+! Bot1.Battlefield.Rough Rhino Cavalry.Activate
+Bot1.Pass
+Bot2.Block(Ornithopter > Rough Rhino Cavalry)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Rough Rhino Cavalry.Power = 7
+Bot2.Life = 15
