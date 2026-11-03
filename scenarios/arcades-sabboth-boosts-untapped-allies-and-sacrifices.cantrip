@@ -1,0 +1,129 @@
+# Arcades boosts untapped allies but not attackers, even with vigilance, and is sacrificed when upkeep is declined (CR 701.21a).
+[Bot1 Deck]
+Arcades Sabboth
+Black Lotus
+Mox Pearl
+Gleemox
+Mox Sapphire
+Lotus Petal
+Mox Jet
+Ornithopter
+Plains
+Maned Serval
+Forest x20
+
+[Bot2 Deck]
+Memnite
+Plains
+Mox Pearl
+Disenchant
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Arcades Sabboth.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+? Bot1.Battlefield.Arcades Sabboth.Power = 7
+? Bot1.Battlefield.Arcades Sabboth.Toughness = 9
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Memnite.Toughness = 1
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+[T7 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Maned Serval.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Maned Serval.Toughness = 6
+[T9 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Maned Serval > Bot2)
+[T9 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Maned Serval.Tapped = false
+? Bot1.Battlefield.Maned Serval.Toughness = 4
+[T10 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Sapphire)
+[T11 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.PayCost
+Bot1.Decline
+[T11 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Arcades Sabboth = (absent)
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Graveyard = Arcades Sabboth; Mox Sapphire; Lotus Petal; Black Lotus

@@ -1,0 +1,91 @@
+# If an opponent takes control before the upkeep ability resolves, its controller cannot sacrifice Arcades (CR 701.21a).
+[Bot1 Deck]
+Arcades Sabboth
+Black Lotus
+Mox Pearl
+Gleemox
+Mox Sapphire
+Lotus Petal
+Mox Jet
+Plains
+Ornithopter
+Forest x20
+
+[Bot2 Deck]
+Old Man of the Sea
+Black Lotus
+Mox Ruby
+Mox Emerald
+Gleemox
+Giant Growth x2
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Arcades Sabboth.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+? Bot1.Battlefield.Arcades Sabboth.Power = 7
+? Bot1.Battlefield.Arcades Sabboth.Toughness = 9
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Gleemox.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Old Man of the Sea.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Old Man of the Sea)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Gleemox.Activate(Color: Green)
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Old Man of the Sea)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Arcades Sabboth)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Arcades Sabboth.Toughness = 9
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T5 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield.Arcades Sabboth.Toughness = 9
+Bot1.Battlefield.Arcades Sabboth = (absent)
