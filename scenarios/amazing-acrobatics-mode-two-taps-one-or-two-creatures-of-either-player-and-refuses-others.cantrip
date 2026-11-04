@@ -1,0 +1,45 @@
+# Amazing Acrobatics, mode 2 alone: "Tap one or two target creatures" (CR 701.26a, 115.1). Zero targets and three targets are
+# refused, and so is a noncreature permanent (Bot1's Mox Ruby); one of your own creatures and one of Bot2's are accepted
+# together and both become tapped. Black Lotus pays {1}{U}{U} exactly.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Ornithopter
+Memnite
+Amazing Acrobatics
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Amazing Acrobatics.Cast
+Bot1.Modes(2)
+! Bot1.Target(Mox Ruby)
+! Bot1.Target(Bot1.Battlefield.Ornithopter; Memnite; Bot2.Battlefield.Ornithopter)
+! Bot1.Target(Count: 0)
+Bot1.Target(Memnite; Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Tapped = true
+? Bot2.Battlefield.Ornithopter.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Memnite.Tapped = true
+Bot2.Battlefield.Ornithopter.Tapped = true

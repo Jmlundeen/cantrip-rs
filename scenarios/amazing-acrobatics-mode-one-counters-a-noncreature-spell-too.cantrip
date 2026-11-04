@@ -1,0 +1,29 @@
+# Amazing Acrobatics' "Counter target spell" is any spell (CR 115.1, 701.6), not only a creature spell: Bot1 counters Bot2's Sol Ring
+# (an artifact) with mode 1 alone, so it never reaches the battlefield. Black Lotus pays the {1}{U}{U} exactly.
+
+[Bot1 Deck]
+Black Lotus
+Amazing Acrobatics
+Island x18
+
+[Bot2 Deck]
+Forest
+Sol Ring
+Forest x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Amazing Acrobatics.Cast
+Bot1.Modes(1)
+Bot1.Target(Stack.Sol Ring)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Sol Ring
+Bot2.Battlefield = Forest
