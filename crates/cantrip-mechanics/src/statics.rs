@@ -324,7 +324,7 @@ pub fn have_flying(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Flying);
 }
 
-/// "... has reach" (CR 702.17, layer 6). Web, Hawkeye's Bow and The Black Arrow grant it.
+/// "... has reach" (CR 702.17, layer 6). Web, Hawkeye's Bow, The Black Arrow and Web-Shooters grant it.
 pub fn have_reach(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Reach);
 }

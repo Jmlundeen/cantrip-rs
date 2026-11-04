@@ -1,14 +1,9 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::statics::{grant_delayed_ability, plus_pt};
+use cantrip_mechanics::statics::{grant_delayed_ability, have_reach, plus_pt};
 use cantrip_mechanics::triggers::THIS_ATTACKS;
 use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
-
-/// "Equipped creature ... has reach" (CR 702.17, 613.1f) as a static ability's `StaticDef::apply`.
-fn have_reach(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Reach);
-}
 
 /// The ability the equipped creature has (CR 613.1f): "Whenever this creature attacks, tap target creature an opponent controls." It is the
 /// creature's own, so its controller (not the Equipment's, if they differ) controls it and "an opponent" is that player's opponent
