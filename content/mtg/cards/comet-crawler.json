@@ -1,0 +1,11 @@
+{
+  "name": "Comet Crawler",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Insect Horror",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Lifelink\nWhenever this creature attacks, you may sacrifice another creature or artifact. If you do, this creature gets +2/+0 until end of turn.",
+  "keywords": [
+    "Lifelink"
+  ]
+}

@@ -1,0 +1,39 @@
+# Comet Crawler may sacrifice another creature as well as an artifact: Bot1 sacrifices Ornithopter on turn 3, keeping the Moxen,
+# and the Crawler is 4/3: 4 lifelink damage (Bot2 16, Bot1 24).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Comet Crawler
+Ornithopter
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Comet Crawler.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Attack(Comet Crawler > Bot2)
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Mox Pearl.Tapped = false

@@ -1,0 +1,48 @@
+# Comet Crawler (2/3 lifelink) cast on turn 1 with three Moxen. On turn 3 it attacks and Bot1 sacrifices Mox Pearl (an artifact;
+# the Crawler itself is not offered, "another"): it is 4/3 until end of turn and deals 4 with lifelink (Bot2 16, Bot1 24). On
+# turn 5 Bot1 declines, nothing is sacrificed and it is 2/3 again: 2 more damage (Bot2 14, Bot1 26).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Comet Crawler
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Comet Crawler.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Comet Crawler > Bot2)
+Bot1.Pass
+! Bot1.Choose(Comet Crawler)
+Bot1.Choose(Mox Pearl)
+? Bot1.Battlefield.Comet Crawler.Power = 4
+? Bot1.Battlefield.Comet Crawler.Toughness = 3
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Life = 24
+? Bot1.Battlefield.Mox Pearl = (absent)
+[T5 Bot1.Main1]
+Bot1.Attack(Comet Crawler > Bot2)
+Bot1.Pass
+Bot1.Choose()
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 26
+Bot1.Battlefield.Comet Crawler.Power = 2
+Bot1.Battlefield.Mox Jet.Tapped = false
