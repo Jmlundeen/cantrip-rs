@@ -1,0 +1,54 @@
+# Thrumming Hivepool: at the beginning of Bot1's upkeep it creates two 1/1 Sliver tokens at once (CR 701.7a), and Slivers Bot1
+# controls have haste and double strike (CR 613.1f): on turn 3 both attack the turn they are made and each deals 1 first-strike and 1
+# regular damage, 4 in all. Bot2's Sizzling Changeling is a Sliver too, every creature type (CR 702.73a), but not one "you control":
+# it has no haste on turn 2 and no keywords.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Thrumming Hivepool
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sizzling Changeling
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thrumming Hivepool.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sizzling Changeling.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Sizzling Changeling.Keywords = Changeling
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Sliver Token#1.Keywords = DoubleStrike; Haste
+? Bot1.Battlefield.Sliver Token#2.Keywords = DoubleStrike; Haste
+? Bot1.Battlefield.Sliver Token#1.Toughness = 1
+? Bot1.Battlefield.Sliver Token#2.Toughness = 1
+Bot1.Attack(Sliver Token#1; Sliver Token#2 > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Sliver Token; Sliver Token; Thrumming Hivepool

@@ -1,0 +1,58 @@
+# Thrumming Hivepool's "Affinity for Slivers" (CR 702.41a): costs {1} less for each Sliver Bot1 controls. On turn 1 there are none and
+# Black Lotus and three Moxen pay the full {6}. On turn 3, with the two Sliver tokens its first Hivepool made, a second costs {4}:
+# the three Moxen and the Forest pay it exactly, three mana is short of it, and Bot2's Sizzling Changeling - a Sliver, but not
+# one Bot1 controls - takes nothing more off.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Thrumming Hivepool
+Thrumming Hivepool
+Forest
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sizzling Changeling
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thrumming Hivepool.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sizzling Changeling.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Thrumming Hivepool.Cast(Mana: short)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Thrumming Hivepool.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Jet; Mox Pearl; Mox Ruby; Sliver Token; Sliver Token; Thrumming Hivepool; Thrumming Hivepool
