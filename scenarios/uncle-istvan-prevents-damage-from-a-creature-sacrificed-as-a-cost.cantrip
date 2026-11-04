@@ -1,0 +1,33 @@
+# Tinder Wall is sacrificed to pay for the ability that damages Uncle Istvan; the damage is dealt by a creature as it last
+# existed on the battlefield (CR 608.2h), so it is prevented, though the source is by then a card in the graveyard.
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Uncle Istvan
+Island x25
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Tinder Wall
+Island x25
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Uncle Istvan.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Tinder Wall.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Uncle Istvan > Bot2)
+Bot2.Block(Tinder Wall > Uncle Istvan)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Tinder Wall.Activate(Bot1.Battlefield.Uncle Istvan; Ability: 2 damage)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Uncle Istvan.Damage = 0
+[Expect]
+Bot2.Graveyard.Tinder Wall.Power = 0

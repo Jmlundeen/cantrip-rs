@@ -1,0 +1,43 @@
+# Rod of Ruin is an artifact on the battlefield but not a creature, so the damage its ability deals is not dealt by a creature
+# and Uncle Istvan does not prevent it (CR 615.1, 109.2).
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Uncle Istvan
+Island x25
+[Bot2 Deck]
+Mox Sapphire
+Sol Ring
+Sol Ring
+Rod of Ruin
+Island x25
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Uncle Istvan.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Sol Ring.Cast
+? Bot2.Mana =
+[T4 Bot2.Main1]
+Bot2.Battlefield.Sol Ring#1.Activate
+Bot2.Battlefield.Sol Ring#2.Activate
+Bot2.Hand.Rod of Ruin.Cast
+? Bot2.Mana =
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Uncle Istvan.Damage = 0
+Bot2.Battlefield.Sol Ring#1.Activate
+Bot2.Battlefield.Sol Ring#2.Activate
+Bot2.Battlefield.Rod of Ruin.Activate(Bot1.Battlefield.Uncle Istvan)
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.Main2]
+[Expect]
+Bot1.Battlefield.Uncle Istvan.Damage = 1
+Bot2.Battlefield.Rod of Ruin.Tapped = true

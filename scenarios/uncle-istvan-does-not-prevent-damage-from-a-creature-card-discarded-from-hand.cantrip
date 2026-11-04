@@ -1,0 +1,26 @@
+# Trumpeting Carnosaur's "Discard this card: It deals 3 damage" is dealt by a creature card in the graveyard, not by a creature
+# (CR 109.2), so Uncle Istvan's prevention of damage by creatures does not apply and the 3 damage kills him.
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Uncle Istvan
+Island x25
+[Bot2 Deck]
+Black Lotus
+Trumpeting Carnosaur
+Island x25
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Uncle Istvan.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Trumpeting Carnosaur.Activate(Bot1.Battlefield.Uncle Istvan)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Uncle Istvan = (absent)
+Bot2.Graveyard.Trumpeting Carnosaur.Power = 7
