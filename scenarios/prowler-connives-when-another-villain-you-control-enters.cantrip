@@ -1,0 +1,58 @@
+# Prowler, Clawed Thief ({1}{U}{B}, 2/3, menace): "Whenever another Villain you control enters, Prowler connives." Turn 1: Prowler entering
+# does not trigger itself ("another"), nor does an Ornithopter (no Villain). Aerial Doombot (an Artifact Creature - Robot Villain) entering
+# makes Prowler connive (CR 701.50a): Bot1 draws Savannah Lions and discards it, a nonland card, so Prowler gets a +1/+1 counter (3/4).
+# Turn 2 Bot2's Aerial Doombot is a Villain an opponent controls: no second connive, no counter.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Gleemox
+Prowler, Clawed Thief
+Aerial Doombot
+Ornithopter
+Savannah Lions
+Island x14
+
+[Bot2 Deck]
+Aerial Doombot
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Prowler, Clawed Thief.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Prowler, Clawed Thief.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Savannah Lions)
+? Bot1.Battlefield.Prowler, Clawed Thief.Counters.PlusOnePlusOne = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aerial Doombot.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Prowler, Clawed Thief.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Prowler, Clawed Thief.Power = 3
