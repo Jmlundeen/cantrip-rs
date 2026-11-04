@@ -150,6 +150,12 @@ pub fn this_is_tapped(q: &dyn Query, asker: &Asker) -> bool {
     q.obj(asker.source).tapped
 }
 
+/// An intervening "if you control two or more tapped creatures" (CR 603.4), checked as the ability triggers and again as it
+/// resolves, so it does nothing if they have untapped or died by then. Dawnstrike Vanguard and Flight-Deck Coordinator print it.
+pub fn you_control_two_or_more_tapped_creatures(q: &dyn Query, asker: &Asker) -> bool {
+    q.permanents_of(asker.controller).into_iter().filter(|&id| q.obj(id).tapped && q.chars(id).is(CardType::Creature)).count() >= 2
+}
+
 /// An intervening "if it's on the battlefield" (CR 603.4), checked as the ability triggers and again as it resolves: the
 /// permanent is still the object that triggered (CR 400.7) and has not left. Animate Dead and Necromancy print it.
 pub fn this_is_on_the_battlefield(q: &dyn Query, asker: &Asker) -> bool {
