@@ -1,0 +1,89 @@
+# Dress Down ("Creatures lose all abilities.", layer 6) is on the battlefield before Infinite Guideline Station enters, on turn 9. Three Alpine Grizzlies (4/2, turns 1, 3 and 5) station it
+# for 12 in the same turn: it becomes an artifact creature, and "12+ | Flying" is one static ability whose effect began in layer 4, so its layer 6 and 7b parts keep applying although
+# Dress Down, earlier in layer 6, took the now-creature's abilities - a 7/15 with flying (CR 613.6, 721.2b). Only the station ability and the abilities it prints were Dress Down's to
+# take. Its enters trigger (it was no creature then) made one Robot, the Station itself being the only multicolored permanent.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Alpine Grizzly
+Alpine Grizzly
+Alpine Grizzly
+Black Lotus
+Dress Down
+Infinite Guideline Station
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Infinite Guideline Station.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot Token.Tapped = true
+? Bot1.Battlefield.Infinite Guideline Station.Types = Artifact
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Alpine Grizzly#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Alpine Grizzly#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Infinite Guideline Station.Counters.Charge = 8
+? Bot1.Battlefield.Infinite Guideline Station.Types = Artifact
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Alpine Grizzly#3)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Infinite Guideline Station.Counters.Charge = 12
+Bot1.Battlefield.Infinite Guideline Station.Types = Artifact; Creature
+Bot1.Battlefield.Infinite Guideline Station.Power = 7
+Bot1.Battlefield.Infinite Guideline Station.Toughness = 15
+Bot1.Battlefield.Infinite Guideline Station.Keywords = Flying

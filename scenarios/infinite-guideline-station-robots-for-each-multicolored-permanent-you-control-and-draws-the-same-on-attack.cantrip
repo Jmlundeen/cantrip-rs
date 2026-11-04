@@ -1,0 +1,115 @@
+# Infinite Guideline Station {W}{U}{B}{R}{G} (all five colors, so multicolored), 7/15 at 12+: "When it enters, create a tapped 2/2 colorless Robot artifact creature token for each
+# multicolored permanent you control." Bot1 has Genemorph Imago ({G}{U}) and a Mother of Runes (only white); Bot2 has a Genemorph Imago too, which is not Bot1's. Counted as the
+# ability resolves: the Genemorph and the Station itself, so two tapped Robots - not the mono-colored Mother, not the colorless Moxen, not Bot2's. The Robots, Genemorph and Mother
+# station it (2 + 2 + 1 + 1 = 6) on turn 5 and again on turn 7: 8, 10, 11 (still no creature, no flying) and 12 - a 7/15 flying artifact creature. It attacks and draws a card for each
+# multicolored permanent Bot1 controls, two (the Robots are colorless): the hand of two Islands from turns 5 and 7 and the two cards, 4.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Genemorph Imago
+Mother of Runes
+Infinite Guideline Station
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Genemorph Imago
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Genemorph Imago.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Genemorph Imago.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Infinite Guideline Station.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot Token#1.Tapped = true
+? Bot1.Battlefield.Robot Token#2.Tapped = true
+? Bot1.Battlefield.Count = 10
+[T5 Bot1.Main1]
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Robot Token#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Robot Token#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Genemorph Imago)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Mother of Runes)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Infinite Guideline Station.Counters.Charge = 6
+[T7 Bot1.Main1]
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Robot Token#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Robot Token#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Genemorph Imago)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Infinite Guideline Station.Counters.Charge = 11
+? Bot1.Battlefield.Infinite Guideline Station.Types = Artifact
+? Bot1.Battlefield.Infinite Guideline Station.Keywords = (absent)
+? Bot1.Battlefield.Infinite Guideline Station.Power = (absent)
+Bot1.Battlefield.Infinite Guideline Station.Activate(Ability: Station)
+Bot1.Choose(Mother of Runes)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Infinite Guideline Station.Counters.Charge = 12
+? Bot1.Battlefield.Infinite Guideline Station.Types = Artifact; Creature
+? Bot1.Battlefield.Infinite Guideline Station.Keywords = Flying
+? Bot1.Battlefield.Infinite Guideline Station.Power = 7
+? Bot1.Battlefield.Infinite Guideline Station.Toughness = 15
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Infinite Guideline Station > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Hand.Count = 4
