@@ -1,0 +1,62 @@
+# Mouth of the Storm {6}{U}, "When this creature enters, creatures your opponents control get -3/-0 until your next turn": in turn 3 Bot1 pays {6}{U} with Black
+# Lotus and four Moxen. Bot2's Grizzly Bears become -1/2; Mouth of the Storm itself stays 6/6. A second Grizzly Bears Bot2 casts in turn 4 is not affected
+# (only the creatures it controls as the ability resolves), and at the beginning of turn 5, Bot1's next turn, the first Bears are 2/2 again.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mouth of the Storm
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Grizzly Bears
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mouth of the Storm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Grizzly Bears.Power = -1
+? Bot2.Battlefield.Grizzly Bears.Toughness = 2
+? Bot1.Battlefield.Mouth of the Storm.Power = 6
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Grizzly Bears#1.Power = -1
+? Bot2.Battlefield.Grizzly Bears#2.Power = 2
+[T5 Bot1.Upkeep]
+? Bot2.Battlefield.Grizzly Bears#1.Power = 2
+
+[Expect]
+Stack.Count = 0

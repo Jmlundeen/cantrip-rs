@@ -1,0 +1,66 @@
+# Mouth of the Storm's ward {2} (CR 702.21a): in turn 3 Bot1 pays {6}{U} with Black Lotus and four Moxen. In turn 4 Bot2's first Lightning Bolt at it is paid with
+# Mox Ruby; one mana (Mox Emerald's) cannot pay ward {2}, Bot2 declines it and the Bolt is countered, the Mouth undamaged. The second Bolt, from Black Lotus's three
+# red mana, leaves exactly two floating: those pay the ward, nothing is left over, and the Bolt deals 3 damage to the Mouth.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mouth of the Storm
+Island
+Island x13
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Lightning Bolt
+Lightning Bolt
+Island
+Island
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mouth of the Storm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mouth of the Storm)
+Bot2.Pass
+! Bot2.PayCost (Mana: short)
+Bot2.Decline
+? Bot1.Battlefield.Mouth of the Storm.Damage = 0
+[T4 Bot2.Main2]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mouth of the Storm)
+Bot2.Pass
+Bot2.PayCost
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Mouth of the Storm.Damage = 3
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt; Black Lotus; Lightning Bolt; Island
