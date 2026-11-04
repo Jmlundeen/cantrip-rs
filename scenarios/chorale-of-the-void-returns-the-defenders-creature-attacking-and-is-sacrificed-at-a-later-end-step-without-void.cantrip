@@ -1,0 +1,69 @@
+# Chorale of the Void on Bot1's Ornithopter. Bot2's Lightning Bolt (to Bot1's face) is in its graveyard too, a card the Aura
+# cannot take. On turn 3 Bot1's Lightning Bolt kills Bot2's Savannah Lions, so the Aura's void is on
+# for the turn; attacking with the Ornithopter, "whenever enchanted creature attacks" returns the Lions from defending Bot2's
+# graveyard under Bot1's control, tapped and attacking (CR 508.4): 2 damage, Bot2 at 18. The Aura survives that end step (a
+# nonland permanent left the battlefield this turn), and is sacrificed at the end of turn 5, when nothing has left.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Ornithopter
+Chorale of the Void
+Lightning Bolt
+Plains x12
+
+[Bot2 Deck]
+Savannah Lions
+Mox Pearl
+Mox Ruby
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Savannah Lions)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Chorale of the Void.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Battlefield.Savannah Lions.Tapped = true
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Chorale of the Void.AttachedTo = Ornithopter
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Chorale of the Void; Lightning Bolt
