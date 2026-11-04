@@ -1,0 +1,6 @@
+{
+  "name": "Zero Point Ballad",
+  "manaCost": "{X}{B}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all creatures with toughness X or less. You lose X life. If X is 6 or more, return a creature card put into a graveyard this way to the battlefield under your control."
+}

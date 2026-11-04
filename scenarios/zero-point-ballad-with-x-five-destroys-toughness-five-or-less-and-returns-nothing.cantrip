@@ -1,0 +1,58 @@
+# Zero Point Ballad: X=5 ({5}{B}) destroys Bot1's Ornithopter (toughness 2) and Bot2's Wall of Air (toughness exactly 5) but not
+# Bot2's Wall of Earth (6); Bot1 loses 5 life; X is under 6, so nothing is returned (the destroyed cards stay in their graveyards).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Black Lotus
+Ornithopter
+Zero Point Ballad
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Wall of Earth
+Wall of Air
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Wall of Air.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Wall of Earth.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Zero Point Ballad.Cast(X: 5)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Life = 15
+Bot1.Graveyard = Zero Point Ballad; Ornithopter; Black Lotus
+Bot2.Graveyard = Wall of Air; Black Lotus
+Bot2.Battlefield = Mountain; Mox Ruby; Wall of Earth

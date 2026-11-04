@@ -1,0 +1,62 @@
+# Zero Point Ballad: "Destroy all creatures with toughness X or less. You lose X life. If X is 6 or more, return a creature card put
+# into a graveyard this way to the battlefield under your control." X=6 ({6}{B} from Mox Jet, Pearl, Sapphire, Ruby and a Black
+# Lotus): Bot1's Memnite (1) and Bot2's Wall of Earth (toughness exactly 6) are destroyed, Bot2's Wall of Granite (7) is not; Bot1 loses
+# 6 life and chooses Bot2's Wall of Earth, which enters under Bot1's control (CR 701.8a, 400.3).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Black Lotus
+Memnite
+Zero Point Ballad
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Wall of Earth
+Wall of Granite
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Granite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Wall of Earth.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Zero Point Ballad.Cast(X: 6)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Wall of Earth)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Life = 14
+Bot1.Battlefield.Wall of Earth.Tapped = false
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Wall of Earth
+Bot2.Battlefield = Mountain; Mox Ruby; Wall of Granite
