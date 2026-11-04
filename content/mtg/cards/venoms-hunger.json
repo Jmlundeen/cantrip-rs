@@ -1,0 +1,6 @@
+{
+  "name": "Venom's Hunger",
+  "manaCost": "{4}{B}",
+  "type": "Sorcery",
+  "oracleText": "This spell costs {2} less to cast if you control a Villain.\nDestroy target creature. You gain 2 life."
+}

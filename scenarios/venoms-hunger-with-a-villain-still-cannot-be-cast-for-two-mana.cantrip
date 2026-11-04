@@ -1,0 +1,36 @@
+# Venom's Hunger: the discount with a Villain is exactly {2}, so {2}{B} is still more than the two Moxen Bot1 has on turn 3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Common Crook
+Venom's Hunger
+Plains
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Common Crook.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Venom's Hunger.Cast(Bot2.Battlefield.Ornithopter; Mana: short)
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot1.Life = 20

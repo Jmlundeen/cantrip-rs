@@ -1,0 +1,46 @@
+# Venom's Hunger: Bot2 kills its own Ornithopter with Lightning Bolt in response, so the spell's only target is illegal when it tries to resolve and it does
+# nothing at all (CR 608.2b): Bot1 gains no life and stays at 20.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Common Crook
+Venom's Hunger
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Common Crook.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Venom's Hunger.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter = (absent)
+Bot1.Life = 20
+Bot1.Graveyard = Venom's Hunger
