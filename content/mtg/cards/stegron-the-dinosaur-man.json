@@ -1,0 +1,11 @@
+{
+  "name": "Stegron the Dinosaur Man",
+  "manaCost": "{4}{R}",
+  "type": "Legendary Creature — Dinosaur Villain",
+  "power": 5,
+  "toughness": 4,
+  "oracleText": "Menace (This creature can't be blocked except by two or more creatures.)\nDinosaur Formula — {1}{R}, Discard this card: Until end of turn, target creature you control gets +3/+1 and becomes a Dinosaur in addition to its other types.",
+  "keywords": [
+    "Menace"
+  ]
+}

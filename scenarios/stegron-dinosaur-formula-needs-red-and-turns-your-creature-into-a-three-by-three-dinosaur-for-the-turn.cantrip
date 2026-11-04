@@ -1,0 +1,43 @@
+# Stegron's "Dinosaur Formula - {1}{R}, Discard this card: Until end of turn, target creature you control gets +3/+1 and becomes a Dinosaur in
+# addition to its other types", from the hand. With only Mox Emerald's {G} and Mox Jet's {B} in the pool it is refused: the {R} is pinned.
+# With Mox Ruby added it is paid, and it refuses Bot2 (a player), a Mox (not a creature) and takes Bot1's Ornithopter (0/2 Thopter): it is a
+# 3/3 Dinosaur Thopter (Stegron in the graveyard) until Bot2's turn 2, where it is back to 0/2 and a Thopter only.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Ornithopter
+Stegron the Dinosaur Man
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Stegron the Dinosaur Man.Activate(Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Stegron the Dinosaur Man.Activate(Bot2)
+! Bot1.Hand.Stegron the Dinosaur Man.Activate(Mox Ruby)
+Bot1.Hand.Stegron the Dinosaur Man.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+? Bot1.Battlefield.Ornithopter.Subtypes = Dinosaur; Thopter
+? Bot1.Graveyard = Stegron the Dinosaur Man
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Subtypes = Thopter
+
+[Expect]
+Bot1.Graveyard = Stegron the Dinosaur Man
