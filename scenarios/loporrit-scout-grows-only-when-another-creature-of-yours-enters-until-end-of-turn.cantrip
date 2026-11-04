@@ -1,0 +1,45 @@
+# Loporrit Scout ({2}{G}, 3/2): "Whenever another creature you control enters, this creature gets +1/+1 until end of turn."
+# Entering itself on turn 1 does nothing (CR 603.6a: "another"): it stays 3/2. Bot1's Llanowar Elves entering then make it 4/3,
+# and Bot2's Llanowar Elves entering on turn 2 do not - a creature an opponent controls - leaving it 3/2 once the +1/+1 of
+# turn 1 has ended with that turn (CR 514.2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Loporrit Scout
+Llanowar Elves
+Forest x20
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Loporrit Scout.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loporrit Scout.Power = 3
+? Bot1.Battlefield.Loporrit Scout.Toughness = 2
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loporrit Scout.Power = 4
+? Bot1.Battlefield.Loporrit Scout.Toughness = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Loporrit Scout.Power = 3
+? Bot1.Battlefield.Loporrit Scout.Toughness = 2
+
+[Expect]
+Bot1.Battlefield.Loporrit Scout.Power = 3
