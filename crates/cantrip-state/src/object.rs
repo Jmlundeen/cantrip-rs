@@ -751,7 +751,7 @@ impl Obj {
 }
 
 /// An ability an exception of a copy effect adds (CR 707.9b), and how many instances of it the copy has (CR 113.2c). An
-/// empty slot has none.
+/// empty slot has none. With `index` `TEXT`, it is the whole text of `card` the exception adds (`Copiable::with_text`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct ExtraAbility {
     pub card: CardId,
@@ -759,8 +759,55 @@ pub struct ExtraAbility {
     pub instances: u8,
 }
 
+/// The texts the exceptions of a copy's values add, each instance once (`Copiable::extra_texts`). A walk of a few slots kept
+/// small and plain, since every object's texts are walked (`CardTable::texts`) and nearly every object has none.
+#[derive(Clone, Debug)]
+pub struct ExceptionTexts<'a> {
+    slots: std::slice::Iter<'a, ExtraAbility>,
+    card: CardId,
+    left: u8,
+}
+
+impl<'a> ExceptionTexts<'a> {
+    /// The texts among `slots`, a copy's `extra_abilities` or none of them.
+    #[inline]
+    pub fn of(slots: &'a [ExtraAbility]) -> ExceptionTexts<'a> {
+        ExceptionTexts { slots: slots.iter(), card: CardId(0), left: 0 }
+    }
+}
+
+impl Iterator for ExceptionTexts<'_> {
+    type Item = CardId;
+
+    #[inline]
+    fn next(&mut self) -> Option<CardId> {
+        if self.left > 0 {
+            self.left -= 1;
+            return Some(self.card);
+        }
+        for slot in self.slots.by_ref() {
+            // An empty slot has no instances, and the slots after it are empty too.
+            if slot.instances == 0 {
+                break;
+            }
+            if slot.is_text() {
+                (self.card, self.left) = (slot.card, slot.instances - 1);
+                return Some(slot.card);
+            }
+        }
+        None
+    }
+}
+
 impl ExtraAbility {
     pub const NONE: ExtraAbility = ExtraAbility { card: CardId(0), index: 0, instances: 0 };
+    /// The `index` of a slot that holds an exception's text (`Copiable::with_text`), not one ability of it.
+    pub const TEXT: u8 = u8::MAX;
+
+    #[inline]
+    fn is_text(&self) -> bool {
+        self.index == ExtraAbility::TEXT
+    }
 
     pub fn ability(&self) -> AbilityRef {
         AbilityRef { card: self.card, index: self.index }
@@ -993,14 +1040,38 @@ impl Copiable {
         self
     }
 
-    /// Every instance of the abilities the exceptions add, in order (CR 707.9b, 113.2c).
+    /// "Except it has \"[a static ability]\"" (CR 707.9b), for an ability that is no activated or triggered ability but a
+    /// rule its card lists beside them - a cost change, a static ability, a replacement effect: the whole text of `card`, a
+    /// definition that has only what the exception gives, read as the copy's own text (`CardTable::texts`). Firion, Wild Rose
+    /// Warrior's token has "This Equipment's equip abilities cost {2} less to activate." Another instance of it is counted as
+    /// `with_ability` counts one (CR 113.2c), and it takes a slot of `extra_abilities` as an ability does.
+    pub fn with_text(self, card: CardId) -> Copiable {
+        self.with_ability(AbilityRef { card, index: ExtraAbility::TEXT })
+    }
+
+    /// Every instance of the abilities the exceptions add, in order (CR 707.9b, 113.2c); not the texts (`extra_texts`).
     pub fn extra_instances(&self) -> impl Iterator<Item = AbilityRef> + '_ {
-        self.extra_abilities.iter().take_while(|e| e.instances > 0).flat_map(|e| std::iter::repeat_n(e.ability(), usize::from(e.instances)))
+        self.extra_abilities
+            .iter()
+            .take_while(|e| e.instances > 0)
+            .filter(|e| !e.is_text())
+            .flat_map(|e| std::iter::repeat_n(e.ability(), usize::from(e.instances)))
+    }
+
+    /// Every instance of the texts the exceptions add (`with_text`), in order (CR 707.9b, 113.2c).
+    #[inline]
+    pub fn extra_texts(&self) -> ExceptionTexts<'_> {
+        ExceptionTexts::of(if self.extra_abilities[0].instances > 0 { &self.extra_abilities } else { &[] })
     }
 
     /// Whether an exception adds `ability`.
     pub fn adds_ability(&self, ability: AbilityRef) -> bool {
-        self.extra_abilities.iter().any(|e| e.instances > 0 && e.ability() == ability)
+        ability.index != ExtraAbility::TEXT && self.extra_abilities.iter().any(|e| e.instances > 0 && e.ability() == ability)
+    }
+
+    /// Whether an exception adds the text of `card` (`with_text`).
+    pub fn adds_text(&self, card: CardId) -> bool {
+        self.extra_abilities.iter().any(|e| e.instances > 0 && e.is_text() && e.card == card)
     }
 
     /// "Except it has [keyword]."
@@ -3112,5 +3183,18 @@ mod copiable_tests {
         let seventh = six.with_ability(ability(Copiable::EXTRA_ABILITIES as u8));
         assert_eq!(seventh, six, "a full list takes no more");
         assert_eq!(seventh.extra_instances().count(), Copiable::EXTRA_ABILITIES + 1);
+    }
+
+    /// An exception's text (`with_text`) is an exception, read by `extra_texts` once for each instance (CR 113.2c) and never
+    /// as an ability by `extra_instances`; the abilities around it keep their order.
+    #[test]
+    fn an_exception_text_is_read_as_a_text_not_an_ability() {
+        let first = AbilityRef { card: CardId(7), index: 0 };
+        let values = Copiable::of(CardId(1)).with_ability(first).with_text(CardId(9)).with_text(CardId(9));
+        assert!(values.has_exceptions() && values.adds_text(CardId(9)) && !values.adds_text(CardId(7)));
+        assert!(!values.adds_ability(AbilityRef { card: CardId(9), index: ExtraAbility::TEXT }));
+        assert_eq!(values.extra_texts().collect::<Vec<_>>(), [CardId(9), CardId(9)]);
+        assert_eq!(values.extra_instances().collect::<Vec<_>>(), [first]);
+        assert!(Copiable::of(CardId(1)).with_text(CardId(9)).has_exceptions());
     }
 }

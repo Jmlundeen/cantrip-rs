@@ -1545,9 +1545,13 @@ public sealed class ScenarioPlayer
             {
                 string place = row switch { "OpponentBattlefield" => "opponent-battlefield", _ => row.ToLowerInvariant() };
                 // A face-down card the page may look at (a spell cast face down, CR 708.5) is found by what it really is, as the
-                // script names it.
-                CardState? found = state.Cards.FirstOrDefault(c => c.Place == place && c.Name == name)
-                    ?? state.Cards.FirstOrDefault(c => c.Place == place && c.Name.Length == 0 && c.FaceDownName == name);
+                // script names it. "Name#2" is the second of that name, in the order the page lays them out - the order they
+                // entered, as the engine's battlefield numbers them.
+                Match numbered = Numbered.Match(name);
+                int nth = numbered.Success ? int.Parse(numbered.Groups["n"].Value, System.Globalization.CultureInfo.InvariantCulture) : 1;
+                string named = numbered.Success ? numbered.Groups["name"].Value : name;
+                CardState? found = state.Cards.Where(c => c.Place == place && c.Name == named).ElementAtOrDefault(nth - 1)
+                    ?? state.Cards.Where(c => c.Place == place && c.Name.Length == 0 && c.FaceDownName == named).ElementAtOrDefault(nth - 1);
                 shown = found is null
                     ? $"(no {name} in {row}: {string.Join("; ", state.Cards.Where(c => c.Place == place).Select(c => c.Name))})"
                     : Face(found, attribute);
@@ -1585,6 +1589,9 @@ public sealed class ScenarioPlayer
     private static readonly Regex CardKey = new(
         @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation|Note|Counters|Damage|FaceDownName|Halves)$",
         RegexOptions.CultureInvariant);
+
+    /// <summary>A card named with its number among the cards of that name: <c>Loxodon Warhammer#2</c>.</summary>
+    private static readonly Regex Numbered = new(@"^(?<name>.+)#(?<n>[1-9][0-9]*)$", RegexOptions.CultureInvariant);
 
     /// <summary>One thing a card's face says, with its lines on one line.</summary>
     private static string Face(CardState card, string attribute) => attribute switch

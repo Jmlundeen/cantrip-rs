@@ -4838,21 +4838,39 @@ impl CardTable {
     /// represents it"), which its copiable values carry (`Copiable::merged`). What every rule a card lists beside its
     /// `abilities` is read off - its static abilities, its replacement effects, its cost changes, its trigger, play and
     /// activation rules - each named by the card it is printed on. One definition for any other object; none of a face-down
-    /// permanent's components gives it anything (CR 708.2).
-    pub fn texts<'a>(&self, s: &'a GameState, obj: &Obj) -> impl Iterator<Item = CardId> + use<'a> {
-        let sources: &'a [Copiable] = match obj.copy {
-            Some(ref c) if c.merged != 0 && obj.marks.face_down_as.is_none() => s.merged_sources(c),
-            _ => &[],
+    /// permanent's components gives it anything (CR 708.2). Last, each text an exception of its copiable values adds
+    /// (`Copiable::with_text`, CR 707.9b), once for each instance (CR 113.2c): Firion, Wild Rose Warrior's token's "This
+    /// Equipment's equip abilities cost {2} less to activate." A face-down permanent has none of them either.
+    ///
+    /// The hottest walk of the engine (every static, cost change, replacement and trigger reads it, for each permanent): an
+    /// object with no exception text walks only its own and its components' texts, with no step for the texts it lacks.
+    pub fn texts<'a>(&self, s: &'a GameState, obj: &'a Obj) -> impl Iterator<Item = CardId> + use<'a> {
+        let (sources, extra): (&'a [Copiable], Option<ExceptionTexts<'a>>) = match obj.copy {
+            Some(ref c) if obj.marks.face_down_as.is_none() => (
+                if c.merged != 0 { s.merged_sources(c) } else { &[] },
+                (c.extra_abilities[0].instances > 0).then(|| c.extra_texts()),
+            ),
+            _ => (&[], None),
         };
-        std::iter::once(self.current(obj)).chain(sources.iter().map(|v| v.card))
+        let own = std::iter::once(self.current(obj)).chain(sources.iter().map(|v| v.card));
+        match extra {
+            None => Texts::Own(own),
+            Some(extra) => Texts::Excepted(own.chain(extra)),
+        }
     }
 
     /// `texts`, each with the link an ability printed on it is asked with (CR 607.1, 607.5): `None` for the definition the
-    /// object has (`current`), whose abilities are asked as its own text's (`linked_to`); for each other component of a
-    /// merged permanent, that component's card (`component_link`), so a static ability, a replacement effect or a hook of a
-    /// card under another reads the choices and exiles its own card made, and names what it gives by its own card.
+    /// object has (`current`), whose abilities are asked as its own text's (`linked_to`), and for a text an exception adds,
+    /// which is the copy's own; for each other component of a merged permanent, that component's card (`component_link`), so
+    /// a static ability, a replacement effect or a hook of a card under another reads the choices and exiles its own card
+    /// made, and names what it gives by its own card.
     pub fn texts_linked<'a>(&'a self, s: &'a GameState, id: ObjectId) -> impl Iterator<Item = (CardId, Option<Linked>)> + use<'a> {
-        self.texts(s, s.obj(id)).enumerate().map(move |(i, card)| (card, (i > 0).then(|| self.component_link(s, id, card))))
+        let obj = s.obj(id);
+        let components = match obj.copy {
+            Some(ref c) if c.merged != 0 && obj.marks.face_down_as.is_none() => s.merged_sources(c).len(),
+            _ => 0,
+        };
+        self.texts(s, obj).enumerate().map(move |(i, card)| (card, (i > 0 && i <= components).then(|| self.component_link(s, id, card))))
     }
 
     /// How an ability printed on `card`, one of the merged permanent `id`'s components other than its topmost, is linked (CR
@@ -4866,7 +4884,9 @@ impl CardTable {
     /// The link an ability printed on `card`, one of `id`'s texts (`texts`), is asked with: `None` for the text the object has,
     /// a component's for any other (`texts_linked`).
     pub fn link_of_text(&self, s: &GameState, id: ObjectId, card: CardId) -> Option<Linked> {
-        (s.merge_of(id).is_some() && card != self.current(s.obj(id))).then(|| self.component_link(s, id, card))
+        let obj = s.obj(id);
+        let exception = obj.copy.is_some_and(|c| c.adds_text(card));
+        (s.merge_of(id).is_some() && card != self.current(obj) && !exception).then(|| self.component_link(s, id, card))
     }
 
     /// The card a face's abilities are printed on, as linked abilities know it (CR 607.1, 607.1b): a transforming
@@ -5152,5 +5172,40 @@ mod tests {
         assert!(!named("Return it to its owner's hand.", &["Kolaghan Skirmisher"], false));
         assert!(!named("Target creature gains \"When this creature dies, draw a card.\"", &["Probe"], false));
         assert!(!named("Ward {1} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it.)", &["Probe"], false));
+    }
+}
+
+/// `CardTable::texts`: an object's own and components' texts (`Own`), or those followed by the texts its copiable values'
+/// exceptions add (`Excepted`), so an object with none walks no more than its own.
+enum Texts<A, B> {
+    Own(A),
+    Excepted(B),
+}
+
+impl<A: Iterator<Item = CardId>, B: Iterator<Item = CardId>> Iterator for Texts<A, B> {
+    type Item = CardId;
+
+    #[inline]
+    fn next(&mut self) -> Option<CardId> {
+        match self {
+            Texts::Own(a) => a.next(),
+            Texts::Excepted(b) => b.next(),
+        }
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        match self {
+            Texts::Own(a) => a.size_hint(),
+            Texts::Excepted(b) => b.size_hint(),
+        }
+    }
+
+    #[inline]
+    fn fold<Acc, F: FnMut(Acc, CardId) -> Acc>(self, init: Acc, f: F) -> Acc {
+        match self {
+            Texts::Own(a) => a.fold(init, f),
+            Texts::Excepted(b) => b.fold(init, f),
+        }
     }
 }

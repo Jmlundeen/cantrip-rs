@@ -1414,6 +1414,14 @@ impl<'a> Projector<'a> {
         if c.name_set || obj.copiable().is_some_and(|copy| copy.name.is_some()) {
             view.name = c.name.to_string();
         }
+        // A text a copy effect's exception adds (CR 707.9b) is the copy's own, after the copied card's: Firion, Wild Rose
+        // Warrior's token's "This Equipment's equip abilities cost {2} less to activate."
+        if let Some(copy) = obj.copiable() {
+            for card in copy.extra_texts() {
+                let text = crate::text::changed_text(self.game.cards.get(card).text, def.name, Query::words(game, id));
+                view.oracle_text = if view.oracle_text.is_empty() { text } else { format!("{}\n{text}", view.oracle_text) };
+            }
+        }
         if def.is_room() && on_battlefield && !c.name_set {
             // A Room on the battlefield (CR 709.5) is its unlocked doors: their names, costs and text; a locked door is
             // one the client can show as locked.
