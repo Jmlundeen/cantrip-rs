@@ -1,0 +1,67 @@
+# Saavik has flash, so she is cast on Bot2's turn as two creatures attack (CR 702.8a). Her enters trigger targets an attacking
+# or blocking creature an opponent controls as it goes on the stack (CR 603.3d) - Bot2's Ornithopter, kept home, is not one -
+# and X is the number of creature types among non-Borg creatures Bot1 controls: Vulcan and Advisor (Saavik) and Thopter (the
+# Ornithopter), three, so the 4/4 Shuttle Ace is dealt exactly 3 damage and the other attacker is untouched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Plains
+Ornithopter
+Saavik, Stoic Student
+Island x15
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Shuttle Ace
+Ornithopter
+Forest
+Llanowar Elves
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Shuttle Ace.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Shuttle Ace > Bot1; Llanowar Elves > Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Saavik, Stoic Student.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Shuttle Ace)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Shuttle Ace.Damage = 3
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Saavik, Stoic Student.Toughness = 2

@@ -1,0 +1,11 @@
+{
+  "name": "Saavik, Stoic Student",
+  "manaCost": "{4}{W}",
+  "type": "Legendary Creature — Vulcan Advisor",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flash\nFederation — When Saavik enters, she deals X damage to target attacking or blocking creature an opponent controls, where X is the number of creature types among non-Borg creatures you control.",
+  "keywords": [
+    "Flash"
+  ]
+}
