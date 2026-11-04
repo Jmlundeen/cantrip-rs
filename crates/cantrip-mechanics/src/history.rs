@@ -373,6 +373,12 @@ pub fn in_your_first_turns(q: &dyn Query, player: PlayerId, n: u32) -> bool {
         && q.history().select(EventQuery::kind(EventMask::TURN_BEGAN).player(player)).nth(n as usize).is_none()
 }
 
+/// "From the Future - You can't cast this spell during your first, second, or third turns of the game" (CR 601.3, 500): a card's
+/// `cast_only_if`, true while it is not one of the caster's own first three turns. Jace Reawakened and Spider-Man 2099 print it.
+pub fn from_the_future(q: &dyn Query, asker: &Asker) -> bool {
+    !in_your_first_turns(q, asker.controller, 3)
+}
+
 /// "If you've completed a dungeon" (CR 309.7): whether `player` has completed one this game. Caves of Chaos Adventurer,
 /// Undermountain Adventurer and White Plume Adventurer print it.
 pub fn completed_a_dungeon(q: &dyn Query, player: PlayerId) -> bool {

@@ -1,14 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::history::in_your_first_turns;
+use cantrip_mechanics::history::from_the_future;
 use cantrip_mechanics::{choose, copy, delayed, effects, plot};
 use cantrip_oracle as oracle;
-
-/// "You can't cast Jace Reawakened during your first, second, or third turns of the game" (CR 601.3, 500): a cast rule on the
-/// caster's own turns only, so another player's turn (with some other effect letting it be cast) is not covered, and an extra
-/// turn counts as a turn taken.
-fn not_in_your_first_three_turns(q: &dyn Query, asker: &Asker) -> bool {
-    !in_your_first_turns(q, asker.controller, 3)
-}
 
 /// "+1: You may exile a nonland card with mana value 3 or less from your hand. If you do, it becomes plotted." (CR 702.170a) It
 /// is a choice made as the ability resolves (CR 608.2d): declining is the empty answer to an up-to-one choice, and nothing is
@@ -41,7 +34,7 @@ fn you_cast_a_spell(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
 }
 
 pub static CARD: CardDef = CardDef {
-    cast_only_if: Some(not_in_your_first_three_turns),
+    cast_only_if: Some(from_the_future),
     abilities: &[
         ability(loyalty(1), effects::loot, "+1: Draw a card, then discard a card."),
         ability(loyalty(1), exile_and_plot, "+1: You may exile a nonland card with mana value 3 or less from your hand. If you do, it becomes plotted."),
