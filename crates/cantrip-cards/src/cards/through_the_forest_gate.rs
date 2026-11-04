@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, select, top_of_library};
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
 /// "Look at the top twenty cards of your library, put any number of land cards from among them onto the battlefield tapped, then
@@ -9,12 +9,7 @@ use cantrip_oracle as oracle;
 /// shuffle, a sentence of its own.
 fn gate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let looked = top_of_library(g, you, 20);
-    g.look_at(you, &looked);
-    let rule = select::land_cards(select::ANY_NUMBER);
-    let lands = choose::select(g, you, item.object, Purpose::PutOntoBattlefield, looked, rule)?;
-    g.put_all_onto_battlefield_as(&lands.into_iter().map(|land| (land, you, true)).collect::<Vec<_>>())?;
-    g.shuffle(you);
+    effects::look_at_top_put_any_lands_onto_the_battlefield_tapped_then_shuffle(g, you, item.object, 20)?;
     g.end_sentence();
     g.gain_life(you, 8);
     Ok(())

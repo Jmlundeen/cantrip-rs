@@ -32,6 +32,20 @@ pub fn counters_on(q: &dyn Query, object: ObjectId) -> u32 {
     CounterKind::ALL.iter().map(|&kind| o.counters(kind) as u32).sum()
 }
 
+/// "Look at the top `count` cards of your library, put any number of land cards from among them onto the battlefield tapped, then
+/// shuffle" (CR 401.2, 608.2c, 701.24): a library of fewer than `count` shows what it has (CR 609.3); the player sees every card and
+/// may take any number of the lands (none included), which enter together, tapped (CR 110.5b, 603.6a); the rest stay in the library,
+/// which is then shuffled whether or not a land was taken. Through the Forest Gate (twenty) and Famished Worldsire (its power) print it.
+pub fn look_at_top_put_any_lands_onto_the_battlefield_tapped_then_shuffle(g: &mut dyn Game, you: PlayerId, source: ObjectId, count: usize) -> Result<(), Suspend> {
+    let looked = crate::top_of_library(g, you, count);
+    g.look_at(you, &looked);
+    let rule = crate::select::land_cards(crate::select::ANY_NUMBER);
+    let lands = crate::choose::select(g, you, source, Purpose::PutOntoBattlefield, looked, rule)?;
+    g.put_all_onto_battlefield_as(&lands.into_iter().map(|land| (land, you, true)).collect::<Vec<_>>())?;
+    g.shuffle(you);
+    Ok(())
+}
+
 /// "This permanent enters with X [kind] counters on it" (CR 614.1c, 122.1), for the X it was cast with; put onto the battlefield
 /// without being cast, X is 0 (CR 107.3). `KIND` is `CounterKind::X as usize`. Walking Ballista, Guiding Hydra and the ravenous
 /// creatures print it with +1/+1 counters, Chalice of the Void with charge counters and Nissa, Steward of Elements with loyalty
