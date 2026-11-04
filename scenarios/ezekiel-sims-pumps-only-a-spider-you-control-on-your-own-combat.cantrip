@@ -1,0 +1,72 @@
+# "At the beginning of combat on your turn, target Spider you control gets +2/+2 until end of turn."
+# Turn 1: Ezekiel (a Spider himself) is the only Spider, so he is the target and is 5/7 that combat. Turn 2 (Bot2's combat) asks
+# nothing, and the pump has ended (3/5 in Bot2's second main phase). Turn 3: Bot1's Giant Spider joins him and Bot2 has a Giant
+# Spider too; Bot2's is refused as a target and Bot1's gets +2/+2 (4/6), Ezekiel staying 3/5. Turn 5: a Grizzly Bears is no
+# Spider, so only the two Spiders Bot1 controls are offered, and Ezekiel is 5/7 again.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Ezekiel Sims, Spider-Totem
+Giant Spider
+Grizzly Bears
+Forest
+Forest x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Giant Spider
+Forest x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ezekiel Sims, Spider-Totem.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ezekiel Sims, Spider-Totem.Power = 5
+? Bot1.Battlefield.Ezekiel Sims, Spider-Totem.Toughness = 7
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Spider.Cast
+! Bot1.Target
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Ezekiel Sims, Spider-Totem.Power = 3
+? Bot1.Battlefield.Ezekiel Sims, Spider-Totem.Toughness = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Giant Spider.Cast
+! Bot1.Target(Bot2.Battlefield.Giant Spider)
+Bot1.Target(Bot1.Battlefield.Giant Spider)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Giant Spider.Power = 4
+? Bot1.Battlefield.Giant Spider.Toughness = 6
+? Bot1.Battlefield.Ezekiel Sims, Spider-Totem.Power = 3
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Grizzly Bears.Cast
+! Bot1.Target(Grizzly Bears)
+Bot1.Target(Ezekiel Sims, Spider-Totem)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ezekiel Sims, Spider-Totem.Power = 5
+Bot1.Battlefield.Giant Spider.Power = 2
+Bot1.Battlefield.Grizzly Bears.Power = 2
