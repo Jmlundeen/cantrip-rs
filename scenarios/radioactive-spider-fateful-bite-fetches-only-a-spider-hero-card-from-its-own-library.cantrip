@@ -1,0 +1,41 @@
+# Radioactive Spider {G}, 1/1: "Fateful Bite - {2}, Sacrifice this creature: Search your library for a Spider Hero card, reveal it, put it into your hand,
+# then shuffle. Activate only as a sorcery." Bot1's library holds a Giant Spider (a Spider, no Hero), a Gwen Stacy (a Hero, her front face no Spider) and a
+# Masked Meower (Spider Cat Hero) and a Spider-Man, Web-Slinger (Spider Human Hero): the first two are refused, so is taking both Spider Heroes ("a
+# ... card" is one), and the Meower alone is found and revealed. Bot2's library holds a Masked Meower too, which stays
+# there. Mox Ruby and Mox Jet pay exactly {2}; the Spider is sacrificed, so it is in the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Radioactive Spider
+Forest x3
+Giant Spider
+Gwen Stacy
+Masked Meower
+Spider-Man, Web-Slinger
+Forest x9
+
+[Bot2 Deck]
+Masked Meower
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Radioactive Spider.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Radioactive Spider.Activate
+! Bot1.Search(Giant Spider)
+! Bot1.Search(Gwen Stacy)
+! Bot1.Search(Masked Meower; Spider-Man, Web-Slinger)
+Bot1.Search(Masked Meower)
+
+[Expect]
+Bot1.Hand = Forest; Forest; Forest; Masked Meower
+Bot1.Revealed = Masked Meower
+Bot1.Graveyard = Radioactive Spider
+Bot2.Library.Count = 8

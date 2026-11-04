@@ -1,0 +1,45 @@
+# Radioactive Spider {G}, 1/1 reach, deathtouch: "Fateful Bite ... Activate only as a sorcery." On turn 2 (Bot2's main phase) Bot1 has Mox Ruby and Mox Jet
+# untapped to pay {2} and may not activate it (the refusal). On turn 4 Bot2's Air Elemental (4/4 flying) attacks: the Spider, with reach, blocks it and
+# its deathtouch kills the Elemental though it deals only 1 damage; the Spider dies too.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Radioactive Spider
+Forest x3
+Masked Meower
+Forest x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Air Elemental
+Island x3
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Radioactive Spider.Cast
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Radioactive Spider.Activate
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Air Elemental.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Air Elemental > Bot1)
+Bot1.Block(Radioactive Spider > Air Elemental)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Air Elemental; Black Lotus
+Bot1.Graveyard = Radioactive Spider
+Bot1.Life = 20

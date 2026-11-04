@@ -1,0 +1,46 @@
+# Radioactive Spider's "Search your library for a Spider Hero card" names the creature type with a word of its text (CR 612.2), so
+# Artificial Evolution, changing "Spider" to "Human" in it, makes the search one for a Human Hero card - and the ability keeps the
+# changed text with the creature sacrificed for its cost (CR 113.7a). Bot1's Masked Meower (Spider Cat Hero) is refused, and Gwen
+# Stacy (Human Performer Hero, no Spider) is found and revealed.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Ruby
+Mox Jet
+Radioactive Spider
+Artificial Evolution
+Forest
+Masked Meower
+Gwen Stacy
+Forest x9
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Radioactive Spider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Radioactive Spider)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Spider)
+Bot1.Modes(Human)
+? Bot1.Battlefield.Radioactive Spider.Subtypes = Human
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Radioactive Spider.Activate
+! Bot1.Search(Masked Meower)
+Bot1.Search(Gwen Stacy)
+
+[Expect]
+Bot1.Hand = Forest; Gwen Stacy
+Bot1.Revealed = Gwen Stacy
+Bot1.Graveyard = Radioactive Spider; Artificial Evolution

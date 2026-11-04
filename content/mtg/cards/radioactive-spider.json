@@ -1,0 +1,12 @@
+{
+  "name": "Radioactive Spider",
+  "manaCost": "{G}",
+  "type": "Creature — Spider",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Reach, deathtouch\nFateful Bite — {2}, Sacrifice this creature: Search your library for a Spider Hero card, reveal it, put it into your hand, then shuffle. Activate only as a sorcery.",
+  "keywords": [
+    "Reach",
+    "Deathtouch"
+  ]
+}
