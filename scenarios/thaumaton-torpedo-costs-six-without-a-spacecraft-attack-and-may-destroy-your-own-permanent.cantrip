@@ -1,0 +1,42 @@
+# Thaumaton Torpedo with no Spacecraft having attacked costs the full {6} (CR 601.2f): Black Lotus and three Moxen make exactly six and
+# pay it, leaving the pool empty (a fourth Mox stays untapped). Its target may be one of Bot1's own
+# permanents (Mox Jet, already tapped for mana; CR 115.2, 701.8), but not a land: Bot2's Island is refused.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Thaumaton Torpedo
+Black Lotus
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thaumaton Torpedo.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Thaumaton Torpedo.Activate(Ability: {6}; Bot2.Battlefield.Island)
+Bot1.Battlefield.Thaumaton Torpedo.Activate(Ability: {6}; Bot1.Battlefield.Mox Jet)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Sapphire
+Bot1.Graveyard = Mox Jet; Thaumaton Torpedo; Black Lotus

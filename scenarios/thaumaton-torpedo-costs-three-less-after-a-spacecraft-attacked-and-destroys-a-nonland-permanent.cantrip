@@ -1,0 +1,64 @@
+# Thaumaton Torpedo: Bot1's Wurmwall Sweeper, stationed with Sunset Saboteur's 4 power on turn 1, attacks on turn 3 (an artifact
+# creature at 4+ counters, a Spacecraft as it was declared: CR 508.1), so the Torpedo's ability costs {3} (CR 601.2f): three Moxen pay
+# it exactly and the pool is empty. A land is not a legal target for it (CR 115.1); Bot2's Mox Ruby is, and is destroyed.
+
+[Bot1 Deck]
+Wurmwall Sweeper
+Sunset Saboteur
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Thaumaton Torpedo
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | Island)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wurmwall Sweeper.Counters.Charge = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thaumaton Torpedo.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Wurmwall Sweeper > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Thaumaton Torpedo.Activate(Ability: {6}; Bot2.Battlefield.Island)
+Bot1.Battlefield.Thaumaton Torpedo.Activate(Ability: {6}; Bot2.Battlefield.Mox Ruby)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Island
+Bot2.Graveyard = Mox Ruby
+Bot1.Graveyard = Thaumaton Torpedo; Island
