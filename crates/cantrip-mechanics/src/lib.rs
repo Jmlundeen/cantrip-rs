@@ -70,6 +70,7 @@ pub mod fight;
 pub mod escape;
 pub mod eternalize;
 pub mod exert;
+pub mod exchange;
 pub mod evoke;
 pub mod for_mirrodin;
 pub mod delayed;
