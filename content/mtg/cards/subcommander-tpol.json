@@ -1,0 +1,11 @@
+{
+  "name": "Subcommander T'Pol",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Vulcan Scientist",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "Flash\nWhen Subcommander T'Pol enters, choose one —\n• Counter target activated or triggered ability.\n• Tap up to one target artifact or creature. Put a stun counter on it. (If a permanent with a stun counter would become untapped, remove one from it instead.)",
+  "keywords": [
+    "Flash"
+  ]
+}

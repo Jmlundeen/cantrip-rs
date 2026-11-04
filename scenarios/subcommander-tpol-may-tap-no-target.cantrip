@@ -1,0 +1,17 @@
+# Up to one target permits zero even when T'Pol itself is an eligible creature (CR 115.1d).
+[Bot1 Deck]
+Subcommander T'Pol
+Black Lotus
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Subcommander T'Pol.Cast
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Subcommander T'Pol.Tapped = false
+Bot1.Battlefield.Subcommander T'Pol.Counters.Stun = (absent)

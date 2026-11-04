@@ -1,0 +1,36 @@
+# T'Pol flashes in above an enters trigger and counters that ability (CR 701.6).
+# The Kavu stays on the battlefield, but its four damage never hits Ornithopter.
+[Bot1 Deck]
+Ornithopter
+Subcommander T'Pol
+Black Lotus
+Island x20
+[Bot2 Deck]
+Mountain
+Flametongue Kavu
+Black Lotus
+Island x20
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Flametongue Kavu.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Ornithopter)
+? Stack.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Subcommander T'Pol.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Hand.Count = 5
+Bot2.Battlefield = Mountain; Flametongue Kavu
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Battlefield = Ornithopter; Subcommander T'Pol
+Stack.Count = 0

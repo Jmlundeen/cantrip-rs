@@ -1,0 +1,28 @@
+# T'Pol counters a nonmana activated ability; its tap cost remains paid (CR 602.2, 701.6).
+[Bot1 Deck]
+Subcommander T'Pol
+Black Lotus
+Island x20
+[Bot2 Deck]
+Plains
+Mother of Runes
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Mother of Runes.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mother of Runes.Activate(Mother of Runes)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Subcommander T'Pol.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Mother of Runes.Tapped = true
+Bot2.Battlefield.Mother of Runes.Keywords = (absent)
+Bot1.Battlefield = Subcommander T'Pol
+Stack.Count = 0
+Bot2.Battlefield.Mother of Runes.ProtectionFrom = (absent)

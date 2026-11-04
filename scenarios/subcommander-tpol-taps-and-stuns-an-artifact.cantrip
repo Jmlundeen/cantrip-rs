@@ -1,0 +1,24 @@
+# Subcommander T'Pol's second mode taps up to one target artifact or creature and puts a stun counter on it (CR 701.26a,
+# 122.1d), so the Ornithopter is tapped and carries one stun counter.
+
+[Bot1 Deck]
+Subcommander T'Pol
+Ornithopter
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Subcommander T'Pol.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Ornithopter.Counters.Stun = 1
