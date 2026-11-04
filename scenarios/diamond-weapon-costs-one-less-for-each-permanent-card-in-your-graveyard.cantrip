@@ -1,0 +1,48 @@
+# Diamond Weapon ({7}{G}{G}, 8/8 reach): "This spell costs {1} less to cast for each permanent card in your graveyard" (CR 601.2f,
+# 118.7a, 110.4a). Bot1's graveyard on turn 3 holds Llanowar Elves, which Bot2's Lightning Bolt killed, and its own Dark Ritual
+# (an instant, which must not count). Black Lotus sacrificed for mana is a permanent card there too: with both gone the cost is
+# {4}{G}{G} and the 6 mana of the two pays it exactly (had the Ritual counted, a mana would be left over, had the Elves not,
+# one would be short). Bot2's graveyard holds only a Lightning Bolt.
+
+[Bot1 Deck]
+Mox Emerald
+Llanowar Elves
+Mox Jet
+Dark Ritual
+Black Lotus x2
+Diamond Weapon
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Diamond Weapon.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Diamond Weapon.Keywords = Reach
+Bot1.Battlefield.Diamond Weapon.Power = 8
+Bot1.Graveyard = Black Lotus; Black Lotus; Llanowar Elves; Dark Ritual

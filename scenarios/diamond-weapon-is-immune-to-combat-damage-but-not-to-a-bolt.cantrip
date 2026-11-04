@@ -1,0 +1,47 @@
+# Diamond Weapon: "Immune - Prevent all combat damage that would be dealt to Diamond Weapon" (CR 615.1). It costs {5}{G}{G}
+# here (two permanent cards in Bot1's graveyard: the two Black Lotuses), paid by Black Lotus twice and Mox Emerald. On turn 4
+# Bot2's Goblin Piker (2/1) attacks, the Weapon blocks it and takes no damage while its 8 kills the Piker; afterwards a
+# Lightning Bolt, damage that is not combat damage, marks 3 on it: only the combat damage is prevented.
+
+[Bot1 Deck]
+Black Lotus x2
+Mox Emerald
+Diamond Weapon
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Goblin Piker
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Goblin Piker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Diamond Weapon.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Goblin Piker > Bot1)
+Bot1.Block(Diamond Weapon > Goblin Piker)
+[T4 Bot2.Main2]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Diamond Weapon)
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt; Goblin Piker
+Bot1.Battlefield.Diamond Weapon.Damage = 3

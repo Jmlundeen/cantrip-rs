@@ -1,0 +1,11 @@
+{
+  "name": "Diamond Weapon",
+  "manaCost": "{7}{G}{G}",
+  "type": "Legendary Artifact Creature — Elemental",
+  "power": 8,
+  "toughness": 8,
+  "oracleText": "This spell costs {1} less to cast for each permanent card in your graveyard.\nReach\nImmune — Prevent all combat damage that would be dealt to Diamond Weapon.",
+  "keywords": [
+    "Reach"
+  ]
+}
