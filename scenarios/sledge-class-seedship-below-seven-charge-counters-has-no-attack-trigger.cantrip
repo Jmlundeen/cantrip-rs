@@ -1,0 +1,39 @@
+# Sledge-Class Seedship with no charge counters, made a 5/5 creature by Ensoul Artifact, attacks. Its attack trigger is
+# printed in the 7+ striation (CR 721.2a), so below seven counters it has no such ability: nothing may be put from hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Sledge-Class Seedship
+Ensoul Artifact
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sledge-Class Seedship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ensoul Artifact.Cast(Bot1.Battlefield.Sledge-Class Seedship)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sledge-Class Seedship.Types = Artifact; Creature
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Sledge-Class Seedship > Bot2)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Hand.Count = 4
