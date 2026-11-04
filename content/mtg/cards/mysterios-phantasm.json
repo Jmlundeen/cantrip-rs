@@ -1,0 +1,12 @@
+{
+  "name": "Mysterio's Phantasm",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Illusion Villain",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Flying, vigilance\nWhenever this creature attacks, mill a card. (Put the top card of your library into your graveyard.)",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ]
+}
