@@ -1,0 +1,6 @@
+{
+  "name": "Decode Transmissions",
+  "manaCost": "{2}{B}",
+  "type": "Sorcery",
+  "oracleText": "You draw two cards and lose 2 life.\nVoid — If a nonland permanent left the battlefield this turn or a spell was warped this turn, instead you draw two cards and each opponent loses 2 life."
+}

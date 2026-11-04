@@ -1,0 +1,25 @@
+# Decode Transmissions with void: Bot1 sacrifices Black Lotus this turn, a nonland permanent leaving the battlefield, and pays
+# for the sorcery with its mana. "Instead you draw two cards and each opponent loses 2 life": Bot2 goes to 18, and Bot1 keeps its
+# 20 life (it does not also lose 2).
+
+[Bot1 Deck]
+Black Lotus
+Decode Transmissions
+Plains x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Decode Transmissions.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 18
+Bot1.Hand.Count = 7
