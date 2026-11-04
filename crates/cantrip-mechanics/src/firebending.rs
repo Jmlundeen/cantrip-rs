@@ -21,3 +21,18 @@ fn firebend<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 pub const fn trigger<const N: u8>(text: &'static str) -> AbilityDef {
     triggered(when(EventMask::ATTACKS, attacks), firebend::<N>, text)
 }
+
+/// "Firebending X, where X is this creature's power": N is whatever X is as the ability resolves (CR 702.189a, 608.2h), the
+/// creature's power as it last existed on the battlefield if it has left, and nothing for a power of 0 or less.
+fn firebend_its_power(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let power = g.chars(item.object).power.unwrap_or(0);
+    if power > 0 {
+        g.add_mana_until_end_of_combat(item.controller, Mana::R, power as u32);
+    }
+    Ok(())
+}
+
+/// Firebending X, where X is the creature's power (Firebending Student). `text` is the card's own reminder text.
+pub const fn trigger_its_power(text: &'static str) -> AbilityDef {
+    triggered(when(EventMask::ATTACKS, attacks), firebend_its_power, text)
+}
