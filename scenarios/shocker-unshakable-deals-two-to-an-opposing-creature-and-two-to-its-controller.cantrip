@@ -1,0 +1,59 @@
+# Shocker, Unshakable: "During your turn, Shocker has first strike" (so FirstStrike on Bot1's turn 3, not on Bot2's turn 4) and "When Shocker
+# enters, he deals 2 damage to target creature and 2 damage to that creature's controller." On turn 3 Bot1 pays {4}{R}{R} with Black Lotus
+# (RRR), Mox Ruby, Mox Jet and Gleemox. The trigger refuses a player and an artifact, and takes Bot2's Wall of Earth (0/6): it survives with
+# exactly 2 damage (until cleanup), and Bot2, the creature's controller, goes from 20 to 18 while Bot1 stays at 20.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Gleemox
+Shocker, Unshakable
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Wall of Earth
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Gleemox.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wall of Earth.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Shocker, Unshakable.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2)
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Wall of Earth)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shocker, Unshakable.Keywords = FirstStrike
+? Bot2.Battlefield.Wall of Earth.Damage = 2
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Shocker, Unshakable.Keywords = (absent)
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot1.Battlefield.Shocker, Unshakable.Damage = 0
+Bot2.Battlefield.Wall of Earth.Damage = 0

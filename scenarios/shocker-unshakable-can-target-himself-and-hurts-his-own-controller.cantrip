@@ -1,0 +1,38 @@
+# Shocker, Unshakable's "target creature" is any creature, his own included, and "that creature's controller" is whoever controls it: with
+# no other creature in play the trigger can only target Shocker himself (a 5/5): he is left with exactly 2 damage and Bot1 goes from 20 to 18, while
+# Bot2 stays at 20.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Gleemox
+Shocker, Unshakable
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Gleemox.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Shocker, Unshakable.Cast
+Bot1.Pass
+Bot2.Pass
+# He is the only creature, so the trigger takes him without a question.
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot1.Battlefield.Shocker, Unshakable.Damage = 2

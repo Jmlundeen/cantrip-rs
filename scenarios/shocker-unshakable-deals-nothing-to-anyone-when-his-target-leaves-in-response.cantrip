@@ -1,0 +1,62 @@
+# Shocker, Unshakable: "When Shocker enters, he deals 2 damage to target creature and 2 damage to that creature's controller." The
+# creature is the ability's only target, so when it is gone as the ability resolves the ability does nothing at all (CR 608.2b): the
+# 2 to its controller as well. On turn 3 Bot1 casts Shocker and targets Bot2's Wall of Earth; in response Bot2 returns the Wall to
+# their hand with Unsummon, paid with Mox Sapphire. Bot2 stays at 20.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Gleemox
+Shocker, Unshakable
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Wall of Earth
+Mox Sapphire
+Unsummon
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Gleemox.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wall of Earth.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Shocker, Unshakable.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Wall of Earth)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Bot2.Battlefield.Wall of Earth)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Stack.Count = 0
+Bot2.Battlefield = Mox Ruby; Mox Jet; Mox Sapphire
+Bot2.Graveyard = Unsummon
