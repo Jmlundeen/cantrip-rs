@@ -458,6 +458,12 @@ pub fn permanent(q: &dyn Query, id: ObjectId) -> bool {
     on_battlefield(q, id)
 }
 
+/// "Enchanted" (CR 303.4b, 303.4e): an Aura is attached to the object, whoever controls the Aura. Enchanted Being's prevention and
+/// Ramses Overdark's "target enchanted creature" read it.
+pub fn is_enchanted(q: &dyn Query, id: ObjectId) -> bool {
+    q.state().battlefield().iter().any(|&a| q.state().obj(a).attached_to == Some(id) && q.chars(a).has_subtype(Subtype::Aura))
+}
+
 /// The objects a spell targeted as it was cast, in the order it chose them (CR 601.2c), wherever they are now: "those
 /// permanents" of a trigger on the cast (Dack Fayden's emblem, "gain control of those permanents"; Storm, Windrider, "those
 /// creatures gain flying") are what the spell targeted when the ability triggered. A later change of targets (CR 115.7) is
