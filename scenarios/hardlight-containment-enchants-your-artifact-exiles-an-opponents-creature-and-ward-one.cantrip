@@ -1,0 +1,56 @@
+# Hardlight Containment: "Enchant artifact you control" (CR 303.4): Bot1's Plains (not an artifact) and Bot2's Ornithopter
+# (not Bot1's) are refused, its Memnite (an artifact creature) is enchanted. "When this Aura enters, exile target creature an
+# opponent controls until this Aura leaves the battlefield" (CR 610.3): Bot1's own Memnite is not a legal target, Bot2's
+# Ornithopter#1 is (Ornithopter#2 is the other candidate). "Enchanted permanent has ward {1}": on turn 4 Bot2's Lightning Bolt
+# at the Memnite is countered unless Bot2 pays {1}; Bot2 has exactly {R}{R}, so Bolt takes one and the ward the other, and the
+# Bolt then resolves, killing the Memnite. With the Aura gone the Ornithopter returns (a new object).
+
+[Bot1 Deck]
+Plains
+Memnite
+Mox Pearl
+Hardlight Containment
+Plains x3
+Plains x14
+
+[Bot2 Deck]
+Mox Ruby x2
+Lightning Bolt
+Ornithopter x2
+Island x2
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Hardlight Containment.Cast(Bot1.Battlefield.Plains)
+! Bot1.Hand.Hardlight Containment.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot1.Hand.Hardlight Containment.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Memnite)
+Bot1.Target(Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+? Bot2.Battlefield.Count = 3
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.PayCost
+? Bot2.Mana =
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Hardlight Containment; Memnite
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Count = 4
