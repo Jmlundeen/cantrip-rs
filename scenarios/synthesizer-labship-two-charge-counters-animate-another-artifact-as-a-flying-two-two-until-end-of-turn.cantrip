@@ -1,0 +1,59 @@
+# Synthesizer Labship, station 2+: "At the beginning of combat on your turn, up to one other target artifact you control becomes an artifact creature with base power and toughness 2/2 and gains flying until end of turn." One charge counter is not enough; Dauntless Scrapbot's station gives 3, so at the beginning of combat on turn 3 the Lander token (an artifact with only the subtype Lander, which it keeps) becomes a 2/2 flying artifact creature, which attacks, and is a plain artifact again next turn. The Labship itself is no creature below 9 (CR 721.2a-b, 613.1).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Synthesizer Labship
+Dauntless Scrapbot
+Memnite
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dauntless Scrapbot.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Synthesizer Labship.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Synthesizer Labship.Activate(Ability: Station)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Synthesizer Labship.Counters.Charge = 1
+Bot1.Battlefield.Synthesizer Labship.Activate(Ability: Station)
+Bot1.Choose(Dauntless Scrapbot)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Synthesizer Labship.Counters.Charge = 4
+? Bot1.Battlefield.Synthesizer Labship.Types = Artifact
+Bot1.Target(Bot1.Battlefield.Lander Token)
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lander Token.Types = Artifact; Creature
+? Bot1.Battlefield.Lander Token.Power = 2
+? Bot1.Battlefield.Lander Token.Toughness = 2
+? Bot1.Battlefield.Lander Token.Keywords = Flying
+? Bot1.Battlefield.Lander Token.Subtypes = Lander
+? Bot1.Battlefield.Synthesizer Labship.Types = Artifact
+Bot1.Attack(Lander Token)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Lander Token.Types = Artifact
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Synthesizer Labship.Counters.Charge = 4

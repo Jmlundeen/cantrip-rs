@@ -1,0 +1,50 @@
+# Synthesizer Labship below the 2+ striation: Memnite's station puts one charge counter on it, so at the beginning of combat on turn 3 the ability is not there and Mox Pearl stays a plain artifact. Memnite untaps and stations again on turn 5: two counters is exactly the 2+ striation, so at the beginning of combat Mox Pearl becomes a 2/2 flying artifact creature (CR 721.2a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Synthesizer Labship
+Memnite
+Mox Jet
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Synthesizer Labship.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Synthesizer Labship.Activate(Ability: Station)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Synthesizer Labship.Counters.Charge = 1
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Mox Pearl.Types = Artifact
+[T5 Bot1.Main1]
+Bot1.Battlefield.Synthesizer Labship.Activate(Ability: Station)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Synthesizer Labship.Counters.Charge = 2
+Bot1.Target(Bot1.Battlefield.Mox Pearl)
+[T5 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Pearl.Types = Artifact; Creature
+? Bot1.Battlefield.Mox Pearl.Power = 2
+? Bot1.Battlefield.Mox Pearl.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.Synthesizer Labship.Counters.Charge = 2
+Bot1.Battlefield.Mox Pearl.Types = Artifact; Creature
