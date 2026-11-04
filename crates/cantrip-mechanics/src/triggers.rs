@@ -1316,6 +1316,13 @@ pub fn you_cast_or_copy_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Ev
     }
 }
 
+/// "When this permanent enters or dies" (CR 603.2, 603.6a, 603.10a): one triggered ability with two conditions, either its own
+/// entering the battlefield or its own death, looked back on as it last existed on the battlefield. Lys Alana Informant and
+/// Thawbringer print it. The `listens` mask is `ZONE_CHANGE`.
+pub fn this_enters_or_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    this_enters(q, source, event).or_else(|| this_dies(q, source, event))
+}
+
 /// "When this is put into a graveyard from the battlefield" (CR 700.4 for a creature: "dies"), looked back on: the
 /// ability is the object's as it last existed there (CR 603.10a).
 pub fn this_dies(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -2127,6 +2134,7 @@ pub const NONCREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST
 pub const NONCREATURE_SPELL_YOU_CAST_ABOUT_IT: Trigger = when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast_about_it);
 pub const YOU_CAST_A_SPELL_FROM_EXILE: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell_from_exile);
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
+pub const THIS_ENTERS_OR_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_enters_or_dies);
 pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
 pub const AN_OPPONENT_DRAWS_THEIR_SECOND_CARD: Trigger = when_asked(EventMask::DREW, an_opponent_draws_their_second_card);
 pub const YOU_DRAW_YOUR_SECOND_CARD: Trigger = when_asked(EventMask::DREW, you_draw_your_second_card);
