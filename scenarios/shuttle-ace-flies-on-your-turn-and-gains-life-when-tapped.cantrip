@@ -1,0 +1,32 @@
+# "During your turn, this creature has flying" (CR 611.3a) and "Whenever this creature becomes tapped, you gain 2 life": it
+# attacks on turn 2 with flying, becoming tapped and gaining 2 life; on Bot2's turn it has no flying.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Shuttle Ace
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Shuttle Ace.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Shuttle Ace.Keywords = Flying
+Bot1.Attack(Shuttle Ace > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Shuttle Ace.Keywords = (absent)
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 16

@@ -1,0 +1,8 @@
+{
+  "name": "Shuttle Ace",
+  "manaCost": "{4}{W}",
+  "type": "Creature — Kelpien Pilot",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "During your turn, this creature has flying.\nWhenever this creature becomes tapped, you gain 2 life."
+}
