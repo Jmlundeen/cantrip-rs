@@ -1,0 +1,56 @@
+# U.S.S. Excelsior, Cutting Edge: "When this creature enters, destroy target tapped creature an opponent controls" (CR 608.2b).
+# Bot2's two Elves attack on turn 4 and stay tapped, so both are legal targets on turn 5 and the chosen one is destroyed.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Plains
+U.S.S. Excelsior, Cutting Edge
+Island x16
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Elvish Mystic
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1; Elvish Mystic > Bot1)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.U.S.S. Excelsior, Cutting Edge.Cast
+! Bot1.Target(Bot1.Battlefield.U.S.S. Excelsior, Cutting Edge)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield.Elvish Mystic.Toughness = 1
+Bot1.Battlefield.U.S.S. Excelsior, Cutting Edge.Types = Artifact
