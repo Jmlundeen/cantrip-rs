@@ -1,0 +1,49 @@
+# Shadow of the Goblin's "Whenever you play a land ... from anywhere other than your hand": Bot1 plays an Island from its hand on turn 1, after
+# Shadow resolves, and Bot2 stays at 20. On turn 3 the first trigger discards the other Island, which Bot1 then plays from its graveyard
+# with Crucible of Worlds: 1 damage, Bot2 at 19. Discarding the Island is no playing of it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Shadow of the Goblin
+Crucible of Worlds
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shadow of the Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+? Bot2.Life = 20
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Crucible of Worlds.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Graveyard.Island.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield = Crucible of Worlds; Island; Island; Mox Emerald; Mox Jet; Mox Ruby; Shadow of the Goblin

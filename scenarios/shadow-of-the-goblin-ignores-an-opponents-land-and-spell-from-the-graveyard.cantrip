@@ -1,0 +1,62 @@
+# Shadow of the Goblin's "Whenever you play a land or cast a spell from anywhere other than your hand" is only for its controller's lands
+# and spells. On turn 2 Bot2, who does not control Shadow, casts Faithless Looting by flashback from its graveyard and plays an Island from its
+# graveyard with Crucible of Worlds: neither triggers Bot1's Shadow, so nobody takes damage.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Shadow of the Goblin
+Island x17
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Gleemox
+Black Lotus
+Faithless Looting
+Crucible of Worlds
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shadow of the Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Gleemox.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Island; Island)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Island; Island)
+? Bot2.Life = 20
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Gleemox.Activate(Color: Green)
+Bot2.Hand.Crucible of Worlds.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Graveyard.Island.Play
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 20
+Bot2.Battlefield = Crucible of Worlds; Gleemox; Island; Mox Emerald; Mox Jet; Mox Ruby
+Exile = Faithless Looting

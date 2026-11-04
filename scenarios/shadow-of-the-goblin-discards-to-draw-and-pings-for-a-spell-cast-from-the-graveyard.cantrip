@@ -1,0 +1,51 @@
+# Shadow of the Goblin: "At the beginning of your first main phase, discard a card. If you do, draw a card" and "Whenever you play a land or
+# cast a spell from anywhere other than your hand, this enchantment deals 1 damage to each opponent." Bot1 casts Shadow, then Mox Emerald from
+# its hand, which deals nothing (Bot2 stays at 20). On turn 3 the first trigger has Bot1 discard Faithless Looting and draw an Island; casting
+# Looting for flashback from the graveyard then costs Bot2 exactly 1 (19).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Shadow of the Goblin
+Faithless Looting
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shadow of the Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Faithless Looting)
+? Bot1.Graveyard = Faithless Looting
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+
+[Expect]
+Bot2.Life = 19
+Bot1.Hand.Count = 4
