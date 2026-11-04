@@ -1,0 +1,81 @@
+# Genemorph Imago {G}{U} 1/3 flying: "Landfall - Whenever a land you control enters, target creature has base power and toughness 3/3 until end of turn. If you control six
+# or more lands, that creature has base power and toughness 6/6 until end of turn instead." Bot1 plays one Forest a turn. Turn 1 targets Imago itself (1/3 to 3/3, one land); turn 3
+# targets Bot2's Memnite (1/1 to 3/3 - "target creature", not only yours). On turn 9 the fifth land still gives 3/3 although Bot2's four Islands would make nine lands between them
+# ("you control", CR 603.2); on turn 11 the sixth land gives Memnite 6/6 (CR 608.2c, the lands counted as the ability resolves). Bot2's own lands entering trigger nothing.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Genemorph Imago
+Forest
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Genemorph Imago.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Genemorph Imago.Power = 1
+? Bot1.Battlefield.Genemorph Imago.Toughness = 3
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Genemorph Imago.Power = 3
+? Bot1.Battlefield.Genemorph Imago.Toughness = 3
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Genemorph Imago.Power = 1
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Island.Play
+? Stack.Count = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Power = 3
+? Bot2.Battlefield.Memnite.Toughness = 3
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Memnite.Power = 1
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Power = 3
+? Bot2.Battlefield.Memnite.Toughness = 3
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Memnite.Power = 6
+Bot2.Battlefield.Memnite.Toughness = 6
