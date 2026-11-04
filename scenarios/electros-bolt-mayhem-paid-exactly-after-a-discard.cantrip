@@ -1,0 +1,42 @@
+# Electro's Bolt's mayhem {1}{R} (CR 702.187b): discarded to Faithless Looting (paid with a Mox Ruby), it is cast from the graveyard
+# for its mayhem cost the same turn, paid exactly with Blasted Landscape's {C} for the generic and a second Mox Ruby's {R}, at Bot1's
+# own Memnite (a creature of its caster is a legal target), and the pool ends empty. With Mox Emerald's {G} in place of the {R} it is
+# not offered: the colored pip is pinned. The Memnite dies to the 4 damage.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Electro's Bolt
+Memnite
+Blasted Landscape
+Mox Emerald
+Mox Ruby
+Island x15
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Electro's Bolt; Island)
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Graveyard.Electro's Bolt.Cast(Memnite; Ability: Mayhem; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Blasted Landscape.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Graveyard.Electro's Bolt.Cast(Memnite; Ability: Mayhem)
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield = Blasted Landscape; Mox Emerald; Mox Ruby; Mox Ruby
+Bot1.Graveyard = Memnite; Electro's Bolt; Faithless Looting; Island

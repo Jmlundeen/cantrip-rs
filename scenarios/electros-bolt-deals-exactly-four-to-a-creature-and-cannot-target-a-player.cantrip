@@ -1,0 +1,50 @@
+# "Electro's Bolt deals 4 damage to target creature." Bot2's Fortress Crab is a 3/6: the Bolt, cast on turn 3 for {2}{R} from three
+# Moxen, leaves it alive with exactly 4 damage marked (so neither 3 nor 5). A player is not a legal target (CR 601.2c).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Electro's Bolt
+Mountain x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Fortress Crab
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Fortress Crab.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Hand.Electro's Bolt.Cast(Bot2)
+! Bot1.Hand.Electro's Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Electro's Bolt.Cast(Fortress Crab)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot2.Battlefield.Fortress Crab.Damage = 4
+Bot2.Battlefield.Fortress Crab.Toughness = 6
+Bot1.Graveyard = Electro's Bolt
