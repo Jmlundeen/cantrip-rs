@@ -1,0 +1,72 @@
+# Eddie Brock // Venom, Lethal Protector. Turn 1: Eddie enters (no graveyard card to return). Turn 3: Bot1 pays {3}{B}{R}{G} and transforms
+# him into Venom, a 5/5 with menace, trample and haste - the same permanent (CR 701.27a). Turn 7: Bot1 casts a second Grizzly Bears and
+# attacks with Venom: "Whenever Venom attacks, you may sacrifice another creature. If you do, draw X cards, then you may put a
+# permanent card with mana value X or less from your hand onto the battlefield, where X is the sacrificed creature's mana value."
+# The sacrificed Bears are 2, so two cards are drawn - Lightning Bolt and Ornithopter. Of the hand, Hill Giant (4) is too big and
+# Lightning Bolt is not a permanent card (both refused), no two cards may be put (refused), and the first Grizzly Bears, with mana
+# value exactly X, goes onto the battlefield untapped (CR 202.3, 608.2h, 110.4a).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Eddie Brock
+Swamp
+Grizzly Bears
+Hill Giant
+Grizzly Bears
+Lightning Bolt
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Eddie Brock.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Eddie Brock.Activate(Ability: Transform)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Venom, Lethal Protector.Power = 5
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Venom, Lethal Protector > Bot2)
+Bot1.Choose(Grizzly Bears)
+! Bot1.Choose(Hill Giant)
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Grizzly Bears; Ornithopter)
+Bot1.Choose(Grizzly Bears)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.Grizzly Bears.Tapped = false
+Bot1.Graveyard.Grizzly Bears.Power = 2
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 10
+Bot2.Life = 15
+Bot1.Battlefield.Venom, Lethal Protector.Keywords = Haste; Menace; Trample

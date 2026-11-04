@@ -1,0 +1,56 @@
+# Venom, Lethal Protector: the Grizzly Bears sacrificed are 2, so two cards are drawn - Hill Giant (4) and Lightning Bolt (not a
+# permanent card) - and neither may be put onto the battlefield: nothing is asked and the hand keeps both.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Eddie Brock
+Swamp
+Grizzly Bears
+Hill Giant
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Eddie Brock.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Eddie Brock.Activate(Ability: Transform)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Venom, Lethal Protector > Bot2)
+Bot1.Choose(Grizzly Bears)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Graveyard.Grizzly Bears.Power = 2
+Bot2.Life = 15

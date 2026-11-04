@@ -1,0 +1,40 @@
+# Eddie Brock is a modal double-faced card: its back face, Venom, Lethal Protector, has its own mana cost {3}{B}{R}{G} and may
+# be cast from the hand (CR 712.11b). Cast with six mana it resolves as the 5/5 face-up back face, colored by its mana cost
+# (black, red and green; it has no color indicator) with mana value 6 (CR 712.8f), and the card is on the battlefield only as Venom.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Eddie Brock
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Eddie Brock.Cast(Ability: back face)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Venom, Lethal Protector.Power = 5
+Bot1.Battlefield.Venom, Lethal Protector.ManaValue = 6
+Bot1.Battlefield.Venom, Lethal Protector.Colors = Black; Green; Red
+Bot1.Battlefield.Count = 7
+Bot1.Hand.Count = 0

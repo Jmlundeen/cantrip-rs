@@ -1,0 +1,54 @@
+# Eddie Brock {2}{B} 3/3: "When Eddie Brock enters, return target creature card with mana value 1 or less from your graveyard to the
+# battlefield." (CR 400.7, 202.3.) Faithless Looting and its flashback fill the graveyard with Ornithopter (0), Llanowar Elves (1),
+# Grizzly Bears (2) and a Swamp. Grizzly Bears is not a legal target (refused); Llanowar Elves is chosen over Ornithopter and
+# returns under Bot1's control, while the others stay.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Faithless Looting
+Eddie Brock
+Ornithopter
+Grizzly Bears
+Llanowar Elves
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Ornithopter; Grizzly Bears)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Llanowar Elves; Swamp)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Eddie Brock.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Grizzly Bears)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Eddie Brock.Power = 3
+Bot1.Graveyard.Count = 4
