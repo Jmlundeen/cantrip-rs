@@ -33,6 +33,18 @@ pub fn this_becomes_tapped(_: &dyn Query, source: ObjectId, event: &Event) -> Op
     }
 }
 
+/// "Whenever a [subtype] an opponent controls becomes tapped" (CR 701.26a, 603.2), by any means; the permanent is the
+/// subject. `SUBTYPE` is a `Subtype` as `u16` (`lands::sub`), read through the words of the source's text (CR 612.2).
+/// Lifetap (Forest) and Lifeblood (Mountain) print it.
+pub fn subtype_an_opponent_controls_becomes_tapped<const SUBTYPE: u16>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    let Event::Tapped { permanent } = event else { return None };
+    let id = *permanent;
+    if q.chars(id).has_subtype(crate::lands::word(q, me.source, SUBTYPE)) && q.state().opponents(me.controller).any(|p| p == q.controller(id)) {
+        return Fired::about(Target::Object(id));
+    }
+    None
+}
+
 /// Whenever the attached permanent becomes tapped (CR 701.26a, 603.2), by any means; the permanent is the subject.
 /// Psychic Venom and Hawkeye's Bow print this trigger for an enchanted land and equipped creature respectively.
 pub fn attached_permanent_becomes_tapped(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
