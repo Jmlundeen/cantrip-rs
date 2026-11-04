@@ -1,0 +1,48 @@
+# Fire Nation Cadets: attacking with no Lesson card in Bot1's graveyard adds no mana; once Firebending Lesson (a Lesson) is in
+# Bot1's graveyard, attacking adds {R}{R} that lasts until end of combat.
+
+[Bot1 Deck]
+Mox Ruby x3
+Fire Nation Cadets
+Firebending Lesson
+Mountain x14
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Fire Nation Cadets.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Fire Nation Cadets > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Firebending Lesson.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Firebending Lesson
+Bot1.Attack(Fire Nation Cadets > Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana = {R}{R} lasting {R}{R}

@@ -1,0 +1,46 @@
+# Fire Nation Cadets: a Lesson card in an opponent's graveyard (Bot2 cast Firebending Lesson on Bot1's Ornithopter) is not "in your
+# graveyard": attacking adds no mana, and the Lesson stays where it is.
+
+[Bot1 Deck]
+Mox Ruby x2
+Fire Nation Cadets
+Ornithopter
+Mountain x16
+
+[Bot2 Deck]
+Mox Ruby
+Firebending Lesson
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Fire Nation Cadets.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Firebending Lesson.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Fire Nation Cadets > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+
+[Expect]
+Bot1.Mana = 
+Bot2.Graveyard = Firebending Lesson
+Bot1.Graveyard = Ornithopter

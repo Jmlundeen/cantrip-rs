@@ -1,0 +1,39 @@
+# Fire Nation Cadets: {2}: it gets +1/+0 until end of turn -- exactly two mana, power 1 to 2, toughness unchanged at 2, and the
+# next turn it is a 1/2 again.
+
+[Bot1 Deck]
+Mox Ruby x3
+Fire Nation Cadets
+Mountain x16
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Fire Nation Cadets.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Fire Nation Cadets.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+? Bot1.Battlefield.Fire Nation Cadets.Power = 2
+? Bot1.Battlefield.Fire Nation Cadets.Toughness = 2
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Fire Nation Cadets.Power = 1
+Bot1.Battlefield.Fire Nation Cadets.Toughness = 2
