@@ -285,6 +285,18 @@ pub static MONK: CardDef = CardDef {
     ..token!(Monk)
 };
 
+/// A 2/2 red Soldier creature token with firebending 1. Cruel Administrator, Fire Nation Attacks, Fire Nation Occupation and
+/// Firebender Ascension make it.
+pub static FIREBENDING_SOLDIER: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Red)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    abilities: &[crate::firebending::trigger::<1>("Firebending 1 (Whenever this creature attacks, add {R}. This mana lasts until end of combat.)")],
+    text: "Firebending 1 (Whenever this creature attacks, add {R}. This mana lasts until end of combat.)",
+    ..token!(Soldier)
+};
+
 /// A 1/1 red Monk creature token with prowess. Crescent Island Temple and Jaya, Fiery Negotiator make it.
 pub static RED_MONK: CardDef = CardDef {
     colors: Some(ColorSet::of(Color::Red)),
