@@ -188,6 +188,15 @@ pub fn have_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Haste);
 }
 
+/// "... has [an ability]" (CR 613.1f, layer 6) as a static ability's `StaticDef::apply`: the ability at `INDEX` of the card's
+/// `delayed` list, given to the permanent in the first free slot. A permanent that copies the card has it too. A station card's
+/// striations (`station::has`) and Fire Nation Cadets' conditional firebending 2 print it.
+pub fn has_delayed_ability<const INDEX: u8>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
+        chars.abilities[slot] = Some(AbilityRef::delayed(chars.card, INDEX));
+    }
+}
+
 /// "... is a [subtype] in addition to its other types" (layer 4) as a static ability's `StaticDef::apply`, `SUBTYPE` a
 /// `Subtype` as `u16` (`lands::sub`). The subtype is a word of the source's text (CR 612.2). Astrologian's Planisphere
 /// (Wizard), Dark Knight's Greatsword (Knight), Samurai's Katana (Samurai) and Laughing Jasper Flint (Mercenary) print it.

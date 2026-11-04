@@ -44,8 +44,4 @@ pub use crate::statics::creature_too as is_a_creature;
 
 /// The abilities of a striation (CR 721.2a), layer 6: the ability at `INDEX` of the station card's `delayed` list. A
 /// permanent that copies the station card has it too, read from its own charge counters (ruling 2025-07-25).
-pub fn has<const INDEX: u8>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-        chars.abilities[slot] = Some(AbilityRef::delayed(chars.card, INDEX));
-    }
-}
+pub use crate::statics::has_delayed_ability as has;
