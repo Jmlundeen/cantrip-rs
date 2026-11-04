@@ -121,7 +121,9 @@ something offered, no more creatures attacking a player, planeswalker or battle 
 (`Forbidden`, CR 508.1c: "creatures with flying can't attack you" refuses a flier's attack on that player, never on their
 planeswalkers), and as many of the requirements obeyed as any declaration
 within those caps can attacking for free (CR 508.1d). The caps are not in the prompt: a client learns of one from the
-verdict, whose `Addable` never offers an attack past a cap and whose `Free` is false wherever a target is capped. The prompt's
+verdict, whose `Addable` never offers an attack past a cap and whose `Free` is false wherever a target is capped, or a
+creature that can't attack alone (CR 508.1c: Pet Sehlat) is eligible - declared with no other attacker it is refused, and
+another attacker beside it mends that. The prompt's
 `Requirements` are one per source, for showing the player - an `Attacker` that must attack (`TargetPlayer` `0`,
 `TargetPermanent` `0`), that must attack a seat or permanent, or that must attack a player other than `OtherThan` (a goad's,
 two per goader) - with `MostRequirements`, the engine's own declaration `Suggested`, and the `Verdict` on no attacks

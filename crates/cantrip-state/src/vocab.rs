@@ -1248,6 +1248,7 @@ counter_kinds! {
     Fire = 62, "fire", "Fire";
     Conqueror = 63, "conqueror", "Conqueror";
     Film = 64, "film", "Film";
+    Peace = 65, "peace", "Peace";
 }
 
 impl CounterKind {

@@ -734,6 +734,9 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
                 && !obj.tapped
                 // CR 508.1c: an effect saying it can't attack; a static ability's restriction is read below, of each attack.
                 && !cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantAttack && in_force(cx, e))
+                // CR 508.1c: a resolved rule about an open set that says it, or those who control it, can't attack this turn
+                // (`LastingRuleKind::CantAttack`: Peace in Our Time).
+                && crate::static_rules::lasting_rules_on(cx, cx.cards(), id, LastingRuleKind::CantAttack).next().is_none()
                 && !summoning_sick(cx.cards(), cx.s(), &cx.g.log, id)
                 // CR 702.3b: defender, unless an effect or a static ability lets it attack as though it didn't have it
                 // (CR 609.4), which lifts no other restriction: asked last, of a creature that could otherwise attack.
@@ -1116,7 +1119,8 @@ fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], barred: Vec<
             }
         }
     }
-    let mut rules = AttackRules { required, barred, limits: crate::static_rules::attack_limits(cx, targets), most: 0, suggested: Vec::new() };
+    let alone = crate::static_rules::attacks_alone_barred(cx, cx.cards(), eligible);
+    let mut rules = AttackRules { required, barred, alone_barred: alone, limits: crate::static_rules::attack_limits(cx, targets), most: 0, suggested: Vec::new() };
     if !rules.required.is_empty() {
         (rules.most, rules.suggested) = rules.solve(eligible, targets, costs);
     }

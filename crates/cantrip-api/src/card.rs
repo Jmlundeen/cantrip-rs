@@ -2482,6 +2482,9 @@ pub type OpenSet = fn(&dyn Query, &Asker, Target, ObjectId) -> bool;
 /// be blocked" and "blocks if able" join it with the first printed card that says one of a set.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum LastingRuleKind {
+    /// "Can't attack" (CR 508.1c): a resolved rule about an open set that takes the creature in, as Peace in Our Time's
+    /// "that player can't attack this turn" does for the creatures that player controls. Read as attackers are declared.
+    CantAttack,
     /// "Can't block" (CR 509.1b): Falter's "creatures without flying", Aragorn, King of Gondor's "creatures", Headliner
     /// Scarlett's "creatures target player controls".
     CantBlock,
@@ -3380,6 +3383,9 @@ pub struct CardDef {
     /// Its static abilities that keep creatures from attacking, or from attacking a given player, planeswalker or battle
     /// (CR 508.1c), while it is on the battlefield.
     pub attack_rules: &'static [AttackRule],
+    /// Its static abilities that forbid a creature to attack alone (CR 508.1c): each rule is false of the creature it is
+    /// about, as Pet Sehlat's "This creature can't attack alone" is. Read as a declaration of exactly one attacker is judged.
+    pub attack_alone_rules: &'static [AttackRule],
     /// Its static abilities that make attacking cost something (CR 508.1d, 508.1h), while it is on the battlefield.
     pub attack_costs: &'static [AttackCostRule],
     /// Its static abilities that limit how many creatures may attack a player, planeswalker or battle (CR 508.1c), while
@@ -3651,6 +3657,7 @@ impl CardDef {
         block_requirements: &[],
         must_be_blocked: &[],
         attack_rules: &[],
+        attack_alone_rules: &[],
         attack_costs: &[],
         attack_limits: &[],
         attacks_despite_defender: &[],
@@ -3750,6 +3757,7 @@ impl CardDef {
             (!self.block_requirements.is_empty(), "block requirements"),
             (!self.must_be_blocked.is_empty(), "must be blocked"),
             (!self.attack_rules.is_empty(), "attack rules"),
+            (!self.attack_alone_rules.is_empty(), "a rule against attacking alone"),
             (!self.attack_costs.is_empty(), "attack costs"),
             (!self.attack_limits.is_empty(), "attack limits"),
             (!self.attacks_despite_defender.is_empty(), "attacking despite defender"),
@@ -3991,6 +3999,8 @@ pub struct CardTable {
     pub block_rules: Vec<bool>,
     /// Which cards have attack rules (CR 508.1c).
     pub attack_rules: Vec<bool>,
+    /// Which cards forbid attacking alone (CR 508.1c).
+    pub attack_alone_rules: Vec<bool>,
     /// Per card: it has a targeting rule. Read to find the few battlefield sources of one, never to ask the table.
     pub targeting_rules: Vec<bool>,
     /// Per card: it gives players keyword abilities (`CardDef::player_keywords`) or protection (`CardDef::player_protection`).
@@ -4557,6 +4567,7 @@ impl CardTable {
         let engines: Vec<bool> = cards.iter().map(|c| c.start_your_engines).collect();
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty() || !c.blocker_limits.is_empty()).collect();
         let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
+        let attack_alone_rules: Vec<bool> = cards.iter().map(|c| !c.attack_alone_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let player_keywords: Vec<bool> = cards.iter().map(|c| !c.player_keywords.is_empty() || !c.player_protection.is_empty()).collect();
         // Like `look_back`: one it prints, one it lists to give, or any a static ability of its own could give itself.
@@ -4636,6 +4647,7 @@ impl CardTable {
             any_cast_limit,
             block_rules,
             attack_rules,
+            attack_alone_rules,
             targeting_rules,
             player_keywords,
             mana_triggers,
