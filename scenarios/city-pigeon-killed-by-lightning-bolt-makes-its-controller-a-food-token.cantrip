@@ -1,0 +1,46 @@
+# City Pigeon {W} (1/1 flier): "When this creature leaves the battlefield, create a Food token." On turn 2 Bot2 kills Bot1's Pigeon with
+# Lightning Bolt; the trigger makes one Food for Bot1, the Pigeon's controller, not for Bot2, who owns the Bolt. The Food is a real
+# one: {2}, {T}, sacrifice it to gain 3 life.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+City Pigeon
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.City Pigeon.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.City Pigeon.Keywords = Flying
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.City Pigeon)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = City Pigeon
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Food Token
+? Bot2.Battlefield = Mox Ruby
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Food Token.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby
+Bot2.Battlefield = Mox Ruby

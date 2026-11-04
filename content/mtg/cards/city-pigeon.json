@@ -1,0 +1,11 @@
+{
+  "name": "City Pigeon",
+  "manaCost": "{W}",
+  "type": "Creature — Bird",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying\nWhen this creature leaves the battlefield, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")",
+  "keywords": [
+    "Flying"
+  ]
+}
