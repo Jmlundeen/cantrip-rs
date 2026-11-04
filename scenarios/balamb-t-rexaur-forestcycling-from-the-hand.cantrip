@@ -1,0 +1,29 @@
+# Balamb T-Rexaur's forestcycling {2} (CR 702.29e): paying it and discarding the card from the hand finds the Forest in the
+# library and puts it into the hand. The cost {2} is paid exactly with Mana Crypt's {C}{C}, so it holds no colored pip, and
+# the pool ends empty; with only Blasted Landscape's {C} the ability is not offered.
+
+[Bot1 Deck]
+Blasted Landscape
+Mana Crypt
+Balamb T-Rexaur
+Plains x4
+Forest
+Plains x12
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Blasted Landscape.Play
+! Bot1.Hand.Balamb T-Rexaur.Activate(Ability: Forestcycling; Mana: short)
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Balamb T-Rexaur.Activate(Ability: Forestcycling)
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Graveyard.Balamb T-Rexaur.Colors = Green
+Bot1.Hand = Forest; Plains; Plains; Plains; Plains

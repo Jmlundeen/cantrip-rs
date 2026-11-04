@@ -1,0 +1,11 @@
+{
+  "name": "Balamb T-Rexaur",
+  "manaCost": "{4}{G}{G}",
+  "type": "Creature — Dinosaur",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Trample\nWhen this creature enters, you gain 3 life.\nForestcycling {2} ({2}, Discard this card: Search your library for a Forest card, reveal it, put it into your hand, then shuffle.)",
+  "keywords": [
+    "Trample"
+  ]
+}

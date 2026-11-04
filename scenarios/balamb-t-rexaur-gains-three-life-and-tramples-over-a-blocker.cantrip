@@ -1,0 +1,43 @@
+# Balamb T-Rexaur (6/6 trample, {4}{G}{G} paid by two Black Lotuses): "When this creature enters, you gain 3 life" makes Bot1's
+# life 23 (CR 603.6a). On turn 3 it attacks and Bot2's Balduvian Bears (2 toughness) block: 2 is lethal damage to them and the
+# other 4 tramples over to Bot2 (CR 702.19b), who is at 16.
+
+[Bot1 Deck]
+Black Lotus x2
+Balamb T-Rexaur
+Swamp x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Balduvian Bears
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Balamb T-Rexaur.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Balduvian Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Balamb T-Rexaur > Bot2)
+Bot2.Block(Balduvian Bears > Balamb T-Rexaur)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot2.Graveyard = Balduvian Bears
+Bot1.Life = 23
+Bot1.Battlefield.Balamb T-Rexaur.Damage = 2
+Bot1.Battlefield.Balamb T-Rexaur.Keywords = Trample
