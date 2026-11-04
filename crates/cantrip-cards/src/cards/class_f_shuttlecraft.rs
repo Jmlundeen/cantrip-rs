@@ -1,12 +1,9 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::have_flying_and_vigilance;
 use cantrip_mechanics::{statics, station};
 use cantrip_oracle as oracle;
 
 const SIX_PLUS: &str = "6+ | Flying, vigilance";
-
-fn have_flying_and_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Flying).with(Keyword::Vigilance);
-}
 
 pub static CARD: CardDef = CardDef {
     abilities: &[

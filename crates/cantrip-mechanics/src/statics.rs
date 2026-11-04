@@ -348,6 +348,11 @@ pub fn have_indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Indestructible);
 }
 
+/// "... has flying and vigilance" (CR 702.9, 702.20, layer 6). Class-F Shuttlecraft and Synthesizer Labship print it.
+pub fn have_flying_and_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Flying).with(Keyword::Vigilance);
+}
+
 /// "... has flying and haste" (CR 702.9, 702.10, layer 6). Detective's Phoenix and Whiplash Wordsmith print it.
 pub fn have_flying_and_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Flying).with(Keyword::Haste);
