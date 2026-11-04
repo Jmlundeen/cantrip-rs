@@ -388,7 +388,7 @@ pub fn three_plus_one_counters_on_this(g: &mut dyn Game, item: &StackItem) -> Re
 /// does nothing once the source has left the battlefield (CR 400.7). Each resolution adds its own, and they stack. The whole
 /// effect of an ability of Attercop, Basking Rootwalla, Blazing Rootwalla, Boughside Wanderers, Burnout Bashtronaut, Desolation
 /// Prowler, Diviner of Victory, Flameblade Adept, Hydro-Man, Fluid Felon, Knight of Dusk's Shadow, Mausoleum Wanderer,
-/// Nighthowl Pursuer, Ravine Raider, Skilled Battlecarver, Slickshot Show-Off, Undulating Witness, Veyran, Voice of Duality
+/// Nighthowl Pursuer, Ravine Raider, Remnant Elemental, Skilled Battlecarver, Slickshot Show-Off, Undulating Witness, Veyran, Voice of Duality
 /// and Woodland Weavemaster.
 pub fn this_gets<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     crate::pump(g, item.object, item.object, P, T);

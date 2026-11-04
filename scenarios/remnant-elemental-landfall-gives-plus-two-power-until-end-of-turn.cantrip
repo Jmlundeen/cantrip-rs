@@ -1,0 +1,36 @@
+# Remnant Elemental is a 0/4 with reach. Playing Bot1's Island makes it 2/4 (+2/+0, the toughness unchanged) until end of turn.
+# On Bot2's turn it is a 0/4 again, and Bot2's Island entering triggers nothing ("a land you control").
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Remnant Elemental
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Remnant Elemental.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Remnant Elemental.Power = 0
+? Bot1.Battlefield.Remnant Elemental.Toughness = 4
+? Bot1.Battlefield.Remnant Elemental.Keywords = Reach
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Remnant Elemental.Power = 2
+? Bot1.Battlefield.Remnant Elemental.Toughness = 4
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Remnant Elemental.Power = 0
+Bot2.Hand.Island.Play
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Remnant Elemental.Power = 0
+Bot1.Battlefield.Remnant Elemental.Toughness = 4
