@@ -1,0 +1,8 @@
+{
+  "name": "Slagdrill Scrapper",
+  "manaCost": "{R}",
+  "type": "Artifact Creature — Robot Scout",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "{2}, {T}, Sacrifice another artifact or land: Draw a card."
+}

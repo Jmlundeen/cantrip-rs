@@ -1,0 +1,37 @@
+# Slagdrill Scrapper, the land half of its cost and the {2}: on turn 3 Bot1 has only Mox Ruby's mana in the pool, which cannot pay
+# {2}, so the ability is not offered. After Mox Jet comes out and pays the second mana (the pool is then spent exactly), the Island
+# played this turn is sacrificed (a land: "artifact or land") instead of either Mox, and a card is drawn. Hand: 7 - 4 played + the
+# turn-3 draw + this draw = 5.
+
+[Bot1 Deck]
+Slagdrill Scrapper
+Mox Ruby
+Mox Jet
+Island
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Slagdrill Scrapper.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Slagdrill Scrapper.Activate(Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Slagdrill Scrapper.Activate
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Battlefield = Slagdrill Scrapper; Mox Ruby; Mox Jet
+Bot1.Hand.Count = 5
+Bot1.Mana =
