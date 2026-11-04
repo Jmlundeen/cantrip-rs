@@ -1,0 +1,40 @@
+# Spider-Gwen, Free Spirit: "Reach" and "Whenever Spider-Gwen becomes tapped, you may discard a card. If you do, draw a card." Bot1
+# casts her on turn 1 with three Moxen. On turn 3 she attacks and becomes tapped: Bot1 discards the Island and draws the card under
+# it, the Plains (Forest was drawn for the turn).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Spider-Gwen, Free Spirit
+Island
+Mountain
+Swamp
+Forest
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Spider-Gwen, Free Spirit.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Spider-Gwen, Free Spirit > Bot2)
+Bot1.Pass
+Bot1.Choose(Island)
+? Bot1.Battlefield.Spider-Gwen, Free Spirit.Keywords = Reach
+
+[Expect]
+Bot1.Hand = Forest; Mountain; Plains; Swamp
+Bot1.Graveyard = Island

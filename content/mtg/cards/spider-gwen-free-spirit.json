@@ -1,0 +1,11 @@
+{
+  "name": "Spider-Gwen, Free Spirit",
+  "manaCost": "{2}{R}",
+  "type": "Legendary Creature — Spider Human Hero",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Reach\nWhenever Spider-Gwen becomes tapped, you may discard a card. If you do, draw a card.",
+  "keywords": [
+    "Reach"
+  ]
+}
