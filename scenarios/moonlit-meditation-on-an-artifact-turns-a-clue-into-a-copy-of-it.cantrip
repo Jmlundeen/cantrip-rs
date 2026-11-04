@@ -1,0 +1,43 @@
+# Moonlit Meditation on an artifact ("Enchant artifact or creature you control"), and its replacement applying to any token - not only artifact or creature
+# tokens - the ruling: Bot1 enchants its Mox Jet, then casts Obsessive Pursuit, whose enters trigger creates a Clue (the turn's first creation). Bot1 takes the
+# copy: a Mox Jet token enters instead of the Clue, and Bot1 loses 1 life.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Moonlit Meditation
+Obsessive Pursuit
+Mox Pearl
+Plains x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Moonlit Meditation.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Moonlit Meditation.AttachedTo = Mox Jet
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Obsessive Pursuit.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Life = 19
+
+[Expect]
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Mox Jet#2.Types = Artifact

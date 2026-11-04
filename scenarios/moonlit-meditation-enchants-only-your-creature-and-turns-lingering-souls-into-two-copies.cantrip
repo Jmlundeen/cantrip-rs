@@ -1,0 +1,58 @@
+# Moonlit Meditation {2}{U}, "Enchant artifact or creature you control": Bot2's Llanowar Elves are refused as the Aura's target (it is not Bot1's), Bot1's own
+# are enchanted. "The first time you would create one or more tokens each turn, you may instead create that many tokens that are copies of enchanted permanent":
+# Bot1's Lingering Souls makes two Spirits, and taking the copies it makes exactly two Llanowar Elves tokens (the count is kept) and no Spirit.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Moonlit Meditation
+Llanowar Elves
+Lingering Souls
+Mox Pearl
+Plains x12
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Moonlit Meditation.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Hand.Moonlit Meditation.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Moonlit Meditation.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Count = 9
+Bot1.Battlefield.Llanowar Elves#1.Power = 1
+Bot1.Battlefield.Llanowar Elves#2.Power = 1
+Bot1.Battlefield.Llanowar Elves#3.Power = 1
