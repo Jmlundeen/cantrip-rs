@@ -1,0 +1,60 @@
+# Rig for War: "Target creature gets +3/+0 and gains reach and first strike until end of turn" (CR 611.2a), {1}{R} paid exactly.
+# It can't target a noncreature permanent (Bot1's Mox Jet). Cast on Bot1's own Grizzly Bears (2/2 becomes 5/2 with reach and first
+# strike, toughness untouched); the effect ends with the turn, so the Bears are plain on Bot2's turn. On turn 3 (Jet's black mana alone can't pay it, and Ruby's red alone can't pay the generic part)
+# it targets the opponent's Ornithopter (0/2 flyer); the Bears, not targeted again, stay 2/2.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Grizzly Bears
+Rig for War
+Rig for War
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Rig for War.Cast(Bot1.Battlefield.Grizzly Bears; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+! Bot1.Hand.Rig for War.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rig for War.Cast(Bot1.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 5
+? Bot1.Battlefield.Grizzly Bears.Toughness = 2
+? Bot1.Battlefield.Grizzly Bears.Keywords = FirstStrike; Reach
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+? Bot1.Battlefield.Grizzly Bears.Keywords = (absent)
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rig for War.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 3
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Ornithopter.Keywords = FirstStrike; Flying; Reach
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.Grizzly Bears.Keywords = (absent)
