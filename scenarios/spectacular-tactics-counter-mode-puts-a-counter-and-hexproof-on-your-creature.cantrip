@@ -1,0 +1,38 @@
+# Spectacular Tactics, first mode: "Put a +1/+1 counter on target creature you control. It gains hexproof until end of turn."
+# Bot1 casts it on its Memnite: it is a 2/2 with hexproof (CR 122.1, 702.11) until the turn ends. Bot2's Memnite is no target
+# for this mode (it says "you control").
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Memnite
+Spectacular Tactics
+Plains x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spectacular Tactics.Cast
+Bot1.Modes(1)
+! Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Keywords = Hexproof
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
