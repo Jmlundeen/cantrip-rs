@@ -1,0 +1,48 @@
+# Galian Beast stolen by Bot2 (Act of Treason) dies under Bot2's control; its "return it to the battlefield tapped" is
+# Bot2's ability (CR 603.3a), and with no "under its owner's control" it enters under Bot2's control (CR 110.2a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Vincent Valentine
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Act of Treason
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vincent Valentine.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Vincent Valentine > Bot2)
+Bot1.Pass
+Bot1.Accept
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Galian Beast)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Galian Beast.Power = 3
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Galian Beast)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Vincent Valentine.Tapped = true
+Bot2.Battlefield.Vincent Valentine.Power = 2
+Bot1.Battlefield = Mox Jet

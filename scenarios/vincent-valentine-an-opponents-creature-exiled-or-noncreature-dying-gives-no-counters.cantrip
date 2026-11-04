@@ -1,0 +1,52 @@
+# Vincent Valentine: "Whenever a creature an opponent controls dies" (CR 700.4: put into a graveyard from the battlefield). Bot2's
+# Memnite exiled by Swords to Plowshares doesn't die, and Bot2's uncrewed Smuggler's Copter (power 3, not a creature) going to the
+# graveyard to Shatter isn't a creature dying: Vincent stays a 2/2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Vincent Valentine
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Smuggler's Copter
+Shatter
+Memnite
+Swords to Plowshares
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vincent Valentine.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Smuggler's Copter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shatter.Cast(Bot2.Battlefield.Smuggler's Copter)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Swords to Plowshares; Shatter; Smuggler's Copter; Black Lotus
+Bot2.Exile.Memnite.Power = 1
+Bot2.Life = 21
+Bot1.Battlefield.Vincent Valentine.Power = 2
