@@ -1,0 +1,48 @@
+# Cosmogoyf: its power and toughness come from a characteristic-defining ability (CR 604.3); with one card of Bot1's in exile (Swords to Plowshares on Ornithopter) it is
+# 1/2. Dress Down on turn 3 ("Creatures lose all abilities.", layer 6) removes it, so the * is 0 (CR 208.2a): Cosmogoyf is a 0/1 although the card is still in exile.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Cosmogoyf
+Ornithopter
+Swords to Plowshares
+Black Lotus
+Dress Down
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cosmogoyf.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cosmogoyf.Power = 1
+? Bot1.Battlefield.Cosmogoyf.Toughness = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Cosmogoyf.Power = 0
+Bot1.Battlefield.Cosmogoyf.Toughness = 1
+Exile.Count = 1

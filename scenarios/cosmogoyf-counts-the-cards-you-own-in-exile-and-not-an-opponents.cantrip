@@ -1,0 +1,63 @@
+# Cosmogoyf {B}{G} */1+*: "power is equal to the number of cards you own in exile and its toughness is equal to that number plus 1." With nothing in exile it is 0/1.
+# Bot1's Swords to Plowshares on its own Ornithopter exiles a card Bot1 owns: 1/2. On turn 3 Swords on Bot2's Memnite exiles a card BOT2 owns, which Bot1's Cosmogoyf
+# does not count: still 1/2. On turn 5 Swords on Bot1's own Memnite makes it 2/3 (power and toughness each move by the one card).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Cosmogoyf
+Ornithopter
+Swords to Plowshares
+Memnite
+Swords to Plowshares
+Swords to Plowshares
+Plains x13
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cosmogoyf.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cosmogoyf.Power = 0
+? Bot1.Battlefield.Cosmogoyf.Toughness = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cosmogoyf.Power = 1
+? Bot1.Battlefield.Cosmogoyf.Toughness = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cosmogoyf.Power = 1
+? Bot1.Battlefield.Cosmogoyf.Toughness = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Cosmogoyf.Power = 2
+Bot1.Battlefield.Cosmogoyf.Toughness = 3

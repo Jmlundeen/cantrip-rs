@@ -1,0 +1,52 @@
+# Cosmogoyf counts "the number of cards you own in exile". A prepared permanent's prepare spell is a copy of a card in exile, not
+# a card (CR 722.3, 707.12), so it is not counted. On turn 3 Bot1's Paradox Shaper becomes prepared in the upkeep, and Omit
+# Variables, its copy, waits in exile; Bot1 owns no card there, so Cosmogoyf stays 0/1. Once the copy is cast and leaves exile,
+# Cosmogoyf is still 0/1: nothing it counts has changed.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Paradox Shaper
+Cosmogoyf
+Black Lotus
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Paradox Shaper.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cosmogoyf.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cosmogoyf.Power = 0
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Paradox Shaper.Prepared = true
+? Bot1.Battlefield.Cosmogoyf.Power = 0
+? Bot1.Battlefield.Cosmogoyf.Toughness = 1
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Exile.Omit Variables.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Paradox Shaper.Prepared = (absent)
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield.Cosmogoyf.Power = 0
+Bot1.Battlefield.Cosmogoyf.Toughness = 1

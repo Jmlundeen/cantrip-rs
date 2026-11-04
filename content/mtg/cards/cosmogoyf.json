@@ -1,0 +1,8 @@
+{
+  "name": "Cosmogoyf",
+  "manaCost": "{B}{G}",
+  "type": "Creature — Elemental Lhurgoyf",
+  "power": "*",
+  "toughness": "1+*",
+  "oracleText": "Cosmogoyf's power is equal to the number of cards you own in exile and its toughness is equal to that number plus 1."
+}
