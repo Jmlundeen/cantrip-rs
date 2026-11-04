@@ -1,0 +1,8 @@
+{
+  "name": "Spider-Ham, Peter Porker",
+  "manaCost": "{1}{G}",
+  "type": "Legendary Creature — Spider Boar Hero",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When Spider-Ham enters, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\nAnimal May-Ham — Other Spiders, Boars, Bats, Bears, Birds, Cats, Dogs, Frogs, Jackals, Lizards, Mice, Otters, Rabbits, Raccoons, Rats, Squirrels, Turtles, and Wolves you control get +1/+1."
+}
