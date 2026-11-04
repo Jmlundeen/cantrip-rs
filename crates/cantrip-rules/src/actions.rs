@@ -739,6 +739,10 @@ fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
             return false;
         }
     }
+    // CR 601.2h, 118.3: a cost that chooses an object needs one to choose; only a spell's is ever paid (`Cost::choose`).
+    if cost.choose.is_some() && (judged != Judged::Cast || choose_candidates(cx, controller, cost, source, by).is_empty()) {
+        return false;
+    }
     // CR 701.68b: a player who controls no creature can't choose to blight.
     if cost.blight > 0 && blight_candidates(cx, controller).is_empty() {
         return false;
@@ -919,9 +923,39 @@ fn pay_behold(cx: &mut Cx, player: PlayerId, spell: ObjectId, exile: bool, chose
     revealed
 }
 
-/// The cards the cost or announcement of the spell or ability at `at` on the stack revealed from a hand (behold, CR 701.4a;
-/// splice, CR 702.47a): among the objects its cost chose (`StackItem::members`), as they stay revealed until it leaves the
-/// stack (CR 701.20a, `ops::seen_by_all`).
+/// What a cost that chooses an object may choose among (`Cost::choose`, CR 601.2h): the permanents on the battlefield and the
+/// cards in exile that pass its filter, which says whose. The spell's own card is in neither as it is judged, from where it
+/// is cast, or chosen, on the stack.
+fn choose_candidates(cx: &Cx, controller: PlayerId, cost: &Cost, source: ObjectId, by: Option<Linked>) -> Vec<ObjectId> {
+    let Some((filter, _)) = cost.choose else { return Vec::new() };
+    let asker = Asker { source, controller, by, spell: false };
+    let mut out = cx.s().zone(Zone::BATTLEFIELD).to_vec();
+    for p in cx.s().seats() {
+        out.extend(cx.s().zone(Zone::exile(p)).iter().copied());
+    }
+    out.retain(|&id| filter(cx, &asker, id));
+    out
+}
+
+/// Chooses the object a spell's cost chooses (`Cost::choose`, CR 601.2h), always asked, even when the choice is forced.
+/// None for a cost without one.
+fn choose_object(cx: &mut Cx, player: PlayerId, spell: ObjectId, cost: &Cost) -> R<Option<ObjectId>> {
+    let Some((_, name)) = cost.choose else { return Ok(None) };
+    let eligible = choose_candidates(cx, player, cost, spell, None);
+    if eligible.is_empty() {
+        return Err(Stop::Cancel);
+    }
+    let ask = RequestKind::choose_cards(spell, Purpose::Choose, eligible.clone(), eligible, 1, false, name);
+    match cx.ask_core(player, ask, true)? {
+        Answer::Cards(cards) => Ok(cards.first().copied()),
+        _ => Err(Stop::Cancel),
+    }
+}
+
+/// The objects the cost or announcement of the spell or ability at `at` on the stack chose or revealed, added to its
+/// `StackItem::members`: the object a spell's cost chose (`Cost::choose`), which its effect names, and the cards revealed
+/// from a hand (behold, CR 701.4a; splice, CR 702.47a), as they stay revealed until it leaves the stack (CR 701.20a,
+/// `ops::seen_by_all`).
 fn add_revealed_to_item(cx: &mut Cx, at: usize, revealed: &[ObjectId]) {
     if revealed.is_empty() {
         return;
@@ -8460,6 +8494,7 @@ fn cast(
     let extra_chosen = choose_permanents(cx, player, spell, &extra, Some(CostFor::Spell), None)?;
     let beheld = choose_behold(cx, player, spell, &cost)?;
     let (extra_beheld, announced) = choose_behold_of(cx, player, spell, &extra)?;
+    let chosen_objects: Vec<ObjectId> = [choose_object(cx, player, spell, &cost)?, choose_object(cx, player, spell, &extra)?].into_iter().flatten().collect();
     if let Some(chosen) = announced {
         // CR 601.2b: the type chosen as the cost was announced is kept on the spell, and on a copy of it (CR 707.10).
         item.choice = StackItem::announce_type(chosen);
@@ -8553,7 +8588,9 @@ fn cast(
     pay_exiles(cx, &hand_exiled);
     pay_life_and_counters(cx, player, spell, &cost);
     pay_permanents(cx, player, &extra, &extra_chosen, None, &mut Vec::new());
-    let mut revealed = pay_behold(cx, player, spell, cost.behold_exile, &beheld);
+    // The object the cost chose comes first among those the spell's cost chose, before any it revealed (`Query::cost_objects`).
+    let mut revealed = chosen_objects;
+    revealed.extend(pay_behold(cx, player, spell, cost.behold_exile, &beheld));
     revealed.extend(pay_behold(cx, player, spell, extra.behold_exile, &extra_beheld));
     if let Some(at) = cx.s().stack.iter().rposition(|i| i.kind == StackKind::Spell && i.object == spell) {
         add_revealed_to_item(cx, at, &revealed);
@@ -12180,12 +12217,14 @@ fn resolution_parts(cost: &Cost) -> bool {
         behold: _,
         behold_exile: _,
         behold_type: _,
+        choose,
         blight: _,
         tap_to_reduce,
         materials,
     } = *cost;
     // A waterbend cost's {X} is announced with a spell's (CR 107.3a), which a payment during a resolution has none of.
     waterbend.x == 0
+        && choose.is_none()
         && !sacrifice_granter
         && loyalty.is_none()
         && !exert

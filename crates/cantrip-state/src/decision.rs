@@ -1416,7 +1416,8 @@ pub enum Purpose {
     /// Objects chosen as an effect resolves, without targeting, that nothing happens to yet: the effect's later words refer to
     /// them as "the chosen" ones (CR 608.2d, 608.2c). Spry and Mighty's "choose exactly two creatures you control" and
     /// Final Showdown's "choose a creature you control. It gains indestructible until end of turn" print it. (A choice of what
-    /// is kept, the rest sacrificed - Tragic Arrogance, Cataclysm - is [`Purpose::Keep`].)
+    /// is kept, the rest sacrificed - Tragic Arrogance, Cataclysm - is [`Purpose::Keep`].) Also the object a spell's cost
+    /// chooses (`Cost::choose`, CR 601.2h), which its effect names "the chosen" one: Close Encounter's.
     Choose,
     /// The creature a cost blights (CR 701.68a).
     Blight,

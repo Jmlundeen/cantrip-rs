@@ -59,8 +59,11 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         // Behold (CR 701.4a) is a permanent you control or a card in your hand.
         string one = prompt.Purpose == CardChoicePurposeView.Behold ? "permanent or card" : copies ? "copy" : permanents ? "permanent" : "card";
         // The type the asking card narrowed the choice to ("a creature to exile"), the word "card" kept for a card in a zone
-        // that is not the battlefield; the quality a behold names and the creature a blight takes are said as they are.
-        bool said = prompt.Purpose is CardChoicePurposeView.Behold or CardChoicePurposeView.Blight;
+        // that is not the battlefield; the quality a behold names, the creature a blight takes and the object a spell's cost
+        // chooses (Close Encounter's "creature you control or warped creature card you own in exile", CR 601.2h) are said as
+        // they are.
+        bool said = prompt.Purpose is CardChoicePurposeView.Behold or CardChoicePurposeView.Blight
+            || prompt.Purpose == CardChoicePurposeView.Choose && cost;
         string kind = prompt.Kind.Length > 0 ? (said || permanents || table == ZoneKindView.Battlefield ? prompt.Kind : prompt.Kind + " card") : one;
         string many = prompt.Count == 1 && !prompt.AnyNumber ? kind : kind.EndsWith('y') ? kind[..^1] + "ies" : kind + "s";
         // What the question's rule asks of the cards together or each beyond their noun, in its own words: "up to two creature
@@ -121,7 +124,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             // creature" from then on (CR 607.2d). Not a target, and nothing happens to it now.
             : prompt.Purpose == CardChoicePurposeView.ChooseAsEnters && prompt.Count == 1
                 ? $"{source}: {(prompt.UpTo ? "you may choose" : "choose")} {article} {kind} as it enters"
-            // An effect's own choice as it resolves (CR 608.2d): not a target, and nothing happens to the objects chosen yet.
+            // An effect's own choice as it resolves (CR 608.2d), or a spell's cost's (Close Encounter, CR 601.2h): not a target,
+            // and nothing happens to the objects chosen yet.
             : prompt.Purpose == CardChoicePurposeView.Choose
                 ? $"{source}: choose {(prompt.UpTo ? "up to " : "")}{(prompt.Count == 1 ? article + " " + kind : prompt.Count + " " + many)}{from}"
             // A prevention shield two or more sources would deal damage to at once (CR 615.7): whose damage it prevents first.

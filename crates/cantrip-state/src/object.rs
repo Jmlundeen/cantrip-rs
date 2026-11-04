@@ -1086,7 +1086,8 @@ pub struct StackItem {
     /// The objects it is about that are not its targets, in `GameState::members`. For a "one or more" ability (CR 603.2c):
     /// the objects of the batch that triggered it. For an activated ability: the permanents its cost chose and tapped,
     /// sacrificed or returned (CR 601.2h by way of 602.2b), which its effect may name ("the tapped creature's power",
-    /// station, CR 702.184a); a copy of the ability has the same (CR 707.10). For a spell or an activated ability, after
+    /// station, CR 702.184a); a copy of the ability has the same (CR 707.10). For a spell: the cards spliced onto it, then the
+    /// object its cost chose (`Cost::choose`), which its effect names. For a spell or an activated ability, after
     /// those, the cards its cost or announcement revealed from a hand (behold, CR 701.4a; splice, CR 702.47a), revealed until
     /// it leaves the stack (CR 701.20a).
     pub members: Span,

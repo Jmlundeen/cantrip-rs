@@ -167,6 +167,28 @@ public sealed class CardChoiceCaptionTests
     }
 
     /// <summary>
+    /// The object a spell's cost chooses (Close Encounter, CR 601.2h) among permanents and cards in exile: its kind is said as the
+    /// card prints it, with no "card" added for the cards in exile.
+    /// </summary>
+    [Fact]
+    public void A_cost_that_chooses_an_object_says_its_kind_as_printed()
+    {
+        ObjectView bears = Card(3, "Grizzly Bears", ZoneKindView.Battlefield, Me);
+        ObjectView culler = Card(4, "Timeline Culler", ZoneKindView.Exile, Me);
+        GameClient client = Seated([Spell(), bears, culler]);
+        ChooseCardsPromptMessage prompt = Choice(CardChoicePurposeView.Choose, 1, false, bears, culler);
+        prompt.Kind = "creature you control or warped creature card you own in exile";
+        var cost = new PromptPresentationContext
+        {
+            Action = PromptActionView.Choose, Cause = PromptCauseView.Cost, Chooser = Me, Owner = Me, Source = Handle(90),
+            Minimum = 1, Maximum = 1,
+        };
+
+        Assert.Equal("Strategic Betrayal: choose a creature you control or warped creature card you own in exile",
+            CardChoicePresentation.Describe(client, prompt, [], cost).Title);
+    }
+
+    /// <summary>
     /// Craft's materials (CR 702.167a) are permanents you control and cards in your graveyard, exiled with the crafting
     /// permanent: the caption says both zones and the quality, "one or more" is said as such, and fewer than that is no answer.
     /// </summary>

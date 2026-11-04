@@ -863,6 +863,13 @@ pub struct Cost {
     /// passes the filter and has it. Only with `behold`, paid when a spell is cast. The type is kept on the spell
     /// (`StackItem::choice`, read with `StackItem::announced_type`) for its resolution. Celestial Reunion.
     pub behold_type: bool,
+    /// "Choose [an object]" as an additional cost (CR 601.2b, 601.2h): one object the filter accepts, chosen as the cost is
+    /// chosen, and nothing happens to it. It is chosen among the permanents on the battlefield and the cards in exile; the
+    /// filter says whose and which (Close Encounter's "a creature you control or a warped creature card you own in exile").
+    /// Payable only with one to choose (CR 601.2h, 118.3). Paid when a spell is cast only: an activation with it is never
+    /// payable. The spell's effect names it with `Query::cost_objects` ("the chosen creature or card"), and a copy of the
+    /// spell has the same (CR 707.10). The name is what the prompt says.
+    pub choose: Option<(ObjectFilter, &'static str)>,
     /// Blight N (CR 701.68a): put this many -1/-1 counters on a creature you control, chosen as the cost is chosen and
     /// put as it is paid. Payable only with a creature to put them on (CR 701.68b). A spell's (Requiting Hex, Cinder
     /// Strike) or an activated ability's (Dawnhand Dissident, Gristle Glutton, Sting-Slinger).
@@ -1071,6 +1078,7 @@ impl Cost {
             behold,
             behold_exile,
             behold_type,
+            choose,
             blight,
             tap_to_reduce,
             materials,
@@ -1110,6 +1118,7 @@ impl Cost {
             && behold.is_none()
             && !behold_exile
             && !behold_type
+            && choose.is_none()
             && blight == 0
             && !tap_to_reduce
             && materials.is_none()
@@ -1275,6 +1284,12 @@ impl Cost {
         };
         c.behold_exile |= other.behold_exile;
         c.behold_type |= other.behold_type;
+        // One object is chosen for each choice a card prints; two can't be told apart by what it names.
+        c.choose = match (self.choose, other.choose) {
+            (Some(_), Some(_)) => panic!("two choices of an object can't be combined"),
+            (None, b) => b,
+            (a, None) => a,
+        };
         c.blight += other.blight;
         if c.materials.is_none() {
             c.materials = other.materials;
@@ -1320,6 +1335,7 @@ impl Cost {
             behold: None,
             behold_exile: false,
             behold_type: false,
+            choose: None,
             blight: 0,
             tap_to_reduce: false,
             materials: None,

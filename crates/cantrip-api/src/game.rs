@@ -245,12 +245,16 @@ pub trait Query {
     /// the creature tapped this way" (Keldon Battlewagon, Impelled Giant). A crew or saddle cost's creatures are among
     /// them, and after them any card the cost revealed from a hand (behold, CR 701.4a). Each is the object as it was chosen:
     /// read its characteristics with `chars`, which gives those it last had on the battlefield once it has left (CR 608.2h).
-    /// Empty for a spell or a triggered ability.
+    /// For a spell, the object its cost chose (`Cost::choose`: "the chosen creature or card", Close Encounter), the object as
+    /// it was chosen, and after it any card the cost revealed from a hand; a copy of the spell has the same (CR 707.10).
+    /// Not the cards spliced onto it (`StackItem::data`'s first count, CR 702.47a). Empty for a triggered ability.
     fn cost_objects(&self, item: &StackItem) -> &[ObjectId] {
-        if item.kind != StackKind::Activated {
-            return &[];
+        let members = self.state().members(item.members);
+        match item.kind {
+            StackKind::Activated => members,
+            StackKind::Spell => &members[(item.data[0] as usize).min(members.len())..],
+            StackKind::Triggered => &[],
         }
-        self.state().members(item.members)
     }
 
     fn obj(&self, id: ObjectId) -> &Obj {
