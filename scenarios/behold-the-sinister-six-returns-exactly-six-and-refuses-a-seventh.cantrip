@@ -1,0 +1,78 @@
+# Behold the Sinister Six! {6}{B}: "Return up to six target creature cards with different names from your graveyard to the battlefield"
+# (CR 115.1, 201.2b). Two Wheels of Fortune put seven differently named creature cards in Bot1's graveyard (Ornithopter, Glistener Elf,
+# Benalish Hero, Mesa Pegasus, Hired Blade, Memnite, Healer's Hawk). All seven at once are refused (the limit is six), the six
+# are accepted and return together, and the seventh stays in the graveyard.
+# Six moxes and a Swamp pay the seven mana on turn 3.
+
+[Bot1 Deck]
+Black Lotus
+Wheel of Fortune
+Ornithopter
+Glistener Elf
+Benalish Hero
+Mesa Pegasus
+Hired Blade
+Wheel of Fortune
+Memnite
+Healer's Hawk
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Behold the Sinister Six!
+Mox Emerald
+Gleemox
+Swamp x4
+Swamp x20
+
+[Bot2 Deck]
+Plains x26
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Behold the Sinister Six!.Cast
+! Bot1.Target(Ornithopter; Glistener Elf; Benalish Hero; Mesa Pegasus; Hired Blade; Memnite; Healer's Hawk)
+Bot1.Target(Ornithopter; Glistener Elf; Benalish Hero; Mesa Pegasus; Hired Blade; Memnite)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Glistener Elf.Power = 1
+Bot1.Battlefield.Benalish Hero.Power = 1
+Bot1.Battlefield.Mesa Pegasus.Power = 1
+Bot1.Battlefield.Hired Blade.Power = 3
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Graveyard.Healer's Hawk.Power = 1

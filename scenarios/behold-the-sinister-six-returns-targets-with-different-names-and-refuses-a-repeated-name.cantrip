@@ -1,0 +1,69 @@
+# Behold the Sinister Six! {6}{B}: "Return up to six target creature cards with different names from your graveyard to the battlefield"
+# (CR 115.1, 201.2b). Wheel of Fortune puts two Ornithopters, Glistener Elf, Benalish Hero and Mesa Pegasus in Bot1's graveyard. Both
+# Ornithopters at once are refused (the same name twice), as is Bot2's Healer's Hawk (not "from your graveyard"); Ornithopter, Glistener Elf, Benalish
+# Hero and Mesa Pegasus are four different names and return together, leaving the second Ornithopter behind.
+# Six moxes and a Swamp pay the seven mana.
+
+[Bot1 Deck]
+Black Lotus
+Wheel of Fortune
+Ornithopter
+Ornithopter
+Glistener Elf
+Benalish Hero
+Mesa Pegasus
+Behold the Sinister Six!
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Gleemox
+Swamp x20
+
+[Bot2 Deck]
+Healer's Hawk
+Plains x6
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Behold the Sinister Six!.Cast
+! Bot1.Target(Ornithopter#1; Ornithopter#2)
+! Bot1.Target(Bot2.Graveyard.Healer's Hawk)
+Bot1.Target(Ornithopter#1; Glistener Elf; Benalish Hero; Mesa Pegasus)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Glistener Elf.Power = 1
+Bot1.Battlefield.Benalish Hero.Power = 1
+Bot1.Battlefield.Mesa Pegasus.Power = 1
+Bot1.Graveyard.Count = 4

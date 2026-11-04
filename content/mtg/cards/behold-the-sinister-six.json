@@ -1,0 +1,6 @@
+{
+  "name": "Behold the Sinister Six!",
+  "manaCost": "{6}{B}",
+  "type": "Sorcery",
+  "oracleText": "Return up to six target creature cards with different names from your graveyard to the battlefield."
+}
