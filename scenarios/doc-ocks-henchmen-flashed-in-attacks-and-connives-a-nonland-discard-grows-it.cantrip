@@ -1,0 +1,38 @@
+# Doc Ock's Henchmen (2/1, {2}{U}, flash): "Whenever this creature attacks, it connives." Bot1 flashes it in during Bot2's turn 2, paying
+# Black Lotus's UUU exactly. In turn 3 it attacks: Bot1 draws Lightning Bolt and discards it, a nonland card, so it gets a +1/+1 counter
+# (CR 701.50) and deals 3 to Bot2 (17).
+
+[Bot1 Deck]
+Black Lotus
+Doc Ock's Henchmen
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Doc Ock's Henchmen.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Doc Ock's Henchmen > Bot2)
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Battlefield.Doc Ock's Henchmen.Power = 3
+Bot1.Battlefield.Doc Ock's Henchmen.Toughness = 2
+Bot1.Battlefield.Doc Ock's Henchmen.Keywords = Flash

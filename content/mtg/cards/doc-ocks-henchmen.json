@@ -1,0 +1,11 @@
+{
+  "name": "Doc Ock's Henchmen",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Human Villain",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Flash\nWhenever this creature attacks, it connives. (Draw a card, then discard a card. If you discarded a nonland card, put a +1/+1 counter on this creature.)",
+  "keywords": [
+    "Flash"
+  ]
+}

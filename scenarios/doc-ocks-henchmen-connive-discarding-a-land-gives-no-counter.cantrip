@@ -1,0 +1,34 @@
+# The same connive when Bot1 draws an Island and discards it: a land discarded means no +1/+1 counter (CR 701.50b), so the Henchmen
+# stay 2/1 and deal 2 (Bot2 at 18). It is cast in Bot1's own turn 1 as well (flash is a permission, not a requirement).
+
+[Bot1 Deck]
+Black Lotus
+Doc Ock's Henchmen
+Island
+Island
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Doc Ock's Henchmen.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Doc Ock's Henchmen > Bot2)
+Bot1.Pass
+Bot1.Choose(Island)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Island; Black Lotus
+Bot1.Battlefield.Doc Ock's Henchmen.Power = 2
+Bot1.Battlefield.Doc Ock's Henchmen.Toughness = 1
