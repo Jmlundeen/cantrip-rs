@@ -1,0 +1,36 @@
+# Those Old Scientists runs all three chapters: chapter I draws two Islands and discards the Lightning Bolt and one Island,
+# chapter II on turn 3 returns the Bolt from the graveyard to hand, and chapter III on turn 5 shuffles two cards from different
+# graveyards (Bot1's sacrificed Black Lotus and the Island Bot2 discarded to hand size) into their owners' libraries. In chapter II
+# an Island card is refused: only an artifact, instant or sorcery card of your graveyard (CR 115.1).
+
+[Bot1 Deck]
+Black Lotus
+Those Old Scientists
+Lightning Bolt
+Island x4
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Those Old Scientists.Cast
+Bot1.Choose(Lightning Bolt; Island)
+[T3 Bot1.Main1]
+! Bot1.Target(Bot1.Graveyard.Island)
+Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+[T5 Bot1.Main1]
+Bot1.Target(Bot1.Graveyard.Black Lotus; Bot2.Graveyard.Island)
+
+[Expect]
+Bot1.Graveyard = Those Old Scientists; Island
+Bot1.Graveyard.Count = 2
+Bot2.Graveyard.Count = 1
+Bot1.Library.Count = 9
+Bot1.Hand.Count = 8
