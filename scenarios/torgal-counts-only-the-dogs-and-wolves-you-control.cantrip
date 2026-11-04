@@ -1,0 +1,47 @@
+# Torgal, A Fine Hound: "that creature enters with an additional +1/+1 counter on it for each Dog and/or Wolf you control" counts the Dogs as
+# well as the Wolves, and only its controller's (CR 109.5). Bot1 has Torgal (a Wolf) and its own Warclamp Mastiff (a Dog); Bot2 has a
+# Warclamp Mastiff too. On turn 3 Torgal's mana pays for Elite Vanguard, Bot1's first Human creature spell of the turn: it enters with two
+# counters (Torgal and Bot1's Mastiff) - not one (the Wolf alone) and not three (Bot2's Dog counted).
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Pearl
+Torgal, A Fine Hound
+Warclamp Mastiff
+Elite Vanguard
+Forest x14
+
+[Bot2 Deck]
+Plains
+Warclamp Mastiff
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Torgal, A Fine Hound.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Warclamp Mastiff.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Warclamp Mastiff.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Torgal, A Fine Hound.Activate(Color: White)
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Elite Vanguard.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Elite Vanguard.Power = 4
+Bot2.Battlefield.Warclamp Mastiff.Power = 1

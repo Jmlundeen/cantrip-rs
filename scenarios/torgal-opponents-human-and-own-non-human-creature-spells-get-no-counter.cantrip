@@ -1,0 +1,38 @@
+# Torgal, A Fine Hound: the trigger is for "you" casting a Human creature spell (CR 603.2): the opponent's Elite Vanguard (Human) on turn 2 enters as a
+# plain 2/1 whatever Torgal's controller has, and Bot1's own Savannah Lions (Cat Soldier, not a Human) on turn 3 is a plain 2/1 too.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Torgal, A Fine Hound
+Savannah Lions
+Forest x16
+
+[Bot2 Deck]
+Plains
+Elite Vanguard
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Torgal, A Fine Hound.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Elite Vanguard.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Torgal, A Fine Hound.Activate(Color: White)
+? Bot1.Mana = {W}
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Savannah Lions.Power = 2
+Bot2.Battlefield.Elite Vanguard.Power = 2

@@ -1,0 +1,41 @@
+# Torgal, A Fine Hound ({1}{G}, Wolf 2/2): "Whenever you cast your first Human creature spell each turn, that creature enters with an additional +1/+1
+# counter on it for each Dog and/or Wolf you control" (CR 603.2, 614.12). Bot1 casts Torgal on turn 1 off Plains and Mox Emerald, with Mox Pearl
+# held back. On turn 3 Torgal's own mana (any color) pays for the first Elite Vanguard (Human Soldier 2/1), which enters with one counter for the
+# one Wolf (Torgal himself) and is 3/2; the Mox Pearl pays for the second, cast the same turn, which is not the first and is a plain 2/1.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Pearl
+Torgal, A Fine Hound
+Elite Vanguard
+Elite Vanguard
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Torgal, A Fine Hound.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Torgal, A Fine Hound.Activate(Color: White)
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Elite Vanguard#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Elite Vanguard#1.Power = 3
+Bot1.Battlefield.Elite Vanguard#2.Power = 2
