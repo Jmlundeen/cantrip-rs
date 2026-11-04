@@ -1,0 +1,47 @@
+# Spider-Man No More {1}{U}: "Enchant creature. Enchanted creature is a Citizen with base power and toughness 1/1. It has defender and loses
+# all other abilities." Black Lotus pays on turn 3 (Bot1 enchants Bot2's Ornithopter, a colorless 0/2 Thopter artifact creature with flying).
+# "Is a Citizen" replaces its creature types only (CR 205.1a): it stays an artifact creature and colorless. It is 1/1 (CR 613.4b), and its
+# flying is lost while the defender granted after the loss is kept (CR 613.1f, 613.7), so on turn 4 it cannot attack (CR 702.3b) while Bot2's Memnite can: Bot1 takes 1.
+
+[Bot1 Deck]
+Black Lotus
+Spider-Man No More
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Spider-Man No More.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spider-Man No More.AttachedTo = Ornithopter
+? Bot2.Battlefield.Ornithopter.Subtypes = Citizen
+? Bot2.Battlefield.Ornithopter.Types = Artifact; Creature
+? Bot2.Battlefield.Ornithopter.Colors = (absent)
+? Bot2.Battlefield.Ornithopter.Power = 1
+? Bot2.Battlefield.Ornithopter.Toughness = 1
+? Bot2.Battlefield.Ornithopter.Keywords = Defender
+[T4 Bot2.Main1]
+! Bot2.Attack(Ornithopter > Bot1)
+Bot2.Attack(Memnite > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Spider-Man No More.Subtypes = Aura
+Bot2.Battlefield.Ornithopter.Keywords = Defender
+Bot1.Life = 19

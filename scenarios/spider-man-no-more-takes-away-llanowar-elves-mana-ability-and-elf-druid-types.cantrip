@@ -1,0 +1,45 @@
+# Spider-Man No More makes the enchanted creature lose all other abilities (CR 613.1f): Bot1 enchants Bot2's Llanowar Elves (a 1/1 Elf Druid with
+# "{T}: Add {G}") on turn 3. It becomes a Citizen alone (its Elf and Druid types are overwritten, CR 205.1a), 1/1 with defender, and its
+# mana ability is gone: on turn 4 it cannot be tapped for mana, though Bot2's Forest still can. Unenchanted, Bot2's second creature (Memnite)
+# is untouched: still a 1/1 Construct.
+
+[Bot1 Deck]
+Black Lotus
+Spider-Man No More
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Memnite
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Spider-Man No More.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Llanowar Elves.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Subtypes = Citizen
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Battlefield.Llanowar Elves.Toughness = 1
+Bot2.Battlefield.Llanowar Elves.Keywords = Defender
+Bot2.Battlefield.Memnite.Subtypes = Construct
+Bot2.Battlefield.Memnite.Keywords = (absent)
