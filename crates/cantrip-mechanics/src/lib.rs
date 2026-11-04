@@ -205,6 +205,12 @@ pub fn your_turn(q: &dyn Query, asker: &Asker) -> bool {
     q.state().turn.active == asker.controller
 }
 
+/// "Activate only during your upkeep" (CR 602.5b): the ability's controller is the active player and the step is the
+/// upkeep. Life Chisel and Life Matrix print it.
+pub fn your_upkeep(q: &dyn Query, asker: &Asker) -> bool {
+    q.state().turn.active == asker.controller && q.state().turn.step() == Step::Upkeep
+}
+
 /// A player chooses `count` cards of their hand (all of it if they have fewer) and discards them together
 /// (CR 701.9). Asked even when the choice is forced, except of an empty hand.
 pub fn discard_chosen(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u32) -> Result<Vec<ObjectId>, Suspend> {
