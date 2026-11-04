@@ -1,0 +1,6 @@
+{
+  "name": "Airship Crash",
+  "manaCost": "{2}{G}",
+  "type": "Instant",
+  "oracleText": "Destroy target artifact, enchantment, or creature with flying.\nCycling {2} ({2}, Discard this card: Draw a card.)"
+}
