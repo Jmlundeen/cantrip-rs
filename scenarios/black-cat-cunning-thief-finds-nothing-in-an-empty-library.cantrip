@@ -1,0 +1,32 @@
+# Black Cat, Cunning Thief {3}{B}{B}: "... look at the top nine cards of target opponent's library, exile two of them face down ..."
+# Bot2's library is empty (its deck is the seven cards of its hand): there is nothing to look at or exile, nobody is asked, and
+# Black Cat stays on the battlefield.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Black Cat, Cunning Thief
+Swamp x16
+
+[Bot2 Deck]
+Island x7
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Black Cat, Cunning Thief.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot2.Library.Count = 0
+Bot1.Battlefield.Black Cat, Cunning Thief.Power = 2

@@ -1,0 +1,60 @@
+# Black Cat, Cunning Thief {3}{B}{B}: "When Black Cat enters, look at the top nine cards of target opponent's library, exile two of them face
+# down, then put the rest on the bottom of their library in a random order. You may play the exiled cards for as long as they
+# remain exiled. Mana of any type can be spent to cast spells this way." (CR 401.4, 406.3, 609.4b.) Bot2's top nine are Lightning
+# Helix, seven Islands and a Plains; the tenth card, Ornithopter, is out of reach (refused), and so are three cards. Helix and
+# the ninth card, Plains, are exiled; the Plains is played as a land and the Helix is cast with black mana for its {R}{W}.
+# The other seven go to the bottom, so Bot2's library keeps ten of its twelve cards.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Black Cat, Cunning Thief
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x7
+Lightning Helix
+Island x7
+Plains
+Ornithopter
+Island x2
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Black Cat, Cunning Thief.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Ornithopter)
+! Bot1.Choose(Lightning Helix; Plains; Island)
+Bot1.Choose(Lightning Helix; Plains)
+? Exile.Count = 2
+? Bot2.Library.Count = 10
+? Bot2.Library = Ornithopter; Island; Island; Island; Island; Island; Island; Island; Island; Island
+? Bot1.Looked = Lightning Helix; Island; Island; Island; Island; Island; Island; Island; Plains; Lightning Helix; Plains
+Bot1.Exile.Plains.Play
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Exile.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Battlefield.Plains.Tapped = false
+Exile.Count = 0
+Bot2.Library.Count = 10
