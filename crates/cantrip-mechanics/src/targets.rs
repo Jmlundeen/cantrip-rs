@@ -668,6 +668,14 @@ fn artifact_or_creature_you_control_filter(q: &dyn Query, asker: &Asker, t: Targ
 /// "Target artifact" (CR 115.1). Abrade and Embereth Shieldbreaker print it.
 pub const ARTIFACT: TargetSpec = target(artifact_filter);
 
+fn artifact_creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Artifact) && q.chars(id).is(CardType::Creature))
+}
+
+/// "Target artifact creature" (CR 115.1): on the battlefield, an artifact and a creature, whoever controls it. Argivian
+/// Blacksmith and the modular trigger (Arcbound Wanderer) print it.
+pub const ARTIFACT_CREATURE: TargetSpec = target(artifact_creature_filter);
+
 fn artifact_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     artifact_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
 }

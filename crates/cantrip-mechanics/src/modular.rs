@@ -12,11 +12,6 @@ use crate::targets;
 use crate::triggers::THIS_DIES;
 use cantrip_api::*;
 
-/// "Target artifact creature" (CR 115.1): on the battlefield, an artifact and a creature, whoever controls it.
-fn artifact_creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if targets::on_battlefield(q, id) && q.chars(id).is(CardType::Artifact) && q.chars(id).is(CardType::Creature))
-}
-
 const ASK: Question = Question::new(
     "Modular",
     "put its +1/+1 counters on the artifact creature?",
@@ -40,4 +35,4 @@ pub const TRIGGER: AbilityDef = triggered(
     move_the_counters,
     "Modular (When this creature dies, you may put its +1/+1 counters on target artifact creature.)",
 )
-.targets(&[target(artifact_creature)]);
+.targets(&[targets::ARTIFACT_CREATURE]);
