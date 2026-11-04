@@ -1,0 +1,54 @@
+# Mm'menon, Uthros Exile {1}{U}{R} 1/3 flying: "Whenever an artifact you control enters, put a +1/+1 counter on target creature." Turn 1: three Moxen enter before it, so nothing
+# triggers, and Mm'menon is a 1/3. Turn 2: Bot2's Memnite (an artifact entering under the opponent's control) triggers nothing. Turn 3: Bot1's Ornithopter enters - the trigger
+# refuses a Mox (not a creature) and takes the opponent's Memnite, a 2/2; then Bot1's Mox Pearl enters and the trigger takes Mm'menon itself, a 2/4. One counter each time, and the
+# Ornithopter is the one creature left alone.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mm'menon, Uthros Exile
+Mox Pearl
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mm'menon, Uthros Exile.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mm'menon, Uthros Exile.Power = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Memnite.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Power = 2
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Target(Bot1.Battlefield.Mm'menon, Uthros Exile)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mm'menon, Uthros Exile.Power = 2
+Bot1.Battlefield.Mm'menon, Uthros Exile.Toughness = 4
+Bot2.Battlefield.Memnite.Power = 2
+Bot2.Battlefield.Memnite.Toughness = 2
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Mm'menon, Uthros Exile.Keywords = Flying
