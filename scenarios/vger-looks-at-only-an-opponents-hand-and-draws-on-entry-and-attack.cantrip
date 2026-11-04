@@ -1,0 +1,48 @@
+# V'Ger's first mode targets only opponents; a third seat keeps target selection explicit (CR 115.1).
+# Entry and attack each look at the chosen hand and draw exactly one (CR 603.2, 701.20b).
+
+[Bot1 Deck]
+V'Ger, the Intruder
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Bot3 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.V'Ger, the Intruder.Cast
+Bot1.Modes(1)
+! Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Hand.Count = 3
+? Bot1.Looked = Island; Island; Island; Island; Island; Island; Island
+[T4 Bot1.Main1]
+Bot1.Attack(V'Ger, the Intruder > Bot2)
+Bot1.Modes(1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[Expect]
+Bot1.Hand.Count = 5
+Bot2.Hand.Count = 7

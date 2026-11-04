@@ -1,0 +1,11 @@
+{
+  "name": "V'Ger, the Intruder",
+  "manaCost": "{6}{U}",
+  "type": "Legendary Artifact Creature — Construct",
+  "power": 5,
+  "toughness": 7,
+  "oracleText": "Flying\nWhenever V'Ger enters or attacks, choose one —\n• Look at target opponent's hand, then draw a card.\n• Creatures your opponents control get -1/-0 until your next turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

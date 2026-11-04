@@ -1,0 +1,44 @@
+# V'Ger's second mode gives each creature an opponent controls -1/-0 until its controller's next turn (CR 611.2c), so the
+# Ornithopter that was already there is a -1/2 until then, and V'Ger, its controller's own creature, stays a 5/7.
+
+[Bot1 Deck]
+V'Ger, the Intruder
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.V'Ger, the Intruder.Cast
+Bot1.Modes(2)
+Bot1.Pass
+Bot2.Pass
+
+? Bot2.Battlefield.Ornithopter.Power = -1
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.V'Ger, the Intruder.Power = 5
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Power = -1
+[T5 Bot1.Main1]
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
