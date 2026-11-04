@@ -1,0 +1,35 @@
+# Lizard, Connors's Curse's Lizard Formula may target a creature its controller owns: Bot1's Memnite, a colorless Artifact Creature - Construct
+# 1/1, is the only other creature, so it is the target. It becomes a green Lizard creature 4/4: "becomes a ... creature" replaces its card
+# types (CR 205.1a), so it is no longer an artifact, and its creature types (CR 205.1a), so no longer a Construct.
+
+[Bot1 Deck]
+Mox Emerald x4
+Lizard, Connors's Curse
+Memnite
+Forest x2
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Lizard, Connors's Curse.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Types = Creature
+Bot1.Battlefield.Memnite.Subtypes = Lizard
+Bot1.Battlefield.Memnite.Colors = Green
+Bot1.Battlefield.Memnite.Power = 4
+Bot1.Battlefield.Memnite.Toughness = 4

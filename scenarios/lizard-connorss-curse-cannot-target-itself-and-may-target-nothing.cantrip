@@ -1,0 +1,43 @@
+# Lizard, Connors's Curse: "up to one other target creature". Lizard itself is not a legal target (the refusal), though Bot1's Memnite is
+# (the positive control: it is among the choices of the very same question); and "up to one" lets Bot1 choose nothing, in which case
+# Memnite is untouched: a colorless Artifact Creature 1/1.
+
+[Bot1 Deck]
+Mox Emerald x4
+Lizard, Connors's Curse
+Memnite
+Forest x2
+Forest x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Lizard, Connors's Curse.Cast
+Bot1.Pass
+! Bot1.Target(Bot1.Battlefield.Lizard, Connors's Curse)
+Bot1.Target()
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Types = Artifact; Creature
+Bot1.Battlefield.Memnite.Power = 1
+Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Elf
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Lizard, Connors's Curse.Subtypes = Lizard; Villain

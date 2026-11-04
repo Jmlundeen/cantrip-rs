@@ -1,0 +1,11 @@
+{
+  "name": "Lizard, Connors's Curse",
+  "manaCost": "{2}{G}{G}",
+  "type": "Legendary Creature — Lizard Villain",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Trample\nLizard Formula — When Lizard, Connors's Curse enters, up to one other target creature loses all abilities and becomes a green Lizard creature with base power and toughness 4/4.",
+  "keywords": [
+    "Trample"
+  ]
+}

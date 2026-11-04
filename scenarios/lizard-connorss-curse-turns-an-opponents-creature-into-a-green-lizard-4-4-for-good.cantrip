@@ -1,0 +1,50 @@
+# Lizard, Connors's Curse: "When Lizard, Connors's Curse enters, up to one other target creature loses all abilities and becomes a green
+# Lizard creature with base power and toughness 4/4." Bot2's Llanowar Elves (a 1/1 Creature - Elf Druid with "{T}: Add {G}") is the only other
+# creature, so it is the target. It becomes a Creature - Lizard alone (the Elf and Druid types are replaced, CR 205.1a), green, 4/4, and
+# the effect does not end at end of turn (the ruling): on Bot2's turn 4 it is still a 4/4 Lizard, untapped and past summoning sickness, and
+# its "{T}: Add {G}" is not offered - it has no abilities.
+
+[Bot1 Deck]
+Mox Emerald x4
+Lizard, Connors's Curse
+Forest x2
+Forest x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Lizard, Connors's Curse.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Llanowar Elves.Power = 4
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Llanowar Elves.Tapped = false
+? Bot2.Battlefield.Llanowar Elves.Toughness = 4
+! Bot2.Battlefield.Llanowar Elves.Activate
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Types = Creature
+Bot2.Battlefield.Llanowar Elves.Subtypes = Lizard
+Bot2.Battlefield.Llanowar Elves.Colors = Green
+Bot2.Battlefield.Llanowar Elves.Power = 4
+Bot2.Battlefield.Llanowar Elves.Toughness = 4
+Bot1.Battlefield.Lizard, Connors's Curse.Power = 5
+Bot1.Battlefield.Lizard, Connors's Curse.Toughness = 5
