@@ -1,0 +1,58 @@
+# Susurian Voidborn: Wrath of God destroys it with Bot1's Ornithopter and Bot2's Ornithopter at once. A dies trigger looks back
+# (CR 603.10a), so Voidborn, dying with them, triggers for itself and for Bot1's Ornithopter but not for Bot2's, which Bot1 does
+# not control. The Black Lotus sacrificed to pay for Wrath is an artifact Bot1 controlled too, so it triggers once more: Bot2
+# loses 3 and Bot1 gains 3.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Susurian Voidborn
+Ornithopter
+Wrath of God
+Black Lotus
+Plains
+Island x11
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Susurian Voidborn.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Triggers(target opponent; target opponent)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 23
+Bot2.Graveyard.Count = 1

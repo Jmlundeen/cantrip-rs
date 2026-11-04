@@ -1,0 +1,42 @@
+# Susurian Voidborn: "Whenever this creature or another creature or artifact you control dies, target opponent loses 1 life and
+# you gain 1 life." Bot2's Disenchant destroys Bot1's Mox Jet, a noncreature artifact (CR 700.4, 603.10a): Bot2 loses 1 and
+# Bot1 gains 1.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Susurian Voidborn
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Plains
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Susurian Voidborn.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Jet)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Mox Jet
+Bot2.Life = 19
+Bot1.Life = 21

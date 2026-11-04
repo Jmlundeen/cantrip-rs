@@ -1,0 +1,27 @@
+# Susurian Voidborn's warp {B} (CR 702.185a): a white Mox Pearl cannot pay the colored pip, so the warp cast is refused; a black
+# Mox Jet pays it exactly, leaving only the white mana unspent, and the creature is exiled at the beginning of the next end step.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Susurian Voidborn
+Island x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Susurian Voidborn.Cast(Ability: Warp; Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Susurian Voidborn.Cast(Ability: Warp)
+Bot1.Pass
+[Bot1.End]
+
+[Expect]
+Exile = Susurian Voidborn
+Bot1.Battlefield = Mox Jet; Mox Pearl
