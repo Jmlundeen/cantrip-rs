@@ -155,6 +155,7 @@ pub mod targets;
 pub mod text_change;
 pub mod tokens;
 pub mod training;
+pub mod modified;
 pub mod modular;
 pub mod outlast;
 pub mod increment;
