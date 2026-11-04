@@ -336,6 +336,15 @@ pub fn your_ability_from_a_source_of_types<const TYPES: u16>(q: &dyn Query, aske
 }
 pub const ACTIVATED_OR_TRIGGERED_ABILITY: TargetSpec = target(activated_or_triggered_ability_filter);
 
+/// "Target activated or triggered ability you control" (CR 115.1): an ability on the stack (a mana ability never is, CR
+/// 605.3b) that the asker controls. Gogo, Master of Mimicry, Lithoform Engine, Adric, Mathematical Genius and Peter Parker's
+/// Camera copy one.
+pub fn your_activated_or_triggered_ability_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    let Target::Ability(serial) = t else { return false };
+    q.state().stack.iter().any(|i| i.kind != StackKind::Spell && i.serial == serial && i.controller == asker.controller)
+}
+pub const YOUR_ACTIVATED_OR_TRIGGERED_ABILITY: TargetSpec = target(your_activated_or_triggered_ability_filter);
+
 /// "Target spell or ability with a single target" (CR 115.1, 115.7a): exactly one target across every slot, counted with
 /// repeats, as the item was announced; re-asked as the spell resolves (CR 608.2b). Untimely Malfunction and Bolt Bend print it.
 pub const SPELL_OR_ABILITY_WITH_A_SINGLE_TARGET: TargetSpec = target(spell_or_ability_with_a_single_target_filter);
