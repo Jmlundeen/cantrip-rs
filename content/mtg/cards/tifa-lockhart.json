@@ -1,0 +1,11 @@
+{
+  "name": "Tifa Lockhart",
+  "manaCost": "{1}{G}",
+  "type": "Legendary Creature — Human Monk",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Trample\nLandfall — Whenever a land you control enters, double Tifa Lockhart's power until end of turn.",
+  "keywords": [
+    "Trample"
+  ]
+}
