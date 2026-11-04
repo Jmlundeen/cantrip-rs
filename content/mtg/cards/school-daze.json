@@ -1,0 +1,6 @@
+{
+  "name": "School Daze",
+  "manaCost": "{3}{U}{U}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Do Homework — Draw three cards.\n• Fight Crime — Counter target spell. Draw a card."
+}

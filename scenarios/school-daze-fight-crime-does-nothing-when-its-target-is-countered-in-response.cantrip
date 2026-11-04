@@ -1,0 +1,43 @@
+# School Daze mode 2 targets one spell (CR 115.1); if that target is gone as it resolves, School Daze does not resolve (CR 608.2b) and Bot1
+# draws nothing. Bot2 casts Memnite; Bot1 puts School Daze on it, then a Counterspell on the Memnite with the other two blue: the Memnite
+# is countered first, School Daze is left with no legal target, and Bot1's hand stays at 2 (a draw would make it 3).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+School Daze
+Counterspell
+Island x25
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.School Daze.Cast
+Bot1.Modes(2)
+Bot1.Target(Stack.Memnite)
+Bot1.Hand.Counterspell.Cast(Stack.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Memnite
+Bot1.Hand.Count = 2

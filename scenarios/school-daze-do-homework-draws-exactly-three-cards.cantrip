@@ -1,0 +1,29 @@
+# School Daze {3}{U}{U}: "Choose one -- Do Homework -- Draw three cards. / Fight Crime -- Counter target spell. Draw a card."
+# Two Black Lotuses pay for it on turn 1. Mode 1 (CR 700.2) draws exactly three: the hand of 4 left after the three casts is 7.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+School Daze
+Island x25
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.School Daze.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Graveyard = School Daze; Black Lotus; Black Lotus

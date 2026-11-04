@@ -1,0 +1,65 @@
+# School Daze mode 2, "Fight Crime -- Counter target spell. Draw a card." (CR 701.6, 700.2). On turn 2 Bot1 counters Bot2's Llanowar
+# Elves (a creature spell) with exactly five blue from two Black Lotuses: a permanent (Bot2's Forest) is refused as the target (CR 115.1),
+# the Elves goes to the graveyard, and Bot1 draws exactly one card. Then, on turn 4, a second School Daze counters a Lightning Bolt
+# (a noncreature spell) aimed at Bot1, whose life stays 20, and Bot1 draws one more.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+School Daze
+School Daze
+Black Lotus
+Black Lotus
+Island x25
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Lightning Bolt
+Mountain
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.School Daze.Cast
+Bot1.Modes(2)
+! Bot1.Target(Bot2.Battlefield.Forest)
+Bot1.Target(Stack.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Llanowar Elves
+? Bot1.Hand.Count = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.School Daze.Cast
+Bot1.Modes(2)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt; Llanowar Elves
+Bot1.Hand.Count = 4
