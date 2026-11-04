@@ -1,0 +1,46 @@
+# Galuf's Final Act on Bot1's Birds of Paradise (0/1): until end of turn it is 1/1 and has the dies trigger (CR 611.2a). Bot1's own
+# Llanowar Elves (1/1) is a legal recipient, as Bot2's creature is: Lightning Bolt kills the Birds the same turn, one counter
+# (its power with the +1/+0, CR 603.10a) makes the Elves 2/2. Black Lotus and Mox Emerald (4 mana) pay Birds, Elves and Galuf's
+# Final Act exactly; Mox Ruby pays the Bolt.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Birds of Paradise
+Galuf's Final Act
+Lightning Bolt
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Galuf's Final Act.Cast(Bot1.Battlefield.Birds of Paradise)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Birds of Paradise)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 2
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,53 @@
+# Galuf's Final Act ({1}{G}) on Bot1's Llanowar Elves (1/1): it gets +1/+0, 2/1 until end of turn, and gains "When this creature
+# dies, put a number of +1/+1 counters equal to its power on up to one target creature" (CR 611.2a, 613.1f). Lightning Bolt kills
+# it the same turn; the power it last had on the battlefield is 2, the +1/+0 included (CR 603.10a, 608.2h), so two counters go on
+# Bot2's Steel Wall (0/4), which becomes 2/6 - the toughness is unchanged. A noncreature, Bot1's Mox Ruby, is no legal target.
+# The three mana of Black Lotus pay Elves ({G}) and Galuf's Final Act ({1}{G}) exactly.
+
+[Bot1 Deck]
+Black Lotus
+Llanowar Elves
+Galuf's Final Act
+Lightning Bolt
+Mox Ruby
+Swamp x20
+
+[Bot2 Deck]
+Steel Wall
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Galuf's Final Act.Cast(Bot1.Battlefield.Llanowar Elves)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt; Galuf's Final Act; Black Lotus
+Bot2.Battlefield.Steel Wall.Power = 2
+Bot2.Battlefield.Steel Wall.Toughness = 6
+Bot2.Battlefield.Steel Wall.Counters.PlusOnePlusOne = 2

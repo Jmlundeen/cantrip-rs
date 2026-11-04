@@ -1,0 +1,61 @@
+# Galuf's Final Act on Bot2's Wall of Earth (0/6) after Blight Rot put four -1/-1 counters on it: it is -4/2, then -3/2 with the
+# +1/+0. Lightning Bolt kills it; its power as it last existed is -3, so "a number of +1/+1 counters equal to its power" are
+# none (CR 107.1b) - the Wall's controller Bot2 chooses its Steel Wall as the target, and it stays 0/4 with no counter put on it.
+
+[Bot1 Deck]
+Black Lotus
+Blight Rot
+Mox Jet
+Mox Emerald
+Mox Ruby
+Galuf's Final Act
+Lightning Bolt
+Swamp x20
+
+[Bot2 Deck]
+Wall of Earth
+Steel Wall
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Island x20
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Wall of Earth.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Steel Wall.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Blight Rot.Cast(Bot2.Battlefield.Wall of Earth)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Galuf's Final Act.Cast(Bot2.Battlefield.Wall of Earth)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Wall of Earth.Power = -3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Wall of Earth)
+Bot1.Pass
+Bot2.Pass
+Bot2.Target(Bot2.Battlefield.Steel Wall)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Wall of Earth
+Bot2.Battlefield.Steel Wall.Power = 0
+Bot2.Battlefield.Steel Wall.Toughness = 4
