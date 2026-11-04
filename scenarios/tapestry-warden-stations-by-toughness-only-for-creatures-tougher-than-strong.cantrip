@@ -1,0 +1,58 @@
+# Tapestry Warden: "Each creature you control with toughness greater than its power stations permanents using its toughness
+# rather than its power" (CR 702.184c). Ornithopter (0/2) stations Adagia, Windswept Bastion for two counters, and its power
+# stays 0 (ruling: power is unchanged). Memnite (1/1, toughness not greater) puts one, its power. On turn 3 Dark Confidant (2/1,
+# toughness below power) puts two, its power, not one.
+
+[Bot1 Deck]
+Adagia, Windswept Bastion
+Black Lotus
+Mox Jet
+Tapestry Warden
+Ornithopter
+Memnite
+Island
+Dark Confidant
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Adagia, Windswept Bastion.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tapestry Warden.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Station)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = 2
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Station)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: {T}: Add {W}.)
+Bot1.Hand.Dark Confidant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Station)
+Bot1.Choose(Dark Confidant)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = 5

@@ -1,0 +1,31 @@
+# Tapestry Warden (3/4, vigilance): "Each creature you control with toughness greater than its power assigns combat damage
+# equal to its toughness rather than its power" (CR 510.1a). On turn 3 the Warden and Ornithopter (0/2) attack: the Warden
+# deals 4 and Ornithopter 2, so Bot2 goes to 14, and the Warden stays untapped (CR 702.20b).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Tapestry Warden
+Ornithopter
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tapestry Warden.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Tapestry Warden; Ornithopter > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Tapestry Warden.Tapped = false
+Bot1.Battlefield.Ornithopter.Tapped = true

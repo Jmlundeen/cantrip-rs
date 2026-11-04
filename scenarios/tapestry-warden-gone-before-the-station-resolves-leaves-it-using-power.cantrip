@@ -1,0 +1,48 @@
+# Tapestry Warden's station rule applies only while it is on the battlefield as the station ability resolves (the rulings,
+# CR 702.184c). Bot1's Ornithopter (0/2) stations Adagia, Windswept Bastion, and Bot2's Swords to Plowshares exiles the
+# Warden in response: the ability uses Ornithopter's power of 0 and puts no counters.
+
+[Bot1 Deck]
+Adagia, Windswept Bastion
+Black Lotus
+Mox Jet
+Tapestry Warden
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Island x18
+
+[Actions]
+Bot1.Hand.Adagia, Windswept Bastion.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tapestry Warden.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Station)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Tapestry Warden)
+Bot2.Pass
+Bot1.Pass
+? Exile = Tapestry Warden
+? Stack = Adagia, Windswept Bastion
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = (absent)
+Bot1.Life = 23

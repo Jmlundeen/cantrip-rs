@@ -1,0 +1,47 @@
+# Tapestry Warden with the tapped creature gone before the station ability resolves: its last known characteristics are used,
+# so its toughness if that was greater than its power (the rulings, CR 702.184c, 608.2h). Ornithopter (0/2) stations
+# Adagia, Windswept Bastion and Bot2's Lightning Bolt kills it in response: Adagia gets two counters.
+
+[Bot1 Deck]
+Adagia, Windswept Bastion
+Black Lotus
+Mox Jet
+Tapestry Warden
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Adagia, Windswept Bastion.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tapestry Warden.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Station)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Ornithopter; Black Lotus
+? Stack = Adagia, Windswept Bastion
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = 2

@@ -1,0 +1,37 @@
+# Tapestry Warden's station rule is for "each creature you control" (CR 702.184c): with Bot2's Warden on the battlefield,
+# Bot1's Ornithopter (0/2) stations Adagia, Windswept Bastion with its power of 0, putting no counters.
+
+[Bot1 Deck]
+Adagia, Windswept Bastion
+Ornithopter
+Island x18
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Tapestry Warden
+Island x17
+
+[Actions]
+Bot1.Hand.Adagia, Windswept Bastion.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Tapestry Warden.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Station)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Mox Jet; Tapestry Warden
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = (absent)
