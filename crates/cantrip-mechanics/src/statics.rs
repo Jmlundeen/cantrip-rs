@@ -156,6 +156,15 @@ pub fn itself_with_two_creature_cards_in_your_graveyard(q: &dyn LayerQuery, sour
     source == affected && card_type_cards_in_your_graveyard(q, source, CardType::Creature) >= 2
 }
 
+/// "As long as there's a Lesson card in your graveyard" (CR 205.3k, 604.1, 611.3a) as a static ability's `StaticDef::affects`: only
+/// the source itself, and only while its controller's graveyard holds a Lesson card (never a token, nor a card in an opponent's
+/// graveyard), each judged as the layers make it, asked again whenever characteristics are computed. First-Time Flyer and Fire Nation
+/// Cadets use it.
+pub fn itself_with_a_lesson_in_your_graveyard(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    let state = q.state();
+    source == affected && state.zone(Zone::graveyard(state.obj(source).controller)).iter().any(|&card| q.chars(card).has_subtype(Subtype::Lesson))
+}
+
 /// "This creature gets +1/+1 for each <card type> card in your graveyard" (CR 613.4c, layer 7c) as a static ability's `StaticDef::apply`,
 /// `TYPE` a `CardType` as `u8`: "your" is its controller's, and the count is taken whenever characteristics are computed. Fiend
 /// Artisan and Wight of the Reliquary (creature cards) and Knight of the Reliquary (land cards) print it.
