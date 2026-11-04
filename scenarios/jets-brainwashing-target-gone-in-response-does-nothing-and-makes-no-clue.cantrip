@@ -1,0 +1,37 @@
+# Jet's Brainwashing's one target is gone when it resolves, so it does nothing at all (CR 608.2b), the Clue token too. Bot1 casts
+# Firebending Lesson at the Ornithopter in response and kills it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Jet's Brainwashing
+Firebending Lesson
+Mountain x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Jet's Brainwashing.Cast(Bot2.Battlefield.Ornithopter; Kicked: 0)
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter; Kicked: 0)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Mox Ruby; Mox Ruby
+Bot1.Graveyard = Jet's Brainwashing; Firebending Lesson
