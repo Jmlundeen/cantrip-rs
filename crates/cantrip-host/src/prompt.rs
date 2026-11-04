@@ -328,8 +328,9 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                         m.produces_of_any_one_color = wire(any);
                     }
                     m.cost_text = cost_text_of(&d.cost, def.name);
-                    // A mana ability's sacrifice comes with the activation: the engine takes it as a target.
-                    if d.cost.permanents.is_some() && o.targets_required > 0 {
+                    // A mana ability's sacrifice comes with the activation: the engine takes it as a target. One permanent has
+                    // its own field; a cost of several (Supportive Parents' two creatures) is asked as that many targets.
+                    if d.cost.permanents.is_some_and(|p| p.count == 1) && o.targets_required > 0 {
                         m.sacrifice_candidates = candidates.iter().map(|t| t.object).collect();
                         m.targets_required = 0;
                         return m;
