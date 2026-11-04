@@ -1,0 +1,29 @@
+# Virus Beetle (an artifact creature, 1/1): "When this creature enters, each opponent discards a card." Bot2 holds a Lightning Bolt and
+# Islands and chooses to discard the Island (CR 701.9a, 101.4); its hand drops from 7 to 6.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Virus Beetle
+Swamp x17
+
+[Bot2 Deck]
+Lightning Bolt
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Virus Beetle.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Island)
+
+[Expect]
+Bot1.Battlefield.Virus Beetle.Types = Artifact; Creature
+Bot1.Battlefield.Virus Beetle.Power = 1
+Bot1.Battlefield.Virus Beetle.Toughness = 1
+Bot2.Graveyard = Island
+Bot2.Hand.Count = 6

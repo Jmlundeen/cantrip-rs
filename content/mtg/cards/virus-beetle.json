@@ -1,0 +1,8 @@
+{
+  "name": "Virus Beetle",
+  "manaCost": "{1}{B}",
+  "type": "Artifact Creature — Insect",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "When this creature enters, each opponent discards a card."
+}
