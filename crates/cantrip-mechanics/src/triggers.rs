@@ -1354,6 +1354,27 @@ pub fn this_leaves(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fir
     }
 }
 
+/// "When you lose control of [this permanent]" (CR 603.2): another player gained control of it (CR 613.1b) - a
+/// control-changing effect began to apply or ended - or it left the battlefield while you controlled it, whatever the
+/// reason (Khârn the Betrayer's and Gustha's Scepter's rulings: "when it leaves the battlefield or another player gains
+/// control of it"). "You" is the asker's controller: for a delayed ability, the player whose spell made it (CR 603.7d).
+/// Stolen Uniform ("when you lose control of that Equipment this turn"), Seraph and Gustha's Scepter print it.
+pub fn you_lose_control_of_this(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ControlChanged { permanent, from, controller }
+            if *permanent == me.source && *from == me.controller && *controller != me.controller =>
+        {
+            Fired::PLAIN
+        }
+        Event::ZoneChange { old, from, .. }
+            if *old == me.source && from.is(ZoneKind::Battlefield) && q.controller(*old) == me.controller =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "At the beginning of your [step]" (CR 503.1a, 603.2): `step` began on its controller's turn.
 fn your_step(q: &dyn Query, me: &Asker, event: &Event, step: Step) -> Option<Fired> {
     match event {
@@ -2136,6 +2157,8 @@ pub const YOU_CAST_A_SPELL_FROM_EXILE: Trigger = when_asked(EventMask::SPELL_CAS
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
 pub const THIS_ENTERS_OR_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_enters_or_dies);
 pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
+pub const YOU_LOSE_CONTROL_OF_THIS: Trigger =
+    when_asked(EventMask(EventMask::CONTROL_CHANGED.0 | EventMask::ZONE_CHANGE.0), you_lose_control_of_this);
 pub const AN_OPPONENT_DRAWS_THEIR_SECOND_CARD: Trigger = when_asked(EventMask::DREW, an_opponent_draws_their_second_card);
 pub const YOU_DRAW_YOUR_SECOND_CARD: Trigger = when_asked(EventMask::DREW, you_draw_your_second_card);
 pub const YOUR_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_upkeep);

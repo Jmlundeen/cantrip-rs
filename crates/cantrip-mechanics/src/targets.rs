@@ -465,6 +465,12 @@ pub fn legal_objects(g: &dyn Game, item: &StackItem) -> Vec<ObjectId> {
     (0..item.target_count as usize).filter_map(|slot| object(g, item, slot)).collect()
 }
 
+fn equipment_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if permanent(q, id) && q.chars(id).has_subtype(Subtype::Equipment))
+}
+/// "Target Equipment" (CR 115.1, 301.5), whoever controls it. Stolen Uniform, Rustspore Ram and Turn to Dust print it.
+pub const EQUIPMENT: TargetSpec = target(equipment_filter);
+
 fn equipment_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if permanent(q, id) && q.controller(id) == asker.controller && q.chars(id).has_subtype(Subtype::Equipment))
 }
