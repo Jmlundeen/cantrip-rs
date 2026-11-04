@@ -1,0 +1,46 @@
+# Kav Landseeker's delayed ability sacrifices its Lander only if Bot1 still controls it (CR 701.21a; the ruling: "When
+# that ability resolves, if you still control the Lander token created by Kav Landseeker's last ability, you'll sacrifice
+# that token"). Bot1 gives the Lander to Bot2 with Harmless Offering on turn 3; at the end step of turn 3, Bot1's next
+# turn, the ability resolves and Bot2's Lander stays.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Kav Landseeker
+Harmless Offering
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kav Landseeker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Lander Token)
+[T3 Bot1.Main2]
+? Bot2.Battlefield = Lander Token
+[T3 Bot1.End]
+Bot1.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot2.Battlefield = Lander Token
+Delayed.Count = 0

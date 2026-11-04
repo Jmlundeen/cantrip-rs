@@ -182,6 +182,10 @@ fn next_turn_taker(s: &mut GameState, after: PlayerId) -> PlayerId {
     // at for triggers as it happened, so dropping it now loses nothing.
     let stale = |d: &cantrip_state::Delayed, s: &GameState| match d.when {
         DelayedWhen::ExtraTurnStep { turn, .. } => turn != extra && !s.extra_turns.iter().any(|t| t.id == turn),
+        // "On your next turn" is the turn ending now, if it is that player's first since the ability was made, and it began: a
+        // skipped turn ends here too, under the player who skipped it, but it is not their next turn, and the ability waits
+        // for the first that isn't skipped (CR 614.10a).
+        DelayedWhen::NextTurnStep { player, after, .. } => s.turn.active == player && s.player(player).turn_began > after,
         DelayedWhen::WhenEvent => s.obj(d.watched()).became.is_some(),
         _ => false,
     };
@@ -219,7 +223,7 @@ fn turn_would_have_begun(s: &mut GameState, p: PlayerId) {
         s.effects_retain(|e| !waits(e));
     }
     for at in (0..s.delayed.len()).rev() {
-        if s.delayed[at].when == DelayedWhen::UntilNextTurnOf(p) {
+        if matches!(s.delayed[at].when, DelayedWhen::UntilNextTurnOf(q) | DelayedWhen::NextTurnStep { player: q, .. } if q == p) {
             s.delayed_remove(at);
         }
     }

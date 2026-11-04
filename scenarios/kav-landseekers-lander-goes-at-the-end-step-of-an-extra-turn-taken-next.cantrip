@@ -1,0 +1,39 @@
+# "Your next turn" is the next turn Bot1 takes, an extra turn included (CR 500.7, 603.7). Bot1 casts Kav Landseeker on turn
+# 1, then Time Walk: turn 2 is Bot1's extra turn, its next turn, and the Lander is sacrificed at its end step.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Kav Landseeker
+Time Walk
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kav Landseeker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Time Walk.Cast
+[T2 Bot1.Main1]
+? ActivePlayer = Bot1
+? Delayed = Kav Landseeker
+? Bot1.Battlefield.Lander Token.Types = Artifact
+[T2 Bot1.End]
+Bot1.Pass
+[T3 Bot2.Upkeep]
+
+[Expect]
+Turn = 3
+ActivePlayer = Bot2
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Sapphire; Kav Landseeker
+Delayed.Count = 0

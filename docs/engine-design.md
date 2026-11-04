@@ -1242,6 +1242,14 @@ once that turn has ended without the step (an effect ended it, CR 724.1e) or wil
 Fortune and Last Chance's "at the beginning of that turn's end step, you lose the game" is
 `cantrip_mechanics::delayed::extra_turn_then_lose`.
 
+"On your next turn" is named the same way, by the turn's number: `DelayedWhen::NextTurnStep { step, player, after }`
+triggers at that step of the first turn of `player` numbered past `after`, the turn it was made in, and is dropped as that
+turn ends, with or without the step, or as it would have begun for a player who has left (CR 800.4m). A turn the player
+skips never began (their `turn_began` stays where it was) and is not "the next": the ability waits for the first turn that
+isn't skipped (CR 614.10a). The table says it as things stand: "on your next turn" (to the other seat "their"), and "this
+turn's end step" once that turn has begun. Kav Landseeker's "at
+the beginning of the end step on your next turn, sacrifice that token" is `cantrip_mechanics::delayed::at_step_on_your_next_turn_about`.
+
 ### Controlling another player
 
 "You control target player during that player's next turn" (CR 723.1: Mindslaver, Sorin Markov, Worst Fears) is

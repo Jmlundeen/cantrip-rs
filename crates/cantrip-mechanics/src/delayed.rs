@@ -250,6 +250,22 @@ fn lose_the_game(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// The delayed ability `extra_turn_then_lose` sets up; a card lists it among its `delayed` abilities.
 pub const LOSE_AT_THAT_END_STEP: AbilityDef = delayed_trigger(lose_the_game, "At the beginning of that turn's end step, you lose the game.");
 
+/// `at_next_end_step_about` for "at the beginning of the [step] on your next turn" (CR 603.7): that step of the ability's
+/// controller's first turn to begin after this one, never this turn's, even when this turn is theirs. If that turn ends
+/// without the step, the ability never triggers (`DelayedWhen::NextTurnStep`). Kav Landseeker prints it for the end step,
+/// Meandering Towershell for the declare attackers step.
+pub fn at_step_on_your_next_turn_about(g: &mut dyn Game, item: &StackItem, step: Step, ability: u8, created: &[ObjectId]) {
+    let card = ability_card(g, item);
+    let after = g.state().turn.number;
+    g.delayed_trigger_about(
+        DelayedWhen::NextTurnStep { step, player: item.controller, after },
+        item.object,
+        item.controller,
+        AbilityRef::delayed(card, ability),
+        created,
+    );
+}
+
 /// Sets up the card's delayed ability number `ability` to trigger "at the beginning of your next main phase" (CR 603.7), about
 /// `subject`, controlled by the resolving ability's controller. Which step that is depends on when this resolves: from the
 /// controller's own precombat main phase or combat it is that turn's postcombat main phase, from anywhere else the

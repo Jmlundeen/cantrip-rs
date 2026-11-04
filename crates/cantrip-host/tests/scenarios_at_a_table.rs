@@ -685,6 +685,36 @@ fn an_additional_land_play_is_shown_to_both_seats_and_gone_after_the_turn() {
     assert_eq!(seen, [0, 1, 0, 1, 2], "the extra plays were shown, in order: none, one (turn 1), none (turn 2), one then two (turn 3)");
 }
 
+/// A delayed ability waiting for a step of its controller's next turn (Kav Landseeker's) is said for where things stand: from
+/// turn 3, when it is made, through the turn Bot1 skips with Time Vault (turn 5, not taken, CR 614.10a), Bot1 is told "on your
+/// next turn" and Bot2 "on their next turn"; during turn 6, the turn it waits for, both are told "this turn's end step", not
+/// the turn after it; once the Lander is sacrificed, nothing.
+#[test]
+fn a_delayed_ability_for_a_step_of_your_next_turn_is_said_as_this_turns_once_that_turn_begins() {
+    let line = |views: &[cantrip_host::protocol::PlayerView; 2], viewer: usize| {
+        views[viewer].players[0].pending_effects.iter().find(|f| f.contains("sacrifice that token")).cloned()
+    };
+    let mut seen: Vec<(Option<String>, Option<String>)> = Vec::new();
+    play_looking("kav-landseekers-lander-waits-past-a-skipped-turn-for-the-next-turn-taken", |_, views, _| {
+        let now = (line(views, 0), line(views, 1));
+        if seen.last() != Some(&now) {
+            seen.push(now);
+        }
+        false
+    });
+    let own = |words: &str| Some(format!("Kav Landseeker: At the beginning of {words}, sacrifice that token."));
+    let theirs = |words: &str| Some(format!("They have Kav Landseeker's delayed ability: At the beginning of {words}, sacrifice that token."));
+    assert_eq!(
+        seen,
+        [
+            (None, None),
+            (own("the end step on your next turn"), theirs("the end step on their next turn")),
+            (own("this turn's end step"), theirs("this turn's end step")),
+            (None, None),
+        ]
+    );
+}
+
 /// The granted lines of the permanent named `name` in `view`, if it is shown.
 fn granted_lines(view: &cantrip_host::protocol::PlayerView, name: &str) -> Option<Vec<String>> {
     view.objects.iter().find(|o| o.name == name).map(|o| o.granted_abilities.iter().map(|a| a.text.clone()).collect())

@@ -713,7 +713,8 @@ impl<'a> Projector<'a> {
         // and named for the object it came from (the words may say "that creature"). The other seat is told whose it is. So is
         // one that triggers at each such step for the rest of the game (paradigm, CR 702.192a): the card it came from may be
         // anywhere, or nowhere it can be seen; and one waiting for a step of an extra turn (Final Fortune's "at the beginning of
-        // that turn's end step, you lose the game"), whose spell is gone; and one waiting for an event of an object it watches
+        // that turn's end step, you lose the game"), whose spell is gone; and one waiting for a step of a player's next turn (Kav
+        // Landseeker's "sacrifice that token"), which outlasts the turn its source may leave in; and one waiting for an event of an object it watches
         // ("when that land dies or is put into exile, return it", earthbend), which nothing on that object shows.
         for d in s.delayed.iter().filter(|d| {
             d.controller == p
@@ -724,10 +725,15 @@ impl<'a> Projector<'a> {
                         | DelayedWhen::UntilNextTurnOf(_)
                         | DelayedWhen::EachStep { .. }
                         | DelayedWhen::ExtraTurnStep { .. }
+                        | DelayedWhen::NextTurnStep { .. }
                         | DelayedWhen::WhenEvent
                 )
         }) {
-            let text = game.cards.ability(d.ability).text();
+            let printed = game.cards.ability(d.ability).text();
+            let text = match d.when {
+                DelayedWhen::NextTurnStep { player, after, .. } => self.next_turn_step_text(printed, player, after),
+                _ => printed.to_string(),
+            };
             let from = game.cards.get(game.chars(d.source).card).name;
             summary.pending_effects.push(if p == self.viewer {
                 format!("{from}: {text}")
@@ -858,6 +864,23 @@ impl<'a> Projector<'a> {
             summary.dungeon_room = label.split(" \u{2014} ").next().unwrap_or(label).to_string();
         }
         summary
+    }
+
+    /// A delayed ability waiting for a step of `player`'s next turn (`DelayedWhen::NextTurnStep`, made on turn `after`), its
+    /// printed words ("At the beginning of the end step on your next turn, sacrifice that token.") said for where things stand:
+    /// once that turn has begun it is "this turn's end step", not the turn after it; before then the other seat reads it as
+    /// "their next turn", not its own.
+    fn next_turn_step_text(&self, printed: &str, player: PlayerId, after: u32) -> String {
+        let Some((head, body)) = printed.split_once(" on your next turn") else { return printed.to_string() };
+        let s = &self.game.state;
+        if s.turn.active == player && s.player(player).turn_began > after {
+            match head.split_once(" of the ") {
+                Some((at, step)) => format!("{at} of this turn's {step}{body}"),
+                None => printed.to_string(),
+            }
+        } else {
+            format!("{head} on {} next turn{body}", if player == self.viewer { "your" } else { "their" })
+        }
     }
 
     /// "You can't cast spells from anywhere other than your hand until Bot1's next turn", as `viewer` reads a restriction on

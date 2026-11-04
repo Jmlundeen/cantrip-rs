@@ -1882,6 +1882,14 @@ pub enum DelayedWhen {
     /// the step (Sundial of the Infinite) or is never taken (skipped, CR 500.11), it never triggers, and it is dropped as
     /// the next turn begins.
     ExtraTurnStep { step: Step, turn: u32 },
+    /// "At the beginning of the [step] on [player]'s next turn" (CR 603.7): triggers once, at that step of the first turn of
+    /// `player` to begin after turn number `after` (the turn it was made in, so never that turn's, even when it is that
+    /// player's). A skipped turn never begins and is not it: the ability waits for the first that isn't skipped (CR 614.10a,
+    /// `Player::turn_began`). That turn is the one meant whether or not it has the step: once it has ended without it (Sundial of the
+    /// Infinite, CR 724.1e), or would have begun for a player who has left (CR 800.4m), the ability is dropped. Kav
+    /// Landseeker's "at the beginning of the end step on your next turn" and Meandering Towershell's "at the beginning of
+    /// the declare attackers step on your next turn".
+    NextTurnStep { step: Step, player: PlayerId, after: u32 },
 }
 
 impl DelayedWhen {

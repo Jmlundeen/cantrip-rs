@@ -1,0 +1,70 @@
+# Kav Landseeker: "When this creature enters, create a Lander token. At the beginning of the end step on your next turn,
+# sacrifice that token." (CR 603.7). Each Lander waits for the end step of the first turn of Bot1's that begins after the
+# ability resolved:
+# - Turn 1 (Bot1's own): Lander A. Turn 1's own end step and Bot2's turn 2 pass it by; it goes at turn 3's end step.
+# - Turn 4 (Bot2's), Ephemerate blinks Kav: Lander B, made on an opponent's turn, goes at the end step of Bot1's turn 5.
+# - Turn 5's upkeep, Ephemerate rebounds: Lander C, made on Bot1's own turn 5, waits for turn 7's end step, not turn 5's.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Kav Landseeker
+Ephemerate
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kav Landseeker.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Kav Landseeker.Keywords = Menace
+? Bot1.Battlefield.Lander Token.Types = Artifact
+? Bot1.Battlefield.Lander Token.Tapped = False
+? Delayed = Kav Landseeker
+[T2 Bot2.Upkeep]
+? Bot1.Battlefield.Lander Token.Types = Artifact
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Lander Token.Types = Artifact
+Bot1.Hand.Plains.Play
+[T3 Bot1.End]
+Bot1.Pass
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Lander Token = (absent)
+? Delayed.Count = 0
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Kav Landseeker)
+[T4 Bot2.Main1]
+? Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Pearl; Plains; Kav Landseeker; Lander Token
+? Delayed = Ephemerate; Kav Landseeker
+[T5 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Target(Kav Landseeker)
+[T5 Bot1.Main1]
+? Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Pearl; Plains; Kav Landseeker; Lander Token; Lander Token
+? Delayed = Kav Landseeker; Kav Landseeker
+[T5 Bot1.End]
+Bot1.Pass
+[T6 Bot2.Upkeep]
+? Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Pearl; Plains; Kav Landseeker; Lander Token
+? Delayed = Kav Landseeker
+[T7 Bot1.End]
+Bot1.Pass
+[T8 Bot2.Upkeep]
+
+[Expect]
+Turn = 8
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Pearl; Plains; Kav Landseeker
+Bot1.Graveyard = Ephemerate
+Delayed.Count = 0

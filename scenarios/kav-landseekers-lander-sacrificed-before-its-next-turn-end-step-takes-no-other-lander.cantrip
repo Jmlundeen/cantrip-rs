@@ -1,0 +1,57 @@
+# Kav Landseeker's "sacrifice that token" is the one Lander its ability made (CR 603.7c, 400.7). Bot1's turn-1 Lander is
+# sacrificed for its own ability on turn 3, Bot1's next turn, before the end step; a second Kav Landseeker makes another
+# Lander that turn. At turn 3's end step the first Kav's delayed ability triggers and resolves with its token gone: it
+# sacrifices nothing, and the new Lander stays until the end step of turn 5, the second Kav's next turn.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Kav Landseeker
+Kav Landseeker
+Mountain
+Black Lotus
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kav Landseeker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lander Token.Activate
+Bot1.Search(Mountain)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kav Landseeker.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Mountain; Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl; Kav Landseeker; Kav Landseeker; Lander Token
+? Delayed = Kav Landseeker; Kav Landseeker
+[T3 Bot1.End]
+? Stack = Kav Landseeker
+Bot1.Pass
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield = Mountain; Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl; Kav Landseeker; Kav Landseeker; Lander Token
+? Delayed = Kav Landseeker
+[T5 Bot1.End]
+Bot1.Pass
+[T6 Bot2.Upkeep]
+
+[Expect]
+Turn = 6
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl; Kav Landseeker; Kav Landseeker
+Delayed.Count = 0

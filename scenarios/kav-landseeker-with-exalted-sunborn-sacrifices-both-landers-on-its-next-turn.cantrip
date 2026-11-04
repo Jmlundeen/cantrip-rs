@@ -1,0 +1,49 @@
+# Kav Landseeker under Exalted Sunborn: "create a Lander token" makes two (CR 614.1a), and "sacrifice that token" is every
+# token the effect created (CR 603.7c; the ruling: "If a replacement effect (such as that of Exalted Sunborn's second
+# ability) causes additional tokens to be created during the resolution of Kav Landseeker's last ability, you'll sacrifice
+# those tokens at the beginning of the end step on your next turn as well"). Both stay through turn 3's end step and turn
+# 4, and both go at the end step of turn 5.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Black Lotus
+Exalted Sunborn
+Kav Landseeker
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Exalted Sunborn.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kav Landseeker.Cast
+[T3 Bot1.End]
+Bot1.Pass
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Pearl; Mox Jet; Exalted Sunborn; Kav Landseeker; Lander Token; Lander Token
+[T5 Bot1.End]
+Bot1.Pass
+[T6 Bot2.Upkeep]
+
+[Expect]
+Turn = 6
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Pearl; Mox Jet; Exalted Sunborn; Kav Landseeker
+Delayed.Count = 0

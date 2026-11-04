@@ -1,0 +1,47 @@
+# "Your next turn" waits for the first turn that isn't skipped (CR 614.10a). Bot1 casts Time Vault on turn 1 (declining
+# its skip at turn 3) and Kav Landseeker on turn 3, then skips turn 5 with the Vault: that turn was never taken, the
+# delayed ability waits on, and Bot1's next turn is turn 6, at whose end step the Lander is sacrificed.
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Time Vault
+Kav Landseeker
+Mountain
+Mountain x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Time Vault.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kav Landseeker.Cast
+[T4 Bot2.Main1]
+? Delayed = Kav Landseeker
+[T4 Bot2.End]
+Bot1.Pass
+Bot1.Accept
+[T5 Bot2.Main1]
+? ActivePlayer = Bot2
+? Delayed = Kav Landseeker
+? Bot1.Battlefield.Lander Token.Types = Artifact
+[T6 Bot1.Main1]
+? Bot1.Battlefield.Lander Token.Types = Artifact
+[T6 Bot1.End]
+Bot1.Pass
+[T7 Bot2.Upkeep]
+[Expect]
+Turn = 7
+Bot1.Battlefield.Lander Token = (absent)
+Delayed.Count = 0
