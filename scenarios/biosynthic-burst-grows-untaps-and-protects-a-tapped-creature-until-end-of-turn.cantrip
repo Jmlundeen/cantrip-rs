@@ -1,0 +1,45 @@
+# Biosynthic Burst, {1}{G}: "Put a +1/+1 counter on target creature you control. It gains reach, trample, and indestructible until
+# end of turn. Untap it." Llanowar Elves, tapped for the {G} that pays for it, becomes an untapped 2/2 with the three keywords, which
+# wear off at the end of the turn (the counter stays). Bot2's Ornithopter is not a creature Bot1 controls, so it is no target.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Llanowar Elves
+Biosynthic Burst
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Biosynthic Burst.Cast(Bot2.Battlefield.Ornithopter)
+? Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Hand.Biosynthic Burst.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Toughness = 2
+? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Llanowar Elves.Keywords = Indestructible; Reach; Trample
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot2.Battlefield.Ornithopter.Power = 0

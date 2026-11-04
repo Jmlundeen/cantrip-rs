@@ -1,0 +1,41 @@
+# Biosynthic Burst targets Llanowar Elves, but Bot2's Lightning Bolt in response kills it. The target is illegal on resolution
+# (CR 608.2b), so the Burst does nothing at all: it goes to the graveyard, the Elves already there.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Llanowar Elves
+Biosynthic Burst
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Biosynthic Burst.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Biosynthic Burst; Llanowar Elves
+Bot1.Battlefield = Mox Emerald; Mox Jet
