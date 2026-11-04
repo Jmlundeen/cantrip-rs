@@ -653,12 +653,21 @@ pub use cantrip_api::intrinsic::COUNTERED_UNLESS_PAID;
 /// make mana for it while asked; the cost is judged as the effect resolves, so a card whose cost depends on the board
 /// (Override's {1} per artifact) reads it first and passes it. Mana Leak and Miscalculation print it with a fixed cost.
 pub fn counter_unless_pays(g: &mut dyn Game, item: &StackItem, slot: usize, cost: ManaCost) -> Result<Option<ObjectId>, Suspend> {
+    Ok(counter_unless_pays_reporting(g, item, slot, cost)?.map(|(spell, _)| spell))
+}
+
+/// `counter_unless_pays` that also says whether the spell's controller paid, for "Counter target spell unless its controller pays {2}.
+/// If they do, you create a Lander token" (CR 118.12, 608.2c): the spell and `true` if they paid, `false` if they did not (the
+/// spell is countered), `None` if the target was no longer legal. Divert Disaster prints it, and Power Sink ("If they don't,
+/// they tap all lands with mana abilities they control") reads the other answer.
+pub fn counter_unless_pays_reporting(g: &mut dyn Game, item: &StackItem, slot: usize, cost: ManaCost) -> Result<Option<(ObjectId, bool)>, Suspend> {
     let Some(spell) = targets::object(g, item, slot) else { return Ok(None) };
     let payer = g.controller(spell);
-    if !g.may_pay(payer, item.object, spell, Cost { mana: cost, ..Cost::NONE }, &COUNTERED_UNLESS_PAID)? {
+    let paid = g.may_pay(payer, item.object, spell, Cost { mana: cost, ..Cost::NONE }, &COUNTERED_UNLESS_PAID)?;
+    if !paid {
         g.counter(spell);
     }
-    Ok(Some(spell))
+    Ok(Some((spell, paid)))
 }
 
 /// Exiles the targeted permanent until `source` leaves the battlefield (CR 610.3, 400.7): a returning card is a new
