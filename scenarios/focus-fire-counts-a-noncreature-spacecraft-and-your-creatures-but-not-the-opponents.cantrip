@@ -1,0 +1,55 @@
+# Focus Fire: "X damage to target attacking or blocking creature, where X is 2 plus the number of creatures and/or Spacecraft
+# you control." Bot1 controls the Spacecraft Oberth-Class Starship (not a creature below six charge counters) and one Memnite,
+# so X = 2 + 2 = 4; Bot2's Ornithopter and attacking Arni, Renowned Champion (1/5) are not counted. Arni survives with 4
+# damage marked (CR 120.3). Bot2's idle Ornithopter is no legal target (neither attacking nor blocking).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Oberth-Class Starship
+Memnite
+Focus Fire
+Plains
+Island x14
+Plains
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Arni, Renowned Champion
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Oberth-Class Starship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Plains)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Arni, Renowned Champion.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Attack(Arni, Renowned Champion > Bot1)
+Bot1.Battlefield.Plains#1.Activate
+! Bot1.Hand.Focus Fire.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Focus Fire.Cast(Bot2.Battlefield.Arni, Renowned Champion)
+Bot1.Pass
+[Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Focus Fire
+Bot2.Battlefield.Arni, Renowned Champion.Damage = 4

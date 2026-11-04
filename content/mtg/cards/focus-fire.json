@@ -1,0 +1,6 @@
+{
+  "name": "Focus Fire",
+  "manaCost": "{W}",
+  "type": "Instant",
+  "oracleText": "Focus Fire deals X damage to target attacking or blocking creature, where X is 2 plus the number of creatures and/or Spacecraft you control."
+}

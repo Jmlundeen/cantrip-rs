@@ -1,0 +1,68 @@
+# Focus Fire: "2 plus the number of creatures and/or Spacecraft you control." Oberth-Class Starship stationed to six charge
+# counters is an artifact creature that is still a Spacecraft (CR 721.2b); it is one permanent and counts once. With Colossal
+# Dreadmaw, X = 2 + 2 = 4, not 5: Bot2's attacking Arni, Renowned Champion (1/5) survives with 4 damage marked.
+
+[Bot1 Deck]
+Oberth-Class Starship
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Colossal Dreadmaw
+Focus Fire
+Island x20
+Plains
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Arni, Renowned Champion
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Arni, Renowned Champion.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Oberth-Class Starship.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Plains)
+Bot1.Battlefield.Oberth-Class Starship.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Oberth-Class Starship.Types = Artifact; Creature
+[T4 Bot2.Main1]
+Bot2.Attack(Arni, Renowned Champion > Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Focus Fire.Cast(Bot2.Battlefield.Arni, Renowned Champion)
+Bot1.Pass
+[Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Focus Fire; Black Lotus
+Bot2.Battlefield.Arni, Renowned Champion.Damage = 4
