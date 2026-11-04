@@ -1,0 +1,34 @@
+# Cunning Maneuver: "Target creature" is any creature, the opponent's included. Bot2's 0/2 Ornithopter becomes 3/3 until end of turn
+# and the Clue is still Bot1's, not Bot2's.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Cunning Maneuver
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cunning Maneuver.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 3
+Bot2.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Clue Token.Types = Artifact
+Bot2.Battlefield = Ornithopter
