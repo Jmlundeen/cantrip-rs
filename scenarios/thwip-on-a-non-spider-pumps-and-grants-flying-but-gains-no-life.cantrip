@@ -1,0 +1,26 @@
+# Thwip!: "If it's a Spider, you gain 2 life." Bot1 casts it on a Memnite, which is not a Spider: it gets +2/+2 and flying but
+# Bot1 gains no life (the Spider test is made as the second sentence resolves, CR 608.2c).
+
+[Bot1 Deck]
+Mox Pearl
+Memnite
+Thwip!
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thwip!.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 3
+? Bot1.Battlefield.Memnite.Toughness = 3
+? Bot1.Battlefield.Memnite.Keywords = Flying
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Thwip!
