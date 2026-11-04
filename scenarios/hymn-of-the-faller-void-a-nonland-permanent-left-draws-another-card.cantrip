@@ -1,0 +1,42 @@
+# Hymn of the Faller after Bot1 Lightning Bolts its own Memnite (a nonland permanent left): surveil 1 puts the top Mountain
+# into the graveyard, then Bot1 draws the Ornithopter and loses 1 life (20 -> 19), and Void draws another card, the Swamp.
+# Library: 13 - 3 = 10. (Without Void: hymn-of-the-faller-no-void-surveils-keeps-the-card-and-draws-only-one.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Memnite
+Lightning Bolt
+Hymn of the Faller
+Island
+Mountain
+Ornithopter
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hymn of the Faller.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Mountain)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Hymn of the Faller; Mountain; Memnite; Lightning Bolt
+Bot1.Hand = Island; Ornithopter; Swamp
+Bot1.Library.Count = 10

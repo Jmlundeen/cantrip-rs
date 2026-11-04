@@ -1,0 +1,33 @@
+# With nothing having left the battlefield and no spell warped, Hymn of the Faller surveils 1, then draws one card and loses 1
+# life. Bot1 keeps the Mountain on top, so the draw is the Mountain (the Ornithopter under it stays): the hand is the four
+# Islands left plus the Mountain, life 19, library 13 - 1 = 12, and no second draw.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Hymn of the Faller
+Island x4
+Mountain
+Ornithopter
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hymn of the Faller.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mountain |)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Hymn of the Faller
+Bot1.Hand = Island; Island; Island; Island; Mountain
+Bot1.Library.Count = 12
