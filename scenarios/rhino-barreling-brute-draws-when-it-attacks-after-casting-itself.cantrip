@@ -1,0 +1,48 @@
+# Rhino, Barreling Brute: casting Rhino itself (mana value 7) satisfies "if you've cast a spell with mana value 4 or greater this turn"
+# (CR 603.4): with haste it attacks the turn it is cast and the trigger draws a card.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Sol Ring
+Mountain
+Mountain
+Rhino, Barreling Brute
+Mountain x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Rhino, Barreling Brute.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Attackers]
+Bot1.Attack(Rhino, Barreling Brute > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Hand = Mountain; Mountain
+Bot1.Battlefield.Rhino, Barreling Brute.Tapped = False
+Stack.Count = 0

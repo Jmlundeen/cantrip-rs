@@ -1,0 +1,55 @@
+# Rhino, Barreling Brute attacks on turn 3 after Bot1 casts only Coalition Relic (mana value 3): not 4 or greater, so no draw (the next card down is an Island).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Sol Ring
+Mountain
+Mountain
+Rhino, Barreling Brute
+Coalition Relic
+Island
+Mountain x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Rhino, Barreling Brute.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Coalition Relic.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Attackers]
+Bot1.Attack(Rhino, Barreling Brute > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Hand = Mountain
+Stack.Count = 0

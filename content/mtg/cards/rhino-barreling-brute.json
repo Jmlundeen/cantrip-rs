@@ -1,0 +1,13 @@
+{
+  "name": "Rhino, Barreling Brute",
+  "manaCost": "{3}{R}{R}{G}{G}",
+  "type": "Legendary Creature — Human Villain",
+  "power": 6,
+  "toughness": 7,
+  "oracleText": "Vigilance, trample, haste\nWhenever Rhino attacks, if you've cast a spell with mana value 4 or greater this turn, draw a card.",
+  "keywords": [
+    "Vigilance",
+    "Trample",
+    "Haste"
+  ]
+}
