@@ -1,0 +1,55 @@
+# Weftblade Enhancer, a 3/4: "When this creature enters, put a +1/+1 counter on each of up to two target creatures." Cast for
+# its warp cost {2}{W} (CR 702.185a) with four Moxen untapped, exactly three of the four mana is spent (one stays in the pool).
+# Bot1 targets one of its own Ornithopters and Bot2's: one counter each; the other Ornithopter and Weftblade get none; a third
+# target is refused ("up to two"). At the beginning of the next end step the warped Weftblade is exiled, the counters stay.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Weftblade Enhancer
+Ornithopter
+Ornithopter
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Weftblade Enhancer.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot1.Battlefield.Ornithopter#2; Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+[T4 Bot2.Upkeep]
+? Exile = Weftblade Enhancer
+
+[Expect]
+Exile = Weftblade Enhancer
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)
