@@ -1,0 +1,8 @@
+{
+  "name": "Boar-q-pine",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Boar Porcupine",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Whenever you cast a noncreature spell, put a +1/+1 counter on this creature."
+}
