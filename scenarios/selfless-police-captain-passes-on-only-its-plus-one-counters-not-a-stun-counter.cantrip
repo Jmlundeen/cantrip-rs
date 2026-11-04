@@ -1,0 +1,66 @@
+# Selfless Police Captain: "put its +1/+1 counters on target creature you control" - only that kind (CR 122.1, 603.10a), unlike a
+# "put its counters" ability. The Captain attacks on turn 3 and a sacrificed Cryogen Relic puts a stun counter on the tapped
+# creature. Bot2's Lightning Bolt then kills it, and Bot1's Ornithopter, the one creature of Bot1's left, gets the +1/+1 counter
+# but not the stun counter.
+
+[Bot1 Deck]
+Selfless Police Captain
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Cryogen Relic
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Selfless Police Captain.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cryogen Relic.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Selfless Police Captain > Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Cryogen Relic.Activate(Bot1.Battlefield.Selfless Police Captain)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Selfless Police Captain.Counters.Stun = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Selfless Police Captain)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Selfless Police Captain; Cryogen Relic
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Counters.Stun = (absent)

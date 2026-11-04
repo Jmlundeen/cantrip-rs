@@ -1,0 +1,40 @@
+# Selfless Police Captain leaves the battlefield with no other creature Bot1 controls: the Captain itself is gone when the ability's
+# target is chosen (CR 115.1), and Bot2's Ornithopter is not "a creature you control", so the ability has no legal target and is removed
+# from the stack (CR 603.3d). The counter is lost with the Captain; Bot2's Ornithopter gets none.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Selfless Police Captain
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Selfless Police Captain.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Selfless Police Captain)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Selfless Police Captain
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)

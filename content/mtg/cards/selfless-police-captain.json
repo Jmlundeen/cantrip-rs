@@ -1,0 +1,8 @@
+{
+  "name": "Selfless Police Captain",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Detective",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "This creature enters with a +1/+1 counter on it.\nWhen this creature leaves the battlefield, put its +1/+1 counters on target creature you control."
+}
