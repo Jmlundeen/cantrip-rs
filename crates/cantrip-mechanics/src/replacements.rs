@@ -199,6 +199,7 @@ pub mod enter_tapped {
     pub const CREATURES: u8 = 1;
     pub const ARTIFACTS: u8 = 2;
     pub const NONBASIC_LANDS: u8 = 4;
+    pub const LANDS: u8 = 8;
 }
 
 fn opponents_enter_tapped_applies<const WHICH: u8>(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
@@ -208,6 +209,7 @@ fn opponents_enter_tapped_applies<const WHICH: u8>(q: &dyn Query, asker: &Asker,
         (WHICH & enter_tapped::CREATURES != 0 && c.is(CardType::Creature))
             || (WHICH & enter_tapped::ARTIFACTS != 0 && c.is(CardType::Artifact))
             || (WHICH & enter_tapped::NONBASIC_LANDS != 0 && c.is(CardType::Land) && !c.supertypes.basic)
+            || (WHICH & enter_tapped::LANDS != 0 && c.is(CardType::Land))
     }
 }
 
@@ -217,10 +219,11 @@ fn opponents_enter_tapped_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposa
     }
 }
 
-/// "[Creatures / artifacts and creatures / nonbasic lands] your opponents control enter tapped" (CR 614.1d): the
+/// "[Creatures / artifacts and creatures / nonbasic lands / artifacts, creatures, and lands] your opponents control enter tapped" (CR 614.1d): the
 /// object is judged as it would exist on the battlefield (CR 614.12), under the player it enters under (CR 110.2a).
 /// `WHICH` is a set of `enter_tapped` bits. Authority of the Consuls (creatures), Spider-Woman, Stunning Savior
-/// (artifacts and creatures) and Archon of Emeria (nonbasic lands) print it.
+/// (artifacts and creatures), Archon of Emeria (nonbasic lands), and Kismet, Frozen Aether and Loxodon Gatekeeper
+/// (artifacts, creatures, and lands) print it.
 pub const fn opponents_enter_tapped<const WHICH: u8>(hint: &'static str) -> ReplacementDef {
     replacement(ReplacementKind::ZoneChange, opponents_enter_tapped_applies::<WHICH>, opponents_enter_tapped_apply, hint)
 }
