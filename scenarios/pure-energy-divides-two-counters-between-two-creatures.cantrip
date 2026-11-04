@@ -1,0 +1,34 @@
+# Pure Energy: two +1/+1 counters divided among two target creatures, one each (CR 601.2d, 122.1a). The Ornithopter is 0/3 and
+# the Pet Sehlat 5/4 by the end.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Plains
+Ornithopter
+Pet Sehlat
+Pure Energy
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Pet Sehlat.Cast
+Bot1.Hand.Pure Energy.Cast
+Bot1.Divide(Ornithopter: 1; Pet Sehlat: 1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Pet Sehlat.Power = 5
+Bot1.Battlefield.Pet Sehlat.Toughness = 4
+Bot1.Graveyard = Pure Energy; Black Lotus
