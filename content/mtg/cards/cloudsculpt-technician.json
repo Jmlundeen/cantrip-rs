@@ -1,0 +1,11 @@
+{
+  "name": "Cloudsculpt Technician",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Jellyfish Artificer",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "Flying\nAs long as you control an artifact, this creature gets +1/+0.",
+  "keywords": [
+    "Flying"
+  ]
+}

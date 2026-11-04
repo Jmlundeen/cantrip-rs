@@ -1,0 +1,47 @@
+# Cloudsculpt Technician: Flying; "As long as you control an artifact, this creature gets +1/+0." Bot1 pays for it with Black Lotus, which is
+# sacrificed, so Bot1 controls no artifact: it is its printed 1/4. Bot2's Mox Pearl (an artifact the other side controls) does not count. On turn
+# 3 Bot1's own Mox Jet makes it 2/4 (the toughness unchanged); on turn 4 Bot2 destroys the Mox Jet with Disenchant and it is 1/4 again.
+
+[Bot1 Deck]
+Black Lotus
+Cloudsculpt Technician
+Mox Jet
+Island x17
+
+[Bot2 Deck]
+Mox Pearl
+Island
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cloudsculpt Technician.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cloudsculpt Technician.Power = 1
+? Bot1.Battlefield.Cloudsculpt Technician.Toughness = 4
+? Bot1.Battlefield.Cloudsculpt Technician.Keywords = Flying
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Island.Play
+? Bot1.Battlefield.Cloudsculpt Technician.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cloudsculpt Technician.Power = 2
+? Bot1.Battlefield.Cloudsculpt Technician.Toughness = 4
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Mox Jet; Black Lotus
+Bot1.Battlefield.Cloudsculpt Technician.Power = 1
+Bot1.Battlefield.Cloudsculpt Technician.Toughness = 4
