@@ -1501,10 +1501,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                                 source: d.source,
                                 ability: d.ability,
                                 controller: d.controller,
-                                // "Until" and "when [event]" are about the object they were made for (CR 603.7c).
+                                // "Until" and "when [event]" are about the object they were made for (CR 603.7c), and the objects it carries (`delayed_trigger_about`) go with it.
                                 subject: if matches!(d.when, DelayedWhen::UntilEvent | DelayedWhen::WhenEvent) { d.subject } else { fired.subject },
                                 data: fired.data,
-                                members: Span::default(),
+                                members: d.members,
                                 count: None,
                                 // A delayed ability goes on the stack with the moment it was created (CR 701.27f).
                                 since: Some(d.since),
