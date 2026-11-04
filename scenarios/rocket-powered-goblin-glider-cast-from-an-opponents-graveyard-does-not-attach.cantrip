@@ -1,0 +1,49 @@
+# Rocket-Powered Goblin Glider: "When this Equipment enters, if it was cast from your graveyard, attach it to target creature
+# you control." A card in a graveyard is in its owner's (CR 404.1), so a Glider cast from an opponent's graveyard was not cast
+# from yours, even though you cast it. Bot2 loots its Glider away with Faithless Looting on turn 2. On turn 3 Bot1's
+# Tinybones hits Bot2 and Bot1 casts the Glider from Bot2's graveyard, paying {3} with three Moxen. It enters under Bot1's
+# control and does not trigger: it is not attached, and Tinybones stays a 1/1 without flying.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Tinybones, the Pickpocket
+Plains x15
+
+[Bot2 Deck]
+Mox Ruby
+Faithless Looting
+Rocket-Powered Goblin Glider
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tinybones, the Pickpocket.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Rocket-Powered Goblin Glider; Island)
+? Bot2.Graveyard = Faithless Looting; Island; Rocket-Powered Goblin Glider
+[T3 Bot1.Main1]
+Bot1.Attack(Tinybones, the Pickpocket)
+Bot1.Accept
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Emerald; Mox Sapphire; Tinybones, the Pickpocket; Rocket-Powered Goblin Glider
+Bot1.Battlefield.Tinybones, the Pickpocket.Power = 1
+Bot1.Battlefield.Tinybones, the Pickpocket.Keywords = Deathtouch
