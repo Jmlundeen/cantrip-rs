@@ -1,0 +1,11 @@
+{
+  "name": "Flying Octobot",
+  "manaCost": "{1}{U}",
+  "type": "Artifact Creature — Robot Villain",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying\nWhenever another Villain you control enters, put a +1/+1 counter on this creature. This ability triggers only once each turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

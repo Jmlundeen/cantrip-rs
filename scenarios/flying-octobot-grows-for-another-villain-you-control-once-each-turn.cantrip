@@ -1,0 +1,67 @@
+# Flying Octobot (1/1 flier, {1}{U}): "Whenever another Villain you control enters, put a +1/+1 counter on this creature. This
+# ability triggers only once each turn." (CR 603.2, 122.1a.) Entering itself is not "another" (still 1/1 on turn 1); Bot2's
+# Aerial Doombot on turn 2 is not one Bot1 controls; on turn 3 the first of two Doombots grows it (2/2) and the second, the same
+# turn, does not; on turn 5 a third Doombot grows it again (3/3).
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Flying Octobot
+Aerial Doombot
+Aerial Doombot
+Aerial Doombot
+Island
+Island x30
+
+[Bot2 Deck]
+Island
+Aerial Doombot
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Flying Octobot.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Flying Octobot.Power = 1
+? Bot1.Battlefield.Flying Octobot.Keywords = Flying
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aerial Doombot.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Flying Octobot.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Flying Octobot.Power = 2
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Flying Octobot.Power = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Flying Octobot.Power = 3
+Bot1.Battlefield.Flying Octobot.Toughness = 3
+Bot1.Battlefield.Flying Octobot.Counters.PlusOnePlusOne = 2
