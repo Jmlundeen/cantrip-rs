@@ -1,0 +1,56 @@
+# Systems Override {2}{R}: "Gain control of target artifact or creature until end of turn. Untap that permanent. It gains haste until end of turn." A
+# land is no legal target. On turn 3 Bot1 takes Bot2's tapped Mox Emerald (an artifact, no Spacecraft): it is untapped under Bot1 and gets no charge counter;
+# it is Bot2's again on turn 4. On turn 5 Bot1 takes Bot2's Memnite, an artifact creature, and attacks with it at once (haste) for 1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Systems Override
+Systems Override
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Hand.Systems Override.Cast(Bot2.Battlefield.Island)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Systems Override.Cast(Bot2.Battlefield.Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+? Bot1.Battlefield.Mox Emerald.Counters.Charge = (absent)
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Systems Override.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Keywords = Haste
+Bot1.Attack(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19

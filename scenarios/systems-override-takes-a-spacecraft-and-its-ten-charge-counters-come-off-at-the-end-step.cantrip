@@ -1,0 +1,72 @@
+# Systems Override {2}{R}: "Gain control of target artifact or creature until end of turn. Untap that permanent. It gains haste until end of turn. If it's a
+# Spacecraft, put ten charge counters on it. If you do, remove ten charge counters from it at the beginning of the next end step." Bot2 casts Class-F
+# Shuttlecraft (station 6+: a 2/4 with flying and vigilance) and stations it once with Memnite, one charge counter, so it is no creature. On turn 3 Bot1 takes
+# it: ten more counters make eleven, so it is a 2/4 flying artifact creature under Bot1, untapped and with haste, and attacks at once for 2.
+# At the end step exactly ten counters come off, leaving the one it had: the Shuttlecraft is back under Bot2 as no creature.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Systems Override
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Memnite
+Class-F Shuttlecraft
+Island x21
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Class-F Shuttlecraft.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Class-F Shuttlecraft.Activate(Ability: Station)
+Bot2.Choose(Memnite)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Class-F Shuttlecraft.Counters.Charge = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Systems Override.Cast(Bot2.Battlefield.Class-F Shuttlecraft)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Class-F Shuttlecraft.Counters.Charge = 11
+? Bot1.Battlefield.Class-F Shuttlecraft.Types = Artifact; Creature
+? Bot1.Battlefield.Class-F Shuttlecraft.Power = 2
+? Bot1.Battlefield.Class-F Shuttlecraft.Toughness = 4
+? Bot1.Battlefield.Class-F Shuttlecraft.Keywords = Flying; Haste; Vigilance
+? Bot1.Battlefield.Class-F Shuttlecraft.Tapped = false
+Bot1.Attack(Class-F Shuttlecraft)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+? Bot1.Battlefield.Class-F Shuttlecraft.Counters.Charge = 11
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Class-F Shuttlecraft.Counters.Charge = 1
+? Bot1.Battlefield.Class-F Shuttlecraft.Types = Artifact
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Class-F Shuttlecraft.Counters.Charge = 1
+Bot2.Battlefield.Class-F Shuttlecraft.Types = Artifact
+Bot2.Battlefield.Class-F Shuttlecraft.Keywords = (absent)
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby

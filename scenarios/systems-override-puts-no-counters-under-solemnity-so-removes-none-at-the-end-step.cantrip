@@ -1,0 +1,68 @@
+# Systems Override: "If it's a Spacecraft, put ten charge counters on it. If you do, remove ten charge counters from it at the beginning of the next end step."
+# Under Solemnity ("Players can't get counters. Counters can't be put on artifacts, creatures, enchantments, or lands.") the counters can't be put, so "if you do"
+# is false and nothing is removed later. Bot2 stations Class-F Shuttlecraft once with Memnite (one charge counter) before Solemnity exists. On turn 3
+# Bot1 casts Solemnity, then takes the Shuttlecraft: control, untap and haste still happen, no counters are added (it stays at one, no creature), and at the end
+# step the one counter it had is still there.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Solemnity
+Systems Override
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Memnite
+Class-F Shuttlecraft
+Island x21
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Class-F Shuttlecraft.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Class-F Shuttlecraft.Activate(Ability: Station)
+Bot2.Choose(Memnite)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Class-F Shuttlecraft.Counters.Charge = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Solemnity.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Systems Override.Cast(Bot2.Battlefield.Class-F Shuttlecraft)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Class-F Shuttlecraft.Counters.Charge = 1
+? Bot1.Battlefield.Class-F Shuttlecraft.Types = Artifact
+? Bot1.Battlefield.Class-F Shuttlecraft.Keywords = Haste
+? Bot1.Battlefield.Class-F Shuttlecraft.Tapped = false
+[T3 Bot1.End]
+? Bot1.Battlefield.Class-F Shuttlecraft.Counters.Charge = 1
+? Stack.Count = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Class-F Shuttlecraft.Counters.Charge = 1
+Bot2.Battlefield.Class-F Shuttlecraft.Types = Artifact
