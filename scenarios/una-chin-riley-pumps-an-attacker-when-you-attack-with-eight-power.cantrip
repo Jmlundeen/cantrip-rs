@@ -1,0 +1,61 @@
+# Una Chin-Riley, Number One: "Whenever you attack while creatures you control have total power 8 or greater, target
+# attacking creature gets +2/+0 and gains first strike until end of turn" (CR 508.3d, 603.4, 608.2h). Una is 4/5 and the two
+# Grizzly Bears 2/2 each, exactly eight together, so the attack on turn 7 pumps Una to 6/5 with first strike.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Plains
+Mox Emerald
+Una Chin-Riley, Number One
+Grizzly Bears
+Grizzly Bears
+Forest
+Forest
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Una Chin-Riley, Number One.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Attack(Una Chin-Riley, Number One > Bot2; Grizzly Bears#1 > Bot2; Grizzly Bears#2 > Bot2)
+Bot1.Target(Una Chin-Riley, Number One)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Una Chin-Riley, Number One.Power = 6
+Bot1.Battlefield.Una Chin-Riley, Number One.Toughness = 5
+Bot1.Battlefield.Una Chin-Riley, Number One.Keywords = FirstStrike
+Bot2.Life = 10

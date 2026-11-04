@@ -1,0 +1,49 @@
+# Una Chin-Riley, Number One: "Whenever you attack while creatures you control have total power 8 or greater" (CR 508.3d,
+# 603.2): Una (4), the Grizzly Bears (2) and the Memnite (1) are seven together, one short, so Una attacking triggers nothing -
+# she stays a 4/5 without first strike. The scenario beside it shows exactly eight.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Plains
+Memnite
+Una Chin-Riley, Number One
+Mox Emerald
+Grizzly Bears
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Una Chin-Riley, Number One.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Una Chin-Riley, Number One > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Una Chin-Riley, Number One.Power = 4
+Bot1.Battlefield.Una Chin-Riley, Number One.Keywords = (absent)
+Bot2.Life = 16

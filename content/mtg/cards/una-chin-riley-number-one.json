@@ -1,0 +1,8 @@
+{
+  "name": "Una Chin-Riley, Number One",
+  "manaCost": "{4}{W}",
+  "type": "Legendary Creature — Illyrian Officer",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "Whenever you attack while creatures you control have total power 8 or greater, target attacking creature gets +2/+0 and gains first strike until end of turn."
+}
