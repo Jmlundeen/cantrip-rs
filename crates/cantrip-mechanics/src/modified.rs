@@ -8,33 +8,17 @@ use crate::targets;
 /// is attached to it (whoever controls the Equipment), or an Aura controlled by the permanent's controller is attached to it (an
 /// Aura an opponent controls does not make it modified). Costume Closet and Silver Sable, Mercenary Leader ask it.
 ///
-/// Asked of a permanent that has just left the battlefield, it answers for the permanent as it last was (CR 603.10a, "whenever a modified
-/// creature leaves the battlefield"): its counters are its last-known ones, and an Equipment or Aura still on the battlefield names it in its
-/// own `attached_to` until state-based actions unattach it (CR 704.5m, 704.5n), which `Query::attached_to` would already deny. One that left
-/// in the same event (a "destroy all nonland permanents") is judged as it last existed too: its old row still names the permanent it was on,
-/// and its leaving is not yet in the history, which ends before the events whose triggers are being looked for (CR 603.10a).
+/// Asked by a look-back ability ("whenever a modified creature leaves the battlefield", CR 603.10a), `q` is the game as it was just
+/// before the event (the core's `BoardThen`): the permanent's counters are its last-known ones, and what was attached to it then is
+/// what `permanents_of` and `attached_to` say then - an Equipment or Aura that left with it (a "destroy all nonland permanents")
+/// included, one that left earlier not.
 pub fn is_modified(q: &dyn Query, id: ObjectId) -> bool {
     q.obj(id).counter_array().iter().any(|&n| n > 0)
-        || q.state().battlefield().iter().any(|&attachment| makes_it_modified(q, attachment, id))
-        || q.obj(id).became.is_some() && (0..q.state().objects.len() as u32).map(ObjectId).any(|attachment| left_with_it(q, attachment, id))
-}
-
-/// Whether `attachment`, as it is or last was, is an Equipment attached to `id` or an Aura attached to it under its controller (CR 700.9).
-fn makes_it_modified(q: &dyn Query, attachment: ObjectId, id: ObjectId) -> bool {
-    q.obj(attachment).attached_to == Some(id)
-        && (q.chars(attachment).has_subtype(Subtype::Equipment)
-            || q.chars(attachment).has_subtype(Subtype::Aura) && q.controller(attachment) == q.controller(id))
-}
-
-/// Whether `attachment` left the battlefield attached to `id` in the event being judged: it has left (CR 400.7), from the battlefield,
-/// and no record of the history before that event is of its leaving.
-fn left_with_it(q: &dyn Query, attachment: ObjectId, id: ObjectId) -> bool {
-    let row = q.obj(attachment);
-    row.attached_to == Some(id)
-        && row.became.is_some()
-        && row.zone.is(ZoneKind::Battlefield)
-        && !q.history().all().iter().any(|r| matches!(r.event, Event::ZoneChange { old, .. } if old == attachment))
-        && makes_it_modified(q, attachment, id)
+        || q.state().seats().flat_map(|p| q.permanents_of(p)).any(|attachment| {
+            q.attached_to(attachment) == Some(id)
+                && (q.chars(attachment).has_subtype(Subtype::Equipment)
+                    || q.chars(attachment).has_subtype(Subtype::Aura) && q.controller(attachment) == q.controller(id))
+        })
 }
 
 fn modified_creature_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
