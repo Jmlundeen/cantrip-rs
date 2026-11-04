@@ -332,6 +332,13 @@ pub fn opponent_would_draw_except_first_in_draw_step(q: &dyn Query, asker: &Aske
         if q.state().opponents(asker.controller).any(|o| o == d.player) && !crate::history::first_draw_in_own_draw_step(q, d.player))
 }
 
+/// "If an opponent would mill one or more cards" (CR 701.17a, 614.1a): a mill of at least one card by an opponent of the
+/// effect's controller, judged once for the whole instruction before any card moves. Bruvac the Grandiloquent and The Water
+/// Crystal print it.
+pub fn an_opponent_would_mill(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::Mill(m) if m.count >= 1 && q.state().opponents(asker.controller).any(|o| o == m.player))
+}
+
 /// "If you would draw a card except the first one you draw in each of your draw steps" (CR 121.6, 614.1a): each draw on its own,
 /// judged as it is about to be made, so the turn's first card drawn in the draw step is left alone, and the one after it is not.
 fn you_would_draw_except_first_in_draw_step(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
