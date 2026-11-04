@@ -1,0 +1,8 @@
+{
+  "name": "Scotty, Miracle Worker",
+  "manaCost": "{1}{U}{U}",
+  "type": "Legendary Creature — Human Artificer",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "During your main phase, each card in your graveyard has beam me up. The beam me up cost is equal to that spell's mana cost. Scotty can't be beamed up to cast a spell this way. (Only instant and sorcery spells can be cast this way. You may cast a card from your graveyard for its beam me up cost if you also return another creature you control to its owner's hand. Then exile that spell.)"
+}

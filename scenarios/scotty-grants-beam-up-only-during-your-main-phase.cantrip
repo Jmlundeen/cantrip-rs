@@ -1,0 +1,43 @@
+# Scotty must not grant the graveyard cast during the opponent's main phase or its controller's upkeep (CR 101.2, 601.3).
+# The same Bolt is then cast in the controller's main phase, proving the refusals are timing restrictions.
+# Scotty gives each instant and sorcery card in Bot1's graveyard beam me up during its controller's main phase: on turn 3
+# the Lightning Bolt that burned Bot2 on turn 1 is cast for {R} plus returning Ornithopter to its owner's hand, and is
+# exiled as it leaves the stack. Two Black Lotuses pay for the Bolt and for Scotty's {1}{U}{U}.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Scotty, Miracle Worker
+Lightning Bolt
+Ornithopter
+Island x2
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Scotty, Miracle Worker.Cast
+[T2 Bot2.Main1]
+! Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Beam me up)
+Bot2.Pass
+[T3 Bot1.Upkeep]
+! Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Beam me up)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Beam me up)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Hand = Island; Island; Ornithopter

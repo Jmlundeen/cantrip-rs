@@ -1382,6 +1382,9 @@ fn pays_permanents(cx: &Cx, cost: &Cost, p: &PermanentCost, asker: &Asker, id: O
 /// payments go (CR 101.2, `CardDef::cost_bans`): a sacrifice one forbids can't be made (CR 701.21a), and tapping, returning
 /// or exiling a permanent is no sacrifice.
 fn permanent_allowed(cx: &Cx, cost: &Cost, p: &PermanentCost, player: PlayerId, id: ObjectId, paid: Option<CostFor>) -> bool {
+    if p.excluded == Some(id) {
+        return false;
+    }
     if cost.tap_permanents {
         return true;
     }

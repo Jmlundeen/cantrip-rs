@@ -1432,6 +1432,10 @@ tapped creature you control to its owner's hand", activated from the hand), offe
 printed does), refused by a card-table test (`every_activated_ability_has_a_cost_activation_can_pay`). The host marks
 such a cast or activation `TappedAfterMana`, and the web client's payment caption for it says to tap a creature for
 mana while none is tapped; one that leaves none is still taken back after it is paid.
+A permanent cost may also name one object that can't pay it whatever its filter says (`PermanentCost::excluded`, CR 118.3,
+601.2h), which the offer and the payment's choice both refuse: Scotty, Miracle Worker's granted beam me up excludes
+Scotty, the granting permanent, which a filter asked about the spell cannot name. Only that object: a copy of Scotty, or
+Scotty as a new object, still pays (CR 201.5, 400.7).
 
 ### Taking back an illegal action
 

@@ -1,0 +1,41 @@
+# Scotty's name means this object, not every permanent with that name (CR 201.5).
+# Spark Double supplies a nonlegendary second Scotty (CR 707.9). The original's
+# granted cast may return that copy, but cannot return its own granting permanent.
+[Bot1 Deck]
+Scotty, Miracle Worker
+Spark Double
+Lightning Bolt
+Black Lotus x3
+Mox Sapphire
+Mountain
+Island x12
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Scotty, Miracle Worker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spark Double.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Beam me up)
+! Bot1.Choose(Scotty, Miracle Worker#1)
+Bot1.Choose(Scotty, Miracle Worker#2)
+Bot1.Battlefield.Mountain.Activate
+[Expect]
+Bot1.Hand = Spark Double
+Bot1.Battlefield = Mox Sapphire; Mountain; Scotty, Miracle Worker
+Bot2.Life = 14
+Exile = Lightning Bolt

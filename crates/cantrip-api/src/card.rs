@@ -1029,6 +1029,9 @@ pub struct CountersAmong {
 
 #[derive(Clone, Copy)]
 pub struct PermanentCost {
+    /// An exact permanent that cannot pay this cost (CR 101.2, 118.3, 601.2h).
+    /// Captured when a granted cost is built; object identity survives through payment (CR 400.7).
+    pub excluded: Option<ObjectId>,
     pub count: u32,
     pub filter: ObjectFilter,
     pub action: PermanentAction,
@@ -1254,6 +1257,11 @@ impl Cost {
             (Some(a), Some(b)) => {
                 // A tapped permanent chosen after the mana and one chosen before are not one choice.
                 assert!(a.tapped == b.tapped, "two permanent costs, only one of them for tapped permanents");
+                assert!(match (a.excluded, b.excluded) {
+                    (Some(a), Some(b)) => a.0 == b.0,
+                    (None, None) => true,
+                    _ => false,
+                }, "two permanent costs exclude different objects");
                 // Nor are permanents sacrificed and permanents exiled.
                 assert!(a.action as u8 == b.action as u8, "two permanent costs that do different things with them");
                 Some(PermanentCost { count: a.count + b.count, ..a })
@@ -1364,27 +1372,27 @@ impl Cost {
     }
 
     pub const fn sacrifice(count: u32, filter: ObjectFilter) -> Cost {
-        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::Sacrifice, tapped: false }), ..Cost::NONE }
+        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::Sacrifice, tapped: false, excluded: None }), ..Cost::NONE }
     }
 
     /// Tap `count` untapped permanents you control that pass the filter, as a cost (CR 118.3).
     pub const fn tap_untapped(count: u32, filter: ObjectFilter) -> Cost {
-        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::Sacrifice, tapped: false }), tap_permanents: true, ..Cost::NONE }
+        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::Sacrifice, tapped: false, excluded: None }), tap_permanents: true, ..Cost::NONE }
     }
 
     pub const fn return_to_hand(count: u32, filter: ObjectFilter) -> Cost {
-        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::ReturnToHand, tapped: false }), ..Cost::NONE }
+        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::ReturnToHand, tapped: false, excluded: None }), ..Cost::NONE }
     }
 
     /// Return `count` tapped permanents you control that pass the filter to their owners' hands (web-slinging, CR
     /// 702.188a): chosen once the mana is paid (`PermanentCost::tapped`).
     pub const fn return_tapped_to_hand(count: u32, filter: ObjectFilter) -> Cost {
-        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::ReturnToHand, tapped: true }), ..Cost::NONE }
+        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::ReturnToHand, tapped: true, excluded: None }), ..Cost::NONE }
     }
 
     /// Exile `count` permanents you control that pass the filter, as a cost (CR 118.3): "Exile a creature you control".
     pub const fn exile_permanents(count: u32, filter: ObjectFilter) -> Cost {
-        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::Exile, tapped: false }), ..Cost::NONE }
+        Cost { permanents: Some(PermanentCost { count, filter, action: PermanentAction::Exile, tapped: false, excluded: None }), ..Cost::NONE }
     }
 
     pub const fn mana(mana: ManaCost) -> Cost {
