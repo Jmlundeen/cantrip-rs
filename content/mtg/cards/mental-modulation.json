@@ -1,0 +1,6 @@
+{
+  "name": "Mental Modulation",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "This spell costs {1} less to cast during your turn.\nTap target artifact or creature.\nDraw a card."
+}

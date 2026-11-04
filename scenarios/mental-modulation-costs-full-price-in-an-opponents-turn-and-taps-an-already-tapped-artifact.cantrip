@@ -1,0 +1,30 @@
+# Mental Modulation {1}{U}: in Bot2's turn 2 it costs its full {1}{U}, paid with both of Bot1's Moxen (the pool is empty afterwards: had {1} come off the cost, one
+# mana would be left over). Bot1 targets its own Mox Sapphire, an artifact that is already tapped for the mana (still a legal target; it stays tapped), and draws.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mental Modulation
+Island x4
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mental Modulation.Cast(Bot1.Battlefield.Mox Sapphire)
+? Bot1.Mana =
+? Bot1.Hand.Count = 4
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 5
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Mental Modulation
+Bot1.Battlefield.Mox Sapphire.Tapped = true

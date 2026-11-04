@@ -1,0 +1,41 @@
+# Mental Modulation {1}{U} instant: "This spell costs {1} less to cast during your turn. Tap target artifact or creature. Draw a card." In turn 3 Bot1 pays the
+# {U} alone from its Mox Sapphire (the pool is empty afterwards; its Mox Jet is untapped and unused). Bot2's Forest (a land) is refused as a target; Bot2's
+# Llanowar Elves, untapped, are tapped and Bot1 draws: its hand is 5 as the spell is cast and 6 after it resolves.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mental Modulation
+Island x4
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Forest
+Island x4
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mental Modulation.Cast(Bot2.Battlefield.Llanowar Elves)
+? Bot1.Mana =
+? Bot1.Hand.Count = 5
+! Bot1.Hand.Mental Modulation.Cast(Bot2.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Llanowar Elves.Tapped = true
+? Bot1.Hand.Count = 6
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Mental Modulation
+Bot2.Battlefield.Mox Emerald.Tapped = true

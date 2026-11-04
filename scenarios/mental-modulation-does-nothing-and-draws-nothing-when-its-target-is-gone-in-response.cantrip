@@ -1,0 +1,43 @@
+# Mental Modulation: if the target is illegal as it tries to resolve, it doesn't resolve and none of its effects happen - no card is drawn (CR 608.2b, and the
+# ruling). In turn 3 Bot1 pays {U} from its Mox Sapphire, targeting Bot2's Llanowar Elves; Bot2 Lightning Bolts its own Elves in response. The spell is
+# countered on resolution: Bot1's hand stays at 5 (it was 5 as the spell was cast).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mental Modulation
+Island x4
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Island x3
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mental Modulation.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 5
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Mental Modulation
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
