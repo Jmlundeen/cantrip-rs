@@ -1,0 +1,55 @@
+# Meltstrider Eulogist: "a creature you control with a +1/+1 counter on it". Bot1's Ornithopter, with no counter, dies to a
+# Lightning Bolt and draws nothing, and neither does Bot2's Walking Ballista (X = 1), which has a counter but is not Bot1's:
+# Bot1 draws only for its turn. Black Lotus gives the two red mana for the Bolts.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Meltstrider Eulogist
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Walking Ballista
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Meltstrider Eulogist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Walking Ballista)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Library.Count = 12
+Bot1.Battlefield = Meltstrider Eulogist; Mox Emerald; Mox Ruby; Mox Sapphire
+Bot2.Graveyard = Walking Ballista; Black Lotus

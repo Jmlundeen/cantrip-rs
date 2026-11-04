@@ -1,0 +1,8 @@
+{
+  "name": "Meltstrider Eulogist",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Insect Soldier",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever a creature you control with a +1/+1 counter on it dies, draw a card."
+}

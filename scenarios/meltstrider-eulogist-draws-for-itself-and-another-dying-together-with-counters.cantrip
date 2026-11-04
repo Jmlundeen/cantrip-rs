@@ -1,0 +1,63 @@
+# Meltstrider Eulogist (ruling 2025-07-25): Toxic Deluge for X = 4 kills the Eulogist and a Walking Ballista together, each
+# with +1/+1 counters on it (put there by Atmospheric Greenhouse, the Ballista's own counter, X = 1, besides). Both died in
+# the same event, so the Eulogist, itself dying with a counter, triggers for both and Bot1 draws two cards.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Meltstrider Eulogist
+Walking Ballista
+Atmospheric Greenhouse
+Toxic Deluge
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Meltstrider Eulogist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Atmospheric Greenhouse.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Meltstrider Eulogist.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+? Bot1.Library.Count = 12
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Toxic Deluge.Cast(X: 4)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 16
+Bot1.Library.Count = 9
+Bot1.Graveyard = Walking Ballista; Meltstrider Eulogist; Toxic Deluge
