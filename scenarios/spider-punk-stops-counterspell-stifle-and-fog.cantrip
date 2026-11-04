@@ -1,0 +1,61 @@
+# Spider-Punk: "Spells and abilities can't be countered. Damage can't be prevented." (CR 101.2, 701.6a, 615.12). Bot2's
+# Counterspell leaves Thraben Inspector on the stack and it resolves; Stifle leaves the Inspector's trigger and Bot1
+# investigates; Fog prevents none of the hasty Spider-Punk's combat damage.
+
+[Bot1 Deck]
+Mox Pearl
+Spider-Punk
+Thraben Inspector
+Mountain
+Mountain x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Counterspell
+Stifle
+Fog
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Spider-Punk.Cast
+Bot1.Pass
+Bot1.Name(Haste)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Counterspell.Cast(Thraben Inspector)
+Bot1.Pass
+Bot2.Pass
+? Stack = Thraben Inspector
+Bot1.Pass
+? Stack = Thraben Inspector
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Stifle.Cast(Stack.Thraben Inspector)
+? Stack = Stifle; Thraben Inspector
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Spider-Punk > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fog.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Mountain; Mox Pearl; Mountain; Spider-Punk; Thraben Inspector; Clue Token
+Bot2.Graveyard = Fog; Stifle; Counterspell; Black Lotus

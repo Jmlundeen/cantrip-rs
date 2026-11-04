@@ -1,0 +1,53 @@
+# Spider-Punk's "Other Spiders you control have riot" covers tokens: a token created on the battlefield enters it (CR 111.1,
+# 614.12a), so each has riot as it would enter. Bot1 web-slings Spiders-Man, Heroic Horde on turn 3; its two 2/1 Spider tokens
+# each choose: haste for the first, the +1/+1 counter for the second. Spiders-Man is a Spider as well, and took the counter as
+# it entered.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Black Lotus
+Spider-Punk
+Llanowar Elves
+Mox Jet
+Spiders-Man, Heroic Horde
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Punk.Cast
+Bot1.Pass
+Bot1.Name(+1/+1 counter)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Spiders-Man, Heroic Horde.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Llanowar Elves)
+Bot1.Name(+1/+1 counter)
+Bot1.Name(Haste)
+Bot1.Name(+1/+1 counter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Spiders-Man, Heroic Horde.Riot = 1
+Bot1.Battlefield.Spiders-Man, Heroic Horde.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spider-Punk.Riot = 1
+Bot1.Battlefield.Spider Token#1.Riot = 1
+Bot1.Battlefield.Spider Token#1.Keywords = Haste; Reach
+Bot1.Battlefield.Spider Token#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spider Token#2.Keywords = Reach
+Bot1.Battlefield.Spider Token#2.Power = 3
+Bot1.Battlefield.Spider Token#2.Toughness = 2

@@ -397,7 +397,7 @@ fn an_aura_with_no_enchant_ability_may_enchant_anything() {
         attach_player: None,
         x: 0,
         transformed: false,
-        protector: None, read_ahead: None,
+        protector: None, read_ahead: None, riot_haste: false,
         instead: None,
         becomes: Some(Becomes { what: &AS_BARE_AURA, card: g.cards.id_of(&BEAR), words: Words::NONE }),
         own: None,

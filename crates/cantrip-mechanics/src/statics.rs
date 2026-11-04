@@ -89,6 +89,13 @@ pub fn your_spells_of_types<const TYPES: u16>(q: &dyn LayerQuery, source: Object
     o.zone.kind() == ZoneKind::Stack && of_a_type && o.controller == q.state().obj(source).controller
 }
 
+/// "Spells ..." (CR 113.6, layer 6) as the `StaticDef::affects` of a static ability declared `.everywhere()`: every spell on
+/// the stack, whoever controls it (an ability on the stack has no card types). Lier, Disciple of the Drowned and Spider-Punk
+/// print it before "can't be countered".
+pub fn spells(q: &dyn LayerQuery, _: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    q.state().obj(affected).zone.kind() == ZoneKind::Stack && so_far.types != TypeSet::NONE
+}
+
 /// A static ability that affects only the object that has it (CR 604.1: "this creature", "this land", "this token") as its
 /// `StaticDef::affects`. Anje's Ravager, Emrakul, the Aeons Torn, Multiversal Passage, Roaming Throne, Territorial Kavu and
 /// the Construct token use it.

@@ -1,0 +1,64 @@
+# Spider-Punk: "Spells and abilities can't be countered" (CR 101.2, 701.6a) - every spell and ability, whoever controls it.
+# Bot1 controls Spider-Punk; on turn 2 Bot1's own Counterspell leaves Bot2's Thraben Inspector on the stack and it resolves,
+# and Bot1's Stifle leaves the Inspector's trigger, so Bot2 investigates. "Other Spiders you control have riot" is Bot1's own: Bot2's
+# Canopy Spider enters on turn 4 with no riot, and no choice is asked (one asked would take the runner's default, a counter).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Spider-Punk
+Mox Sapphire
+Black Lotus
+Counterspell
+Stifle
+Mountain x13
+
+[Bot2 Deck]
+Plains
+Thraben Inspector
+Forest
+Canopy Spider
+Plains x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Punk.Cast
+Bot1.Pass
+Bot1.Name(Haste)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Counterspell.Cast(Thraben Inspector)
+Bot1.Pass
+Bot2.Pass
+? Stack = Thraben Inspector
+Bot2.Pass
+Bot1.Pass
+? Stack = Thraben Inspector
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stifle.Cast(Stack.Thraben Inspector)
+? Stack = Stifle; Thraben Inspector
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Canopy Spider.Cast
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield = Plains; Thraben Inspector; Clue Token; Forest; Canopy Spider
+Bot2.Battlefield.Canopy Spider.Riot = (absent)
+Bot2.Battlefield.Canopy Spider.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Stifle; Counterspell; Black Lotus

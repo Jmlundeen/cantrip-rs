@@ -94,6 +94,7 @@ mod tests {
                 hexproof_from: HexproofFrom::NONE,
                 must_attack: 0,
                 toxic: 0,
+                riot: 0,
                 abilities: [None; MAX_ABILITIES],
                 no_cost: false,
                 name_set: false,

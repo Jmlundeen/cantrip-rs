@@ -45,6 +45,9 @@ pub struct Chars {
     /// Its total toxic value (CR 702.164b): the sum of the N of every toxic N it has, printed and granted, 0 for none.
     /// Combat damage it deals a player gives that many poison counters as well (CR 702.164c, 120.3g).
     pub toxic: u16,
+    /// How many instances of riot it has (CR 702.136b), printed and granted: each one is a replacement of its own as it
+    /// enters (CR 702.136a, 614.12), its choice made separately.
+    pub riot: u16,
     pub abilities: [Option<AbilityRef>; MAX_ABILITIES],
     /// It has no mana cost (CR 118.6, 707.9b): a copy that says so, whatever the card it copies prints. Its mana
     /// value is 0.
@@ -177,6 +180,7 @@ impl Chars {
         self.hexproof_from = HexproofFrom::NONE;
         self.must_attack = 0;
         self.toxic = 0;
+        self.riot = 0;
         self.abilities = [None; MAX_ABILITIES];
     }
 

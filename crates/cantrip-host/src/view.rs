@@ -1049,6 +1049,15 @@ impl<'a> Projector<'a> {
         } else if c.toxic < printed_toxic {
             view.lost_abilities.push(format!("Toxic {printed_toxic}"));
         }
+        // Riot (CR 702.136): as toxic, the instances beyond its printed one are granted, each its own line (CR 702.136b), and a
+        // printed riot it has no more is lost.
+        let printed_riot = if c.lost_all { 0 } else { u16::from(def.riot) };
+        for _ in printed_riot..c.riot {
+            view.granted_abilities.push(AbilityTextView { text: "Riot".to_string(), spent: false });
+        }
+        if c.riot < printed_riot {
+            view.lost_abilities.push("Riot".to_string());
+        }
         // "Hexproof from [quality]" (CR 702.11d): the qualities it has and did not start with are granted, those it started
         // with and has not are lost.
         if c.hexproof_from != def.hexproof_from {

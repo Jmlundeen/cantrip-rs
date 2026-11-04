@@ -45,8 +45,11 @@ static UNTAPPER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "This land enters tapped." and riot (CR 702.136a).
+static RIOT_TAPLAND: CardDef = CardDef { name: "Entry Order Riot Tapland", riot: true, ..TAPLAND };
+
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &TAPLAND, &UNTAPPER])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &TAPLAND, &UNTAPPER, &RIOT_TAPLAND])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -138,6 +141,50 @@ fn nothing_is_asked_where_only_one_effect_applies() {
     assert_eq!(play(&mut g, land, land), (false, Vec::new()));
 }
 
+/// Riot is one of the replacements that modify how a permanent enters (CR 702.136a, 614.12), ordered with its own "enters
+/// tapped" (CR 616.1): its controller is asked which applies first, and either may - riot first among them, as Rhythm of the
+/// Wild's ruling on Rescuer Sphinx needs. Riot's choice is asked as riot applies: at once if it is chosen first, after the
+/// other if not.
+#[test]
+fn riot_is_ordered_with_its_own_replacement_and_either_may_apply_first() {
+    for riot_first in [true, false] {
+        let mut g = game();
+        let land = put(&mut g, &RIOT_TAPLAND, YOU, Zone::hand(YOU));
+        g.run();
+        let r = g.pending().cloned().expect("a question");
+        let option = match &r.kind {
+            RequestKind::Priority { options } => options.iter().find(|o| o.source == Some(land)).cloned(),
+            _ => None,
+        }
+        .expect("the land play is offered");
+        g.answer(r.id, r.player, Answer::Act(Action::of(&option))).expect("a legal answer");
+        let mut asked = Vec::new();
+        loop {
+            g.run();
+            let Some(r) = g.pending().cloned() else { break };
+            match &r.kind {
+                RequestKind::ChooseReplacement { sources, hints, .. } => {
+                    assert_eq!(sources, &vec![land, land], "both are the land's own");
+                    let riot = hints.iter().position(|h| h.starts_with("riot")).expect("riot is offered");
+                    assert!(hints.contains(&"This land enters tapped."), "its own is offered");
+                    asked.push("order");
+                    let pick = if riot_first { riot } else { 1 - riot };
+                    g.answer(r.id, r.player, Answer::Index(pick as u8)).expect("a legal answer");
+                }
+                RequestKind::ChooseModes { .. } => {
+                    asked.push("riot");
+                    g.answer(r.id, r.player, Answer::Modes(vec![intrinsic::RIOT_COUNTER])).expect("a legal answer");
+                }
+                _ => break,
+            }
+        }
+        assert_eq!(asked, vec!["order", "riot"], "riot first: {riot_first}");
+        let new = g.state.obj(land).became.expect("the land entered");
+        assert!(g.state.obj(new).tapped, "its own applied too");
+        assert_eq!(g.state.obj(new).counters(CounterKind::PlusOne), 1, "riot's counter");
+    }
+}
+
 /// "As this creature enters, an opponent of your choice gains control of it" written as `CardDef::enters`: a replacement that
 /// changes under whose control it enters, which is chosen before the others (CR 616.1b), not ordered as one any of which may
 /// be chosen.
@@ -181,7 +228,7 @@ fn an_own_enters_out_of_its_tier_stops_a_verifying_run() {
             attach_player: None,
             x: 0,
             transformed: false,
-            protector: None, read_ahead: None,
+            protector: None, read_ahead: None, riot_haste: false,
             instead: None,
             becomes: None,
             own: Some(table.id_of(def)),

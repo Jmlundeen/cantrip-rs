@@ -1,0 +1,11 @@
+{
+  "name": "Spider-Punk",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Creature — Spider Human Hero",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Riot (This creature enters with your choice of a +1/+1 counter or haste.)\nOther Spiders you control have riot.\nSpells and abilities can't be countered.\nDamage can't be prevented.",
+  "keywords": [
+    "Riot"
+  ]
+}

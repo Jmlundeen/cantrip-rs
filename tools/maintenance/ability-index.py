@@ -436,6 +436,8 @@ class Index:
             return None
         if ab.keyword == "toxic":
             return "core keyword toxic N (\"Toxic N\" in the content JSON's keywords; no code)"
+        if ab.keyword == "riot":
+            return "core keyword riot (\"Riot\" in the content JSON's keywords; no code)"
         if ab.keyword in self.core:
             return "core keyword (Keywords::of in the content JSON; no code)"
         return mechanics_for(ab.keyword)

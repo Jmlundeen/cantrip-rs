@@ -4,5 +4,8 @@
   "type": "Creature — Beast",
   "power": 4,
   "toughness": 4,
-  "oracleText": "Riot (This creature enters with your choice of a +1/+1 counter or haste.)"
+  "oracleText": "Riot (This creature enters with your choice of a +1/+1 counter or haste.)",
+  "keywords": [
+    "Riot"
+  ]
 }

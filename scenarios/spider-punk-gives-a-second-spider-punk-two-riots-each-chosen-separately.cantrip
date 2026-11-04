@@ -1,0 +1,35 @@
+# Riot's instances work separately (CR 702.136b). A second Spider-Punk has its own printed riot and, as it would enter, the
+# riot the first one gives other Spiders, so Bot1 chooses twice: the +1/+1 counter both times, a 4/3. The legend rule then
+# keeps one; Bot1 keeps the new one.
+
+[Bot1 Deck]
+Black Lotus
+Spider-Punk
+Spider-Punk
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Spider-Punk#1.Cast
+Bot1.Pass
+Bot1.Name(Haste)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Spider-Punk.Cast
+Bot1.Pass
+Bot1.Name(+1/+1 counter)
+Bot1.Name(+1/+1 counter)
+Bot1.Choose(Spider-Punk#2)
+
+[Expect]
+Bot1.Battlefield.Spider-Punk.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Spider-Punk.Power = 4
+Bot1.Battlefield.Spider-Punk.Toughness = 3
+Bot1.Battlefield.Spider-Punk.Keywords = (absent)
+Bot1.Battlefield.Spider-Punk.Riot = 1
+Bot1.Graveyard = Spider-Punk; Black Lotus

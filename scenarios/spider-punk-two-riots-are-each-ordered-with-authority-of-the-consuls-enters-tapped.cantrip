@@ -1,0 +1,45 @@
+# Riot's instances are ordered with the other replacements that modify how a permanent enters (CR 616.1, 702.136b). Under Bot2's
+# Authority of the Consuls ("Creatures your opponents control enter tapped"), Bot1's second Spider-Punk has its printed riot and
+# the first one's grant: each instance is offered and chosen separately with the Authority's (the order left to the runner),
+# so it enters tapped with two +1/+1 counters. The legend rule then keeps the new one.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Spider-Punk
+Spider-Punk
+Mountain
+Mountain x15
+
+[Bot2 Deck]
+Plains
+Authority of the Consuls
+Plains x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Authority of the Consuls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Spider-Punk#1.Cast
+Bot1.Pass
+Bot1.Name(Haste)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Spider-Punk.Cast
+Bot1.Pass
+Bot1.Name(+1/+1 counter)
+Bot1.Name(+1/+1 counter)
+Bot1.Choose(Spider-Punk#2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Spider-Punk.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Spider-Punk.Tapped = true

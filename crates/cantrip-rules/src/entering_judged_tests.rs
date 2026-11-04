@@ -156,7 +156,7 @@ fn entering(id: ObjectId, controller: PlayerId, tapped: bool) -> Entering {
         attach_player: None,
         x: 0,
         transformed: false,
-        protector: None, read_ahead: None,
+        protector: None, read_ahead: None, riot_haste: false,
         instead: None,
         becomes: None,
         own: None,

@@ -556,6 +556,9 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
         if entering && let Some(b) = m.entering.and_then(|e| e.becomes) {
             enter_as(cx, new_id, b);
         }
+        if entering && m.entering.is_some_and(|e| e.riot_haste) {
+            riot_haste(cx, new_id);
+        }
         // The counters it arrives with are on it as it arrives (CR 614.1c), announced after its move.
         let mut put = Vec::new();
         counters::place_arrived(cx, new_id, counts, counts_by, &mut put);
@@ -1252,7 +1255,8 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     if !copied && !entering.transformed && copy_over(cx, entering) && enters_by_daybound(cx, entering, may_lose) {
         entering.transformed = true;
     }
-    // Read ahead's choice is judged on what it now enters as: its face, or the copy it enters as.
+    // Read ahead's choice is judged on what it now enters as: its face, or the copy it enters as. Riot's is not made here:
+    // its replacement is ordered with the others that modify how it enters (`entry_replacements`, `apply_riot`).
     choose_read_ahead(cx, entering, may_lose)
 }
 
@@ -1313,6 +1317,93 @@ fn choose_read_ahead(cx: &mut Cx, entering: &mut Entering, may_lose: bool) -> R<
     Ok(())
 }
 
+/// Whether riot could apply to the permanent `entering` would be (CR 702.136a, 614.12), now or once the other replacements
+/// that modify how it enters have applied (CR 616.1f): its text prints riot (its face's, or the copy's it enters as), an
+/// "it's a ..." or a static ability of its own could give it some, or a static ability on the battlefield could grant it
+/// (Spider-Punk's "Other Spiders you control have riot" to a Roaming Throne whose choice makes it a Spider). The guard that
+/// keeps an entry with no riot free of the judging.
+fn riot_may_apply(cx: &Cx, entering: &Entering) -> bool {
+    let def = cx.cards().get(entering_card(cx, entering));
+    def.riot
+        || entering.becomes.is_some()
+        || def.statics.iter().any(|s| s.own && s.layer == Layer::Ability)
+        || layers::ability_grants_present(cx.cards(), cx.s())
+}
+
+/// How many instances of riot the permanent `entering` would have on the battlefield (CR 702.136b, 614.12, `Chars::riot`), as
+/// the replacements applied so far have made it: printed, by the text of a copy it enters as, or given by a static ability
+/// that would apply to it there - none it would have lost there (CR 613.1f, 305.7).
+fn riot_instances(cx: &mut Cx, entering: &Entering) -> u16 {
+    let def = cx.cards().get(entering_card(cx, entering));
+    // Where no static ability could give it abilities or take them, and no copy effect or "it's a ..." could make it other
+    // than its card, it has the riot its card prints.
+    let judged = entering.copy.is_some()
+        || entering.becomes.is_some()
+        || def.statics.iter().any(|s| s.layer == Layer::Ability || s.loses_all || s.sets_land_subtypes)
+        || layers::abilities_may_be_lost(cx.cards(), cx.s())
+        || layers::ability_grants_present(cx.cards(), cx.s());
+    if !judged {
+        return u16::from(def.riot);
+    }
+    let would = as_it_would_exist(cx, entering);
+    if would.lost { 0 } else { would.chars.riot }
+}
+
+/// One instance of riot applied to `entering` (CR 702.136a): "You may have this permanent enter with an additional +1/+1
+/// counter on it. If you don't, it gains haste" - a replacement effect (CR 614.1c) whose choice is made as it applies, before
+/// it enters (CR 614.12a), by the player it enters under. Each instance is a replacement of its own, chosen separately
+/// (CR 702.136b), and ordered with the other replacements that modify how it enters, its own "as this enters" among them
+/// (CR 616.1, `replace::entry`): one that makes it get riot (Roaming Throne naming Spider under Spider-Punk) has riot apply
+/// after it, and riot may apply before one that would take it away (Rhythm of the Wild's ruling, of Rescuer Sphinx). A
+/// counter chosen is one more it enters with (`Entering::counters`); one that can't be put on it (Solemnity) is haste
+/// instead (the riot cards' ruling), and haste chosen it gains as it enters (`Entering::riot_haste`, `riot_haste`). A
+/// question with no answer yet leaves the entry as if the counter were chosen; the run is replayed with the answer
+/// (`Cx::ask_core`).
+pub(crate) fn apply_riot(cx: &mut Cx, entering: &mut Entering) {
+    let rules = cx.cards().intrinsic;
+    let modes = vec![Label::Option(rules, intrinsic::RIOT_COUNTER), Label::Option(rules, intrinsic::RIOT_HASTE)];
+    let ask = RequestKind::ChooseModes {
+        source: entering.object,
+        modes,
+        eligible: vec![intrinsic::RIOT_COUNTER, intrinsic::RIOT_HASTE],
+        count: 1,
+        at_most: 0,
+        affordable: Vec::new(),
+        additional_cost: false,
+        repeat: false,
+    };
+    // The core checks the answer is one offered (`validate`).
+    let chosen = match cx.ask_core(entering.controller, ask, false) {
+        Ok(Answer::Modes(m)) => m.first().copied().unwrap_or(intrinsic::RIOT_COUNTER),
+        _ => intrinsic::RIOT_COUNTER,
+    };
+    if chosen == intrinsic::RIOT_COUNTER
+        && !crate::static_rules::counters_banned(&*cx, cx.cards(), entering.object, entering.controller, CounterKind::PlusOne)
+    {
+        entering.counters[CounterKind::PlusOne as usize] += 1;
+    } else {
+        entering.riot_haste = true;
+    }
+}
+
+/// "If you don't, it gains haste" (CR 702.136a): the permanent `id`, as it arrives, gains haste from then on, for as long as
+/// it is that object (CR 611.2a, 400.7) - an effect of the riot that applied, which riot granted by a permanent that has left
+/// since (Rhythm of the Wild's ruling) or riot lost later does not end. Its timestamp is its arrival's, so "loses all
+/// abilities" later takes it (CR 613.7).
+fn riot_haste(cx: &mut Cx, id: ObjectId) {
+    let timestamp = cx.st().timestamp();
+    let controller = cx.s().obj(id).controller;
+    cx.st().effect_push(cantrip_state::ContinuousEffect {
+        source: id,
+        controller,
+        timestamp,
+        affected: id,
+        kind: EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])),
+        duration: Duration::Indefinite,
+        words: Words::NONE,
+    });
+}
+
 /// Notes `card`'s `CardDef::enters` as the entering permanent's own replacements still to apply (`Entering::own`): its
 /// face's, or those of what it enters as a copy of (CR 707.9a) - `prepare_entry` notes the one text it enters with.
 fn own_to_apply(entering: &mut Entering, card: CardId) {
@@ -1366,12 +1457,18 @@ fn keep_chosen(cx: &Cx, entering: &Entering) -> impl Fn(&mut Obj) + use<> {
 /// ruling). `entering` is left as they made it, but for where it goes and whether it enters tapped and under whom, which are
 /// the returned zone change's; an entry its own replacement sent elsewhere (`Entering::instead`) goes there.
 ///
-/// Where nothing could apply but its own, there is nothing to order: they are applied as they are, and nothing is judged.
+/// Each instance of riot it would have is one of them (CR 702.136b, `apply_riot`), offered while it would have more
+/// instances than have applied.
+///
+/// Where nothing could apply but one kind - its own, its riot, or the others - there is nothing to order: they are applied
+/// as they are, and nothing is judged but riot's instances.
 fn entry_replacements(cx: &mut Cx, entering: &mut Entering, proposed: ZoneChange) -> ZoneChange {
     let own = entering.own.is_some();
+    let riot = riot_may_apply(cx, entering);
     // A copy's own replacements that function from every zone are its, not its card's (`judged_entering`).
     let copy_replaces = copy_over(cx, entering) && cx.cards().replaces[entering_card(cx, entering).0 as usize];
-    if !own || !(copy_replaces || crate::replace::zone_change_possible(cx, &proposed)) {
+    let others = copy_replaces || crate::replace::zone_change_possible(cx, &proposed);
+    if !(own && (riot || others)) && !(riot && others) {
         let mut proposed = proposed;
         apply_own_entering(cx, entering, proposed.controller, proposed.tapped);
         proposed.controller = entering.controller;
@@ -1379,6 +1476,14 @@ fn entry_replacements(cx: &mut Cx, entering: &mut Entering, proposed: ZoneChange
         // An entry its own replacement turned into a move elsewhere (CR 614.12): it does not enter at all.
         if let Some(instead) = entering.instead {
             return crate::replace::zone_change(cx, crate::replace::sent_instead(cx, proposed, instead));
+        }
+        // Riot alone: each instance applied in turn, judged again after the one before (CR 616.1f).
+        if riot {
+            let mut applied = 0;
+            while riot_instances(cx, entering) > applied {
+                apply_riot(cx, entering);
+                applied += 1;
+            }
         }
         return judged_entering(cx, entering, false, |cx| crate::replace::zone_change(cx, proposed));
     }
@@ -1503,6 +1608,10 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
     // What the effect putting it there says it is (`Entering::becomes`), it would be there.
     if let Some(b) = entering.becomes {
         enter_as(cx, id, b);
+    }
+    // The haste an instance of riot applied so far gives it (CR 702.136a, 614.12).
+    if entering.riot_haste {
+        riot_haste(cx, id);
     }
     note_statics(cx, id);
     let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
@@ -1724,7 +1833,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, read_ahead: None, instead: None, becomes, own: None };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes, own: None };
         prepare_entry(cx, &mut entering)?;
         // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1789,7 +1898,7 @@ pub fn put_onto_battlefield_as(
         attach: None, attach_player: None,
         x: 0,
         transformed,
-        protector: None, read_ahead: None,
+        protector: None, read_ahead: None, riot_haste: false,
         instead: None,
         becomes: None,
         own: None,
@@ -1914,7 +2023,7 @@ pub fn put_onto_battlefield_attached(cx: &mut Cx, id: ObjectId, controller: Play
         attach_player: None,
         x: 0,
         transformed: false,
-        protector: None, read_ahead: None,
+        protector: None, read_ahead: None, riot_haste: false,
         instead: None,
         becomes: None,
         own: None,
@@ -2353,7 +2462,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, read_ahead: None, instead: None, becomes: None, own: None };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes: None, own: None };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
@@ -2452,6 +2561,9 @@ fn create_tokens_onto(
             o.attached_to = entering.attach;
             o.attached_player = entering.attach_player;
         });
+        if entering.riot_haste {
+            riot_haste(cx, id);
+        }
         let mut put = Vec::new();
         counters::place_arrived(cx, id, entering.counters, controller, &mut put);
         // Once every counter it enters with is on it, a hone counter among them (CR 122.1j).
@@ -4991,7 +5103,7 @@ mod tests {
             attach_player: None,
             x: 0,
             transformed: false,
-            protector: None, read_ahead: None,
+            protector: None, read_ahead: None, riot_haste: false,
             instead: None,
             becomes: None,
             own: None,

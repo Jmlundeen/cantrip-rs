@@ -1,0 +1,47 @@
+# Spider-Punk: "Other Spiders you control have riot." Bot1 casts Spider-Punk and takes its own riot's +1/+1 counter (a 3/2),
+# then Canopy Spider, which has riot as it would enter (CR 614.12a) and chooses haste. Lightning Bolt kills Spider-Punk; the
+# haste the Spider gained has no duration (CR 702.136a, Rhythm of the Wild's ruling), so it still attacks on turn 1.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Spider-Punk
+Canopy Spider
+Lightning Bolt
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Punk.Cast
+Bot1.Pass
+Bot1.Name(+1/+1 counter)
+? Bot1.Battlefield.Spider-Punk.Power = 3
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Canopy Spider.Cast
+Bot1.Pass
+Bot1.Name(Haste)
+Bot1.Hand.Lightning Bolt.Cast(Spider-Punk)
+Bot1.Pass
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Canopy Spider > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Spider-Punk; Lightning Bolt; Black Lotus
+Bot1.Battlefield.Canopy Spider.Keywords = Haste; Reach
+Bot1.Battlefield.Canopy Spider.Counters.PlusOnePlusOne = (absent)

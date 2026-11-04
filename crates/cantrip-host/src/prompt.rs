@@ -2084,7 +2084,8 @@ fn phyrexian_heading(game: &Game, source: ObjectId, modes: &[Label]) -> Option<S
 
 /// The caption of a choice between the words a card's text offers (CR 607.2f), in its words with the card's name: "Frostcliff
 /// Siege: choose Jeskai or Temur", "Mirrodin Besieged: choose Mirran or Phyrexian". The name is the card whose text it is,
-/// which a permanent entering as a copy of it is not yet (CR 707.5). None when the options are anything else.
+/// which a permanent entering as a copy of it is not yet (CR 707.5); riot's choice (CR 702.136a), the rules' own, is "Riot:
+/// choose +1/+1 counter or Haste". None when the options are anything else.
 fn options_heading(game: &Game, modes: &[Label]) -> Option<String> {
     let Some(&Label::Option(card, _)) = modes.first() else { return None };
     if !modes.iter().all(|l| matches!(l, Label::Option(c, _) if *c == card)) {
@@ -2096,7 +2097,9 @@ fn options_heading(game: &Game, modes: &[Label]) -> Option<String> {
         Some((last, rest)) => format!("{} or {last}", rest.join(", ")),
         None => return None,
     };
-    Some(format!("{}: choose {listed}", game.cards.get(card).name))
+    // The rules' own choice between words is riot's (CR 702.136a, `intrinsic::RIOT_COUNTER`): named for the keyword.
+    let name = if card == game.cards.intrinsic { "Riot" } else { game.cards.get(card).name };
+    Some(format!("{name}: choose {listed}"))
 }
 
 /// What a choice of a subtype says it is for: "Choose a creature type" for one an effect names from now on (the heading the

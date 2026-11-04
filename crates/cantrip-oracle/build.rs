@@ -28,10 +28,10 @@ const KEYWORDS: [&str; 44] = [
 const COLORS: &str = "WUBRG";
 const COLOR_NAMES: [&str; 5] = ["White", "Blue", "Black", "Red", "Green"];
 /// The Oracle words of the core keywords a card can have and still need no file of its own.
-const KEYWORD_WORDS: [&str; 33] = [
+const KEYWORD_WORDS: [&str; 34] = [
     "flying", "haste", "vigilance", "trample", "first strike", "double strike", "deathtouch", "lifelink", "reach", "defender",
     "flash", "hexproof", "indestructible", "menace", "infect", "shadow", "shroud", "changeling", "decayed", "islandwalk", "plainswalk", "swampwalk", "mountainwalk", "forestwalk", "banding",
-    "horsemanship", "fear", "intimidate", "skulk", "nonbasic landwalk", "legendary landwalk", "wither", "phasing",
+    "horsemanship", "fear", "intimidate", "skulk", "nonbasic landwalk", "legendary landwalk", "wither", "phasing", "riot",
 ];
 
 fn main() {
@@ -361,6 +361,12 @@ fn printed_toxic(card: &Card) -> u16 {
     text.split('\n').flat_map(|line| line.split([',', ';'])).filter_map(|part| toxic_n(&part.to_lowercase())).sum()
 }
 
+/// Whether its Oracle text prints riot (CR 702.136a): a keyword part of a line, alone or in a keyword list ("Riot, trample").
+fn prints_riot(card: &Card) -> bool {
+    let text = without_reminder(&str_of(card, "oracleText"));
+    text.split('\n').flat_map(|line| line.split([',', ';'])).any(|part| part.trim().eq_ignore_ascii_case("riot"))
+}
+
 /// The N of a toxic N (CR 702.164a), as content's `keywords` ("Toxic 2") or Oracle text ("toxic 2") words it.
 fn toxic_n(word: &str) -> Option<u16> {
     let word = word.trim();
@@ -449,6 +455,15 @@ fn face_fields(card: &Card, is_back: bool, source: &str, known: &HashSet<String>
     }
     if toxic > 0 {
         fields.push(format!("    toxic: {toxic},"));
+    }
+    // Riot (CR 702.136a), "Riot" in `keywords`. A content file that leaves out the riot its text prints would build the card
+    // without it.
+    let riot = card.get("keywords").and_then(Value::as_array).into_iter().flatten().filter_map(Value::as_str).any(|k| k == "Riot");
+    if riot != prints_riot(card) {
+        panic!("{source}: {name}'s Oracle text and its `keywords` disagree on riot: list \"Riot\" in `keywords` exactly when the text prints it (CR 702.136a)");
+    }
+    if riot {
+        fields.push("    riot: true,".into());
     }
     // Convoke, delve and improvise (CR 702.51, 702.66, 702.126): what else may pay the total cost.
     let flag = |k: &str| card.get(k) == Some(&Value::Bool(true));

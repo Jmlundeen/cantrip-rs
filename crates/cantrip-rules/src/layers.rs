@@ -618,6 +618,7 @@ fn merged_abilities(cards: &CardTable, sources: &[Copiable], chars: &mut Chars) 
         let other = initial(cards, values.card, Some(values));
         chars.keywords = Keywords(chars.keywords.0 | other.keywords.0);
         chars.toxic += other.toxic;
+        chars.riot += other.riot;
         chars.protection = ColorSet(chars.protection.0 | other.protection.0);
         chars.hexproof_from = chars.hexproof_from.and(other.hexproof_from);
         for ability in other.abilities.iter().flatten() {
@@ -1335,6 +1336,8 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         must_attack: 0,
         // Printed toxic N (CR 702.164a): the card's, or the one it copies.
         toxic: def.toxic,
+        // Printed riot (CR 702.136a): one instance, the card's or the one it copies.
+        riot: u16::from(def.riot),
         abilities,
         no_cost,
         name_set: false,
@@ -2275,7 +2278,7 @@ enum Field {
     Plain(u64),
 }
 
-fn fields(c: &Chars) -> [(&'static str, Field); 21] {
+fn fields(c: &Chars) -> [(&'static str, Field); 22] {
     use std::hash::{Hash, Hasher};
     let plain = |v: &dyn Fn(&mut std::collections::hash_map::DefaultHasher)| {
         let mut h = std::collections::hash_map::DefaultHasher::new();
@@ -2311,6 +2314,8 @@ fn fields(c: &Chars) -> [(&'static str, Field); 21] {
         ("must_attack", Field::Number(Some(i16::try_from(c.must_attack).unwrap_or(i16::MAX)))),
         // The total toxic value (CR 702.164b), a sum of instances as `must_attack` is.
         ("toxic", Field::Number(Some(i16::try_from(c.toxic).unwrap_or(i16::MAX)))),
+        // Its instances of riot (CR 702.136b), a count as `must_attack` is.
+        ("riot", Field::Number(Some(i16::try_from(c.riot).unwrap_or(i16::MAX)))),
         ("losses", bits(u64::from(c.lost_all) | u64::from(c.text_lost) << 1)),
         ("marks", bits(u64::from(c.spell) | u64::from(c.no_cost) << 1 | u64::from(c.name_set) << 2)),
         ("card", plain(&|h| c.card.hash(h))),
@@ -2454,6 +2459,7 @@ fn contract_pairs(base: Chars, ability: AbilityRef) -> Vec<(Chars, Chars)> {
     vary(&|c| c.protection_everything = !c.protection_everything);
     vary(&|c| c.must_attack += 1);
     vary(&|c| c.toxic += 1);
+    vary(&|c| c.riot += 1);
     // losses
     vary(&|c| c.lost_all = !c.lost_all);
     vary(&|c| c.text_lost = !c.text_lost);
@@ -3413,6 +3419,7 @@ mod tests {
             hexproof_from: HexproofFrom::NONE,
             must_attack: 0,
             toxic: 0,
+            riot: 0,
             abilities,
             no_cost: false,
             name_set: false,

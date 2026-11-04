@@ -236,8 +236,13 @@ pub static INTRINSIC: CardDef = CardDef {
         inherent("At the beginning of the next cleanup step, the controller of the permanent it became sacrifices it.", untimely_sacrifice),
     ],
     lasting: &[Lasting { text: "you control {source}", holds: caster_controls }],
+    labels: &["+1/+1 counter", "Haste"],
     ..CardDef::BLANK
 };
+
+/// The choice each instance of riot makes as its permanent enters (CR 702.136a), by index into `INTRINSIC`'s `labels`.
+pub const RIOT_COUNTER: u8 = 0;
+pub const RIOT_HASTE: u8 = 1;
 
 /// "Turn it face up" (CR 701.40b, 701.58b, 708.7): a face-down permanent that is a creature card may be turned face up any
 /// time its controller has priority, by paying its mana cost. A special action (CR 116.2): no stack. The cost is the card's

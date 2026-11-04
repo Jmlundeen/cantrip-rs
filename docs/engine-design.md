@@ -1865,6 +1865,22 @@ exactly its number of lore counters (CR 702.155a, `settle::chapter_reached`, the
 so the skipped chapters and those later counters pass over that turn don't trigger. A card prints it as `"ReadAhead"` in its
 content file's `keywords` and needs no code for it.
 
+Riot (CR 702.136) is a core keyword too, since its choice is made as the permanent enters (CR 614.12a) and one instance may be
+another permanent's grant (Spider-Punk's "Other Spiders you control have riot"). Its instances are a count, `Chars::riot`
+(`CardDef::riot` for the printed one, `cantrip_mechanics::riot::have_riot` for a grant), since each is chosen separately
+(CR 702.136b). Each instance the permanent would have on the battlefield is one of the replacements that modify how it enters
+(`replace::Origin::Riot`), ordered with its own "as this enters" and the others in the order its controller chooses (CR 616.1,
+`ops::entry_replacements`) and offered while it would have more instances than have applied, judged again after each one
+(CR 616.1f): a Roaming Throne naming Spider under Spider-Punk gets riot once its choice has applied, and riot may apply before
+an own replacement that would take it away (Rhythm of the Wild's ruling on Rescuer Sphinx). Each asks a `ChooseModes` as it
+applies (`ops::apply_riot`), labelled by the intrinsic card's options: a +1/+1 counter goes on the entry, unless a static
+ability forbids it, which is haste (the ruling); haste is an indefinite effect from its arrival (`Entering::riot_haste`), kept after the grant is gone. A card prints
+it as `"Riot"` in its content file's `keywords`.
+
+A static ability may say an activated or triggered ability can't be countered (CR 101.2, 701.6a,
+`CardDef::uncounterable_abilities`): `resolve::counter_at` leaves such an ability on the stack
+(`static_rules::ability_cant_be_countered`), as it leaves a spell that can't be countered.
+
 A static ability may forbid some payments of the costs to cast spells and activate abilities (CR 101.2, 118.3, 601.2h, 602.2b:
 `CardDef::cost_bans`, a `CostBan` asked of the payer, what the cost is for - `CostFor::Spell`, `Ability` or `ManaAbility` - and the
 payment, `CostPayment::Life` or `Sacrifice(permanent)`, through `static_rules::cost_banned`). Yasharn, Implacable Earth forbids life
@@ -2746,8 +2762,8 @@ below it: on top, the part's values and every ability of what was below; under, 
 (the release notes: "if a creature that's a copy of another creature mutates, the characteristics it gains from mutating apply
 after applying the copy effect"); a later copy effect replaces it all. The result is `Obj::copy`, the topmost values with
 `Copiable::merged` naming the other components' values in `GameState::merged_sources` - copiable, so a copy of a merged
-permanent has every ability and is one object of one card. The layers add those values' abilities, keywords, protections and
-toxic to the topmost's in layer 1 (`layers::merged_abilities`, CR 702.140e). Every rule a card lists beside its abilities is
+permanent has every ability and is one object of one card. The layers add those values' abilities, keywords, protections,
+toxic and riot to the topmost's in layer 1 (`layers::merged_abilities`, CR 702.140e). Every rule a card lists beside its abilities is
 read off every definition the object has (`CardTable::texts`): static abilities (`layers::statics_of`), replacement and
 prevention effects (`replace::source_texts`, a printed effect's index counting through them all), cost changes, play, trigger,
 activation, attack, block, untap and turn rules, each named by the card it is printed on and asked with that card's link

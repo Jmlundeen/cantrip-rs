@@ -303,6 +303,9 @@ def _face(face, names, index, core):
             toxic = re.fullmatch(r"toxic (\d+)", part.strip(), re.I)
             if toxic:
                 keywords.append(f"Toxic {toxic.group(1)}")
+            # Riot (CR 702.136a): a core count of its own, not a `Keyword`, "Riot" alone or in a keyword list.
+            if part.strip().lower() == "riot" and "Riot" not in keywords:
+                keywords.append("Riot")
     if keywords:
         out["keywords"] = keywords
     for flag in ("convoke", "delve", "improvise", "assist"):

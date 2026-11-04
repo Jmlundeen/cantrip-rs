@@ -61,6 +61,10 @@ pub(crate) enum Origin {
     /// `CardDef::enters`, the one in `Entering::own` at the candidate's index. Ordered with the others that modify how it
     /// enters (CR 616.1): a land's own "enters tapped" and Spelunking's "lands you control enter untapped" in either order.
     Enters(CardId),
+    /// An instance of riot the entering permanent would have (CR 702.136a-b, `ops::apply_riot`): each is applied separately,
+    /// offered while it would have more instances than have applied, and ordered with the others that modify how it enters
+    /// (CR 616.1).
+    Riot,
 }
 
 /// One effect that applies to the event: its source, and which of the source's replacements it is.
@@ -105,6 +109,9 @@ const PLAYED_TAPPED_HINT: &str = "a land played this way enters tapped";
 
 /// What a permanent's own entering replacement says it does where its text has no line for it (CR 616.1).
 const ENTERS_HINT: &str = "its own replacement as it enters";
+
+/// What an instance of riot says it does, for the player who orders it with others (CR 616.1, 702.136a).
+const RIOT_HINT: &str = "riot: it enters with an additional +1/+1 counter, or gains haste";
 
 /// What a permanent's own entering replacement (`CardDef::enters`) says it does, for the player who orders it with others
 /// (CR 616.1): the line of its card's rules text that says how it enters ("This land enters tapped.", "As this creature
@@ -593,7 +600,16 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
         && !cx.entering.is_some_and(|w| w.object == e.object && w.lost)
     {
         let own = e.own.map(|card| Candidate { source: e.object, index: 0, origin: Origin::Enters(card) });
+        let after_own = usize::from(own.is_some());
         found.splice(0..0, own);
+        // An instance of riot it would have and that has not applied yet (CR 702.136b), judged as it would exist with those
+        // applied so far (CR 616.1f): one its own "as this enters" gives it applies after that one. Offered after its own.
+        if let Some(w) = cx.entering.filter(|w| w.object == e.object) {
+            let applied_riot = applied.iter().filter(|&&(source, _, origin)| source == e.object && origin == Origin::Riot).count();
+            if usize::from(w.chars.riot) > applied_riot {
+                found.insert(after_own, Candidate { source: e.object, index: 0, origin: Origin::Riot });
+            }
+        }
     }
     // The discarded card's own madness (CR 702.35a), ordered with the rest (CR 616.1). It is offered first, as the
     // order its owner almost always wants: declining the cast still puts the card into the graveyard, where the other
@@ -706,6 +722,7 @@ fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
         },
         Origin::PlayedTapped => PLAYED_TAPPED_HINT,
         Origin::Enters(card) => enters_hint(cx.cards().get(card)),
+        Origin::Riot => RIOT_HINT,
     }
 }
 
@@ -868,6 +885,16 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
                     } else {
                         cx.entering = Some(crate::ops::as_it_would_exist(cx, e));
                     }
+                }
+            }
+            // An instance of riot (CR 702.136a), its choice made by the player it now enters under (CR 614.12a): the counter
+            // or the haste is the entry's. It is judged again as it would exist with it applied (CR 614.12).
+            Origin::Riot => {
+                if let (Some(e), Proposal::ZoneChange(z)) = (entry.as_deref_mut(), &mut *proposal) {
+                    e.controller = z.controller;
+                    e.tapped = z.tapped;
+                    crate::ops::apply_riot(cx, e);
+                    cx.entering = Some(crate::ops::as_it_would_exist(cx, e));
                 }
             }
             // CR 702.34a, 614.1a: exiled instead, in its owner's exile (CR 400.3).

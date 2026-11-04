@@ -754,6 +754,10 @@ impl StateDump {
                     if c.toxic > 0 {
                         d.set(format!("{key}.Toxic"), c.toxic.to_string());
                     }
+                    // Its instances of riot (CR 702.136b), printed and granted.
+                    if c.riot > 0 {
+                        d.set(format!("{key}.Riot"), c.riot.to_string());
+                    }
                     // Its "hexproof from [quality]" abilities (CR 702.11d), as the qualities' words: `Black; White`, `Monocolored`.
                     if !c.hexproof_from.is_empty() {
                         let h = c.hexproof_from;
@@ -918,7 +922,7 @@ const PLAYER_KEYS: &[&str] = &[
 
 /// The keys the dump writes of a permanent, after `BotN.Battlefield.<name>.` (or `.PhasedOut.`), beside `Counters.<Kind>`.
 const PERMANENT_KEYS: &[&str] = &[
-    "Tapped", "Toxic", "FaceDown", "FaceDownName", "Token", "Prototyped", "Transformed", "ManaValue", "X", "Doors", "Prepared", "AttachedTo", "Monstrous",
+    "Tapped", "Toxic", "Riot", "FaceDown", "FaceDownName", "Token", "Prototyped", "Transformed", "ManaValue", "X", "Doors", "Prepared", "AttachedTo", "Monstrous",
     "Solved", "Suspected", "Saddled", "Exerted", "GoadedBy", "MustAttack", "CantBeBlocked", "BlockRestriction", "DoesntUntap", "LastingRules", "ChosenPlayer", "ChosenOption", "ChosenNumber", "ChosenObject",
     "ChosenModes", "ChosenName", "ClassLevel", "Types", "Supertypes", "Subtypes", "Colors", "Keywords", "HexproofFrom",
     "ProtectionFrom", "ProtectionFromSubtypes", "ProtectionFromManaValue", "Power", "Toughness", "Damage", "SummoningSick", "ChosenColor", "ChosenSubtype",

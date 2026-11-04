@@ -580,7 +580,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     x: item.x,
                     // Cast as its back face, or transformed, it enters with that face up (CR 712.8c, 712.8f, 712.13).
                     transformed: item.way == WAY_BACK_FACE || item.way == WAY_TRANSFORMED,
-                    protector: None, read_ahead: None,
+                    protector: None, read_ahead: None, riot_haste: false,
                     instead: None,
                     becomes: None,
                     own: None,
@@ -759,7 +759,8 @@ fn can_be_countered(cx: &Cx, spell: ObjectId) -> bool {
     !cx.chars(spell).keywords.has(Keyword::CantBeCountered) && !cx.s().obj(spell).marks.cant_be_countered
 }
 
-/// Counters the items at `at` on the stack together (CR 701.6, 608.2c): what can't be countered stays (CR 101.2, 701.6a); a
+/// Counters the items at `at` on the stack together (CR 701.6, 608.2c): what can't be countered stays (CR 101.2, 701.6a; a
+/// spell's own characteristics or a static ability's say so of an ability, `static_rules::ability_cant_be_countered`); a
 /// countered ability ceases to exist; the countered spells are announced as one batch and leave the stack for their owners'
 /// graveyards in one move (`leave_stack`), so an ability that triggers on "one or more" of either triggers once (CR 603.2c).
 /// Returns how many were countered.
@@ -769,7 +770,10 @@ fn counter_at(cx: &mut Cx, at: &[usize]) -> u32 {
         .copied()
         .filter(|&a| {
             let item = cx.s().stack[a];
-            item.kind != StackKind::Spell || can_be_countered(cx, item.object)
+            match item.kind {
+                StackKind::Spell => can_be_countered(cx, item.object),
+                StackKind::Activated | StackKind::Triggered => !crate::static_rules::ability_cant_be_countered(cx, &item),
+            }
         })
         .collect();
     // Announced before they leave the stack: what triggers on a spell being countered looks back on the game as it was just

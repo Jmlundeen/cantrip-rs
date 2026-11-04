@@ -1,0 +1,41 @@
+# Roaming Throne naming Spider under Spider-Punk. Riot is one of the replacements that modify how the Throne enters, ordered
+# with its own "as this enters, choose a creature type" (CR 616.1): with that one applied, the Throne would be a Spider
+# (CR 614.12, 616.1f), so Spider-Punk's grant gives it riot, and riot then applies - its choice asked after the type's.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Spider-Punk
+Roaming Throne
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Punk.Cast
+Bot1.Pass
+Bot1.Name(Haste)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Roaming Throne.Cast
+Bot1.Pass
+Bot1.Modes(Spider)
+Bot1.Name(+1/+1 counter)
+
+[Expect]
+Bot1.Battlefield.Roaming Throne.ChosenSubtype = Spider
+Bot1.Battlefield.Roaming Throne.Riot = 1
+Bot1.Battlefield.Roaming Throne.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Roaming Throne.Power = 5

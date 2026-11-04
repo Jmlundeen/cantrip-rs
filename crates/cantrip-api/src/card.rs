@@ -106,6 +106,10 @@ pub struct Entering {
     /// The number a Saga with read ahead chose as it enters (CR 702.155b, 714.3b), by `prepare_entry`: it enters with that
     /// many lore counters, in place of the one a Saga without read ahead enters with (CR 714.3a).
     pub read_ahead: Option<u8>,
+    /// It gains haste as it enters, by an instance of riot whose controller chose haste or whose +1/+1 counter can't be put
+    /// on it (CR 702.136a), as that instance applied among its entry replacements (`apply_riot`): an effect from then on for as long as it is that object, which the riot
+    /// ability later lost or the permanent that granted it gone does not end (Rhythm of the Wild's ruling).
+    pub riot_haste: bool,
     /// It does not enter: it goes to this zone instead (CR 614.12, 614.1a), as Mox Diamond's replacement sends it to the graveyard
     /// when its controller does not discard a land.
     pub instead: Option<Zone>,
@@ -2706,6 +2710,11 @@ pub type CauseRule = fn(&dyn Query, &Asker, PlayerId, PlayerId, CauseKind) -> bo
 /// `combat` or not. "Combat damage that would be dealt by creatures you control can't be prevented."
 pub type UnpreventableRule = fn(&dyn Query, &Asker, ObjectId, bool) -> bool;
 
+/// A static ability that says an activated or triggered ability on the stack can't be countered (CR 101.2, 701.6a): true
+/// for `item`, asked as an effect would counter it. Spider-Punk's "Spells and abilities can't be countered" (its spells half
+/// is a layer 6 static granting `Keyword::CantBeCountered`, as a spell's own "can't be countered" is).
+pub type UncounterableAbilityRule = fn(&dyn Query, &Asker, &StackItem) -> bool;
+
 /// A static ability that says a player can't gain life (CR 119.7): true for `player`. "Players can't gain life" (Sunspine
 /// Lynx), "Your opponents can't gain life" (Knight of Dusk's Shadow). `cantrip_mechanics::statics` has both.
 pub type LifeGainRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
@@ -3047,6 +3056,9 @@ pub struct CardDef {
     /// Its printed toxic N (CR 702.164a), 0 for none: a keyword ability, part of its copiable values and lost as keywords
     /// are. What the layers grant is added to it (`Chars::toxic`, its total toxic value, CR 702.164b).
     pub toxic: u16,
+    /// It prints riot (CR 702.136a): a keyword ability, part of its copiable values and lost as keywords are. What the layers
+    /// grant is an instance more each (`Chars::riot`, CR 702.136b).
+    pub riot: bool,
     /// Its printed "hexproof from [quality]" abilities (CR 702.11d): a keyword ability, so it is part of its copiable values
     /// and is lost as keywords are (CR 702.11e). A color word in it is a word of its text (CR 612.2): a text-changing effect
     /// changes the color.
@@ -3342,6 +3354,9 @@ pub struct CardDef {
     pub player_protection: &'static [PlayerProtectionRule],
     /// Its static abilities that make some damage unpreventable (CR 615.12).
     pub unpreventable_damage: &'static [UnpreventableRule],
+    /// Its static abilities that keep activated and triggered abilities on the stack from being countered (CR 101.2,
+    /// 701.6a), while it is on the battlefield with its abilities.
+    pub uncounterable_abilities: &'static [UncounterableAbilityRule],
     /// Its static abilities that stop players from gaining life (CR 119.7), while it is on the battlefield: the gain, the
     /// part of an exchange or a new life total that would raise the total, does not happen (CR 119.5).
     pub cant_gain_life: &'static [LifeGainRule],
@@ -3495,6 +3510,7 @@ impl CardDef {
         defense: None,
         keywords: Keywords::NONE,
         toxic: 0,
+        riot: false,
         hexproof_from: HexproofFrom::NONE,
         protection: ColorSet::NONE,
         pay_with: PayWith::NONE,
@@ -3589,6 +3605,7 @@ impl CardDef {
         player_keywords: &[],
         player_protection: &[],
         unpreventable_damage: &[],
+        uncounterable_abilities: &[],
         cant_gain_life: &[],
         cant_lose_life: &[],
         cant_draw: &[],
@@ -3685,6 +3702,7 @@ impl CardDef {
             (!self.player_keywords.is_empty(), "player keywords"),
             (!self.player_protection.is_empty(), "player protection"),
             (!self.unpreventable_damage.is_empty(), "unpreventable damage"),
+            (!self.uncounterable_abilities.is_empty(), "uncounterable abilities"),
             (!self.cant_gain_life.is_empty(), "a life gain rule"),
             (!self.cant_lose_life.is_empty(), "a life loss rule"),
             (!self.cant_draw.is_empty(), "a draw rule"),

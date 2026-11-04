@@ -197,6 +197,16 @@ pub fn damage_cant_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool
     false
 }
 
+/// Whether a static ability of a permanent on the battlefield keeps the ability `item` from being countered (CR 101.2,
+/// 701.6a, `CardDef::uncounterable_abilities`). Asked only as an effect would counter an ability, which is rare, so the
+/// battlefield is searched then.
+pub fn ability_cant_be_countered(cx: &Cx, item: &StackItem) -> bool {
+    sources(cx, |d| !d.uncounterable_abilities.is_empty()).any(|(id, controller, def, by)| {
+        let asker = Asker { source: id, controller, by, spell: false };
+        def.uncounterable_abilities.iter().any(|rule| rule(cx, &asker, item))
+    })
+}
+
 /// Which of the `damaged` permanents keep their damage through this cleanup step (CR 514.2): those a static ability of a
 /// permanent on the battlefield says so of (`CardDef::damage_stays`), while that permanent has its abilities (CR 613.1f).
 /// Asked only in a cleanup step with damage marked, so the battlefield is searched then.
