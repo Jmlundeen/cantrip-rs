@@ -1,0 +1,47 @@
+# Frontline War-Rager: "At the beginning of your end step, if you control two or more tapped creatures, put a +1/+1 counter on this creature" (CR 603.4, 122.1). Bot1 casts it and two Memnites on turn one. On turn three the War-Rager and one Memnite attack (two tapped creatures, itself one of them, the lower bound): its end step puts one counter on it, making it 3/4. On turn four Bot2 attacks with its two Memnites and they stay tapped through turn five, when only one Memnite of Bot1's attacks (one tapped creature of its own, just under the bound; the opponent's two tapped creatures do not count): no counter.
+
+[Bot1 Deck]
+Memnite
+Memnite
+Mox Ruby
+Mox Jet
+Mox Pearl
+Frontline War-Rager
+Island
+Island x20
+
+[Bot2 Deck]
+Memnite
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Frontline War-Rager.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Frontline War-Rager > Bot2; Memnite#1 > Bot2)
+[T3 Bot1.Main2]
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Frontline War-Rager.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Frontline War-Rager.Power = 3
+? Bot1.Battlefield.Frontline War-Rager.Toughness = 4
+Bot2.Attack(Memnite#1 > Bot1; Memnite#2 > Bot1)
+[T5 Bot1.Main1]
+Bot1.Attack(Memnite#1 > Bot2)
+[T5 Bot1.Main2]
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Frontline War-Rager.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Frontline War-Rager.Power = 3
+Bot1.Battlefield.Frontline War-Rager.Toughness = 4

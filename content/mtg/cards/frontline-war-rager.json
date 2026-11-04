@@ -1,0 +1,8 @@
+{
+  "name": "Frontline War-Rager",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Kavu Soldier",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "At the beginning of your end step, if you control two or more tapped creatures, put a +1/+1 counter on this creature."
+}
