@@ -1,0 +1,64 @@
+# Clash of the Eikons, {G} sorcery, "Choose one or more" (CR 700.2): all three modes, done in printed order (CR 700.2d). Bot1
+# cast The Birth of Meletis on turn 1 (lore counter 1, chapter I fetched a Plains) and its draw on turn 3 added a second, so
+# chapter II made the first Wall. Clash's Cactuar (3/3) fights Bot2's Steel Wall (0/4), taking 3 damage and none back; then a lore
+# counter comes off the Saga (2 to 1, no chapter ability triggers: CR 714.2b), then one goes on it (1 to 2): the Saga has as many
+# as chapter II's number again, with fewer before, so chapter II triggers a second time (CR 714.2c) and makes a second Wall.
+
+[Bot1 Deck]
+The Birth of Meletis
+Clash of the Eikons
+Cactuar
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Forest
+Plains
+Forest x20
+
+[Bot2 Deck]
+Steel Wall
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Cactuar.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Birth of Meletis.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Plains)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Birth of Meletis.Counters.Lore = 2
+? Bot1.Battlefield.Wall Token.Power = 0
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Clash of the Eikons.Cast
+Bot1.Modes(1; 2; 3)
+Bot1.Target(Bot1.Battlefield.Cactuar)
+Bot1.Target(Bot2.Battlefield.Steel Wall)
+Bot1.Target(Bot1.Battlefield.The Birth of Meletis)
+Bot1.Target(Bot1.Battlefield.The Birth of Meletis)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Steel Wall.Damage = 3
+Bot1.Battlefield.Cactuar.Damage = 0
+Bot1.Battlefield.The Birth of Meletis.Counters.Lore = 2
+Bot1.Battlefield.Wall Token#1.Power = 0
+Bot1.Battlefield.Wall Token#2.Power = 0

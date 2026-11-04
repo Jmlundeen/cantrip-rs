@@ -1,0 +1,43 @@
+# Clash of the Eikons choosing one mode only, "Target creature you control fights target creature an opponent controls" (CR 701.14a):
+# no mode at all is refused ("choose one or more"). Bot1's Cactuar (3/3) fights Bot2's Steel Wall (0/4): the Wall takes 3, the Cactuar
+# none. Bot2's creature is no legal first target and Bot1's own Cactuar no legal second one. Bot1 pays {G} exactly with Mox Emerald.
+
+[Bot1 Deck]
+Clash of the Eikons
+Cactuar
+Mox Emerald
+Forest
+Forest x20
+
+[Bot2 Deck]
+Steel Wall
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Cactuar.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Clash of the Eikons.Cast
+! Bot1.Modes(Count: 0)
+Bot1.Modes(1)
+! Bot1.Target(Bot2.Battlefield.Steel Wall)
+Bot1.Target(Bot1.Battlefield.Cactuar)
+! Bot1.Target(Bot1.Battlefield.Cactuar)
+Bot1.Target(Bot2.Battlefield.Steel Wall)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Steel Wall.Damage = 3
+Bot1.Battlefield.Cactuar.Damage = 0

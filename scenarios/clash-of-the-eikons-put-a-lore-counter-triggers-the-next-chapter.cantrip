@@ -1,0 +1,44 @@
+# Clash of the Eikons choosing only "Put a lore counter on target Saga you control" (CR 122.1, 714.2c). On turn 1 Bot1's The Birth of
+# Meletis has one lore counter (chapter I fetched a Plains); Clash puts a second, so chapter II triggers at once and makes a 0/4 Wall
+# token - turn 1, two turns before the Saga's own lore counter would. Only a Saga is a legal target: Bot1's Mox Emerald is not.
+
+[Bot1 Deck]
+The Birth of Meletis
+Clash of the Eikons
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Forest
+Forest
+Plains
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Birth of Meletis.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Plains)
+? Bot1.Battlefield.The Birth of Meletis.Counters.Lore = 1
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Clash of the Eikons.Cast
+Bot1.Modes(3)
+! Bot1.Target(Bot1.Battlefield.Mox Emerald)
+Bot1.Target(Bot1.Battlefield.The Birth of Meletis)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.The Birth of Meletis.Counters.Lore = 2
+Bot1.Battlefield.Wall Token.Power = 0
+Bot1.Battlefield.Wall Token.Toughness = 4
