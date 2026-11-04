@@ -1,0 +1,78 @@
+# Ride the Shoopuf ({1}{G}, enchantment): "Landfall - Whenever a land you control enters, put a +1/+1 counter on target creature
+# you control. {5}{G}{G}: This enchantment becomes a 7/7 Beast creature in addition to its other types." On turn 1 the enchantment
+# is no creature, so the Ornithopter is the only target of the Forest's landfall (a +1/+1 counter, the enchantment getting
+# none). Bot2's Island on turn 2 triggers nothing (a land an opponent controls). On turn 3 the ability costs exactly seven mana
+# (Black Lotus's three green and four Moxen, the pool empty afterwards): it becomes an Enchantment Creature - Beast, 7/7. It
+# doesn't end (CR 611.2a), so on turn 5 a Plains makes it a legal target of its own landfall: a +1/+1 counter on top (CR 613.4c)
+# makes it 8/8.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Ride the Shoopuf
+Ornithopter
+Forest
+Black Lotus
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ride the Shoopuf.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ride the Shoopuf.Types = Enchantment
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Ride the Shoopuf.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ride the Shoopuf.Types = Enchantment; Creature
+? Bot1.Battlefield.Ride the Shoopuf.Subtypes = Beast
+? Bot1.Battlefield.Ride the Shoopuf.Power = 7
+? Bot1.Battlefield.Ride the Shoopuf.Toughness = 7
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ride the Shoopuf.Types = Enchantment; Creature
+Bot1.Hand.Plains.Play
+Bot1.Target(Ride the Shoopuf)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ride the Shoopuf.Power = 8
+Bot1.Battlefield.Ride the Shoopuf.Toughness = 8
+Bot1.Battlefield.Ride the Shoopuf.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

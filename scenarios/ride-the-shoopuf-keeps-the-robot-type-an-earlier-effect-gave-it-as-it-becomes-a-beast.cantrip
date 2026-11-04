@@ -1,0 +1,77 @@
+# Ride the Shoopuf: "{5}{G}{G}: This enchantment becomes a 7/7 Beast creature in addition to its other types." "In addition"
+# keeps every type it already has, creature types among them (CR 205.1b). Under Mycosynth Lattice the enchantment is an artifact
+# too, so on turn 5 Donatello, Mutant Mechanic can target it: three +1/+1 counters, and it becomes a 0/0 Robot creature. Ride
+# the Shoopuf's own ability, a later effect in layer 4 (CR 613.7a), adds Beast and keeps Robot: a Beast Robot, 7/7 with the
+# counters on top (CR 613.4c), 10/10.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Sol Ring
+Donatello, Mutant Mechanic
+Forest
+Forest
+Black Lotus
+Mycosynth Lattice
+Ride the Shoopuf
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Donatello, Mutant Mechanic.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Mycosynth Lattice.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ride the Shoopuf.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Donatello, Mutant Mechanic.Activate(Bot1.Battlefield.Ride the Shoopuf)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ride the Shoopuf.Subtypes = Robot
+? Bot1.Battlefield.Ride the Shoopuf.Power = 3
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Ride the Shoopuf.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ride the Shoopuf.Subtypes = Beast; Robot
+Bot1.Battlefield.Ride the Shoopuf.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Ride the Shoopuf.Power = 10
+Bot1.Battlefield.Ride the Shoopuf.Toughness = 10
