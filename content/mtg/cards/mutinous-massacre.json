@@ -1,0 +1,6 @@
+{
+  "name": "Mutinous Massacre",
+  "manaCost": "{3}{B}{B}{R}{R}",
+  "type": "Sorcery",
+  "oracleText": "Choose odd or even. Destroy each creature with mana value of the chosen quality. Then gain control of all creatures until end of turn. Untap them. They gain haste until end of turn. (Zero is even.)"
+}
