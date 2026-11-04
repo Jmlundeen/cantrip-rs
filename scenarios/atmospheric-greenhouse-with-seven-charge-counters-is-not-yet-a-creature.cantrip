@@ -1,0 +1,55 @@
+# Seven charge counters are one short of "8+": Atmospheric Greenhouse stays a plain artifact with no flying or trample (CR 721.2a).
+# Its own enter trigger makes the stationing creatures 5/2 and 2/2, so tapping both puts exactly seven counters on it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Alpine Grizzly
+Memnite
+Black Lotus
+Atmospheric Greenhouse
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Atmospheric Greenhouse.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Atmospheric Greenhouse.Activate(Ability: Station)
+Bot1.Choose(Alpine Grizzly)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Atmospheric Greenhouse.Activate(Ability: Station)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Atmospheric Greenhouse.Types = Artifact
+Bot1.Battlefield.Atmospheric Greenhouse.Counters.Charge = 7
