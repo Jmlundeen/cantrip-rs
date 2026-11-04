@@ -102,7 +102,7 @@ public static class CreatureType
         "Hippogriff", "Hirogen", "Homarid", "Homunculus", "Horror", "Horse", "Human", "Hydra", "Hyena", "Illusion", "Illyrian", "Imp",
         "Incarnation", "Inhuman", "Inkling", "Inquisitor", "Insect", "Jackal", "Jellyfish", "Juggernaut", "Kangaroo",
         "Kavu", "Kelpien", "Kirin", "Kithkin", "Klingon", "Knight", "Kobold", "Kor", "Kraken", "Kree", "Kwejian", "Lamia", "Lammasu", "Lanthanite", "Leech", "Lemur",
-        "Leviathan", "Lhurgoyf", "Licid", "Lizard", "Llama", "Lobster", "Manticore", "Masticore", "Medusan", "Mercenary",
+        "Leviathan", "Lhurgoyf", "Licid", "Lizard", "Llama", "Lobster", "Manticore", "Masticore", "Medusan", "Melkotian", "Mercenary",
         "Merfolk", "Metathran", "Minion", "Minotaur", "Mite", "Mole", "Monger", "Mongoose", "Monk", "Monkey", "Moogle",
         "Moonfolk", "Mount", "Mouse", "Mutant", "Myr", "Mystic", "Na'kuhl", "Nautilus", "Necron", "Nephilim", "Nightmare",
         "Nightstalker", "Ninja", "Noble", "Noggle", "Nomad", "Nymph", "Ocampa", "Octopus", "Officer", "Ogre", "Ooze", "Orb", "Orc", "Orgg", "Orion",

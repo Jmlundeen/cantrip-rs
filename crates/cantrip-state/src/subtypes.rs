@@ -8,7 +8,7 @@ use crate::vocab::{CardType, Mana, TypeSet};
 
 pub const SUBTYPE_WORDS: usize = 8;
 
-/// In order of `name()` up to Zubera, then each subtype added since (Borg, Klingon, Andorian, Caitian, Gorn, Vulcan, then the Star Trek set's Aenar to Xindi): a subtype's number (`as u16`) is recorded (the AI's
+/// In order of `name()` up to Zubera, then each subtype added since (Borg, Klingon, Andorian, Caitian, Gorn, Vulcan, then the Star Trek set's Aenar to Xindi, then Melkotian): a subtype's number (`as u16`) is recorded (the AI's
 /// observations and answers), so a new one is appended at the end, never inserted.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u16)]
@@ -515,10 +515,11 @@ pub enum Subtype {
     VauNAkat,
     Vorta,
     Xindi,
+    Melkotian,
 }
 
 impl Subtype {
-    pub const ALL: [Subtype; 502] = [
+    pub const ALL: [Subtype; 503] = [
         Subtype::Adventure,
         Subtype::Advisor,
         Subtype::Aetherborn,
@@ -1021,6 +1022,7 @@ impl Subtype {
         Subtype::VauNAkat,
         Subtype::Vorta,
         Subtype::Xindi,
+        Subtype::Melkotian,
     ];
 
     pub const fn name(self) -> &'static str {
@@ -1268,6 +1270,7 @@ impl Subtype {
             Subtype::Manticore => "Manticore",
             Subtype::Map => "Map",
             Subtype::Masticore => "Masticore",
+            Subtype::Melkotian => "Melkotian",
             Subtype::Mercenary => "Mercenary",
             Subtype::Merfolk => "Merfolk",
             Subtype::Metathran => "Metathran",
@@ -1565,9 +1568,9 @@ impl Subtype {
     }
 
     /// Every creature type (CR 205.3m), in the order the removed C# engine offered them for "choose a creature type",
-    /// and after them each one added since (Borg, Klingon, Andorian, Caitian, Gorn, Vulcan, then the Star Trek set's Aenar to Xindi). The order is load-bearing: a creature-type question's answer is its
+    /// and after them each one added since (Borg, Klingon, Andorian, Caitian, Gorn, Vulcan, then the Star Trek set's Aenar to Xindi, then Melkotian). The order is load-bearing: a creature-type question's answer is its
     /// position here, so a new type is appended, never inserted.
-    pub const CREATURE_TYPES: [Subtype; 362] = [
+    pub const CREATURE_TYPES: [Subtype; 363] = [
         Subtype::Advisor,
         Subtype::Aetherborn,
         Subtype::Alien,
@@ -1930,6 +1933,7 @@ impl Subtype {
         Subtype::VauNAkat,
         Subtype::Vorta,
         Subtype::Xindi,
+        Subtype::Melkotian,
     ];
 
     pub fn named(name: &str) -> Option<Subtype> {
@@ -2039,6 +2043,7 @@ mod card_type_tests {
             (Subtype::VauNAkat, "Vau-N'Akat"),
             (Subtype::Vorta, "Vorta"),
             (Subtype::Xindi, "Xindi"),
+            (Subtype::Melkotian, "Melkotian"),
         ];
         assert_eq!(Subtype::ALL.len(), 470 + appended.len());
         assert_eq!(Subtype::CREATURE_TYPES.len(), 330 + appended.len());
