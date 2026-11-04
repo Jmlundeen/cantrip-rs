@@ -13,6 +13,17 @@ pub static THOPTER: CardDef = CardDef {
     ..token!(Thopter)
 };
 
+/// The 1/1 colorless Drone artifact creature token with flying and "This token can block only creatures with flying." (CR 111).
+/// Pinnacle Emissary and Desculpting Blast create this exact token.
+pub static DRONE: CardDef = CardDef {
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Flying, Keyword::CanBlockOnlyCreaturesWithFlying]),
+    text: "Flying\nThis token can block only creatures with flying.",
+    ..token!(Drone)
+};
+
 /// A 1/1 colorless Myr artifact creature token (CR 111). Memnarch, the Warden and Myr Battlesphere create this exact token.
 pub static MYR: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
