@@ -132,6 +132,17 @@ pub fn equipment_attached_to(q: &dyn Query, creature: ObjectId) -> Vec<ObjectId>
     q.state().battlefield().iter().copied().filter(|&id| q.attached_to(id) == Some(creature) && q.chars(id).has_subtype(Subtype::Equipment)).collect()
 }
 
+/// The Auras and Equipment attached to `host` (CR 301.5, 303.4), counted as the layers are worked out: every permanent on the battlefield
+/// attached to it that is an Aura or an Equipment, judged on what the earlier layers made it (an animated Equipment still counts, one that
+/// stopped being an Equipment does not), each once, whoever controls it. Kellan, the Fae-Blooded and With Great Power . . . count them.
+pub fn auras_and_equipment_attached_to(view: &dyn LayerQuery, host: ObjectId) -> usize {
+    view.state()
+        .battlefield()
+        .iter()
+        .filter(|&&id| view.state().obj(id).attached_to == Some(host) && (view.chars(id).has_subtype(Subtype::Aura) || view.chars(id).has_subtype(Subtype::Equipment)))
+        .count()
+}
+
 /// "Equipped" (CR 301.5a): an Equipment is attached to `creature`. Whiplash, Swordsman, Sharp Scoundrel and Cloud, Midgar Mercenary
 /// ask it.
 pub fn is_equipped(q: &dyn Query, creature: ObjectId) -> bool {
