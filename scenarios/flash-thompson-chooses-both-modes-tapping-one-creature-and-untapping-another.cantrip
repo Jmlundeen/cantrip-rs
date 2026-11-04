@@ -1,0 +1,39 @@
+# Flash Thompson, Spider-Fan: "When Flash Thompson enters, choose one or both" (CR 700.2). Bot1 attacks with an Ornithopter on
+# turn 3 (it taps), then flashes Flash Thompson in: Heckle taps Bot2's Ornithopter (CR 701.26a) and Hero Worship untaps Bot1's
+# attacker (CR 701.26b), each with its own target (CR 700.2c).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Ornithopter
+Flash Thompson, Spider-Fan
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+? Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Flash Thompson, Spider-Fan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1; 2)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = false
+Stack.Count = 0

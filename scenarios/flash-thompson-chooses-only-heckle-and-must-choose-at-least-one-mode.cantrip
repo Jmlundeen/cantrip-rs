@@ -1,0 +1,37 @@
+# Flash Thompson, Spider-Fan: "choose one or both" takes at least one mode (CR 700.2): choosing none is refused. Bot1 chooses only
+# Heckle, tapping Bot2's Ornithopter; the attacker of Bot1's, tapped, stays tapped because Hero Worship was not chosen.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Ornithopter
+Flash Thompson, Spider-Fan
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Flash Thompson, Spider-Fan.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Modes(Count: 0)
+Bot1.Modes(1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
+Stack.Count = 0

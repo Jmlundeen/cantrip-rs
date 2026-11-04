@@ -1,0 +1,11 @@
+{
+  "name": "Flash Thompson, Spider-Fan",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Human Citizen",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flash\nWhen Flash Thompson enters, choose one or both —\n• Heckle — Tap target creature.\n• Hero Worship — Untap target creature.",
+  "keywords": [
+    "Flash"
+  ]
+}
