@@ -1,0 +1,36 @@
+# Memorial Team Leader's warp {1}{R} (CR 702.185a): cast for its warp cost, paid exactly with Blasted Landscape's {C} for the
+# generic and Mox Ruby's {R} (the pool ends empty), it pumps Bot1's Memnite to 2/1 during that turn and is exiled at the beginning
+# of the next end step. With Mox Emerald's {G} alone the warp cast is not offered: the cost's {R} is pinned.
+
+[Bot1 Deck]
+Blasted Landscape
+Mox Emerald
+Mox Ruby
+Memnite
+Memorial Team Leader
+Island x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Hand.Memorial Team Leader.Cast(Ability: Warp; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Blasted Landscape.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Memorial Team Leader.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memorial Team Leader.Power = 4
+[Bot1.End]
+
+[Expect]
+Exile = Memorial Team Leader
+Bot1.Battlefield.Memnite.Power = 1

@@ -1,0 +1,44 @@
+# Memorial Team Leader, "During your turn, other creatures you control get +1/+0" (CR 604.1, 613.4c): on Bot1's own turn its other
+# creature (a 1/1 Memnite) is 2/1 - the power alone rises - while the Leader itself stays the printed 4/3 ("other") and Bot2's
+# Memnite stays 1/1 ("you control"); on Bot2's turn Bot1's Memnite is back to 1/1 and Bot2's own is still 1/1.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Memnite
+Memorial Team Leader
+Island x23
+
+[Bot2 Deck]
+Memnite
+Island x26
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Memorial Team Leader.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Toughness = 1
+? Bot1.Battlefield.Memorial Team Leader.Power = 4
+? Bot1.Battlefield.Memorial Team Leader.Toughness = 3
+? Bot2.Battlefield.Memnite.Power = 1
+? Bot2.Battlefield.Memnite.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Memnite.Toughness = 1
+Bot1.Battlefield.Memorial Team Leader.Power = 4
+Bot2.Battlefield.Memnite.Power = 1
