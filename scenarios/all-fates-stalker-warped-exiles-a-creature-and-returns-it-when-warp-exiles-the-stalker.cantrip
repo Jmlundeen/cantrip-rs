@@ -1,0 +1,47 @@
+# Warp {1}{W} (CR 702.185a): Bot1 casts All-Fates Stalker from hand for {1}{W} (Plains, Mox Pearl) on turn 3. Its enters trigger exiles
+# Bot2's Grizzly Bears, the only creature that is not an Assassin (CR 610.3). At the beginning of the next end step warp exiles the Stalker
+# (CR 702.185a), and with it gone the Bears return to the battlefield under their owner's control as a new object (CR 610.3a, 400.7).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+All-Fates Stalker
+Island x4
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.All-Fates Stalker.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Grizzly Bears)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Exile = Grizzly Bears
+? Bot1.Battlefield = All-Fates Stalker; Mox Pearl; Plains
+[T4 Bot2.Main1]
+? Exile = All-Fates Stalker
+
+[Expect]
+Bot2.Battlefield = Grizzly Bears; Mox Emerald; Mox Ruby
+Exile = All-Fates Stalker
+Stack.Count = 0

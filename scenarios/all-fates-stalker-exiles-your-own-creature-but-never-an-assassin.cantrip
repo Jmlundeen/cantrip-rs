@@ -1,0 +1,50 @@
+# "Up to one target non-Assassin creature" (CR 115.1, 205.3): cast for its full {3}{W} (Black Lotus' WWW and Mox Pearl), the Stalker's trigger
+# refuses Bot2's Hired Poisoner, a Human Assassin, and the Stalker itself, a Drix Assassin, and accepts Bot1's own Elvish Mystic, which is
+# exiled until the Stalker leaves the battlefield (CR 610.3). Nothing else of Bot2's is touched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Elvish Mystic
+All-Fates Stalker
+Island x2
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Hired Poisoner
+Island x5
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Hired Poisoner.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.All-Fates Stalker.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Hired Poisoner)
+! Bot1.Target(All-Fates Stalker)
+Bot1.Target(Elvish Mystic)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Elvish Mystic
+Bot1.Battlefield = All-Fates Stalker; Mox Emerald; Mox Pearl
+Bot2.Battlefield = Hired Poisoner; Mox Jet
+Stack.Count = 0
