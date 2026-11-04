@@ -1,0 +1,56 @@
+# Rhino's Rampage: "When excess damage is dealt to the creature an opponent controls this way" - not to yours. Grizzly Bears (3
+# power with the +1/+0) fights a Serra Angel (4/4): the Angel deals 4 to the 2-toughness Bears (2 excess) and the Bears deal
+# only 3 to the Angel (no excess), so there is no reflexive ability: the Sol Ring stays and no target is asked.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Rhino's Rampage
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Sol Ring
+Serra Angel
+Island x3
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Serra Angel.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rhino's Rampage.Cast
+Bot1.Target(Grizzly Bears)
+Bot1.Target(Serra Angel)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+? Stack.Count = 0
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Grizzly Bears; Rhino's Rampage
+Bot2.Battlefield.Serra Angel.Damage = 3
+Bot2.Battlefield = Mox Pearl; Sol Ring; Serra Angel
+Stack.Count = 0

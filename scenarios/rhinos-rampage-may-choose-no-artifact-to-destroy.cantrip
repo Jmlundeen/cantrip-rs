@@ -1,0 +1,54 @@
+# Rhino's Rampage: "up to one target" - with excess damage dealt Bot1 may choose no artifact: the Sol Ring (a legal target) stays.
+
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Rhino's Rampage
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Sol Ring
+Gathering Stone
+Memnite
+Island x3
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Gathering Stone.Cast
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rhino's Rampage.Cast
+Bot1.Target(Grizzly Bears)
+Bot1.Target(Memnite)
+Bot1.Pass
+Bot2.Pass
+
+
+Bot1.Target()
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Memnite; Black Lotus
+Bot2.Battlefield = Sol Ring; Gathering Stone
+Bot1.Battlefield.Grizzly Bears.Power = 3
+Bot1.Battlefield.Grizzly Bears.Damage = 1
+Stack.Count = 0

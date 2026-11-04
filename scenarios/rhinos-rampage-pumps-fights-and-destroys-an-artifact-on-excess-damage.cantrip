@@ -1,0 +1,57 @@
+# Rhino's Rampage: Bot1's Grizzly Bears (2/2) gets +1/+0 and fights Bot2's Memnite (1/1): 3 damage to a 1-toughness creature is
+# 2 excess damage (CR 120.10), so the reflexive ability destroys up to one target noncreature artifact with mana value 3 or less.
+# Bot2 has a Sol Ring (mana value 1, legal), the Memnite (an artifact creature, refused) and a Gathering Stone (mana value 4,
+# refused). Bot1 destroys the Sol Ring; the Bears take 1 from the Memnite and survive.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Rhino's Rampage
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Sol Ring
+Gathering Stone
+Memnite
+Island x3
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Gathering Stone.Cast
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rhino's Rampage.Cast
+Bot1.Target(Grizzly Bears)
+Bot1.Target(Memnite)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Memnite)
+! Bot1.Target(Gathering Stone)
+Bot1.Target(Sol Ring)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Sol Ring; Memnite; Black Lotus
+Bot2.Battlefield = Gathering Stone
+Bot1.Battlefield.Grizzly Bears.Power = 3
+Bot1.Battlefield.Grizzly Bears.Damage = 1
+Bot1.Battlefield.Grizzly Bears.Toughness = 2
+Stack.Count = 0

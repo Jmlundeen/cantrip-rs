@@ -1,0 +1,50 @@
+# Rhino's Rampage: Grizzly Bears (3 power with the +1/+0) deals 3 damage to an Ornithopter (0/2): lethal is 2, so the excess is 1
+# - any excess at all makes the reflexive ability. Bot1 targets Bot2's Coalition Relic, a noncreature artifact with mana value
+# exactly 3 (legal); the Ornithopter, an artifact creature, is refused.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Rhino's Rampage
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Coalition Relic
+Ornithopter
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Coalition Relic.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rhino's Rampage.Cast
+Bot1.Target(Grizzly Bears)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Ornithopter)
+Bot1.Target(Coalition Relic)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Coalition Relic; Ornithopter; Black Lotus
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield.Grizzly Bears.Damage = 0
+Stack.Count = 0
