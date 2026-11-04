@@ -3,20 +3,12 @@ use cantrip_mechanics::triggers::{THIS_ATTACKS, THIS_DIES};
 use cantrip_mechanics::{effects, hand, tokens};
 use cantrip_oracle as oracle;
 
-/// "Whenever Aclazotz attacks, each opponent discards a card. For each opponent who can't, you draw a card." Each
-/// opponent chooses in turn order and the cards are discarded together (CR 101.4, 701.9). An opponent "can't" with no card
-/// in hand, or when nothing lets this ability make them discard (CR 101.2: Tamiyo, Collector of Tales). The draws follow
-/// the discards, one draw for each such opponent.
+/// "Whenever Aclazotz attacks, each opponent discards a card. For each opponent who can't, you draw a card." The draws follow
+/// the discards, one draw for each opponent who couldn't (CR 101.4, 701.9).
 fn each_opponent_discards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != you).collect();
-    let cant = opponents
-        .iter()
-        .filter(|&&p| g.state().zone(Zone::hand(p)).is_empty() || !may_cause(&*g, you, p, CauseKind::Discard))
-        .count();
-    effects::each_opponent_discards_a_card(g, item)?;
-    for _ in 0..cant {
-        g.draw(you, 1);
+    let cant = effects::each_opponent_discards_a_card_and_those_who_cant(g, item)?;
+    for _ in cant {
+        g.draw(item.controller, 1);
     }
     Ok(())
 }

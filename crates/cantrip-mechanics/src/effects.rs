@@ -1005,6 +1005,23 @@ pub fn each_opponent_discards_a_card(g: &mut dyn Game, item: &StackItem) -> Resu
     Ok(())
 }
 
+/// "Each opponent discards a card" (CR 701.9, 101.4), and the opponents who couldn't, for a clause that follows: "for each
+/// opponent who can't, ..." or "each opponent who can't ...". An opponent "can't" with no card in hand, or when nothing lets
+/// this ability make them discard (CR 101.2: Tamiyo, Collector of Tales); that is judged before they discard, the discards
+/// are made together, and the opponents who couldn't are returned in turn order. Aclazotz, Deepest Betrayal (draws for each) and
+/// Entropic Battlecruiser (loses 3 life) print it.
+pub fn each_opponent_discards_a_card_and_those_who_cant(g: &mut dyn Game, item: &StackItem) -> Result<Vec<PlayerId>, Suspend> {
+    let you = item.controller;
+    let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != you).collect();
+    let cant: Vec<PlayerId> = opponents
+        .iter()
+        .copied()
+        .filter(|&p| g.state().zone(Zone::hand(p)).is_empty() || !may_cause(&*g, you, p, CauseKind::Discard))
+        .collect();
+    each_opponent_discards_a_card(g, item)?;
+    Ok(cant)
+}
+
 /// "[Source] deals N damage to target [thing]" (CR 120.3): the source of the resolving item deals N damage to its first
 /// target, if that is still a legal target as it resolves (CR 608.2b); a source that has left its zone (sacrificed as a cost,
 /// discarded, dead) deals it as it last existed (CR 113.7a, 608.2h). Which targets are allowed is the card's own spell or
