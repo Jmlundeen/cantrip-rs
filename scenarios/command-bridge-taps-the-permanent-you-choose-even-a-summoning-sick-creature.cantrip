@@ -1,0 +1,29 @@
+# Command Bridge's "sacrifice it unless you tap an untapped permanent you control": the permanent is any type and the payer's choice. Bot1
+# has an untapped Mox Ruby and a summoning-sick Ornithopter (tapping it is no {T} cost of its own, CR 302.6) and pays with the Ornithopter:
+# the Bridge stays, tapped, the Ornithopter is tapped and the Mox is not.
+
+[Bot1 Deck]
+Mox Ruby
+Ornithopter
+Command Bridge
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Command Bridge.Play
+Bot1.Pass
+Bot1.PayCost
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Ornithopter; Command Bridge
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Battlefield.Command Bridge.Tapped = true
+Bot1.Graveyard.Count = 0

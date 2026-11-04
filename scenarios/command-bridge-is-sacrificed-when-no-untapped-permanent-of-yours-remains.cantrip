@@ -1,0 +1,31 @@
+# Command Bridge: only an untapped permanent *you control* can be tapped. Bot1's lone Mox Ruby is tapped for mana, and Bot2's own Mox
+# Ruby is untapped but not Bot1's: the Bridge cannot pay, is not asked, and is sacrificed (the Bridge itself entered tapped).
+
+[Bot1 Deck]
+Mox Ruby
+Command Bridge
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Command Bridge.Play
+Bot1.Pass
+Bot2.Pass
+! Bot1.PayCost
+
+[Expect]
+Bot1.Battlefield = Mox Ruby
+Bot1.Graveyard = Command Bridge
+Bot2.Battlefield = Mox Ruby
+Bot2.Battlefield.Mox Ruby.Tapped = false

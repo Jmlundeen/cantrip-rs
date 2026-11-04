@@ -1,0 +1,22 @@
+# Command Bridge: "sacrifice it unless you tap an untapped permanent you control" is a choice (CR 118.12a). Bot1 has an untapped Mox Ruby
+# but declines to tap it: the Bridge is sacrificed and the Mox stays untapped.
+
+[Bot1 Deck]
+Mox Ruby
+Command Bridge
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Command Bridge.Play
+Bot1.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield = Mox Ruby
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Graveyard = Command Bridge
