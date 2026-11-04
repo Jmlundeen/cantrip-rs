@@ -1820,6 +1820,20 @@ pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, me: &As
     }
 }
 
+/// `creature_you_control_deals_combat_damage_to_player` for an ability that refers to the damage ("that many", "that
+/// much"): the player is the trigger's subject and the amount of that creature's damage its `data[0]`. Starwinder and Old Gnawbone
+/// ("create that many Treasure tokens") print it.
+pub fn creature_you_control_deals_combat_damage_to_player_for_amount(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: from, target: Target::Player(p), amount, kind, .. }
+            if kind.is_combat() && *amount > 0 && q.controller(*from) == me.controller && q.chars(*from).is(CardType::Creature) =>
+        {
+            Some(Fired { subject: Target::Player(*p), data: [*amount as u32, 0] })
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you commit a crime" (CR 700.13): the ability's controller cast a spell, activated an ability or put a
 /// triggered ability on the stack that targets an opponent, anything an opponent controls and/or a card in an opponent's
 /// graveyard - once for that spell or ability, however many such targets it has. Magda, the Hoardmaster, Raven of Fell
