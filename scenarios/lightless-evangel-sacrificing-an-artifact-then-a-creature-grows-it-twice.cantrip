@@ -1,0 +1,51 @@
+# Lightless Evangel: "Whenever you sacrifice another creature or artifact, put a +1/+1 counter on this creature." Umbral Collar
+# Zealot ("Sacrifice another creature or artifact: Surveil 1") is the outlet. Bot1 sacrifices the Mox Pearl (an artifact) and
+# then the Memnite (an artifact creature): one counter each, 2/2 -> 4/4. Sacrificing the Evangel itself is "another" to
+# the Zealot but not to the Evangel, so it triggers nothing (the stack is empty after it).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Swamp
+Mox Emerald
+Lightless Evangel
+Umbral Collar Zealot
+Memnite
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightless Evangel.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Umbral Collar Zealot.Cast
+Bot1.Battlefield.Umbral Collar Zealot.Activate
+Bot1.Choose(Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Island)
+? Bot1.Battlefield.Lightless Evangel.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Umbral Collar Zealot.Activate
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Island)
+? Bot1.Battlefield.Lightless Evangel.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Umbral Collar Zealot.Activate
+Bot1.Choose(Lightless Evangel)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Island)
+
+[Expect]
+Bot1.Graveyard = Island; Lightless Evangel; Island; Memnite; Island; Mox Pearl

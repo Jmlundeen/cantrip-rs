@@ -1,0 +1,29 @@
+# The Evangel counts creatures and artifacts only: Bot1 cracks a Bloodstained Mire (sacrificing a land, CR 701.21a) and the
+# Evangel stays a 2/2 with no counter and no trigger on the stack. (The control is
+# lightless-evangel-sacrificing-an-artifact-then-a-creature-grows-it-twice.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Lightless Evangel
+Bloodstained Mire
+Island x3
+Swamp x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightless Evangel.Cast
+Bot1.Hand.Bloodstained Mire.Play
+Bot1.Battlefield.Bloodstained Mire.Activate
+Bot1.Search(Swamp)
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Lightless Evangel.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Lightless Evangel.Power = 2
