@@ -1,0 +1,33 @@
+# "Whenever you cast": Bot2's Elvish Mystic has mana value 1, equal to Jackal's power, but it is not cast by Jackal's controller,
+# so nothing is copied and Jackal stays 1/1 (CR 603.2).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Jackal, Genius Geneticist
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jackal, Genius Geneticist.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 2
+Bot1.Battlefield.Jackal, Genius Geneticist.Power = 1
+Stack.Count = 0

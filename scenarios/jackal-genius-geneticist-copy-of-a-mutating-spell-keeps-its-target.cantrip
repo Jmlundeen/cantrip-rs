@@ -1,0 +1,77 @@
+# A creature spell cast for its mutate cost has a target (CR 702.140a) and is still a creature spell with its card's mana value (CR 702.140b):
+# with Jackal grown to power 4 (Elvish Mystic, Grizzly Bears, Alpine Grizzly each copied: 1 -> 4), Cubwarden (mana value 4) mutated onto Alpine Grizzly is copied.
+# "Copy that spell" gives the copy the original's target and no chance to choose new ones (CR 707.10c), so no target prompt appears and the
+# copy mutates onto one Alpine Grizzly (two Cats), then the original onto that merged creature, which now has the mutate trigger of both Cubwarden cards
+# (CR 702.140e, 603.2): four more Cats, six in all. The other Alpine Grizzly is left alone, and Jackal gets his counter (5/5).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Jackal, Genius Geneticist
+Elvish Mystic
+Grizzly Bears
+Plains
+Alpine Grizzly
+Plains
+Cubwarden
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jackal, Genius Geneticist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Cubwarden.Cast(Alpine Grizzly; Ability: Mutate)
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jackal, Genius Geneticist.Power = 5
+Bot1.Battlefield.Jackal, Genius Geneticist.Toughness = 5
+Bot1.Battlefield.Count = 17
+Bot1.Battlefield.Cubwarden.Power = 3
+Bot1.Battlefield.Cubwarden.Toughness = 5
+Bot1.Battlefield.Alpine Grizzly.Power = 4
+Stack.Count = 0

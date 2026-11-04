@@ -1,0 +1,46 @@
+# Each copy gives Jackal a counter, so the mana value that matters grows with him (CR 603.2): at power 1 an Elvish Mystic (mana value 1)
+# is copied (Jackal 2/2), then Grizzly Bears (mana value 2) is copied (Jackal 3/3), and Memnite (mana value 0) is copied by neither.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Jackal, Genius Geneticist
+Elvish Mystic
+Grizzly Bears
+Memnite
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jackal, Genius Geneticist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Jackal, Genius Geneticist.Power = 3
+Bot1.Battlefield.Jackal, Genius Geneticist.Toughness = 3
+Stack.Count = 0
