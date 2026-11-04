@@ -1,0 +1,8 @@
+{
+  "name": "Alpharael, Dreaming Acolyte",
+  "manaCost": "{1}{U}{B}",
+  "type": "Legendary Creature — Human Cleric",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "When Alpharael enters, draw two cards. Then discard two cards unless you discard an artifact card.\nDuring your turn, Alpharael has deathtouch."
+}

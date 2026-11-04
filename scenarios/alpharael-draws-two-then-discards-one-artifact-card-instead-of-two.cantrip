@@ -1,0 +1,36 @@
+# Alpharael, Dreaming Acolyte: "When Alpharael enters, draw two cards. Then discard two cards unless you discard an artifact card." Bot1 draws Ornithopter and Island,
+# so the artifact card is in hand only because the draw comes first. {1}{U}{B} is paid exactly by three Moxen (the pool is empty after). Taking the artifact option, an
+# Island is not eligible (refusal beside the choice of the drawn Ornithopter). Only the Ornithopter goes.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Alpharael, Dreaming Acolyte
+Plains x3
+Ornithopter
+Island
+Plains x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Alpharael, Dreaming Acolyte.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+Bot1.Modes(Discard an artifact card)
+! Bot1.Choose(Island)
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Hand = Plains; Plains; Plains; Island
+Bot1.Library.Count = 10

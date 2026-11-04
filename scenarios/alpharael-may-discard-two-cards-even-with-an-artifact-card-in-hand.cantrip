@@ -1,0 +1,34 @@
+# Alpharael, Dreaming Acolyte: "discard two cards unless you discard an artifact card" is a choice (CR 608.2d), and its ruling says the artifact card may be one of the
+# two: with an Ornithopter drawn the player may still discard two cards, the Ornithopter and an Island here, the other Island staying.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Alpharael, Dreaming Acolyte
+Plains x3
+Ornithopter
+Island
+Island
+Plains x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Alpharael, Dreaming Acolyte.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Discard two cards)
+Bot1.Choose(Ornithopter; Island)
+
+[Expect]
+Bot1.Graveyard = Island; Ornithopter
+Bot1.Hand = Plains; Plains; Plains
+Bot1.Library.Count = 11
