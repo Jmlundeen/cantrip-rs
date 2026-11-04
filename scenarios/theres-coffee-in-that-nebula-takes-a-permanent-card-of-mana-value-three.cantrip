@@ -1,0 +1,38 @@
+# There's Coffee in that Nebula: "a Plains card or nonland permanent card with mana value 3 or less" (CR 202.3). Of the top
+# five, the Pet Sehlat (a creature card of mana value exactly 3) may be taken; Peace in Our Time (a permanent card of mana
+# value 4), Shields Up! (mana value 2, but an instant) and an Island (a land, no Plains) may not.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+There's Coffee in that Nebula
+Island
+Island
+Island
+Island
+Pet Sehlat
+Peace in Our Time
+Shields Up!
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.There's Coffee in that Nebula.Cast
+! Bot1.Choose(Peace in Our Time)
+! Bot1.Choose(Shields Up!)
+! Bot1.Choose(Island)
+Bot1.Choose(Pet Sehlat)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Pet Sehlat
+Bot1.Graveyard = There's Coffee in that Nebula; Black Lotus

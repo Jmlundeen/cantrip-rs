@@ -1,0 +1,31 @@
+# There's Coffee in that Nebula: look at the top five cards, reveal a Plains or a nonland permanent card with mana value 3 or
+# less, put it into the hand, the rest on the bottom (CR 701.20a). The five are one Plains and four Islands, and only the Plains
+# qualifies.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+There's Coffee in that Nebula
+Island
+Island
+Island
+Island
+Island
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.There's Coffee in that Nebula.Cast
+Bot1.Choose(Plains)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = There's Coffee in that Nebula; Black Lotus
