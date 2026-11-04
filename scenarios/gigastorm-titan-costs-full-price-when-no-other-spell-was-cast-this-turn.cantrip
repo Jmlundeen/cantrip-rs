@@ -1,0 +1,32 @@
+# Gigastorm Titan costs all {4}{U} when its caster has cast no other spell this turn: Bot1 cast Black Lotus on turn 1, but on turn 3 casts
+# nothing before the Titan, which Black Lotus's three blue mana and two Islands pay for in full; the pool is empty afterwards.
+
+[Bot1 Deck]
+Island
+Island
+Black Lotus
+Gigastorm Titan
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Gigastorm Titan.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Gigastorm Titan.Power = 4
+Bot1.Graveyard = Black Lotus

@@ -1,0 +1,8 @@
+{
+  "name": "Gigastorm Titan",
+  "manaCost": "{4}{U}",
+  "type": "Creature — Elemental",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "This spell costs {3} less to cast if you've cast another spell this turn."
+}

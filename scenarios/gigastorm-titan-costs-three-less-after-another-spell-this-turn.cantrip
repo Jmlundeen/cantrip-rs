@@ -1,0 +1,28 @@
+# Gigastorm Titan (CR 601.2f): "This spell costs {3} less to cast if you've cast another spell this turn." Bot1 casts Mox Sapphire, then pays
+# {1}{U} (an Island and the Mox) for the Titan instead of {4}{U}: it resolves as a 4/4, and the pool is empty, so exactly {3} came off.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Gigastorm Titan
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Gigastorm Titan.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Gigastorm Titan.Power = 4
+Bot1.Battlefield.Gigastorm Titan.Toughness = 4
