@@ -1,0 +1,75 @@
+# Passenger Ferry ({3}, 4/3 Vehicle, crew 2): "Whenever this Vehicle attacks, you may pay {U}. When you do, another target attacking creature can't be blocked this turn."
+# On turn 3 Bot1 crews it by tapping Grizzly Bears (summoning sick, power 2) and attacks with the Ferry, Savannah Lions and Ornithopter. Paying with Mox Pearl's {W} does not pay {U};
+# Mox Sapphire's does. The target must be another attacking creature: the Ferry itself, the tapped non-attacking Bears and Bot2's Ornithopter are refused; the Lions are chosen.
+# Bot2's Ornithopter may not block the Lions (CR 509.1b) but blocks Bot1's Ornithopter (the control: the others stay blockable), so the Ferry and the Lions connect: Bot2 is at 14.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Passenger Ferry
+Savannah Lions
+Ornithopter
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Passenger Ferry.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Passenger Ferry.Activate(Ability: Crew)
+Bot1.Choose(Grizzly Bears)
+Bot1.Attack(Passenger Ferry > Bot2; Savannah Lions > Bot2; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.PayCost
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+! Bot1.Target(Passenger Ferry)
+! Bot1.Target(Grizzly Bears)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareBlockers]
+! Bot2.Block(Ornithopter > Savannah Lions)
+Bot2.Block(Ornithopter > Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot2.Graveyard.Count = 0
