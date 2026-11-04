@@ -38,7 +38,7 @@ pub fn subtype_spells_you_cast<const N: u8, const TYPE: u16>(q: &dyn Query, sour
 
 /// "[Color] spells you cast cost {1} less to cast" (CR 601.2f, 118.7a): a spell of the source's controller that is that color as it is
 /// cast, the color read through the words of the source's text (CR 612); a generic reduction takes only the generic part. `COLOR` is
-/// `cost_reduction::color(Color::Red)` and so on. The Fire Crystal (red) and The Water Crystal (blue) print it.
+/// `cost_reduction::color(Color::Red)` and so on. The Fire Crystal (red), The Water Crystal (blue) and The Wind Crystal (white) print it.
 pub fn colored_spells_you_cast_cost_one_less<const COLOR: u8>(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     let Costed::Spell(spell) = costed else { return CostDelta::NONE };
     if player == q.controller(source) && q.chars(spell).colors.has(q.words(source).color(Color::ALL[COLOR as usize])) { CostDelta::less(1) } else { CostDelta::NONE }
