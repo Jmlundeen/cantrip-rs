@@ -5763,6 +5763,10 @@ fn play_condition_holds(cx: &Cx, player: PlayerId, when: PlayCondition) -> bool 
         PlayCondition::ControlsSubtype(kind) => {
             cx.s().battlefield().iter().any(|&id| cx.s().obj(id).controller == player && cx.chars(id).has_subtype(kind))
         }
+        PlayCondition::PutCounterOnThisTurn(object, kind) => cx
+            .history()
+            .select(EventQuery::kind(EventMask::COUNTERS).object(object).this_turn())
+            .any(|r| matches!(r.event, Event::CountersPut { object: o, kind: k, by, .. } if o == object && k == kind && by == player)),
     }
 }
 

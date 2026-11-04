@@ -1208,6 +1208,11 @@ impl<'a> Projector<'a> {
         match grant.when {
             Some(PlayCondition::AttackedWithThisTurn(subtype)) => text.push_str(&format!(", if {who} attacked with a {}", subtype.name())),
             Some(PlayCondition::ControlsSubtype(subtype)) => text.push_str(&format!(", if {who} control a {}", subtype.name())),
+            // Named as the object is now, or as it last was if it has left (CR 400.7).
+            Some(PlayCondition::PutCounterOnThisTurn(object, kind)) => {
+                let name = self.game.cards.get(self.game.chars(object).card).name;
+                text.push_str(&format!(", during any turn {who} put a {} counter on {name}", kind.name()))
+            }
             None => {}
         }
         // "A card exiled with [it]" (CR 607.2a): one card of those it covers, then it is used up.

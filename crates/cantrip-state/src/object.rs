@@ -1798,6 +1798,11 @@ pub enum PlayCondition {
     /// control a Wizard". Asked as the card would be played (CR 601.3, 305.1); losing the permanent once a spell is cast does
     /// not undo it (ruling 2026-06-29).
     ControlsSubtype(Subtype),
+    /// The permitted player put a counter of this kind on this object this turn (CR 122.1): Summon: Brynhildr's "during any
+    /// turn you put a lore counter on this Saga". The object is the one that existed then (CR 400.7), so a Saga that left and
+    /// came back is another object, and counters put on it do not count. Asked of this turn's history, so the counter
+    /// being removed or the object leaving later that turn does not undo it.
+    PutCounterOnThisTurn(ObjectId, CounterKind),
 }
 
 impl PlayGrant {
