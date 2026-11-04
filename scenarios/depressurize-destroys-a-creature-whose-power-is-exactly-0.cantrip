@@ -1,0 +1,32 @@
+# Depressurize on Bot1's Ornithopter pumped to 3/5 by Giant Growth: -3/-0 leaves it 0/5, and power 0 or less is destroyed
+# although it has toughness left. Depressurize goes to the graveyard last.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Ornithopter
+Giant Growth
+Depressurize
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Depressurize.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Depressurize; Ornithopter; Giant Growth

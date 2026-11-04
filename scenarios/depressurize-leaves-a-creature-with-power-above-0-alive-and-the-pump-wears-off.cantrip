@@ -1,0 +1,41 @@
+# Depressurize: "Target creature gets -3/-0 until end of turn. Then if that creature's power is 0 or less, destroy it." Bot1's
+# Llanowar Elves (1/1) gets +3/+3 from Giant Growth: 4/4. Depressurize makes it 1/4: power 1 is above 0, so it lives. At turn 5
+# both effects have worn off.
+
+[Bot1 Deck]
+Mox Emerald
+Llanowar Elves
+Mox Jet
+Mox Ruby
+Giant Growth
+Depressurize
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Depressurize.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+? Bot1.Battlefield.Llanowar Elves.Toughness = 4
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Graveyard = Depressurize; Giant Growth
