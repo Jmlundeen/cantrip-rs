@@ -1,0 +1,44 @@
+# Harmonious Grovestrider, a */*: its power and toughness come from a characteristic-defining ability (CR 604.3). Bot1 has a Forest (so it is a 1/1) and enchants it with Enchanted River's
+# Grasp, "Enchanted creature loses all abilities": with the ability gone its power and toughness are 0 (the * has nothing to stand for), a 0/0 that state-based actions put into the
+# graveyard (CR 704.5f), and the Aura with it (CR 704.5m). Ward {2} is lost too, but Bot1 is its controller, so the Aura is not countered.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Harmonious Grovestrider
+Forest
+Enchanted River's Grasp
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Harmonious Grovestrider.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Harmonious Grovestrider.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Enchanted River's Grasp.Cast(Harmonious Grovestrider)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Harmonious Grovestrider = (absent)
+Bot1.Battlefield.Enchanted River's Grasp = (absent)

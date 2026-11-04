@@ -1,0 +1,46 @@
+# Harmonious Grovestrider's ward {2} (CR 702.21a): Bot2 has a Mox Ruby for the Bolt and exactly 2 more mana (Mox Sapphire, Mox Pearl), which pay the ward cost exactly (the pool is left
+# empty): the Bolt resolves and kills the 1/1 Grovestrider (one Forest).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Harmonious Grovestrider
+Forest
+Plains x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mox Sapphire
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Harmonious Grovestrider.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Harmonious Grovestrider)
+Bot2.PayCost
+Bot1.Pass
+Bot2.Pass
+? Bot2.Mana = 
+
+[Expect]
+Bot2.Mana = 
+Bot1.Graveyard = Harmonious Grovestrider; Black Lotus
