@@ -1,0 +1,45 @@
+# Zookeeper Mechan {T}: Add {R}. On turn 3 (no longer summoning sick) it taps for {R}; with two Black Lotus' six red that is the seven mana of its {6}{R} ability.
+# The ability targets only a creature you control (CR 115.1): Bot2's Memnite is refused, then it pumps the Mechan to 5/3, and at the cleanup step the pump is
+# gone: the Mechan is 1/3 again on turn 4.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Emerald
+Zookeeper Mechan
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Zookeeper Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Zookeeper Mechan.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+! Bot1.Battlefield.Zookeeper Mechan.Activate(Ability: Target creature you control gets +4/+0 until end of turn; Bot2.Battlefield.Memnite)
+Bot1.Battlefield.Zookeeper Mechan.Activate(Ability: Target creature you control gets +4/+0 until end of turn; Bot1.Battlefield.Zookeeper Mechan)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Zookeeper Mechan.Power = 5
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Zookeeper Mechan.Power = 1
+
+[Expect]
+Bot1.Battlefield.Zookeeper Mechan.Toughness = 3

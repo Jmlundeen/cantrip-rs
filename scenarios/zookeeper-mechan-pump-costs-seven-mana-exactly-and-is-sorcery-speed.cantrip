@@ -1,0 +1,44 @@
+# Zookeeper Mechan {6}{R}: "Target creature you control gets +4/+0 until end of turn. Activate only as a sorcery." With Bot1's Ornithopter spell still on the stack the
+# ability cannot be activated (CR 307.1) although seven mana is in the pool; once it has resolved the pump on the Mechan pays {6}{R} exactly (the pool ends empty),
+# gives +4/+0 (5/3) and leaves Ornithopter at 0/2.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Jet
+Zookeeper Mechan
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Zookeeper Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Zookeeper Mechan.Activate(Ability: Target creature you control gets +4/+0 until end of turn; Bot1.Battlefield.Zookeeper Mechan)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Zookeeper Mechan.Activate(Ability: Target creature you control gets +4/+0 until end of turn; Bot1.Battlefield.Zookeeper Mechan)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Zookeeper Mechan.Power = 5
+Bot1.Battlefield.Zookeeper Mechan.Toughness = 3
+Bot1.Battlefield.Ornithopter.Power = 0
