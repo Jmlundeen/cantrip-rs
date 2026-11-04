@@ -1,0 +1,56 @@
+# "Exiled card with flashback": a card exiled face down has no characteristics (CR 406.3a), so it has no flashback. On
+# turn 1 Bot1's Flameshape exiles its own Firebolt and an Island face down, and its Lightning Bolt goes to the graveyard.
+# On turn 3 Schemes cannot target the face-down Firebolt, and returns the Bolt.
+# Sorceress's Schemes {3}{R}: Sorcery
+#   Return target instant or sorcery card from your graveyard or exiled card with flashback you own to your hand. Add {R}.
+#   Flashback {4}{R}
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Gandalf, Goblins' Bane
+Lightning Bolt
+Sorceress's Schemes
+Firebolt
+Island
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gandalf, Goblins' Bane.Cast(Ability: Flameshape)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Sorceress's Schemes.Cast(Bot1.Exile.Firebolt)
+Bot1.Hand.Sorceress's Schemes.Cast(Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Hand = Lightning Bolt
+Bot1.Exile.Firebolt.Colors.Count = 0
+Bot2.Life = 17

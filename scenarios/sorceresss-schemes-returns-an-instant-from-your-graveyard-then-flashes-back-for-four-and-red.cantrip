@@ -1,0 +1,77 @@
+# "Return target instant or sorcery card from your graveyard ... Add {R}." On turn 3 Bot1's Schemes returns its own
+# Lightning Bolt, not Bot2's in Bot2's graveyard, and the {R} it adds casts the Bolt again. On turn 5 Schemes is cast with
+# flashback for {4}{R} (CR 702.34a) off exactly five sources, returns the Bolt again, and is exiled as it resolves.
+# Sorceress's Schemes {3}{R}: Sorcery
+#   Return target instant or sorcery card from your graveyard or exiled card with flashback you own to your hand. Add {R}.
+#   Flashback {4}{R}
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Lightning Bolt
+Sorceress's Schemes
+Mountain
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Sorceress's Schemes.Cast(Bot2.Graveyard.Lightning Bolt)
+Bot1.Hand.Sorceress's Schemes.Cast(Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Sorceress's Schemes.Cast(Bot1.Graveyard.Lightning Bolt; Ability: Flashback)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 11
+Bot1.Life = 17
+Exile = Sorceress's Schemes
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Lightning Bolt

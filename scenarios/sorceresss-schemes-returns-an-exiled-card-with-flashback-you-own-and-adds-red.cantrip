@@ -1,0 +1,80 @@
+# Browser
+# "... or exiled card with flashback you own": on turn 1 Bot1's Tormod's Crypt exiles its own Firebolt, Lightning Bolt and
+# the Crypt; on turn 2 Bot2's Crypt does the same to Bot2's Firebolt. On turn 3 Bot1's page aims Schemes at its own exiled
+# Firebolt. Refused: the exiled Lightning Bolt (no flashback), the exiled Crypt, and Bot2's exiled Firebolt (not Bot1's).
+# The Firebolt comes back to hand and the {R} Schemes adds casts it again, leaving nothing in the pool.
+# Sorceress's Schemes {3}{R}: Sorcery
+#   Return target instant or sorcery card from your graveyard or exiled card with flashback you own to your hand. Add {R}.
+#   Flashback {4}{R}
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Firebolt
+Lightning Bolt
+Tormod's Crypt
+Sorceress's Schemes
+Mountain
+Island x20
+
+[Bot2 Deck]
+Mountain
+Firebolt
+Tormod's Crypt
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Firebolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Tormod's Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Tormod's Crypt.Activate(Bot1)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Firebolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Tormod's Crypt.Cast
+Bot2.Pass
+Bot2.Battlefield.Tormod's Crypt.Activate(Bot2)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Sorceress's Schemes.Cast(Bot1.Exile.Lightning Bolt)
+! Bot1.Hand.Sorceress's Schemes.Cast(Bot1.Exile.Tormod's Crypt)
+! Bot1.Hand.Sorceress's Schemes.Cast(Bot2.Exile.Firebolt)
+Bot1.Hand.Sorceress's Schemes.Cast(Bot1.Exile.Firebolt)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Firebolt
+? Bot1.Mana = {R}
+Bot1.Hand.Firebolt.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Life = 18
+Exile = Firebolt; Lightning Bolt; Tormod's Crypt; Tormod's Crypt
+Bot2.Exile.Firebolt.Colors = Red
+Bot1.Graveyard = Firebolt; Sorceress's Schemes
