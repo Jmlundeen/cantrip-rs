@@ -1,0 +1,42 @@
+# Starwinder {5}{U}{U}, a 7/7: "Whenever a creature you control deals combat damage to a player, you may draw that many cards." Bot1 pays {5}{U}{U} with Black Lotus and four Moxen on turn 1. On turn 3 Starwinder attacks and deals 7: Bot1 accepts and draws seven (the turn-3 draw left two cards in hand; 2 + 7 = 9).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Starwinder
+Island
+Island x20
+
+[Bot2 Deck]
+Forest x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Starwinder.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Attack(Starwinder)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Hand.Count = 9
+? Bot2.Life = 13
+
+[Expect]
+Bot1.Hand.Count = 9
+Bot2.Life = 13
