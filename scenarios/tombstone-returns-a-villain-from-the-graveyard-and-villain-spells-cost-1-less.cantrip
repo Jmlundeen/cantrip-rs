@@ -1,0 +1,55 @@
+# Tombstone, Career Criminal: "When Tombstone enters, return target Villain card from your graveyard to your hand. Villain spells you cast cost {1} less to
+# cast." Bot2 kills Common Crook with Lightning Bolt; on turn 3 Bot1 casts Tombstone, which returns the Crook, and the Crook ({1}{B}) is cast again for just {B}
+# from Mox Jet.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Swamp
+Common Crook
+Tombstone, Career Criminal
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Common Crook.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Common Crook)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tombstone, Career Criminal.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Common Crook.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Common Crook.Power = 2
+Bot1.Battlefield.Tombstone, Career Criminal.Power = 2
+Bot1.Graveyard.Count = 0
+Stack.Count = 0

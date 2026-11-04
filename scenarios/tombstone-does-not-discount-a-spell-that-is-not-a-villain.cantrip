@@ -1,0 +1,30 @@
+# Tombstone, Career Criminal: only Villain spells cost {1} less. With Tombstone out and every Mox tapped, Bot1 cannot cast Sol Ring ({1}, not a Villain).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Tombstone, Career Criminal
+Sol Ring
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tombstone, Career Criminal.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Sol Ring.Cast(Mana: short)
+
+[Expect]
+Bot1.Battlefield.Tombstone, Career Criminal.Power = 2
+Bot1.Hand.Count = 3

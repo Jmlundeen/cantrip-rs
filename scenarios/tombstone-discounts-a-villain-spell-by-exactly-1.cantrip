@@ -1,0 +1,33 @@
+# Tombstone, Career Criminal: Villain spells cost exactly {1} less. Inner Demons Gangsters ({3}{B}, a Villain) costs {2}{B} with Tombstone out, so the two
+# sources Bot1 has left (Mox Sapphire and a Swamp) cannot pay for it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Swamp
+Tombstone, Career Criminal
+Inner Demons Gangsters
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tombstone, Career Criminal.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Inner Demons Gangsters.Cast(Mana: short)
+
+[Expect]
+Bot1.Battlefield.Tombstone, Career Criminal.Power = 2
+Bot1.Hand.Count = 1

@@ -1,0 +1,8 @@
+{
+  "name": "Tombstone, Career Criminal",
+  "manaCost": "{2}{B}",
+  "type": "Legendary Creature — Human Villain",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When Tombstone enters, return target Villain card from your graveyard to your hand.\nVillain spells you cast cost {1} less to cast."
+}
