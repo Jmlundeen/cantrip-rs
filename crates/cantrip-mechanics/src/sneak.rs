@@ -79,6 +79,13 @@ pub fn was_cast_for_sneak(q: &dyn Query, id: ObjectId) -> bool {
 /// spell, the turn of the cast it copied, whose sneak cost the copy has paid (CR 707.10). Karai, Future of the Foot asks if
 /// that is this turn.
 pub fn sneak_cast_turn(q: &dyn Query, id: ObjectId) -> Option<u32> {
+    cast_through_turn(q, id, WayKind::Sneak)
+}
+
+/// The turn the spell `id` was cast in through a way of `kind`, the card's own or one a permanent gave it (CR 118.9, 113.6), or
+/// `None` if it was cast another way or not at all: for a copy of a spell (no `Cast` of its own, CR 707.10), the turn of the cast
+/// it copied, whose alternative cost the copy has paid. Sneak and web-slinging ask it.
+pub fn cast_through_turn(q: &dyn Query, id: ObjectId, kind: WayKind) -> Option<u32> {
     // The spell the permanent was, and, for a copy of a spell (no `Cast` of its own, CR 707.10), the spell it copied, back to
     // the one that was cast: a copy copies the alternative cost paid for it.
     let mut spell = id;
@@ -96,13 +103,13 @@ pub fn sneak_cast_turn(q: &dyn Query, id: ObjectId) -> Option<u32> {
         }
     };
     let (cast, turn) = cast;
-    let sneak = match cast.granted_by() {
+    let through = match cast.granted_by() {
         Some(grant) => grant
             .ability
             .as_granted_way()
             .and_then(|k| q.card(grant.ability.card).granted_ways.get(k))
-            .is_some_and(|w| w.kind == WayKind::Sneak),
-        None => cast.way > 0 && q.card(q.obj(cast.spell).card).ways.get(cast.way as usize - 1).is_some_and(|w| w.kind == WayKind::Sneak),
+            .is_some_and(|w| w.kind == kind),
+        None => cast.way > 0 && q.card(q.obj(cast.spell).card).ways.get(cast.way as usize - 1).is_some_and(|w| w.kind == kind),
     };
-    sneak.then_some(turn)
+    through.then_some(turn)
 }
