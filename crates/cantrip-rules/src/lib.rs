@@ -2443,6 +2443,10 @@ impl cantrip_api::Game for Cx<'_> {
         !static_rules::cant_lose_life(self, self.cards(), player) && !ops::life_total_cant_change(self.s(), player)
     }
 
+    fn stations_using_toughness(&self, creature: ObjectId) -> bool {
+        static_rules::stations_by_toughness(self, creature)
+    }
+
     fn lose_life(&mut self, player: PlayerId, amount: i32) {
         ops::change_life(self, player, -amount);
     }

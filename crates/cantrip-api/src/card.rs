@@ -2863,6 +2863,11 @@ pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 /// (CR 510.1a, 609.4): given the rule's own asker. This changes combat assignment alone, never the creature's power.
 pub type DamageByAbsolutePowerRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// Whether a static ability makes this creature station permanents using its toughness rather than its power (CR 702.184c):
+/// given the rule's own asker, and the creature as it last existed on the battlefield if it has left. It changes only how many
+/// charge counters a station ability puts, never the creature's power.
+pub type StationByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether a static ability keeps the damage marked on this permanent through the cleanup step (CR 514.2): given the
 /// rule's own asker. "Damage isn't removed from this creature during cleanup steps" (Ancient Adamantoise); "from creatures
 /// your opponents control" (Patient Zero, Uthgardt Fury) and "from creatures" (Case of the Market Melee) are the same kind.
@@ -3430,6 +3435,10 @@ pub struct CardDef {
     /// (CR 510.1a, 609.4), while the source has its abilities: Loot, the Anomaly. The rule selects the creatures;
     /// the core computes the positive magnitude only where combat assignment uses their power.
     pub damage_by_absolute_power: &'static [DamageByAbsolutePowerRule],
+    /// "Each creature you control with toughness greater than its power stations permanents using its toughness rather than
+    /// its power" (CR 702.184c), while the source is on the battlefield with its abilities as the station ability resolves:
+    /// Tapestry Warden. See `StationByToughnessRule`.
+    pub stations_by_toughness: &'static [StationByToughnessRule],
     /// Its static abilities that keep damage on permanents during cleanup steps (CR 514.2), while it is on the battlefield
     /// with its abilities. An effect that removes all damage (regeneration, CR 701.19a) still removes it.
     pub damage_stays: &'static [DamageStaysRule],
@@ -3637,6 +3646,7 @@ impl CardDef {
         cant_become_untapped: &[],
         damage_by_toughness: &[],
         damage_by_absolute_power: &[],
+        stations_by_toughness: &[],
         damage_stays: &[],
         mana_told_apart: &[],
         zero_loyalty_stays: &[],
@@ -3735,6 +3745,7 @@ impl CardDef {
             (!self.cant_become_untapped.is_empty(), "rules against becoming untapped"),
             (!self.damage_by_toughness.is_empty(), "damage by toughness"),
             (!self.damage_by_absolute_power.is_empty(), "damage by absolute power"),
+            (!self.stations_by_toughness.is_empty(), "stations by toughness"),
             (!self.damage_stays.is_empty(), "a damage-stays rule"),
             (!self.mana_told_apart.is_empty(), "a mana source rule"),
             (!self.zero_loyalty_stays.is_empty(), "a zero-loyalty rule"),

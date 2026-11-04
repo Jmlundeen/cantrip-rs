@@ -1,5 +1,6 @@
 //! Station (CR 702.184a): "Tap another untapped creature you control: Put a number of charge counters on this permanent
-//! equal to the tapped creature's power. Activate only as a sorcery." The station symbols of a station card (CR 721.2) are
+//! equal to the tapped creature's power. Activate only as a sorcery." A static ability may make it use the creature's
+//! toughness instead (CR 702.184c, `CardDef::stations_by_toughness`). The station symbols of a station card (CR 721.2) are
 //! its own statics, read from its charge counters with `charged::<N>`: "{N+}[abilities]" means "as long as this permanent
 //! has N or more charge counters on it, it has [abilities]" (CR 721.2a), and "{N+}[abilities][P/T]" makes it also "a
 //! creature with base power and toughness [P/T] in addition to its other types" (CR 721.2b, `creature::<P, T>`).
@@ -10,14 +11,17 @@
 use cantrip_api::*;
 
 /// "Put a number of charge counters on this permanent equal to the tapped creature's power": its power as the ability
-/// resolves, or as it last existed on the battlefield if it has left (CR 608.2h; the station rulings). A power of 0 or less
-/// puts none and removes none (ruling 2025-07-25). A station permanent that has left the battlefield gets none
-/// (`add_counters` skips an object that has changed zones: one that came back is a new object, CR 400.7).
+/// resolves, or as it last existed on the battlefield if it has left (CR 608.2h; the station rulings) - or its toughness, if
+/// a static ability on the battlefield as it resolves makes it station using its toughness (CR 702.184c, Tapestry Warden),
+/// judged of the creature as it last existed too. A value of 0 or less puts none and removes none (ruling 2025-07-25). A
+/// station permanent that has left the battlefield gets none (`add_counters` skips an object that has changed zones: one
+/// that came back is a new object, CR 400.7).
 fn put_charge_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(&tapped) = g.cost_objects(item).first() else { return Ok(()) };
-    let power = g.chars(tapped).power.unwrap_or(0);
-    if power > 0 {
-        g.add_counters(item.object, CounterKind::Charge, power);
+    let chars = g.chars(tapped);
+    let amount = if g.stations_using_toughness(tapped) { chars.toughness } else { chars.power }.unwrap_or(0);
+    if amount > 0 {
+        g.add_counters(item.object, CounterKind::Charge, amount);
     }
     Ok(())
 }

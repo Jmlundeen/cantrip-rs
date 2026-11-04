@@ -420,6 +420,16 @@ pub fn activates_as_though_haste(cx: &Cx, player: PlayerId, creature: ObjectId) 
     })
 }
 
+/// Whether `creature` stations permanents using its toughness rather than its power (CR 702.184c): a static ability of a
+/// permanent on the battlefield says so (`CardDef::stations_by_toughness`), asked as the station ability resolves, of the
+/// creature as it last existed on the battlefield if it has left.
+pub fn stations_by_toughness(cx: &Cx, creature: ObjectId) -> bool {
+    sources(cx, |d| !d.stations_by_toughness.is_empty()).any(|(id, controller, def, by)| {
+        let asker = Asker { source: id, controller, by, spell: false };
+        def.stations_by_toughness.iter().any(|rule| rule(cx, &asker, creature))
+    })
+}
+
 /// What `creature` assigns as combat damage (CR 510.1a): its power, or its toughness if a static ability says so.
 /// An "as though its power were positive" rule (CR 609.4) uses negative power's magnitude only when assigning by power;
 /// every other procedure still reads its actual negative power (CR 107.1b).

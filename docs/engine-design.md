@@ -2046,7 +2046,9 @@ building): 25.38 / 16.20, 9.83 / 10.98, 12.79 / 12.22 us per decision - no diffe
 Station (CR 702.184a) is `cantrip_mechanics::station::ability(text)`: "tap another untapped creature you control" as a cost
 (`Cost::tap_untapped`, not the {T} symbol, so a summoning-sick creature pays it and the station permanent needs no untapping),
 sorcery speed, and an effect putting charge counters equal to the tapped creature's power (`cost_objects`), none for a power
-of 0 or less. A station symbol (CR 721.2) is the card's own static ability gated on its charge counters,
+of 0 or less. A static ability may make it use the creature's toughness instead (CR 702.184c): `CardDef::stations_by_toughness`,
+asked through `Game::stations_using_toughness` (`static_rules::stations_by_toughness`) as the ability resolves, of the
+tapped creature as it last existed if it has left (Tapestry Warden). A station symbol (CR 721.2) is the card's own static ability gated on its charge counters,
 `station::charged::<N>` as the static's `affects`: "{N+}[abilities]" grants the abilities, which the card lists in its
 `delayed` list (`station::has::<INDEX>`, layer 6), and a "[P/T]" box also makes it a creature in layer 4
 (`station::is_a_creature`) with that base power and toughness in layer 7b (`station::base_pt::<P, T>`). A station card prints
