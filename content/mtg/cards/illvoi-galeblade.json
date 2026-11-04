@@ -1,0 +1,12 @@
+{
+  "name": "Illvoi Galeblade",
+  "manaCost": "{U}",
+  "type": "Creature — Jellyfish Warrior",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flash\nFlying\n{2}, Sacrifice this creature: Draw a card.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

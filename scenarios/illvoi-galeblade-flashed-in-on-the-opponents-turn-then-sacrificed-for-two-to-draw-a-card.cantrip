@@ -1,0 +1,35 @@
+# Illvoi Galeblade: Flash, Flying; "{2}, Sacrifice this creature: Draw a card." Bot1 flashes it in on Bot2's turn 2 with its one Island, then cannot
+# pay {2} for the ability (Mana: short). On turn 3 two Islands pay for it, the Galeblade is sacrificed as a cost, and the top card of the library,
+# the Mountain, is drawn: five Islands and the Mountain are in hand.
+
+[Bot1 Deck]
+Island
+Illvoi Galeblade
+Island x6
+Mountain
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Illvoi Galeblade.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Illvoi Galeblade.Keywords = Flash; Flying
+! Bot1.Battlefield.Illvoi Galeblade.Activate(Mana: short)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Illvoi Galeblade.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Illvoi Galeblade
+Bot1.Hand = Island; Island; Island; Island; Island; Mountain
