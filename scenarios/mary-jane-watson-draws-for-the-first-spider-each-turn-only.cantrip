@@ -1,0 +1,69 @@
+# Mary Jane Watson ({1}{G/W}, 2/2): "Whenever a Spider you control enters, draw a card. This ability triggers only once each turn."
+# Turn 1: she is cast with a Forest and a Mox Emerald (green for each hybrid symbol, CR 107.4e); an Ornithopter (not a Spider)
+# entering after her draws nothing. Turn 3 (Bot1 skips the first draw, draws Attercop): Deadly Recluse enters and she draws the top card (an Island); Attercop entering the
+# same turn draws nothing more (the ability triggers once each turn, CR 603.2). Bot2's own Deadly Recluse on turn 2 draws Bot1
+# nothing (a Spider an opponent controls).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Gleemox
+Mary Jane Watson
+Ornithopter
+Deadly Recluse
+Forest
+Attercop
+Island x16
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Deadly Recluse
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mary Jane Watson.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+? Bot1.Hand.Count = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Deadly Recluse.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Hand.Deadly Recluse.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+Bot1.Hand.Attercop.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Hand = Island

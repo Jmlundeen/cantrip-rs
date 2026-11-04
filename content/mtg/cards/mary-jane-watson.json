@@ -1,0 +1,8 @@
+{
+  "name": "Mary Jane Watson",
+  "manaCost": "{1}{G/W}",
+  "type": "Legendary Creature — Human Performer",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Whenever a Spider you control enters, draw a card. This ability triggers only once each turn."
+}
