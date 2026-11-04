@@ -14,9 +14,8 @@ fn tap_three_to_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     if untapped.len() < 3 || !effects::ask_may(g, you, item.object, Purpose::TapToPay)? {
         return Ok(());
     }
-    for creature in choose::select(g, you, item.object, Purpose::Tap, untapped, select::creature_cards(select::exactly(3)))? {
-        g.tap(creature);
-    }
+    let chosen = choose::select(g, you, item.object, Purpose::Tap, untapped, select::creature_cards(select::exactly(3)))?;
+    g.tap_together(&chosen);
     copy::copy_the_cast_spell(g, item)
 }
 
