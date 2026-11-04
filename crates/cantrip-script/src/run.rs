@@ -2612,13 +2612,28 @@ impl<'s> Run<'s> {
         let option = on_source[0];
         // A mana ability's sacrifice comes with the activation: `Sacrifice:` names it, a lone candidate is taken.
         if option.kind == ActionKind::ActivateAbility && option.targets_required > 0 && self.is_mana_ability(option) {
-            let targets = match step.named("Sacrifice").or_else(|| step.named("Tap")) {
-                Some(name) => match self.target(step, name, &option.target_candidates)? {
-                    Some(t) => vec![t],
-                    None => return fail(format!("line {}: {} cannot sacrifice {name}", step.line, step.text)),
-                },
-                None if option.target_candidates.len() == option.targets_required as usize => option.target_candidates.clone(),
-                None => {
+            // A cost of several permanents (Supportive Parents' two creatures) repeats the key: `Tap: A; Tap: B`, each name
+            // taking a candidate not already named.
+            let names: Vec<&str> = step
+                .arguments
+                .iter()
+                .filter(|a| a.key.as_deref().is_some_and(|k| k.eq_ignore_ascii_case("Sacrifice") || k.eq_ignore_ascii_case("Tap")))
+                .map(|a| a.value.as_str())
+                .collect();
+            let targets = match names.as_slice() {
+                [_, ..] => {
+                    let mut chosen: Vec<Target> = Vec::new();
+                    for name in &names {
+                        let left: Vec<Target> = option.target_candidates.iter().copied().filter(|t| !chosen.contains(t)).collect();
+                        match self.target(step, name, &left)? {
+                            Some(t) => chosen.push(t),
+                            None => return fail(format!("line {}: {} cannot sacrifice {name}", step.line, step.text)),
+                        }
+                    }
+                    chosen
+                }
+                [] if option.target_candidates.len() == option.targets_required as usize => option.target_candidates.clone(),
+                [] => {
                     return fail(format!(
                         "line {}: {} sacrifices one of several permanents; add Sacrifice: (a card name)",
                         step.line, step.text
