@@ -2434,6 +2434,10 @@ impl cantrip_api::Game for Cx<'_> {
         !static_rules::cant_gain_life(self, self.cards(), player) && !ops::life_total_cant_change(self.s(), player)
     }
 
+    fn can_lose_life(&self, player: PlayerId) -> bool {
+        !static_rules::cant_lose_life(self, self.cards(), player) && !ops::life_total_cant_change(self.s(), player)
+    }
+
     fn lose_life(&mut self, player: PlayerId, amount: i32) {
         ops::change_life(self, player, -amount);
     }

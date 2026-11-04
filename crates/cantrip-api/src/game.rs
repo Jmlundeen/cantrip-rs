@@ -1175,6 +1175,9 @@ pub trait Game: Query {
     /// Whether `player` could gain life now (CR 119.7): not while an effect says they can't gain life, nor while their life
     /// total can't change. "A cost that involves having that player gain life can't be paid" while it is false.
     fn can_gain_life(&self, player: PlayerId) -> bool;
+    /// Whether `player` could lose life now (CR 119.8): not while a static ability says they can't lose life, nor while their life
+    /// total can't change (CR 119.7). "A cost that involves having that player pay life can't be paid" while it is false.
+    fn can_lose_life(&self, player: PlayerId) -> bool;
     fn lose_life(&mut self, player: PlayerId, amount: i32);
     /// "`player`'s life total becomes `total`" (CR 119.5): they gain or lose the difference, so a player who can't gain life
     /// keeps a total lower than `total` (CR 119.7).

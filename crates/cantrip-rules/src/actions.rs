@@ -11784,10 +11784,10 @@ fn resolution_may_cause(cx: &Cx, player: PlayerId, kind: CauseKind) -> bool {
 /// that involves having that player pay life can't be paid") or their life total can't change (Teferi's Protection's ruling:
 /// "You can't pay a cost that includes the payment of any amount of life other than 0 life").
 pub fn payable_life(cx: &Cx, player: PlayerId) -> i32 {
-    if static_rules::cant_lose_life(cx, cx.cards(), player) || ops::life_total_cant_change(cx.s(), player) {
-        0
-    } else {
+    if cantrip_api::Game::can_lose_life(cx, player) {
         cx.s().player(player).life
+    } else {
+        0
     }
 }
 
