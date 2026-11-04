@@ -1,0 +1,29 @@
+# Sinister Cryologist's warp {U} (CR 702.185a): cast from the hand for {U}, paid exactly by Mox Sapphire (the Jet's {B} is left
+# in the pool). A Mox Jet cannot pay it - a warp cast with only {B} is refused - the enters trigger finds no opposing creature to target, and
+# the creature is exiled at the beginning of the next end step.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Sinister Cryologist
+Island x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Sinister Cryologist.Cast(Ability: Warp)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sinister Cryologist.Cast(Ability: Warp)
+? Bot1.Mana = {B}
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sinister Cryologist.Types = Creature
+[Bot1.End]
+
+[Expect]
+Exile = Sinister Cryologist
+Bot1.Battlefield = Mox Jet; Mox Sapphire

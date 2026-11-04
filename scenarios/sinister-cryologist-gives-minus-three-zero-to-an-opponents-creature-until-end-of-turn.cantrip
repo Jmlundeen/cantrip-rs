@@ -1,0 +1,50 @@
+# Sinister Cryologist {2}{U}: "When this creature enters, target creature an opponent controls gets -3/-0 until end of turn."
+# On turn 3 Bot1 pays exactly {2}{U} from three Moxen; the trigger refuses Bot1's own Ornithopter and takes Bot2's Savannah Lions
+# (2/1), which becomes -1/1 (the toughness is untouched, so it does not die) and is a 2/1 again on Bot2's next turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Sinister Cryologist
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Savannah Lions
+Memnite
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sinister Cryologist.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot2.Battlefield.Savannah Lions.Power = -1
+? Bot2.Battlefield.Savannah Lions.Toughness = 1
+? Bot2.Battlefield.Memnite.Power = 1
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Savannah Lions.Power = 2
+
+[Expect]
+Bot2.Battlefield = Mox Pearl; Savannah Lions; Memnite
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Ornithopter; Sinister Cryologist
