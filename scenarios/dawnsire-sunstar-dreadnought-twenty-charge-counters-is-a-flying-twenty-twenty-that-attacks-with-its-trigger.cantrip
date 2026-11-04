@@ -1,0 +1,78 @@
+# Dawnsire, Sunstar Dreadnought stationed with Gigantosaurus on turn 3 and again on turn 5: twenty charge counters make it a 20/20
+# artifact creature with flying (CR 721.2a) that keeps its 10+ attack trigger. It has been under Bot1's control since turn 3, so it
+# attacks on turn 5; its trigger deals 100 damage to Bot2's Raging Goblin and its 20 flying damage takes Bot2 from 20 to 0.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Gigantosaurus
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Dawnsire, Sunstar Dreadnought
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Raging Goblin
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Dawnsire, Sunstar Dreadnought.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Counters.Charge = 10
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Types = Artifact
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Counters.Charge = 20
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Types = Artifact; Creature
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Power = 20
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Toughness = 20
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Keywords = Flying
+Bot1.Attack(Dawnsire, Sunstar Dreadnought > Bot2)
+Bot1.Target(Bot2.Battlefield.Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Raging Goblin
+Bot2.Life = 0

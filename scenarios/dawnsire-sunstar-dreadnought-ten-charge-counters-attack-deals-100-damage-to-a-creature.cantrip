@@ -1,0 +1,74 @@
+# Dawnsire, Sunstar Dreadnought stationed with Gigantosaurus (power 10): ten charge counters give it "Whenever you attack, Dawnsire deals
+# 100 damage to up to one target creature or planeswalker" but leave it a plain artifact (it is a creature only at 20+). On turn 5
+# Bot1 attacks with Gigantosaurus; the trigger's targets are creatures and planeswalkers only (not a player, not Bot2's Mox Ruby),
+# and 100 damage destroys Bot2's Raging Goblin before blockers, so Gigantosaurus's 10 damage reaches Bot2 (20 -> 10).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Gigantosaurus
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Dawnsire, Sunstar Dreadnought
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Raging Goblin
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Dawnsire, Sunstar Dreadnought.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Counters.Charge = 10
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Types = Artifact
+[T5 Bot1.Main1]
+Bot1.Attack(Gigantosaurus > Bot2)
+! Bot1.Target(Bot2)
+! Bot1.Target(Bot2.Battlefield.Mox Ruby)
+Bot1.Target(Bot2.Battlefield.Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Mox Ruby
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 10
+Bot2.Graveyard = Raging Goblin
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Types = Artifact

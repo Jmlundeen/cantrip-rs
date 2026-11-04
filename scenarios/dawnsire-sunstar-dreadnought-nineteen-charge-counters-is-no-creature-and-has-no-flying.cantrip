@@ -1,0 +1,75 @@
+# Dawnsire, Sunstar Dreadnought stationed three times: Gigantosaurus (10) on turn 3, Hulking Devil (5) on turn 5 and Tyrox, Saurid
+# Tyrant (4) on turn 7 make nineteen charge counters, one short of "20+": it is still only an artifact, with no flying and no
+# 20/20 (CR 721.2a), though the 10+ trigger it gained at ten is still there for later.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Gigantosaurus
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Dawnsire, Sunstar Dreadnought
+Hulking Devil
+Tyrox, Saurid Tyrant
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Dawnsire, Sunstar Dreadnought.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Counters.Charge = 10
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hulking Devil.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Activate(Ability: Station)
+Bot1.Choose(Hulking Devil)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Counters.Charge = 15
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tyrox, Saurid Tyrant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Activate(Ability: Station)
+Bot1.Choose(Tyrox, Saurid Tyrant)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Counters.Charge = 19
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Types = Artifact
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Keywords = (absent)

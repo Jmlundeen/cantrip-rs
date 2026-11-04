@@ -1,0 +1,74 @@
+# Dawnsire, Sunstar Dreadnought at ten charge counters: "up to one target creature or planeswalker" (CR 115.1d) may be none, and a
+# creature of Bot1's own is as good a target as an opponent's. On turn 5 Bot1 attacks with Gigantosaurus and Ornithopter (cast on turn
+# 3) and chooses no target for the first attack: Bot2's Raging Goblin survives. Turn 7's attack targets Bot1's own Ornithopter and
+# it dies, while the Goblin lives still.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Gigantosaurus
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Dawnsire, Sunstar Dreadnought
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Raging Goblin
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Dawnsire, Sunstar Dreadnought.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dawnsire, Sunstar Dreadnought.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Gigantosaurus > Bot2)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Mox Ruby; Raging Goblin
+[T7 Bot1.Main1]
+Bot1.Attack(Gigantosaurus > Bot2)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot2.Battlefield = Mox Ruby; Raging Goblin
