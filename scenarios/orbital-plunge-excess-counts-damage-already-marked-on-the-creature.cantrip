@@ -1,0 +1,60 @@
+# Orbital Plunge: excess damage is damage beyond lethal, with damage already marked taken into account (the ruling). Bot2's
+# Phyrexian Soulgorger is an 8/8. The first Plunge's 6 damage is below lethal: no excess, so no Lander token. The second Plunge needs
+# only 2 more to be lethal, so its 6 has excess and a Lander token is created while the Soulgorger dies.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Orbital Plunge
+Orbital Plunge
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Phyrexian Soulgorger
+Island x21
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Phyrexian Soulgorger.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Orbital Plunge.Cast(Bot2.Battlefield.Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Phyrexian Soulgorger.Damage = 6
+? Bot1.Battlefield.Lander Token = (absent)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Orbital Plunge.Cast(Bot2.Battlefield.Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Phyrexian Soulgorger; Black Lotus
+Bot1.Battlefield.Lander Token.Subtypes = Lander

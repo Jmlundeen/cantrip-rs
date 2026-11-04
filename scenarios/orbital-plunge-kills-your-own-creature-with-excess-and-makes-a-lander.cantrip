@@ -1,0 +1,39 @@
+# Orbital Plunge: "deals 6 damage to target creature. If excess damage was dealt this way, create a Lander token." It refuses a
+# Mox (no creature); Bot1 targets its own Memnite (1/1): 6 damage is 5 more than lethal, so a Lander token is created.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Memnite
+Orbital Plunge
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Orbital Plunge.Cast(Bot1.Battlefield.Mox Ruby)
+Bot1.Hand.Orbital Plunge.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Graveyard = Memnite; Orbital Plunge
+Bot1.Battlefield.Lander Token.Subtypes = Lander

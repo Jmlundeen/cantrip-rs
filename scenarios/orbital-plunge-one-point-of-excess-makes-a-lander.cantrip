@@ -1,0 +1,57 @@
+# Orbital Plunge: a single point of excess damage is enough. Bot2's Pardic Wanderer is a 5/5; 6 damage is lethal with 1 to spare, so
+# Bot1 creates a Lander token.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Orbital Plunge
+Island x21
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Pardic Wanderer
+Island x22
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Pardic Wanderer.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Orbital Plunge.Cast(Bot2.Battlefield.Pardic Wanderer)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Pardic Wanderer; Black Lotus
+Bot1.Battlefield.Lander Token.Subtypes = Lander
