@@ -1,0 +1,27 @@
+# Weftwalking: "When this enchantment enters, if you cast it": put onto the battlefield by Show and Tell it was not cast, so nothing is shuffled and nothing drawn (CR 603.4). Bot1's hand holds the Weftwalking's neighbours: Mox Jet, Island and Black Lotus (in the graveyard) all stay where they are.
+
+[Bot1 Deck]
+Black Lotus
+Show and Tell
+Weftwalking
+Mox Jet
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Weftwalking)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Weftwalking.Types = Enchantment
+Bot1.Graveyard = Show and Tell; Black Lotus
+Bot1.Hand = Mox Jet; Island; Island; Island
+Bot1.Library.Count = 20

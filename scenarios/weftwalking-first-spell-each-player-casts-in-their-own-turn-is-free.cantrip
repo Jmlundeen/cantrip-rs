@@ -1,0 +1,50 @@
+# Weftwalking: "The first spell each player casts during each of their turns may be cast without paying its mana cost." Bot1 puts it onto the battlefield with Show and Tell. On T2 Bot2 casts Dauntless Scrapbot ({3}) for nothing with one Island, but cannot cast a second for want of mana. On T3 Bot1 casts one for nothing, and the second one it cannot pay for. Bot2's Lightning Bolt in Bot1's turn is not free: it is not Bot2's turn, and Bot2 has no mana (CR 118.9, 601.2b).
+
+[Bot1 Deck]
+Black Lotus
+Show and Tell
+Weftwalking
+Dauntless Scrapbot
+Dauntless Scrapbot
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Dauntless Scrapbot
+Dauntless Scrapbot
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Weftwalking)
+Bot2.Choose(Island)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Dauntless Scrapbot.Cast(Ability: Without paying)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Count = 4
+! Bot2.Hand.Dauntless Scrapbot.Cast(Mana: short)
+[T3 Bot1.Upkeep]
+! Bot1.Hand.Dauntless Scrapbot.Cast(Ability: Without paying)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Dauntless Scrapbot.Cast(Ability: Without paying)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1; Mana: short)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Dauntless Scrapbot.Cast(Mana: short)
+
+[Expect]
+Bot1.Battlefield.Count = 4

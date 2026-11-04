@@ -1,0 +1,39 @@
+# Weftwalking: the first spell "may be cast without paying its mana cost" - it is a choice (CR 118.9). With it on the battlefield (put there by Show and Tell on T1, with three Moxen cast before it), Bot1 casts its first spell of T3, Dauntless Scrapbot, paying {3} with the three Moxen: they are tapped for it, the pool is left empty, and Bot2 (which has no mana) cannot take the free cast. That cast was the first spell of the turn, so the second Scrapbot gets no free cast and cannot be paid for (CR 601.2b).
+
+[Bot1 Deck]
+Black Lotus
+Show and Tell
+Weftwalking
+Dauntless Scrapbot
+Mox Jet
+Mox Ruby
+Mox Emerald
+Dauntless Scrapbot
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Weftwalking)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dauntless Scrapbot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+! Bot1.Hand.Dauntless Scrapbot.Cast(Mana: short)
+
+[Expect]
+Bot1.Battlefield.Mox Jet.Tapped = true
