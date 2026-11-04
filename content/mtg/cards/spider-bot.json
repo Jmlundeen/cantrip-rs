@@ -1,0 +1,11 @@
+{
+  "name": "Spider-Bot",
+  "manaCost": "{2}",
+  "type": "Artifact Creature — Spider Robot Scout",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Reach\nWhen this creature enters, you may search your library for a basic land card, reveal it, then shuffle and put that card on top.",
+  "keywords": [
+    "Reach"
+  ]
+}
