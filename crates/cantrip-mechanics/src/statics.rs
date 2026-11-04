@@ -867,9 +867,11 @@ pub fn subtype_spell<const SUBTYPE: u16>(q: &dyn Query, asker: &Asker, card: Obj
     q.chars(card).has_subtype(crate::lands::word(q, asker.source, SUBTYPE))
 }
 
-/// "You may activate abilities of creatures you control as though those creatures had haste" (CR 302.6): the creatures their
-/// controller controls, the source included (`activate_as_though_haste: &[statics::creatures_you_control_as_though_haste]`).
-/// Shang-Chi, Master of Kung Fu and Tyvar, Jubilant Brawler print it.
-pub fn creatures_you_control_as_though_haste(q: &dyn Query, asker: &Asker, creature: ObjectId) -> bool {
+/// "Each creature you control" of a static rule asked of one creature (an `Asker` rule: `CardDef::activate_as_though_haste`,
+/// `damage_by_toughness`, `attacks_despite_defender`, `stations_by_toughness`): a creature its source's controller controls,
+/// the source included, read as it last existed if it has left. Shang-Chi, Master of Kung Fu and Tyvar, Jubilant Brawler
+/// ("You may activate abilities of creatures you control as though those creatures had haste", CR 302.6), Assault Formation
+/// (CR 510.1a) and Ghalta the Immovable (CR 702.3b) print it.
+pub fn creature_you_control(q: &dyn Query, asker: &Asker, creature: ObjectId) -> bool {
     q.controller(creature) == asker.controller && q.chars(creature).is(CardType::Creature)
 }

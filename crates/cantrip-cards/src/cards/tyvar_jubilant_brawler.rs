@@ -29,6 +29,6 @@ pub static CARD: CardDef = CardDef {
         )
         .sorcery_speed(),
     ],
-    activate_as_though_haste: &[statics::creatures_you_control_as_though_haste],
+    activate_as_though_haste: &[statics::creature_you_control],
     ..oracle::TYVAR_JUBILANT_BRAWLER
 };

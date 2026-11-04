@@ -25,6 +25,14 @@ pub fn unblocked_attacker_you_control(q: &dyn Query, asker: &Asker, id: ObjectId
     q.controller(id) == asker.controller && q.is_attacking(id) && !q.is_blocked(id)
 }
 
+/// "Each creature you control with toughness greater than its power": `statics::creature_you_control`, with its toughness above its power as
+/// it is asked. Ghalta the Immovable and Tapestry Warden print it for combat damage ("assigns combat damage equal to its
+/// toughness rather than its power", CR 510.1a), and Tapestry Warden for stationing (CR 702.184c).
+pub fn your_creature_with_toughness_greater_than_power(q: &dyn Query, asker: &Asker, creature: ObjectId) -> bool {
+    let chars = q.chars(creature);
+    crate::statics::creature_you_control(q, asker, creature) && chars.toughness.unwrap_or(0) > chars.power.unwrap_or(0)
+}
+
 /// What a creature that enters attacking attacks when its effect names nothing (CR 508.4): its controller chooses among
 /// `Query::enter_attacking_targets`, and a lone candidate is taken without asking. None when there is nothing to attack. Raph & Mikey,
 /// Troublemakers and Gut, True-Soul Zealot print it.

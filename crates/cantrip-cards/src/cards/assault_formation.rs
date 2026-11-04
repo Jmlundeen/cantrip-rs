@@ -1,11 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, targets};
+use cantrip_mechanics::{effects, statics, targets};
 use cantrip_oracle as oracle;
-
-/// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a).
-fn your_creature(q: &dyn Query, asker: &Asker, creature: ObjectId) -> bool {
-    q.controller(creature) == asker.controller && q.chars(creature).is(CardType::Creature)
-}
 
 /// "Target creature with defender" (CR 115.1).
 fn creature_with_defender(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -26,6 +21,6 @@ pub static CARD: CardDef = CardDef {
             .targets(&[target(creature_with_defender)]),
         ability(cost("{2}{G}"), effects::creatures_you_control_get::<0, 1>, "{2}{G}: Creatures you control get +0/+1 until end of turn."),
     ],
-    damage_by_toughness: &[your_creature],
+    damage_by_toughness: &[statics::creature_you_control],
     ..oracle::ASSAULT_FORMATION
 };
