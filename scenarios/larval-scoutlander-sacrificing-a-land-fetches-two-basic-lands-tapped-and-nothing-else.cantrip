@@ -1,0 +1,48 @@
+# Larval Scoutlander: "When this Spacecraft enters, you may sacrifice a land or Lander. If you do, search your library for up to two basic land cards, put them onto the battlefield tapped, then shuffle." (CR 701.21a, 701.23)
+# Bot1 sacrifices a Forest (not a Mox Emerald, which is no land): the Island and the Mountain found enter tapped, though a Plains, a Tropical Island and a Llanowar Elves are in the library, and
+# at most two are taken. The library is Bot1's own: Bot2's basics stay put.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Forest
+Larval Scoutlander
+Black Lotus
+Forest
+Island
+Mountain
+Tropical Island
+Llanowar Elves
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Larval Scoutlander.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mox Emerald)
+! Bot1.Choose(Larval Scoutlander)
+Bot1.Choose(Forest)
+! Bot1.Search(Tropical Island)
+! Bot1.Search(Llanowar Elves)
+! Bot1.Search(Island; Mountain; Plains)
+Bot1.Search(Island; Mountain)
+? Bot1.Battlefield.Mountain.Tapped = true
+? Bot1.Battlefield.Island.Tapped = true
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Jet; Larval Scoutlander; Island; Mountain
+Bot1.Graveyard = Forest
+Bot1.Library.Count = 12
+Bot2.Library.Count = 13

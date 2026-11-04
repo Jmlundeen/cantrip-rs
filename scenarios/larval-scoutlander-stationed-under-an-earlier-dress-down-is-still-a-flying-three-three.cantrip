@@ -1,0 +1,70 @@
+# Dress Down is on the battlefield before Larval Scoutlander enters. Seven charge counters turn on "7+ | Flying": one static
+# ability whose effect began in layer 4, so its layer 6 and 7b parts keep applying although Dress Down, earlier in layer
+# 6, took Larval Scoutlander's abilities - a 3/3 with flying (CR 613.6, 721.2b).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Black Lotus
+Colossal Dreadmaw
+Elvish Mystic
+Black Lotus
+Dress Down
+Larval Scoutlander
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Larval Scoutlander.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Larval Scoutlander.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Larval Scoutlander.Activate(Ability: Station)
+Bot1.Choose(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+? Bot1.Battlefield.Larval Scoutlander.Counters.Charge = 7
+? Bot1.Battlefield.Larval Scoutlander.Types = Artifact; Creature
+? Bot1.Battlefield.Larval Scoutlander.Power = 3
+? Bot1.Battlefield.Larval Scoutlander.Toughness = 3
+? Bot1.Battlefield.Larval Scoutlander.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.Larval Scoutlander.Types = Artifact; Creature

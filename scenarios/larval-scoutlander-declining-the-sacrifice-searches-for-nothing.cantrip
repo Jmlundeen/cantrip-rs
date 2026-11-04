@@ -1,0 +1,42 @@
+# Larval Scoutlander: "you may sacrifice a land or Lander. If you do, search ..." Bot1 has a Forest and a Lander token but declines: nothing is sacrificed and, as "if you do" is
+# not met, the library (with a Plains in it) is not searched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Ruby
+Galactic Wayfarer
+Larval Scoutlander
+Forest
+Plains
+Elvish Mystic x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Galactic Wayfarer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Larval Scoutlander.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Forest; Lander Token)
+Bot1.Choose
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Galactic Wayfarer; Larval Scoutlander; Forest; Lander Token
+Bot1.Library.Count = 12

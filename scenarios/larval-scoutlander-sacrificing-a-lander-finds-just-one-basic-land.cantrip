@@ -1,0 +1,44 @@
+# Larval Scoutlander, "a land or Lander" and "up to two" (CR 701.23d): Bot1's Galactic Wayfarer makes a Lander token (an artifact, not a land). Sacrificing it lets Bot1
+# search; the library has just the one basic land, a Forest, so only that is found (fewer than two) and it enters tapped. Bot1 has no land to sacrifice, so only the Lander is offered.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Ruby
+Galactic Wayfarer
+Larval Scoutlander
+Elvish Mystic
+Forest
+Elvish Mystic x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Galactic Wayfarer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Larval Scoutlander.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Galactic Wayfarer)
+! Bot1.Choose(Mox Emerald)
+Bot1.Choose(Lander Token)
+Bot1.Search(Forest)
+? Bot1.Battlefield.Forest.Tapped = true
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Galactic Wayfarer; Larval Scoutlander; Forest
+Bot1.Library.Count = 11
