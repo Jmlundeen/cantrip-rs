@@ -1,0 +1,29 @@
+# Glasspool Mimic copies "a creature you control" (CR 614.1c): with only Bot2's Ornithopter on the battlefield it is not asked and enters
+# as itself, a 0/0 that state-based actions put into the graveyard (CR 704.5f). `! Bot1.Accept` fails if Bot1 is asked whether
+# to copy, as an engine that offered the opponent's creature would ask.
+
+[Bot1 Deck]
+Black Lotus
+Glasspool Mimic
+Island x18
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Glasspool Mimic.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Bot1.Graveyard = Glasspool Mimic; Black Lotus
+Bot1.Battlefield.Count = 0

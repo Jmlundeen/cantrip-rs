@@ -1,0 +1,36 @@
+# Glasspool Mimic copies "a creature you control" (CR 614.1c): Bot2's Ornithopter (0/2) was on the battlefield first, then Bot1's Memnite
+# (1/1). Only the Memnite is a creature Bot1 controls, so the Mimic enters as a copy of it without a choice (one candidate): a 1/1
+# Construct Shapeshifter Rogue. An engine that also offered the opponent's creature would ask which, and the Ornithopter, first
+# on the battlefield, would be the one it copies.
+
+[Bot1 Deck]
+Black Lotus
+Memnite
+Glasspool Mimic
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Glasspool Mimic.Cast
+Bot1.Accept
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Memnite; Memnite
+Bot1.Battlefield.Memnite#2.Subtypes = Construct; Rogue; Shapeshifter
+Bot1.Battlefield.Memnite#2.Power = 1
+Bot1.Battlefield.Memnite#2.Toughness = 1
+Bot2.Battlefield = Ornithopter
