@@ -1,0 +1,27 @@
+# Suus Mahna Practitioner's ability costs {X} less, X the differently named lands you control (CR 601.2f): with an Island and a
+# Swamp that is 2, so {4}{U} becomes {2}{U} and two lands cannot pay it (a reduction of 3 or more could).
+
+[Bot1 Deck]
+Suus Mahna Practitioner
+Black Lotus
+Island
+Swamp
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Suus Mahna Practitioner.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Battlefield.Suus Mahna Practitioner.Activate(Bot2.Battlefield.Ornithopter; Mana: short)
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = false

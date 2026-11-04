@@ -1,0 +1,33 @@
+# Suus Mahna Practitioner's ability costs {X} less for each differently named land you control: with three of them its
+# {4}{U} is {1}{U}, and it taps a creature (CR 601.2f, 107.3).
+
+[Bot1 Deck]
+Suus Mahna Practitioner
+Black Lotus
+Island
+Swamp
+Mountain
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Suus Mahna Practitioner.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Suus Mahna Practitioner.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Suus Mahna Practitioner.Tapped = true
