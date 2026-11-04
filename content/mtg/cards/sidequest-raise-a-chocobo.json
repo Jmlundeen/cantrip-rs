@@ -1,0 +1,16 @@
+{
+  "name": "Sidequest: Raise a Chocobo",
+  "manaCost": "{1}{G}",
+  "type": "Enchantment",
+  "oracleText": "When this enchantment enters, create a 2/2 green Bird creature token with \"Whenever a land you control enters, this token gets +1/+0 until end of turn.\"\nAt the beginning of your first main phase, if you control four or more Birds, transform this enchantment.",
+  "backFace": {
+    "name": "Black Chocobo",
+    "colorIndicator": [
+      "Green"
+    ],
+    "type": "Creature — Bird",
+    "power": 2,
+    "toughness": 2,
+    "oracleText": "When this permanent transforms into Black Chocobo, search your library for a land card, put it onto the battlefield tapped, then shuffle.\nLandfall — Whenever a land you control enters, Birds you control get +1/+0 until end of turn."
+  }
+}

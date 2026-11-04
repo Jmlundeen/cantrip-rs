@@ -1,0 +1,68 @@
+# Sidequest: Raise a Chocobo ({1}{G}, enchantment): "When this enchantment enters, create a 2/2 green Bird creature token with
+# 'Whenever a land you control enters, this token gets +1/+0 until end of turn.' At the beginning of your first main phase, if you
+# control four or more Birds, transform this enchantment." Back: Black Chocobo, a 2/2 Bird creature: "When this permanent
+# transforms into Black Chocobo, search your library for a land card, put it onto the battlefield tapped, then shuffle.
+# Landfall - Whenever a land you control enters, Birds you control get +1/+0 until end of turn."
+# On turn 1 Bot1 makes four Birds - the token, Birds of Paradise (1/1), Aven Skirmisher (1/1) and Aven Envoy (1/1) - and the
+# trigger is not on the stack yet (it is not a first main phase's beginning). On turn 3 it triggers with exactly four Birds, the
+# enchantment becomes the 2/2 creature Black Chocobo, and Bot1 searches: a Lightning Bolt (not a land) is refused, the Mountain
+# comes in tapped. That land entering is a landfall for the token (+1/+0) and for Black Chocobo (+1/+0 to every Bird): the token
+# is 4/2 (2 +1 +1), Black Chocobo 3/2, and the three 1/1 Birds 2/1. On turn 4 the effects have ended (CR 514.2).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Sidequest: Raise a Chocobo
+Birds of Paradise
+Aven Skirmisher
+Aven Envoy
+Forest
+Mountain
+Lightning Bolt
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sidequest: Raise a Chocobo.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Skirmisher.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aven Envoy.Cast
+Bot1.Pass
+? Bot1.Battlefield.Sidequest: Raise a Chocobo.Types = Enchantment
+[T3 Bot1.Main1]
+Bot1.Pass
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Mountain)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Black Chocobo.Types = Creature
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Black Chocobo.Power = 3
+? Bot1.Battlefield.Bird Token.Power = 4
+? Bot1.Battlefield.Aven Skirmisher.Power = 2
+? Bot1.Battlefield.Aven Skirmisher.Toughness = 1
+? Bot1.Battlefield.Mountain.Tapped = true
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Black Chocobo.Power = 2
+Bot1.Battlefield.Bird Token.Power = 2
+Bot1.Battlefield.Aven Skirmisher.Power = 1
+Bot1.Battlefield.Birds of Paradise.Power = 0
+Bot1.Shuffles = 1

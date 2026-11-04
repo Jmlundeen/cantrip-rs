@@ -1,0 +1,47 @@
+# Sidequest: Raise a Chocobo's "if you control four or more Birds" is a count of Birds YOU control. Bot1 controls three on turn 1
+# (the token, Birds of Paradise and Aven Skirmisher), one short of four; Bot2 casts an Aven Envoy (a Bird) on turn 2 off a Mox
+# Sapphire, making four Birds on the battlefield but only three Bot1's. On turn 3 the ability does not trigger: Bot1 has no
+# Search prompt to answer and the enchantment is still an enchantment, with no land fetched.
+
+[Bot1 Deck]
+Mox Pearl
+Black Lotus
+Sidequest: Raise a Chocobo
+Birds of Paradise
+Aven Skirmisher
+Forest
+Forest
+Mountain
+Forest x12
+
+[Bot2 Deck]
+Mox Sapphire
+Aven Envoy
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sidequest: Raise a Chocobo.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Skirmisher.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Aven Envoy.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sidequest: Raise a Chocobo.Types = Enchantment
+Bot1.Battlefield.Count = 6
+Bot1.Shuffles = 0

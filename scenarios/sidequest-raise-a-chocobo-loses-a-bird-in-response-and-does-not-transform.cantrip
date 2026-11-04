@@ -1,0 +1,53 @@
+# Sidequest: Raise a Chocobo's "if you control four or more Birds" is checked as the ability triggers and again as it resolves
+# (CR 603.4). Bot1 controls four Birds on turn 3 (the token, Birds of Paradise, Aven Skirmisher and Aven Envoy), so it triggers at
+# the beginning of the first main phase. In response Bot1 taps Birds of Paradise for {R} and casts the Lightning Bolt it drew on
+# the Aven Skirmisher: the Bolt resolves first, the Birds are three and the ability does nothing - no transform, no land fetched,
+# no search prompt.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Sidequest: Raise a Chocobo
+Birds of Paradise
+Aven Skirmisher
+Aven Envoy
+Lightning Bolt
+Mountain
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sidequest: Raise a Chocobo.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Skirmisher.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aven Envoy.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Aven Skirmisher)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sidequest: Raise a Chocobo.Types = Enchantment
+Bot1.Graveyard = Aven Skirmisher; Lightning Bolt; Black Lotus
+Bot1.Shuffles = 0
