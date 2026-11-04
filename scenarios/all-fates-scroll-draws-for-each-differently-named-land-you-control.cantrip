@@ -1,0 +1,60 @@
+# All-Fates Scroll: "{7}, {T}, Sacrifice this artifact: Draw X cards, where X is the number of differently named lands you control."
+# Turn 1 Bot1 casts five Moxen, the Scroll (three of them) and a Forest; turn 3 a Plains; turn 5 a second Forest. Bot2's Swamp is
+# not a land Bot1 controls, the duplicate Forest counts once and the Scroll is no land, so X is two (CR 608.2h, 201.2a).
+# Five Moxen and three lands pay {7}; the Scroll is tapped and sacrificed as part of the cost.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Sapphire
+All-Fates Scroll
+Forest
+Plains
+Forest
+Island x24
+
+[Bot2 Deck]
+Swamp
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.All-Fates Scroll.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.All-Fates Scroll.Activate(Ability: Draw X cards, where X is the number of differently named lands you control.)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Graveyard = All-Fates Scroll
+Stack.Count = 0

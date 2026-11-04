@@ -1,0 +1,36 @@
+# All-Fates Scroll {3} Artifact: "{T}: Add one mana of any color." Bot1 taps three Moxen for the Scroll, so nothing else pays for the
+# Lightning Bolt: only the Scroll's mana (red, chosen on activation) pays for it, then Bot2 takes 3. The Scroll stays on the battlefield.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+All-Fates Scroll
+Lightning Bolt
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.All-Fates Scroll.Cast
+Bot1.Pass
+Bot1.Battlefield.All-Fates Scroll.Activate(Color: Red)
+? Bot1.Mana = {R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Jet; All-Fates Scroll
