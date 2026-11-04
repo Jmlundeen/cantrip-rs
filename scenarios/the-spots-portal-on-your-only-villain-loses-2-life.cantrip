@@ -1,0 +1,37 @@
+# The Spot's Portal: the Villain is looked for after the creature has left (CR 608.2c). Bot1 targets its own Common Crook, its only Villain: it
+# goes to the bottom of Bot1's library first, so Bot1 controls no Villain by then and loses 2 life.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Swamp
+Common Crook
+The Spot's Portal
+Plains x3
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Common Crook.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Spot's Portal.Cast(Bot1.Battlefield.Common Crook)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Common Crook = (absent)
+Bot1.Life = 18
+Bot1.Library = Plains; Plains; Plains; Common Crook
+Stack.Count = 0
