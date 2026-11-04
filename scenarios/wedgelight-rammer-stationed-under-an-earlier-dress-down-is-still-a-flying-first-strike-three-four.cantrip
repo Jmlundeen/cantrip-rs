@@ -1,0 +1,76 @@
+# Dress Down is on the battlefield before Wedgelight Rammer enters. When nine charge counters turn on "9+ | Flying, first
+# strike", the striation is one static ability whose effect began in layer 4 (it's an artifact creature), so its layer 6
+# and layer 7b parts keep applying although Dress Down, earlier in layer 6, took the Rammer's abilities: a 3/4 with
+# flying and first strike (CR 613.6, 721.2b). The stationing creatures have lost theirs.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Black Lotus
+Colossal Dreadmaw
+Elvish Mystic
+Black Lotus
+Dress Down
+Wedgelight Rammer
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Colossal Dreadmaw.Keywords = (absent)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wedgelight Rammer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Wedgelight Rammer.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Wedgelight Rammer.Activate(Ability: Station)
+Bot1.Choose(Robot Token)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Wedgelight Rammer.Activate(Ability: Station)
+Bot1.Choose(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+? Bot1.Battlefield.Wedgelight Rammer.Counters.Charge = 9
+? Bot1.Battlefield.Wedgelight Rammer.Types = Artifact; Creature
+? Bot1.Battlefield.Wedgelight Rammer.Power = 3
+? Bot1.Battlefield.Wedgelight Rammer.Toughness = 4
+? Bot1.Battlefield.Wedgelight Rammer.Keywords = FirstStrike; Flying
+
+[Expect]
+Bot1.Battlefield.Wedgelight Rammer.Types = Artifact; Creature

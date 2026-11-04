@@ -1,0 +1,71 @@
+# Wedgelight Rammer: "When this Spacecraft enters, create a 2/2 colorless Robot artifact creature token" (CR 111.1). It stations
+# with Colossal Dreadmaw (6) and then the Robot (2): eight charge counters are not enough, so it is still a noncreature
+# artifact. Elvish Mystic (1) makes nine: an artifact creature, a 3/4 with flying and first strike (CR 702.184a, 721.2a-b).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Black Lotus
+Colossal Dreadmaw
+Elvish Mystic
+Wedgelight Rammer
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wedgelight Rammer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot Token.Types = Artifact; Creature
+? Bot1.Battlefield.Robot Token.Power = 2
+? Bot1.Battlefield.Robot Token.Toughness = 2
+? Bot1.Battlefield.Robot Token.Colors = (absent)
+Bot1.Battlefield.Wedgelight Rammer.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Wedgelight Rammer.Activate(Ability: Station)
+Bot1.Choose(Robot Token)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wedgelight Rammer.Counters.Charge = 8
+? Bot1.Battlefield.Wedgelight Rammer.Types = Artifact
+? Bot1.Battlefield.Wedgelight Rammer.Keywords = (absent)
+Bot1.Battlefield.Wedgelight Rammer.Activate(Ability: Station)
+Bot1.Choose(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Wedgelight Rammer.Counters.Charge = 9
+Bot1.Battlefield.Wedgelight Rammer.Types = Artifact; Creature
+Bot1.Battlefield.Wedgelight Rammer.Power = 3
+Bot1.Battlefield.Wedgelight Rammer.Toughness = 4
+Bot1.Battlefield.Wedgelight Rammer.Keywords = FirstStrike; Flying
