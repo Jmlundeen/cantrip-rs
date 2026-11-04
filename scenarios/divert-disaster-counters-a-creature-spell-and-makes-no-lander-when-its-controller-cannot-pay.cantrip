@@ -1,0 +1,40 @@
+# Divert Disaster counters a creature spell (the other kind of spell from Lightning Bolt) when its controller cannot pay {2}: Bot2 casts Aegis Turtle
+# with Mox Sapphire, holding only Mox Jet, whose one mana it makes while asked, so paying {2} is not offered (! Bot2.PayCost). The Turtle is
+# countered and Bot1 gets no Lander: two Islands only.
+
+[Bot1 Deck]
+Island
+Island
+Divert Disaster
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Aegis Turtle
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Aegis Turtle.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Divert Disaster.Cast(Aegis Turtle)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+! Bot2.PayCost
+
+[Expect]
+Bot2.Graveyard = Aegis Turtle
+Bot1.Graveyard = Divert Disaster
+Bot1.Battlefield.Count = 2
+Bot2.Battlefield.Count = 2
