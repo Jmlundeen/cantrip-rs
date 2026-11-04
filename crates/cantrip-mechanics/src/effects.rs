@@ -2203,3 +2203,11 @@ pub fn control_target_player_next_turn(g: &mut dyn Game, item: &StackItem) -> Re
     g.control_next_turn(item, player);
     Ok(())
 }
+
+/// "Draw a card for each artifact you control" (CR 121.2): the artifacts the ability's controller controls as it resolves
+/// (CR 608.2h), drawn as one draw of that many. Memnarch, the Warden and Edgar, King of Figaro print it.
+pub fn draw_a_card_for_each_artifact_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let count = crate::artifacts_you_control(g, item.controller) as u32;
+    g.draw(item.controller, count);
+    Ok(())
+}
