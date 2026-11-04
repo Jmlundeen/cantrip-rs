@@ -1,0 +1,6 @@
+{
+  "name": "Requiem Monolith",
+  "manaCost": "{2}{B}",
+  "type": "Artifact",
+  "oracleText": "{T}: Until end of turn, target creature gains \"Whenever this creature is dealt damage, you draw that many cards and lose that much life.\" That creature's controller may have this artifact deal 1 damage to it. Activate only as a sorcery."
+}

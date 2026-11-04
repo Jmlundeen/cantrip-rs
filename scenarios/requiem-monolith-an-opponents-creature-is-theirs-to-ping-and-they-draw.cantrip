@@ -1,0 +1,39 @@
+# Requiem Monolith: "that creature's controller may have this artifact deal 1 damage to it" - the choice is the creature's
+# controller's. Bot1 targets Bot2's Memnite on turn 3, Bot2 accepts, and it is Bot2 (the controller of the trigger, CR 603.3a) who
+# draws and loses 1 life; Bot1 does neither.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Requiem Monolith
+Island x16
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Requiem Monolith.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Requiem Monolith.Activate(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot2.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Bot2.Graveyard = Memnite

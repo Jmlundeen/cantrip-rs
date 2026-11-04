@@ -1,0 +1,48 @@
+# Requiem Monolith: declining deals no damage, but the Memnite keeps the gift until end of turn (CR 611.2a). A Lightning Bolt then
+# deals 3, "that many" is 3 (CR 120.2): Bot1 draws 3 cards and loses 3 life, and the Memnite dies.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Requiem Monolith
+Memnite
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Requiem Monolith.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Requiem Monolith.Activate(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Bot1.Life = 20
+? Bot1.Battlefield.Memnite.Damage = 0
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Memnite; Lightning Bolt

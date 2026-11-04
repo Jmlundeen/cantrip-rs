@@ -1,0 +1,47 @@
+# Requiem Monolith: on turn 1 the Memnite is given the trigger and Bot1 declines the damage. On turn 3 the gift is gone (CR 514.2),
+# so a Lightning Bolt that kills the Memnite draws nothing and costs no life; and with that Bolt on the stack the untapped Monolith
+# can't be activated ("only as a sorcery", CR 602.5d).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Requiem Monolith
+Memnite
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Requiem Monolith.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Requiem Monolith.Activate(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Requiem Monolith.Activate(Mox Jet)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Memnite)
+! Bot1.Battlefield.Requiem Monolith.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand.Count = 1
+Bot1.Graveyard = Memnite; Lightning Bolt
