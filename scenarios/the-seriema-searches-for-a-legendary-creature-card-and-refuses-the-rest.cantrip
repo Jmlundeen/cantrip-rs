@@ -1,0 +1,43 @@
+# The Seriema: "When The Seriema enters, search your library for a legendary creature card, reveal it, put it into your hand,
+# then shuffle" (CR 701.23, 701.20, 701.24). Ornithopter (a creature, not legendary) is refused, so is Black Lotus; Agent Maria
+# Hill is taken and Agent Phil Coulson, also legendary, stays in the library. Bot1 pays {1}{W}{W} with Plains, Mox Pearl and
+# Mox Sapphire.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+The Seriema
+Island x3
+Ornithopter
+Agent Maria Hill
+Agent Phil Coulson
+Black Lotus
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Seriema.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Ornithopter)
+! Bot1.Search(Black Lotus)
+Bot1.Search(Agent Maria Hill)
+? Bot1.Shuffles = 1
+
+[Expect]
+Bot1.Shuffles = 1
+Bot1.Hand.Count = 4
+Bot1.Hand.Agent Maria Hill.Power = 2
+Bot1.Library.Count = 12
+Bot1.Revealed = Agent Maria Hill

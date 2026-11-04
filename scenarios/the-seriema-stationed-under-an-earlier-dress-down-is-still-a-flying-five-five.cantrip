@@ -1,0 +1,71 @@
+# Dress Down is on the battlefield before The Seriema enters. Seven charge counters turn on "7+ | Flying": one static
+# ability whose effect began in layer 4, so its layer 6 and 7b parts keep applying although Dress Down, earlier in layer
+# 6, took The Seriema's abilities - a 5/5 with flying (CR 613.6, 721.2b).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Black Lotus
+Colossal Dreadmaw
+Elvish Mystic
+Black Lotus
+Dress Down
+The Seriema
+Agent Maria Hill
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Seriema.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Agent Maria Hill)
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+? Bot1.Battlefield.The Seriema.Counters.Charge = 7
+? Bot1.Battlefield.The Seriema.Types = Artifact; Creature
+? Bot1.Battlefield.The Seriema.Power = 5
+? Bot1.Battlefield.The Seriema.Toughness = 5
+? Bot1.Battlefield.The Seriema.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.The Seriema.Types = Artifact; Creature

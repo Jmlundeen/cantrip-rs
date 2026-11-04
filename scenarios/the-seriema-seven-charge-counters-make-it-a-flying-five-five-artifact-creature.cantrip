@@ -1,0 +1,63 @@
+# The Seriema stations with a 6-power Colossal Dreadmaw: six charge counters are not enough (CR 721.2a), so it is still a
+# noncreature artifact. Stationing with an Elvish Mystic (power 1) makes seven: an artifact creature with flying, a 5/5
+# (CR 702.184a, 721.2a-b).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Colossal Dreadmaw
+The Seriema
+Elvish Mystic
+Plains
+Agent Maria Hill
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Seriema.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Agent Maria Hill)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Seriema.Counters.Charge = 6
+? Bot1.Battlefield.The Seriema.Types = Artifact
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.The Seriema.Counters.Charge = 7
+Bot1.Battlefield.The Seriema.Types = Artifact; Creature
+Bot1.Battlefield.The Seriema.Power = 5
+Bot1.Battlefield.The Seriema.Toughness = 5
+Bot1.Battlefield.The Seriema.Keywords = Flying

@@ -1,0 +1,84 @@
+# The Seriema: "Other tapped legendary creatures you control have indestructible." Bot1 controls Agent Maria Hill, tapped to
+# station (CR 702.184a), Agent Phil Coulson, untapped, and a tapped Ornithopter, which is not legendary. Bot2's own Agent Maria Hill
+# attacked and is tapped, but The Seriema gives nothing to a creature Bot2 controls. Bot2's Wrath of God (CR 701.8) destroys all
+# of them except Bot1's tapped Maria Hill (CR 702.12b); The Seriema, no creature at two charge counters, is not destroyed either.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+The Seriema
+Agent Phil Coulson
+Ornithopter
+Plains
+Agent Maria Hill
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Agent Maria Hill
+Wrath of God
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Seriema.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Agent Maria Hill)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Agent Maria Hill.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Agent Maria Hill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Agent Phil Coulson.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Agent Maria Hill)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Seriema.Counters.Charge = 2
+[T4 Bot2.Main1]
+Bot2.Attack(Agent Maria Hill > Bot1)
+[T4 Bot2.Main2]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.End]
+
+[Expect]
+Bot1.Battlefield = Agent Maria Hill; Mox Pearl; Mox Sapphire; Plains; Plains; The Seriema
+Bot1.Battlefield.Agent Maria Hill.Tapped = true
+Bot2.Battlefield = Mox Jet; Mox Pearl
+Bot2.Graveyard = Wrath of God; Agent Maria Hill; Black Lotus
