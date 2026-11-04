@@ -1,0 +1,61 @@
+# Auxiliary Boosters {4}{W} (Black Lotus' WWW, Mox Pearl, Mox Sapphire): "When this Equipment enters, create a 2/2 colorless Robot artifact
+# creature token and attach this Equipment to it" (CR 111.1, 701.3a). "Equipped creature gets +1/+2 and has flying": the Robot is a 3/4
+# flier, where Bot1's unequipped Memnite is a 1/1. Turn 3: Equip {3} (Mox Jet, Mox Ruby, Mox Emerald) is not paid by two sources, and
+# when paid moves the Equipment onto the Memnite (2/3 flying) as a sorcery, leaving the Robot a plain 2/2 without flying.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Auxiliary Boosters
+Memnite
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Auxiliary Boosters.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Robot Token = (absent)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot Token.Power = 3
+? Bot1.Battlefield.Robot Token.Toughness = 4
+? Bot1.Battlefield.Robot Token.Keywords = Flying
+? Bot1.Battlefield.Auxiliary Boosters.AttachedTo = Robot Token
+? Bot1.Battlefield.Memnite.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Auxiliary Boosters.Activate(Bot1.Battlefield.Memnite)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Auxiliary Boosters.Activate(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Auxiliary Boosters.AttachedTo = Memnite
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Battlefield.Memnite.Toughness = 3
+Bot1.Battlefield.Memnite.Keywords = Flying
+Bot1.Battlefield.Robot Token.Power = 2
+Bot1.Battlefield.Robot Token.Toughness = 2
+Bot1.Battlefield.Robot Token.Keywords = (absent)
+Bot1.Battlefield.Robot Token.Colors = (absent)
+Stack.Count = 0

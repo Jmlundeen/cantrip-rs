@@ -1,0 +1,50 @@
+# Bot2 destroys Auxiliary Boosters with Disenchant while its enters trigger is on the stack: the Equipment is no longer on the battlefield
+# when the trigger resolves, so the Robot token is still created but nothing attaches (CR 701.3b): it is a plain 2/2 with no flying.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Auxiliary Boosters
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Disenchant
+Island x4
+Island x20
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Auxiliary Boosters.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Auxiliary Boosters)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Robot Token.Power = 2
+Bot1.Battlefield.Robot Token.Toughness = 2
+Bot1.Battlefield.Robot Token.Keywords = (absent)
+Bot1.Graveyard = Auxiliary Boosters; Black Lotus
+Stack.Count = 0
