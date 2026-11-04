@@ -1117,7 +1117,7 @@ public sealed partial class TacticalPlay
             "Assist" => false,
 
             // Payments of life - a shockland's, ward's, Master of Death's - are the payment prompt's (WorthPaying).
-            "DiscardUnlessCountered" => client.MyHand().Count > prompt.Amount,
+            "DiscardUnlessCountered" or "DiscardAtRandomUnlessCountered" => client.MyHand().Count > prompt.Amount,
 
             // Ward—Sacrifice N permanents (Emrakul, the Exigent Doom; Ulamog, the Defiler): a price paid only out of a wide
             // board, which still holds four permanents afterwards.

@@ -2090,6 +2090,11 @@ public sealed partial class MainPage
                 Ask($"Discard a card, or {source} is countered?", "Ward", "Discard a card", "Don't pay");
                 return;
 
+            // Ward-Discard a card at random (CR 702.21a, 701.9b): the payer is told the card is not theirs to choose.
+            case "DiscardAtRandomUnlessCountered":
+                Ask($"Discard a card at random, or {source} is countered?", "Ward", "Discard at random", "Don't pay");
+                return;
+
             // Assist (CR 702.132a): asked as the spell is cast, once its total cost is locked in. Neither button is primary, so
             // passing through the announcement never hands part of a payment to another player by accident.
             case "Assist":

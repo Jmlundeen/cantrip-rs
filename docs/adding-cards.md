@@ -550,7 +550,8 @@ shapes have an example:
   rather than "cast": a land it allows is played from exile as a land play (CR 305.1); `life_for_mana_value: true` is "if
   you cast a spell this way, pay life equal to its mana value rather than pay its mana cost" (CR 118.9, 119.4), the one
   alternative cost, additional costs paid as usual (Valgavoth, Terror Eater).
-- **Ward with a cost other than mana** (CR 702.21a, 118.12): `triggers::ward_life::<N>`, `ward_discard`, and
+- **Ward with a cost other than mana** (CR 702.21a, 118.12): `triggers::ward_life::<N>`, `ward_discard`,
+  `ward_discard_at_random` ("Discard a card at random", CR 701.9b), and
   `ward_sacrifice::<N>` ("Sacrifice N permanents": refused with fewer, and under Tamiyo, Collector of Tales),
   `ward_sacrifice_nonland::<N>` ("Sacrifice N nonland permanents") and `ward_sacrifice_a_food`.
 - **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `DelayedWhen::EachStep` for "at the beginning of each [step] ... for the

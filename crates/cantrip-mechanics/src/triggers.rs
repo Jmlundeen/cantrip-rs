@@ -9,6 +9,16 @@ pub use crate::enlist::{THIS_ENLISTS, this_enlists};
 const WARD_DISCARD: Question =
     Question::new("DiscardUnlessCountered", "Discard a card, or {source} is countered?", "Ward: what it targeted can't be targeted for free", "Discard a card", "Let it be countered").no_default();
 
+/// What ward's discard-at-random cost asks: the payer chooses to pay, not which card goes.
+const WARD_DISCARD_AT_RANDOM: Question = Question::new(
+    "DiscardAtRandomUnlessCountered",
+    "Discard a card at random, or {source} is countered?",
+    "Ward: what it targeted can't be targeted for free",
+    "Discard a card at random",
+    "Let it be countered",
+)
+.no_default();
+
 /// "When this enters" (CR 603.6a): the entering object's own zone change onto the battlefield.
 pub fn this_enters(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -846,14 +856,21 @@ pub const fn ward_waterbend<const N: u8>(text: &'static str) -> AbilityDef {
 /// Whether the player whose spell or ability targeted pays ward's discard cost (CR 118.12a): a player with no card in hand
 /// cannot pay and is not asked, nor is one whom the ward's controller's abilities can't make discard (CR 101.2; Tamiyo,
 /// Collector of Tales's ruling: "something happens unless you discard" can't be paid); one who can is asked whether to, and
-/// then which card.
-fn ward_discard_paid(g: &mut dyn Game, item: &StackItem, by: ObjectId) -> Result<bool, Suspend> {
+/// then which card - or, `at_random`, none: the card is taken at random (CR 701.9b).
+fn ward_discard_paid(g: &mut dyn Game, item: &StackItem, by: ObjectId, at_random: bool) -> Result<bool, Suspend> {
     let payer = PlayerId(item.data[0] as u8);
     if !g.state().zone(Zone::hand(payer)).is_empty()
         && may_cause(&*g, item.controller, payer, CauseKind::Discard)
-        && matches!(g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(&WARD_DISCARD) })?, Answer::Yes)
+        && matches!(
+            g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(if at_random { &WARD_DISCARD_AT_RANDOM } else { &WARD_DISCARD }) })?,
+            Answer::Yes
+        )
     {
-        crate::discard_chosen(g, payer, item.object, 1)?;
+        if at_random {
+            crate::discard_at_random(g, payer, 1);
+        } else {
+            crate::discard_chosen(g, payer, item.object, 1)?;
+        }
         return Ok(true);
     }
     Ok(false)
@@ -861,7 +878,7 @@ fn ward_discard_paid(g: &mut dyn Game, item: &StackItem, by: ObjectId) -> Result
 
 fn ward_discard_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
-    if !ward_discard_paid(g, item, by)? {
+    if !ward_discard_paid(g, item, by, false)? {
         g.counter_item(by, item.data[1] as usize);
     }
     Ok(())
@@ -872,6 +889,21 @@ fn ward_discard_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 pub const fn ward_discard(text: &'static str) -> AbilityDef {
     triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_discard_effect, text)
         .ward()
+}
+
+fn ward_discard_at_random_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Target::Object(by) = item.subject else { return Ok(()) };
+    if !ward_discard_paid(g, item, by, true)? {
+        g.counter_item(by, item.data[1] as usize);
+    }
+    Ok(())
+}
+
+/// Ward--Discard a card at random (CR 702.21a, 118.12, 701.9b): "Whenever this becomes the target of a spell or ability an
+/// opponent controls, counter it unless that player discards a card at random." The player decides whether to pay; the card is
+/// then taken at random from their hand. Alpharael, Stonechosen prints it.
+pub const fn ward_discard_at_random(text: &'static str) -> AbilityDef {
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_discard_at_random_effect, text).ward()
 }
 
 /// Ward's mana half of "discard a card or pay {N}": declining it is not yet a counter, the discard is offered next to a payer who
@@ -888,7 +920,7 @@ fn ward_discard_or_pay_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
     // The cost is either one: the payer is asked about the mana first, and about the discard if they decline or can't pay.
-    if g.may_pay(payer, item.object, by, Cost { mana: generic(N as u32), ..Cost::NONE }, &WARD_PAY_OR_DISCARD)? || ward_discard_paid(g, item, by)? {
+    if g.may_pay(payer, item.object, by, Cost { mana: generic(N as u32), ..Cost::NONE }, &WARD_PAY_OR_DISCARD)? || ward_discard_paid(g, item, by, false)? {
         return Ok(());
     }
     g.counter_item(by, item.data[1] as usize);
