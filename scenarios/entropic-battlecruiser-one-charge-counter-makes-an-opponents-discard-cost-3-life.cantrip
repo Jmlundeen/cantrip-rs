@@ -1,0 +1,41 @@
+# Entropic Battlecruiser {3}{B}, 1+ | "Whenever an opponent discards a card, they lose 3 life." Bot2's draw on turn 2 makes eight cards
+# in hand, and the cleanup step discards one: with no charge counters yet nothing happens (Bot2 stays at 20). Bot1 then stations with
+# Elvish Mystic (power 1): one charge counter, still no creature, and the discard of turn 4 costs Bot2 exactly 3 life.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Black Lotus
+Entropic Battlecruiser
+Elvish Mystic
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entropic Battlecruiser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Life = 20
+Bot1.Battlefield.Entropic Battlecruiser.Activate(Ability: Station)
+Bot1.Choose(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Entropic Battlecruiser.Counters.Charge = 1
+? Bot1.Battlefield.Entropic Battlecruiser.Types = Artifact
+[T5 Bot1.Main1]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Entropic Battlecruiser.Types = Artifact

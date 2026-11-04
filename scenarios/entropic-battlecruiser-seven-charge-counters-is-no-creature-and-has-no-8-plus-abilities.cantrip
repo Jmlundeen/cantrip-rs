@@ -1,0 +1,55 @@
+# Entropic Battlecruiser with 7 charge counters (Frostbite Pyromental's 4 on turn 1, Darklight Phoenix's 3 on turn 3) is still no creature
+# and has neither flying nor deathtouch nor 3/10: its 8+ striation needs one counter more (CR 721.2a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Ruby x2
+Entropic Battlecruiser
+Frostbite Pyromental
+Darklight Phoenix
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entropic Battlecruiser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Frostbite Pyromental.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Entropic Battlecruiser.Activate(Ability: Station)
+Bot1.Choose(Frostbite Pyromental)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Entropic Battlecruiser.Counters.Charge = 4
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Darklight Phoenix.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Entropic Battlecruiser.Activate(Ability: Station)
+Bot1.Choose(Darklight Phoenix)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Entropic Battlecruiser.Counters.Charge = 7
+Bot1.Battlefield.Entropic Battlecruiser.Types = Artifact
+Bot1.Battlefield.Entropic Battlecruiser.Keywords = (absent)

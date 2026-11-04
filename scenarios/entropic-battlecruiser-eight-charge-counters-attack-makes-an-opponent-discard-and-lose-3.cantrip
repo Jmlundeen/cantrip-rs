@@ -1,0 +1,62 @@
+# Entropic Battlecruiser stationed at once with Phyrexian Soulgorger (power 8): eight charge counters make it a 3/10 artifact creature
+# with flying and deathtouch, and its 1+ ability costs Bot2 3 life for the discard of turn 2's cleanup (20 -> 17). When it attacks
+# on turn 3, Bot2 discards a card (7 -> 6 in hand) and loses 3 life for it (-> 14), then 3 combat damage (-> 11).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Black Lotus
+Entropic Battlecruiser
+Phyrexian Soulgorger
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entropic Battlecruiser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Soulgorger.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Entropic Battlecruiser.Activate(Ability: Station)
+Bot1.Choose(Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Entropic Battlecruiser.Counters.Charge = 8
+? Bot1.Battlefield.Entropic Battlecruiser.Types = Artifact; Creature
+? Bot1.Battlefield.Entropic Battlecruiser.Power = 3
+? Bot1.Battlefield.Entropic Battlecruiser.Toughness = 10
+? Bot1.Battlefield.Entropic Battlecruiser.Keywords = Deathtouch; Flying
+[T3 Bot1.Main1]
+? Bot2.Life = 17
+? Bot2.Hand.Count = 7
+Bot1.Attack(Entropic Battlecruiser > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Island)
+? Bot2.Hand.Count = 6
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 14
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 11
+Bot2.Graveyard.Count = 2
