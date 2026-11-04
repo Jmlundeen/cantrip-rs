@@ -1,0 +1,11 @@
+{
+  "name": "Kraven, Proud Predator",
+  "manaCost": "{1}{R}{G}",
+  "type": "Legendary Creature — Human Warrior Villain",
+  "power": "*",
+  "toughness": 4,
+  "oracleText": "Vigilance\nTop of the Food Chain — Kraven's power is equal to the greatest mana value among permanents you control.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

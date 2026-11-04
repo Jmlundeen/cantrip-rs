@@ -1,0 +1,63 @@
+# Kraven, Proud Predator ({1}{R}{G}, */4 vigilance): "Kraven's power is equal to the greatest mana value among permanents you control."
+# In the hand, with no permanents to count, the power is 0 (CR 208.2a, 604.3: the ability works in every zone).
+# Turn 1 with only Moxen (mana value 0) beside him, his power is his own 3. On turn 3 Vulture, Scheming Scavenger (mana value 6, hybrid
+# {5}{U/B}) comes in and Kraven's power is 6, toughness still 4. The Moxen cast on turn 3 (mana value 0) change nothing before it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Kraven, Proud Predator
+Mox Pearl
+Mox Sapphire
+Gleemox
+Vulture, Scheming Scavenger
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+? Bot1.Hand.Kraven, Proud Predator.Power = 0
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kraven, Proud Predator.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kraven, Proud Predator.Power = 3
+? Bot1.Battlefield.Kraven, Proud Predator.Toughness = 4
+? Bot1.Battlefield.Kraven, Proud Predator.Keywords = Vigilance
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kraven, Proud Predator.Power = 3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Vulture, Scheming Scavenger.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Kraven, Proud Predator.Power = 6
+Bot1.Battlefield.Kraven, Proud Predator.Toughness = 4

@@ -1,0 +1,57 @@
+# Kraven, Proud Predator: his power is a characteristic-defining ability over a printed */4 (CR 604.3). With three Moxen he is a 3/4 (the
+# control). Bot2's The Wondrous Wasp takes his abilities away on turn 2 and the star is worth 0 (CR 208.2a, 208.5): a 0/4 without vigilance.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Kraven, Proud Predator
+Island x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+The Wondrous Wasp
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kraven, Proud Predator.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Kraven, Proud Predator.Power = 3
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Kraven, Proud Predator)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Kraven, Proud Predator.Power = 0
+Bot1.Battlefield.Kraven, Proud Predator.Toughness = 4
+Bot1.Battlefield.Kraven, Proud Predator.Keywords = (absent)
