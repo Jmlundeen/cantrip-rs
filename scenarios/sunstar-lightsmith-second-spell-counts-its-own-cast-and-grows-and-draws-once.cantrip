@@ -1,0 +1,48 @@
+# Sunstar Lightsmith, a 3/3: "Whenever you cast your second spell each turn, put a +1/+1 counter on this creature and
+# draw a card." Per the ruling, spells cast earlier this turn count, Lightsmith's own cast included: on turn 3 Bot1 casts
+# Lightsmith (first, nothing triggers: it is not on the battlefield) and Mox Emerald (second): one counter (a 4/4) and one
+# card, the Mountain below the Island drawn for the turn. A third spell, Black Lotus, is a negative control: still one counter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Sunstar Lightsmith
+Mox Emerald
+Black Lotus
+Island
+Mountain
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sunstar Lightsmith.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sunstar Lightsmith.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sunstar Lightsmith.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sunstar Lightsmith.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Sunstar Lightsmith.Power = 4
+Bot1.Battlefield.Sunstar Lightsmith.Toughness = 4
+Bot1.Hand = Island; Mountain

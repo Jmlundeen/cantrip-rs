@@ -1,0 +1,45 @@
+# "Whenever YOU cast your second spell each turn": Bot2 casts two spells on its own turn 2 and Lightsmith (Bot1's, on the
+# battlefield since turn 1) does nothing. On turn 3 Bot1 casts two spells, a positive control with the same count: spells are
+# counted for each player afresh each turn, so the trigger fires then.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Sunstar Lightsmith
+Mox Emerald
+Black Lotus
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sunstar Lightsmith.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Sunstar Lightsmith.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sunstar Lightsmith.Counters.PlusOnePlusOne = 1

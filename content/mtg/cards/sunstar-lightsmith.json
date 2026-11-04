@@ -1,0 +1,8 @@
+{
+  "name": "Sunstar Lightsmith",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Human Artificer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever you cast your second spell each turn, put a +1/+1 counter on this creature and draw a card."
+}
