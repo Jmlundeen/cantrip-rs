@@ -165,6 +165,20 @@ pub fn creatures_you_control_get<const P: i16, const T: i16>(g: &mut dyn Game, i
     Ok(())
 }
 
+/// "Creatures target player controls get +`P`/+`T` until end of turn" (CR 611.2, 611.2c): the creatures the player at target
+/// slot `TARGET` controls as it resolves, and no creature that enters later; nothing if that player is no longer a legal target
+/// (CR 608.2b). Gnashing of Teeth (-1/-1) and How to Start a Riot (+2/+0) print it.
+pub fn creatures_target_player_controls_get<const TARGET: usize, const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(player) = crate::targets::player(g, item, TARGET) else { return Ok(()) };
+    let creatures: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    instruction(g, |g| {
+        for id in creatures {
+            crate::pump(g, item.object, id, P, T);
+        }
+    });
+    Ok(())
+}
+
 /// "Creatures you control get +`power`/+`toughness` and gain [a keyword] until end of turn" (CR 611.2, 611.2c): the creatures
 /// `item`'s controller controls as it resolves, and no creature that enters later. Silk, Web Weaver (+2/+2) and The Super Hero
 /// Civil War (+1/+1) print it with vigilance.

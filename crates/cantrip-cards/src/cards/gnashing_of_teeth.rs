@@ -14,23 +14,10 @@ fn shrink_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Mode 2: "Creatures target player controls get -1/-1 until end of turn." (CR 611.2c): the creatures that player controls as
-/// it resolves, and no creature that enters later; nothing if the player is no longer a legal target (CR 608.2b).
-fn shrink_their_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = targets::player(g, item, 0) else { return Ok(()) };
-    let creatures: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    instruction(g, |g| {
-        for id in creatures {
-            cantrip_mechanics::pump(g, item.object, id, -1, -1);
-        }
-    });
-    Ok(())
-}
-
 static MODAL: ModalDef = modes(&[
     mode(shrink_and_exile, "Target creature gets -5/-5 until end of turn. If that creature would die this turn, exile it instead.")
         .targets(&[targets::CREATURE]),
-    mode(shrink_their_creatures, "Creatures target player controls get -1/-1 until end of turn.").targets(&[targets::PLAYER]),
+    mode(effects::creatures_target_player_controls_get::<0, -1, -1>, "Creatures target player controls get -1/-1 until end of turn.").targets(&[targets::PLAYER]),
 ]);
 
 pub static CARD: CardDef = CardDef {
