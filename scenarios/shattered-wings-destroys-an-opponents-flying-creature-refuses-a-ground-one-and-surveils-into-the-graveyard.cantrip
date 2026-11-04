@@ -1,0 +1,48 @@
+# Shattered Wings: Bot2's Grizzly Bears (no flying, not an artifact or enchantment) is refused as a target; its Suntail Hawk (a
+# creature with flying) is destroyed, and the surveil puts the Forest on top into the graveyard: the library goes 12 to 11.
+
+[Bot1 Deck]
+Black Lotus
+Shattered Wings
+Island x6
+Forest
+Island x11
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Suntail Hawk
+Grizzly Bears
+Island x15
+
+[Actions]
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Suntail Hawk.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+! Bot1.Hand.Shattered Wings.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Hand.Shattered Wings.Cast(Bot2.Battlefield.Suntail Hawk)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Forest)
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Suntail Hawk
+Bot1.Graveyard = Shattered Wings; Forest; Black Lotus
+Bot1.Library.Count = 11
