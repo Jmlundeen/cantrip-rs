@@ -1,0 +1,35 @@
+# Scour for Scrap, the return mode alone (CR 700.2): Sol Ring stays in the library, unsearched, and only the target comes
+# back: the sacrificed Black Lotus returns to the hand and the library keeps its 14 cards. Paid for exactly {3}{U}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Scour for Scrap
+Island
+Island
+Island
+Island
+Sol Ring
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Scour for Scrap.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Scour for Scrap
+Bot1.Hand = Island; Island; Island; Island; Black Lotus
+Bot1.Library.Count = 14

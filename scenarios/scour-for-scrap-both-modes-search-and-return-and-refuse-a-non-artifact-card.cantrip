@@ -1,0 +1,45 @@
+# Scour for Scrap, choose one or both (CR 700.2): the graveyard holds Lightning Bolt (not an artifact) and Black Lotus (sacrificed
+# for {U}{U}{U}); the return mode refuses the Bolt and takes the Lotus, and with both modes chosen Sol Ring is searched out of the
+# library to the hand (revealed, then shuffled) and the Lotus returns, so the hand ends with both. Paid for exactly {3}{U}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Lightning Bolt
+Scour for Scrap
+Island
+Island
+Sol Ring
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Scour for Scrap.Cast
+Bot1.Modes(1; 2)
+! Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Search(Sol Ring)
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Scour for Scrap; Lightning Bolt
+Bot1.Hand = Island; Island; Black Lotus; Sol Ring
+Bot1.Library.Count = 13
+Bot1.Revealed = Sol Ring

@@ -1,0 +1,60 @@
+# CR 608.2b: with both modes chosen, the return mode's target, Mox Jet in Bot1's graveyard, is exiled by Bot2's Ghost Vacuum in
+# response. The spell's only target is illegal, so it does not resolve at all: not even the search mode (which has no target of
+# its own) is done - Sol Ring stays in the library, nothing is shuffled, and the spell goes to the graveyard. Bot1 discards the
+# Mox Jet to Faithless Looting on turn 1 and casts Scour for Scrap on turn 3 with the three Moxen and an Island.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Faithless Looting
+Mox Jet
+Scour for Scrap
+Island x4
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island
+Ghost Vacuum
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Mox Jet; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Scour for Scrap.Cast
+Bot1.Modes(1; 2)
+Bot1.Target(Bot1.Graveyard.Mox Jet)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Shuffles = 0
+? Bot1.Library.Count = 11
+
+[Expect]
+Stack.Count = 0
+Exile = Mox Jet
+Bot1.Graveyard = Scour for Scrap; Faithless Looting; Island
+Bot1.Hand = Island; Island
+Bot1.Library.Count = 11

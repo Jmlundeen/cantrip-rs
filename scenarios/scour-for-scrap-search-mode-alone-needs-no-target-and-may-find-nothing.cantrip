@@ -1,0 +1,37 @@
+# Scour for Scrap, the search mode alone (CR 700.2): it has no target, so casting it with only that mode asks for none (CR 700.2c).
+# The search is for an artifact card, which a player may fail to find (CR 701.23b): Bot1 takes none although Sol Ring is in the
+# library, and the library is shuffled all the same; the hand gains nothing. Paid for exactly {3}{U}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Scour for Scrap
+Island
+Island
+Island
+Island
+Sol Ring
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Scour for Scrap.Cast
+! Bot1.Modes(Count: 0)
+Bot1.Modes(1)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Search()
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Scour for Scrap; Black Lotus
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Library.Count = 14
