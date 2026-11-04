@@ -238,6 +238,13 @@ pub fn other_creature_you_control_filter(q: &dyn Query, asker: &Asker, t: Target
     creature_you_control_filter(q, asker, t) && t != Target::Object(asker.source)
 }
 pub const OTHER_CREATURE_YOU_CONTROL: TargetSpec = target(other_creature_you_control_filter);
+/// "Another target creature you control with power 2 or less" (CR 115.1, 109.5, 208.1): another creature under your control, with
+/// the power the layers give it now, so a counter or an effect moves a creature in and out of range. Eardrum Rattler and
+/// Deserter's Disciple print it.
+pub fn other_creature_you_control_with_power_two_or_less_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    other_creature_you_control_filter(q, asker, t) && creature_with_power_at_most::<2>(q, asker, t)
+}
+pub const OTHER_CREATURE_YOU_CONTROL_WITH_POWER_2_OR_LESS: TargetSpec = target(other_creature_you_control_with_power_two_or_less_filter);
 
 /// "Creature or Vehicle" (CR 205.3g, 301.7): a permanent on the battlefield that is a creature, or a Vehicle whether or not
 /// it is crewed into a creature right now. Bounce Off and Perilous Snare target one; Reckoner Shakedown chooses one.
