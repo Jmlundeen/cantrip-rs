@@ -1,0 +1,42 @@
+# Mechan Navigator {1}{U} 2/1: "Whenever this creature becomes tapped, draw a card, then discard a card" (CR 603.2, 701.9). Casting it (two Moxen) does
+# nothing. In turn 3 Bot1 plays the Island it drew, so its hand is empty when the Navigator attacks: the trigger draws the Forest and then must discard it
+# (hand 0, Forest in the graveyard). Discarding first would find nothing to discard and leave the Forest in hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mechan Navigator
+Island
+Island
+Forest
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mechan Navigator.Cast
+Bot1.Hand.Island.Play
+? Bot1.Hand.Count = 0
+? Bot1.Graveyard.Count = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Hand.Count = 0
+Bot1.Attack(Mechan Navigator > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Forest
+Bot1.Battlefield.Mechan Navigator.Tapped = true
+Bot2.Life = 18

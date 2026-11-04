@@ -1,0 +1,8 @@
+{
+  "name": "Mechan Navigator",
+  "manaCost": "{1}{U}",
+  "type": "Artifact Creature — Robot Pilot",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Whenever this creature becomes tapped, draw a card, then discard a card."
+}
