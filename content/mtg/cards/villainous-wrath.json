@@ -1,0 +1,6 @@
+{
+  "name": "Villainous Wrath",
+  "manaCost": "{3}{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "Target opponent loses life equal to the number of creatures they control. Then destroy all creatures."
+}

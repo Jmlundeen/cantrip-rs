@@ -1,0 +1,54 @@
+# Villainous Wrath: "Target opponent loses life equal to the number of creatures they control. Then destroy all creatures." Bot2 controls
+# three Ornithopters and Bot1 one: Bot2 loses 3 (17) - not 4 - and then all four creatures are destroyed (CR 119.3, 701.8a).
+
+[Bot1 Deck]
+Ornithopter
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Swamp
+Villainous Wrath
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Villainous Wrath.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 20
+Bot1.Battlefield.Ornithopter = (absent)
+Bot2.Battlefield.Count = 0
+Stack.Count = 0
