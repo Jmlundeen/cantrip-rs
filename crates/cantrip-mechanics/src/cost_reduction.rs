@@ -52,7 +52,7 @@ pub const fn color(color: Color) -> u8 {
 /// "This ability costs {1} less to activate for each [subtype] you control" (CR 601.2f by way of 602.2b): the activated ability's own cost change
 /// (`ActivatedDef::cost_change`), asked as it is activated and counting only the permanents of the player activating it, as the layers
 /// have made them that type. Generic mana only (CostDelta::less never takes a colored symbol). `TYPE` is `lands::sub(Subtype::Island)` and so
-/// on, read as a word of the source's text (CR 612.2). The Lonely Mountain (Equipment) and Waterbending Scroll (Island) print it.
+/// on, read as a word of the source's text (CR 612.2). The Lonely Mountain (Equipment), Waterbending Scroll (Island) and Qiqirn Merchant (Town) print it.
 pub fn ability_cheaper_per_subtype_you_control<const TYPE: u16>(q: &dyn Query, asker: &Asker, _: Costed, _: &[Target]) -> CostDelta {
     let wanted = crate::lands::word(q, asker.source, TYPE);
     CostDelta::less(crate::permanents_with_subtype_you_control(q, asker.controller, wanted) as u32)
