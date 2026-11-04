@@ -3,26 +3,13 @@ use cantrip_mechanics::triggers::{NONCREATURE_SPELL_YOU_CAST, PROWESS};
 use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
-/// "Whenever you cast a noncreature spell, put a +1/+1 counter on each other creature you control." (CR 122.1, 603.2, 101.4): the
-/// creatures its controller controls as it resolves other than Photon, together.
-fn counter_on_each_other_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let puts: Vec<(ObjectId, CounterKind, i16)> = g
-        .permanents_of(item.controller)
-        .into_iter()
-        .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature))
-        .map(|id| (id, CounterKind::PlusOne, 1))
-        .collect();
-    g.add_counters_together(&puts);
-    Ok(())
-}
-
 /// Photon, Living Light: flying and hexproof are core keywords.
 pub static BACK: CardDef = CardDef {
     abilities: &[
         PROWESS,
         triggered(
             NONCREATURE_SPELL_YOU_CAST,
-            counter_on_each_other_creature,
+            effects::plus_one_counter_on_each_other_creature_you_control,
             "Whenever you cast a noncreature spell, put a +1/+1 counter on each other creature you control.",
         ),
     ],

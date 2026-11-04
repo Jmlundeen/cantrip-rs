@@ -324,6 +324,15 @@ pub fn plus_one_counter_on_each_other_of_subtype_you_control<const SUBTYPE: u16>
     Ok(())
 }
 
+/// "Put a +1/+1 counter on each other creature you control" as an ability's whole effect (CR 122.1, 101.4): the creatures its controller controls
+/// as it resolves but its source, together. Monica Rambeau and Web-Warriors print it.
+pub fn plus_one_counter_on_each_other_creature_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let others: Vec<ObjectId> =
+        g.permanents_of(item.controller).into_iter().filter(|&id| id != item.object && g.chars(id).is(CardType::Creature)).collect();
+    counters_on_each(g, &others, CounterKind::PlusOne, 1);
+    Ok(())
+}
+
 /// "Put two +1/+1 counters on target [permanent]" (CR 122.1a, 608.2b), the first target still legal on resolution. The whole
 /// effect of the sacrifice ability of Elvenking's Halls, Goblin-town, Iron Hills, Lake-town and Mirkwood (`lands::sacrifice_for_two_counters`),
 /// and of Room of Refuge, Trash the Town and Silverquill Charm: with none chosen (an "up to one" slot) or none legal nothing is put on.
