@@ -1,0 +1,84 @@
+# Specimen Freighter, station 9+ (4/7): "Flying. Whenever this Spacecraft attacks, defending player mills four cards." Bot1 charges it with Lodestone Golem (5), Dauntless Scrapbot (3) and Memnite (1): at 5 and at 8 counters it is no creature (an attack is refused, no flying); the ninth counter makes it a 4/7 artifact creature with flying, which attacks, mills Bot2 four cards and deals 4 (CR 702.184a, 721.2a-b).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Specimen Freighter
+Lodestone Golem
+Dauntless Scrapbot
+Memnite
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Specimen Freighter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lodestone Golem.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauntless Scrapbot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Specimen Freighter.Activate(Ability: Station)
+Bot1.Choose(Lodestone Golem)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Specimen Freighter.Counters.Charge = 5
+? Bot1.Battlefield.Specimen Freighter.Types = Artifact
+[T7 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Specimen Freighter.Activate(Ability: Station)
+Bot1.Choose(Dauntless Scrapbot)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Specimen Freighter.Counters.Charge = 8
+? Bot1.Battlefield.Specimen Freighter.Types = Artifact
+Bot1.Battlefield.Specimen Freighter.Activate(Ability: Station)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Specimen Freighter.Counters.Charge = 9
+? Bot1.Battlefield.Specimen Freighter.Types = Artifact; Creature
+? Bot1.Battlefield.Specimen Freighter.Power = 4
+? Bot1.Battlefield.Specimen Freighter.Toughness = 7
+? Bot1.Battlefield.Specimen Freighter.Keywords = Flying
+? Bot2.Library.Count = 20
+Bot1.Attack(Specimen Freighter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Library.Count = 16
+[T7 Bot1.Main2]
+? Bot2.Life = 16
+
+[Expect]
+Bot2.Library.Count = 16
+Bot2.Life = 16
+Bot1.Battlefield.Specimen Freighter.Counters.Charge = 9

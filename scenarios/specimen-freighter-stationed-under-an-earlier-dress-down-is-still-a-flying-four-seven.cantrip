@@ -1,0 +1,77 @@
+# Dress Down is on the battlefield before Specimen Freighter enters. Nine charge counters (Colossal Dreadmaw's 6, Centaur
+# Courser's 3) turn on "9+ | Flying / Whenever this Spacecraft attacks, defending player mills four cards": one static
+# ability whose effect began in layer 4, so all of its layer 6 part (flying and the attack trigger) and its 7b part keep
+# applying although Dress Down, earlier in layer 6, took the Freighter's abilities - a 4/7 with flying (CR 613.6, 721.2b).
+# The Freighter's enters trigger returns nothing: "up to two", none chosen.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Colossal Dreadmaw
+Centaur Courser
+Dress Down
+Specimen Freighter
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Centaur Courser.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Specimen Freighter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Specimen Freighter.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Specimen Freighter.Activate(Ability: Station)
+Bot1.Choose(Centaur Courser)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+? Bot1.Battlefield.Specimen Freighter.Counters.Charge = 9
+? Bot1.Battlefield.Specimen Freighter.Types = Artifact; Creature
+? Bot1.Battlefield.Specimen Freighter.Power = 4
+? Bot1.Battlefield.Specimen Freighter.Toughness = 7
+? Bot1.Battlefield.Specimen Freighter.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.Specimen Freighter.Types = Artifact; Creature
+Bot1.Battlefield.Specimen Freighter.Toughness = 7

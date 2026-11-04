@@ -1,0 +1,47 @@
+# Specimen Freighter {5}{U}: "When this Spacecraft enters, return up to two target non-Spacecraft creatures to their owners' hands." Bot1 pays with Black Lotus and three Moxen on turn 1; the trigger takes two creatures at once, one of each player's, and a land is not a legal target, nor are three creatures (Bot1's second Ornithopter stays). The Freighter itself stays (it is no creature below 9 charge counters).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Ornithopter
+Specimen Freighter
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Specimen Freighter.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Island)
+! Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot1.Battlefield.Ornithopter#2; Bot2.Battlefield.Memnite)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Hand.Count = 2
+? Bot2.Hand.Count = 7
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot2.Hand.Count = 7
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Ornithopter; Specimen Freighter

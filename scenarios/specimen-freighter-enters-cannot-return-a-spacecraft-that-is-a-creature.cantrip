@@ -1,0 +1,64 @@
+# Specimen Freighter's "up to two target non-Spacecraft creatures": Wurmwall Sweeper, charged to 5 by Lodestone Golem's station, is an artifact creature (4+) but still a Spacecraft, so the Freighter's enters trigger refuses it (and the Freighter, no creature, and an Island); the Golem is a legal target and goes back to its owner's hand.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Wurmwall Sweeper
+Island
+Lodestone Golem
+Specimen Freighter
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lodestone Golem.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+Bot1.Choose(Lodestone Golem)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wurmwall Sweeper.Counters.Charge = 5
+? Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact; Creature
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Specimen Freighter.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Wurmwall Sweeper)
+! Bot1.Target(Bot1.Battlefield.Specimen Freighter)
+! Bot1.Target(Bot1.Battlefield.Island)
+Bot1.Target(Bot1.Battlefield.Lodestone Golem)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Island; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald; Wurmwall Sweeper; Specimen Freighter
+Bot1.Hand = Lodestone Golem
