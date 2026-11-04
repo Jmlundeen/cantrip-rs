@@ -1,0 +1,44 @@
+# Grow Extra Arms ({1}{G}): "This spell costs {1} less to cast if it targets a Spider." The increase is added before the reduction
+# is taken off (CR 601.2f), so with Bot1's Sphere of Resistance ("Spells cost {1} more to cast") the total on a Spider is
+# {1}{G}+{1}-{1} = {1}{G}: the {G}{R} of Mox Emerald and Mox Ruby pay it exactly. It takes one off, not two - two would leave
+# only {G} and the {R} unspent.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sphere of Resistance
+Radioactive Spider
+Grow Extra Arms
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sphere of Resistance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Radioactive Spider.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grow Extra Arms.Cast(Bot1.Battlefield.Radioactive Spider)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Radioactive Spider.Power = 5
+
+[Expect]
+Bot1.Graveyard = Grow Extra Arms

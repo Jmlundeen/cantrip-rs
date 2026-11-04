@@ -1,0 +1,72 @@
+# Grow Extra Arms ({1}{G}, instant): "This spell costs {1} less to cast if it targets a Spider. Target creature gets +4/+4 until
+# end of turn." Bot1 has Mox Emerald and Mox Ruby. Turn 3, with {G}{R} in its pool: Grow Extra Arms on Bot2's Giant Spider costs
+# only {G}, so the {R} is left, and a second one on Bot2's Grizzly Bears (no Spider, {1}{G}) is refused for want of mana. The
+# Spider is 6/8 that turn and 2/4 the next. Turn 5, both Moxen: the Bears cost the full {1}{G}, paid exactly, and are 6/6 until
+# end of turn only.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Grow Extra Arms
+Grow Extra Arms
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Giant Spider
+Grizzly Bears
+Forest
+Forest
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Giant Spider.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grow Extra Arms.Cast(Bot2.Battlefield.Giant Spider)
+? Bot1.Mana = {R}
+!Bot1.Hand.Grow Extra Arms.Cast(Bot2.Battlefield.Grizzly Bears; Mana: short)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Giant Spider.Power = 6
+? Bot2.Battlefield.Giant Spider.Toughness = 8
+? Bot2.Battlefield.Grizzly Bears.Power = 2
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Giant Spider.Power = 2
+? Bot2.Battlefield.Giant Spider.Toughness = 4
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grow Extra Arms.Cast(Bot2.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Grizzly Bears.Power = 6
+? Bot2.Battlefield.Grizzly Bears.Toughness = 6
+[T6 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Grizzly Bears.Toughness = 2
