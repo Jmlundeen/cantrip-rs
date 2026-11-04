@@ -1,0 +1,81 @@
+# Jeong Jeong, the Deserter's exhaust ability watches for "the next Lesson spell this turn" only (CR 603.7b). Bot1 casts two Firebending
+# Lessons. The first, aimed at Bot2's Ornithopter, is copied and the copy is aimed at Bot2's Fortress Crab (1/6): 2 damage. The
+# second is aimed at the Crab and is not copied: the Crab ends with 4 damage and survives (a second copy would make it 6, lethal).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mountain
+Jeong Jeong, the Deserter
+Firebending Lesson
+Firebending Lesson
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sol Ring
+Fortress Crab
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Jeong Jeong, the Deserter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Fortress Crab.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Jeong Jeong, the Deserter.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Fortress Crab)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Fortress Crab.Damage = 2
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Fortress Crab)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Fortress Crab.Damage = 4
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard.Count = 2
+Delayed.Count = 0

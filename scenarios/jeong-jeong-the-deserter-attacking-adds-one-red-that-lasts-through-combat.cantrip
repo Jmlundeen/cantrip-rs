@@ -1,0 +1,32 @@
+# Jeong Jeong, the Deserter's "Firebending 1": attacking adds {R}, kept until end of combat.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Jeong Jeong, the Deserter
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Jeong Jeong, the Deserter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Jeong Jeong, the Deserter > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R} lasting {R}
+
+[Expect]
+Bot1.Mana = {R} lasting {R}

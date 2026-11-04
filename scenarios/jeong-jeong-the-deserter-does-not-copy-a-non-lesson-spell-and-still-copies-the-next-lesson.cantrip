@@ -1,0 +1,64 @@
+# Jeong Jeong, the Deserter's exhaust ability copies a Lesson spell only. After it resolves Bot1 casts Lightning Bolt at Bot2 (not
+# a Lesson: it is not copied, Bot2 takes 3 once) and then Firebending Lesson at Bot2's Ornithopter: the Bolt did not use up the
+# watch, so the Lesson is copied, and the copy is aimed at Bot2's Memnite: both die.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mountain
+Jeong Jeong, the Deserter
+Lightning Bolt
+Firebending Lesson
+
+[Bot2 Deck]
+Ornithopter
+Memnite
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Jeong Jeong, the Deserter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Jeong Jeong, the Deserter.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard.Count = 2
+Bot2.Battlefield.Count = 0
