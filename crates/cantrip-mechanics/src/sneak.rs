@@ -118,13 +118,6 @@ pub fn cast_through_turn(q: &dyn Query, id: ObjectId, kind: WayKind) -> Option<u
             .or_else(|| by.ability.as_lasting_spell_alternative().and_then(|k| card.lasting_spell_alternatives.get(k)));
         return alternative.is_some_and(|a| a.kind == kind).then_some(turn);
     }
-    let through = match cast.granted_by() {
-        Some(grant) => grant
-            .ability
-            .as_granted_way()
-            .and_then(|k| q.card(grant.ability.card).granted_ways.get(k))
-            .is_some_and(|w| w.kind == kind),
-        None => cast.way > 0 && q.card(q.obj(cast.spell).card).ways.get(cast.way as usize - 1).is_some_and(|w| w.kind == kind),
-    };
+    let through = crate::history::way_kind_of(q, cast) == Some(kind);
     through.then_some(turn)
 }

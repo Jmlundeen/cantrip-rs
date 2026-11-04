@@ -4,6 +4,32 @@
 
 use cantrip_api::*;
 
+/// The `Cast` record of the spell `id`, or of the spell the permanent `id` became (CR 400.7, 608.3): the latest one. A copy of a
+/// spell was not cast (CR 707.10) and has none, and a permanent put onto the battlefield was never a spell.
+pub fn cast_of(q: &dyn Query, id: ObjectId) -> Option<Cast> {
+    q.history().all().iter().rev().find_map(|r| match &r.event {
+        Event::Cast(c) if c.spell == id || q.obj(c.spell).became == Some(id) => Some(*c),
+        _ => None,
+    })
+}
+
+/// What kind of way a cast used (`WayKind`): the way a permanent gave it (`GrantedWay::kind`), or else the card's own way it was
+/// cast by; `None` for the card's mana cost (no way) or a way no keyword's. Escape (CR 702.138b), mayhem (CR 702.187) and sneak
+/// (CR 702.190) ask it. A way a permanent gave casts the face for its cost; the card's own ways are not open under another
+/// permission.
+pub fn way_kind_of(q: &dyn Query, cast: Cast) -> Option<WayKind> {
+    match cast.granted_by() {
+        Some(grant) => grant.ability.as_granted_way().and_then(|k| q.card(grant.ability.card).granted_ways.get(k)).map(|w| w.kind),
+        None => (cast.way > 0).then(|| q.card(q.obj(cast.spell).card).ways.get(cast.way as usize - 1)).flatten().map(|w| w.kind),
+    }
+}
+
+/// The kind of way the spell `id` (or the spell the permanent `id` became) was cast by: `way_kind_of` its `cast_of`. Escape's
+/// "escaped" and mayhem's "mayhem cost was paid" are `Some(WayKind::Escape)` and `Some(WayKind::Mayhem)` of it.
+pub fn cast_way_kind(q: &dyn Query, id: ObjectId) -> Option<WayKind> {
+    way_kind_of(q, cast_of(q, id)?)
+}
+
 /// "A creature that dealt damage this turn" (CR 120.2): `source` dealt damage this turn, to anything, combat or not. Damage that
 /// was prevented, or whose amount was zero, was not dealt (CR 615.6). The object is the one that dealt it, so a permanent that left
 /// and came back is another (CR 400.7). Red Guardian, Super-Soldier, Avenging Arrow and Executioner's Swing print it.

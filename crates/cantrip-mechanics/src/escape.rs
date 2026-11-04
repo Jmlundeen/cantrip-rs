@@ -48,20 +48,7 @@ pub const fn way_by_types(mana: ManaCost, types: u8, text: &'static str) -> WayD
 /// spell's `Cast` record: a copy of a spell was not cast (CR 707.10), and a permanent put onto the battlefield was never a
 /// spell, so neither escaped.
 pub fn escaped(q: &dyn Query, id: ObjectId) -> bool {
-    let cast = q.history().all().iter().rev().find_map(|r| match &r.event {
-        Event::Cast(c) if c.spell == id || q.obj(c.spell).became == Some(id) => Some(*c),
-        _ => None,
-    });
-    let Some(cast) = cast.filter(|c| c.from == ZoneKind::Graveyard) else { return false };
-    match cast.granted_by() {
-        // A way a permanent gave casts the face for its cost; the card's own ways are not open under another permission.
-        Some(grant) => grant
-            .ability
-            .as_granted_way()
-            .and_then(|k| q.card(grant.ability.card).granted_ways.get(k))
-            .is_some_and(|w| w.kind == WayKind::Escape),
-        None => cast.way > 0 && q.card(q.obj(cast.spell).card).ways.get(cast.way as usize - 1).is_some_and(|w| w.kind == WayKind::Escape),
-    }
+    crate::history::cast_way_kind(q, id) == Some(WayKind::Escape)
 }
 
 /// "Sacrifice it unless it escaped": always triggers, and is judged as it resolves (CR 702.138b, 701.21a).
