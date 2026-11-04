@@ -1,0 +1,52 @@
+# Kraven's Last Hunt, chapter I: "Mill five cards. When you do, this Saga deals damage equal to the greatest power among creature cards in
+# your graveyard to target creature." Bot2 has discarded an Alpine Grizzly (power 4), which is not in Bot1's graveyard and so does not
+# count. Bot1's Giant Spider (2/4) is the only creature; the five milled cards are a Hill Giant (3), a Grizzly Bears (2) and three Forests,
+# so the Saga deals exactly 3: the Spider survives with 3 damage (4 damage, the greatest power of either graveyard, or 5, the two creature
+# cards' powers added, would destroy it; 2 would mark 2).
+
+[Bot1 Deck]
+Kraven's Last Hunt
+Giant Spider
+Mox Emerald x4
+Forest
+Forest
+Hill Giant
+Grizzly Bears
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Alpine Grizzly
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Giant Spider.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Discard(Alpine Grizzly)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Kraven's Last Hunt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard.Alpine Grizzly.Power = 4
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield.Giant Spider.Damage = 3

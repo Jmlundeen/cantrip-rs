@@ -1,0 +1,58 @@
+# Kraven's Last Hunt, chapter I: the greatest power among the creature cards in Bot1's graveyard is 1 (a milled Memnite, 1/1; the four
+# other milled cards are Forests), so the Saga deals exactly 1 damage to the target creature: Bot2's Giant Spider (2/4), chosen over
+# Bot1's own Memnite (also a legal target). An artifact is not a creature and is refused as the target.
+
+[Bot1 Deck]
+Kraven's Last Hunt
+Mox Emerald x4
+Memnite
+Forest
+Forest
+Memnite
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Mox Emerald x4
+Giant Spider
+Island x2
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Battlefield.Mox Emerald#3.Activate
+Bot2.Battlefield.Mox Emerald#4.Activate
+Bot2.Hand.Giant Spider.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Kraven's Last Hunt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Mox Emerald)
+Bot1.Target(Bot2.Battlefield.Giant Spider)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Giant Spider.Damage = 1
+Bot1.Battlefield.Memnite.Damage = 0
