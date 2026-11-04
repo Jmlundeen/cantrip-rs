@@ -1,0 +1,48 @@
+# Fire Nation Attacks: for {4}{R} it creates two 2/2 red Soldier tokens at once, each with firebending 1 -- attacking with one adds {R}
+# that lasts until end of combat.
+
+[Bot1 Deck]
+Mox Ruby x5
+Forest x2
+Fire Nation Attacks
+Mountain x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Hand.Fire Nation Attacks.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield = Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby; Soldier Token; Soldier Token
+? Bot1.Battlefield.Soldier Token#1.Power = 2
+? Bot1.Battlefield.Soldier Token#1.Toughness = 2
+? Bot1.Battlefield.Soldier Token#1.Colors = Red
+[T5 Bot1.Main1]
+Bot1.Attack(Soldier Token#1 > Bot2)
+
+[Expect]
+Bot1.Mana = {R} lasting {R}
+Bot1.Graveyard = Fire Nation Attacks
