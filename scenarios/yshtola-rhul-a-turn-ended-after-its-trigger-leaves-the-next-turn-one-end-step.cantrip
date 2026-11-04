@@ -1,0 +1,72 @@
+# A turn can end in the first end step after Y'shtola's ability has added a second one (CR 724.1, Sundial of the
+# Infinite); the step added is then never reached, and the next turn has its own single end step. On turn 5 Y'shtola's
+# trigger resolves in Bot1's first end step, then Bot1 ends the turn with Sundial. On turn 6, in Bot2's end step, Bot2
+# casts Hide on the Ceiling on its own Memnite: "the next end step" is Bot1's on turn 7, so Memnite is still in exile as
+# turn 7 begins. Had Bot2's turn been given the leftover end step, Memnite would have come back in it.
+# Y'shtola Rhul {4}{U}{U}: Legendary Creature — Cat Druid
+#   At the beginning of your end step, exile target creature you control, then return it to the battlefield under its owner's control. Then if it's the first end step of the turn, there is an additional end step after this step.
+# Sundial of the Infinite {2}: Artifact
+#   {1}, {T}: End the turn. Activate only during your turn.
+
+[Bot1 Deck]
+Y'shtola Rhul
+Sundial of the Infinite
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Tundra
+Island x20
+
+[Bot2 Deck]
+Memnite
+Hide on the Ceiling
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Tundra.Activate(Ability: Add {U})
+Bot1.Hand.Y'shtola Rhul.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sundial of the Infinite.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.End]
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sundial of the Infinite.Activate
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T6 Bot2.End]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Hide on the Ceiling.Cast(X: 1)
+Bot2.Target(Memnite)
+Bot2.Pass
+[T7 Bot1.Upkeep]
+
+[Expect]
+Turn = 7
+Exile = Memnite
+Delayed.Count = 1

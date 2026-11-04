@@ -1,0 +1,47 @@
+# Y'shtola Rhul flickers itself in the first end step, and the new Y'shtola triggers again in the additional end step
+# its ability made: "If a permanent with an ability that triggers 'at the beginning of the end step' enters during your
+# first end step, ... it will trigger during your second end step" (the ruling). That second trigger finds it is not the
+# first end step of the turn, so no third end step follows. Case of the Uneaten Feast counts each return: one life as
+# Y'shtola is cast, one for each flicker - 23, where one end step alone gives 22 and endless end steps never end the turn.
+# Y'shtola Rhul {4}{U}{U}: Legendary Creature — Cat Druid
+#   At the beginning of your end step, exile target creature you control, then return it to the battlefield under its owner's control. Then if it's the first end step of the turn, there is an additional end step after this step.
+
+[Bot1 Deck]
+Y'shtola Rhul
+Case of the Uneaten Feast
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Underground Sea
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Underground Sea.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Case of the Uneaten Feast.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Underground Sea.Activate(Ability: Add {U})
+Bot1.Hand.Y'shtola Rhul.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Upkeep]
+
+[Expect]
+Turn = 2
+Bot1.Life = 23
+Bot1.Battlefield = Underground Sea; Mox Pearl; Mox Sapphire; Mox Jet; Case of the Uneaten Feast; Y'shtola Rhul

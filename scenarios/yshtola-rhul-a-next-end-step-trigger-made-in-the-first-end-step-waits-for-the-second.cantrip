@@ -1,0 +1,62 @@
+# "If a delayed triggered ability that triggers 'at the beginning of the next end step' is created during your first end
+# step, that ability will trigger during your second end step" (Y'shtola Rhul's ruling). On turn 3, with Y'shtola's
+# trigger on the stack in the first end step, Bot1 casts Hide on the Ceiling on its own Memnite. Memnite comes back in the
+# additional end step Y'shtola made, on Bot1's turn, so it is on the battlefield as turn 4 begins; with no second end step
+# it would still be in exile until Bot2's end step. The new Y'shtola triggers again there, with Memnite not back yet, and
+# makes no third end step.
+# Y'shtola Rhul {4}{U}{U}: Legendary Creature — Cat Druid
+#   At the beginning of your end step, exile target creature you control, then return it to the battlefield under its owner's control. Then if it's the first end step of the turn, there is an additional end step after this step.
+
+[Bot1 Deck]
+Y'shtola Rhul
+Hide on the Ceiling
+Memnite
+Black Lotus
+Mox Sapphire
+Mox Jet
+Tundra
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Tundra.Activate(Ability: Add {U})
+Bot1.Hand.Y'shtola Rhul.Cast
+Bot1.Pass
+[T1 Bot1.End]
+Bot1.Target(Memnite)
+Bot1.Pass
+Bot1.Target(Memnite)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T3 Bot1.End]
+Bot1.Target(Y'shtola Rhul)
+Bot1.Battlefield.Tundra.Activate(Ability: Add {U})
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Hide on the Ceiling.Cast(X: 1)
+Bot1.Target(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Exile = Memnite
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Exile.Count = 0
+Delayed.Count = 0
+Bot1.Battlefield = Tundra; Mox Sapphire; Mox Jet; Y'shtola Rhul; Island; Memnite
+Bot1.Graveyard = Hide on the Ceiling; Black Lotus

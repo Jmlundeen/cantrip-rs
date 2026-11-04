@@ -1,0 +1,8 @@
+{
+  "name": "Y'shtola Rhul",
+  "manaCost": "{4}{U}{U}",
+  "type": "Legendary Creature — Cat Druid",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "At the beginning of your end step, exile target creature you control, then return it to the battlefield under its owner's control. Then if it's the first end step of the turn, there is an additional end step after this step."
+}

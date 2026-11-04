@@ -1,0 +1,69 @@
+# "If the target creature is an illegal target as Y'shtola Rhul's ability tries to resolve, it won't resolve and none of its
+# effects will happen. There won't be an additional end step" (the ruling; CR 608.2b). On turn 3 Bot2 bolts the Memnite
+# Y'shtola targets, so the ability does nothing, and the turn goes on to its cleanup step: a second end step would have
+# Y'shtola trigger again on itself, its only creature left, and Case of the Uneaten Feast would gain a life. Bot2's
+# Ornithopter is refused as "target creature you control". On turn 1, with no Case yet, the ability flickers Memnite in
+# both end steps.
+# Y'shtola Rhul {4}{U}{U}: Legendary Creature — Cat Druid
+#   At the beginning of your end step, exile target creature you control, then return it to the battlefield under its owner's control. Then if it's the first end step of the turn, there is an additional end step after this step.
+
+[Bot1 Deck]
+Y'shtola Rhul
+Case of the Uneaten Feast
+Memnite
+Black Lotus
+Mox Sapphire
+Mox Jet
+Tundra
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Lightning Bolt
+Plateau
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Tundra.Activate(Ability: Add {U})
+Bot1.Hand.Y'shtola Rhul.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T1 Bot1.End]
+Bot1.Target(Memnite)
+Bot1.Pass
+Bot1.Target(Memnite)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plateau.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tundra.Activate(Ability: Add {W})
+Bot1.Hand.Case of the Uneaten Feast.Cast
+Bot1.Pass
+[T3 Bot1.End]
+! Bot1.Target(Ornithopter)
+Bot1.Target(Memnite)
+Bot2.Battlefield.Plateau.Activate(Ability: Add {R})
+Bot2.Hand.Lightning Bolt.Cast(Memnite)
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Bot1.Battlefield = Tundra; Mox Sapphire; Mox Jet; Y'shtola Rhul; Case of the Uneaten Feast
+Bot1.Graveyard = Memnite; Black Lotus
+Bot2.Battlefield = Plateau; Ornithopter
