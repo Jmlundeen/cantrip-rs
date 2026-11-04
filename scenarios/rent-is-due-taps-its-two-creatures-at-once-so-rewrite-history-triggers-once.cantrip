@@ -1,0 +1,34 @@
+# Rent Is Due: "tap two untapped creatures" is one instruction, so both become tapped at once (CR 701.26a) and Rewrite History triggers once (CR 603.2c).
+
+[Bot1 Deck]
+Black Lotus
+Rewrite History
+Rent Is Due
+Mox Pearl
+Ornithopter
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Rewrite History.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rent Is Due.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Battlefield.Rewrite History.Counters.Plan = 1

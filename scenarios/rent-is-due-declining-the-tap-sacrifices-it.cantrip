@@ -1,0 +1,33 @@
+# Rent Is Due: the tap is a "may"; "otherwise" covers declining as well as being unable. Bot1 has two untapped Ornithopters but declines:
+# nothing is tapped, no card is drawn, and Rent Is Due is sacrificed.
+
+[Bot1 Deck]
+Rent Is Due
+Mox Pearl
+Ornithopter
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rent Is Due.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield.Rent Is Due = (absent)
+Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Ornithopter#1.Tapped = false
+Bot1.Battlefield.Ornithopter#2.Tapped = false
+Bot1.Hand.Count = 3
+Stack.Count = 0

@@ -1,0 +1,44 @@
+# Rent Is Due: "creatures and/or Treasures" - a Treasure counts beside a creature. Bot1 casts Rent Is Due (paid by Mox Pearl) and Seize the
+# Spoils (discarding a Plains) on turn 1, making a Treasure; with the Ornithopter it taps the Treasure and the creature at the end step, draws
+# a card, and keeps the enchantment.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Seize the Spoils
+Plains
+Rent Is Due
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Seize the Spoils.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rent Is Due.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Rent Is Due.Tapped = false
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Treasure Token.Tapped = true
+Stack.Count = 0

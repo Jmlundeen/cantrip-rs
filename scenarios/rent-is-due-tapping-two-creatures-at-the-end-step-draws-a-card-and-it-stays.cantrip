@@ -1,0 +1,33 @@
+# Rent Is Due: "At the beginning of your end step, you may tap two untapped creatures and/or Treasures you control; if you do, draw a card,
+# otherwise sacrifice this." Bot1 casts it on turn 1 with two summoning-sick Ornithopters (tapping for the effect is no cost, so they may be
+# tapped), taps both, draws a card, and keeps the enchantment.
+
+[Bot1 Deck]
+Rent Is Due
+Mox Pearl
+Ornithopter
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rent Is Due.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Rent Is Due.Tapped = false
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Hand.Count = 4
+Stack.Count = 0
