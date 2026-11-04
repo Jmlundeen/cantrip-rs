@@ -1,0 +1,109 @@
+# Doctor Octopus, Master Planner ({5}{U}{B}, 4/8): "Other Villains you control get +2/+2. Your maximum hand size is eight. At the beginning of
+# your end step, if you have fewer than eight cards in hand, draw cards equal to the difference." Turn 3 (six Moxen and an Island) he is cast
+# with an empty hand: at the end step Bot1 draws eight cards, and eight stay through the cleanup step (the maximum is eight, not seven). Turn 5:
+# an Island and an Agents of Hydra (a Villain, 1/1 -> 3/3 beside him; Bot2's own Agents stays 1/1) leave seven in hand: one is drawn at the
+# end step. Turn 7: an Island leaves exactly eight in hand and nothing is drawn, and no ability is even put on the stack (the condition is "fewer than", CR 603.4). Turn 9: nine in hand draw nothing and
+# the cleanup step discards one, back to eight. Octopus himself stays 4/8.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Gleemox
+Doctor Octopus, Master Planner
+Island
+Agents of Hydra
+Island x7
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Agents of Hydra
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Agents of Hydra.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Doctor Octopus, Master Planner.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 0
+? Bot2.Battlefield.Agents of HYDRA.Power = 1
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 8
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 9
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Agents of Hydra.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Agents of HYDRA.Power = 3
+? Bot1.Battlefield.Doctor Octopus, Master Planner.Power = 4
+? Bot1.Battlefield.Doctor Octopus, Master Planner.Toughness = 8
+? Bot1.Battlefield.Agents of HYDRA.Toughness = 3
+[T5 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 8
+[T7 Bot1.Main1]
+? Bot1.Hand.Count = 9
+Bot1.Hand.Island.Play
+[T7 Bot1.End]
+? Stack.Count = 0
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 8
+[T9 Bot1.Main1]
+? Bot1.Hand.Count = 9
+[T9 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[T10 Bot2.Main1]
+? Bot1.Hand.Count = 8
+
+[Expect]
+Bot1.Graveyard.Count = 1
