@@ -1,0 +1,41 @@
+# "That player may draw a card. If they do, they can't attack this turn and you put a peace counter on this enchantment."
+# "If they do" is whether a card was drawn, not whether the player said yes (CR 608.2c): Bot1 takes the draw at the
+# beginning of combat and dredges it away with Golgari Grave-Troll instead (CR 702.52a, 614.6), so no card is drawn and
+# no peace counter is put on the enchantment.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Peace in Our Time
+Thoughtseize
+Golgari Grave-Troll
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Peace in Our Time.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Golgari Grave-Troll)
+[T1 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Accept
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Peace in Our Time.Counters.Peace = (absent)
+Bot1.Hand = Golgari Grave-Troll; Island
+Bot1.Library.Count = 14

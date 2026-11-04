@@ -1,0 +1,44 @@
+# "At the beginning of combat on each player's turn, that player may draw a card. If they do, they can't attack this turn
+# and you put a peace counter on this enchantment." (CR 507.1, 608.2c, 611.2c.) Bot1 draws at the beginning of combat of
+# each of its turns, so on turn 3 the untapped, no longer summoning-sick Ornithopter cannot attack: the declaration is not
+# even asked for. Each draw puts a peace counter on the enchantment.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Peace in Our Time
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Peace in Our Time.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Attackers]
+! Bot1.Attack
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Peace in Our Time.Counters.Peace = 3
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot2.Life = 20

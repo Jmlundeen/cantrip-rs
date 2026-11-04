@@ -1,0 +1,60 @@
+# Peace in Our Time: "At the beginning of your upkeep, if this enchantment has twelve or more peace counters on it, you win
+# the game" (CR 603.4, 104.2b). Bot2 turns down the draw on turn 2, so no counter is put then (CR 608.2c) and Bot2's Raging
+# Goblin attacks; every other draw is taken. At the upkeep of turn 13 there are eleven counters and nothing happens; the
+# draw on turn 13 makes twelve, Bot2 declines on turn 14, and Bot1 wins at the upkeep of turn 15.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Peace in Our Time
+Island x37
+
+[Bot2 Deck]
+Mountain
+Raging Goblin
+Island x38
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Peace in Our Time.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Decline
+Bot2.Attack(Raging Goblin > Bot1)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Peace in Our Time.Counters.Peace = 1
+? Bot1.Life = 19
+Bot1.Accept
+Bot2.Accept
+Bot1.Accept
+Bot2.Accept
+Bot1.Accept
+Bot2.Accept
+Bot1.Accept
+Bot2.Accept
+Bot1.Accept
+Bot2.Accept
+[T13 Bot1.Main1]
+? Bot1.Battlefield.Peace in Our Time.Counters.Peace = 11
+? Result = InProgress
+Bot1.Accept
+[T14 Bot2.Main2]
+? Bot1.Battlefield.Peace in Our Time.Counters.Peace = 12
+[T15 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Result = Bot1 won
+Turn = 15
+Bot1.Life = 19
