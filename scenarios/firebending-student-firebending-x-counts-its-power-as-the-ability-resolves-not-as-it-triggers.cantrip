@@ -1,0 +1,42 @@
+# Firebending Student: X is its power as the firebending ability resolves (CR 608.2h), not as it triggers. It attacks as a 1/2;
+# with the ability on the stack Bot1 casts Giant Growth on it, which also triggers prowess. Prowess (+1/+1) and Giant Growth (+3/+3)
+# resolve first, so the firebending ability resolves with the Student a 5/6 and adds {R}{R}{R}{R}{R}, not the {R} its power was
+# when it attacked.
+
+[Bot1 Deck]
+Mox Ruby x2
+Mox Emerald
+Firebending Student
+Giant Growth
+Mountain x15
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Firebending Student.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Attack(Firebending Student > Bot2)
+? Bot1.Battlefield.Firebending Student.Power = 1
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Firebending Student)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firebending Student.Power = 5
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana = {R}{R}{R}{R}{R} lasting {R}{R}{R}{R}{R}
+Bot1.Battlefield.Firebending Student.Power = 5

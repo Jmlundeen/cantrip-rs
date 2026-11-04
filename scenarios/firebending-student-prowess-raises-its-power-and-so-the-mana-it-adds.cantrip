@@ -1,0 +1,37 @@
+# Firebending Student: casting a noncreature spell (Mox Ruby) gives prowess +1/+1 until end of turn, so attacking then, as a 2/3,
+# adds {R}{R}: X is its power as the ability resolves.
+
+[Bot1 Deck]
+Mox Ruby x3
+Firebending Student
+Mountain x15
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Firebending Student.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firebending Student.Power = 2
+? Bot1.Battlefield.Firebending Student.Toughness = 3
+Bot1.Attack(Firebending Student > Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana = {R}{R} lasting {R}{R}

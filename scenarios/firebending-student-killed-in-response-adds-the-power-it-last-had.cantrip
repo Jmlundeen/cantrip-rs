@@ -1,0 +1,45 @@
+# Firebending Student: with the Student gone when its firebending ability resolves, X is its power as it last existed on the
+# battlefield (CR 608.2h, 113.7a). Shock triggers prowess, so it attacks as a 2/3; with the ability on the stack Bot2 bolts it.
+# The ability adds {R}{R}, its last power, not the {R} of the 1/2 card now in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby x2
+Firebending Student
+Shock
+Mountain x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Firebending Student.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firebending Student.Power = 2
+Bot1.Attack(Firebending Student > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Firebending Student)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Firebending Student; Shock
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana = {R}{R} lasting {R}{R}

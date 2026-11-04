@@ -1,0 +1,8 @@
+{
+  "name": "Firebending Student",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Human Monk",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nFirebending X, where X is this creature's power. (Whenever this creature attacks, add X {R}. This mana lasts until end of combat.)"
+}
