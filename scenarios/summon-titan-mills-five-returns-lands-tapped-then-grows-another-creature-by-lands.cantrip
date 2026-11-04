@@ -1,0 +1,78 @@
+# Summon: Titan ({3}{G}{G}, 7/7 Enchantment Creature - Saga Giant, reach, trample): "I - Mill five cards. II - Return all land
+# cards from your graveyard to the battlefield tapped. III - Until end of turn, another target creature you control gains trample
+# and gets +X/+X, where X is the number of lands you control." Bot1 casts it on turn 1 off Black Lotus (green x3), Mox Emerald and
+# Mox Ruby; chapter I mills a Forest, a Forest, a Lightning Bolt, a Mountain and a Plains (the graveyard: those five and the
+# sacrificed Lotus). On turn 3 chapter II returns the four land cards tapped and leaves the Bolt (the graveyard: Bolt and Lotus).
+# Bot2's Island (turn 2) is not a land Bot1 controls. After the Forest Bot1 plays on turn 3 it controls five lands. On turn 5
+# chapter III: the Titan itself ("another") and Bot2's Ornithopter ("you control") are refused - Bot1's Ornithopter and
+# Llanowar Elves are the choices, and the Elves (1/1) end 6/6 with trample (X = 5); the Ornithopter stays 0/2. On
+# turn 6 it has ended, and the Saga, with three lore counters, is sacrificed.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Summon: Titan
+Ornithopter
+Llanowar Elves
+Forest
+Forest
+Forest
+Lightning Bolt
+Mountain
+Plains
+Forest
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Summon: Titan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 6
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Lightning Bolt; Black Lotus
+? Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 10
+[T5 Bot1.Main1]
+! Bot1.Target(Summon: Titan)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 6
+? Bot1.Battlefield.Llanowar Elves.Toughness = 6
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Graveyard = Summon: Titan; Lightning Bolt; Black Lotus
