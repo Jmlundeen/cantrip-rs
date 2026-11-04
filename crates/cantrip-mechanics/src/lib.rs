@@ -136,6 +136,7 @@ pub mod storm;
 pub mod spree;
 pub mod start_your_engines;
 pub mod tiered;
+pub mod triple;
 pub mod sneak;
 pub mod solved;
 pub mod spectacle;
