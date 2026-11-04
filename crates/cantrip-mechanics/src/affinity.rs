@@ -1,4 +1,4 @@
-//! Affinity (CR 702.41a): affinity for artifacts (Emry, Lurker of the Loch and Thoughtcast) and for a basic land type
+//! Affinity (CR 702.41a): affinity for artifacts (Emry, Lurker of the Loch and Thoughtcast, and Sami, Wildcat Captain's spells you cast) and for a basic land type
 //! (Sapling Nursery's Forests), a creature type (Scales of Shale's Lizards), creatures (Witherbloom, the Balancer) and
 //! artifact creatures (Borg Cube, Urza, Chief Artificer).
 
@@ -14,6 +14,16 @@ fn less_for_each_permanent(q: &dyn Query, player: PlayerId, counts: impl Fn(Obje
 /// This spell costs {1} less to cast for each artifact you control.
 pub fn for_artifacts(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     less_for_each_permanent(q, player, |id| q.chars(id).is(CardType::Artifact))
+}
+
+/// "Spells you cast have affinity for artifacts" (CR 702.41a, 702.41b, 604.1): a static ability of the source, asked as each
+/// spell is cast; only its controller's spells, every kind, one reduction for each source (two of them reduce twice, CR
+/// 702.41b), the generic part only (CR 118.7c). Sami, Wildcat Captain prints it, as a cost change in `CardDef::cost_changes`.
+pub fn spells_you_cast_have_affinity_for_artifacts(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    if !matches!(costed, Costed::Spell(_)) || player != q.controller(source) {
+        return CostDelta::NONE;
+    }
+    for_artifacts(q, source, player, costed, &[])
 }
 
 /// A spell costs {1} less to cast for each artifact creature you control (CR 702.41a). Borg Cube and Urza, Chief Artificer
