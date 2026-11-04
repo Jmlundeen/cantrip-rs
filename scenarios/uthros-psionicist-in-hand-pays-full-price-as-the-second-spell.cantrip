@@ -1,0 +1,20 @@
+# Uthros Psionicist: "The second spell you cast each turn costs {2} less to cast." A static ability works only on the battlefield (CR 604.2, 113.6), so the Psionicist being cast gives itself nothing: Bot1 casts Black Lotus (the first spell), then the Psionicist as the second spell and pays all of {2}{U}, leaving nothing in the pool (CR 601.2f).
+
+[Bot1 Deck]
+Black Lotus
+Uthros Psionicist
+Island x26
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Uthros Psionicist.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield.Uthros Psionicist.Types = Creature

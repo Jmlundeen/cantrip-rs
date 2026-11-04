@@ -1,0 +1,39 @@
+# Uthros Psionicist: "The second spell you cast each turn costs {2} less to cast." With it on the battlefield, Bot1 casts Mox Sapphire (the first spell of T3), then Dauntless Scrapbot ({3}) as the second, paying only {1} (CR 601.2f, 118.7c); the pool is empty after it. Then Mox Jet (the third spell) and a second Scrapbot (the fourth) pay all {3}, the pool again empty after it.
+
+[Bot1 Deck]
+Black Lotus
+Uthros Psionicist
+Island
+Island
+Mox Sapphire
+Mox Jet
+Dauntless Scrapbot
+Dauntless Scrapbot
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Uthros Psionicist.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dauntless Scrapbot.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauntless Scrapbot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield.Count = 9

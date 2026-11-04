@@ -1,0 +1,26 @@
+# Uthros Psionicist: "The second spell you cast each turn" is its controller's own spells. Bot1 has it on the battlefield; on T2 Bot2 casts Mox Sapphire (its first spell) and has two mana, so it could pay {1} for Dauntless Scrapbot but not the {3} it costs: the cast is not offered for want of mana (CR 601.2f).
+
+[Bot1 Deck]
+Black Lotus
+Uthros Psionicist
+Island x25
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Dauntless Scrapbot
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Uthros Psionicist.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+! Bot2.Hand.Dauntless Scrapbot.Cast(Mana: short)
+
+[Expect]
+Bot2.Hand = Dauntless Scrapbot; Island; Island; Island; Island; Island

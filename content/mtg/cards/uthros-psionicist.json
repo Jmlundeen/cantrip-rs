@@ -1,0 +1,8 @@
+{
+  "name": "Uthros Psionicist",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Jellyfish Scientist",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "The second spell you cast each turn costs {2} less to cast."
+}
