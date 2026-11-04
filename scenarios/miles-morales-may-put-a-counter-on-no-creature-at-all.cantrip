@@ -1,0 +1,26 @@
+# Miles Morales: "put a +1/+1 counter on each of up to two target creatures": "up to two" includes none. Bot1 casts Miles Morales, whose enters
+# trigger could target himself (the positive control: he is the creature it may choose), and chooses no target: he stays a 1/2.
+
+[Bot1 Deck]
+Miles Morales
+Mox Emerald
+Mox Jet
+Forest x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Miles Morales.Cast
+Bot1.Pass
+Bot1.Target()
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Miles Morales.Power = 1
+Bot1.Battlefield.Miles Morales.Toughness = 2
+Bot1.Battlefield.Miles Morales.Counters.PlusOnePlusOne = (absent)

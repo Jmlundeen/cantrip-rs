@@ -1,0 +1,39 @@
+# Miles Morales {1}{G}, a 1/2: "When Miles Morales enters, put a +1/+1 counter on each of up to two target creatures." The creatures may be
+# anyone's: Bot1 targets its own Memnite and Bot2's Memnite, and both become 2/2. A noncreature (Mox Emerald) is refused, and so is a
+# third creature - Miles Morales himself, a legal creature but one too many. Miles himself, not chosen, stays a 1/2.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Memnite
+Miles Morales
+Forest x3
+Forest x13
+
+[Bot2 Deck]
+Memnite
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Miles Morales.Cast
+Bot1.Pass
+! Bot1.Target(Bot1.Battlefield.Mox Emerald)
+! Bot1.Target(Bot2.Battlefield.Memnite; Bot1.Battlefield.Memnite; Bot1.Battlefield.Miles Morales)
+Bot1.Target(Bot2.Battlefield.Memnite; Bot1.Battlefield.Memnite)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Battlefield.Memnite.Toughness = 2
+Bot2.Battlefield.Memnite.Power = 2
+Bot2.Battlefield.Memnite.Toughness = 2
+Bot1.Battlefield.Miles Morales.Power = 1
+Bot1.Battlefield.Miles Morales.Toughness = 2

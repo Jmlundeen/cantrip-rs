@@ -1,0 +1,87 @@
+# Miles Morales // Ultimate Spider-Man. Turn 1 Bot1 casts Miles (a 1/2) and puts a counter on him and on its Memnite; turn 2 Bot2 casts its
+# own Miles, which puts a counter on himself. Turn 3 Bot1 pays {3}{R}{G}{W} (Black Lotus's three, Mox Ruby, Mox Emerald, Mox Pearl) at sorcery
+# speed: Miles transforms into Ultimate Spider-Man, a 4/3 first strike, haste legend, and keeps his counter, so 5/4. Camouflage ({2}, Mox Jet
+# and Mox Sapphire): a second counter, 6/5; until end of turn he is colorless and has hexproof - Bot2's Lightning Bolt, which could target
+# anything, may not target him (the refusal). Then Bot1 attacks with him alone: "Whenever you attack" doubles the counters on each Spider
+# and legendary creature Bot1 controls - his 2 become 4, so he is an 8/7 and Bot2 takes 8 - and only those: Bot1's Memnite (not a Spider, not
+# legendary) keeps its 1 counter, a 2/2, and Bot2's legendary Miles Morales, not Bot1's, keeps his 1, a 2/3.
+
+[Bot1 Deck]
+Miles Morales
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Black Lotus
+Memnite
+Mox Sapphire
+Forest x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby x2
+Miles Morales
+Lightning Bolt
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Miles Morales.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Miles Morales; Bot1.Battlefield.Memnite)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Miles Morales.Cast
+Bot2.Pass
+Bot2.Target(Bot2.Battlefield.Miles Morales)
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Miles Morales.Power = 2
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Miles Morales.Activate(Ability: Transform)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ultimate Spider-Man.Power = 5
+? Bot1.Battlefield.Ultimate Spider-Man.Toughness = 4
+? Bot1.Battlefield.Ultimate Spider-Man.Keywords = FirstStrike; Haste
+? Bot1.Battlefield.Ultimate Spider-Man.Colors.Count = 3
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Ultimate Spider-Man.Activate(Ability: Camouflage)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ultimate Spider-Man.Power = 6
+? Bot1.Battlefield.Ultimate Spider-Man.Colors = (absent)
+? Bot1.Battlefield.Ultimate Spider-Man.Keywords = FirstStrike; Haste; Hexproof
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ultimate Spider-Man)
+Bot1.Pass
+Bot1.Attack(Ultimate Spider-Man > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ultimate Spider-Man.Power = 8
+? Bot1.Battlefield.Ultimate Spider-Man.Toughness = 7
+[T3 Bot1.Main2]
+? Bot2.Life = 12
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot2.Battlefield.Miles Morales.Power = 2
+
+[Expect]
+Bot1.Battlefield.Ultimate Spider-Man.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Miles Morales.Counters.PlusOnePlusOne = 1
