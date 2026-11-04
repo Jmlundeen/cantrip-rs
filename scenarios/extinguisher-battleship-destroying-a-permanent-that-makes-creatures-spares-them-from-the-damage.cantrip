@@ -1,0 +1,57 @@
+# Living Lands makes Bot1's Forest a 1/1 creature. Extinguisher Battleship's trigger destroys Living Lands, a noncreature permanent;
+# its second sentence then deals 4 damage to each creature on the battlefield as it is after the destruction (CR 608.2c), when the
+# Forest is no longer a creature: it takes no damage and lives. (Both sentences are one resolution, but the second sees the board as
+# the first left it.)
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Living Lands
+Black Lotus
+Extinguisher Battleship
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Living Lands.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Forest.Types = Land; Creature
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Extinguisher Battleship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Living Lands)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Living Lands; Black Lotus
+Bot1.Battlefield = Extinguisher Battleship; Forest; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot1.Battlefield.Forest.Types = Land

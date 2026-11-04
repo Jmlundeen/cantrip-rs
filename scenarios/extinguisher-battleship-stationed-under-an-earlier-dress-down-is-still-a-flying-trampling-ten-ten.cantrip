@@ -1,0 +1,67 @@
+# Dress Down is on the battlefield before Extinguisher Battleship enters (its trigger destroys Bot1's tapped Mox Jet and the 4 damage
+# leaves Gigantosaurus alive) and is stationed with Bot1's Gigantosaurus (10 power). Ten charge counters turn on "5+": the type
+# change, flying and trample and the 10/10 are one static ability whose effect began in layer 4, so its layer 6 and 7b parts keep
+# applying although Dress Down, earlier in layer 6, took the abilities of every creature - a 10/10 artifact creature with flying and
+# trample (CR 613.6, 721.2b).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Gigantosaurus
+Mox Jet
+Mox Sapphire
+Black Lotus
+Dress Down
+Extinguisher Battleship
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Extinguisher Battleship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Gigantosaurus.Damage = 4
+Bot1.Battlefield.Extinguisher Battleship.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+
+[Expect]
+Bot1.Battlefield.Extinguisher Battleship.Counters.Charge = 10
+Bot1.Battlefield.Extinguisher Battleship.Types = Artifact; Creature
+Bot1.Battlefield.Extinguisher Battleship.Power = 10
+Bot1.Battlefield.Extinguisher Battleship.Toughness = 10
+Bot1.Battlefield.Extinguisher Battleship.Keywords = Flying; Trample

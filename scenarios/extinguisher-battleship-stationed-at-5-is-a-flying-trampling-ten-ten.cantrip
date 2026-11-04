@@ -1,0 +1,71 @@
+# Extinguisher Battleship enters on turn 1 (five Moxen and Black Lotus pay {8}) and destroys Bot1's own Mox Pearl. Stationed with
+# Tyrox, Saurid Tyrant (power 4) on turn 3 it has four charge counters, one short of "5+": still only an artifact, with no flying or
+# trample. Stationed with Raging Goblin (power 1) on turn 5 it has exactly five: a 10/10 artifact creature with flying and trample (CR 721.2a).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Black Lotus
+Extinguisher Battleship
+Tyrox, Saurid Tyrant
+Raging Goblin
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Extinguisher Battleship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Mox Pearl; Black Lotus
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tyrox, Saurid Tyrant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Extinguisher Battleship.Activate(Ability: Station)
+Bot1.Choose(Tyrox, Saurid Tyrant)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Extinguisher Battleship.Counters.Charge = 4
+? Bot1.Battlefield.Extinguisher Battleship.Types = Artifact
+? Bot1.Battlefield.Extinguisher Battleship.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Extinguisher Battleship.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Extinguisher Battleship.Counters.Charge = 5
+Bot1.Battlefield.Extinguisher Battleship.Types = Artifact; Creature
+Bot1.Battlefield.Extinguisher Battleship.Power = 10
+Bot1.Battlefield.Extinguisher Battleship.Toughness = 10
+Bot1.Battlefield.Extinguisher Battleship.Keywords = Flying; Trample

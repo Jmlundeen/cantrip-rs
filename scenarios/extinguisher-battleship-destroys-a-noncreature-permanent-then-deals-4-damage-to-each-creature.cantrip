@@ -1,0 +1,71 @@
+# Extinguisher Battleship enters on turn 3 (five Moxen and Black Lotus pay {8}): its trigger destroys target noncreature permanent -
+# Bot2's Mox Ruby, not a creature (Bot2's Leatherback Baloth, and Bot1's own Ornithopter, an artifact creature, are refused) - and
+# then deals 4 damage to each creature on both sides: Ornithopter (0/2) and Raging Goblin (1/1) die, Leatherback Baloth (4/5) survives
+# with exactly 4 damage marked, and the Battleship, no creature below 5 charge counters, is not hit.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Black Lotus
+Ornithopter
+Extinguisher Battleship
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Leatherback Baloth
+Mox Ruby
+Raging Goblin
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Leatherback Baloth.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Extinguisher Battleship.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Leatherback Baloth)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Leatherback Baloth
+Bot2.Graveyard = Raging Goblin; Mox Ruby; Black Lotus
+Bot2.Battlefield.Leatherback Baloth.Damage = 4
+Bot1.Battlefield = Extinguisher Battleship; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot1.Battlefield.Extinguisher Battleship.Types = Artifact

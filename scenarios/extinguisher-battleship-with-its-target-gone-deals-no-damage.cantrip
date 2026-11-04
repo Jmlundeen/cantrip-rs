@@ -1,0 +1,64 @@
+# Extinguisher Battleship's trigger targets Bot2's Black Lotus; in response Bot2 taps it for mana, sacrificing it. With its one target
+# illegal the ability does not resolve and none of its effects happen (CR 608.2b, ruling 2025-07-25): no creature is dealt damage,
+# so Bot1's Ornithopter and Bot2's Raging Goblin both live.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Black Lotus
+Ornithopter
+Extinguisher Battleship
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Raging Goblin
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Extinguisher Battleship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Black Lotus)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Mana = {R}{R}{R}
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Black Lotus
+Bot2.Battlefield = Mox Ruby; Raging Goblin
+Bot1.Battlefield = Extinguisher Battleship; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter
