@@ -1808,6 +1808,8 @@ pub enum WayKind {
     WebSlinging,
     /// Escape (CR 702.138a), the card's own or one a permanent gives it (`GrantedWay::kind`): "escaped" asks it (CR 702.138b).
     Escape,
+    /// Mayhem (CR 702.187a), the card's own or the one a permanent gives it (`GrantedWay::kind`, CR 702.187b): "mayhem cost was paid" asks it.
+    Mayhem,
     /// Morph (CR 702.37a): cast as a 2/2 face-down creature spell for {3} (`intrinsic::MORPHED`), and turned face up for its
     /// morph cost (`WayDef::turn_up`) as a special action (CR 702.37e).
     Morph,
