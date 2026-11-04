@@ -1094,6 +1094,16 @@ pub fn may_pay_to_untap_self(g: &mut dyn Game, item: &StackItem, payment: Cost) 
     Ok(())
 }
 
+/// "Sacrifice this [permanent] unless you pay [cost]" (CR 608.2c, 701.21a, 118.1): the resolving ability's controller pays
+/// `payment` or sacrifices the source. Arcades Sabboth and Phantasmal Forces print it at the beginning of their controller's upkeep.
+pub fn sacrifice_this_unless_pay(g: &mut dyn Game, item: &StackItem, payment: Cost) -> Result<(), Suspend> {
+    static QUESTION: Question = Question::new("Pay", "pay {cost}?", "If you don't, sacrifice {subject} if you control it", "Pay {cost}", "Don't pay").no_default();
+    if !g.may_pay(item.controller, item.object, item.object, payment, &QUESTION)? {
+        g.sacrifice(item.controller, &[item.object]);
+    }
+    Ok(())
+}
+
 /// "Untap this [permanent]" (CR 701.26): the ability's source. Basalt Monolith and Grim Monolith print it.
 pub fn untap_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.untap(item.object);
