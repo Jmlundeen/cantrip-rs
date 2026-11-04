@@ -1,0 +1,72 @@
+# Warmaker Gunship {2}{R}: "When this Spacecraft enters, it deals damage equal to the number of artifacts you control to target creature an opponent controls." Dress Down
+# ("Creatures lose all abilities") is on the battlefield before the Gunship enters. Bot1 controls the Gunship, Mox Emerald and Mox Ruby when the trigger resolves
+# (Black Lotus is sacrificed for mana): three damage on Bot2's Wall of Stone, whose own Mox Pearl and Mox Jet do not count. Six charge counters (Colossal
+# Dreadmaw's power) then make it a 4/3 artifact creature with flying though Dress Down, earlier in layer 6, took abilities from creatures (CR 613.6, 721.2b).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Emerald
+Mox Ruby
+Colossal Dreadmaw
+Dress Down
+Warmaker Gunship
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Wall of Stone
+Island
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Warmaker Gunship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Wall of Stone.Damage = 3
+Bot1.Battlefield.Warmaker Gunship.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Wall of Stone.Damage = 3
+Bot1.Battlefield.Warmaker Gunship.Counters.Charge = 6
+Bot1.Battlefield.Warmaker Gunship.Types = Artifact; Creature
+Bot1.Battlefield.Warmaker Gunship.Power = 4
+Bot1.Battlefield.Warmaker Gunship.Toughness = 3
+Bot1.Battlefield.Warmaker Gunship.Keywords = Flying

@@ -1,0 +1,47 @@
+# Warmaker Gunship: stationed with Grizzly Bears (power two) and Centaur Courser (power three) it has five charge counters - one short of "6+" - so it is still a
+# noncreature artifact with no flying. With no creature an opponent controls its enters trigger has no target and does nothing.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Centaur Courser
+Warmaker Gunship
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Centaur Courser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Warmaker Gunship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Warmaker Gunship.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Warmaker Gunship.Activate(Ability: Station)
+Bot1.Choose(Centaur Courser)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Warmaker Gunship.Counters.Charge = 5
+Bot1.Battlefield.Warmaker Gunship.Types = Artifact
+Bot1.Battlefield.Warmaker Gunship.Keywords = (absent)
