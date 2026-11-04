@@ -822,7 +822,7 @@ fn another_permanent_you_control_filter(q: &dyn Query, asker: &Asker, t: Target)
 }
 
 /// "Another target permanent you control" (CR 115.1, 109.5): a permanent its controller controls, other than the source itself.
-/// Rescue Girl, First Responder and North Pole Patrol print it.
+/// Rescue Girl, First Responder, North Pole Patrol and Stiltzkin, Moogle Merchant print it.
 pub const ANOTHER_PERMANENT_YOU_CONTROL: TargetSpec = target(another_permanent_you_control_filter);
 
 /// "Target nonland permanent". Banishing Knack and Boomerang Basics print it.
