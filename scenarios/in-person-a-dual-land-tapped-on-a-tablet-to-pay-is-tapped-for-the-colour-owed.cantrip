@@ -1,0 +1,21 @@
+# In-person play (docs/in-person.md): Bot1 casts a {U} creature from their phone and pays by tapping Tundra on a tablet.
+# Auto-mana is the phone's, as it is on any other page: a land tapped while a cost is paid is tapped for what the cost
+# needs, {U} rather than Tundra's first ability's {W}, with no question asked on any device.
+
+[Bot1 Deck]
+Tundra
+Flying Men
+Tundra x25
+
+[Bot2 Deck]
+Forest x27
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Flying Men.Cast
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Tundra.Tapped = true
+Bot1.Battlefield.Flying Men.Tapped = false

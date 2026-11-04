@@ -341,12 +341,24 @@ public sealed partial class MainPage
             return TableTapOutcome.NoChoice;
         }
 
-        // A menu the click opens - a land's colours, a card's abilities - opens in the middle of the phone, where the
-        // remote client opens it under the pointer.
+        // A menu the click opens - a land's colours, a card's abilities - is shown on the tablets, where the finger is
+        // (OpenCardMenu). Only one the table may not read opens here: in the middle of the phone, where the remote client
+        // opens it under the pointer.
         _pointer = new Windows.Foundation.Point(Root.ActualWidth / 2, Root.ActualHeight / 2);
         _autoManaHeld = false;
-        click();
+        _tableMenu = null;
+        _takingTableTap = true;
+        try
+        {
+            click();
+        }
+        finally
+        {
+            _takingTableTap = false;
+        }
+
         RedrawNow();
+        SendTablePrompt();
         return TableTapOutcome.Used;
     }
 

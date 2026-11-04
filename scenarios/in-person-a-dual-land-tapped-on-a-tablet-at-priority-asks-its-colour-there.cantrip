@@ -1,0 +1,21 @@
+# In-person play (docs/in-person.md): Bot1 taps Tundra on a tablet while nothing is being paid for, so auto-mana has
+# nothing to go by and the player chooses: its colours are shown on the tablet that tapped it and {U} is pressed there,
+# with nothing opening on the phone. The mana then casts a {U} creature from the phone.
+
+[Bot1 Deck]
+Tundra
+Flying Men
+Tundra x25
+
+[Bot2 Deck]
+Forest x27
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+Bot1.Hand.Flying Men.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Tundra.Tapped = true
+Bot1.Battlefield.Flying Men.Tapped = false

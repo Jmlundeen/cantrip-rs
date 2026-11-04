@@ -85,6 +85,9 @@ public sealed class ScenarioPlayer
     /// </summary>
     private readonly InPersonTable? _atTable;
 
+    /// <summary>Whether auto-mana is on, so a land tapped to pay must ask nothing: a menu opening is the failure.</summary>
+    private bool _autoMana;
+
     private ScenarioPlayer(TablePage page, ScenarioTable table, bool hold, (GameClient Client, TimeSpan Thinks)? opponent, (string Name, int Count)? planX, bool phone, bool probeRefusals, InPersonTable? atTable = null)
     {
         _atTable = atTable;
@@ -118,7 +121,8 @@ public sealed class ScenarioPlayer
         (string Name, int Count)? planX = null,
         bool phone = false,
         bool probeRefusals = false,
-        InPersonTable? atTable = null)
+        InPersonTable? atTable = null,
+        bool autoMana = false)
     {
         phone |= atTable is not null;
         ScenarioSpec scenario = ScenarioSpec.Load(path, opponentThinks is null ? [1] : [1, 2]);
@@ -134,7 +138,7 @@ public sealed class ScenarioPlayer
             site,
             $"server={Uri.EscapeDataString(table.Address.AbsoluteUri)}&art={Uri.EscapeDataString(art.Urls.First())}{(phone ? "&inperson=phone" : string.Empty)}{seat}",
             WebClient.Pictures(Path.Combine(nameof(ScenarioPlayer), scenario.Name + (atTable is not null ? $"-{atTable.Name}" : phone ? (planX is null ? "-phone" : "-phone-planned") : string.Empty))),
-            settings: new Dictionary<string, string> { ["auto-mana"] = "false" },
+            settings: new Dictionary<string, string> { ["auto-mana"] = autoMana ? "true" : "false" },
             storage: new Dictionary<string, string>
             {
                 ["cantrip-stops-mine"] = stopsMine is null ? EveryStep : string.Join(",", stopsMine),
@@ -161,6 +165,7 @@ public sealed class ScenarioPlayer
             atTable);
         try
         {
+            player._autoMana = autoMana;
             return await player.PlayAsync();
         }
         catch (Exception error) when (error is TimeoutException or Xunit.Sdk.XunitException or PlaywrightException or NotDrivenException)
@@ -832,8 +837,15 @@ public sealed class ScenarioPlayer
                     after = await _page.SettledAsync();
                 }
 
+                // A tap on a tablet asks on the tablets, never on the phone, unless the table may not read it.
+                bool tappedOnTable = _phone && !state.Cards.Any(c => c.Visible && c.Handle == action.Source.Value);
+                if (tappedOnTable && after.InPerson?.TablePrompt is not { Private: true } && after.Controls.Any(c => c.Kind == "item"))
+                {
+                    throw new Xunit.Sdk.XunitException($"A tap on the table opened its menu on the phone: {string.Join("; ", after.Controls.Where(c => c.Kind == "item").Select(c => c.Label))}");
+                }
+
                 // A card with more than one thing to do opens a menu: the row the answer is.
-                if (after.Controls.Any(c => c.Kind == "item"))
+                if (after.Controls.Any(c => c.Kind == "item") || after.InPerson?.TablePrompt?.Menu is { Count: > 0 })
                 {
                     await ChooseRowAsync(action, after, line);
                 }
@@ -865,8 +877,16 @@ public sealed class ScenarioPlayer
     /// <summary>The menu's row for the answer: the one adding its colour, for a mana ability of any colour.</summary>
     private async Task ChooseRowAsync(TakeActionAnswer action, TableState state, string? line)
     {
-        List<ControlState> rows = [.. state.Controls.Where(c => c.Kind == "item")];
+        // A menu on the tablets is read from the prompt the phone sent them, and pressed there.
+        PhonePromptState? onTablets = state.InPerson?.TablePrompt is { Menu.Count: > 0 } sent ? sent : null;
+        List<ControlState> rows = onTablets is not null
+            ? [.. onTablets.Menu!.Select(each => new ControlState("item", onTablets.Items.First(item => item.Id == each.Id).Text, 0, 0, 0, 0, each.Ability, each.OptionId))]
+            : [.. state.Controls.Where(c => c.Kind == "item")];
         _lastMenu = string.Join("; ", rows.Select(r => r.Label));
+        if (_autoMana)
+        {
+            throw new Xunit.Sdk.XunitException($"Auto-mana is on and {action.Kind} opened a menu: {_lastMenu}");
+        }
 
         // Else, where the script names the ability (`Activate(Ability: +2)`, `Cast(Ability: Flashback {R})`), the row that says it.
         string? ability = line is null ? null : System.Text.RegularExpressions.Regex.Match(line, @"Ability:\s*(.+?)\)\s*$") is { Success: true } named
@@ -896,6 +916,27 @@ public sealed class ScenarioPlayer
         if (row is null)
         {
             throw new NotDrivenException($"which row of the menu is {action.Kind}{(action.Color is { } c ? " " + c : string.Empty)}", state);
+        }
+
+        if (onTablets is not null)
+        {
+            string text = row.Label;
+            int pressed = state.InPerson!.Pressed;
+            if (_atTable is not null)
+            {
+                await _atTable.PressMenuRowAsync(text);
+                TableState taken = await _page.SettledAsync(s => (s.InPerson?.Pressed ?? 0) > pressed);
+                if (taken.InPerson!.Presses![^1] is not { Used: true })
+                {
+                    throw new Xunit.Sdk.XunitException($"The phone did not press \"{text}\" from the tablet.");
+                }
+            }
+            else
+            {
+                await TablePressAsync(state, item => item.Text == text);
+            }
+
+            return;
         }
 
         await _page.TapAsync(row.X, row.Y);

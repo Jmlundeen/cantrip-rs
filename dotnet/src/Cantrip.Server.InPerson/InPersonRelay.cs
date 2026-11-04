@@ -662,23 +662,18 @@ public sealed class InPersonRelay : IStepObserver
         phone.Send(new SeatLineMessage { Decision = line.Decision, Line = line.Line, Take = line.Take });
     }
 
-    /// <summary>The most rows, items and characters of words a phone's prompt may hold; a larger one is not shown.</summary>
-    private const int MostPromptRows = 16;
-    private const int MostPromptItems = 64;
-    private const int MostPromptText = 2000;
-
     /// <summary>
     /// A phone's prompt, kept for its seat and shown on every tablet (docs/in-person.md, "The prompt on the table"). A private
     /// one is kept with nothing in it, whatever the phone sent, so a tablet never shows any of it.
     /// </summary>
     private void TakePrompt(int seat, PromptCard? prompt)
     {
-        if (prompt is null || prompt.Rows is null || prompt.Rows.Count > MostPromptRows) return;
-        if (prompt.Rows.Any(row => row?.Items is null) || prompt.Rows.Sum(row => row.Items.Count) > MostPromptItems) return;
+        if (prompt is null || prompt.Rows is null || prompt.Rows.Count > PromptCard.MostRows) return;
+        if (prompt.Rows.Any(row => row?.Items is null) || prompt.Rows.Sum(row => row.Items.Count) > PromptCard.MostItems) return;
         if (prompt.Rows.SelectMany(row => row.Items).Any(item => item is null || !Enum.IsDefined(item.Kind))) return;
         int text = (prompt.Title?.Length ?? 0) + (prompt.Detail?.Length ?? 0) + (prompt.Error?.Length ?? 0)
             + prompt.Rows.SelectMany(row => row.Items).Sum(item => item.Text?.Length ?? 0);
-        if (text > MostPromptText) return;
+        if (text > PromptCard.MostText) return;
 
         PromptCard kept = prompt.Private
             ? new PromptCard { Version = prompt.Version, Private = true, Asking = prompt.Asking }

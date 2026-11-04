@@ -223,6 +223,33 @@ public sealed class InPersonTests(WebClient web)
         await table.Tablets[0].PictureAsync("over");
     }
 
+    /// <summary>
+    /// Auto-mana from the table: Tundra tapped on the shared tablet while a {U} spell is paid for is tapped for {U}, with no
+    /// question on the tablet or the phone. The table judges the answer against the script.
+    /// </summary>
+    [Fact]
+    public async Task A_dual_land_tapped_on_the_tablet_to_pay_is_tapped_for_the_colour_owed()
+    {
+        const string name = "in-person-a-dual-land-tapped-on-a-tablet-to-pay-is-tapped-for-the-colour-owed";
+        await using var table = new InPersonTable(web, "auto-mana", 0);
+        string? failure = await ScenarioPlayer.PlayAsync(web, ScenarioPath(name), atTable: table, autoMana: true);
+        Assert.True(failure is null, $"{name}:\n{failure}");
+    }
+
+    /// <summary>
+    /// A land's colours asked on the tablet that tapped it: Tundra tapped on the shared tablet at priority, with nothing owed
+    /// for auto-mana to go by, shows its colours on the tablet, and its {U} is pressed there. Nothing opens on the phone.
+    /// </summary>
+    [Fact]
+    public async Task A_dual_land_tapped_on_the_tablet_at_priority_asks_its_colour_on_the_tablet()
+    {
+        const string name = "in-person-a-dual-land-tapped-on-a-tablet-at-priority-asks-its-colour-there";
+        await using var table = new InPersonTable(web, "land-menu", 0);
+        string? failure = await ScenarioPlayer.PlayAsync(web, ScenarioPath(name), atTable: table);
+        Assert.True(failure is null, $"{name}:\n{failure}");
+        await table.Tablets[0].PictureAsync("over");
+    }
+
     private static string ScenarioPath(string name) => Path.Combine(WebClient.Root, "scenarios", name + ".cantrip");
 
     /// <summary>Hands a tablet the game as the public feed would, and waits for Lightning Bolt on its stack.</summary>

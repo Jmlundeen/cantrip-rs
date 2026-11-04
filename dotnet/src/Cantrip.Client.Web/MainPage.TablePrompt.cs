@@ -32,6 +32,85 @@ public sealed partial class MainPage
     /// <summary>How many presses from the tablets this page has taken, for the page's test state.</summary>
     private int _tablePressCount;
 
+    /// <summary>A card's menu opened by a tap on a tablet: shown on the tablets, in place of the dock, while its question stands.</summary>
+    private sealed record TableMenu(
+        int RequestId,
+        string Title,
+        IReadOnlyList<(string Text, Action OnChosen)> Rows,
+        IReadOnlyList<int> Abilities,
+        IReadOnlyList<int> OptionIds);
+
+    /// <summary>The menu the tablets are showing for this page, if any.</summary>
+    private TableMenu? _tableMenu;
+
+    /// <summary>Whether the click being made is a tap from a tablet (<see cref="TryTableTap"/>).</summary>
+    private bool _takingTableTap;
+
+    /// <summary>
+    /// Opens a card's menu where the finger that asked for it is. A click on this page opens it here; a tap on a tablet shows
+    /// it there, its rows the prompt's buttons, unless it says what the table may not know (a face-down card's real name) or
+    /// is more than a prompt can hold, and then it opens here, with the tablets told a choice is being made on the phone.
+    /// </summary>
+    private void OpenCardMenu(GameClient client, ViewHandle source, List<(string Text, Action OnChosen)> items, List<int> abilities, List<int> optionIds)
+    {
+        if (_takingTableTap && client.Prompt is { } prompt)
+        {
+            var menu = new TableMenu(prompt.RequestId, client.Object(source)?.Name ?? string.Empty, items, abilities, optionIds);
+            PromptCard card = TableMenuCard(client, menu, []);
+            int words = card.Title.Length + card.Detail.Length + card.Rows.SelectMany(row => row.Items).Sum(item => item.Text.Length);
+            if (card.Rows.Sum(row => row.Items.Count) <= PromptCard.MostItems && words <= PromptCard.MostText && !NamesHiddenCard(client, card))
+            {
+                _menu.Close();
+                _tableMenu = menu;
+                return;
+            }
+        }
+
+        _menu.Open(Root, _pointer, items, abilities: abilities, optionIds: optionIds);
+    }
+
+    /// <summary>A menu as the prompt the tablets show: a button for each row, and Cancel, which is the way out a phone's menu has in a tap beside it.</summary>
+    private PromptCard TableMenuCard(GameClient client, TableMenu menu, List<Action?> presses)
+    {
+        // The panel is short and narrow, so a cost every row shares is not said on each: a land's colours fit side by side.
+        int shared = menu.Rows.Count > 1 ? menu.Rows[0].Text.IndexOf(": ", StringComparison.Ordinal) + 2 : 0;
+        string cost = shared >= 2 ? menu.Rows[0].Text[..shared] : string.Empty;
+        if (!menu.Rows.All(row => row.Text.StartsWith(cost, StringComparison.Ordinal)))
+        {
+            cost = string.Empty;
+        }
+
+        List<PromptItem> rows = [];
+        foreach ((string text, Action onChosen) in menu.Rows)
+        {
+            rows.Add(new PromptItem { Id = presses.Count, Kind = PromptItemKind.Button, Text = text[cost.Length..] });
+            presses.Add(() =>
+            {
+                // A press on its way as the question moved on answers nothing: what it chose was offered by that question.
+                bool current = client.Prompt?.RequestId == menu.RequestId;
+                _tableMenu = null;
+                if (current)
+                {
+                    onChosen();
+                }
+            });
+        }
+
+        rows.Add(new PromptItem { Id = presses.Count, Kind = PromptItemKind.Button, Text = "Cancel" });
+        presses.Add(() =>
+        {
+            _tableMenu = null;
+            _needsRedraw = true;
+        });
+
+        return new PromptCard
+        {
+            Asking = true,
+            Title = menu.Title,
+            Rows = [new PromptRow { Items = rows }],
+        };
+    }
+
     /// <summary>
     /// The dock as the table may see it, sent when it changes: its toggles, its title and detail, an error, Undo and the dock's
     /// buttons and steppers - or, while the choice is among cards only this player may see, only that one is being made.
@@ -81,8 +160,20 @@ public sealed partial class MainPage
     /// <summary>The dock read into a card for the table, each pressable item's action added to <paramref name="presses"/> at its id.</summary>
     private PromptCard TablePrompt(List<Action?> presses)
     {
+        if (_tableMenu is { } menu)
+        {
+            if (_gameClient is { } asked && asked.Prompt?.RequestId == menu.RequestId && !asked.IsOver)
+            {
+                return TableMenuCard(asked, menu, presses);
+            }
+
+            _tableMenu = null;
+        }
+
         var card = new PromptCard();
-        bool hidden = _choicesOpen && _choicePrompted;
+
+        // A card's menu open on this page is being answered here, whatever it says.
+        bool hidden = _choicesOpen && _choicePrompted || _menu.IsOpen;
         List<PromptItem> row = [];
 
         void Item(PromptItemKind kind, string text, Action? press, bool primary = false, bool enabled = true, bool on = false)

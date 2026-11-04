@@ -204,6 +204,7 @@ public sealed partial class MainPage
             return;
         }
 
+        _tableMenu = null;
         clicked();
         RedrawNow();
     }
@@ -412,7 +413,7 @@ public sealed partial class MainPage
             return;
         }
 
-        _menu.Open(Root, _pointer, MenuItems(client, entries), abilities: [.. entries.Select(entry => entry[0].Option.AbilityIndex)], optionIds: [.. entries.Select(entry => entry[0].Option.OptionId)]);
+        OpenCardMenu(client, offered[0].Source, MenuItems(client, entries), [.. entries.Select(entry => entry[0].Option.AbilityIndex)], [.. entries.Select(entry => entry[0].Option.OptionId)]);
     }
 
     /// <summary>A card's menu rows, each worded and with what choosing it does: one for each thing it offers.</summary>
@@ -522,7 +523,7 @@ public sealed partial class MainPage
                 () => { Take(client, option, color, combination, sacrifice); RedrawNow(); }));
         }
 
-        _menu.Open(Root, _pointer, items, abilities: [.. rows.Select(row => row.Option.AbilityIndex)], optionIds: [.. rows.Select(row => row.Option.OptionId)]);
+        OpenCardMenu(client, rows[0].Option.Source, items, [.. rows.Select(row => row.Option.AbilityIndex)], [.. rows.Select(row => row.Option.OptionId)]);
     }
 
     private static string CostChoiceLabel(GameClient client, List<ManaRow> entry)

@@ -405,7 +405,10 @@ public sealed record InPersonState(
     int SentOff = 0);
 
 /// <summary>The prompt a phone last sent the tablets: its version, whether it is private, its title and its items.</summary>
-public sealed record PhonePromptState(int Version, bool Private, string Title, IReadOnlyList<PhonePromptItem> Items);
+public sealed record PhonePromptState(int Version, bool Private, string Title, IReadOnlyList<PhonePromptItem> Items, IReadOnlyList<PhoneMenuRow>? Menu = null);
+
+/// <summary>A row of a card's menu shown on the tablets: the prompt item it is, and the ability it stands for.</summary>
+public sealed record PhoneMenuRow(int Id, int Ability, int OptionId);
 
 /// <summary>An item of a phone's prompt for the tablets: its id, kind (Button, Toggle, Words), words, and whether it is the answer expected and can be pressed.</summary>
 public sealed record PhonePromptItem(int Id, string Kind, string Text, bool Primary, bool Enabled);

@@ -169,6 +169,16 @@ public sealed class InPersonTable : IAsyncDisposable
         static string Describe(TabletCard card) => $"{card.Name.ToLowerInvariant().Replace(' ', '-')}-{card.Place}";
     }
 
+    /// <summary>A row of a card's menu pressed with a finger on the first tablet showing it; every tablet shows the one prompt.</summary>
+    public async Task PressMenuRowAsync(string text)
+    {
+        TabletDriver tablet = _tablets[0];
+        TabletState state = await tablet.SettledAsync(each => each.Prompt?.Items.Any(item => item.Text == text) == true);
+        await tablet.PictureAsync("card-menu");
+        TabletPromptItem row = state.Prompt!.Items.First(item => item.Text == text);
+        await tablet.TapAsync(row.X, row.Y);
+    }
+
     /// <summary>
     /// The tablets show nothing of Bot1's hand: no card on any of them is named as a card in the phone's hand is, but for the
     /// names the public also sees elsewhere (a Mountain on the battlefield and another in the hand).

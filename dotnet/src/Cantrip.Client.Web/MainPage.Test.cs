@@ -570,6 +570,22 @@ public sealed partial class MainPage
             }
 
             json.WriteEndArray();
+            if (_tableMenu is { } menu)
+            {
+                // The rows of a card's menu shown on the tablets, each with the ability it is, as a menu's rows are told apart.
+                json.WriteStartArray("menu");
+                for (int row = 0; row < menu.Rows.Count; row++)
+                {
+                    json.WriteStartObject();
+                    json.WriteNumber("id", row);
+                    json.WriteNumber("ability", menu.Abilities[row]);
+                    json.WriteNumber("optionId", menu.OptionIds[row]);
+                    json.WriteEndObject();
+                }
+
+                json.WriteEndArray();
+            }
+
             json.WriteEndObject();
         }
 

@@ -403,6 +403,15 @@ public sealed class TablePromptMessage : DeviceServerMessage
 [MessagePackObject]
 public sealed class PromptCard
 {
+    /// <summary>The most rows a prompt may hold; the relay shows no larger one.</summary>
+    public const int MostRows = 16;
+
+    /// <summary>The most items a prompt may hold; the relay shows no larger one.</summary>
+    public const int MostItems = 64;
+
+    /// <summary>The most characters of words a prompt may hold; the relay shows no larger one.</summary>
+    public const int MostText = 2000;
+
     [Key(0)]
     public int Version { get; set; }
 

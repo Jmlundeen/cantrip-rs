@@ -74,6 +74,12 @@ phone, then looks at the board for the rest, without their eyes going back and f
   ("Cast Brainstorm for its miracle cost?" says what was drawn). The card being cast or activated is the exception: it
   is revealed as it is in paper, even if it is then taken back. The phone decides, and sends a private prompt with
   nothing of it in it; the relay keeps nothing of a private prompt either way.
+- **A card's menu.** A tap on a tablet that opens a card's menu - a land's colours when auto-mana has nothing to go on, a
+  card's abilities, an ability that cannot be taken back - is answered where the finger is: the tablets show the card's
+  name, a button for each row and Cancel in place of the prompt (`OpenCardMenu`), and the phone opens nothing. Tapping
+  another card there, or the question moving on, puts the menu away. A menu the table may not read, one naming a
+  face-down card, or one too large for a prompt, opens on the phone, the tablets saying "Choosing on their phone". A
+  click on the phone's own board opens its menu on the phone, and a hand card's sheet is the phone's as ever.
 - **The wire.** The phone sends its prompt whenever it changes (`SeatPromptMessage`), numbered (`PromptCard.Version`);
   the relay keeps each seat's and shows it on every tablet (`TablePromptMessage`), a tablet joining later with its
   welcome. A press names the seat, the version and the item (`TablePressMessage`); the relay hands it to that seat's
