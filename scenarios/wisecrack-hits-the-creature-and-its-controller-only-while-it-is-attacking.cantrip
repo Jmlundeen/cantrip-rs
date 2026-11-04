@@ -1,0 +1,54 @@
+# Wisecrack: "Target creature deals damage equal to its power to itself. If that creature is attacking, Wisecrack deals 2 damage to that
+# creature's controller." Bot1's Sentinel of the Nameless City (3/4) is hit on turn 3 when it is not attacking: 3 damage marked, no life
+# lost (20 and 20), and a Mox (not a creature) is refused as a target. On turn 5 it attacks and is hit again after the attack is declared:
+# 3 damage again (damage clears at cleanup) and now Bot1, its own controller, loses exactly 2 (18) - Bot2, the opponent, stays at 20.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Black Lotus
+Sentinel of the Nameless City
+Wisecrack
+Wisecrack
+Island x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sentinel of the Nameless City.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Wisecrack.Cast(Mox Ruby)
+Bot1.Hand.Wisecrack.Cast(Sentinel of the Nameless City)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sentinel of the Nameless City.Damage = 3
+? Bot1.Life = 20
+? Bot2.Life = 20
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Sentinel of the Nameless City > Bot2)
+[T5 Bot1.DeclareAttackers]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wisecrack.Cast(Sentinel of the Nameless City)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sentinel of the Nameless City.Damage = 3
+? Bot1.Life = 18
+? Bot2.Life = 20
+
+[Expect]
+Bot1.Graveyard = Wisecrack; Black Lotus; Wisecrack
+Bot1.Battlefield.Sentinel of the Nameless City.Toughness = 4

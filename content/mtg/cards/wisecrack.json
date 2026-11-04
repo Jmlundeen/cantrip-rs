@@ -1,0 +1,6 @@
+{
+  "name": "Wisecrack",
+  "manaCost": "{2}{R}",
+  "type": "Instant",
+  "oracleText": "Target creature deals damage equal to its power to itself. If that creature is attacking, Wisecrack deals 2 damage to that creature's controller."
+}

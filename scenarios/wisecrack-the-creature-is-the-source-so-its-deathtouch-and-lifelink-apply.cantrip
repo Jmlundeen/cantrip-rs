@@ -1,0 +1,37 @@
+# Wisecrack: "Target creature deals damage equal to its power to itself." The creature is the source of that damage, so its own abilities
+# apply to it (CR 120.3, 702.2b, 702.15b): Bot1's Vampire Nighthawk (2/3, deathtouch and lifelink), not attacking, deals itself 2 on turn 3.
+# The 2 is lethal from a source with deathtouch (CR 704.5h), so the Nighthawk dies with only 2 of its 3 toughness marked, and Bot1, its
+# controller, gains 2 (22). Were Wisecrack the source, the Nighthawk would live and nobody would gain life.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Emerald
+Vampire Nighthawk
+Wisecrack
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vampire Nighthawk.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wisecrack.Cast(Vampire Nighthawk)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
+Bot1.Graveyard = Vampire Nighthawk; Wisecrack; Black Lotus

@@ -1,0 +1,45 @@
+# A creature with no power deals itself no damage (CR 120.8): Bot1's Ornithopter (0/2) is hit by Wisecrack on turn 3 while not attacking and
+# nothing happens at all (damage 0, life 20). On turn 5 it attacks; Wisecrack again deals it 0 but, it being attacking, 2 to Bot1 (18).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Black Lotus
+Ornithopter
+Wisecrack
+Wisecrack
+Island x17
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wisecrack.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Damage = 0
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.DeclareAttackers]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wisecrack.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Damage = 0
+? Bot1.Life = 18
+
+[Expect]
+Bot2.Life = 20

@@ -1,0 +1,46 @@
+# Wisecrack on an opponent's creature: Bot2 (Black Lotus mana) casts it on Bot1's attacking Hill Giant (3/3) after attackers are declared.
+# The Giant deals its 3 power to itself and dies (CR 704.5g); Bot1, its controller, takes 2 from Wisecrack (18) - the caster Bot2 is untouched
+# (20), and Bot2's own Ornithopter (a creature Bot2 controls, not attacking) stays out of it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Hill Giant
+Island x17
+
+[Bot2 Deck]
+Black Lotus
+Ornithopter
+Wisecrack
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Hill Giant > Bot2)
+[T3 Bot1.DeclareAttackers]
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wisecrack.Cast(Hill Giant)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 18
+? Bot2.Life = 20
+? Bot2.Battlefield.Ornithopter.Damage = 0
+
+[Expect]
+Bot1.Graveyard = Hill Giant; Black Lotus
+Bot2.Graveyard = Wisecrack; Black Lotus
