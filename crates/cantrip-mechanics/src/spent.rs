@@ -31,6 +31,15 @@ pub fn five_or_more_mana_spent_on_the_spell(q: &dyn Query, item: &StackItem) -> 
     matches!(item.subject, Target::Object(spell) if q.obj(spell).spent.total() >= 5)
 }
 
+/// "The amount of mana spent to cast [the spell] was less than its mana value" (CR 601.2h, 202.3): all of the payment, additional
+/// costs too, against the mana value with X as chosen (CR 202.3e), so a spell cast for an alternative cost, with a cost reduction
+/// or for free has had less spent than its value; a copy was not cast and has had nothing spent (CR 707.10). Read from the spell's own
+/// object, so it still answers once the spell has been countered or has left the stack. Tokka & Rahzar, Terrible Twos and Unravel
+/// print it.
+pub fn less_than_its_mana_value(q: &dyn Query, spell: ObjectId) -> bool {
+    q.obj(spell).spent.total() < q.mana_value(spell)
+}
+
 /// "If mana from a Treasure was spent to cast [the spell]" (CR 601.2h, 106.3): some of the mana paid for the spell, additional
 /// costs too, was produced by a Treasure - an artifact with the Treasure subtype as it last was on the battlefield (a Treasure
 /// sacrificed for its mana is gone by then, CR 608.2h). A copy was not cast and had nothing spent (CR 707.10), and a spell cast

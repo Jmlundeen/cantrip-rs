@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::spent;
 use cantrip_oracle as oracle;
 
 /// "Whenever a player casts a spell, if the amount of mana spent to cast it was less than its mana value" (CR 603.2, 603.4, 601.2h): any
@@ -8,7 +9,7 @@ use cantrip_oracle as oracle;
 /// resolves. The spell rides along as the trigger's subject; the player who cast it is "that player".
 fn a_player_casts_a_spell_with_less_mana_spent_than_its_mana_value(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { spell, .. } if q.obj(*spell).spent.total() < q.mana_value(*spell) => Fired::about(Target::Object(*spell)),
+        Event::SpellCast { spell, .. } if spent::less_than_its_mana_value(q, *spell) => Fired::about(Target::Object(*spell)),
         _ => None,
     }
 }
