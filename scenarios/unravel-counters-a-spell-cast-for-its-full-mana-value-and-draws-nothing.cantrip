@@ -1,0 +1,39 @@
+# Unravel: "Counter target spell. If the amount of mana spent to cast that spell was less than its mana value, you draw a card." Bot1 casts Dauntless Scrapbot ({3}) for its full three mana, so Unravel counters it and Bot2 draws nothing (3 is not less than 3; CR 601.2h, 202.3).
+
+[Bot1 Deck]
+Black Lotus
+Dauntless Scrapbot
+Island x26
+
+[Bot2 Deck]
+Unravel
+Island
+Mox Sapphire
+Mox Jet
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dauntless Scrapbot.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Unravel.Cast(Stack.Dauntless Scrapbot)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Dauntless Scrapbot; Black Lotus
+Bot2.Hand.Count = 4

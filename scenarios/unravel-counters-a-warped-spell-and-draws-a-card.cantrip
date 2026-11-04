@@ -1,0 +1,39 @@
+# Unravel against a spell cast for less than its mana value: Bot1 warps Starbreach Whale (mana value 5) for {1}{U}, so only two mana was spent and Unravel counters it and Bot2 draws a card (2 is less than 5; CR 601.2h, 202.3, 702.185a). The mana value is not changed by the alternative cost.
+
+[Bot1 Deck]
+Black Lotus
+Starbreach Whale
+Island x26
+
+[Bot2 Deck]
+Unravel
+Island
+Mox Sapphire
+Mox Jet
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Starbreach Whale.Cast(Ability: Warp)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Unravel.Cast(Stack.Starbreach Whale)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Starbreach Whale; Black Lotus
+Bot2.Hand.Count = 5
