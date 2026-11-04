@@ -1,0 +1,56 @@
+# Bard's Bow: job select makes a 1/1 Hero and attaches the Bow to it: "Equipped creature gets +2/+2, has reach, and is a Bard
+# in addition to its other types", so the Hero is a 3/3 Hero Bard with reach. Perseus's Bow, "Equip {6}" (CR 702.6a): with only
+# a Black Lotus's three it is refused, and on turn 3 with the Lotus and three Moxen it moves the Bow to Bot1's Ornithopter
+# (0/2 Thopter -> 2/4 Bard Thopter, reach); the Hero is a plain 1/1 Hero again.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Black Lotus
+Bard's Bow
+Ornithopter
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bard's Bow.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hero Token.Power = 3
+? Bot1.Battlefield.Hero Token.Toughness = 3
+? Bot1.Battlefield.Hero Token.Subtypes = Bard; Hero
+? Bot1.Battlefield.Hero Token.Keywords = Reach
+? Bot1.Battlefield.Bard's Bow.AttachedTo = Hero Token
+! Bot1.Battlefield.Bard's Bow.Activate(Ornithopter; Mana: short)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Bard's Bow.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Hero Token.Power = 1
+Bot1.Battlefield.Hero Token.Subtypes = Hero
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Reach
+Bot1.Battlefield.Ornithopter.Subtypes = Bard; Thopter
+Bot1.Battlefield.Bard's Bow.AttachedTo = Ornithopter
