@@ -1,0 +1,50 @@
+# "Gain control of that Equipment until end of turn. Attach it to the chosen creature. When you lose control of that
+# Equipment this turn, if it's attached to a creature you control, unattach it." Bot1 takes Bot2's Skullclamp onto its
+# Grizzly Bears (3/1). In the cleanup step the "until end of turn" control ends and the "this turn" delayed ability ends
+# at the same moment (CR 514.2); the ruling: it triggers "whether it's because the 'until end of turn' duration ended or
+# because someone else gained control of the Equipment". It does, Bot1 gets priority in that cleanup step (CR 514.3a),
+# and the Skullclamp comes off: on turn 4 Bot2 has it back unattached and the Bears are 2/2.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Grizzly Bears
+Stolen Uniform
+Island x15
+
+[Bot2 Deck]
+Mox Jet
+Skullclamp
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Skullclamp.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stolen Uniform.Cast
+Bot1.Target(Bot1.Battlefield.Grizzly Bears)
+Bot1.Target(Bot2.Battlefield.Skullclamp)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Skullclamp.AttachedTo = Grizzly Bears
+? Bot1.Battlefield.Grizzly Bears.Toughness = 1
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Skullclamp.AttachedTo = (absent)
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Emerald; Mox Pearl; Grizzly Bears
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.Grizzly Bears.Toughness = 2
+Bot1.Graveyard = Stolen Uniform
+Bot2.Battlefield = Mox Jet; Skullclamp
+Bot2.Battlefield.Skullclamp.AttachedTo = (absent)

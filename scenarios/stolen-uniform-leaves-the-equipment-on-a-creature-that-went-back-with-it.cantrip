@@ -1,0 +1,56 @@
+# "If it's attached to a creature you control" (CR 603.4). Bot1 takes Bot2's Grizzly Bears with Act of Treason, then puts
+# Bot2's Skullclamp on them with Stolen Uniform, and the 3/1 Bears attack Bot2. In the cleanup step both "until end of
+# turn" control effects end at once (CR 514.2): as Bot1 loses control of the Skullclamp, it is attached to a creature Bot2
+# controls, so the delayed ability does not trigger, and the Skullclamp stays on the Bears.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Act of Treason
+Stolen Uniform
+Island x15
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Grizzly Bears
+Skullclamp
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Skullclamp.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stolen Uniform.Cast
+Bot1.Target(Bot1.Battlefield.Grizzly Bears)
+Bot1.Target(Bot2.Battlefield.Skullclamp)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Skullclamp.AttachedTo = Grizzly Bears
+Bot1.Attack(Grizzly Bears > Bot2)
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Skullclamp.AttachedTo = Grizzly Bears
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Ruby
+Bot1.Graveyard = Stolen Uniform; Act of Treason; Black Lotus
+Bot2.Life = 17
+Bot2.Battlefield = Mox Jet; Mox Emerald; Mountain; Grizzly Bears; Skullclamp
+Bot2.Battlefield.Grizzly Bears.Toughness = 1
+Bot2.Battlefield.Skullclamp.AttachedTo = Grizzly Bears

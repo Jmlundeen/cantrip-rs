@@ -1,0 +1,59 @@
+# "When you lose control of that Equipment this turn" lasts only this turn (CR 603.7b), and ends in the cleanup step
+# (CR 514.2) though nothing it waits for happens there. Bot1 puts its own Skullclamp on its Grizzly Bears with Stolen
+# Uniform - gaining control of what it already controls changes nothing, so no control changes in the cleanup step. On
+# turn 4 Bot2 takes the Skullclamp with Dack Fayden's -2: Bot1 loses control of it on a later turn, nothing triggers, and
+# the Skullclamp stays on Bot1's Bears.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Grizzly Bears
+Skullclamp
+Stolen Uniform
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Dack Fayden
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stolen Uniform.Cast
+Bot1.Target(Bot1.Battlefield.Grizzly Bears)
+Bot1.Target(Bot1.Battlefield.Skullclamp)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Skullclamp.AttachedTo = Grizzly Bears
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Skullclamp.AttachedTo = Grizzly Bears
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dack Fayden.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Dack Fayden.Activate(Ability: Gain control; Bot1.Battlefield.Skullclamp)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Emerald; Mox Pearl; Grizzly Bears
+Bot1.Battlefield.Grizzly Bears.Toughness = 1
+Bot2.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Dack Fayden; Skullclamp
+Bot2.Battlefield.Skullclamp.AttachedTo = Grizzly Bears
