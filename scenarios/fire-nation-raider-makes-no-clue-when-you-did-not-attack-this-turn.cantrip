@@ -1,0 +1,47 @@
+# Fire Nation Raider: Raid needs an attack this turn -- Bot1 attacked on turn 1, but on turn 3 casts Fire Nation Raider before any
+# combat, so it makes no Clue.
+
+[Bot1 Deck]
+Mox Ruby x5
+Fanatical Firebrand
+Fire Nation Raider
+Mountain x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Hand.Fire Nation Raider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+
+[Expect]
+Bot1.Battlefield = Fanatical Firebrand; Fire Nation Raider; Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby

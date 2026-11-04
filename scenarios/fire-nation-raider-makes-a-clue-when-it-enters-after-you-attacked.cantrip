@@ -1,0 +1,47 @@
+# Fire Nation Raider: Raid -- when it enters after Bot1 has attacked this turn (with a hasty Fanatical Firebrand), it creates a
+# Clue token; the four mana pay for it exactly.
+
+[Bot1 Deck]
+Mox Ruby x5
+Fanatical Firebrand
+Fire Nation Raider
+Mountain x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[Bot1.Main2]
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Hand.Fire Nation Raider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+
+[Expect]
+Bot1.Battlefield = Clue Token; Fanatical Firebrand; Fire Nation Raider; Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby
