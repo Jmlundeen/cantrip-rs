@@ -1,0 +1,44 @@
+# Gravpack Monoist, a 2/1 flyer, is shot by Bot2's Lightning Bolt: it dies and Bot1 gets a tapped 2/2 colorless Robot artifact
+# creature token (a Bolt-killed creature leaves the Robot as the only battlefield card).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Gravpack Monoist
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gravpack Monoist.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Gravpack Monoist.Keywords = Flying
+? Bot1.Battlefield.Gravpack Monoist.Power = 2
+? Bot1.Battlefield.Gravpack Monoist.Toughness = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gravpack Monoist)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Gravpack Monoist
+Bot1.Battlefield.Robot Token.Types = Artifact; Creature
+Bot1.Battlefield.Robot Token.Power = 2
+Bot1.Battlefield.Robot Token.Toughness = 2
+Bot1.Battlefield.Robot Token.Tapped = true
+Bot1.Battlefield.Robot Token.Colors = (absent)

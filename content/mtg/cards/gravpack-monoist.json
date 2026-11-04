@@ -1,0 +1,11 @@
+{
+  "name": "Gravpack Monoist",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Human Scout",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Flying\nWhen this creature dies, create a tapped 2/2 colorless Robot artifact creature token.",
+  "keywords": [
+    "Flying"
+  ]
+}
