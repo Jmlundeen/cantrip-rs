@@ -1,0 +1,58 @@
+# Gysahl Greens ({1}{G}): "Create a 2/2 green Bird creature token with 'Whenever a land you control enters, this token gets +1/+0
+# until end of turn.'" Bot1's Bird on turn 1 is 2/2, then 3/2 when Bot1 plays a Forest (CR 603.2). On turn 2 Bot2 makes its own
+# Bird and plays an Island: Bot2's is 3/2, Bot1's Bird - whose +1/+0 ended with turn 1 (CR 514.2) - stays 2/2, an opponent's
+# land not being "a land you control". On turn 3 Bot1's Forest makes its Bird 3/2 while Bot2's Bird stays 2/2.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Gysahl Greens
+Forest
+Forest x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Gysahl Greens
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gysahl Greens.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Bird Token.Power = 2
+? Bot1.Battlefield.Bird Token.Toughness = 2
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bird Token.Power = 3
+? Bot1.Battlefield.Bird Token.Toughness = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Gysahl Greens.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Bird Token.Power = 3
+? Bot1.Battlefield.Bird Token.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bird Token.Power = 3
+? Bot2.Battlefield.Bird Token.Power = 2
+
+[Expect]
+Bot1.Battlefield.Bird Token.Power = 3
+Bot2.Battlefield.Bird Token.Power = 2

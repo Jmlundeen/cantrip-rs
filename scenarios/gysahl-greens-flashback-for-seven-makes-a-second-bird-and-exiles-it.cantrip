@@ -1,0 +1,41 @@
+# Gysahl Greens: "Flashback {6}{G}" (CR 702.34a). Cast for {1}{G} on turn 1 it goes to the graveyard; on turn 3 two Black Lotuses
+# and Mox Emerald make exactly {6}{G} - with the pool short of seven by one it is refused - and a second Bird is created, the
+# card exiled instead of put into the graveyard (CR 702.34a). The Lotuses are in the graveyard in its place.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Gysahl Greens
+Black Lotus
+Black Lotus
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gysahl Greens.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Gysahl Greens
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Graveyard.Gysahl Greens.Cast(Ability: Flashback)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Graveyard.Gysahl Greens.Cast(Ability: Flashback)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Bird Token#1.Power = 2
+Bot1.Battlefield.Bird Token#2.Power = 2
+Bot1.Exile.Gysahl Greens.Colors.Count = 1
+Bot1.Graveyard = Black Lotus; Black Lotus
