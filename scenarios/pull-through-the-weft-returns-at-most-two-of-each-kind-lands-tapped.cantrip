@@ -1,0 +1,62 @@
+# Pull Through the Weft: "up to two target nonland permanent cards ... to your hand, then up to two target land cards ... to the
+# battlefield tapped" (CR 601.2c, 608.2c). Three Faithless Loots (Black Lotus's RRR) put three nonland permanent cards (Memnite,
+# Ornithopter, Mox Jet) and three lands (Island, Forest, Mountain) in the graveyard. Three of either kind are more than the
+# slot takes, and a land is no nonland target. Two of each come back, the lands tapped, and the third of each stays behind.
+
+[Bot1 Deck]
+Black Lotus
+Faithless Looting
+Faithless Looting
+Faithless Looting
+Memnite
+Ornithopter
+Mox Jet
+Island
+Forest
+Mountain
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Pull Through the Weft
+Forest
+Island x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Memnite; Ornithopter)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mox Jet; Island)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Forest; Mountain)
+? Bot1.Graveyard.Count = 10
+[T7 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Pull Through the Weft.Cast
+! Bot1.Target(Bot1.Graveyard.Memnite; Bot1.Graveyard.Ornithopter; Bot1.Graveyard.Mox Jet)
+Bot1.Target(Bot1.Graveyard.Memnite; Bot1.Graveyard.Mox Jet)
+! Bot1.Target(Bot1.Graveyard.Island; Bot1.Graveyard.Forest; Bot1.Graveyard.Mountain)
+Bot1.Target(Bot1.Graveyard.Island; Bot1.Graveyard.Forest)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Pull Through the Weft; Faithless Looting; Mountain; Faithless Looting; Faithless Looting; Ornithopter; Black Lotus
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Forest#2.Tapped = true
+Bot1.Hand.Memnite.Power = 1
+Bot1.Hand.Count = 2

@@ -1,0 +1,40 @@
+# Pull Through the Weft: both targets are "up to two" (CR 601.2c), so either group may be left empty. Faithless Looting (Mox Ruby)
+# puts a Memnite and an Island in the graveyard; the Weft (Black Lotus's GGG, Mox Emerald and Mox Pearl) takes only a nonland card: the land group is left empty and the Island stays in the graveyard; Memnite returns to hand.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Memnite
+Island
+Black Lotus
+Mox Emerald
+Mox Pearl
+Plains
+Plains
+Pull Through the Weft
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Memnite; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pull Through the Weft.Cast
+Bot1.Target(Bot1.Graveyard.Memnite)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Pull Through the Weft; Black Lotus; Faithless Looting; Island
+Bot1.Hand.Memnite.Power = 1

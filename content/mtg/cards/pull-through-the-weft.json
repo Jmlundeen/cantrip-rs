@@ -1,0 +1,6 @@
+{
+  "name": "Pull Through the Weft",
+  "manaCost": "{3}{G}{G}",
+  "type": "Sorcery",
+  "oracleText": "Return up to two target nonland permanent cards from your graveyard to your hand, then return up to two target land cards from your graveyard to the battlefield tapped."
+}
