@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::history;
 use cantrip_mechanics::statics::your_creatures;
 use cantrip_mechanics::{tokens, triggers};
 use cantrip_oracle as oracle;
@@ -11,7 +12,7 @@ pub static EXTRA: &[&CardDef] = &[&tokens::KITHKIN];
 /// one that entered under another player's control or was a noncreature does not.
 fn plus_x_plus_x(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let you = view.state().obj(source).controller;
-    let x = view.history().entered().filter(|e| e.controller == you && e.is(CardType::Creature)).count() as i16;
+    let x = history::creatures_entered_under_control_this_turn(view.history(), you) as i16;
     chars.power = chars.power.map(|v| v + x);
     chars.toughness = chars.toughness.map(|v| v + x);
 }

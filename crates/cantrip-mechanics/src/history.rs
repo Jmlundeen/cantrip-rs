@@ -115,6 +115,13 @@ pub fn another_creature_entered_under_control_this_turn(history: History<'_>, pl
     history.entered().any(|e| e.permanent != except && e.controller == player && e.is(CardType::Creature))
 }
 
+/// The number of creatures that entered the battlefield under `player`'s control this turn (CR 603.6a), judged as each entered (the
+/// controller and card types `Event::Entered` holds), tokens included, whatever has happened to it since. Kinbinding sums them into a
+/// bonus; Spider-UK asks whether there were two or more.
+pub fn creatures_entered_under_control_this_turn(history: History<'_>, player: PlayerId) -> usize {
+    history.entered().filter(|e| e.controller == player && e.is(CardType::Creature)).count()
+}
+
 /// The number of permanents `player` has sacrificed this turn (CR 701.21a): every permanent that went from the battlefield to a
 /// graveyard as a sacrifice this turn, token or not, under that player's control as it left. Asked of the history (CR 603.10a).
 /// Obsessive Pursuit counts them; Phoenix Fleet Airship asks whether there was one ("if you sacrificed a permanent this turn").
