@@ -1,0 +1,39 @@
+# Feint taps and silences only the creatures blocking its target: the creature blocking another attacker stays untapped
+# and its combat damage, and that attacker's, is dealt (CR 115.1, 615.1). Bofur's blocker and Bofur deal nothing.
+[Bot1 Deck]
+Bofur, Reliable Guardian
+Memnite
+Feint
+Plains
+Mountain
+Island x20
+[Bot2 Deck]
+Memnite
+Memnite
+Island x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Bofur, Reliable Guardian > Bot2; Memnite > Bot2)
+Bot2.Block(Memnite#1 > Bofur, Reliable Guardian; Memnite#2 > Memnite)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Feint.Cast(Bot1.Battlefield.Bofur, Reliable Guardian)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite#1.Tapped = true
+? Bot2.Battlefield.Memnite#2.Tapped = false
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Bofur, Reliable Guardian.Damage = 0
+Bot2.Battlefield.Memnite.Damage = 0
+Bot1.Graveyard = Memnite; Feint
+Bot2.Graveyard = Memnite
