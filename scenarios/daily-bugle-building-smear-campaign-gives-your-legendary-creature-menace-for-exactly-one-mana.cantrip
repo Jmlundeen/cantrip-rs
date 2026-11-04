@@ -1,0 +1,36 @@
+# Daily Bugle Building's Smear Campaign ({1}, {T}: target legendary creature gains menace until end of turn; only as a sorcery). On turn 1 Bot1 casts Thalia, Guardian of Thraben
+# (legendary, first strike) with Mox Pearl and Mox Emerald and, once she resolves, pays exactly {1} with Mox Ruby: she gains menace (the pool is empty after) in addition to
+# first strike. On turn 3 the menace is gone.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Thalia, Guardian of Thraben
+Daily Bugle Building
+Plains x2
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Daily Bugle Building.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Daily Bugle Building.Activate(Ability: Smear Campaign; Thalia, Guardian of Thraben)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Thalia, Guardian of Thraben.Keywords = FirstStrike; Menace
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Thalia, Guardian of Thraben.Keywords = FirstStrike

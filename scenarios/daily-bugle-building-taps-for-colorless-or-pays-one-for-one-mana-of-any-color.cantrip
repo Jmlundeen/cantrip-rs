@@ -1,0 +1,26 @@
+# Daily Bugle Building: "{T}: Add {C}." and "{1}, {T}: Add one mana of any color." On turn 1 Bot1 plays it and taps it for {C}; on turn 3 it pays {1} with Mox Emerald and taps it for
+# {R}: one mana of the chosen color, the {G} spent on the cost.
+
+[Bot1 Deck]
+Daily Bugle Building
+Mox Emerald
+Plains x5
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Daily Bugle Building.Play
+Bot1.Battlefield.Daily Bugle Building.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Daily Bugle Building.Activate(Ability: {1}; Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Daily Bugle Building.Tapped = true

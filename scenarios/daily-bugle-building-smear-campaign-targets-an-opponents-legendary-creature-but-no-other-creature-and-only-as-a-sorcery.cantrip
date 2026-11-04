@@ -1,0 +1,47 @@
+# Daily Bugle Building's Smear Campaign: "Target legendary creature" is either player's legendary creature, and no non-legendary creature. Bot2 casts Thalia, Guardian of Thraben on
+# turn 2; at the end of that turn, with {1} from Mox Ruby floating, Bot1 cannot target her: it is not a sorcery window (Bot2's turn). On turn 3 Bot1, with {1} from Mox Emerald,
+# cannot target its own Ornithopter (not legendary), and gives Bot2's Thalia menace.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Ornithopter
+Daily Bugle Building
+Plains x3
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Thalia, Guardian of Thraben
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Daily Bugle Building.Play
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Daily Bugle Building.Activate(Ability: Smear Campaign; Bot2.Battlefield.Thalia, Guardian of Thraben)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Daily Bugle Building.Activate(Ability: Smear Campaign; Ornithopter)
+Bot1.Battlefield.Daily Bugle Building.Activate(Ability: Smear Campaign; Bot2.Battlefield.Thalia, Guardian of Thraben)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Thalia, Guardian of Thraben.Keywords = FirstStrike; Menace
+
+[Expect]
+Bot1.Battlefield.Daily Bugle Building.Tapped = true
