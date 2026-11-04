@@ -1,0 +1,26 @@
+# Scorpion's Sting: "Target creature gets -3/-3 until end of turn." Ornithopter (0/2) is a -3/-1 and dies as a state-based action (CR 704.5f).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Ornithopter
+Scorpion's Sting
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Scorpion's Sting.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Graveyard = Ornithopter; Scorpion's Sting
+Stack.Count = 0
