@@ -1,0 +1,29 @@
+# Test of Conviction (Begin Negotiations): target opponent draws a card and this spell's controller draws two (CR 608.2c).
+# Bot1 is down to seven cards after casting it and is up to nine; Bot2 draws the one it is given.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Test of Conviction
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Test of Conviction.Cast
+Bot1.Modes(Begin Negotiations)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 11
+Bot2.Hand.Count = 8
+Bot2.Library.Count = 12
+Bot1.Graveyard = Test of Conviction

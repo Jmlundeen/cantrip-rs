@@ -1,0 +1,28 @@
+# Test of Conviction (Battle Stations): put a +1/+1 counter on each creature you control (CR 608.2c, 122.1a). Bot1's Ornithopter
+# is the only creature, and it is a 0/3 afterwards.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Test of Conviction
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Test of Conviction.Cast
+Bot1.Modes(Battle Stations)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Graveyard = Test of Conviction
