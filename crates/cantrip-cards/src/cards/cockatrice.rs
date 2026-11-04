@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::delayed;
 use cantrip_oracle as oracle;
 
 /// Whenever this creature blocks or becomes blocked by a non-Wall creature (CR 603.2).
@@ -19,32 +20,12 @@ fn blocks_or_becomes_blocked(q: &dyn Query, asker: &Asker, event: &Event) -> Opt
     }
 }
 
-/// Set up destruction of that creature at end of combat (CR 603.7, 603.7c).
-fn schedule_destruction(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.delayed_trigger(
-        DelayedWhen::Step { step: Step::EndOfCombat, on_turn_of: None },
-        item.object,
-        item.controller,
-        AbilityRef::delayed(item.ability.card, 0),
-        item.subject,
-    );
-    Ok(())
-}
-
-/// Destroy that same object, even if it is no longer a creature (CR 603.7c, 701.8a).
-fn destroy_that_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(creature) = item.subject {
-        g.destroy(creature);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
         when_asked(EventMask::BLOCKS, blocks_or_becomes_blocked),
-        schedule_destruction,
+        delayed::destroy_that_creature_at_end_of_combat,
         "Whenever this creature blocks or becomes blocked by a non-Wall creature, destroy that creature at end of combat.",
     )],
-    delayed: &[delayed_trigger(destroy_that_creature, "Destroy that creature at end of combat.")],
+    delayed: &[delayed::DESTROY_THAT_CREATURE_AT_END_OF_COMBAT],
     ..oracle::COCKATRICE
 };

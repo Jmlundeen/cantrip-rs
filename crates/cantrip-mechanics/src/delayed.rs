@@ -26,6 +26,40 @@ pub fn at_next_end_step(g: &mut dyn Game, item: &StackItem, ability: u8, subject
     );
 }
 
+/// Sets up the card's delayed ability number `ability` to trigger at the beginning of the end of combat step (CR 513.1, 603.7),
+/// about `subject`, controlled by the resolving ability's controller. Cockatrice and Abomination ("destroy that creature at end of
+/// combat") use it, with `DESTROY_THAT_CREATURE_AT_END_OF_COMBAT`.
+pub fn at_end_of_combat(g: &mut dyn Game, item: &StackItem, ability: u8, subject: Target) {
+    let this = ability_card(g, item);
+    g.delayed_trigger(
+        DelayedWhen::Step { step: Step::EndOfCombat, on_turn_of: None },
+        item.object,
+        item.controller,
+        AbilityRef::delayed(this, ability),
+        subject,
+    );
+}
+
+/// "Destroy that creature at end of combat" (CR 603.7c): the trigger's effect, setting up `DESTROY_THAT_CREATURE_AT_END_OF_COMBAT`
+/// (the card's delayed ability number 0) about the creature the trigger is about.
+pub fn destroy_that_creature_at_end_of_combat(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    at_end_of_combat(g, item, 0, item.subject);
+    Ok(())
+}
+
+/// "Destroy it": the delayed ability's subject, if it is still the object it was (CR 603.7c, 400.7), even if it is no longer a
+/// creature (CR 701.8a). Cockatrice and Abomination print "destroy that creature at end of combat".
+pub fn destroy_subject(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(it) = item.subject {
+        g.destroy(it);
+    }
+    Ok(())
+}
+
+/// The delayed ability of "destroy that creature at end of combat" (CR 603.7c), the body of `destroy_subject`; a card lists it
+/// among its `delayed` abilities and names its index in `at_end_of_combat`.
+pub const DESTROY_THAT_CREATURE_AT_END_OF_COMBAT: AbilityDef = delayed_trigger(destroy_subject, "Destroy that creature at end of combat.");
+
 /// "Exile [the target in slot `slot`]. Return that card to the battlefield under its owner's control at the beginning of the next
 /// end step" (CR 603.7): exiles the target and sets up the card's delayed ability number `ability` about the card exiled, but only
 /// if it is in exile: a token ceases to exist (CR 111.7, 400.7), and an exile replaced to somewhere else leaves nothing to
