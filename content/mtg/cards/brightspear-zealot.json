@@ -1,0 +1,11 @@
+{
+  "name": "Brightspear Zealot",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Human Soldier",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Vigilance\nThis creature gets +2/+0 as long as you've cast two or more spells this turn.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

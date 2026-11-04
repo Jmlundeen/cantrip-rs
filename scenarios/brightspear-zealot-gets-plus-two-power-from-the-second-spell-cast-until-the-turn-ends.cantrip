@@ -1,0 +1,48 @@
+# Brightspear Zealot: "This creature gets +2/+0 as long as you've cast two or more spells this turn" (CR 611.3a, 601.2i). On turn
+# three Bot1 casts the Zealot itself, its first spell of the turn, and it is a 2/4 (the three Moxen cast on turn one do not count);
+# the second spell makes it a 4/4 and a third leaves it a 4/4; on Bot2's turn it is a 2/4 again, and stays one when Bot2 casts two
+# spells of its own (only spells its controller cast count). It has vigilance throughout.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Brightspear Zealot
+Ornithopter
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Memnite
+Memnite
+Plains x11
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Brightspear Zealot.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Brightspear Zealot.Power = 2
+? Bot1.Battlefield.Brightspear Zealot.Toughness = 4
+? Bot1.Battlefield.Brightspear Zealot.Keywords = Vigilance
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Battlefield.Brightspear Zealot.Power = 4
+? Bot1.Battlefield.Brightspear Zealot.Toughness = 4
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Battlefield.Brightspear Zealot.Power = 4
+[T4 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Brightspear Zealot.Power = 2
+Bot1.Battlefield.Brightspear Zealot.Toughness = 4
