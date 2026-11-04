@@ -166,6 +166,9 @@ fn scenarios_that_once_failed_record() {
             // "A source of your choice" chosen as a creature that has left the battlefield while a delayed ability naming
             // it waits (CR 609.7a, 400.7): the observation holds it as it last existed, so the answer has a ref.
             "deflecting-palm-chooses-a-dead-dragonhawk-whose-delayed-burn-waits",
+            // The same with a token that died: the object the delayed ability names keeps the zone it left (the graveyard
+            // copy is what ceases), so it is shown as it last existed too.
+            "deflecting-palm-chooses-a-dead-elemental-token-whose-delayed-sacrifice-waits",
         ]
         .iter()
         .map(|n| {

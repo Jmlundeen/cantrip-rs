@@ -1,0 +1,49 @@
+# Deflecting Palm (CR 609.7a): Chandra, Acolyte of Flame's two Elemental tokens wait on a delayed sacrifice at the next end step
+# (CR 603.7c). Bot1 Bolts both, so they die and cease to exist (CR 704.5d, 400.7); the waiting ability still names them, so a dead
+# token is still a source to choose, named by its name now that no Elemental is in play (the Palm resolves, nothing is prevented).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Pearl
+Chandra, Acolyte of Flame
+Lightning Bolt
+Lightning Bolt
+Deflecting Palm
+Mountain x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Acolyte of Flame.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Chandra, Acolyte of Flame.Activate(Ability: Elemental)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 4
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Elemental Token#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Elemental Token)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 2
+Bot1.Hand.Deflecting Palm.Cast
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Deflecting Palm: choose a source of damage
+Bot1.Choose(Elemental Token)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Deflecting Palm; Lightning Bolt; Lightning Bolt; Black Lotus; Black Lotus
+Bot1.Life = 20
