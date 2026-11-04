@@ -1,0 +1,37 @@
+# Bagel and Schmear's Nosh ({2}, {T}, Sacrifice this artifact: you gain 3 life and draw a card) has no timing restriction, while Share ("Activate only as a sorcery") does. On turn 1
+# Bot1 casts the Bagel with Mox Ruby's mana, keeping Mox Pearl and Mox Emerald untapped. In Bot2's upkeep on turn 2 Share is refused with {W} in the pool (it is not Bot1's main phase),
+# and Nosh, paid exactly with that {W} and Mox Emerald's {G}, gains 3 life (23) and draws the Forest.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Bagel and Schmear
+Plains x3
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bagel and Schmear.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Bagel and Schmear.Activate(Ability: Share)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Bagel and Schmear.Activate(Ability: Nosh)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot1.Hand = Plains; Plains; Plains; Forest
+Bot1.Graveyard = Bagel and Schmear

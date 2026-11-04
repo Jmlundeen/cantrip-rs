@@ -1,0 +1,33 @@
+# Bagel and Schmear's Share ({W}, {T}, Sacrifice this artifact: put a +1/+1 counter on up to one target creature, draw a card; only as a sorcery).
+# On turn 1 Bot1 casts the Bagel with Mox Emerald's {G}. Paying Share's {W} exactly with Mox Pearl (the pool is empty after), it puts a counter on its own Ornithopter (0/2 to 1/2) and draws the Forest on top of its library.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Ornithopter
+Bagel and Schmear
+Plains x3
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bagel and Schmear.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bagel and Schmear.Activate(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Hand = Plains; Plains; Plains; Forest
+Bot1.Graveyard = Bagel and Schmear

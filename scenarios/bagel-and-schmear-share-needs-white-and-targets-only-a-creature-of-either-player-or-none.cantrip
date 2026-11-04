@@ -1,0 +1,54 @@
+# Bagel and Schmear's Share: "{W}, {T}, Sacrifice this artifact: Put a +1/+1 counter on up to one target creature. Draw a card. Activate only as a sorcery." On turn 1 Bot1 casts
+# two Bagels with Mox Pearl's {W} and Mox Ruby's {R}, leaving only Mox Emerald's {G}: Share is not offered, since green cannot pay {W}. Bot2 casts an Ornithopter on turn 2. On turn 3
+# Share cannot target Mox Emerald (not a creature); it puts its counter on Bot2's Ornithopter (0/2 to 1/2: an opponent's creature is a legal target) and draws, and the second Bagel's
+# Share, activated with no target, only draws.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Bagel and Schmear
+Bagel and Schmear
+Plains
+Plains
+Forest
+Island
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bagel and Schmear#1.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bagel and Schmear.Cast
+! Bot1.Battlefield.Bagel and Schmear#1.Activate(Mana: short)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Bagel and Schmear#1.Activate(Ability: Share; Mox Emerald)
+Bot1.Battlefield.Bagel and Schmear#1.Activate(Ability: Share; Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Bagel and Schmear.Activate(Ability: Share)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 1
