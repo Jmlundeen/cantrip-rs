@@ -1,0 +1,32 @@
+# Kavaron Harrier: the payment is a choice made as the ability resolves. With Moxen able to pay {2}, Bot1 declines: no Robot is made, and only the Harrier's 2 damage is dealt, Bot2 going from 20 to 18.
+
+[Bot1 Deck]
+Mox Ruby
+Kavaron Harrier
+Mox Jet
+Mox Pearl
+Island x23
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kavaron Harrier.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Attack(Kavaron Harrier > Bot2)
+Bot1.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Robot Token = (absent)
+Bot1.Battlefield.Mox Jet.Tapped = false

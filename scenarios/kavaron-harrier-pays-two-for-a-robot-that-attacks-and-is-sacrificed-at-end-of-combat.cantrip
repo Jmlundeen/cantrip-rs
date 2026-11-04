@@ -1,0 +1,38 @@
+# Kavaron Harrier (a 2/1): "Whenever this creature attacks, you may pay {2}. If you do, create a 2/2 colorless Robot artifact creature token that's tapped and attacking. Sacrifice that token at end of combat." Turn 1 Bot1 casts it off Mox Ruby. Turn 3 it attacks with two Moxen untapped: one mana is not enough to pay {2}, two are. The Robot (a 2/2, tapped, attacking) deals 2 beside the Harrier's 2, so Bot2 goes from 20 to 16 (CR 508.4), and at end of combat the Robot is sacrificed (CR 603.7), so it is gone in the second main phase.
+
+[Bot1 Deck]
+Mox Ruby
+Kavaron Harrier
+Mox Jet
+Mox Pearl
+Island x23
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kavaron Harrier.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Attack(Kavaron Harrier > Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.PayCost
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+? Bot1.Battlefield.Robot Token.Power = 2
+? Bot1.Battlefield.Robot Token.Toughness = 2
+? Bot1.Battlefield.Robot Token.Types = Artifact; Creature
+? Bot1.Battlefield.Robot Token.Tapped = true
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Robot Token = (absent)
