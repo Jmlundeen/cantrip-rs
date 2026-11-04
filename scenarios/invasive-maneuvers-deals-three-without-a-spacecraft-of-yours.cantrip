@@ -1,0 +1,26 @@
+# Invasive Maneuvers deals 3 damage to target creature while you control no Spacecraft (CR 608.2c): your own Phyrexian Soulgorger (8/8) is an accepted target and takes exactly 3, not 2, 4 or 5.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Phyrexian Soulgorger
+Invasive Maneuvers
+Island x24
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Phyrexian Soulgorger.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Invasive Maneuvers.Cast(Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Phyrexian Soulgorger.Damage = 3

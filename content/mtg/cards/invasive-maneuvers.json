@@ -1,0 +1,6 @@
+{
+  "name": "Invasive Maneuvers",
+  "manaCost": "{1}{R}",
+  "type": "Instant",
+  "oracleText": "Invasive Maneuvers deals 3 damage to target creature. It deals 5 damage instead if you control a Spacecraft."
+}

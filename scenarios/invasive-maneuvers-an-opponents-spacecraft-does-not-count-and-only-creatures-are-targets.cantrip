@@ -1,0 +1,37 @@
+# Invasive Maneuvers: "if you control a Spacecraft" is about its controller. Bot2 controls a Class-F Shuttlecraft and a Phyrexian Soulgorger (8/8); Bot1 controls no Spacecraft, so it deals exactly 3 to the opponent's creature (CR 608.2c). The Shuttlecraft is not a creature and is refused as a target.
+
+[Bot1 Deck]
+Black Lotus
+Invasive Maneuvers
+Island x25
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Phyrexian Soulgorger
+Class-F Shuttlecraft
+Island x23
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Phyrexian Soulgorger.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Class-F Shuttlecraft.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+! Bot1.Hand.Invasive Maneuvers.Cast(Class-F Shuttlecraft)
+Bot1.Hand.Invasive Maneuvers.Cast(Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Phyrexian Soulgorger.Damage = 3

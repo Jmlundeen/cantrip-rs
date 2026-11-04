@@ -1,0 +1,33 @@
+# Invasive Maneuvers deals 5 damage instead if you control a Spacecraft as it resolves (CR 608.2c; the ruling): with Bot1's Class-F Shuttlecraft on the battlefield, its Phyrexian Soulgorger (8/8) takes exactly 5.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Phyrexian Soulgorger
+Class-F Shuttlecraft
+Invasive Maneuvers
+Island x23
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Phyrexian Soulgorger.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Class-F Shuttlecraft.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Invasive Maneuvers.Cast(Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Phyrexian Soulgorger.Damage = 5
