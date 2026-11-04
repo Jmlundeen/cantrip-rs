@@ -35,6 +35,25 @@ pub fn spell_was_warped_this_turn(q: &dyn Query) -> bool {
     q.history().casts().any(|c| c.way > 0 && q.card(q.obj(c.spell).card).ways.get(c.way as usize - 1).is_some_and(|w| w.kind == WayKind::Warp))
 }
 
+/// "A warped card in exile" (CR 702.185b): one that was exiled by the delayed triggered ability a warp ability created, asked
+/// of the history - the move that put this object into exile (CR 400.7: a card that left exile and came back is a new
+/// object, not warped). That ability is the delayed one a warp way rides with (`RIDERS`), of the card that was cast for it,
+/// so a card a merged permanent became is warped with the rest (CR 730.3c), and a card exiled any other way is not. Close
+/// Encounter asks it.
+pub fn warped_card_in_exile(q: &dyn Query, id: ObjectId) -> bool {
+    if !q.obj(id).zone.is(ZoneKind::Exile) {
+        return false;
+    }
+    let Some(entry) = q.history().all().iter().rev().find(|r| matches!(r.event, Event::ZoneChange { new, .. } if new == id)) else { return false };
+    let Cause::Ability { ability, .. } = entry.cause else { return false };
+    if !ability.is_delayed() {
+        return false;
+    }
+    let card = q.card(ability.card);
+    let delayed = ability.index - AbilityRef::DELAYED;
+    card.end_step_riders.iter().any(|&(way, d)| d == delayed && card.ways.get((way as usize).wrapping_sub(1)).is_some_and(|w| w.kind == WayKind::Warp))
+}
+
 /// Exile the permanent the warped spell became, if it is still on the battlefield, and let its owner cast it from
 /// exile on a later turn, for its mana cost: warp's cost is a way from the hand only, so it is not offered again.
 fn exile_for_later(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
