@@ -61,3 +61,20 @@ pub fn targets_bite(g: &mut dyn Game, item: &StackItem, source_slot: usize, vict
         bite(g, creature, victim);
     }
 }
+
+/// "One or two target creatures you control each deal damage equal to their power to target creature an opponent controls"
+/// (CR 120.2, 120.3, 120.4b, 608.2b): the targets before the last are the sources, the last the recipient. The powers are read as
+/// this resolves and all the damage is dealt together; a source that is no longer a legal target deals none, and with the
+/// recipient illegal nothing is dealt. Common Goal and Terrific Team-Up print it.
+pub fn targets_each_bite_last(g: &mut dyn Game, item: &StackItem) {
+    let recipient_slot = item.target_count as usize - 1;
+    let Some(recipient) = targets::object(g, item, recipient_slot) else { return };
+    let hits: Vec<(ObjectId, Target, u16)> = (0..recipient_slot)
+        .filter_map(|slot| {
+            let source = targets::object(g, item, slot)?;
+            let power = g.chars(source).power.unwrap_or(0).max(0) as u16;
+            Some((source, Target::Object(recipient), power))
+        })
+        .collect();
+    g.damage_together(&hits);
+}
