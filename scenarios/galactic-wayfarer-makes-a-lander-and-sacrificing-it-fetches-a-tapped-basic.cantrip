@@ -1,0 +1,47 @@
+# Galactic Wayfarer: "When this creature enters, create a Lander token." The Lander is an artifact with "{2}, {T}, Sacrifice this token: Search your library for a
+# basic land card, put it onto the battlefield tapped, then shuffle" (CR 111.10u). Bot1 casts the 3/3 with three Moxen, the token appears when the trigger
+# resolves, and sacrificing it for {2} fetches the Forest, tapped, though the library also holds an untouched Mountain; the token is gone (CR 111.7).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Galactic Wayfarer
+Island
+Mountain
+Forest
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Galactic Wayfarer.Cast
+? Bot1.Battlefield.Lander Token = (absent)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Lander Token.Types = Artifact
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lander Token.Activate
+Bot1.Search(Forest)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire; Galactic Wayfarer; Forest
+Bot1.Battlefield.Galactic Wayfarer.Power = 3
+Bot1.Battlefield.Galactic Wayfarer.Toughness = 3
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Library.Count = 12
