@@ -1,0 +1,54 @@
+# Rayblade Trooper: "a nontoken creature" - a Human Soldier token (from Knight Luminary) given a +1/+1 counter by the Trooper
+# and then killed by Lightning Bolt makes no new token. Only the Luminary's token ever exists: none is left at the end.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Knight Luminary
+Rayblade Trooper
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Knight Luminary.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Human Soldier Token.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Rayblade Trooper.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Human Soldier Token)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Human Soldier Token.Counters.PlusOnePlusOne = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Human Soldier Token)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Knight Luminary; Mox Pearl; Mox Ruby; Mox Sapphire; Rayblade Trooper

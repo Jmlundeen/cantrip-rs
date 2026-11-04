@@ -1,0 +1,49 @@
+# Rayblade Trooper: "When this creature enters, put a +1/+1 counter on target creature you control" (CR 122.1a) - not Bot2's
+# Ornithopter, which is refused. Bot1's Ornithopter becomes 1/3; when Lightning Bolt kills it, a nontoken creature Bot1
+# controls with a +1/+1 counter has died (CR 700.4, last-known information), and Bot1 gets a 1/1 white Human Soldier token.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Ornithopter
+Rayblade Trooper
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Rayblade Trooper.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+? Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Lightning Bolt; Black Lotus
+Bot1.Battlefield = Human Soldier Token; Mox Ruby; Rayblade Trooper
+Bot1.Battlefield.Rayblade Trooper.Counters.PlusOnePlusOne = (absent)

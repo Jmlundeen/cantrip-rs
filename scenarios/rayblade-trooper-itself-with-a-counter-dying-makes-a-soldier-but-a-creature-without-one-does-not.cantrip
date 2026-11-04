@@ -1,0 +1,50 @@
+# Rayblade Trooper (ruling 2025-07-25): it puts the counter on itself. Bolting Bot1's other Ornithopter, which has no +1/+1
+# counter, makes nothing. On turn 3 Bolt kills the Trooper itself, which died with a counter: it triggers its own ability, and
+# Bot1 gets a Human Soldier token.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Ornithopter
+Rayblade Trooper
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Rayblade Trooper.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Rayblade Trooper)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Rayblade Trooper.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Pearl; Mox Ruby; Rayblade Trooper
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Rayblade Trooper)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Human Soldier Token; Mox Pearl; Mox Ruby
+Bot1.Graveyard = Rayblade Trooper; Lightning Bolt; Ornithopter; Lightning Bolt; Black Lotus
