@@ -1,0 +1,35 @@
+# Goblin Diplomats makes each creature attack this turn if able, and Pet Sehlat - tapped Diplomats aside - is the only
+# creature that could attack, but it can't attack alone (CR 508.1c). No declaration with it obeys the restriction, so
+# the most requirements a declaration can obey is none (CR 508.1d): attacking with nothing is legal, and attacking with
+# the Pet alone is not. Before this was fixed the declaration had no legal answer and the game could not go on.
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Goblin Diplomats
+Pet Sehlat
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Goblin Diplomats.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pet Sehlat.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Goblin Diplomats.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Attack(Pet Sehlat > Bot2)
+Bot1.Attack()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Pet Sehlat.Tapped = false

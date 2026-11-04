@@ -1,0 +1,30 @@
+# "This creature can't attack alone" (CR 508.1c): Pet Sehlat alone is not a legal declaration of attackers, and with the
+# Ornithopter attacking too it is.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Pet Sehlat
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Pet Sehlat.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Attack(Pet Sehlat > Bot2; Alone: yes)
+Bot1.Attack(Pet Sehlat > Bot2; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Pet Sehlat.Tapped = true
+Bot2.Life = 16

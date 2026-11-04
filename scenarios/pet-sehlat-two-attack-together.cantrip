@@ -1,0 +1,42 @@
+# Two creatures that can't attack alone may attack together (CR 508.1c): each is the other's company. Neither alone is a
+# legal declaration, and the pair is. The client offers either Pet Sehlat first because the rules' verdict on no attack
+# lists each as addable, with the other to mend it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Pet Sehlat
+Pet Sehlat
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Pet Sehlat.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pet Sehlat.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+! Bot1.Attack(Pet Sehlat#1 > Bot2; Alone: yes)
+! Bot1.Attack(Pet Sehlat#2 > Bot2; Alone: yes)
+Bot1.Attack(Pet Sehlat#1 > Bot2; Pet Sehlat#2 > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Pet Sehlat#1.Tapped = true
+Bot1.Battlefield.Pet Sehlat#2.Tapped = true
+Bot2.Life = 12
