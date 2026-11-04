@@ -1,0 +1,37 @@
+# Scrounge for Eternity (CR 115.1, 202.3): with a Memnite in the graveyard to return but no artifact or creature on the battlefield to sacrifice (the other Memnite stays in hand), Scrounge for Eternity can't be cast (CR 601.2b, 118.8).
+
+[Bot1 Deck]
+Memnite
+Swamp
+Swamp
+Swamp
+Hymn of the Faller
+Scrounge for Eternity
+Island
+Island
+Memnite
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Hymn of the Faller.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Memnite)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Hand.Scrounge for Eternity.Cast(Bot1.Graveyard.Memnite)
+
+[Expect]
+Bot1.Graveyard = Hymn of the Faller; Memnite

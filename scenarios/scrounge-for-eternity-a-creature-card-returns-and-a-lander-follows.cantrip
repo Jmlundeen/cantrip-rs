@@ -1,0 +1,53 @@
+# Scrounge for Eternity (CR 115.1, 202.3, 400.3, 111.10u): Bot1's turn-3 Hymn of the Faller surveils a Memnite into the graveyard; on turn 5 Scrounge, sacrificing the battlefield Memnite (an artifact creature, the only one), returns the other, and then a Lander token is created. Bot2's own Memnite, bolted on turn 2, is a creature card in a graveyard but
+# not in Bot1's: it is refused ("from your graveyard").
+
+[Bot1 Deck]
+Memnite
+Swamp
+Swamp
+Swamp
+Hymn of the Faller
+Scrounge for Eternity
+Island
+Island
+Memnite
+Island x12
+
+[Bot2 Deck]
+Memnite
+Mox Ruby
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Hymn of the Faller.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Memnite)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Hand.Scrounge for Eternity.Cast(Bot2.Graveyard.Memnite)
+Bot1.Hand.Scrounge for Eternity.Cast(Bot1.Graveyard.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; Memnite; Lander Token
+Bot1.Graveyard = Scrounge for Eternity; Memnite; Hymn of the Faller
+Bot2.Graveyard = Memnite; Lightning Bolt
