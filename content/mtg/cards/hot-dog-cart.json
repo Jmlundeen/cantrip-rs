@@ -1,0 +1,6 @@
+{
+  "name": "Hot Dog Cart",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\n{T}: Add one mana of any color."
+}

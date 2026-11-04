@@ -1,0 +1,39 @@
+# Hot Dog Cart's Food token ("{2}, {T}, Sacrifice this token: You gain 3 life."). On turn 1 Bot1 casts the Cart with three Moxen; on turn 3 one Mox's {G}
+# is not enough for the Food, two are, and the Food gains exactly 3 life and is sacrificed.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Hot Dog Cart
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hot Dog Cart.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.End]
+Bot1.Battlefield.Hot Dog Cart.Activate(Color: Green)
+! Bot1.Battlefield.Food Token.Activate(Mana: short)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Food Token.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+? Bot1.Battlefield.Count = 4
+
+[Expect]
+Bot1.Life = 23
