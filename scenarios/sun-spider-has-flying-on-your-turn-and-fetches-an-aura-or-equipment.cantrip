@@ -1,0 +1,53 @@
+# Sun-Spider, Nimble Webber ({3}{W/U}, 3/2): "During your turn, Sun-Spider has flying. When Sun-Spider enters, search your library for an
+# Aura or Equipment card, reveal it, put it into your hand, then shuffle." Turn 1: Mox Pearl pays the hybrid with white; the library holds an
+# Aura (Animate Dead), an Equipment (Colossus Hammer) and a Mox Sapphire, which is neither and is refused. The Aura goes to the hand. Sun-Spider
+# has flying on turn 1 (her controller's turn) and not on Bot2's turn 2.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Sun-Spider, Nimble Webber
+Island
+Island
+Mox Sapphire
+Animate Dead
+Colossus Hammer
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sun-Spider, Nimble Webber.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Mox Sapphire)
+! Bot1.Search(Island)
+Bot1.Search(Animate Dead)
+? Bot1.Battlefield.Sun-Spider, Nimble Webber.Keywords = Flying
+? Bot1.Hand.Count = 3
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Sun-Spider, Nimble Webber.Keywords = (absent)
+
+[Expect]
+Bot1.Hand = Animate Dead; Island; Island
+Bot1.Battlefield.Sun-Spider, Nimble Webber.Power = 3
+Bot1.Battlefield.Sun-Spider, Nimble Webber.Toughness = 2

@@ -1,0 +1,8 @@
+{
+  "name": "Sun-Spider, Nimble Webber",
+  "manaCost": "{3}{W/U}",
+  "type": "Legendary Creature — Spider Human Hero",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "During your turn, Sun-Spider has flying.\nWhen Sun-Spider enters, search your library for an Aura or Equipment card, reveal it, put it into your hand, then shuffle."
+}
