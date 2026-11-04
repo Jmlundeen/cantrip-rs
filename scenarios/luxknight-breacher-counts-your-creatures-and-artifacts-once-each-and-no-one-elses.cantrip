@@ -1,0 +1,49 @@
+# Luxknight Breacher (CR 614.1c, 122.6): it enters with a +1/+1 counter for each other creature and/or artifact its controller
+# controls. Bot1 has Ornithopter (an artifact creature: counted once), Mox Pearl and Mox Sapphire (artifacts), Savannah Lions
+# (a creature) and a Plains, which is neither; Bot2's Ornithopter and Mox Ruby do not count. 4 permanents: 4 counters, a 6/6.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Plains
+Savannah Lions
+Luxknight Breacher
+Plains
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Luxknight Breacher.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Luxknight Breacher.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Luxknight Breacher.Power = 6
+Bot1.Battlefield.Luxknight Breacher.Toughness = 6

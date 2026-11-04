@@ -1,0 +1,8 @@
+{
+  "name": "Luxknight Breacher",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Human Knight",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "This creature enters with a +1/+1 counter on it for each other creature and/or artifact you control."
+}
