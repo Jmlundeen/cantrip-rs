@@ -1,0 +1,44 @@
+# Hylderblade's Void attaches it to "target creature you control": on turn 3 Bot1 casts the Blade (B from Mox Jet) and sacrifices
+# a Black Lotus for mana, so a nonland permanent left the battlefield. At the beginning of Bot1's end step Bot2's Ornithopter is
+# refused as the target and Bot1 chooses its own Ornithopter over its Memnite: 0/2 + 3/+1 = 3/3, the Memnite a 1/1 still.
+
+[Bot1 Deck]
+Mox Jet
+Memnite
+Ornithopter
+Hylderblade
+Black Lotus
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hylderblade.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: B)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Hylderblade.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Memnite.Power = 1
+Bot2.Battlefield.Ornithopter.Power = 0

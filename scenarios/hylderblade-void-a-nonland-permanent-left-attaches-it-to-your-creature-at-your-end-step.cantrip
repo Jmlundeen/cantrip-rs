@@ -1,0 +1,38 @@
+# Hylderblade's Void: Bot1 casts Hylderblade (B from Mox Jet) and two creatures, then Lightning Bolts its own Memnite with the
+# Mox Ruby, so a nonland permanent left the battlefield this turn. At the beginning of Bot1's end step the Blade attaches
+# itself to target creature Bot1 controls - the Ornithopter, the only one left - which is 0/2 + 3/+1 = 3/3. (Without it
+# the Blade stays unattached: hylderblade-nothing-left-so-it-stays-put-and-equip-costs-exactly-four.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Hylderblade
+Memnite
+Ornithopter
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hylderblade.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hylderblade.AttachedTo = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Memnite)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Hylderblade.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Graveyard = Memnite; Lightning Bolt

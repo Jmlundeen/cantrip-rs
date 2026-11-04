@@ -1,0 +1,43 @@
+# With no nonland permanent leaving the battlefield and no spell warped, Hylderblade's Void does nothing at the end step of
+# turn 1: it is still unattached (the control for hylderblade-void-a-nonland-permanent-left-...). On turn 3 Equip {4} is
+# refused with three Moxen's mana (short by one) and works once the fourth Mox is cast and tapped: the Ornithopter is 3/3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Hylderblade
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hylderblade.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Hylderblade.AttachedTo = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Hylderblade.Activate(Ornithopter; Ability: Equip {4}; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hylderblade.Activate(Ornithopter; Ability: Equip {4})
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Hylderblade.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 3
