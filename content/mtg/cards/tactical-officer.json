@@ -1,0 +1,8 @@
+{
+  "name": "Tactical Officer",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Officer",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Whenever you attack while creatures you control have total power 8 or greater, put a +1/+1 counter on this creature. Untap it."
+}

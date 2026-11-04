@@ -1,0 +1,53 @@
+# Tactical Officer: "Whenever you attack while creatures you control have total power 8 or greater, put a +1/+1 counter on
+# this creature. Untap it" (CR 508.3d, 603.4, 608.2c). The Officer (2), the Rot-Curse Rakshasa (5) and Llanowar Elves (1) are
+# exactly eight together, so the attack on turn 3 grows the Officer to 3/2 and untaps it while it is still attacking.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Forest
+Llanowar Elves
+Tactical Officer
+Rot-Curse Rakshasa
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Tactical Officer.Cast
+Bot1.Hand.Rot-Curse Rakshasa.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Tactical Officer > Bot2; Rot-Curse Rakshasa > Bot2; Llanowar Elves > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Tactical Officer.Tapped = false
+Bot1.Battlefield.Tactical Officer.Power = 3
+Bot1.Battlefield.Tactical Officer.Toughness = 2
+Bot2.Life = 11

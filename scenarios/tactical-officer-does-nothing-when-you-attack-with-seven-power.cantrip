@@ -1,0 +1,50 @@
+# Tactical Officer: "Whenever you attack while creatures you control have total power 8 or greater" (CR 508.3d, 603.2): the
+# Officer (2) and the Rot-Curse Rakshasa (5) are seven together, one short, so attacking with both triggers nothing - the
+# Officer gets no counter and stays tapped. The scenario beside it shows exactly eight.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Forest
+Tactical Officer
+Rot-Curse Rakshasa
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tactical Officer.Cast
+Bot1.Hand.Rot-Curse Rakshasa.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Tactical Officer > Bot2; Rot-Curse Rakshasa > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Tactical Officer.Tapped = true
+Bot1.Battlefield.Tactical Officer.Power = 2
+Bot1.Battlefield.Tactical Officer.Counters.PlusOnePlusOne = (absent)
+Bot2.Life = 13
