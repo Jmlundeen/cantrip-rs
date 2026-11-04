@@ -1,0 +1,39 @@
+# Terrific Team-Up {3}{G} needs one or two target creatures you control: with Bot1 controlling none (only Rod of Ruin, which is no creature, and discounting the
+# spell to {1}{G}, paid for in full by two Moxen), the spell cannot be cast even though Bot2's Wall of Stone is a legal target for its second part (CR 601.2c).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Rod of Ruin
+Terrific Team-Up
+Forest x15
+
+[Bot2 Deck]
+Black Lotus
+Wall of Stone
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rod of Ruin.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Terrific Team-Up.Cast
+? Bot2.Battlefield.Wall of Stone.Damage = 0
+
+[Expect]
+Bot2.Life = 20

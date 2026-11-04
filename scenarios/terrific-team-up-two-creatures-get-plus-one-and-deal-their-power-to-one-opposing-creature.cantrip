@@ -1,0 +1,62 @@
+# Terrific Team-Up {3}{G}: "One or two target creatures you control each get +1/+0 until end of turn. They each deal damage equal to their power to target creature an
+# opponent controls." No permanent of Bot1's has mana value 4 or greater, so it costs the full {4} (four Moxen, all tapped). Bot1 targets a Grizzly Bears (2/2) and a
+# Llanowar Elves (1/1): they become 3/2 and 2/1 - the pump is power only - and deal 3 and 2, together 5, to Bot2's Wall of Stone (0/8), whose damage is 5. Back on turn 4
+# the pump is gone: Bears 2/2 and Elves 1/1 again.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Jet
+Grizzly Bears
+Llanowar Elves
+Terrific Team-Up
+Mox Pearl
+Forest x14
+
+[Bot2 Deck]
+Black Lotus
+Wall of Stone
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Terrific Team-Up.Cast
+Bot1.Target(Bot1.Battlefield.Grizzly Bears; Bot1.Battlefield.Llanowar Elves)
+Bot1.Target(Bot2.Battlefield.Wall of Stone)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 3
+? Bot1.Battlefield.Grizzly Bears.Toughness = 2
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Toughness = 1
+? Bot2.Battlefield.Wall of Stone.Damage = 5
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot2.Life = 20

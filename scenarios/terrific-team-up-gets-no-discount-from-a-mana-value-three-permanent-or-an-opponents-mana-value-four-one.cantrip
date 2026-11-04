@@ -1,0 +1,69 @@
+# Terrific Team-Up {3}{G} gets no discount when no permanent Bot1 controls has mana value 4 or greater: its Crucible of Worlds has 3 (just under the limit) and Bot2's Rod of
+# Ruin has 4 but is the other side's. With three Moxen tapped for three mana the cast is refused; a Forest for the fourth makes it castable. The Ornithopter (0/2) pumped to 1 deals
+# 1 to Bot2's Wall of Stone: damage 1.
+
+[Bot1 Deck]
+Black Lotus
+Crucible of Worlds
+Mox Emerald
+Mox Ruby
+Mox Jet
+Ornithopter
+Forest
+Terrific Team-Up
+Forest x13
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Wall of Stone
+Rod of Ruin
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Crucible of Worlds.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Rod of Ruin.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Terrific Team-Up.Cast(Mana: short)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Terrific Team-Up.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Wall of Stone)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Wall of Stone.Damage = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot2.Life = 20

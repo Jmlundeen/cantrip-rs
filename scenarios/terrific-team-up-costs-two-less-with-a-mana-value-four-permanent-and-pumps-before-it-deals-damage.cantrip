@@ -1,0 +1,56 @@
+# Terrific Team-Up {3}{G}: costs {2} less if you control a permanent with mana value 4 or greater. Bot1's Rod of Ruin ({4}, exactly at the limit; it is no creature) makes it {1}{G}: two
+# Moxen pay for it, and nothing is left in the pool (so it is not three less). One to two of your creatures are targeted: none, three, or an opponent's creature as the first target
+# is refused. Targeting one Ornithopter (0/2), the pump comes first: it deals 1, not 0, to Bot2's Wall of Stone (0/8): damage 1, and the Wall is not pumped (power 0). The pump
+# lasts the turn only: on turn 4 the Ornithopter is 0/2 again.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Rod of Ruin
+Ornithopter x3
+Terrific Team-Up
+Forest x13
+
+[Bot2 Deck]
+Black Lotus
+Wall of Stone
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rod of Ruin.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Terrific Team-Up.Cast
+! Bot1.Target(Bot2.Battlefield.Wall of Stone)
+! Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot1.Battlefield.Ornithopter#2; Bot1.Battlefield.Ornithopter#3)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1)
+Bot1.Target(Bot2.Battlefield.Wall of Stone)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#1.Power = 1
+? Bot1.Battlefield.Ornithopter#1.Toughness = 2
+? Bot2.Battlefield.Wall of Stone.Damage = 1
+? Bot2.Battlefield.Wall of Stone.Power = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Power = 0
