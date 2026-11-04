@@ -1,0 +1,42 @@
+# Susurian Dirgecraft: "When this Spacecraft enters, each opponent sacrifices a nontoken creature of their choice." Bot2
+# controls Ornithopter and Llanowar Elves and chooses to sacrifice the Elves, keeping the Ornithopter (CR 701.21a, 101.4).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Susurian Dirgecraft
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Susurian Dirgecraft.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Llanowar Elves)
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest; Ornithopter
+Bot1.Battlefield.Susurian Dirgecraft.Types = Artifact

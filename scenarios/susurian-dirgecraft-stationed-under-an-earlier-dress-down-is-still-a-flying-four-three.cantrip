@@ -1,0 +1,61 @@
+# Dress Down is on the battlefield before Susurian Dirgecraft enters. Seven or more charge counters turn on "7+ | Flying":
+# one static ability whose effect began in layer 4, so its layer 6 part keeps applying although Dress Down, earlier in
+# layer 6, took the Spacecraft's abilities - a 4/3 artifact creature with flying (CR 613.6, 721.2b).
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Black Lotus
+Black Lotus
+Dress Down
+Susurian Dirgecraft
+Phyrexian Soulgorger
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Susurian Dirgecraft.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Phyrexian Soulgorger.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Susurian Dirgecraft.Activate(Ability: Station)
+Bot1.Choose(Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+? Bot1.Battlefield.Susurian Dirgecraft.Counters.Charge = 8
+? Bot1.Battlefield.Susurian Dirgecraft.Types = Artifact; Creature
+? Bot1.Battlefield.Susurian Dirgecraft.Power = 4
+? Bot1.Battlefield.Susurian Dirgecraft.Toughness = 3
+? Bot1.Battlefield.Susurian Dirgecraft.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.Susurian Dirgecraft.Types = Artifact; Creature
