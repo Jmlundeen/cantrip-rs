@@ -1,0 +1,42 @@
+# Memorial Vault: X is one plus the sacrificed artifact's mana value, so sacrificing Mox Ruby (mana value 0, already tapped for the
+# Vault) exiles exactly one card - the Island - not none and not two (the Memnite below it stays). Vault itself is an artifact but not
+# "another": it cannot be the sacrifice. Bot2's library is untouched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Memorial Vault
+Island
+Island
+Island
+Island
+Island
+Memnite
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Memorial Vault.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Memorial Vault.Activate(Sacrifice: Memorial Vault)
+Bot1.Battlefield.Memorial Vault.Activate
+Bot1.Choose(Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 1
+? Bot1.Library.Count = 13
+? Bot2.Library.Count = 13
+
+[Expect]
+Exile = Island
+Bot1.Battlefield.Memorial Vault.Tapped = true
+Bot1.Graveyard = Mox Ruby; Black Lotus

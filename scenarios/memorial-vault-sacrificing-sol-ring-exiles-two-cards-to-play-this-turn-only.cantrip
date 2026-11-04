@@ -1,0 +1,52 @@
+# Memorial Vault: "{T}, Sacrifice another artifact: Exile the top X cards of your library, where X is one plus the mana value of the
+# sacrificed artifact. You may play those cards this turn." Sacrificing Sol Ring (mana value 1) exiles exactly two cards - the
+# Island and Mox Sapphire, not the Memnite below them - and nothing of Bot2's library. The Island is played from exile as the
+# land drop; Mox Sapphire is left, and on the next turn of Bot1's can no longer be cast ("this turn" only).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Sol Ring
+Memorial Vault
+Island
+Island
+Island
+Mox Sapphire
+Memnite
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Memorial Vault.Cast
+Bot1.Pass
+? Bot1.Mana =
+! Bot1.Battlefield.Memorial Vault.Activate(Sacrifice: Memorial Vault)
+Bot1.Battlefield.Memorial Vault.Activate
+Bot1.Choose(Sol Ring)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 2
+? Bot1.Library.Count = 11
+? Bot2.Library.Count = 13
+Bot1.Exile.Island.Play
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Exile.Mox Sapphire.Cast
+
+[Expect]
+Exile = Mox Sapphire
+Bot1.Graveyard = Sol Ring; Black Lotus

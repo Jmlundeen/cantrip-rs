@@ -1,0 +1,6 @@
+{
+  "name": "Memorial Vault",
+  "manaCost": "{3}{R}",
+  "type": "Artifact",
+  "oracleText": "{T}, Sacrifice another artifact: Exile the top X cards of your library, where X is one plus the mana value of the sacrificed artifact. You may play those cards this turn."
+}
