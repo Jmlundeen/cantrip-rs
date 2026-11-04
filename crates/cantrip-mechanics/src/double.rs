@@ -15,6 +15,21 @@ pub fn counters(g: &mut dyn Game, permanents: &[ObjectId], kind: CounterKind) {
     g.add_counters_together(&puts);
 }
 
+/// Double the number of each kind of counter on each of `permanents` (CR 701.10e): every count of every kind is read before
+/// any is doubled, and all the counters are put on at once, as one event. Ultimate Spider-Man prints it.
+pub fn each_kind_of_counter(g: &mut dyn Game, permanents: &[ObjectId]) {
+    let mut puts: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
+    for &id in permanents {
+        for kind in CounterKind::ALL {
+            let have = g.obj(id).counters(kind);
+            if have > 0 {
+                puts.push((id, kind, have));
+            }
+        }
+    }
+    g.add_counters_together(&puts);
+}
+
 /// Double the number of `kind` counters on each creature `player` controls.
 pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kind: CounterKind) {
     let creatures: Vec<ObjectId> =
