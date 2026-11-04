@@ -1,0 +1,43 @@
+# Broodguard Elite's warp {X}{G} (CR 702.185a) with X=2: paid exactly with three Moxen (without Mox Emerald's {G} even X=1 is refused; the pool empty after), it enters with two
+# +1/+1 counters, a 2/2, and is exiled at the beginning of the next end step. That is leaving the battlefield without dying, and its
+# trigger still puts its two counters on Bot1's Memnite, a 1/1 becoming 3/3; the Elite sits in exile to be cast later.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Memnite
+Broodguard Elite
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Broodguard Elite.Cast(Ability: Warp; X: 1; Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Broodguard Elite.Cast(Ability: Warp; X: 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Broodguard Elite.Power = 2
+? Bot1.Battlefield.Broodguard Elite.Counters.PlusOnePlusOne = 2
+[Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Broodguard Elite
+Bot1.Battlefield.Memnite.Power = 3
+Bot1.Battlefield.Memnite.Toughness = 3
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 2

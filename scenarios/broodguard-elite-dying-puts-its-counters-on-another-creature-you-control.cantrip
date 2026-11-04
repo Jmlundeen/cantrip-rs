@@ -1,0 +1,47 @@
+# Broodguard Elite cast for X=3 ({3}{G}{G}) enters with three +1/+1 counters, a 3/3. When Bot2's Lightning Bolt kills it, its
+# leave-the-battlefield trigger puts its three counters (as it last had them, CR 603.10a) on Bot1's Memnite, a 1/1 becoming 4/4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Emerald
+Memnite
+Broodguard Elite
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Broodguard Elite.Cast(X: 3)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Broodguard Elite.Power = 3
+? Bot1.Battlefield.Broodguard Elite.Toughness = 3
+? Bot1.Battlefield.Broodguard Elite.Counters.PlusOnePlusOne = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Broodguard Elite)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Broodguard Elite; Black Lotus
+Bot1.Battlefield.Memnite.Power = 4
+Bot1.Battlefield.Memnite.Toughness = 4
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 3

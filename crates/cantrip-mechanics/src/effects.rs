@@ -2070,8 +2070,8 @@ pub fn put_counters_of_on(g: &mut dyn Game, from: ObjectId, target: ObjectId) {
     g.add_counters_together(&puts);
 }
 
-/// "When this creature dies, put its counters on [up to one] target creature" (see `put_counters_of_on_target`). Essence
-/// Channeler, Graft Surgeon and Scolding Administrator print it.
+/// "When this creature dies [or leaves the battlefield], put its counters on [up to one] target creature" (see `put_counters_of_on_target`). Essence
+/// Channeler, Graft Surgeon, Scolding Administrator and Broodguard Elite print it.
 pub fn put_its_counters_on_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     put_counters_of_on_target(g, item, item.object)
 }
