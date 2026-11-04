@@ -1,0 +1,8 @@
+{
+  "name": "Taxi Driver",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Human Pilot",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "{1}, {T}: Target creature gains haste until end of turn."
+}

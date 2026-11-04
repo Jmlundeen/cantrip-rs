@@ -1,0 +1,45 @@
+# "{1}, {T}: Target creature gains haste until end of turn." Taxi Driver is cast on turn 1 with Mox Ruby and Mox Jet. On turn 3 Bot1
+# casts Memnite and pays the {1} with Mox Emerald (the pool is empty after), tapping Taxi Driver: Memnite gains haste, attacks the turn
+# it came and takes Bot2 to 19. The haste is gone with the turn.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Taxi Driver
+Memnite
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Taxi Driver.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Taxi Driver.Activate(Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Keywords = Haste
+? Bot1.Battlefield.Taxi Driver.Tapped = true
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Bot2)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+
+[Expect]
+Bot2.Life = 19

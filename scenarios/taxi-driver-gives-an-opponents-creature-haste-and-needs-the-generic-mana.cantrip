@@ -1,0 +1,35 @@
+# "{1}, {T}: Target creature gains haste until end of turn." The target may be any creature: Bot2's Memnite, cast on turn 2, gains
+# haste from Bot1's Taxi Driver on turn 3. With nothing to pay the {1} the ability is not offered (Taxi Driver is untapped and not
+# summoning sick, so only the mana is missing); with Mox Emerald it is.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Taxi Driver
+Island x15
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Taxi Driver.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
