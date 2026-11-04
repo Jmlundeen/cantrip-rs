@@ -1,0 +1,50 @@
+# Browser
+# Blade of the Swarm's trigger with two exiled cards that have warp to aim at (CR 115.1, 702.185a): Bot1 warps Haliya and
+# Bygone Colossus on turn 1, and both are exiled at the end step. Every candidate is in exile, a pile a card cannot be
+# clicked in until it is looked into, so the page opens Bot1's exile on its own, as it opens the graveyards for
+# Reanimate, and Bot1 clicks Haliya there. She goes to the bottom of Bot1's library; the Colossus stays in exile.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Sol Ring
+Swamp
+Bygone Colossus
+Haliya, Guided by Light
+Blade of the Swarm
+Island x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Haliya, Guided by Light.Cast(Ability: Warp)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bygone Colossus.Cast(Ability: Warp)
+Bot1.Pass
+[T3 Bot1.Main1]
+? Exile = Haliya, Guided by Light; Bygone Colossus
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Blade of the Swarm.Cast
+Bot1.Pass
+Bot1.Modes(Put target exiled card)
+? Client.Bot1.Prompt.Detail = 2 possible targets
+? Client.Bot1.Exile.Open = true
+Bot1.Target(Haliya, Guided by Light)
+? Client.Bot1.Exile.Open = false
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Bygone Colossus
+Bot1.Library = Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Haliya, Guided by Light

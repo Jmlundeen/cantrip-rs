@@ -2070,6 +2070,9 @@ fn candidates(
     }
     let mut zones = vec![Zone::BATTLEFIELD, Zone::STACK];
     zones.extend(s.seats().map(Zone::graveyard));
+    // Cards in exile are objects a spell or ability may target (CR 115.1, 400.2): "target exiled card with warp" (Blade of
+    // the Swarm), "target face-up exiled card" (Pull from Eternity). A filter names the zone it reaches into.
+    zones.extend(s.seats().map(Zone::exile));
     for zone in zones {
         for &id in s.zone(zone) {
             // A spell cannot target itself (CR 115.5); an ability may target its own source.

@@ -1,0 +1,42 @@
+# Blade of the Swarm's first mode puts two +1/+1 counters on it, a 5/3. The second needs a card in exile: Bygone Colossus,
+# warped onto the battlefield, has warp but is not exiled, so with nothing in exile that mode has no legal target and is not
+# offered (CR 700.2b, 115.1).
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Blasted Landscape
+Bygone Colossus
+Blade of the Swarm
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Blasted Landscape.Activate
+Bot1.Hand.Bygone Colossus.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Blade of the Swarm.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blade of the Swarm.Power = 5
+? Bot1.Battlefield.Blade of the Swarm.Toughness = 3

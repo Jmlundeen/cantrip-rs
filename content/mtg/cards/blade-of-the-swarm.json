@@ -1,0 +1,8 @@
+{
+  "name": "Blade of the Swarm",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Insect Assassin",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "When this creature enters, choose one —\n• Put two +1/+1 counters on this creature.\n• Put target exiled card with warp on the bottom of its owner's library."
+}

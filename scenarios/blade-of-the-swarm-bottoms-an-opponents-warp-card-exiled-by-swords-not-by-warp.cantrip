@@ -1,0 +1,64 @@
+# Blade of the Swarm's "put target exiled card with warp on the bottom of its owner's library": the target is any card in
+# exile that has warp, not only one warp exiled (the ruling). Bot2 casts Bygone Colossus for its warp cost and Bot1 exiles it
+# with Swords to Plowshares before the end step, so warp's own exile finds nothing (it is a new object, CR 400.7). Memnite,
+# which Bot1 exiled with Swords on turn 1, has no warp and is no target, so the Colossus is the one legal target and is
+# taken without a prompt. It goes to the bottom of Bot2's library, its owner's, not Bot1's, and Memnite stays in exile.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Memnite
+Swords to Plowshares
+Swords to Plowshares
+Mox Jet
+Mox Jet
+Blade of the Swarm
+Island x10
+
+[Bot2 Deck]
+Mana Crypt
+Blasted Landscape
+Bygone Colossus
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Blasted Landscape.Play
+Bot2.Hand.Mana Crypt.Cast
+Bot2.Battlefield.Mana Crypt.Activate
+Bot2.Battlefield.Blasted Landscape.Activate
+Bot2.Hand.Bygone Colossus.Cast(Ability: Warp)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Bygone Colossus)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Exile.Bygone Colossus.Power = 9
+? Exile = Memnite; Bygone Colossus
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Blade of the Swarm.Cast
+Bot1.Pass
+Bot1.Modes(Put target exiled card)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Memnite
+Bot2.Library = Island; Island; Island; Island; Island; Bygone Colossus
+Bot1.Battlefield.Blade of the Swarm.Power = 3
+Bot2.Life = 29

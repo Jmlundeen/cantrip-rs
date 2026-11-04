@@ -1137,7 +1137,8 @@ pub fn shuffle_graveyard_into_library(g: &mut dyn Game, player: PlayerId) {
 
 /// "Put target card from a graveyard on the bottom of its owner's library" (CR 400.3): the first target goes there as the
 /// ability resolves, if it is still the card that was targeted (CR 608.2b); the library it joins is its owner's, whatever
-/// graveyard it was in. Paradox Shaper (a card from your graveyard) and Sundering Archaic (from a graveyard) print it.
+/// graveyard it was in. Paradox Shaper (a card from your graveyard) and Sundering Archaic (from a graveyard) print it, and
+/// Blade of the Swarm the same of "target exiled card with warp", from exile.
 pub fn put_first_target_on_the_bottom(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = crate::targets::object(g, item, 0) {
         g.put_into_library(&[card], LibraryPlace::Bottom);

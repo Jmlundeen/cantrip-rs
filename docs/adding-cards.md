@@ -130,6 +130,9 @@ spell: spell(&[targets::CREATURE], effect),                       // `spell(&[],
 target(filter), up_to_one(filter), up_to(3, filter),               // target slots; `targets::X.optional()`, `.between(min, max)`, `.counted()`,
                                                                   // `.if_kicked(0, TargetSpec::ANY_NUMBER)` ("if this spell was kicked, instead choose any number of ...")
                                                                   // slots in printed order, a slot of several targets anywhere: `item.spec_targets(n)` is where slot n's targets are
+                                                                  // a filter is asked of the players, the battlefield, the stack, every graveyard and every
+                                                                  // exile (CR 115.1, 400.2), so it names the zone it takes: `zone.is(ZoneKind::Exile)` for
+                                                                  // "target exiled card with warp" (Blade of the Swarm)
 static MODAL: ModalDef = modes(&[mode(deal_3, "...").targets(&[targets::CREATURE]), mode(gain_3, "...")]).choose(1, 2);
 statics: &[static_ability(Layer::PtModify, attached_object, plus_one, "Equipped creature gets +1/+1.")],
 statics: &[characteristic_defining(Layer::PtDefine, power_is_creatures, "...")],
