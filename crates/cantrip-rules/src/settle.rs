@@ -141,6 +141,9 @@ fn check_once(cx: &mut Cx) -> R<bool> {
         crate::designations::monarch_left(cx);
         crate::designations::initiative_left(cx);
     }
+    // The game they lost is looked back on (CR 603.10f): as the board was before this check, whose actions all happen at
+    // once with the losses (CR 704.3) - a permanent dying in it still sees its controller's opponent lose.
+    let lost_before = (!leavers.is_empty()).then(|| (cx.s().battlefield().to_vec(), Then::now(cx)));
     // CR 704.3: the rest of this check is judged on the board as it is now, the losers' objects still on it - an anthem of
     // theirs still counts towards whether another player's creature has lethal damage - and those objects leave with their
     // owners as part of this check (CR 800.4a), below, not by any of the other actions.
@@ -443,8 +446,10 @@ fn check_once(cx: &mut Cx) -> R<bool> {
     // the check were judged with their objects on the battlefield, and performed - so what dies in this check is seen as it
     // last existed with those objects there (CR 603.10a). The game goes on without them, or ends with the one left (CR
     // 104.2a).
-    for (p, reason) in leavers {
-        cx.record(Event::GameLost { player: p, reason });
+    if let Some((battlefield, then)) = &lost_before {
+        lost_the_game(cx, &leavers, battlefield, then);
+    }
+    for (p, _) in leavers {
         ops::leave_game(cx, p);
     }
 
@@ -1495,6 +1500,18 @@ pub(crate) fn could_have<'a>(cx: &'a Cx, table: &'a [bool], kind: fn(&TriggeredD
             || o.copy.is_some_and(|c| c.extra_instances().any(is_kind))
             || (effects && s.effects.iter().any(|e| e.affected == id && matches!(e.kind, EffectKind::AddAbility(a) if is_kind(a))))
     }
+}
+
+/// `losses`, players who lost the game at once and are about to leave it (CR 104.3, 800.4a): recorded, and the abilities
+/// that trigger on them looked for (CR 603.2), looking back on `battlefield` as it was just before (CR 603.10f), as `then`
+/// took it. Their own abilities that trigger go with them as they leave (CR 800.4a).
+pub(crate) fn lost_the_game(cx: &mut Cx, losses: &[(PlayerId, LossReason)], battlefield: &[ObjectId], then: &Then) {
+    let events: Vec<Event> = losses.iter().map(|&(player, reason)| Event::GameLost { player, reason }).collect();
+    let start = cx.g.log.len();
+    for &event in &events {
+        cx.record(event);
+    }
+    collect_batch(cx, &events, Some(Before { battlefield, then, seen_by_all: &[] }), start);
 }
 
 /// Every triggered ability this event triggers (CR 603.2).

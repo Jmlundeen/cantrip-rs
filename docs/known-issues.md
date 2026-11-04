@@ -75,7 +75,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-131](#ki-131-harmonizes-tap-a-creature-caption-says-up-to-or-an-exact-amount-a-little-off-in-rare-costs) | Harmonize's tap-a-creature caption says "up to", or an exact amount, a little off in rare costs | Pri-2 | Open |
 | [KI-134](#ki-134-the-browser-scenario-for-lands-planned-for-x-fails-on-main) | The browser scenario for lands planned for X fails on main | Pri-2 | Open |
 | [KI-136](#ki-136-a-choice-listing-an-opponents-face-down-permanent-records-it-as-shown-to-the-chooser) | A choice listing an opponent's face-down permanent records it as shown to the chooser | Pri-2 | Open |
-| [KI-135](#ki-135-a-permanent-keeps-the-names-of-at-most-two-abilities-that-chose-one) | A permanent keeps the names of at most two abilities that chose one | Pri-3 | Won't fix: beyond practical scale |
+| [KI-135](#ki-135-a-permanent-keeps-at-most-two-names-objects-or-players-its-abilities-chose) | A permanent keeps at most two names, objects or players its abilities chose | Pri-3 | Won't fix: beyond practical scale |
 | [KI-137](#ki-137-the-host-shows-an-attacker-attacking-nothing-as-attacking-a-player-at-seat-0) | The host shows an attacker attacking nothing as attacking a player at seat 0 | Pri-2 | Open |
 | [KI-138](#ki-138-a-cast-menu-rows-cost-reads-the-card-where-it-is-not-the-spell-it-would-be) | A cast menu row's cost reads the card where it is, not the spell it would be | Pri-2 | Open |
 | [KI-139](#ki-139-the-language-model-clients-dack-fayden-prompt-runs-words-together) | The language-model client's Dack Fayden prompt runs words together | Pri-2 | Open |
@@ -579,20 +579,21 @@ nothing that plays a real game uses its search; the host and the client never re
 whatever `hidden_from` hides from the chooser.
 
 **Scenarios.** None: the history record only; a `cantrip-ai` redaction test can pin it.
-### KI-135: A permanent keeps the names of at most two abilities that chose one
+### KI-135: A permanent keeps at most two names, objects or players its abilities chose
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Pri-3 | Won't fix: beyond practical scale | engine | 2026-10-24, review of the chosen-choice links |
 
-**Notes.** A card name chosen for a permanent is kept with the ability that chose it (`cantrip_state::Choices`, CR 607.2d),
-one place for each such ability, `CHOSEN_NAMES` (two) in all; the same ability choosing again replaces its own. A third
-ability's name is not kept, so that ability reads no chosen name: never another ability's. An ability is told apart by
-its text and how the permanent acquired it, so the same card's ability given at two different times - two effects, two
-timestamps - is two abilities, each with its own place, the earlier one's never read again once its effect has ended.
-Reaching it takes three such abilities that each choose a name, all on one permanent that stays the same object: a name
-chosen as it entered (Anointed Peacekeeper) and as abilities of it resolved (Petrified Hamlet's, Medomai's Prophecy's) - a
-copy effect does not make it enter or its enters abilities trigger again. No printed card reaches it.
+**Notes.** A card name, an object or a player chosen for a permanent by an ability of it is kept with the ability that
+chose it (`cantrip_state::Choices`, CR 607.2d), one place for each such ability and kind of choice, `CHOSEN_KEPT` (two) in
+all; the same ability choosing again replaces its own choice of that kind. A third choice is not kept, so the ability that
+made it reads none: never another ability's. An ability is told apart by its text and how the permanent acquired it, so
+the same card's ability given at two different times - two effects, two timestamps - is two abilities, each with its own
+place, the earlier one's never read again once its effect has ended. Reaching it takes three such choices on one permanent
+that stays the same object: a name chosen as it entered (Anointed Peacekeeper) and as abilities of it resolved (Petrified
+Hamlet's, Medomai's Prophecy's), or Zenos yae Galvus's creature and Shinryu's opponent with a third such ability granted
+to it - a copy effect does not make it enter or its enters abilities trigger again. No printed card reaches it.
 
 **Scenarios.** None: no printed card reaches it.
 

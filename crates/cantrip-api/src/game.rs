@@ -1195,6 +1195,18 @@ pub trait Game: Query {
     /// object's alone: a new object the permanent becomes has no chosen name (CR 400.7), and a later choice for the same
     /// object replaces the earlier one. Nothing if the permanent is no longer on the battlefield.
     fn remember_chosen_name(&mut self, by: Linked, name: CardId);
+    /// An object chosen as `by`, an ability of a permanent, resolves (CR 607.2d), remembered by that permanent: Zenos yae
+    /// Galvus's "choose a creature an opponent controls", read by its linked "when the chosen creature leaves the
+    /// battlefield". Kept with that ability (`Chosen`) as `remember_chosen_name` keeps a name: the abilities linked to it read
+    /// it with `GameState::chosen_object`, as they read an object chosen as it entered (`Entering::chosen_object`). The id is
+    /// of the object as it was chosen, wherever it goes after (CR 400.7). Nothing if the permanent is no longer on the
+    /// battlefield.
+    fn remember_chosen_object(&mut self, by: Linked, object: ObjectId);
+    /// A player chosen as `by`, an ability of a permanent, resolves, or as the permanent transforms (CR 607.2d, 712.20):
+    /// Shinryu, Transcendent Rival's "As this creature transforms into Shinryu, choose an opponent", read by its linked "When
+    /// the chosen player loses the game". Kept as `remember_chosen_object` keeps an object; read with
+    /// `GameState::chosen_player`. Nothing if the permanent is no longer on the battlefield.
+    fn remember_chosen_player(&mut self, by: Linked, player: PlayerId);
     fn exile(&mut self, object: ObjectId) -> ObjectId {
         let owner = self.obj(object).owner;
         self.move_to(object, Zone::exile(owner))

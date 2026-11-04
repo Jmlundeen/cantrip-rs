@@ -2,7 +2,7 @@
 //! procedure, each writes through the journal, and each announces what it did.
 
 use cantrip_api::*;
-use cantrip_state::{ChoiceRecord, Choices, Entered, PendingTrigger};
+use cantrip_state::{ChoiceRecord, Choices, Entered, Kept, PendingTrigger};
 
 use crate::layers::{self, live};
 use crate::{Cx, R, counters, replace};
@@ -1069,17 +1069,17 @@ pub fn unlock_door(cx: &mut Cx, id: ObjectId, door: u8, player: PlayerId) {
     cx.emit(Event::DoorUnlocked { permanent: id, door, player });
 }
 
-/// A card name chosen for a permanent as an ability of it resolves (CR 607.2d): kept by the permanent as the object it is
-/// now, so a new object it becomes has none (CR 400.7), and a later choice for it replaces an earlier one. Nothing if it is
-/// no longer on the battlefield.
-pub fn remember_chosen_name(cx: &mut Cx, by: Linked, name: CardId) {
+/// A card name, an object or a player chosen for a permanent as an ability of it resolves, or as it transforms (CR 607.2d,
+/// 712.20): kept by the permanent as the object it is now, so a new object it becomes has none (CR 400.7), and a later
+/// choice of the same kind by the same ability replaces an earlier one. Nothing if it is no longer on the battlefield.
+pub fn remember_chosen(cx: &mut Cx, by: Linked, value: Kept) {
     let id = by.object;
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
         return;
     }
     // Kept with the ability that chose it (CR 607.2d): only abilities linked to that one refer to it.
     let mut choices = cx.s().obj(id).marks.choices;
-    if choices.name(by, name) {
+    if choices.keep(by, value) {
         cx.st().update_obj(id, |o| o.marks.choices = choices);
     }
 }
@@ -4850,10 +4850,12 @@ pub fn concede(cx: &mut Cx, player: PlayerId) {
 
 /// `player` has lost for `reason` and leaves the game; the game ends if one or no player is left (CR 104.2a, 104.4a).
 fn leaves_having_lost(cx: &mut Cx, player: PlayerId, reason: LossReason) {
+    // The board just before the loss, which an ability that triggers on it looks back on (CR 603.10f).
+    let (battlefield, then) = (cx.s().battlefield().to_vec(), crate::settle::Then::now(cx));
     cx.st().update_player(player, |pl| pl.lost = true);
     crate::designations::monarch_left(cx);
     crate::designations::initiative_left(cx);
-    cx.record(Event::GameLost { player, reason });
+    crate::settle::lost_the_game(cx, &[(player, reason)], &battlefield, &then);
     leave_game(cx, player);
     let left: Vec<PlayerId> = cx.s().apnap().collect();
     match left.len() {

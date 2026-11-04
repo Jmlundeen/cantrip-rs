@@ -208,9 +208,25 @@ pub struct Marks {
     pub face_down_as: Option<CardId>,
 }
 
-/// The names an object keeps, chosen by different abilities of it as they resolved (Petrified Hamlet's, Medomai's
-/// Prophecy's) or as it entered: one for each ability that chose one.
-pub const CHOSEN_NAMES: usize = 2;
+/// The choices an object keeps with the ability that made each (`Kept`): names chosen by different abilities of it as they
+/// resolved (Petrified Hamlet's, Medomai's Prophecy's) or as it entered, and objects and players chosen as an ability of it
+/// resolved or as it transformed (Zenos yae Galvus's): one for each ability and kind of choice.
+pub const CHOSEN_KEPT: usize = 2;
+
+/// A choice an object keeps with the ability that made it (`Chosen`), told apart from that ability's other choices by its
+/// kind: a card name (CR 201.3), an object, or a player.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Kept {
+    Name(CardId),
+    Object(ObjectId),
+    Player(PlayerId),
+}
+
+impl Kept {
+    fn same_kind(self, other: Kept) -> bool {
+        core::mem::discriminant(&self) == core::mem::discriminant(&other)
+    }
+}
 
 /// What was chosen for a permanent (CR 607.2d, 607.2f), each choice with the ability that made it (`Chosen`), its fields the
 /// engine's alone (`ChoiceRecord`): card code reads a choice only through `GameState::chosen_color` and its siblings, with
@@ -218,9 +234,10 @@ pub const CHOSEN_NAMES: usize = 2;
 /// gave it, reads no choice that ability didn't make (CR 607.5).
 ///
 /// The choices made as it entered are all made by one text, the text it entered with (`by`): its own "as this enters" is
-/// the only one of its own that modifies how it enters (CR 614.12, 707.9a). A name may also be chosen as an ability of it
-/// resolves (`names`), each ability's name kept apart; a later choice by the same ability replaces its earlier one. A
-/// permanent that changes zones is a new object with none (CR 400.7).
+/// the only one of its own that modifies how it enters (CR 614.12, 707.9a). A name, an object or a player may also be chosen
+/// as an ability of it resolves, or as it transforms (CR 712.20): kept apart (`kept`) by the ability that chose it and its
+/// kind; a later choice of that kind by the same ability replaces its earlier one. A permanent that changes zones is a new
+/// object with none (CR 400.7).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub struct Choices {
     /// The text that made the choices as it entered, as linked abilities know it (`Linked::text`). None while it chose
@@ -232,8 +249,9 @@ pub struct Choices {
     option: Option<ChosenOption>,
     number: Option<u32>,
     object: Option<ObjectId>,
-    /// Card names, each with the ability that chose it: one chosen as it entered is its entering text's.
-    names: [Option<Chosen<CardId>>; CHOSEN_NAMES],
+    /// Names, objects and players, each with the ability that chose it: a name chosen as it entered is its entering
+    /// text's.
+    kept: [Option<Chosen<Kept>>; CHOSEN_KEPT],
 }
 
 /// What a permanent chose as it entered (CR 614.12a), for `ChoiceRecord::entered`.
@@ -261,16 +279,16 @@ impl Entered {
 pub trait ChoiceRecord {
     /// The choices `text` made as the permanent entered (CR 614.12a), acquired as its own text.
     fn entered(text: CardId, made: Entered) -> Choices;
-    /// `name` chosen by `by`, an ability of the permanent, as it resolved: replacing that ability's earlier name. Every
-    /// ability's place taken (`CHOSEN_NAMES`), it is kept no more (beyond practical scale, docs/known-issues.md). Whether it
-    /// was kept.
-    fn name(&mut self, by: Linked, name: CardId) -> bool;
+    /// `value` chosen by `by`, an ability of the permanent, as it resolved or as the permanent transformed: replacing that
+    /// ability's earlier choice of the same kind. Every place taken (`CHOSEN_KEPT`), it is kept no more (beyond practical
+    /// scale, docs/known-issues.md KI-135). Whether it was kept.
+    fn keep(&mut self, by: Linked, value: Kept) -> bool;
     /// What was chosen, with no ability asking: the scenario dump's and the loop watch's.
     fn entered_raw(&self) -> (Option<CardId>, Entered);
-    /// The names, each with the ability that chose it.
-    fn names_raw(&self) -> [Option<Chosen<CardId>>; CHOSEN_NAMES];
-    /// The object chosen, renamed (the loop watch's canonical names).
-    fn with_object(&self, object: Option<ObjectId>) -> Choices;
+    /// Every object chosen: as it entered, then as its abilities resolved (the loop watch's).
+    fn objects_raw(&self) -> [Option<ObjectId>; 1 + CHOSEN_KEPT];
+    /// The same choices with no object chosen (the loop watch's, which hashes the objects by their canonical names).
+    fn without_objects(&self) -> Choices;
 }
 
 impl ChoiceRecord for Choices {
@@ -284,17 +302,19 @@ impl ChoiceRecord for Choices {
             option: made.option,
             number: made.number,
             object: made.object,
-            names: [made.card.map(own), None],
+            kept: [made.card.map(|card| own(Kept::Name(card))), None],
         }
     }
 
-    fn name(&mut self, by: Linked, name: CardId) -> bool {
-        let chosen = Chosen { value: name, text: by.text, acquired: by.acquired };
-        let mine = |c: &Option<Chosen<CardId>>| c.is_some_and(|c| c.text == by.text && c.acquired == by.acquired);
-        let slot = self.names.iter().position(mine).or_else(|| self.names.iter().position(Option::is_none));
+    fn keep(&mut self, by: Linked, value: Kept) -> bool {
+        let chosen = Chosen { value, text: by.text, acquired: by.acquired };
+        let mine = |c: &Option<Chosen<Kept>>| {
+            c.is_some_and(|c| c.text == by.text && c.acquired == by.acquired && c.value.same_kind(value))
+        };
+        let slot = self.kept.iter().position(mine).or_else(|| self.kept.iter().position(Option::is_none));
         match slot {
             Some(at) => {
-                self.names[at] = Some(chosen);
+                self.kept[at] = Some(chosen);
                 true
             }
             None => false,
@@ -302,16 +322,32 @@ impl ChoiceRecord for Choices {
     }
 
     fn entered_raw(&self) -> (Option<CardId>, Entered) {
-        let card = self.names.iter().flatten().find(|c| Some(c.text) == self.by && c.acquired == Acquired::OWN).map(|c| c.value);
+        let card = self.kept.iter().flatten().find_map(|c| match c.value {
+            Kept::Name(card) if Some(c.text) == self.by && c.acquired == Acquired::OWN => Some(card),
+            _ => None,
+        });
         (self.by, Entered { color: self.color, subtype: self.subtype, player: self.player, card, option: self.option, number: self.number, object: self.object })
     }
 
-    fn names_raw(&self) -> [Option<Chosen<CardId>>; CHOSEN_NAMES] {
-        self.names
+    fn objects_raw(&self) -> [Option<ObjectId>; 1 + CHOSEN_KEPT] {
+        let mut all = [self.object; 1 + CHOSEN_KEPT];
+        for (at, kept) in self.kept.iter().enumerate() {
+            all[1 + at] = match kept {
+                Some(Chosen { value: Kept::Object(id), .. }) => Some(*id),
+                _ => None,
+            };
+        }
+        all
     }
 
-    fn with_object(&self, object: Option<ObjectId>) -> Choices {
-        Choices { object, ..*self }
+    fn without_objects(&self) -> Choices {
+        let mut kept = self.kept;
+        for k in &mut kept {
+            if let Some(Chosen { value: Kept::Object(id), .. }) = k {
+                *id = ObjectId::NONE;
+            }
+        }
+        Choices { object: None, kept, ..*self }
     }
 }
 
@@ -332,9 +368,14 @@ impl Choices {
         self.entered_to(by)?.subtype
     }
 
-    /// The player chosen, to `by`.
+    /// The player chosen, to `by`: as the permanent entered, or by `by` as it resolved or as the permanent transformed.
     pub fn player(&self, by: Linked) -> Option<PlayerId> {
-        self.entered_to(by)?.player
+        self.entered_to(by).and_then(|c| c.player).or_else(|| {
+            self.kept_to(by, |k| match k {
+                Kept::Player(p) => Some(p),
+                _ => None,
+            })
+        })
     }
 
     /// The word chosen, to `by`.
@@ -347,14 +388,27 @@ impl Choices {
         self.entered_to(by)?.number
     }
 
-    /// The object chosen, to `by`, wherever it is now.
+    /// The object chosen, to `by`, wherever it is now: as the permanent entered, or by `by` as it resolved.
     pub fn object(&self, by: Linked) -> Option<ObjectId> {
-        self.entered_to(by)?.object
+        self.entered_to(by).and_then(|c| c.object).or_else(|| {
+            self.kept_to(by, |k| match k {
+                Kept::Object(id) => Some(id),
+                _ => None,
+            })
+        })
     }
 
     /// The card name `by` chose (`Chosen::to`): as the permanent entered, or as `by` resolved.
     pub fn card(&self, by: Linked) -> Option<CardId> {
-        self.names.iter().flatten().find_map(|c| c.to(by))
+        self.kept_to(by, |k| match k {
+            Kept::Name(card) => Some(card),
+            _ => None,
+        })
+    }
+
+    /// The kept choice of one kind (`of`) that `by` made (`Chosen::to`).
+    fn kept_to<T>(&self, by: Linked, of: impl Fn(Kept) -> Option<T>) -> Option<T> {
+        self.kept.iter().flatten().find_map(|c| c.to(by).and_then(&of))
     }
 }
 
@@ -2855,7 +2909,7 @@ mod tests {
     }
 
     /// Each ability that chose a name keeps its own (CR 607.2d): a second ability's name doesn't take the first's place, the
-    /// same ability choosing again replaces its own, and with every place taken (`CHOSEN_NAMES`) a new one is kept no more.
+    /// same ability choosing again replaces its own, and with every place taken (`CHOSEN_KEPT`) a new one is kept no more.
     #[test]
     fn each_ability_keeps_the_name_it_chose() {
         let entered = <Choices as ChoiceRecord>::entered(CardId(4), Entered { card: Some(CardId(10)), ..Default::default() });
@@ -2864,12 +2918,35 @@ mod tests {
         let other = Linked { object: ObjectId(2), text: CardId(6), acquired: Acquired::OWN };
         let mut choices = entered;
         assert_eq!(choices.card(own), Some(CardId(10)), "the name chosen as it entered");
-        assert!(choices.name(given, CardId(11)));
+        assert!(choices.keep(given, Kept::Name(CardId(11))));
         assert_eq!((choices.card(own), choices.card(given)), (Some(CardId(10)), Some(CardId(11))), "each its own");
-        assert!(choices.name(given, CardId(12)));
+        assert!(choices.keep(given, Kept::Name(CardId(12))));
         assert_eq!((choices.card(own), choices.card(given)), (Some(CardId(10)), Some(CardId(12))), "the same ability's replaced");
-        assert!(!choices.name(other, CardId(13)), "every place taken");
+        assert!(!choices.keep(other, Kept::Name(CardId(13))), "every place taken");
         assert_eq!((choices.card(own), choices.card(given), choices.card(other)), (Some(CardId(10)), Some(CardId(12)), None));
+    }
+
+    /// An ability keeps an object and a player it chose apart from each other and from a name (CR 607.2d): Zenos yae
+    /// Galvus's creature, chosen as an ability of it resolved, and Shinryu's opponent, chosen as it transformed - both of the
+    /// one card's text - are each read as what they are, the same ability choosing again replaces only its choice of that
+    /// kind, and none is read by an ability of another text. An object or player chosen as it entered comes first.
+    #[test]
+    fn an_ability_keeps_an_object_and_a_player_it_chose_apart() {
+        let own = Linked { object: ObjectId(2), text: CardId(4), acquired: Acquired::OWN };
+        let other = Linked { object: ObjectId(2), text: CardId(6), acquired: Acquired::OWN };
+        let mut choices = Choices::default();
+        assert!(choices.keep(own, Kept::Object(ObjectId(9))));
+        assert!(choices.keep(own, Kept::Player(PlayerId(1))));
+        assert_eq!((choices.object(own), choices.player(own), choices.card(own)), (Some(ObjectId(9)), Some(PlayerId(1)), None));
+        assert_eq!((choices.object(other), choices.player(other)), (None, None), "another text's abilities read neither");
+        assert!(choices.keep(own, Kept::Player(PlayerId(2))), "its own place, not a third");
+        assert_eq!((choices.object(own), choices.player(own)), (Some(ObjectId(9)), Some(PlayerId(2))), "only the player replaced");
+        assert_eq!(choices.objects_raw(), [None, Some(ObjectId(9)), None]);
+        assert_eq!(choices.without_objects().objects_raw(), [None, Some(ObjectId::NONE), None], "kept apart, its id gone");
+        let entered = <Choices as ChoiceRecord>::entered(CardId(4), Entered { object: Some(ObjectId(7)), player: Some(PlayerId(0)), ..Default::default() });
+        let mut both = entered;
+        assert!(both.keep(own, Kept::Object(ObjectId(9))));
+        assert_eq!((both.object(own), both.player(own)), (Some(ObjectId(7)), Some(PlayerId(0))));
     }
 
     /// A subtype restriction's name reads back as the same restriction, whatever its subtypes hold: "or" inside a name

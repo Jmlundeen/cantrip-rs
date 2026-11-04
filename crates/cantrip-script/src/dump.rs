@@ -692,8 +692,9 @@ impl StateDump {
                     if let Some(chosen) = s.chosen_number(own) {
                         d.set(format!("{key}.ChosenNumber"), chosen);
                     }
-                    // The permanent chosen as it entered (CR 614.12a, 607.2d), while it is still that permanent on the
-                    // battlefield: one that left, or came back as a new object (CR 400.7), is chosen no longer.
+                    // The permanent chosen as it entered (CR 614.12a, 607.2d) or as an ability of it resolved, while it is
+                    // still that permanent on the battlefield: one that left, or came back as a new object (CR 400.7), is
+                    // chosen no longer.
                     if let Some(chosen) = s.chosen_object(own)
                         && s.obj(chosen).became.is_none()
                         && s.obj(chosen).zone.is(ZoneKind::Battlefield)

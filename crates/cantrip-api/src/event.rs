@@ -551,7 +551,8 @@ impl EventMask {
     pub const DAMAGE_PREVENTED: EventMask = EventMask(1 << 44);
     pub const SPEED_CHANGED: EventMask = EventMask(1 << 45);
     pub const MANA_SPENT: EventMask = EventMask(1 << 46);
-    /// A player lost the game, or the game was drawn: recorded only, for the history and the host.
+    /// A player lost the game (CR 104.3), which an ability may trigger on (CR 603.10f), or the game was drawn, which is
+    /// recorded only, for the history and the host.
     pub const GAME_OVER: EventMask = EventMask(1 << 47);
     /// An Aura, Equipment or Fortification became attached to something (CR 701.3a).
     pub const ATTACHED: EventMask = EventMask(1 << 48);
@@ -623,7 +624,7 @@ impl EventMask {
 
     /// The events a triggered ability can look back on (CR 603.10, `CardTable::looks_back`): every kind `looks_back` says
     /// yes to, so an ability listening for one is among the permanents taken as they were before (`settle::Then`). Phasing
-    /// out and losing the game are filed in the history only (`of_history`); no ability triggers on them yet.
+    /// out is filed in the history only (`of_history`); no ability triggers on it yet.
     pub const LOOKS_BACK: EventMask = EventMask(
         EventMask::ZONE_CHANGE.0 | EventMask::UNATTACHED.0 | EventMask::COUNTERED.0 | EventMask::PHASED_OUT.0 | EventMask::GAME_OVER.0,
     );
@@ -685,6 +686,9 @@ impl EventMask {
             Event::Surveilled { .. } => EventMask::SURVEILLED,
             Event::DamagePrevented { .. } => EventMask::DAMAGE_PREVENTED,
             Event::SpeedChanged { .. } => EventMask::SPEED_CHANGED,
+            // "When [a player] loses the game" (CR 603.10f): Shinryu, Transcendent Rival's Burning Chains. A drawn game
+            // ends it, and nothing is left to trigger.
+            Event::GameLost { .. } => EventMask::GAME_OVER,
             _ => EventMask(0),
         }
     }

@@ -2080,7 +2080,15 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn remember_chosen_name(&mut self, by: Linked, name: CardId) {
-        ops::remember_chosen_name(self, by, name);
+        ops::remember_chosen(self, by, cantrip_state::Kept::Name(name));
+    }
+
+    fn remember_chosen_object(&mut self, by: Linked, object: ObjectId) {
+        ops::remember_chosen(self, by, cantrip_state::Kept::Object(object));
+    }
+
+    fn remember_chosen_player(&mut self, by: Linked, player: PlayerId) {
+        ops::remember_chosen(self, by, cantrip_state::Kept::Player(player));
     }
 
     fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: MoveReason) -> Vec<ObjectId> {

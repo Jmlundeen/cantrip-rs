@@ -343,7 +343,7 @@ impl Hash for Name<'_> {
             o.entered_with = None;
             o.prepared_from = None;
             o.exiled = None;
-            o.marks.choices = o.marks.choices.with_object(None);
+            o.marks.choices = o.marks.choices.without_objects();
             if let Some(phased) = &mut o.marks.phased { phased.last_known = 0; }
             let known = s.last_known(id).map(|k| LastKnown { id: ObjectId::NONE, ..*k });
             (o, known).hash(h);
@@ -483,7 +483,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
                 o.entered_with.map(|id| canon.id(id)),
                 o.prepared_from.map(|id| canon.id(id)),
                 o.exiled.map(|e| (canon.id(e.by), e.text, e.from, e.until_leaves, e.encoded)),
-                o.marks.choices.entered_raw().1.object.map(|c| canon.id(c)),
+                o.marks.choices.objects_raw().map(|c| c.map(|c| canon.id(c))),
                 stamp,
                 s.phased_last_known(id).map(|last| LastKnown { id: ObjectId::NONE, ..*last }),
             )
@@ -494,7 +494,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
             o.entered_with = None;
             o.prepared_from = None;
             o.exiled = None;
-            o.marks.choices = o.marks.choices.with_object(None);
+            o.marks.choices = o.marks.choices.without_objects();
             if let Some(phased) = &mut o.marks.phased { phased.last_known = 0; }
             if hashed {
                 row(id, &o).hash(h);
