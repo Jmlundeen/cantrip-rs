@@ -1,0 +1,55 @@
+# Deserter's Disciple: "Another target creature you control with power 2 or less can't be blocked this turn." The target is checked again
+# as the ability resolves (CR 608.2b). In turn 3 Bot1 targets the 2/2 Runeclaw Bear and, with the ability on the stack, casts Giant
+# Growth on it (5/5). The target no longer has power 2 or less, so the ability does nothing: the Bear attacks and Bot2's Ornithopter
+# can block it (and dies), where a card that skipped the check would have left it unblockable and Bot2 at 18.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Pearl
+Deserter's Disciple
+Runeclaw Bear
+Giant Growth
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Runeclaw Bear.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Deserter's Disciple.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Deserter's Disciple.Activate(Ability: can't be blocked; Bot1.Battlefield.Runeclaw Bear)
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Runeclaw Bear)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Runeclaw Bear.Power = 5
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Runeclaw Bear > Bot2)
+Bot2.Block(Ornithopter > Runeclaw Bear)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter

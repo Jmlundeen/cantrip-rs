@@ -1,0 +1,70 @@
+# Deserter's Disciple: "{T}: Another target creature you control with power 2 or less can't be blocked this turn." {1}{R} needs red
+# (Mox Ruby and Mox Pearl pay exactly). In turn 1 it is summoning sick (CR 302.6), so the ability is refused. In
+# turn 3 the targets are checked: the Disciple itself (not another), Bot2's 0/2 Ornithopter (not yours) and the 3/3 Hill Giant (power
+# 3, one over the limit) are refused while the 2/2 Runeclaw Bear (exactly 2) is accepted. The tap is the whole cost. Bot2's Ornithopter
+# may not block the Bear in turn 3 (Bot2 takes 2) but may in turn 5 ("this turn" has ended) and dies to the Bear.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Pearl
+Deserter's Disciple
+Runeclaw Bear
+Hill Giant
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Runeclaw Bear.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Deserter's Disciple.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Deserter's Disciple.Activate(Ability: can't be blocked; Bot1.Battlefield.Runeclaw Bear)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Deserter's Disciple.Activate(Ability: can't be blocked; Bot1.Battlefield.Deserter's Disciple)
+! Bot1.Battlefield.Deserter's Disciple.Activate(Ability: can't be blocked; Bot2.Battlefield.Ornithopter)
+! Bot1.Battlefield.Deserter's Disciple.Activate(Ability: can't be blocked; Bot1.Battlefield.Hill Giant)
+Bot1.Battlefield.Deserter's Disciple.Activate(Ability: can't be blocked; Bot1.Battlefield.Runeclaw Bear)
+? Bot1.Battlefield.Deserter's Disciple.Tapped = true
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Runeclaw Bear > Bot2)
+! Bot2.Block(Ornithopter > Runeclaw Bear)
+[Bot1.Main2]
+? Bot2.Life = 18
+[T5 Bot1.Main1]
+Bot1.Attack(Runeclaw Bear > Bot2)
+Bot2.Block(Ornithopter > Runeclaw Bear)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Ornithopter
