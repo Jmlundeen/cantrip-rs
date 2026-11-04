@@ -1,0 +1,36 @@
+# Wild Pack Squad: "At the beginning of combat on your turn, up to one target creature gains first strike and vigilance until
+# end of turn." Bot1 targets its own Memnite at the beginning of combat on turn 3 (CR 507.1) and attacks with it: it has first
+# strike and vigilance (CR 702.7, 702.20), so it stays untapped; the grant ends at the end of turn.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Wild Pack Squad
+Memnite
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Wild Pack Squad.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Target(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Keywords = FirstStrike; Vigilance
+Bot1.Attack(Memnite > Bot2)
+
+[Expect]
+Bot1.Battlefield.Memnite.Tapped = false

@@ -1,0 +1,8 @@
+{
+  "name": "Wild Pack Squad",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Human Mercenary",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "At the beginning of combat on your turn, up to one target creature gains first strike and vigilance until end of turn."
+}
