@@ -1,0 +1,49 @@
+# Molecular Modifier: "At the beginning of combat on your turn, target creature you control gets +1/+0 and gains first strike until
+# end of turn." Turn 1 Bot1 casts Memnite and the Modifier (Black Lotus' three red). On turn 3 the trigger refuses Bot2's Memnite
+# (not Bot1's); Bot1 picks its own Memnite: 2/1 - power only, the toughness unchanged - with first strike, while the Modifier stays
+# 2/2 with none. The pump is over by Bot2's turn 4, and Bot2's combat then triggers nothing ("on your turn").
+
+[Bot1 Deck]
+Black Lotus
+Memnite
+Molecular Modifier
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Molecular Modifier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+! Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Toughness = 1
+? Bot1.Battlefield.Memnite.Keywords = FirstStrike
+? Bot1.Battlefield.Molecular Modifier.Power = 2
+? Bot1.Battlefield.Molecular Modifier.Toughness = 2
+? Bot1.Battlefield.Molecular Modifier.Keywords = (absent)
+? Bot2.Battlefield.Memnite.Power = 1
+? Bot2.Battlefield.Memnite.Keywords = (absent)
+[T4 Bot2.BeginCombat]
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Memnite.Keywords = (absent)
+Bot1.Battlefield.Molecular Modifier.Power = 2
+Bot1.Battlefield.Molecular Modifier.Keywords = (absent)

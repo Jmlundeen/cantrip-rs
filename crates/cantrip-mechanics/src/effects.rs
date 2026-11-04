@@ -86,7 +86,7 @@ pub fn target_creature_gets<const P: i16, const T: i16>(g: &mut dyn Game, item: 
 
 /// "Target creature gets +`P`/+`T` and gains first strike until end of turn" (CR 611.2a, 702.7): one instruction, the creature
 /// being the ability's first target; nothing if it is no longer a legal target as the spell resolves (CR 608.2b). Interjection
-/// (+2/+2), Charge the Sanctum's single-target mode (+2/+0) and Riverguard's Reflexes (+2/+2) print it.
+/// (+2/+2), Molecular Modifier (+1/+0), Charge the Sanctum's single-target mode (+2/+0) and Riverguard's Reflexes (+2/+2) print it.
 pub fn target_creature_gets_and_gains_first_strike<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = crate::targets::object(g, item, 0) {
         instruction(g, |g| {
