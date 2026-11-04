@@ -170,6 +170,13 @@ pub fn card_to_an_opponents_graveyard(q: &dyn Query, asker: &Asker, proposal: &P
             && q.state().opponents(asker.controller).any(|opponent| opponent == z.to.player))
 }
 
+/// "If a nontoken creature an opponent controls would die" (CR 614.1a, 700.4, 111.1): `opponents_creature_would_die`, of a
+/// creature that is not a token. Kalitas, Traitor of Ghet, The Darkness Crystal, Draugr Necromancer and Valentin, Dean of the
+/// Vein print it.
+pub fn opponents_nontoken_creature_would_die(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    opponents_creature_would_die(q, asker, proposal) && matches!(proposal, Proposal::ZoneChange(z) if !q.obj(z.object).token)
+}
+
 /// "If a creature an opponent controls would die" (CR 614.1a, 700.4): a creature controlled by an opponent of this
 /// effect's controller, moving from the battlefield to a graveyard. A token is a creature too. Garruk, Vren and Malicious
 /// Eclipse (for the turn, as a granted replacement) read it.

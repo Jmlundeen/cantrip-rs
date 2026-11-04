@@ -972,6 +972,15 @@ fn creature_card_in_a_graveyard_filter(q: &dyn Query, _: &Asker, t: Target) -> b
 /// the Catacombs, Portal to Phyrexia and Virtue of Persistence print it.
 pub const CREATURE_CARD_IN_A_GRAVEYARD: TargetSpec = target(creature_card_in_a_graveyard_filter);
 
+fn creature_card_exiled_with_this_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if q.chars(id).is(CardType::Creature) && q.exiled_with(q.linked_to(asker)).contains(&id))
+}
+
+/// "Target creature card exiled with [this]" (CR 115.1, 607.2a, 607.2b): a creature card in exile that the ability linked
+/// to this one exiled, from this object as it is now (CR 400.7). The Darkness Crystal, Dino DNA and Mimeoplasm, Revered One
+/// print it.
+pub const CREATURE_CARD_EXILED_WITH_THIS: TargetSpec = target(creature_card_exiled_with_this_filter);
+
 fn creature_put_onto_the_battlefield_with_this(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     (CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).entered_with == Some(asker.source))
 }
