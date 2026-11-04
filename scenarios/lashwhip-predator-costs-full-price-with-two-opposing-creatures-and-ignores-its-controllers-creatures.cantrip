@@ -1,0 +1,45 @@
+# Lashwhip Predator: only creatures "your opponents control" count. Bot2 has two Elvish Mystics while Bot1 itself has three Ornithopters, so the Predator costs its full
+# {4}{G}{G}: Bot1's Black Lotus and Mox Emerald (four mana) cannot pay for it.
+
+[Bot1 Deck]
+Mox Emerald
+Black Lotus
+Lashwhip Predator
+Ornithopter x3
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Elvish Mystic x2
+Island x17
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Lashwhip Predator.Cast(Mana: short)
+
+[Expect]
+Bot1.Battlefield = Ornithopter; Ornithopter; Ornithopter; Mox Emerald

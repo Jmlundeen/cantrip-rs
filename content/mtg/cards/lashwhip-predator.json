@@ -1,0 +1,11 @@
+{
+  "name": "Lashwhip Predator",
+  "manaCost": "{4}{G}{G}",
+  "type": "Creature — Plant Beast",
+  "power": 5,
+  "toughness": 7,
+  "oracleText": "This spell costs {2} less to cast if your opponents control three or more creatures.\nReach",
+  "keywords": [
+    "Reach"
+  ]
+}

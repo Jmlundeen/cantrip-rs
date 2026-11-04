@@ -1,0 +1,61 @@
+# Lashwhip Predator: the cost increase is applied before the reduction (CR 601.2f). Bot2 has four Elvish Mystics ("three or more"). With Bot1's Sphere of Resistance in play the Predator
+# costs {4}{G}{G} + {1} - {2} = {3}{G}{G}, which Black Lotus (GGG), Mox Pearl and Mox Sapphire pay exactly (the pool is left empty).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Sphere of Resistance
+Lashwhip Predator
+Island x17
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Elvish Mystic x4
+Island x15
+
+[Actions]
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sphere of Resistance.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lashwhip Predator.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Lashwhip Predator.Power = 5
+Bot2.Battlefield = Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic; Mox Emerald

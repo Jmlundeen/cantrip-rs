@@ -1,0 +1,45 @@
+# Lashwhip Predator: "This spell costs {2} less to cast if your opponents control three or more creatures." (CR 601.2f) Bot2 has exactly three Elvish Mystics, so
+# the {4}{G}{G} Predator costs {2}{G}{G}, paid exactly by a Black Lotus and a Mox Emerald (the pool is left empty). It has reach.
+
+[Bot1 Deck]
+Mox Emerald
+Black Lotus
+Lashwhip Predator
+Island x17
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Elvish Mystic x3
+Island x17
+
+[Actions]
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lashwhip Predator.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Lashwhip Predator.Keywords = Reach
+Bot1.Battlefield.Lashwhip Predator.Power = 5
+Bot1.Battlefield.Lashwhip Predator.Toughness = 7
+Bot2.Battlefield = Elvish Mystic; Elvish Mystic; Elvish Mystic
