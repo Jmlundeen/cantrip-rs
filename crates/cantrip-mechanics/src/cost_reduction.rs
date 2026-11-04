@@ -28,6 +28,14 @@ pub fn spells_you_cast(q: &dyn Query, source: ObjectId, player: PlayerId, costed
     if player == q.controller(source) && q.chars(spell).is(card_type) { CostDelta::less(amount) } else { CostDelta::NONE }
 }
 
+/// "[Subtype] spells you cast cost {`N`} less to cast" (CR 601.2f, 118.7a): a spell of the source's controller that is that subtype as it is cast,
+/// the subtype read through the words of the source's text (CR 612); generic mana only. `TYPE` is `lands::sub(Subtype::Villain)` and so on.
+/// Baron Strucker, Hydra Overlord and Tombstone, Career Criminal (Villain, {1}) print it.
+pub fn subtype_spells_you_cast<const N: u8, const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    let Costed::Spell(spell) = costed else { return CostDelta::NONE };
+    if player == q.controller(source) && q.chars(spell).has_subtype(crate::lands::word(q, source, TYPE)) { CostDelta::less(N as u32) } else { CostDelta::NONE }
+}
+
 /// "This ability costs {1} less to activate for each [subtype] you control" (CR 601.2f by way of 602.2b): the activated ability's own cost change
 /// (`ActivatedDef::cost_change`), asked as it is activated and counting only the permanents of the player activating it, as the layers
 /// have made them that type. Generic mana only (CostDelta::less never takes a colored symbol). `TYPE` is `lands::sub(Subtype::Island)` and so

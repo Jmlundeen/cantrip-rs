@@ -1,20 +1,9 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::ask_may;
-use cantrip_mechanics::{connive, lands, triggers};
+use cantrip_mechanics::{connive, cost_reduction, lands, triggers};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("Connive", "have it connive?", "Draw a card, then discard a card  ·  only once each turn", "Connive", "Don't");
-
-/// "Villain spells you cast cost {1} less to cast" (CR 601.2f): a spell of yours that is a Villain as it is cast, read through
-/// the words of this creature's text (CR 612); generic mana only (CR 118.7a).
-fn villain_spells_cost_one_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    let Costed::Spell(spell) = costed else { return CostDelta::NONE };
-    if player == q.controller(source) && q.chars(spell).has_subtype(q.words(source).subtype(Subtype::Villain)) {
-        CostDelta::less(1)
-    } else {
-        CostDelta::NONE
-    }
-}
 
 /// The ability the once-each-turn record is kept under.
 fn connive_ability(q: &dyn Query, source: ObjectId) -> AbilityRef {
@@ -46,7 +35,7 @@ fn may_connive(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    cost_changes: &[villain_spells_cost_one_less],
+    cost_changes: &[cost_reduction::subtype_spells_you_cast::<1, { lands::sub(Subtype::Villain) }>],
     abilities: &[triggered(
         when_asked(EventMask::ZONE_CHANGE, another_villain_enters),
         may_connive,
