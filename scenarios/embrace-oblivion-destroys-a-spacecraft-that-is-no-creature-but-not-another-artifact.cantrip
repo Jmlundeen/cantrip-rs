@@ -1,0 +1,40 @@
+# "Destroy target creature or Spacecraft": Bot2's Class-F Shuttlecraft is an artifact Spacecraft and not a creature (it is one only
+# stationed, at 6+), and is a legal target; its Mox Emerald, an artifact that is neither, is refused (the cast at the Shuttlecraft on
+# the next line is the positive control). The sacrifice is Bot1's Mox Ruby, an artifact that is no creature.
+
+[Bot1 Deck]
+Mox Ruby
+Swamp
+Embrace Oblivion
+Swamp x17
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Class-F Shuttlecraft
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Class-F Shuttlecraft.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Hand.Embrace Oblivion.Cast(Bot2.Battlefield.Mox Emerald)
+Bot1.Hand.Embrace Oblivion.Cast(Bot2.Battlefield.Class-F Shuttlecraft)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Embrace Oblivion; Mox Ruby
+Bot2.Graveyard = Class-F Shuttlecraft
+Bot2.Battlefield.Count = 4

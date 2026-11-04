@@ -1,0 +1,24 @@
+# Embrace Oblivion sacrifices Bot1's Mox Ruby (chosen over the Ornithopter, either is an artifact) and destroys Bot1's own
+# Ornithopter: one of your own is a legal target.
+
+[Bot1 Deck]
+Mox Ruby
+Swamp
+Ornithopter
+Embrace Oblivion
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Embrace Oblivion.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Choose(Mox Ruby)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Embrace Oblivion; Ornithopter; Mox Ruby

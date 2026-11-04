@@ -1,0 +1,31 @@
+# Embrace Oblivion {B}: "As an additional cost to cast this spell, sacrifice an artifact or creature." Bot1 has only Swamps in play on
+# turn 3: the cast aimed at Bot2's Ornithopter is refused though {B} is there to pay (CR 601.2b, 118.3). Once Bot1 has cast its own
+# Ornithopter the same cast is legal and sacrifices it; Bot2's Ornithopter is destroyed.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Ornithopter
+Embrace Oblivion
+Swamp x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Hand.Embrace Oblivion.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Embrace Oblivion.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Embrace Oblivion; Ornithopter
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Count = 0
