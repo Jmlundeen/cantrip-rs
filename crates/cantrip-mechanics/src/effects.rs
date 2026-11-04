@@ -1428,6 +1428,16 @@ pub fn damage_each_creature_and_player<const N: u16>(g: &mut dyn Game, item: &St
     Ok(())
 }
 
+/// "Target spell or permanent becomes [color]" (CR 611.2a, 613.1e): the target's colors are set to `COLOR`, read through the
+/// words of the effect's text, indefinitely (CR 105.3: mana symbols are unchanged); it follows a permanent spell onto the
+/// battlefield (CR 400.7a). Chaoslace, Deathlace, Lifelace, Purelace and Thoughtlace print it, each with its color.
+pub fn target_becomes_color<const COLOR: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(object) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    let colors = g.words(item.object).colors(ColorSet::of(Color::ALL[COLOR as usize]));
+    g.add_effect(item.object, object, EffectKind::SetColors(colors), Duration::Indefinite);
+    Ok(())
+}
+
 /// "[This spell] deals `n` damage to each creature" (Pyroclasm, Fiery Confluence, Avengers Disassembled): one damage event
 /// for every creature on the battlefield as the effect is carried out (CR 608.2c), all dealt together.
 pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
