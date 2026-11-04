@@ -1,0 +1,33 @@
+# Desculpting Blast on Bot2's Ornithopter at Bot1's own main phase: it is not attacking, so it is only returned to Bot2's hand and no Drone is made.
+# A land is not a legal target (the refusal names Bot2's Island, while the Ornithopter and Bot1's own Mox Jet are accepted).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Desculpting Blast
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Desculpting Blast.Cast(Bot2.Battlefield.Island)
+Bot1.Hand.Desculpting Blast.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Hand.Ornithopter.Power = 0
+Bot2.Battlefield.Count = 1
+Bot2.Battlefield.Island.Tapped = false
+Bot1.Battlefield.Count = 2

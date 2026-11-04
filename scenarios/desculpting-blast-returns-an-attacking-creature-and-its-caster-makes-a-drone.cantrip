@@ -1,0 +1,37 @@
+# Desculpting Blast, {1}{U}: "Return target nonland permanent to its owner's hand. If it was attacking, create a 1/1 colorless Drone artifact
+# creature token with flying and 'This token can block only creatures with flying.'" Bot2 attacks Bot1 with its Ornithopter on turn 4; Bot1
+# (the caster, not the attacker's controller) returns it with the attack declared: it goes to Bot2's hand and Bot1 gets the Drone.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Desculpting Blast
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter > Bot1)
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Desculpting Blast.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Drone Token.Power = 1
+? Bot1.Battlefield.Drone Token.Toughness = 1
+? Bot1.Battlefield.Drone Token.Types = Artifact; Creature
+? Bot1.Battlefield.Drone Token.Colors = (absent)
+? Bot1.Battlefield.Drone Token.Keywords = CanBlockOnlyCreaturesWithFlying; Flying
+
+[Expect]
+Bot2.Hand.Ornithopter.Power = 0
+Bot2.Battlefield.Count = 0
+Bot1.Life = 20
