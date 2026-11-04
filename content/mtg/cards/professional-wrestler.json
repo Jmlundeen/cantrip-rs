@@ -1,0 +1,8 @@
+{
+  "name": "Professional Wrestler",
+  "manaCost": "{3}{G}",
+  "type": "Creature — Human Warrior Performer",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "When this creature enters, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")\nThis creature can't be blocked by more than one creature."
+}

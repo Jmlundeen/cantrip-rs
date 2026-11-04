@@ -1,0 +1,39 @@
+# Professional Wrestler {3}{G}, 4/4: "When this creature enters, create a Treasure token" - exactly one - and "This creature can't be blocked by more
+# than one creature" (CR 509.1b). Bot1 casts it turn 1 (Black Lotus's three and Mox Emerald): it leaves a Mox Emerald, the Wrestler and one Treasure.
+# On turn 3 it attacks and Bot2's two Ornithopters may not both block it (the refusal) while one may; that Ornithopter dies and the Wrestler takes none.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Professional Wrestler
+Forest x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Professional Wrestler.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 3
+? Bot1.Battlefield.Treasure Token.Types = Artifact
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Professional Wrestler > Bot2)
+! Bot2.Block(Ornithopter#1 > Professional Wrestler; Ornithopter#2 > Professional Wrestler)
+Bot2.Block(Ornithopter#1 > Professional Wrestler)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Count = 1
+Bot1.Battlefield.Professional Wrestler.Damage = 0
