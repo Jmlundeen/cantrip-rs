@@ -1,0 +1,67 @@
+# Secluded Starforge's other abilities, and its tap X with X of 0. Turn 1 it taps for {C} (the pool holds just that) and
+# the {C} pays for Sol Ring. Turn 3, with Memnite on the stack, the pump is refused: "Activate only as a sorcery" (CR
+# 602.5d, 307.1), so not while the stack holds anything. Then an Island is refused as its target (it is no creature, CR 115.1), and it is
+# activated with X announced as 0 (CR 107.3a: "Tap X untapped artifacts" may be X of 0) for Bot2's Walker, an
+# opponent's creature: Sol Ring's {C}{C} pays the {2} with nothing left over, Memnite (an untapped artifact) stays
+# untapped, and the Walker stays 0/3. Turn 5 "{5}, {T}" is refused with four mana sources (Mana: short), then paid
+# exactly by Black Lotus and Sol Ring with both Islands left untapped, and makes a 2/2 Robot artifact creature token.
+
+[Bot1 Deck]
+Secluded Starforge
+Sol Ring
+Island
+Memnite
+Black Lotus
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Phyrexian Walker
+Island x20
+
+[Actions]
+Bot1.Hand.Secluded Starforge.Play
+Bot1.Battlefield.Secluded Starforge.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Phyrexian Walker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+! Bot1.Battlefield.Secluded Starforge.Activate(Ability: Target creature)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.Secluded Starforge.Activate(Bot1.Battlefield.Island; Ability: Target creature)
+Bot1.Battlefield.Secluded Starforge.Activate(Bot2.Battlefield.Phyrexian Walker; Ability: Target creature; X: 0)
+Bot1.Pass
+? Stack.Count = 1
+? Bot1.Mana =
+? Bot1.Battlefield.Memnite.Tapped = false
+Bot2.Pass
+? Bot2.Battlefield.Phyrexian Walker.Power = 0
+? Bot2.Battlefield.Phyrexian Walker.Toughness = 3
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Secluded Starforge.Activate(Ability: Create; Mana: short)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Secluded Starforge.Activate(Ability: Create)
+Bot1.Pass
+? Stack.Count = 1
+? Bot1.Mana =
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Robot Token.Power = 2
+Bot1.Battlefield.Robot Token.Toughness = 2
+Bot1.Battlefield.Robot Token.Token = true
+Bot1.Battlefield.Island#1.Tapped = false
+Bot1.Battlefield.Island#2.Tapped = false
+Bot1.Battlefield.Robot Token.Types = Artifact; Creature
+Bot1.Battlefield.Robot Token.Subtypes = Robot
+Bot1.Battlefield.Secluded Starforge.Tapped = true

@@ -1,0 +1,53 @@
+# Secluded Starforge's "{2}, {T}, Tap X untapped artifacts you control: Target creature gets +X/+0 until end of turn."
+# X is announced as it is activated (CR 107.3a, 601.2b by way of 602.2b), and can't be more than the untapped artifacts
+# Bot1 controls (three: two Memnites and Ornithopter), so 4 is refused. X is 2: the two Islands' {U}{U} pay the {2}
+# with the pool left empty; Bot2's Phyrexian Walker, an artifact Bot1 doesn't control, can't be tapped for it; the two
+# Memnites are tapped (CR 118.3), and Starforge itself for {T}. Ornithopter, Bot1's own, is 2/2 until end of turn: +2
+# power, its toughness unchanged (CR 611.2a); on turn 6 it is 0/2 again (CR 514.2).
+
+[Bot1 Deck]
+Secluded Starforge
+Memnite
+Memnite
+Ornithopter
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Phyrexian Walker
+Island x20
+
+[Actions]
+Bot1.Hand.Secluded Starforge.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Phyrexian Walker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Secluded Starforge.Activate(Ability: Target creature; X: 2; Target: Bot1.Battlefield.Ornithopter)
+! Bot1.Battlefield.Secluded Starforge.Activate(X: 4)
+! Bot1.Choose(Bot2.Battlefield.Phyrexian Walker)
+Bot1.Choose(Memnite; Memnite)
+? Bot1.Mana =
+? Bot1.Battlefield.Memnite#1.Tapped = true
+? Bot1.Battlefield.Memnite#2.Tapped = true
+? Bot1.Battlefield.Ornithopter.Tapped = false
+? Bot1.Battlefield.Secluded Starforge.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+[T6 Bot2.Main1]
+
+[Expect]
+Turn = 6
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+

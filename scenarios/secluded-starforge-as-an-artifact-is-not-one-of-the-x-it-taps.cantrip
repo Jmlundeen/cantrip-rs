@@ -1,0 +1,54 @@
+# Secluded Starforge made an artifact by Mycosynth Lattice: "{2}, {T}, Tap X untapped artifacts you control" can't tap
+# Starforge for both {T} and one of the X (CR 118.3, 602.2b). Sol Ring's {C}{C} pays the {2}; the untapped artifacts
+# besides Starforge are the four Islands, Lattice and Memnite, so X of 7 is refused and 6 is not, and Starforge isn't
+# one of the six chosen.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Memnite
+Secluded Starforge
+Island
+Mycosynth Lattice
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Secluded Starforge.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Secluded Starforge.Activate(Ability: Add {C})
+Bot1.Hand.Mycosynth Lattice.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Secluded Starforge.Activate(Ability: Target creature; X: 6; Target: Bot1.Battlefield.Memnite)
+! Bot1.Battlefield.Secluded Starforge.Activate(X: 7)
+! Bot1.Choose(Secluded Starforge)
+Bot1.Choose(Island; Island; Island; Island; Mycosynth Lattice; Memnite)
+? Bot1.Battlefield.Secluded Starforge.Tapped = true
+? Bot1.Battlefield.Memnite.Tapped = true
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 9
+Bot1.Battlefield.Memnite.Power = 7
+Bot1.Battlefield.Mycosynth Lattice.Tapped = true
