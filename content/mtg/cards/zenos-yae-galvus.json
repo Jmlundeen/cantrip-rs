@@ -1,0 +1,21 @@
+{
+  "name": "Zenos yae Galvus",
+  "manaCost": "{3}{B}{B}",
+  "type": "Legendary Creature — Human Noble Warrior",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "My First Friend — When Zenos yae Galvus enters, choose a creature an opponent controls. Until end of turn, creatures other than Zenos yae Galvus and the chosen creature get -2/-2.\nWhen the chosen creature leaves the battlefield, transform Zenos yae Galvus.",
+  "backFace": {
+    "name": "Shinryu, Transcendent Rival",
+    "colorIndicator": [
+      "Black"
+    ],
+    "type": "Legendary Creature — Dragon",
+    "power": 8,
+    "toughness": 8,
+    "oracleText": "Flying\nAs this creature transforms into Shinryu, choose an opponent.\nBurning Chains — When the chosen player loses the game, you win the game.",
+    "keywords": [
+      "Flying"
+    ]
+  }
+}

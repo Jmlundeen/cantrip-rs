@@ -1,0 +1,73 @@
+# Burning Chains triggers only for the chosen player (CR 607.2d). As in the game Shinryu wins, Bot1 transforms Zenos yae Galvus
+# by Bolting the Ornithopter it chose, but chooses Bot2 as the rival. Bot3 then loses to a second Bolt: nothing triggers, and the
+# game goes on between Bot1 and Bot2.
+
+[Life]
+Bot3: 3
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Ruby
+Zenos yae Galvus
+Lightning Bolt
+Lightning Bolt
+Mountain
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Bot3 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Zenos yae Galvus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.ChoosePlayer(Bot2)
+? Bot1.Battlefield.Shinryu, Transcendent Rival.Power = 8
+? Bot1.Battlefield.Shinryu, Transcendent Rival.Keywords = Flying
+? Result = InProgress
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot3.Status = Lost
+Bot1.Pass
+Bot2.Pass
+[T4 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Stack.Count = 0
+Bot3.LostTo = Life
+Bot2.Status = (absent)
