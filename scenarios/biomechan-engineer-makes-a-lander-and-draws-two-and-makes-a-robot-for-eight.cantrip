@@ -1,0 +1,52 @@
+# Biomechan Engineer {G}{U} 2/2: "When this creature enters, create a Lander token." and "{8}: Draw two cards and create a 2/2 colorless Robot artifact creature token."
+# {G}{U} is paid by Mox Emerald and Mox Sapphire, and the Lander arrives. Seven mana (two Black Lotus' red and Mox Ruby) cannot pay {8} (refusal, Mox Jet not yet on
+# the battlefield); with Mox Jet it is paid exactly (the pool ends empty), Bot1 draws two cards (the hand 0 to 2) and a 2/2 Robot joins: seven permanents.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Biomechan Engineer
+Plains x2
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Biomechan Engineer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Biomechan Engineer.Activate(Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Biomechan Engineer.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Robot Token.Tapped = false
+Bot1.Battlefield.Robot Token.Power = 2
+Bot1.Battlefield.Robot Token.Toughness = 2
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Count = 7
