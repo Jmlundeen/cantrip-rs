@@ -1170,3 +1170,17 @@ pub fn owner_puts_first_target_on_top_or_bottom(g: &mut dyn Game, item: &StackIt
     let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
     owner_puts_on_top_or_bottom(g, item.object, creature)
 }
+
+/// "Mill `count` cards, then return [`rule`] from your graveyard to your hand" (CR 701.17, 608.2c): the choice is made from the
+/// whole graveyard as the mill left it, a card just milled included, and is not a target. One is returned whenever the rule
+/// finds one. Takenuma, Abandoned Mire (a creature or planeswalker card) and Fell Gravship (a creature or Spacecraft card)
+/// print it.
+pub fn mill_then_return_a_card(g: &mut dyn Game, item: &StackItem, count: u32, rule: Selection) -> Result<(), Suspend> {
+    let you = item.controller;
+    g.mill(you, count);
+    g.end_sentence();
+    let graveyard = g.state().zone(Zone::graveyard(you)).to_vec();
+    let chosen = crate::choose::select(g, you, item.object, Purpose::PutIntoHand, graveyard, rule)?;
+    g.return_to_hand(&chosen);
+    Ok(())
+}
