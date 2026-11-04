@@ -1,0 +1,61 @@
+# Peter Parker: "When Peter Parker enters, create a 2/1 green Spider creature token with reach", and "{1}{G}{W}{U}: Transform Peter Parker.
+# Activate only as a sorcery." Amazing Spider-Man: "Each legendary spell you cast that's one or more colors has web-slinging {G}{W}{U}."
+# Bot1 casts Peter on turn 1 (a Spider), transforms him on turn 3, and on turn 5 casts the second Peter - legendary and white - for
+# {G}{W}{U}, returning the Llanowar Elves it tapped for the {G} (CR 702.188a, 113.6): a second Spider is made, and the Elves are in hand.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Llanowar Elves
+Peter Parker
+Peter Parker
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Peter Parker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spider Token.Power = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Peter Parker.Activate(Ability: Transform)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Amazing Spider-Man.Power = 4
+[T5 Bot1.Main1]
+Bot1.Hand.Peter Parker.Cast(Ability: Peter Parker: Web-slinging)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Amazing Spider-Man.Power = 4
+Bot1.Battlefield.Amazing Spider-Man.Toughness = 4
+Bot1.Battlefield.Peter Parker.Power = 0
+Bot1.Battlefield.Spider Token#1.Power = 2
+Bot1.Battlefield.Spider Token#2.Power = 2
+Bot1.Hand = Llanowar Elves; Plains; Plains
+Stack.Count = 0

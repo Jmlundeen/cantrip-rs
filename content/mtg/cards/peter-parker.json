@@ -1,0 +1,20 @@
+{
+  "name": "Peter Parker",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Human Scientist Hero",
+  "power": 0,
+  "toughness": 1,
+  "oracleText": "When Peter Parker enters, create a 2/1 green Spider creature token with reach.\n{1}{G}{W}{U}: Transform Peter Parker. Activate only as a sorcery.",
+  "backFace": {
+    "name": "Amazing Spider-Man",
+    "manaCost": "{1}{G}{W}{U}",
+    "type": "Legendary Creature — Spider Human Hero",
+    "power": 4,
+    "toughness": 4,
+    "oracleText": "Vigilance, reach\nEach legendary spell you cast that's one or more colors has web-slinging {G}{W}{U}. (You may cast a spell for its web-slinging cost if you also return a tapped creature you control to its owner's hand.)",
+    "keywords": [
+      "Vigilance",
+      "Reach"
+    ]
+  }
+}

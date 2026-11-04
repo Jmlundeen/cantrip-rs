@@ -1,0 +1,35 @@
+# Peter Parker is a modal double-faced card (CR 712.3): its back face, Amazing Spider-Man, has a mana cost of its own, {1}{G}{W}{U},
+# and so is a second way to cast the card from hand. Cast that way it enters back face up (CR 712.8b) - a 4/4 with vigilance and
+# reach, with no Spider token, since the enters trigger is on the front face - and its mana value is that of the up face, four
+# (CR 712.8f), not the front face's two.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Peter Parker
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Peter Parker.Cast(Ability: back face)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Sapphire; Mox Jet; Amazing Spider-Man
+Bot1.Battlefield.Amazing Spider-Man.Power = 4
+Bot1.Battlefield.Amazing Spider-Man.Keywords = Reach; Vigilance
+Bot1.Battlefield.Amazing Spider-Man.ManaValue = 4
+Stack.Count = 0

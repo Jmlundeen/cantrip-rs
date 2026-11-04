@@ -1,0 +1,49 @@
+# Amazing Spider-Man: "Each legendary spell you cast that's one or more colors has web-slinging {G}{W}{U}." Only a legendary, coloured
+# spell has it, and only once Peter Parker has transformed. Bot1 has Llanowar Elves tapped for mana as the creature to return. Before the
+# transform, the second Peter Parker can't be web-slung; after it, a colorless legendary Mox Amber or a nonlegendary Savannah Lions (white) in hand still can't be.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Llanowar Elves
+Peter Parker
+Peter Parker
+Mox Amber
+Savannah Lions
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Peter Parker.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Hand.Peter Parker.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Peter Parker.Activate(Ability: Transform)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+! Bot1.Hand.Mox Amber.Cast(Ability: Web-slinging)
+! Bot1.Hand.Savannah Lions.Cast(Ability: Web-slinging)
+
+[Expect]
+Bot1.Battlefield.Amazing Spider-Man.Power = 4
+Bot1.Hand = Mox Amber; Peter Parker; Savannah Lions
+Bot1.Battlefield.Llanowar Elves.Tapped = true
