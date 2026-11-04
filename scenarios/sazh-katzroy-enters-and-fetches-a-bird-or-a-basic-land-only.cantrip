@@ -1,0 +1,45 @@
+# Sazh Katzroy ({3}{G}): "When this creature enters, you may search your library for a Bird or basic land card, reveal it, put it
+# into your hand, then shuffle." Bot1 casts it off four Moxen and accepts. A Plains is a basic land, Aven Sentry (Creature - Bird
+# Soldier) is a Bird; a Wasteland (nonbasic land), a Lightning Bolt and an Ornithopter are neither and are refused. Bot1 takes the
+# Bird; the opponent's library is untouched and Bot1's shuffled once.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Sazh Katzroy
+Island x2
+Lightning Bolt
+Wasteland
+Ornithopter
+Aven Sentry
+Plains
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sazh Katzroy.Cast
+Bot1.Accept
+! Bot1.Search(Wasteland)
+! Bot1.Search(Lightning Bolt)
+! Bot1.Search(Ornithopter)
+Bot1.Search(Aven Sentry)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Island; Aven Sentry
+Bot1.Shuffles = 1
+Bot2.Shuffles = 0
+Bot1.Revealed = Aven Sentry

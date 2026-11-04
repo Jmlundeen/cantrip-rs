@@ -1,0 +1,34 @@
+# Sazh Katzroy's enters ability is a "may": Bot1 declines, so nothing is taken, the library keeps its cards and is not shuffled.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Sazh Katzroy
+Island x2
+Plains
+Aven Sentry
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sazh Katzroy.Cast
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Island
+Bot1.Library.Count = 10
+Bot1.Shuffles = 0
