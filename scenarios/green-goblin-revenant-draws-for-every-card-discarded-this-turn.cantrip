@@ -1,0 +1,58 @@
+# Green Goblin, Revenant draws for EVERY card discarded this turn, not only its own: on turn 3 Faithless Looting (draw two, discard two)
+# discards Mountain and Mountain first, then the attack discards the Island, so three cards have been discarded and Green Goblin draws
+# three. The hand ends at three cards and the graveyard holds the Looting and the three discards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Green Goblin, Revenant
+Faithless Looting
+Mountain
+Island
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Green Goblin, Revenant.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mountain; Mountain)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Green Goblin, Revenant > Bot2)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Graveyard.Count = 4
+
+[Expect]
+Bot2.Life = 17
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 4

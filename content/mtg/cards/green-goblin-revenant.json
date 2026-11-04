@@ -1,0 +1,12 @@
+{
+  "name": "Green Goblin, Revenant",
+  "manaCost": "{3}{B}{R}",
+  "type": "Legendary Creature — Goblin Human Villain",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying, deathtouch\nWhenever Green Goblin attacks, discard a card. Then draw a card for each card you've discarded this turn.",
+  "keywords": [
+    "Flying",
+    "Deathtouch"
+  ]
+}
