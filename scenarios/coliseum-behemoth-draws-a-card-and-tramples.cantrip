@@ -1,0 +1,49 @@
+# Coliseum Behemoth ({5}{G}{G}, 7/7 trample, paid exactly by two Black Lotuses and Mox Emerald): its enters trigger "choose one"
+# (CR 700.2) - choosing "Draw a card" draws one card (CR 121.1): Bot1's hand of three Forests after casting everything is four.
+# On turn 3 it attacks, Bot2's Balduvian Bears (2 toughness) block, and the other 5 tramples over (CR 702.19b): Bot2 is at 15.
+
+[Bot1 Deck]
+Black Lotus x2
+Coliseum Behemoth
+Mox Emerald
+Forest x3
+Forest x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Balduvian Bears
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Coliseum Behemoth.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Modes(Count: 0)
+Bot1.Modes(2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Balduvian Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Coliseum Behemoth > Bot2)
+Bot2.Block(Balduvian Bears > Coliseum Behemoth)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Balduvian Bears
+Bot1.Battlefield.Coliseum Behemoth.Damage = 2
+Bot1.Battlefield.Coliseum Behemoth.Keywords = Trample

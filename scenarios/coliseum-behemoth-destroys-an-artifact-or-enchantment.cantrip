@@ -1,0 +1,47 @@
+# Coliseum Behemoth choosing "Destroy target artifact or enchantment" (CR 700.2, 701.8). Bot2's Mox Emerald (artifact) is a legal
+# target and its Balduvian Bears (a creature) is not; Bot1's own Mox Emerald is a legal target too, but here Bot2's Mox is chosen.
+# The Mox goes to Bot2's graveyard and nothing is drawn: Bot1 holds the four cards left after casting four of eight.
+
+[Bot1 Deck]
+Black Lotus x2
+Coliseum Behemoth
+Mox Emerald
+Forest x3
+Forest x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Balduvian Bears
+Swamp x20
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Balduvian Bears.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Coliseum Behemoth.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+! Bot1.Target(Bot2.Battlefield.Balduvian Bears)
+Bot1.Target(Bot2.Battlefield.Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Mox Emerald
+Bot2.Battlefield.Balduvian Bears.Power = 2
+Bot1.Hand.Count = 4

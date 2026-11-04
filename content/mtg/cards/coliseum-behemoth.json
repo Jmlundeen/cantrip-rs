@@ -1,0 +1,11 @@
+{
+  "name": "Coliseum Behemoth",
+  "manaCost": "{5}{G}{G}",
+  "type": "Creature — Beast",
+  "power": 7,
+  "toughness": 7,
+  "oracleText": "Trample\nWhen this creature enters, choose one —\n• Destroy target artifact or enchantment.\n• Draw a card.",
+  "keywords": [
+    "Trample"
+  ]
+}
