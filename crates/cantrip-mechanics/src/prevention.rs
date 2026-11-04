@@ -181,8 +181,33 @@ pub const FROM_CHOSEN_SOURCE: GrantedPreventionDef = GrantedPreventionDef {
 /// `then`) `index`th in its `granted_preventions`. Deflecting Palm, Haazda Shield Mate, Invulnerability, Reverse Damage,
 /// Intervention Pact. The source chosen, if any.
 pub fn next_time_chosen_source_would_damage_you(g: &mut dyn Game, item: &StackItem, index: u8) -> Result<Option<ObjectId>, Suspend> {
-    let Some(source) = choose_source(g, item, SOURCE)? else { return Ok(None) };
+    next_time_source_would_damage_you(g, item, index, SOURCE)
+}
+
+/// `next_time_chosen_source_would_damage_you` for a source `rule` allows ("a black or red source of your choice": `SOURCE`
+/// with `source_of_colors` as a part), judged as it is chosen (CR 609.7a) and again, by the card's `applies`
+/// (`from_chosen_source_of_colors`), as it would deal damage (CR 609.7b). Circle of Protection: Black and Greater Realm of
+/// Preservation print it.
+pub fn next_time_source_would_damage_you(g: &mut dyn Game, item: &StackItem, index: u8, rule: Selection) -> Result<Option<ObjectId>, Suspend> {
+    let Some(source) = choose_source(g, item, rule)? else { return Ok(None) };
     let to = Target::Player(item.controller);
     g.add_effect(item.object, source, EffectKind::Prevention { card: item.ability.card, index, to, shield: Shield::NextTime }, Duration::EndOfTurn);
     Ok(Some(source))
+}
+
+/// Whether `id` is one of the colors `COLORS` (a `ColorSet`'s bits) as the text of `source` words them (CR 612).
+fn is_of_colors<const COLORS: u8>(q: &dyn Query, source: ObjectId, id: ObjectId) -> bool {
+    let colors = q.chars(id).colors;
+    Color::ALL.into_iter().any(|c| ColorSet(COLORS).has(c) && colors.has(q.words(source).color(c)))
+}
+
+/// A `SelectFn` for "a [color] source of your choice": a source of one of the colors `COLORS`, in the words of the effect's text.
+pub fn source_of_colors<const COLORS: u8>(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |id| is_of_colors::<COLORS>(q, choice.source, id))
+}
+
+/// A `GrantedPreventionDef::applies` for "the next time a [color] source of your choice would deal damage to you": damage from
+/// the source chosen (`by_chosen_source`), as long as it is still one of the colors `COLORS` (CR 609.7b).
+pub fn from_chosen_source_of_colors<const COLORS: u8>(q: &dyn Query, asker: &Asker, affected: ObjectId, d: &DamageEvent) -> bool {
+    by_chosen_source(q, affected, d) && is_of_colors::<COLORS>(q, asker.source, d.source)
 }
