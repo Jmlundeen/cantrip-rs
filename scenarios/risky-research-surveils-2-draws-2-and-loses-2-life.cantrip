@@ -1,0 +1,36 @@
+# Risky Research: "Surveil 2, then draw two cards. You lose 2 life." The library is Island, Mountain, Forest, ...: Bot1 surveils Island and
+# Mountain, keeping Island on top and putting Mountain into the graveyard, then draws Island and Forest. Bot1 is at 18.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Risky Research
+Plains
+Plains
+Plains
+Island
+Mountain
+Forest
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Risky Research.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | Mountain)
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Island; Forest
+Bot1.Graveyard = Risky Research; Mountain
+Bot1.Life = 18
+Stack.Count = 0
