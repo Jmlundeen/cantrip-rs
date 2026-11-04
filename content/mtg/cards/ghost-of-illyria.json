@@ -1,0 +1,11 @@
+{
+  "name": "Ghost of Illyria",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Elemental Spirit",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nWhen this creature enters, exile up to one other target nonland permanent you control. Return that card to the battlefield under its owner's control at the beginning of the next end step.",
+  "keywords": [
+    "Flying"
+  ]
+}
