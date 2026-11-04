@@ -1,0 +1,41 @@
+# The Measure of a Man: I exiles Bot2's Ornithopter with the Saga, II investigates for a Clue, and III returns the exiled card
+# to the battlefield under its owner's control - Bot2's - and Bot1 gains 2 life (CR 607.2a, 714.3a, 701.16a). The Saga is
+# sacrificed after its last chapter (CR 714.4).
+
+[Bot1 Deck]
+Black Lotus
+Plains
+The Measure of a Man
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Measure of a Man.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Clue Token.Types = Artifact
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.The Measure of a Man = (absent)
+Exile.Count = 0

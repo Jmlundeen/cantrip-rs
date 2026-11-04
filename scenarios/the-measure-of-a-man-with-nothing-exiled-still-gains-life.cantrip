@@ -1,0 +1,25 @@
+# The Measure of a Man: chapter I's target is "up to one" (CR 115.1d), and with no artifact or creature on the battlefield
+# there is nothing to exile; chapter III then has no exiled card to return, and Bot1 still gains 2 life (CR 608.2c).
+
+[Bot1 Deck]
+Black Lotus
+The Measure of a Man
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Measure of a Man.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.The Measure of a Man = (absent)
+Exile.Count = 0
