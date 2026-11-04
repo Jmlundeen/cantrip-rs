@@ -1,0 +1,11 @@
+{
+  "name": "Nebula Dragon",
+  "manaCost": "{6}{R}",
+  "type": "Creature — Dragon",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Flying\nWhen this creature enters, it deals 3 damage to any target.",
+  "keywords": [
+    "Flying"
+  ]
+}

@@ -1,0 +1,48 @@
+# Nebula Dragon, a 4/4 flyer for {6}{R} (Black Lotus' three red, Mox Ruby and three more Moxen): "When this creature enters, it deals 3
+# damage to any target." The target refuses Bot1's own Mox Ruby (an artifact that is no creature, player or planeswalker, so
+# outside "any target"); Bot1 picks Bot2, who goes from 20 to 17 - exactly 3 - while Bot1's life stays at 20.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Nebula Dragon
+Memnite
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Nebula Dragon.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 20
+Bot1.Battlefield.Nebula Dragon.Keywords = Flying
+Bot1.Battlefield.Nebula Dragon.Power = 4
+Bot1.Battlefield.Nebula Dragon.Toughness = 4
