@@ -1,0 +1,57 @@
+# Atomic Microsizer: "Equipped creature gets +1/+0." "Equip {2}": on turn 1 with only Mox Jet's mana available the equip is refused (short by one);
+# once Mox Ruby is cast, the two together pay exactly {2} and the pool is empty. On turn 3 the equipped Ornithopter (1/2) attacks and its trigger
+# targets itself (one of two creatures; Mox Jet, no creature, is refused): it can't be blocked (Bot2's Ornithopter may not block it) and has base
+# power and toughness 1/1, +1/+0 on top: 2/1, so Bot2 takes exactly 2. After the turn it is 1/2 again.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Atomic Microsizer
+Ornithopter
+Island
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Atomic Microsizer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Atomic Microsizer.Activate(Ornithopter; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Atomic Microsizer.Activate(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter)
+! Bot1.Target(Mox Jet)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+! Bot2.Block(Bot2.Battlefield.Ornithopter > Bot1.Battlefield.Ornithopter)
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 1
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot2.Life = 18
