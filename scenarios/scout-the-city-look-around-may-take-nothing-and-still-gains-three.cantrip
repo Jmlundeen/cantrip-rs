@@ -1,0 +1,31 @@
+# Scout the City, "Look Around": "You may put a permanent card from among them into your hand" - Bot1 declines (Choose with nothing), though the top
+# three (Island, Ornithopter, Memnite) are all permanent cards: all three stay in the graveyard with the spell, and the 3 life is gained all the same.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Scout the City
+Forest x4
+Island
+Ornithopter
+Memnite
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Scout the City.Cast
+Bot1.Modes(Look Around)
+Bot1.Pass
+Bot1.Choose()
+
+[Expect]
+Bot1.Life = 23
+Bot1.Hand = Forest; Forest; Forest; Forest
+Bot1.Graveyard = Scout the City; Memnite; Ornithopter; Island
+Bot1.Library.Count = 10

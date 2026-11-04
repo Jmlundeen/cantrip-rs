@@ -1,0 +1,34 @@
+# Scout the City {1}{G}, "Look Around": "Mill three cards. You may put a permanent card from among them into your hand. You gain 3 life." The top three are
+# Island, Ornithopter and Lightning Bolt: the Lightning Bolt (no permanent) is refused, Bot1 takes the Ornithopter, the other two stay in the graveyard
+# (the fourth card is not milled), and Bot1 gains exactly 3. Bot2's hand is not touched.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Scout the City
+Forest x4
+Island
+Ornithopter
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Scout the City.Cast
+Bot1.Modes(Look Around)
+Bot1.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Bot1.Life = 23
+Bot1.Hand = Forest; Forest; Forest; Forest; Ornithopter
+Bot1.Graveyard = Scout the City; Lightning Bolt; Island
+Bot1.Library.Count = 10
+Bot2.Hand.Count = 7
