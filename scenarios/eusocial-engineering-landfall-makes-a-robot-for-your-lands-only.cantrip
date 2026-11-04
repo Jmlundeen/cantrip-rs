@@ -1,0 +1,36 @@
+# Eusocial Engineering: Landfall (CR 207.2c) - Bot1's land enters and makes one 2/2 colorless Robot artifact creature token for Bot1; Bot2's land, entering under Bot2's control, makes none.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Eusocial Engineering
+Forest x3
+Island x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Eusocial Engineering.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Robot Token.Power = 2
+Bot1.Battlefield.Robot Token.Toughness = 2
+Bot1.Battlefield.Robot Token.Types = Artifact; Creature
+Bot1.Battlefield = Eusocial Engineering; Forest; Mox Emerald; Mox Sapphire; Robot Token
+Bot2.Battlefield = Island

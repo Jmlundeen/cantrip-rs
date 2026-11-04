@@ -1,0 +1,26 @@
+# Eusocial Engineering's warp {1}{G} (CR 702.185a): Mox Emerald's {G} and Mox Pearl's {W} pay it exactly with the pool empty after; Mox Pearl alone is refused ({G} is needed).
+# It is exiled at the beginning of the next end step.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Eusocial Engineering
+Island x17
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Eusocial Engineering.Cast(Ability: Warp; Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Eusocial Engineering.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+[Bot1.End]
+
+[Expect]
+Exile = Eusocial Engineering
