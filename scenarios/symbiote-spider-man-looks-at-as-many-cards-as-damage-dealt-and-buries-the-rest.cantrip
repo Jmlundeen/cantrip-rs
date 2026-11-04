@@ -1,0 +1,48 @@
+# Symbiote Spider-Man (2/4): "Whenever this creature deals combat damage to a player, look at that many cards from the top of your library. Put one of them into
+# your hand and the rest into your graveyard." It deals 2: Bot1 looks at exactly the top two (the third card down is not touched), takes Ponder and the Lightning Bolt
+# goes to the graveyard. Taking both cards is refused: only one goes to the hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Symbiote Spider-Man
+Island x3
+Mountain
+Ponder
+Lightning Bolt
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Symbiote Spider-Man.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Attackers]
+Bot1.Attack(Symbiote Spider-Man > Bot2)
+! Bot1.Arrange(Ponder; Lightning Bolt | )
+Bot1.Arrange(Ponder | Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand = Island; Island; Island; Mountain; Ponder
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 21
+Stack.Count = 0
