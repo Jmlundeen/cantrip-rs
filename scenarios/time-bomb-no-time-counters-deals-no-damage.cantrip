@@ -1,0 +1,34 @@
+# Sacrificed before its first upkeep, Time Bomb has no time counters and deals no damage: the amount is the number of
+# counters on it, zero included (CR 608.2h, 120.8).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Time Bomb
+Ornithopter
+Island x25
+[Bot2 Deck]
+Island x25
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Time Bomb.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Time Bomb.Counters.Time = (absent)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Time Bomb.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+[Expect]
+Bot1.Graveyard.Time Bomb.Colors =
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Life = 20
+Bot2.Life = 20
