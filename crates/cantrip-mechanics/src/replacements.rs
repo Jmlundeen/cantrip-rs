@@ -2,6 +2,22 @@
 
 use cantrip_api::*;
 
+fn add_a_finality_counter(_: &dyn Query, _: &Asker, _: ObjectId, proposal: &mut Proposal) {
+    if let Proposal::ZoneChange(z) = proposal {
+        z.counters[CounterKind::Finality as usize] += 1;
+    }
+}
+
+/// "That creature enters with a finality counter" (CR 614.1c, 122.6): a replacement effect about a spell, applied as it
+/// enters the battlefield from the stack (`next_creature_counter::spell_enters`); Leonardo, Sewer Samurai and Overflow
+/// Submatrix.
+pub const SPELL_ENTERS_WITH_FINALITY: GrantedReplacementDef = granted_replacement(
+    ReplacementKind::ZoneChange,
+    crate::next_creature_counter::spell_enters,
+    add_a_finality_counter,
+    "enters with a finality counter on it",
+);
+
 /// "If one or more +1/+1 counters would be put on a [permanent of these types] you control, that many plus one +1/+1
 /// counters are put on it instead" (CR 122.6, 614.1a): whether it replaces this event. Keyed to the recipient, never to
 /// who puts the counters; a permanent entering with counters is judged as it would exist on the battlefield

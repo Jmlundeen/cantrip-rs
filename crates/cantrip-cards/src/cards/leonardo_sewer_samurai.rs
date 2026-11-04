@@ -1,6 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::next_creature_counter::spell_enters;
-use cantrip_mechanics::sneak;
+use cantrip_mechanics::{replacements, sneak};
 use cantrip_oracle as oracle;
 
 /// "During your turn, you may cast creature spells with power or toughness 1 or less from your graveyard": a way a permanent
@@ -18,16 +17,6 @@ fn cast_small_creature(q: &dyn Query, asker: &Asker, card: ObjectId, player: Pla
     Some(Cost::mana(q.card(c.card).cost))
 }
 
-/// "If you cast a spell this way, that creature enters with a finality counter on it" (CR 614.1c, 122.6): a replacement
-/// effect about the spell cast by the way (`GrantedWay::spell_replacement`), made as it is cast and so still applying if
-/// Leonardo has left before it resolves. It applies as that spell enters the battlefield from the stack
-/// (`next_creature_counter::spell_enters`).
-fn add_a_finality_counter(_: &dyn Query, _: &Asker, _: ObjectId, proposal: &mut Proposal) {
-    if let Proposal::ZoneChange(z) = proposal {
-        z.counters[CounterKind::Finality as usize] += 1;
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     ways: &[sneak::way(mana("{2}{W}{W}"), "Sneak {2}{W}{W}")],
     granted_ways: &[GrantedWay {
@@ -37,12 +26,10 @@ pub static CARD: CardDef = CardDef {
         spell_replacement: Some(0),
         ..GrantedWay::CAST
     }],
-    granted_replacements: &[granted_replacement(
-        ReplacementKind::ZoneChange,
-        spell_enters,
-        add_a_finality_counter,
-        "enters with a finality counter on it",
-    )
-    .text("If you cast a spell this way, that creature enters with a finality counter on it.")],
+    // "If you cast a spell this way, that creature enters with a finality counter on it": a replacement effect about the
+    // spell cast by the way (`GrantedWay::spell_replacement`), made as it is cast and so still applying if Leonardo has
+    // left before it resolves.
+    granted_replacements: &[replacements::SPELL_ENTERS_WITH_FINALITY
+        .text("If you cast a spell this way, that creature enters with a finality counter on it.")],
     ..oracle::LEONARDO_SEWER_SAMURAI
 };
