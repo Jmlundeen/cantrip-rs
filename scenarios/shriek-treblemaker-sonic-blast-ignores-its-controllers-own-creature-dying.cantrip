@@ -1,0 +1,49 @@
+# Sonic Blast triggers only for "a creature an opponent controls": Bot1's own Ornithopter dying to its own Lightning Bolt on
+# turn 3 deals no damage to anyone (the stack stays empty and both players stay at 20).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Shriek, Treblemaker
+Ornithopter
+Lightning Bolt
+Island
+Plains x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shriek, Treblemaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Choose()
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Ornithopter; Lightning Bolt
+Stack.Count = 0
