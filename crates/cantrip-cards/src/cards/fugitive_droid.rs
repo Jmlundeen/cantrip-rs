@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{counter_target, targets};
+use cantrip_mechanics::{counter_target, history, targets};
 use cantrip_oracle as oracle;
 
 /// "Can't be blocked if an artifact entered the battlefield under your control this turn" (CR 509.1b): asked of the history,
@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// has become since, wherever it has gone and whoever controls it now. Only the Droid's own attack is limited, and its
 /// controller is the one it has as blockers are declared.
 fn cant_be_blocked_if_an_artifact_entered_under_your_control(q: &dyn Query, source: ObjectId, _: ObjectId, attacker: ObjectId) -> bool {
-    source != attacker || !q.history().entered().any(|e| e.is(CardType::Artifact) && e.controller == q.controller(source))
+    source != attacker || !history::artifact_entered_under_control_this_turn(q.history(), q.controller(source))
 }
 
 /// "A spell that targets an artifact or creature you control" (CR 115.1, 115.9): a spell on the stack with at least one target

@@ -1,12 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, statics, triggers};
+use cantrip_mechanics::{effects, history, statics, triggers};
 use cantrip_oracle as oracle;
 
 /// "If an artifact entered the battlefield under your control this turn" (CR 603.4): a permanent that entered this turn under
 /// this ability's controller and was an artifact as it entered (CR 603.6a), whatever it is or who controls it now. Asked as it
 /// triggers and again as it resolves.
 fn an_artifact_entered_under_your_control_this_turn(q: &dyn Query, asker: &Asker) -> bool {
-    q.history().entered().any(|e| e.controller == asker.controller && e.is(CardType::Artifact))
+    history::artifact_entered_under_control_this_turn(q.history(), asker.controller)
 }
 
 pub static CARD: CardDef = CardDef {

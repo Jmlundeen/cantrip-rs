@@ -148,6 +148,14 @@ pub fn creatures_entered_under_control_this_turn(history: History<'_>, player: P
     history.entered().filter(|e| e.controller == player && e.is(CardType::Creature)).count()
 }
 
+/// "An artifact entered the battlefield under your control this turn" (CR 603.6a): a permanent that entered this turn under
+/// `player`'s control and was an artifact as it entered (the controller and card types `Event::Entered` holds), whatever it is
+/// or who controls it now - one that has since died, been stolen or stopped being an artifact still counts. Iron Man, Fugitive
+/// Droid and Mechan Shieldmate ask it.
+pub fn artifact_entered_under_control_this_turn(history: History<'_>, player: PlayerId) -> bool {
+    history.entered().any(|e| e.controller == player && e.is(CardType::Artifact))
+}
+
 /// The number of permanents `player` has sacrificed this turn (CR 701.21a): every permanent that went from the battlefield to a
 /// graveyard as a sacrifice this turn, token or not, under that player's control as it left. Asked of the history (CR 603.10a).
 /// Obsessive Pursuit counts them; Phoenix Fleet Airship asks whether there was one ("if you sacrificed a permanent this turn").
