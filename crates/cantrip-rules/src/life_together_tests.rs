@@ -228,10 +228,53 @@ static DARIEN: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+// Darien's printed trigger condition without the separate history-boundary probe's assumptions about life totals.
+fn review_dealt_to_you(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    if matches!(event, Event::Damage { target: Target::Player(p), .. } if *p == me.controller) {
+        Fired::PLAIN
+    } else {
+        None
+    }
+}
+
+static REVIEW_DARIEN: CardDef = CardDef {
+    name: "Damage Timing Darien, King of Kjeldor",
+    abilities: &[triggered(when_asked(EventMask::DAMAGE, review_dealt_to_you), nothing,
+        "Whenever you're dealt damage, you may create that many 1/1 white Soldier creature tokens.")],
+    ..DARIEN
+};
+
+fn review_counters_on_your_permanent(_: &dyn Query, me: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::Counters(c) if c.effect && c.controller == me.controller)
+}
+
+fn review_double_counters(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::Counters(c) = proposal {
+        for amount in &mut c.counts {
+            *amount *= 2;
+        }
+    }
+}
+
+/// Doubling Season's counter replacement; its token replacement is irrelevant to this combat.
+static REVIEW_SEASON: CardDef = CardDef {
+    name: "Damage Result Doubling Season",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    replacements: &[replacement(ReplacementKind::Counters, review_counters_on_your_permanent, review_double_counters,
+        "If an effect would put one or more counters on a permanent you control, it puts twice that many of those counters on that permanent instead.")],
+    ..CardDef::BLANK
+};
+
+static REVIEW_STINGER: CardDef = CardDef {
+    name: "Damage Result Plague Stinger",
+    keywords: Keywords::of(&[Keyword::Flying, Keyword::Infect]),
+    ..INFECT
+};
+
 fn game() -> Game {
     let table = Box::leak(Box::new(CardTable::new([
         &WATCHER, &DOUBLER, &EMPERION, &REMEDY, &DRAIN, &PYROHEMIA, &LIFELINKER, &PRIDEMATE, &ANGEL, &DARIEN,
-        &HAWK, &INFECT, &TOXIC, &ARMOR,
+        &HAWK, &INFECT, &TOXIC, &ARMOR, &REVIEW_DARIEN, &REVIEW_SEASON, &REVIEW_STINGER,
     ])));
     let mut g = Game::new(table, &Setup { decks: vec![Vec::new(); 4], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -420,6 +463,91 @@ fn damage_result_replacement_choices_rebuild_after_concession() {
         _ => None,
     }).collect();
     assert_eq!(recipients, vec![Target::Player(ACTIVE), Target::Player(LAST), Target::Player(YOU), Target::Player(FIRST)]);
+}
+
+/// CR 120.4b-c: Darien has already triggered when damage's life-loss replacements are chosen. Its owner leaving
+/// then removes the permanent (CR 800.4a), not the surviving controller's trigger (CR 603.3a, 800.4d).
+/// Reachable with Bribery taking Darien, two Bloodletters controlled by ACTIVE, and YOU activating Pyrohemia.
+#[test]
+fn darien_trigger_survives_owner_conceding_during_damage_life_replacements() {
+    for concede_owner in [false, true] {
+        let mut g = game();
+        let darien = put(&mut g, &REVIEW_DARIEN, ACTIVE);
+        // Bribery puts the opponent's card onto the battlefield under YOU's control; ownership is unchanged.
+        g.state.update_obj(darien, |o| o.controller = YOU);
+        g.state.see_statics();
+        put(&mut g, &DOUBLER, ACTIVE);
+        put(&mut g, &DOUBLER, ACTIVE);
+        let source = put(&mut g, &PYROHEMIA, YOU);
+        g.state.stack_push(pyrohemia_item(&g, source));
+        let serial = g.state.stack.last().unwrap().serial;
+        g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
+        g.run();
+        let request = g.pending().unwrap();
+        assert_eq!(request.player, LAST);
+        assert!(matches!(request.kind, RequestKind::ChooseReplacement { life: Some(-1), .. }));
+        assert_eq!(g.state.obj(darien).owner, ACTIVE);
+        assert_eq!(g.state.obj(darien).controller, YOU);
+
+        if concede_owner {
+            g.concede(ACTIVE);
+            assert!(!g.state.in_game(ACTIVE));
+            assert!(!g.state.battlefield().contains(&darien));
+            assert_eq!(changes(&g), vec![(LAST, -1), (YOU, -1), (FIRST, -1)]);
+        } else {
+            // Positive control: the same printed trigger is collected when its owner stays.
+            for player in [LAST, YOU, FIRST] {
+                let request = g.pending().cloned().unwrap();
+                assert_eq!(request.player, player);
+                g.answer(request.id, player, Answer::Index(0)).unwrap();
+                g.run();
+            }
+        }
+        assert!(g.state.in_game(YOU));
+        let pending = g.state.triggers.iter()
+            .filter(|t| t.source == darien && t.ability.index == 0 && t.controller == YOU).count();
+        let stacked = g.state.stack.iter()
+            .filter(|item| item.kind == StackKind::Triggered && item.object == darien && item.controller == YOU).count();
+        assert_eq!(pending + stacked, 1,
+            "Darien triggered at CR 120.4b and belongs to YOU even if its owner later leaves; concede_owner={concede_owner}");
+    }
+}
+
+/// CR 510.2, 120.4c, 616.1: results of the same combat damage are replaced in APNAP order, not all life choices
+/// before all counter choices. ACTIVE's Vampire Nighthawk is blocked by FIRST's Plague Stinger, while ACTIVE's
+/// Healer's Hawk hits FIRST. Two Doubling Seasons modify ACTIVE's -1/-1 counters; two Bloodletters modify FIRST's loss.
+#[test]
+fn damage_result_choices_are_apnap_across_counters_and_life() {
+    for with_life_choices in [false, true] {
+        let mut g = game();
+        let first_season = put(&mut g, &REVIEW_SEASON, ACTIVE);
+        let second_season = put(&mut g, &REVIEW_SEASON, ACTIVE);
+        if with_life_choices {
+            put(&mut g, &DOUBLER, ACTIVE);
+            put(&mut g, &DOUBLER, ACTIVE);
+        }
+        let nighthawk = put(&mut g, &LIFELINKER, ACTIVE);
+        let hawk = put(&mut g, &HAWK, ACTIVE);
+        let stinger = put(&mut g, &REVIEW_STINGER, FIRST);
+        g.state.set_attackers(vec![
+            Attacker { blocked: true, ..Attacker::new(nighthawk, Target::Player(FIRST), FIRST, TypeSet::NONE) },
+            Attacker::new(hawk, Target::Player(FIRST), FIRST, TypeSet::NONE),
+        ]);
+        g.state.set_blocks(vec![Block { blocker: stinger, attacker: nighthawk, first_strike: false }]);
+        g.state.update_turn(|t| t.set_step(Step::CombatDamage));
+        g.state.frame_push(Frame::new(FrameKind::BeginStep));
+        g.run();
+        let request = g.pending().expect("damage-result replacement order");
+        assert_eq!(request.player, ACTIVE,
+            "ACTIVE's counter-result choices precede FIRST's life-result choices; with_life_choices={with_life_choices}");
+        let RequestKind::ChooseReplacement { life: None, counters, sources, .. } = &request.kind else {
+            panic!("expected the active player's counter-result order: {:?}", request.kind);
+        };
+        assert_eq!(*counters, vec![(CounterKind::MinusOne, 1)]);
+        assert_eq!(*sources, vec![first_season, second_season]);
+        assert_eq!(life(&g), vec![20; 4]);
+        assert_eq!(g.state.obj(nighthawk).counters(CounterKind::MinusOne), 0);
+    }
 }
 
 #[test]
