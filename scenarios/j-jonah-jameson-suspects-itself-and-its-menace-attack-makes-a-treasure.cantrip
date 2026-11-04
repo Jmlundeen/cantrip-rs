@@ -1,0 +1,38 @@
+# J. Jonah Jameson's enter trigger may target any creature, JJJ himself included: he becomes suspected and has menace. When he attacks on turn 5 ("Whenever a creature you control with menace attacks") Bot1 creates one Treasure token. Bot2's Memnite is not suspected.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+J. Jonah Jameson
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.J. Jonah Jameson.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(J. Jonah Jameson)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.J. Jonah Jameson.Suspected = true
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(J. Jonah Jameson > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Memnite.Suspected = (absent)
+Bot1.Battlefield = J. Jonah Jameson; Mox Emerald; Mox Jet; Mox Ruby; Treasure Token
