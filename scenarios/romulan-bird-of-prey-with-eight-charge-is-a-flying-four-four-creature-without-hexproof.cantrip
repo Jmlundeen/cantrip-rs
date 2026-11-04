@@ -1,0 +1,62 @@
+# Romulan Bird-of-Prey at exactly 8 charge counters (four noncreature spells, 2 each) is an artifact creature (CR 721.2a-b,
+# Station 8+): 4/4 with flying, and no longer hexproof (CR 702.11b), so Bot2's Shatter may target it where it could not at 7.
+
+[Bot1 Deck]
+Black Lotus
+Romulan Bird-of-Prey
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Shatter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Romulan Bird-of-Prey.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Romulan Bird-of-Prey.Types = Artifact
+? Bot1.Battlefield.Romulan Bird-of-Prey.Counters.Charge = 6
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Romulan Bird-of-Prey.Counters.Charge = 8
+? Bot1.Battlefield.Romulan Bird-of-Prey.Types = Artifact; Creature
+? Bot1.Battlefield.Romulan Bird-of-Prey.Power = 4
+? Bot1.Battlefield.Romulan Bird-of-Prey.Toughness = 4
+? Bot1.Battlefield.Romulan Bird-of-Prey.Keywords = Flying
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Shatter.Cast(Bot1.Battlefield.Romulan Bird-of-Prey)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Romulan Bird-of-Prey; Black Lotus

@@ -1,0 +1,65 @@
+# Romulan Bird-of-Prey at 7 charge counters (three noncreature spells, 2 each, and one station of a 1-power creature) is
+# still no creature (Station 8+, CR 721.2a/702.184a): no flying, no 4/4, and it keeps hexproof (CR 702.11b) while the Mox Sapphire
+# next to it does not have it, so Bot2's Shatter may target the Mox but not the Bird.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mons's Goblin Raiders
+Romulan Bird-of-Prey
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Shatter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mons's Goblin Raiders.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Romulan Bird-of-Prey.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Romulan Bird-of-Prey.Counters.Charge = 6
+Bot1.Battlefield.Romulan Bird-of-Prey.Activate(Ability: Station)
+Bot1.Choose(Mons's Goblin Raiders)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Romulan Bird-of-Prey.Counters.Charge = 7
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+! Bot2.Hand.Shatter.Cast(Bot1.Battlefield.Romulan Bird-of-Prey)
+Bot2.Hand.Shatter.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Romulan Bird-of-Prey.Types = Artifact
+Bot1.Battlefield.Romulan Bird-of-Prey.Keywords = Hexproof
+Bot1.Battlefield.Romulan Bird-of-Prey.Counters.Charge = 7
+Bot1.Graveyard = Mox Sapphire; Black Lotus

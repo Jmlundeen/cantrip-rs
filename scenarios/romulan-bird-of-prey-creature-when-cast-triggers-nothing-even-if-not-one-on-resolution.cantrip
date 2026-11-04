@@ -1,0 +1,60 @@
+# Probe: a noncreature spell cast while the Bird-of-Prey is a creature (8 charge) triggers nothing (CR 603.4), even if it
+# stops being a creature before the trigger would resolve.
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Romulan Bird-of-Prey
+Vampire Hexmage
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Romulan Bird-of-Prey.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Romulan Bird-of-Prey.Counters.Charge = 8
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vampire Hexmage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Romulan Bird-of-Prey)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Romulan Bird-of-Prey.Counters.Charge = (absent)

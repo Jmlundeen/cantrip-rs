@@ -1,0 +1,7 @@
+{
+  "name": "Romulan Bird-of-Prey",
+  "manaCost": "{1}{U}",
+  "type": "Artifact — Spacecraft",
+  "stationPt": "4/4",
+  "oracleText": "Cloaking Device — As long as this Spacecraft isn't a creature, it has hexproof.\nWhenever you cast a noncreature spell, if this Spacecraft isn't a creature, put two charge counters on it.\nStation\n8+ | Flying"
+}

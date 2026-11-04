@@ -1,0 +1,24 @@
+# Romulan Bird-of-Prey's second ability puts two charge counters on it whenever its controller casts a noncreature spell
+# while it isn't a creature (its Station 8+ is not met yet), so a Mox Sapphire stations it once.
+
+[Bot1 Deck]
+Romulan Bird-of-Prey
+Mox Sapphire
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Romulan Bird-of-Prey.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Romulan Bird-of-Prey.Counters.Charge = 2
