@@ -1,0 +1,6 @@
+{
+  "name": "Bombard",
+  "manaCost": "{2}{R}",
+  "type": "Instant",
+  "oracleText": "Bombard deals 4 damage to target creature."
+}

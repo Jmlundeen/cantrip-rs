@@ -1,0 +1,54 @@
+# "Bombard deals 4 damage to target creature." On turn 1 Bot1 casts one at its own Raging Goblin (a creature of its own is a legal target) and it dies; Bot2 as a player is refused as a target. On turn 3 Bot1 casts one at Bot2's Colossal Dreadmaw (6/6): exactly 4 damage is marked on it (not 3 or 5) and it survives (CR 601.2c, 120.3).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Raging Goblin
+Bombard
+Bombard
+Mountain
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Gleemox
+Mox Pearl
+Colossal Dreadmaw
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+! Bot1.Hand.Bombard.Cast(Bot2)
+Bot1.Hand.Bombard.Cast(Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Gleemox.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Gleemox.Activate(Color: Green)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Colossal Dreadmaw.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Bombard.Cast(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Bombard; Black Lotus; Raging Goblin; Bombard; Black Lotus
+Bot2.Battlefield.Colossal Dreadmaw.Damage = 4
