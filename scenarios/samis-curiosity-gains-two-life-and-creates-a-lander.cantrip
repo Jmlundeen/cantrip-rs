@@ -1,0 +1,22 @@
+# Sami's Curiosity ({G}): "You gain 2 life. Create a Lander token." Mox Emerald pays for it: Bot1 goes from 20 to 22 life and the
+# Lander token, an artifact, is on the battlefield with the Mox.
+
+[Bot1 Deck]
+Mox Emerald
+Sami's Curiosity
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sami's Curiosity.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield = Lander Token; Mox Emerald
+Bot1.Graveyard = Sami's Curiosity
