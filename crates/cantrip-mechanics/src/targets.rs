@@ -30,7 +30,7 @@ fn creature_planeswalker_or_battle_filter(q: &dyn Query, _: &Asker, t: Target) -
 /// the Source and Tandem Takedown print it.
 pub const CREATURE_PLANESWALKER_OR_BATTLE: TargetSpec = target(creature_planeswalker_or_battle_filter);
 
-fn creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+pub fn creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Creature))
 }
 
