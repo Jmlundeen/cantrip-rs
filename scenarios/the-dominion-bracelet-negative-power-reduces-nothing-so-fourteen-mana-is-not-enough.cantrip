@@ -1,0 +1,71 @@
+# The Dominion Bracelet's ability costs {X} less, where X is the equipped creature's power: a power below zero reduces nothing
+# (CR 601.2f, 107.1b), so the cost stays {15}. Grizzly Bears with the Bracelet and De-evolve (-4/-0) is a -1/3; with fourteen
+# mana among its untapped permanents Bot1 can't activate it.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Pearl
+Grizzly Bears
+The Dominion Bracelet
+Black Lotus
+Sol Ring
+Mana Vault
+De-evolve
+Mox Sapphire
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Dominion Bracelet.Cast
+Bot1.Pass
+
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.The Dominion Bracelet.Activate(Grizzly Bears)
+Bot1.Pass
+
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mana Vault.Cast
+Bot1.Pass
+
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.De-evolve.Cast(Grizzly Bears)
+Bot1.Pass
+
+[T9 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+
+[T11 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+
+[T11 Bot1.Main2]
+? Bot1.Battlefield.Grizzly Bears.Power = -1
+! Bot1.Battlefield.Grizzly Bears.Activate(Mana: short)
+
+[Expect]
+Bot1.Battlefield.The Dominion Bracelet.AttachedTo = Grizzly Bears
+Exile.Count = 0

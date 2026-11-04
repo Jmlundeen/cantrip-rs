@@ -1,0 +1,77 @@
+# The equipped power-3 Bears' granted "{15}, Exile The Dominion Bracelet" costs {12}; eleven mana floats, and the last is
+# paid with Krark-Clan Ironworks sacrificing the Bracelet itself. Once the mana is paid the Bracelet is gone (CR 400.7), so
+# it can't be exiled for the cost (CR 601.2g-h by way of 602.2b, 118.3): the activation is taken back with the Ironworks'
+# activation (CR 733.1), the Bracelet back on the battlefield, nothing exiled and Bot1 controlling none of Bot2's turns.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Pearl
+Grizzly Bears
+The Dominion Bracelet
+Black Lotus
+Sol Ring
+Mana Vault
+Krark-Clan Ironworks
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Dominion Bracelet.Cast
+Bot1.Pass
+
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.The Dominion Bracelet.Activate(Grizzly Bears)
+Bot1.Pass
+
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mana Vault.Cast
+Bot1.Pass
+
+[T7 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Krark-Clan Ironworks.Cast
+Bot1.Pass
+
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mana Vault.Activate
+Bot1.Battlefield.Grizzly Bears.Activate(Bot2)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: The Dominion Bracelet)
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Grizzly Bears.Power = 3
+
+[T9 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Forest; Grizzly Bears; Island; Krark-Clan Ironworks; Mana Vault; Mox Emerald; Mox Jet; Mox Pearl; Sol Ring; The Dominion Bracelet
+Bot2.NextTurnControlledBy = (absent)

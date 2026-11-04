@@ -1,0 +1,104 @@
+# Bot1 takes Bot2's Grizzly Bears, equipped with Bot2's The Dominion Bracelet, with Act of Treason. The Bracelet stays Bot2's
+# (CR 301.5d), but the ability it grants is the Bears', so only Bot1 can activate it (CR 602.2). "Exile The Dominion Bracelet"
+# names the Bracelet that granted it (CR 201.5a), and unlike a sacrifice (CR 701.21a) no rule limits it to a permanent Bot1
+# controls: Bot1 pays {12} (power 3), exiles Bot2's Bracelet, and controls Bot2 during Bot2's next turn (CR 723.1).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Black Lotus
+Act of Treason
+Sol Ring
+Mana Vault
+Mountain
+Mox Sapphire
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Island
+Island
+Island
+Grizzly Bears
+The Dominion Bracelet
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mana Vault.Cast
+Bot1.Pass
+
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Island#1.Activate
+Bot2.Hand.The Dominion Bracelet.Cast
+Bot2.Pass
+
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.The Dominion Bracelet.Activate(Grizzly Bears)
+Bot2.Pass
+
+[T9 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot1.Battlefield.Mountain#1.Activate
+? Bot1.Battlefield.Grizzly Bears.Power = 3
+? Bot2.Battlefield.The Dominion Bracelet.AttachedTo = Grizzly Bears
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mana Vault.Activate
+Bot1.Battlefield.Grizzly Bears.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+
+[T9 Bot1.Main2]
+? Exile = The Dominion Bracelet
+? Bot2.NextTurnControlledBy = Bot1
+
+[T10 Bot2.Main1]
+? Bot2.ControlledBy = Bot1
+
+[Expect]
+Exile = The Dominion Bracelet
+Bot2.Battlefield.Grizzly Bears.Power = 2
