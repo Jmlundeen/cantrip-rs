@@ -193,7 +193,8 @@ public sealed class MulliganTakenEvent : GameEventView
 /// <summary>
 /// A coin was flipped (CR 705). Public. A flip <see cref="Called"/> is won or lost: <see cref="Won"/> is whether
 /// <see cref="Player"/> won it, the way a card that says "if you lose the flip" reads it. A flip that cares only whether it
-/// comes up heads is not called, and no one wins or loses it (CR 705.2): <see cref="Heads"/> is what it came up.
+/// comes up heads is not called, and no one wins or loses it (CR 705.2): <see cref="Heads"/> is what it came up. A flip an
+/// effect made come up heads and won (CR 705.3, Edgar, King of Figaro) is called, won and heads, whatever it was for.
 /// </summary>
 [MessagePackObject]
 public sealed class CoinFlippedEvent : GameEventView

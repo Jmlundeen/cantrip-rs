@@ -1919,10 +1919,10 @@ pub fn you_flip_a_coin(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired
     }
 }
 
-/// "Whenever you win a coin flip" (CR 705.2): a flip its controller wins.
+/// "Whenever you win a coin flip" (CR 705.2, 705.3): a flip its controller wins, one an effect makes them win included.
 pub fn you_win_a_flip(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::CoinFlipped { player, result: CoinFlip::Won } if *player == me.controller => Fired::PLAIN,
+        Event::CoinFlipped { player, result } if *player == me.controller && result.won() => Fired::PLAIN,
         _ => None,
     }
 }

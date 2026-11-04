@@ -52,6 +52,8 @@ mod cast_permission_tests;
 #[cfg(test)]
 mod cloak_tests;
 #[cfg(test)]
+mod coin_flip_rules_tests;
+#[cfg(test)]
 mod morph_tests;
 #[cfg(test)]
 mod face_down_reveal_tests;
@@ -1448,6 +1450,19 @@ impl<'a> Cx<'a> {
         settle::collect_batch(self, events, before, start);
     }
 
+    /// `player` flips `n` coins together (CR 705.1), each made a result by `natural` from its face (the first face wins, or is
+    /// heads), unless an effect says what they come to (CR 705.3, `static_rules::coin_flips_won_on_heads`): asked once of the
+    /// whole set before any is flipped, it ignores the coins' faces, and each comes up heads and is won. The flips happen
+    /// together (CR 603.2c).
+    fn flip_together(&mut self, player: PlayerId, n: u32, natural: fn(bool) -> CoinFlip) -> Vec<CoinFlip> {
+        let fixed = static_rules::coin_flips_won_on_heads(self, self.cards(), player);
+        let results: Vec<CoinFlip> =
+            (0..n).map(|_| if fixed { CoinFlip::WonHeads } else { natural(self.g.state.roll_die(2) == 1) }).collect();
+        let events: Vec<Event> = results.iter().map(|&result| Event::CoinFlipped { player, result }).collect();
+        self.emit_batch(&events, None);
+        results
+    }
+
     /// Records an event in the history without looking for triggers: the records no ability triggers on.
     pub fn record(&mut self, event: Event) {
         let turn = self.g.state.turn;
@@ -2252,16 +2267,12 @@ impl cantrip_api::Game for Cx<'_> {
         index
     }
 
-    fn flip_coin(&mut self, player: PlayerId) -> bool {
-        let won = self.g.state.roll_die(2) == 1;
-        self.emit(Event::CoinFlipped { player, result: if won { CoinFlip::Won } else { CoinFlip::Lost } });
-        won
+    fn flip_coins(&mut self, player: PlayerId, n: u32) -> Vec<bool> {
+        self.flip_together(player, n, |won| if won { CoinFlip::Won } else { CoinFlip::Lost }).into_iter().map(CoinFlip::won).collect()
     }
 
-    fn flip_coin_for_heads(&mut self, player: PlayerId) -> bool {
-        let heads = self.g.state.roll_die(2) == 1;
-        self.emit(Event::CoinFlipped { player, result: if heads { CoinFlip::Heads } else { CoinFlip::Tails } });
-        heads
+    fn flip_coins_for_heads(&mut self, player: PlayerId, n: u32) -> Vec<bool> {
+        self.flip_together(player, n, |heads| if heads { CoinFlip::Heads } else { CoinFlip::Tails }).into_iter().map(CoinFlip::heads).collect()
     }
 
     fn random(&mut self, bound: u32) -> u32 {

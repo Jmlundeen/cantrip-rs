@@ -538,9 +538,9 @@ impl Teller<'_> {
             }
             Proto::Coin { player, result } => Some(GameEventView::CoinFlippedEvent(CoinFlippedEvent {
                 player: seat(*player),
-                won: *result == CoinFlip::Won,
-                called: matches!(result, CoinFlip::Won | CoinFlip::Lost),
-                heads: *result == CoinFlip::Heads,
+                won: result.won(),
+                called: matches!(result, CoinFlip::Won | CoinFlip::Lost | CoinFlip::WonHeads),
+                heads: result.heads(),
             })),
             Proto::Kept { player, cards } => Some(GameEventView::HandKeptEvent(HandKeptEvent { player: seat(*player), cards: *cards })),
             Proto::TurnEnded { player } => Some(GameEventView::TurnEndedEvent(TurnEndedEvent { player: seat(*player) })),

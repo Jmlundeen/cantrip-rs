@@ -19,11 +19,12 @@ fn each_target_discards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 
 /// "−7: Flip five coins. Target opponent skips their next X turns, where X is the number of coins that came up heads."
 /// Flips that care only whether they come up heads are won or lost by no one (CR 705.2). Each turn to skip is a
-/// replacement effect of one of that player's turns beginning (CR 500.11, 614.10); X of zero skips none. With the
+/// replacement effect of one of that player's turns beginning (CR 500.11, 614.10); X of zero skips none. The five are flipped
+/// together, one set of flips (Edgar, King of Figaro's ruling). With the
 /// opponent no longer a legal target the ability does not resolve (CR 608.2b), and no coin is flipped.
 fn skip_turns(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = targets::player(g, item, 0) else { return Ok(()) };
-    let heads = (0..5).filter(|_| g.flip_coin_for_heads(item.controller)).count();
+    let heads = g.flip_coins_for_heads(item.controller, 5).into_iter().filter(|&heads| heads).count();
     g.skip_next_turns(item.object, opponent, heads as u32);
     Ok(())
 }

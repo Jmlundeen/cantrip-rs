@@ -755,6 +755,13 @@ pub fn cant_draw(q: &dyn Query, cards: &'static CardTable, player: PlayerId, n: 
     any_static(q, cards, |d| d.cant_draw, |rule, asker| rule(q, asker, player, n))
 }
 
+/// Whether the coins `player` is about to flip together come up heads and are won (CR 705.3): a static ability of a permanent
+/// with its abilities, or of an emblem, says so (`CardDef::coin_flip_rules`: Edgar, King of Figaro's "the first time you flip
+/// one or more coins each turn, those coins come up heads and you win those flips").
+pub fn coin_flips_won_on_heads(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> bool {
+    any_static(q, cards, |d| d.coin_flip_rules, |rule, asker| rule(q, asker, player))
+}
+
 /// Whether `player` can't win the game (CR 104.2b): Platinum Angel's "your opponents can't win the game" (`CardDef::win_rules`).
 pub fn cant_win(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> bool {
     any_static(q, cards, |d| d.win_rules, |rule, asker| rule(q, asker, player))

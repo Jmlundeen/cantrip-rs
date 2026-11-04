@@ -2226,11 +2226,15 @@ pub struct MulliganTakenEvent {
 #[serde(rename_all = "PascalCase")]
 pub struct CoinFlippedEvent {
     pub player: i32,
-    /// Whether the player won a flip they called (CR 705.2); false for a flip no one calls.
+    /// Whether the player won the flip (CR 705.2, 705.3): a flip they called and won, or one an effect made come up heads and
+    /// won (`called` and `heads` both true then, even for a flip that cared only about heads); false for any other flip no one
+    /// calls.
     pub won: bool,
-    /// Whether the flip was called, to be won or lost; one that cares only whether it comes up heads is not (CR 705.2).
+    /// Whether the flip was called, to be won or lost; one that cares only whether it comes up heads is not (CR 705.2), unless
+    /// an effect made it come up heads and won (CR 705.3).
     pub called: bool,
-    /// For a flip no one calls, whether it came up heads; false otherwise.
+    /// Whether it came up heads: a flip no one calls that did, or one an effect made come up heads and won (CR 705.3); false
+    /// for any other called flip.
     pub heads: bool,
 }
 

@@ -6,13 +6,28 @@ use crate::history::Cast;
 
 /// What a coin flip came to (CR 705.2): a flip its player called is won or lost; one that cares only whether it comes up
 /// heads (Ral Zarek, Guest Lecturer's "the number of coins that came up heads") is heads or tails, and no one wins or
-/// loses it.
+/// loses it. An effect may fix a flip's result and that its player wins it (CR 705.3): such a flip came up heads and was
+/// won (`WonHeads`), whether or not it was called - one that cared only about heads is won too (Edgar, King of Figaro's
+/// ruling).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum CoinFlip {
     Won,
     Lost,
     Heads,
     Tails,
+    WonHeads,
+}
+
+impl CoinFlip {
+    /// Its player won it (CR 705.2, 705.3): what "whenever you win a coin flip" sees.
+    pub fn won(self) -> bool {
+        matches!(self, CoinFlip::Won | CoinFlip::WonHeads)
+    }
+
+    /// It came up heads: what an effect that cares only about heads counts (CR 705.2).
+    pub fn heads(self) -> bool {
+        matches!(self, CoinFlip::Heads | CoinFlip::WonHeads)
+    }
 }
 
 /// The damage's combat designation and its source's five colors as it dealt damage (CR 120.3, 609.7).

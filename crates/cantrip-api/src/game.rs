@@ -931,11 +931,22 @@ pub trait Game: Query {
     fn choose_at_random(&mut self, count: usize) -> usize;
     /// `player` flips a coin (CR 705.1): true if they win the flip (CR 705.2). A flip is a two-sided die whose first face
     /// wins; it is recorded as `Event::CoinFlipped` and is not a die roll.
-    fn flip_coin(&mut self, player: PlayerId) -> bool;
+    fn flip_coin(&mut self, player: PlayerId) -> bool {
+        self.flip_coins(player, 1)[0]
+    }
+    /// `player` flips `n` coins at once (CR 705.1), as one instruction ("flip five coins"): for each, true if they win it
+    /// (CR 705.2). Each flip is recorded as `Event::CoinFlipped`. An effect that fixes the result of the coins a player
+    /// flips (CR 705.3, `CardDef::coin_flip_rules`) is asked once, of the whole set, before any of them is flipped.
+    fn flip_coins(&mut self, player: PlayerId, n: u32) -> Vec<bool>;
     /// `player` flips a coin that cares only whether it comes up heads (CR 705.2): true for heads. No one wins or loses
     /// it, so "whenever you win a coin flip" does not trigger, and "whenever you flip a coin" does. Its face is the same
     /// two-sided die's (the first face is heads), recorded as `Event::CoinFlipped`.
-    fn flip_coin_for_heads(&mut self, player: PlayerId) -> bool;
+    fn flip_coin_for_heads(&mut self, player: PlayerId) -> bool {
+        self.flip_coins_for_heads(player, 1)[0]
+    }
+    /// `player` flips `n` coins at once that care only whether they come up heads (CR 705.2), as `flip_coins` does: for
+    /// each, true for heads.
+    fn flip_coins_for_heads(&mut self, player: PlayerId, n: u32) -> Vec<bool>;
     /// Moves a card already in a library to `from_top` cards from its top (0 is the top): "second from the top".
     fn place_in_library(&mut self, card: ObjectId, from_top: usize);
     /// "After this phase, there is an additional combat phase" (CR 500.8), from the precombat main phase or a combat phase: a

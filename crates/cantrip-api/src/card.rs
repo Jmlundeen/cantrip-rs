@@ -2734,6 +2734,13 @@ pub type LifeGainRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
 /// Leovold, Emissary of Trest): `cantrip_mechanics::statics` has both. Asked by `Game::cant_draw`.
 pub type DrawRule = fn(&dyn Query, &Asker, PlayerId, u32) -> bool;
 
+/// A static ability that fixes the result of coins a player flips (CR 705.3): true when the coins `player` is about to flip
+/// together come up heads and they win those flips, whatever the coins show and whether or not the flips were called. It is
+/// asked once of each set of coins flipped together, before any of them is flipped (`cantrip_rules::static_rules::coin_flips_won_on_heads`). Edgar, King
+/// of Figaro's "the first time you flip one or more coins each turn, those coins come up heads and you win those flips".
+pub type CoinFlipRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
+
+
 /// A static ability that says a player can't lose life (CR 119.8): true for `player`. Platinum Emperion's "your life total
 /// can't change" is this and a `LifeGainRule` together.
 pub type LifeLossRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
@@ -3388,6 +3395,8 @@ pub struct CardDef {
     /// abilities: a draw that can't happen does not, and no replacement effect replaces it (CR 614.17c); a choice to draw
     /// that many can't be taken (CR 121.3). See `Game::cant_draw`.
     pub cant_draw: &'static [DrawRule],
+    /// Its static abilities that fix the result of the coins a player flips (CR 705.3). See `CoinFlipRule`.
+    pub coin_flip_rules: &'static [CoinFlipRule],
     /// Its static abilities that keep a player from losing the game (CR 104.3, 704.5a-c), while it is on the battlefield with
     /// its abilities: "you can't lose the game" (Platinum Angel), "you don't lose the game for having 0 or less life"
     /// (Phyrexian Unlife). A concession still loses (CR 104.3a), and nothing stops a draw (CR 104.4).
@@ -3635,6 +3644,7 @@ impl CardDef {
         cant_gain_life: &[],
         cant_lose_life: &[],
         cant_draw: &[],
+        coin_flip_rules: &[],
         loss_rules: &[],
         win_rules: &[],
         infect_damage_to: &[],
@@ -3735,6 +3745,7 @@ impl CardDef {
             (!self.cant_gain_life.is_empty(), "a life gain rule"),
             (!self.cant_lose_life.is_empty(), "a life loss rule"),
             (!self.cant_draw.is_empty(), "a draw rule"),
+            (!self.coin_flip_rules.is_empty(), "a coin flip rule"),
             (!self.loss_rules.is_empty(), "loss rules"),
             (!self.win_rules.is_empty(), "win rules"),
             (!self.infect_damage_to.is_empty(), "an infect damage rule"),
