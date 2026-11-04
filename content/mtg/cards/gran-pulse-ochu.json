@@ -1,0 +1,11 @@
+{
+  "name": "Gran Pulse Ochu",
+  "manaCost": "{G}",
+  "type": "Creature — Plant Beast",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Deathtouch\n{8}: Until end of turn, this creature gets +1/+1 for each permanent card in your graveyard.",
+  "keywords": [
+    "Deathtouch"
+  ]
+}

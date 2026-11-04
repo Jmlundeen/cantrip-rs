@@ -1,0 +1,57 @@
+# Gran Pulse Ochu ({G}, 1/1 deathtouch): "{8}: Until end of turn, this creature gets +1/+1 for each permanent card in your graveyard."
+# On turn 3 two Black Lotuses are sacrificed for the {8} (with Mox Jet and Mox Ruby), and the graveyard also holds an instant
+# card, Lightning Bolt, which is not a permanent card (CR 110.4a), while Bot2's graveyard holds Bot2's own Black Lotus, which is
+# not in "your graveyard": the count is two, so Gran Pulse Ochu is a 3/3 (CR 608.2h). The {8} is paid exactly: six from the
+# Lotuses, one each from Mox Jet and Mox Ruby, the pool empty and Mox Emerald left untapped. The Wall of
+# Bot2, 0/4, blocks it and takes three damage, not enough to destroy it: deathtouch does (CR 702.2b). On turn 4 it is a 1/1 again.
+
+[Bot1 Deck]
+Gran Pulse Ochu
+Mox Emerald
+Mox Ruby
+Lightning Bolt
+Black Lotus
+Black Lotus
+Mox Jet
+Forest x15
+
+[Bot2 Deck]
+Black Lotus
+Steel Wall
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gran Pulse Ochu.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Steel Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gran Pulse Ochu.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Gran Pulse Ochu.Power = 3
+? Bot1.Battlefield.Gran Pulse Ochu.Toughness = 3
+Bot1.Attack(Gran Pulse Ochu > Bot2)
+Bot2.Block(Steel Wall > Gran Pulse Ochu)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Gran Pulse Ochu.Power = 1
+? Bot1.Battlefield.Gran Pulse Ochu.Toughness = 1
+
+[Expect]
+Bot2.Graveyard = Steel Wall; Black Lotus
+Bot1.Battlefield.Gran Pulse Ochu.Power = 1
