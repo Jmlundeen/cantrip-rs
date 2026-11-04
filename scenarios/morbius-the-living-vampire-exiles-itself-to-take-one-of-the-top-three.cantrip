@@ -1,0 +1,44 @@
+# Morbius the Living Vampire: "{U}{B}, Exile this card from your graveyard: Look at the top three cards of your library. Put one of
+# them into your hand and the rest on the bottom of your library in any order." Entomb puts Morbius in the graveyard; with only one
+# colour of mana the ability is refused, then with {U}{B} Bot1 takes the Forest and the Plains and Mountain go to the bottom.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Swamp
+Entomb
+Island x3
+Morbius the Living Vampire
+Plains
+Forest
+Mountain
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot1.Search(Morbius the Living Vampire)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Graveyard.Morbius the Living Vampire.Activate(Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Morbius the Living Vampire.Activate
+Bot1.Pass
+Bot1.Arrange(Forest | Plains; Mountain)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Forest
+Bot1.Library = Plains; Mountain
+Bot1.Graveyard = Entomb
+Bot1.Exile.Morbius the Living Vampire.Power = 3
+Stack.Count = 0

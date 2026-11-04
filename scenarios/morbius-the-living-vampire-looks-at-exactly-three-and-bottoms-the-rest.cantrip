@@ -1,0 +1,53 @@
+# Morbius the Living Vampire from a graveyard that Faithless Looting filled (no shuffle): the top three cards of a longer library
+# are Mountain, Swamp and Island - not the Forests below them. Bot1 takes the Swamp and puts the Island and Mountain on the bottom,
+# in that order, under the two Forests.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Faithless Looting
+Morbius the Living Vampire
+Island
+Island
+Plains
+Forest
+Mountain
+Swamp
+Island
+Forest
+Forest
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Morbius the Living Vampire; Plains)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Morbius the Living Vampire.Activate
+Bot1.Pass
+! Bot1.Arrange(Swamp; Island | Mountain)
+! Bot1.Arrange( | Swamp; Island; Mountain)
+Bot1.Arrange(Swamp | Island; Mountain)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Forest; Island; Island; Swamp
+Bot1.Library = Forest; Forest; Island; Mountain
+Bot1.Graveyard = Faithless Looting; Plains
+Bot1.Revealed = (absent)
+Bot2.Revealed = (absent)
+Stack.Count = 0
