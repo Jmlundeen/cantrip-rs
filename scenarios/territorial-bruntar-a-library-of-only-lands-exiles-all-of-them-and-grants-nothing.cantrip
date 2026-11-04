@@ -1,0 +1,36 @@
+# Territorial Bruntar: with no nonland card in the library, every card is exiled and there is nothing to cast (CR 701.13a).
+
+[Bot1 Deck]
+Territorial Bruntar
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Mountain
+Mountain
+Mountain x2
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Territorial Bruntar.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+! Bot1.Exile.Mountain.Play
+
+[Expect]
+Exile.Count = 3
+Bot1.Library.Count = 0

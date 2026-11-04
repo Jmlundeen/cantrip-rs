@@ -1,0 +1,50 @@
+# Territorial Bruntar {4}{R}{R} 6/6 Reach: "Landfall - Whenever a land you control enters, exile cards from the top of your library until you exile a nonland card.
+# You may cast that card this turn." The top Mountain is exiled on the way and cannot be played or cast; the Ornithopter (the nonland hit) is cast from
+# exile for free. Bot2's library is untouched.
+
+[Bot1 Deck]
+Territorial Bruntar
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Mountain
+Mountain
+Ornithopter
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Territorial Bruntar.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 2
+? Bot1.Library.Count = 10
+? Bot2.Library.Count = 13
+! Bot1.Exile.Mountain.Cast
+! Bot1.Exile.Mountain.Play
+Bot1.Exile.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Mountain
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Territorial Bruntar.Power = 6
+Bot1.Battlefield.Territorial Bruntar.Toughness = 6
+Bot1.Battlefield.Territorial Bruntar.Keywords = Reach
+Bot2.Library.Count = 13

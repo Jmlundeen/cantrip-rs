@@ -1,0 +1,11 @@
+{
+  "name": "Territorial Bruntar",
+  "manaCost": "{4}{R}{R}",
+  "type": "Creature — Beast",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Reach\nLandfall — Whenever a land you control enters, exile cards from the top of your library until you exile a nonland card. You may cast that card this turn.",
+  "keywords": [
+    "Reach"
+  ]
+}
