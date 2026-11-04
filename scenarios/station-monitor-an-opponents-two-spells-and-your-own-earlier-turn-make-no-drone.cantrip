@@ -1,0 +1,52 @@
+# Station Monitor: "Whenever YOU cast your second spell each turn". Bot1 casts Mox Pearl, Mox Sapphire and then the Monitor itself on turn 1: the Monitor is not on the battlefield for the first two, and its own
+# cast is the third, so there is no Drone. Bot2 then casts two spells of its own on turn 2: still none. On turn 3 Bot1 casts two spells and the count is fresh: one Drone, only now.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Station Monitor
+Mox Jet
+Mox Ruby
+Black Lotus
+Island
+Island x24
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Station Monitor.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Count = 3
+? Bot2.Battlefield.Count = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 4
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 5
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Drone Token; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Station Monitor
+Bot2.Battlefield = Mox Jet; Mox Ruby

@@ -1,0 +1,45 @@
+# Station Monitor {W}{U} 2/2: "Whenever you cast your second spell each turn, create a 1/1 colorless Drone artifact creature token with flying..." Per the ruling, spells cast earlier this turn count,
+# the Monitor's own cast included: on turn 3 Bot1 casts the Monitor with an Island and a Plains (the first spell, no trigger: it is not on the battlefield yet), then Mox Jet (the second): one Drone, a
+# 1/1 colorless artifact creature with flying that can block only creatures with flying. A third spell, Mox Ruby, is a negative control: still one Drone.
+
+[Bot1 Deck]
+Island
+Plains
+Station Monitor
+Mox Jet
+Mox Ruby
+Black Lotus
+Plains
+Island x23
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Station Monitor.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 3
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 4
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 5
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Drone Token; Island; Mox Jet; Mox Ruby; Plains; Station Monitor
+Bot1.Battlefield.Drone Token.Power = 1
+Bot1.Battlefield.Drone Token.Toughness = 1
+Bot1.Battlefield.Drone Token.Types = Artifact; Creature
+Bot1.Battlefield.Drone Token.Keywords = CanBlockOnlyCreaturesWithFlying; Flying
