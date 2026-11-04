@@ -1,0 +1,12 @@
+{
+  "name": "Agent Venom",
+  "manaCost": "{2}{B}",
+  "type": "Legendary Creature — Symbiote Soldier Hero",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flash\nMenace\nWhenever another nontoken creature you control dies, you draw a card and lose 1 life.",
+  "keywords": [
+    "Flash",
+    "Menace"
+  ]
+}
