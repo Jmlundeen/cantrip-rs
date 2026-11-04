@@ -1,0 +1,38 @@
+# Spider-Byte, Web Warden {2}{U}: "When Spider-Byte enters, return up to one target nonland permanent to its owner's hand." (CR 603.1, 115.1).
+# On turn 3 Black Lotus pays exactly three blue. A land (Bot2's Island) is refused as the target; Bot2's Memnite is accepted and goes back to
+# Bot2's hand, its owner's (CR 400.3), leaving the Island on the battlefield.
+
+[Bot1 Deck]
+Black Lotus
+Spider-Byte, Web Warden
+Island x20
+
+[Bot2 Deck]
+Island
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Spider-Byte, Web Warden.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Hand.Count = 7
+Bot2.Battlefield = Island
+Bot2.Graveyard =
+Bot1.Battlefield = Spider-Byte, Web Warden

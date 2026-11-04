@@ -1,0 +1,37 @@
+# Spider-Byte's "up to one target" (CR 601.2c, 115.1): two targets are refused; Bot1 chooses no target on turn 3, so nothing returns to a hand - Bot1's Ornithopter
+# and Bot2's Memnite both stay on the battlefield.
+
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Spider-Byte, Web Warden
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Spider-Byte, Web Warden.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Memnite)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Ornithopter; Spider-Byte, Web Warden
+Bot2.Battlefield = Memnite

@@ -1,0 +1,8 @@
+{
+  "name": "Spider-Byte, Web Warden",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Spider Avatar Hero",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When Spider-Byte enters, return up to one target nonland permanent to its owner's hand."
+}
