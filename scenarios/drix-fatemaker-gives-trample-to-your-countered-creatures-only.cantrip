@@ -1,0 +1,32 @@
+# Drix Fatemaker: its enters trigger puts a +1/+1 counter on Bot1's Ornithopter, which then has trample (CR 613.1f); Drix, with no counter, does not.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Ornithopter
+Drix Fatemaker
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Drix Fatemaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+? Bot1.Battlefield.Drix Fatemaker.Keywords = (absent)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot1.Battlefield.Drix Fatemaker.Keywords = (absent)
+Bot1.Battlefield.Drix Fatemaker.Power = 3

@@ -1,0 +1,26 @@
+# Drix Fatemaker's warp {1}{G} (CR 702.185a): Mox Emerald's {G} and Mox Pearl's {W} pay it exactly, with the pool empty after; a Mox Pearl alone is refused ({G} is needed). The enters
+# trigger puts its counter on Drix itself (the only creature), then at the beginning of the next end step Drix is exiled.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Drix Fatemaker
+Island x17
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Drix Fatemaker.Cast(Ability: Warp; Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Drix Fatemaker.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+[Bot1.End]
+
+[Expect]
+Exile = Drix Fatemaker

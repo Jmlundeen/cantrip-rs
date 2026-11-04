@@ -1,0 +1,27 @@
+# Drix Fatemaker: with its own +1/+1 counter (it targets itself) it has trample, and is a 4/3 (CR 613.1f).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Drix Fatemaker
+Island x16
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Drix Fatemaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Drix Fatemaker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Drix Fatemaker.Keywords = Trample
+Bot1.Battlefield.Drix Fatemaker.Power = 4
+Bot1.Battlefield.Drix Fatemaker.Toughness = 3

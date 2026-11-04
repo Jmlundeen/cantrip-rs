@@ -1,0 +1,33 @@
+# Drix Fatemaker: the counter may go on the opponent's Ornithopter, which Bot1 does not control and so gains no trample (CR 613.1f); nor does Drix, with no counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Drix Fatemaker
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Drix Fatemaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Drix Fatemaker.Keywords = (absent)
