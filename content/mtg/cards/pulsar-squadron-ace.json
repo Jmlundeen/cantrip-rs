@@ -1,0 +1,8 @@
+{
+  "name": "Pulsar Squadron Ace",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Pilot",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "When this creature enters, look at the top five cards of your library. You may reveal a Spacecraft card from among them and put it into your hand. Put the rest on the bottom of your library in a random order. If you didn't put a card into your hand this way, put a +1/+1 counter on this creature."
+}

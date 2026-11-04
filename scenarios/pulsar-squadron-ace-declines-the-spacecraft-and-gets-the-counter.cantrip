@@ -1,0 +1,41 @@
+# Pulsar Squadron Ace: "You may reveal" - Bot1 declines the Oberth-Class Starship among the top five, so nothing goes to the
+# hand and the Ace gets its +1/+1 counter. The Starship goes to the bottom with the rest.
+
+[Bot1 Deck]
+Pulsar Squadron Ace
+Mox Pearl
+Plains
+Island
+Island
+Island
+Island
+Island
+Oberth-Class Starship
+Island
+Island
+Island
+Lumen-Class Frigate
+Island x10
+
+[Bot2 Deck]
+Lumen-Class Frigate
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Hand.Pulsar Squadron Ace.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Arrange( | Island; Island; Island; Island; Oberth-Class Starship)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Battlefield.Pulsar Squadron Ace.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Pulsar Squadron Ace.Power = 2
+Bot1.Library.Count = 16

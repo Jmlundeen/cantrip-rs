@@ -1,0 +1,42 @@
+# Pulsar Squadron Ace: no Spacecraft among the top five (four Islands and a Plains), and the Lumen-Class Frigate is sixth,
+# out of reach. Nothing is put into the hand, so the Ace gets its +1/+1 counter: a 2/3. Nothing is revealed.
+
+[Bot1 Deck]
+Pulsar Squadron Ace
+Mox Pearl
+Plains
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Plains
+Lumen-Class Frigate
+Island x10
+
+[Bot2 Deck]
+Lumen-Class Frigate
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Hand.Pulsar Squadron Ace.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Arrange( | Island; Island; Island; Island; Plains)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Battlefield.Pulsar Squadron Ace.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Pulsar Squadron Ace.Power = 2
+Bot1.Battlefield.Pulsar Squadron Ace.Toughness = 3
+Bot1.Library.Count = 16

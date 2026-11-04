@@ -1,0 +1,43 @@
+# Pulsar Squadron Ace: "a Spacecraft card" - two are among the top five (Oberth-Class Starship and Lumen-Class Frigate); taking
+# both is refused, and Bot1 takes the Starship alone, the Frigate going to the bottom. No counter: a 1/2.
+
+[Bot1 Deck]
+Pulsar Squadron Ace
+Mox Pearl
+Plains
+Island
+Island
+Island
+Island
+Island
+Oberth-Class Starship
+Lumen-Class Frigate
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Lumen-Class Frigate
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Hand.Pulsar Squadron Ace.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+! Bot1.Arrange(Oberth-Class Starship; Lumen-Class Frigate | Island; Island; Island)
+Bot1.Arrange(Oberth-Class Starship | Lumen-Class Frigate; Island; Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Oberth-Class Starship
+Bot1.Revealed = Oberth-Class Starship
+Bot1.Battlefield.Pulsar Squadron Ace.Power = 1
+Bot1.Battlefield.Pulsar Squadron Ace.Toughness = 2
+Bot1.Library.Count = 15
