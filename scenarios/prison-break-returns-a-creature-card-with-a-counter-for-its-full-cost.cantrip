@@ -1,0 +1,40 @@
+# Prison Break for {4}{B} from the hand: Common Crook, discarded to Faithless Looting, comes back with an additional +1/+1 counter. Paid
+# with four Moxen and an Island.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Common Crook
+Prison Break
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Island x15
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Common Crook; Island)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Prison Break.Cast(Common Crook)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Common Crook.Power = 3
+Bot1.Battlefield.Common Crook.Toughness = 3
+Bot1.Battlefield.Common Crook.Tapped = false
