@@ -1,0 +1,53 @@
+# Equip {3} (CR 702.6a): cast on turn 1 beside two Ornithopters, Squire's Lightblade attaches itself to the first Ornithopter as it enters. On turn 3 the
+# equip, paid with three of Bot1's four untapped Moxen, moves it to the second Ornithopter for exactly {3}: the
+# pool is empty afterwards (a fourth Mox stays untapped), the second Ornithopter is a 1/2 and the first a 0/2 again.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Squire's Lightblade
+Ornithopter
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Squire's Lightblade.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Squire's Lightblade.Activate(Ability: Equip; Bot1.Battlefield.Ornithopter#2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Squire's Lightblade.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter#2.Power = 1
+Bot1.Battlefield.Ornithopter#2.Toughness = 2
+Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot1.Battlefield.Ornithopter#1.Toughness = 2
+Bot1.Battlefield.Mox Sapphire.Tapped = false

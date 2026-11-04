@@ -1,0 +1,46 @@
+# Squire's Lightblade has flash: on Bot2's turn 2, with Bot2's Ornithopter also on the battlefield, Bot1 casts it for exactly {W}.
+# Entering, its trigger refuses Bot2's Ornithopter (the target must be a creature Bot1 controls) and attaches it to one of Bot1's
+# Ornithopters, which gains first strike until end of turn (CR 702.7b) and, equipped, gets +1/+0 only (1/2): at the start of
+# turn 3 the first strike is gone, the Equipment still attached.
+
+[Bot1 Deck]
+Mox Pearl
+Ornithopter
+Ornithopter
+Squire's Lightblade
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Squire's Lightblade.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#1.Keywords = FirstStrike; Flying
+? Bot1.Battlefield.Ornithopter#1.Power = 1
+? Bot1.Battlefield.Ornithopter#1.Toughness = 2
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Squire's Lightblade.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+Bot1.Battlefield.Ornithopter#1.Power = 1
+Bot1.Battlefield.Ornithopter#1.Toughness = 2
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter#2.Power = 0
