@@ -1,0 +1,38 @@
+# Radiant Strike: "target artifact or tapped creature" (CR 115.1). Bot2's Llanowar Elves, untapped and no artifact, cannot be
+# targeted; its Ornithopter, an untapped artifact creature, can. It is destroyed and Bot1 gains 3 life (20 -> 23).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Radiant Strike
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Ornithopter
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Radiant Strike.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Hand.Radiant Strike.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Radiant Strike; Black Lotus
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Llanowar Elves.Tapped = false

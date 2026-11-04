@@ -1,0 +1,6 @@
+{
+  "name": "Radiant Strike",
+  "manaCost": "{3}{W}",
+  "type": "Instant",
+  "oracleText": "Destroy target artifact or tapped creature. You gain 3 life."
+}

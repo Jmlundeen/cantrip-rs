@@ -1,0 +1,44 @@
+# Radiant Strike (ruling 2025-07-25): if its target is illegal as it tries to resolve, it does not resolve and none of its effects
+# happen - Bot1 gains no life. Bot1 kills the attacking Llanowar Elves with Lightning Bolt in response; Radiant Strike is put into
+# the graveyard having done nothing, and Bot1 stays at 20.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Radiant Strike
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Hand.Radiant Strike.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Radiant Strike; Lightning Bolt; Black Lotus
+Bot2.Graveyard = Llanowar Elves

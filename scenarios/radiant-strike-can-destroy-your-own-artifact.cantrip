@@ -1,0 +1,29 @@
+# Radiant Strike: "target artifact" is any artifact, one's own too (CR 115.1). Bot1 destroys its own Mox Sapphire, after tapping it
+# for mana toward the spell, and gains 3 life.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Radiant Strike
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Radiant Strike.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Radiant Strike; Mox Sapphire; Black Lotus
