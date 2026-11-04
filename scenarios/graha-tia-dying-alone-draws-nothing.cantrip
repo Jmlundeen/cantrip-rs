@@ -1,0 +1,44 @@
+# G'raha Tia's Allagan Eye watches "other" creatures and artifacts: on turn 4 Bot2's Go for the Throat destroys G'raha Tia, the
+# only creature Bot1 has, and Bot1 draws nothing (its hand and library stay as they were); its own death is no other creature's
+# (CR 700.4, 603.10a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+G'raha Tia
+Plains x16
+
+[Bot2 Deck]
+Swamp
+Swamp
+Go for the Throat
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.G'raha Tia.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+? Bot1.Hand.Count = 4
+? Bot1.Library.Count = 12
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Go for the Throat.Cast(Bot1.G'raha Tia)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = G'raha Tia; Black Lotus
+? Stack =
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 12
