@@ -1,0 +1,58 @@
+# Starport Security: "if you control a creature with a +1/+1 counter on it" - Bot2's Rayblade Trooper puts a counter on itself, but
+# that is not Bot1's creature, so Bot1's activation on turn 3 costs the full {3}{W}: Bot1 floats five colours and spends W, B, R, G,
+# leaving exactly {U}. Bot2's Trooper is tapped.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Starport Security
+Swamp x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Rayblade Trooper
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Starport Security.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Rayblade Trooper.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Rayblade Trooper.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Starport Security.Activate(Bot2.Battlefield.Rayblade Trooper; Spend: W, B, R, G)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U}
+
+[Expect]
+Bot2.Battlefield.Rayblade Trooper.Tapped = true
+Bot1.Battlefield.Starport Security.Tapped = true

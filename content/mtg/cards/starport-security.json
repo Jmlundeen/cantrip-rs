@@ -1,0 +1,8 @@
+{
+  "name": "Starport Security",
+  "manaCost": "{W}",
+  "type": "Artifact Creature — Robot Soldier",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{3}{W}, {T}: Tap another target creature. This ability costs {2} less to activate if you control a creature with a +1/+1 counter on it."
+}
