@@ -878,13 +878,20 @@ pub fn exile_top_choose_one_may_play(g: &mut dyn Game, player: PlayerId, source:
 }
 
 /// "Exile the top `count` cards of `from`'s library face down. `who` may look at and play [it / those cards]" under `grant`
-/// (CR 406.3, 601.3, 305.1): the cards leave together face down, `who` looks at each that really reached exile (a
-/// replacement may send it elsewhere), and may play it under the grant. The cards still in exile. Headliner Scarlett (one,
-/// this turn) and Outrageous Robbery (X, for as long as they remain exiled) print it.
+/// (CR 406.3, 601.3, 305.1): `exile_face_down_may_look_and_play` of the top cards. The cards still in exile. Headliner Scarlett
+/// (one, this turn) and Outrageous Robbery (X, for as long as they remain exiled) print it.
 pub fn exile_top_face_down_may_look_and_play(g: &mut dyn Game, from: PlayerId, count: usize, who: PlayerId, grant: PlayGrant) -> Vec<ObjectId> {
     let top = top_of_library(g, from, count);
+    exile_face_down_may_look_and_play(g, &top, who, grant)
+}
+
+/// "Exile [these cards] face down. `who` may look at and play [them]" under `grant` (CR 406.3, 601.3, 305.1): the cards leave
+/// together face down, `who` looks at each that really reached exile (a replacement may send it elsewhere), and may play it under
+/// the grant. The cards still in exile. Black Cat, Cunning Thief (two chosen cards of a looked-at nine) and Outrageous Robbery
+/// (the top X) print it.
+pub fn exile_face_down_may_look_and_play(g: &mut dyn Game, cards: &[ObjectId], who: PlayerId, grant: PlayGrant) -> Vec<ObjectId> {
     let exiled: Vec<ObjectId> =
-        g.exile_face_down(&top, None).into_iter().filter(|&card| g.obj(card).zone.is(ZoneKind::Exile)).collect();
+        g.exile_face_down(cards, None).into_iter().filter(|&card| g.obj(card).zone.is(ZoneKind::Exile)).collect();
     g.look_at(who, &exiled);
     for &card in &exiled {
         g.allow_play(card, who, grant);
