@@ -132,26 +132,16 @@ pub fn look_at_target_players_hand(g: &mut dyn Game, item: &StackItem) -> Result
     Ok(())
 }
 
-/// "Look at target player's hand. You may choose a card from it [that passes `eligible`]": the ability's controller sees the hand
-/// (it is shown to them alone, not revealed) and may choose one eligible card. Looking is part of the ability, so the choice is
-/// asked of any hand that is not empty, even when nothing in it is eligible; an empty hand is nothing to look at. The card chosen
-/// is left for the caller to exile or discard; `purpose` and `kind` word the question. Deep Cavern Bat, Invasion of Gobakhan and
-/// Oildeep Gearhulk print it.
+/// "Look at target player's hand. You may choose a card from it": Deep-Cavern Bat and Oildeep Gearhulk (CR 701.20e, 608.2d).
 pub fn look_and_may_choose(
     g: &mut dyn Game,
     item: &StackItem,
     player: PlayerId,
     purpose: Purpose,
-    kind: &'static str,
-    eligible: fn(&dyn Query, ObjectId) -> bool,
+    rule: Selection,
 ) -> Result<Option<ObjectId>, Suspend> {
     let hand = g.state().zone(Zone::hand(player)).to_vec();
-    if hand.is_empty() {
-        return Ok(None);
-    }
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| eligible(&*g, c)).collect();
-    let rule = Selection::listed(Count::UpTo(u32::from(!eligible.is_empty())), &hand, eligible).called(kind);
-    Ok(crate::choose::select(g, item.controller, item.object, purpose, hand, rule)?.first().copied())
+    Ok(choose::select(g, item.controller, item.object, purpose, hand, rule)?.first().copied())
 }
 
 /// "Exile [that card]. For as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to

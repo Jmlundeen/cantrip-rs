@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::{THIS_ENTERS, ward};
-use cantrip_mechanics::{hand, targets};
+use cantrip_mechanics::{hand, select, targets};
 use cantrip_oracle as oracle;
 
 /// "When this creature enters, look at target player's hand. You may choose a card from it. If you do, that player discards that
@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// chosen card is discarded by that player (the discard can be replaced), and an empty hand is nothing to choose from.
 fn look_and_swap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(player) = targets::player(g, item, 0) else { return Ok(()) };
-    if let Some(card) = hand::look_and_may_choose(g, item, player, Purpose::TakeFromHand, "", |_, _| true)? {
+    if let Some(card) = hand::look_and_may_choose(g, item, player, Purpose::TakeFromHand, select::cards(select::up_to(1)))? {
         g.discard_together(&[card]);
         g.draw(player, 1);
     }

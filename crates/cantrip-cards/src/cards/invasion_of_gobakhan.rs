@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{hand, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{hand, select, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Look at target opponent's hand. You may exile a nonland card from it. For as long as that card remains exiled, its
@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// with nothing eligible, so the choice is asked of any hand that is not empty.
 fn take_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Player(opponent) = item.target(0) else { return Ok(()) };
-    let Some(card) = hand::look_and_may_choose(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))? else { return Ok(()) };
+    let Some(card) = hand::look_and_may_choose(g, item, opponent, Purpose::Exile, select::NONLAND_CARD)? else { return Ok(()) };
     hand::exile_owner_may_play_for_two_more(g, card);
     Ok(())
 }
