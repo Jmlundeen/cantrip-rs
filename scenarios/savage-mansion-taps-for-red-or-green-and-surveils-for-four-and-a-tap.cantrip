@@ -1,0 +1,51 @@
+# Savage Mansion, a red-green surveil land: it enters tapped (so nothing is offered on turn 1), taps for {R} on turn 3 and for {G} on turn 5 and offers no {W}. On turn 7 its
+# "{4}, {T}: Surveil 1." is refused with three Moxen's {3} in the pool and no fourth source, and goes through once Mox Pearl makes the fourth mana: the Swamp on top of the library
+# goes to the graveyard and the pool is empty, so {4} is paid exactly.
+
+[Bot1 Deck]
+Savage Mansion
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Jet
+Island
+Island x3
+Swamp
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Savage Mansion.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+? Bot1.Battlefield.Savage Mansion.Tapped = true
+! Bot1.Battlefield.Savage Mansion.Activate(Color: Red)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Savage Mansion.Activate(Color: White)
+Bot1.Battlefield.Savage Mansion.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Savage Mansion.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Savage Mansion.Activate(Ability: Surveil; Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Savage Mansion.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Swamp)
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Swamp
+Bot1.Library.Count = 8
+Bot1.Battlefield.Savage Mansion.Tapped = true
+Bot1.Mana =
