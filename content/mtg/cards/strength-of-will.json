@@ -1,0 +1,6 @@
+{
+  "name": "Strength of Will",
+  "manaCost": "{1}{G}",
+  "type": "Instant",
+  "oracleText": "Until end of turn, target creature you control gains indestructible and \"Whenever this creature is dealt damage, put that many +1/+1 counters on it.\""
+}

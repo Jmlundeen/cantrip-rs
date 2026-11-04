@@ -1,0 +1,74 @@
+# Strength of Will {1}{G}: "Until end of turn, target creature you control gains indestructible and 'Whenever this creature is dealt damage, put that many +1/+1 counters on it.'"
+# Only a creature you control can be the target: Bot2's Grizzly Bears and Bot1's own Mox Emerald are refused. On turn 3 Bot1 gives its Grizzly Bears (2/2) the
+# gift and Bot2 Lightning Bolts it: three damage on a 2/2 would kill it, but it is indestructible and gets exactly three +1/+1 counters, a 5/5 with
+# 3 damage marked. On turn 4 the effect has ended: one Bolt makes no more counters (still 5/5), and a second Bolt, 6 damage in all, kills it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Strength of Will
+Forest x16
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Ruby
+Grizzly Bears
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby#1.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Strength of Will.Cast(Bot2.Battlefield.Grizzly Bears)
+! Bot1.Hand.Strength of Will.Cast(Bot1.Battlefield.Mox Emerald)
+Bot1.Hand.Strength of Will.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt#1.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 5
+? Bot1.Battlefield.Grizzly Bears.Toughness = 5
+? Bot1.Battlefield.Grizzly Bears.Damage = 3
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt#1.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 5
+? Bot1.Battlefield.Grizzly Bears.Damage = 3
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt#1.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Grizzly Bears; Strength of Will
+Bot2.Battlefield.Grizzly Bears.Power = 2

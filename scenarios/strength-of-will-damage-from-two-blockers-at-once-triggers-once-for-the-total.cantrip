@@ -1,0 +1,53 @@
+# Strength of Will: "Whenever this creature is dealt damage, put that many +1/+1 counters on it." Damage dealt at once by several
+# sources is one event, so the ability triggers once for the total (CR 510.2, 603.2c; Boros Reckoner's ruling). Bot1's Grizzly
+# Bears, given it on turn 3, attacks and is blocked by Bot2's two Memnites: they deal it 1 each at once, one trigger for 2, and
+# Hardened Scales adds one to that single placement - 3 counters, a 5/5. Had each Memnite's damage triggered on its own, Hardened
+# Scales would have added one to each - 4 counters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Hardened Scales
+Grizzly Bears
+Strength of Will
+Forest
+Forest x14
+
+[Bot2 Deck]
+Memnite
+Memnite
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Hardened Scales.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Strength of Will.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot2.Block(Memnite#1 > Grizzly Bears; Memnite#2 > Grizzly Bears)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Grizzly Bears.Damage = 2
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Grizzly Bears.Power = 5
