@@ -1,0 +1,58 @@
+# Impostor Syndrome triggers only for a creature "you control" that deals combat damage "to a player" (CR 603.2, 510.2). Bot1's
+# Memnite hits Bot2's Ral Zarek, Guest Lecturer on turn 3 with the Syndrome out: damage to a planeswalker, no token. On turn 4
+# Bot2's Memnite hits Bot1: an opponent's creature, no token for either side. Bot1 stays at 19, Memnites stay single.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Memnite
+Black Lotus
+Impostor Syndrome
+Island
+Island x30
+
+[Bot2 Deck]
+Black Lotus
+Ral Zarek, Guest Lecturer
+Memnite
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Impostor Syndrome.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Ral Zarek, Guest Lecturer)
+[T3 Bot1.Main2]
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Impostor Syndrome; Memnite; Mox Jet; Mox Ruby; Mox Sapphire

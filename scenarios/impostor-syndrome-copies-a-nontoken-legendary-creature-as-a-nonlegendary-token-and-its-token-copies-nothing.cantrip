@@ -1,0 +1,54 @@
+# Impostor Syndrome ({4}{U}{U}): "Whenever a nontoken creature you control deals combat damage to a player, create a token that's a copy
+# of it, except it isn't legendary." (CR 510.2, 603.2, 707.2, 707.9b, 111.1.) Marwyn, the Clearcutter (legendary, 2/1) is cast on
+# turn 1; on turn 3 the Syndrome comes down (Black Lotus and the three Moxen pay) and he attacks: a copy token that is not
+# legendary (so the legend rule leaves both, CR 704.5j), Bot2 at 18. On turn 5 both attack: the nontoken one makes another token, the
+# token's damage makes nothing (CR 111.7): three Marwyns, Bot2 at 14.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Marwyn, the Clearcutter
+Black Lotus
+Impostor Syndrome
+Island
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Marwyn, the Clearcutter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Impostor Syndrome.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Marwyn, the Clearcutter > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Battlefield.Marwyn, the Clearcutter#1.Supertypes = Legendary
+? Bot1.Battlefield.Marwyn, the Clearcutter#2.Supertypes = (absent)
+? Bot1.Battlefield.Marwyn, the Clearcutter#2.Power = 2
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Marwyn, the Clearcutter#1; Marwyn, the Clearcutter#2 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Marwyn, the Clearcutter#3.Supertypes = (absent)
+Bot1.Battlefield = Impostor Syndrome; Marwyn, the Clearcutter; Marwyn, the Clearcutter; Marwyn, the Clearcutter; Mox Jet; Mox Ruby; Mox Sapphire

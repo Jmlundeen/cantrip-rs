@@ -1,0 +1,44 @@
+# Impostor Syndrome triggers only on "combat damage" (CR 510.2, 603.2): Bot1's Prodigal Sorcerer, a nontoken creature it controls, pings
+# Bot2 on turn 3 with the Syndrome out. That is noncombat damage to a player (CR 120.2), so no copy is made: Bot2 at 19, one Sorcerer.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Prodigal Sorcerer
+Black Lotus
+Impostor Syndrome
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Prodigal Sorcerer.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Impostor Syndrome.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Prodigal Sorcerer.Activate(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield = Impostor Syndrome; Mox Jet; Mox Ruby; Mox Sapphire; Prodigal Sorcerer
