@@ -1,0 +1,43 @@
+# Silver Sable, Mercenary Leader: "When Silver Sable enters, put a +1/+1 counter on another target creature" (not herself, CR 115.1) and
+# "Whenever Silver Sable attacks, target modified creature you control gains lifelink until end of turn." A creature with a counter is
+# modified (CR 700.9). Bot1 has two Ornithopters; the counter goes on #1. When Sable attacks on turn 3 the only modified creature Bot1 controls is
+# that one (Sable herself, with no counter, and the other Ornithopter are not), so it is the one target and gains lifelink.
+
+[Bot1 Deck]
+Silver Sable, Mercenary Leader
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Silver Sable, Mercenary Leader.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Silver Sable, Mercenary Leader)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Attack(Silver Sable, Mercenary Leader > Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying; Lifelink
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+Bot1.Battlefield.Silver Sable, Mercenary Leader.Keywords = (absent)

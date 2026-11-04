@@ -1,0 +1,56 @@
+# Silver Sable, Mercenary Leader: a creature that is equipped is modified (CR 700.9) though it has no counter. Bot1 equips its
+# Ornithopter with Lavaspur Boots on turn 1. On turn 3 Sable's enters trigger puts its counter on Bot2's Ornithopter, which is then a
+# modified creature but not one Bot1 controls. When Sable attacks, the one modified creature Bot1 controls is its equipped Ornithopter,
+# the one target, and it gains lifelink; Sable herself, unmodified, does not.
+
+[Bot1 Deck]
+Silver Sable, Mercenary Leader
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Lavaspur Boots
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lavaspur Boots.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Lavaspur Boots.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Silver Sable, Mercenary Leader.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Attack(Silver Sable, Mercenary Leader > Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Lifelink
+Bot1.Battlefield.Silver Sable, Mercenary Leader.Keywords = (absent)
+Bot2.Battlefield.Ornithopter.Keywords = Flying
