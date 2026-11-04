@@ -1,0 +1,42 @@
+# Debris Field Crusher: "It's an artifact creature at 8+" and "8+ | Flying", printed 1/5: with seven charge counters, one short, it is not a creature, has no flying and no printed 1/5 (CR 721.2b). Bot1 taps Bebop & Rocksteady (power 7) to station it.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Pearl
+Debris Field Crusher
+Bebop & Rocksteady
+Island
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Debris Field Crusher.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bebop & Rocksteady.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Debris Field Crusher.Activate(Ability: Station)
+Bot1.Choose(Bebop & Rocksteady)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Debris Field Crusher.Counters.Charge = 7
+Bot1.Battlefield.Debris Field Crusher.Types = Artifact

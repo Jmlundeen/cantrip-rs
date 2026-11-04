@@ -1,0 +1,62 @@
+# Debris Field Crusher: "When this Spacecraft enters, it deals 3 damage to any target" (Bot2 goes 20 to 17). "Station ... 8+ | Flying", printed 1/5: on turn 3 Bot1 taps Phyrexian Soulgorger (power 8) to station it, and it is a 1/5 artifact creature with flying. "{1}{R}: This Spacecraft gets +2/+0 until end of turn." makes it 3/5, the toughness unchanged, and it is a 1/5 again from the next turn (CR 702.184a, 721.2b, 611.2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Debris Field Crusher
+Phyrexian Soulgorger
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Debris Field Crusher.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Phyrexian Soulgorger.Cast
+Bot1.Pass
+? Bot1.Battlefield.Debris Field Crusher.Types = Artifact
+Bot1.Battlefield.Debris Field Crusher.Activate(Ability: Station)
+Bot1.Choose(Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Debris Field Crusher.Counters.Charge = 8
+? Bot1.Battlefield.Debris Field Crusher.Types = Artifact; Creature
+? Bot1.Battlefield.Debris Field Crusher.Power = 1
+? Bot1.Battlefield.Debris Field Crusher.Toughness = 5
+? Bot1.Battlefield.Debris Field Crusher.Keywords = Flying
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Debris Field Crusher.Activate(Ability: +2/+0)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Debris Field Crusher.Power = 3
+? Bot1.Battlefield.Debris Field Crusher.Toughness = 5
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Debris Field Crusher.Power = 1
+Bot1.Battlefield.Debris Field Crusher.Toughness = 5
+Bot1.Battlefield.Debris Field Crusher.Keywords = Flying

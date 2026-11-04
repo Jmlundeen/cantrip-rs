@@ -1,0 +1,49 @@
+# Dress Down is on the battlefield before Debris Field Crusher enters. Eight charge counters turn on "8+ | Flying": one static ability whose effect began in layer 4, so its layer 6 and 7b parts keep applying although Dress Down, earlier in layer 6, took the Spacecraft's abilities - a 1/5 with flying (CR 613.6, 721.2b). Without the continuing parts it would be a 0/0 and die.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Phyrexian Soulgorger
+Dress Down
+Debris Field Crusher
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Phyrexian Soulgorger.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Debris Field Crusher.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+Bot1.Battlefield.Debris Field Crusher.Activate(Ability: Station)
+Bot1.Choose(Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Debris Field Crusher.Types = Artifact; Creature
+Bot1.Battlefield.Debris Field Crusher.Power = 1
+Bot1.Battlefield.Debris Field Crusher.Toughness = 5
+Bot2.Life = 17
