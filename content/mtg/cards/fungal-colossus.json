@@ -1,0 +1,8 @@
+{
+  "name": "Fungal Colossus",
+  "manaCost": "{6}{G}",
+  "type": "Creature — Fungus Beast",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "This spell costs {X} less to cast, where X is the number of differently named lands you control."
+}
