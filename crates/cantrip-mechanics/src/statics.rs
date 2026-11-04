@@ -794,8 +794,8 @@ pub fn artifacts_and_creatures_entering_dont_trigger(q: &dyn Query, _: &Asker, e
     })
 }
 
-/// "Nonbasic lands ...": every land without the basic supertype, judged as layers 1 to 3 left it (CR 205.4a, 613.1d).
-fn nonbasic_land(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, so_far: &Chars) -> bool {
+/// "Nonbasic lands ...": (Blood Moon, Magus of the Moon, Zhao, the Moon Slayer) every land without the basic supertype, judged as layers 1 to 3 left it (CR 205.4a, 613.1d).
+pub fn nonbasic_land(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, so_far: &Chars) -> bool {
     so_far.is(CardType::Land) && !so_far.supertypes.basic
 }
 

@@ -202,15 +202,24 @@ pub mod enter_tapped {
     pub const LANDS: u8 = 8;
 }
 
+/// Whether `proposal` is a permanent of one of the `WHICH` kinds entering the battlefield untapped, judged as it would exist
+/// there (CR 614.12); the part of the condition `opponents_enter_tapped` and `permanents_enter_tapped` share.
+fn untapped_entry_of_kind<const WHICH: u8>(q: &dyn Query, proposal: &Proposal) -> Option<PlayerId> {
+    let Proposal::ZoneChange(z) = proposal else { return None };
+    let c = q.chars(z.object);
+    let kind = (WHICH & enter_tapped::CREATURES != 0 && c.is(CardType::Creature))
+        || (WHICH & enter_tapped::ARTIFACTS != 0 && c.is(CardType::Artifact))
+        || (WHICH & enter_tapped::NONBASIC_LANDS != 0 && c.is(CardType::Land) && !c.supertypes.basic)
+        || (WHICH & enter_tapped::LANDS != 0 && c.is(CardType::Land));
+    (z.to.is(ZoneKind::Battlefield) && !z.tapped && kind).then_some(z.controller)
+}
+
 fn opponents_enter_tapped_applies<const WHICH: u8>(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
-    let Proposal::ZoneChange(z) = proposal else { return false };
-    z.to.is(ZoneKind::Battlefield) && !z.tapped && z.controller != asker.controller && {
-        let c = q.chars(z.object);
-        (WHICH & enter_tapped::CREATURES != 0 && c.is(CardType::Creature))
-            || (WHICH & enter_tapped::ARTIFACTS != 0 && c.is(CardType::Artifact))
-            || (WHICH & enter_tapped::NONBASIC_LANDS != 0 && c.is(CardType::Land) && !c.supertypes.basic)
-            || (WHICH & enter_tapped::LANDS != 0 && c.is(CardType::Land))
-    }
+    untapped_entry_of_kind::<WHICH>(q, proposal).is_some_and(|controller| controller != asker.controller)
+}
+
+fn permanents_enter_tapped_applies<const WHICH: u8>(q: &dyn Query, _: &Asker, proposal: &Proposal) -> bool {
+    untapped_entry_of_kind::<WHICH>(q, proposal).is_some()
 }
 
 fn opponents_enter_tapped_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
@@ -226,6 +235,13 @@ fn opponents_enter_tapped_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposa
 /// (artifacts, creatures, and lands) print it.
 pub const fn opponents_enter_tapped<const WHICH: u8>(hint: &'static str) -> ReplacementDef {
     replacement(ReplacementKind::ZoneChange, opponents_enter_tapped_applies::<WHICH>, opponents_enter_tapped_apply, hint)
+}
+
+/// "[Artifacts and lands / nonbasic lands] enter tapped" (CR 614.1d), whoever controls them: `opponents_enter_tapped` without
+/// the opponents filter, the object judged as it would exist on the battlefield (CR 614.12). `WHICH` is a set of
+/// `enter_tapped` bits. Root Maze (artifacts and lands) and Zhao, the Moon Slayer (nonbasic lands) print it.
+pub const fn permanents_enter_tapped<const WHICH: u8>(hint: &'static str) -> ReplacementDef {
+    replacement(ReplacementKind::ZoneChange, permanents_enter_tapped_applies::<WHICH>, opponents_enter_tapped_apply, hint)
 }
 
 /// "If you would gain life" (CR 119.10, 614.1a): a gain of life by the effect's controller. Zero is no gain.
