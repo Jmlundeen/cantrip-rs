@@ -1,0 +1,58 @@
+# Dual-Sun Adepts: double strike, and "{5}: Creatures you control get +1/+1 until end of turn" (CR 611.2c, 613.4c). On turn three Bot1
+# holds only four mana, so the ability is refused (the cost is five, not four); with Black Lotus's three it pays and leaves two
+# behind (five, not four or six). The Adepts (2/2) becomes 3/3 and Bot1's Memnite 2/2, Bot2's Ornithopter stays 0/2 (Bot1's creatures
+# only), and on Bot2's turn the Adepts and the Memnite are back to 2/2 and 1/1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Dual-Sun Adepts
+Memnite
+Black Lotus
+Plains
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Plains x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Dual-Sun Adepts.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+! Bot1.Battlefield.Dual-Sun Adepts.Activate(Mana: short)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Dual-Sun Adepts.Activate
+? Bot1.Mana = {W}{W}
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Dual-Sun Adepts.Power = 3
+? Bot1.Battlefield.Dual-Sun Adepts.Toughness = 3
+? Bot1.Battlefield.Dual-Sun Adepts.Keywords = DoubleStrike
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Toughness = 2
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Dual-Sun Adepts.Power = 2
+Bot1.Battlefield.Dual-Sun Adepts.Toughness = 2
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Memnite.Toughness = 1
