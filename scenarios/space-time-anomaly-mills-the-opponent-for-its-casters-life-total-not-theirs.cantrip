@@ -1,0 +1,39 @@
+# Space-Time Anomaly {2}{W}{U}: "Target player mills cards equal to your life total." Bot1 pays with Ancient Tomb's {C}{C} (2 damage to its controller, life 18), the Pearl's W and the Sapphire's U, exactly,
+# and targets Bot2, whose life total is still 20: Bot2 mills 18 of its 23 cards, not 20 (CR 119.1: "your" is the caster). A permanent is no target for it.
+
+[Bot1 Deck]
+Ancient Tomb
+Mox Pearl
+Mox Sapphire
+Space-Time Anomaly
+Island
+Island
+Island
+Island x23
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Life = 18
+! Bot1.Hand.Space-Time Anomaly.Cast(Bot1.Battlefield.Ancient Tomb)
+Bot1.Hand.Space-Time Anomaly.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot2.Library.Count = 5
+Bot2.Graveyard.Count = 18
+Bot1.Library.Count = 23
+Bot1.Graveyard = Space-Time Anomaly

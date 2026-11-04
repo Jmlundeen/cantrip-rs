@@ -1,0 +1,56 @@
+# Space-Time Anomaly {2}{W}{U}: "Target player mills cards equal to your life total." Bot1, at 1 life, casts Platinum Angel on turn one with the Black Lotus and four Moxen, and on turn three taps Ancient Tomb
+# (2 damage: life -1, yet it does not lose the game, CR 704.5a, 104.3b). A life total below zero is zero cards (CR 107.1b, 701.17a): Bot2 mills nothing (its one graveyard card is its turn-two discard to hand size).
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Platinum Angel
+Space-Time Anomaly
+Ancient Tomb
+Island x22
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Platinum Angel.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Life = -1
+Bot1.Hand.Space-Time Anomaly.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = -1
+Bot2.Library.Count = 22
+Bot2.Graveyard.Count = 1
+Bot1.Graveyard = Space-Time Anomaly; Black Lotus

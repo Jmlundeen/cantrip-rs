@@ -1,0 +1,6 @@
+{
+  "name": "Space-Time Anomaly",
+  "manaCost": "{2}{W}{U}",
+  "type": "Sorcery",
+  "oracleText": "Target player mills cards equal to your life total."
+}

@@ -1,0 +1,35 @@
+# Space-Time Anomaly {2}{W}{U}: "Target player mills cards equal to your life total." Bot1 (life 18 after Ancient Tomb's two damage) targets itself: it mills 18 of its 23 cards, and the
+# Anomaly, already on the stack when it resolves, lands in the graveyard after them (CR 608.2n), on top of them. The opponent's library is untouched.
+
+[Bot1 Deck]
+Ancient Tomb
+Mox Pearl
+Mox Sapphire
+Space-Time Anomaly
+Island
+Island
+Island
+Island x23
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Space-Time Anomaly.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot1.Library.Count = 5
+Bot1.Graveyard.Count = 19
+Bot2.Library.Count = 23
+Bot2.Graveyard.Count = 0
