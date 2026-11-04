@@ -1,0 +1,11 @@
+{
+  "name": "Swarm Culler",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Insect Warrior",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Flying\nWhenever this creature becomes tapped, you may sacrifice another creature or artifact. If you do, draw a card.",
+  "keywords": [
+    "Flying"
+  ]
+}
