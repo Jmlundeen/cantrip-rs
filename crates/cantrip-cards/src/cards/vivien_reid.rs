@@ -10,11 +10,6 @@ fn look_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Target artifact, enchantment, or creature with flying" (CR 115.1), read from what the layers give it now.
-fn destroyable(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::ARTIFACT_OR_ENCHANTMENT.filter)(q, asker, t) || (targets::CREATURE_WITH_FLYING.filter)(q, asker, t)
-}
-
 // --- The emblem ---------------------------------------------------------------------------------------------------
 
 /// "Creatures you control" (CR 114.4: the emblem's controller), from the command zone.
@@ -54,7 +49,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), look_and_take, "+1: Look at the top four cards of your library. You may reveal a creature or land card from among them and put it into your hand. Put the rest on the bottom of your library in a random order."),
         ability(loyalty(-3), effects::destroy_first_target, "\u{2212}3: Destroy target artifact, enchantment, or creature with flying.")
-            .targets(&[target(destroyable)]),
+            .targets(&[targets::ARTIFACT_ENCHANTMENT_OR_CREATURE_WITH_FLYING]),
         ability(loyalty(-8), emblem, "\u{2212}8: You get an emblem with \"Creatures you control get +2/+2 and have vigilance, trample, and indestructible.\""),
     ],
     ..oracle::VIVIEN_REID

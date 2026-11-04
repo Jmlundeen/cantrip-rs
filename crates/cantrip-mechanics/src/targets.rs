@@ -559,6 +559,14 @@ fn creature_with_flying_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool 
 /// Formation, Glorious Decay, Warg Tactics and Konstrari Charm print it.
 pub const CREATURE_WITH_FLYING: TargetSpec = target(creature_with_flying_filter);
 
+/// The filter of `ARTIFACT_ENCHANTMENT_OR_CREATURE_WITH_FLYING`, for a slot that is "up to one" of them.
+pub fn artifact_enchantment_or_creature_with_flying_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    artifact_or_enchantment_filter(q, asker, t) || creature_with_flying_filter(q, asker, t)
+}
+/// "Target artifact, enchantment, or creature with flying" (CR 115.1, 702.9): flying as the layers give it now. Vivien Reid,
+/// Mutant Chain Reaction (up to one) and Shattered Wings print it.
+pub const ARTIFACT_ENCHANTMENT_OR_CREATURE_WITH_FLYING: TargetSpec = target(artifact_enchantment_or_creature_with_flying_filter);
+
 /// "Target creature or enchantment" (CR 115.1): the filter itself, for a card that adds to it ("an opponent controls").
 /// Shredder's Technique prints it as it is and Feed the Swarm adds the opponent.
 pub fn creature_or_enchantment(q: &dyn Query, _: &Asker, t: Target) -> bool {
