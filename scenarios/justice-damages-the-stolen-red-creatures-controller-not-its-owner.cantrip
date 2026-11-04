@@ -1,0 +1,47 @@
+# Justice deals the damage to "that creature's controller" (CR 120.3, 608.2h), not its owner: Bot1 takes Bot2's Raging
+# Goblin with Control Magic and attacks Bot2 with it (haste); the Goblin deals 1 to Bot2, and Justice deals 1 to Bot1.
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Justice
+Black Lotus
+Mox Sapphire
+Control Magic
+Island x20
+[Bot2 Deck]
+Mountain
+Raging Goblin
+Island x20
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Justice.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Control Magic.Cast(Bot2.Battlefield.Raging Goblin)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Raging Goblin.Power = 1
+Bot1.Attack(Raging Goblin > Bot2)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
