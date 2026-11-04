@@ -1,0 +1,55 @@
+# Bumi Bash's first mode deals damage equal to the number of lands its controller has: Bot1 has two Mountains and Bot2 has
+# one, so the Hill Giant (3/3) takes exactly 2 and survives; counting all three lands, or Bot2's one, would not leave 2.
+# The four mana are paid exactly ({3}{R}: two Mountains and two Moxen), so the pool is empty right after the cast.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Bumi Bash
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Hill Giant
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hill Giant.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bumi Bash.Cast
+Bot1.Modes(Bumi Bash deals damage)
+Bot1.Target(Hill Giant)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Hill Giant.Damage = 2
+Bot1.Graveyard = Bumi Bash

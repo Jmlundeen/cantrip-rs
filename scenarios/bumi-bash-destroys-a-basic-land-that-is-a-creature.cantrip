@@ -1,0 +1,49 @@
+# Bumi Bash's second mode destroys a "land creature" even when it is a basic land: Badgermole Cub earthbends Bot1's
+# Forest (a basic land, now a creature). The Bash destroys it; the Forest's own delayed return (earthbend) puts it back
+# tapped as a plain land with no +1/+1 counter, so it is no longer a creature.
+
+[Bot1 Deck]
+Forest
+Mountain
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Badgermole Cub
+Bumi Bash
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Forest.Types = Land; Creature
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bumi Bash.Cast
+Bot1.Modes(Destroy target land creature)
+Bot1.Target(Forest)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Bumi Bash
+Bot1.Battlefield.Forest.Types = Land
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Forest.Counters.PlusOnePlusOne = (absent)

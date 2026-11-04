@@ -1,0 +1,42 @@
+# Bumi Bash's second mode: "Destroy target land creature or nonbasic land." Bot2's Wasteland is a nonbasic land and is
+# destroyed; Bot1's own Forest is a basic land that is not a creature, so it is refused.
+
+[Bot1 Deck]
+Forest
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Bumi Bash
+Island x13
+
+[Bot2 Deck]
+Wasteland
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Wasteland.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bumi Bash.Cast
+Bot1.Modes(Destroy target land creature)
+! Bot1.Target(Bot1.Battlefield.Forest)
+! Bot1.Target(Bot1.Battlefield.Mountain)
+Bot1.Target(Wasteland)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Wasteland
+Bot2.Battlefield = 
+Bot1.Battlefield = Forest; Mountain; Mox Ruby; Mox Jet
