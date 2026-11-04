@@ -1951,6 +1951,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::mill(self, player, count)
     }
 
+    fn mill_result(&mut self, player: PlayerId, count: u32) -> MillResult {
+        ops::mill_result(self, player, count)
+    }
+
     fn mill_together(&mut self, mills: &[(PlayerId, u32)]) -> Vec<ObjectId> {
         ops::mill_together(self, mills)
     }

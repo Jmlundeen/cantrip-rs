@@ -59,6 +59,15 @@ pub struct DamageResult {
     pub excess: u32,
 }
 
+/// A player's mill (CR 701.17) as it was carried out: `cards` are the new objects `Game::mill` returns, and `count` is the
+/// number the instruction became once the effects that change it applied (CR 614.1a, 614.6: The Water Crystal's "that
+/// many cards plus four instead"), which the library may not have held all of (CR 701.17b). "When you do" reads both.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MillResult {
+    pub cards: Vec<ObjectId>,
+    pub count: u32,
+}
+
 /// One thing that happened. Each names what it is about by id; a zone change names both the old object and the new
 /// one it became (CR 400.7).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

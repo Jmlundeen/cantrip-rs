@@ -409,6 +409,7 @@ fn subject_of(proposal: &Proposal) -> Option<ObjectId> {
         Proposal::Connive(c) => Some(c.creature),
         Proposal::DrawInstruction(_)
         | Proposal::Draw(_)
+        | Proposal::Mill(_)
         | Proposal::TokenCreation(_)
         | Proposal::PlayerCounters(_)
         | Proposal::LifeChange(_) => None,
@@ -442,6 +443,7 @@ fn affected(cx: &Cx, proposal: &Proposal) -> PlayerId {
         Proposal::PlayerCounters(c) => c.player,
         Proposal::DrawInstruction(d) => d.player,
         Proposal::Draw(d) => d.player,
+        Proposal::Mill(m) => m.player,
         // Whoever controls the conniving creature (last controlled, CR 701.50b), who is the one that draws and discards.
         Proposal::Connive(c) => cx.s().obj(c.creature).controller,
         Proposal::TokenCreation(t) => t.controller,
@@ -1416,6 +1418,20 @@ pub fn draw_count(cx: &mut Cx, player: PlayerId, count: u32) -> u32 {
     apply(cx, &mut proposal);
     match proposal {
         Proposal::DrawInstruction(d) => d.count,
+        _ => unreachable!("an effect cannot change the kind of the event"),
+    }
+}
+
+/// An instruction to mill cards (CR 701.17a): how many are milled once every effect that changes the number has applied
+/// (CR 614.1a), before any card moves.
+pub fn mill_count(cx: &mut Cx, player: PlayerId, count: u32) -> u32 {
+    if !possible(cx, None) {
+        return count;
+    }
+    let mut proposal = Proposal::Mill(MillInstruction { player, count });
+    apply(cx, &mut proposal);
+    match proposal {
+        Proposal::Mill(m) => m.count,
         _ => unreachable!("an effect cannot change the kind of the event"),
     }
 }

@@ -8,7 +8,7 @@ use crate::card::{CounterTo, Entering, EntersAs, FaceDown, LibraryPlace, TurnUp,
 use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef, CauseKind, PlayerCounter, TriggeredDef};
 use crate::chars::Chars;
 use crate::history::{History, Record};
-use crate::DamageResult;
+use crate::{DamageResult, MillResult};
 use crate::Event;
 
 /// A die roll (CR 706.2): the face the die showed, and the result once the roll was modified (CR 706.4).
@@ -656,6 +656,9 @@ pub trait Game: Query {
     /// that were put into a graveyard or, by a replacement effect, into exile instead (CR 701.17c): the cards "from among
     /// them" an effect looks at.
     fn mill(&mut self, player: PlayerId, count: u32) -> Vec<ObjectId>;
+    /// Mills as `mill` does, returning the cards and the number the instruction became once replacement effects changed it
+    /// (CR 614.1a): "mill N cards. When you do" asks whether the instruction as replaced was carried out in full.
+    fn mill_result(&mut self, player: PlayerId, count: u32) -> MillResult;
     /// Several players mill at once (CR 701.17, 101.4): "each player mills", "any number of target players each mill".
     /// Each pair is a player and how many they mill, worked out before any card moves; every card moves in one
     /// simultaneous zone change, one event, so "whenever one or more cards are milled" triggers once (CR 603.2c). The new

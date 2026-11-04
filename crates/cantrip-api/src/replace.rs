@@ -146,6 +146,16 @@ pub struct DrawInstruction {
     pub count: u32,
 }
 
+/// An instruction to mill cards (CR 701.17a), before any card moves: "if an opponent would mill one or more cards, they
+/// mill twice that many cards instead" (Bruvac the Grandiloquent) changes `count` (CR 614.1a). It is the instruction's
+/// number, which the library may not hold all of (CR 701.17b: as many as possible are milled once the effects have
+/// applied). Each player's mill of a "mill together" is its own.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct MillInstruction {
+    pub player: PlayerId,
+    pub count: u32,
+}
+
 /// A permanent about to connive (CR 701.50): "if a creature you control would connive, instead you draw a card, then that
 /// creature connives" (Leader, Super-Genius), what the effect does besides being its `ReplacementThen`. The creature is
 /// its last known information if it has left the battlefield (CR 701.50b); `count` is the N of connive N.
@@ -244,6 +254,7 @@ pub enum Proposal {
     DrawInstruction(DrawInstruction),
     Draw(CardDraw),
     Connive(Connive),
+    Mill(MillInstruction),
     Damage(DamageEvent),
     TokenCreation(TokenCreation),
     LifeChange(LifeChange),
@@ -259,6 +270,8 @@ pub enum ReplacementKind {
     Draw,
     /// A permanent conniving (CR 701.50): `Proposal::Connive`.
     Connive,
+    /// An instruction to mill cards (CR 701.17a): `Proposal::Mill`.
+    Mill,
     Damage,
     TokenCreation,
     LifeChange,
@@ -274,6 +287,7 @@ impl Proposal {
             Proposal::DrawInstruction(_) => ReplacementKind::DrawInstruction,
             Proposal::Draw(_) => ReplacementKind::Draw,
             Proposal::Connive(_) => ReplacementKind::Connive,
+            Proposal::Mill(_) => ReplacementKind::Mill,
             Proposal::Damage(_) => ReplacementKind::Damage,
             Proposal::TokenCreation(_) => ReplacementKind::TokenCreation,
             Proposal::LifeChange(_) => ReplacementKind::LifeChange,
