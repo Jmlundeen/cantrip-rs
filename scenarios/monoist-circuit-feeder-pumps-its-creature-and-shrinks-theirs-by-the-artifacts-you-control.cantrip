@@ -1,0 +1,57 @@
+# Monoist Circuit-Feeder (flying 4/4): "When this creature enters, until end of turn, target creature you control gets +X/+0 and
+# target creature an opponent controls gets -0/-X, where X is the number of artifacts you control." In turn 3 Bot1 pays {4}{B}{B}
+# with Mox Jet, Mox Pearl, Mox Emerald and Black Lotus (sacrificed for its mana, so not counted): X = Jet, Pearl, Emerald, Memnite
+# and the Circuit-Feeder itself = 5. Bot1's Memnite becomes 6/1 (power only) and Bot2's Wall of Earth (0/6) becomes 0/1
+# (toughness only). Bot2's Mox Ruby and Mox Jet are artifacts too but not counted: "you control". The first target refuses
+# Bot2's Wall of Earth and the second Bot1's own Circuit-Feeder: each slot takes only its side's creature.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Black Lotus
+Monoist Circuit-Feeder
+Memnite
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Wall of Earth
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wall of Earth.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: B)
+Bot1.Hand.Monoist Circuit-Feeder.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Wall of Earth)
+Bot1.Target(Memnite)
+! Bot1.Target(Monoist Circuit-Feeder)
+Bot1.Target(Wall of Earth)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 6
+Bot1.Battlefield.Memnite.Toughness = 1
+Bot1.Battlefield.Monoist Circuit-Feeder.Power = 4
+Bot1.Battlefield.Monoist Circuit-Feeder.Toughness = 4
+Bot1.Battlefield.Monoist Circuit-Feeder.Keywords = Flying
+Bot2.Battlefield.Wall of Earth.Power = 0
+Bot2.Battlefield.Wall of Earth.Toughness = 1
