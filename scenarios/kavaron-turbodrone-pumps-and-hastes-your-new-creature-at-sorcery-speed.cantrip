@@ -1,0 +1,39 @@
+# Kavaron Turbodrone (a 2/3): "{T}: Target creature you control gets +1/+1 and gains haste until end of turn. Activate only as a sorcery." Turn 1 it is cast off Black Lotus and is summoning sick until turn 3. Bot2's Memnite is not a creature Bot1 controls, so it is refused as a target. On turn 3 a Memnite (1/1) is cast, and with it on the stack the ability is refused though the target is fine (sorcery speed, CR 602.5d). Once it has resolved the ability goes on it: a 2/2 with haste that attacks the turn it came in, so Bot2 goes from 20 to 18, and the Turbodrone taps.
+
+[Bot1 Deck]
+Black Lotus
+Kavaron Turbodrone
+Memnite
+Memnite
+Island x23
+
+[Bot2 Deck]
+Memnite
+Island x26
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kavaron Turbodrone.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+! Bot1.Battlefield.Kavaron Turbodrone.Activate(Bot1.Battlefield.Kavaron Turbodrone)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Kavaron Turbodrone.Activate(Bot2.Battlefield.Memnite)
+Bot1.Battlefield.Kavaron Turbodrone.Activate(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Toughness = 2
+? Bot1.Battlefield.Memnite.Keywords = Haste
+Bot1.Attack(Memnite > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Kavaron Turbodrone.Tapped = true
