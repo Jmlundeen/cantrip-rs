@@ -15,7 +15,10 @@ pub fn chapter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn give_the_spell_a_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+/// The delayed trigger's effect, shared by every card whose trigger is about a creature spell as it is cast: it makes the
+/// replacement effect about that spell (the trigger's subject) for the turn, the card's granted replacement 0, applied as the
+/// spell enters the battlefield from the stack (CR 614.12). Wildgrowth Archaic and Torgal, A Fine Hound give it too.
+pub fn give_the_spell_a_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(spell) = item.subject {
         g.add_effect(item.object, spell, EffectKind::Replacement { card: item.ability.card, index: 0 }, Duration::EndOfTurn);
     }
@@ -29,7 +32,8 @@ pub const DELAYED: AbilityDef = triggered(
     "When you next cast a creature spell this turn, that creature enters with an additional +1/+1 counter on it.",
 );
 
-fn spell_enters(_: &dyn Query, _: &Asker, affected: ObjectId, proposal: &Proposal) -> bool {
+/// The replacement's condition: the creature spell it is about becomes a permanent (CR 614.12), shared by every card that gives one.
+pub fn spell_enters(_: &dyn Query, _: &Asker, affected: ObjectId, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z) if z.object == affected && z.from.is(ZoneKind::Stack) && z.to.is(ZoneKind::Battlefield))
 }
 

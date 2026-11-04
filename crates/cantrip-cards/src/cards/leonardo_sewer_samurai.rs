@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::next_creature_counter::spell_enters;
 use cantrip_mechanics::sneak;
 use cantrip_oracle as oracle;
 
@@ -19,12 +20,8 @@ fn cast_small_creature(q: &dyn Query, asker: &Asker, card: ObjectId, player: Pla
 
 /// "If you cast a spell this way, that creature enters with a finality counter on it" (CR 614.1c, 122.6): a replacement
 /// effect about the spell cast by the way (`GrantedWay::spell_replacement`), made as it is cast and so still applying if
-/// Leonardo has left before it resolves. It applies as that spell enters the battlefield from the stack.
-fn spell_enters(_: &dyn Query, _: &Asker, spell: ObjectId, proposal: &Proposal) -> bool {
-    matches!(proposal, Proposal::ZoneChange(z)
-        if z.object == spell && z.from.is(ZoneKind::Stack) && z.to.is(ZoneKind::Battlefield))
-}
-
+/// Leonardo has left before it resolves. It applies as that spell enters the battlefield from the stack
+/// (`next_creature_counter::spell_enters`).
 fn add_a_finality_counter(_: &dyn Query, _: &Asker, _: ObjectId, proposal: &mut Proposal) {
     if let Proposal::ZoneChange(z) = proposal {
         z.counters[CounterKind::Finality as usize] += 1;
