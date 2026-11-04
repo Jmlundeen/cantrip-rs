@@ -1,0 +1,8 @@
+{
+  "name": "Vaultguard Trooper",
+  "manaCost": "{4}{R}",
+  "type": "Creature — Kavu Soldier",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "At the beginning of your end step, if you control two or more tapped creatures, you may discard your hand. If you do, draw two cards."
+}

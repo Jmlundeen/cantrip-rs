@@ -1,0 +1,41 @@
+# Vaultguard Trooper: discarding an empty hand is allowed and counts as having done it, so "if you do" draws two cards. Bot1 plays its Island on turn one and its
+# drawn Plains on turn three, leaving an empty hand at the end step.
+
+[Bot1 Deck]
+Memnite
+Memnite
+Mox Ruby
+Mox Jet
+Black Lotus
+Vaultguard Trooper
+Island
+Plains
+Swamp
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vaultguard Trooper.Cast
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Vaultguard Trooper > Bot2; Memnite#1 > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 0
+Bot1.Accept
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Graveyard.Count = 1
