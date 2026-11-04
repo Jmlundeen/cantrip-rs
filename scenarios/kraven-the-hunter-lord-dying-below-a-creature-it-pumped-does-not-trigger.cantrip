@@ -1,0 +1,64 @@
+# Bot2's Bard's Company (2/3, "Other creatures you control get +1/+1") makes its Grizzly Bears a 3/3. Lightning Bolt kills the Company
+# alone. Kraven's ability looks back in time (CR 603.10a): just before the event the Bears had power 3, greater than the Company's 2, so
+# the Company was not the creature with the greatest power among those Bot2 controlled, and nothing triggers - though the Bears are a
+# 2/2 once it is gone. Bot2 recruits as the Company enters and discards an Island, so it makes no token.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Kraven the Hunter
+Lightning Bolt
+Lightning Bolt
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Bard's Company
+Grizzly Bears
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kraven the Hunter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Bard's Company.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Island)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Grizzly Bears.Power = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bard's Company)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot2.Battlefield.Grizzly Bears.Power = 2
+
+[Expect]
+Bot1.Battlefield.Kraven the Hunter.Power = 4
+Bot1.Hand.Count = 3
+Stack.Count = 0

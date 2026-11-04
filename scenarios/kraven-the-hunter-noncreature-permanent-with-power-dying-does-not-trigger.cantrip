@@ -1,0 +1,48 @@
+# Disenchant destroys Bot2's Smuggler's Copter, an uncrewed Vehicle: an artifact whose card prints a power of 3, but not a creature
+# (CR 208.3, 301.7a), so nothing "dies" (CR 700.4) and Kraven does not trigger: no card is drawn and he stays 4/3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Kraven the Hunter
+Mox Pearl
+Disenchant
+Island
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Smuggler's Copter
+Elvish Mystic
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kraven the Hunter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Smuggler's Copter.Cast
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Disenchant.Cast(Smuggler's Copter)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Kraven the Hunter.Power = 4
+Bot1.Hand.Count = 2
+Bot2.Battlefield.Count = 1
+Stack.Count = 0

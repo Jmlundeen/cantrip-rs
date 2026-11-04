@@ -1,0 +1,50 @@
+# Lightning Bolt kills Bot2's Grizzly Bears (power 2) while Elvish Mystic (power 1) lives: the Bears have the greatest power among the
+# creatures Bot2 controls (CR 208.1), so its death triggers Kraven alone (CR 700.4): Bot1 draws a card and Kraven gets a +1/+1 counter
+# (4/3 to 5/4). The paired scenario kills the Mystic instead, which is not the greatest, and nothing triggers.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Kraven the Hunter
+Lightning Bolt
+Lightning Bolt
+Island
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Elvish Mystic
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kraven the Hunter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Kraven the Hunter.Power = 5
+Bot1.Hand.Count = 4
+Bot2.Battlefield.Count = 1
+Stack.Count = 0

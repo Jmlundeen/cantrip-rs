@@ -1,0 +1,36 @@
+# Bot1 bolts its own Kraven the Hunter. He dies with the greatest power among the creatures Bot1 controls, and his ability looks back
+# (CR 603.10a), but he is no creature an opponent controls, so nothing triggers: no card is drawn.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Kraven the Hunter
+Lightning Bolt
+Lightning Bolt
+Island
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kraven the Hunter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Kraven the Hunter)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Kraven the Hunter; Lightning Bolt
+Bot1.Hand.Count = 3
+Stack.Count = 0

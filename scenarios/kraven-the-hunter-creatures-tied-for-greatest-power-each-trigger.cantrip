@@ -1,0 +1,54 @@
+# Pyroclasm kills Bot2's Elvish Mystic and Llanowar Elves together, both power 1. Each has the greatest power among the creatures Bot2
+# controlled just before (CR 603.10a, 208.1), so Kraven triggers for each: two cards drawn and two +1/+1 counters (4/3 to 6/5).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Kraven the Hunter
+Pyroclasm
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Elvish Mystic
+Llanowar Elves
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kraven the Hunter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Triggers(Kraven the Hunter; Kraven the Hunter)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Kraven the Hunter.Power = 6
+Bot1.Battlefield.Kraven the Hunter.Toughness = 5
+Bot1.Hand.Count = 5
+Bot2.Battlefield.Count = 0
+Stack.Count = 0

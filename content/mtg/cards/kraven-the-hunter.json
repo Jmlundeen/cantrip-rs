@@ -1,0 +1,11 @@
+{
+  "name": "Kraven the Hunter",
+  "manaCost": "{1}{B}{G}",
+  "type": "Legendary Creature — Human Warrior Villain",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Trample\nWhenever a creature an opponent controls with the greatest power among creatures that player controls dies, draw a card and put a +1/+1 counter on Kraven the Hunter.",
+  "keywords": [
+    "Trample"
+  ]
+}
