@@ -117,6 +117,7 @@ pub mod prepare;
 pub mod prototype;
 pub mod prevention;
 pub mod protection;
+pub mod raid;
 pub mod ravenous;
 pub mod recruit;
 pub mod reconfigure;
