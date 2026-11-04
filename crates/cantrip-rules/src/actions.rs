@@ -5709,7 +5709,8 @@ fn graveyard_play(cx: &Cx, player: PlayerId) -> Vec<Grant> {
 /// text (CR 709.5). Then the play rules the permanents they control were given (`AbilityDef::PlayRule`, CR 613.1f): each
 /// one the permanent has among its abilities once layer 6 is done, so one a later "loses all abilities" took is gone (CR
 /// 613.7) and one given after it stays; looked for only while one might have been given
-/// (`layers::play_rules_given_possible`).
+/// (`layers::play_rules_given_possible`). Last, the play rules resolved effects gave the player (`EffectKind::PlayerPlayRule`,
+/// CR 611.2a), each named by its `AbilityRef::delayed` with the effect's source: about the player, whatever the source is now.
 pub fn each_play_rule(q: &dyn Query, cards: &CardTable, player: PlayerId, command: bool, mut f: impl FnMut(ObjectId, &'static PlayRule)) {
     each_play_rule_named(q, cards, player, command, |source, _, rule| f(source, rule));
 }
@@ -5766,6 +5767,14 @@ pub fn each_play_rule_named(q: &dyn Query, cards: &CardTable, player: PlayerId, 
                     f(id, ability, &given.rule);
                 }
             }
+        }
+    }
+    for e in &s.effects {
+        if let EffectKind::PlayerPlayRule(ability) = e.kind
+            && e.controller == player
+            && let AbilityDef::PlayRule(given) = cards.ability(ability)
+        {
+            f(e.source, ability, &given.rule);
         }
     }
 }
@@ -5894,7 +5903,8 @@ pub fn maximum_hand_size(cx: &Cx, player: PlayerId) -> Option<u32> {
 }
 
 /// Whether `player` may look at the top card of their library any time (CR 401.2): a permanent they control says so (Bolas's
-/// Citadel, Mystic Forge, Case of the Locked Hothouse once solved).
+/// Citadel, Mystic Forge, Case of the Locked Hothouse once solved), or a resolved effect gave them that rule (Gwenom,
+/// Remorseless).
 pub fn may_look_at_library_top(q: &dyn Query, cards: &CardTable, player: PlayerId) -> bool {
     let mut may = false;
     each_play_rule(q, cards, player, false, |_, rule| may |= matches!(rule, PlayRule::LookAtLibraryTop));
@@ -7016,8 +7026,9 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             offer.card(card, zone, options);
         }
     }
-    // The top card of the library, for a player a permanent lets cast spells from there (CR 601.3): for life rather than its
-    // mana cost (Bolas's Citadel, CR 118.9), or for its costs (Mystic Forge, Case of the Locked Hothouse), each its own.
+    // The top card of the library, for a player a permanent or a resolved effect lets cast spells from there (CR 601.3): for
+    // life rather than its mana cost (Bolas's Citadel, Gwenom, Remorseless, CR 118.9), or for its costs (Mystic Forge, Case
+    // of the Locked Hothouse), each its own.
     if let Some(top) = library_top_castable(cx, player, barred) {
         let mut routes = Vec::new();
         each_play_rule_named(cx, cx.cards(), player, false, |source, ability, rule| {
@@ -7056,10 +7067,10 @@ fn cast_zones<'a>(cx: &'a Cx, player: PlayerId, barred: ZoneKinds) -> impl Itera
         .filter(move |zone| !barred.contains(zone.kind()))
 }
 
-/// The top card of `player`'s library, where a permanent may let them cast spells from there (CR 601.3) and no rule forbids
-/// them to cast from a library (`barred`, CR 101.2).
+/// The top card of `player`'s library, where a permanent or a resolved effect may let them cast spells from there (CR 601.3)
+/// and no rule forbids them to cast from a library (`barred`, CR 101.2).
 fn library_top_castable(cx: &Cx, player: PlayerId, barred: ZoneKinds) -> Option<ObjectId> {
-    if !cx.cards().any_play_rules || barred.contains(ZoneKind::Library) {
+    if !(cx.cards().any_play_rules || cx.cards().any_granted_play_rules) || barred.contains(ZoneKind::Library) {
         return None;
     }
     cx.s().zone(Zone::library(player)).first().copied()

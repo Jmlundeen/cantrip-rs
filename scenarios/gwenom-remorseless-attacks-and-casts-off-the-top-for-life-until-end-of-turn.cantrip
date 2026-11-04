@@ -1,0 +1,61 @@
+# Gwenom, Remorseless is cast on turn one and attacks on turn three. With its trigger on the stack Bot1 may neither look at
+# the top card of its library nor cast the Lightning Bolt there. Once it resolves, Bot1 may look (CR 401.2) and casts the
+# Bolt off the top for 1 life, its mana value, rather than {R}; the Shock on top of Bot2's library stays Bot2's (the effect
+# says "your library"). Gwenom's 4 lifelink damage takes Bot1 to 23. In the second main phase Bot1 plays Tundra, the new
+# top card, as its land for the turn. On turn five the effect has ended ("until end of turn"): no look, and the second
+# Bolt on top can't be cast.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Gwenom, Remorseless
+Swamp
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Tundra
+Swamp
+Lightning Bolt
+Swamp x4
+
+[Bot2 Deck]
+Island x8
+Shock
+Island x7
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Gwenom, Remorseless.Cast
+[T3 Bot1.Main1]
+? Bot1.MayLookAtLibraryTop = (absent)
+Bot1.Attack(Gwenom, Remorseless > Bot2)
+? Stack.Count = 1
+! Bot1.Library.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.MayLookAtLibraryTop = true
+? Bot2.MayLookAtLibraryTop = (absent)
+! Bot1.Library.Shock.Cast(Bot2)
+Bot1.Library.Lightning Bolt.Cast(Bot2)
+? Bot1.Life = 19
+[T3 Bot1.Main2]
+Bot1.Library.Tundra.Play
+[T5 Bot1.Main1]
+? Bot1.MayLookAtLibraryTop = (absent)
+! Bot1.Library.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Turn = 5
+Bot1.Life = 23
+Bot2.Life = 13
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Battlefield = Swamp; Mox Jet; Gwenom, Remorseless; Tundra
+Bot1.Library.Count = 5

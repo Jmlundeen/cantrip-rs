@@ -1421,6 +1421,12 @@ pub enum EffectKind {
     /// A mana ability the effect's controller has of their own until the effect ends (CR 605.1a, 611.2a): an ability of the
     /// source card's `delayed` list. About the player, so it outlives its `affected` object, which is only the source (Channel).
     PlayerManaAbility(AbilityRef),
+    /// A play rule the effect's controller has of their own until the effect ends (CR 611.2a, 305.1, 601.3, 401.2): an
+    /// `AbilityDef::PlayRule` of the source card's `delayed` list, read as one a permanent they control prints. About the
+    /// player, so it outlives its `affected` object, which is only the source, and no "loses all abilities" takes it.
+    /// Gwenom, Remorseless's "until end of turn, you may look at the top card of your library any time and you may play cards
+    /// from the top of your library" (for life); The Belligerent's, for mana.
+    PlayerPlayRule(AbilityRef),
     /// A copy effect (CR 707.2, layer 1) on the `affected` permanent, for its duration (CR 611.2b): it holds the copiable
     /// values it was applied over, put back when it ends (or handed to the next later copy effect on the permanent, CR
     /// 613.7: `GameState::effect_remove`). The copy the latest one makes is in `Obj::copy`.
@@ -1508,6 +1514,7 @@ impl EffectKind {
                 | EffectKind::CreaturesAssignDamageByToughness
                 | EffectKind::PlayFromGraveyard
                 | EffectKind::PlayerManaAbility(_)
+                | EffectKind::PlayerPlayRule(_)
                 | EffectKind::NextSpellCantBeCountered
                 | EffectKind::SkipNextTurn(_)
                 | EffectKind::ControlNextTurn { .. }

@@ -378,6 +378,10 @@ impl StateDump {
             if game.cant_win(p) {
                 d.set(format!("{b}.CantWin"), true);
             }
+            // "You may look at the top card of your library any time" (CR 401.2): absent while nothing lets the player.
+            if game.may_look_at_library_top(p) {
+                d.set(format!("{b}.MayLookAtLibraryTop"), true);
+            }
             // How they lost (CR 104.3), from the history: absent for a player who has not, or who left another way.
             if let Some(reason) = game.log.iter().find_map(|r| match r.event {
                 Event::GameLost { player, reason } if player == p => Some(reason),
@@ -907,7 +911,7 @@ const GAME_KEYS: &[&str] = &[
 
 /// The keys the dump writes of a player, after `BotN.`.
 const PLAYER_KEYS: &[&str] = &[
-    "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "LostTo", "Mana", "ManaFrom", "LandsPlayed", "CitysBlessing",
+    "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "MayLookAtLibraryTop", "LostTo", "Mana", "ManaFrom", "LandsPlayed", "CitysBlessing",
     "EnduringStory", "Speed", "Dungeon", "DungeonsCompleted", "TurnsToSkip", "ControlledBy", "NextTurnControlledBy", "Looked", "Surveilled", "Shuffles",
     "Hand", "Revealed", "Crimes", "Library", "Companion", "Sideboard", "Graveyard", "Emblems", "Battlefield", "PhasedOut",
 ];

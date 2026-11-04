@@ -553,6 +553,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   first, the last the one that works (CR 723.1a), `+extra` on one that gives an extra turn after it; absent when none
 - `BotN.Speed` (`1` to `4`), once the player has a speed (CR 702.179) and absent while they have none (CR 702.179b)
 - `BotN.Dungeon` (`Undercity: Forge`) while in a dungeon, and `BotN.DungeonsCompleted` once one is completed (CR 309.7)
+- `BotN.MayLookAtLibraryTop` (`true`) while the player may look at the top card of their library any time (CR 401.2; Bolas's
+  Citadel, Gwenom, Remorseless), absent while nothing lets them
 - `BotN.Looked`, the cards the player has looked at, in the order they looked (a look at one card of a hand, Urza's Bauble),
   once they have looked at any and absent until then
 - `BotN.Surveilled`, each completed surveil in order as `<count> requested, <looked> looked` (CR 701.25a, 701.25d),

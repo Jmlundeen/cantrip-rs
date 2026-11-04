@@ -697,6 +697,16 @@ impl<'a> Projector<'a> {
                 summary.pending_effects.push(if p == self.viewer { format!("{name}: {}", rule.text) } else { format!("Their {name}'s effect: {}", rule.text) });
             }
         }
+        // A play rule a resolved ability gave the player for a duration (CR 611.2a, 401.2: "until end of turn, you may play cards
+        // from the top of your library"): a permission about the player, on no object (the card may be gone), said in the rule's
+        // own words and named for the card that gave it, as the lasting rules are.
+        for e in s.effects.iter().filter(|e| e.controller == p) {
+            if let EffectKind::PlayerPlayRule(ability) = e.kind {
+                let name = game.cards.get(ability.card).name;
+                let text = game.cards.ability(ability).text();
+                summary.pending_effects.push(if p == self.viewer { format!("{name}: {text}") } else { format!("Their {name}'s effect: {text}") });
+            }
+        }
         // "Whenever [event] this turn" / "when you next [event] this turn" / "until your next turn, whenever [event]" (CR 603.7b):
         // a delayed triggered ability that waits for its event, on no object, so the page says it beside its controller's life
         // total, in the ability's own words

@@ -1,0 +1,72 @@
+# Browser
+# Gwenom, Remorseless attacks on turn three into Bot2's Colossal Dreadmaw, which blocks. Deathtouch kills the Dreadmaw,
+# lifelink gains Bot1 4 life, and the Dreadmaw's 6 damage kills Gwenom. The attack trigger had already resolved, so its
+# effect lasts the turn without Gwenom (CR 611.2a): in the second main phase Bot1 may still look at the top card of its
+# library and casts the Lightning Bolt there for 1 life. Bot1 then plays a Swamp from its hand, and the Tundra now on top
+# can't be played: the effect gives no extra land play (CR 305.2). Bot1's page says both play rules beside its life total
+# though Gwenom is gone, the effect being the player's; Bot2's page shows none, and nothing is left on turn four.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Gwenom, Remorseless
+Swamp
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Tundra
+Swamp x6
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Pearl
+Colossal Dreadmaw
+Island
+Island
+Island x9
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Gwenom, Remorseless.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Colossal Dreadmaw.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Gwenom, Remorseless > Bot2)
+Bot2.Block(Colossal Dreadmaw > Gwenom, Remorseless)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Gwenom, Remorseless; Black Lotus
+? Bot2.Graveyard = Colossal Dreadmaw; Black Lotus
+? Bot1.Life = 24
+? Bot1.MayLookAtLibraryTop = true
+? Client.Bot1.Facts = Gwenom, Remorseless: You may look at the top card of your library any time; Gwenom, Remorseless: You may play cards from the top of your library. If you cast a spell this way, pay life equal to its mana value rather than pay its mana cost
+? Client.Bot1.OpponentFacts =
+Bot1.Library.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Swamp.Play
+! Bot1.Library.Tundra.Play
+[T4 Bot2.Main1]
+? Bot1.MayLookAtLibraryTop = (absent)
+? Client.Bot1.Facts =
+
+[Expect]
+Turn = 4
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Gwenom, Remorseless; Black Lotus
+Bot1.Battlefield = Swamp; Mox Jet; Swamp

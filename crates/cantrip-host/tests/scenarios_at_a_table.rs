@@ -240,6 +240,58 @@ fn players_cant_gain_life_is_shown_to_both_players_while_the_static_ability_appl
     assert!(gone_after, "the restriction was still shown after the Lynx left");
 }
 
+/// A play rule a resolved ability gave a player for the turn (CR 611.2a) is shown beside that player's life total to both seats:
+/// after Gwenom, Remorseless's attack trigger has resolved, Bot1's view says each of its two rules in Bot1's words and Bot2's
+/// view says they are Bot1's ("Their Gwenom, Remorseless's effect: ..."), still once Gwenom has died, nothing of Bot2; and once
+/// the turn has ended neither seat is told them.
+#[test]
+fn a_play_rule_given_to_a_player_is_shown_to_both_seats_until_end_of_turn() {
+    let name = "gwenom-remorseless-dies-blocked-and-its-effect-still-casts-but-plays-no-second-land";
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).map_err(|r| r.detail).unwrap();
+    let mut step = session.step();
+    let rules = [
+        "You may look at the top card of your library any time.",
+        "You may play cards from the top of your library. If you cast a spell this way, pay life equal to its mana value rather than pay its mana cost.",
+    ];
+    let (mut shown, mut gone_after) = (0, false);
+    for _ in 0..20_000 {
+        let views = [session.view(1).map_err(|r| r.detail).unwrap(), session.view(2).map_err(|r| r.detail).unwrap()];
+        let facts = |viewer: usize, about: usize| views[viewer].players[about].pending_effects.clone();
+        let own: Vec<String> = rules.iter().map(|r| format!("Gwenom, Remorseless: {r}")).collect();
+        let theirs: Vec<String> = rules.iter().map(|r| format!("Their Gwenom, Remorseless's effect: {r}")).collect();
+        let applies = facts(0, 0).iter().any(|f| f.starts_with("Gwenom, Remorseless: "));
+        if applies {
+            assert_eq!(facts(0, 0).iter().filter(|f| f.contains("Gwenom")).cloned().collect::<Vec<_>>(), own, "Bot1 is told something else of itself");
+            assert_eq!(facts(1, 0).iter().filter(|f| f.contains("Gwenom")).cloned().collect::<Vec<_>>(), theirs, "Bot2 is told something else of Bot1");
+            shown += 1;
+            assert!(!gone_after, "the rules came back");
+        } else {
+            assert!(!facts(1, 0).iter().any(|f| f.contains("Gwenom")), "Bot2 is told of a rule Bot1's view does not show");
+            if shown > 0 {
+                gone_after = true;
+            }
+        }
+        assert!(!facts(0, 1).iter().chain(facts(1, 1).iter()).any(|f| f.contains("Gwenom")), "Bot2 is said to have Gwenom's rules");
+        let scenario = &step["Scenario"];
+        if scenario["Verdict"].is_object() {
+            assert_eq!(scenario["Verdict"]["Passed"], Value::Bool(true));
+            break;
+        }
+        let expected = &scenario["Expected"];
+        let answer: AnswerPayload = if expected["Undo"] == Value::Bool(true) {
+            AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::UndoManaAbility, ViewHandle::NONE))
+        } else {
+            serde_json::from_value(expected["Answer"].clone()).unwrap()
+        };
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        step = session.answer(id, seat, &answer).map_err(|r| r.detail).unwrap();
+    }
+    assert!(shown > 0, "Bot1 was never told of Gwenom's rules");
+    assert!(gone_after, "Gwenom's rules were still shown after the turn ended");
+}
+
 /// Plays the scenario `name` at a table and judges what each seat is told, beside Bot1's life total, of a delayed triggered
 /// ability that waits for its event (CR 603.7b) whose words contain `words`: nothing before it is set up, then Bot1's own view
 /// names its source and gives the words, Bot2's says it is Bot1's ("They have ..."), and once it has lapsed neither does.
