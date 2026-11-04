@@ -2150,24 +2150,30 @@ pub fn three_counters_and_becomes(g: &mut dyn Game, item: &StackItem, kind: Subt
 /// (CR 107.3b, the rulings). A cast that cannot be completed is given up (CR 733.1). Dreadhorde Arcanist and The Dawning
 /// Archaic print it.
 pub fn may_cast_first_target_free_exiling_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    may_cast_first_target_exiling_it(g, item, Some(ManaCost::ZERO))
+    may_cast_first_target(g, item, Some(ManaCost::ZERO), false, ExileInstead::Spell)
 }
 
 /// "You may cast [the target card] from your graveyard. If that spell would be put into your graveyard, exile it instead":
 /// `may_cast_first_target_free_exiling_it` with its costs paid (CR 601.2f-h), its mana cost or an alternative cost it has, and an
 /// {X} chosen as it is cast (the rulings). Chandra, Acolyte of Flame's last ability prints it.
 pub fn may_cast_first_target_exiling_it_paying_costs(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    may_cast_first_target_exiling_it(g, item, None)
+    may_cast_first_target(g, item, None, false, ExileInstead::Spell)
 }
 
-fn may_cast_first_target_exiling_it(g: &mut dyn Game, item: &StackItem, instead: Option<ManaCost>) -> Result<(), Suspend> {
+/// "You may cast [the target card]" as the ability resolves, whatever the timing restrictions of its types (CR 608.2g): the
+/// first target is cast if its controller says yes and it can be cast; the way is chosen for a card that has several (CR 715.3,
+/// 720.3), and a cast that cannot be paid for is given up (CR 733.1). `instead` is the cost paid in place of its own (`None`:
+/// its own costs), `any_type` is "mana of any type can be spent to cast that spell" (CR 609.4b), and `exile_instead` the card's own
+/// "If that spell would be put into a graveyard, exile it instead" (CR 614.1a) or `ExileInstead::Never`. Tinybones, the
+/// Pickpocket (`any_type`) and Quistis Trepe (`any_type`, exiling) print it, besides the two wrappers above.
+pub fn may_cast_first_target(g: &mut dyn Game, item: &StackItem, instead: Option<ManaCost>, any_type: bool, exile_instead: ExileInstead) -> Result<(), Suspend> {
     let Some(card) = crate::targets::object(g, item, 0) else { return Ok(()) };
     if !g.could_cast_during_resolution(card) || !ask_may(g, item.controller, item.object, Purpose::Cast)? {
         return Ok(());
     }
     let ways = g.cast_ways_during_resolution(card);
     let way = crate::choose::cast_way(g, item.controller, card, ways)?.map(|w| w.way);
-    g.cast_during_resolution_as(card, CastTerms { instead, exile_instead: ExileInstead::Spell, way, ..CastTerms::default() })?;
+    g.cast_during_resolution_as(card, CastTerms { instead, any_type, exile_instead, way, ..CastTerms::default() })?;
     Ok(())
 }
 
