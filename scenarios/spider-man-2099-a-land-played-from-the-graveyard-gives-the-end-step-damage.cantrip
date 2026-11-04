@@ -1,0 +1,41 @@
+# A land played from the graveyard with Crucible of Worlds (not from the hand) counts: at the beginning of the end step of turn 7 Spider-Man 2099,
+# cast earlier that turn from the hand, deals damage equal to his power (2) to any target. The Strip Mine's earlier play from the hand did not count.
+
+[Bot1 Deck]
+Strip Mine
+Black Lotus
+Crucible of Worlds
+Mox Sapphire
+Mox Ruby
+Spider-Man 2099
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Strip Mine.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Crucible of Worlds.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Strip Mine.Activate(Bot2.Battlefield.Island; Ability: Destroy)
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T7 Bot1.Main1]
+Bot1.Graveyard.Strip Mine.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Man 2099.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+Bot1.Target(Bot2)
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Count = 5
+Stack.Count = 0

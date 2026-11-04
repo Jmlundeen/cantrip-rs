@@ -1,0 +1,41 @@
+# "You can't cast Spider-Man 2099 during your first, second, or third turns of the game." Bot1 has U and R (Mox Sapphire and Mox Ruby)
+# on turns 1, 3 and 5 and is refused each time; on turn 7, its fourth turn, the same mana casts it (the positive control).
+# A spell cast from the hand and a land played from the hand are both "from your hand", so at the end step nothing is asked or dealt.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Spider-Man 2099
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+! Bot1.Hand.Spider-Man 2099.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Spider-Man 2099.Cast
+[T5 Bot1.Main1]
+! Bot1.Hand.Spider-Man 2099.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Man 2099.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+! Bot1.Target
+[T8 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Ruby; Spider-Man 2099
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Spider-Man 2099.Damage = 0
+Stack.Count = 0

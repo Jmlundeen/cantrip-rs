@@ -1,0 +1,48 @@
+# Spider-Man 2099: "if YOU'VE played a land or cast a spell this turn from anywhere other than your hand" (CR 603.4). On turn 7 Bot2
+# casts Lava Dart from its graveyard (flashback, sacrificing its Mountain) during Bot1's turn: a spell cast from outside a hand, but
+# Bot2's, and Bot1 cast and played only from its hand, so at Bot1's end step nothing is asked or dealt. Bot1 takes 1 from each Lava Dart.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Spider-Man 2099
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lava Dart
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lava Dart.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Man 2099.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Graveyard.Lava Dart.Cast(Bot1; Ability: Flashback)
+Bot2.Pass
+Bot1.Pass
+? Exile = Lava Dart
+[T7 Bot1.Main2]
+! Bot1.Target
+[T8 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot1.Battlefield.Spider-Man 2099.Damage = 0
+Stack.Count = 0
