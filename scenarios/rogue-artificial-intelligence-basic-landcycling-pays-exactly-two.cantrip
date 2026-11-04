@@ -1,0 +1,38 @@
+# Basic landcycling costs exactly {2} and discards the card, then finds and reveals a basic land and shuffles (CR 702.29e).
+# One floating colorless mana is too little; spend it on Sol Ring, whose {C}{C} proves the cycling cost has no colored pip.
+
+[Bot1 Deck]
+Rogue Artificial Intelligence
+Blasted Landscape
+Sol Ring
+Swamp x4
+Tropical Island
+Forest
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Blasted Landscape.Play
+Bot1.Battlefield.Blasted Landscape.Activate
+? Bot1.Mana = {C}
+! Bot1.Hand.Rogue Artificial Intelligence.Activate(Ability: Basic landcycling; Mana: short)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Rogue Artificial Intelligence.Activate(Ability: Basic landcycling)
+Bot1.Pass
+? Bot1.Mana =
+! Bot1.Search(Tropical Island)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Graveyard = Rogue Artificial Intelligence
+Bot1.Hand = Forest; Swamp; Swamp; Swamp; Swamp
+Bot1.Library.Count = 11
+Bot1.Revealed = Forest; Rogue Artificial Intelligence
+Bot1.Shuffles = 1
+Bot1.Life = 20
+Bot1.Battlefield.Rogue Artificial Intelligence = (absent)

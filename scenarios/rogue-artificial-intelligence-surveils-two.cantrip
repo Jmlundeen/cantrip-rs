@@ -1,0 +1,34 @@
+# Surveil 2 examines the known top two cards; keep Island above Forest and put Lightning Bolt into the graveyard (CR 701.25a).
+# The surveil mode gains no life, and the card beneath the two looked at is untouched.
+
+[Bot1 Deck]
+Rogue Artificial Intelligence
+Black Lotus x2
+Swamp x4
+Lightning Bolt
+Island
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Rogue Artificial Intelligence.Cast
+? Bot1.Mana =
+Bot1.Modes(Surveil 2)
+Bot1.Arrange(Island | Lightning Bolt)
+
+[Expect]
+Bot1.Surveilled = 2 requested, 2 looked
+Bot1.Library = Island; Forest
+Bot1.Graveyard.Lightning Bolt.Colors = Red
+Bot1.Graveyard.Count = 3
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Rogue Artificial Intelligence.ChosenModes = 2

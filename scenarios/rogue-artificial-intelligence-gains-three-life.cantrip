@@ -1,0 +1,37 @@
+# The entry trigger chooses exactly one mode on the stack, then gains exactly 3 life for its controller (CR 603.3c, 119.3).
+# Two Black Lotuses pay the creature's mana cost without waiting for land drops.
+
+[Bot1 Deck]
+Rogue Artificial Intelligence
+Black Lotus x2
+Swamp x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Rogue Artificial Intelligence.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Modes(1; 2)
+! Bot1.Modes(Count: 0)
+Bot1.Modes(You gain 3 life)
+? Stack.Count = 1
+? Bot1.Life = 20
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 20
+Bot1.Surveilled = (absent)
+Bot1.Battlefield.Rogue Artificial Intelligence.ChosenModes = 1
+Bot1.Battlefield.Rogue Artificial Intelligence.Types = Artifact; Creature
+Bot1.Battlefield.Rogue Artificial Intelligence.Power = 6
+Bot1.Battlefield.Rogue Artificial Intelligence.Toughness = 5
