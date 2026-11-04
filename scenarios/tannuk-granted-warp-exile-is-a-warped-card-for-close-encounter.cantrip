@@ -1,0 +1,42 @@
+# probe: a card warped by Tannuk's granted warp is a warped card in exile (CR 702.185b) for Close Encounter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby x4
+Tannuk, Steadfast Second
+Hill Giant
+Mox Emerald
+Close Encounter
+Mountain x16
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Tannuk, Steadfast Second.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Hill Giant.Cast(Ability: Warp)
+Bot1.Pass
+[T3 Bot1.Main1]
+? Exile = Hill Giant
+Bot1.Hand.Mox Emerald.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Close Encounter.Cast(Bot1.Battlefield.Tannuk, Steadfast Second)
+Bot1.Choose(Hill Giant)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Tannuk, Steadfast Second.Damage = 3
+Exile = Hill Giant

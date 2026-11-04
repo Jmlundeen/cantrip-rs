@@ -1,0 +1,46 @@
+# Tannuk, Steadfast Second's warp, once a spell is cast for it, leaves its delayed ability with the spell (CR 702.185a,
+# 603.7): "exile that permanent at the beginning of the next end step" happens even after Tannuk has left. Bot1 casts
+# Tannuk on turn 1 and a Mox Sapphire on turn 3; on turn 5 Hill Giant for the warp Tannuk gives, then Unsummon returns
+# Tannuk to Bot1's hand. At the end step the Giant is exiled all the same.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby x4
+Tannuk, Steadfast Second
+Hill Giant
+Mox Sapphire
+Unsummon
+Mountain x16
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Tannuk, Steadfast Second.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Hill Giant.Cast(Ability: Warp)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Bot1.Battlefield.Tannuk, Steadfast Second)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Tannuk, Steadfast Second
+? Delayed = Hill Giant
+[T6 Bot2.Main1]
+
+[Expect]
+Exile = Hill Giant
+Bot1.Battlefield = Mox Ruby; Mox Ruby; Mox Ruby; Mox Ruby; Mox Sapphire
