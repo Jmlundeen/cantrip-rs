@@ -1,0 +1,36 @@
+# News Helicopter ({3}, 1/1 artifact creature, flying): "When this creature enters, create a 1/1 green and white Human Citizen creature token." Bot1 casts three Moxen and the
+# Helicopter on turn 1. Once the trigger resolves, the token is a 1/1 (power 1, toughness 1) of exactly two colors, Human Citizen, and the Helicopter itself has flying.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+News Helicopter
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.News Helicopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 4
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.News Helicopter.Keywords = Flying
+Bot1.Battlefield.News Helicopter.Power = 1
+Bot1.Battlefield.News Helicopter.Toughness = 1
+Bot1.Battlefield.Human Citizen Token.Power = 1
+Bot1.Battlefield.Human Citizen Token.Toughness = 1
+Bot1.Battlefield.Human Citizen Token.Colors = Green; White
+Bot1.Battlefield.Human Citizen Token.Subtypes = Citizen; Human
+Bot1.Battlefield.Count = 5
