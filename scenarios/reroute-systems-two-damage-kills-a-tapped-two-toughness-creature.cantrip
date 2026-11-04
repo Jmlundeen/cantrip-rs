@@ -1,0 +1,28 @@
+# Reroute Systems, second mode: Bot2's Ornithopter (0/2) attacks on turn 4 and is tapped; 2 damage is lethal and it dies.
+
+[Bot1 Deck]
+Mox Pearl
+Reroute Systems
+Island x18
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+[T4 Bot2.End]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reroute Systems.Cast
+Bot1.Modes(Reroute Systems deals 2 damage)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter

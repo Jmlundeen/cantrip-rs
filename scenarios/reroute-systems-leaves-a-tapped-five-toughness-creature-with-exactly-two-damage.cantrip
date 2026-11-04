@@ -1,0 +1,31 @@
+# Reroute Systems's second mode deals exactly 2 damage: Bot2's Aegis Turtle (0/5) attacks on turn 4 and is tapped, and the spell
+# leaves it alive with 2 damage marked, not 1 or 3.
+
+[Bot1 Deck]
+Mox Pearl
+Reroute Systems
+Island x18
+
+[Bot2 Deck]
+Aegis Turtle
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aegis Turtle.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Aegis Turtle > Bot1)
+[T4 Bot2.End]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reroute Systems.Cast
+Bot1.Modes(Reroute Systems deals 2 damage)
+Bot1.Target(Bot2.Battlefield.Aegis Turtle)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Aegis Turtle.Damage = 2

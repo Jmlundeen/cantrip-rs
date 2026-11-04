@@ -1,0 +1,22 @@
+# Reroute Systems, second mode: an untapped creature is no legal target (Bot2's Ornithopter just cast, never tapped).
+
+[Bot1 Deck]
+Mox Pearl
+Reroute Systems
+Island x18
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reroute Systems.Cast
+! Bot1.Modes(Reroute Systems deals 2 damage)
+
+[Expect]
+Bot2.Battlefield = Ornithopter

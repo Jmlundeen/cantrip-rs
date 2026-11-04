@@ -1,0 +1,25 @@
+# Reroute Systems, first mode: the target may be an artifact that is no creature. Bot1 gives its Mox Pearl indestructible
+# until end of turn (CR 702.12b).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Reroute Systems
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reroute Systems.Cast
+Bot1.Modes(Target artifact or creature gains indestructible)
+Bot1.Target(Bot1.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mox Pearl.Keywords = Indestructible
+Bot1.Graveyard = Reroute Systems
