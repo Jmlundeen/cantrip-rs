@@ -1,0 +1,24 @@
+# Bot1 controls Mox Jet, an artifact: Gravblade Heavy gets +1/+0 (4/4, toughness unchanged) and has deathtouch.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Gravblade Heavy
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gravblade Heavy.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Gravblade Heavy.Power = 4
+Bot1.Battlefield.Gravblade Heavy.Toughness = 4
+Bot1.Battlefield.Gravblade Heavy.Keywords = Deathtouch

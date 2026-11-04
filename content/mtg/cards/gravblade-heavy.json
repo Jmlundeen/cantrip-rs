@@ -1,0 +1,8 @@
+{
+  "name": "Gravblade Heavy",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Human Soldier",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "As long as you control an artifact, this creature gets +1/+0 and has deathtouch."
+}

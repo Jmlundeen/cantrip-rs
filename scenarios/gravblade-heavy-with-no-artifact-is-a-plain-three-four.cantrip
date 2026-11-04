@@ -1,0 +1,26 @@
+# Without an artifact Gravblade Heavy is its printed 3/4 with no deathtouch. Black Lotus (sacrificed for BBB) and Dark Ritual pay
+# for it, leaving Bot1 no artifact.
+
+[Bot1 Deck]
+Black Lotus
+Dark Ritual
+Gravblade Heavy
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Gravblade Heavy.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Gravblade Heavy.Power = 3
+Bot1.Battlefield.Gravblade Heavy.Toughness = 4
+Bot1.Battlefield.Gravblade Heavy.Keywords = (absent)

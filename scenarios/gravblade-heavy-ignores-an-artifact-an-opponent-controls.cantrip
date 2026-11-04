@@ -1,0 +1,33 @@
+# Only artifacts Bot1 controls count: Bot2's Mox Jet (cast on turn 2) leaves Gravblade Heavy a plain 3/4 without deathtouch.
+
+[Bot1 Deck]
+Black Lotus
+Dark Ritual
+Gravblade Heavy
+Island x17
+
+[Bot2 Deck]
+Mox Jet
+Island x19
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Gravblade Heavy.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Mox Jet.Types = Artifact
+Bot1.Battlefield.Gravblade Heavy.Power = 3
+Bot1.Battlefield.Gravblade Heavy.Toughness = 4
+Bot1.Battlefield.Gravblade Heavy.Keywords = (absent)
