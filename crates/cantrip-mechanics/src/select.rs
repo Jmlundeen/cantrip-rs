@@ -94,7 +94,7 @@ fn another_creature(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
     Verdict::each(choice, |id| id != choice.source && q.chars(id).is(CardType::Creature))
 }
 
-fn forest(q: &dyn Query, choice: &Choice, word: u32) -> Verdict {
+fn subtype(q: &dyn Query, choice: &Choice, word: u32) -> Verdict {
     let wanted = crate::lands::word(q, choice.source, u16::try_from(word).unwrap_or(u16::MAX));
     Verdict::each(choice, |card| q.chars(card).has_subtype(wanted))
 }
@@ -139,11 +139,17 @@ pub const LAND: Part = part(&(land as SelectFn), 0, "");
 /// "A Forest card" (CR 205.3i, 305.6): a land card with the subtype Forest, basic or not (a Stomping Ground is one), the type read
 /// through the words of the text of the card that asks (CR 612.2) and a card as it is where it is. Nature's Lore, Three Visits and
 /// Wood Elves search for it.
-pub const FOREST: Part = part(&(forest as SelectFn), crate::lands::sub(Subtype::Forest) as u32, "");
+pub const FOREST: Part = subtype_card(Subtype::Forest);
+
+/// "A [subtype] card" (CR 205.3, 612.2): a card with `subtype`, the type read through the words of the text of the card that asks
+/// and a card as it is where it is. `FOREST` is the Forest card; From Father to Son searches for a Vehicle card.
+pub const fn subtype_card(subtype: Subtype) -> Part {
+    part(&(self::subtype as SelectFn), crate::lands::sub(subtype) as u32, "")
+}
 
 /// "An Equipment card" (CR 205.3g, 205.4a): a card with the subtype Equipment, the type read through the words of the text of the
 /// card that asks (CR 612.2) and a card as it is where it is. Cloud, Midgar Mercenary and Honored Knight-Captain search for it.
-pub const EQUIPMENT: Part = part(&(forest as SelectFn), crate::lands::sub(Subtype::Equipment) as u32, "");
+pub const EQUIPMENT: Part = subtype_card(Subtype::Equipment);
 
 /// "A basic land card or a [subtype] card" (CR 205.4a, 205.3i): a basic land card, or a card with `subtype`, the type read through
 /// the words of the text of the card that asks (CR 612.2) and a card as it is where it is. Spinewoods Armadillo's Desert is
