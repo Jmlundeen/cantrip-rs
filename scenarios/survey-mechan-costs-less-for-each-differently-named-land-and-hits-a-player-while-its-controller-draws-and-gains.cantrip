@@ -1,0 +1,63 @@
+# Survey Mechan's ability costs {10} less {X}, X the differently named lands Bot1 controls (CR 601.2f, 201.2a): Forest, Plains and a
+# second Forest are two names, and Bot2's Swamp is not Bot1's, so it costs exactly {8} - five Moxen and Black Lotus pay it and nothing
+# is left over. Its 3 damage goes to Bot2 (20 -> 17); Bot1, the target player, draws exactly three cards and gains 3 life (20 -> 23).
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Survey Mechan
+Plains
+Forest
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Swamp
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Survey Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Survey Mechan.Activate(Ability: It deals 3 damage)
+Bot1.Target(Bot2)
+Bot1.Target(Bot1)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Survey Mechan; Black Lotus
+Stack.Count = 0

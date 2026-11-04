@@ -1,0 +1,43 @@
+# Survey Mechan has flying and hexproof (CR 702.9, 702.11): Bot2's Lightning Bolt cannot target it, an opponent's ability or spell
+# being refused as a target, but can still target Bot1 (20 -> 17).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Survey Mechan
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Survey Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Survey Mechan.Keywords = Flying; Hexproof
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Survey Mechan)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Survey Mechan.Damage = 0
+Bot2.Graveyard = Lightning Bolt

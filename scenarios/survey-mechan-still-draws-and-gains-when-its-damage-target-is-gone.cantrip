@@ -1,0 +1,73 @@
+# Survey Mechan's targets are judged one by one as it resolves (CR 608.2b): Bot2 casts Lightning Bolt on its own Raging Goblin, the
+# ability's damage target, in response, so the 3 damage is not dealt, but its other target, Bot1, the target player, is still legal
+# and draws three cards and gains 3 life (20 -> 23). Bot2's life is untouched.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Survey Mechan
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Black Lotus
+Raging Goblin
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Survey Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Survey Mechan.Activate(Ability: It deals 3 damage)
+Bot1.Target(Bot2.Battlefield.Raging Goblin)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Raging Goblin)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Raging Goblin; Lightning Bolt; Black Lotus
+Bot2.Life = 20
+Bot1.Life = 23
+Bot1.Hand.Count = 3
+Stack.Count = 0

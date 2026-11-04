@@ -1,0 +1,66 @@
+# Survey Mechan's two targets are independent (CR 115.1, 120.3): its 3 damage goes to Bot2's Leatherback Baloth (4/5), which lives with
+# exactly 3 damage marked, while the target player - Bot2 too, an opponent is as good a choice as its controller - draws exactly three
+# cards and gains 3 life (20 -> 23). Bot1 controls one land, a Forest, so the ability costs {9}: five Moxen, Black Lotus and the Forest
+# pay it exactly.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Survey Mechan
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Leatherback Baloth
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Survey Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Leatherback Baloth.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Survey Mechan.Activate(Ability: It deals 3 damage)
+Bot1.Target(Bot2.Battlefield.Leatherback Baloth)
+Bot1.Target(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Leatherback Baloth.Damage = 3
+Bot2.Life = 23
+Bot1.Life = 20
+Bot2.Hand.Count = 8
+Bot1.Graveyard = Survey Mechan; Black Lotus
