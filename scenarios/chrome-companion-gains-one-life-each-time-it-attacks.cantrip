@@ -1,0 +1,29 @@
+# Chrome Companion: "Whenever this creature becomes tapped, you gain 1 life." Cast on turn 1 untapped, it has gained nothing (20); it
+# attacks on turn 3, which taps it (CR 508.1f): Bot1 gains 1 (21) and Bot2 takes 2 (18).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Chrome Companion
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chrome Companion.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+Bot1.Attack(Chrome Companion > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 18

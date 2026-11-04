@@ -1,0 +1,49 @@
+# Chrome Companion's "{2}, {T}: Put target card from a graveyard on the bottom of its owner's library." Turn 1 Bot1 burns Bot2 with a
+# Lightning Bolt (Mox Ruby) and casts the Companion with Mox Jet and Mox Pearl, so Bolt is in Bot1's own graveyard. On turn 3 the
+# Companion is no longer summoning sick: a permanent (Mox Ruby) is no card in a graveyard and is refused as the target, and Bot1's
+# own Bolt is accepted and goes to the bottom of Bot1's own library.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Chrome Companion
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chrome Companion.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Chrome Companion.Activate(Ability: {2}; Bot1.Battlefield.Mox Ruby)
+Bot1.Battlefield.Chrome Companion.Activate(Ability: {2}; Bot1.Graveyard.Lightning Bolt)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 20
+Bot1.Life = 21
+Bot2.Life = 17

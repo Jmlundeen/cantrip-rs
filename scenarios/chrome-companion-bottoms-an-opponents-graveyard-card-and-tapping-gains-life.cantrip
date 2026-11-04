@@ -1,0 +1,50 @@
+# Chrome Companion {2} Artifact Creature 2/1: "Whenever this creature becomes tapped, you gain 1 life. {2}, {T}: Put target card from a
+# graveyard on the bottom of its owner's library." Bot2's Bolt (turn 2, Bot1 to 17) is in Bot2's graveyard. On turn 3 Bot1 pays {2}
+# exactly (Mox Pearl and Mox Emerald, the pool empty after) and taps the Companion as a cost: the tapped trigger gains 1 (18) and
+# the ability puts that Bolt on the bottom of Bot2's library - not Bot1's - under its four Islands.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Chrome Companion
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chrome Companion.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 17
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Chrome Companion.Activate(Ability: {2}; Bot2.Graveyard.Lightning Bolt)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 18
+Bot2.Graveyard.Count = 0
+Bot2.Library = Island; Island; Island; Island; Lightning Bolt
+Bot1.Battlefield.Chrome Companion.Tapped = true
