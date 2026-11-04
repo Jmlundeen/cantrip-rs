@@ -43,15 +43,14 @@ pub fn permute<T>(state: &mut GameState, items: &mut [T]) {
 
 /// Moves the game on to its next step, or its first turn, and puts that step's work on the agenda.
 pub fn next_step(game: &mut Game) {
-    let s = &mut game.state;
-    let turn = s.turn;
+    let turn = game.state.turn;
     let ending = turn.step();
     // The combat phase ends with its end of combat step, or with whatever step of it an effect ended the turn in
     // (CR 724.1d).
     let combat_ends = ending == Step::EndOfCombat
         || (turn.ending && matches!(ending, Step::BeginCombat | Step::DeclareAttackers | Step::DeclareBlockers | Step::CombatDamage));
 
-    // Mana empties as each step ends (CR 500.4), except the mana that lasts until the end of combat, which is lost as
+    // Mana empties as each step ends (CR 500.5), except the mana that lasts until the end of combat, which is lost as
     // the combat phase ends, and the mana that lasts until end of turn, lost as the cleanup step does (CR 106.4, 500.5a).
     if turn.number > 0 {
         let ends = if ending == Step::Cleanup {
@@ -61,10 +60,18 @@ pub fn next_step(game: &mut Game) {
         } else {
             ManaLasts::Step
         };
+        // Except what a static ability keeps (CR 500.5: Electro, Assaulting Battery), asked as the step ends.
+        let kept = {
+            let cx = Cx { g: &mut *game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+            crate::static_rules::mana_kept(&cx)
+        };
+        let s = &mut game.state;
         for p in s.seats().collect::<Vec<_>>() {
-            s.empty_mana(p, ends);
+            let keep = kept.iter().find(|&&(q, _)| q == p).map_or([false; 6], |&(_, k)| k);
+            s.empty_mana_keeping(p, ends, keep);
         }
     }
+    let s = &mut game.state;
     // CR 724.1d: a turn ended during combat removes every creature and planeswalker from combat as the step ends, as
     // the end of the combat phase does.
     if turn.number > 0 && combat_ends {

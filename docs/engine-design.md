@@ -2146,6 +2146,14 @@ nothing of this cost is still offered (CR 601.2g) and is marked `pays_nothing`, 
 mana goes where the player sends it: two mana of one restriction may pay one ability or two. The pool empties at the end
 of each step and phase as any mana does (CR 106.4).
 
+A static ability may say a player doesn't lose some unspent mana as steps and phases end (CR 500.5). Examples are "red
+mana" (Electro, Assaulting Battery), "green mana" (Omnath, Locus of Mana) and all of it (Upwelling). Such an ability is a
+`CardDef::mana_kept` rule, a `ManaKeptRule` asked of a player and a type of mana. As each step or phase ends, `turn::next_step`
+asks `static_rules::mana_kept` once over the battlefield, which leaves out permanents that have lost their abilities
+(CR 613.1f). It passes each player's kept types to `GameState::empty_mana_keeping`. Mana of those types stays, restricted
+mana with its rider too (Electro's rulings). Kept mana whose own duration has run out stays on as ordinary mana. Once the
+ability is gone, the mana is lost at the next ending, as any mana is.
+
 A mana ability without {T} may be activated again for as long as its cost can be paid (CR 602.2, 605): where that cost is
 one permanent sacrificed or counters removed from its source (`actions::Repeat`), the advice counts it once for each thing
 it can spend. Each permanent it could sacrifice is a source of its own for `Available`, whose alternatives are the
@@ -2251,7 +2259,7 @@ Every unit of mana has a source (CR 106.3): the source of the ability that produ
 triggered mana ability's source (Mana Flare's additional mana is Mana Flare's, not the land's), the spell or ability
 resolving - or none for a player's own mana ability (CR 605.1a, `ObjectId::NONE`). The pools keep it beside the counts:
 `GameState::mana_from` breaks each player's pool and restricted mana down by source (and by restriction, and whether it
-lasts until end of combat), written only by the state's three mana methods (`add_mana`, `spend_mana`, `empty_mana`),
+lasts until end of combat), written only by the state's mana methods (`add_mana`, `spend_mana`, `empty_mana` and `empty_mana_keeping`),
 which write the counts too, so the two cannot disagree; each entry is undone on its own (`Undo::ManaFromSet` and its
 kin), not by copying the list. Card code still says `g.add_mana(player, mana, n)`: `Cx::mana_source` says whose it is.
 

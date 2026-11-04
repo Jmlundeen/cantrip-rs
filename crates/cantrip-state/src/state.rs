@@ -822,25 +822,63 @@ impl GameState {
         spent
     }
 
-    /// Empties `player`'s pool as `ending` ends (CR 106.4, 500.4): a step, the combat phase or the turn - all of it but the
+    /// Empties `player`'s pool as `ending` ends (CR 106.4, 500.5): a step, the combat phase or the turn - all of it but the
     /// mana that lasts past that (`ManaLasts`, CR 500.5a).
     pub fn empty_mana(&mut self, player: PlayerId, ending: ManaLasts) {
+        self.empty_mana_keeping(player, ending, [false; 6]);
+    }
+
+    /// `empty_mana`, except for the types of mana `kept` names (indexed by `Mana`). A static ability says the player doesn't
+    /// lose that unspent mana as steps and phases end (CR 500.5: Electro, Assaulting Battery, Upwelling). That mana stays,
+    /// restricted or not (CR 106.6). Kept mana whose own duration ran out with `ending` stays as ordinary mana. It is lost at
+    /// the first ending after this that nothing keeps it through.
+    pub fn empty_mana_keeping(&mut self, player: PlayerId, ending: ManaLasts, kept: [bool; 6]) {
         if !self.players[player.index()].pool.is_empty() || !self.players[player.index()].lasting.is_empty() {
-            let mut kept = ManaPool::default();
+            let mut lasting = ManaPool::default();
             for e in self.mana_from.iter().filter(|e| e.player == player && e.restriction.is_none() && e.lasts > ending) {
-                for (k, n) in kept.0.iter_mut().zip(e.pool.0) {
+                for (k, n) in lasting.0.iter_mut().zip(e.pool.0) {
                     *k += n;
                 }
             }
             self.update_player(player, |pl| {
-                pl.pool = kept;
-                pl.lasting = kept;
+                for (m, &keep) in kept.iter().enumerate() {
+                    if !keep {
+                        pl.pool.0[m] = lasting.0[m];
+                    }
+                }
+                pl.lasting = lasting;
             });
         }
-        self.empty_restricted_mana(player);
+        self.empty_restricted_mana(player, kept);
         if self.mana_from.iter().any(|e| e.player == player && e.lasts <= ending) {
             let old = self.mana_from.clone();
-            self.mana_from.retain(|e| e.player != player || e.lasts > ending);
+            let mut after: Vec<ManaFrom> = Vec::with_capacity(old.len());
+            for e in &old {
+                if e.player != player || e.lasts > ending {
+                    after.push(*e);
+                    continue;
+                }
+                let mut pool = ManaPool::default();
+                for (m, &keep) in kept.iter().enumerate() {
+                    if keep {
+                        pool.0[m] = e.pool.0[m];
+                    }
+                }
+                if pool.is_empty() {
+                    continue;
+                }
+                // What is kept is ordinary mana from now on: one entry per source and restriction, as `add_mana` keeps it. The
+                // parts add up to no more than the pool holds, so this cannot overflow.
+                match after.iter_mut().find(|a| a.player == player && a.source == e.source && a.restriction == e.restriction && a.lasts == ManaLasts::Step) {
+                    Some(a) => {
+                        for (k, n) in a.pool.0.iter_mut().zip(pool.0) {
+                            *k += n;
+                        }
+                    }
+                    None => after.push(ManaFrom { pool, lasts: ManaLasts::Step, ..*e }),
+                }
+            }
+            self.mana_from = after;
             self.log(Undo::ManaFromAll(old));
         }
     }
@@ -882,15 +920,24 @@ impl GameState {
         take
     }
 
-    /// Empties `player`'s restricted mana (CR 106.4): the pool alone (`empty_mana`).
-    fn empty_restricted_mana(&mut self, player: PlayerId) {
+    /// Empties `player`'s restricted mana (CR 106.4) but for the types `kept` names: the pool alone (`empty_mana_keeping`).
+    fn empty_restricted_mana(&mut self, player: PlayerId, kept: [bool; 6]) {
         if !self.has_restricted_mana(player) {
             return;
         }
         let old = self.restricted_mana.clone();
-        self.restricted_mana.retain(|r| r.player != player);
-        self.log(Undo::RestrictedManaSet(old));
-        self.set_unsettled();
+        for r in self.restricted_mana.iter_mut().filter(|r| r.player == player) {
+            for (n, &keep) in r.pool.0.iter_mut().zip(kept.iter()) {
+                if !keep {
+                    *n = 0;
+                }
+            }
+        }
+        self.restricted_mana.retain(|r| r.player != player || !r.pool.is_empty());
+        if self.restricted_mana != old {
+            self.log(Undo::RestrictedManaSet(old));
+            self.set_unsettled();
+        }
     }
 
     pub fn update_turn(&mut self, f: impl FnOnce(&mut Turn)) {
@@ -2316,5 +2363,47 @@ mod tests {
         assert_eq!(s.player(p).pool.get(Mana::R), 1);
         s.empty_mana(p, ManaLasts::Turn);
         assert_eq!(s.player(p).pool.get(Mana::R), 0);
+    }
+
+    /// CR 500.5, Electro, Assaulting Battery: the types a static ability keeps stay as an ending empties the pool, restricted
+    /// mana too (the rulings: Arena of Glory's rider stays on it), and other types go. Kept mana whose own duration ran out
+    /// stays as ordinary mana, in one entry per source and restriction, so it is lost at the next ending nothing keeps.
+    #[test]
+    fn kept_mana_stays_through_an_ending_and_becomes_ordinary_mana() {
+        let mut s = GameState::new(2, 1);
+        let p = PlayerId(0);
+        let src = ObjectId(1);
+        let mut red = [false; 6];
+        red[Mana::R as usize] = true;
+        s.add_mana(p, Mana::R, 1, src, None, ManaLasts::Step);
+        s.add_mana(p, Mana::R, 2, ObjectId(2), None, ManaLasts::Turn);
+        s.add_mana(p, Mana::R, 1, ObjectId(2), None, ManaLasts::Step);
+        s.add_mana(p, Mana::G, 1, src, None, ManaLasts::Step);
+        s.add_mana(p, Mana::R, 1, src, Some(ManaRestriction::GainsHaste), ManaLasts::Step);
+        s.add_mana(p, Mana::G, 1, src, Some(ManaRestriction::GainsHaste), ManaLasts::Step);
+
+        s.empty_mana_keeping(p, ManaLasts::Step, red);
+        assert_eq!((s.player(p).pool.get(Mana::R), s.player(p).pool.get(Mana::G)), (4, 0));
+        assert_eq!(s.player(p).lasting.get(Mana::R), 2);
+        assert!(s.has_restricted_mana(p));
+
+        // The turn ends: the {R}{R} that lasted until then is kept as ordinary mana, its own duration over, joining the
+        // ordinary {R} from the same source in one entry.
+        s.empty_mana_keeping(p, ManaLasts::Turn, red);
+        assert_eq!(s.player(p).pool.get(Mana::R), 4);
+        assert_eq!(s.player(p).lasting.get(Mana::R), 0);
+        let mut ordinary: Vec<_> = s.mana_from_of(p).filter(|e| e.restriction.is_none()).map(|e| (e.source, e.lasts, e.pool.get(Mana::R))).collect();
+        ordinary.sort_by_key(|e| e.0);
+        assert_eq!(ordinary, vec![(src, ManaLasts::Step, 1), (ObjectId(2), ManaLasts::Step, 3)]);
+        s.empty_mana_keeping(p, ManaLasts::Step, red);
+        assert_eq!(s.mana_from_of(p).filter(|e| e.restriction.is_none()).count(), 2);
+        let restricted: Vec<_> = s.mana_from_of(p).filter(|e| e.restriction.is_some()).map(|e| (e.pool.get(Mana::R), e.pool.get(Mana::G))).collect();
+        assert_eq!(restricted, vec![(1, 0)]);
+
+        // Nothing keeps it any more: all of it is lost.
+        s.empty_mana(p, ManaLasts::Step);
+        assert_eq!(s.player(p).pool.get(Mana::R), 0);
+        assert!(!s.has_restricted_mana(p));
+        assert_eq!(s.mana_from_of(p).count(), 0);
     }
 }

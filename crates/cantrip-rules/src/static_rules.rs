@@ -32,6 +32,31 @@ pub fn extra_power_up_activations(cx: &Cx, player: PlayerId) -> u32 {
         .sum()
 }
 
+/// The players whose unspent mana of some types a static ability keeps in their pool as steps and phases end (CR 500.5,
+/// `CardDef::mana_kept`): each with those types, indexed by `Mana`. Empty while no permanent with its abilities has one
+/// (CR 613.1f).
+pub fn mana_kept(cx: &Cx) -> Vec<(PlayerId, [bool; 6])> {
+    let mut kept: Vec<(PlayerId, [bool; 6])> = Vec::new();
+    for (id, controller, def, by) in sources(cx, |d| !d.mana_kept.is_empty()) {
+        let asker = Asker { source: id, controller, by, spell: false };
+        for player in cx.s().seats() {
+            for mana in Mana::ALL {
+                if def.mana_kept.iter().any(|rule| rule(cx, &asker, player, mana)) {
+                    match kept.iter_mut().find(|(p, _)| *p == player) {
+                        Some((_, k)) => k[mana as usize] = true,
+                        None => {
+                            let mut k = [false; 6];
+                            k[mana as usize] = true;
+                            kept.push((player, k));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    kept
+}
+
 /// The sources of the ordinary mana in `player`'s pool whose mana an ability of a permanent on the battlefield tells apart
 /// (CR 106.3, `CardDef::mana_told_apart`): mana its payer chooses to spend or keep (CR 601.2h, 118.3a). Asked only while
 /// that mana came from more than one source, since one source's mana is all alike: a pool of one land's mana searches

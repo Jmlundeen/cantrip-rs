@@ -1,0 +1,11 @@
+{
+  "name": "Electro, Assaulting Battery",
+  "manaCost": "{1}{R}{R}",
+  "type": "Legendary Creature — Human Villain",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flying\nYou don't lose unspent red mana as steps and phases end.\nWhenever you cast an instant or sorcery spell, add {R}.\nWhen Electro leaves the battlefield, you may pay {X}. When you do, he deals X damage to target player.",
+  "keywords": [
+    "Flying"
+  ]
+}

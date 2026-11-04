@@ -1,0 +1,59 @@
+# Electro, Assaulting Battery: "You don't lose unspent red mana as steps and phases end" (CR 500.5). The rulings say that
+# red mana can be spent in a later step, phase or turn, and that other mana is still lost. Turn 1: Black Lotus pays
+# for Electro, then Mox Ruby and Mox Emerald add {R}{G}; the {G} empties with the step and the {R} stays into Bot2's turn.
+# Bot2's own red mana empties as usual. Turn 3: Mox Ruby adds a second {R}. Lightning Bolt spends one, and Electro's
+# trigger (an instant was cast) adds {R}. Raging Goblin, a creature spell, spends one more and triggers nothing. Bot1
+# ends with the one {R}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Electro, Assaulting Battery
+Lightning Bolt
+Raging Goblin
+Island x15
+
+[Bot2 Deck]
+Mountain
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Electro, Assaulting Battery.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana = {R}{G}
+[T1 Bot1.BeginCombat]
+? Bot1.Mana = {R}
+[T2 Bot2.Main1]
+? Bot1.Mana = {R}
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+? Bot2.Mana = {R}
+[T2 Bot2.BeginCombat]
+? Bot2.Mana =
+[T3 Bot1.Main1]
+? Bot1.Mana = {R}
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana = {R}
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Mana = {R}
+Bot2.Mana =
+Bot2.Life = 17
+Bot1.Battlefield.Raging Goblin.Power = 1
+Bot1.Battlefield.Electro, Assaulting Battery.Keywords = Flying

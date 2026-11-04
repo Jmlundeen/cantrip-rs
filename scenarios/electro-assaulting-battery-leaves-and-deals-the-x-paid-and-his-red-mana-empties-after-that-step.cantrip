@@ -1,0 +1,50 @@
+# Electro, Assaulting Battery: "When Electro leaves the battlefield, you may pay {X}. When you do, he deals X damage to
+# target player." The rulings: X is chosen as the ability resolves, and the reflexive ability's target is chosen when it
+# triggers. Once Electro has left, the red mana he kept is lost as the step under way ends. Turn 1: Black Lotus pays for
+# Electro, and Mox Ruby and a Mountain add {R}{R}, which he keeps. Turn 3: Mox Ruby adds {R}, and Bot1 Lightning Bolts
+# its own Electro. Electro's trigger adds {R} first ({R}{R}{R}), then Bolt kills him. Bot1 pays X = 2 and targets Bot2,
+# who takes exactly 2. The {R} left over is still there in the main phase and gone at the beginning of combat.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mountain
+Electro, Assaulting Battery
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Electro, Assaulting Battery.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+? Bot1.Mana = {R}{R}
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Electro, Assaulting Battery)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}{R}
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost(X: 2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot1.Mana = {R}
+[T3 Bot1.BeginCombat]
+
+[Expect]
+Bot1.Mana =
+Bot2.Life = 18
+Bot1.Graveyard = Electro, Assaulting Battery; Lightning Bolt; Black Lotus
