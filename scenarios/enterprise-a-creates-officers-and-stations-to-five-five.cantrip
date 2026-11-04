@@ -1,0 +1,60 @@
+# U.S.S. Enterprise-A, Free Spirit: the enters trigger creates three 1/1 red Officer tokens, and stationing its own Officers
+# puts a charge counter for each one's power (CR 721.2a). Two rounds of stationing the three Officers reach six on turn 5:
+# at five it is still a noncreature artifact with no keywords, and at six a 5/5 artifact creature with flying and lifelink
+# (CR 721.2b-c).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Plains
+U.S.S. Enterprise-A, Free Spirit
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.U.S.S. Enterprise-A, Free Spirit.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Officer Token#3.Colors = Red
+? Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Types = Artifact
+? Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Keywords = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Activate(Ability: Station)
+Bot1.Choose(Officer Token#1)
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Activate(Ability: Station)
+Bot1.Choose(Officer Token#2)
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Activate(Ability: Station)
+Bot1.Choose(Officer Token#3)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Activate(Ability: Station)
+Bot1.Choose(Officer Token#1)
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Activate(Ability: Station)
+Bot1.Choose(Officer Token#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Counters.Charge = 5
+? Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Types = Artifact
+? Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Keywords = (absent)
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Activate(Ability: Station)
+Bot1.Choose(Officer Token#3)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Counters.Charge = 6
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Types = Artifact; Creature
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Power = 5
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Toughness = 5
+Bot1.Battlefield.U.S.S. Enterprise-A, Free Spirit.Keywords = Flying; Lifelink
