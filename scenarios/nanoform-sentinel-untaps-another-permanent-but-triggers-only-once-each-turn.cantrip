@@ -1,0 +1,66 @@
+# Nanoform Sentinel {2}{U}, "Whenever this creature becomes tapped, untap another target permanent. This ability triggers only once each turn": Bot1 has two of them
+# (turns 1 and 3). In turn 5 a Mental Modulation taps the first, whose trigger untaps Mox Jet (tapped for mana beforehand); a second taps the other, whose trigger
+# untaps the first. The first then attacks - tapping again - and, having already triggered this turn, triggers no more: nothing is on the stack and the second Sentinel stays tapped.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Nanoform Sentinel
+Nanoform Sentinel
+Mental Modulation
+Mental Modulation
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Nanoform Sentinel.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Nanoform Sentinel.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Mental Modulation.Cast(Bot1.Battlefield.Nanoform Sentinel#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Mox Jet)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Jet.Tapped = false
+? Bot1.Battlefield.Nanoform Sentinel#1.Tapped = true
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Mental Modulation.Cast(Bot1.Battlefield.Nanoform Sentinel#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Nanoform Sentinel#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Nanoform Sentinel#1.Tapped = false
+? Bot1.Battlefield.Nanoform Sentinel#2.Tapped = true
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Nanoform Sentinel#1 > Bot2)
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Nanoform Sentinel#1.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Nanoform Sentinel#2.Tapped = true
