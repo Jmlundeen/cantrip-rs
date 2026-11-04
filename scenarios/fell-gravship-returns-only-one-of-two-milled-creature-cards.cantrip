@@ -1,0 +1,33 @@
+# Ornithopter and Memnite are both milled: "a creature or Spacecraft card" is one card, so only Memnite is returned and
+# Ornithopter stays in the graveyard (CR 608.2c).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Fell Gravship
+Island x3
+Ornithopter
+Memnite
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fell Gravship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Memnite)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Memnite
+Bot1.Graveyard = Island; Ornithopter

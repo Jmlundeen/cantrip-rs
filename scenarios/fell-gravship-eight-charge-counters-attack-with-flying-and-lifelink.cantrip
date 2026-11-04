@@ -1,0 +1,54 @@
+# Fell Gravship stationed at once with Phyrexian Soulgorger (power 8): eight charge counters make it a 3/2 artifact creature with
+# flying and lifelink (CR 721.2a-b). Attacking on turn 3 it deals 3 to Bot2 (20 -> 17) and Bot1 gains 3 (20 -> 23).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Black Lotus
+Fell Gravship
+Phyrexian Soulgorger
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fell Gravship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Soulgorger.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Fell Gravship.Activate(Ability: Station)
+Bot1.Choose(Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fell Gravship.Counters.Charge = 8
+? Bot1.Battlefield.Fell Gravship.Types = Artifact; Creature
+? Bot1.Battlefield.Fell Gravship.Power = 3
+? Bot1.Battlefield.Fell Gravship.Toughness = 2
+? Bot1.Battlefield.Fell Gravship.Keywords = Flying; Lifelink
+[T3 Bot1.Main1]
+Bot1.Attack(Fell Gravship > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 17

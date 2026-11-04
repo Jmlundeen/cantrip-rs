@@ -1,0 +1,7 @@
+{
+  "name": "Fell Gravship",
+  "manaCost": "{2}{B}",
+  "type": "Artifact — Spacecraft",
+  "stationPt": "3/2",
+  "oracleText": "When this Spacecraft enters, mill three cards, then return a creature or Spacecraft card from your graveyard to your hand.\nStation (Tap another creature you control: Put charge counters equal to its power on this Spacecraft. Station only as a sorcery. It's an artifact creature at 8+.)\n8+ | Flying, lifelink"
+}

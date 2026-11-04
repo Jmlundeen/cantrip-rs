@@ -1,0 +1,31 @@
+# The card returned may be a Spacecraft card that is no creature card: Entropic Battlecruiser, milled with two Islands, is returned.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Fell Gravship
+Island x3
+Entropic Battlecruiser
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fell Gravship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Entropic Battlecruiser)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Entropic Battlecruiser
+Bot1.Graveyard = Island; Island

@@ -1,0 +1,58 @@
+# Seven charge counters (Frostbite Pyromental's 4 on turn 1, Darklight Phoenix's 3 on turn 3, the Phoenix returned to the hand by the
+# enter trigger's mill) are one short of 8+: Fell Gravship is still an artifact, not a creature, without flying or lifelink.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Ruby x2
+Fell Gravship
+Frostbite Pyromental
+Darklight Phoenix
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fell Gravship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Darklight Phoenix)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Frostbite Pyromental.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Fell Gravship.Activate(Ability: Station)
+Bot1.Choose(Frostbite Pyromental)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fell Gravship.Counters.Charge = 4
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Darklight Phoenix.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Fell Gravship.Activate(Ability: Station)
+Bot1.Choose(Darklight Phoenix)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Fell Gravship.Counters.Charge = 7
+Bot1.Battlefield.Fell Gravship.Types = Artifact
+Bot1.Battlefield.Fell Gravship.Keywords = (absent)
