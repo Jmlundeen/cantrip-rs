@@ -1,0 +1,35 @@
+# Living Brain, Mechanical Marvel is itself a non-Equipment artifact its controller controls (an artifact creature, Robot Villain): at the beginning of combat Bot1 targets it, and it
+# stays a Robot Villain artifact creature (the text names no creature type, so its own are neither replaced nor added to), its 3/3 base set again (a 3/3 already) and it untaps.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Living Brain, Mechanical Marvel
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Living Brain, Mechanical Marvel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Living Brain, Mechanical Marvel)
+[T1 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Living Brain, Mechanical Marvel.Subtypes = Robot; Villain
+? Bot1.Battlefield.Living Brain, Mechanical Marvel.Types = Artifact; Creature
+
+[Expect]
+Bot1.Battlefield.Living Brain, Mechanical Marvel.Power = 3

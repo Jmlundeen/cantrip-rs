@@ -1,0 +1,41 @@
+# Living Brain, Mechanical Marvel ({4}): "At the beginning of combat on your turn, target non-Equipment artifact you control becomes an artifact creature with base power and
+# toughness 3/3 until end of turn. Untap it." On turn 1 Bot1 taps four Moxen to cast the Brain (exactly {4}, nothing left in the pool); at the beginning of combat the tapped Mox Pearl
+# is the target: it becomes a 3/3 artifact creature (two card types, power 3) and is untapped. By turn 3 it is a plain artifact again (one type).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Living Brain, Mechanical Marvel
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Living Brain, Mechanical Marvel.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Mox Pearl)
+[T1 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Pearl.Power = 3
+? Bot1.Battlefield.Mox Pearl.Toughness = 3
+? Bot1.Battlefield.Mox Pearl.Types.Count = 2
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Mox Pearl.Types.Count = 1
+
+[Expect]
+Bot1.Battlefield.Mox Emerald.Types.Count = 1

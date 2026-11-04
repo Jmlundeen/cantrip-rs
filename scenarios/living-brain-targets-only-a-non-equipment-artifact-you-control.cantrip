@@ -1,0 +1,49 @@
+# Living Brain, Mechanical Marvel's "target non-Equipment artifact you control". On turn 1 Bot1 casts the Brain (four Moxen); turn 2 Bot2 casts its own Mox Sapphire. On turn 3
+# Bot1 plays a Plains and casts Skullclamp (an Equipment) with Mox Pearl; at the beginning of combat neither the Skullclamp (an Equipment), the Plains (not an artifact) nor Bot2's Mox
+# Sapphire (not Bot1's) can be targeted, while Bot1's own Mox Emerald can: it becomes a 3/3 artifact creature (turn 1's trigger had no better choice than the first candidate).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Living Brain, Mechanical Marvel
+Skullclamp
+Plains x20
+
+[Bot2 Deck]
+Mox Sapphire
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Living Brain, Mechanical Marvel.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Skullclamp)
+! Bot1.Target(Plains)
+! Bot1.Target(Bot2.Battlefield.Mox Sapphire)
+Bot1.Target(Mox Emerald)
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Emerald.Power = 3
+? Bot1.Battlefield.Skullclamp.Types.Count = 1
+
+[Expect]
+Bot2.Battlefield.Mox Sapphire.Types.Count = 1

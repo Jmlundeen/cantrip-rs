@@ -1,0 +1,8 @@
+{
+  "name": "Living Brain, Mechanical Marvel",
+  "manaCost": "{4}",
+  "type": "Legendary Artifact Creature — Robot Villain",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "At the beginning of combat on your turn, target non-Equipment artifact you control becomes an artifact creature with base power and toughness 3/3 until end of turn. Untap it."
+}
