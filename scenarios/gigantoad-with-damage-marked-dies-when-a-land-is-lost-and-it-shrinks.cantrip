@@ -1,0 +1,60 @@
+# Gigantoad as a 6/6 with seven lands (CR 604.1, 613.4c): Bot2 casts Lightning Bolt and Shock at it on turn 6 - five damage marked on
+# a 6/6 does not kill it - and then Stone Rain destroys one of the seven Forests. With six lands the +2/+2 is gone, it is a 4/4
+# with five damage marked, and as a state-based action it is destroyed (CR 704.5g); the damage was never removed (CR 120.6).
+
+[Bot1 Deck]
+Forest x5
+Fastbond
+Gigantoad
+Forest x3
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Shock
+Stone Rain
+Mountain x3
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Forest#4.Activate
+Bot1.Battlefield.Forest#5.Activate
+Bot1.Hand.Gigantoad.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gigantoad)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Gigantoad)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Gigantoad.Toughness = 6
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mountain#3.Activate
+Bot2.Hand.Stone Rain.Cast(Bot1.Battlefield.Forest)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Gigantoad; Forest

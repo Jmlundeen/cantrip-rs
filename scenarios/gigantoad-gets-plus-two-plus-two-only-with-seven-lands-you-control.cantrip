@@ -1,0 +1,55 @@
+# Gigantoad ({3}{G}, 4/4): "As long as you control seven or more lands, this creature gets +2/+2" (CR 604.1, 613.4c). Fastbond puts
+# five Forests out on turn 1 (four damage) and Gigantoad is cast with four of them: five lands, a 4/4. On turn 3 a sixth land and
+# Bot2's Island make seven lands between them, but only six are Bot1's, so it is still a 4/4 - an opponent's lands are not
+# "lands you control". The seventh land on turn 5 makes it a 6/6, and only it: Bot2's Merfolk of the Pearl Trident stays 1/1.
+
+[Bot1 Deck]
+Forest x5
+Fastbond
+Gigantoad
+Forest x3
+Island x20
+
+[Bot2 Deck]
+Island x2
+Merfolk of the Pearl Trident
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Forest#4.Activate
+Bot1.Battlefield.Forest#5.Activate
+Bot1.Hand.Gigantoad.Cast
+[T1 Bot1.End]
+? Bot1.Battlefield.Gigantoad.Power = 4
+? Bot1.Battlefield.Gigantoad.Toughness = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T3 Bot1.End]
+? Bot1.Battlefield.Gigantoad.Power = 4
+? Bot1.Battlefield.Gigantoad.Toughness = 4
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Merfolk of the Pearl Trident.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.End]
+? Bot2.Battlefield.Merfolk of the Pearl Trident.Power = 1
+? Bot1.Battlefield.Gigantoad.Power = 6
+? Bot1.Battlefield.Gigantoad.Toughness = 6
+
+[Expect]
+Bot1.Life = 16
+Bot1.Battlefield.Gigantoad.Power = 6
+Bot1.Battlefield.Gigantoad.Toughness = 6

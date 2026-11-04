@@ -1,0 +1,8 @@
+{
+  "name": "Gigantoad",
+  "manaCost": "{3}{G}",
+  "type": "Creature — Frog",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "As long as you control seven or more lands, this creature gets +2/+2."
+}
