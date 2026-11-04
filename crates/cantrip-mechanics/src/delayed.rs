@@ -58,7 +58,13 @@ pub fn destroy_subject(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 
 /// The delayed ability of "destroy that creature at end of combat" (CR 603.7c), the body of `destroy_subject`; a card lists it
 /// among its `delayed` abilities and names its index in `at_end_of_combat`.
-pub const DESTROY_THAT_CREATURE_AT_END_OF_COMBAT: AbilityDef = delayed_trigger(destroy_subject, "Destroy that creature at end of combat.");
+pub const DESTROY_THAT_CREATURE_AT_END_OF_COMBAT: AbilityDef = destroy_that_at_end_of_combat("Destroy that creature at end of combat.");
+
+/// The same delayed ability with a card's own wording of it, for a card whose text names the object another way ("destroy that Wall
+/// at end of combat": Battering Ram), so the ability's text is the card's Oracle text.
+pub const fn destroy_that_at_end_of_combat(text: &'static str) -> AbilityDef {
+    delayed_trigger(destroy_subject, text)
+}
 
 /// "Exile [the target in slot `slot`]. Return that card to the battlefield under its owner's control at the beginning of the next
 /// end step" (CR 603.7): exiles the target and sets up the card's delayed ability number `ability` about the card exiled, but only
