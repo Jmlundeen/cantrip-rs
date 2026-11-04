@@ -1,0 +1,26 @@
+# Set Phasers to . . . (Stun): tap target creature and put a stun counter on it (CR 701.26a, 122.1d). Bot1's own Ornithopter is
+# the target, and the stun counter stays even though the tap does nothing new.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Set Phasers to . . .
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Set Phasers to . . ..Cast
+Bot1.Modes(Stun — Tap target creature and put a stun counter on it.)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Ornithopter.Counters.Stun = 1
+Bot1.Graveyard = Set Phasers to . . .
