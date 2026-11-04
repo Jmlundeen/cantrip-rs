@@ -1,0 +1,36 @@
+# Spider-UK: "Web-slinging {2}{W}" (CR 702.188a): cast for {2}{W} by also returning a tapped creature you control to its owner's hand. Bot1
+# attacks with its Ornithopter on turn 3 (it taps), then in the second main phase casts Spider-UK for {2}{W} from three Moxen,
+# returning the Ornithopter. Spider-UK is on the battlefield and the Ornithopter back in hand; cast for its normal {3}{W} it would have cost a fourth mana.
+
+[Bot1 Deck]
+Spider-UK
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-UK.Cast(Ability: Web-slinging)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Spider-UK
+Bot1.Hand.Ornithopter.Power = 0
+Bot2.Life = 20

@@ -1,0 +1,51 @@
+# Spider-UK: its end-step ability needs two or more creatures to have entered under your control that turn. On turn 1 only Spider-UK
+# enters: no trigger (CR 603.4), so Bot1's life stays 20 and no card is drawn. On turn 3 Bot1 casts two Ornithopters and gets the draw and 2 life
+# at the end step; Bot2's own creature entering, on turn 2, is no creature of Bot1's.
+
+[Bot1 Deck]
+Spider-UK
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spider-UK.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot1.Life = 20
+? Bot1.Hand = Ornithopter; Ornithopter
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 22
