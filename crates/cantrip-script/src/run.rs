@@ -613,7 +613,7 @@ impl<'s> Run<'s> {
             // `! Bot1.Accept`, `! Bot1.Choose`, a bare `! Bot1.Target` or `! Bot2.Block`...: the player is not asked that kind of question
             // before their next priority (a bare Block: no block is possible, so the declaration is never asked for).
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
-                && ((action.verb.is_question() && !(matches!(action.verb, ScriptVerb::Choose | ScriptVerb::Colors | ScriptVerb::Name) && action.positional().next().is_some())
+                && ((action.verb.is_question() && !(matches!(action.verb, ScriptVerb::Choose | ScriptVerb::ChoosePlayer | ScriptVerb::Colors | ScriptVerb::Name) && action.positional().next().is_some())
                     && !(matches!(action.verb, ScriptVerb::Choose) && action.text.contains('('))
                     && !(matches!(action.verb, ScriptVerb::Arrange) && !action.raw_arguments.trim().is_empty()))
                     || (matches!(action.verb, ScriptVerb::Target | ScriptVerb::Modes | ScriptVerb::Block | ScriptVerb::Attack)
@@ -1682,6 +1682,20 @@ impl<'s> Run<'s> {
     /// proves nothing.
     fn check_refused_declaration(&self, action: &ActionStep, line: usize, text: &str, request: &Request) -> R<()> {
         match &request.kind {
+            // `! Bot1.ChoosePlayer(Bot1)`: that player is no answer the question accepts - not among its candidates (Shinryu,
+            // Transcendent Rival's "choose an opponent" leaves its controller out), judged by the rules' own check of the answer.
+            RequestKind::ChoosePlayer { .. } => {
+                let Some(spec) = action.positional().next() else {
+                    return fail(format!("line {line}: {text}: name the player that must not be chosen"));
+                };
+                let Some(p) = bot_id(spec).map(player_of) else { return fail(format!("line {line}: {spec} is not a player")) };
+                if p.0 as usize >= self.game.state.players.len() {
+                    return fail(format!("line {line}: {text} proves nothing: there is no {spec} in the game"));
+                }
+                if check_answer(&self.game, request, &Answer::Player(p)).is_ok() {
+                    return fail(format!("line {line} says {text} must not be choosable, but it is"));
+                }
+            }
             RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements } => {
                 // `! Bot2.Block()`: declaring no blockers at all is refused, because some creature must block (CR 509.1c).
                 if action.positional().next().is_none() {

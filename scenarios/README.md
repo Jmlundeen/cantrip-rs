@@ -461,6 +461,10 @@ The same holds for the other questions, written bare: `! Bot1.Choose`, `! Bot1.D
 of question before their next priority: a discard, a search result, a placement or a target that should not be asked for (an
 empty hand, a lone candidate, nothing to reveal). Pair each with a scenario that does ask it.
 
+With a player, `! Bot1.ChoosePlayer(Bot1)` is judged at that player's next player choice instead: it fails if the question
+would accept that player (Shinryu, Transcendent Rival's "choose an opponent" refuses its controller). Put it before the line
+that answers the choice.
+
 Such a refusal must cover a point where its question could have been asked, or it fails as proving nothing. Its window
 opens where the game stood before the answer to the line above it (or, under a step header, as the step began; a refusal
 straight after another, checks between, shares that one's window) and closes where it is judged. For `Modes` and `Target`,
