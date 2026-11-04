@@ -1,0 +1,39 @@
+# Tractor Beam on Bot2's Memnite: "When this Aura enters, tap enchanted permanent. You control enchanted permanent. Enchanted permanent doesn't untap during its controller's untap step." Memnite becomes Bot1's, tapped; Bot1's untap step on turn 5 leaves it tapped (CR 303.4m, 613.1b, 502.3). An Island is not a creature or Spacecraft, so it is not a legal target (a refusal).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Island
+Tractor Beam
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Tractor Beam.Cast(Bot1.Battlefield.Island)
+Bot1.Hand.Tractor Beam.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Count = 0
+? Bot1.Battlefield.Memnite.Tapped = true
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Memnite.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Memnite.Tapped = true
+Bot2.Battlefield.Count = 0

@@ -1,0 +1,41 @@
+# Tractor Beam's "Enchant creature or Spacecraft": Bot2's Synthesizer Labship has no charge counters and is no creature, yet it is a legal target. Bot1 takes it tapped, and it stays tapped through Bot1's next untap step (CR 303.4a, 205.3g, 613.1b, 502.3).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Island
+Tractor Beam
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Synthesizer Labship
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Synthesizer Labship.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tractor Beam.Cast(Bot2.Battlefield.Synthesizer Labship)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Count = 1
+? Bot1.Battlefield.Synthesizer Labship.Tapped = true
+? Bot1.Battlefield.Synthesizer Labship.Types = Artifact
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Synthesizer Labship.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Synthesizer Labship.Tapped = true
