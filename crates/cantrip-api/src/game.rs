@@ -1293,10 +1293,17 @@ pub trait Game: Query {
     /// on the battlefield now (`CardDef::stations_by_toughness`); asked of the creature as it last existed if it has left.
     fn stations_using_toughness(&self, creature: ObjectId) -> bool;
     fn lose_life(&mut self, player: PlayerId, amount: i32);
+    /// The life losses of one instruction, simultaneously (CR 101.4, 119.3): each pair is a player and the amount they
+    /// lose, determined before this call (CR 608.2h). Positive amounts for the same player are added; none or fewer do
+    /// nothing. Prohibitions and replacements apply in APNAP order before any of the instruction's life totals change,
+    /// then the changes are announced together (CR 603.2c). Returns the actual life lost: only final negative changes,
+    /// not blocked losses or losses replaced with gains. Gul Dukat, Colonial Prefect; Archfiend of Despair.
+    fn lose_life_together(&mut self, losses: &[(PlayerId, i32)]) -> i32;
     /// "`player`'s life total becomes `total`" (CR 119.5): they gain or lose the difference, so a player who can't gain life
     /// keeps a total lower than `total` (CR 119.7).
     fn set_life_total(&mut self, player: PlayerId, total: i32);
-    /// Each opponent of `player` who is still in the game loses `amount` life (CR 119.3), in turn order. The total they lost.
+    /// Each opponent of `player` still in the game loses `amount` life simultaneously (CR 101.4, 119.3), through
+    /// `lose_life_together`. Returns the actual life lost, excluding blocked losses and losses replaced with gains.
     fn each_opponent_loses_life(&mut self, player: PlayerId, amount: i32) -> i32;
     fn add_mana(&mut self, player: PlayerId, mana: Mana, amount: u32);
     /// Adds mana that lasts until the end of combat (CR 106.4, 500.5a): not lost as the steps before it end.

@@ -1008,7 +1008,7 @@ A live player at zero life still receives simultaneous damage before state-based
 including lifelink from a departed source-controller's independent ability, likewise affect only players still in the
 game. The original simultaneous batch and each source's live damage totals are preserved.
 
-Every gain and loss of life goes through `ops::change_life` (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR
+Every gain and loss of life uses the `ops::change_life` pipeline (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR
 120.3a), lifelink (CR 702.15b), and a life total set to a number (`Game::set_life_total`, CR 119.5: the player gains or loses
 the difference). A gain does not happen while the player can't gain life (CR 119.7, `static_rules::cant_gain_life`): a
 resolved effect about the player says so (`EffectKind::CantGainLife`, Screaming Nemesis's "for the rest of the game"), or a
@@ -1026,6 +1026,15 @@ Emperion rulings). `change_life` asks both rules before the replacement effects 
 would turn the event into a gain or a loss the player can't have leaves nothing. Such a player can't pay life (CR 119.8, 119.4b:
 `actions::payable_life` is 0 for them): a cost with life in it is not offered, Phyrexian symbols are paid with mana, and X paid
 in life is announced at 0. The host shows "You can't lose life." or, with both, "Your life total can't change." beside the total.
+
+Losses one instruction causes for several players use `Game::lose_life_together` (Gul Dukat, Colonial Prefect;
+Archfiend of Despair): the caller determines each amount once before the instruction applies (CR 608.2h), and the core
+coalesces positive amounts per player. The shared `ops::prepare_life_change` runs each player's prohibitions and existing
+life replacements in `GameState::apnap()` order (CR 101.4, 616.1), before any of the instruction's life updates. Then the
+journal applies the changes and `Cx::emit_batch` records and collects their triggers together (CR 603.2c): "one or more
+opponents" sees one occurrence, individual observers see each loss. The return value counts only final negative deltas,
+not blocked losses, replaced gains or a replacement continuation's other actions. `each_opponent_loses_life` uses the same
+operation for equal amounts; single-player changes still apply and emit immediately.
 
 Draws (CR 121) are judged one card at a time (`ops::draw`): first whether the player can't draw it (`cantrip_api::cant_draw`,
 a permanent's `CardDef::cant_draw` rule: "can't draw more than one card each turn", CR 121.2b) - then nothing happens and no

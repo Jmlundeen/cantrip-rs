@@ -3963,14 +3963,38 @@ fn lifelink(cx: &mut Cx, source: ObjectId, chars: &Chars, amount: u32, batch: &m
     }
 }
 
-/// Each opponent of `player` still in the game loses `amount` life (CR 119.3): the total lost.
+/// Each opponent of `player` still in the game loses `amount` life simultaneously (CR 101.4, 119.3): the total lost.
 pub fn each_opponent_loses_life(cx: &mut Cx, player: PlayerId, amount: i32) -> i32 {
-    let opponents: Vec<PlayerId> = cx.s().opponents(player).collect();
+    let losses: Vec<_> = cx.s().opponents(player).map(|p| (p, amount)).collect();
+    lose_life_together(cx, &losses)
+}
+
+/// The losses of one instruction (CR 101.4, 119.3, 608.2h): coalesced per player, replaced in APNAP order (CR 616.1)
+/// before any of its life totals change, then announced as one event (CR 603.2c). Only the final losses count towards
+/// "life lost this way", not gains or the separate actions a replacement's continuation performs.
+pub fn lose_life_together(cx: &mut Cx, losses: &[(PlayerId, i32)]) -> i32 {
+    let mut changes = Vec::new();
+    for player in cx.s().apnap() {
+        let amount: i32 = losses.iter().filter(|&&(p, n)| p == player && n > 0).map(|&(_, n)| n).sum();
+        let delta = prepare_life_change(cx, player, -amount);
+        if delta != 0 {
+            changes.push((player, delta));
+        }
+    }
+    // A later replacement's continuation may have removed a player or changed what they can gain or lose. Judge
+    // every final prohibition before applying any of the original instruction's changes.
+    changes.retain(|&(player, delta)| cx.s().in_game(player) && !life_total_cant_change(cx.s(), player) && !blocked(cx, player, delta));
     let mut total = 0;
-    for p in opponents {
-        let before = cx.s().player(p).life;
-        change_life(cx, p, -amount);
-        total += before - cx.s().player(p).life;
+    let mut events = Vec::with_capacity(changes.len());
+    for (player, delta) in changes {
+        cx.st().update_player(player, |p| p.life += delta);
+        if delta < 0 {
+            total -= delta;
+        }
+        events.push(Event::LifeChange { player, delta });
+    }
+    if !events.is_empty() {
+        cx.emit_batch(&events, None);
     }
     total
 }
@@ -3980,33 +4004,44 @@ pub fn life_total_cant_change(s: &GameState, player: PlayerId) -> bool {
     !s.effects.is_empty() && s.effects.iter().any(|e| e.kind == EffectKind::LifeTotalCantChange(player))
 }
 
-/// `player`'s life total goes up or down by `delta` (CR 119.3). Every gain and loss of life comes here: an effect's, a
-/// cost's (CR 119.4), damage (CR 120.3a), lifelink (CR 702.15b) and a life total set to a number (CR 119.5).
+/// `player`'s life total goes up or down by `delta` (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR 120.3a),
+/// lifelink (CR 702.15b) or a life total set to a number (CR 119.5). Simultaneous losses use the same preparation
+/// through `lose_life_together`, deferring the updates and announcement until every player's change is prepared.
 pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
-    if delta == 0 || !cx.s().in_game(player) {
-        return;
-    }
-    // CR 119.7: a player who can't gain life gains none, and nothing happens: no life gain event, so nothing that
-    // triggers on one (CR 119.9) triggers, and no replacement effect of a life gain event does anything.
-    if blocked(cx, player, delta) {
-        return;
-    }
-    // CR 119.7, 119.8: a player whose life total can't change gains and loses none, and nothing replaces what can't happen
-    // (Teferi's Protection's rulings: "Words of Worship's effect ... ends up replacing the event with nothing").
-    if life_total_cant_change(cx.s(), player) {
-        return;
-    }
-    // CR 614.1a, 616.1: "you gain that much life plus 1 instead", "they lose twice that much life instead". The event
-    // history records the life that actually changed. A gain an effect turned into a loss, or a loss into a gain, the player
-    // can't have is nothing (the Platinum Emperion rulings).
-    let delta = crate::replace::life_change(cx, player, delta);
-    if delta == 0 || !cx.s().in_game(player) || blocked(cx, player, delta) {
+    let delta = prepare_life_change(cx, player, delta);
+    if delta == 0 {
         return;
     }
     cx.st().update_player(player, |p| p.life = p.life.saturating_add(delta));
     // CR 702.179d: an opponent losing life during the turn of a player with speed triggers its inherent ability
     // (`designations::inherent_triggers`).
     cx.emit(Event::LifeChange { player, delta });
+}
+
+/// The shared life-change pipeline before its update: single-player changes apply it at once; simultaneous losses
+/// prepare every player's change first (CR 101.4, 614.1a, 616.1).
+fn prepare_life_change(cx: &mut Cx, player: PlayerId, delta: i32) -> i32 {
+    if delta == 0 || !cx.s().in_game(player) {
+        return 0;
+    }
+    // CR 119.7: a player who can't gain life gains none, and nothing happens: no life gain event, so nothing that
+    // triggers on one (CR 119.9) triggers, and no replacement effect of a life gain event does anything.
+    if blocked(cx, player, delta) {
+        return 0;
+    }
+    // CR 119.7, 119.8: a player whose life total can't change gains and loses none, and nothing replaces what can't happen
+    // (Teferi's Protection's rulings: "Words of Worship's effect ... ends up replacing the event with nothing").
+    if life_total_cant_change(cx.s(), player) {
+        return 0;
+    }
+    // CR 614.1a, 616.1: "you gain that much life plus 1 instead", "they lose twice that much life instead". The event
+    // history records the life that actually changed. A gain an effect turned into a loss, or a loss into a gain, the player
+    // can't have is nothing (the Platinum Emperion rulings).
+    let delta = crate::replace::life_change(cx, player, delta);
+    if delta == 0 || !cx.s().in_game(player) || blocked(cx, player, delta) {
+        return 0;
+    }
+    delta
 }
 
 /// Whether `player` can't have this change of life: a gain while they can't gain life (CR 119.7), a loss while they can't lose

@@ -78,6 +78,8 @@ mod control_at_once_tests;
 #[cfg(test)]
 mod can_gain_life_tests;
 #[cfg(test)]
+mod life_together_tests;
+#[cfg(test)]
 mod return_at_once_tests;
 #[cfg(test)]
 mod linked_text_tests;
@@ -2525,6 +2527,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn lose_life(&mut self, player: PlayerId, amount: i32) {
         ops::change_life(self, player, -amount);
+    }
+
+    fn lose_life_together(&mut self, losses: &[(PlayerId, i32)]) -> i32 {
+        ops::lose_life_together(self, losses)
     }
 
     fn set_life_total(&mut self, player: PlayerId, total: i32) {
