@@ -1,0 +1,51 @@
+# Friendly Neighborhood: "Enchant land. When this Aura enters, create three 1/1 green and white Human Citizen creature tokens. Enchanted land has
+# '{1}, {T}: Target creature gets +1/+1 until end of turn for each creature you control. Activate only as a sorcery.'" Bot1 enchants its
+# Plains on turn 1 and gets three Citizens. On turn 3 the Plains (tapping itself, with a Mox paying {1}) gives a Citizen +1/+1 for each of the three
+# creatures Bot1 controls: a 4/4 (CR 611.2a). Bot2's Ornithopter, cast on turn 2, is no creature Bot1 controls and adds nothing.
+
+[Bot1 Deck]
+Friendly Neighborhood
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Friendly Neighborhood.Cast(Bot1.Battlefield.Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 9
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate(Ability: gets +1/+1; Human Citizen Token#1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Human Citizen Token#1.Power = 4
+Bot1.Battlefield.Human Citizen Token#1.Toughness = 4
+Bot1.Battlefield.Human Citizen Token#2.Power = 1
+Bot2.Battlefield.Ornithopter.Power = 0
+Stack.Count = 0
