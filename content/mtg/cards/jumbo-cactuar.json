@@ -1,0 +1,8 @@
+{
+  "name": "Jumbo Cactuar",
+  "manaCost": "{5}{G}{G}",
+  "type": "Creature — Plant",
+  "power": 1,
+  "toughness": 7,
+  "oracleText": "10,000 Needles — Whenever this creature attacks, it gets +9999/+0 until end of turn."
+}

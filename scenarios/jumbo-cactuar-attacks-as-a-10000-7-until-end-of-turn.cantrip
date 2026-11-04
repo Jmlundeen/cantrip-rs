@@ -1,0 +1,46 @@
+# Jumbo Cactuar ({5}{G}{G}, 1/7): "10,000 Needles - Whenever this creature attacks, it gets +9999/+0 until end of turn." Cast on
+# turn 1 with two Black Lotuses and Mox Emerald, exactly seven mana, it is a 1/7 until it attacks on turn 3: then it is a
+# 10000/7 (CR 611.2a, 613.4c) - the toughness is unchanged - and Bot2's Steel Wall (0/4) that blocks it is destroyed. On
+# turn 4 it is a 1/7 again.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Jumbo Cactuar
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Steel Wall
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jumbo Cactuar.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Steel Wall.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Jumbo Cactuar.Power = 1
+? Bot1.Battlefield.Jumbo Cactuar.Toughness = 7
+Bot1.Attack(Jumbo Cactuar > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Block(Steel Wall > Jumbo Cactuar)
+? Bot1.Battlefield.Jumbo Cactuar.Power = 10000
+? Bot1.Battlefield.Jumbo Cactuar.Toughness = 7
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Jumbo Cactuar.Power = 1
+? Bot1.Battlefield.Jumbo Cactuar.Toughness = 7
+
+[Expect]
+Bot2.Graveyard = Steel Wall; Black Lotus
+Bot1.Battlefield.Jumbo Cactuar.Power = 1
