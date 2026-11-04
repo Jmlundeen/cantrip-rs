@@ -1,0 +1,42 @@
+# Casting Archdruid's Charm with one mode chosen is facing a dilemma (CR 700.2), so Melkotian Adjudicator gets a +1/+1
+# counter: one, for the one Charm cast (the second stays in hand).
+
+[Bot1 Deck]
+Melkotian Adjudicator
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Black Lotus
+Archdruid's Charm
+Archdruid's Charm
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Melkotian Adjudicator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(1)
+Bot1.Search()
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Melkotian Adjudicator.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Melkotian Adjudicator.Power = 3
+Bot1.Battlefield.Melkotian Adjudicator.Toughness = 2
