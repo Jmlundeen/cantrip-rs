@@ -1,0 +1,52 @@
+# "The power of the chosen creature" is read as Close Encounter resolves (CR 608.2h): a permanent that is no longer a creature
+# has no power (CR 208.3), and Close Encounter deals no damage (CR 120.8). Ensoul Artifact makes Bot1's Mox Emerald a 5/5
+# creature; Bot1 chooses the Mox and targets Bot2's Aegis Turtle, and Bot2 answers with Disenchant on Ensoul Artifact. The
+# Mox is still on the battlefield, but an artifact with no power: the Turtle is dealt nothing.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Emerald
+Ensoul Artifact
+Close Encounter
+Forest
+Island x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Aegis Turtle
+Disenchant
+Plains x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ensoul Artifact.Cast(Bot1.Battlefield.Mox Emerald)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Aegis Turtle.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Mox Emerald.Power = 5
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Close Encounter.Cast(Bot2.Battlefield.Aegis Turtle)
+Bot1.Choose(Mox Emerald)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Ensoul Artifact)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Aegis Turtle.Damage = 0
+Bot1.Graveyard = Close Encounter; Ensoul Artifact
+Bot1.Battlefield = Forest; Island; Mox Emerald; Mox Pearl

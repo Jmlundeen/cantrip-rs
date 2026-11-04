@@ -1,0 +1,51 @@
+# Close Encounter's additional cost, "choose a creature you control or a warped creature card you own in exile", can't be paid
+# with nothing to choose (CR 601.2h), so the spell can't be cast though its mana is there. On turn 3 Bot1 controls no creature.
+# Its own Ornithopter and Memnite are in exile but not warped (CR 702.185b): Oblivion Ring's triggered ability exiled the one,
+# Bot2's Swords to Plowshares the other. Bot2's Timeline Culler is a warped creature card in exile, but Bot2 owns it. And
+# Bot2's Memnite is a creature Bot1 doesn't control.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Emerald
+Memnite
+Ornithopter
+Oblivion Ring
+Close Encounter
+Plains x13
+
+[Bot2 Deck]
+Swamp
+Timeline Culler
+Memnite
+Mox Pearl
+Swords to Plowshares
+Swamp x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Oblivion Ring.Cast
+Bot1.Target(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Timeline Culler.Cast(Ability: Warp)
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Memnite)
+[T3 Bot1.Main1]
+? Exile = Memnite; Ornithopter; Timeline Culler
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Close Encounter.Cast(Bot2.Battlefield.Memnite)
+
+[Expect]
+Bot2.Battlefield = Memnite; Mox Pearl; Swamp

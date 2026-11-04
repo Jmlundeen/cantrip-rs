@@ -1,0 +1,44 @@
+# Close Encounter {1}{G}: "As an additional cost to cast this spell, choose a creature you control or a warped creature card you
+# own in exile. Close Encounter deals damage equal to the power of the chosen creature or card to target creature." On turn 1
+# Bot1 casts Red Tiger Mechan (3/3) for its warp cost {1}{R}, and warp exiles it at that end step: a warped card in exile
+# (CR 702.185b). On turn 3 Bot1 controls no creature and chooses the Mechan in exile: Bot2's Aegis Turtle (0/5) is dealt 3.
+# The choice is of exactly one (CR 601.2h): none is refused, and so is Bot2's Turtle, a creature Bot1 doesn't control.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Red Tiger Mechan
+Forest
+Close Encounter
+Mountain x15
+
+[Bot2 Deck]
+Island
+Aegis Turtle
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Red Tiger Mechan.Cast(Ability: Warp)
+[T2 Bot2.Main1]
+? Exile = Red Tiger Mechan
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aegis Turtle.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Close Encounter.Cast(Bot2.Battlefield.Aegis Turtle)
+! Bot1.Choose()
+! Bot1.Choose(Aegis Turtle)
+Bot1.Choose(Red Tiger Mechan)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Aegis Turtle.Damage = 3
+Bot1.Graveyard = Close Encounter
+Exile = Red Tiger Mechan

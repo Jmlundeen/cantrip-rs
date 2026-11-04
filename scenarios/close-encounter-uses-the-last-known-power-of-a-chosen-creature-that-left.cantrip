@@ -1,0 +1,40 @@
+# If the chosen creature has left the battlefield, Close Encounter uses its power as it last existed there (the ruling; CR
+# 608.2h). Bot1 chooses its Memnite (1/1) and targets Bot2's Aegis Turtle (0/5); Bot2 answers with Lightning Bolt on the
+# Memnite. Close Encounter still deals the Turtle 1.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Memnite
+Close Encounter
+Forest x16
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Aegis Turtle
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aegis Turtle.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Close Encounter.Cast(Bot2.Battlefield.Aegis Turtle)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Aegis Turtle.Damage = 1
+Bot1.Graveyard = Close Encounter; Memnite

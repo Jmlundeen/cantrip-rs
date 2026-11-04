@@ -1,0 +1,38 @@
+# A copy of a spell copies the decisions made for it, additional costs included (CR 707.10): a copy of Close Encounter deals
+# damage equal to the power of the object the original chose. Bot1 chooses its Memnite (1/1) and targets its own Ornithopter
+# (0/2), then copies Close Encounter with Choreographed Sparks, keeping the target. The copy deals 1 and Close Encounter 1:
+# the Ornithopter dies.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Memnite
+Ornithopter
+Close Encounter
+Choreographed Sparks
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Close Encounter.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Choose(Memnite)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Choreographed Sparks.Cast
+Bot1.Modes(1)
+Bot1.Target(Stack.Close Encounter)
+Bot1.Target(Ornithopter)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Close Encounter; Choreographed Sparks; Black Lotus
+Bot1.Battlefield = Forest; Memnite; Mox Emerald

@@ -1,0 +1,46 @@
+# Close Encounter: a chosen creature with negative power deals no damage (CR 107.1b, 120.8). Bot1's Grizzly Bears get -4/-0
+# from Depower and are -2/2; Bot1 chooses them and targets Bot2's Aegis Turtle (0/5), which is dealt nothing.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Black Lotus
+Depower
+Close Encounter
+Forest x13
+
+[Bot2 Deck]
+Island
+Aegis Turtle
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aegis Turtle.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Depower.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = -2
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Close Encounter.Cast(Bot2.Battlefield.Aegis Turtle)
+Bot1.Choose(Grizzly Bears)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Aegis Turtle.Damage = 0
+Bot2.Battlefield = Aegis Turtle; Island
+Bot1.Graveyard = Close Encounter; Depower; Black Lotus

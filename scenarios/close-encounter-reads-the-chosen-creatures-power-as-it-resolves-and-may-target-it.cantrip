@@ -1,0 +1,35 @@
+# Close Encounter reads the chosen creature's power as it resolves (CR 608.2h; the ruling: "use that creature's power when Close
+# Encounter resolves"), and the chosen creature may also be the target. Bot1 chooses its Grizzly Bears (2/2) and targets them,
+# then Giant Growth on the Bears resolves first: they are 5/5 when Close Encounter resolves, are dealt 5 and die. Read when
+# cast, the 2 damage would leave them alive.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Close Encounter
+Giant Growth
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Close Encounter.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Choose(Grizzly Bears)
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Grizzly Bears)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Grizzly Bears; Close Encounter; Giant Growth
