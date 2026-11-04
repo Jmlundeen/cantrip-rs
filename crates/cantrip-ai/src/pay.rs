@@ -296,7 +296,7 @@ fn pays_with(symbols: &[Vec<Mana>], generic: u32, sources: &[Source], used: &[us
     let mut taken = vec![false; slots.len()];
     cover(symbols, &slots, &mut taken)?;
     let left = taken.iter().filter(|t| !**t).count() as u32;
-    (left >= generic).then_some(left - generic)
+    left.checked_sub(generic)
 }
 
 /// Whether the sources `left` could pay `cost`.
