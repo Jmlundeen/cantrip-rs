@@ -1,0 +1,49 @@
+# Iron Spider, Stark Upgrade's "{T}: Put a +1/+1 counter on each artifact creature and/or Vehicle you control." On turn 1 Bot1 casts the Spider (exactly {3}: three
+# Moxen) and a free Ornithopter; Bot2 casts its own Ornithopter on turn 2. On turn 3 Bot1 casts Savannah Lions (a creature that is not an artifact) and Smuggler's Copter
+# (a Vehicle, not crewed so not a creature), then taps the Spider: counters on the Spider, Ornithopter and Copter - one each - and none on the Lions, a Mox, or Bot2's Ornithopter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Iron Spider, Stark Upgrade
+Ornithopter
+Savannah Lions
+Smuggler's Copter
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iron Spider, Stark Upgrade.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Iron Spider, Stark Upgrade.Activate(Ability: Put)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Iron Spider, Stark Upgrade.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Smuggler's Copter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Savannah Lions.Power = 2
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 0
