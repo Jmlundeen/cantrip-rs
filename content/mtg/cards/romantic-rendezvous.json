@@ -1,0 +1,6 @@
+{
+  "name": "Romantic Rendezvous",
+  "manaCost": "{1}{R}",
+  "type": "Sorcery",
+  "oracleText": "Discard a card, then draw two cards."
+}

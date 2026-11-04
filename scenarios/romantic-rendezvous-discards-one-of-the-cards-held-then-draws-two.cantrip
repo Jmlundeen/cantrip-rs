@@ -1,0 +1,34 @@
+# "Discard a card, then draw two cards." Bot1 casts it with Mox Ruby and Mox Jet, holding Island, Mountain, Plains and Swamp: it
+# discards the Island (a card from the hand it had, the order shown: were the two drawn first, the Forests would be offered
+# too) and then draws the two Forests on top of its library.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Romantic Rendezvous
+Island
+Mountain
+Plains
+Swamp
+Forest
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Romantic Rendezvous.Cast
+Bot1.Pass
+Bot1.Choose(Island)
+Bot1.Pass
+
+[Expect]
+Bot1.Hand = Forest; Forest; Mountain; Plains; Swamp
+Bot1.Graveyard = Romantic Rendezvous; Island
