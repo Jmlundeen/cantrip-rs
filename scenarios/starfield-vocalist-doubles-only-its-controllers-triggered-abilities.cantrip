@@ -1,0 +1,68 @@
+# Starfield Vocalist {3}{U}: "If a permanent entering the battlefield causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time." Bot1 pays {3}{U} with Black Lotus and Mox Jet on turn 1. Bot2's own Starbreach Whale (warped for {1}{U}) on turn 2 surveils only once - the ability is Bot2's, not Bot1's (CR 603.2d) - but Bot1's on turn 3 surveils twice (the Whale's controller chooses each time separately).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Starfield Vocalist
+Starbreach Whale
+Island
+Island
+Mountain
+Swamp
+Forest
+Island x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Starbreach Whale
+Island x4
+Island
+Forest
+Plains
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Starfield Vocalist.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Starbreach Whale.Cast(Ability: Warp)
+Bot2.Pass
+Bot1.Pass
+Bot2.Arrange(Forest; Plains |)
+? Stack.Count = 0
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Starbreach Whale.Cast(Ability: Warp)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Triggers(Starbreach Whale; Starbreach Whale)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mountain | Swamp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mountain | Forest)
+? Stack.Count = 0
+? Bot1.Graveyard = Forest; Swamp; Black Lotus
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Forest; Swamp; Black Lotus

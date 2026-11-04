@@ -1,0 +1,28 @@
+# Starfield Vocalist's warp {1}{U} (CR 702.185a): cast on turn 1 for exactly Mox Sapphire ({U}) and Mox Ruby ({1}); at the beginning of the end step it is exiled, and its doubling of triggers ends with it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Starfield Vocalist
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Starfield Vocalist.Cast(Ability: Warp)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Starfield Vocalist.Power = 3
+? Bot1.Battlefield.Starfield Vocalist.Toughness = 4
+[T2 Bot2.Main1]
+? Exile = Starfield Vocalist
+
+[Expect]
+Exile = Starfield Vocalist
+Bot1.Battlefield = Mox Ruby; Mox Sapphire
