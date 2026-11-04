@@ -1430,7 +1430,7 @@ pub(crate) fn counters(
 }
 
 /// `counts` less every kind `object`, controlled by `controller`, can't have put on it (CR 101.2, 122.6).
-fn without_banned(cx: &Cx, object: ObjectId, controller: PlayerId, mut counts: [i32; CounterKind::COUNT]) -> [i32; CounterKind::COUNT] {
+pub(crate) fn without_banned(cx: &Cx, object: ObjectId, controller: PlayerId, mut counts: [i32; CounterKind::COUNT]) -> [i32; CounterKind::COUNT] {
     for (i, n) in counts.iter_mut().enumerate() {
         if *n > 0 && crate::static_rules::counters_banned(cx, cx.cards(), object, controller, CounterKind::ALL[i]) {
             *n = 0;

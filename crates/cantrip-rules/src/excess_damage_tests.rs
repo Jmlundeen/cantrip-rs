@@ -254,7 +254,6 @@ fn excess_damage_combat_snapshots_recipients_before_any_assignment() {
     let mut events: Vec<Event> =
         hits.into_iter().filter_map(|(s, t, n)| ops::deal_damage_with(&mut cx, s, t, n, true, &mut batch)).collect();
     batch.finish(&mut cx, &mut events);
-    cx.emit_batch(&events, None);
     assert_eq!(recorded(&g), [(Target::Player(YOU), 3, 0), (Target::Object(ids[1]), 3, 0)]);
 }
 

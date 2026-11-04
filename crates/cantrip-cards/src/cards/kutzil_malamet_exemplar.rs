@@ -5,8 +5,9 @@ use cantrip_mechanics::triggers::creature_you_control_deals_combat_damage_to_pla
 use cantrip_oracle as oracle;
 
 /// "Whenever one or more creatures you control each with power greater than its base power deals combat damage to a
-/// player" (CR 603.2c, 603.10): the power is read as the event is checked, after that damage's
-/// lifelink and wither or infect counters have taken effect but before state-based actions. One trigger for each player the batch damaged.
+/// player" (CR 603.2c, 120.4b): the power is read as the damage is dealt, before it is processed into its results
+/// (CR 120.4c), so neither that damage's lifelink gain nor its wither or infect counters count. One trigger for each player
+/// the batch damaged.
 fn creature_above_base_power_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::Damage { source, .. } if q.chars(*source).power_above_base() => {

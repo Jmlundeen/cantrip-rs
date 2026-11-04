@@ -1541,10 +1541,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
     // read it apply to that look (CR 702.131d, 702.195c): Bifur, Melodic Rider entering for the third storied permanent
     // makes its own enters ability trigger an additional time.
     crate::designations::keyword_designations(cx);
-    // The events are recorded already (from `start`), so the continuous effects that read the history see them as the
-    // triggers are looked for (CR 603.10: "continuous effects that exist at that time are used to determine what the trigger
-    // conditions are"); each trigger's own question about the past is of the history as it was before them, as it always
-    // has been: "the first time each turn" is not this event.
+    // Normally the completed events are recorded already, so continuous effects that read history see them as the
+    // triggers are looked for (CR 603.10). Damage is the exception: it triggers at CR 120.4b, before result replacements
+    // and before the completed event is recorded at CR 120.4d. Both damage and result matchers use the same `start`,
+    // excluding the entire instruction from their question about the past; result-time continuous effects see it all.
     // The look-back abilities are judged on the game just before the events (CR 603.10a), the history then included.
     let then = before.map(|b| b.then);
     // Every look-back ability is asked of the game as it was then, the battlefield included (`BoardThen`): a permanent's, an

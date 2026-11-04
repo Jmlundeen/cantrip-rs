@@ -101,9 +101,9 @@ fn cx(g: &mut Game) -> Cx<'_> {
 fn deal(g: &mut Game, source: ObjectId, target: Target, amount: u32, combat: bool) {
     let mut cx = cx(g);
     let mut batch = ops::DamageBatch::default();
-    ops::deal_damage_with(&mut cx, source, target, amount, combat, &mut batch);
-    let mut events = Vec::new();
+    let mut events = ops::deal_damage_with(&mut cx, source, target, amount, combat, &mut batch).into_iter().collect();
     batch.finish(&mut cx, &mut events);
+    batch.rest_of_preventions(&mut cx);
 }
 
 fn grant(g: &mut Game, id: ObjectId, kind: EffectKind) {

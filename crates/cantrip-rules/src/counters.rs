@@ -62,32 +62,57 @@ pub fn put_together(cx: &mut Cx, placements: &[Placement], how: How) {
     }
 }
 
-/// `put_together`, the events handed back for the caller to announce with the rest of a simultaneous event: the counters
-/// damage is dealt as (CR 120.3d) are announced with the damage (CR 510.2, 603.2c).
+/// `put_together`, with preparation and application separated so damage can prepare these placements in the same
+/// APNAP pass as its life and player-counter results (CR 120.4c, 616.1).
 pub fn place_together(cx: &mut Cx, placements: &[Placement], how: How) -> Vec<Event> {
-    let mut merged: Vec<Placement> = placements
-        .iter()
-        .filter(|p| p.counts.iter().any(|&n| n > 0))
-        .map(|p| Placement { counts: p.counts.map(|n| n.max(0)), ..*p })
-        .collect();
-    // Phased-out permanents cannot be affected (CR 702.26b); an object gone from its zone is another (CR 400.7).
-    let can = |cx: &Cx, id: ObjectId| live(cx.s(), id) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut);
-    // On a permanent, as many as the replacement effects of counters being put leave (CR 614.1a); on a card in another
-    // zone, as many as it can have (CR 101.2), which no replacement of counters put on a permanent sees.
-    for m in &mut merged {
-        if !can(cx, m.object) {
-            m.counts = [0; CounterKind::COUNT];
-            continue;
-        }
-        if cx.s().obj(m.object).zone.is(ZoneKind::Battlefield) {
-            let controller = cx.s().obj(m.object).controller;
-            m.counts = replace::counters(cx, m.object, controller, m.by, false, how == How::Effect, m.counts);
-        }
+    let mut pending = placements.to_vec();
+    let mut prepared = Vec::with_capacity(pending.len());
+    // Re-read controllers between preparations: a replacement's continuation or a concession may return a recipient
+    // to an earlier player, restarting APNAP for outstanding choices (CR 101.4d).
+    while let Some(at) = cx.s().apnap().find_map(|player| pending.iter().position(|p| cx.s().obj(p.object).controller == player)) {
+        let mut placement = pending.remove(at);
+        prepare(cx, &mut placement, how);
+        prepared.push(placement);
     }
+    retain_allowed(cx, &mut prepared);
+    place_prepared(cx, &prepared)
+}
+
+/// Phased-out permanents cannot be affected (CR 702.26b); an object gone from its zone is another (CR 400.7).
+fn can_put(cx: &Cx, id: ObjectId) -> bool {
+    live(cx.s(), id) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut)
+}
+
+/// Apply replacements to one occurrence, putting nothing yet (CR 614.6). Separate infect sources remain separate
+/// placements even on the same creature: "that many plus one" adds one to each (CR 120.3d).
+pub(crate) fn prepare(cx: &mut Cx, placement: &mut Placement, how: How) {
+    placement.counts = placement.counts.map(|n| n.max(0));
+    if !can_put(cx, placement.object) {
+        placement.counts = [0; CounterKind::COUNT];
+    } else if cx.s().obj(placement.object).zone.is(ZoneKind::Battlefield) {
+        let controller = cx.s().obj(placement.object).controller;
+        placement.counts = replace::counters(cx, placement.object, controller, placement.by, false, how == How::Effect, placement.counts);
+    }
+}
+
+/// Recheck recipients and prohibitions after every replacement's continuation, before any original result applies
+/// (CR 101.2, 614.6). Damage does this for all result kinds against the same pre-result state.
+pub(crate) fn retain_allowed(cx: &Cx, placements: &mut [Placement]) {
+    for placement in placements {
+        placement.counts = if can_put(cx, placement.object) {
+            replace::without_banned(cx, placement.object, cx.s().obj(placement.object).controller, placement.counts)
+        } else {
+            [0; CounterKind::COUNT]
+        };
+    }
+}
+
+/// Put prepared, allowed counters through the single journalled put path. No replacement choice remains here; the
+/// caller announces these events together with every other result of its instruction (CR 603.2c).
+pub(crate) fn place_prepared(cx: &mut Cx, placements: &[Placement]) -> Vec<Event> {
     let mut events = Vec::new();
-    for m in &merged {
-        // A replacement's continuation may move or phase out a recipient before the placement finishes.
-        if !can(cx, m.object) || m.counts.iter().all(|&n| n <= 0) {
+    for m in placements {
+        if m.counts.iter().all(|&n| n <= 0) {
             continue;
         }
         let (id, counts) = (m.object, m.counts);
@@ -338,26 +363,64 @@ pub struct PlayerCounts {
     pub experience: u16,
 }
 
+/// One occurrence of counters given to a player, kept separate from other sources' occurrences (CR 120.3b, 120.3g).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct PlayerPlacement {
+    pub player: PlayerId,
+    pub counts: PlayerCounts,
+    pub by: PlayerId,
+}
+
 /// Counters put on `player` by `by` (CR 122.6): an event replacement effects can change (CR 614.1a). A player who can't
 /// get counters of a kind gets none (CR 101.2: Melira, Sylvok Outcast; Solemnity), and no replacement effect of the event
 /// that doesn't happen applies.
 pub fn put_on_player(cx: &mut Cx, player: PlayerId, counts: PlayerCounts, by: PlayerId) {
-    let banned = |cx: &Cx, n: u16, kind| n > 0 && crate::static_rules::player_counters_banned(cx, cx.cards(), player, kind);
-    let mut counts = counts;
-    if banned(cx, counts.poison, PlayerCounter::Poison) {
-        counts.poison = 0;
+    let mut placement = PlayerPlacement { player, counts, by };
+    prepare_player(cx, &mut placement);
+    retain_players_allowed(cx, std::slice::from_mut(&mut placement));
+    place_players_prepared(cx, &[placement]);
+}
+
+/// Prepare, but do not give, one source's player counters (CR 120.4c, 614.6). Damage schedules this alongside every
+/// other result for the affected player, never while its damage replacements are still being applied.
+pub(crate) fn prepare_player(cx: &mut Cx, placement: &mut PlayerPlacement) {
+    retain_players_allowed(cx, std::slice::from_mut(placement));
+    if placement.counts != PlayerCounts::default() {
+        placement.counts = replace::player_counters(cx, placement.player, placement.by, placement.counts);
     }
-    if banned(cx, counts.energy, PlayerCounter::Energy) {
-        counts.energy = 0;
+}
+
+/// A later replacement may remove a recipient or change a prohibition (CR 800.4a, 101.2). Check all players before
+/// applying any original result, as for permanent counters and life changes.
+pub(crate) fn retain_players_allowed(cx: &Cx, placements: &mut [PlayerPlacement]) {
+    for placement in placements {
+        let player = placement.player;
+        if !cx.s().in_game(player) {
+            placement.counts = PlayerCounts::default();
+            continue;
+        }
+        let banned = |n: u16, kind| n > 0 && crate::static_rules::player_counters_banned(cx, cx.cards(), player, kind);
+        let counts = &mut placement.counts;
+        if banned(counts.poison, PlayerCounter::Poison) {
+            counts.poison = 0;
+        }
+        if banned(counts.energy, PlayerCounter::Energy) {
+            counts.energy = 0;
+        }
+        if banned(counts.experience, PlayerCounter::Experience) {
+            counts.experience = 0;
+        }
     }
-    if banned(cx, counts.experience, PlayerCounter::Experience) {
-        counts.experience = 0;
+}
+
+/// Apply prepared player placements through the same put path used by `put_on_player`.
+pub(crate) fn place_players_prepared(cx: &mut Cx, placements: &[PlayerPlacement]) {
+    for placement in placements {
+        let PlayerCounts { poison, energy, experience } = placement.counts;
+        if placement.counts != PlayerCounts::default() {
+            cx.st().update_player(placement.player, |p| p.put_path_add(poison, energy, experience));
+        }
     }
-    if counts == PlayerCounts::default() {
-        return;
-    }
-    let counts = replace::player_counters(cx, player, by, counts);
-    cx.st().update_player(player, |p| p.put_path_add(counts.poison, counts.energy, counts.experience));
 }
 
 #[cfg(test)]

@@ -1,0 +1,92 @@
+# CR 510.2, 120.4b-d, 616.1: one combat damage event has a counter result for the active player and a life-loss
+# result for the opponent. Bot1 orders its two Doubling Seasons before Bot2 orders its two Bloodletters.
+# Neither marks, counters nor life totals change at either question. Nighthawk's and Hawk's lifelink still gain 3;
+# Plague Stinger puts four -1/-1 counters on Nighthawk, and Hawk's 1 damage causes one loss of 4 for Bot2.
+
+[Bot1 Deck]
+Gleemox x5
+Doubling Season
+Vampire Nighthawk
+Doubling Season
+Bloodletter of Aclazotz
+Bloodletter of Aclazotz
+Healer's Hawk
+Plains x16
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Plague Stinger
+Island x24
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#1.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#5.Activate(Color: Green)
+Bot1.Hand.Doubling Season.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Plague Stinger.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#5.Activate(Color: Green)
+Bot1.Hand.Doubling Season.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Black)
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Black)
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+[T9 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Black)
+Bot1.Hand.Vampire Nighthawk.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#4.Activate(Color: White)
+Bot1.Hand.Healer's Hawk.Cast
+[T11 Bot1.DeclareAttackers]
+Bot1.Attack(Vampire Nighthawk > Bot2; Healer's Hawk > Bot2)
+Bot2.Block(Plague Stinger > Vampire Nighthawk)
+[T11 Bot1.CombatDamage]
+? Bot1.Life = 20
+? Bot2.Life = 20
+? Bot1.Battlefield.Vampire Nighthawk.Counters.MinusOneMinusOne = (absent)
+? Bot2.Battlefield.Plague Stinger.Damage = 0
+Bot1.Replace(Doubling Season)
+? Bot1.Life = 20
+? Bot2.Life = 20
+? Bot1.Battlefield.Vampire Nighthawk.Counters.MinusOneMinusOne = (absent)
+? Bot2.Battlefield.Plague Stinger.Damage = 0
+Bot2.Replace(Bloodletter of Aclazotz)
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Bot1.Life = 23
+Bot2.Life = 16
+Bot2.Poison = 0
+Bot1.Graveyard = Vampire Nighthawk
+Bot2.Graveyard = Plague Stinger; Island; Island
+Bot1.Battlefield.Healer's Hawk.Tapped = true

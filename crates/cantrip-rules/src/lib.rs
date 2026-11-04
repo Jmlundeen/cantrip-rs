@@ -1468,11 +1468,7 @@ impl<'a> Cx<'a> {
     /// ability triggers once. `before` is the battlefield before them and the journal's mark then, for look-back
     /// abilities (CR 603.10a).
     pub fn emit_batch(&mut self, events: &[Event], before: Option<settle::Before>) {
-        ops::settle_at_once(self);
-        let start = self.g.log.len();
-        for &e in events {
-            self.record(e);
-        }
+        let start = self.record_batch(events);
         settle::collect_batch(self, events, before, start);
     }
 
@@ -1489,7 +1485,20 @@ impl<'a> Cx<'a> {
         results
     }
 
-    /// Records an event in the history without looking for triggers: the records no ability triggers on.
+    /// Records a completed simultaneous event, returning its pre-event history boundary. Usually `emit_batch` then
+    /// collects all its triggers; damage collects its damage triggers earlier (CR 120.4b), and only its result triggers
+    /// after recording the completed event (CR 120.4c-d), both with the boundary from before that first collection.
+    pub(crate) fn record_batch(&mut self, events: &[Event]) -> usize {
+        ops::settle_at_once(self);
+        let start = self.g.log.len();
+        for &event in events {
+            self.record(event);
+        }
+        start
+    }
+
+    /// Records an event in the history without looking for triggers: the records no ability triggers on, or an event
+    /// whose triggers are collected separately at the time the rules require.
     pub fn record(&mut self, event: Event) {
         let turn = self.g.state.turn;
         let cause = self.cause();

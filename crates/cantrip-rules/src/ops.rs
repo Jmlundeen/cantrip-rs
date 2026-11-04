@@ -5,7 +5,7 @@ use cantrip_api::*;
 use cantrip_state::{ChoiceRecord, Choices, Entered, Kept, PendingTrigger};
 
 use crate::layers::{self, live};
-use crate::{Cx, R, counters, replace};
+use crate::{Cx, R, counters, replace, settle};
 
 /// A player commits a crime (CR 700.13) as they cast a spell, activate an ability or put a triggered ability on the stack
 /// that targets at least one opponent; at least one permanent, spell or ability an opponent controls; and/or at least one
@@ -3518,9 +3518,6 @@ pub fn damage_result(cx: &mut Cx, source: ObjectId, target: Target, amount: u32,
         Event::Damage { target, amount, recipient_excess, .. } => Some(DamageResult { target, amount, excess: recipient_excess }),
         _ => None,
     });
-    if !events.is_empty() {
-        cx.emit_batch(&events, None);
-    }
     batch.rest_of_preventions(cx);
     result
 }
@@ -3545,7 +3542,6 @@ pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u32)]) -> Vec<u32
         }
     }
     batch.finish(cx, &mut events);
-    cx.emit_batch(&events, None);
     batch.rest_of_preventions(cx);
     dealt
 }
@@ -3672,6 +3668,9 @@ pub struct DamageBatch {
     /// The -1/-1 counters its damage is dealt to creatures as (CR 702.90c, 120.3d): put on together once all of it is dealt,
     /// and announced with it (CR 510.2, 603.2c).
     counters: Vec<counters::Placement>,
+    /// Infect and toxic's player counters, one placement per source's damage (CR 120.3b, 120.3g), prepared in the same
+    /// APNAP pass as life and permanent counters, never applied while damage replacements are still running.
+    player_counters: Vec<counters::PlayerPlacement>,
     /// The permanents whose shield counter has applied to this event (CR 122.1c): one replacement for the simultaneous event
     /// (CR 120.4), so a second assignment of damage to the same permanent is prevented as well, and no second counter is removed.
     shielded: Vec<ObjectId>,
@@ -3685,6 +3684,10 @@ pub struct DamageBatch {
 struct DamageRecipient {
     object: ObjectId,
     marked: u32,
+    heal_marked: bool,
+    touched: bool,
+    loyalty: u32,
+    defense: u32,
     amount: u32,
     creature_toughness: Option<u32>,
     prior_marked: u32,
@@ -3740,7 +3743,10 @@ impl DamageBatch {
             chars.is(CardType::Planeswalker).then(|| obj.counters(CounterKind::Loyalty).max(0) as u32),
             chars.is(CardType::Battle).then(|| obj.counters(CounterKind::Defense).max(0) as u32),
         ].into_iter().flatten().min();
-        self.dealt.push(DamageRecipient { object: id, marked: 0, amount: 0, creature_toughness, prior_marked: obj.damage, other_lethal, deathtouch: false });
+        self.dealt.push(DamageRecipient {
+            object: id, marked: 0, heal_marked: false, touched: false, loyalty: 0, defense: 0, amount: 0,
+            creature_toughness, prior_marked: obj.damage, other_lethal, deathtouch: false,
+        });
         self.dealt.len() - 1
     }
 
@@ -3755,21 +3761,95 @@ impl DamageBatch {
         infect
     }
 
-    /// Prepare the life results of all the damage together (CR 120.4c): one loss per player, but one lifelink gain per
-    /// source (CR 119.9-10, 702.15e). No original life update precedes the result replacements. Their announcements and
-    /// the -1/-1 counters join the damage's events, so the whole damage event occurs at once (CR 120.4d, 603.2c).
+    /// Finish and announce one damage event. First finalize the actual damage and collect its triggers (CR 120.4b),
+    /// before any result-choice suspension can remove their sources or change their controllers (CR 603.3a).
+    /// Then prepare every result in one APNAP pass (CR 120.4c, 616.1), with one loss per player but one lifelink gain
+    /// per source (CR 119.9-10, 702.15e). No original result applies until all its replacements are prepared.
+    /// Finally apply and record the whole event, collecting only its result triggers then (CR 120.4d, 603.2c).
     pub fn finish(&mut self, cx: &mut Cx, events: &mut Vec<Event>) {
-        let mut life = std::mem::take(&mut self.life);
-        life.extend(std::mem::take(&mut self.lifelink).into_iter().map(|(_, controller, amount)| (controller, amount)));
-        let changes = prepare_life_changes(cx, &life);
-        let placements = std::mem::take(&mut self.counters);
-        events.extend(counters::place_together(cx, &placements, counters::How::Effect));
-        apply_life_changes(cx, changes, events);
-        // Complete the simultaneous event's excess amounts before any damage triggers see it (CR 120.10).
+        if events.is_empty() {
+            return;
+        }
+        // Excess is a recipient's total across the whole simultaneous event, not one assignment's (CR 120.10).
         for event in events.iter_mut() {
             if let Event::Damage { target: Target::Object(id), recipient_excess, .. } = event {
                 *recipient_excess = self.dealt.iter().find(|r| r.object == *id).map_or(0, DamageRecipient::excess);
             }
+        }
+        settle_at_once(cx);
+        // Keep this boundary even when early trigger collection records a limited triggering, or result replacements
+        // have continuations of their own. Neither phase's matchers see part of this instruction as its prior history.
+        let start = cx.g.log.len();
+        let damage_count = events.len();
+        settle::collect_batch(cx, events, None, start);
+
+        let mut life = std::mem::take(&mut self.life);
+        life.extend(std::mem::take(&mut self.lifelink).into_iter().map(|(_, controller, amount)| (controller, amount)));
+        let mut changes = Vec::with_capacity(life.len());
+        let mut pending_counters = std::mem::take(&mut self.counters);
+        let mut placements = Vec::with_capacity(pending_counters.len());
+        let mut pending_player_counters = std::mem::take(&mut self.player_counters);
+        let mut player_placements = Vec::with_capacity(pending_player_counters.len());
+        loop {
+            // Re-read the affected controllers after each preparation: a continuation or concession can return an
+            // unprepared recipient to an earlier player, restarting APNAP for outstanding choices (CR 101.4d).
+            let next = cx.s().apnap().find(|&player| {
+                life.iter().any(|&(p, _)| p == player)
+                    || pending_counters.iter().any(|p| cx.s().obj(p.object).controller == player)
+                    || pending_player_counters.iter().any(|p| p.player == player)
+            });
+            let Some(player) = next else { break };
+            if let Some(at) = life.iter().position(|&(p, _)| p == player) {
+                let (_, amount) = life.remove(at);
+                let delta = prepare_life_change(cx, player, amount);
+                if delta != 0 {
+                    changes.push((player, delta));
+                }
+            } else if let Some(at) = pending_counters.iter().position(|p| cx.s().obj(p.object).controller == player) {
+                let mut placement = pending_counters.remove(at);
+                counters::prepare(cx, &mut placement, counters::How::Effect);
+                placements.push(placement);
+            } else if let Some(at) = pending_player_counters.iter().position(|p| p.player == player) {
+                let mut placement = pending_player_counters.remove(at);
+                counters::prepare_player(cx, &mut placement);
+                player_placements.push(placement);
+            }
+        }
+        // A replacement's continuation or a concession may have changed a recipient or a prohibition. Judge all of
+        // them against the same state, before any of the original life, counter or marked-damage results applies.
+        retain_life_changes(cx, &mut changes);
+        counters::retain_allowed(cx, &mut placements);
+        counters::retain_players_allowed(cx, &mut player_placements);
+        apply_life_changes(cx, changes, events);
+        counters::place_players_prepared(cx, &player_placements);
+        events.extend(counters::place_prepared(cx, &placements));
+        for recipient in &self.dealt {
+            let id = recipient.object;
+            if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+                continue;
+            }
+            if recipient.marked > 0 || recipient.heal_marked || recipient.touched {
+                cx.st().update_obj(id, |o| {
+                    if recipient.heal_marked {
+                        o.damage = 0;
+                    }
+                    o.damage += recipient.marked;
+                    o.deathtouched |= recipient.touched;
+                });
+            }
+            for (kind, amount) in [(CounterKind::Loyalty, recipient.loyalty), (CounterKind::Defense, recipient.defense)] {
+                if amount > 0 {
+                    let removed = amount.min(cx.s().obj(id).counters(kind).max(0) as u32) as i32;
+                    counters::remove(cx, id, kind, removed);
+                }
+            }
+        }
+        cx.record_batch(events);
+        if events.len() > damage_count {
+            settle::collect_batch(cx, &events[damage_count..], None, start);
+        } else if damage_count > 0 {
+            // Damage whose only results are marks or removed counters still leaves a new state to judge (CR 603.8).
+            settle::state_triggers_now(cx);
         }
     }
 
@@ -3843,14 +3923,21 @@ pub fn deal_damage_with(
             // toxic value, whatever the amount dealt (CR 702.164c, 120.3g): prevented, no damage is dealt and none are given.
             let toxic = if combat && source_chars.is(CardType::Creature) { source_chars.toxic } else { 0 };
             if !infect {
-                batch.life.push((p, -i32::from(amount)));
+                // All of this event's noninfect damage to one player causes one loss (CR 120.3a); keep it distinct
+                // from every source-level lifelink gain, including a gain later replaced with a loss.
+                match batch.life.iter_mut().find(|(player, _)| *player == p) {
+                    Some((_, loss)) => *loss -= amount as i32,
+                    None => batch.life.push((p, -(amount as i32))),
+                }
             }
             let poison = (if infect { amount } else { 0 } + u32::from(toxic)).min(u32::from(u16::MAX)) as u16;
             if poison > 0 {
                 // "That source's controller" (CR 120.3b) and "that creature's controller" (CR 702.164c) gives them, at once
                 // as results of the one damage, so "if you would put one or more counters" is theirs.
                 let by = cx.controller(source);
-                counters::put_on_player(cx, p, counters::PlayerCounts { poison, ..Default::default() }, by);
+                batch.player_counters.push(counters::PlayerPlacement {
+                    player: p, counts: counters::PlayerCounts { poison, ..Default::default() }, by,
+                });
             }
             lifelink(cx, source, &source_chars, amount, batch);
             Some(Event::Damage { source, target, amount, kind: DamageKind::new(combat, source_chars.colors), controller: cx.controller(source), recipient_excess: 0, known: dealer_known(cx, source, &source_chars) })
@@ -3887,28 +3974,20 @@ pub fn deal_damage_with(
                     let mut counts = [0; CounterKind::COUNT];
                     counts[CounterKind::MinusOne as usize] = amount as i32;
                     batch.counters.push(counters::Placement { object: id, counts, by: source_controller });
-                    cx.st().update_obj(id, |o| o.deathtouched |= deathtouch);
                 } else {
-                    if heal_marked {
-                        // CR 614.1a: the damage marked before this event is healed; this event's own stays.
-                        let kept = batch.dealt[at].marked;
-                        cx.st().update_obj(id, |o| o.damage = kept);
-                    }
+                    // CR 614.1a: healing removes the marks from before this event, never this event's own marks.
+                    batch.dealt[at].heal_marked |= heal_marked;
                     batch.dealt[at].marked += amount;
-                    cx.st().update_obj(id, |o| {
-                        o.damage += amount;
-                        o.deathtouched |= deathtouch;
-                    });
                 }
+                batch.dealt[at].touched |= deathtouch;
             }
-            // CR 120.3h, 310.6: damage dealt to a battle removes that many defense counters.
+            // Loyalty and defense removal are also results, not updates made while damage replacements or another
+            // player's result choices are still pending (CR 120.3c, 120.3h, 120.4c-d).
             if target_chars.is(CardType::Battle) {
-                let removed = amount.min(cx.s().obj(id).counters(CounterKind::Defense).max(0) as u32) as i32;
-                counters::remove(cx, id, CounterKind::Defense, removed);
+                batch.dealt[at].defense += amount;
             }
             if target_chars.is(CardType::Planeswalker) {
-                // CR 120.3c: that many loyalty counters are removed.
-                counters::remove(cx, id, CounterKind::Loyalty, amount as i32);
+                batch.dealt[at].loyalty += amount;
             }
             lifelink(cx, source, &source_chars, amount, batch);
             Some(Event::Damage { source, target, amount, kind: DamageKind::new(combat, source_chars.colors), controller: cx.controller(source), recipient_excess: 0, known: dealer_known(cx, source, &source_chars) })
@@ -3955,8 +4034,8 @@ fn lifelink(cx: &mut Cx, source: ObjectId, chars: &Chars, amount: u32, batch: &m
     if chars.has(Keyword::Lifelink) {
         let controller = cx.controller(source);
         match batch.lifelink.iter_mut().find(|(s, _, _)| *s == source) {
-            Some(entry) => entry.2 += i32::from(amount),
-            None => batch.lifelink.push((source, controller, i32::from(amount))),
+            Some(entry) => entry.2 += amount as i32,
+            None => batch.lifelink.push((source, controller, amount as i32)),
         }
     }
 }
@@ -3972,7 +4051,8 @@ pub fn each_opponent_loses_life(cx: &mut Cx, player: PlayerId, amount: i32) -> i
 /// "life lost this way", not gains or the separate actions a replacement's continuation performs.
 pub fn lose_life_together(cx: &mut Cx, losses: &[(PlayerId, i32)]) -> i32 {
     let losses: Vec<_> = losses.iter().filter(|&&(_, n)| n > 0).map(|&(player, n)| (player, -n)).collect();
-    let changes = prepare_life_changes(cx, &losses);
+    let mut changes = prepare_life_changes(cx, &losses);
+    retain_life_changes(cx, &mut changes);
     let mut events = Vec::with_capacity(changes.len());
     let total = apply_life_changes(cx, changes, &mut events);
     if !events.is_empty() {
@@ -4002,12 +4082,16 @@ fn prepare_life_changes(cx: &mut Cx, changes: &[(PlayerId, i32)]) -> Vec<(Player
     prepared
 }
 
-/// Apply prepared life results through the journal, returning the life actually lost and leaving their announcements
-/// with the caller. Damage announces them with its other results, an explicit loss instruction on its own (CR 603.2c).
-fn apply_life_changes(cx: &mut Cx, mut changes: Vec<(PlayerId, i32)>, events: &mut Vec<Event>) -> i32 {
-    // A later replacement's continuation may have removed a player or changed what they can gain or lose. Judge
-    // every final prohibition before applying any of the original event's changes.
+/// A later replacement's continuation may remove a player or change a prohibition. Judge every final prohibition
+/// before applying any original result, including the counter results of damage (CR 101.2, 120.4c-d).
+fn retain_life_changes(cx: &Cx, changes: &mut Vec<(PlayerId, i32)>) {
     changes.retain(|&(player, delta)| cx.s().in_game(player) && !life_total_cant_change(cx.s(), player) && !blocked(cx, player, delta));
+}
+
+/// Apply prepared, allowed life results through the journal, returning the life actually lost and leaving their
+/// announcements with the caller. Damage announces them with its other results, an explicit loss instruction on its own
+/// (CR 603.2c). No replacement or prohibition is judged against a partially applied simultaneous event.
+fn apply_life_changes(cx: &mut Cx, changes: Vec<(PlayerId, i32)>, events: &mut Vec<Event>) -> i32 {
     let mut total = 0;
     for (player, delta) in changes {
         cx.st().update_player(player, |p| p.life += delta);

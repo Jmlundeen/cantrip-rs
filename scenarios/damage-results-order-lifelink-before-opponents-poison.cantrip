@@ -1,0 +1,87 @@
+# CR 510.2, 120.4b-d, 616.1: the infect attacker is listed first, but its poison-result replacements must wait for
+# the active player's lifelink-result replacements. Two Angels of Vitality make Nighthawk's gain 4; two level-three
+# Innkeeper's Talents make Glistener Elf's poison 4. Every original result is still unapplied at both questions.
+# The Talents' beginning-of-combat counters go to the first Angel (the first creature cast), not either attacker.
+
+[Bot1 Deck]
+Gleemox x5
+Innkeeper's Talent
+Innkeeper's Talent
+Angel of Vitality
+Angel of Vitality
+Glistener Elf
+Vampire Nighthawk
+Plains x18
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#1.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#5.Activate(Color: Green)
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent#1.Activate(Ability: Level 2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#5.Activate(Color: Green)
+Bot1.Battlefield.Innkeeper's Talent#2.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent#1.Activate(Ability: Level 3)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Green)
+Bot1.Battlefield.Innkeeper's Talent#2.Activate(Ability: Level 3)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: White)
+Bot1.Battlefield.Gleemox#2.Activate(Color: White)
+Bot1.Battlefield.Gleemox#3.Activate(Color: White)
+Bot1.Hand.Angel of Vitality.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#4.Activate(Color: Green)
+Bot1.Hand.Glistener Elf.Cast
+[T9 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: White)
+Bot1.Battlefield.Gleemox#2.Activate(Color: White)
+Bot1.Battlefield.Gleemox#3.Activate(Color: White)
+Bot1.Hand.Angel of Vitality.Cast
+[T11 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Black)
+Bot1.Hand.Vampire Nighthawk.Cast
+[T13 Bot1.DeclareAttackers]
+Bot1.Attack(Glistener Elf > Bot2; Vampire Nighthawk > Bot2)
+[T13 Bot1.CombatDamage]
+? Bot1.Life = 20
+? Bot2.Life = 20
+? Bot2.Poison = 0
+Bot1.Replace(Angel of Vitality)
+? Bot1.Life = 20
+? Bot2.Life = 20
+? Bot2.Poison = 0
+Bot2.Replace(Innkeeper's Talent)
+[T13 Bot1.Main2]
+
+[Expect]
+Turn = 13
+Bot1.Life = 24
+Bot2.Life = 18
+Bot2.Poison = 4
+Bot1.Battlefield.Glistener Elf.Power = 1
+Bot1.Battlefield.Vampire Nighthawk.Power = 2

@@ -121,6 +121,7 @@ fn pyrohemia(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Susp
 static PYROHEMIA: CardDef = CardDef {
     name: "Damage Life Pyrohemia",
     types: TypeSet::of(&[CardType::Enchantment]),
+    colors: Some(ColorSet::of(Color::Red)),
     abilities: &[ability(cost("{R}"), pyrohemia, "{R}: Pyrohemia deals 1 damage to each creature and each player.")],
     ..CardDef::BLANK
 };
@@ -159,7 +160,7 @@ fn to_you(_: &dyn Query, me: &Asker, damage: &DamageEvent) -> bool {
     damage.target == Target::Player(me.controller)
 }
 
-fn one_damage(_: &dyn Query, _: &Asker, _: &DamageEvent) -> u16 {
+fn one_damage(_: &dyn Query, _: &Asker, _: &DamageEvent) -> u32 {
     1
 }
 
@@ -206,11 +207,12 @@ static ANGEL: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// Darien's trigger sees the completed damage results, but its question about the past excludes the whole event,
-/// including its life changes (CR 120.4c-d, 603.2c). Used only in the Pyrohemia position below.
+/// Darien triggers on the dealt damage before any life result or result replacement (CR 120.4b-c). Its question about
+/// the past excludes the whole instruction, the same boundary its result triggers use. Used in the Pyrohemia position.
 fn dealt_to_you(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     if matches!(event, Event::Damage { target: Target::Player(p), .. } if *p == me.controller) {
-        assert!(q.state().players.iter().all(|p| p.life == 19));
+        assert!(q.state().players.iter().all(|p| p.life == 20), "damage triggers before life results");
+        assert_eq!(q.state().obj(me.source).damage, 0, "marks are also results, not the triggering damage");
         assert!(!q.history().records.iter().any(|r| matches!(r.event, Event::LifeChange { .. } | Event::Damage { .. })),
             "life results and damage have the same pre-event history");
         Fired::PLAIN
@@ -271,10 +273,122 @@ static REVIEW_STINGER: CardDef = CardDef {
     ..INFECT
 };
 
+fn result_loss(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    let fired = opponent_lost_life(q, me, event)?;
+    assert!(q.state().players.iter().all(|p| p.life == 19), "life triggers see every applied result");
+    assert!(q.state().battlefield().iter().filter(|&&id| q.chars(id).is(CardType::Creature))
+        .all(|&id| q.state().obj(id).damage == 1), "life triggers also see the final damage marks");
+    assert!(!q.history().records.iter().any(|r| matches!(r.event, Event::Damage { .. } | Event::LifeChange { .. })),
+        "result triggers use the damage trigger's pre-instruction history boundary");
+    Some(fired)
+}
+
+/// Mindcrank's trigger, with the complementary post-result-state/pre-instruction-history probe.
+static RESULT_HISTORY_WATCHER: CardDef = CardDef {
+    name: "Damage Result History Mindcrank",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[triggered(when_asked(EventMask::LIFE_CHANGE, result_loss), nothing,
+        "Whenever an opponent loses life, that player mills that many cards.")],
+    ..CardDef::BLANK
+};
+
+fn red_source_damage(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    if let Event::Damage { source, target, kind, controller, .. } = *event
+        && controller == me.controller && kind.colors().has(Color::Red)
+    {
+        assert!(q.state().players.iter().all(|p| p.life == 20), "one-or-more damage triggers before results too");
+        Some(Fired { subject: target, data: [0, source.0] })
+    } else {
+        None
+    }
+}
+
+static RED_TERROR: CardDef = CardDef {
+    name: "Damage Timing The Red Terror",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(4), toughness: Some(3),
+    abilities: &[triggered(when_asked(EventMask::DAMAGE, red_source_damage), nothing,
+        "Whenever a red source you control deals damage to one or more permanents and/or players, put a +1/+1 counter on The Red Terror.")
+        .once_per_batch().batch_by_data()],
+    ..CardDef::BLANK
+};
+
+fn result_counters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    if let Event::CountersPut { object, kind: CounterKind::MinusOne, by, .. } = *event
+        && by == me.controller && q.chars(object).is(CardType::Creature)
+    {
+        assert_eq!(q.state().player(ACTIVE).life, 23);
+        assert_eq!(q.state().player(FIRST).life, 16);
+        assert_eq!(q.state().player(LAST).poison(), 4);
+        assert_eq!(q.state().obj(object).counters(CounterKind::MinusOne), 4);
+        assert!(!q.history().records.iter().any(|r| matches!(r.event,
+            Event::Damage { .. } | Event::LifeChange { .. } | Event::CountersPut { .. })),
+            "counter-result matchers also exclude the whole instruction's history");
+        Fired::about(Target::Object(object))
+    } else {
+        None
+    }
+}
+
+static HAPATRA: CardDef = CardDef {
+    name: "Damage Result Hapatra, Vizier of Poisons",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2), toughness: Some(2),
+    abilities: &[triggered(when_asked(EventMask::COUNTERS, result_counters), nothing,
+        "Whenever you put one or more -1/-1 counters on a creature, create a 1/1 green Snake creature token with deathtouch.")
+        .once_per_batch()],
+    ..CardDef::BLANK
+};
+
+fn counters_put_by_you(_: &dyn Query, me: &Asker, proposal: &Proposal) -> bool {
+    match proposal {
+        Proposal::Counters(c) => c.putter == me.controller && c.counts.iter().any(|&n| n > 0),
+        Proposal::PlayerCounters(c) => c.putter == me.controller && c.poison > 0,
+        _ => false,
+    }
+}
+
+fn double_placed_counters(q: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    assert!(q.state().players.iter().all(|p| p.life == 20 && p.poison() == 0),
+        "counter replacement choices precede all original life and player-counter results");
+    assert!(q.state().battlefield().iter().all(|&id| q.state().obj(id).damage == 0
+        && q.state().obj(id).counters(CounterKind::MinusOne) == 0),
+        "counter replacements precede all marks and permanent-counter results");
+    match proposal {
+        Proposal::Counters(c) => c.counts.iter_mut().for_each(|n| *n *= 2),
+        Proposal::PlayerCounters(c) => c.poison *= 2,
+        _ => {}
+    }
+}
+
+/// Innkeeper's Talent's level-three ability, already gained in these positions. The putter, not the recipient, owns it.
+static TALENT: CardDef = CardDef {
+    name: "Damage Result Level Three Innkeeper's Talent",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    replacements: &[replacement(ReplacementKind::Counters, counters_put_by_you, double_placed_counters,
+        "If you would put one or more counters on a permanent or player, put twice that many of each of those kinds of counters on that permanent or player instead.")],
+    ..CardDef::BLANK
+};
+
+fn your_poison_banned(_: &dyn Query, me: &Asker, player: PlayerId, kind: PlayerCounter) -> bool {
+    player == me.controller && kind == PlayerCounter::Poison
+}
+
+/// Melira's poison prohibition. The only infect source in its test is controlled by Melira's controller when it deals
+/// damage, so the separate ability that removes infect from opposing creatures cannot affect that damage.
+static MELIRA: CardDef = CardDef {
+    name: "Damage Result Melira, Sylvok Outcast",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2), toughness: Some(2),
+    player_counter_bans: &[your_poison_banned],
+    ..CardDef::BLANK
+};
+
 fn game() -> Game {
     let table = Box::leak(Box::new(CardTable::new([
         &WATCHER, &DOUBLER, &EMPERION, &REMEDY, &DRAIN, &PYROHEMIA, &LIFELINKER, &PRIDEMATE, &ANGEL, &DARIEN,
         &HAWK, &INFECT, &TOXIC, &ARMOR, &REVIEW_DARIEN, &REVIEW_SEASON, &REVIEW_STINGER,
+        &RESULT_HISTORY_WATCHER, &TALENT, &MELIRA, &RED_TERROR, &HAPATRA,
     ])));
     let mut g = Game::new(table, &Setup { decks: vec![Vec::new(); 4], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -339,13 +453,27 @@ fn pyrohemia_triggers_ob_nixilis_once_for_three_opponents_losing_one() {
 }
 
 #[test]
+fn one_or_more_damage_triggers_keep_the_whole_batch() {
+    let mut g = game();
+    let watcher = put(&mut g, &RED_TERROR, YOU);
+    let source = put(&mut g, &PYROHEMIA, YOU);
+    let item = pyrohemia_item(&g, source);
+    pyrohemia(&mut cx(&mut g), &item).unwrap();
+    assert_eq!(trigger_count(&g, watcher, 0), 1, "one per red source, not one per hit or one per result phase");
+    assert_eq!(life(&g), vec![19; 4]);
+    assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Damage { .. })).count(), 5);
+}
+
+#[test]
 fn damage_and_its_life_results_share_the_same_trigger_history_boundary() {
     let mut g = game();
     let darien = put(&mut g, &DARIEN, FIRST);
+    let result_watcher = put(&mut g, &RESULT_HISTORY_WATCHER, YOU);
     let source = put(&mut g, &PYROHEMIA, YOU);
     let item = pyrohemia_item(&g, source);
     pyrohemia(&mut cx(&mut g), &item).unwrap();
     assert_eq!(trigger_count(&g, darien, 0), 1);
+    assert_eq!(trigger_count(&g, result_watcher, 0), 3);
     assert_eq!(g.state.obj(darien).damage, 1);
 }
 
@@ -364,7 +492,6 @@ fn combat_damage_combines_a_players_losses_but_not_sources_lifelink() {
         .filter_map(|(s, t, n)| crate::ops::deal_damage_with(&mut c, s, t, n, true, &mut batch)).collect();
     assert_eq!(life(c.g), vec![20; 4], "assignment preparation does not change life");
     batch.finish(&mut c, &mut events);
-    c.emit_batch(&events, None);
     batch.rest_of_preventions(&mut c);
     assert_eq!(changes(&g), vec![(ACTIVE, 1), (ACTIVE, 1), (FIRST, -2)]);
     assert_eq!(trigger_count(&g, watcher, 0), 0);
@@ -488,6 +615,8 @@ fn darien_trigger_survives_owner_conceding_during_damage_life_replacements() {
         assert!(matches!(request.kind, RequestKind::ChooseReplacement { life: Some(-1), .. }));
         assert_eq!(g.state.obj(darien).owner, ACTIVE);
         assert_eq!(g.state.obj(darien).controller, YOU);
+        assert_eq!(trigger_count(&g, darien, 0), 1, "already triggered before the first result choice");
+        assert_eq!(g.state.obj(darien).damage, 0, "damage marks wait for all result choices");
 
         if concede_owner {
             g.concede(ACTIVE);
@@ -548,6 +677,218 @@ fn damage_result_choices_are_apnap_across_counters_and_life() {
         assert_eq!(life(&g), vec![20; 4]);
         assert_eq!(g.state.obj(nighthawk).counters(CounterKind::MinusOne), 0);
     }
+}
+
+fn no_damage_results_yet(g: &Game) {
+    assert_eq!(life(g), vec![20; 4]);
+    assert!(g.state.players.iter().all(|p| p.poison() == 0));
+    assert!(g.state.battlefield().iter().all(|&id| g.state.obj(id).damage == 0
+        && g.state.obj(id).counters(CounterKind::MinusOne) == 0));
+    assert!(!g.log.iter().any(|r| matches!(r.event, Event::Damage { .. } | Event::LifeChange { .. }
+        | Event::CountersPut { kind: CounterKind::MinusOne, .. })));
+}
+
+fn waiting_or_stacked(g: &Game, source: ObjectId, controller: PlayerId) -> usize {
+    g.state.triggers.iter().filter(|t| t.source == source && t.controller == controller).count()
+        + g.state.stack.iter().filter(|i| i.kind == StackKind::Triggered && i.object == source && i.controller == controller).count()
+}
+
+/// One real combat has all three result kinds: counter placement on ACTIVE, poison on LAST, life loss on FIRST.
+/// The attack order proposes LAST's poison first, which must not jump ahead of ACTIVE's permanent counters.
+#[test]
+fn damage_results_share_apnap_across_permanent_counters_poison_and_life_with_replay() {
+    let mut g = game();
+    let seasons = [put(&mut g, &REVIEW_SEASON, ACTIVE), put(&mut g, &REVIEW_SEASON, ACTIVE)];
+    let talents = [put(&mut g, &TALENT, ACTIVE), put(&mut g, &TALENT, ACTIVE)];
+    let bloodletters = [put(&mut g, &DOUBLER, ACTIVE), put(&mut g, &DOUBLER, ACTIVE)];
+    let nighthawk = put(&mut g, &LIFELINKER, ACTIVE);
+    let hawk = put(&mut g, &HAWK, ACTIVE);
+    let infect = put(&mut g, &INFECT, ACTIVE);
+    let stinger = put(&mut g, &REVIEW_STINGER, FIRST);
+    let darien = put(&mut g, &REVIEW_DARIEN, LAST);
+    let hapatra = put(&mut g, &HAPATRA, FIRST);
+    g.state.set_attackers(vec![
+        Attacker::new(infect, Target::Player(LAST), LAST, TypeSet::NONE),
+        Attacker::new(hawk, Target::Player(FIRST), FIRST, TypeSet::NONE),
+        Attacker { blocked: true, ..Attacker::new(nighthawk, Target::Player(FIRST), FIRST, TypeSet::NONE) },
+    ]);
+    g.state.set_blocks(vec![Block { blocker: stinger, attacker: nighthawk, first_strike: false }]);
+    g.state.update_turn(|t| t.set_step(Step::CombatDamage));
+    g.state.frame_push(Frame::new(FrameKind::BeginStep));
+    g.run();
+    let before = g.at;
+    for (player, sources, loss, permanent) in [
+        (ACTIVE, seasons, None, Some(nighthawk)),
+        (LAST, talents, None, None),
+        (FIRST, bloodletters, Some(-1), None),
+    ] {
+        let request = g.pending().cloned().unwrap();
+        assert_eq!(request.player, player);
+        let RequestKind::ChooseReplacement { sources: offered, life, subject, .. } = request.kind else { panic!("expected result replacement") };
+        assert_eq!(offered, sources);
+        assert_eq!(life, loss);
+        assert_eq!(subject, permanent);
+        no_damage_results_yet(&g);
+        assert_eq!(trigger_count(&g, darien, 0), 1, "poison damage already triggered, exactly once");
+        assert_eq!(trigger_count(&g, hapatra, 0), 0, "counter-result triggers wait until results occur");
+        g.answer(request.id, player, Answer::Index(1)).unwrap();
+        g.run();
+    }
+    let after = g.at;
+    assert_eq!(life(&g), vec![20, 16, 23, 20]);
+    assert_eq!(g.state.player(LAST).poison(), 4);
+    assert!(g.log.iter().any(|r| matches!(r.event,
+        Event::CountersPut { object, kind: CounterKind::MinusOne, amount: 4, by: FIRST, .. } if object == nighthawk)));
+    assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Damage { .. })).count(), 4);
+    assert_eq!(waiting_or_stacked(&g, darien, LAST), 1);
+    assert_eq!(waiting_or_stacked(&g, hapatra, FIRST), 1);
+    let completed = g.log.clone();
+    g.goto(before);
+    no_damage_results_yet(&g);
+    assert_eq!(g.pending().unwrap().player, ACTIVE);
+    assert_eq!(trigger_count(&g, darien, 0), 1);
+    g.goto(after);
+    assert_eq!(g.log, completed, "undo/redo keeps completed damage and results without duplicates");
+    assert_eq!(g.state.player(LAST).poison(), 4);
+    assert_eq!(waiting_or_stacked(&g, darien, LAST), 1);
+}
+
+/// The opposite cross-kind order: ACTIVE's lifelink replacements must precede FIRST's poison replacements, even
+/// though the infect source is the first attacker. Also covers toxic as an additional result, rather than infect.
+#[test]
+fn life_choices_precede_later_players_infect_and_toxic_counter_choices() {
+    for poison_source in [&INFECT, &TOXIC] {
+        let mut g = game();
+        let angels = [put(&mut g, &ANGEL, ACTIVE), put(&mut g, &ANGEL, ACTIVE)];
+        let talents = [put(&mut g, &TALENT, ACTIVE), put(&mut g, &TALENT, ACTIVE)];
+        let poison = put(&mut g, poison_source, ACTIVE);
+        let nighthawk = put(&mut g, &LIFELINKER, ACTIVE);
+        let darien = put(&mut g, &REVIEW_DARIEN, FIRST);
+        g.state.set_attackers(vec![
+            Attacker::new(poison, Target::Player(FIRST), FIRST, TypeSet::NONE),
+            Attacker::new(nighthawk, Target::Player(LAST), LAST, TypeSet::NONE),
+        ]);
+        g.state.update_turn(|t| t.set_step(Step::CombatDamage));
+        g.state.frame_push(Frame::new(FrameKind::BeginStep));
+        g.run();
+        for (player, sources, gain) in [(ACTIVE, angels, Some(2)), (FIRST, talents, None)] {
+            let request = g.pending().cloned().unwrap();
+            assert_eq!(request.player, player);
+            assert!(matches!(&request.kind, RequestKind::ChooseReplacement { life, sources: offered, .. }
+                if *life == gain && *offered == sources));
+            no_damage_results_yet(&g);
+            assert_eq!(trigger_count(&g, darien, 0), 1);
+            g.answer(request.id, player, Answer::Index(0)).unwrap();
+            g.run();
+        }
+        assert_eq!(life(&g), vec![20, if poison_source.toxic > 0 { 19 } else { 20 }, 24, 18]);
+        assert_eq!(g.state.player(FIRST).poison(), 4);
+        assert_eq!(waiting_or_stacked(&g, darien, FIRST), 1);
+    }
+}
+
+/// CR 120.3d: the same putter's two infect sources remain two placement occurrences, not a merged addition.
+#[test]
+fn simultaneous_infect_keeps_separate_source_counter_placements() {
+    let mut g = game();
+    let one = put(&mut g, &INFECT, ACTIVE);
+    let two = put(&mut g, &INFECT, ACTIVE);
+    let target = put(&mut g, &LIFELINKER, FIRST);
+    put(&mut g, &TALENT, ACTIVE);
+    crate::ops::damage_together(&mut cx(&mut g), &[
+        (one, Target::Object(target), 1), (two, Target::Object(target), 1),
+    ]);
+    let counters: Vec<_> = g.log.iter().filter_map(|r| match r.event {
+        Event::CountersPut { object, kind: CounterKind::MinusOne, amount, total, by, .. } if object == target => Some((amount, total, by)),
+        _ => None,
+    }).collect();
+    assert_eq!(counters, vec![(2, 2, ACTIVE), (2, 4, ACTIVE)]);
+    assert_eq!(g.state.obj(target).counters(CounterKind::MinusOne), 4);
+    assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Damage { recipient_excess: 0, .. })).count(), 2,
+        "counter doubling changes results, not the actual damage or its excess");
+}
+
+/// A poison result already prepared for LAST is no longer allowed after the later life-result choice: ACTIVE
+/// concedes, returning LAST's Melira that a control effect had taken. The dealt damage and Darien trigger remain.
+#[test]
+fn prepared_poison_rechecks_prohibition_after_a_later_result_choice_concession() {
+    let mut g = game();
+    put(&mut g, &TALENT, ACTIVE);
+    put(&mut g, &TALENT, ACTIVE);
+    put(&mut g, &DOUBLER, ACTIVE);
+    put(&mut g, &DOUBLER, ACTIVE);
+    let infect = put(&mut g, &INFECT, ACTIVE);
+    let hawk = put(&mut g, &HAWK, ACTIVE);
+    let melira = put(&mut g, &MELIRA, LAST);
+    let darien = put(&mut g, &REVIEW_DARIEN, LAST);
+    cantrip_api::Game::add_effect(&mut cx(&mut g), infect, melira, EffectKind::Control(ACTIVE), Duration::EndOfTurn);
+    assert_eq!(g.state.obj(melira).controller, ACTIVE);
+    g.state.set_attackers(vec![
+        Attacker::new(infect, Target::Player(LAST), LAST, TypeSet::NONE),
+        Attacker::new(hawk, Target::Player(FIRST), FIRST, TypeSet::NONE),
+    ]);
+    g.state.update_turn(|t| t.set_step(Step::CombatDamage));
+    g.state.frame_push(Frame::new(FrameKind::BeginStep));
+    g.run();
+    let request = g.pending().cloned().unwrap();
+    assert_eq!(request.player, LAST);
+    assert_eq!(trigger_count(&g, darien, 0), 1);
+    g.answer(request.id, LAST, Answer::Index(0)).unwrap();
+    g.run();
+    assert_eq!(g.pending().unwrap().player, FIRST);
+    no_damage_results_yet(&g);
+    g.concede(ACTIVE);
+    assert_eq!(g.state.obj(melira).controller, LAST);
+    assert_eq!(g.state.player(LAST).poison(), 0, "Melira now prohibits the prepared poison result");
+    assert_eq!(g.state.player(FIRST).life, 19);
+    assert_eq!(waiting_or_stacked(&g, darien, LAST), 1);
+    assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Damage { .. })).count(), 2);
+    let known = g.log.iter().find_map(|r| match r.event {
+        Event::Damage { source, controller: ACTIVE, known, .. } if source == infect => Some(known),
+        _ => None,
+    }).expect("damage retains its departed source's controller and LKI");
+    assert!(g.state.last_known[known as usize].keywords.has(Keyword::Infect));
+}
+
+/// CR 101.4d: a concession during LAST's life choice returns a borrowed counter recipient to ACTIVE. Its still
+/// unprepared counter replacements must restart APNAP, not be skipped because ACTIVE's earlier pass is over.
+#[test]
+fn result_preparation_restarts_apnap_when_concession_returns_a_counter_recipient() {
+    let mut g = game();
+    let seasons = [put(&mut g, &REVIEW_SEASON, ACTIVE), put(&mut g, &REVIEW_SEASON, ACTIVE)];
+    put(&mut g, &DOUBLER, ACTIVE);
+    put(&mut g, &DOUBLER, ACTIVE);
+    let stinger = put(&mut g, &REVIEW_STINGER, ACTIVE);
+    let hawk = put(&mut g, &HAWK, ACTIVE);
+    let nighthawk = put(&mut g, &LIFELINKER, ACTIVE);
+    let controller_source = put(&mut g, &PYROHEMIA, FIRST);
+    cantrip_api::Game::add_effect(&mut cx(&mut g), controller_source, nighthawk, EffectKind::Control(FIRST), Duration::EndOfTurn);
+    g.state.set_attackers(vec![
+        Attacker { blocked: true, ..Attacker::new(stinger, Target::Player(FIRST), FIRST, TypeSet::NONE) },
+        Attacker::new(hawk, Target::Player(LAST), LAST, TypeSet::NONE),
+    ]);
+    g.state.set_blocks(vec![Block { blocker: nighthawk, attacker: stinger, first_strike: false }]);
+    g.state.update_turn(|t| t.set_step(Step::CombatDamage));
+    g.state.frame_push(Frame::new(FrameKind::BeginStep));
+    g.run();
+    assert_eq!(g.pending().unwrap().player, LAST);
+    g.concede(FIRST);
+    // The outstanding LAST choice is rebuilt before the outer result scheduler resumes.
+    let request = g.pending().cloned().unwrap();
+    assert_eq!(request.player, LAST);
+    g.answer(request.id, LAST, Answer::Index(0)).unwrap();
+    g.run();
+    let request = g.pending().cloned().expect("ACTIVE must order the returned creature's counters");
+    assert_eq!(request.player, ACTIVE);
+    assert!(matches!(&request.kind, RequestKind::ChooseReplacement { subject: Some(id), sources, .. }
+        if *id == nighthawk && *sources == seasons));
+    no_damage_results_yet(&g);
+    g.answer(request.id, ACTIVE, Answer::Index(0)).unwrap();
+    g.run();
+    assert!(g.log.iter().any(|r| matches!(r.event,
+        Event::CountersPut { object, kind: CounterKind::MinusOne, amount: 4, by: ACTIVE, .. } if object == nighthawk)));
+    assert_eq!(g.state.player(LAST).life, 16);
+    assert_eq!(g.state.player(ACTIVE).life, 21);
 }
 
 #[test]

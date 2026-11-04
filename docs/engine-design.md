@@ -1036,15 +1036,35 @@ opponents" sees one occurrence, individual observers see each loss. The return v
 not blocked losses, replaced gains or a replacement continuation's other actions. `each_opponent_loses_life` uses the same
 operation for equal amounts; single-player changes still apply and emit immediately.
 
-Damage uses that same preparation and application, within the existing `ops::DamageBatch` (CR 120.4c-d). After damage
-replacement and prevention, its noninfect player damage is a combined loss per player; lifelink is a separate gain per
-source, summed across that source's recipients, never across different sources (CR 119.9-10, 702.15e). Losses and gains
-are not netted, even if they leave a life total unchanged. All life-result replacements are prepared in APNAP order
-before any original life total changes; the journal applies them only after the damage-result replacements finish.
-Life-change announcements join the damage and counter announcements in one `emit_batch`, including gains replaced
-with losses: Ob Nixilis, Captive Kingpin sees one event when several opponents each lose exactly 1, while Ajani's
-Pridemate still sees each source's lifelink gain. Spell damage, single damage and combat all finish this same batch.
-An explicit `lose_life` or `gain_life` call remains its own event, not part of another instruction's damage batch.
+Damage uses that same life preparation and application within the existing `ops::DamageBatch`, with the four phases
+of CR 120.4 kept distinct. Once every damage replacement and prevention has applied, the batch finalizes actual damage
+and each recipient's total excess, then calls `settle::collect_batch` for **damage triggers before any result replacement
+choice** (CR 120.4b). These are the ordinary journalled pending triggers, with their controller fixed now (CR 603.3a),
+not a separate damage-trigger store. A concession during the following choices replays this collection before the
+concession at its recorded cursor: an owner's departure removes their borrowed Darien, not the trigger controlled by a
+player still in the game (CR 800.4a, 800.4d).
+
+Noninfect player damage is a combined loss per player; lifelink is a separate gain per source, summed across that
+source's recipients, never across different sources (CR 119.9-10, 702.15e). Losses and gains are not netted, even if they
+leave a life total unchanged. **One APNAP preparation pass covers all result kinds**, not a pass per kind: each affected
+player's life and poison, and the permanent counters whose recipients they control (CR 120.4c, 616.1). The next affected
+player is read again after each prepared occurrence: if a continuation or concession returns a still-unprepared counter
+recipient to an earlier player, outstanding choices restart APNAP (CR 101.4d). Permanent and
+player counters use the existing `counters` put path's split preparation/application, preserving a placement per source
+and its putter. No original life total, player counter, permanent counter, damage mark, loyalty or defense changes until
+all applicable result replacements are prepared. Recipients and prohibitions are rechecked together after replacement
+continuations, before any original result is applied.
+
+`DamageBatch::finish` then applies the results and records damage and results together through `Cx::record_batch`
+(CR 120.4d). Only the **result** events go through trigger collection then, against the completed state; damage triggers
+are not collected again. Both collections use the history boundary saved before the first collection, so a result
+matcher does not mistake earlier damage, a limited triggering or a continuation within this instruction for its prior
+history. Continuous effects at result time can read the completed history as usual. A marks/removal-only result still
+checks state triggers after completion. "One or more" damage and life triggers keep their whole batches: Ob Nixilis,
+Captive Kingpin sees one event when several opponents each lose exactly 1, while Ajani's Pridemate still sees each
+source's lifelink gain. Spell damage, single damage and combat all finish this same batch; prevention continuations still
+run once afterward. An explicit `lose_life` or `gain_life` call remains its own event, not part of another instruction's
+damage batch.
 
 Draws (CR 121) are judged one card at a time (`ops::draw`): first whether the player can't draw it (`cantrip_api::cant_draw`,
 a permanent's `CardDef::cant_draw` rule: "can't draw more than one card each turn", CR 121.2b) - then nothing happens and no
@@ -1903,6 +1923,11 @@ as (`DamageBatch::finish`, announced with the damage, CR 120.3d, 510.2) go throu
 counters on each of several permanents (`effects::counters_on_creatures_you_control`,
 `double::counters`, `counters_divided`). A card never loops
 `add_counters` over objects or kinds its one instruction names together.
+The same path exposes `prepare`/`prepare_player`, final recipient/prohibition checks, and
+`place_prepared`/`place_players_prepared` to damage: the batch can prepare counters alongside each affected player's
+life results, then apply all results with no remaining replacement questions. Player poison is not given while damage
+assignments are still being replaced; it waits for this pass too. A later replacement continuation or concession cannot
+leave an already-prepared placement on a departed recipient or one now prohibited from getting those counters.
 
 Counters that would be put on a permanent are one `Proposal::Counters` (CR 122.6, 614.1a), whose `CounterPlacement` says who puts
 them (`putter`, CR 122.6a: "if you would put", Innkeeper's Talent) and whether an effect does (`effect`: "if an effect would put",

@@ -1,9 +1,9 @@
 # Kutzil, Malamet Exemplar: Elenda, Saint of Dusk (printed 4/4, lifelink; +1/+1 while her controller's life total is greater
-# than starting life) attacks at exactly 20 life. When she deals her damage the lifelink gain is part of the same event
-# (CR 510.2, 120.3f), and the trigger is checked right after it, before state-based actions (CR 603.10): her power is then 5,
-# above her base 4, so Kutzil's controller draws. Her power was 4 as she dealt the damage, so only reading it after the
-# event draws (Bot1 hand: 1 draw for turn 3 + 1 for the trigger). "Your opponents can't cast spells during your turn"
-# (CR 101.2): Bot2 casts a Lightning Bolt in its own turn 2 but is refused one in Bot1's turn 3.
+# than starting life) attacks at exactly 20 life. Abilities that trigger when damage is dealt trigger as it is dealt, before
+# it is processed into its results (CR 120.4b-c): her lifelink gain (CR 120.3f) comes after the trigger is checked, so her
+# power is then 4, her base, and Kutzil's controller draws nothing (Bot1 hand: the turn-3 draw alone), though the gain
+# then makes her 5/5. "Your opponents can't cast spells during your turn" (CR 101.2): Bot2 casts a Lightning Bolt in its
+# own turn 2 but is refused one in Bot1's turn 3.
 
 [Bot1 Deck]
 Mox Pearl
@@ -51,5 +51,6 @@ Bot1.Pass
 [Expect]
 Bot2.Life = 13
 Bot1.Life = 24
-Bot1.Hand.Count = 2
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Elenda, Saint of Dusk.Power = 5
 Bot2.Graveyard = Lightning Bolt
