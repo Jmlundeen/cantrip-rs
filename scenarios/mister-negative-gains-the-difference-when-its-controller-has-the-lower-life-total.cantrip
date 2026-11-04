@@ -1,0 +1,41 @@
+# Darkforce Inversion (CR 701.12c) the other way round: Bot1 at 4 life and Bot2 at 15 exchange totals, Bot1 gaining 11 and Bot2 losing 11.
+# Bot1 lost no life, so draws nothing ("if you lost life this way"): the Island is still the only card in hand.
+
+[Life]
+Bot1: 4
+Bot2: 15
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Sol Ring x2
+Mister Negative
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring#1.Activate
+Bot1.Battlefield.Sol Ring#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mister Negative.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 15
+Bot2.Life = 4
+Bot1.Hand = Island
+Stack.Count = 0

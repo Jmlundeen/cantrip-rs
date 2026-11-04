@@ -1,0 +1,43 @@
+# Darkforce Inversion (CR 701.12c): Bot1 at 12 life and Bot2 at 5 exchange life totals, Bot1 losing 7 and Bot2 gaining 7. "If you lost life this way,
+# draw that many cards": Bot1 draws 7 (Mister Negative's lifelink is not involved). Cost {5}{W}{B}: Lotus's BBB pays two Sol Rings, leaving
+# one B; the Rings' CCCC, that B, Mox Pearl's W and Mox Jet's B pay it exactly.
+
+[Life]
+Bot1: 12
+Bot2: 5
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Sol Ring x2
+Mister Negative
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring#1.Activate
+Bot1.Battlefield.Sol Ring#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mister Negative.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 5
+Bot2.Life = 12
+Bot1.Hand.Count = 8
+Bot1.Battlefield.Mister Negative.Power = 5
+Stack.Count = 0
