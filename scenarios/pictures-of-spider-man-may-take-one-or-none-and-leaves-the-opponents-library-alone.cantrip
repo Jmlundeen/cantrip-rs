@@ -1,0 +1,43 @@
+# Pictures of Spider-Man: "You may reveal up to two creature cards" - one, or none, is allowed. Bot1 casts it with the top five Memnite,
+# Forest, Forest, Forest, Forest and takes only the Memnite; Bot2's library, full of creatures, is not looked at. Bot1 then
+# pays {1} and taps, sacrificing it: "Create a Treasure token", which Bot1 can sacrifice for mana.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Pictures of Spider-Man
+Mox Pearl
+Forest x2
+Memnite
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Memnite x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pictures of Spider-Man.Cast
+Bot1.Pass
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Forest; Forest; Memnite; Mox Pearl
+? Bot2.Hand.Count = 7
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Pictures of Spider-Man.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Revealed = Memnite
+Bot1.Battlefield.Pictures of Spider-Man = (absent)
+Bot1.Battlefield.Treasure Token.Types = Artifact
+Bot1.Graveyard = Pictures of Spider-Man

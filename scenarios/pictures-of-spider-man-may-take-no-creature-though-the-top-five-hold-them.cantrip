@@ -1,0 +1,37 @@
+# Pictures of Spider-Man: "You may reveal up to two creature cards": taking none is allowed even when the top five (Memnite, Giant Spider,
+# Hill Giant, Llanowar Elves, Alpine Grizzly) are all creatures. Bot1 takes none, so nothing is revealed, the hand is the three Forests
+# alone, and all five go to the bottom of the library.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Pictures of Spider-Man
+Forest x3
+Memnite
+Giant Spider
+Hill Giant
+Llanowar Elves
+Alpine Grizzly
+Forest x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pictures of Spider-Man.Cast
+Bot1.Pass
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Forest; Forest; Forest
+Bot1.Library.Count = 13
+Bot1.Revealed = (absent)

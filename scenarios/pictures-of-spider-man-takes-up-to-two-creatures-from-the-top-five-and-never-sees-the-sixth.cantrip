@@ -1,0 +1,42 @@
+# Pictures of Spider-Man {2}{G}: "When this artifact enters, look at the top five cards of your library. You may reveal up to two creature
+# cards from among them and put them into your hand. Put the rest on the bottom of your library in a random order." The top five are
+# Memnite, Forest, Giant Spider, Llanowar Elves and Hill Giant, and the sixth is an Alpine Grizzly: three creatures are refused, so is a
+# Forest (no creature), and Bot1 takes two, Giant Spider and Hill Giant. The other three go to the bottom; the Grizzly, the sixth, is not
+# among the cards the prompt offers at all (the refusal).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Pictures of Spider-Man
+Forest x3
+Memnite
+Forest
+Giant Spider
+Llanowar Elves
+Hill Giant
+Alpine Grizzly
+Forest x7
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pictures of Spider-Man.Cast
+Bot1.Pass
+! Bot1.Choose(Memnite; Giant Spider; Hill Giant)
+! Bot1.Choose(Forest)
+! Bot1.Choose(Alpine Grizzly)
+Bot1.Choose(Giant Spider; Hill Giant)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Forest; Forest; Forest; Giant Spider; Hill Giant
+Bot1.Library.Count = 11
