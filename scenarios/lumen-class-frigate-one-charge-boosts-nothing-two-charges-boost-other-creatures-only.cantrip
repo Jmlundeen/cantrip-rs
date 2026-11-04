@@ -1,0 +1,57 @@
+# Lumen-Class Frigate "2+ | Other creatures you control get +1/+1." (CR 721.2a, 613.4c): one charge counter boosts nothing; the
+# second (two Llanowar Elves, power 1 each, stationed in turn) turns it on - for the Elves but not the Frigate, which is no
+# creature, and not for Bot2's Ornithopter.
+
+[Bot1 Deck]
+Lumen-Class Frigate
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Llanowar Elves x2
+Island x20
+
+[Bot2 Deck]
+Ornithopter x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Lumen-Class Frigate.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Lumen-Class Frigate.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lumen-Class Frigate.Counters.Charge = 1
+? Bot1.Battlefield.Llanowar Elves#1.Power = 1
+? Bot1.Battlefield.Llanowar Elves#2.Power = 1
+Bot1.Battlefield.Lumen-Class Frigate.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves#2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Lumen-Class Frigate.Counters.Charge = 2
+Bot1.Battlefield.Lumen-Class Frigate.Types = Artifact
+Bot1.Battlefield.Lumen-Class Frigate.Keywords = (absent)
+Bot1.Battlefield.Llanowar Elves#1.Power = 2
+Bot1.Battlefield.Llanowar Elves#1.Toughness = 2
+Bot1.Battlefield.Llanowar Elves#2.Power = 2
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
