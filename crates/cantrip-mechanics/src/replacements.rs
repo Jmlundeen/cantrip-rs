@@ -97,6 +97,28 @@ pub const PLUS_ONE_COUNTERS_ON_YOUR_CREATURES: ReplacementDef = replacement(
 pub const DOUBLE_TOKENS: ReplacementDef =
     replacement(ReplacementKind::TokenCreation, tokens_under_your_control, twice_that_many_tokens, "twice that many tokens are created");
 
+/// "As long as this permanent is attached to a permanent, the first time you would create one or more tokens each turn"
+/// (CR 111.1, 614.1a): tokens that are yours, this turn's first creation. What was created earlier this turn is read from the
+/// history (a token created as a copy of a permanent spell is not created, CR 111.13), and a creation the player declined to
+/// replace still used the turn's first time up. Mirrormind Crown (equipped creature) and Moonlit Meditation (enchanted permanent).
+pub fn first_tokens_you_would_create_this_turn_while_attached(q: &dyn Query, me: &Asker, p: &Proposal) -> bool {
+    if !matches!(p, Proposal::TokenCreation(t) if t.controller == me.controller) || q.attached_to(me.source).is_none() {
+        return false;
+    }
+    !q.history()
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).to(ZoneKind::Battlefield).reason(ZoneReason::Created).this_turn())
+        .any(|r| matches!(r.event, Event::ZoneChange { new, .. } if q.obj(new).owner == me.controller))
+}
+
+/// "... you may instead create that many tokens that are copies of the permanent it is attached to": the same count, each a copy
+/// of that permanent's copiable values (CR 707.2) - a token's own characteristics if it is one, what it copies if it is a copy.
+pub fn copies_of_the_attached_permanent(q: &dyn Query, me: &Asker, p: &mut Proposal) {
+    let (Proposal::TokenCreation(t), Some(permanent)) = (p, q.attached_to(me.source)) else { return };
+    let values = q.copiable_values(permanent);
+    t.token = values.card;
+    t.copy = Some(values);
+}
+
 fn buyback_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z)
         if z.object == asker.source
