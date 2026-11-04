@@ -1,0 +1,8 @@
+{
+  "name": "Mysterio, Master of Illusion",
+  "manaCost": "{3}{U}",
+  "type": "Legendary Creature — Human Villain",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When Mysterio enters, create a 3/3 blue Illusion Villain creature token for each nontoken Villain you control. Exile those tokens when Mysterio leaves the battlefield."
+}

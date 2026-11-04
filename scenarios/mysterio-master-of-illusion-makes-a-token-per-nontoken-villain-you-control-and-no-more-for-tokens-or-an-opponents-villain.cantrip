@@ -1,0 +1,64 @@
+# Mysterio, Master of Illusion ({3}{U}): "When Mysterio enters, create a 3/3 blue Illusion Villain creature token for each nontoken
+# Villain you control" (CR 111.1, 608.2c). Turn 1: Black Lotus and Mox Sapphire pay for him; he is the only Villain Bot1 controls,
+# so one token, though Bot2's Mysterio's Phantasm (turn 2, a Villain too) is not Bot1's to count. Turn 3: Chameleon, Master of
+# Disguise (a Villain) enters as a copy of Mysterio, so his enter trigger runs again: the nontoken Villains are the two of them,
+# and the Illusion Villain token already there (a Villain, but a token) is not counted: two more tokens, three in all.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mysterio, Master of Illusion
+Chameleon, Master of Disguise
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mysterio's Phantasm
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mysterio, Master of Illusion.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Mysterio's Phantasm.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chameleon, Master of Disguise.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Chameleon, Master of Disguise; Illusion Villain Token; Illusion Villain Token; Illusion Villain Token; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Mysterio, Master of Illusion

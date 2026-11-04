@@ -1,0 +1,51 @@
+# Mysterio's enter trigger resolved after he has left the battlefield: the 2025-09-19 ruling says the ability that removes the tokens
+# never triggers. Bot1 has Mysterio's Phantasm (a Villain) out; on turn 3 it casts Mysterio, and with his trigger on the stack Bot2
+# kills him with Lightning Bolt. The trigger still counts one nontoken Villain, the Phantasm, and makes one token that stays.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mysterio's Phantasm
+Mysterio, Master of Illusion
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mysterio's Phantasm.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mysterio, Master of Illusion.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Mysterio, Master of Illusion)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Illusion Villain Token; Mox Jet; Mox Sapphire; Mysterio's Phantasm
+Bot1.Graveyard = Mysterio, Master of Illusion; Black Lotus
