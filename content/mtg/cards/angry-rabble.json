@@ -1,0 +1,11 @@
+{
+  "name": "Angry Rabble",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Human Citizen",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Trample\nWhenever you cast a spell with mana value 4 or greater, this creature deals 1 damage to each opponent.\n{5}{R}: Put two +1/+1 counters on this creature. Activate only as a sorcery.",
+  "keywords": [
+    "Trample"
+  ]
+}

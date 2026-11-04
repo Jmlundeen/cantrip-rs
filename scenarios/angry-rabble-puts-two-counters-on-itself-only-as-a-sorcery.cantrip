@@ -1,0 +1,48 @@
+# Angry Rabble: "{5}{R}: Put two +1/+1 counters on this creature. Activate only as a sorcery." Bot1 casts it on turn 1 with Mox
+# Ruby and Mox Jet. On turn 3 Black Lotus (RRR) and three Moxen pay the {5}{R}, but with Mox Pearl on the stack the ability is not
+# offered (CR 602.5d); once Pearl has resolved it is, and the Rabble is a 4/4 with two counters.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Angry Rabble
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Angry Rabble.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Pearl.Cast
+! Bot1.Battlefield.Angry Rabble.Activate
+Bot1.Pass
+Bot1.Battlefield.Angry Rabble.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Angry Rabble.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Angry Rabble.Power = 4
+Bot1.Battlefield.Angry Rabble.Toughness = 4
