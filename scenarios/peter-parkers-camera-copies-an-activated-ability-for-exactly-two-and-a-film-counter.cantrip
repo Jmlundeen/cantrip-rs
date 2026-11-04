@@ -1,0 +1,58 @@
+# Peter Parker's Camera ({1}): "This artifact enters with three film counters on it. {2}, {T}, Remove a film counter from this artifact: Copy target activated or triggered
+# ability you control." Bot1 casts it with Mox Pearl (three film counters), then activates Mind Stone's "{1}, {T}, Sacrifice: Draw a card" with mana from Black Lotus and, with the
+# ability on the stack, copies it with the other two: the pool is empty (the cost was exactly {2}), the Camera is tapped and has two film counters, and both draws happen although the Stone is gone.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mind Stone
+Peter Parker's Camera
+Mox Sapphire
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Peter Parker's Camera.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Peter Parker's Camera.Counters.Film = 3
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+Bot1.Battlefield.Peter Parker's Camera.Activate(Stack.Mind Stone)
+? Bot1.Mana =
+? Bot1.Battlefield.Peter Parker's Camera.Tapped = true
+? Bot1.Battlefield.Peter Parker's Camera.Counters.Film = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 0
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 1
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Sapphire.Tapped = false

@@ -1,0 +1,29 @@
+# Peter Parker's Camera: "{2}, {T}, Remove a film counter from this artifact: Copy target activated or triggered ability you
+# control." An ability on the stack can't target itself (CR 115.5), so with nothing else on the stack the Camera has no legal
+# target and can't be activated (CR 602.2b, 601.2c): Bot1 has the mana, and the Camera stays untapped with its three counters.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Peter Parker's Camera
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Peter Parker's Camera.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Peter Parker's Camera.Activate
+
+[Expect]
+Bot1.Battlefield.Peter Parker's Camera.Counters.Film = 3
+Bot1.Battlefield.Peter Parker's Camera.Tapped = false
