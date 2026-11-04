@@ -1,0 +1,43 @@
+# Icecave Crasher: "Trample. Landfall - Whenever a land you control enters, this creature gets +1/+0 until end of turn." Four Moxen pay {3}{G} exactly (the pool is empty after the cast) for a 4/4
+# with trample. Bot1's Forest makes it a 5/4 (toughness unchanged); Bot2's Island on turn 2 changes nothing ("you control"), and the +1/+0 has worn off by then.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Icecave Crasher
+Forest
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Icecave Crasher.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Icecave Crasher.Power = 4
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Icecave Crasher.Power = 5
+? Bot1.Battlefield.Icecave Crasher.Toughness = 4
+? Bot1.Battlefield.Icecave Crasher.Keywords = Trample
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Icecave Crasher.Power = 4
+Bot1.Battlefield.Icecave Crasher.Toughness = 4
