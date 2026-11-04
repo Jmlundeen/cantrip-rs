@@ -1,0 +1,62 @@
+# Bot3 taps its Savannah Lions, then concedes while Bot1 is choosing Plains. Bot3 is not asked to choose its own
+# Plains afterwards (CR 800.4a), and Bot1, who tapped one creature, saves its one Plains.
+[Bot1 Deck]
+Raiding Party
+Orcish Lumberjack
+Savannah Lions
+Mox Ruby
+Mox Ruby
+Mox Pearl
+Black Lotus
+Plains
+Island x20
+[Bot2 Deck]
+Island x20
+[Bot3 Deck]
+Plains
+Savannah Lions
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Orcish Lumberjack.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Raiding Party.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Plains.Play
+Bot3.Battlefield.Plains.Activate
+Bot3.Hand.Savannah Lions.Cast
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Raiding Party.Activate
+Bot1.Choose(Orcish Lumberjack)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Choose(Bot1.Battlefield.Savannah Lions)
+Bot2.Choose()
+Bot3.Choose(Bot3.Battlefield.Savannah Lions)
+Bot3.Concede
+Bot1.Choose(Bot1.Battlefield.Plains)
+
+[Expect]
+Bot3.Status = Lost
+Bot1.Battlefield.Savannah Lions.Tapped = true
+Bot1.Battlefield.Plains.ManaValue = 0

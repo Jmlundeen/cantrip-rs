@@ -1,0 +1,50 @@
+# Bot2 concedes before the tap choice reaches them; Bot3 taps one white creature and must still choose up to two Plains (CR 800.4a).
+[Bot1 Deck]
+Raiding Party
+Orcish Lumberjack
+Mox Ruby
+Mox Ruby
+Black Lotus
+Island x20
+[Bot2 Deck]
+Island x20
+[Bot3 Deck]
+Plains
+Savannah Lions
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Orcish Lumberjack.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Raiding Party.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Plains.Play
+Bot3.Battlefield.Plains.Activate
+Bot3.Hand.Savannah Lions.Cast
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot1.Main1]
+Bot1.Battlefield.Raiding Party.Activate
+Bot1.Choose(Orcish Lumberjack)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot2.Concede
+Bot1.Choose()
+Bot3.Choose(Bot3.Battlefield.Savannah Lions)
+Bot3.Choose(Bot3.Battlefield.Plains)
+
+[Expect]
+Bot2.Status = Lost
+Bot3.Battlefield.Savannah Lions.Tapped = true
+Bot3.Battlefield.Plains.ManaValue = 0
