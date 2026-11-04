@@ -1,0 +1,50 @@
+# Web of Life and Destiny's "You may put a creature card from among them onto the battlefield": the choice is up to one. Bot1 looks at Serra Angel, Grizzly Bears and three
+# Islands and chooses none; all five go to the bottom of the library and nothing joins the Web on the battlefield. The card drawn on turn 3 is the sixth, a Llanowar Elves.
+# It is cast with eight mana (Black Lotus and five Moxen), no convoke.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Web of Life and Destiny
+Serra Angel
+Grizzly Bears
+Island
+Island
+Island
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Grizzly Bears x4
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Web of Life and Destiny.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Web of Life and Destiny
+Bot1.Looked = Serra Angel; Grizzly Bears; Island; Island; Island
+Bot1.Hand = Llanowar Elves
+Bot2.Life = 20

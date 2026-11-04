@@ -1,0 +1,51 @@
+# Web of Life and Destiny {6}{G}{G} with convoke: Black Lotus and Mox Emerald make the {G}{G} and two more, Mox Ruby another, and three tapped Ornithopters (summoning sick
+# but tapped by convoke) pay {1} each: eight in all. "At the beginning of combat on your turn, look at the top five cards of your library. You may put a creature card from
+# among them onto the battlefield. Put the rest on the bottom of your library in a random order." The five are Serra Angel (a creature, mana value 5: any is allowed), Sol Ring (not
+# a creature), Grizzly Bears, and two Islands; a Llanowar Elves is sixth and is not looked at. Sol Ring and the Elves can't be chosen; Serra Angel is put onto the battlefield, the four
+# others go to the bottom, and Bot1 draws the sixth card, Llanowar Elves, on turn 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Ornithopter x3
+Web of Life and Destiny
+Serra Angel
+Sol Ring
+Grizzly Bears
+Island
+Island
+Llanowar Elves
+Island x11
+
+[Bot2 Deck]
+Grizzly Bears x4
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Web of Life and Destiny.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Sol Ring)
+! Bot1.Choose(Llanowar Elves)
+! Bot1.Choose(Serra Angel; Grizzly Bears)
+Bot1.Choose(Serra Angel)
+? Bot1.Battlefield.Serra Angel.Tapped = false
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Ornithopter; Ornithopter; Ornithopter; Serra Angel; Web of Life and Destiny
+Bot1.Looked = Serra Angel; Sol Ring; Grizzly Bears; Island; Island
+Bot1.Hand = Llanowar Elves
+Bot2.Life = 20
