@@ -2,17 +2,21 @@
 
 use cantrip_api::*;
 
-use crate::attach;
 use crate::targets;
 
 /// Whether `id` is a modified permanent (CR 700.9), through the layers: it has one or more counters of any kind on it, an Equipment
 /// is attached to it (whoever controls the Equipment), or an Aura controlled by the permanent's controller is attached to it (an
 /// Aura an opponent controls does not make it modified). Costume Closet and Silver Sable, Mercenary Leader ask it.
+///
+/// Asked of a permanent that has just left the battlefield, it answers for the permanent as it last was (CR 603.10a, "whenever a modified
+/// creature leaves the battlefield"): its counters are its last-known ones, and an Equipment or Aura still on the battlefield names it in its
+/// own `attached_to` until state-based actions unattach it (CR 704.5m, 704.5n), which `Query::attached_to` would already deny.
 pub fn is_modified(q: &dyn Query, id: ObjectId) -> bool {
     q.obj(id).counter_array().iter().any(|&n| n > 0)
-        || attach::is_equipped(q, id)
-        || q.state().battlefield().iter().any(|&aura| {
-            q.attached_to(aura) == Some(id) && q.chars(aura).has_subtype(Subtype::Aura) && q.controller(aura) == q.controller(id)
+        || q.state().battlefield().iter().any(|&attachment| {
+            q.obj(attachment).attached_to == Some(id)
+                && (q.chars(attachment).has_subtype(Subtype::Equipment)
+                    || q.chars(attachment).has_subtype(Subtype::Aura) && q.controller(attachment) == q.controller(id))
         })
 }
 
