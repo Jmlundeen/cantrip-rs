@@ -370,6 +370,19 @@ pub fn this_gets<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem)
     Ok(())
 }
 
+/// "[This creature] gets +`P`/+`T` and gains menace until end of turn" (CR 611.2a, 613.4c, 702.111): one instruction ("gets +1/+0 and
+/// gains menace") of two continuous effects from the ability's source, both of which do nothing once it has left the battlefield
+/// (CR 400.7). Flame-Chain Mauler and Inner Demons Gangsters (+1/+0) print it.
+pub fn this_gets_and_gains_menace<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.one_instruction(&mut |g| {
+        crate::pump(g, item.object, item.object, P, T);
+        if g.is_on_battlefield(item.object) {
+            gain_until_end_of_turn(g, item.object, item.object, Keyword::Menace);
+        }
+        Ok(())
+    })
+}
+
 fn creatures_on_the_battlefield(g: &dyn Game) -> Vec<ObjectId> {
     g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect()
 }
