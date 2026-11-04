@@ -1,0 +1,29 @@
+# Three players: Bot3 concedes while Bot2 is choosing its discards, so Bot3 is not asked for any (CR 800.4a, 101.4). Bot1 and
+# Bot2 each discard one card together and take 2 damage.
+[Bot1 Deck]
+Mind Bomb
+Mox Sapphire
+Island x20
+[Bot2 Deck]
+Island x20
+[Bot3 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mind Bomb.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Choose(Island)
+Bot3.Concede
+Bot2.Choose(Island)
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Bot1.Graveyard.Count = 2
+Bot2.Graveyard.Count = 1
