@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::THIS_ENTERS;
+use cantrip_mechanics::{effects, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "When this land enters, choose a land card name." The name is chosen as the trigger resolves, of a land card
@@ -23,10 +23,7 @@ fn choose_land_name(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         }
     }
     let suggestion = seen.iter().max_by_key(|(_, n)| *n).map(|(card, _)| *card);
-    let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion, kind: NameKind::LAND };
-    if let Answer::Name(Some(name)) = g.ask(you, ask)? {
-        g.remember_chosen_name(g.linked(item), name);
-    }
+    effects::choose_a_card_name(g, item, NameKind::LAND, suggestion)?;
     Ok(())
 }
 

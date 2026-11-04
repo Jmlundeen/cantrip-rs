@@ -911,6 +911,17 @@ pub fn surveil(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspe
     crate::surveil(g, item.controller, item.object, n)
 }
 
+/// "Choose a card name" / "choose a land card name" (CR 201.4, 201.4a) as an ability resolves: the controller names a card of
+/// `kind` (an unscripted player the `suggestion`), and the name is remembered by the ability's source as the object it is (CR
+/// 607.2d), for the rest of its text to refer to (`GameState::chosen_card`). The name chosen, if one was; if the source has left
+/// the battlefield by then the choice is made and nothing keeps it. Medomai's Prophecy and Petrified Hamlet print it.
+pub fn choose_a_card_name(g: &mut dyn Game, item: &StackItem, kind: NameKind, suggestion: Option<CardId>) -> Result<Option<CardId>, Suspend> {
+    let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion, kind };
+    let Answer::Name(Some(name)) = g.ask(item.controller, ask)? else { return Ok(None) };
+    g.remember_chosen_name(g.linked(item), name);
+    Ok(Some(name))
+}
+
 /// "Return target <permanent> to its owner's hand. Surveil N." as one spell's whole effect, for its first target.
 /// Banishing Betrayal (nonland permanent, surveil 1) and Ephara's Dispersal (creature, surveil 2) print it. A spell whose
 /// only target has become illegal does nothing at all (CR 608.2b), so there is no surveil then; otherwise the surveil
