@@ -1,0 +1,8 @@
+{
+  "name": "Vexing Drone",
+  "manaCost": "{1}{W}",
+  "type": "Artifact Creature — Borg",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature enters, tap target creature an opponent controls."
+}

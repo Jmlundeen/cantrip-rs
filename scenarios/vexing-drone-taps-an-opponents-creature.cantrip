@@ -1,0 +1,37 @@
+# "When this creature enters, tap target creature an opponent controls." (CR 701.26a, 608.2b): Bot1's own Vexing Drone is
+# not offered, and the chosen Ornithopter is tapped as the ability resolves while its twin is left alone.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Vexing Drone
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Vexing Drone.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Vexing Drone)
+Bot1.Target(Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter#1.Tapped = true
+Bot2.Battlefield.Ornithopter#2.Tapped = false
+Bot1.Battlefield.Vexing Drone.Toughness = 2
