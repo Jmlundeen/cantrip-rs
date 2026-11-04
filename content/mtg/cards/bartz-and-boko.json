@@ -1,0 +1,8 @@
+{
+  "name": "Bartz and Boko",
+  "manaCost": "{3}{G}{G}",
+  "type": "Legendary Creature — Human Bird",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Affinity for Birds (This spell costs {1} less to cast for each Bird you control.)\nWhen Bartz and Boko enters, each other Bird you control deals damage equal to its power to target creature an opponent controls."
+}

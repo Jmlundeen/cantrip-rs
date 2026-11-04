@@ -1,0 +1,71 @@
+# Bartz and Boko, {3}{G}{G} with affinity for Birds (CR 702.41a): on turn 5 Bot1 controls City Pigeon (1/1), Aven Skirmisher
+# (1/1), Birds of Paradise (0/1) and Aven Sentry (3/2), four Birds, so it costs {G}{G}, paid exactly by Emerald and the Birds of
+# Paradise and leaving the pool empty - Bot2's own City Pigeon is not a Bird Bot1 controls and reduces nothing. "When Bartz and
+# Boko enters, each other Bird you control deals damage equal to its power to target creature an opponent controls": the
+# Pigeon and the Skirmisher deal 1 each, the Sentry 3 and the Birds of Paradise none, 5 in all to Bot2's Balamb T-Rexaur (6/6);
+# Bartz and Boko (4 power, a Bird itself) deals none - not 9 - and Bot2's Pigeon deals none either. Bot1's own Aven Sentry is
+# no legal target.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Ruby
+City Pigeon
+Birds of Paradise
+Aven Sentry
+Aven Skirmisher
+Bartz and Boko
+Forest x15
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Mox Pearl
+City Pigeon
+Balamb T-Rexaur
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.City Pigeon.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aven Sentry.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.City Pigeon.Cast
+Bot2.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Balamb T-Rexaur.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Skirmisher.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bartz and Boko.Cast
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Target(Bot1.Battlefield.Aven Sentry)
+Bot1.Target(Bot2.Battlefield.Balamb T-Rexaur)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Balamb T-Rexaur.Damage = 5
+Bot2.Battlefield.City Pigeon.Damage = 0
+Bot1.Battlefield.Aven Sentry.Damage = 0
+Bot1.Battlefield.Bartz and Boko.Damage = 0
