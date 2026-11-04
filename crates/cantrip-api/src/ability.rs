@@ -726,6 +726,11 @@ impl AbilityDef {
         AbilityDef::Triggered(TriggeredDef { sums_per_subject: true, ..triggered_def(self, "only a triggered ability sums its events") })
     }
 
+    /// "Deals N or more damage" (CR 603.2c): `sums_per_subject`, triggering only if the amounts add up to at least `n`.
+    pub const fn sums_at_least(self, n: u32) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { sums_per_subject: true, sums_at_least: n, ..triggered_def(self, "only a triggered ability sums its events") })
+    }
+
     /// "This ability triggers only N times each turn" (no numbered rule; CR 603.2h is "do this only once each turn").
     pub const fn triggers_each_turn(self, n: u8) -> AbilityDef {
         AbilityDef::Triggered(TriggeredDef { triggers_each_turn: n, ..triggered_def(self, "only a triggered ability triggers") })

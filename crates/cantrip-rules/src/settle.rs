@@ -1811,6 +1811,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
     }
 
     for (mut trigger, def, members, again) in kept {
+        // "Deals N or more damage": judged on the batch's total, once its events are added up (CR 603.2c).
+        if trigger.data[0] < def.sums_at_least {
+            continue;
+        }
         // It triggers once, and once more for each static ability that says so (CR 603.2d): each a triggering of its own,
         // counted against "this ability triggers only N times each turn" (no numbered rule; CR 603.2h is "do this only once each turn").
         for n in 0..=again.len() {

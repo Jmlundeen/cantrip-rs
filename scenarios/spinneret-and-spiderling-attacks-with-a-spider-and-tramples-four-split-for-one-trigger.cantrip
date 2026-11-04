@@ -1,0 +1,57 @@
+# Spinneret and Spiderling: "Whenever you attack with two or more Spiders, put a +1/+1 counter on Spinneret and Spiderling.
+# Whenever Spinneret and Spiderling deals 4 or more damage, exile the top card of your library. Until the end of your next
+# turn, you may play that card." It attacks beside Masked Meower, exactly two Spiders, and takes a counter: with Rancor it is
+# a 4/4 trampler. Blocked by Memnite, it deals 1 to the Memnite and 3 to Bot2 at once (CR 510.2): neither part is 4,
+# but the total is, so the ability triggers once. The top card, Lightning Bolt, is exiled, and Bot1 casts it from exile.
+
+[Bot1 Deck]
+Mountain
+Spinneret and Spiderling
+Forest
+Mox Ruby
+Masked Meower
+Rancor
+Mountain
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Bot2 Deck]
+Memnite
+Plains x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Spinneret and Spiderling.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Rancor.Cast(Spinneret and Spiderling)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Spinneret and Spiderling > Bot2; Masked Meower > Bot2)
+Bot2.Block(Memnite > Spinneret and Spiderling)
+? Bot1.Battlefield.Spinneret and Spiderling.Power = 4
+Bot1.AssignDamage(Spinneret and Spiderling > Memnite: 1; Spinneret and Spiderling > Bot2: 3)
+? Stack.Count = 1
+[T3 Bot1.Main2]
+? Exile = Lightning Bolt
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 13
+Bot2.Graveyard = Memnite
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Spinneret and Spiderling.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spinneret and Spiderling.Power = 4

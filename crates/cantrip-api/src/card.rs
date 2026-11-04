@@ -1603,6 +1603,7 @@ impl TriggeredDef {
         mana_ability: false,
         mana_yield: TriggeredMana::Unstated,
         sums_per_subject: false,
+        sums_at_least: 0,
         triggers_each_turn: 0,
         members_of: None,
         counted_by_amount: false,
@@ -1706,6 +1707,11 @@ pub struct TriggeredDef {
     /// 603.2c): damage dealt to one creature at once is one event, however many sources dealt it. "Whenever a creature
     /// you control is dealt damage ... that much damage" (The Sensational She-Hulk, Screaming Nemesis).
     pub sums_per_subject: bool,
+    /// With `sums_per_subject`, "deals N or more damage" (CR 603.2c, 510.2): it triggers only if its batch's events about one
+    /// subject add up to at least this, so damage dealt at once to several creatures and players counts as one total, and less
+    /// than it triggers nothing at all. 0 for any amount. Spinneret and Spiderling (4, any recipients) and Deus of Calamity (6,
+    /// to one opponent: the opponent is the subject) print it.
+    pub sums_at_least: u32,
     /// "This ability triggers only N times each turn" (no numbered rule; CR 603.2h is "do this only once each turn"): 0 for no limit. A triggering that would exceed it
     /// does not happen, and one that happens uses one up.
     pub triggers_each_turn: u8,

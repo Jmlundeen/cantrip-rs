@@ -1,0 +1,40 @@
+# Spinneret and Spiderling: "Whenever you attack with two or more Spiders, put a +1/+1 counter on Spinneret and Spiderling."
+# Bot2 attacks Bot1 with two Masked Meowers, two Spiders, but it is Bot2 who attacks, not Spinneret and Spiderling's
+# controller: the ability does not trigger and it takes no counter.
+
+[Bot1 Deck]
+Mountain
+Spinneret and Spiderling
+Mountain x18
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Masked Meower
+Masked Meower
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Spinneret and Spiderling.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Masked Meower#1.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Masked Meower.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Attack(Masked Meower#1 > Bot1; Masked Meower#2 > Bot1)
+? Stack.Count = 0
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Spinneret and Spiderling.Power = 1

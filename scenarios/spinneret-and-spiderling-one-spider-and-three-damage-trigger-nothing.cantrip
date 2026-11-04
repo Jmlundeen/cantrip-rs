@@ -1,0 +1,46 @@
+# Spinneret and Spiderling: it attacks beside Llanowar Elves, so only one Spider attacks and it takes no counter. With Rancor
+# it is a 3/2 trampler and deals 3 to Bot2, one short of 4: the damage ability does not trigger, and Bot1's top card stays in
+# its library.
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Spinneret and Spiderling
+Llanowar Elves
+Forest
+Rancor
+Mountain
+Mountain
+Lightning Bolt
+Mountain x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Spinneret and Spiderling.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Rancor.Cast(Spinneret and Spiderling)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Spinneret and Spiderling > Bot2; Llanowar Elves > Bot2)
+? Stack.Count = 0
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Spinneret and Spiderling.Power = 3
+Bot1.Library = Lightning Bolt; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain
+Exile.Count = 0
