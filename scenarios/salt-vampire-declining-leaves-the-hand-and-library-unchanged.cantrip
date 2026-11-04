@@ -1,0 +1,27 @@
+# Choosing none is allowed even with a nonland available; neither exile nor draw follows (CR 608.2d).
+
+[Bot1 Deck]
+Salt Vampire
+Mox Jet
+Mox Pearl
+Swamp x20
+
+[Bot2 Deck]
+Lightning Bolt
+Island x6
+Mountain
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Salt Vampire.Cast
+Bot1.Choose()
+
+[Expect]
+Exile.Count = 0
+Bot2.Hand = Lightning Bolt; Island; Island; Island; Island; Island; Island
+Bot2.Library.Count = 13
+Bot2.Graveyard.Count = 0

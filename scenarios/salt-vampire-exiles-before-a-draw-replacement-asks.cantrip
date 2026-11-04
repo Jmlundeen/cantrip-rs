@@ -1,0 +1,45 @@
+# The chosen card is already exiled when Underrealm Lich replaces the ensuing draw (CR 608.2c, 614.1a).
+# Checking at the Lich's placement prompt distinguishes exile-then-draw from draw-then-exile.
+
+[Bot1 Deck]
+Salt Vampire
+Mox Jet
+Mox Pearl
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus x2
+Underrealm Lich
+Lightning Bolt
+Counterspell
+Island x2
+Mountain
+Forest
+Plains
+Swamp
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Underrealm Lich.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Salt Vampire.Cast
+Bot1.Choose(Lightning Bolt)
+? Exile = Lightning Bolt
+? Bot2.Hand.Count = 4
+Bot2.Arrange(Forest | Plains; Swamp)
+
+[Expect]
+Exile = Lightning Bolt
+Bot2.Hand = Counterspell; Island; Island; Mountain; Forest
+Bot2.Graveyard.Count = 4
+Bot2.Library.Count = 12

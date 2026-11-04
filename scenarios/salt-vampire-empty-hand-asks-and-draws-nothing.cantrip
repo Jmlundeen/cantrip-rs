@@ -1,0 +1,32 @@
+# Lion's Eye Diamond empties Bot2's hand before the Vampire enters; no choice or draw follows (CR 608.2d).
+
+[Bot1 Deck]
+Salt Vampire
+Mox Jet
+Mox Pearl
+Swamp x20
+
+[Bot2 Deck]
+Lion's Eye Diamond
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Lion's Eye Diamond.Cast
+Bot2.Pass
+Bot2.Battlefield.Lion's Eye Diamond.Activate(Color: Black)
+? Bot2.Hand.Count = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Salt Vampire.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+
+[Expect]
+Exile.Count = 0
+Bot2.Hand.Count = 0
+Bot2.Library.Count = 13

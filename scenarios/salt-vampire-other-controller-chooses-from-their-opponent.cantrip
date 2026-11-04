@@ -1,0 +1,30 @@
+# Bot2 controls the Vampire, chooses from Bot1's hand, and Bot1 alone draws (CR 608.2d, 121.1).
+
+[Bot1 Deck]
+Lightning Bolt
+Island x7
+Mountain
+Island x12
+
+[Bot2 Deck]
+Salt Vampire
+Mox Jet
+Mox Pearl
+Counterspell
+Swamp x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Salt Vampire.Cast
+Bot2.Choose(Lightning Bolt)
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Hand = Island; Island; Island; Island; Island; Island; Island
+Bot1.Library.Count = 13
+Bot2.Hand = Counterspell; Swamp; Swamp; Swamp; Swamp
+Bot2.Library.Count = 16

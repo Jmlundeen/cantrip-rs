@@ -1,0 +1,11 @@
+{
+  "name": "Salt Vampire",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Vampire Shapeshifter",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Lifelink\nWhen this creature enters, look at target opponent's hand. You may choose a nonland card from it. If you do, that player exiles that card, then draws a card.",
+  "keywords": [
+    "Lifelink"
+  ]
+}
