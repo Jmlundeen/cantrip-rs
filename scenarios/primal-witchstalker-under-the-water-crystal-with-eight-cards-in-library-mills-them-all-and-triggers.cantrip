@@ -1,0 +1,40 @@
+# Primal Witchstalker under an opponent's The Water Crystal with exactly eight cards in its controller's library: "mill
+# four cards" becomes "mill eight" (CR 614.1a, 614.6) and all eight are milled, the instruction as replaced carried out in
+# full, so "when you do" triggers (CR 603.12; the project owner's ruling, 2026-11-05) and a milled Island returns tapped.
+# Negative control: primal-witchstalker-under-the-water-crystal-with-six-cards-*.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Primal Witchstalker
+Island x13
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+The Water Crystal
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.The Water Crystal.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Primal Witchstalker.Cast
+Bot1.Target(Graveyard.Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Library.Count = 0
+Bot1.Graveyard.Count = 9
+Bot1.Battlefield.Island.Tapped = true

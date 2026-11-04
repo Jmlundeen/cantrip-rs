@@ -1,0 +1,52 @@
+# Grindstone with its controller's The Water Crystal: "mills two cards" becomes six (CR 614.1a), and "if two cards that
+# share a color were milled this way" asks of every card milled (CR 701.17d). The first pass mills Island, Island, Bolt,
+# Bolt, Island, Island: the top two share no color, but the two Bolts do, so it repeats. The second pass mills six
+# Islands, which share none, and stops: twelve milled.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+The Water Crystal
+Grindstone
+Island
+Island x20
+
+[Bot2 Deck]
+Island x10
+Lightning Bolt x2
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Water Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Grindstone.Cast
+Bot1.Pass
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Grindstone.Activate(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 12
+Bot2.Library.Count = 12

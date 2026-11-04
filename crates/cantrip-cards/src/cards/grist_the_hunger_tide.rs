@@ -29,7 +29,8 @@ fn insect_size(q: &dyn LayerQuery, grist: ObjectId, chars: &mut Chars) {
 }
 
 /// +1: "Create a 1/1 black and green Insect creature token, then mill a card. If an Insect card was milled this way,
-/// put a loyalty counter on Grist and repeat this process." Grist herself, milled, is an Insect card. The counter goes only on Grist if
+/// put a loyalty counter on Grist and repeat this process." Grist herself, milled, is an Insect card. A replacement may
+/// mill more than one card (The Water Crystal); the question is then asked of each card milled (CR 701.17d). The counter goes only on Grist if
 /// she is still the permanent that activated this; otherwise the ability goes on making tokens and milling.
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
@@ -37,8 +38,8 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let insect = g.words(grist).subtype(Subtype::Insect);
     loop {
         cantrip_mechanics::tokens::create(g, player, &INSECT, 1)?;
-        let Some(&milled) = g.mill(player, 1).first() else { return Ok(()) };
-        if !g.chars(milled).has_subtype(insect) {
+        let milled = g.mill(player, 1);
+        if !milled.iter().any(|&card| g.chars(card).has_subtype(insect)) {
             return Ok(());
         }
         if targets::permanent(g, grist) {

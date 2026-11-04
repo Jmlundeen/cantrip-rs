@@ -786,12 +786,16 @@ pub fn mill_then_put_onto_battlefield(
 }
 
 /// "Mill `count` cards. When you do, [`reflexive`]" (CR 701.17, 603.12): the reflexive ability triggers when the controller
-/// milled that many cards, which they cannot if the library holds fewer (CR 701.17b: they mill what they can, and
-/// nothing triggers) or a replacement effect kept a card from being milled. It chooses its target as it goes on the
+/// carried out the mill in full - as many cards milled as the instruction said once replacement effects changed it. With
+/// fewer cards in the library they mill what they can and nothing triggers (CR 701.17b; Wick's Patrol's ruling), and so too
+/// when a replacement effect kept a card from being milled. A replacement that changes the number (The Water Crystal's
+/// "that many cards plus four instead", CR 614.6) changes what "in full" is: mill three becomes mill seven, and it
+/// triggers only if seven were milled (the project owner's ruling, 2026-11-05). It chooses its target as it goes on the
 /// stack, the milled cards included. Primal Witchstalker, Yathan Roadwatcher, Wick's Patrol, The Last Ronin (II) and
 /// Kraven's Last Hunt (I) print it.
 pub fn mill_then_reflexive(g: &mut dyn Game, item: &StackItem, count: u32, reflexive: AbilityRef) {
-    if g.mill(item.controller, count).len() as u32 == count {
+    let milled = g.mill_result(item.controller, count);
+    if milled.cards.len() as u32 == milled.count {
         g.reflexive_trigger(item.object, item.controller, reflexive, Target::None);
     }
 }

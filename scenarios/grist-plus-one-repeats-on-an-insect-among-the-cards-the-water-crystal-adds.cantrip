@@ -1,0 +1,46 @@
+# Grist's +1 under an opponent's The Water Crystal: "mill a card" becomes five (CR 614.1a), and "if an Insect card was
+# milled this way" asks of each card milled (CR 701.17d). The Llanowar Elves on top is no Insect, but the Haywire Mite
+# under it is: a loyalty counter and a second pass. The second pass mills five Forests and stops. Two tokens, ten cards
+# milled, 3 + 1 + 1 = 5 loyalty.
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Forest x5
+Llanowar Elves
+Haywire Mite
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+The Water Crystal
+Island x20
+
+[Actions]
+Bot1.Hand.Bayou.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.The Water Crystal.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Grist, the Hunger Tide.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: +1)
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Grist, the Hunger Tide.Counters.Loyalty = 5
+Bot1.Battlefield = Bayou; Bayou; Bayou; Grist, the Hunger Tide; Insect Token; Insect Token
+Bot1.Graveyard.Count = 10
