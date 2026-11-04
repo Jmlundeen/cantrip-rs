@@ -190,6 +190,18 @@ pub fn also_a<const SUBTYPE: u16>(view: &dyn LayerQuery, source: ObjectId, chars
     }
 }
 
+/// "... is a [subtype]" with no "in addition" (CR 205.1a, 613.1d, layer 4) as a static ability's `StaticDef::apply`, `SUBTYPE` a
+/// `Subtype` as `u16` (`lands::sub`): its creature types become that one alone (a changeling's every creature type is
+/// overwritten); its card types, supertypes, colors and other subtypes stay. The subtype is a word of the source's text (CR 612.2).
+/// Lignify (Treefolk), Noggle the Mind (Noggle), De-Evolve (Salamander), Retro Mutation (Turtle) and Honest Work (Citizen)
+/// print it.
+pub fn creature_type_alone<const SUBTYPE: u16>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    if let Some(word) = subtype_word(view, source, SUBTYPE) {
+        let kept = chars.subtypes.iter().filter(|t| !t.is_creature_type()).fold(SubtypeSet::NONE, SubtypeSet::with);
+        chars.subtypes = kept.with(word);
+    }
+}
+
 /// The subtype a `Subtype as u16` number names, as `source`'s text has that word now (CR 612.2); `None` for a number that
 /// names no subtype. `also_a`, `your_of_subtype` and `other_of_subtype_you_control` read their `SUBTYPE` through it.
 pub(crate) fn subtype_word(view: &dyn LayerQuery, source: ObjectId, n: u16) -> Option<Subtype> {

@@ -1,16 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::{attached_object, enchanted_creature_cant_block, exile_enchanted_creature}, targets, triggers};
+use cantrip_mechanics::{attach::{attached_object, enchanted_creature_cant_block, exile_enchanted_creature}, lands, statics::creature_type_alone, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "Enchanted creature gets -4/-0" (CR 613.4c, layer 7c).
 fn minus_four_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = chars.power.map(|power| power - 4);
-}
-
-/// "... is a Salamander. (It loses all other creature types.)" Salamander is a word of this Aura's text (CR 205.3, 612; layer 4, 613.1d).
-fn salamander(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let kept = chars.subtypes.iter().filter(|subtype| !subtype.is_creature_type()).fold(SubtypeSet::NONE, SubtypeSet::with);
-    chars.subtypes = kept.with(view.words(source).subtype(Subtype::Salamander));
 }
 
 /// The threshold condition is an intervening "if" (CR 603.4): the core checks it as each upkeep begins and again as the
@@ -29,7 +23,7 @@ pub static CARD: CardDef = CardDef {
     .condition(threshold)],
     block_rules: &[enchanted_creature_cant_block],
     statics: &[
-        static_ability(Layer::Type, attached_object, salamander, "Enchanted creature is a Salamander."),
+        static_ability(Layer::Type, attached_object, creature_type_alone::<{ lands::sub(Subtype::Salamander) }>, "Enchanted creature is a Salamander."),
         static_ability(Layer::PtModify, attached_object, minus_four_power, "Enchanted creature gets -4/-0.").continues(),
     ],
     ..oracle::DE_EVOLVE
