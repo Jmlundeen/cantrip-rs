@@ -1,0 +1,49 @@
+# Wall Crawl: "Spiders you control ... can't be blocked by creatures with defender" is of its controller's Spiders only (CR 509.1b).
+# Bot2's Giant Spider (2/4) attacks Bot1, who controls Wall Crawl and a Wall of Vines (0/3, defender): the Wall may block it, and
+# does - Bot1 takes no damage and the Wall survives with 2 damage marked.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Wall Crawl
+Wall of Vines
+Forest x15
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Giant Spider
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wall Crawl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Wall of Vines.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Spider.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Giant Spider > Bot1)
+Bot1.Block(Wall of Vines > Giant Spider)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Wall of Vines.Damage = 2
+
+[Expect]
+Bot1.Life = 21

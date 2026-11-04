@@ -1,0 +1,56 @@
+# Wall Crawl {3}{G}: "Spiders you control ... can't be blocked by creatures with defender." Bot1's Spider token (3/2 with reach) and Llanowar Elves attack Bot2, who has a
+# Wall of Stone (0/8, defender) and a Grizzly Bears (no defender). The Wall may not block the Spider but may block the Elves, which are no Spider; the Bears may block the Spider.
+# The Wall blocks the Elves and the Bears the Spider: the Spider (3/2) takes 2 and dies, the Bears take 3 and die.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Llanowar Elves
+Wall Crawl
+Forest x15
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Wall of Stone
+Grizzly Bears
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wall Crawl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Spider Token; Llanowar Elves > Bot2)
+! Bot2.Block(Wall of Stone > Spider Token)
+Bot2.Block(Wall of Stone > Llanowar Elves; Grizzly Bears > Spider Token)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Count = 4
+? Bot2.Graveyard = Grizzly Bears; Black Lotus
+
+[Expect]
+Bot2.Life = 20

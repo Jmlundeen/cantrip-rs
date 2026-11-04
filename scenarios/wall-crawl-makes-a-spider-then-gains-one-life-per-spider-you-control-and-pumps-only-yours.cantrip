@@ -1,0 +1,56 @@
+# Wall Crawl {3}{G}: "When this enchantment enters, create a 2/1 green Spider creature token with reach, then you gain 1 life for each Spider you control. Spiders you
+# control get +1/+1". Bot1 controls a Masked Meower (a 1/1 Spider) and Bot2 one too. The enchantment is cast on turn 3: the token is made first, so the life counts the token and
+# Bot1's Meower - two Spiders, 2 life (22) - and not Bot2's Meower. Bot1's Meower is 2/2, the token 3/2 with reach, and Bot2's Meower stays 1/1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Masked Meower
+Wall Crawl
+Forest x13
+
+[Bot2 Deck]
+Black Lotus
+Masked Meower
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Masked Meower.Power = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Masked Meower.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wall Crawl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+? Bot1.Battlefield.Masked Meower.Power = 2
+? Bot1.Battlefield.Masked Meower.Toughness = 2
+? Bot1.Battlefield.Spider Token.Power = 3
+? Bot1.Battlefield.Spider Token.Toughness = 2
+? Bot2.Battlefield.Masked Meower.Power = 1
+? Bot2.Battlefield.Masked Meower.Toughness = 1
+
+[Expect]
+Bot2.Life = 20
