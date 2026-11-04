@@ -2457,6 +2457,11 @@ pub enum LastingRuleKind {
     /// "Attacks [this turn] if able" (CR 508.1d): one requirement for each such effect. The creature's controller still
     /// chooses what it attacks (the Goblin Diplomats ruling). Goblin Diplomats, Bident of Thassa.
     MustAttack,
+    /// "Attacks each combat if able and attacks a player other than you if able" (CR 508.1d): two requirements for each such
+    /// effect, attacking and attacking a player other than its controller (the rule's "you"). The same as goad's (CR
+    /// 701.15b), but no creature becomes goaded (the rulings), so a second such rule, or a goad by the same player, is a
+    /// requirement of its own. Maximum Carnage, Kardur, Doomscourge.
+    MustAttackPlayerOtherThanYou,
     /// "Doesn't untap during [its controller's] untap step" (CR 502.3), as `EffectKind::DoesntUntap` reads it: in the untap
     /// step of the player who controls the permanent, and with `Duration::DuringNextUntapStepOf`, only in that player's.
     /// Exhaustion, Mana Vapors.

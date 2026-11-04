@@ -2428,7 +2428,8 @@ A resolved rule about a set that can still gain members (CR 611.2c: an effect th
 the game, and reaches objects that weren't there as it began) is `EffectKind::LastingRule { card, index, about }`, naming the
 `index`th of the `CardDef::lasting_rules` of the card that made it, made by `Game::add_lasting_rule`: a `LastingRule { text,
 rule, applies }`, whose `rule` (`LastingRuleKind`) is one of the per-object rules above - can't block, attacks if able,
-doesn't untap; another joins it with the first printed card that says it of a set - and whose `applies` (`OpenSet`) is asked
+attacks if able and attacks a player other than the rule's controller if able (goad's two requirements without the goaded
+designation: Maximum Carnage, Kardur, Doomscourge), doesn't untap; another joins it with the first printed card that says it of a set - and whose `applies` (`OpenSet`) is asked
 of a permanent each time that rule is read, so Falter's "creatures without flying can't block this turn" bars a creature that
 enters later and frees one that gains flying. It is the one system for such rules: Aragorn, King of Gondor's "creatures can't
 block this turn" and Headliner Scarlett's "creatures target player controls can't block this turn" are lasting rules too.

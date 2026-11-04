@@ -1,0 +1,65 @@
+# Maximum Carnage in a game of two: a creature that can't attack a player other than Bot1 must still attack, and attacks
+# Bot1 (the rulings). Bot2's Grizzly Bears, there before the Saga, may not stay home on Bot2's turn 4; Bot2's Memnite, cast
+# that turn, can't attack (summoning sickness, CR 302.6), so it doesn't (the rulings). On Bot1's turn 5 the rule is over:
+# chapter II's {R}{R}{R} comes with it, and Bot2's turn 6 needs no attack.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Maximum Carnage
+Island x16
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Memnite
+Island x16
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Maximum Carnage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Grizzly Bears.LastingRules = Until your next turn, each creature attacks each combat if able and attacks a player other than you if able.
+[T4 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot2.Attack()
+! Bot2.Attack(Memnite > Bot1)
+Bot2.Attack(Grizzly Bears > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 18
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Grizzly Bears.LastingRules = (absent)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}{R}
+[T6 Bot2.Main1]
+Bot2.Attack()
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot2.Battlefield.Grizzly Bears.Tapped = false
+Bot2.Battlefield.Memnite.Tapped = false
+Bot1.Battlefield.Maximum Carnage.Counters.Lore = 2

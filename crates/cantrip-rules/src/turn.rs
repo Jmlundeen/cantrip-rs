@@ -1072,7 +1072,9 @@ fn maximum_blockers(cx: &Cx, attacker: ObjectId, rule_sources: &[ObjectId]) -> u
 }
 
 /// The requirements on a declaration of attackers by `eligible` among `targets` (CR 508.1d), one for each source: each
-/// instance of "attacks each combat if able" it has (printed or gained, `Chars::must_attack`); for each player who goaded it,
+/// instance of "attacks each combat if able" it has (printed or gained, `Chars::must_attack`); one for each "attacks if able"
+/// rule about a set that takes it in, and two for each that also says "attacks a player other than you if able"
+/// (`LastingRuleKind`); for each player who goaded it,
 /// two (CR 701.15b-c: attack, and attack a player other than that one), goad being an effect and no ability, which a creature
 /// that loses its abilities is still under; and each "attacks [that player or permanent] if able" in force now
 /// (`EffectKind::MustAttackAt`, `in_force`).
@@ -1089,6 +1091,12 @@ fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], barred: Vec<
         // it in now (CR 611.2c), an effect and no ability, so one that has lost its abilities attacks too.
         for _ in crate::static_rules::lasting_rules_on(cx, cx.cards(), id, LastingRuleKind::MustAttack) {
             required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
+        }
+        // "Until your next turn, each creature attacks each combat if able and attacks a player other than you if able"
+        // (Maximum Carnage): goad's two requirements, from a rule of the game and no designation (the rulings).
+        for e in crate::static_rules::lasting_rules_on(cx, cx.cards(), id, LastingRuleKind::MustAttackPlayerOtherThanYou) {
+            required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
+            required.push(RequiredAttack { attacker: id, aim: AttackAim::PlayerOtherThan(e.controller) });
         }
         let mut goaders: Vec<PlayerId> = Vec::new();
         for e in cx.s().effects.iter().filter(|e| e.affected == id) {
