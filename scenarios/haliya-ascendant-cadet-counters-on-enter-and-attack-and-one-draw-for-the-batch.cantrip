@@ -1,0 +1,45 @@
+# Haliya, Ascendant Cadet {2}{G}{W}{W} 3/3: "Whenever Haliya enters or attacks, put a +1/+1 counter on target creature you control. Whenever one or more creatures you control with
+# +1/+1 counters on them deal combat damage to a player, draw a card." Turn 1: Ornithopter (0/2), then Haliya, whose enter trigger puts its counter on Haliya (4/4). Turn 3: both
+# attack and the attack trigger puts a counter on Ornithopter (1/3): both have counters, deal damage together (4 + 1 = 5, Bot2 at 15) and that batch draws ONE card (CR 603.2c):
+# the hand is the two Islands left from turn 1, the turn-3 draw and that card, 4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Ornithopter
+Haliya, Ascendant Cadet
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Haliya, Ascendant Cadet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Haliya, Ascendant Cadet)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Haliya, Ascendant Cadet.Power = 4
+? Bot1.Battlefield.Haliya, Ascendant Cadet.Toughness = 4
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Haliya, Ascendant Cadet > Bot2; Ornithopter > Bot2)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3

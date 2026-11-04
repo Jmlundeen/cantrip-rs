@@ -1,0 +1,8 @@
+{
+  "name": "Haliya, Ascendant Cadet",
+  "manaCost": "{2}{G}{W}{W}",
+  "type": "Legendary Creature — Human Soldier",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever Haliya enters or attacks, put a +1/+1 counter on target creature you control.\nWhenever one or more creatures you control with +1/+1 counters on them deal combat damage to a player, draw a card."
+}

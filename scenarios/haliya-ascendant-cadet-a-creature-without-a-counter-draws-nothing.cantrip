@@ -1,0 +1,38 @@
+# Haliya, Ascendant Cadet: "Whenever one or more creatures you control with +1/+1 counters on them deal combat damage to a player, draw a card." Haliya's enter trigger puts its
+# counter on Haliya (4/4), and on turn 3 a Memnite with no counter attacks alone and hits Bot2 for 1: no card (the hand is the two Islands left from turn 1 and the turn-3 draw, 3).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Memnite
+Haliya, Ascendant Cadet
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Haliya, Ascendant Cadet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Haliya, Ascendant Cadet)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Haliya, Ascendant Cadet.Power = 4
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Hand.Count = 3
