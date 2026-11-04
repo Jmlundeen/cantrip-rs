@@ -1,0 +1,76 @@
+# Weftstalker Ardent {2}{R} 2/3: "Whenever another creature or artifact you control enters, this creature deals 1 damage to each opponent." Three players: Bot1's Mox Emerald and
+# Mox Sapphire (artifacts), Grizzly Bears (a creature) and Ornithopter (an artifact creature, one trigger only) each ping both opponents once, so each is at 16. Neither
+# the Ardent itself, a land, nor Bot2's own Ornithopter pings anyone, and Bot1 stays at 20.
+
+[Bot1 Deck]
+Black Lotus
+Weftstalker Ardent
+Mox Emerald
+Mox Sapphire
+Grizzly Bears
+Ornithopter
+Mountain
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Weftstalker Ardent.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+[T4 Bot1.Main1]
+? Bot2.Life = 20
+? Bot3.Life = 20
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Life = 19
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Life = 18
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Life = 17
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot2.Life = 16
+Bot3.Life = 16
+Bot1.Life = 20
