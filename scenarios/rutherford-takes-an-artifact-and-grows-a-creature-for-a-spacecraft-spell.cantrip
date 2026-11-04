@@ -1,0 +1,51 @@
+# Rutherford, Upgraded Ensign: "When Rutherford enters, look at the top six cards of your library. You may reveal an artifact
+# card from among them and put it into your hand. Put the rest on the bottom of your library in a random order." The six are
+# the Ornithopter, the Grizzly Bears and four Islands; the Ornithopter is the one artifact, so it may be taken and the Bears
+# may not. "Whenever you cast a Spacecraft spell, put a +1/+1 counter on target creature" (CR 603.2): casting the Ornithopter,
+# an artifact but no Spacecraft, triggers nothing, and casting U.S.S. Excelsior does, putting the counter on the Ornithopter.
+
+[Bot1 Deck]
+Rutherford, Upgraded Ensign
+Black Lotus
+Black Lotus
+Mox Pearl
+U.S.S. Excelsior, Cutting Edge
+Island
+Island
+Island
+Ornithopter
+Grizzly Bears
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Rutherford, Upgraded Ensign.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Arrange(Grizzly Bears | Island; Island; Island; Island; Ornithopter)
+Bot1.Arrange(Ornithopter | Island; Grizzly Bears; Island; Island; Island)
+? Bot1.Library.Count = 11
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.U.S.S. Excelsior, Cutting Edge.Cast
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Rutherford, Upgraded Ensign.Power = 2
+Bot1.Hand = Island; Island
+Bot1.Library.Count = 11
