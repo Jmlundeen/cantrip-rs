@@ -1,0 +1,77 @@
+# Spider-Mobile (3/3 Vehicle, Trample, Crew 2): "Whenever this Vehicle attacks or blocks, it gets +1/+1 until end of turn for each Spider you
+# control." Bot1 has two Spider-Bots (Spider Robot Scout, 2/1 each) and Bot2 has one of its own. On turn 3 one Spider-Bot crews the Vehicle (power 2
+# is enough: Crew 2), which attacks with Trample: only Bot1's own two Spiders count (the Vehicle itself is not a Spider, nor is Bot2's), so it is 5/5
+# and Bot2 takes 5. On turn 5 the Vehicle is a plain artifact again, and crewed once more it is 3/3: the bonus ended with turn 3.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Spider-Mobile
+Spider-Bot
+Spider-Bot
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Spider-Bot
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spider-Mobile.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Bot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Spider-Bot.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Decline
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Spider-Bot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Battlefield.Spider-Mobile.Activate(Ability: Crew)
+Bot1.Choose(Spider-Bot#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spider-Mobile.Keywords = Trample
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Spider-Mobile)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spider-Mobile.Power = 5
+? Bot1.Battlefield.Spider-Mobile.Toughness = 5
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Spider-Mobile.Types.Count = 1
+Bot1.Battlefield.Spider-Mobile.Activate(Ability: Crew)
+Bot1.Choose(Spider-Bot#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spider-Mobile.Power = 3
+? Bot1.Battlefield.Spider-Mobile.Toughness = 3
+
+[Expect]
+Bot2.Life = 15

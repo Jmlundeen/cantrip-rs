@@ -1,0 +1,54 @@
+# Spider-Mobile: the same trigger when it blocks (CR 509.1). Bot2's Savannah Lions attacks on turn 4, Bot1's Spider-Bot crews the Vehicle once the
+# attack is declared, the Vehicle blocks the Lions and, with one Spider under Bot1's control, becomes 4/4 until end of turn; it takes 2 and the
+# Lions die.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Spider-Mobile
+Spider-Bot
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Savannah Lions
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spider-Mobile.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Bot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Savannah Lions)
+Bot1.Battlefield.Spider-Mobile.Activate(Ability: Crew)
+Bot1.Block(Spider-Mobile > Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spider-Mobile.Power = 4
+? Bot1.Battlefield.Spider-Mobile.Toughness = 4
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Savannah Lions
+Bot1.Life = 20
+Bot1.Battlefield.Spider-Mobile.Damage = 2
