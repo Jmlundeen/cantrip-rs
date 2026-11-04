@@ -1,0 +1,45 @@
+# Sunstar Chaplain: "At the beginning of your end step, if you control two or more tapped creatures, put a +1/+1 counter on target
+# creature you control" (CR 603.4). Turn 3: the Chaplain and Bot1's Memnite attack (exactly two tapped creatures), Bot2's Memnite is
+# refused as the target and Bot1's Memnite gets the counter (2/2). Turn 5: only the Memnite attacks (one tapped creature) and
+# no counter is put anywhere.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Sunstar Chaplain
+Memnite
+Swamp x20
+
+[Bot2 Deck]
+Memnite
+Swamp x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunstar Chaplain.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Sunstar Chaplain > Bot2; Memnite > Bot2)
+[T3 Bot1.End]
+! Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Memnite.Power = 2
+[T5 Bot1.Main1]
+Bot1.Attack(Memnite > Bot2)
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Sunstar Chaplain.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Memnite.Counters.PlusOnePlusOne = (absent)

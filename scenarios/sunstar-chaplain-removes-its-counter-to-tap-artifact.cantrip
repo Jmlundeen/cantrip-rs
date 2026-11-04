@@ -1,0 +1,61 @@
+# Sunstar Chaplain "{2}, Remove a +1/+1 counter from a creature you control: Tap target artifact or creature". Rayblade Trooper
+# puts a counter on the Chaplain on turn 1; on turn 3 Bot1 floats {W}{W}{B}{R}{G} and spends exactly B, R for {2}, leaving
+# {W}{W}{G}, tapping Bot2's Mox Ruby (an artifact that is no creature). The counter is gone, so a second activation with mana to spare is refused, and a land is no legal target.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Sunstar Chaplain
+Rayblade Trooper
+Swamp x20
+
+[Bot2 Deck]
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunstar Chaplain.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rayblade Trooper.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Sunstar Chaplain)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sunstar Chaplain.Counters.PlusOnePlusOne = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Sunstar Chaplain.Activate(Bot2.Battlefield.Island; Spend: B, R)
+Bot1.Battlefield.Sunstar Chaplain.Activate(Bot2.Battlefield.Mox Ruby; Spend: B, R)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {W}{W}{G}
+? Bot2.Battlefield.Mox Ruby.Tapped = true
+? Bot1.Battlefield.Sunstar Chaplain.Counters.PlusOnePlusOne = (absent)
+! Bot1.Battlefield.Sunstar Chaplain.Activate(Bot2.Battlefield.Mox Ruby; Spend: W, W)
+
+[Expect]
+Bot2.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Sunstar Chaplain.Tapped = false
