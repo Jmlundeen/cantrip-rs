@@ -1,0 +1,26 @@
+# "Artifact creatures you control have double strike" (CR 702.4, 613.1f): the Ornithopter, an artifact creature, has it, and
+# so does the Primary Unimatrix Adjunct, an artifact creature itself.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Primary Unimatrix Adjunct
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Primary Unimatrix Adjunct.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = DoubleStrike; Flying
+Bot1.Battlefield.Primary Unimatrix Adjunct.Keywords = DoubleStrike

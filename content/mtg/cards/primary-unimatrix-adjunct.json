@@ -1,0 +1,8 @@
+{
+  "name": "Primary Unimatrix Adjunct",
+  "manaCost": "{3}{W}",
+  "type": "Artifact Creature — Borg",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Artifact creatures you control have double strike."
+}
