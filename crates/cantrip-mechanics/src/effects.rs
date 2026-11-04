@@ -368,6 +368,15 @@ pub fn destroy_all_creatures_no_regen(g: &mut dyn Game, _: &StackItem) -> Result
     Ok(())
 }
 
+/// "Destroy all [card type]" as a spell's whole effect, `TYPE` a `CardType` as `u8`: every permanent of that type on the
+/// battlefield as the spell resolves, whoever controls it, destroyed at once (CR 701.8a, 608.2c, 101.4); regeneration and
+/// indestructible are the verb's business. Armageddon (lands) and Tranquility (enchantments) print it.
+pub fn destroy_all_of_type<const TYPE: u8>(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+    let doomed: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.chars(id).types.0 & (1 << TYPE) != 0).collect();
+    g.destroy_all(&doomed);
+    Ok(())
+}
+
 /// "Destroy all [subtype]" as a spell's whole effect, `SUBTYPE` a `Subtype` as `u16` (`lands::sub`): every permanent on the
 /// battlefield with the subtype as the spell resolves, whoever controls it, destroyed at once (CR 701.8a, 608.2c, 101.4), the
 /// subtype read through the words of the spell's text (CR 612.2), so a text change ("Plains" to "Islands") changes what it
@@ -1162,7 +1171,7 @@ pub fn ask_may(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Pu
 const PAY_TO_GAIN_LIFE: Question = Question::new("GainLife", "pay {cost} to gain 1 life?", "", "Pay {cost}", "Don't pay");
 
 /// "You may pay [cost]. If you do, you gain 1 life." (CR 608.2d, 118.12, 119.3) as the ability resolves: its controller is asked
-/// whether to pay `cost`, and gains 1 life only if they did. Farmstead and Ivory Cup print it.
+/// whether to pay `cost`, and gains 1 life only if they did. Farmstead, Ivory Cup and Soul Net print it.
 pub fn may_pay_to_gain_life(g: &mut dyn Game, item: &StackItem, cost: Cost) -> Result<(), Suspend> {
     if g.may_pay(item.controller, item.object, item.object, cost, &PAY_TO_GAIN_LIFE)? {
         g.gain_life(item.controller, 1);
