@@ -2,15 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
-/// "This creature enters with two +1/+1 counters on it. Whenever one or more +1/+1 counters are put on another permanent you control, if it's the first time +1/+1 counters have been put on that permanent this turn, put a +1/+1 counter on this creature." (CR 614.1c, 122.6).
-fn creature_enters_two_1_1_enters(
-    _: &mut dyn Game,
-    entering: &mut Entering,
-) -> Result<(), Suspend> {
-    entering.counters[CounterKind::PlusOne as usize] += 2;
-    Ok(())
-}
-
 /// "Whenever one or more +1/+1 counters are put on another permanent you control" (CR 603.2).
 fn when_one_more_1_1_counters(
     q: &dyn Query,
@@ -40,6 +31,6 @@ pub static CARD: CardDef = CardDef {
             .once_per_batch()
             .batch_by_data(),
     ],
-    enters: Some(creature_enters_two_1_1_enters),
+    enters: Some(effects::enters_with_plus_one_counters::<2>),
     ..oracle::BOTANICAL_BRAWLER
 };

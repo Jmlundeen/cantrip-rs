@@ -49,6 +49,13 @@ pub fn enters_with_a_counter<const KIND: usize>(_: &mut dyn Game, entering: &mut
     Ok(())
 }
 
+/// "This permanent enters with `N` +1/+1 counters on it" (CR 614.1c, 122.1). Botanical Brawler and Costume Closet (two) print
+/// it; one is `enters_with_a_counter`.
+pub fn enters_with_plus_one_counters<const N: i16>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.counters[CounterKind::PlusOne as usize] += N;
+    Ok(())
+}
+
 /// "This creature enters with `N` -1/-1 counters on it" (CR 614.1c). Glen Elendra Guardian, Flitterwing Nuisance (one)
 /// and Moonshadow (six) print it.
 pub fn enters_with_minus_one_counters<const N: i16>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {

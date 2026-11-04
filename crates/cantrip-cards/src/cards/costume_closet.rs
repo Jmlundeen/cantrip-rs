@@ -3,12 +3,6 @@ use cantrip_mechanics::modified::is_modified;
 use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
-/// "This artifact enters with two +1/+1 counters on it" (CR 614.1c, 122.1).
-fn enters_with_two_plus_one_counters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::PlusOne as usize] += 2;
-    Ok(())
-}
-
 /// "Move a +1/+1 counter from this artifact onto target creature you control" (CR 122.1: the counter comes off this and goes onto the target): nothing moves if the target is no longer legal as it resolves (CR 608.2b), and no counter moves if this has none left (CR 400.7).
 fn move_a_counter_onto_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
@@ -34,7 +28,7 @@ fn modified_creature_you_control_leaves(q: &dyn Query, me: &Asker, event: &Event
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(enters_with_two_plus_one_counters),
+    enters: Some(effects::enters_with_plus_one_counters::<2>),
     abilities: &[
         ability(
             cost("{T}"),
