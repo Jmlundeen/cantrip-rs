@@ -204,6 +204,7 @@ static FREE_ALTERNATIVE: CardDef = CardDef {
         applies: spells_you_cast,
         cost: InsteadOfManaCost::Mana(ManaCost::ZERO),
         flash: false,
+        kind: WayKind::Other,
     }],
     ..CardDef::BLANK
 };

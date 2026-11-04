@@ -103,6 +103,21 @@ pub fn cast_through_turn(q: &dyn Query, id: ObjectId, kind: WayKind) -> Option<u
         }
     };
     let (cast, turn) = cast;
+    // An alternative cost a permanent gave every spell it applies to, from whatever zone (`SpellAlternative::kind`): the
+    // web-slinging Amazing Spider-Man gives, recorded with the cast (`Event::PaidAlternative`).
+    let paid = q.history().all().iter().rev().find_map(|r| match r.event {
+        Event::PaidAlternative { spell, by } if spell == cast.spell => Some(by),
+        _ => None,
+    });
+    if let Some(by) = paid {
+        let card = q.card(by.ability.card);
+        let alternative = by
+            .ability
+            .as_spell_alternative()
+            .and_then(|k| card.spell_alternatives.get(k))
+            .or_else(|| by.ability.as_lasting_spell_alternative().and_then(|k| card.lasting_spell_alternatives.get(k)));
+        return alternative.is_some_and(|a| a.kind == kind).then_some(turn);
+    }
     let through = match cast.granted_by() {
         Some(grant) => grant
             .ability

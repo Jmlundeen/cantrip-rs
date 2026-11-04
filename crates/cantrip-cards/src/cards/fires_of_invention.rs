@@ -40,6 +40,7 @@ pub static CARD: CardDef = CardDef {
             applies: can_cast_spells_only_during_rule_3,
             cost: InsteadOfManaCost::WithoutPaying,
             flash: false,
+            kind: WayKind::Other,
         },
     ],
     spell_rules: &[can_cast_spells_only_during_rule, can_cast_spells_only_during_rule_2],

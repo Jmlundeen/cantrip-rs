@@ -2068,8 +2068,9 @@ pub struct GrantedWay {
     pub text: &'static str,
     pub cost: GrantedCost,
     /// The zone of the caster's own the way casts cards from (CR 601.3): their graveyard (Lurrus, escape, mayhem) or their
-    /// hand (a way given to cards in a hand, as web-slinging would be). Another zone's rule or permission does not open it.
-    /// An alternative cost for spells cast from wherever (Omniscience's, Dracogenesis's) is a `SpellAlternative` instead.
+    /// hand (a way given only to cards in a hand). Another zone's rule or permission does not open it. An alternative cost
+    /// for spells cast from wherever (Omniscience's, Dracogenesis's, the web-slinging Amazing Spider-Man gives) is a
+    /// `SpellAlternative` instead.
     pub from: ZoneKind,
     /// The way also lets a land card in the graveyard be played (CR 305.1) rather than cast: `cost` is asked of the land
     /// card too, and any `Some` allows the play (the land has no cost). It uses the land drop, and the history marks the
@@ -2130,7 +2131,7 @@ impl GrantedWay {
 }
 
 /// What a static ability lets a spell be cast for rather than its mana cost (CR 118.9, `SpellAlternative::cost`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy)]
 pub enum InsteadOfManaCost {
     /// "Without paying its mana cost" (Dracogenesis, Omniscience): no mana, and X is 0 (CR 107.3b).
     WithoutPaying,
@@ -2140,6 +2141,9 @@ pub enum InsteadOfManaCost {
     /// "By paying {E} rather than paying their mana costs" (Primal Prayers): energy counters (CR 107.14), no mana, and X is 0
     /// (CR 107.3b).
     Energy(u8),
+    /// A cost with more in it than mana and energy: the web-slinging Amazing Spider-Man gives, "{G}{W}{U}, return a tapped
+    /// creature you control to its owner's hand" (CR 702.188a). X is 0 (CR 107.3b).
+    Cost(Cost),
 }
 
 impl InsteadOfManaCost {
@@ -2148,13 +2152,15 @@ impl InsteadOfManaCost {
         match self {
             InsteadOfManaCost::WithoutPaying | InsteadOfManaCost::Energy(_) => ManaCost::ZERO,
             InsteadOfManaCost::Mana(mana) => mana,
+            InsteadOfManaCost::Cost(cost) => cost.mana,
         }
     }
 
-    /// The whole of what is paid rather than the mana cost: its mana and its energy.
+    /// The whole of what is paid rather than the mana cost: its mana, its energy and anything else it names.
     pub const fn cost(self) -> Cost {
         match self {
             InsteadOfManaCost::Energy(n) => Cost { energy: n, ..Cost::NONE },
+            InsteadOfManaCost::Cost(cost) => cost,
             other => Cost::mana(other.mana()),
         }
     }
@@ -2190,6 +2196,10 @@ pub struct SpellAlternative {
     /// this cost may be made whenever its caster could cast an instant, by whatever lets the card be cast from where it is;
     /// what forbids casting at such a time (Teferi, Time Raveler) still does (CR 101.2).
     pub flash: bool,
+    /// Which keyword's cost it is, as `WayDef::kind` and `GrantedWay::kind` say for a way: the web-slinging Amazing
+    /// Spider-Man gives (`cantrip_mechanics::web_slinging::granted`), so a spell cast for it is known to have been cast using
+    /// web-slinging (CR 702.188a) whatever zone it was cast from. `WayKind::Other` for a cost no keyword names.
+    pub kind: WayKind,
 }
 
 /// A static ability of a permanent that lets a player cast cards in exile (CR 601.3, 604.1): "you may cast spells from among

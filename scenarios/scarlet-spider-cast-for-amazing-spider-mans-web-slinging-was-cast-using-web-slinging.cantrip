@@ -1,0 +1,56 @@
+# Scarlet Spider, Ben Reilly: "Web-slinging {R}{G}"; "Sensational Save - If Scarlet Spider was cast using web-slinging, he
+# enters with X +1/+1 counters on him, where X is the mana value of the returned creature." Amazing Spider-Man: "Each legendary
+# spell you cast that's one or more colors has web-slinging {G}{W}{U}." A spell with two web-slinging abilities may be cast for
+# either (CR 702.188a, 118.9), and both are web-slinging. Bot1 casts Peter Parker as Amazing Spider-Man on turn 1 and Llanowar
+# Elves on turn 3. On turn 5 Bot1 casts Scarlet Spider for the {G}{W}{U} Amazing Spider-Man gives, not its own {R}{G}, taps the
+# Elves for the {G} and returns them. Scarlet Spider was cast using web-slinging, so he enters with one +1/+1 counter, the
+# Elves' mana value.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Peter Parker
+Llanowar Elves
+Scarlet Spider, Ben Reilly
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Peter Parker.Cast(Ability: back face)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Scarlet Spider, Ben Reilly.Cast(Ability: Web-slinging {G}{W}{U})
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.End]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Sapphire; Mox Jet; Amazing Spider-Man; Scarlet Spider, Ben Reilly
+Bot1.Battlefield.Scarlet Spider, Ben Reilly.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Scarlet Spider, Ben Reilly.Power = 5
+Bot1.Battlefield.Scarlet Spider, Ben Reilly.Toughness = 4
+Bot1.Hand = Plains; Plains; Llanowar Elves

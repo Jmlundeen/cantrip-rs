@@ -7453,8 +7453,6 @@ fn describe_cast(cards: &CardTable, state: &GameState, log: &[Record], option: &
     // A face other than the card itself is named by its name, the prototyped face, which has the card's, by its keyword
     // line (CR 718.3): "Prototype {2}{R} — 3/2".
     let face_label = if option.index == WAY_PROTOTYPE { whole.prototype.map_or(face.name, |p| p.text) } else { face.name };
-    // A text about a face other than the card itself names the face: "Stomp: Without paying its mana cost".
-    let of_face = |text: &str| if std::ptr::eq(face, whole) { text.to_string() } else { format!("{face_label}: {text}") };
     // A way a permanent gives names the face it casts wherever the card could be cast as more than one: "Unholy Annex: Once
     // during each of your turns, ...".
     let of_way = |text: &'static str| -> std::borrow::Cow<'static, str> {
@@ -7468,9 +7466,10 @@ fn describe_cast(cards: &CardTable, state: &GameState, log: &[Record], option: &
     let player = asked_player(state);
     let through = option.granted_by.and_then(|_| through(&reader, cards, player, source, option.granted_by));
     let permission = |g: Grant| permission_name(cards, state, g);
-    // An alternative cost another object gives (CR 118.9): its own words, then the permission it is cast by, if any.
+    // An alternative cost another object gives (CR 118.9): its own words, after the face it casts where the card has more than
+    // one, as a way a permanent gives says them ("Peter Parker: Web-slinging"), then the permission it is cast by, if any.
     if let Some(alternative) = option.paid_by.and_then(|g| named_alternative(state, cards, g)) {
-        let text = of_face(alternative.what.text);
+        let text = of_way(alternative.what.text);
         return match option.granted_by {
             Some(g) => format!("{text} ({})", permission(g)).into(),
             None => text.into(),
@@ -7900,7 +7899,7 @@ fn cast(
     // else as it leaves the stack. The way a permanent gave is read now: the spell keeps it if the permanent leaves.
     let flashback = flashback || def.aftermath || granted.is_some_and(|w| w.what.flashback);
     let mut cost = match (way, instead) {
-        (_, Some(instead)) => Cost { energy: by.alternative.map_or(0, |a| a.energy), ..Cost::mana(instead) },
+        (_, Some(instead)) => Cost { mana: instead, ..by.alternative.unwrap_or(Cost::NONE) },
         _ if let Some(granted) = granted => {
             // Judged on the face being cast, as the offer was.
             let view = AsFace { cx: &*cx, spell: card, face };
@@ -12246,13 +12245,13 @@ mod tests {
     static GENESIS: CardDef = CardDef {
         name: "Alternative Test Genesis",
         types: TypeSet::of(&[CardType::Enchantment]),
-        spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: dragon_spells_you_cast, cost: InsteadOfManaCost::WithoutPaying, flash: false }],
+        spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: dragon_spells_you_cast, cost: InsteadOfManaCost::WithoutPaying, flash: false, kind: WayKind::Other }],
         ..CardDef::BLANK
     };
     static ARCHMAGE: CardDef = CardDef {
         name: "Alternative Test Archmage",
         types: TypeSet::of(&[CardType::Enchantment]),
-        spell_alternatives: &[SpellAlternative { text: "Pay {W}{U}{B}{R}{G} rather than pay its mana cost", applies: spells_you_cast, cost: InsteadOfManaCost::Mana(mana("{W}{U}{B}{R}{G}")), flash: false }],
+        spell_alternatives: &[SpellAlternative { text: "Pay {W}{U}{B}{R}{G} rather than pay its mana cost", applies: spells_you_cast, cost: InsteadOfManaCost::Mana(mana("{W}{U}{B}{R}{G}")), flash: false, kind: WayKind::Other }],
         ..CardDef::BLANK
     };
     /// "You may cast spells from among cards in exile" (a permanent's permission, CR 601.3).

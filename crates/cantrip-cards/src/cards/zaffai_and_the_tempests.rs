@@ -22,6 +22,7 @@ pub static CARD: CardDef = CardDef {
         applies: once_each_of_your_turns,
         cost: InsteadOfManaCost::WithoutPaying,
         flash: false,
+        kind: WayKind::Other,
     }],
     ..oracle::ZAFFAI_AND_THE_TEMPESTS
 };

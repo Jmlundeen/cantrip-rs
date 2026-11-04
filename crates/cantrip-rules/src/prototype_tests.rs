@@ -34,7 +34,7 @@ fn any_spell_you_cast(_: &dyn Query, asker: &Asker, _: ObjectId, caster: PlayerI
 static OMNISCIENT: CardDef = CardDef {
     name: "Prototype Test Omniscient",
     types: TypeSet::of(&[CardType::Enchantment]),
-    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: any_spell_you_cast, cost: InsteadOfManaCost::WithoutPaying, flash: false }],
+    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: any_spell_you_cast, cost: InsteadOfManaCost::WithoutPaying, flash: false, kind: WayKind::Other }],
     ..CardDef::BLANK
 };
 

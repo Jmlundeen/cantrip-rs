@@ -48,6 +48,7 @@ pub static CARD: CardDef = CardDef {
         applies: red_or_green_creature_spell_you_cast,
         cost: InsteadOfManaCost::WithoutPaying,
         flash: false,
+        kind: WayKind::Other,
     }],
     ..oracle::WORLD_WAR_HULK
 };

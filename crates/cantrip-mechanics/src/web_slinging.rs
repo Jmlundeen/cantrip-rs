@@ -17,23 +17,26 @@ pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
     cantrip_api::way(Cost::mana(cost).and(return_tapped_to_hand(1, creature)), ZoneKind::Hand, text).kind(WayKind::WebSlinging)
 }
 
-/// The cost of a web-slinging a permanent gives (CR 702.188a, 113.6, 604): `mana` and a tapped creature `player` controls
-/// returned to its owner's hand, the same cost a card's own `way` asks.
-pub fn granted_cost(mana: ManaCost) -> Cost {
-    Cost::mana(mana).and(return_tapped_to_hand(1, creature))
-}
-
-/// Web-slinging a permanent gives to the spells in a hand (CR 702.188a, 113.6): "each legendary spell you cast that's one or
-/// more colors has web-slinging {G}{W}{U}" (Amazing Spider-Man). `cost` is each card's web-slinging cost, `granted_cost` of
-/// its mana, or none for a card that does not have it. Like a card's own it is cast at the spell's own timing, and a spell
+/// Web-slinging a permanent gives to spells (CR 702.188a, 113.6, 604): "each legendary spell you cast that's one or more
+/// colors has web-slinging {G}{W}{U}" (Amazing Spider-Man). `applies` says which spells have it; `mana` is its cost, with a
+/// tapped creature the caster controls returned to its owner's hand, the cost a card's own `way` asks; and `text` is what the
+/// menu calls it, as a card's own is called ("Web-slinging {G}{W}{U}"). Like a card's own web-slinging, which names no zone
+/// (CR 118.9, 601.3), it is an alternative cost offered wherever the spell may be cast from: its hand, or a graveyard or exile
+/// that a permission (Lurrus of the Dream-Den, plot) lets it be cast from. It is cast at the spell's own timing, and a spell
 /// cast by it was cast using web-slinging (`WayKind::WebSlinging`).
-pub const fn granted(cost: GrantedCost) -> GrantedWay {
-    GrantedWay { text: "Web-slinging", cost, from: ZoneKind::Hand, kind: WayKind::WebSlinging, ..GrantedWay::CAST }
+pub const fn granted(applies: fn(&dyn Query, &Asker, ObjectId, PlayerId) -> bool, mana: ManaCost, text: &'static str) -> SpellAlternative {
+    SpellAlternative {
+        text,
+        applies,
+        cost: InsteadOfManaCost::Cost(Cost::mana(mana).and(return_tapped_to_hand(1, creature))),
+        flash: false,
+        kind: WayKind::WebSlinging,
+    }
 }
 
-/// "Was cast using web-slinging" (CR 702.188a): the spell, or the permanent it became, was cast through the way a card
-/// lists as web-slinging (`WayKind::WebSlinging`, set by `way` and `granted`), the card's own or one a permanent gave it
-/// (Amazing Spider-Man). Another way and a permanent that was not cast were not; a copy of a spell cast so copies its
+/// "Was cast using web-slinging" (CR 702.188a): the spell, or the permanent it became, was cast for a web-slinging cost
+/// (`WayKind::WebSlinging`, set by `way` and `granted`): the card's own, or the one a permanent gave it (Amazing Spider-Man),
+/// from whatever zone. Another way and a permanent that was not cast were not; a copy of a spell cast so copies its
 /// alternative cost (CR 707.10) and was too. Spiders-Man, Heroic Horde and Scarlet Spider, Ben Reilly ask it.
 pub fn was_cast_using_web_slinging(q: &dyn Query, id: ObjectId) -> bool {
     crate::sneak::cast_through_turn(q, id, WayKind::WebSlinging).is_some()

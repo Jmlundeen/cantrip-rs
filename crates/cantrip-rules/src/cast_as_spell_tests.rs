@@ -70,7 +70,7 @@ static CUB: CardDef = CardDef {
 static FREEDOM: CardDef = CardDef {
     name: "Cast As Spell Test Freedom",
     types: TypeSet::of(&[CardType::Enchantment]),
-    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: spirit_you_cast_free, cost: InsteadOfManaCost::WithoutPaying, flash: false }],
+    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: spirit_you_cast_free, cost: InsteadOfManaCost::WithoutPaying, flash: false, kind: WayKind::Other }],
     ..CardDef::BLANK
 };
 

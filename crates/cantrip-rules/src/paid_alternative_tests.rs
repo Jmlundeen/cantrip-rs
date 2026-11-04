@@ -54,6 +54,7 @@ static TEMPEST: CardDef = CardDef {
         applies: once_each_of_your_turns,
         cost: InsteadOfManaCost::WithoutPaying,
         flash: false,
+        kind: WayKind::Other,
     }],
     ..CardDef::BLANK
 };
@@ -69,7 +70,7 @@ fn any_card(_: &dyn Query, _: &Asker, _: ObjectId, _: PlayerId) -> bool {
 static SCROLL: CardDef = CardDef {
     name: "Paid Test Scroll",
     types: TypeSet::of(&[CardType::Enchantment]),
-    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: spells_you_cast, cost: InsteadOfManaCost::WithoutPaying, flash: false }],
+    spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: spells_you_cast, cost: InsteadOfManaCost::WithoutPaying, flash: false, kind: WayKind::Other }],
     ..CardDef::BLANK
 };
 /// "You may cast spells from among cards in exile" (CR 601.3).
@@ -97,6 +98,7 @@ static GIFT: CardDef = CardDef {
         applies: instant_spells_you_cast,
         cost: InsteadOfManaCost::WithoutPaying,
         flash: false,
+        kind: WayKind::Other,
     }],
     ..CardDef::BLANK
 };

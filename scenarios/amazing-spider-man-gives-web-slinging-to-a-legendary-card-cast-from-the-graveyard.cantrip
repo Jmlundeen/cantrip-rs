@@ -1,0 +1,82 @@
+# Amazing Spider-Man: "Each legendary spell you cast that's one or more colors has web-slinging {G}{W}{U}." Web-slinging names
+# no zone (CR 702.188a): it is an alternative cost (CR 118.9) that may be paid wherever a rule or permission lets the spell be
+# cast from (CR 601.3), not only from the hand. Bot1 casts two Peter Parkers on turn 1, and the legend rule puts one into the
+# graveyard (CR 704.5j). Lurrus of the Dream-Den comes on turn 3 and the kept Peter transforms on turn 5. On turn 7 both
+# Spider tokens attack, and in the second main phase the Peter in the graveyard (legendary, white, mana value 2) is cast by
+# Lurrus's permission for web-slinging's {G}{W}{U}, returning a tapped Spider token. It enters and makes a Spider.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Peter Parker
+Peter Parker
+Lurrus of the Dream-Den
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Peter Parker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Peter Parker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Peter Parker)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Peter Parker.Activate(Ability: Transform)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Amazing Spider-Man.Power = 4
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Spider Token#1 > Bot2; Spider Token#2 > Bot2)
+[T7 Bot1.Main2]
+Bot1.Graveyard.Peter Parker.Cast(Ability: Peter Parker: Web-slinging)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Spider Token)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.End]
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot2.Life = 16
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Plains; Plains; Plains; Mox Pearl; Mox Jet; Mox Emerald; Mox Sapphire; Lurrus of the Dream-Den; Amazing Spider-Man; Peter Parker; Spider Token; Spider Token

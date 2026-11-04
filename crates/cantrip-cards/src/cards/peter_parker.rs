@@ -10,15 +10,15 @@ fn create_spider(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "Each legendary spell you cast that's one or more colors has web-slinging {G}{W}{U}" (CR 702.188a, 113.6, 604): a legendary
-/// card in its owner's hand, judged on the characteristics it has there, that has at least one color (a colorless legendary
-/// spell has none). Only the spells this permanent's controller casts.
-fn colored_legendary_spell_you_cast(q: &dyn Query, asker: &Asker, card: ObjectId, caster: PlayerId) -> Option<Cost> {
+/// card with at least one color (a colorless legendary spell has none), judged as the spell it would be in the zone it is cast
+/// from, whichever that is. Only the spells this permanent's controller casts.
+fn colored_legendary_spell_you_cast(q: &dyn Query, asker: &Asker, card: ObjectId, caster: PlayerId) -> bool {
     let chars = q.chars(card);
-    (caster == asker.controller && chars.supertypes.legendary && !chars.colors.is_empty()).then(|| web_slinging::granted_cost(mana("{G}{W}{U}")))
+    caster == asker.controller && chars.supertypes.legendary && !chars.colors.is_empty()
 }
 
 pub static BACK: CardDef = CardDef {
-    granted_ways: &[web_slinging::granted(colored_legendary_spell_you_cast)],
+    spell_alternatives: &[web_slinging::granted(colored_legendary_spell_you_cast, mana("{G}{W}{U}"), "Web-slinging {G}{W}{U}")],
     ..oracle::AMAZING_SPIDER_MAN
 };
 

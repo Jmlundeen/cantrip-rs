@@ -25,6 +25,7 @@ pub static CARD: CardDef = CardDef {
         applies: small_creature_spells_you_cast,
         cost: InsteadOfManaCost::Energy(1),
         flash: true,
+        kind: WayKind::Other,
     }],
     ..oracle::PRIMAL_PRAYERS
 };
