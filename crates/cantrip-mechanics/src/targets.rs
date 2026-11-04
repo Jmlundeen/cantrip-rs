@@ -602,6 +602,13 @@ pub fn permanent_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> 
     permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
 }
 
+/// "Up to one other target permanent you control" (CR 115.1, 109.1, 109.5): a permanent on the battlefield under your control other
+/// than the source, a land, an artifact or a creature among them. Mirkwood Nurturer and Exosuit Savior print it as
+/// `up_to_one(other_permanent_you_control_filter)`.
+pub fn other_permanent_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    permanent_you_control_filter(q, asker, t) && t != Target::Object(asker.source)
+}
+
 fn nonland_permanent_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && !q.chars(id).is(CardType::Land))
 }
