@@ -1,0 +1,27 @@
+# Face-down exile grants each exiling player permission to play the other's land
+# (CR 406.3b, 305.2); normal land timing and the one-land limit still apply.
+[Bot1 Deck]
+Vulcan Mind-Meld
+Mox Sapphire
+Island x5
+Mountain
+Island x12
+[Bot2 Deck]
+Island x7
+Plains
+Swamp
+Island x12
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Vulcan Mind-Meld.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Plains.Play
+! Bot1.Exile.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Exile.Mountain.Play
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Plains
+Bot2.Battlefield = Mountain
+Exile = (face down)

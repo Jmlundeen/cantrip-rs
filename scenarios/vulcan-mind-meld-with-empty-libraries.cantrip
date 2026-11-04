@@ -1,0 +1,19 @@
+# Empty libraries contribute no cards to Mind-Meld (CR 609.3).
+# Both decks hold exactly seven cards; resolve on turn one before either must draw.
+[Bot1 Deck]
+Vulcan Mind-Meld
+Mox Sapphire
+Island x5
+[Bot2 Deck]
+Island x7
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Vulcan Mind-Meld.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Exile.Count = 0
+Bot1.Library.Count = 0
+Bot2.Library.Count = 0
+Bot1.Graveyard = Vulcan Mind-Meld

@@ -1,0 +1,34 @@
+# Vulcan Mind-Meld: "Mana of any type can be spent to cast spells this way" (CR 609.4b). Each player casts the red Lightning
+# Bolt the other's library gave up with only blue mana, a Mox Sapphire for Bot1's Bolt of Bot2 and an Island for Bot2's.
+[Bot1 Deck]
+Vulcan Mind-Meld
+Mox Sapphire
+Island x5
+Lightning Bolt
+Island x12
+[Bot2 Deck]
+Island x7
+Lightning Bolt
+Island x13
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Vulcan Mind-Meld.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Exile.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 17
+Exile.Count = 1

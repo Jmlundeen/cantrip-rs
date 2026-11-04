@@ -1,0 +1,20 @@
+# Vulcan Mind-Meld exiles the top card of your library and the top two of the target opponent's, each face down (CR 406.3):
+# three cards are in exile, none of them in a graveyard.
+
+[Bot1 Deck]
+Vulcan Mind-Meld
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Vulcan Mind-Meld.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 3
+Bot1.Graveyard.Count = 1
