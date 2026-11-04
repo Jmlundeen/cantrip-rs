@@ -1,0 +1,11 @@
+{
+  "name": "Venom, Evil Unleashed",
+  "manaCost": "{4}{B}",
+  "type": "Legendary Creature — Symbiote Villain",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "Deathtouch\n{2}{B}, Exile this card from your graveyard: Put two +1/+1 counters on target creature. It gains deathtouch until end of turn. Activate only as a sorcery.",
+  "keywords": [
+    "Deathtouch"
+  ]
+}

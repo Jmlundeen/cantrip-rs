@@ -1,0 +1,35 @@
+# Venom, Evil Unleashed {4}{B} 4/5 deathtouch: "{2}{B}, Exile this card from your graveyard: Put two +1/+1 counters on target creature. It gains
+# deathtouch until end of turn. Activate only as a sorcery" (CR 122.1, 702.2, 611.2a). Faithless Looting discards it; from the
+# graveyard, paid with Black Lotus's three mana, it exiles itself and makes Ornithopter a 2/2 with deathtouch this turn.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Faithless Looting
+Venom, Evil Unleashed
+Ornithopter
+Swamp x2
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Venom, Evil Unleashed; Swamp)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Graveyard.Venom, Evil Unleashed.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying
+Exile = Venom, Evil Unleashed
