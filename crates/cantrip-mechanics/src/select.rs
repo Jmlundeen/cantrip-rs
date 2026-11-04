@@ -166,6 +166,13 @@ pub const BASIC_LAND_OR_PLANET: Part = basic_land_or_subtype(Subtype::Planet);
 /// "A creature card". Survival of the Fittest, Worldly Tutor and Formidable Speaker search for it.
 pub const CREATURE: Part = part(&(creature as SelectFn), 0, "");
 
+fn legendary_creature(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |card| q.chars(card).is(CardType::Creature) && q.chars(card).supertypes.legendary)
+}
+
+/// "A legendary creature card" (CR 205.4). The Arkenstone's Seek the Heart and The Seriema search for it.
+pub const LEGENDARY_CREATURE: Part = part(&(legendary_creature as SelectFn), 0, "");
+
 /// "A nonland card". Reckoner Shakedown chooses one from a revealed hand (`NONLAND_CARD`); Tidehollow Sculler, Elite
 /// Spellbinder and Deep Cavern Bat print the same quality.
 pub const NONLAND: Part = part(&(nonland as SelectFn), 0, "");
@@ -448,6 +455,9 @@ pub const EQUIPMENT_CARD: Selection = Selection::of(up_to(1), &[EQUIPMENT]).call
 pub const fn land_cards(count: Count) -> Selection {
     Selection::of(count, &[LAND]).called("land")
 }
+
+/// "A legendary creature card", which may be left unfound (CR 701.23b): The Arkenstone's Seek the Heart and The Seriema.
+pub const LEGENDARY_CREATURE_CARD: Selection = Selection::of(up_to(1), &[LEGENDARY_CREATURE]).called("legendary creature");
 
 /// `count` creature cards: Survival of the Fittest's and Worldly Tutor's one (`CREATURE_CARD`).
 pub const fn creature_cards(count: Count) -> Selection {
