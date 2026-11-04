@@ -1,0 +1,84 @@
+# CR 701.34a, 616.1, 101.4: proliferating a player and a permanent is one simultaneous instruction. Two level-three
+# Talents modify counters Bot1 puts on both recipients. Bot1's poison replacement choice precedes Bot2's Ballista
+# counter replacement choice, even when the permanent is selected first. Neither recipient changes at either question.
+# Bot2's infect damage supplied the original poison, and Ballista entered for X=1 before the Talents reached level three.
+
+[Bot1 Deck]
+Gleemox x5
+Innkeeper's Talent
+Innkeeper's Talent
+Tezzeret's Gambit
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Glistener Elf
+Sol Ring
+Walking Ballista
+Forest x20
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#1.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#5.Activate(Color: Green)
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent#1.Activate(Ability: Level 2)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Glistener Elf.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#5.Activate(Color: Green)
+Bot1.Battlefield.Innkeeper's Talent#2.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent#1.Activate(Ability: Level 3)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Glistener Elf > Bot1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Green)
+Bot1.Battlefield.Innkeeper's Talent#2.Activate(Ability: Level 3)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Blue)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Blue)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Blue)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Blue)
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Target(Bot2.Battlefield.Walking Ballista; Bot1)
+? Bot1.Poison = 1
+? Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Replace(Innkeeper's Talent)
+? Bot1.Poison = 1
+? Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot2.Replace(Innkeeper's Talent)
+
+[Expect]
+Turn = 7
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Poison = 5
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 5
+Bot2.Battlefield.Walking Ballista.Power = 5

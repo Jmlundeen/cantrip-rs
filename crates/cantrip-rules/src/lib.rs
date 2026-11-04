@@ -1485,9 +1485,9 @@ impl<'a> Cx<'a> {
         results
     }
 
-    /// Records a completed simultaneous event, returning its pre-event history boundary. Usually `emit_batch` then
-    /// collects all its triggers; damage collects its damage triggers earlier (CR 120.4b), and only its result triggers
-    /// after recording the completed event (CR 120.4c-d), both with the boundary from before that first collection.
+    /// Records simultaneous events that have occurred, returning their prior-history boundary. Damage records its
+    /// dealt-damage events before damage triggers (CR 120.4b), then only its results when they occur (CR 120.4c-d).
+    /// Both trigger phases retain the first boundary for matchers; layer queries see all events recorded so far.
     pub(crate) fn record_batch(&mut self, events: &[Event]) -> usize {
         ops::settle_at_once(self);
         let start = self.g.log.len();

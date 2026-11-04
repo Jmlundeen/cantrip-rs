@@ -1038,8 +1038,11 @@ operation for equal amounts; single-player changes still apply and emit immediat
 
 Damage uses that same life preparation and application within the existing `ops::DamageBatch`, with the four phases
 of CR 120.4 kept distinct. Once every damage replacement and prevention has applied, the batch finalizes actual damage
-and each recipient's total excess, then calls `settle::collect_batch` for **damage triggers before any result replacement
-choice** (CR 120.4b). These are the ordinary journalled pending triggers, with their controller fixed now (CR 603.3a),
+and each recipient's total excess, records all of that dealt damage in the existing history through `Cx::record_batch`,
+then calls `settle::collect_batch` for **damage triggers before any result replacement choice** (CR 120.4b).
+History-dependent continuous effects already see that simultaneous damage (CR 603.10, 611.3a): Whiplash Wordsmith gains
+haste from an opponent's damage in time for Sonic the Hedgehog to see it being dealt damage. No result event is recorded
+yet. These are the ordinary journalled pending triggers, with their controller fixed now (CR 603.3a),
 not a separate damage-trigger store. A concession during the following choices replays this collection before the
 concession at its recorded cursor: an owner's departure removes their borrowed Darien, not the trigger controlled by a
 player still in the game (CR 800.4a, 800.4d).
@@ -1055,11 +1058,12 @@ and its putter. No original life total, player counter, permanent counter, damag
 all applicable result replacements are prepared. Recipients and prohibitions are rechecked together after replacement
 continuations, before any original result is applied.
 
-`DamageBatch::finish` then applies the results and records damage and results together through `Cx::record_batch`
-(CR 120.4d). Only the **result** events go through trigger collection then, against the completed state; damage triggers
-are not collected again. Both collections use the history boundary saved before the first collection, so a result
-matcher does not mistake earlier damage, a limited triggering or a continuation within this instruction for its prior
-history. Continuous effects at result time can read the completed history as usual. A marks/removal-only result still
+`DamageBatch::finish` then applies the results and records **only those result events** through `Cx::record_batch`
+(CR 120.4c-d). The earlier damage records are not duplicated. Only the **result** events go through trigger collection
+then, against the completed state; damage triggers are not collected again. Both collections use the history boundary
+saved before recording any of this damage, so a result matcher does not mistake earlier damage, a limited triggering
+or a continuation within this instruction for its prior history. Layer queries see every event that has actually
+occurred by the phase being judged, never a private history overlay. A marks/removal-only result still
 checks state triggers after completion. "One or more" damage and life triggers keep their whole batches: Ob Nixilis,
 Captive Kingpin sees one event when several opponents each lose exactly 1, while Ajani's Pridemate still sees each
 source's lifelink gain. Spell damage, single damage and combat all finish this same batch; prevention continuations still
@@ -1923,11 +1927,21 @@ as (`DamageBatch::finish`, announced with the damage, CR 120.3d, 510.2) go throu
 counters on each of several permanents (`effects::counters_on_creatures_you_control`,
 `double::counters`, `counters_divided`). A card never loops
 `add_counters` over objects or kinds its one instruction names together.
-The same path exposes `prepare`/`prepare_player`, final recipient/prohibition checks, and
-`place_prepared`/`place_players_prepared` to damage: the batch can prepare counters alongside each affected player's
-life results, then apply all results with no remaining replacement questions. Player poison is not given while damage
-assignments are still being replaced; it waits for this pass too. A later replacement continuation or concession cannot
-leave an already-prepared placement on a departed recipient or one now prohibited from getting those counters.
+The preparation/application split is `counters::Batch`, used by ordinary placements, damage and proliferate.
+`next_player` reads the current affected controllers in APNAP order; damage includes its outstanding life occurrences
+in that selection and interleaves their preparation with `prepare_next`. `retain_allowed` checks every permanent and
+player before `place` applies anything through the single journalled put path. Player poison is not given while damage
+assignments are still being replaced. Proliferate uses `put_mixed_together`: one additional counter of **every** existing
+kind per chosen recipient, one player placement for poison, energy and experience together, and no type-by-type
+application. Contagion Clasp, Contagion Engine and Tezzeret's Gambit therefore use the same ordering procedure as damage.
+A later replacement continuation or concession cannot leave an already-prepared placement on a departed recipient or
+one now prohibited from getting those counters.
+
+A counter proposal already inside replacement processing is refreshed too (`replace::apply_each`, CR 616.1, 611.3a).
+For a non-entering battlefield recipient, its current controller is reread before candidate matching, choices and
+prohibitions on each rebuild, including a concession at its own outstanding choice; the final prohibition check uses
+that refreshed controller. The putter remains the original effect's or damage source's. An entering proposal instead
+keeps its prospective battlefield controller (CR 614.12), never overwritten by the old-zone object's controller/owner.
 
 Counters that would be put on a permanent are one `Proposal::Counters` (CR 122.6, 614.1a), whose `CounterPlacement` says who puts
 them (`putter`, CR 122.6a: "if you would put", Innkeeper's Talent) and whether an effect does (`effect`: "if an effect would put",

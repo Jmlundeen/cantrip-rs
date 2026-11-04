@@ -56,26 +56,77 @@ pub struct Placement {
 /// 616.1), every object's worked out before any counter goes on (CR 614.6: a replacement modifies the event before it
 /// happens); then they are all put on, and all announced together.
 pub fn put_together(cx: &mut Cx, placements: &[Placement], how: How) {
-    let events = place_together(cx, placements, how);
+    put_mixed_together(cx, placements, &[], how);
+}
+
+/// One simultaneous instruction's permanent and player counters (CR 701.34a, 101.4, 616.1). All kinds on one
+/// recipient form one placement; damage instead supplies separate occurrences per source. Nothing is added until
+/// every replacement is prepared. Proliferate, ordinary placements and damage use this same batch/put path.
+pub(crate) fn put_mixed_together(cx: &mut Cx, placements: &[Placement], players: &[PlayerPlacement], how: How) {
+    let mut batch = Batch { pending: placements.to_vec(), player_pending: players.to_vec(), ..Default::default() };
+    while let Some(player) = batch.next_player(cx, |_| false) {
+        batch.prepare_next(cx, player, how);
+    }
+    batch.retain_allowed(cx);
+    let events = batch.place(cx);
     if !events.is_empty() {
         cx.emit_batch(&events, None);
     }
 }
 
-/// `put_together`, with preparation and application separated so damage can prepare these placements in the same
-/// APNAP pass as its life and player-counter results (CR 120.4c, 616.1).
-pub fn place_together(cx: &mut Cx, placements: &[Placement], how: How) -> Vec<Event> {
-    let mut pending = placements.to_vec();
-    let mut prepared = Vec::with_capacity(pending.len());
-    // Re-read controllers between preparations: a replacement's continuation or a concession may return a recipient
-    // to an earlier player, restarting APNAP for outstanding choices (CR 101.4d).
-    while let Some(at) = cx.s().apnap().find_map(|player| pending.iter().position(|p| cx.s().obj(p.object).controller == player)) {
-        let mut placement = pending.remove(at);
-        prepare(cx, &mut placement, how);
-        prepared.push(placement);
+/// The existing counter preparation/application split as one mixed batch. Damage holds this batch alongside its
+/// life results, inserting those occurrences into the same APNAP sequence; proliferate has only counter occurrences.
+/// This is work pending for one instruction, never a second record of counters or event history.
+#[derive(Default)]
+pub(crate) struct Batch {
+    pending: Vec<Placement>,
+    player_pending: Vec<PlayerPlacement>,
+    prepared: Vec<Placement>,
+    player_prepared: Vec<PlayerPlacement>,
+}
+
+impl Batch {
+    pub(crate) fn push(&mut self, placement: Placement) {
+        self.pending.push(placement);
     }
-    retain_allowed(cx, &mut prepared);
-    place_prepared(cx, &prepared)
+
+    pub(crate) fn push_player(&mut self, placement: PlayerPlacement) {
+        self.player_pending.push(placement);
+    }
+
+    /// Re-read controllers between occurrences: concessions/continuations can return an unprepared recipient to an
+    /// earlier player, restarting APNAP (CR 101.4d). `also` includes the damage batch's still-pending life occurrences.
+    pub(crate) fn next_player(&self, cx: &Cx, also: impl Fn(PlayerId) -> bool) -> Option<PlayerId> {
+        cx.s().apnap().find(|&player| {
+            also(player) || self.pending.iter().any(|p| cx.s().obj(p.object).controller == player)
+                || self.player_pending.iter().any(|p| p.player == player)
+        })
+    }
+
+    pub(crate) fn prepare_next(&mut self, cx: &mut Cx, player: PlayerId, how: How) {
+        if let Some(at) = self.pending.iter().position(|p| cx.s().obj(p.object).controller == player) {
+            let mut placement = self.pending.remove(at);
+            prepare(cx, &mut placement, how);
+            self.prepared.push(placement);
+        } else if let Some(at) = self.player_pending.iter().position(|p| p.player == player) {
+            let mut placement = self.player_pending.remove(at);
+            prepare_player(cx, &mut placement);
+            self.player_prepared.push(placement);
+        }
+    }
+
+    /// Validate all original counter results against one state after replacement continuations, before application.
+    pub(crate) fn retain_allowed(&mut self, cx: &Cx) {
+        retain_allowed(cx, &mut self.prepared);
+        retain_players_allowed(cx, &mut self.player_prepared);
+    }
+
+    /// All results are prepared and allowed: apply through the single put path and return the permanent events for
+    /// the caller to announce with the rest of its instruction. No replacement runs against partially updated state.
+    pub(crate) fn place(self, cx: &mut Cx) -> Vec<Event> {
+        place_players_prepared(cx, &self.player_prepared);
+        place_prepared(cx, &self.prepared)
+    }
 }
 
 /// Phased-out permanents cannot be affected (CR 702.26b); an object gone from its zone is another (CR 400.7).
@@ -375,10 +426,7 @@ pub(crate) struct PlayerPlacement {
 /// get counters of a kind gets none (CR 101.2: Melira, Sylvok Outcast; Solemnity), and no replacement effect of the event
 /// that doesn't happen applies.
 pub fn put_on_player(cx: &mut Cx, player: PlayerId, counts: PlayerCounts, by: PlayerId) {
-    let mut placement = PlayerPlacement { player, counts, by };
-    prepare_player(cx, &mut placement);
-    retain_players_allowed(cx, std::slice::from_mut(&mut placement));
-    place_players_prepared(cx, &[placement]);
+    put_mixed_together(cx, &[], &[PlayerPlacement { player, counts, by }], How::Effect);
 }
 
 /// Prepare, but do not give, one source's player counters (CR 120.4c, 614.6). Damage schedules this alongside every

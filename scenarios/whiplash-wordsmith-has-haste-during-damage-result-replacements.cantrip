@@ -1,0 +1,61 @@
+# CR 120.4b, 603.10, 611.3a: Earthquake's damage has been dealt when damage triggers are checked and before the
+# life-result replacements are chosen. Wordsmith therefore already has flying and haste from the opponent's damage
+# at Bot2's Bloodletter ordering question. Life and damage marks are results and remain unchanged at that question.
+# Wordsmith had no flying when Earthquake's recipients were determined, so it still takes the one damage.
+
+[Bot1 Deck]
+Gleemox x5
+Whiplash Wordsmith
+Bloodletter of Aclazotz
+Bloodletter of Aclazotz
+Earthquake
+Mountain x18
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#1.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Black)
+Bot1.Hand.Whiplash Wordsmith.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Black)
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Black)
+Bot1.Battlefield.Gleemox#4.Activate(Color: Black)
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Whiplash Wordsmith.Keywords = (absent)
+Bot1.Battlefield.Gleemox#1.Activate(Color: Red)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Red)
+Bot1.Hand.Earthquake.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Whiplash Wordsmith.Keywords = Flying; Haste
+? Bot1.Battlefield.Whiplash Wordsmith.Damage = 0
+? Bot1.Life = 20
+? Bot2.Life = 20
+Bot2.Replace(Bloodletter of Aclazotz)
+
+[Expect]
+Turn = 7
+Bot1.Life = 19
+Bot2.Life = 16
+Bot1.Battlefield.Whiplash Wordsmith.Keywords = Flying; Haste
+Bot1.Battlefield.Whiplash Wordsmith.Damage = 1
+Bot1.Battlefield.Whiplash Wordsmith.Prepared = true
+Bot1.Graveyard = Earthquake

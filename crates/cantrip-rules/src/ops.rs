@@ -3665,12 +3665,9 @@ pub struct DamageBatch {
     /// long as you have 0 or less life"): judged once, as the event begins for that player, since all of it is dealt at once
     /// (CR 120.2, 510.2) - a life total the event itself takes to 0 makes none of it poison.
     as_infect: Vec<(PlayerId, bool)>,
-    /// The -1/-1 counters its damage is dealt to creatures as (CR 702.90c, 120.3d): put on together once all of it is dealt,
-    /// and announced with it (CR 510.2, 603.2c).
-    counters: Vec<counters::Placement>,
-    /// Infect and toxic's player counters, one placement per source's damage (CR 120.3b, 120.3g), prepared in the same
-    /// APNAP pass as life and permanent counters, never applied while damage replacements are still running.
-    player_counters: Vec<counters::PlayerPlacement>,
+    /// The permanent and player counters damage produces (CR 120.3b, 120.3d, 120.3g), one occurrence per source.
+    /// The shared counter batch prepares them alongside this damage's life results and applies them only afterward.
+    counters: counters::Batch,
     /// The permanents whose shield counter has applied to this event (CR 122.1c): one replacement for the simultaneous event
     /// (CR 120.4), so a second assignment of damage to the same permanent is prevented as well, and no second counter is removed.
     shielded: Vec<ObjectId>,
@@ -3765,7 +3762,8 @@ impl DamageBatch {
     /// before any result-choice suspension can remove their sources or change their controllers (CR 603.3a).
     /// Then prepare every result in one APNAP pass (CR 120.4c, 616.1), with one loss per player but one lifelink gain
     /// per source (CR 119.9-10, 702.15e). No original result applies until all its replacements are prepared.
-    /// Finally apply and record the whole event, collecting only its result triggers then (CR 120.4d, 603.2c).
+    /// Finally apply and record the results, collecting only their triggers then (CR 120.4d, 603.2c); the already
+    /// recorded dealt-damage events are neither recorded nor collected twice.
     pub fn finish(&mut self, cx: &mut Cx, events: &mut Vec<Event>) {
         if events.is_empty() {
             return;
@@ -3776,53 +3774,34 @@ impl DamageBatch {
                 *recipient_excess = self.dealt.iter().find(|r| r.object == *id).map_or(0, DamageRecipient::excess);
             }
         }
-        settle_at_once(cx);
-        // Keep this boundary even when early trigger collection records a limited triggering, or result replacements
-        // have continuations of their own. Neither phase's matchers see part of this instruction as its prior history.
-        let start = cx.g.log.len();
+        // Actual damage is already dealt at CR 120.4b: record the entire simultaneous damage before looking for
+        // triggers, so history-dependent continuous effects see it (CR 603.10, 611.3a). Result records still wait.
+        // Both trigger phases keep the boundary from before this instruction, even across replacement continuations.
+        let start = cx.record_batch(events);
         let damage_count = events.len();
         settle::collect_batch(cx, events, None, start);
 
         let mut life = std::mem::take(&mut self.life);
         life.extend(std::mem::take(&mut self.lifelink).into_iter().map(|(_, controller, amount)| (controller, amount)));
         let mut changes = Vec::with_capacity(life.len());
-        let mut pending_counters = std::mem::take(&mut self.counters);
-        let mut placements = Vec::with_capacity(pending_counters.len());
-        let mut pending_player_counters = std::mem::take(&mut self.player_counters);
-        let mut player_placements = Vec::with_capacity(pending_player_counters.len());
-        loop {
-            // Re-read the affected controllers after each preparation: a continuation or concession can return an
-            // unprepared recipient to an earlier player, restarting APNAP for outstanding choices (CR 101.4d).
-            let next = cx.s().apnap().find(|&player| {
-                life.iter().any(|&(p, _)| p == player)
-                    || pending_counters.iter().any(|p| cx.s().obj(p.object).controller == player)
-                    || pending_player_counters.iter().any(|p| p.player == player)
-            });
-            let Some(player) = next else { break };
+        let mut counters = std::mem::take(&mut self.counters);
+        while let Some(player) = counters.next_player(cx, |player| life.iter().any(|&(p, _)| p == player)) {
             if let Some(at) = life.iter().position(|&(p, _)| p == player) {
                 let (_, amount) = life.remove(at);
                 let delta = prepare_life_change(cx, player, amount);
                 if delta != 0 {
                     changes.push((player, delta));
                 }
-            } else if let Some(at) = pending_counters.iter().position(|p| cx.s().obj(p.object).controller == player) {
-                let mut placement = pending_counters.remove(at);
-                counters::prepare(cx, &mut placement, counters::How::Effect);
-                placements.push(placement);
-            } else if let Some(at) = pending_player_counters.iter().position(|p| p.player == player) {
-                let mut placement = pending_player_counters.remove(at);
-                counters::prepare_player(cx, &mut placement);
-                player_placements.push(placement);
+            } else {
+                counters.prepare_next(cx, player, counters::How::Effect);
             }
         }
         // A replacement's continuation or a concession may have changed a recipient or a prohibition. Judge all of
         // them against the same state, before any of the original life, counter or marked-damage results applies.
         retain_life_changes(cx, &mut changes);
-        counters::retain_allowed(cx, &mut placements);
-        counters::retain_players_allowed(cx, &mut player_placements);
+        counters.retain_allowed(cx);
         apply_life_changes(cx, changes, events);
-        counters::place_players_prepared(cx, &player_placements);
-        events.extend(counters::place_prepared(cx, &placements));
+        events.extend(counters.place(cx));
         for recipient in &self.dealt {
             let id = recipient.object;
             if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
@@ -3844,7 +3823,7 @@ impl DamageBatch {
                 }
             }
         }
-        cx.record_batch(events);
+        cx.record_batch(&events[damage_count..]);
         if events.len() > damage_count {
             settle::collect_batch(cx, &events[damage_count..], None, start);
         } else if damage_count > 0 {
@@ -3935,7 +3914,7 @@ pub fn deal_damage_with(
                 // "That source's controller" (CR 120.3b) and "that creature's controller" (CR 702.164c) gives them, at once
                 // as results of the one damage, so "if you would put one or more counters" is theirs.
                 let by = cx.controller(source);
-                batch.player_counters.push(counters::PlayerPlacement {
+                batch.counters.push_player(counters::PlayerPlacement {
                     player: p, counts: counters::PlayerCounts { poison, ..Default::default() }, by,
                 });
             }
@@ -4498,44 +4477,29 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
         any_number: true,
     };
     let Answer::Targets(chosen) = cx.ask_core(player, ask, false)? else { return Ok(()) };
-    // Which kinds each one has, read first: objects' counters, then a player's poison, energy and experience.
+    // Read every recipient before any replacement runs. All kinds on one recipient are one placement, whether
+    // that recipient is a permanent or a player (CR 701.34a); no sequential per-kind player applications.
     let one = |n: u8| u16::from(n > 0);
-    let plan: Vec<(Target, [i32; CounterKind::COUNT], counters::PlayerCounts)> = chosen
-        .iter()
-        .map(|&t| match t {
-            Target::Object(id) => (t, cx.s().obj(id).counter_array(), counters::PlayerCounts::default()),
-            Target::Player(p) => {
-                let pl = cx.s().player(p);
-                let counts = counters::PlayerCounts { poison: one(pl.poison()), energy: one(pl.energy()), experience: one(pl.experience()) };
-                (t, [0; CounterKind::COUNT], counts)
-            }
-            _ => (t, [0; CounterKind::COUNT], counters::PlayerCounts::default()),
-        })
-        .collect();
-    // The permanents' counters are one event, each permanent's of every kind and all of them together (CR 701.34a, 608.2,
-    // 603.2c).
-    let placements: Vec<counters::Placement> = plan
-        .iter()
-        .filter_map(|&(target, had, _)| match target {
-            Target::Object(object) => Some(counters::Placement { object, counts: had.map(|n| i32::from(n > 0)), by: player }),
-            _ => None,
-        })
-        .collect();
-    counters::put_together(cx, &placements, counters::How::Effect);
-    for (target, _, counts) in plan {
+    let mut placements = Vec::new();
+    let mut players = Vec::new();
+    for target in chosen {
         match target {
-            Target::Player(p) => {
-                for counts in [
-                    counters::PlayerCounts { poison: counts.poison, ..Default::default() },
-                    counters::PlayerCounts { energy: counts.energy, ..Default::default() },
-                    counters::PlayerCounts { experience: counts.experience, ..Default::default() },
-                ] {
-                    counters::put_on_player(cx, p, counts, player);
-                }
+            Target::Object(object) => placements.push(counters::Placement {
+                object, counts: cx.s().obj(object).counter_array().map(|n| i32::from(n > 0)), by: player,
+            }),
+            Target::Player(recipient) => {
+                let p = cx.s().player(recipient);
+                players.push(counters::PlayerPlacement {
+                    player: recipient, by: player,
+                    counts: counters::PlayerCounts { poison: one(p.poison()), energy: one(p.energy()), experience: one(p.experience()) },
+                });
             }
             _ => {}
         }
     }
+    // The counter path shares damage's APNAP scheduling and defers every original result until all replacements
+    // have been prepared, including those for players (CR 101.4, 616.1).
+    counters::put_mixed_together(cx, &placements, &players, counters::How::Effect);
     Ok(())
 }
 

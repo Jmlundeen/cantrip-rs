@@ -849,6 +849,23 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
         if let Proposal::ZoneChange(z) = *proposal {
             crate::ops::rejudge_entering(cx, &z);
         }
+        if let Proposal::Counters(placement) = proposal {
+            // A non-entering recipient's controller is live information, not the controller from when its first
+            // replacement choice was built (CR 616.1, 611.3a). A concession or a continuation can change it here.
+            // An entry instead keeps its prospective controller, even while its object is still in another zone
+            // (CR 614.12). Neither case changes the damage/effect's putter.
+            if !placement.entering {
+                if !live(cx.s(), placement.object) || !cx.s().obj(placement.object).zone.is(ZoneKind::Battlefield) {
+                    placement.counts = [0; CounterKind::COUNT];
+                    return;
+                }
+                placement.controller = cx.s().obj(placement.object).controller;
+            }
+            placement.counts = without_banned(cx, placement.object, placement.controller, placement.counts);
+            if placement.counts.iter().all(|&n| n <= 0) {
+                return;
+            }
+        }
         let found = candidates(cx, proposal, &applied, entry.as_deref());
         if found.is_empty() {
             return;
@@ -861,8 +878,9 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
         if chosen.origin == Origin::Printed
             && printed_replacement(cx, chosen.source, chosen.index).optional.is_some()
             && cx.concessions_here()
-            && !candidates(cx, proposal, &applied, entry.as_deref()).contains(&chosen)
         {
+            // Re-enter the loop to refresh both the proposal and its candidates, even if the old candidate would
+            // still match the stale proposal (for example, counters on a creature that just changed controller).
             continue;
         }
         let Candidate { source, index, origin } = chosen;
@@ -1424,7 +1442,7 @@ pub(crate) fn counters(
     let mut proposal = Proposal::Counters(CounterPlacement { object, controller, entering, counts, putter, effect });
     apply(cx, &mut proposal);
     match proposal {
-        Proposal::Counters(placement) => without_banned(cx, object, controller, placement.counts),
+        Proposal::Counters(placement) => without_banned(cx, placement.object, placement.controller, placement.counts),
         _ => unreachable!("an effect cannot change the kind of the event"),
     }
 }

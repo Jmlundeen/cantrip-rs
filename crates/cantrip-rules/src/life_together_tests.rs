@@ -374,13 +374,18 @@ fn your_poison_banned(_: &dyn Query, me: &Asker, player: PlayerId, kind: PlayerC
     player == me.controller && kind == PlayerCounter::Poison
 }
 
-/// Melira's poison prohibition. The only infect source in its test is controlled by Melira's controller when it deals
-/// damage, so the separate ability that removes infect from opposing creatures cannot affect that damage.
+fn your_minus_one_banned(q: &dyn Query, me: &Asker, object: ObjectId, controller: PlayerId, kind: CounterKind) -> bool {
+    controller == me.controller && kind == CounterKind::MinusOne && q.chars(object).is(CardType::Creature)
+}
+
+/// Melira's counter prohibitions. The only infect source in these tests is controlled by Melira's controller when
+/// it deals damage, so the separate ability removing infect from opposing creatures cannot affect that damage.
 static MELIRA: CardDef = CardDef {
     name: "Damage Result Melira, Sylvok Outcast",
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(2), toughness: Some(2),
     player_counter_bans: &[your_poison_banned],
+    counter_bans: &[your_minus_one_banned],
     ..CardDef::BLANK
 };
 
@@ -449,12 +454,39 @@ static REVIEW_CLASP: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn engine_proliferate(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    g.proliferate(item.controller, item.object)?;
+    g.proliferate(item.controller, item.object)
+}
+
+static REVIEW_ENGINE: CardDef = CardDef {
+    name: "Counter Order Contagion Engine",
+    abilities: &[ability(Cost { tap: true, ..cost("{4}") }, engine_proliferate, "{4}, {T}: Proliferate, then proliferate again.")],
+    ..REVIEW_CLASP
+};
+
+fn thrummingbird_damage(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::Damage { source, target: Target::Player(_), kind, .. } if source == me.source && kind.is_combat() => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+static REVIEW_THRUMMINGBIRD: CardDef = CardDef {
+    name: "Counter Order Thrummingbird",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1), toughness: Some(1), keywords: Keywords::of(&[Keyword::Flying]),
+    abilities: &[triggered(when_asked(EventMask::DAMAGE, thrummingbird_damage), clasp_proliferate,
+        "Whenever Thrummingbird deals combat damage to a player, proliferate.")],
+    ..CardDef::BLANK
+};
+
 fn game() -> Game {
     let table = Box::leak(Box::new(CardTable::new([
         &WATCHER, &DOUBLER, &EMPERION, &REMEDY, &DRAIN, &PYROHEMIA, &LIFELINKER, &PRIDEMATE, &ANGEL, &DARIEN,
         &HAWK, &INFECT, &TOXIC, &ARMOR, &REVIEW_DARIEN, &REVIEW_SEASON, &REVIEW_STINGER,
         &RESULT_HISTORY_WATCHER, &TALENT, &MELIRA, &RED_TERROR, &HAPATRA, &REVIEW_WORDSMITH, &REVIEW_SONIC,
-        &REVIEW_TALENT, &REVIEW_CLASP,
+        &REVIEW_TALENT, &REVIEW_CLASP, &REVIEW_ENGINE, &REVIEW_THRUMMINGBIRD,
     ])));
     let mut g = Game::new(table, &Setup { decks: vec![Vec::new(); 4], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -532,6 +564,48 @@ fn damage_trigger_layers_see_the_simultaneous_damage_history() {
     pyrohemia(&mut cx(&mut g), &item).unwrap();
     assert!(cx(&mut g).chars(wordsmith).has(Keyword::Haste));
     assert_eq!(trigger_count(&g, sonic, 0), 2, "Sonic sees itself and Wordsmith with haste from this damage");
+}
+
+#[test]
+fn damage_history_and_layer_dependent_triggers_survive_result_choice_replay() {
+    let mut g = game();
+    g.state.update_turn(|t| t.number = 1);
+    let sonic = put(&mut g, &REVIEW_SONIC, YOU);
+    let wordsmith = put(&mut g, &REVIEW_WORDSMITH, YOU);
+    let source = put(&mut g, &PYROHEMIA, YOU);
+    put(&mut g, &DOUBLER, ACTIVE);
+    put(&mut g, &DOUBLER, ACTIVE);
+    g.state.stack_push(pyrohemia_item(&g, source));
+    let serial = g.state.stack.last().unwrap().serial;
+    g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
+    g.run();
+    let before = g.at;
+    for player in [LAST, YOU, FIRST] {
+        no_damage_results_yet(&g);
+        assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Damage { .. })).count(), 6);
+        assert!(cx(&mut g).chars(wordsmith).has(Keyword::Haste));
+        assert_eq!(trigger_count(&g, sonic, 0), 2, "both triggers exist before every result choice");
+        let request = g.pending().cloned().unwrap();
+        assert_eq!(request.player, player);
+        g.answer(request.id, player, Answer::Index(0)).unwrap();
+        g.run();
+    }
+    let order = g.pending().cloned().expect("Sonic's two already-triggered abilities need ordering");
+    assert!(matches!(&order.kind, RequestKind::OrderTriggers { sources, .. } if *sources == vec![sonic, sonic]));
+    g.answer(order.id, YOU, Answer::Order(vec![0, 1])).unwrap();
+    g.run();
+    let after = g.at;
+    let completed = g.log.clone();
+    assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Damage { .. })).count(), 6);
+    assert_eq!(changes(&g).len(), 4);
+    assert_eq!(waiting_or_stacked(&g, sonic, YOU), 2);
+    g.goto(before);
+    no_damage_results_yet(&g);
+    assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Damage { .. })).count(), 6);
+    assert_eq!(trigger_count(&g, sonic, 0), 2);
+    g.goto(after);
+    assert_eq!(g.log, completed, "damage is recorded once, and result records follow only on completion");
+    assert_eq!(waiting_or_stacked(&g, sonic, YOU), 2);
 }
 
 /// Positive control: the same real static and trigger work when earlier noncombat damage gave Wordsmith haste.
@@ -658,7 +732,8 @@ fn damage_life_choices_precede_all_updates_and_survive_undo_redo() {
         assert_eq!(*sources, vec![one, two]);
         assert_eq!(life(&g), vec![20; 4]);
         assert!(changes(&g).is_empty());
-        assert!(!g.log.iter().any(|r| matches!(r.event, Event::Damage { .. })));
+        assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Damage { .. })).count(), 4,
+            "damage is already dealt and recorded, without duplicate records on replay");
         g.answer(request.id, player, Answer::Index(1)).expect("valid order");
         g.run();
     }
@@ -794,8 +869,9 @@ fn no_damage_results_yet(g: &Game) {
     assert!(g.state.players.iter().all(|p| p.poison() == 0));
     assert!(g.state.battlefield().iter().all(|&id| g.state.obj(id).damage == 0
         && g.state.obj(id).counters(CounterKind::MinusOne) == 0));
-    assert!(!g.log.iter().any(|r| matches!(r.event, Event::Damage { .. } | Event::LifeChange { .. }
-        | Event::CountersPut { kind: CounterKind::MinusOne, .. })));
+    assert!(g.log.iter().any(|r| matches!(r.event, Event::Damage { .. })), "dealt damage is already recorded");
+    assert!(!g.log.iter().any(|r| matches!(r.event, Event::LifeChange { .. }
+        | Event::CountersPut { kind: CounterKind::MinusOne, .. })), "no damage results have occurred yet");
 }
 
 fn waiting_or_stacked(g: &Game, source: ObjectId, controller: PlayerId) -> usize {
@@ -1029,6 +1105,120 @@ fn proliferate_counter_replacements_are_apnap_across_players_and_permanents() {
     assert_eq!(g.state.player(ACTIVE).poison(), 1);
 }
 
+/// CR 701.34a: every kind on a selected recipient is part of the same placement. Both input orders still ask the
+/// active player first, and the original counters remain unchanged through both questions and undo/redo.
+#[test]
+fn proliferate_mixed_counter_kinds_are_prepared_together_and_replay_once() {
+    for player_first in [false, true] {
+        let mut g = game();
+        let creature = put(&mut g, &LIFELINKER, FIRST);
+        let mut initial = [0; CounterKind::COUNT];
+        initial[CounterKind::PlusOne as usize] = 1;
+        initial[CounterKind::Shield as usize] = 2;
+        crate::counters::put_all(&mut cx(&mut g), creature, initial, FIRST, crate::counters::How::Effect);
+        crate::counters::put_on_player(&mut cx(&mut g), ACTIVE,
+            crate::counters::PlayerCounts { poison: 1, energy: 2, experience: 3 }, FIRST);
+        put(&mut g, &REVIEW_TALENT, ACTIVE);
+        put(&mut g, &REVIEW_TALENT, ACTIVE);
+        let source = put(&mut g, &REVIEW_CLASP, ACTIVE);
+        g.state.stack_push(pyrohemia_item(&g, source));
+        let serial = g.state.stack.last().unwrap().serial;
+        g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
+        g.run();
+        let request = g.pending().cloned().unwrap();
+        let mut chosen = vec![Target::Object(creature), Target::Player(ACTIVE)];
+        if player_first { chosen.reverse(); }
+        g.answer(request.id, ACTIVE, Answer::Targets(chosen)).unwrap();
+        g.run();
+        let before = g.at;
+        for player in [ACTIVE, FIRST] {
+            let request = g.pending().cloned().unwrap();
+            assert_eq!(request.player, player);
+            assert!(matches!(request.kind, RequestKind::ChooseReplacement { .. }));
+            let p = g.state.player(ACTIVE);
+            assert_eq!((p.poison(), p.energy(), p.experience()), (1, 2, 3));
+            assert_eq!(g.state.obj(creature).counters(CounterKind::PlusOne), 1);
+            assert_eq!(g.state.obj(creature).counters(CounterKind::Shield), 2);
+            assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::CountersPut { .. })).count(), 2);
+            g.answer(request.id, player, Answer::Index(0)).unwrap();
+            g.run();
+        }
+        let after = g.at;
+        let completed = g.log.clone();
+        let p = g.state.player(ACTIVE);
+        assert_eq!((p.poison(), p.energy(), p.experience()), (5, 6, 7));
+        assert_eq!(g.state.obj(creature).counters(CounterKind::PlusOne), 5);
+        assert_eq!(g.state.obj(creature).counters(CounterKind::Shield), 6);
+        assert_eq!(g.log.iter().filter(|r| matches!(r.event,
+            Event::CountersPut { amount: 4, by: ACTIVE, .. })).count(), 2);
+        g.goto(before);
+        assert_eq!(g.pending().unwrap().player, ACTIVE);
+        assert_eq!(g.state.player(ACTIVE).poison(), 1);
+        assert_eq!(g.state.obj(creature).counters(CounterKind::PlusOne), 1);
+        g.goto(after);
+        assert_eq!(g.log, completed);
+        assert_eq!(g.state.player(ACTIVE).experience(), 7);
+        assert_eq!(g.state.obj(creature).counters(CounterKind::Shield), 6);
+    }
+}
+
+/// The other printed proliferate callers with no scenarios in this checkout: Engine completes its first instruction
+/// before asking the second selection; Thrummingbird waits for its damage trigger to resolve, then uses the same batch.
+#[test]
+fn proliferate_from_engine_and_combat_trigger_uses_complete_mixed_batches() {
+    for (def, times, combat) in [(&REVIEW_ENGINE, 2u8, false), (&REVIEW_THRUMMINGBIRD, 1, true)] {
+        let mut g = game();
+        let creature = put(&mut g, &LIFELINKER, FIRST);
+        crate::counters::put(&mut cx(&mut g), creature, CounterKind::PlusOne, 1, FIRST, crate::counters::How::Effect);
+        crate::counters::put_on_player(&mut cx(&mut g), ACTIVE,
+            crate::counters::PlayerCounts { poison: 1, ..Default::default() }, FIRST);
+        put(&mut g, &REVIEW_TALENT, ACTIVE);
+        put(&mut g, &REVIEW_TALENT, ACTIVE);
+        let source = put(&mut g, def, ACTIVE);
+        if combat {
+            g.state.set_attackers(vec![Attacker::new(source, Target::Player(FIRST), FIRST, TypeSet::NONE)]);
+            g.state.update_turn(|t| t.set_step(Step::CombatDamage));
+            g.state.frame_push(Frame::new(FrameKind::BeginStep));
+            g.run();
+            for player in [ACTIVE, LAST, YOU, FIRST] {
+                let request = g.pending().cloned().unwrap();
+                assert_eq!(request.player, player);
+                assert!(matches!(request.kind, RequestKind::Priority { .. }));
+                g.answer(request.id, player, Answer::Pass).unwrap();
+                g.run();
+            }
+        } else {
+            g.state.stack_push(pyrohemia_item(&g, source));
+            let serial = g.state.stack.last().unwrap().serial;
+            g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
+            g.run();
+        }
+        for round in 0..times {
+            let current = 1 + 4 * round;
+            let request = g.pending().cloned().unwrap();
+            assert!(matches!(request.kind, RequestKind::ChooseTarget { .. }));
+            assert_eq!(g.state.player(ACTIVE).poison(), current);
+            assert_eq!(g.state.obj(creature).counters(CounterKind::PlusOne), i32::from(current));
+            g.answer(request.id, ACTIVE, Answer::Targets(vec![Target::Object(creature), Target::Player(ACTIVE)])).unwrap();
+            g.run();
+            for player in [ACTIVE, FIRST] {
+                let request = g.pending().cloned().unwrap();
+                assert_eq!(request.player, player);
+                assert!(matches!(request.kind, RequestKind::ChooseReplacement { .. }));
+                assert_eq!(g.state.player(ACTIVE).poison(), current);
+                assert_eq!(g.state.obj(creature).counters(CounterKind::PlusOne), i32::from(current));
+                g.answer(request.id, player, Answer::Index(0)).unwrap();
+                g.run();
+            }
+            assert_eq!(g.state.player(ACTIVE).poison(), current + 4);
+            assert_eq!(g.state.obj(creature).counters(CounterKind::PlusOne), i32::from(current + 4));
+        }
+        assert_eq!(g.state.player(FIRST).life, if combat { 19 } else { 20 });
+        assert_eq!(g.log.iter().filter(|r| matches!(r.event,
+            Event::CountersPut { amount: 4, by: ACTIVE, .. })).count(), usize::from(times));
+    }
+}
+
 /// CR 616.1, 800.4a: a creature returned by its controller's concession is now affected by its surviving
 /// controller's Doubling Seasons, including when its own counter-replacement question was already outstanding.
 /// Reachable with Ray of Command taking Vampire Nighthawk, Plague Stinger in combat, and two Seasons on each side.
@@ -1062,6 +1252,66 @@ fn counter_result_rechecks_controller_during_its_own_replacement_choice() {
     g.run();
     assert!(g.log.iter().any(|r| matches!(r.event,
         Event::CountersPut { object, kind: CounterKind::MinusOne, amount: 4, by: ACTIVE, .. } if object == nighthawk)));
+}
+
+/// The same outstanding-choice concession now returns the creature to Melira's protection. No replacement of the
+/// prohibited placement may be offered or applied (CR 101.2, 611.3a), even though damage itself was already dealt.
+#[test]
+fn counter_result_rechecks_prohibition_during_its_own_replacement_choice() {
+    let mut g = game();
+    put(&mut g, &MELIRA, ACTIVE);
+    put(&mut g, &REVIEW_SEASON, ACTIVE);
+    put(&mut g, &REVIEW_SEASON, ACTIVE);
+    put(&mut g, &REVIEW_SEASON, FIRST);
+    put(&mut g, &REVIEW_SEASON, FIRST);
+    let stinger = put(&mut g, &REVIEW_STINGER, ACTIVE);
+    let nighthawk = put(&mut g, &LIFELINKER, ACTIVE);
+    let controller_source = put(&mut g, &PYROHEMIA, FIRST);
+    cantrip_api::Game::add_effect(&mut cx(&mut g), controller_source, nighthawk, EffectKind::Control(FIRST), Duration::EndOfTurn);
+    g.state.set_attackers(vec![Attacker { blocked: true,
+        ..Attacker::new(stinger, Target::Player(FIRST), FIRST, TypeSet::NONE) }]);
+    g.state.set_blocks(vec![Block { blocker: nighthawk, attacker: stinger, first_strike: false }]);
+    g.state.update_turn(|t| t.set_step(Step::CombatDamage));
+    g.state.frame_push(Frame::new(FrameKind::BeginStep));
+    g.run();
+    assert_eq!(g.pending().unwrap().player, FIRST);
+    assert!(matches!(g.pending().unwrap().kind, RequestKind::ChooseReplacement { .. }));
+    g.concede(FIRST);
+    assert_eq!(g.state.obj(nighthawk).controller, ACTIVE);
+    assert!(!matches!(g.pending().map(|r| &r.kind), Some(RequestKind::ChooseReplacement { .. })));
+    assert_eq!(g.state.obj(nighthawk).counters(CounterKind::MinusOne), 0);
+    assert!(!g.log.iter().any(|r| matches!(r.event, Event::CountersPut { kind: CounterKind::MinusOne, .. })));
+    assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Damage { .. })).count(), 2);
+}
+
+/// CR 614.12: entry counters use the prospective battlefield controller, not the object's controller/owner in its
+/// previous zone. Doubling Season and Melira must both judge the proposed entry, including the post-replacement check.
+#[test]
+fn entering_counters_keep_the_prospective_controller_for_choices_and_prohibitions() {
+    for zone in [Zone::graveyard(YOU), Zone::STACK] {
+        for banned in [false, true] {
+            let mut g = game();
+            let seasons = [put(&mut g, &REVIEW_SEASON, ACTIVE), put(&mut g, &REVIEW_SEASON, ACTIVE)];
+            put(&mut g, &MELIRA, if banned { ACTIVE } else { YOU });
+            let card = g.cards.id_of(&LIFELINKER);
+            let object = g.state.push_obj(Obj::new(card, YOU, zone));
+            g.state.zone_push(zone, object);
+            let mut counts = [0; CounterKind::COUNT];
+            counts[CounterKind::MinusOne as usize] = 1;
+            let counts = crate::counters::entering(&mut cx(&mut g), object, ACTIVE, LAST, counts);
+            assert_eq!(counts[CounterKind::MinusOne as usize], if banned { 0 } else { 4 });
+            assert_eq!(g.state.obj(object).controller, YOU, "preparing an entry does not change its old-zone object");
+            assert_eq!(g.state.obj(object).counters(CounterKind::MinusOne), 0);
+            if banned {
+                assert!(g.pending().is_none(), "a prohibited entry counter offers no replacement order");
+            } else {
+                let request = g.pending().unwrap();
+                assert_eq!(request.player, ACTIVE);
+                assert!(matches!(&request.kind, RequestKind::ChooseReplacement { subject: Some(id), sources, .. }
+                    if *id == object && *sources == seasons));
+            }
+        }
+    }
 }
 
 #[test]
