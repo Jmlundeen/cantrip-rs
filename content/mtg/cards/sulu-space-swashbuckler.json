@@ -1,0 +1,11 @@
+{
+  "name": "Sulu, Space Swashbuckler",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Human Pilot",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "First strike\nWhenever Sulu becomes tapped, if an Equipment or Spacecraft entered the battlefield under your control this turn, draw a card.",
+  "keywords": [
+    "FirstStrike"
+  ]
+}

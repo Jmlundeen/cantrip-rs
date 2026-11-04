@@ -1,0 +1,42 @@
+# Sulu, Space Swashbuckler: "if an Equipment or Spacecraft entered the battlefield under your control this turn" (CR
+# 603.4). On turn 2 Bot2's Adaptive Omnitool enters under Bot2's control, and Bot2's Rapier Wit taps Sulu: Sulu became
+# tapped, but no Equipment entered under Bot1's control, so Bot1 draws nothing.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Sulu, Space Swashbuckler
+Island x17
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Adaptive Omnitool
+Rapier Wit
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sulu, Space Swashbuckler.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Adaptive Omnitool.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Rapier Wit.Cast(Sulu, Space Swashbuckler)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Sulu, Space Swashbuckler.Tapped = true
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Battlefield.Adaptive Omnitool.Subtypes = Equipment

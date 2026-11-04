@@ -1,0 +1,43 @@
+# Sulu, Space Swashbuckler: "Whenever Sulu becomes tapped, if an Equipment or Spacecraft entered the battlefield under your
+# control this turn, draw a card" (CR 603.4, 603.2e). On turn 3 the Adaptive Omnitool enters and Sulu attacks and becomes
+# tapped, so Bot1 draws; on turn 5 Sulu attacks again with nothing entering that turn, and draws nothing.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Plains
+Sulu, Space Swashbuckler
+Adaptive Omnitool
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sulu, Space Swashbuckler.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Adaptive Omnitool.Cast
+? Bot1.Hand.Count = 3
+Bot1.Attack(Sulu, Space Swashbuckler > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 4
+[T5 Bot1.Main1]
+Bot1.Attack(Sulu, Space Swashbuckler > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 5
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Sulu, Space Swashbuckler.Tapped = true
+Bot1.Battlefield.Adaptive Omnitool.Types = Artifact
+Bot1.Battlefield.Adaptive Omnitool.Subtypes = Equipment

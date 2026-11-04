@@ -1,0 +1,38 @@
+# Sulu, Space Swashbuckler: "if an Equipment or Spacecraft entered the battlefield under your control this turn" (CR
+# 603.4). On turn 3 Wurmwall Sweeper, a Spacecraft and no Equipment, enters, and Sulu attacks and becomes tapped: Bot1
+# draws a card.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Plains
+Sulu, Space Swashbuckler
+Wurmwall Sweeper
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sulu, Space Swashbuckler.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 3
+Bot1.Attack(Sulu, Space Swashbuckler > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 4
+
+[Expect]
+Bot1.Battlefield.Sulu, Space Swashbuckler.Tapped = true
+Bot1.Battlefield.Wurmwall Sweeper.Subtypes = Spacecraft
