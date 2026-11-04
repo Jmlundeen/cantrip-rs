@@ -1722,7 +1722,15 @@ fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: Va
             cx.s().zone(Zone::hand(player)).iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect()
         }
         VariableCost::BlightX => blight_candidates(cx, player),
+        VariableCost::TapX(filter) => tap_x_candidates(cx, source, player, filter, false, by),
     }
+}
+
+/// The permanents "Tap X untapped [permanents] you control" may tap (CR 118.3): those of `player`'s that pass the filter
+/// (which names them untapped), but the source when the same cost has {T}, which taps it (`pays_permanents`).
+fn tap_x_candidates(cx: &Cx, source: ObjectId, player: PlayerId, filter: ObjectFilter, tap: bool, by: Option<Linked>) -> Vec<ObjectId> {
+    let asker = Asker { source, controller: player, by, spell: false };
+    cx.permanents_of(player).into_iter().filter(|&id| !(tap && id == source) && filter(cx, &asker, id)).collect()
 }
 
 /// The most a blight X may be announced as (CR 701.68a, 601.2b): the greatest toughness among the creatures its payer controls,
@@ -1760,7 +1768,8 @@ fn types_among(cx: &Cx, cards: &[ObjectId]) -> usize {
 /// Whether a variable cost could be paid at all: X may be zero, "one or more" needs one, and the exile needs enough types.
 fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost, paid: Option<CostFor>) -> bool {
     match variable {
-        VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } | VariableCost::RemoveAnyNumberOfCounters(_) => true,
+        // X may be 0 (CR 107.3a).
+        VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } | VariableCost::RemoveAnyNumberOfCounters(_) | VariableCost::TapX(_) => true,
         // Blight X, even X = 0, needs a creature you control to put the counters on (CR 701.68b).
         VariableCost::BlightX => !blight_candidates(cx, player).is_empty(),
         VariableCost::SacrificeOneOrMore(_) | VariableCost::DiscardOneOrMore(_) => !variable_candidates(cx, source, player, variable, paid, None).is_empty(),
@@ -1811,7 +1820,8 @@ fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost,
 fn choose_variable_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, variable: VariableCost, candidates: Vec<ObjectId>, x: u32) -> R<(Vec<ObjectId>, Vec<ObjectId>)> {
     match variable {
         // The counters are put by `pay_blight`, on the creature `choose_blight` chose.
-        VariableCost::DiscardOneOrMore(_) | VariableCost::RemoveAnyNumberOfCounters(_) | VariableCost::BlightX => Ok((Vec::new(), Vec::new())),
+        // A tap X cost is a tap cost by the time anything is chosen (`activate`).
+        VariableCost::DiscardOneOrMore(_) | VariableCost::RemoveAnyNumberOfCounters(_) | VariableCost::BlightX | VariableCost::TapX(_) => Ok((Vec::new(), Vec::new())),
         VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => {
             if x == 0 {
                 return Ok((Vec::new(), Vec::new()));
@@ -10036,10 +10046,16 @@ fn activate(
         item.modes = mask;
     }
     // CR 601.2b by way of 602.2b: the way of paying a cost that names a choice is chosen before X and the targets.
-    let whole = choose_cost_way(cx, player, source, ability, def, paid, by)?;
+    let mut whole = choose_cost_way(cx, player, source, ability, def, paid, by)?;
+    // "Tap X untapped [permanents] you control" (CR 118.3): X can't be announced past the permanents that could pay it.
+    let tap_x = match whole.variable {
+        Some(VariableCost::TapX(filter)) => Some((filter, tap_x_candidates(cx, source, player, filter, whole.tap, by).len().min(usize::from(u16::MAX)) as u16)),
+        _ => None,
+    };
     if mana.x > 0 {
         // "X target lands" cannot be announced past the legal targets there are (CR 601.2c, 602.2b).
         let cap = x_target_cap(cx, &Asker { source, controller: player, by, spell: false }, def);
+        let cap = tap_x.map_or(cap, |(_, most)| cap.min(most));
         let n = announce(cx, player, source, mana, mana.x, least_x(def.x_cant_be_zero), cap)?;
         mana.generic += u32::from(n) * u32::from(mana.x);
         item.x = n;
@@ -10059,6 +10075,20 @@ fn activate(
         }
         _ => None,
     };
+    // CR 107.3a, 601.2b by way of 602.2b: "Tap X untapped [permanents] you control" announces X with the rest, once for every X
+    // of the ability (CR 107.3i: an {X} in its mana cost has announced it already), and is then a cost that taps X of them,
+    // chosen as the cost is paid (CR 601.2h).
+    if let Some((filter, most)) = tap_x {
+        if mana.x == 0 {
+            item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), u32::from(most), false, 0, 0, VariableCost::TapX(filter).governs())? as u16;
+        }
+        // One permanents choice can't hold the X to tap beside another cost's permanents (`Cost::and` would make a
+        // sacrifice and the tap one choice). No printed card has both; one that did is refused, not paid as another cost.
+        if whole.permanents.is_some() {
+            return Err(Stop::Cancel);
+        }
+        whole = Cost { variable: None, ..whole.and(Cost::tap_untapped(u32::from(item.x), filter)) };
+    }
     announce_twobrids(cx, player, source, &mut mana, AnyMana::No)?;
     let life = announce_life(cx, player, source, &mut mana, AnyMana::No, paid)?;
     // What the mana paying its cost pays for (CR 106.6): the source as the ability is activated, as it begins to be put on

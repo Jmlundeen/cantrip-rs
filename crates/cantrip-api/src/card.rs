@@ -964,6 +964,12 @@ pub enum VariableCost {
     /// than the greatest toughness among creatures you control": Soul Immolation. X is the spell's X (CR 107.3i, its `x`), the
     /// -1/-1 counters it puts on the one creature chosen as the cost is chosen (`Cost::blight` is the fixed N of "blight N").
     BlightX,
+    /// An activated ability's "Tap X untapped [permanents] you control" (CR 118.3, 602.2b): X is announced as the ability is
+    /// activated (CR 107.3a, 601.2b), up to the permanents there are that could pay it, and is the ability's X
+    /// (`StackItem::x`, one value for every X of it, CR 107.3i: Necron Overlord's {X} too). The permanents are then chosen and
+    /// tapped as a tap cost of X of them (`Cost::tap_untapped`). The filter names the untapped permanents. Secluded
+    /// Starforge, Glacian, Merchant's Dockhand. Not a mana ability's (Hazel of the Rootbloom's): `mana_ability` refuses it.
+    TapX(ObjectFilter),
 }
 
 impl VariableCost {
@@ -975,6 +981,7 @@ impl VariableCost {
             VariableCost::SacrificeWithPowerX(_) => "the least power of the creature you sacrifice",
             VariableCost::RemoveAnyNumberOfCounters(_) => "the number of counters you remove",
             VariableCost::BlightX => "the number of -1/-1 counters you put on a creature you control",
+            VariableCost::TapX(_) => "the number of permanents you tap",
             _ => "",
         }
     }

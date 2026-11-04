@@ -80,6 +80,12 @@ pub const fn tap_untapped(n: u32, filter: ObjectFilter) -> Cost {
     Cost::tap_untapped(n, filter)
 }
 
+/// "Tap X untapped [permanents] you control" (CR 118.3, 107.3a): X announced as the ability is activated, then that many
+/// permanents that pass the filter tapped (`VariableCost::TapX`). The ability's effect reads X as `StackItem::x`.
+pub const fn tap_x_untapped(filter: ObjectFilter) -> Cost {
+    Cost { variable: Some(VariableCost::TapX(filter)), ..Cost::NONE }
+}
+
 /// "Discard N cards" (CR 701.9): any cards of the hand.
 pub const fn discard_cards(n: u8) -> Cost {
     Cost { discard: Discards::one(n, None), ..Cost::NONE }
@@ -268,6 +274,7 @@ pub const fn ability(cost: Cost, effect: Effect, text: &'static str) -> AbilityD
 
 /// A mana ability (CR 605.1a): pay `cost`, and what `adds` says is added at once, never on the stack (CR 605.3).
 pub const fn mana_ability(cost: Cost, adds: Adds, text: &'static str) -> AbilityDef {
+    assert!(!matches!(cost.variable, Some(VariableCost::TapX(_))), "a mana ability's tap X cost is not supported yet");
     AbilityDef::Activated(ActivatedDef {
         text,
         cost,
