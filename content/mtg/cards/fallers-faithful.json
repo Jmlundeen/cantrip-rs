@@ -1,0 +1,8 @@
+{
+  "name": "Faller's Faithful",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Human Wizard",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "When this creature enters, destroy up to one other target creature. If that creature wasn't dealt damage this turn, its controller draws two cards."
+}

@@ -1,0 +1,58 @@
+# "If that creature wasn't dealt damage this turn": only damage dealt to the target counts. Bot1 Shocks Bot2's Ornithopter (it dies), and Faller's Faithful
+# then destroys Bot2's Colossal Dreadmaw, which was dealt none this turn, so Bot2 draws two cards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Shock
+Faller's Faithful
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Colossal Dreadmaw
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Colossal Dreadmaw.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter; Black Lotus
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Faller's Faithful.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Colossal Dreadmaw; Ornithopter; Black Lotus
+Bot2.Hand.Count = 4

@@ -1,0 +1,56 @@
+# "If that creature wasn't dealt damage this turn" (CR 120.3): Bot1 Shocks Bot2's Colossal Dreadmaw (6/6, it survives), then Faller's Faithful destroys
+# it. It was dealt damage this turn, so Bot2 draws nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Shock
+Faller's Faithful
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Colossal Dreadmaw
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Colossal Dreadmaw.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Colossal Dreadmaw.Damage = 2
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Faller's Faithful.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Colossal Dreadmaw; Black Lotus
+Bot2.Hand.Count = 3
