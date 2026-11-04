@@ -1,0 +1,11 @@
+{
+  "name": "Dawnstrike Vanguard",
+  "manaCost": "{5}{W}",
+  "type": "Creature — Human Knight",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "Lifelink\nAt the beginning of your end step, if you control two or more tapped creatures, put a +1/+1 counter on each creature you control other than this creature.",
+  "keywords": [
+    "Lifelink"
+  ]
+}

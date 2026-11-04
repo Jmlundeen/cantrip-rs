@@ -1,0 +1,49 @@
+# Dawnstrike Vanguard: "At the beginning of your end step, if you control two or more tapped creatures, put a +1/+1 counter on each
+# creature you control other than this creature" (CR 603.4, 122.1). Bot1 casts it with three Moxen and Black Lotus and two Memnites
+# on turn one. On turn three the Vanguard and one Memnite attack (two tapped creatures, the Vanguard itself one of them, the lower
+# bound): the end step puts a counter on both Memnites, the tapped and the untapped, and none on the Vanguard, and its lifelink
+# gains 4. On turn five only one Memnite attacks (one tapped creature, just under the bound) and nothing is put on.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Black Lotus
+Dawnstrike Vanguard
+Memnite
+Memnite
+Plains x10
+
+[Bot2 Deck]
+Plains x13
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Dawnstrike Vanguard.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Dawnstrike Vanguard > Bot2; Memnite#1 > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Life = 24
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Memnite#1.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Memnite#2.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Dawnstrike Vanguard.Power = 4
+[T5 Bot1.Main1]
+Bot1.Attack(Memnite#1 > Bot2)
+[T5 Bot1.Main2]
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Memnite#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Memnite#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Dawnstrike Vanguard.Power = 4
+Bot1.Battlefield.Dawnstrike Vanguard.Keywords = Lifelink
