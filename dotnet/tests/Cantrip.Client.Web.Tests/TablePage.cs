@@ -559,6 +559,7 @@ public sealed record CardState(
     string Rules = "",
     string Status = "",
     string Annotation = "",
+    string Note = "",
     string Counters = "",
     string Damage = "",
     string FaceDownName = "",

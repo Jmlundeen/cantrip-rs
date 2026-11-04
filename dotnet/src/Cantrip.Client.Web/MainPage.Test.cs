@@ -370,6 +370,8 @@ public sealed partial class MainPage
                         json.WriteString("annotation", _looks.TryGetValue(card.Handle, out CardLook? shown) && shown.Annotation is { Length: > 0 } written
                             ? written
                             : card.Choices.Count == 1 ? card.Choices[0].Value : string.Empty);
+                        // What its tooltip says of it, below its rules ("Exiled with The Darkness Crystal.").
+                        json.WriteString("note", shown?.Note ?? string.Empty);
                         WriteBox(json, toPage.TransformBounds(box));
                         if (lower is { } down && raise is { } up)
                         {

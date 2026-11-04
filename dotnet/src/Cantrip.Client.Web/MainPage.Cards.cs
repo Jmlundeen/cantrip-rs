@@ -973,7 +973,10 @@ public sealed partial class MainPage
             && !_picked.Contains(handle);
     }
 
-    /// <summary>The cards in exile that a permanent is holding "until it leaves the battlefield" (CR 610.3).</summary>
+    /// <summary>
+    /// The cards in exile linked to a permanent (CR 607.2a): those it holds "until it leaves the battlefield" (CR 610.3)
+    /// and those exiled with it for good.
+    /// </summary>
     private static IEnumerable<ObjectView> HeldBy(GameClient client, ViewHandle holder) => Holdings(client).Held[holder];
 
     /// <summary>The permanents attached to this one: the Auras enchanting it and the Equipment attached to it (CR 301.5c, 303.4).</summary>
@@ -1034,7 +1037,9 @@ public sealed partial class MainPage
         {
             return card.Kind == ObjectKindView.CardCopy
                 ? $"Prepared by {holder.Name}. Cast it from here for as long as {holder.Name} stays prepared on the battlefield."
-                : $"Exiled by {holder.Name} until it leaves the battlefield.";
+                : card.ExiledUntilLeaves
+                    ? $"Exiled by {holder.Name} until it leaves the battlefield."
+                    : $"Exiled with {holder.Name}.";
         }
 
         return null;

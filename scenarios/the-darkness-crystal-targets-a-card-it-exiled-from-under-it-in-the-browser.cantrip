@@ -1,0 +1,76 @@
+# Browser
+# A card the Crystal exiled is drawn tucked under it, and its ability targets that card in exile, which nothing did before.
+# On turn 3 Bot1's Shock kills Bot2's Memnite, and the Crystal exiles it for good: its tooltip says "Exiled with", not
+# "until it leaves the battlefield". Portable Hole exiles Bot2's Ornithopter until the Hole leaves (CR 610.3), and that
+# one says so. On turn 5 Bot1's page aims the Crystal's ability at the Memnite, which enters as a 3/3.
+# The Darkness Crystal {2}{B}{B}: Legendary Artifact
+#   Black spells you cast cost {1} less to cast.
+#   If a nontoken creature an opponent controls would die, instead exile it and you gain 2 life.
+#   {4}{B}{B}, {T}: Put target creature card exiled with The Darkness Crystal onto the battlefield tapped under your control with two additional +1/+1 counters on it.
+
+[Bot1 Deck]
+The Darkness Crystal
+Mox Jet
+Mox Ruby
+Mox Pearl
+Swamp
+Shock
+Swamp
+Portable Hole
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Memnite
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Darkness Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Portable Hole.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Memnite; Ornithopter
+? Client.Bot1.OpponentExile.Memnite.Note = Exiled with The Darkness Crystal.
+? Client.Bot1.OpponentExile.Ornithopter.Note = Exiled by Portable Hole until it leaves the battlefield.
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.The Darkness Crystal.Activate(Bot2.Exile.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+[T6 Bot2.Upkeep]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Battlefield.Memnite.Tapped = true
+Bot1.Battlefield.Memnite.Power = 3

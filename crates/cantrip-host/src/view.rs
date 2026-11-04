@@ -1621,6 +1621,7 @@ impl<'a> Projector<'a> {
             && s.obj(link.by).zone.is(ZoneKind::Battlefield)
         {
             view.exiled_with = handles.handle(link.by);
+            view.exiled_until_leaves = link.until_leaves;
         }
         if let Some(item) = item {
             // A fused split spell's targets each say whose half they are (CR 702.102b): its left half's specs come first.

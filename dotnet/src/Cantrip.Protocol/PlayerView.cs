@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 226;
+    public const int ProtocolVersion = 227;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -372,9 +372,9 @@ public sealed class ObjectView
     public List<SpellTargetView> Targets { get; set; } = [];
 
     /// <summary>
-    /// For a card in exile "until" a permanent leaves the battlefield (CR 610.3), as Portable Hole's victim: that
-    /// permanent, while it is still there and so still holding the card. None for everything else, so a client can show
-    /// the card tucked under what is keeping it.
+    /// For a card in exile linked to a permanent still on the battlefield (CR 607.2a), as Portable Hole's victim or a
+    /// creature card The Darkness Crystal exiled: that permanent. None for everything else, so a client can show the card
+    /// tucked under it. Whether the card comes back when that permanent leaves is <see cref="ExiledUntilLeaves"/>.
     /// <para>
     /// A preparation card's copy (CR 722.3c, <see cref="ObjectKindView.CardCopy"/>) names its permanent here too.
     /// It is the same fact — this card is in exile because that permanent is on the battlefield keeping it there —
@@ -677,6 +677,13 @@ public sealed class ObjectView
     /// </summary>
     [Key(62)]
     public List<ObjectView> MergedWith { get; set; } = [];
+
+    /// <summary>
+    /// Whether the card in exile under <see cref="ExiledWith"/> returns once that permanent leaves the battlefield (an
+    /// "until" exile, CR 610.3), as Portable Hole's does; The Darkness Crystal's stays. False for everything else.
+    /// </summary>
+    [Key(65)]
+    public bool ExiledUntilLeaves { get; set; }
 
     /// <summary>
     /// What is printed on this card besides what it shows, to be read beside it: its other face, then its prepare spell,

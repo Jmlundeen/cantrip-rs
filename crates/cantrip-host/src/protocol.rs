@@ -530,7 +530,14 @@ pub struct ObjectView {
     pub known_by: Vec<i32>,
     /// What this spell or ability on the stack is aimed at, in printed order.
     pub targets: Vec<SpellTargetView>,
+    /// For a card in exile linked to a permanent still on the battlefield (CR 607.2a), as Portable Hole's victim or a creature
+    /// card The Darkness Crystal exiled: that permanent, so a client can show the card tucked under it. None for anything
+    /// else. A preparation card's copy (CR 722.3c) names its permanent here too.
     pub exiled_with: ViewHandle,
+    /// Whether the card in exile under `exiled_with` returns once that permanent leaves the battlefield (an "until" exile,
+    /// CR 610.3): Portable Hole's, not The Darkness Crystal's. False for anything else.
+    #[serde(default)]
+    pub exiled_until_leaves: bool,
     pub produces_mana: bool,
     pub face_down_name: String,
     pub monstrous: bool,
