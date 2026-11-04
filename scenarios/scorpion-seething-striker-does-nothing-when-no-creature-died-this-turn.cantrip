@@ -1,0 +1,26 @@
+# Scorpion, Seething Striker: no creature died this turn (CR 603.4), so nothing is put on the stack at the end step: Bot1 draws nothing
+# and Scorpion stays a 3/3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Scorpion, Seething Striker
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Scorpion, Seething Striker.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Scorpion, Seething Striker.Power = 3
+Bot1.Hand.Count = 4

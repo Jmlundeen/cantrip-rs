@@ -1,0 +1,41 @@
+# Scorpion, Seething Striker {3}{B} 3/3: "At the beginning of your end step, if a creature died this turn, target creature you control
+# connives" (CR 603.4, 701.50). Lightning Bolt kills Bot1's own Ornithopter; at the end step Scorpion draws an Island and discards Sol
+# Ring, a nonland card, so it gets a +1/+1 counter and is a 4/4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Scorpion, Seething Striker
+Ornithopter
+Lightning Bolt
+Sol Ring
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Scorpion, Seething Striker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Sol Ring)
+
+[Expect]
+Bot1.Battlefield.Scorpion, Seething Striker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Scorpion, Seething Striker.Power = 4
+Bot1.Battlefield.Scorpion, Seething Striker.Keywords = Deathtouch
+Bot1.Graveyard = Sol Ring; Ornithopter; Lightning Bolt; Black Lotus
