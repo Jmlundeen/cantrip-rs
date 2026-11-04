@@ -1,0 +1,68 @@
+# Terminal Velocity {4}{R}{R}: "You may put an artifact or creature card from your hand onto the battlefield. That permanent gains haste, 'When this
+# permanent leaves the battlefield, it deals damage equal to its mana value to each creature,' and 'At the beginning of your end step, sacrifice this
+# permanent.'" Bot1 has an Ornithopter (0/2) out; Bot2 has a Memnite (1/1) and a Hill Giant (3/3). On turn 3 Bot1 pays exactly six (Black Lotus' three red and
+# three Moxen). A land is no artifact or creature card, so the Island drawn that turn is refused; Grizzly Bears (mana value 2) come in and attack at once
+# (haste): 2 damage, unblocked. At Bot1's end step the Bears are sacrificed and, leaving, deal 2 to each creature: the Ornithopter and the Memnite
+# die, the Hill Giant lives with 2 damage.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Terminal Velocity
+Grizzly Bears
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Hill Giant
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Hill Giant.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Terminal Velocity.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Island)
+Bot1.Choose(Grizzly Bears)
+? Bot1.Battlefield.Grizzly Bears.Keywords = Haste
+? Bot1.Hand.Count = 1
+Bot1.Attack(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Grizzly Bears; Terminal Velocity; Black Lotus
+Bot2.Graveyard = Memnite; Black Lotus
+Bot2.Battlefield.Hill Giant.Damage = 2

@@ -1,0 +1,53 @@
+# Terminal Velocity: "it deals damage equal to its mana value to each creature": the smallest damage there is, 1, from Aegis Turtle (mana value 1). Bot2's
+# Memnite (1/1) dies to it; Bot2's Hill Giant (3/3) takes 1, and the Turtle, sacrificed at Bot1's end step, is the one that dealt it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Terminal Velocity
+Aegis Turtle
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Hill Giant
+Memnite
+Island x20
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Hill Giant.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Terminal Velocity.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Aegis Turtle)
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Aegis Turtle; Terminal Velocity; Black Lotus
+Bot2.Graveyard = Memnite; Black Lotus
+Bot2.Battlefield.Hill Giant.Damage = 1

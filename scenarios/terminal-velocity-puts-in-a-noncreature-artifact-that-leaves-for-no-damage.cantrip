@@ -1,0 +1,47 @@
+# Terminal Velocity: "an artifact or creature card" - a noncreature artifact qualifies. Bot1 puts Black Lotus (mana value 0) onto the battlefield from hand
+# (the second one, from hand) onto the battlefield; a land is refused. It is sacrificed at Bot1's end step and, leaving, deals damage equal to its mana value,
+# 0, to each creature: Bot2's Memnite takes none. The six mana come from the first Lotus (red 3) and three Moxen.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Terminal Velocity
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Terminal Velocity.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Island)
+Bot1.Choose(Black Lotus)
+? Bot1.Battlefield.Black Lotus.Keywords = Haste
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Black Lotus; Terminal Velocity; Black Lotus
+Bot2.Battlefield.Memnite.Damage = 0
