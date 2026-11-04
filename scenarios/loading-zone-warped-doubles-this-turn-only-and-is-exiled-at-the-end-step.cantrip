@@ -1,0 +1,47 @@
+# Loading Zone's warp {G} (CR 702.185a): Mox Emerald's {G} pays it exactly (the pool is empty after). While it is on the battlefield, Bot1's Walking Ballista cast for X = 1 enters with
+# 2 counters. At the beginning of the next end step the Zone is exiled; on turn 3 the Ballista's "{4}: Put a +1/+1 counter" then puts just one more: 3.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Loading Zone
+Walking Ballista
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Loading Zone.Cast(Ability: Warp)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+[Bot1.End]
+[T3 Bot1.Main1]
+? Exile = Loading Zone
+Bot1.Battlefield.Walking Ballista.Activate(Ability: {4})
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 3
+Exile = Loading Zone

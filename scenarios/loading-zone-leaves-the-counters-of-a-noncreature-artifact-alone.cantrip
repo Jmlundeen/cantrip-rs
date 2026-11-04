@@ -1,0 +1,35 @@
+# Loading Zone only doubles counters put on a creature, Spacecraft or Planet you control (CR 614.1a): Bot1's Chalice of the Void, cast for X = 1, is an artifact of none of
+# those kinds and enters with its single charge counter, though the Zone is on the battlefield (cast with a Black Lotus and a Mox Jet, paid exactly).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Emerald
+Loading Zone
+Chalice of the Void
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Loading Zone.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chalice of the Void.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Chalice of the Void.Counters.Charge = 1
+Bot1.Battlefield.Loading Zone.Types = Enchantment

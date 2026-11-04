@@ -1,0 +1,6 @@
+{
+  "name": "Loading Zone",
+  "manaCost": "{3}{G}",
+  "type": "Enchantment",
+  "oracleText": "If one or more counters would be put on a creature, Spacecraft, or Planet you control, twice that many of each of those kinds of counters are put on it instead.\nWarp {G} (You may cast this card from your hand for its warp cost. Exile this enchantment at the beginning of the next end step, then you may cast it from exile on a later turn.)"
+}

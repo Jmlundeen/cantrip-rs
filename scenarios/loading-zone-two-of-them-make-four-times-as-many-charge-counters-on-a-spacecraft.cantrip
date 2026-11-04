@@ -1,0 +1,60 @@
+# Loading Zone: each replacement effect applies once (CR 614.5), so two Loading Zones make four times as many counters (the ruling). Bot1 casts a Loading Zone and a Grizzly Bears on turn 1 and
+# the second Loading Zone on turn 3. On turn 5 it casts a Larval Scoutlander (a Spacecraft, not yet a creature); stationing it with the Bears (power 2) puts 2 x 4 = 8 charge counters on it, enough
+# for 7+ (it is a Spacecraft before it is a creature).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Loading Zone
+Grizzly Bears
+Loading Zone
+Larval Scoutlander
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Loading Zone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Loading Zone.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Larval Scoutlander.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Larval Scoutlander.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Replace(Loading Zone)
+? Bot1.Battlefield.Larval Scoutlander.Counters.Charge = 8
+? Bot1.Battlefield.Larval Scoutlander.Types = Artifact; Creature
+
+[Expect]
+Bot1.Battlefield.Larval Scoutlander.Power = 3
