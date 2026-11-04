@@ -1,0 +1,40 @@
+# Exosuit Savior: "When this creature enters, return up to one other target permanent you control to its owner's hand" (CR 400.3,
+# 115.1). Bot1's Memnite, a creature, goes back to its owner's hand and the lands stay.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Plains
+Memnite
+Exosuit Savior
+Plains x10
+
+[Bot2 Deck]
+Plains x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Exosuit Savior.Cast
+! Bot1.Target(Exosuit Savior)
+! Bot1.Target(Bot2.Battlefield.Plains)
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Plains
+Bot1.Battlefield.Exosuit Savior.Keywords = Flying
+Bot1.Battlefield = Plains; Mox Pearl; Mox Pearl; Mox Pearl; Exosuit Savior
+Bot1.Hand.Count = 3
