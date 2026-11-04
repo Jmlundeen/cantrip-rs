@@ -1,0 +1,8 @@
+{
+  "name": "Supportive Parents",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Human Citizen",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Tap two untapped creatures you control: Add one mana of any color."
+}
