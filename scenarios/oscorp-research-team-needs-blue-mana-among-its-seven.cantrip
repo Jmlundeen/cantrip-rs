@@ -1,0 +1,51 @@
+# Oscorp Research Team's {6}{U} needs a blue mana, not just seven (CR 107.4). On turn 3 Bot1 has seven mana with no blue (a second
+# Black Lotus for black and four Moxen): refused. The Mox Sapphire, drawn on turn 3, adds the blue and the ability resolves.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Oscorp Research Team
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Oscorp Research Team.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Oscorp Research Team.Activate(Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Oscorp Research Team.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 2
