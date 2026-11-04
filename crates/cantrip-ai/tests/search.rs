@@ -731,6 +731,17 @@ fn corpus_play(path: &Path, evaluator: &dyn Evaluator, tally: &Mutex<Tally>) {
     }
 }
 
+/// The cards merged with a permanent (CR 730.2) have no row of their own, but they are in the game, so a world's deal of the
+/// seat's unseen cards (checked exactly against its deck less what it has seen under `CANTRIP_VERIFY`) must count them.
+#[test]
+fn a_mutated_permanents_merged_cards_are_accounted_for_in_every_world() {
+    let evaluator = TractEvaluator::load(&tiny(), table()).unwrap();
+    let tally = Mutex::new(Tally::default());
+    corpus_play(&root().join("scenarios/snapdax-apex-of-the-hunt-mutate.cantrip"), &evaluator, &tally);
+    let t = tally.into_inner().unwrap();
+    assert!(t.refused.is_empty(), "{:#?}", t.refused);
+}
+
 #[test]
 fn searched_answers_are_accepted() {
     let evaluator = TractEvaluator::load(&tiny(), table()).unwrap();
