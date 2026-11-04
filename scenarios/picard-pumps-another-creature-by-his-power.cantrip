@@ -1,0 +1,33 @@
+# "{1}, {T}: Another target creature gets +X/+X until end of turn, where X is Picard's power" (CR 608.2h): Picard is a 2/2,
+# so the Ornithopter is 2/4 - and Picard, being "another", could not be the target.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Picard, Leading by Example
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Picard, Leading by Example.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Picard, Leading by Example.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Picard, Leading by Example.Tapped = true

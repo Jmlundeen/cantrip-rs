@@ -1,0 +1,44 @@
+# "Another target creature gets +X/+X until end of turn, where X is Picard's power." Depower makes Picard -2/2, and a
+# negative power gives X = 0 (CR 107.1b): the Ornithopter gets +0/+0 and stays a 0/2, not -2/0.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Picard, Leading by Example
+Ornithopter
+Depower
+Island
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Picard, Leading by Example.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Depower.Cast(Picard, Leading by Example)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Picard, Leading by Example.Power = -2
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Picard, Leading by Example.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Picard, Leading by Example.Tapped = true

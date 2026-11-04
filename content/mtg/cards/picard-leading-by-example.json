@@ -1,0 +1,8 @@
+{
+  "name": "Picard, Leading by Example",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{1}, {T}: Another target creature gets +X/+X until end of turn, where X is Picard's power. Activate only as a sorcery."
+}
