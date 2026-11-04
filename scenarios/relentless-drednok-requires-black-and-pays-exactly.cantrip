@@ -1,0 +1,52 @@
+# Three nonblack mana cannot pay {2}{B}; exactly {B}{R}{R} is spent before resolution (CR 602.2b).
+# Exiling is a cost, then the controller draws the top card and loses 1 life (CR 602.1a, 121.1, 119.3).
+
+[Bot1 Deck]
+Black Lotus
+Faithless Looting
+Relentless Drednok
+Mox Pearl
+Mox Jet
+Sol Ring
+Island
+Mountain
+Swamp
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+! Bot1.Hand.Relentless Drednok.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+! Bot1.Hand.Relentless Drednok.Cast(Mana: short)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Relentless Drednok; Island)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{R}{R}
+! Bot1.Graveyard.Relentless Drednok.Activate(Mana: short)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}{R}{R}
+Bot1.Graveyard.Relentless Drednok.Activate
+Bot1.Pass
+? Bot1.Mana =
+? Exile = Relentless Drednok
+? Bot1.Hand = Mountain; Swamp
+? Bot1.Life = 20
+? Stack.Count = 1
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20
+Bot1.Hand = Mountain; Swamp; Plains
+Bot1.Library.Count = 9
+Bot1.Graveyard = Faithless Looting; Island; Black Lotus
+Exile = Relentless Drednok

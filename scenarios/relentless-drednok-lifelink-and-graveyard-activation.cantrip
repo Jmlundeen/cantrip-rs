@@ -1,0 +1,54 @@
+# Both Drednoks trade in combat and each controller gains 1 life (CR 702.15b).
+# Only Bot1's graveyard card is exiled; its owner activates during Bot2's turn (CR 113.6m, 602.2).
+
+[Bot1 Deck]
+Relentless Drednok
+Mox Jet
+Black Lotus
+Swamp x4
+Mountain
+Plains
+Island x10
+
+[Bot2 Deck]
+Relentless Drednok
+Mox Jet
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Relentless Drednok.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+! Bot1.Battlefield.Relentless Drednok.Activate
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Relentless Drednok.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Relentless Drednok > Bot2)
+Bot2.Block(Relentless Drednok > Relentless Drednok)
+[T3 Bot1.Main2]
+? Bot1.Life = 21
+? Bot2.Life = 21
+? Bot1.Graveyard = Relentless Drednok
+? Bot2.Graveyard = Relentless Drednok
+Bot1.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Graveyard.Relentless Drednok.Activate
+Bot1.Pass
+? Bot1.Mana =
+? Exile = Relentless Drednok
+? Bot1.Graveyard = Black Lotus
+? Bot2.Graveyard = Relentless Drednok
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 21
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Mountain; Plains
+Bot1.Library.Count = 10
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Relentless Drednok
+Exile = Relentless Drednok

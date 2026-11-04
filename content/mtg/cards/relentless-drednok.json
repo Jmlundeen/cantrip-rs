@@ -1,0 +1,11 @@
+{
+  "name": "Relentless Drednok",
+  "manaCost": "{B}",
+  "type": "Artifact Creature — Robot",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Lifelink\n{2}{B}, Exile this card from your graveyard: You draw a card and lose 1 life.",
+  "keywords": [
+    "Lifelink"
+  ]
+}
