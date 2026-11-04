@@ -1,0 +1,11 @@
+{
+  "name": "Starling, Aerial Ally",
+  "manaCost": "{4}{W}",
+  "type": "Legendary Creature — Human Hero",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Flying\nWhen Starling enters, another target creature you control gains flying until end of turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

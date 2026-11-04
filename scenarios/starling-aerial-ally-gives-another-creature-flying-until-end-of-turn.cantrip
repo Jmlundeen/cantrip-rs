@@ -1,0 +1,34 @@
+# Starling, Aerial Ally: "When Starling enters, another target creature you control gains flying until end of turn." Bot1 casts
+# it with a Memnite in play: the Memnite (not Starling) gains flying (CR 702.9b) until the turn ends (CR 514.2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Pearl
+Memnite
+Starling, Aerial Ally
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Starling, Aerial Ally.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Keywords = Flying
+? Bot1.Battlefield.Starling, Aerial Ally.Keywords = Flying
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield.Starling, Aerial Ally.Keywords = Flying
