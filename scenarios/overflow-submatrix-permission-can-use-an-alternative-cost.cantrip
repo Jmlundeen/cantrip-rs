@@ -1,0 +1,48 @@
+# Overflow grants permission, not an alternative cost, so Fires' free cost may be paid (CR 601.3, 118.9).
+# Two lands permit the two-mana Sable for free; three floated mana stay unspent, and Overflow refuses another cast.
+
+[Bot1 Deck]
+Overflow Submatrix
+Black Lotus
+Black Lotus
+Mox Ruby
+Faithless Looting
+Fires of Invention
+Bronze Sable
+Ornithopter
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Bronze Sable; Ornithopter)
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Overflow Submatrix.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Fires of Invention.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Bronze Sable.Cast(Ability: Without paying its mana cost)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{R}
+! Bot1.Graveyard.Ornithopter.Cast
+
+[Expect]
+Bot1.Battlefield.Bronze Sable.Counters.Finality = 1
+Bot1.Graveyard.Ornithopter.Power = 0

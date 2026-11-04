@@ -1,0 +1,52 @@
+# The own-turn limit still applies to an artifact creature with flash (CR 601.3, 604.1).
+# Six mana is floated in both turns, so the refusal is about permission, not mana or creature timing.
+
+[Bot1 Deck]
+Overflow Submatrix
+Black Lotus
+Mox Ruby
+Faithless Looting
+Sol Ring
+Darksteel Sentinel
+Sol Ring
+Mox Pearl
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Darksteel Sentinel; Swamp)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Overflow Submatrix.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot1.Battlefield.Sol Ring#1.Activate
+Bot1.Battlefield.Sol Ring#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {W}{R}{C}{C}{C}{C}
+! Bot1.Graveyard.Darksteel Sentinel.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring#1.Activate
+Bot1.Battlefield.Sol Ring#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Darksteel Sentinel.Cast(Ability: Once during each)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Darksteel Sentinel.Counters.Finality = 1

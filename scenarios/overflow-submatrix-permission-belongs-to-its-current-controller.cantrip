@@ -1,0 +1,57 @@
+# "You" means Overflow's controller, not its owner (CR 109.5); Control Magic moves the graveyard permission to Bot2.
+# Both players discard eligible creatures; Bot2 casts one and cannot cast another, while Bot1 can no longer cast theirs.
+
+[Bot1 Deck]
+Overflow Submatrix
+Black Lotus
+Mox Ruby
+Faithless Looting
+Phyrexian Walker
+Island
+Island
+Island x16
+
+[Bot2 Deck]
+Control Magic
+Black Lotus
+Black Lotus
+Mox Ruby
+Faithless Looting
+Memnite
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Walker; Island)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Overflow Submatrix.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Memnite; Ornithopter)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Control Magic.Cast(Bot1.Battlefield.Overflow Submatrix)
+Bot2.Pass
+Bot1.Pass
+Bot2.Graveyard.Memnite.Cast(Ability: Once during each)
+Bot2.Pass
+Bot1.Pass
+! Bot2.Graveyard.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Phyrexian Walker.Cast
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Memnite.Counters.Finality = 1
+Bot2.Graveyard.Ornithopter.Power = 0
+Bot1.Graveyard.Phyrexian Walker.Power = 0
+Bot2.Battlefield.Overflow Submatrix.Power = 3

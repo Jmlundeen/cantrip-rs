@@ -1,0 +1,35 @@
+# Each Overflow is a separate permission (CR 601.3); two copies permit two graveyard casts in one turn.
+
+[Bot1 Deck]
+Overflow Submatrix
+Overflow Submatrix
+Black Lotus
+Black Lotus
+Mox Ruby
+Faithless Looting
+Memnite
+Ornithopter
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Memnite; Ornithopter)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Overflow Submatrix.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Overflow Submatrix.Cast
+Bot1.Graveyard.Memnite.Cast(Ability: Once during each)
+Bot1.Graveyard.Ornithopter.Cast(Ability: Once during each)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Memnite.Counters.Finality = 1
+Bot1.Battlefield.Ornithopter.Counters.Finality = 1

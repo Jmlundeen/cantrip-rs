@@ -1,0 +1,49 @@
+# Overflow's permission is optional, usable once per own turn, and resets next turn (CR 601.3, 604.1).
+# Two free artifact creatures are discarded; turn 1 passes unused, then one is cast on each of turns 3 and 5.
+
+[Bot1 Deck]
+Overflow Submatrix
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Faithless Looting
+Memnite
+Ornithopter
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Memnite; Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Overflow Submatrix.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T2 Bot2.Main1]
+? Bot1.Graveyard = Faithless Looting; Ornithopter; Memnite
+[T3 Bot1.Main1]
+Bot1.Graveyard.Memnite.Cast(Ability: Once during each)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Counters.Finality = 1
+! Bot1.Graveyard.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Graveyard.Ornithopter.Cast(Ability: Once during each)
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Memnite.Counters.Finality = 1
+Bot1.Battlefield.Ornithopter.Counters.Finality = 1
+Bot1.Battlefield.Overflow Submatrix.Counters.Finality = (absent)
