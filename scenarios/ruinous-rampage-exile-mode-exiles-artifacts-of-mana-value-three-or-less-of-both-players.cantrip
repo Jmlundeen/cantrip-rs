@@ -1,0 +1,58 @@
+# Ruinous Rampage, second mode: "Exile all artifacts with mana value 3 or less" (CR 406.2, 202.3). Each player has artifacts at and
+# under the limit (Bot1's Loxodon Warhammer, mana value exactly 3, and its three Moxen; Bot2's Moxen) which are exiled, not destroyed
+# (nothing goes to a graveyard but the spell), and one just past it (Bot2's Krark-Clan Ironworks, mana value 4) that stays. Bot2's Island
+# is not an artifact and stays, and nobody takes damage (the other mode is not chosen).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Loxodon Warhammer
+Ruinous Rampage
+Mountain x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Krark-Clan Ironworks
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Loxodon Warhammer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Krark-Clan Ironworks.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Ruinous Rampage.Cast
+Bot1.Modes(2)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Ruinous Rampage
+Bot2.Battlefield = Island; Krark-Clan Ironworks
+Bot2.Graveyard.Count = 0
+Exile.Count = 8
+Bot1.Life = 20
+Bot2.Life = 20

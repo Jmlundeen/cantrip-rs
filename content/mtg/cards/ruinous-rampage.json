@@ -1,0 +1,6 @@
+{
+  "name": "Ruinous Rampage",
+  "manaCost": "{1}{R}{R}",
+  "type": "Sorcery",
+  "oracleText": "Choose one —\n• Ruinous Rampage deals 3 damage to each opponent.\n• Exile all artifacts with mana value 3 or less."
+}

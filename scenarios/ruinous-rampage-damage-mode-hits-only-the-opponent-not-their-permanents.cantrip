@@ -1,0 +1,48 @@
+# Ruinous Rampage, first mode: "3 damage to each opponent" (CR 120.3, 102.2). Bot2 takes exactly 3 (17); Bot1 is not hurt, and Bot2's
+# Ornithopter (0/2) and Wrenn and Six (loyalty 3) are not damaged: it is damage to the opponent only, and the other mode (exiling cheap
+# artifacts) is not chosen, so all of the Moxen stay. "Choose one" takes exactly one mode: choosing both, or none, is refused.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Ruinous Rampage
+Mountain x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Wrenn and Six
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Ruinous Rampage.Cast
+! Bot1.Modes(1; 2)
+! Bot1.Modes(Count: 0)
+Bot1.Modes(1)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Life = 20
+Bot2.Battlefield = Mox Ruby; Mox Emerald; Ornithopter; Wrenn and Six
+Bot2.Battlefield.Wrenn and Six.Counters.Loyalty = 3
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot1.Battlefield.Count = 3
+Exile.Count = 0
