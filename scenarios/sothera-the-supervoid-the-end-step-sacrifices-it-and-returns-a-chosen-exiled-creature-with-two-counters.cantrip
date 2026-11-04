@@ -1,0 +1,67 @@
+# Sothera, the Supervoid (CR 603.4, 607.2a, 701.21a, 122.6): Bot1's Memnite and Ornithopter die on turns 5 and 7, each time exiling one of Bot2's creatures with Sothera. At Bot1's turn-7 end step Bot1 controls no creature, so Sothera is sacrificed and Bot1 chooses one of the two exiled creature cards to put onto the battlefield with two +1/+1 counters; on the earlier end steps every player controlled a creature and nothing happened.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Swamp
+Sothera, the Supervoid
+Memnite
+Lightning Bolt
+Ornithopter
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Memnite
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sothera, the Supervoid.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+? Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Ornithopter)
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Sothera, the Supervoid.Tapped = false
+? Exile = Ornithopter
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Memnite; Ornithopter
+[Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Bot1.Graveyard = Sothera, the Supervoid; Ornithopter; Lightning Bolt; Memnite; Lightning Bolt
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Tapped = false
+Exile = Memnite
