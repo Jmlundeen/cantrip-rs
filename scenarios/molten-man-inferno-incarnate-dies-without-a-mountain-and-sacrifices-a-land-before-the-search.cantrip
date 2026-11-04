@@ -1,0 +1,35 @@
+# Molten Man, Inferno Incarnate is 0/0 until he controls a Mountain, so with none he dies as soon as he enters, before his enters trigger
+# resolves (CR 704.5f). The ruling: the leaves-the-battlefield trigger then resolves first, and Bot1 sacrifices a land before searching. Their
+# only land is the Swamp, which goes; the search then still puts the Mountain onto the battlefield tapped, and it stays.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Molten Man, Inferno Incarnate
+Forest x5
+Mountain
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Molten Man, Inferno Incarnate.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Mountain)
+
+[Expect]
+Bot1.Battlefield = Mountain
+Bot1.Graveyard = Swamp; Molten Man, Inferno Incarnate; Black Lotus
+Bot1.Battlefield.Mountain.Tapped = true

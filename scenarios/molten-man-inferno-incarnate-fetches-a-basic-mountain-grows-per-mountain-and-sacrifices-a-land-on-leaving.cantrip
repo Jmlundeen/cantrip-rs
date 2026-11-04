@@ -1,0 +1,61 @@
+# Molten Man, Inferno Incarnate (0/0): "When Molten Man enters, search your library for a basic Mountain card, put it onto the battlefield
+# tapped, then shuffle", "Molten Man gets +1/+1 for each Mountain you control" and "When Molten Man leaves the battlefield, sacrifice a land."
+# Bot1 has a Mountain already, so the 0/0 survives until its trigger fetches the library's only Mountain, tapped (a Forest and a Blasted
+# Landscape stay, and so does Bot2's Mountain in its own library): two Mountains make him 2/2, and Bot2's Mountain on the battlefield does not
+# count. Bot1 then plays Swamp and kills him with Flame Slash (4 damage); the leaves trigger makes Bot1 sacrifice a land of their choice, the
+# Swamp, so both Mountains stay.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Molten Man, Inferno Incarnate
+Flame Slash
+Swamp
+Forest
+Forest
+Mountain
+Blasted Landscape
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Molten Man, Inferno Incarnate.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Molten Man, Inferno Incarnate.Power = 1
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Forest)
+! Bot1.Search(Blasted Landscape)
+Bot1.Search(Mountain)
+? Bot1.Battlefield.Mountain#2.Tapped = true
+? Bot1.Battlefield.Molten Man, Inferno Incarnate.Power = 2
+? Bot1.Battlefield.Molten Man, Inferno Incarnate.Toughness = 2
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Flame Slash.Cast(Molten Man, Inferno Incarnate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Swamp)
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby
+Bot1.Graveyard = Swamp; Molten Man, Inferno Incarnate; Flame Slash; Black Lotus
+Bot2.Battlefield = Mountain
+Bot1.Library.Count = 11

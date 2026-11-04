@@ -1,0 +1,8 @@
+{
+  "name": "Molten Man, Inferno Incarnate",
+  "manaCost": "{2}{R}",
+  "type": "Legendary Creature — Elemental Villain",
+  "power": 0,
+  "toughness": 0,
+  "oracleText": "When Molten Man enters, search your library for a basic Mountain card, put it onto the battlefield tapped, then shuffle.\nMolten Man gets +1/+1 for each Mountain you control.\nWhen Molten Man leaves the battlefield, sacrifice a land."
+}
