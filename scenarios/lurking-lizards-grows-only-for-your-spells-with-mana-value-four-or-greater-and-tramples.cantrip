@@ -1,0 +1,57 @@
+# Lurking Lizards {1}{G}, a 1/3 with trample: "Whenever you cast a spell with mana value 4 or greater, put a +1/+1 counter on this creature."
+# Turn 3 Bot1 casts Alpine Grizzly (mana value 3, one short): no counter, still a 1/3. Turn 5 it casts Giant Spider (mana value 4, exactly
+# the limit): the trigger goes on the stack above the spell and resolves first, one counter, a 2/4. Then it attacks and Bot2's Memnite (1/1)
+# blocks: trample (CR 702.19b) lets 1 damage go to the Memnite, lethal, and the other 1 to Bot2.
+
+[Bot1 Deck]
+Mox Emerald x4
+Forest
+Lurking Lizards
+Alpine Grizzly
+Giant Spider
+Forest x14
+
+[Bot2 Deck]
+Memnite
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Lurking Lizards.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Alpine Grizzly.Cast
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lurking Lizards.Power = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Giant Spider.Cast
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lurking Lizards.Power = 2
+? Bot1.Battlefield.Lurking Lizards.Toughness = 4
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Lurking Lizards > Bot2)
+Bot2.Block(Memnite > Lurking Lizards)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Battlefield.Memnite = (absent)
+Bot1.Battlefield.Lurking Lizards.Damage = 1

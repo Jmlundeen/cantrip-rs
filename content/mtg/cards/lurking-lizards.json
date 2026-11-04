@@ -1,0 +1,11 @@
+{
+  "name": "Lurking Lizards",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Lizard Villain",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Trample\nWhenever you cast a spell with mana value 4 or greater, put a +1/+1 counter on this creature.",
+  "keywords": [
+    "Trample"
+  ]
+}
