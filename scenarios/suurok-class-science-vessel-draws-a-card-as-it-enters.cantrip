@@ -1,0 +1,22 @@
+# Suurok-Class Science Vessel's enters ability draws a card (CR 603.6a): the hand is five after the cast and six after the
+# draw, and no other card was drawn.
+
+[Bot1 Deck]
+Suurok-Class Science Vessel
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+? Bot1.Hand.Count = 6
+Bot1.Hand.Suurok-Class Science Vessel.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Battlefield = Suurok-Class Science Vessel

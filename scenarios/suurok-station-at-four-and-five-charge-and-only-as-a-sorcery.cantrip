@@ -1,0 +1,57 @@
+# Station taps another creature you control, including a summoning-sick one (CR 702.184a).
+# Four counters leave Suurok noncreature; exactly five turn on flying and the 3/2 box (CR 721.2).
+[Bot1 Deck]
+Suurok-Class Science Vessel
+Sunset Saboteur
+Llanowar Elves
+Black Lotus
+Black Lotus
+Mox Jet
+Mox Emerald
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x30
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Suurok-Class Science Vessel.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sunset Saboteur.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Suurok-Class Science Vessel.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Suurok-Class Science Vessel.Counters.Charge = 4
+? Bot1.Battlefield.Suurok-Class Science Vessel.Types = Artifact
+? Bot1.Battlefield.Suurok-Class Science Vessel.Keywords = (absent)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Suurok-Class Science Vessel.Activate(Ability: Station)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Suurok-Class Science Vessel.Activate(Ability: Station)
+! Bot1.Choose(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Suurok-Class Science Vessel.Counters.Charge = 5
+Bot1.Battlefield.Suurok-Class Science Vessel.Types = Artifact; Creature
+Bot1.Battlefield.Suurok-Class Science Vessel.Keywords = Flying
+Bot1.Battlefield.Suurok-Class Science Vessel.Power = 3
+Bot1.Battlefield.Suurok-Class Science Vessel.Toughness = 2
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Ornithopter.Tapped = false
