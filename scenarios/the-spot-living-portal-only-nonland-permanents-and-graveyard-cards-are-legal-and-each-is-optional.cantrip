@@ -1,0 +1,60 @@
+# The enter trigger's first target is a nonland permanent, its second a nonland permanent card in a graveyard (CR 115.1, 110.4a):
+# a land card in a graveyard and a permanent on the battlefield are each refused for the second. The second is "up to one", so only
+# Mox Jet is exiled, and only it comes back when The Spot dies.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Ruby
+The Spot, Living Portal
+Entomb
+Island
+Island x28
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Vindicate
+Island x31
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Island)
+Bot1.Hand.The Spot, Living Portal.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Mox Jet)
+! Bot1.Target(Island)
+! Bot1.Target(Mox Pearl)
+Bot1.Target()
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Vindicate.Cast(The Spot, Living Portal)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 2
+Bot1.Graveyard.Count = 3
+Bot1.Library.Count = 28
+Bot1.Battlefield.Count = 2
+Exile.Count = 0

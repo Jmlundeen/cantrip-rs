@@ -1,0 +1,8 @@
+{
+  "name": "The Spot, Living Portal",
+  "manaCost": "{3}{W}{B}",
+  "type": "Legendary Creature — Human Scientist Villain",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "When The Spot enters, exile up to one target nonland permanent and up to one target nonland permanent card from a graveyard.\nWhen The Spot dies, put him on the bottom of his owner's library. If you do, return the exiled cards to their owners' hands."
+}
