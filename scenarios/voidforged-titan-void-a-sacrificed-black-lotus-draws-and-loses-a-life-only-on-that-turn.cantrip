@@ -1,0 +1,46 @@
+# Voidforged Titan (5/4): "Void — At the beginning of your end step, if a nonland permanent left the battlefield this turn or a
+# spell was warped this turn, you draw a card and lose 1 life." Cast on turn 1 with five Moxen, then Black Lotus is sacrificed for mana
+# (a nonland permanent left): at the end step Bot1 draws a card and loses 1 life (19 life, 1 card). On turn 3 nothing leaves and no
+# spell is warped, so the end step does nothing: only the turn's own draw is added (2 cards), and Bot1 stays at 19.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Voidforged Titan
+Black Lotus
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Voidforged Titan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+? Bot1.Hand.Count = 1
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 2
+[Bot1.End]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Hand.Count = 2

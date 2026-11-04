@@ -1,0 +1,44 @@
+# Voidforged Titan's void with the warp clause: cast on turn 1 with five Moxen (no void, so nothing at that end step). On turn 3 a
+# Susurian Voidborn is cast for its warp cost {B}: a spell was warped this turn, so at the beginning of the end step Bot1 draws a
+# card and loses 1 life, before the Voidborn is exiled (the Titan's trigger needs no permanent to have left).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Voidforged Titan
+Susurian Voidborn
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Voidforged Titan.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.End]
+? Bot1.Life = 20
+? Bot1.Hand.Count = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Susurian Voidborn.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+[Bot1.End]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Hand.Count = 2
