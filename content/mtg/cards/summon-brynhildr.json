@@ -1,0 +1,8 @@
+{
+  "name": "Summon: Brynhildr",
+  "manaCost": "{1}{R}",
+  "type": "Enchantment Creature — Saga Knight",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI — Chain — Exile the top card of your library. During any turn you put a lore counter on this Saga, you may play that card.\nII, III — Gestalt Mode — When you next cast a creature spell this turn, it gains haste until end of turn."
+}

@@ -1,0 +1,77 @@
+# Summon: Brynhildr's chapters II and III: "When you next cast a creature spell this turn, it gains haste until end of turn."
+# Turn 3 (II): a Mox cast first is not a creature spell; the Grizzly Bears cast next gain haste as a spell and keep it on the
+# battlefield (CR 400.7a), and attack; the Goblin Piker cast after them doesn't, and can't. Turn 4: the Bears' haste is gone
+# (until end of turn). Turn 5 (III): the Hill Giant cast that turn gains haste and attacks with the others, and the Saga is
+# sacrificed.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Summon: Brynhildr
+Mox Emerald
+Grizzly Bears
+Goblin Piker
+Mox Pearl
+Island
+Island
+Hill Giant
+Island x8
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Summon: Brynhildr.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Goblin Piker.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Keywords = Haste
+? Bot1.Battlefield.Goblin Piker.Keywords = (absent)
+! Bot1.Attack(Goblin Piker > Bot2)
+Bot1.Attack(Grizzly Bears > Bot2)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Grizzly Bears.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Summon: Brynhildr = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hill Giant.Keywords = Haste
+Bot1.Attack(Grizzly Bears; Goblin Piker; Hill Giant > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 11
+Bot1.Graveyard = Summon: Brynhildr

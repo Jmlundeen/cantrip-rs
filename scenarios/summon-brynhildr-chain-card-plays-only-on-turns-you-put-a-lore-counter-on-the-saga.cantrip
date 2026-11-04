@@ -1,0 +1,82 @@
+# Browser
+# Summon: Brynhildr's chapter I (turn 1) exiles Bot1's Lightning Bolt, which says over its art that it is playable "during any
+# turn you put a lore counter on Summon: Brynhildr". Turn 2 is Bot2's: Bot2's Tezzeret's Gambit proliferates the Saga's lore
+# counter, so a lore counter goes on it this turn, but not by Bot1 ("you put"), and the Bolt can't be cast; nor once Bot1
+# itself puts a +1/+1 counter on the Saga (Take Up the Shield) - not a lore counter - though its Mox Ruby is untapped. Turn 3: Bot1 puts the third lore counter
+# on it, chapter III resolves and the Saga is sacrificed (CR 714.4), and the Bolt is cast from exile anyway: it is this
+# turn's counter that counts, whatever became of the Saga since.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Summon: Brynhildr
+Mox Pearl
+Mox Emerald
+Take Up the Shield
+Mountain
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Tezzeret's Gambit
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Summon: Brynhildr.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt
+? Client.Bot1.Exile.Lightning Bolt.Annotation = Playable while it stays here, during any turn you put a lore counter on Summon: Brynhildr
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Tezzeret's Gambit.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Bot1.Battlefield.Summon: Brynhildr)
+? Bot1.Battlefield.Summon: Brynhildr.Counters.Lore = 2
+Bot2.Pass
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Take Up the Shield.Cast(Bot1.Battlefield.Summon: Brynhildr)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Summon: Brynhildr.Counters.PlusOnePlusOne = 1
+Bot2.Pass
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Summon: Brynhildr = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Exile.Count = 0
+Bot1.Graveyard.Count = 3

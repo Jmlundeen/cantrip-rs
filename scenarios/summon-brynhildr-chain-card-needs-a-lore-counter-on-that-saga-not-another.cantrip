@@ -1,0 +1,55 @@
+# "This Saga" is the Summon: Brynhildr that exiled the card (CR 400.7). Turn 1: the first Brynhildr's chapter I exiles Bot1's
+# Lightning Bolt, and Bot1 Shocks that Brynhildr away. Turn 3: a second Brynhildr enters with its lore counter, which Bot1 puts
+# on it, and its chapter I exiles a Mountain: the Mountain is played from exile as Bot1's land ("play", CR 305.1), but the Bolt
+# can't be cast, though Bot1 has the red mana.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Summon: Brynhildr
+Shock
+Mox Ruby
+Summon: Brynhildr
+Island
+Lightning Bolt
+Island
+Mountain
+Island x8
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Summon: Brynhildr.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Summon: Brynhildr)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Summon: Brynhildr = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Summon: Brynhildr.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Summon: Brynhildr.Counters.Lore = 1
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Exile.Mountain.Play
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mountain.Types = Land
+Exile = Lightning Bolt
+Bot2.Life = 20

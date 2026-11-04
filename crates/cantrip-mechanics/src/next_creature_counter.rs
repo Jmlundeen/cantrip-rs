@@ -9,15 +9,6 @@
 
 use cantrip_api::*;
 
-fn next_creature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { spell, player, .. } if *player == me.controller && q.chars(*spell).is(CardType::Creature) => {
-            Fired::about(Target::Object(*spell))
-        }
-        _ => None,
-    }
-}
-
 /// The chapter's effect: set up the delayed trigger.
 pub fn chapter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     crate::delayed::next_this_turn(g, item, 0, item.object);
@@ -33,7 +24,7 @@ fn give_the_spell_a_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
 
 /// The delayed trigger, the card's delayed ability 0.
 pub const DELAYED: AbilityDef = triggered(
-    when_asked(EventMask::SPELL_CAST, next_creature_spell_you_cast),
+    crate::triggers::CREATURE_SPELL_YOU_CAST,
     give_the_spell_a_counter,
     "When you next cast a creature spell this turn, that creature enters with an additional +1/+1 counter on it.",
 );
