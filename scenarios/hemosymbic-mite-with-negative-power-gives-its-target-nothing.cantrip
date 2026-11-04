@@ -1,0 +1,44 @@
+# Hemosymbic Mite: "gets +X/+X ... where X is this creature's power". A calculation that comes out negative gives zero (CR 107.1b).
+# Bot1's 1/1 Mite attacks on turn 5; with its trigger on the stack Bot1 casts Depower on it (-4/-0, {2} cheaper against an
+# attacking creature), so it resolves with the Mite at -3/1 and X is zero: the Bears stays a 2/2 and does not become -1/-1.
+
+[Bot1 Deck]
+Forest
+Hemosymbic Mite
+Forest
+Grizzly Bears
+Island
+Depower
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Hemosymbic Mite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Hemosymbic Mite > Bot2)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Depower.Cast(Hemosymbic Mite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hemosymbic Mite.Power = -3
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.Grizzly Bears.Toughness = 2
+Bot1.Battlefield.Hemosymbic Mite.Power = -3

@@ -1,0 +1,38 @@
+# Hemosymbic Mite: X is calculated only once, as the ability resolves (the ruling, CR 608.2h). Bot1's Mite attacks on turn 3 as a 1/1; with its trigger on the stack Bot1 casts
+# Giant Growth on it (a 4/4), so the trigger resolves with X = 4 and the lone Bears (auto-chosen as the only other creature) becomes a 6/6.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Hemosymbic Mite
+Grizzly Bears
+Giant Growth
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Hemosymbic Mite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Attack(Hemosymbic Mite > Bot2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Hemosymbic Mite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hemosymbic Mite.Power = 4
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 6
+Bot1.Battlefield.Grizzly Bears.Toughness = 6

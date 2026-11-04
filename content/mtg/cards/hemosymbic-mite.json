@@ -1,0 +1,8 @@
+{
+  "name": "Hemosymbic Mite",
+  "manaCost": "{G}",
+  "type": "Creature — Mite",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Whenever this creature becomes tapped, another target creature you control gets +X/+X until end of turn, where X is this creature's power."
+}
