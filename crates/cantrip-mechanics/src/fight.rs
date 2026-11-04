@@ -15,6 +15,20 @@ pub fn targets_fight(g: &mut dyn Game, item: &StackItem, first: usize, second: u
     }
 }
 
+/// "Put `N` +1/+1 counters on target creature you control. [Then] it fights target creature an opponent controls." (CR 122.1,
+/// 701.14, 608.2b-c): the creature is the spell's first target and the one fought its second, each judged as the spell resolves.
+/// With the first gone nothing is put on and nothing fights; with only the second gone the counters are still put on and no
+/// fight happens. The counters come first, so the fight is with the power they give (CR 608.2c). Troll Negotiations (two) and
+/// Kapow! (one) print it.
+pub fn plus_one_counters_on_first_target_then_it_fights_second<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(creature) = targets::object(g, item, 0) {
+        g.add_counters(creature, CounterKind::PlusOne, N);
+    }
+    g.end_sentence();
+    targets_fight(g, item, 0, 1);
+    Ok(())
+}
+
 /// "Enchanted creature fights up to one target creature an opponent controls" / "equipped creature fights ..." (CR 701.14), the
 /// ability's first target being the one fought. The enchanted or equipped creature is the one the source is attached to as the
 /// ability resolves, or, if the source has left the battlefield by then, the one it was attached to as it left (CR 608.2h). The
