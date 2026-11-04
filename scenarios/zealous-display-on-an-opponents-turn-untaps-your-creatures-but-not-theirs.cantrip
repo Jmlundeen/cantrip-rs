@@ -1,0 +1,43 @@
+# Zealous Display cast on Bot2's turn (T4), after Bot1's Ornithopter attacked on T3 and stayed tapped and Bot2's attacked on T4:
+# Bot1's Ornithopter gets +2/+0 and untaps ("If it's not your turn"); Bot2's attacking Ornithopter is neither pumped nor untapped.
+
+[Bot1 Deck]
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Zealous Display
+Plains x15
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zealous Display.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Tapped = true

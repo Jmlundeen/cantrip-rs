@@ -1,0 +1,6 @@
+{
+  "name": "Zealous Display",
+  "manaCost": "{2}{W}",
+  "type": "Instant",
+  "oracleText": "Creatures you control get +2/+0 until end of turn. If it's not your turn, untap those creatures."
+}
