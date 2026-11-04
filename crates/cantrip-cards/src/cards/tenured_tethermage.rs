@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::{effects, select, tokens};
+use cantrip_mechanics::{effects, select, tokens, untapped_artifact_you_control};
 use cantrip_oracle as oracle;
 
 /// "When this creature enters, you may sacrifice a land. If you do, create two tapped Heartwood tokens." (CR 603.6a,
@@ -18,13 +18,6 @@ fn may_trade_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Tap two untapped artifacts you control": a cost, not the {T} symbol of those artifacts (CR 118.3, 107.5), so an
-/// artifact creature that entered this turn may be tapped for it. Chosen as the cost is paid, and tapped then,
-/// among the payer's own permanents (the engine offers only those, so "you control" needs no test here).
-fn untapped_artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    !q.obj(id).tapped && q.chars(id).is(CardType::Artifact)
-}
-
 /// "Put two +1/+1 counters on this creature." Nothing if it has left the battlefield (CR 400.7).
 fn two_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 2);
@@ -35,7 +28,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, may_trade_a_land, "When this creature enters, you may sacrifice a land. If you do, create two tapped Heartwood tokens."),
         ability(
-            Cost::tap_untapped(2, untapped_artifact),
+            Cost::tap_untapped(2, untapped_artifact_you_control),
             two_counters,
             "Tap two untapped artifacts you control: Put two +1/+1 counters on this creature.",
         ),

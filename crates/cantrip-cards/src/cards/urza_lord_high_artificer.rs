@@ -2,6 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::library::exile_top_may_play;
 use cantrip_mechanics::tokens::{self, CONSTRUCT};
 use cantrip_mechanics::triggers::THIS_ENTERS;
+use cantrip_mechanics::untapped_artifact_you_control;
 use cantrip_oracle as oracle;
 
 /// When Urza enters, create a 0/0 colorless Construct artifact creature token with "This token gets +1/+1 for each artifact
@@ -9,10 +10,6 @@ use cantrip_oracle as oracle;
 fn make_construct(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create(g, item.controller, &CONSTRUCT, 1)?;
     Ok(())
-}
-
-fn untapped_artifact_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    q.controller(id) == asker.controller && !q.obj(id).tapped && q.chars(id).is(CardType::Artifact)
 }
 
 /// Shuffle your library, then exile the top card. Until end of turn, you may play that card without paying its mana cost.

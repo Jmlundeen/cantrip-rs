@@ -453,6 +453,13 @@ pub fn untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId)
     q.controller(id) == asker.controller && !q.obj(id).tapped && q.chars(id).is(CardType::Creature)
 }
 
+/// "An untapped artifact you control" as the permanents a cost taps (CR 118.3): Urza, Lord High Artificer's mana ability taps
+/// one, Tenured Tethermage's two, Secluded Starforge's X (`tap_x_untapped`). An artifact creature that came under your control
+/// this turn counts (CR 302.6 limits only {T}).
+pub fn untapped_artifact_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.controller(id) == asker.controller && !q.obj(id).tapped && q.chars(id).is(CardType::Artifact)
+}
+
 /// Delirium (an ability word, CR 207.2c): four or more card types among the cards in `player`'s graveyard. Fear of Missing Out and
 /// Unholy Heat read it; a static ability asks the same of a `LayerQuery` with `statics::itself_with_delirium`.
 pub fn delirium(q: &dyn Query, player: PlayerId) -> bool {
