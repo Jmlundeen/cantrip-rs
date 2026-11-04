@@ -1,19 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::delayed;
+use cantrip_mechanics::{delayed, triggers};
 use cantrip_oracle as oracle;
 
 /// Whenever this creature blocks or becomes blocked by a non-Wall creature (CR 603.2).
 fn blocks_or_becomes_blocked(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
-    let Event::Blocks { blocker, attacker, .. } = event else { return None };
-    let other = if *blocker == asker.source {
-        *attacker
-    } else if *attacker == asker.source {
-        *blocker
-    } else {
-        return None;
-    };
+    let other = triggers::other_creature_in_block_with_this(q, asker.source, event)?;
     let wall = q.words(asker.source).subtype(Subtype::Wall);
-    if q.chars(other).is(CardType::Creature) && !q.chars(other).has_subtype(wall) {
+    if !q.chars(other).has_subtype(wall) {
         Fired::about(Target::Object(other))
     } else {
         None

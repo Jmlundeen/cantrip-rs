@@ -1,17 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::delayed;
+use cantrip_mechanics::{delayed, triggers};
 use cantrip_oracle as oracle;
 
 /// Each creature this blocks or that blocks it is checked for green or white as the block happens (CR 509.3b, 509.3d).
 fn blocks_or_becomes_blocked(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
-    let Event::Blocks { blocker, attacker, .. } = event else { return None };
-    let other = if *blocker == asker.source {
-        *attacker
-    } else if *attacker == asker.source {
-        *blocker
-    } else {
-        return None;
-    };
+    let other = triggers::other_creature_in_block_with_this(q, asker.source, event)?;
     let colors = q.chars(other).colors;
     let words = q.words(asker.source);
     if colors.has(words.color(Color::Green)) || colors.has(words.color(Color::White)) {

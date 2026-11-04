@@ -474,6 +474,21 @@ pub fn this_attacks_or_blocks(_: &dyn Query, source: ObjectId, event: &Event) ->
     }
 }
 
+/// "The other creature in a block involving this one" (CR 509.1, 509.3b, 603.2): when `source` blocks a creature or is blocked
+/// by one, that creature, still a creature as the block happens. Aisling Leprechaun, Cockatrice and Abomination ("whenever this
+/// creature blocks or becomes blocked by ...") print it; each adds its own condition on the other creature.
+pub fn other_creature_in_block_with_this(q: &dyn Query, source: ObjectId, event: &Event) -> Option<ObjectId> {
+    let Event::Blocks { blocker, attacker, .. } = event else { return None };
+    let other = if *blocker == source {
+        *attacker
+    } else if *attacker == source {
+        *blocker
+    } else {
+        return None;
+    };
+    q.chars(other).is(CardType::Creature).then_some(other)
+}
+
 /// "Whenever this permanent enters or attacks" (CR 603.2, 603.6a): one triggered ability with two conditions, either its own entering the
 /// battlefield or its own attack. Overlord of the Balemurk, Overlord of the Mistmoors, Sentinel of the Nameless City, Archon of Cruelty
 /// Dragonhawk, Fate's Tempest and Dread Osseosaur print it. The `listens` mask is `ZONE_CHANGE` and `ATTACKS`.
