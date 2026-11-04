@@ -1,0 +1,49 @@
+# Edgar, King of Figaro: "When Edgar enters, draw a card for each artifact you control." On turn 3 Bot1 casts Edgar off Black
+# Lotus, a Mox Sapphire and Sol Ring. As the trigger resolves Bot1 controls three artifacts (two Moxen and Sol Ring; the
+# Lotus was sacrificed) and draws three, 19 cards left in its library going to 16. Bot2's Ornithopter is not Bot1's and
+# does not count.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Sol Ring
+Black Lotus
+Edgar, King of Figaro
+Island
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x23
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Edgar, King of Figaro.Cast
+? Bot1.Library.Count = 19
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Library.Count = 16
+Bot1.Battlefield.Edgar, King of Figaro.Power = 4

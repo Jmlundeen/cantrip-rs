@@ -1,0 +1,55 @@
+# Edgar, King of Figaro's Two-Headed Coin counts only its controller's own flips: "the first time you flip one or more coins
+# each turn" (CR 705.3). Every die the script fixes is face 2, a lost flip. Turn 4: Bot2's Mana Crypt flip in its upkeep is
+# lost (3 damage), and Bot1's The Gold Saucer flip later that turn is still the first coin Bot1 flips, so Bot1 wins it
+# whatever the coin shows and makes a Treasure.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+The Gold Saucer
+Edgar, King of Figaro
+Island x20
+
+[Bot2 Deck]
+Mana Crypt
+Island x23
+
+[Dice]
+2; 2; 2; 2; 2
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.The Gold Saucer.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.The Gold Saucer.Activate(Ability: #1)
+Bot1.Hand.Edgar, King of Figaro.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[T2 Bot2.Main1]
+Bot2.Hand.Mana Crypt.Cast
+Bot2.Pass
+
+[T4 Bot2.Main1]
+? Bot2.Life = 17
+? Bot1.Battlefield.Count = 4
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.The Gold Saucer.Activate(Ability: #2)
+Bot1.Pass
+Bot2.Pass
+
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Treasure Token.Token = true

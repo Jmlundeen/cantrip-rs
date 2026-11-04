@@ -1,0 +1,61 @@
+# Edgar, King of Figaro's Two-Headed Coin: "The first time you flip one or more coins each turn, those coins come up heads and
+# you win those flips" (CR 705.3). Every die the script fixes is face 2, a lost flip. Turn 3: Bot1's Mana Crypt flips in its
+# upkeep, the first flip of the turn, so Bot1 wins it whatever the coin shows (the ruling) and takes no damage; The Gold
+# Saucer's flip later that turn is the second, so it is lost and makes no Treasure. Turn 4: Bot2's own Mana Crypt flip is
+# not Bot1's, and Bot2 loses it (3 damage). Turn 5: a new turn, and Bot1's Mana Crypt flip is won again.
+
+[Bot1 Deck]
+Mana Crypt
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Edgar, King of Figaro
+The Gold Saucer
+Island
+Island x20
+
+[Bot2 Deck]
+Mana Crypt
+Island x23
+
+[Dice]
+2; 2; 2; 2; 2
+
+[Actions]
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Edgar, King of Figaro.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.The Gold Saucer.Play
+
+[T2 Bot2.Main1]
+Bot2.Hand.Mana Crypt.Cast
+Bot2.Pass
+
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.The Gold Saucer.Activate(Ability: #2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 5
+
+[T4 Bot2.Main1]
+? Bot2.Life = 17
+
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot1.Battlefield.Count = 5

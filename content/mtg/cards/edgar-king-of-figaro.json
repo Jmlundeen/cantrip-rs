@@ -1,0 +1,8 @@
+{
+  "name": "Edgar, King of Figaro",
+  "manaCost": "{4}{U}{U}",
+  "type": "Legendary Creature — Human Artificer Noble",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "When Edgar enters, draw a card for each artifact you control.\nTwo-Headed Coin — The first time you flip one or more coins each turn, those coins come up heads and you win those flips."
+}

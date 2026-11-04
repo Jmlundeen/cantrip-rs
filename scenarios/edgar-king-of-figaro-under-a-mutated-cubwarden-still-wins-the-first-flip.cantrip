@@ -1,0 +1,66 @@
+# Turn to Frog makes Edgar, King of Figaro a Frog with no abilities, a non-Human, and Cubwarden mutates over him, on top (CR
+# 702.140c). Once the turn ends the merged creature is Cubwarden with all the abilities of both its cards (CR 702.140e), so
+# Edgar's Two-Headed Coin still applies: turn 5's Mana Crypt flip, the first of the turn, comes up heads and is won (CR
+# 705.3) though every die the script fixes is a lost flip, and Bot1 takes no damage. The merged creature has lost all its
+# abilities until the turn ends, Turn to Frog's effect applying to it still, so "whenever this creature mutates" makes no Cats.
+
+[Bot1 Deck]
+Mana Crypt
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Mox Pearl
+Edgar, King of Figaro
+Turn to Frog
+Cubwarden
+Plains
+Island x20
+
+[Bot2 Deck]
+Island x24
+
+[Dice]
+2; 2; 2; 2; 2
+
+[Actions]
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Edgar, King of Figaro.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Turn to Frog.Cast(Edgar, King of Figaro)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Edgar, King of Figaro.Subtypes = Frog
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Cubwarden.Cast(Edgar, King of Figaro; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Cubwarden.Power = 3
+
+[Expect]
+Turn = 5
+Bot1.Life = 20
+Bot1.Battlefield = Cubwarden; Mana Crypt; Mox Pearl; Mox Sapphire; Mox Sapphire; Plains
