@@ -1,0 +1,61 @@
+# Beam me up costs exactly {1}{B} and returns a creature you control; an opponent's creature or your Mox cannot pay (CR 118.9, 601.2h).
+# It resolves the same top-two split again. The shared keyword follows flashback/harmonize's exile rule (CR 702.34a, 702.180a).
+
+[Bot1 Deck]
+Pattern Buffer Preservation
+Mox Jet
+Mox Pearl
+Ornithopter
+Swamp x3
+Forest
+Mountain
+Ornithopter
+Plains
+Island
+Swamp x10
+
+[Bot2 Deck]
+Memnite
+Lotus Petal
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pattern Buffer Preservation.Cast
+Bot1.Arrange(Forest | Mountain)
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Battlefield.Lotus Petal.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Graveyard.Pattern Buffer Preservation.Cast(Ability: Beam me up)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Graveyard.Pattern Buffer Preservation.Cast(Ability: Beam me up)
+! Bot1.Choose(Bot2.Battlefield.Memnite)
+! Bot1.Choose(Bot1.Battlefield.Mox Jet)
+! Bot1.Choose()
+Bot1.Choose(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Ornithopter = (absent)
+Bot2.Pass
+Bot1.Arrange(Plains | Island)
+
+[Expect]
+Bot1.Looked = Forest; Mountain; Plains; Island
+Bot1.Hand = Swamp; Swamp; Swamp; Forest; Ornithopter; Ornithopter; Plains
+Bot1.Graveyard = Island; Mountain
+Bot1.Library.Count = 10
+Exile = Pattern Buffer Preservation
+Bot1.Battlefield = Mox Jet; Mox Pearl
+Bot2.Battlefield = Memnite
+Bot2.Hand = Island; Island; Island; Island; Island; Island
+Bot2.Graveyard = Lotus Petal
+Bot2.Library.Count = 10

@@ -1,0 +1,30 @@
+# Looking at an empty library does nothing and asks no placement; this is not drawing from an empty library (CR 609.3).
+# Turn one skips the draw, allowing the spell to resolve with the library already empty.
+
+[Bot1 Deck]
+Pattern Buffer Preservation
+Mox Jet
+Mox Pearl
+Swamp x4
+
+[Bot2 Deck]
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pattern Buffer Preservation.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Arrange
+
+[Expect]
+Result = InProgress
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp
+Bot1.Graveyard = Pattern Buffer Preservation
+Bot1.Library.Count = 0
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 0
+Bot2.Library.Count = 3

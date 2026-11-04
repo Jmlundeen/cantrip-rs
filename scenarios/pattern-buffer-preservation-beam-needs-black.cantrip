@@ -1,0 +1,49 @@
+# Two nonblack mana cannot pay the hard cast or Beam me up's {1}{B}; adding black mana permits each (CR 107.4a, 118.9).
+# The creature is already out when the graveyard cast is refused, so only the missing black mana bars it.
+
+[Bot1 Deck]
+Pattern Buffer Preservation
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Ornithopter
+Swamp x2
+Forest
+Mountain
+Island
+Plains
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Pattern Buffer Preservation.Cast(Mana: short)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Pattern Buffer Preservation.Cast
+Bot1.Arrange(Forest | Mountain)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Graveyard.Pattern Buffer Preservation.Cast(Ability: Beam me up; Mana: short)
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Graveyard.Pattern Buffer Preservation.Cast(Ability: Beam me up)
+Bot1.Choose(Ornithopter)
+Bot1.Arrange(Plains | Swamp)
+
+[Expect]
+Exile = Pattern Buffer Preservation
+Bot1.Hand = Swamp; Forest; Island; Ornithopter; Plains
+Bot1.Graveyard = Swamp; Mountain; Black Lotus
+Bot1.Library.Count = 10
+Bot1.Battlefield = Mox Ruby; Mox Sapphire; Swamp

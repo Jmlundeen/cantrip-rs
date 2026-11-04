@@ -1,0 +1,27 @@
+# With only one library card, it goes to the hand and nothing goes to the graveyard except the resolved spell (CR 609.3).
+# Turn one skips the draw, so an empty library after resolution does not make the player lose.
+
+[Bot1 Deck]
+Pattern Buffer Preservation
+Mox Jet
+Mox Pearl
+Swamp x4
+Ancestral Recall
+
+[Bot2 Deck]
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pattern Buffer Preservation.Cast
+Bot1.Arrange(Ancestral Recall | )
+
+[Expect]
+Result = InProgress
+Bot1.Looked = Ancestral Recall
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Ancestral Recall
+Bot1.Graveyard = Pattern Buffer Preservation
+Bot1.Library.Count = 0

@@ -1,0 +1,45 @@
+# The hard cast costs exactly {1}{B}; take the second of the top two, not a card already in hand or the third card.
+# The other card goes to your graveyard, with the opponent's matching cards untouched (CR 401.2, 609.3).
+
+[Bot1 Deck]
+Pattern Buffer Preservation
+Mox Jet
+Mox Pearl
+Ponder
+Swamp x3
+Mountain
+Island
+Plains
+
+[Bot2 Deck]
+Island
+Mountain
+Plains
+Island x4
+Mountain
+Island
+Plains
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Pattern Buffer Preservation.Cast(Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pattern Buffer Preservation.Cast
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+! Bot1.Arrange( | Mountain; Island)
+! Bot1.Arrange(Mountain; Island | )
+Bot1.Arrange(Island | Mountain)
+
+[Expect]
+Bot1.Looked = Mountain; Island
+Bot1.Hand = Ponder; Swamp; Swamp; Swamp; Island
+Bot1.Graveyard = Pattern Buffer Preservation; Mountain
+Bot1.Library = Plains
+Bot2.Hand = Island; Mountain; Plains; Island; Island; Island; Island
+Bot2.Library = Mountain; Island; Plains
+Bot2.Graveyard.Count = 0
+Exile.Count = 0
