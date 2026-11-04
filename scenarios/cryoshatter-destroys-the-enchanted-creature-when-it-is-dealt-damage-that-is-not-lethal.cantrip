@@ -1,0 +1,44 @@
+# Cryoshatter on Bot1's Aegis Turtle (0/5): the Turtle becomes -5/5 and stays untapped. On turn 2 Bot2 deals it 3 damage with Lightning Bolt,
+# not lethal to a toughness-5 creature, but Cryoshatter's trigger destroys it all the same, and the Aura goes to the graveyard with it.
+# Bot1 also has an Ornithopter that Bot2 does not hurt, so the Cryoshatter does not touch it.
+
+[Bot1 Deck]
+Black Lotus
+Aegis Turtle
+Cryoshatter
+Ornithopter
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Aegis Turtle.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Cryoshatter.Cast(Bot1.Battlefield.Aegis Turtle)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Aegis Turtle.Power = -5
+? Bot1.Battlefield.Aegis Turtle.Toughness = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Aegis Turtle)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Cryoshatter; Aegis Turtle; Black Lotus
+Bot1.Battlefield.Ornithopter.Power = 0

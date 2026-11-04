@@ -1,0 +1,34 @@
+# Cryoshatter: "Enchant creature. Enchanted creature gets -5/-0. When enchanted creature becomes tapped or is dealt damage, destroy it."
+# Bot1 puts it on its own Ornithopter (0/2 flying, so -5/-0 makes its power -5; its toughness is unchanged). On turn 3 the Ornithopter
+# attacks: attacking taps it, the trigger destroys it. Bot2's Island-only deck has nothing to block with.
+
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Cryoshatter
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Cryoshatter.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = -5
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Cryoshatter; Ornithopter
+Bot2.Life = 20

@@ -1,0 +1,52 @@
+# Cryoshatter on Aegis Turtle (0/5), with two Ornithopters and Goblin Bombardment (sacrifice a creature: 1 damage to any target). Damage of exactly 1
+# is dealt. First an Ornithopter is sacrificed to ping the other Ornithopter (not enchanted: it survives with 1 damage, so the trigger is not
+# "any creature is dealt damage"). Then that Ornithopter is sacrificed to ping the Turtle: the trigger destroys it though 1 damage is far from
+# lethal to its toughness of 5, and Cryoshatter goes with it.
+
+[Bot1 Deck]
+Black Lotus
+Mountain
+Goblin Bombardment
+Cryoshatter
+Aegis Turtle
+Ornithopter
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Aegis Turtle.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Cryoshatter.Cast(Bot1.Battlefield.Aegis Turtle)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Aegis Turtle.Power = -5
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Goblin Bombardment.Activate(Bot1.Battlefield.Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Damage = 1
+? Bot1.Battlefield.Aegis Turtle.Power = -5
+Bot1.Battlefield.Goblin Bombardment.Activate(Bot1.Battlefield.Aegis Turtle)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Cryoshatter; Aegis Turtle; Ornithopter; Ornithopter; Black Lotus
