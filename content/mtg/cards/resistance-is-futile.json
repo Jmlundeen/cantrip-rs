@@ -1,0 +1,6 @@
+{
+  "name": "Resistance Is Futile",
+  "manaCost": "{1}{B}",
+  "type": "Sorcery",
+  "oracleText": "Choose one —\n• Destroy target nonartifact creature.\n• Return target artifact creature card with mana value 3 or less from your graveyard to the battlefield."
+}

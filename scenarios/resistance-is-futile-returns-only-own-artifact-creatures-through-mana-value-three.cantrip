@@ -1,0 +1,94 @@
+# Mode 2 returns an artifact AND creature at MV 3, then one at MV 0, untapped under the caster's control (CR 110.2a, 202.3).
+# Breaking mills a fixed eight cards; Thought Scour puts a matching card in the opponent's graveyard (CR 109.5).
+# Both modes are legal when choosing exactly one; the target refusals pin type, value, zone and player (CR 700.2a, 601.2c).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Breaking // Entering
+Resistance Is Futile
+Dryad Arbor
+Ornithopter
+Wicker Witch
+Gilded Sentinel
+Grizzly Bears
+Black Lotus
+Ornithopter
+Memnite
+Island
+Island
+Resistance Is Futile
+Memnite
+Island x12
+
+[Bot2 Deck]
+Mox Sapphire
+Thought Scour
+Island x6
+Memnite
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Breaking // Entering.Cast(Bot1; Ability: Breaking)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 9
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Thought Scour.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard.Memnite.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Resistance Is Futile.Cast
+! Bot1.Modes(Count: 0)
+! Bot1.Modes(1; 2)
+Bot1.Modes(2)
+! Bot1.Target(Count: 0)
+! Bot1.Target(Bot1.Graveyard.Gilded Sentinel)
+! Bot1.Target(Bot1.Graveyard.Grizzly Bears)
+! Bot1.Target(Bot1.Graveyard.Black Lotus)
+! Bot1.Target(Bot2.Graveyard.Memnite)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+! Bot1.Target(Bot1.Library.Memnite)
+! Bot1.Target(Bot1.Graveyard.Wicker Witch; Bot1.Graveyard.Memnite)
+Bot1.Target(Bot1.Graveyard.Wicker Witch)
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+? Bot1.Battlefield.Wicker Witch.ManaValue = 3
+? Bot1.Battlefield.Wicker Witch.Types = Artifact; Creature
+? Bot1.Battlefield.Wicker Witch.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Resistance Is Futile.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Wicker Witch.Power = 3
+Bot1.Battlefield.Wicker Witch.Toughness = 1
+Bot1.Battlefield.Ornithopter#1.Tapped = false
+Bot1.Battlefield.Ornithopter#2.Tapped = false
+Bot1.Battlefield.Ornithopter#2.ManaValue = 0
+Bot1.Graveyard.Count = 9
+Bot1.Graveyard.Gilded Sentinel.Power = 3
+Bot1.Graveyard.Grizzly Bears.Power = 2
+Bot1.Graveyard.Memnite.Power = 1
+Bot2.Graveyard.Memnite.Power = 1
+Bot2.Battlefield.Count = 1
