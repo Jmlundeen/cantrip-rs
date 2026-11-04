@@ -2105,6 +2105,17 @@ pub fn plus_one_counter_on_target(g: &mut dyn Game, item: &StackItem) -> Result<
     Ok(())
 }
 
+/// "Put a +1/+1 counter on target creature, then double the number of +1/+1 counters on that creature" (CR 122.1, 701.10e):
+/// nothing if the target is no longer legal (CR 608.2b). The count to double is read after the counter is on it, so a creature
+/// with none ends with two. Growth Curve and Sazh Katzroy print it.
+pub fn plus_one_counter_on_target_then_double(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    g.add_counters(creature, CounterKind::PlusOne, 1);
+    g.end_sentence();
+    crate::double::counters(g, &[creature], CounterKind::PlusOne);
+    Ok(())
+}
+
 /// "Put [its / those] counters on [up to one] target [permanent]": as many of each kind as `from` had as it left, read from its
 /// last existence on the battlefield (CR 603.10a, 608.2h); the counters are put on, not moved (the rulings), every kind of
 /// them, -1/-1 counters too, together as one event (CR 122.6). Nothing if the target is no longer legal (CR 608.2b) or none was
