@@ -1,0 +1,80 @@
+# Seedship Broodtender {B}{G} 2/3: "{3}{B}{G}, Sacrifice this creature: Return target creature or Spacecraft card from your graveyard to the battlefield. Activate only as a sorcery." A Spacecraft
+# card in a graveyard is no creature, yet a legal target (CR 205.3g): Bot1's Class-F Shuttlecraft, milled on turn one, comes back on turn three, while the Lumen-Class Frigate in Bot2's graveyard
+# and Bot1's own Black Lotus are no targets. In the declare attackers step, with five Moxen untapped to pay for it, the ability is refused: it is a sorcery-speed one (CR 602.5d).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Seedship Broodtender
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Island
+Class-F Shuttlecraft
+Black Lotus
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Seedship Broodtender
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Island
+Memnite
+Lumen-Class Frigate
+Haywire Mite
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Seedship Broodtender.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Seedship Broodtender.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+! Bot1.Battlefield.Seedship Broodtender.Activate(Bot1.Graveyard.Class-F Shuttlecraft)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Seedship Broodtender.Activate(Bot2.Graveyard.Lumen-Class Frigate)
+! Bot1.Battlefield.Seedship Broodtender.Activate(Bot1.Graveyard.Black Lotus)
+Bot1.Battlefield.Seedship Broodtender.Activate(Bot1.Graveyard.Class-F Shuttlecraft)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Class-F Shuttlecraft.Subtypes = Spacecraft
+
+[Expect]
+Bot1.Battlefield = Class-F Shuttlecraft; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot1.Graveyard = Seedship Broodtender; Ornithopter; Black Lotus
+Bot2.Graveyard.Count = 3
