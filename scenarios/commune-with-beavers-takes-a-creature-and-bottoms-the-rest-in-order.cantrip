@@ -1,0 +1,32 @@
+# Commune with Beavers: the top three are Lightning Bolt, Grizzly Bears and Brainstorm; Birds of Paradise, a creature card that would
+# qualify, is the fourth and is not looked at. Bot1 reveals and takes the creature card (one card at most) and
+# bottoms Lightning Bolt then Brainstorm, Brainstorm lowest: "in any order" (CR 401.4). Lightning Bolt, a card that is no
+# artifact, creature or land, cannot be taken. Bot2's library is untouched.
+
+[Bot1 Deck]
+Forest
+Commune with Beavers
+Plains x5
+Lightning Bolt
+Grizzly Bears
+Brainstorm
+Birds of Paradise
+Plains x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Commune with Beavers.Cast
+Bot1.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Grizzly Bears)
+Bot1.Arrange(Lightning Bolt; Brainstorm)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Grizzly Bears; Plains; Plains; Plains; Plains; Plains
+Bot1.Library = Birds of Paradise; Plains; Plains; Plains; Plains; Lightning Bolt; Brainstorm
+Bot1.Revealed = Grizzly Bears

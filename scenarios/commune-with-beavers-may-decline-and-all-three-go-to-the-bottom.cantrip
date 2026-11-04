@@ -1,0 +1,28 @@
+# Commune with Beavers: "You may reveal": Bot1 declines the Mox Ruby, Grizzly Bears and Island - an artifact, a creature and a land
+# card among the top three - so its hand gains nothing, nothing is revealed, and all three go to the bottom in the order chosen
+# (CR 401.4), the Island lowest; the Mountains that were below them are now on top.
+
+[Bot1 Deck]
+Forest
+Commune with Beavers
+Plains x5
+Mox Ruby
+Grizzly Bears
+Island
+Mountain x3
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Commune with Beavers.Cast
+Bot1.Pass
+Bot1.Choose()
+Bot1.Arrange(Mox Ruby; Grizzly Bears; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains
+Bot1.Library = Mountain; Mountain; Mountain; Mox Ruby; Grizzly Bears; Island

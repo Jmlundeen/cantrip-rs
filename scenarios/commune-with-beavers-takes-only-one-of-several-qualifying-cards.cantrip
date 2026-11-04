@@ -1,0 +1,31 @@
+# Commune with Beavers: "an artifact, creature, or land card" is one card: with an artifact, a creature and a land card all among
+# the top three, taking two of them is refused and so is taking all three; Bot1 takes the Grizzly Bears alone and bottoms the Mox
+# Ruby then the Island, the Island lowest (CR 401.4).
+
+[Bot1 Deck]
+Forest
+Commune with Beavers
+Plains x5
+Mox Ruby
+Grizzly Bears
+Island
+Mountain x3
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Commune with Beavers.Cast
+Bot1.Pass
+! Bot1.Choose(Mox Ruby; Grizzly Bears)
+! Bot1.Choose(Mox Ruby; Grizzly Bears; Island)
+Bot1.Choose(Grizzly Bears)
+Bot1.Arrange(Mox Ruby; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Grizzly Bears; Plains; Plains; Plains; Plains; Plains
+Bot1.Library = Mountain; Mountain; Mountain; Mox Ruby; Island
+Bot1.Revealed = Grizzly Bears
