@@ -1,0 +1,28 @@
+# "Target creature or Spacecraft" is any: Bot1 exiles its own Ornithopter.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Ornithopter
+Gravkill
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gravkill.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Ornithopter
+Bot1.Graveyard = Gravkill; Black Lotus

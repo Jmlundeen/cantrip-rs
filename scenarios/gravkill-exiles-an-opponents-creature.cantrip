@@ -1,0 +1,32 @@
+# Gravkill ({3}{B}, paid with Black Lotus and Mox Jet) exiles Bot2's Ornithopter, not leaving it in the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Gravkill
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gravkill.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Ornithopter
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = Gravkill; Black Lotus

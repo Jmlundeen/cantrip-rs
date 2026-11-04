@@ -1,0 +1,42 @@
+# "Exile target creature or Spacecraft": Bot2's Class-F Shuttlecraft is an artifact Spacecraft and no creature (it is one only
+# stationed, at 6+) and a legal target; its Mox Emerald, an artifact that is neither, is refused (the cast at the Shuttlecraft on
+# the next line is the positive control).
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Gravkill
+Island x17
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Class-F Shuttlecraft
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Class-F Shuttlecraft.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Gravkill.Cast(Bot2.Battlefield.Mox Emerald)
+Bot1.Hand.Gravkill.Cast(Bot2.Battlefield.Class-F Shuttlecraft)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Class-F Shuttlecraft
+Bot2.Battlefield.Count = 4
