@@ -1,0 +1,57 @@
+# Four distinct lands do not spare the discard and exactly five do; six still bar the activation, seven permit it (CR 602.5).
+# The base-setting effect lasts through cleanup (CR 611.2a, 613.4b).
+[Bot1 Deck]
+Seven of Nine, Unassimilated
+Black Lotus
+Island
+Plains
+Swamp
+Mountain
+Forest
+Savannah
+Tundra
+Island x20
+[Bot2 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Seven of Nine, Unassimilated.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Choose(Island)
+? Bot1.Graveyard = Island; Black Lotus
+Bot1.Hand.Forest.Play
+! Bot1.Battlefield.Seven of Nine, Unassimilated.Activate
+[T11 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Island; Black Lotus
+Bot1.Hand.Savannah.Play
+! Bot1.Battlefield.Seven of Nine, Unassimilated.Activate
+[T13 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+Bot1.Battlefield.Seven of Nine, Unassimilated.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Savannah.Activate(Ability: {W})
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+[T15 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Seven of Nine, Unassimilated.Power = 7
+Bot1.Battlefield.Seven of Nine, Unassimilated.Toughness = 9
+
+

@@ -1,0 +1,8 @@
+{
+  "name": "Seven of Nine, Unassimilated",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Artifact Creature — Human Officer",
+  "power": 0,
+  "toughness": 4,
+  "oracleText": "At the beginning of your first main phase, draw a card. Then discard a card unless you control five or more differently named lands.\n{6}{U}: Seven of Nine's base power and toughness become 7/9. Activate only if you control seven or more differently named lands."
+}

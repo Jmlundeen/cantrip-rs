@@ -1,0 +1,27 @@
+# Seven of Nine is cast for {1}{U} off a Black Lotus on turn 1. In the first main phase of turn 3 it draws a card (the
+# Lightning Bolt) and then, controlling fewer than five differently named lands, discards the card it chooses.
+
+[Bot1 Deck]
+Black Lotus
+Seven of Nine, Unassimilated
+Island x5
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Seven of Nine, Unassimilated.Cast
+? Bot1.Hand.Count = 5
+[T3 Bot1.Main1]
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Bot1.Battlefield.Seven of Nine, Unassimilated.Toughness = 4
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Hand.Count = 6
