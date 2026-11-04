@@ -1,0 +1,12 @@
+{
+  "name": "Syr Vondam, the Lucent",
+  "manaCost": "{2}{W}{B}{B}",
+  "type": "Legendary Creature — Human Knight",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Deathtouch, lifelink\nWhenever Syr Vondam enters or attacks, other creatures you control get +1/+0 and gain deathtouch until end of turn.",
+  "keywords": [
+    "Deathtouch",
+    "Lifelink"
+  ]
+}

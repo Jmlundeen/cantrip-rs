@@ -1,0 +1,72 @@
+# Syr Vondam, the Lucent {2}{W}{B}{B} 4/4 deathtouch, lifelink: "Whenever Syr Vondam enters or attacks, other creatures you control get +1/+0 and gain deathtouch until end of turn." On turn 1 Bot1 casts a Memnite and
+# an Ornithopter, then Syr Vondam with a Black Lotus (BBB), a Mox Pearl and a Mox Jet: as it enters, the Memnite is a 2/1 and the Ornithopter a 1/2 flier, both with deathtouch, and Syr Vondam itself is still a
+# 4/4. On turn 2 the pump is gone (CR 514.2) and Bot2, who casts a Memnite, never had it. On turn 3 Syr Vondam attacks and the same happens again: the Memnite is a 2/1 deathtouch, Bot2's Memnite stays a 1/1
+# without it, and Syr Vondam is a 4/4: 4 damage and 4 life from lifelink (Bot2: 16, Bot1: 24).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Syr Vondam, the Lucent
+Memnite
+Ornithopter
+Island
+Island x23
+
+[Bot2 Deck]
+Island x7
+Memnite
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Syr Vondam, the Lucent.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Toughness = 1
+? Bot1.Battlefield.Memnite.Keywords = Deathtouch
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying
+? Bot1.Battlefield.Syr Vondam, the Lucent.Power = 4
+? Bot1.Battlefield.Syr Vondam, the Lucent.Toughness = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Memnite.Power = 1
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Memnite.Power = 1
+[T3 Bot1.Main1]
+Bot1.Attack(Syr Vondam, the Lucent > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Keywords = Deathtouch
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Syr Vondam, the Lucent.Power = 4
+? Bot2.Battlefield.Memnite.Power = 1
+? Bot2.Battlefield.Memnite.Keywords = (absent)
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Life = 24
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 24
