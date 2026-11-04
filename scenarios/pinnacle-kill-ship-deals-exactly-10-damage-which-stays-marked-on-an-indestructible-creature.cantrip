@@ -1,0 +1,76 @@
+# Pinnacle Kill-Ship's trigger deals exactly 10 damage to up to one target creature (CR 120.3): Bot2's Adept Watershaper gives its
+# tapped creatures indestructible, and Raging Goblin attacked on turn 4, so on turn 5 it is tapped and the 10 damage marked on it
+# does not destroy it: 10 stays marked, neither more nor less. A noncreature permanent (Bot2's Mox Pearl) is refused as the target.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Black Lotus
+Pinnacle Kill-Ship
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Black Lotus
+Adept Watershaper
+Raging Goblin
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Adept Watershaper.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Raging Goblin > Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Raging Goblin.Tapped = true
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Pinnacle Kill-Ship.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Target(Bot2.Battlefield.Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Raging Goblin.Damage = 10
+
+[Expect]
+Bot2.Battlefield.Raging Goblin.Damage = 10
+Bot2.Battlefield.Raging Goblin.Tapped = true

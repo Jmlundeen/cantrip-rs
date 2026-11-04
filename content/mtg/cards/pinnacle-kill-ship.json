@@ -1,0 +1,7 @@
+{
+  "name": "Pinnacle Kill-Ship",
+  "manaCost": "{7}",
+  "type": "Artifact — Spacecraft",
+  "stationPt": "7/7",
+  "oracleText": "When this Spacecraft enters, it deals 10 damage to up to one target creature.\nStation (Tap another creature you control: Put charge counters equal to its power on this Spacecraft. Station only as a sorcery. It's an artifact creature at 7+.)\n7+ | Flying"
+}

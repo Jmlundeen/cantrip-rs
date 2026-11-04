@@ -1,0 +1,65 @@
+# Dress Down is on the battlefield before Pinnacle Kill-Ship enters (its trigger chooses no target) and is stationed with Bot1's
+# Gigantosaurus (10 power). Ten charge counters turn on "7+": the type change, flying and the 7/7 are one static ability whose effect
+# began in layer 4, so its layer 6 and 7b parts keep applying although Dress Down, earlier in layer 6, took the abilities of every
+# creature - a 7/7 artifact creature with flying (CR 613.6, 721.2b).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Gigantosaurus
+Mox Jet
+Mox Sapphire
+Black Lotus
+Dress Down
+Pinnacle Kill-Ship
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Pinnacle Kill-Ship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Pinnacle Kill-Ship.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+
+[Expect]
+Bot1.Battlefield.Pinnacle Kill-Ship.Counters.Charge = 10
+Bot1.Battlefield.Pinnacle Kill-Ship.Types = Artifact; Creature
+Bot1.Battlefield.Pinnacle Kill-Ship.Power = 7
+Bot1.Battlefield.Pinnacle Kill-Ship.Toughness = 7
+Bot1.Battlefield.Pinnacle Kill-Ship.Keywords = Flying

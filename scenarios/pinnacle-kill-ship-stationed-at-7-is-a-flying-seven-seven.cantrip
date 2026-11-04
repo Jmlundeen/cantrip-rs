@@ -1,0 +1,74 @@
+# Pinnacle Kill-Ship enters on turn 1 (five Moxen and Black Lotus pay {7}) with no creature to target. Stationed with Hulking Devil
+# (power 5) on turn 3 and then Raging Goblin (power 1) on turn 5 it has five and six charge counters, short of "7+": still only an
+# artifact, with no flying. Stationed with Raging Goblin again on turn 7 it has exactly seven: a 7/7 artifact creature with flying
+# (CR 721.2a).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Black Lotus
+Pinnacle Kill-Ship
+Hulking Devil
+Raging Goblin
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Pinnacle Kill-Ship.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hulking Devil.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Pinnacle Kill-Ship.Activate(Ability: Station)
+Bot1.Choose(Hulking Devil)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Pinnacle Kill-Ship.Counters.Charge = 5
+? Bot1.Battlefield.Pinnacle Kill-Ship.Types = Artifact
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Pinnacle Kill-Ship.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Pinnacle Kill-Ship.Counters.Charge = 6
+? Bot1.Battlefield.Pinnacle Kill-Ship.Types = Artifact
+? Bot1.Battlefield.Pinnacle Kill-Ship.Keywords = (absent)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Pinnacle Kill-Ship.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Pinnacle Kill-Ship.Counters.Charge = 7
+Bot1.Battlefield.Pinnacle Kill-Ship.Types = Artifact; Creature
+Bot1.Battlefield.Pinnacle Kill-Ship.Power = 7
+Bot1.Battlefield.Pinnacle Kill-Ship.Toughness = 7
+Bot1.Battlefield.Pinnacle Kill-Ship.Keywords = Flying
