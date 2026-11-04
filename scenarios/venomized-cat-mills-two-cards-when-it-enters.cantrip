@@ -1,0 +1,36 @@
+# Venomized Cat: deathtouch, and "When this creature enters, mill two cards." The top two cards of Bot1's library, Island and Mountain, go to its
+# graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Venomized Cat
+Plains
+Plains
+Plains
+Island
+Mountain
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Venomized Cat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Venomized Cat.Keywords = Deathtouch
+Bot1.Graveyard.Count = 2
+Bot1.Library.Count = 20
+Stack.Count = 0
