@@ -1,0 +1,67 @@
+# Mechan Assembler: 4/4; "Whenever another artifact you control enters, create a 2/2 colorless Robot artifact creature token. This ability triggers only once each turn."
+# Bot1 pays {4}{U} with five Moxen (artifacts that entered before it); the Assembler itself makes no Robot. Bot2's Ornithopter (an artifact the other side
+# controls) makes none. On turn 3 Bot1's Sol Ring makes one Robot; the Ornithopter after it, in the same turn, makes none, nor does the Robot token's own entry.
+# On turn 5 Mana Vault makes a second.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Mechan Assembler
+Sol Ring
+Ornithopter
+Mana Vault
+Island x11
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mechan Assembler.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Count = 6
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 8
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 9
+? Stack.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mana Vault.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 11

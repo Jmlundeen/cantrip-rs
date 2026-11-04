@@ -1,0 +1,8 @@
+{
+  "name": "Mechan Assembler",
+  "manaCost": "{4}{U}",
+  "type": "Artifact Creature — Robot Artificer",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Whenever another artifact you control enters, create a 2/2 colorless Robot artifact creature token. This ability triggers only once each turn."
+}
