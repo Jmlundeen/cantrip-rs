@@ -1,0 +1,61 @@
+# Ragost, Deft Gastronaut {R}{W} 2/2: "Artifacts you control are Foods in addition to their other types and have '{2}, {T}, Sacrifice this artifact: You gain 3 life.' {1}, {T}, Sacrifice a Food:
+# Ragost deals 3 damage to each opponent. At the beginning of each end step, if you gained life this turn, untap Ragost." Turn 1: Ragost enters. Turn 3: Mox Jet pays the {1} exactly and Ragost
+# sacrifices Mox Emerald, a Food: Bot2 takes 3, a 17. Then Ruby and Pearl pay the {2} of the Mox Sapphire's own granted ability, which taps itself and is sacrificed: Bot1 gains 3, a 23.
+# Ragost itself, a creature and no artifact, is no Food and cannot be sacrificed for its own ability. Bot2's Mox Ruby is no Food and has no such ability. Life was gained this turn, so Ragost, tapped for its ability, untaps at the end step (CR 603.4).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Ragost, Deft Gastronaut
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate(Ability: Add)
+Bot1.Battlefield.Mox Pearl.Activate(Ability: Add)
+Bot1.Hand.Ragost, Deft Gastronaut.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Emerald.Subtypes = Food
+? Bot2.Battlefield.Mox Ruby.Subtypes = (absent)
+Bot1.Battlefield.Mox Jet.Activate(Ability: Add)
+Bot1.Battlefield.Ragost, Deft Gastronaut.Activate(Ability: Sacrifice a Food)
+! Bot1.Choose(Ragost, Deft Gastronaut)
+Bot1.Choose(Mox Emerald)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Bot1.Battlefield.Ragost, Deft Gastronaut.Tapped = true
+Bot1.Battlefield.Mox Ruby.Activate(Ability: Add)
+Bot1.Battlefield.Mox Pearl.Activate(Ability: Add)
+Bot1.Battlefield.Mox Sapphire.Activate(Ability: Sacrifice this artifact)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ragost, Deft Gastronaut.Tapped = false
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Ragost, Deft Gastronaut
+Bot1.Graveyard.Count = 2
+Bot2.Battlefield = Mox Ruby

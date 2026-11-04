@@ -1,0 +1,54 @@
+# Ragost, Deft Gastronaut: "At the beginning of each end step, if you gained life this turn, untap Ragost." Turn 3: Ragost taps to sacrifice Mox Emerald (a Food) for 3 damage and no life is
+# gained, so at the end step it does not untap (CR 603.4): still tapped on turn 4. During Bot2's turn 4 Bot1 gains 3 life with the Mox Sapphire's granted ability (the Food Sapphire
+# sacrificed to itself), and at Bot2's end step - "each end step", not only its own - Ragost untaps, though the life was gained on the other player's turn.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Ragost, Deft Gastronaut
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate(Ability: Add)
+Bot1.Battlefield.Mox Pearl.Activate(Ability: Add)
+Bot1.Hand.Ragost, Deft Gastronaut.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate(Ability: Add)
+Bot1.Battlefield.Ragost, Deft Gastronaut.Activate(Ability: Sacrifice a Food)
+Bot1.Choose(Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ragost, Deft Gastronaut.Tapped = true
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate(Ability: Add)
+Bot1.Battlefield.Mox Pearl.Activate(Ability: Add)
+Bot1.Battlefield.Mox Sapphire.Activate(Ability: Sacrifice this artifact)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+[T4 Bot2.End]
+? Bot1.Battlefield.Ragost, Deft Gastronaut.Tapped = true
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ragost, Deft Gastronaut.Tapped = false
+Bot1.Life = 23
+Bot2.Life = 17
