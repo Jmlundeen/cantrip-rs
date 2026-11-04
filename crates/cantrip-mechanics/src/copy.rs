@@ -264,3 +264,10 @@ pub const COPY_THE_NEXT_INSTANT_OR_SORCERY_YOU_CAST: AbilityDef = triggered(
     copy_the_cast_spell,
     "When you next cast an instant or sorcery spell this turn, copy that spell. You may choose new targets for the copy.",
 );
+
+/// `COPY_THE_NEXT_INSTANT_OR_SORCERY_YOU_CAST` as printed "copy it": Rimefire Torque and Summon: G.F. Cerberus's chapter II.
+pub const COPY_IT_THE_NEXT_INSTANT_OR_SORCERY_YOU_CAST: AbilityDef = triggered(
+    when_asked(EventMask::SPELL_CAST, crate::triggers::you_cast_instant_or_sorcery),
+    copy_the_cast_spell,
+    "When you next cast an instant or sorcery spell this turn, copy it. You may choose new targets for the copy.",
+);
