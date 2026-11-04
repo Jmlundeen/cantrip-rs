@@ -1,0 +1,39 @@
+# Beamsaw Prospector (2/1) dies to Bot2's Lightning Bolt: its controller Bot1 (not the Bolt's caster) gets a Lander token, an
+# artifact; the Prospector is in the graveyard.
+
+[Bot1 Deck]
+Beamsaw Prospector
+Mox Jet
+Mox Pearl
+Swamp x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Beamsaw Prospector.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Beamsaw Prospector)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Beamsaw Prospector
+Bot1.Battlefield = Mox Jet; Mox Pearl; Lander Token
+Bot1.Battlefield.Lander Token.Types = Artifact
+Bot2.Battlefield = Mox Ruby
