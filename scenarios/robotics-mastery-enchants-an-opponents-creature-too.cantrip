@@ -1,0 +1,42 @@
+# Robotics Mastery's "Enchant creature" is any creature (CR 303.4, 702.5): Bot1 flashes it onto Bot2's Memnite on turn 2, so Bot2's
+# 1/1 becomes 3/3 while the Aura and the two Robot tokens stay Bot1's (CR 303.4e).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Robotics Mastery
+Island x22
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Robotics Mastery.Cast(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Memnite.Power = 3
+Bot2.Battlefield.Memnite.Toughness = 3
+Bot1.Battlefield = Mox Jet; Mox Sapphire; Robot Token; Robot Token; Robotics Mastery
+Bot2.Battlefield = Memnite

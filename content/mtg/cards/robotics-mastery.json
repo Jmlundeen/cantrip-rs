@@ -1,0 +1,9 @@
+{
+  "name": "Robotics Mastery",
+  "manaCost": "{4}{U}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Flash\nEnchant creature\nWhen this Aura enters, create two 1/1 colorless Robot artifact creature tokens with flying.\nEnchanted creature gets +2/+2.",
+  "keywords": [
+    "Flash"
+  ]
+}
