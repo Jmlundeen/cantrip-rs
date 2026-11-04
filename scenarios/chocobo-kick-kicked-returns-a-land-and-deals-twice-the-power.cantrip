@@ -1,0 +1,48 @@
+# Chocobo Kick kicked: "Kicker - Return a land you control to its owner's hand" (CR 702.33a) is paid with Bot1's Forest, an
+# untapped land that is not what pays the {1}{G} (the Moxen do, exactly). The spell is kicked (CR 702.33d), so Bot1's Cactuar
+# (3 power) deals twice that, 6, to Bot2's Balamb T-Rexaur (6/6) instead of 3, and it dies. The Forest is in Bot1's hand again:
+# the four Forests (three dealt, one drawn on turn 3, one played and returned) are all that Bot1 holds.
+
+[Bot1 Deck]
+Cactuar
+Mox Emerald
+Mox Pearl
+Chocobo Kick
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Mox Pearl
+Balamb T-Rexaur
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cactuar.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Balamb T-Rexaur.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chocobo Kick.Cast
+Bot1.Modes(Kicker—Return a land you control to its owner's hand)
+Bot1.Target(Bot1.Battlefield.Cactuar)
+Bot1.Target(Bot2.Battlefield.Balamb T-Rexaur)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Balamb T-Rexaur; Black Lotus; Black Lotus
+Bot1.Graveyard = Chocobo Kick
+Bot1.Hand.Count = 4

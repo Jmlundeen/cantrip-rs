@@ -1,0 +1,51 @@
+# Chocobo Kick with one of its two targets gone as it resolves (CR 608.2b): Bot1 targets its Cactuar (3/3) and Bot2's Steel Wall
+# (0/4), and Bot2 answers with an Unsummon on the Cactuar. The Cactuar is back in Bot1's hand, no longer a legal target, so it
+# deals no damage - the Wall is unmarked - but the spell still resolves for its other, legal target and goes to the graveyard.
+
+[Bot1 Deck]
+Cactuar
+Mox Emerald
+Mox Pearl
+Chocobo Kick
+Forest x20
+
+[Bot2 Deck]
+Steel Wall
+Mox Pearl
+Mox Sapphire
+Unsummon
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cactuar.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steel Wall.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chocobo Kick.Cast
+Bot1.Modes(Cast without kicking)
+Bot1.Target(Bot1.Battlefield.Cactuar)
+Bot1.Target(Bot2.Battlefield.Steel Wall)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Cactuar)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Steel Wall.Damage = 0
+Bot1.Hand.Cactuar.Power = 3
+Bot1.Graveyard = Chocobo Kick

@@ -1,0 +1,51 @@
+# Chocobo Kick, {1}{G} sorcery: "Target creature you control deals damage equal to its power to target creature an opponent
+# controls" (CR 120.3, 609.7). On turn 3 Bot1, with Mox Emerald and Mox Pearl paying exactly, casts it without the kicker
+# (declining "Return a land you control") with its Cactuar (3/3) as the source and Bot2's Balamb T-Rexaur (6/6) as the victim: 3
+# damage, not the kicked 6, and Bot1's Forest stays. The sides count: Bot2's creature is no legal first target, and Bot1's own
+# Cactuar is no legal second one.
+
+[Bot1 Deck]
+Cactuar
+Mox Emerald
+Mox Pearl
+Chocobo Kick
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Mox Pearl
+Balamb T-Rexaur
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cactuar.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Balamb T-Rexaur.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chocobo Kick.Cast
+Bot1.Modes(Cast without kicking)
+! Bot1.Target(Bot2.Battlefield.Balamb T-Rexaur)
+Bot1.Target(Bot1.Battlefield.Cactuar)
+! Bot1.Target(Bot1.Battlefield.Cactuar)
+Bot1.Target(Bot2.Battlefield.Balamb T-Rexaur)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Balamb T-Rexaur.Damage = 3
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Chocobo Kick
