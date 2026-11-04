@@ -1,0 +1,11 @@
+{
+  "name": "Vulture, Scheming Scavenger",
+  "manaCost": "{5}{U/B}",
+  "type": "Legendary Creature — Human Artificer Villain",
+  "power": 4,
+  "toughness": 6,
+  "oracleText": "Flying\nWhenever Vulture attacks, other Villains you control gain flying until end of turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

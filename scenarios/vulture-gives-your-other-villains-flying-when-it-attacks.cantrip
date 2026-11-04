@@ -1,0 +1,87 @@
+# Vulture, Scheming Scavenger ({5}{U/B}, 4/6, flying): "Whenever Vulture attacks, other Villains you control gain flying until end of turn." Turn 1
+# the five Moxen and Gleemox cast him. Turn 3 Agents of Hydra (a Villain) and turn 5 Memnite (no Villain) are cast; Bot2 has an Agents of Hydra too.
+# Attacking on turn 5, Vulture's trigger gives flying to Bot1's Agents of Hydra only: not to the Memnite, not to Bot2's Villain, and not to
+# Vulture himself, who has it already. On Bot2's turn 6 the Agents has lost it with the turn.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Gleemox
+Vulture, Scheming Scavenger
+Agents of Hydra
+Memnite
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Agents of Hydra
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Vulture, Scheming Scavenger.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Agents of Hydra.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Agents of Hydra.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Vulture, Scheming Scavenger > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Agents of HYDRA.Keywords = Flying
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+? Bot2.Battlefield.Agents of HYDRA.Keywords = (absent)
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Agents of HYDRA.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield.Vulture, Scheming Scavenger.Keywords = Flying
