@@ -1,0 +1,37 @@
+# Dockworker Drone dying with no other creature of Bot1's: "target creature you control" has no legal target (CR 603.3d), so the
+# trigger is removed from the stack without a target being asked for (refused) and Bot2's Ornithopter gets nothing.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Dockworker Drone
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Flame Slash
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Dockworker Drone.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Flame Slash.Cast(Bot1.Battlefield.Dockworker Drone)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Target
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Dockworker Drone
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
