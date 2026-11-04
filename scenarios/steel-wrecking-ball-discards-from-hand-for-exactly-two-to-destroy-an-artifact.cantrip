@@ -1,0 +1,39 @@
+# Steel Wrecking Ball: "{1}{R}, Discard this card: Destroy target artifact." Activated from the hand, the discard part of the cost (CR 118.3).
+# On turn 3 Bot1 has only Mox Ruby's {R} (Mox Jet still in hand): short by one, refused. Mox Jet then makes exactly {1}{R} and the pool is
+# empty afterwards; Bot2's Mox Sapphire is destroyed. An Island is refused as a target (not an artifact), beside the Moxen.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Steel Wrecking Ball
+Mountain x3
+Mountain x10
+
+[Bot2 Deck]
+Mox Sapphire
+Island x3
+Island x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Steel Wrecking Ball.Activate(Bot2.Battlefield.Mox Sapphire; Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Steel Wrecking Ball.Activate(Bot2.Battlefield.Island)
+Bot1.Hand.Steel Wrecking Ball.Activate(Bot2.Battlefield.Mox Sapphire)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot2.Battlefield = Island
+Bot2.Graveyard = Mox Sapphire
+Bot1.Graveyard = Steel Wrecking Ball

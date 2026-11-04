@@ -1,0 +1,43 @@
+# Steel Wrecking Ball: "When this artifact enters, it deals 5 damage to target creature." Only a creature may be chosen (CR 115.1): Bot2's
+# Mox Sapphire, an artifact that is no creature, is refused beside Aegis Turtle, a 0/5 that dies of exactly 5 damage (CR 120.6, 704.5g).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Ornithopter
+Steel Wrecking Ball
+Mountain x3
+Mountain x10
+
+[Bot2 Deck]
+Mox Sapphire
+Aegis Turtle
+Island x2
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Aegis Turtle.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Steel Wrecking Ball.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Mox Sapphire)
+Bot1.Target(Aegis Turtle)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Aegis Turtle
+Bot2.Battlefield = Mox Sapphire
+Bot1.Battlefield = Mox Ruby; Mox Jet; Ornithopter; Steel Wrecking Ball

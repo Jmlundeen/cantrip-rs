@@ -1,0 +1,6 @@
+{
+  "name": "Steel Wrecking Ball",
+  "manaCost": "{5}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, it deals 5 damage to target creature.\n{1}{R}, Discard this card: Destroy target artifact."
+}
