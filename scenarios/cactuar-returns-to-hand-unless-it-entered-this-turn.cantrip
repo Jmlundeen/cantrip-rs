@@ -1,0 +1,28 @@
+# Cactuar, {G} 3/3 Plant with trample: "At the beginning of your end step, if this creature didn't enter the battlefield this turn,
+# return it to its owner's hand" (CR 603.4, 400.7). Bot1 casts it on turn 1 off a Mox Emerald: it entered this turn, so the end
+# step's trigger does not happen and it is still a 3/3 trampler on the battlefield on turn 3. That turn's end step finds it
+# having been there since before, so it returns to Bot1's hand, and on turn 5 it is in the hand and off the battlefield.
+
+[Bot1 Deck]
+Cactuar
+Mox Emerald
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cactuar.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Cactuar.Power = 3
+? Bot1.Battlefield.Cactuar.Toughness = 3
+? Bot1.Battlefield.Cactuar.Keywords = Trample
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Hand.Cactuar.Power = 3

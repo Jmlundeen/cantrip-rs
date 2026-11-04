@@ -1,0 +1,11 @@
+{
+  "name": "Cactuar",
+  "manaCost": "{G}",
+  "type": "Creature — Plant",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Trample\nAt the beginning of your end step, if this creature didn't enter the battlefield this turn, return it to its owner's hand.",
+  "keywords": [
+    "Trample"
+  ]
+}
