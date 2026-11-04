@@ -1,0 +1,59 @@
+# "If The Darkness Crystal leaves the battlefield at the same time as one or more nontoken creatures an opponent controls
+# would die, those creature cards will be exiled and you'll gain 2 life for each of them" (the ruling): the Crystal is still
+# on the battlefield as the event would happen, so its replacement applies to it (CR 614.1).
+# On turn 3 Bot1's Ultima destroys the Crystal and Bot2's Ornithopter at once: the Ornithopter is exiled, and Bot1 gains 2.
+# Ultima ends the turn, so it is exiled as it resolves (CR 724.1b).
+# The Darkness Crystal {2}{B}{B}: Legendary Artifact
+#   Black spells you cast cost {1} less to cast.
+#   If a nontoken creature an opponent controls would die, instead exile it and you gain 2 life.
+#   {4}{B}{B}, {T}: Put target creature card exiled with The Darkness Crystal onto the battlefield tapped under your control with two additional +1/+1 counters on it.
+
+[Bot1 Deck]
+The Darkness Crystal
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Tundra
+Ultima
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Darkness Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tundra.Activate(Ability: Add {W})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ultima.Cast
+Bot1.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Life = 22
+Exile = Ornithopter; Ultima
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = The Darkness Crystal; Mox Sapphire; Mox Ruby; Mox Pearl; Mox Jet; Black Lotus

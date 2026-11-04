@@ -1,0 +1,6 @@
+{
+  "name": "The Darkness Crystal",
+  "manaCost": "{2}{B}{B}",
+  "type": "Legendary Artifact",
+  "oracleText": "Black spells you cast cost {1} less to cast.\nIf a nontoken creature an opponent controls would die, instead exile it and you gain 2 life.\n{4}{B}{B}, {T}: Put target creature card exiled with The Darkness Crystal onto the battlefield tapped under your control with two additional +1/+1 counters on it."
+}

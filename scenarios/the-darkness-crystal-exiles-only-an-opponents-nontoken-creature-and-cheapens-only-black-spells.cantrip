@@ -1,0 +1,87 @@
+# On turn 3 Bot1 casts Withering Torment ({2}{B}) off a Swamp and Mox Jet: black, it costs {1}{B}. It destroys Bot2's
+# Memnite, which is exiled instead of dying, and Bot1 gains 2 life and loses the Torment's 2. On turn 5 Pyroclasm, red,
+# costs its full {1}{R}: of what it kills, Bot2's Ornithopter is exiled for 2 more life; Bot2's Warrior token and Bot1's own
+# Memnite go to the graveyard, with no life. Bot2's Night's Whisper, black but not Bot1's, costs its full {1}{B} on turn 4.
+# The Darkness Crystal {2}{B}{B}: Legendary Artifact
+#   Black spells you cast cost {1} less to cast.
+#   If a nontoken creature an opponent controls would die, instead exile it and you gain 2 life.
+#   {4}{B}{B}, {T}: Put target creature card exiled with The Darkness Crystal onto the battlefield tapped under your control with two additional +1/+1 counters on it.
+
+[Bot1 Deck]
+The Darkness Crystal
+Black Lotus
+Mox Jet
+Swamp
+Memnite
+Withering Torment
+Pyroclasm
+Mountain
+Mountain
+Island x20
+
+[Bot2 Deck]
+Memnite
+Ornithopter
+Secure the Wastes
+Mox Pearl
+Plains
+Mox Jet
+Night's Whisper
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Darkness Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Secure the Wastes.Cast(X: 1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Withering Torment.Cast(Bot2.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Night's Whisper.Cast
+? Bot2.Mana =
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Pyroclasm.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot1.Life = 22
+Exile = Memnite; Ornithopter
+Bot2.Graveyard = Night's Whisper; Secure the Wastes
+Bot1.Graveyard = Memnite; Pyroclasm; Withering Torment; Black Lotus
+Bot2.Battlefield = Plains; Mox Pearl; Mox Jet

@@ -1,0 +1,82 @@
+# "Target creature card exiled with The Darkness Crystal" (CR 115.1, 607.2b): a card is a creature card by its
+# characteristics in exile. On turn 3 Bot1 Shocks Bot2's Memnite, and on turn 4 Bot2's Mutavault, animated into a 2/2
+# creature until end of turn; the Crystal exiles both for 2 life each. In exile Mutavault is a land card, not a creature
+# card, so on turn 7 the Crystal's ability refuses it, and returns the Memnite as a 3/3.
+# The Darkness Crystal {2}{B}{B}: Legendary Artifact
+#   Black spells you cast cost {1} less to cast.
+#   If a nontoken creature an opponent controls would die, instead exile it and you gain 2 life.
+#   {4}{B}{B}, {T}: Put target creature card exiled with The Darkness Crystal onto the battlefield tapped under your control with two additional +1/+1 counters on it.
+
+[Bot1 Deck]
+The Darkness Crystal
+Black Lotus
+Mox Jet
+Mox Ruby
+Mountain
+Swamp
+Shock
+Shock
+Swamp
+Swamp
+Island x20
+
+[Bot2 Deck]
+Memnite
+Mutavault
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Darkness Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mutavault.Play
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Mutavault)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 24
+? Exile = Memnite; Mutavault
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.The Darkness Crystal.Activate(Bot2.Exile.Mutavault)
+Bot1.Battlefield.The Darkness Crystal.Activate(Bot2.Exile.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+[T8 Bot2.Upkeep]
+
+[Expect]
+Exile = Mutavault
+Bot1.Battlefield.Memnite.Power = 3
+Bot1.Battlefield.Memnite.Tapped = true
+Bot2.Battlefield = Island
