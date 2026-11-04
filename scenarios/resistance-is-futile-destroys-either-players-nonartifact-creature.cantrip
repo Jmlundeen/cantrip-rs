@@ -1,4 +1,4 @@
-# Mode 1 destroys either player's nonartifact creature but cannot target an artifact creature or a land (CR 115.1, 701.8).
+# Mode 1 destroys either player's nonartifact creature but cannot target an artifact creature or a noncreature land (CR 115.1, 701.8).
 # Free mana isolates targeting; the pool immediately after casting also checks the printed {1}{B} cost.
 
 [Bot1 Deck]
