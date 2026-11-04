@@ -1,0 +1,33 @@
+# Alpharael's void trigger has an intervening "if" (CR 603.4): on Bot1's turn 3 no nonland permanent has left the battlefield
+# and no spell was warped, so attacking does not trigger it (nothing is on the stack) and Bot2 only takes the 3 combat damage.
+
+[Life]
+Bot2: 19
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Alpharael, Stonechosen
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Alpharael, Stonechosen.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Alpharael, Stonechosen > Bot2)
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16

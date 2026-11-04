@@ -1,0 +1,50 @@
+# Alpharael, Stonechosen's void: Bot2 is at 19. On Bot1's turn 3 its Lightning Bolt kills Bot2's Ornithopter (a nonland
+# permanent left the battlefield this turn), then Alpharael attacks and the trigger makes Bot2 lose half of 19 rounded up
+# (CR 107.1a): 10, so 9, not 10 (rounding down would leave 10). Alpharael's 3 combat damage then leaves 6.
+
+[Life]
+Bot2: 19
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Ruby
+Alpharael, Stonechosen
+Lightning Bolt
+Mox Sapphire
+Swamp x13
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Alpharael, Stonechosen.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Alpharael, Stonechosen > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 9
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 6
+Bot2.Graveyard = Ornithopter

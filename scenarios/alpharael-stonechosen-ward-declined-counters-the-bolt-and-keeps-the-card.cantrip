@@ -1,0 +1,45 @@
+# Same position, but Bot2 declines the ward cost: the Bolt is countered, Alpharael lives undamaged and Bot2 keeps Mox Jet.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Alpharael, Stonechosen
+Swamp x16
+
+[Bot2 Deck]
+Lightning Bolt
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island
+Black Lotus
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Alpharael, Stonechosen.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Alpharael, Stonechosen)
+Bot2.Decline
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand = Mox Jet
+Bot1.Battlefield.Alpharael, Stonechosen.Damage = 0

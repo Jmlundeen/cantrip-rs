@@ -1,0 +1,8 @@
+{
+  "name": "Alpharael, Stonechosen",
+  "manaCost": "{3}{B}{B}",
+  "type": "Legendary Creature — Human Cleric",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Ward—Discard a card at random.\nVoid — Whenever Alpharael attacks, if a nonland permanent left the battlefield this turn or a spell was warped this turn, defending player loses half their life, rounded up."
+}
