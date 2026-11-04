@@ -1,0 +1,24 @@
+use cantrip_api::*;
+use cantrip_mechanics::{flashback, history, library, select};
+use cantrip_oracle as oracle;
+
+/// "A Vehicle card", which may be left unfound (CR 701.23b).
+const VEHICLE_CARD: Selection = Selection::of(select::up_to(1), &[select::subtype_card(Subtype::Vehicle)]).called("Vehicle");
+
+/// "Search your library for a Vehicle card, reveal it, and put it into your hand. If this spell was cast from a graveyard, put
+/// that card onto the battlefield instead. Then shuffle." The card goes to one place only (CR 701.23, 608.2c), asked of how the
+/// spell was cast (CR 601.2a).
+fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if history::cast_from_graveyard(g.history(), item.object).is_some() {
+        library::find_to_battlefield(g, item.controller, item.object, VEHICLE_CARD, false)?;
+    } else {
+        library::find_to_hand(g, item.controller, item.object, VEHICLE_CARD, true)?;
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    spell: spell(&[], effect),
+    ways: &[flashback::way(cost("{4}{W}{W}{W}"), "Flashback {4}{W}{W}{W} (You may cast this card from your graveyard for its flashback cost. Then exile it.)")],
+    ..oracle::FROM_FATHER_TO_SON
+};
