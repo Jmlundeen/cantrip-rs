@@ -1,0 +1,39 @@
+# Honor: if its only target is illegal as it resolves, it doesn't resolve and "you won't draw a card" (CR 608.2b, the
+# rulings). Bot1 casts Honor at its Memnite on turn 3; Bot2 answers with Lightning Bolt ({R} from Mox Ruby), so no counter
+# is put anywhere and Bot1's hand gains nothing from Honor.
+
+[Bot1 Deck]
+Plains
+Memnite
+Honor
+Island
+Island
+Island
+Island
+Mox Pearl
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Honor.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Honor; Memnite
+Bot1.Hand = Island; Island; Island; Island; Mox Pearl
+Bot1.Library.Count = 14
