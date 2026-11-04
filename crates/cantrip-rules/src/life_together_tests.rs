@@ -384,11 +384,77 @@ static MELIRA: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn wordsmith_opponent_damaged(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected && cantrip_mechanics::history::opponent_dealt_noncombat_damage_this_turn(
+        q.history(), q.state(), q.controller(source))
+}
+
+/// Whiplash Wordsmith's history-dependent static, using the same history query as the printed card implementation.
+static REVIEW_WORDSMITH: CardDef = CardDef {
+    name: "Damage History Whiplash Wordsmith",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(3), toughness: Some(3),
+    statics: &[static_ability(Layer::Ability, wordsmith_opponent_damaged,
+        cantrip_mechanics::statics::have_flying_and_haste,
+        "As long as an opponent was dealt noncombat damage this turn, this creature has flying and haste.")],
+    ..CardDef::BLANK
+};
+
+fn sonic_damage(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    if let Event::Damage { target: Target::Object(id), .. } = *event {
+        let chars = q.chars(id);
+        if q.state().obj(id).controller == me.controller && chars.is(CardType::Creature)
+            && (chars.has(Keyword::Flash) || chars.has(Keyword::Haste))
+        {
+            return Fired::about(Target::Object(id));
+        }
+    }
+    None
+}
+
+/// Sonic's printed damage trigger; the attack trigger does not participate in these positions.
+static REVIEW_SONIC: CardDef = CardDef {
+    name: "Damage History Sonic the Hedgehog",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2), toughness: Some(4),
+    keywords: Keywords::of(&[Keyword::Haste]),
+    abilities: &[triggered(when_asked(EventMask::DAMAGE, sonic_damage), nothing,
+        "Whenever a creature you control with flash or haste is dealt damage, create a tapped Treasure token.")],
+    ..CardDef::BLANK
+};
+
+fn review_double_all_counters(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    match proposal {
+        Proposal::Counters(c) => c.counts.iter_mut().for_each(|n| *n *= 2),
+        Proposal::PlayerCounters(c) => { c.poison *= 2; c.energy *= 2; c.experience *= 2; }
+        _ => {}
+    }
+}
+
+static REVIEW_TALENT: CardDef = CardDef {
+    name: "Counter Order Level Three Innkeeper's Talent",
+    replacements: &[replacement(ReplacementKind::Counters, counters_put_by_you, review_double_all_counters,
+        "If you would put one or more counters on a permanent or player, put twice that many of each of those kinds of counters on that permanent or player instead.")],
+    ..TALENT
+};
+
+fn clasp_proliferate(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    g.proliferate(item.controller, item.object)
+}
+
+static REVIEW_CLASP: CardDef = CardDef {
+    name: "Counter Order Contagion Clasp",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[ability(Cost { tap: true, ..cost("{4}") }, clasp_proliferate, "{4}, {T}: Proliferate.")],
+    ..CardDef::BLANK
+};
+
 fn game() -> Game {
     let table = Box::leak(Box::new(CardTable::new([
         &WATCHER, &DOUBLER, &EMPERION, &REMEDY, &DRAIN, &PYROHEMIA, &LIFELINKER, &PRIDEMATE, &ANGEL, &DARIEN,
         &HAWK, &INFECT, &TOXIC, &ARMOR, &REVIEW_DARIEN, &REVIEW_SEASON, &REVIEW_STINGER,
-        &RESULT_HISTORY_WATCHER, &TALENT, &MELIRA, &RED_TERROR, &HAPATRA,
+        &RESULT_HISTORY_WATCHER, &TALENT, &MELIRA, &RED_TERROR, &HAPATRA, &REVIEW_WORDSMITH, &REVIEW_SONIC,
+        &REVIEW_TALENT, &REVIEW_CLASP,
     ])));
     let mut g = Game::new(table, &Setup { decks: vec![Vec::new(); 4], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -450,6 +516,50 @@ fn pyrohemia_triggers_ob_nixilis_once_for_three_opponents_losing_one() {
     assert_eq!(changes(&g), vec![(ACTIVE, -1), (LAST, -1), (YOU, -1), (FIRST, -1)]);
     assert_eq!(trigger_count(&g, watcher, 0), 1, "one simultaneous loss event, not three triggers");
     assert_eq!(trigger_count(&g, watcher, 1), 3, "Mindcrank still sees each opponent's occurrence");
+}
+
+/// CR 120.4b, 603.10, 611.3a: the damage has been dealt when its triggers are checked. Wordsmith's static
+/// therefore gives it haste from the opponent's simultaneous damage, and Sonic triggers for it as well as itself.
+#[test]
+fn damage_trigger_layers_see_the_simultaneous_damage_history() {
+    let mut g = game();
+    g.state.update_turn(|t| t.number = 1);
+    let sonic = put(&mut g, &REVIEW_SONIC, YOU);
+    let wordsmith = put(&mut g, &REVIEW_WORDSMITH, YOU);
+    let source = put(&mut g, &PYROHEMIA, YOU);
+    assert!(!cx(&mut g).chars(wordsmith).has(Keyword::Haste));
+    let item = pyrohemia_item(&g, source);
+    pyrohemia(&mut cx(&mut g), &item).unwrap();
+    assert!(cx(&mut g).chars(wordsmith).has(Keyword::Haste));
+    assert_eq!(trigger_count(&g, sonic, 0), 2, "Sonic sees itself and Wordsmith with haste from this damage");
+}
+
+/// Positive control: the same real static and trigger work when earlier noncombat damage gave Wordsmith haste.
+#[test]
+fn damage_trigger_layers_see_prior_damage_history_control() {
+    let mut g = game();
+    g.state.update_turn(|t| t.number = 1);
+    let sonic = put(&mut g, &REVIEW_SONIC, YOU);
+    let wordsmith = put(&mut g, &REVIEW_WORDSMITH, YOU);
+    let source = put(&mut g, &PYROHEMIA, YOU);
+    crate::ops::damage(&mut cx(&mut g), source, Target::Player(FIRST), 1, false);
+    assert!(cx(&mut g).chars(wordsmith).has(Keyword::Haste));
+    let item = pyrohemia_item(&g, source);
+    pyrohemia(&mut cx(&mut g), &item).unwrap();
+    assert_eq!(trigger_count(&g, sonic, 0), 2);
+}
+
+/// Negative control: an ordinary one-damage spell hitting only Wordsmith gives it no haste and triggers no Sonic.
+#[test]
+fn damage_trigger_layers_without_opponent_damage_control() {
+    let mut g = game();
+    g.state.update_turn(|t| t.number = 1);
+    let sonic = put(&mut g, &REVIEW_SONIC, YOU);
+    let wordsmith = put(&mut g, &REVIEW_WORDSMITH, YOU);
+    let source = put(&mut g, &PYROHEMIA, YOU);
+    crate::ops::damage(&mut cx(&mut g), source, Target::Object(wordsmith), 1, false);
+    assert!(!cx(&mut g).chars(wordsmith).has(Keyword::Haste));
+    assert_eq!(trigger_count(&g, sonic, 0), 0);
 }
 
 #[test]
@@ -889,6 +999,69 @@ fn result_preparation_restarts_apnap_when_concession_returns_a_counter_recipient
         Event::CountersPut { object, kind: CounterKind::MinusOne, amount: 4, by: ACTIVE, .. } if object == nighthawk)));
     assert_eq!(g.state.player(LAST).life, 16);
     assert_eq!(g.state.player(ACTIVE).life, 21);
+}
+
+/// CR 701.34a, 616.1, 101.4: proliferating a player and a permanent is one simultaneous instruction.
+/// ACTIVE's poison-counter replacements must precede FIRST's permanent-counter replacements, not vice versa.
+#[test]
+fn proliferate_counter_replacements_are_apnap_across_players_and_permanents() {
+    let mut g = game();
+    let nighthawk = put(&mut g, &LIFELINKER, FIRST);
+    crate::counters::put(&mut cx(&mut g), nighthawk, CounterKind::PlusOne, 1, FIRST, crate::counters::How::Effect);
+    crate::counters::put_on_player(&mut cx(&mut g), ACTIVE,
+        crate::counters::PlayerCounts { poison: 1, ..Default::default() }, FIRST);
+    put(&mut g, &REVIEW_TALENT, ACTIVE);
+    put(&mut g, &REVIEW_TALENT, ACTIVE);
+    let source = put(&mut g, &REVIEW_CLASP, ACTIVE);
+    g.state.stack_push(pyrohemia_item(&g, source));
+    let serial = g.state.stack.last().unwrap().serial;
+    g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
+    g.run();
+    let request = g.pending().cloned().unwrap();
+    assert_eq!(request.player, ACTIVE);
+    assert!(matches!(request.kind, RequestKind::ChooseTarget { .. }));
+    g.answer(request.id, ACTIVE, Answer::Targets(vec![Target::Player(ACTIVE), Target::Object(nighthawk)])).unwrap();
+    g.run();
+    let request = g.pending().unwrap();
+    assert!(matches!(request.kind, RequestKind::ChooseReplacement { .. }));
+    assert_eq!(request.player, ACTIVE, "proliferate's player counters cannot be scheduled after all permanent counters");
+    assert_eq!(g.state.obj(nighthawk).counters(CounterKind::PlusOne), 1);
+    assert_eq!(g.state.player(ACTIVE).poison(), 1);
+}
+
+/// CR 616.1, 800.4a: a creature returned by its controller's concession is now affected by its surviving
+/// controller's Doubling Seasons, including when its own counter-replacement question was already outstanding.
+/// Reachable with Ray of Command taking Vampire Nighthawk, Plague Stinger in combat, and two Seasons on each side.
+#[test]
+fn counter_result_rechecks_controller_during_its_own_replacement_choice() {
+    let mut g = game();
+    let seasons = [put(&mut g, &REVIEW_SEASON, ACTIVE), put(&mut g, &REVIEW_SEASON, ACTIVE)];
+    put(&mut g, &REVIEW_SEASON, FIRST);
+    put(&mut g, &REVIEW_SEASON, FIRST);
+    let stinger = put(&mut g, &REVIEW_STINGER, ACTIVE);
+    let nighthawk = put(&mut g, &LIFELINKER, ACTIVE);
+    let controller_source = put(&mut g, &PYROHEMIA, FIRST);
+    cantrip_api::Game::add_effect(&mut cx(&mut g), controller_source, nighthawk, EffectKind::Control(FIRST), Duration::EndOfTurn);
+    g.state.set_attackers(vec![
+        Attacker { blocked: true, ..Attacker::new(stinger, Target::Player(FIRST), FIRST, TypeSet::NONE) },
+    ]);
+    g.state.set_blocks(vec![Block { blocker: nighthawk, attacker: stinger, first_strike: false }]);
+    g.state.update_turn(|t| t.set_step(Step::CombatDamage));
+    g.state.frame_push(Frame::new(FrameKind::BeginStep));
+    g.run();
+    assert_eq!(g.pending().unwrap().player, FIRST);
+    assert!(matches!(g.pending().unwrap().kind, RequestKind::ChooseReplacement { subject: Some(id), .. } if id == nighthawk));
+    g.concede(FIRST);
+    assert_eq!(g.state.obj(nighthawk).controller, ACTIVE);
+    let request = g.pending().cloned().expect("the returned creature's controller orders its two Seasons");
+    assert!(matches!(&request.kind, RequestKind::ChooseReplacement { subject: Some(id), sources, .. }
+        if *id == nighthawk && *sources == seasons), "expected returned recipient's replacements, got {:?}; counters={}",
+        request.kind, g.state.obj(nighthawk).counters(CounterKind::MinusOne));
+    assert_eq!(request.player, ACTIVE);
+    g.answer(request.id, ACTIVE, Answer::Index(0)).unwrap();
+    g.run();
+    assert!(g.log.iter().any(|r| matches!(r.event,
+        Event::CountersPut { object, kind: CounterKind::MinusOne, amount: 4, by: ACTIVE, .. } if object == nighthawk)));
 }
 
 #[test]
