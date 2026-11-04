@@ -336,12 +336,22 @@ pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
 /// existed on the battlefield, pumps, counters and copy effects included. It is the old object of the zone change that made
 /// `sacrificed` (CR 400.7); zero for an object no zone change made. Bolg of the North and Rhovanion Rampager print it.
 pub fn power_of_sacrificed_permanent(q: &dyn Query, sacrificed: ObjectId) -> i16 {
-    q.history()
-        .all()
-        .iter()
-        .rev()
-        .find_map(|r| if let Event::ZoneChange { old, new, .. } = r.event && new == sacrificed { Some(old) } else { None })
-        .map_or(0, |old| crate::targets::power_or_last_known(q, old))
+    sacrificed_permanent(q, sacrificed).map_or(0, |old| crate::targets::power_or_last_known(q, old))
+}
+
+/// What a sacrificed permanent was on the battlefield (CR 701.21, 400.7): the old object of the zone change that made `sacrificed`
+/// (the new object in the graveyard, as `effects::may_sacrifice` returns it), whose characteristics are last-known information
+/// (CR 608.2h); `None` for an object no zone change made.
+fn sacrificed_permanent(q: &dyn Query, sacrificed: ObjectId) -> Option<ObjectId> {
+    q.history().all().iter().rev().find_map(|r| if let Event::ZoneChange { old, new, .. } = r.event && new == sacrificed { Some(old) } else { None })
+}
+
+/// "The sacrificed permanent's mana value" of a permanent a resolving ability sacrificed (CR 701.21, 608.2h, 202.3): the mana
+/// value of the permanent that `sacrificed` (the new object in the graveyard, as `effects::may_sacrifice` returns it) was before
+/// the sacrifice, as it last existed on the battlefield, copy effects included. It is the old object of the zone change that
+/// made `sacrificed` (CR 400.7); zero for an object no zone change made. Enigmatic Incarnation and Eddie Brock print it.
+pub fn mana_value_of_sacrificed_permanent(q: &dyn Query, sacrificed: ObjectId) -> u32 {
+    sacrificed_permanent(q, sacrificed).map_or(0, |old| q.mana_value(old))
 }
 
 /// "Each creature that convoked it" (CR 702.51c, 109.2): the creatures that convoked `object` (a spell, or the permanent it

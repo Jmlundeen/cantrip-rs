@@ -13,7 +13,7 @@
 //!   (`select::basic_land_cards(up_to(2))`).
 //! - **Counts:** [`exactly`], [`up_to`], [`ANY_NUMBER`], [`as_many_as_can`] - "a card" of a search with no quality it could
 //!   fail to find is `as_many_as_can(1)`; "a [quality] card" may be left unfound (CR 701.23b), `up_to(1)`.
-//! - **Qualities of each card:** [`BASIC_LAND`], [`LAND`], [`CREATURE`], [`ARTIFACT`], [`NONLAND`], [`mana_value_at_most`], [`mana_value_exactly`],
+//! - **Qualities of each card:** [`BASIC_LAND`], [`LAND`], [`CREATURE`], [`ARTIFACT`], [`NONLAND`], [`PERMANENT_CARD`], [`mana_value_at_most`], [`mana_value_exactly`],
 //!   [`named`].
 //! - **Rules of the cards together:** [`DIFFERENT_NAMES`] (CR 201.2b), [`DIFFERENT_MANA_VALUES`] (CR 202.3),
 //!   [`total_mana_value_at_most`] (CR 202.3), [`SHARE_A_CARD_TYPE`] (CR 205.2a).
@@ -72,6 +72,10 @@ fn creature(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
 
 fn nonland(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
     Verdict::each(choice, |card| !q.chars(card).is(CardType::Land))
+}
+
+fn permanent_card(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |card| crate::targets::is_permanent_card(&q.chars(card)))
 }
 
 fn artifact(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
@@ -161,6 +165,10 @@ pub const CREATURE: Part = part(&(creature as SelectFn), 0, "");
 /// "A nonland card". Reckoner Shakedown chooses one from a revealed hand (`NONLAND_CARD`); Tidehollow Sculler, Elite
 /// Spellbinder and Deep Cavern Bat print the same quality.
 pub const NONLAND: Part = part(&(nonland as SelectFn), 0, "");
+
+/// "A permanent card" (CR 110.4a): a card that is not an instant or a sorcery - an artifact, battle, creature, enchantment, land or
+/// planeswalker card. Cache Grab (from the cards milled) and Eddie Brock (from a hand) print it.
+pub const PERMANENT_CARD: Part = part(&(permanent_card as SelectFn), 0, "");
 
 /// "An artifact card". Tinker, Goblin Engineer, Inventors' Fair and Transmute Artifact search for it.
 pub const ARTIFACT: Part = part(&(artifact as SelectFn), 0, "");
