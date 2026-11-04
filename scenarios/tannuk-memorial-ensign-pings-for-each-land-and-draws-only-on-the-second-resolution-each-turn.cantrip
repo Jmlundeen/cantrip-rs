@@ -1,0 +1,68 @@
+# Tannuk, Memorial Ensign {1}{R}{G} 2/4: "Landfall - Whenever a land you control enters, Tannuk deals 1 damage to each opponent. If this is the second time this ability has resolved this turn, draw a card." On turn 1 Bot1 casts
+# Tannuk with three Moxen, plays a Forest (1st resolution: Bot2 19, no card), and two Crop Rotations each sacrifice a Forest to put another onto the battlefield: the 2nd resolution pings again (18) and draws a
+# card, the 3rd pings (17) and draws nothing (CR 608.2c). Bot2's own land on turn 2 is not "a land you control": no damage. On turn 3 the count starts again: Bot1's Forest is the 1st resolution this turn (16), no card.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Tannuk, Memorial Ensign
+Forest
+Crop Rotation
+Crop Rotation
+Forest x23
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tannuk, Memorial Ensign.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Crop Rotation.Cast
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Crop Rotation.Cast
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Bot1.Hand.Count = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Stack.Count = 0
+? Bot2.Life = 17
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+? Bot1.Hand.Count = 1
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 20
+Bot1.Hand.Count = 1

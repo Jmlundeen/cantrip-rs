@@ -1,0 +1,8 @@
+{
+  "name": "Tannuk, Memorial Ensign",
+  "manaCost": "{1}{R}{G}",
+  "type": "Legendary Creature — Kavu Pilot",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Landfall — Whenever a land you control enters, Tannuk deals 1 damage to each opponent. If this is the second time this ability has resolved this turn, draw a card."
+}
