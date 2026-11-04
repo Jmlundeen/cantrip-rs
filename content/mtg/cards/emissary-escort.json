@@ -1,0 +1,8 @@
+{
+  "name": "Emissary Escort",
+  "manaCost": "{1}{U}",
+  "type": "Artifact Creature — Robot Soldier",
+  "power": 0,
+  "toughness": 4,
+  "oracleText": "This creature gets +X/+0, where X is the greatest mana value among other artifacts you control."
+}

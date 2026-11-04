@@ -1,0 +1,64 @@
+# Emissary Escort: 0/4, an Artifact Creature, "This creature gets +X/+0, where X is the greatest mana value among other artifacts you control."
+# Bot1 pays for it with Black Lotus, which is sacrificed: it is 0/4, not 2/4 (the Escort, mana value 2, is not "other"). Bot2's Sol Ring (mana
+# value 1, an artifact the other side controls) does not count. Bot1's Mox Jet has mana value 0: still 0. Bot1's Sol Ring makes it 1, and Basalt
+# Monolith (3) makes it 3 - the greatest, not the sum 4. When Bot2 destroys the Monolith it is 1 again; the toughness stays 4.
+
+[Bot1 Deck]
+Black Lotus
+Emissary Escort
+Mox Jet
+Sol Ring
+Basalt Monolith
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Sol Ring
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Emissary Escort.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Emissary Escort.Power = 0
+? Bot1.Battlefield.Emissary Escort.Toughness = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+? Bot1.Battlefield.Emissary Escort.Power = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Emissary Escort.Power = 0
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Emissary Escort.Power = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Basalt Monolith.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Emissary Escort.Power = 3
+? Bot1.Battlefield.Emissary Escort.Toughness = 4
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Basalt Monolith)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Basalt Monolith; Black Lotus
+Bot1.Battlefield.Emissary Escort.Power = 1
+Bot1.Battlefield.Emissary Escort.Toughness = 4
