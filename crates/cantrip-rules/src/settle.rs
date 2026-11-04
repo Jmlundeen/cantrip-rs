@@ -824,6 +824,9 @@ type Found = Vec<(PendingTrigger, &'static TriggeredDef, Again)>;
 ///
 /// `permanent`: the source is on the battlefield (or was, for a look-back ability); false for an emblem in the command zone,
 /// which is no permanent (CR 114.4), so "a triggered ability of a permanent" does not mean its abilities.
+///
+/// `then`: the source as it was just before the events, for a look-back pass over the permanents that were there. `board`:
+/// the battlefield then, which each of its abilities that looks back on the event is asked of (`BoardThen`, CR 603.10a).
 #[allow(clippy::too_many_arguments)]
 fn consider(
     cx: &Cx,
@@ -837,6 +840,7 @@ fn consider(
     found: &mut Found,
     mut later: Option<&mut Found>,
     then: Option<&Then>,
+    board: Option<&Then>,
 ) {
     // A look-back pass judges the object as it was just before the event (CR 603.10a): its characteristics then, and who
     // controlled it then, who controls the ability (CR 603.3a).
@@ -885,6 +889,16 @@ fn consider(
         };
         // Asked through the game itself where its text is its object's own, which is nearly always.
         let own: &dyn Query = if words.is_some() { &given_text } else { cx };
+        // A look-back ability is asked of the game as it was just before the events (CR 603.10a, `BoardThen`): the
+        // permanents that stay on the battlefield as they were then, not as the events left them.
+        let board_then;
+        let own: &dyn Query = match board {
+            Some(then) if cx.cards().looks_back(ability, event, seen) => {
+                board_then = BoardThen { q: own, then };
+                &board_then
+            }
+            _ => own,
+        };
         // A state trigger (CR 603.8) triggers as soon as its state is true, so it is asked after every event, of the board as
         // it is now (never of a look-back pass), as well as each time a player would receive priority (`state_triggers`).
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
@@ -1231,6 +1245,14 @@ pub struct Before<'a> {
 /// copy's or its face-down values), one a copy effect's exception added, one a static ability that gives abilities
 /// anywhere or an effect could have given it, one from a keyword counter (CR 122.1b) - and any other has none to look back
 /// with. `Then::none` takes nothing, and the look-back pass then judges each permanent as it is now.
+///
+/// The whole battlefield is taken as well (`board`), and every look-back ability is asked of it (`BoardThen`): a condition
+/// that asks about other permanents (Kraven the Hunter's "the greatest power among creatures that player controls",
+/// Costume Closet's "modified creature": an Equipment attached then) is judged on the game as it was then, the permanents
+/// that stay on the battlefield included. Without it, one that stays could only be judged as it is now, after the events:
+/// a creature that a lord leaving with the event had pumped has lost the bonus by then, though the rule asks for the power
+/// it had just before. The departed rows (`LastKnown`) are no help there - only an object that left has one - and the
+/// history records the events, not every permanent's characteristics between them.
 pub struct Then {
     taken: bool,
     /// Resolved trigger multipliers before the event, including ones whose source leaves with it (CR 603.10a).
@@ -1240,6 +1262,11 @@ pub struct Then {
     /// By object, parallel to `objects`: how it had acquired its abilities then (CR 607.5; `layers::acquisitions`), the text
     /// it had and each slot's where an effect could have given one. Empty where nothing could have (`acquisition_possible`).
     acquired: Vec<Taken>,
+    /// Every permanent on the battlefield then, by object, with its characteristics, its controller and what it was
+    /// attached to (`BoardThen`).
+    board: Vec<(ObjectId, Chars, PlayerId, Option<ObjectId>)>,
+    /// The battlefield then, in its order.
+    battlefield: Vec<ObjectId>,
 }
 
 /// How an object had acquired its abilities as a `Then` was taken: by the text it had, and each slot's where an effect could
@@ -1266,29 +1293,35 @@ impl Then {
         Some(self.acquired.get(at).cloned().unwrap_or((Acquired::OWN, None)))
     }
 
-    /// Nothing taken: the look-back pass judges the permanents as they are now.
-    pub(crate) fn none() -> Then {
-        Then { taken: false, trigger_effects: Vec::new(), objects: Vec::new(), acquired: Vec::new() }
+    /// The game as it was then, for a look-back ability to be asked of (`BoardThen`): `None` where nothing was taken.
+    fn board(&self) -> Option<&Then> {
+        self.taken.then_some(self)
     }
 
-    /// The permanents on the battlefield now that could look back, as they are now: called just before the events.
+    /// `id` as it was on the battlefield then, if it was there.
+    fn on_board(&self, id: ObjectId) -> Option<&(ObjectId, Chars, PlayerId, Option<ObjectId>)> {
+        self.board.binary_search_by_key(&id, |r| r.0).ok().map(|at| &self.board[at])
+    }
+
+    /// Nothing taken: the look-back pass judges the permanents as they are now.
+    pub(crate) fn none() -> Then {
+        Then { taken: false, trigger_effects: Vec::new(), objects: Vec::new(), acquired: Vec::new(), board: Vec::new(), battlefield: Vec::new() }
+    }
+
+    /// The whole battlefield as it is now, and which of its permanents could look back: called just before the events.
     pub(crate) fn now(cx: &Cx) -> Then {
         let cards = cx.cards();
         let s = cx.s();
         let could = could_have(cx, &cards.look_back, TriggeredDef::may_look_back);
-        let mut objects: Vec<(ObjectId, Chars, PlayerId)> = s
-            .battlefield()
-            .iter()
-            .copied()
-            .filter(|&id| could(id))
-            .map(|id| (id, layers::chars(cards, s, &cx.g.log, id), s.obj(id).controller))
-            .collect();
-        objects.sort_unstable_by_key(|&(id, _, _)| id);
+        let battlefield = s.battlefield().to_vec();
+        let mut board: Vec<(ObjectId, Chars, PlayerId, Option<ObjectId>)> =
+            battlefield.iter().map(|&id| (id, layers::chars(cards, s, &cx.g.log, id), s.obj(id).controller, s.obj(id).attached_to)).collect();
+        board.sort_unstable_by_key(|r| r.0);
+        let objects: Vec<(ObjectId, Chars, PlayerId)> = board.iter().filter(|r| could(r.0)).map(|&(id, chars, controller, _)| (id, chars, controller)).collect();
         // With `CANTRIP_VERIFY`: a permanent left out has no look-back ability now - a way of giving one that the set above
         // misses is found here, not as a trigger that silently never happens.
         if layers::verifying() {
-            for &id in s.battlefield().iter().filter(|&&id| !could(id)) {
-                let chars = layers::chars(cards, s, &cx.g.log, id);
+            for &(id, chars, _, _) in board.iter().filter(|r| !could(r.0)) {
                 assert!(
                     !chars.abilities().any(|a| matches!(cards.ability(a), AbilityDef::Triggered(t) if t.may_look_back())),
                     "{id:?} has a look-back ability that nothing counted as able to give it (CR 603.10a)"
@@ -1301,7 +1334,109 @@ impl Then {
         } else {
             Vec::new()
         };
-        Then { taken: true, trigger_effects: s.effects.iter().filter(|e| e.kind == EffectKind::TriggersAgainWhileSourceTapped).copied().collect(), objects, acquired }
+        let trigger_effects = s.effects.iter().filter(|e| e.kind == EffectKind::TriggersAgainWhileSourceTapped).copied().collect();
+        Then { taken: true, trigger_effects, objects, acquired, board, battlefield }
+    }
+}
+
+/// The game as a look-back ability asks it (CR 603.10a: "the game state before the event"): the permanents on the
+/// battlefield just before the events (`Then::board`) - what is on it, with each one's characteristics, controller and
+/// attachment then - and everything else as `q` has it.
+struct BoardThen<'a> {
+    q: &'a dyn Query,
+    then: &'a Then,
+}
+
+impl Query for BoardThen<'_> {
+    fn state(&self) -> &GameState {
+        self.q.state()
+    }
+
+    fn linked_card(&self, card: CardId) -> CardId {
+        self.q.linked_card(card)
+    }
+
+    fn names_its_source(&self, waiting: Waiting) -> bool {
+        self.q.names_its_source(waiting)
+    }
+
+    fn text_linked(&self, source: ObjectId) -> Linked {
+        self.q.text_linked(source)
+    }
+
+    fn events(&self) -> &[Record] {
+        self.q.events()
+    }
+
+    fn card_id(&self, def: &'static CardDef) -> CardId {
+        self.q.card_id(def)
+    }
+
+    fn card(&self, id: CardId) -> &'static CardDef {
+        self.q.card(id)
+    }
+
+    fn chars(&self, id: ObjectId) -> Chars {
+        self.then.on_board(id).map_or_else(|| self.q.chars(id), |r| r.1)
+    }
+
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        self.q.token_chars(card, copy)
+    }
+
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        self.q.lost_all_abilities(id)
+    }
+
+    fn can_target(&self, asker: &Asker, target: Target) -> bool {
+        self.q.can_target(asker, target)
+    }
+
+    fn words(&self, id: ObjectId) -> Words {
+        self.q.words(id)
+    }
+
+    fn obj(&self, id: ObjectId) -> &Obj {
+        self.q.obj(id)
+    }
+
+    fn chosen_targets(&self) -> &[Target] {
+        self.q.chosen_targets()
+    }
+
+    fn event_subject(&self) -> Target {
+        self.q.event_subject()
+    }
+
+    fn slot_opponent(&self) -> Option<PlayerId> {
+        self.q.slot_opponent()
+    }
+
+    fn gift_assumed(&self) -> bool {
+        self.q.gift_assumed()
+    }
+
+    fn announced_x(&self) -> Option<u32> {
+        self.q.announced_x()
+    }
+
+    /// Whether `id` was on the battlefield then.
+    fn is_on_battlefield(&self, id: ObjectId) -> bool {
+        self.then.on_board(id).is_some()
+    }
+
+    fn controller(&self, id: ObjectId) -> PlayerId {
+        self.then.on_board(id).map_or_else(|| self.q.controller(id), |r| r.2)
+    }
+
+    /// The permanents `player` controlled then, in battlefield order.
+    fn permanents_of(&self, player: PlayerId) -> Vec<ObjectId> {
+        self.then.battlefield.iter().copied().filter(|&id| self.then.on_board(id).is_some_and(|r| r.2 == player)).collect()
+    }
+
+    /// What it was attached to then, both being on the battlefield.
+    fn attached_to(&self, id: ObjectId) -> Option<ObjectId> {
+        self.then.on_board(id)?.3.filter(|&host| self.then.on_board(host).is_some())
     }
 }
 
@@ -1397,6 +1532,9 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
     // has been: "the first time each turn" is not this event.
     // The look-back abilities are judged on the game just before the events (CR 603.10a), the history then included.
     let then = before.map(|b| b.then);
+    // Every look-back ability is asked of the game as it was then, the battlefield included (`BoardThen`): a permanent's, an
+    // emblem's, a delayed one's or a card's in another zone.
+    let board = then.and_then(Then::board);
     let seen_by_all = before.map_or(&[][..], |b| b.seen_by_all);
     // The cards a discard put into a hidden zone unrevealed: their characteristics, their abilities among them, are undefined
     // (CR 701.9c, 109.3), so none of their own abilities is asked of these events.
@@ -1427,17 +1565,17 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
             if let Some(before) = before {
                 for &id in before {
-                    consider(cx, id, true, true, event, seen, mask, &mut statics, &mut found, None, then);
+                    consider(cx, id, true, true, event, seen, mask, &mut statics, &mut found, None, then, board);
                 }
                 for &id in &now {
-                    consider(cx, id, false, true, event, seen, mask, &mut statics, &mut found, None, None);
+                    consider(cx, id, false, true, event, seen, mask, &mut statics, &mut found, None, None, None);
                 }
             } else {
                 // The same permanents for both: each one's characteristics are found once, and the abilities that don't look
                 // back come after every one that does, as they would from two passes.
                 let mut later: Found = Vec::new();
                 for &id in &now {
-                    consider(cx, id, true, true, event, seen, mask, &mut statics, &mut found, Some(&mut later), None);
+                    consider(cx, id, true, true, event, seen, mask, &mut statics, &mut found, Some(&mut later), None, None);
                 }
                 found.append(&mut later);
             }
@@ -1448,7 +1586,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             if !cx.s().zone(Zone::COMMAND).is_empty() {
                 let mut later: Found = Vec::new();
                 for id in cx.s().zone(Zone::COMMAND).to_vec() {
-                    consider(cx, id, true, false, event, seen, mask, &mut statics, &mut found, Some(&mut later), None);
+                    consider(cx, id, true, false, event, seen, mask, &mut statics, &mut found, Some(&mut later), None, board);
                 }
                 found.append(&mut later);
             }
@@ -1461,7 +1599,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                     // in an intervening "if" (CR 603.4). Its event is asked of the object it watches (`Delayed::watched`).
                     let asker = Asker { source: d.watched(), controller: d.controller, by: delayed_link(cx, &d), spell: false };
                     // Its text is the one that created it (`Delayed::words`, CR 603.7, 113.7a), its source's now notwithstanding.
-                    let own = crate::resolve::Given {
+                    let given = crate::resolve::Given {
                         q: &*cx,
                         earlier: &[],
                         subject: Target::None,
@@ -1470,14 +1608,23 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                         x: None,
                         text: d.words.map(|w| (d.source, w)),
                     };
+                    // One that looks back is asked of the game as it was just before the events (CR 603.10a, `BoardThen`).
+                    let board_then;
+                    let own: &dyn Query = match board {
+                        Some(then) if cx.cards().looks_back(d.ability, event, seen) => {
+                            board_then = BoardThen { q: &given, then };
+                            &board_then
+                        }
+                        _ => &given,
+                    };
                     if d.when.is_event()
                         && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
                         // A delayed triggered mana ability never goes on the stack: it resolves as the mana ability that
                         // triggered it does (CR 605.1b, 605.4a), in `tapped_for_mana`.
                         && !t.mana_ability
                         && t.listens.intersects(mask)
-                        && let Some(fired) = t.fires(&own, &asker, event)
-                        && t.condition.is_none_or(|condition| condition(&own, &asker))
+                        && let Some(fired) = t.fires(own, &asker, event)
+                        && t.condition.is_none_or(|condition| condition(own, &asker))
                         // The end of an "until" exile is no triggered ability but the second one-shot effect the rules create
                         // immediately after the event (CR 610.3), so nothing that stops abilities triggering stops it, and the
                         // event that ends the wait always uses it up below. A "this turn" delayed ability is a triggered ability
@@ -1551,13 +1698,22 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                 let zone = cx.s().obj(id).zone.kind();
                 for (nth, ability) in chars.abilities().enumerate() {
                     let by = || cx.link_nth(id, &chars, nth);
+                    // One that looks back is asked of the game as it was just before the events (CR 603.10a, `BoardThen`).
+                    let board_then;
+                    let own: &dyn Query = match board {
+                        Some(then) if cx.cards().looks_back(ability, event, seen) => {
+                            board_then = BoardThen { q: &*cx, then };
+                            &board_then
+                        }
+                        _ => &*cx,
+                    };
                     if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                         && t.functions.contains(zone)
                         && t.listens.intersects(mask)
                         && let Some(fired) = if t.cast_option.is_some() {
                             paid_to_cast(cx, id, &chars, nth, event)
                         } else {
-                            t.fires(cx, &Asker { source: id, controller: cx.s().obj(id).controller, by: by(), spell: false }, event)
+                            t.fires(own, &Asker { source: id, controller: cx.s().obj(id).controller, by: by(), spell: false }, event)
                         }
                     {
                         // A spell is controlled by whoever cast it; a card in another zone answers to its owner.
@@ -1567,7 +1723,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                             cx.s().obj(id).owner
                         };
                         if let Some(condition) = t.condition
-                            && !condition(cx, &Asker { source: id, controller, by: by(), spell: false })
+                            && !condition(own, &Asker { source: id, controller, by: by(), spell: false })
                         {
                             continue;
                         }
