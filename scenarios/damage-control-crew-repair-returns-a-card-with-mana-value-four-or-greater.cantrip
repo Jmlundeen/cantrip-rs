@@ -1,0 +1,33 @@
+# Damage Control Crew's Repair mode returns target card with mana value 4 or greater from your graveyard to your hand (CR 202.3):
+# the Hill Giant (mana value exactly 4) discarded to Faithless Looting is the one legal target; the Forests (mana value 0) are not.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Black Lotus
+Faithless Looting
+Damage Control Crew
+Hill Giant
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Hill Giant; Forest)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Damage Control Crew.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Hill Giant; Forest; Forest
+Bot1.Battlefield.Count = 3

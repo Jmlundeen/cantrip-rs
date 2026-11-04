@@ -1,0 +1,8 @@
+{
+  "name": "Damage Control Crew",
+  "manaCost": "{3}{G}",
+  "type": "Creature — Human Citizen",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When this creature enters, choose one —\n• Repair — Return target card with mana value 4 or greater from your graveyard to your hand.\n• Impound — Exile target artifact or enchantment."
+}

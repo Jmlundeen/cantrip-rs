@@ -1,0 +1,34 @@
+# Repair needs a card with mana value 4 or greater in YOUR graveyard (CR 115.1, 202.3): with only an Alpine Grizzly (mana value
+# 3) and a Forest there, the mode has no target, so the trigger is Impound and exiles Bot1's own Mox Emerald.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Black Lotus
+Faithless Looting
+Damage Control Crew
+Alpine Grizzly
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Alpine Grizzly; Forest)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Damage Control Crew.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Exile.Mox Emerald.Colors.Count = 0
+Bot1.Graveyard.Count = 4
