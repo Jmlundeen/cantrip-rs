@@ -1,0 +1,6 @@
+{
+  "name": "Singularity Rupture",
+  "manaCost": "{3}{U}{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all creatures, then any number of target players each mill half their library, rounded down."
+}

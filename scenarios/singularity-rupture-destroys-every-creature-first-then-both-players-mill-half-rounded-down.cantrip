@@ -1,0 +1,59 @@
+# Singularity Rupture {3}{U}{B}{B}: "Destroy all creatures, then any number of target players each mill half their library, rounded down." Bot2's Dauthi Voidwalker exiles every card going to an
+# opponent's graveyard instead (with a void counter), so Bot1's sacrificed Black Lotus is exiled, and its Memnite, destroyed together with the Voidwalker (CR 701.8a, 614), is too. Then Bot1 and Bot2,
+# both targeted, each mill half of 23 cards, 11 (rounded down, CR 107.1a): Bot1's 11 go to its graveyard, with the Rupture, because the Voidwalker is gone by then. A creature is no target. The cost is
+# {3}{U}{B}{B}, paid exactly with the Lotus's three B, the Sapphire's U and the Ruby and Pearl.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Mox Ruby
+Mox Pearl
+Singularity Rupture
+Memnite
+Island
+Island x24
+
+[Bot2 Deck]
+Black Lotus
+Dauthi Voidwalker
+Island x29
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Dauthi Voidwalker.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Singularity Rupture.Cast
+! Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Target(Bot1; Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 12
+? Bot2.Library.Count = 12
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Sapphire
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard.Count = 12
+Bot2.Graveyard.Count = 13
+Bot1.Exile.Black Lotus.Counters.Void = 1
+Bot1.Exile.Memnite.Counters.Void = 1
