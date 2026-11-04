@@ -1,0 +1,6 @@
+{
+  "name": "Drill Too Deep",
+  "manaCost": "{1}{R}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Put five charge counters on target Spacecraft or Planet you control.\n• Destroy target artifact."
+}

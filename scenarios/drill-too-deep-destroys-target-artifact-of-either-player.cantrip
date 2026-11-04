@@ -1,0 +1,47 @@
+# Drill Too Deep, second mode: "Destroy target artifact." Bot1 destroys Bot2's Mox Emerald and then its own Mox Jet; a Raging Goblin (a creature, not an artifact) and Bot2 as a player are refused as targets (CR 701.8, 115.1).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Raging Goblin
+Drill Too Deep
+Drill Too Deep
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Drill Too Deep.Cast
+Bot1.Modes(Destroy target artifact)
+! Bot1.Target(Raging Goblin)
+! Bot1.Target(Bot2)
+Bot1.Target(Bot2.Battlefield.Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Mox Emerald
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Drill Too Deep.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Mox Emerald
+Bot1.Graveyard = Drill Too Deep; Mox Jet; Black Lotus; Drill Too Deep
+Bot1.Battlefield.Raging Goblin.Types = Creature

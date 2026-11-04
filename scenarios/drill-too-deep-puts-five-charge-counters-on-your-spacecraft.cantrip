@@ -1,0 +1,39 @@
+# Drill Too Deep, first mode: "Put five charge counters on target Spacecraft or Planet you control." Bot1's Debris Field Crusher (a Spacecraft, only an artifact below eight counters) takes exactly five, and is still not a creature (CR 122.1, 721.2b).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Debris Field Crusher
+Drill Too Deep
+Island
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Debris Field Crusher.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Drill Too Deep.Cast
+Bot1.Modes(Put five charge counters)
+Bot1.Target(Debris Field Crusher)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Debris Field Crusher.Counters.Charge = 5
+Bot1.Battlefield.Debris Field Crusher.Types = Artifact

@@ -1,0 +1,37 @@
+# Drill Too Deep, first mode: "Put five charge counters on target Spacecraft or Planet you control." On turn 3 both players have an Evendo, Waking Haven (a Planet). The target question refuses Bot2's Planet (not yours), Bot1's own Mox Jet (an artifact that is neither) and Bot2 as a player, and takes Bot1's Evendo: exactly five charge counters (CR 115.1, 122.1).
+
+[Bot1 Deck]
+Evendo, Waking Haven
+Mox Ruby
+Mox Pearl
+Mox Jet
+Drill Too Deep
+Island x20
+
+[Bot2 Deck]
+Evendo, Waking Haven
+Island x20
+
+[Actions]
+Bot1.Hand.Evendo, Waking Haven.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Evendo, Waking Haven.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Drill Too Deep.Cast
+Bot1.Modes(Put five charge counters)
+! Bot1.Target(Bot2.Battlefield.Evendo, Waking Haven)
+! Bot1.Target(Bot1.Battlefield.Mox Jet)
+! Bot1.Target(Bot2)
+Bot1.Target(Bot1.Battlefield.Evendo, Waking Haven)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Evendo, Waking Haven.Counters.Charge = 5
+Bot1.Graveyard = Drill Too Deep
