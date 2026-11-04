@@ -1,0 +1,43 @@
+# Diplomatic Relations: Alpine Grizzly (4/2) gets +1/+0 and vigilance, then deals damage equal to its new power (5) to Bot2's Ornithopter, which dies; the Grizzly is 5/2 with vigilance.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Alpine Grizzly
+Diplomatic Relations
+Island x2
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Diplomatic Relations.Cast
+Bot1.Target(Bot1.Battlefield.Alpine Grizzly)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Alpine Grizzly.Power = 5
+Bot1.Battlefield.Alpine Grizzly.Toughness = 2
+Bot1.Battlefield.Alpine Grizzly.Keywords = Vigilance
+Bot1.Battlefield.Alpine Grizzly.Damage = 0
