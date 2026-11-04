@@ -1,0 +1,59 @@
+# Honored Knight-Captain: "When this creature enters, create a 1/1 white Human Soldier creature token" and "{4}{W}{W},
+# Sacrifice this creature: Search your library for an Equipment card, put it onto the battlefield, then shuffle." Turn 1: cast
+# with Plains and Mox Pearl, the token arrives. Turn 3: Plains, Mox Pearl and Black Lotus (three blue) make only five mana, so
+# the ability is refused; the Island makes six with {W}{W} and the pool is empty after paying. Only an Equipment card may be
+# found: the Ornithopter (an artifact, not Equipment) is refused and Bark of Doran is put onto the battlefield, unattached;
+# Bot2's Equipment in its own library stays there. The library is shuffled and the Captain is in the graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Honored Knight-Captain
+Island
+Island
+Island
+Island
+Ornithopter
+Bark of Doran
+Island x12
+
+[Bot2 Deck]
+Island x8
+Bark of Doran
+Island x8
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Honored Knight-Captain.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Human Soldier Token.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+! Bot1.Battlefield.Honored Knight-Captain.Activate(Mana: short)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Honored Knight-Captain.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Ornithopter)
+Bot1.Search(Bark of Doran)
+
+[Expect]
+Bot1.Graveyard = Honored Knight-Captain; Black Lotus
+Bot1.Battlefield.Bark of Doran.Subtypes = Equipment
+Bot1.Battlefield.Bark of Doran.Tapped = false
+Bot1.Shuffles = 1
+Bot2.Library.Count = 9
