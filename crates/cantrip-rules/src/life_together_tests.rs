@@ -248,6 +248,27 @@ fn single_player_changes_remain_individual_and_keep_sign_changing_replacements()
     assert_eq!(changes(&g).len(), 4);
 }
 
+#[test]
+fn concession_removes_replacements_before_the_question_is_rebuilt() {
+    let mut g = game();
+    put(&mut g, &DOUBLER, ACTIVE);
+    put(&mut g, &DOUBLER, ACTIVE);
+    let card = g.cards.id_of(&DRAIN);
+    let source = g.state.push_obj(Obj::new(card, YOU, Zone::STACK));
+    g.state.zone_push(Zone::STACK, source);
+    g.state.stack_push(crate::actions::stack_item(StackKind::Spell, source, AbilityRef::spell(card), YOU, &[]));
+    let serial = g.state.stack.last().unwrap().serial;
+    g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
+    g.run();
+    assert_eq!(g.pending().unwrap().player, LAST);
+    assert!(matches!(g.pending().unwrap().kind, RequestKind::ChooseReplacement { .. }));
+
+    g.concede(ACTIVE);
+    assert!(!matches!(g.pending().map(|r| &r.kind), Some(RequestKind::ChooseReplacement { .. })), "removed Bloodletters must not be offered");
+    assert_eq!(changes(&g), vec![(LAST, -1), (FIRST, -1), (YOU, 2)]);
+    assert_eq!(life(&g), vec![22, 19, 20, 19]);
+}
+
 /// Real replacement questions and resolution replay, not preloaded answers: every opponent orders two Bloodletters
 /// before Exsanguinate changes any total. Undo/redo restores both the pre-instruction request and the final history.
 #[test]

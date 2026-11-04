@@ -747,7 +747,11 @@ fn prevents_all(cx: &Cx, c: &Candidate) -> bool {
 
 /// Asks the affected player which of several effects applies first (CR 616.1). When the question has no answer yet
 /// the run is abandoned and replayed with it (see `Cx::ask_core`), so the first is taken to carry on to the end.
-fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> usize {
+fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> Option<usize> {
+    // A concession at this question may remove its candidates (CR 104.3a, 611.3b); rebuild before asking.
+    if cx.concessions_here() {
+        return None;
+    }
     let ask = RequestKind::ChooseReplacement {
         subject: subject_of(proposal),
         life: match proposal {
@@ -768,8 +772,8 @@ fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> usize {
         draw: matches!(proposal, Proposal::Draw(_)),
     };
     match cx.ask_core(affected(cx, proposal), ask, false) {
-        Ok(Answer::Index(i)) if (i as usize) < found.len() => i as usize,
-        _ => 0,
+        Ok(Answer::Index(i)) if (i as usize) < found.len() => Some(i as usize),
+        _ => Some(0),
     }
 }
 
@@ -849,8 +853,19 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
         if found.is_empty() {
             return;
         }
-        let pick = if found.len() > 1 && !found.iter().all(|c| prevents_all(cx, c)) { choose(cx, proposal, &found) } else { 0 };
-        let Candidate { source, index, origin } = found[pick];
+        let pick = if found.len() > 1 && !found.iter().all(|c| prevents_all(cx, c)) {
+            let Some(pick) = choose(cx, proposal, &found) else { continue };
+            pick
+        } else { 0 };
+        let chosen = found[pick];
+        if chosen.origin == Origin::Printed
+            && printed_replacement(cx, chosen.source, chosen.index).optional.is_some()
+            && cx.concessions_here()
+            && !candidates(cx, proposal, &applied, entry.as_deref()).contains(&chosen)
+        {
+            continue;
+        }
+        let Candidate { source, index, origin } = chosen;
         applied.push((source, index, origin));
         let start = *proposal;
         match origin {
@@ -1129,13 +1144,25 @@ fn take_plus(parts: &mut Vec<Proposal>) {
 fn apply_to_each_part(cx: &mut Cx, parts: &mut Vec<Proposal>) {
     let mut applied: Vec<Applied> = cx.lineage.clone();
     loop {
-        let found: Vec<Vec<Candidate>> = parts.iter().map(|p| candidates(cx, p, &applied, None)).collect();
+        let mut found: Vec<Vec<Candidate>> = parts.iter().map(|p| candidates(cx, p, &applied, None)).collect();
         let mut all: Vec<Candidate> = found.iter().flatten().copied().collect();
         all.sort_by_key(|c| (c.source, c.index, c.origin));
         all.dedup();
         let Some(&first) = all.first() else { return };
-        let Candidate { source, index, origin } =
-            if all.len() > 1 && !all.iter().all(|c| prevents_all(cx, c)) { all[choose(cx, &parts[0], &all)] } else { first };
+        let chosen = if all.len() > 1 && !all.iter().all(|c| prevents_all(cx, c)) {
+            let Some(pick) = choose(cx, &parts[0], &all) else { continue };
+            all[pick]
+        } else { first };
+        if chosen.origin == Origin::Printed
+            && printed_replacement(cx, chosen.source, chosen.index).optional.is_some()
+            && cx.concessions_here()
+        {
+            found = parts.iter().map(|p| candidates(cx, p, &applied, None)).collect();
+            if !found.iter().flatten().any(|c| *c == chosen) {
+                continue;
+            }
+        }
+        let Candidate { source, index, origin } = chosen;
         applied.push((source, index, origin));
         let meets = |j: usize| found[j].iter().any(|c| (c.source, c.index, c.origin) == (source, index, origin));
         match origin {
@@ -1722,6 +1749,28 @@ mod tests {
         assert_eq!(draw(&mut game, 1), (8, 9, 20));
         let mut game = self::game(&[(&GRAVE_GAINER, Zone::graveyard(ME))], vec![Answer::No]);
         assert_eq!(draw(&mut game, 1), (8, 9, 20));
+    }
+
+    #[test]
+    fn a_concession_before_an_optional_replacement_removes_its_source() {
+        static FAMILIAR: CardDef = CardDef {
+            name: "Obstinate Familiar probe",
+            types: TypeSet::of(&[CardType::Creature]),
+            replacements: &[replacement(ReplacementKind::Draw, you_would_draw, instead, "skip that draw instead").optional(&SKIP)],
+            ..CardDef::BLANK
+        };
+        let owner = PlayerId(2);
+        let table = Box::leak(Box::new(CardTable::new([&FILLER, &FAMILIAR])));
+        let deck = std::iter::repeat_n(table.id_of(&FILLER), 17).collect();
+        let mut game = Game::new(table, &crate::Setup { decks: vec![deck, Vec::new(), Vec::new(), Vec::new()], ..Default::default() });
+        let source = game.state.push_obj(Obj::new(table.id_of(&FAMILIAR), owner, Zone::BATTLEFIELD));
+        game.state.update_obj(source, |o| o.controller = ME);
+        game.state.zone_push(Zone::BATTLEFIELD, source);
+        game.state.frame_push(Frame::new(FrameKind::Settle));
+        let frame = game.state.agenda.len() - 1;
+        game.state.update_frame(frame, |f| f.conceded.push((0, owner)));
+        assert_eq!(draw(&mut game, 1), (8, 9, 20));
+        assert!(game.state.player(owner).lost);
     }
 
     /// CR 109.5: "you may ... instead" is the choice of the effect's controller, not of the affected player (CR 616.1 gives

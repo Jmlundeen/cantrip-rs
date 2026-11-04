@@ -1161,15 +1161,18 @@ impl<'a> Cx<'a> {
             .map_or(Acquired::OWN, |i| i.acquired)
     }
 
-    pub(crate) fn concessions_here(&mut self) {
+    pub(crate) fn concessions_here(&mut self) -> bool {
         if self.g.state.agenda[self.frame].conceded.is_empty() {
-            return;
+            return false;
         }
-        let here: Vec<PlayerId> =
-            self.g.state.agenda[self.frame].conceded.iter().filter(|&&(at, _)| at as usize == self.cursor).map(|&(_, p)| p).collect();
+        let here: Vec<PlayerId> = self.g.state.agenda[self.frame].conceded.iter()
+            .filter(|&&(at, p)| at as usize == self.cursor && !self.g.state.player(p).lost)
+            .map(|&(_, p)| p).collect();
+        let changed = !here.is_empty();
         for p in here {
             ops::concede(self, p);
         }
+        changed
     }
 
     /// A question a rule procedure asks a player about their own game action - priority, attacks, blocks, the discard to hand
