@@ -1,0 +1,49 @@
+# Roving Actuator, Void's second clause: "a spell was warped this turn" (CR 702.185c), with nothing leaving the battlefield (the warped
+# Pinnacle Emissary is exiled only at the next end step). Turn 1 puts a Lightning Helix in Bot1's graveyard. On turn 3 Bot1 warps the
+# Emissary (paid with Mox Sapphire), then casts the Actuator. The trigger exiles the Helix and copies it, but Bot1 declines to cast the
+# copy ("may"): Bot2 stays at 17, Bot1 at 23, the Helix card stays exiled and the copy ceases to exist.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Lightning Helix
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Pinnacle Emissary
+Roving Actuator
+Swamp x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pinnacle Emissary.Cast(Ability: Warp)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Roving Actuator.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Lightning Helix)
+Bot1.Pass
+Bot1.Decline
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 23
+Exile = Lightning Helix
+Bot1.Graveyard.Count = 0
+Stack.Count = 0

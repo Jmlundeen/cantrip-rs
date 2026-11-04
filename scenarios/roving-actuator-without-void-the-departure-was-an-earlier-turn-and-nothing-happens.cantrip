@@ -1,0 +1,44 @@
+# Roving Actuator: Void's "if" (CR 603.4) is about this turn. On turn 1 Bot1 sacrifices Black Lotus for the mana of a Lightning Helix
+# (a nonland permanent leaves, but on turn 1), leaving the Helix in the graveyard. On turn 3 nothing leaves the battlefield and no spell
+# is warped, so the Actuator enters with no trigger: no target is asked, the Helix stays in the graveyard and Bot2 is still at 17.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Black Lotus
+Lightning Helix
+Mox Jet
+Mox Emerald
+Swamp
+Roving Actuator
+Swamp x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Roving Actuator.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Roving Actuator.Power = 3
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Graveyard = Lightning Helix; Black Lotus
+Stack.Count = 0

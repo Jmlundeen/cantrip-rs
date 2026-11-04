@@ -1,0 +1,64 @@
+# Roving Actuator: "Void - When this creature enters, if a nonland permanent left the battlefield this turn or a spell was warped
+# this turn, exile up to one target instant or sorcery card with mana value 2 or less from your graveyard. Copy it. You may cast the
+# copy without paying its mana cost." Turn 1 Bot1 casts Anger of the Gods (mana value 3, just past the limit) into the graveyard;
+# Bot2 casts Dark Ritual on turn 2 (mana value 1, but in the other graveyard). On turn 3 Bot1 casts Lightning Helix (mana value
+# exactly 2) at Bot2, then sacrifices Black Lotus (a nonland permanent leaving: void) for the Actuator's mana. The trigger refuses
+# the Anger and Bot2's Ritual, takes the Helix, exiles it, copies it and casts the copy for free: 3 more damage to Bot2 and 3 more life
+# for Bot1. The Ritual stays in Bot2's graveyard, the Anger in Bot1's.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Pearl
+Mox Jet
+Anger of the Gods
+Lightning Helix
+Black Lotus
+Roving Actuator
+Swamp x12
+
+[Bot2 Deck]
+Mox Jet
+Dark Ritual
+Swamp x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Anger of the Gods.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Roving Actuator.Cast
+Bot1.Pass
+! Bot1.Target(Bot1.Graveyard.Anger of the Gods)
+! Bot1.Target(Bot2.Graveyard.Dark Ritual)
+Bot1.Target(Bot1.Graveyard.Lightning Helix)
+Bot1.Pass
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 26
+Exile = Lightning Helix
+Bot1.Graveyard = Black Lotus; Anger of the Gods
+Bot2.Graveyard = Dark Ritual
+Stack.Count = 0

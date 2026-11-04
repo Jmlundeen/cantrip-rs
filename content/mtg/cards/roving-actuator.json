@@ -1,0 +1,8 @@
+{
+  "name": "Roving Actuator",
+  "manaCost": "{3}{R}",
+  "type": "Artifact Creature — Robot",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Void — When this creature enters, if a nonland permanent left the battlefield this turn or a spell was warped this turn, exile up to one target instant or sorcery card with mana value 2 or less from your graveyard. Copy it. You may cast the copy without paying its mana cost."
+}

@@ -1,0 +1,38 @@
+# Roving Actuator: "up to one target" (CR 115.1b). Bot1 sacrifices Black Lotus for the Actuator's mana, so Void holds, and a Lightning
+# Helix (mana value 2) sits in the graveyard, but Bot1 chooses no target: nothing is exiled or copied, the Helix stays in the graveyard
+# and Bot2 is still at 17.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Lightning Helix
+Black Lotus
+Roving Actuator
+Swamp x12
+Swamp x4
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Roving Actuator.Cast
+Bot1.Pass
+Bot1.Target()
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Graveyard = Black Lotus; Lightning Helix
+Exile.Count = 0
+Stack.Count = 0
