@@ -141,6 +141,10 @@ pub const LAND: Part = part(&(land as SelectFn), 0, "");
 /// Wood Elves search for it.
 pub const FOREST: Part = part(&(forest as SelectFn), crate::lands::sub(Subtype::Forest) as u32, "");
 
+/// "An Equipment card" (CR 205.3g, 205.4a): a card with the subtype Equipment, the type read through the words of the text of the
+/// card that asks (CR 612.2) and a card as it is where it is. Cloud, Midgar Mercenary and Honored Knight-Captain search for it.
+pub const EQUIPMENT: Part = part(&(forest as SelectFn), crate::lands::sub(Subtype::Equipment) as u32, "");
+
 /// "A basic land card or a [subtype] card" (CR 205.4a, 205.3i): a basic land card, or a card with `subtype`, the type read through
 /// the words of the text of the card that asks (CR 612.2) and a card as it is where it is. Spinewoods Armadillo's Desert is
 /// the same shape; `BASIC_LAND_OR_PLANET` is Final Frontier's and Genesis Device's.
@@ -435,6 +439,9 @@ pub const fn forest_cards(count: Count) -> Selection {
 
 /// "A Forest card", which may be left unfound (CR 701.23b): Nature's Lore, Three Visits and Wood Elves search for it.
 pub const FOREST_CARD: Selection = forest_cards(up_to(1));
+
+/// "An Equipment card", which may be left unfound (CR 701.23b): Cloud, Midgar Mercenary and Honored Knight-Captain search for it.
+pub const EQUIPMENT_CARD: Selection = Selection::of(up_to(1), &[EQUIPMENT]).called("Equipment");
 
 /// `count` land cards: Crop Rotation's and Expedition Map's one (`LAND_CARD`), and Hexhaven Invigorator's "up to that many
 /// land cards".

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach;
-use cantrip_mechanics::library::{Find, search_to_hand};
+use cantrip_mechanics::{library, select};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -11,7 +11,7 @@ fn is_equipment(q: &dyn Query, id: ObjectId) -> bool {
 /// "Search your library for an Equipment card, reveal it, put it into your hand, then shuffle." (CR 701.23): the search may
 /// find nothing, as any search for a quality may.
 fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    search_to_hand(g, item.controller, item.object, Find::ONE.revealed(), is_equipment)?;
+    library::find_to_hand(g, item.controller, item.object, select::EQUIPMENT_CARD, true)?;
     Ok(())
 }
 
