@@ -1,0 +1,26 @@
+# Lithobraking: "an artifact" is any artifact its controller has, not only the Lander. Bot1 sacrifices its Mox Jet (already tapped for mana) instead, so the Lander token stays on the battlefield beside Bot1's Memnite - which the 2 damage kills.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Memnite
+Lithobraking
+Island x23
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lithobraking.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mox Jet; Lander Token)
+Bot1.Choose(Mox Jet)
+
+[Expect]
+Bot1.Battlefield = Lander Token
+Bot1.Graveyard = Memnite; Lithobraking; Mox Jet; Black Lotus

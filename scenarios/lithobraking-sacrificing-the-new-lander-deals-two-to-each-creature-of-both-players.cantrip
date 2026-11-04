@@ -1,0 +1,38 @@
+# Lithobraking: "Create a Lander token. Then you may sacrifice an artifact. When you do, Lithobraking deals 2 damage to each creature." The Lander is made before the choice (CR 701.7a), so it can itself be the artifact sacrificed: Bot1 sacrifices it, and the reflexive ability (CR 603.12) deals exactly 2 to every creature at once, Bot1's own Memnite (1/1) dying and Bot2's Memnite (1/1) too, while Bot2's Phyrexian Soulgorger (8/8) has taken 2, not 1 or 3.
+
+[Bot1 Deck]
+Black Lotus
+Memnite
+Lithobraking
+Island x24
+
+[Bot2 Deck]
+Black Lotus
+Phyrexian Soulgorger
+Memnite
+Island x24
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Phyrexian Soulgorger.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lithobraking.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lander Token)
+
+[Expect]
+Bot1.Battlefield.Lander Token = (absent)
+Bot1.Battlefield.Memnite = (absent)
+Bot2.Battlefield.Memnite = (absent)
+Bot2.Battlefield.Phyrexian Soulgorger.Damage = 2
