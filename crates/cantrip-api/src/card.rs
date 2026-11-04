@@ -771,6 +771,12 @@ pub struct Cost {
     /// gives the equipped creature. Paid by sacrificing the permanent the activation names as what gave the ability
     /// (`ActionOption::granted_by`), which the payer must control (CR 701.21a); an ability no permanent gave can't pay it.
     pub sacrifice_granter: bool,
+    /// "Exile [the card that gives this ability]" in an ability another permanent gives (CR 201.5a, 406.2): The Dominion
+    /// Bracelet's "{15}, Exile The Dominion Bracelet", which the Bracelet gives the equipped creature. Paid by exiling the
+    /// permanent the activation names as what gave the ability (`ActionOption::granted_by`), while it is on the battlefield -
+    /// whoever controls it, since only a sacrifice is limited to the payer's permanents (CR 701.21a); an ability no permanent
+    /// gave can't pay it.
+    pub exile_granter: bool,
     /// Discard this card (cycling, CR 702.29a).
     pub discard_self: bool,
     /// Choose this many permanents you control that pass the filter, and sacrifice them, return them to their owners'
@@ -1058,6 +1064,7 @@ impl Cost {
             tap,
             sacrifice_self,
             sacrifice_granter,
+            exile_granter,
             discard_self,
             permanents,
             loyalty,
@@ -1098,6 +1105,7 @@ impl Cost {
             && waterbend.x == 0
             && !sacrifice_self
             && !sacrifice_granter
+            && !exile_granter
             && !discard_self
             && permanents.is_none()
             && loyalty.is_none()
@@ -1209,6 +1217,7 @@ impl Cost {
         c.tap |= other.tap;
         c.sacrifice_self |= other.sacrifice_self;
         c.sacrifice_granter |= other.sacrifice_granter;
+        c.exile_granter |= other.exile_granter;
         c.discard_self |= other.discard_self;
         c.exile_self |= other.exile_self;
         if c.put_self_into_library.is_none() {
@@ -1319,6 +1328,7 @@ impl Cost {
             tap: false,
             sacrifice_self: false,
             sacrifice_granter: false,
+            exile_granter: false,
             discard_self: false,
             permanents: None,
             loyalty: None,

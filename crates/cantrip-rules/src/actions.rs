@@ -1576,11 +1576,12 @@ fn chosen_still_pay(cx: &Cx, cost: &Cost, chosen: &[ObjectId]) -> bool {
     })
 }
 
-/// Whether the permanent that gave an ability can pay its "Sacrifice [the card that gives this ability]" cost (CR 201.5a):
-/// still the permanent it was, on the battlefield (`chosen_still_pay`, CR 400.7), and the payer's (CR 701.21a). Asked as
-/// the ability is activated and again once its mana is paid (CR 601.2g-h by way of 602.2b).
-fn granter_pays(cx: &Cx, player: PlayerId, granter: ObjectId) -> bool {
-    chosen_still_pay(cx, &Cost::NONE, &[granter]) && cx.s().obj(granter).controller == player
+/// Whether the permanent that gave an ability can pay its "Sacrifice [the card that gives this ability]" or "Exile [it]"
+/// cost (CR 201.5a): still the permanent it was, on the battlefield (`chosen_still_pay`, CR 400.7), and for a sacrifice
+/// the payer's (CR 701.21a); an exile has no such limit. Asked as the ability is activated and again once its mana is
+/// paid (CR 601.2g-h by way of 602.2b).
+fn granter_pays(cx: &Cx, cost: &Cost, player: PlayerId, granter: ObjectId) -> bool {
+    chosen_still_pay(cx, &Cost::NONE, &[granter]) && (cost.exile_granter || cx.s().obj(granter).controller == player)
 }
 
 /// Chooses the permanents a cost names (CR 601.2h), always asked, even when the choice is forced. Too few to choose
@@ -5619,9 +5620,14 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             }
             let mut option = ActionOption { granted_by: granted_by(cx, id, Some(&chars), index, ability, &givers), ..ActionOption::on(ActionKind::ActivateAbility, id, index as u8) };
             // "Sacrifice [the card that gives this ability]" (CR 201.5a, 701.21a): only with that permanent the player's, and
-            // one a static ability lets them sacrifice for it (CR 101.2, `may_sacrifice_for`).
-            if def.cost.sacrifice_granter
-                && !option.granted_by.is_some_and(|g| cx.s().obj(g.object).controller == player && may_sacrifice_for(cx, player, g.object, activating(def)))
+            // one a static ability lets them sacrifice for it (CR 101.2, `may_sacrifice_for`). "Exile [it]" needs only that
+            // permanent, whoever controls it: no rule limits exiling to permanents the payer controls, as CR 701.21a does
+            // sacrificing (a Threatened creature's granted ability exiles its owner's Equipment).
+            if (def.cost.sacrifice_granter || def.cost.exile_granter)
+                && !option.granted_by.is_some_and(|g| {
+                    !def.cost.sacrifice_granter
+                        || cx.s().obj(g.object).controller == player && may_sacrifice_for(cx, player, g.object, activating(def))
+                })
             {
                 continue;
             }
@@ -10017,10 +10023,10 @@ fn activate(
     // What gave the source this ability (CR 113.2c, 613.1f): the option names it; read now, before any cost moves it (a cost
     // may sacrifice the very permanent that gave it).
     let granted = granted.or_else(|| granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
-    // "Sacrifice [the card that gives this ability]" (CR 201.5a): that permanent, which the payer must control; judged again
-    // once the mana is paid (`granter_pays`).
-    let granter = if def.cost.sacrifice_granter {
-        match granted.map(|g| g.object).filter(|&g| granter_pays(cx, player, g)) {
+    // "Sacrifice [the card that gives this ability]" or "Exile [it]" (CR 201.5a): that permanent, still on the battlefield, and
+    // for a sacrifice the payer's (CR 701.21a); an exile has no such limit. Judged again once the mana is paid (`granter_pays`).
+    let granter = if def.cost.sacrifice_granter || def.cost.exile_granter {
+        match granted.map(|g| g.object).filter(|&g| granter_pays(cx, &def.cost, player, g)) {
             Some(g) => Some(g),
             None => return Err(Stop::Cancel),
         }
@@ -10208,12 +10214,12 @@ fn activate(
     let beheld = choose_behold(cx, player, source, &whole)?;
     // The energy and life, judged again after the mana abilities (CR 601.2g-h by way of 602.2b), and the permanents the cost
     // sacrifices by naming them, which a static ability may forbid it to (CR 101.2, `may_sacrifice_for`). The granter a
-    // granted cost sacrifices is judged again too, as the permanents chosen before the mana are (`chosen_still_pay`): a mana
+    // granted cost sacrifices or exiles is judged again too, as the permanents chosen before the mana are (`chosen_still_pay`): a mana
     // ability activated while paying may have sacrificed it (Krark-Clan Ironworks), and then the cost can't be paid
     // (CR 601.2h, 400.7, 118.3) and the activation is taken back (CR 733.1).
     if !rest_payable(cx, player, whole.energy as u32, life + whole.life, paid)
         || whole.sacrifice_self && !may_sacrifice_for(cx, player, source, paid)
-        || granter.is_some_and(|g| !granter_pays(cx, player, g) || !may_sacrifice_for(cx, player, g, paid))
+        || granter.is_some_and(|g| !granter_pays(cx, &def.cost, player, g) || def.cost.sacrifice_granter && !may_sacrifice_for(cx, player, g, paid))
     {
         return Err(Stop::Cancel);
     }
@@ -10292,7 +10298,11 @@ fn activate(
         ops::sacrifice(cx, player, &[source]);
     }
     if let Some(granter) = granter {
-        ops::sacrifice(cx, player, &[granter]);
+        if def.cost.sacrifice_granter {
+            ops::sacrifice(cx, player, &[granter]);
+        } else {
+            ops::move_to_for(cx, granter, Zone::exile(cx.s().obj(granter).owner), ZoneReason::Exile);
+        }
     }
     if whole.return_self {
         ops::move_to_for(cx, source, Zone::hand(cx.s().obj(source).owner), ZoneReason::Other);
@@ -12243,6 +12253,7 @@ fn resolution_parts(cost: &Cost) -> bool {
         tap: _,
         sacrifice_self: _,
         sacrifice_granter,
+        exile_granter,
         discard_self: _,
         permanents: _,
         loyalty,
@@ -12280,6 +12291,7 @@ fn resolution_parts(cost: &Cost) -> bool {
     waterbend.x == 0
         && choose.is_none()
         && !sacrifice_granter
+        && !exile_granter
         && loyalty.is_none()
         && !exert
         && !emerge
