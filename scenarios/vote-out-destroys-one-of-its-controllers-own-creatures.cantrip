@@ -1,0 +1,30 @@
+# Vote Out: "Destroy target creature" has no "opponent's" restriction, so its controller may target their own creature (CR 115.1).
+# Mox Jet pays {B}, three Ornithopters convoke {3} (CR 702.51a); the Memnite is the one destroyed.
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Ornithopter
+Ornithopter
+Memnite
+Vote Out
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vote Out.Cast(Bot1.Battlefield.Memnite; Convoke: Ornithopter, Ornithopter, Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Vote Out; Memnite
+Bot1.Battlefield.Count = 4
