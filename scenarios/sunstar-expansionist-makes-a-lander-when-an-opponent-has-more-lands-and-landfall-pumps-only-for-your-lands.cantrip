@@ -1,0 +1,46 @@
+# Sunstar Expansionist, a 2/3: "When this creature enters, if an opponent controls more lands than you, create a Lander
+# token." Bot2 has played an Island and Bot1 has no land, so Bot1's Expansionist on turn 3 makes a Lander (CR 603.4). Landfall
+# then gives +1/+0 until end of turn (CR 611.2): Bot1's own Island makes it a 3/3. On turn 4 Bot2's land gives it nothing
+# ("you control"), and the turn-3 pump has ended (a 2/3 again).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Sunstar Expansionist
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sunstar Expansionist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lander Token.Types = Artifact
+? Bot1.Battlefield.Sunstar Expansionist.Power = 2
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sunstar Expansionist.Power = 3
+? Bot1.Battlefield.Sunstar Expansionist.Toughness = 3
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Sunstar Expansionist.Power = 2
+Bot1.Battlefield.Sunstar Expansionist.Toughness = 3
