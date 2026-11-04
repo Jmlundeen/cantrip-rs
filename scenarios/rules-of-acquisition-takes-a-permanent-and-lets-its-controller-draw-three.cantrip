@@ -1,0 +1,30 @@
+# Rules of Acquisition's first mode gains control of a nonland permanent an opponent controls and that opponent draws three
+# cards (CR 700.2, 110.2a, 121.1): the Ornithopter changes controller and Bot2's hand grows by three.
+
+[Bot1 Deck]
+Rules of Acquisition
+Black Lotus
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Rules of Acquisition.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Ornithopter
+Bot2.Hand.Count = 10
