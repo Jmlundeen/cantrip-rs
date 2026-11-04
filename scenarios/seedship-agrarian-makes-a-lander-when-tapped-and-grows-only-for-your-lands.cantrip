@@ -1,0 +1,39 @@
+# Seedship Agrarian ({3}{G}, 3/3): attacking taps it and makes a Lander token (CR 603.2). Landfall puts a +1/+1 counter on it
+# for a land Bot1 plays (CR 207.2c), but not for Bot2's Island on turn 2, a land its opponent controls.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Seedship Agrarian
+Island
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Seedship Agrarian.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Seedship Agrarian.Power = 3
+[T3 Bot1.Main1]
+Bot1.Attack(Seedship Agrarian > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Seedship Agrarian.Tapped = true
+? Bot1.Battlefield = Lander Token; Mox Emerald; Seedship Agrarian
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Seedship Agrarian.Power = 4
+Bot1.Battlefield.Seedship Agrarian.Counters.PlusOnePlusOne = 1
