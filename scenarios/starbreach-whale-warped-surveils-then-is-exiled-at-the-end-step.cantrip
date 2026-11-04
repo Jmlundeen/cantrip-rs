@@ -1,0 +1,31 @@
+# Starbreach Whale's warp {1}{U} (CR 702.185a): cast on turn 1 for exactly Mox Sapphire ({U}) and Mox Ruby ({1}). It surveils 2 as it enters (the Swamp goes to the graveyard, the Mountain stays), and at the beginning of the end step it is exiled.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Starbreach Whale
+Island x4
+Mountain
+Swamp
+Island x11
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Starbreach Whale.Cast(Ability: Warp)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mountain | Swamp)
+? Bot1.Battlefield.Starbreach Whale.Power = 3
+[T2 Bot2.Main1]
+? Exile = Starbreach Whale
+
+[Expect]
+Exile = Starbreach Whale
+Bot1.Graveyard = Swamp
