@@ -1,0 +1,54 @@
+# The Needs of the Many, cast as Bot2's Raging Goblin attacks, sacrificing the Ornithopter (CR 601.2b): the Memnite Bot1 still
+# controls gains hexproof and indestructible, Bot1 gains hexproof - Bot2's Lightning Bolt can target neither (CR 702.11b-c) -
+# and the Goblin's combat damage to Bot1 is prevented (CR 615.1). The spell is exiled as it resolves (CR 608.2c).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Memnite
+The Needs of the Many
+Island x15
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Raging Goblin
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.DeclareAttackers]
+Bot2.Attack(Raging Goblin > Bot1)
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Needs of the Many.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Keywords = Hexproof; Indestructible
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot2.Hand.Lightning Bolt.Cast(Memnite)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Exile = The Needs of the Many
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Memnite.Keywords = Hexproof; Indestructible

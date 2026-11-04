@@ -1,0 +1,29 @@
+# "As an additional cost to cast this spell, sacrifice a creature" (CR 601.2b): the Ornithopter is sacrificed, and the
+# spell exiles itself rather than going to the graveyard, after giving Bot1's creatures hexproof and indestructible and
+# Bot1 hexproof, and preventing all damage to Bot1 this turn (CR 608.2m, 615.1, 702.11c).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Ornithopter
+The Needs of the Many
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Needs of the Many.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Black Lotus
+Exile = The Needs of the Many
+Bot1.Battlefield = Mox Pearl
