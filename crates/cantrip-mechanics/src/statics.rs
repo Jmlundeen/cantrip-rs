@@ -413,6 +413,11 @@ pub fn spell_mastery(view: &dyn LayerQuery, source: ObjectId) -> bool {
     state.zone(Zone::graveyard(you)).iter().filter(|&&c| view.chars(c).is(CardType::Instant) || view.chars(c).is(CardType::Sorcery)).count() >= 2
 }
 
+/// "... has defender" (CR 702.3, layer 6) as a static ability's `StaticDef::apply`. Spider-Man No More prints it.
+pub fn have_defender(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Defender);
+}
+
 /// "... has vigilance" (CR 702.20, layer 6) as a static ability's `StaticDef::apply`. Ori, Keeper of Songs, Gideon's Memorial's
 /// creature tokens and Teysa Karlov's print it.
 pub fn have_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
