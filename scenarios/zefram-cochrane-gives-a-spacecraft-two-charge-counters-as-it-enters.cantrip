@@ -1,0 +1,27 @@
+# Zefram Cochrane's replacement effect puts two additional charge counters on a Spacecraft he controls as it enters
+# (CR 614.1c, 122.6), so the Science Vessel arrives with two and stations later.
+
+[Bot1 Deck]
+Zefram Cochrane, Warp Pioneer
+Suurok-Class Science Vessel
+Black Lotus
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Zefram Cochrane, Warp Pioneer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Suurok-Class Science Vessel.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Suurok-Class Science Vessel.Counters.Charge = 2

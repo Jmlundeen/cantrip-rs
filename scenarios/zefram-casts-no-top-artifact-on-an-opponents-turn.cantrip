@@ -1,0 +1,35 @@
+# "Once during each of your turns" (CR 601.3): a flash artifact on top of the library is not offered on the opponent's turn,
+# though Zefram has cast nothing yet.
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Zefram Cochrane, Warp Pioneer
+Island
+Island
+Island
+Darksteel Sentinel
+Island x20
+[Bot2 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Zefram Cochrane, Warp Pioneer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+! Bot1.Library.Darksteel Sentinel.Cast
+[Expect]
+Bot1.Library.Count = 21
+Bot1.Battlefield = Zefram Cochrane, Warp Pioneer

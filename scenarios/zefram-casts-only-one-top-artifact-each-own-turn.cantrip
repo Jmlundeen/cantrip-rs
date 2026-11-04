@@ -1,0 +1,44 @@
+# The library permission is restricted by type, turn, and uses this turn (CR 601.3).
+# Artifacts cast from hand do not use the top-of-library permission.
+[Bot1 Deck]
+Zefram Cochrane, Warp Pioneer
+Black Lotus
+Ornithopter
+Island x4
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Island x20
+[Bot2 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Zefram Cochrane, Warp Pioneer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Library.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Library.Mox Jet.Cast
+[T2 Bot2.Main1]
+! Bot1.Library.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Library.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Upkeep]
+! Bot1.Library.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield = Zefram Cochrane, Warp Pioneer; Ornithopter; Mox Sapphire; Mox Ruby
+Bot1.Hand = Island; Island; Island; Island; Mox Jet
+Bot2.Life = 17
