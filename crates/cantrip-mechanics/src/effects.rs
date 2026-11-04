@@ -1949,6 +1949,38 @@ pub fn loses_all_abilities_and_becomes(g: &mut dyn Game, item: &StackItem, slot:
     });
 }
 
+/// "[Target creature or artifact] loses all abilities and becomes a [color] [creature type] creature with base power and
+/// toughness [P]/[T]", for good (CR 611.2a, the rulings: the effect doesn't end at end of turn), for the target in `slot`:
+/// continuous effects from a resolved ability (CR 611.2), all at its timestamp (CR 613.7a) - layer 4, its card types replaced
+/// by creature (the types it had and the subtypes of those going with them, CR 205.1a) and its creature types replaced by the
+/// one named, so an artifact becomes only a creature of that type and a creature is that type alone; layer 5, that color and
+/// no other (CR 105.3); layer 6, every ability it has by then lost, and one gained later kept; layer 7b, the base power and
+/// toughness. The color and the creature type are words of the ability's text (CR 612), read through its words. With the
+/// target gone or no longer a legal target, nothing happens (CR 608.2b). Oko, Thief of Crowns (a green Elk, 3/3) and Lizard,
+/// Connors's Curse (a green Lizard, 4/4) print it.
+pub fn loses_all_abilities_and_becomes_a_creature_for_good(
+    g: &mut dyn Game,
+    item: &StackItem,
+    slot: usize,
+    color: Color,
+    kind: Subtype,
+    power: i16,
+    toughness: i16,
+) {
+    let Some(target) = crate::targets::object(g, item, slot) else { return };
+    let source = item.object;
+    let words = g.words(source);
+    // One instruction (CR 608.2c): the state triggers see it all done.
+    instruction(g, |g| {
+        g.add_effect(source, target, EffectKind::LoseAllAbilities, Duration::Indefinite);
+        g.add_effect(source, target, EffectKind::SetTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
+        g.add_effect(source, target, EffectKind::LoseAllCreatureTypes, Duration::Indefinite);
+        g.add_effect(source, target, EffectKind::AddSubtype(words.subtype(kind)), Duration::Indefinite);
+        g.add_effect(source, target, EffectKind::SetColors(words.colors(ColorSet::of(color))), Duration::Indefinite);
+        g.add_effect(source, target, EffectKind::SetPt(power, toughness), Duration::Indefinite);
+    });
+}
+
 /// A Gideon's "Until end of turn, Gideon becomes a P/T [colors] [creature types] creature [with keywords] that's still a
 /// planeswalker. Prevent all damage that would be dealt to him this turn." (CR 205.1b, 611.2a, 613.1d, 615.1): the
 /// animation is laid over him until the cleanup step as a manland's is (`animate`: the creature type, the colors where the
