@@ -1,0 +1,37 @@
+# Interceptor Mechan: with no artifact or creature card in Bot1's graveyard the enters trigger has no target and is removed from the stack (CR 603.3d). Four Moxen pay for it (a
+# Black Lotus would be sacrificed, a nonland permanent leaving the battlefield), so nothing leaves the battlefield on turn 3 and at the end step the Void trigger does not trigger
+# (CR 603.4): the Mechan is still a 2/2 with no counter, and the hand is untouched.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Interceptor Mechan
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Interceptor Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Interceptor Mechan.Power = 2
+Bot1.Battlefield.Interceptor Mechan.Toughness = 2
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 0

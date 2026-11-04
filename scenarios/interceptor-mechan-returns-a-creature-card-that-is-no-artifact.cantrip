@@ -1,0 +1,40 @@
+# Interceptor Mechan: "return target artifact OR CREATURE card from your graveyard to your hand." The other scenario returns an artifact creature card; here the card is a creature and no artifact.
+# Turn 1: Bot1 casts Raging Goblin off the Mox Ruby. Turn 3: the Ruby's Lightning Bolt kills it, and the Mechan, paid by the Black Lotus's {R}{R}{R} and the Mox Jet, returns it to Bot1's hand, beside the opening Island and the turn-3 draw.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Raging Goblin
+Lightning Bolt
+Interceptor Mechan
+Black Lotus
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Interceptor Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Graveyard.Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island; Raging Goblin
+Bot1.Graveyard = Black Lotus; Lightning Bolt

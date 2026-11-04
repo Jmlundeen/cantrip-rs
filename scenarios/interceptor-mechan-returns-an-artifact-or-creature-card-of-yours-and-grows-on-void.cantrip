@@ -1,0 +1,58 @@
+# Interceptor Mechan {2}{B}{R} 2/2 flying: "When this creature enters, return target artifact or creature card from your graveyard to your hand." and "Void - At the beginning of your end
+# step, if a nonland permanent left the battlefield this turn or a spell was warped this turn, put a +1/+1 counter on this creature." Turn 1: Bot1's Bolt kills its own Ornithopter (an
+# artifact creature card in its graveyard, beside the Bolt - an instant, no target - and on turn 2 Bot2 casts a Memnite). Turn 3: a second Bolt kills Bot2's Memnite (the opponent's graveyard
+# card is no target of Bot1's, and stays there) and the Mechan, cast after it, returns the Ornithopter. The Memnite left the battlefield this turn: at the end step the Mechan gets
+# a counter, a 3/3 (CR 603.4).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Interceptor Mechan
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Interceptor Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+! Bot1.Target(Bot2.Graveyard.Memnite)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Island; Ornithopter
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Interceptor Mechan.Power = 3
+Bot1.Battlefield.Interceptor Mechan.Toughness = 3
+Bot1.Graveyard = Black Lotus; Lightning Bolt; Lightning Bolt
+Bot2.Graveyard = Memnite
