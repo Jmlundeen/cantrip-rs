@@ -1,0 +1,53 @@
+# Knight Luminary, Warp {1}{W} (CR 702.185a): cast from hand on turn 3 for {W}{W} (Plains and Mox Pearl; the pool is empty
+# after), its enters trigger makes a Human Soldier. At the beginning of the next end step it is exiled (it is exiled, not the
+# Soldier). On turn 5 it is cast from exile for {3}{W}, and enters again: a second Soldier.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Knight Luminary
+Plains
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Knight Luminary.Cast(Ability: Warp)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Human Soldier Token; Knight Luminary; Mox Pearl; Mox Sapphire; Plains
+[T4 Bot2.Main1]
+? Exile = Knight Luminary
+? Bot1.Battlefield = Human Soldier Token; Mox Pearl; Mox Sapphire; Plains
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Knight Luminary.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Knight Luminary.Power = 3
+Exile.Count = 0

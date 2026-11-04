@@ -1,0 +1,8 @@
+{
+  "name": "Knight Luminary",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Human Knight",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "When this creature enters, create a 1/1 white Human Soldier creature token.\nWarp {1}{W} (You may cast this card from your hand for its warp cost. Exile this creature at the beginning of the next end step, then you may cast it from exile on a later turn.)"
+}

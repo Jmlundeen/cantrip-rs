@@ -1,0 +1,36 @@
+# Knight Luminary {3}{W}: "When this creature enters, create a 1/1 white Human Soldier creature token." With only Plains
+# the cast is refused ({W} is short of four); with Black Lotus's three white added it is paid exactly and the pool is
+# empty. The 3/2 Knight stays on the battlefield and its trigger makes one 1/1 Soldier.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Knight Luminary
+Island x4
+Island x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+! Bot1.Hand.Knight Luminary.Cast(Mana: short)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Knight Luminary.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Human Soldier Token; Knight Luminary; Plains
+Bot1.Battlefield.Knight Luminary.Power = 3
+Bot1.Battlefield.Knight Luminary.Toughness = 2
+Bot1.Battlefield.Human Soldier Token.Power = 1
+Bot1.Battlefield.Human Soldier Token.Toughness = 1
+Bot1.Graveyard = Black Lotus
+Exile.Count = 0
