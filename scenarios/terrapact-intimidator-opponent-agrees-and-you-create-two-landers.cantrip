@@ -1,0 +1,29 @@
+# Terrapact Intimidator {1}{R}: "When this creature enters, target opponent may have you create two Lander tokens. If they don't, put two +1/+1 counters on this
+# creature." Only an opponent can be the target (Bot1 itself is refused). Bot2 agrees, so Bot1 creates two Lander tokens and the 2/1 gets no counters.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Terrapact Intimidator
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Terrapact Intimidator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot2.Accept
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Lander Token; Lander Token; Mox Jet; Mox Ruby; Terrapact Intimidator
+Bot1.Battlefield.Terrapact Intimidator.Power = 2
+Bot1.Battlefield.Terrapact Intimidator.Toughness = 1

@@ -1,0 +1,45 @@
+# Terrapact Intimidator: Bot2 declines to have Bot1 create Lander tokens, so the Intimidator gets two +1/+1 counters (a 4/3) and no token is made. Cast from
+# the other side too: on turn 2 Bot2 casts its own, and Bot1 (its only opponent, so the target is automatic) accepts, so Bot2 gets the two Landers.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Terrapact Intimidator
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Terrapact Intimidator
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Terrapact Intimidator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot2.Decline
+? Bot1.Battlefield.Terrapact Intimidator.Counters.PlusOnePlusOne = 2
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Terrapact Intimidator.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Terrapact Intimidator.Power = 4
+Bot1.Battlefield.Terrapact Intimidator.Toughness = 3
+Bot2.Battlefield = Lander Token; Lander Token; Mox Jet; Mox Ruby; Terrapact Intimidator
+Bot2.Battlefield.Terrapact Intimidator.Power = 2
