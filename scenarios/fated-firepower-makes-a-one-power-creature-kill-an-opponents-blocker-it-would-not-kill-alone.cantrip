@@ -1,0 +1,47 @@
+# Fated Firepower with one fire counter: damage to "a permanent an opponent controls" gets the counters too. Bot1's Fanatical
+# Firebrand (power 1) is blocked by Bot2's 0/2 Ornithopter and deals 1 + 1 = 2 to it: the Ornithopter dies, which one damage
+# alone would not do. Bot2 takes none (20) and the Firebrand takes the Ornithopter's 0 and lives.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Jet
+Fated Firepower
+Fanatical Firebrand
+Island
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fated Firepower.Cast(X: 1; Spend: B, R, R, R)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+Bot2.Block(Ornithopter > Fanatical Firebrand)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Fanatical Firebrand.Damage = 0

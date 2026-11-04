@@ -1,0 +1,49 @@
+# Fated Firepower with one fire counter (X = 1, paid {1}{R}{R}{R} with Moxen): "damage" is combat damage too. In turn 3 Bot1's hasty
+# Fanatical Firebrand (power 1) attacks and deals 1 + 1 = 2 to Bot2 (20 to 18). Bot2's own Lightning Bolt in turn 2 deals only its
+# 3 to Bot1 (20 to 17): the source is Bot2's, and the Firepower adds to damage "a source you control" deals.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Jet
+Fated Firepower
+Fanatical Firebrand
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fated Firepower.Cast(X: 1; Spend: B, R, R, R)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 17
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 17

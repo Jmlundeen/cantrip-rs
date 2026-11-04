@@ -1,0 +1,54 @@
+# Fated Firepower: "Flash. This enchantment enters with X fire counters on it. If a source you control would deal damage to an
+# opponent or a permanent an opponent controls, it deals that much damage plus an amount of damage equal to the number of fire
+# counters on this enchantment instead." Bot1 casts it during Bot2's turn 2 (flash) with X = 2, paying {2}{R}{R}{R} exactly
+# with five Moxen. In turn 3 Lightning Bolt to Bot2 deals 3 + 2 = 5 (20 to 15) but Lightning Bolt to Bot1's own face only 3 (17).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Pearl
+Fated Firepower
+Lightning Bolt
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fated Firepower.Cast(X: 2; Spend: W, B, R, R, R)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+? Bot1.Battlefield.Fated Firepower.Counters.Fire = 2
+? Bot1.Battlefield.Fated Firepower.Keywords = Flash
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt#1.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 15
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 15
+Bot1.Life = 17
+Bot1.Battlefield.Fated Firepower.Counters.Fire = 2
