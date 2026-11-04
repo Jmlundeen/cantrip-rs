@@ -3659,9 +3659,12 @@ pub struct DamageBatch {
     /// What it has dealt to each permanent, for an effect that heals the damage marked before the event (it must not
     /// heal the event's own).
     dealt: Vec<DamageRecipient>,
+    /// The life lost to noninfect player damage (CR 120.3a), prepared only once all damage replacements have applied.
+    /// Losses to one player are combined; gains remain distinct from them (CR 120.4c-d).
+    life: Vec<(PlayerId, i32)>,
     /// What each source with lifelink has dealt, and who controls it: one life gain event per source, however many
-    /// recipients it dealt damage to (CR 120.3f; Angel of Vitality's and Leyline of Hope's rulings).
-    lifelink: Vec<(ObjectId, PlayerId, u32)>,
+    /// recipients it dealt damage to (CR 120.3f, 702.15e; Angel of Vitality's and Leyline of Hope's rulings).
+    lifelink: Vec<(ObjectId, PlayerId, i32)>,
     /// For each player dealt damage in it, whether the damage is dealt as though its source had infect (Phyrexian Unlife's "as
     /// long as you have 0 or less life"): judged once, as the event begins for that player, since all of it is dealt at once
     /// (CR 120.2, 510.2) - a life total the event itself takes to 0 makes none of it poison.
@@ -3752,19 +3755,22 @@ impl DamageBatch {
         infect
     }
 
-    /// What the event's damage results in once it is all dealt (CR 120.3): the -1/-1 counters it is dealt to creatures as,
-    /// put on together, their announcements added to the damage's `events` (CR 120.3d, 603.2c), then the life its lifelink
-    /// sources gain (`gain_lifelink`).
+    /// Prepare the life results of all the damage together (CR 120.4c): one loss per player, but one lifelink gain per
+    /// source (CR 119.9-10, 702.15e). No original life update precedes the result replacements. Their announcements and
+    /// the -1/-1 counters join the damage's events, so the whole damage event occurs at once (CR 120.4d, 603.2c).
     pub fn finish(&mut self, cx: &mut Cx, events: &mut Vec<Event>) {
+        let mut life = std::mem::take(&mut self.life);
+        life.extend(std::mem::take(&mut self.lifelink).into_iter().map(|(_, controller, amount)| (controller, amount)));
+        let changes = prepare_life_changes(cx, &life);
         let placements = std::mem::take(&mut self.counters);
         events.extend(counters::place_together(cx, &placements, counters::How::Effect));
+        apply_life_changes(cx, changes, events);
         // Complete the simultaneous event's excess amounts before any damage triggers see it (CR 120.10).
         for event in events.iter_mut() {
             if let Event::Damage { target: Target::Object(id), recipient_excess, .. } = event {
                 *recipient_excess = self.dealt.iter().find(|r| r.object == *id).map_or(0, DamageRecipient::excess);
             }
         }
-        self.gain_lifelink(cx);
     }
 
     /// The rest of the prevention effects that prevented some of the event's damage (CR 615.5), once it has all been dealt and
@@ -3776,14 +3782,6 @@ impl DamageBatch {
             replace::rest_of_preventions(cx, std::mem::take(&mut self.prevented));
         }
     }
-
-    /// The life the event's sources with lifelink cause their controllers to gain (CR 120.3f), once the damage is all
-    /// dealt: one gain for each source.
-    fn gain_lifelink(&mut self, cx: &mut Cx) {
-        for (_, controller, amount) in std::mem::take(&mut self.lifelink) {
-            change_life(cx, controller, amount.min(i32::MAX as u32) as i32);
-        }
-    }
 }
 
 /// The last-known row of `source` as it deals damage (`Event::Damage::known`): its characteristics then, `chars`, which the
@@ -3793,8 +3791,8 @@ fn dealer_known(cx: &mut Cx, source: ObjectId, chars: &Chars) -> u32 {
     cx.st().last_known_push(row)
 }
 
-/// Damage as `damage` deals it, as one assignment of a simultaneous event, `batch`. The life its lifelink sources gain is gained by
-/// `DamageBatch::finish` once every assignment has been dealt, and so are the counters it is dealt as.
+/// Damage as `damage` deals it, as one assignment of a simultaneous event, `batch`. Its life losses, lifelink gains and
+/// creature counters are results prepared by `DamageBatch::finish` after every damage replacement has applied.
 pub fn deal_damage_with(
     cx: &mut Cx,
     source: ObjectId,
@@ -3845,7 +3843,7 @@ pub fn deal_damage_with(
             // toxic value, whatever the amount dealt (CR 702.164c, 120.3g): prevented, no damage is dealt and none are given.
             let toxic = if combat && source_chars.is(CardType::Creature) { source_chars.toxic } else { 0 };
             if !infect {
-                change_life(cx, p, -(amount as i32));
+                batch.life.push((p, -i32::from(amount)));
             }
             let poison = (if infect { amount } else { 0 } + u32::from(toxic)).min(u32::from(u16::MAX)) as u16;
             if poison > 0 {
@@ -3957,8 +3955,8 @@ fn lifelink(cx: &mut Cx, source: ObjectId, chars: &Chars, amount: u32, batch: &m
     if chars.has(Keyword::Lifelink) {
         let controller = cx.controller(source);
         match batch.lifelink.iter_mut().find(|(s, _, _)| *s == source) {
-            Some(entry) => entry.2 += amount as u32,
-            None => batch.lifelink.push((source, controller, amount as u32)),
+            Some(entry) => entry.2 += i32::from(amount),
+            None => batch.lifelink.push((source, controller, i32::from(amount))),
         }
     }
 }
@@ -3973,28 +3971,50 @@ pub fn each_opponent_loses_life(cx: &mut Cx, player: PlayerId, amount: i32) -> i
 /// before any of its life totals change, then announced as one event (CR 603.2c). Only the final losses count towards
 /// "life lost this way", not gains or the separate actions a replacement's continuation performs.
 pub fn lose_life_together(cx: &mut Cx, losses: &[(PlayerId, i32)]) -> i32 {
-    let mut changes = Vec::new();
+    let losses: Vec<_> = losses.iter().filter(|&&(_, n)| n > 0).map(|&(player, n)| (player, -n)).collect();
+    let changes = prepare_life_changes(cx, &losses);
+    let mut events = Vec::with_capacity(changes.len());
+    let total = apply_life_changes(cx, changes, &mut events);
+    if !events.is_empty() {
+        cx.emit_batch(&events, None);
+    }
+    total
+}
+
+/// Life results of one simultaneous event (CR 101.4, 120.4c, 616.1), with signed amounts. Losses are one amount per
+/// player; gains are already one per source (CR 119.9-10, 702.15e), never merged with losses or each other. Replacements
+/// run in APNAP order before any original life update, including when a replacement changes a result's sign.
+fn prepare_life_changes(cx: &mut Cx, changes: &[(PlayerId, i32)]) -> Vec<(PlayerId, i32)> {
+    let mut prepared = Vec::with_capacity(changes.len());
+    if changes.is_empty() {
+        return prepared;
+    }
     for player in cx.s().apnap() {
-        let amount: i32 = losses.iter().filter(|&&(p, n)| p == player && n > 0).map(|&(_, n)| n).sum();
-        let delta = prepare_life_change(cx, player, -amount);
-        if delta != 0 {
-            changes.push((player, delta));
+        let loss: i32 = changes.iter().filter(|&&(p, n)| p == player && n < 0).map(|&(_, n)| n).sum();
+        let gains = changes.iter().filter(|&&(p, n)| p == player && n > 0).map(|&(_, n)| n);
+        for amount in std::iter::once(loss).chain(gains) {
+            let delta = prepare_life_change(cx, player, amount);
+            if delta != 0 {
+                prepared.push((player, delta));
+            }
         }
     }
+    prepared
+}
+
+/// Apply prepared life results through the journal, returning the life actually lost and leaving their announcements
+/// with the caller. Damage announces them with its other results, an explicit loss instruction on its own (CR 603.2c).
+fn apply_life_changes(cx: &mut Cx, mut changes: Vec<(PlayerId, i32)>, events: &mut Vec<Event>) -> i32 {
     // A later replacement's continuation may have removed a player or changed what they can gain or lose. Judge
-    // every final prohibition before applying any of the original instruction's changes.
+    // every final prohibition before applying any of the original event's changes.
     changes.retain(|&(player, delta)| cx.s().in_game(player) && !life_total_cant_change(cx.s(), player) && !blocked(cx, player, delta));
     let mut total = 0;
-    let mut events = Vec::with_capacity(changes.len());
     for (player, delta) in changes {
         cx.st().update_player(player, |p| p.life += delta);
         if delta < 0 {
             total -= delta;
         }
         events.push(Event::LifeChange { player, delta });
-    }
-    if !events.is_empty() {
-        cx.emit_batch(&events, None);
     }
     total
 }
@@ -4004,22 +4024,22 @@ pub fn life_total_cant_change(s: &GameState, player: PlayerId) -> bool {
     !s.effects.is_empty() && s.effects.iter().any(|e| e.kind == EffectKind::LifeTotalCantChange(player))
 }
 
-/// `player`'s life total goes up or down by `delta` (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR 120.3a),
-/// lifelink (CR 702.15b) or a life total set to a number (CR 119.5). Simultaneous losses use the same preparation
-/// through `lose_life_together`, deferring the updates and announcement until every player's change is prepared.
+/// `player`'s life total goes up or down by `delta` (CR 119.3): an effect's, a cost's (CR 119.4), or a life total set to a
+/// number (CR 119.5). Simultaneous losses and damage results use the same preparation through `prepare_life_changes`,
+/// deferring their updates and announcement until every player's change is prepared.
 pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
     let delta = prepare_life_change(cx, player, delta);
     if delta == 0 {
         return;
     }
-    cx.st().update_player(player, |p| p.life = p.life.saturating_add(delta));
+    cx.st().update_player(player, |p| p.life += delta);
     // CR 702.179d: an opponent losing life during the turn of a player with speed triggers its inherent ability
     // (`designations::inherent_triggers`).
     cx.emit(Event::LifeChange { player, delta });
 }
 
-/// The shared life-change pipeline before its update: single-player changes apply it at once; simultaneous losses
-/// prepare every player's change first (CR 101.4, 614.1a, 616.1).
+/// The shared life-change pipeline before its update: single-player changes apply it at once; simultaneous losses and
+/// damage results prepare every player's changes first (CR 101.4, 120.4c, 614.1a, 616.1).
 fn prepare_life_change(cx: &mut Cx, player: PlayerId, delta: i32) -> i32 {
     if delta == 0 || !cx.s().in_game(player) {
         return 0;

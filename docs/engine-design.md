@@ -1008,7 +1008,7 @@ A live player at zero life still receives simultaneous damage before state-based
 including lifelink from a departed source-controller's independent ability, likewise affect only players still in the
 game. The original simultaneous batch and each source's live damage totals are preserved.
 
-Every gain and loss of life uses the `ops::change_life` pipeline (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR
+Every gain and loss of life uses the `ops::prepare_life_change` pipeline (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR
 120.3a), lifelink (CR 702.15b), and a life total set to a number (`Game::set_life_total`, CR 119.5: the player gains or loses
 the difference). A gain does not happen while the player can't gain life (CR 119.7, `static_rules::cant_gain_life`): a
 resolved effect about the player says so (`EffectKind::CantGainLife`, Screaming Nemesis's "for the rest of the game"), or a
@@ -1036,6 +1036,16 @@ opponents" sees one occurrence, individual observers see each loss. The return v
 not blocked losses, replaced gains or a replacement continuation's other actions. `each_opponent_loses_life` uses the same
 operation for equal amounts; single-player changes still apply and emit immediately.
 
+Damage uses that same preparation and application, within the existing `ops::DamageBatch` (CR 120.4c-d). After damage
+replacement and prevention, its noninfect player damage is a combined loss per player; lifelink is a separate gain per
+source, summed across that source's recipients, never across different sources (CR 119.9-10, 702.15e). Losses and gains
+are not netted, even if they leave a life total unchanged. All life-result replacements are prepared in APNAP order
+before any original life total changes; the journal applies them only after the damage-result replacements finish.
+Life-change announcements join the damage and counter announcements in one `emit_batch`, including gains replaced
+with losses: Ob Nixilis, Captive Kingpin sees one event when several opponents each lose exactly 1, while Ajani's
+Pridemate still sees each source's lifelink gain. Spell damage, single damage and combat all finish this same batch.
+An explicit `lose_life` or `gain_life` call remains its own event, not part of another instruction's damage batch.
+
 Draws (CR 121) are judged one card at a time (`ops::draw`): first whether the player can't draw it (`cantrip_api::cant_draw`,
 a permanent's `CardDef::cant_draw` rule: "can't draw more than one card each turn", CR 121.2b) - then nothing happens and no
 replacement effect replaces it (CR 614.17c) - then the `Proposal::Draw` replacements (CR 121.6), ordered by the drawing player
@@ -1061,8 +1071,9 @@ life instead", "that player loses that much life instead") are `ReplacementKind:
 119.7) and ordered by the player whose life it is (CR 616.1, `RequestKind::ChooseReplacement`'s `life`, which the host words as
 "You would gain 3 life"). Each is judged again on the event as the one before left it (CR 616.1f), so a gain turned into a loss
 meets the effects on losing life; an amount left at zero is no event (CR 119.10). The `LifeChange` event records the life that
-actually changed, so the history's `life_gained`/`life_lost` count it. Damage is replaced as damage before it is dealt; the life
-lost to it is a separate event (Bloodletter of Aclazotz doubles the loss, not the damage nor its lifelink). Lifelink is one gain
+actually changed, so the history's `life_gained`/`life_lost` count it. Damage is replaced as damage before its life
+results are prepared; the life lost to it is a distinct result of the same simultaneous event (Bloodletter of Aclazotz
+doubles the loss, not the damage nor its lifelink). Lifelink is one gain
 per source of a simultaneous damage event, however many recipients (`ops::DamageBatch`, CR 120.3f and Angel of Vitality's
 ruling). The shared effects are in `cantrip_mechanics::replacements`. A cost's payability (CR 119.4) is judged on the payment,
 not on what a replacement makes of the loss. A cost paid as an effect resolves - "you may pay {W}{B} and 2 life. When you
