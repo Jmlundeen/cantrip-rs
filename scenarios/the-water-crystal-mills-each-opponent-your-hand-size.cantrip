@@ -1,0 +1,74 @@
+# The Water Crystal: "{4}{U}{U}, {T}: Each opponent mills cards equal to the number of cards in your hand." (CR 701.17a)
+# Turn 1: the Crystal, then Mox Emerald pays for Sol Ring, and Bot1's hand is empty. Turn 3: Bot1 plays the Island it drew
+# and activates with no card in hand: Bot2 mills zero. Zero is not "one or more", so the Crystal's replacement adds nothing.
+# Turn 5: Bot1 holds the Counterspell it drew and activates again with one card in hand. Bot2 mills one, plus four from
+# the Crystal: five. Bot2's own, larger hand does not count. Both activations use exactly the six mana tapped.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+The Water Crystal
+Mox Emerald
+Sol Ring
+Island
+Counterspell
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Water Crystal.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 0
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.The Water Crystal.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard.Count = 0
+? Bot1.Battlefield.The Water Crystal.Tapped = true
+? Stack.Count = 0
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+? Bot1.Hand = Counterspell
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.The Water Crystal.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard.Count = 5
+Bot1.Battlefield.The Water Crystal.Tapped = true

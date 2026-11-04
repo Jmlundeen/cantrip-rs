@@ -1,0 +1,61 @@
+# The Water Crystal (CR 701.17a, 614.1a): "If an opponent would mill one or more cards, they mill that many cards plus four
+# instead." Turn 3: Bot1's Thought Scour makes Bot2 mill two, and Bot2 mills six. Bot1's second Thought Scour makes Bot1 mill
+# two, and Bot1 mills two: the Crystal changes only its controller's opponents' mills. Turn 4: Bot2's Consider surveils one card
+# into its graveyard. The ruling: a card put into a graveyard without the word "mill" is not milled, so nothing is added.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+The Water Crystal
+Thought Scour
+Thought Scour
+Island
+Island x20
+
+[Bot2 Deck]
+Island
+Island
+Consider
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Water Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Thought Scour.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard.Count = 6
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 4
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Consider.Cast
+Bot2.Arrange(| Island)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 8
+Bot1.Graveyard.Count = 4

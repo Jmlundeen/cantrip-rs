@@ -1,0 +1,62 @@
+# The Water Crystal (CR 601.2f, 118.7a): "Blue spells you cast cost {1} less to cast." Turn 1: Island, Mox Sapphire, Mox Jet
+# and Mox Pearl pay for the Crystal ({2}{U}{U}). Turn 3: Bot1 casts Hullbreacher ({2}{U}, blue) for its Island and Mox Jet,
+# {1}{U} with nothing over. The colorless Mind Stone ({2}) is not reduced: Mox Pearl and Mox Sapphire pay it and leave nothing
+# over. Turn 4: Bot2 casts its own Snapcaster Mage off two Islands. The Crystal is Bot1's, so it costs the full {1}{U} and
+# leaves nothing in Bot2's pool.
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+The Water Crystal
+Hullbreacher
+Mind Stone
+Island
+Island x20
+
+[Bot2 Deck]
+Island
+Island
+Snapcaster Mage
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Water Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hullbreacher.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mind Stone.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Snapcaster Mage.Cast
+? Bot2.Mana =
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Hullbreacher; Mind Stone; Mox Jet; Mox Pearl; Mox Sapphire; The Water Crystal
+Bot2.Battlefield = Island; Island; Snapcaster Mage
