@@ -390,7 +390,7 @@ fn a_change_of_control_is_recorded_each_time_it_happens() {
     game.state.update_obj(mind, |o| o.attached_to = Some(bear));
     let mut cx = cx(&mut game);
     let changes = |cx: &Cx| -> Vec<PlayerId> {
-        cx.g.log.iter().filter_map(|r| match r.event { Event::ControlChanged { permanent, controller } if permanent == bear => Some(controller), _ => None }).collect()
+        cx.g.log.iter().filter_map(|r| match r.event { Event::ControlChanged { permanent, controller, .. } if permanent == bear => Some(controller), _ => None }).collect()
     };
     crate::ops::settle_control(&mut cx);
     crate::ops::settle_control(&mut cx);

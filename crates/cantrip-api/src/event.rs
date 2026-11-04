@@ -335,11 +335,13 @@ pub enum Event {
     /// turn began (723.1) or its controller left the game (CR 800.4a). Recorded only, so the history says who saw which
     /// hidden card when (`GameState::player_controller` is who controls them now).
     PlayerControlled { player: PlayerId, controller: PlayerId },
-    /// A permanent came under `controller`'s control without entering the battlefield (CR 108.4, 613.1b): a control-changing
-    /// effect began to apply, or ended and control went back. The same object (CR 110.2). Recorded only, for the history: the
-    /// one record of when an object came under a player's control besides its zone change onto the battlefield, which echo
-    /// asks (CR 702.30a: "came under your control since the beginning of your last upkeep").
-    ControlChanged { permanent: ObjectId, controller: PlayerId },
+    /// A permanent came under `controller`'s control from `from`'s without entering the battlefield (CR 108.4, 613.1b): a
+    /// control-changing effect began to apply, or ended and control went back. The same object (CR 110.2). The one record of
+    /// when an object came under a player's control besides its zone change onto the battlefield, which echo asks (CR
+    /// 702.30a: "came under your control since the beginning of your last upkeep"), and what "when you lose control of
+    /// [it]" triggers on (Stolen Uniform, Seraph). Its triggers are looked for once layer 2 is settled for every permanent
+    /// (`ops::settle_control`).
+    ControlChanged { permanent: ObjectId, from: PlayerId, controller: PlayerId },
     /// A mutating creature spell merged with the creature it targeted as it resolved (CR 702.140c-d, 730.2): `spell` was the
     /// spell, `permanent` the merged permanent - the same object it was (CR 730.2c) - and `on_top` whether the spell was put
     /// on top. What "whenever this creature mutates" triggers on (CR 702.140d), and "the number of times it has mutated"
@@ -566,7 +568,8 @@ impl EventMask {
     pub const PLAYER_CONTROLLED: EventMask = EventMask(1 << 59);
     /// A creature became tapped to pay a spell's teamwork cost (CR 702.194a).
     pub const TAPPED_FOR_TEAMWORK: EventMask = EventMask(1 << 60);
-    /// A permanent came under a player's control without entering (CR 613.1b): recorded only, for the history.
+    /// A permanent came under a player's control without entering (CR 613.1b): what "when you lose control of [it]" triggers
+    /// on, and what echo asks of the history.
     pub const CONTROL_CHANGED: EventMask = EventMask(1 << 61);
     /// A permanent entered the battlefield as it was (CR 603.6a): recorded only, for the history.
     pub const ENTERED: EventMask = EventMask(1 << 62);
@@ -605,7 +608,6 @@ impl EventMask {
             Event::Randomized { .. } => EventMask::RANDOMIZED,
             Event::PhasedOut { .. } => EventMask::PHASED_OUT,
             Event::PlayerControlled { .. } => EventMask::PLAYER_CONTROLLED,
-            Event::ControlChanged { .. } => EventMask::CONTROL_CHANGED,
             other => EventMask::of(other),
         }
     }
@@ -622,6 +624,7 @@ impl EventMask {
             Event::SpellCast { .. } => EventMask::SPELL_CAST,
             Event::BecameTarget { .. } => EventMask::BECAME_TARGET,
             Event::ZoneChange { .. } => EventMask::ZONE_CHANGE,
+            Event::ControlChanged { .. } => EventMask::CONTROL_CHANGED,
             Event::Damage { .. } => EventMask::DAMAGE,
             Event::StepBegan { .. } => EventMask::STEP_BEGAN,
             Event::Discarded { .. } => EventMask::DISCARDED,

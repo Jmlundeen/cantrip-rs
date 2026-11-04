@@ -1626,12 +1626,6 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
             });
         }
     }
-    // "This turn" delayed abilities end with it (CR 603.7b), and so does a "when you next ... this turn" that never triggered.
-    for at in (0..cx.s().delayed.len()).rev() {
-        if matches!(cx.s().delayed[at].when, DelayedWhen::ThisTurn | DelayedWhen::NextThisTurn) {
-            cx.st().delayed_remove(at);
-        }
-    }
     // "This combat" ends with its combat phase (`next_step`); one made outside combat ends with the turn at the latest.
     if cx.s().effects.iter().any(|e| e.duration == Duration::EndOfCombat) {
         cx.st().effects_retain(|e| e.duration != Duration::EndOfCombat);
@@ -1648,6 +1642,16 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
         // effect that made a permanent an Aura that gives control), before anything reads it (the untap step's "untap all
         // permanents you control").
         ops::settle_lasting_and_control(cx);
+    }
+    // "This turn" delayed abilities end with it (CR 603.7b), and so does a "when you next ... this turn" that never triggered:
+    // as the "until end of turn" effects end, at the same moment (CR 514.2), so one still triggers on what their ending does
+    // (Stolen Uniform's "when you lose control of that Equipment this turn" as its "until end of turn" control ends; its
+    // ruling: "whether it's because the 'until end of turn' duration ended or ..."), and its trigger gives the active
+    // player priority in this cleanup step and another one follows (CR 514.3a).
+    for at in (0..cx.s().delayed.len()).rev() {
+        if matches!(cx.s().delayed[at].when, DelayedWhen::ThisTurn | DelayedWhen::NextThisTurn) {
+            cx.st().delayed_remove(at);
+        }
     }
     // Permissions to play cards end with the turn they name (CR 514.2), "this turn" or "your next turn"; one for a
     // card that has since moved is gone with the old object (CR 400.7).

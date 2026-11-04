@@ -4510,7 +4510,7 @@ fn write_controller(cx: &mut Cx, id: ObjectId, controller: PlayerId, by_effect: 
     });
     if controller != obj.controller {
         // It came under this player's control (CR 613.1b): what an echo ability asks of the history (CR 702.30a).
-        cx.record(Event::ControlChanged { permanent: id, controller });
+        cx.record(Event::ControlChanged { permanent: id, from: obj.controller, controller });
         // A permanent whose controller changes is removed from combat (CR 506.4): an attacking or blocking creature, and a
         // planeswalker or battle being attacked, whose attackers then attack nothing (CR 506.4c).
         remove_from_combat(cx, &[id]);
@@ -4763,11 +4763,19 @@ pub fn settle_control(cx: &mut Cx) -> bool {
         return false;
     }
     let order = layers::control_order(cx.cards(), cx.s(), &cx.g.log);
+    let start = cx.g.log.len();
     let mut changed = false;
     for (id, controller, by_effect) in order {
         if cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
             changed |= write_controller(cx, id, controller, by_effect);
         }
+    }
+    if changed {
+        // The changes of control layer 2 made at once happened together (CR 603.2c): what they trigger ("when you lose
+        // control of [it]", CR 603.2) is looked for once every permanent's controller is settled.
+        let events: Vec<Event> =
+            cx.g.log[start..].iter().map(|r| r.event).filter(|e| matches!(e, Event::ControlChanged { .. })).collect();
+        crate::settle::collect_batch(cx, &events, None, start);
     }
     changed
 }

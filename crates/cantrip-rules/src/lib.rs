@@ -1375,7 +1375,9 @@ impl<'a> Cx<'a> {
         {
             self.g.state.see_statics();
         }
-        if matches!(kind, EffectKind::Control(_)) {
+        // Control is settled as the effect begins; inside an instruction that holds settling (an exchange of control's
+        // two halves, CR 701.12a), once it is done (`ops::as_one_instruction`), so what the changes trigger sees them both.
+        if matches!(kind, EffectKind::Control(_)) && self.g.state.settle_held.get() == 0 {
             ops::settle_control(self);
         }
         // What it changes may end a "for as long as" (Old Man of the Sea's "that creature's power remains less than or
