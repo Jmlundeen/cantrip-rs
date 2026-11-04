@@ -1868,6 +1868,24 @@ pub fn deals_combat_damage_to_a_creature(q: &dyn Query, source: ObjectId, event:
     }
 }
 
+/// "Whenever this creature or another creature or artifact you control dies" (CR 700.4, 603.10a): any creature or artifact put into
+/// a graveyard from the battlefield, looked back on as it last was and under the controller it last had; the source itself is one
+/// of them, since it is a creature or an artifact. Several dying together trigger it once each, and an artifact creature, one
+/// event, once. Al Bhed Salvagers and Susurian Voidborn print it.
+pub fn this_or_another_creature_or_artifact_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, from, to, .. }
+            if from.is(ZoneKind::Battlefield)
+                && to.is(ZoneKind::Graveyard)
+                && q.obj(*old).controller == me.controller
+                && (q.chars(*old).is(CardType::Creature) || q.chars(*old).is(CardType::Artifact)) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever a creature you control deals combat damage to a player" (CR 510.2, 603.2): one trigger for each creature and
 /// player, with "that player" fixed as the trigger's subject. Vraska, Golgari Queen's emblem and Enduring Curiosity print it.
 pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
