@@ -1,0 +1,48 @@
+# Illvoi Light Jammer has flash: on Bot2's turn 2, with Lightning Bolt aimed at Elvish Mystic on the stack, Bot1 casts it. Entering, it attaches to
+# the Mystic, which gains hexproof until end of turn (CR 702.11b): the Bolt's target is now illegal and it fizzles (CR 608.2b). Equipped the Mystic is a
+# 2/3 (+1/+2). On turn 3 the "until end of turn" part is over: it is a 2/3 with no keyword, still equipped.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Elvish Mystic
+Illvoi Light Jammer
+Island x15
+
+[Bot2 Deck]
+Island
+Mountain
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Elvish Mystic)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Illvoi Light Jammer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Elvish Mystic.Keywords = Hexproof
+? Bot1.Battlefield.Elvish Mystic.Power = 2
+? Bot1.Battlefield.Elvish Mystic.Toughness = 3
+? Bot2.Graveyard = Lightning Bolt
+? Bot1.Battlefield.Elvish Mystic.Damage = 0
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Illvoi Light Jammer.AttachedTo = Elvish Mystic
+Bot1.Battlefield.Elvish Mystic.Keywords = (absent)
+Bot1.Battlefield.Elvish Mystic.Power = 2
+Bot1.Battlefield.Elvish Mystic.Toughness = 3
