@@ -1,0 +1,8 @@
+{
+  "name": "Gallant Citizen",
+  "manaCost": "{G/W}{G/W}",
+  "type": "Creature — Human Citizen",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "When this creature enters, draw a card."
+}

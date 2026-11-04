@@ -1,0 +1,32 @@
+# Gallant Citizen: "When this creature enters, draw a card." Its {G/W}{G/W} is paid here with two green mana (a Forest and a Mox
+# Emerald: each hybrid symbol takes either color, CR 107.4e), the pool empty after the cast; it enters and its trigger draws
+# the top card (a Plains): the hand holds the four Islands and the Plains, the library one card fewer (CR 121.1, 603.6a).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Gallant Citizen
+Island x4
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gallant Citizen.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Gallant Citizen
+Bot1.Hand = Island; Island; Island; Island; Plains
+Bot1.Library.Count = 10
