@@ -1,0 +1,8 @@
+{
+  "name": "Virulent Silencer",
+  "manaCost": "{3}",
+  "type": "Artifact Creature — Robot Assassin",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Whenever a nontoken artifact creature you control deals combat damage to a player, that player gets two poison counters. (A player with ten or more poison counters loses the game.)"
+}
