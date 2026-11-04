@@ -1,0 +1,31 @@
+# Scarlet Spider, Kaine: the discard is optional ("you may discard", CR 608.2d) and the counter follows only "if you do". With cards in hand
+# and the choice declined, he stays a 2/1 with no counter and nothing is discarded.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Scarlet Spider, Kaine
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Scarlet Spider, Kaine.Cast
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Scarlet Spider, Kaine.Power = 2
+Bot1.Battlefield.Scarlet Spider, Kaine.Toughness = 1
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 4

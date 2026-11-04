@@ -1,0 +1,35 @@
+# Scarlet Spider, Kaine: "Mayhem {B/R}" (CR 702.187a): discarded to Faithless Looting on turn 1, he is cast from the graveyard the same turn for the
+# one hybrid mana {B/R}, paid here with Mox Jet's black. He enters, and his own enters trigger discards the Island for his counter: a 3/2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Faithless Looting
+Scarlet Spider, Kaine
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Scarlet Spider, Kaine; Island)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Scarlet Spider, Kaine.Cast(Ability: Mayhem)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Scarlet Spider, Kaine.Power = 3
+Bot1.Battlefield.Scarlet Spider, Kaine.Toughness = 2
+Bot1.Graveyard.Count = 3

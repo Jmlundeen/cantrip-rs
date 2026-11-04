@@ -1,0 +1,33 @@
+# Scarlet Spider, Kaine ({B}{R}, 2/1 menace): "When Scarlet Spider enters, you may discard a card. If you do, put a +1/+1 counter on him."
+# Cast on turn 1 with four Islands left in hand, he discards one and is a 3/2 with a +1/+1 counter (CR 701.9, 122.1), still with menace.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Scarlet Spider, Kaine
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Scarlet Spider, Kaine.Cast
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Scarlet Spider, Kaine.Power = 3
+Bot1.Battlefield.Scarlet Spider, Kaine.Toughness = 2
+Bot1.Battlefield.Scarlet Spider, Kaine.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Scarlet Spider, Kaine.Keywords = Menace
+Bot1.Graveyard.Count = 1
+Bot1.Hand.Count = 3
