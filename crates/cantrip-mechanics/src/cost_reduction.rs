@@ -44,3 +44,14 @@ pub fn ability_cheaper_per_subtype_you_control<const TYPE: u16>(q: &dyn Query, a
     let wanted = crate::lands::word(q, asker.source, TYPE);
     CostDelta::less(crate::permanents_with_subtype_you_control(q, asker.controller, wanted) as u32)
 }
+
+/// "The second spell you cast each turn costs {N} less to cast" (CR 601.2f, 118.7a, 601.2i): the controller's own spells only,
+/// the one being cast being their second when exactly one spell of theirs was cast earlier this turn, whoever's it was and
+/// however it was cast. A generic reduction takes only the generic part (CR 118.7c). Uthros Psionicist ({2}), Highspire
+/// Bell-Ringer, Monk Class and Raging Battle Mouse ({1}) print it.
+pub fn second_spell_you_cast_each_turn_costs_less<const N: u8>(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    if !matches!(costed, Costed::Spell(_)) || player != q.controller(source) {
+        return CostDelta::NONE;
+    }
+    if q.history().casts_by(player).count() == 1 { CostDelta::less(N as u32) } else { CostDelta::NONE }
+}
