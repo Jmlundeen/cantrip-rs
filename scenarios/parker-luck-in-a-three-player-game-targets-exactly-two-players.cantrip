@@ -1,0 +1,42 @@
+# Parker Luck {2}{B}: with three players it still takes exactly two target players, not three (CR 115.3, 601.2c). Bot1 names Bot2
+# and Bot3 and is not one of them: Bot2 reveals Sol Ring (mana value 1) and Bot3 reveals Serra Angel (5), so Bot2 loses 5 and
+# Bot3 loses 1, and Bot1 reveals nothing and loses nothing.
+
+[Bot1 Deck]
+Black Lotus
+Parker Luck
+Swamp x5
+Ornithopter
+Swamp x10
+
+[Bot2 Deck]
+Island x7
+Sol Ring
+Island x10
+
+[Bot3 Deck]
+Island x7
+Serra Angel
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Parker Luck.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T1 Bot1.End]
+! Bot1.Target(Count: 3)
+Bot1.Target(Bot2; Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand.Count = 6
+Bot2.Life = 15
+Bot3.Life = 19
+Bot2.Hand.Sol Ring.Colors.Count = 0
+Bot3.Hand.Serra Angel.Colors = White

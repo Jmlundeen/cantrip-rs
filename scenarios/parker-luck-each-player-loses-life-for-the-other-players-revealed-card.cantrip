@@ -1,0 +1,37 @@
+# Parker Luck {2}{B}: at the beginning of its controller's end step, the two target players (here both players) each reveal the top card
+# of their library, each loses life equal to the mana value of the card the other revealed, and each puts the card they revealed into
+# their hand. Bot1 reveals Sol Ring (mana value 1) and Bot2 reveals Serra Angel (5): Bot1 loses 5, Bot2 loses 1, and each has the
+# card in hand.
+
+[Bot1 Deck]
+Black Lotus
+Parker Luck
+Swamp x5
+Sol Ring
+Swamp x10
+
+[Bot2 Deck]
+Island x7
+Serra Angel
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Parker Luck.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+Bot1.Target(Bot1; Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 15
+Bot2.Life = 19
+Bot1.Revealed = Sol Ring
+Bot2.Revealed = Serra Angel
+Bot1.Hand.Count = 6
+Bot1.Hand.Sol Ring.Colors.Count = 0
+Bot2.Hand.Count = 8
+Bot2.Hand.Serra Angel.Colors = White

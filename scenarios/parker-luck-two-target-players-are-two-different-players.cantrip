@@ -1,0 +1,33 @@
+# Parker Luck {2}{B}: "two target players" is one instance of the word "target", so the same player can't be chosen twice
+# (CR 115.3, 601.2c). Bot1 can't name Bot2 for both, and one player is not two; it must choose Bot1 and Bot2. Bot1 reveals Sol Ring
+# (mana value 1) and Bot2 reveals Serra Angel (5): Bot1 loses 5 and Bot2 loses 1, not 10 from revealing Serra Angel twice.
+
+[Bot1 Deck]
+Black Lotus
+Parker Luck
+Swamp x5
+Sol Ring
+Swamp x10
+
+[Bot2 Deck]
+Island x7
+Serra Angel
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Parker Luck.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+! Bot1.Target(Bot2; Bot2)
+! Bot1.Target(Count: 1)
+Bot1.Target(Bot1; Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 15
+Bot2.Life = 19
+Bot2.Revealed = Serra Angel
