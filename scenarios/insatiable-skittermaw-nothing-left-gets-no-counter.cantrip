@@ -1,0 +1,38 @@
+# Without a nonland permanent leaving (the control for insatiable-skittermaw-void-...), nothing happens at the end step:
+# the Skittermaw is still a 2/2 with no counter after Bot1's turns 1 and 3. Lands leaving do not count either: on turn 3
+# Bot1 plays a fetch land, cracks it and the Skittermaw stays 2/2.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Insatiable Skittermaw
+Bloodstained Mire
+Island x2
+Swamp x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Insatiable Skittermaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Insatiable Skittermaw.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Bloodstained Mire.Play
+Bot1.Battlefield.Bloodstained Mire.Activate
+Bot1.Search(Swamp)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Insatiable Skittermaw.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Insatiable Skittermaw.Power = 2
+Bot1.Battlefield.Insatiable Skittermaw.Toughness = 2
