@@ -1,0 +1,33 @@
+# Starfighter Pilot {1}{W} (Mox Pearl and Mox Jet, turn 1): "Whenever this creature becomes tapped, surveil 1" (CR 603.2, 701.25a).
+# Casting it surveils nothing; attacking on turn 3 taps it and Bot1 looks at ONE card, the Lightning Bolt, and bins the top card of the library
+# (the Counterspell under it is not looked at).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Starfighter Pilot
+Island x4
+Swamp
+Lightning Bolt
+Counterspell
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Starfighter Pilot.Cast
+? Bot1.Graveyard.Count = 0
+[T3 Bot1.Main1]
+Bot1.Attack(Starfighter Pilot > Bot2)
+Bot1.Arrange( | Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Starfighter Pilot.Tapped = true
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library = Counterspell; Island
