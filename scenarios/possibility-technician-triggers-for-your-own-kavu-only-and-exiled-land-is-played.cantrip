@@ -1,0 +1,72 @@
+# Possibility Technician cast normally ({2}{R}: Ruby, Jet, Pearl). Its own entry exiles the top card of Bot1's library, an Island, which
+# Bot1 may play as their land play (the Technician is a Kavu they control); Bot2's library is untouched. Bot1's Ornithopter (no Kavu)
+# entering, and Bot2's Molecular Modifier (a Kavu Bot1 doesn't control) entering, trigger nothing. Then Bot1's own Molecular
+# Modifier enters and the Technician triggers for it: the next card after the turn's draw, Mox Sapphire, is exiled and may be played.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Possibility Technician
+Molecular Modifier
+Ornithopter
+Island
+Island
+Island
+Mox Sapphire
+Island x11
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Molecular Modifier
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Possibility Technician.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Exile.Island.Colors.Count = 0
+? Bot2.Library.Count = 13
+Bot1.Exile.Island.Play
+? Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Possibility Technician; Island
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Molecular Modifier.Cast
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Molecular Modifier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Exile.Mox Sapphire.Colors.Count = 0
+Bot1.Exile.Mox Sapphire.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Island; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Molecular Modifier; Ornithopter; Possibility Technician
+Bot2.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Molecular Modifier
