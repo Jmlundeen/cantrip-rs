@@ -1,0 +1,8 @@
+{
+  "name": "Guy in the Chair",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Human Advisor",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "{T}: Add one mana of any color.\nWeb Support — {2}{G}, {T}: Put a +1/+1 counter on target Spider. Activate only as a sorcery."
+}

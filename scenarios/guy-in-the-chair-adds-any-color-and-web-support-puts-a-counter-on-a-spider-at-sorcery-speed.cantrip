@@ -1,0 +1,67 @@
+# Guy in the Chair: "{T}: Add one mana of any color. Web Support - {2}{G}, {T}: Put a +1/+1 counter on target Spider. Activate
+# only as a sorcery." Turn 1: Guy, paid with three Moxen. Turn 4 (Bot2's main phase), Guy and the Moxen untapped: Web Support is
+# refused at instant speed. Turn 5: Guy taps for exactly one {U} (any color), which with the Moxen and a Forest pays for Bot1's
+# Giant Spider. Turn 7: Web Support with both Giant Spiders on the battlefield (Bot2's too: any controller's) and Guy, no Spider:
+# Guy is refused as a target, Bot2's Spider gets the one +1/+1 counter and Bot1's none.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Guy in the Chair
+Giant Spider
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Giant Spider
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Guy in the Chair.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Spider.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+! Bot1.Battlefield.Guy in the Chair.Activate(Ability: Web Support; Bot2.Battlefield.Giant Spider)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Guy in the Chair.Activate(Ability: any color; Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Giant Spider.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Guy in the Chair.Activate(Ability: Web Support; Bot1.Battlefield.Guy in the Chair)
+Bot1.Battlefield.Guy in the Chair.Activate(Ability: Web Support; Bot2.Battlefield.Giant Spider)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Giant Spider.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Giant Spider.Power = 3
+Bot1.Battlefield.Giant Spider.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Guy in the Chair.Tapped = true
