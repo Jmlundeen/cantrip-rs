@@ -1,0 +1,42 @@
+# Bioengineered Future counts lands by any means: the played Forest and the basic a Lander puts onto the battlefield tapped are two
+# lands that entered under Bot1's control this turn, so Memnite enters with two additional +1/+1 counters: a 3/3.
+
+[Bot1 Deck]
+Black Lotus
+Bioengineered Future
+Forest
+Mox Jet
+Mox Emerald
+Memnite
+Island
+Forest
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Bioengineered Future.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Lander Token.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 3
+Bot1.Battlefield.Memnite.Toughness = 3
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 2

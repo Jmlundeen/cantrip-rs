@@ -1,0 +1,64 @@
+# Bioengineered Future only counts lands that entered this turn and only helps its controller's creatures and nothing else. Bot1
+# played a Forest on turn 1, so on turn 3 Memnite is a plain 1/1. Bot2's Ornithopter, cast on its own turn, and its Ashcoat Bear,
+# flashed in on turn 3 after Bot1's new Island, stay 0/2 and 2/2; Bot1's Mox Jet, not a creature, gets no counter (CR 614.1c).
+
+[Bot1 Deck]
+Black Lotus
+Bioengineered Future
+Forest
+Memnite
+Island
+Island
+Island
+Mox Jet
+Island x13
+
+[Bot2 Deck]
+Island
+Ornithopter
+Mox Emerald
+Mox Jet
+Ashcoat Bear
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Bioengineered Future.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ashcoat Bear.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Memnite.Toughness = 1
+Bot1.Battlefield.Mox Jet.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Ashcoat Bear.Power = 2
+Bot2.Battlefield.Ashcoat Bear.Toughness = 2
