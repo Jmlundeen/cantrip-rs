@@ -39,3 +39,4 @@ Bot2.Battlefield = Mox Ruby
 Bot2.Library.Count = 13
 Bot1.Graveyard = Cathartic Parting; Lightning Bolt
 Bot1.Library.Count = 12
+Bot1.Shuffles = 0

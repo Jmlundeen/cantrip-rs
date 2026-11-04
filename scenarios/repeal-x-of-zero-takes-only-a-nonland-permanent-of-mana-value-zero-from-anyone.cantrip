@@ -1,5 +1,5 @@
 # X = 0 is a legal X (CR 107.3a): Repeal costs {U} and its target must be a nonland permanent with mana value 0, chosen after
-# X is announced. Bot1's Island (a land) and Sol Ring (mana value 1) are refused; Bot2's Ornithopter (mana value 0) is the
+# X is announced. Bot1's Island (a land of mana value 0), Sol Ring (mana value 1) and Bot2 (a player) are each refused; Bot2's Ornithopter (mana value 0) is the
 # control, returned to its owner's hand, and Bot1 draws a card.
 
 [Bot1 Deck]
@@ -27,7 +27,9 @@ Bot2.Pass
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate
 Bot1.Hand.Repeal.Cast(X: 0)
-! Bot1.Target(Island; Sol Ring)
+! Bot1.Target(Bot1.Battlefield.Island)
+! Bot1.Target(Bot1.Battlefield.Sol Ring)
+! Bot1.Target(Bot2)
 Bot1.Target(Bot2.Battlefield.Ornithopter)
 [T3 Bot1.Main2]
 

@@ -1,5 +1,6 @@
 # Prismari Charm, second mode, two targets: "deals 1 damage to each of one or two targets". Bot1 targets Bot2's Birds of
 # Paradise (0/1, dies to the 1 damage) and Bot2 himself (20 -> 19): each target is dealt its own 1 damage, not 1 divided.
+# Choosing no target at all is refused: "one or two" needs at least one (CR 601.2c).
 
 [Bot1 Deck]
 Mox Sapphire
@@ -23,6 +24,7 @@ Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Prismari Charm.Cast
 Bot1.Modes(deals 1 damage)
+! Bot1.Target(Count: 0)
 Bot1.Target(Bot2.Battlefield.Birds of Paradise; Bot2)
 Bot2.Pass
 [Bot1.Main2]

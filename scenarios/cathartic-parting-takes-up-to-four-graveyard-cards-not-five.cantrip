@@ -1,0 +1,42 @@
+# Cathartic Parting: "up to four target cards from your graveyard". Two Thought Scours put six cards in Bot1's graveyard. Five
+# graveyard targets are refused; four are taken, shuffled into Bot1's library with the "may" accepted, and the rest stay.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Thought Scour
+Thought Scour
+Forest
+Mox Emerald
+Cathartic Parting
+Plains x13
+
+[Bot2 Deck]
+Mox Pearl
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cathartic Parting.Cast
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+! Bot1.Target(Bot1.Graveyard.Thought Scour#1; Bot1.Graveyard.Thought Scour#2; Bot1.Graveyard.Plains#1; Bot1.Graveyard.Plains#2; Bot1.Graveyard.Plains#3)
+Bot1.Target(Bot1.Graveyard.Thought Scour#1; Bot1.Graveyard.Thought Scour#2; Bot1.Graveyard.Plains#1; Bot1.Graveyard.Plains#2)
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = Cathartic Parting; Plains; Plains
+Bot1.Shuffles = 1
