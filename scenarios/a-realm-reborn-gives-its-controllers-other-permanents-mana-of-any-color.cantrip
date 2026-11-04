@@ -1,0 +1,49 @@
+# A Realm Reborn. "Other permanents you control have '{T}: Add one mana of any color.'" (CR 613.1f, layer 6): a Forest and a
+# Mox (an artifact) of Bot1's make any color on turn 3 - Ruby makes {U}, Forest {R} - so the pool is exactly {U}{R}; the
+# enchantment itself is not "other" and has no ability to tap, and Bot2's Island is not a permanent Bot1 controls: a refusal of
+# a color it cannot make.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Pearl
+A Realm Reborn
+Forest x15
+
+[Bot2 Deck]
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.A Realm Reborn.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+! Bot2.Battlefield.Island.Activate(Color: Red)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.A Realm Reborn.Activate
+Bot1.Battlefield.Mox Ruby.Activate(Ability: any color; Color: Blue)
+Bot1.Battlefield.Forest.Activate(Ability: any color; Color: Red)
+? Bot1.Mana = {U}{R}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.A Realm Reborn.Tapped = false

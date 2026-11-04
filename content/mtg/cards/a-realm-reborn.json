@@ -1,0 +1,6 @@
+{
+  "name": "A Realm Reborn",
+  "manaCost": "{4}{G}{G}",
+  "type": "Enchantment",
+  "oracleText": "Other permanents you control have \"{T}: Add one mana of any color.\""
+}
