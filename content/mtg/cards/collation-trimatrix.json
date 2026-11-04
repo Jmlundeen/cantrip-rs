@@ -1,0 +1,8 @@
+{
+  "name": "Collation Trimatrix",
+  "manaCost": "{B}",
+  "type": "Artifact Creature — Borg",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Tap three untapped artifact creatures you control: You draw a card and lose 1 life."
+}

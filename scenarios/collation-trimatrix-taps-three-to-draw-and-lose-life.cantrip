@@ -1,0 +1,62 @@
+# Exactly three artifact creatures pay, including the newly entered source; this is not {T} (CR 118.3, 302.6).
+# Dryad Arbor is a nonartifact creature; payment taps only the chosen three before the draw and life loss (CR 602.2b).
+
+[Bot1 Deck]
+Collation Trimatrix
+Mox Jet
+Ornithopter
+Memnite
+Phyrexian Walker
+Memnite
+Dryad Arbor
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}
+Bot1.Hand.Collation Trimatrix.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Phyrexian Walker.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Dryad Arbor.Play
+? Bot1.Battlefield.Collation Trimatrix.SummoningSick = true
+? Bot1.Battlefield.Ornithopter.SummoningSick = true
+Bot1.Battlefield.Collation Trimatrix.Activate
+? Turn = 1
+! Bot1.Choose(Ornithopter; Memnite#1)
+! Bot1.Choose(Ornithopter; Memnite#1; Memnite#2; Phyrexian Walker)
+! Bot1.Choose(Dryad Arbor)
+Bot1.Choose(Collation Trimatrix; Ornithopter; Memnite#1)
+? Bot1.Battlefield.Collation Trimatrix.Tapped = true
+? Bot1.Battlefield.Ornithopter.Tapped = true
+? Bot1.Battlefield.Memnite#1.Tapped = true
+? Bot1.Battlefield.Memnite#2.Tapped = false
+? Bot1.Battlefield.Phyrexian Walker.Tapped = false
+? Bot1.Life = 20
+? Bot1.Hand.Count = 0
+? Stack.Count = 1
+! Bot1.Battlefield.Collation Trimatrix.Activate
+
+[Expect]
+Turn = 1
+Step = Main1
+Bot1.Hand = Swamp
+Bot1.Library.Count = 19
+Bot1.Life = 19
+Bot2.Life = 20
+Bot1.Battlefield.Collation Trimatrix.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Memnite#1.Tapped = true
+Bot1.Battlefield.Dryad Arbor.Tapped = false
+Bot1.Battlefield.Memnite#2.Tapped = false
+Bot1.Battlefield.Phyrexian Walker.Tapped = false
