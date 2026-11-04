@@ -1,0 +1,8 @@
+{
+  "name": "Chameleon, Master of Disguise",
+  "manaCost": "{3}{U}",
+  "type": "Legendary Creature — Human Shapeshifter Villain",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "You may have Chameleon enter as a copy of a creature you control, except his name is Chameleon, Master of Disguise.\nMayhem {2}{U} (You may cast this card from your graveyard for {2}{U} if you discarded it this turn. Timing rules still apply.)"
+}

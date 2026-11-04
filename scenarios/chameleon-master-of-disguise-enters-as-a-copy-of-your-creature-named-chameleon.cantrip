@@ -1,0 +1,28 @@
+# Chameleon, Master of Disguise (2/3, {3}{U}): "You may have Chameleon enter as a copy of a creature you control, except his name is Chameleon,
+# Master of Disguise." Black Lotus (UUU) and a Mox Ruby pay for it; with Ornithopter the only creature he can copy, he enters as a 0/2
+# flier (CR 707.2) that keeps his own name (CR 707.9b).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Ornithopter
+Chameleon, Master of Disguise
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chameleon, Master of Disguise.Cast
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Chameleon, Master of Disguise; Mox Ruby; Ornithopter
+Bot1.Battlefield.Chameleon, Master of Disguise.Power = 0
+Bot1.Battlefield.Chameleon, Master of Disguise.Toughness = 2
+Bot1.Battlefield.Chameleon, Master of Disguise.Keywords = Flying

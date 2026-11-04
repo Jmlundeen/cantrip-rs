@@ -1,0 +1,32 @@
+# Mayhem {2}{U} pins its blue pip: with Mox Emerald, Mox Jet and Mox Pearl in the pool (three mana, none blue) Chameleon cannot be cast
+# from the graveyard after the discard.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Chameleon, Master of Disguise
+Mox Emerald
+Mox Jet
+Mox Pearl
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Chameleon, Master of Disguise; Island)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Graveyard.Chameleon, Master of Disguise.Cast(Ability: Mayhem; Mana: short)
+
+[Expect]
+Bot1.Graveyard = Faithless Looting; Island; Chameleon, Master of Disguise

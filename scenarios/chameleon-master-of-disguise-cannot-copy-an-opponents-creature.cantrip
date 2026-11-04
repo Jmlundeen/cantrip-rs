@@ -1,0 +1,30 @@
+# "A creature you control" (CR 614.1c): in turn 3 the only creature on the battlefield is Bot2's Ornithopter, so Chameleon is not
+# asked and enters as himself, a 2/3 (a card that offered it would have copied a 0/2 flier).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Chameleon, Master of Disguise
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chameleon, Master of Disguise.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Chameleon, Master of Disguise.Power = 2
+Bot1.Battlefield.Chameleon, Master of Disguise.Toughness = 3

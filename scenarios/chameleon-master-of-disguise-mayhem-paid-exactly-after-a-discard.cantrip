@@ -1,0 +1,36 @@
+# Chameleon's mayhem {2}{U} (CR 702.187b): discarded to Faithless Looting (Mox Ruby), it is cast from the graveyard for its mayhem cost the
+# same turn, paid exactly with Mox Sapphire's {U} and two more Moxen, the pool ends empty, and it enters as himself (nothing to copy but
+# the Moxen, which are not creatures).
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Chameleon, Master of Disguise
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Pearl
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Chameleon, Master of Disguise; Island)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Chameleon, Master of Disguise.Cast(Ability: Mayhem)
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Chameleon, Master of Disguise.Power = 2
+Bot1.Graveyard = Faithless Looting; Island

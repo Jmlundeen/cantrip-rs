@@ -1,0 +1,25 @@
+# Chameleon's copy is a "may": with Bot1's Ornithopter there to copy, Bot1 declines and he enters as himself, a 2/3 without flying.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Ornithopter
+Chameleon, Master of Disguise
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chameleon, Master of Disguise.Cast
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield.Chameleon, Master of Disguise.Power = 2
+Bot1.Battlefield.Chameleon, Master of Disguise.Toughness = 3
+Bot1.Battlefield.Chameleon, Master of Disguise.Keywords = (absent)
