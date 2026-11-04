@@ -1,0 +1,46 @@
+# The Frostbeast blocks a Hill Giant; with its end-of-combat trigger on the stack it is exiled. The trigger still destroys the Giant it was blocking, as the Frostbeast last existed (CR 608.2h).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Kjeldoran Frostbeast
+Island x16
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Swords to Plowshares
+Hill Giant
+Island x15
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Kjeldoran Frostbeast.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Hill Giant.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Hill Giant > Bot1)
+Bot1.Block(Kjeldoran Frostbeast > Hill Giant)
+[T4 Bot2.EndCombat]
+? Bot2.Battlefield.Hill Giant.Toughness = 3
+? Bot1.Battlefield.Kjeldoran Frostbeast.Damage = 3
+? Stack.Count = 1
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Kjeldoran Frostbeast)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Exile = Kjeldoran Frostbeast
+Bot2.Graveyard.Hill Giant.Power = 3
