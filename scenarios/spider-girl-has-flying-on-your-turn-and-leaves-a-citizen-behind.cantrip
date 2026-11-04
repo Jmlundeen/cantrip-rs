@@ -1,0 +1,47 @@
+# Spider-Girl, Legacy Hero ({G}{W}, 2/2): "During your turn, Spider-Girl has flying. When Spider-Girl leaves the battlefield, create a 1/1
+# green and white Human Citizen creature token." Turn 1: cast, she has flying on her controller's turn. Turn 2 (Bot2's turn) she has none, and
+# Bot2's Lightning Bolt kills her: she leaves and Bot1 (her controller) gets a 1/1 green and white Human Citizen.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Spider-Girl, Legacy Hero
+Forest x17
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spider-Girl, Legacy Hero.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spider-Girl, Legacy Hero.Keywords = Flying
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Spider-Girl, Legacy Hero.Keywords = (absent)
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spider-Girl, Legacy Hero)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Human Citizen Token.Power = 1
+Bot1.Battlefield.Human Citizen Token.Toughness = 1
+Bot1.Battlefield.Human Citizen Token.Colors = Green; White
+Bot1.Battlefield.Human Citizen Token.Subtypes = Citizen; Human

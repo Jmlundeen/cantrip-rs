@@ -1,0 +1,8 @@
+{
+  "name": "Spider-Girl, Legacy Hero",
+  "manaCost": "{G}{W}",
+  "type": "Legendary Creature — Spider Human Hero",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "During your turn, Spider-Girl has flying.\nWhen Spider-Girl leaves the battlefield, create a 1/1 green and white Human Citizen creature token."
+}
