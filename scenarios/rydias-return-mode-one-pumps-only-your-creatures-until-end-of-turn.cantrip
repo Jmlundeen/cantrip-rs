@@ -1,0 +1,39 @@
+# Rydia's Return, mode 1: "Creatures you control get +3/+3 until end of turn." Bot1's Ornithopter (0/2) becomes 3/5 for the turn
+# while Bot2's (0/2) is unchanged, and the bonus is gone on Bot2's turn (CR 514.2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Rydia's Return
+Ornithopter
+Forest x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rydia's Return.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Toughness = 5
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2

@@ -1,0 +1,63 @@
+# Rydia's Return ({3}{G}{G}, sorcery), "Return up to two target permanent cards from your graveyard to your hand." On turn 1 Bot1
+# puts a Black Lotus, an Ornithopter, a Llanowar Elves and two Lightning Bolts into its graveyard (the Lotus pays for the two Bolts
+# that kill its own creatures), and Bot2 puts its own Black Lotus into its graveyard on turn 2. On turn 9 (Emerald and four Forests:
+# exactly the five mana the spell costs) a Bolt (not a permanent card), Bot2's Lotus (the wrong graveyard) and three permanent
+# cards (more than "up to two") are refused; Bot1 takes the Ornithopter and the Lotus. The Elves and the Bolts stay behind, and
+# Bot2's graveyard (three discarded Islands and the Lotus) is untouched.
+
+[Bot1 Deck]
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Ornithopter
+Llanowar Elves
+Rydia's Return
+Mox Emerald
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Forest#4.Activate
+Bot1.Hand.Rydia's Return.Cast
+Bot1.Modes(2)
+! Bot1.Target(Lightning Bolt)
+! Bot1.Target(Bot2.Graveyard.Black Lotus)
+! Bot1.Target(Ornithopter; Llanowar Elves; Black Lotus)
+Bot1.Target(Ornithopter; Black Lotus)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard = Island; Island; Island; Black Lotus
