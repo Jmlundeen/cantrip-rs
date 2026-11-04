@@ -1,0 +1,48 @@
+# Unstable Experiment ({1}{U}): "Target player draws a card, then up to one target creature you control connives." (CR 701.50a, 608.2c.)
+# Bot1 targets itself and its Ornithopter. The draw comes first: the Lightning Bolt Bot1 connive-draws (the third card) is in hand to be
+# discarded, a nonland card, so the Ornithopter gets a +1/+1 counter (1/3). Hand 4 -> 5 (draw) -> 6 -> 5.
+
+[Bot1 Deck]
+Ornithopter
+Mox Sapphire
+Mox Ruby
+Unstable Experiment
+Island x3
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Island x8
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Unstable Experiment.Cast
+Bot1.Target(Bot1)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Unstable Experiment; Lightning Bolt

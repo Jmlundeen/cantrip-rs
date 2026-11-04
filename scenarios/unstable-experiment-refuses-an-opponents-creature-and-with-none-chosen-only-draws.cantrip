@@ -1,0 +1,45 @@
+# Unstable Experiment's creature is "up to one target creature you control": the opponent's Ornithopter is refused (! Target), and
+# choosing none (Target()) just draws the card - no connive, so the hand is 5 (4 + the draw) and nothing is asked.
+
+[Bot1 Deck]
+Ornithopter
+Mox Sapphire
+Mox Ruby
+Unstable Experiment
+Island x3
+Island
+Island
+Island x11
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Island x8
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Unstable Experiment.Cast
+Bot1.Target(Bot1)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Ornithopter.Toughness = 2

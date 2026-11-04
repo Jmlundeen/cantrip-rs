@@ -1,0 +1,50 @@
+# Unstable Experiment's targets are judged apart (CR 608.2b): in response Bot2 bolts Bot1's Ornithopter, so the creature target is gone,
+# but the spell still resolves for the player - Bot1 draws (hand 4 -> 5) - and nothing connives (no discard is asked).
+
+[Bot1 Deck]
+Ornithopter
+Mox Sapphire
+Mox Ruby
+Unstable Experiment
+Island x3
+Island
+Island
+Island x11
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Island x8
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Unstable Experiment.Cast
+Bot1.Target(Bot1)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Ornithopter
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Unstable Experiment; Ornithopter
