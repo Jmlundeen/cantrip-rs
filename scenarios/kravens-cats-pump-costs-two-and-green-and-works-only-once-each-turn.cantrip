@@ -1,0 +1,64 @@
+# Kraven's Cats (2/2): "{2}{G}: This creature gets +2/+2 until end of turn. Activate only once each turn." Bot1 casts it on turn 1
+# with Mox Emerald and Mox Ruby; the three other Rubies, its only untapped sources, make {R}{R}{R} and cannot pay {2}{G} (the
+# refusal, for want of mana). On turn 3 Emerald#1, Ruby#1 and Ruby#2 pay it exactly (the pool is empty after) and it is a 4/4 that
+# attacks (20 -> 16); a second activation in combat (Ruby#3, Ruby#4 and Emerald#2 would pay it) is refused, once each turn. On
+# turn 5 it is a 2/2 again and can be activated again.
+
+[Bot1 Deck]
+Kraven's Cats
+Mox Emerald
+Mox Ruby x4
+Mox Emerald
+Mox Emerald
+Forest x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Kraven's Cats.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+! Bot1.Battlefield.Kraven's Cats.Activate(Mana: short)
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Kraven's Cats.Power = 2
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Kraven's Cats.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Pass
+Bot1.Attack(Kraven's Cats > Bot2)
+? Bot1.Battlefield.Kraven's Cats.Power = 4
+? Bot1.Battlefield.Kraven's Cats.Toughness = 4
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+! Bot1.Battlefield.Kraven's Cats.Activate
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Kraven's Cats.Power = 2
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Kraven's Cats.Activate
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Kraven's Cats.Power = 4
