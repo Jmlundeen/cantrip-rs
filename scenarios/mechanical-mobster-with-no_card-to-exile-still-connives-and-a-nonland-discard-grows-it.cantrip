@@ -1,0 +1,35 @@
+# Mechanical Mobster: "exile up to one target card" is optional, and "target creature you control connives" still happens with both graveyards empty. Bot1 casts three Moxen and the
+# Mobster on turn 1; the only target is the Mobster itself. It connives: Bot1 draws Grizzly Bears and discards it, a nonland card, so the Mobster gets a +1/+1 counter (3/2).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mechanical Mobster
+Forest
+Mountain
+Plains
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mechanical Mobster.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Mechanical Mobster)
+Bot1.Choose(Grizzly Bears)
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Grizzly Bears
+Bot1.Battlefield.Mechanical Mobster.Power = 3
+Bot1.Battlefield.Mechanical Mobster.Toughness = 2

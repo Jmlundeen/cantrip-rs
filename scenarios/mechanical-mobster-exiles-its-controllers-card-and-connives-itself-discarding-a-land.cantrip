@@ -1,0 +1,35 @@
+# Mechanical Mobster ({3}): "When this creature enters, exile up to one target card from a graveyard. Target creature you control connives." Bot1 casts and sacrifices Black Lotus
+# for {G}{G}{G} (the Lotus is in its graveyard), then casts the Mobster with exactly that mana. The trigger exiles the Lotus from the graveyard and the Mobster connives itself: Bot1
+# draws Grizzly Bears and discards Forest, a land, so there is no +1/+1 counter (2/1) and the hand ends as it began minus the cards played.
+
+[Bot1 Deck]
+Black Lotus
+Mechanical Mobster
+Forest
+Mountain
+Savannah Lions
+Runeclaw Bear
+Hill Giant
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mechanical Mobster.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+Bot1.Target(Mechanical Mobster)
+Bot1.Choose(Forest)
+
+[Expect]
+Exile.Count = 1
+Bot1.Graveyard = Forest
+Bot1.Battlefield.Mechanical Mobster.Power = 2
+Bot1.Battlefield.Mechanical Mobster.Toughness = 1
+Bot1.Hand = Grizzly Bears; Hill Giant; Mountain; Runeclaw Bear; Savannah Lions

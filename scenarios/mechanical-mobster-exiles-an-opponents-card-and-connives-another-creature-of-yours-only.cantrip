@@ -1,0 +1,50 @@
+# Mechanical Mobster's two targets: "up to one target card from a graveyard" (either player's, and only from a graveyard) and "target creature you control". Bot1 casts a free
+# Ornithopter on turn 1; on turn 2 Bot2 casts a free Ornithopter and a Black Lotus, sacrificing the Lotus (it is in Bot2's graveyard). On turn 3 Bot1 casts the Mobster with three
+# Moxen. Bot2's Ornithopter (a battlefield permanent, not a graveyard card) and Bot2's Ornithopter as the creature (not Bot1's) are refused; the Lotus is exiled and Bot1's own
+# Ornithopter connives: Bot1 draws and discards Forest, so no counter - the Ornithopter stays 0/2 and the Mobster 2/1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mechanical Mobster
+Ornithopter
+Forest
+Mountain
+Plains
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mechanical Mobster.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Graveyard.Black Lotus)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Choose(Forest)
+
+[Expect]
+Exile.Count = 1
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Mechanical Mobster.Power = 2
+Bot1.Graveyard = Forest
