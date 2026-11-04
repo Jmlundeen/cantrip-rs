@@ -1,0 +1,11 @@
+{
+  "name": "Merciless Enforcers",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Human Mercenary Villain",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Lifelink\n{3}{B}: This creature deals 1 damage to each opponent.",
+  "keywords": [
+    "Lifelink"
+  ]
+}
