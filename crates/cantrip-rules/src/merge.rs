@@ -111,15 +111,20 @@ pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
     cx.st().set_merge(target, merge);
     // A card with static abilities is now part of a permanent (CR 702.140e): the layers look for them from here on.
     ops::note_statics(cx, target);
-    // What modifies the spell modifies the merged permanent (CR 702.140f).
-    ops::carry_effects(cx, spell, target);
-    if card.marks.gains_haste {
-        Game::add_effect(cx, target, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
-    }
-    if let Some(ability) = card.marks.gains {
-        Game::add_effect(cx, target, target, EffectKind::AddAbility(ability), Duration::Indefinite);
-    }
-    cx.state_changed();
+    // What modifies the spell modifies the merged permanent (CR 702.140f): one instruction of the merge, judged once it is done.
+    cx.instruction(
+        |cx| {
+            ops::carry_effects(cx, spell, target);
+            if card.marks.gains_haste {
+                Game::add_effect(cx, target, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
+            }
+            if let Some(ability) = card.marks.gains {
+                Game::add_effect(cx, target, target, EffectKind::AddAbility(ability), Duration::Indefinite);
+            }
+            cx.state_changed();
+        },
+        |_| true,
+    );
     cx.emit(Event::Mutated { permanent: target, spell, on_top });
     Ok(())
 }

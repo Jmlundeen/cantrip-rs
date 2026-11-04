@@ -3014,6 +3014,9 @@ pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> 
     // copy copies, is found through the copy's `Copied` event (`sneak::was_cast_for_sneak`).
     if let Some(&token) = tokens.first() {
         cx.st().update_obj(item.object, |o| o.became = Some(token));
+        // What spells and abilities did to the permanent spell goes on applying to the token it becomes (CR 400.7a): Spider-Verse's
+        // haste for the copy it makes.
+        carry_effects(cx, item.object, token);
     }
     for token in tokens.into_iter().filter(|_| door != 0) {
         unlock_door(cx, token, door, item.controller);
