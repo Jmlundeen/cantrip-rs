@@ -1,0 +1,34 @@
+# Wesley's first and fourth modes (CR 700.2d) counter a noncreature spell
+# when its controller declines {2}, then draw and discard exactly two.
+[Bot1 Deck]
+Wesley Crusher, Starfleet Cadet
+Black Lotus
+Mox Sapphire
+Island x4
+Lightning Bolt
+Counterspell
+Island x12
+[Bot2 Deck]
+Sol Ring
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wesley Crusher, Starfleet Cadet.Cast
+Bot1.Modes(1; 4)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot1.Choose(Lightning Bolt; Counterspell)
+[Expect]
+Bot2.Graveyard = Sol Ring
+Bot1.Graveyard = Counterspell; Lightning Bolt; Black Lotus
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Wesley Crusher, Starfleet Cadet.Power = 2
+
+

@@ -1,0 +1,33 @@
+# Wesley Crusher chooses two modes (CR 700.2): the second returns a creature with mana value 2 or less to its owner's hand,
+# so the Ornithopter Bot2 cast goes back to Bot2's hand.
+
+[Bot1 Deck]
+Wesley Crusher, Starfleet Cadet
+Mox Sapphire
+Black Lotus
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wesley Crusher, Starfleet Cadet.Cast
+Bot1.Modes(2; 3)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 8

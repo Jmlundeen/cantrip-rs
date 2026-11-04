@@ -1,0 +1,29 @@
+# Probe: Wesley's fourth mode targeting the opponent - the opponent draws two and discards two; Wesley's controller draws none.
+[Bot1 Deck]
+Wesley Crusher, Starfleet Cadet
+Black Lotus
+Mox Sapphire
+Island x4
+Lightning Bolt
+Counterspell
+Island x12
+[Bot2 Deck]
+Sol Ring
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wesley Crusher, Starfleet Cadet.Cast
+Bot1.Modes(1; 4)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Choose(Island; Island)
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Hand.Count = 6
