@@ -1141,6 +1141,17 @@ pub fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> O
     }
 }
 
+/// "Whenever you cast a noncreature spell, if at least `N` mana was spent to cast it" (CR 603.2, 603.4, 601.2h): the mana
+/// spent is the whole of the payment, additional costs too, and is read from the spell's own object as it is cast (a spell
+/// cast without spending mana has none). Answered as it triggers; what was spent on the spell does not change afterwards.
+/// With 4: Sahagin, The Prima Vista and Ultros, Obnoxious Octopus's first ability; with 8: Ultros's second.
+pub fn noncreature_spell_you_cast_with_at_least_mana_spent<const N: u32>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, .. } if q.obj(*spell).spent.total() >= N => noncreature_spell_you_cast(q, me, event),
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a noncreature spell, ... that spell's ..." (CR 603.2, 601.2i): the same trigger as
 /// `noncreature_spell_you_cast`, with the spell as the ability's subject so the effect can read it ("that spell's mana
 /// value"). Chrome Host Seedshark, Shark Typhoon and Thor, God of Thunder print it.
