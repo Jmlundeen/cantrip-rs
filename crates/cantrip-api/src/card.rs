@@ -1544,6 +1544,9 @@ pub struct ActivatedDef {
     /// "X can't be 0" (CR 107.3a, 601.2b by way of 602.2b): the X of its activation cost is announced as 1 or more, and it is
     /// offered only where it could be paid with X as 1 (Lair of the Hydra, Helm of Obedience, Aladdin's Lamp).
     pub x_cant_be_zero: bool,
+    /// "This ability can't be copied" (CR 101.2, 707.10): no effect copies it while it is on the stack, and an effect that
+    /// would does nothing (Gogo, Master of Mimicry).
+    pub cant_be_copied: bool,
 }
 
 /// An effect that does nothing: a mode that only names its targets for a `ModalDef::shared` instruction.
@@ -1605,6 +1608,7 @@ impl ActivatedDef {
         plot: false,
         cycling: false,
         x_cant_be_zero: false,
+        cant_be_copied: false,
         special_action: false,
         modal: None,
         cost_choice: &[],

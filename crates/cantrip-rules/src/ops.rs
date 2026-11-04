@@ -2782,6 +2782,11 @@ pub fn copy_ability(cx: &mut Cx, ability: Target, copier: PlayerId, new_targets:
             None => return Ok(None),
         },
     };
+    // "This ability can't be copied" (Gogo, Master of Mimicry): the 'can't' beats the copy effect (CR 101.2, 707.10), which does
+    // nothing.
+    if matches!(cx.cards().ability(item.ability), AbilityDef::Activated(a) if a.cant_be_copied) {
+        return Ok(None);
+    }
     if cx.s().player(copier).lost {
         return Ok(None);
     }
