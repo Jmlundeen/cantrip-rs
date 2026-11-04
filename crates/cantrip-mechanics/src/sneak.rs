@@ -84,7 +84,7 @@ pub fn sneak_cast_turn(q: &dyn Query, id: ObjectId) -> Option<u32> {
 
 /// The turn the spell `id` was cast in through a way of `kind`, the card's own or one a permanent gave it (CR 118.9, 113.6), or
 /// `None` if it was cast another way or not at all: for a copy of a spell (no `Cast` of its own, CR 707.10), the turn of the cast
-/// it copied, whose alternative cost the copy has paid. Sneak and web-slinging ask it.
+/// it copied, whose alternative cost the copy has paid. Sneak, web-slinging and warp ask it.
 pub fn cast_through_turn(q: &dyn Query, id: ObjectId, kind: WayKind) -> Option<u32> {
     // The spell the permanent was, and, for a copy of a spell (no `Cast` of its own, CR 707.10), the spell it copied, back to
     // the one that was cast: a copy copies the alternative cost paid for it.
