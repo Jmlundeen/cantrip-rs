@@ -1,0 +1,54 @@
+# Subway Train: the {G} is optional ("you may pay"). With Mox Emerald's {G} in the pool Bot1 declines, so nothing is searched or shuffled: the library
+# is still 13 cards with the Forest in it and the {G} stays in the pool. Then "Crew 2": a lone Zephyr Sprite (power 1) cannot crew it (the refusal, the
+# Vehicle still a plain artifact); with a second Sprite the two together (total power 2, exactly) crew it and it becomes an artifact creature.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Subway Train
+Zephyr Sprite
+Zephyr Sprite
+Forest
+Plains x12
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Subway Train.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Bot1.Library.Count = 13
+? Bot1.Mana = {G}
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Zephyr Sprite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Subway Train.Activate(Ability: Crew)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zephyr Sprite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Subway Train.Activate(Ability: Crew)
+Bot1.Choose(Zephyr Sprite#1; Zephyr Sprite#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Subway Train.Types.Count = 2
+
+[Expect]
+Bot1.Battlefield.Zephyr Sprite#1.Tapped = true
+Bot1.Battlefield.Zephyr Sprite#2.Tapped = true

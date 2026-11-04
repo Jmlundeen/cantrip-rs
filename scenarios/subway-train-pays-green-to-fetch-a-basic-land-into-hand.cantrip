@@ -1,0 +1,42 @@
+# Subway Train: "When this Vehicle enters, you may pay {G}. If you do, search your library for a basic land card, reveal it, put it into your hand,
+# then shuffle." Bot1 casts it for {2} (Mox Pearl, Mox Jet), then Mox Emerald's {G} is in the pool when the trigger resolves and Bot1 pays:
+# only a basic land card of Bot1's own library may be found (Tropical Island, a nonbasic land, and Lightning Bolt are refused; the Forest in
+# Bot2's library is not offered and stays there: 13 cards). The Forest goes to the hand and is revealed, and the pool is empty afterwards.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Subway Train
+Plains x3
+Lightning Bolt
+Tropical Island
+Forest
+Plains x10
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Subway Train.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost
+! Bot1.Search(Tropical Island)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Forest
+Bot1.Revealed = Forest
+Bot1.Library.Count = 12
+Bot2.Library.Count = 13
+Bot1.Mana =
