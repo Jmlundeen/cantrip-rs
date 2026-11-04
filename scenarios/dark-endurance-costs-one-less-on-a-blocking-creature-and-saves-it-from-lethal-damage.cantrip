@@ -1,0 +1,44 @@
+# Dark Endurance: "this spell costs {1} less to cast if it targets a blocking creature". Bot2's Ornithopter blocks Bot1's Savannah
+# Lions on turn 3. Before it blocks, one Mox Jet cannot pay {1}{B} for it; once it blocks, {B} is enough. It is 2/2 and
+# indestructible: it kills the Lions (2 damage) and survives its 2 damage. At turn 5 it is a 0/2 again.
+
+[Bot1 Deck]
+Mox Pearl
+Savannah Lions
+Plains x18
+
+[Bot2 Deck]
+Mox Jet
+Ornithopter
+Dark Endurance
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Savannah Lions > Bot2)
+! Bot2.Hand.Dark Endurance.Cast(Ornithopter; Mana: short)
+Bot2.Block(Ornithopter > Savannah Lions)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Endurance.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Ornithopter.Power = 2
+? Bot2.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Savannah Lions
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Life = 20

@@ -1,0 +1,37 @@
+# Dark Endurance on an Ornithopter that is not blocking costs its full {1}{B}: paid with Mox Jet and Mox Pearl, the Ornithopter is
+# 2/2 with flying and indestructible until end of turn, and a Mox Ruby, not needed, stays untapped.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ornithopter
+Dark Endurance
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dark Endurance.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Mox Ruby.Tapped = false

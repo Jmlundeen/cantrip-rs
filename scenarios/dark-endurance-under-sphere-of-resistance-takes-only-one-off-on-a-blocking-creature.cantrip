@@ -1,0 +1,54 @@
+# Dark Endurance's reduction is {1}, applied after increases (CR 601.2f): under Bot1's Sphere of Resistance it costs {2}{B}, and
+# on a blocking creature {1}{B}, paid exactly by Mox Jet and Mox Pearl (the pool is empty after). Bot1 casts it on Bot2's
+# blocking Ornithopter: it is a 2/2 indestructible, so Bot1's Savannah Lions dies and the Ornithopter survives.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Savannah Lions
+Sphere of Resistance
+Dark Endurance
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sphere of Resistance.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Savannah Lions > Bot2)
+Bot2.Block(Ornithopter > Savannah Lions)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dark Endurance.Cast(Ornithopter)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Savannah Lions; Dark Endurance
+Bot2.Battlefield.Ornithopter.Power = 2
+Bot2.Life = 20
