@@ -1,0 +1,89 @@
+# Spider-Verse: "You don't have to put legendary Spiders you control into your graveyard because of the legend rule" (the legend rule, CR
+# 704.5j, stops applying to your legendary Spiders). Bot1 controls Spider-Verse and, on turns three and five, casts two Spider-Gwen, Free
+# Spirit: both stay. On turn seven it casts two Ragavan, Nimble Pilferer, not a Spider: the rule applies and one goes to the graveyard. On
+# turn two Bot2 - Spider-Verse is not its own - casts two Spider-Gwens and keeps one: the rule applies to an opponent's Spiders.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Gleemox
+Mox Jet
+Spider-Gwen, Free Spirit
+Spider-Gwen, Free Spirit
+Spider-Verse
+Ragavan, Nimble Pilferer
+Ragavan, Nimble Pilferer
+Island x15
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Gleemox
+Mox Jet
+Spider-Gwen, Free Spirit
+Spider-Gwen, Free Spirit
+Island
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Spider-Verse.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Gleemox.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Spider-Gwen, Free Spirit.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Gleemox.Activate(Color: Red)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Spider-Gwen, Free Spirit.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Spider-Gwen, Free Spirit#2)
+? Bot2.Graveyard = Spider-Gwen, Free Spirit; Black Lotus
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spider-Gwen, Free Spirit.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spider-Gwen, Free Spirit.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Gleemox; Mox Jet; Mox Ruby; Spider-Gwen, Free Spirit; Spider-Gwen, Free Spirit; Spider-Verse
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Ragavan, Nimble Pilferer#2)
+
+[Expect]
+Bot1.Battlefield = Gleemox; Mox Jet; Mox Ruby; Ragavan, Nimble Pilferer; Spider-Gwen, Free Spirit; Spider-Gwen, Free Spirit; Spider-Verse
+Bot1.Graveyard = Ragavan, Nimble Pilferer; Black Lotus
+Bot2.Battlefield = Gleemox; Mox Jet; Mox Ruby; Spider-Gwen, Free Spirit

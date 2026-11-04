@@ -1,0 +1,71 @@
+# Spider-Verse: "Whenever you cast a spell from anywhere other than your hand, you may copy it. If you do, you may choose new targets for the
+# copy. If the copy is a permanent spell, it gains haste. Do this only once each turn." Wrenn's Resolve exiles two Grizzly Bears, played from
+# exile on turn five: the first is copied (the token has haste, and so can attack at once; the Bears that was cast cannot), and the second,
+# cast the same turn, neither triggers nor asks, as the allowance is spent.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Gleemox
+Spider-Verse
+Mox Emerald
+Mox Jet
+Island
+Wrenn's Resolve
+Grizzly Bears
+Grizzly Bears
+Island x14
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Spider-Verse.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wrenn's Resolve.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Exile.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+? Bot1.Battlefield.Grizzly Bears#1.Keywords = Haste
+? Bot1.Battlefield.Count = 8
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.DeclareAttackers]
+! Bot1.Attack(Grizzly Bears#2 > Bot2)
+! Bot1.Attack(Grizzly Bears#3 > Bot2)
+Bot1.Attack(Grizzly Bears#1 > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+? Bot2.Life = 18
+
+[Expect]
+Bot2.Life = 18

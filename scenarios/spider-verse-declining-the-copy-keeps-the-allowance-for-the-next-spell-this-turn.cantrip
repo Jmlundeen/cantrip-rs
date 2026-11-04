@@ -1,0 +1,65 @@
+# Spider-Verse: "Do this only once each turn." Declining the copy does not use it up (ruling: only choosing to copy stops it triggering again): the
+# first Grizzly Bears from exile is cast and not copied, the second is offered the copy and copied.
+
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Gleemox
+Spider-Verse
+Mox Emerald
+Mox Jet
+Island
+Wrenn's Resolve
+Grizzly Bears
+Grizzly Bears
+Island x14
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Spider-Verse.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wrenn's Resolve.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Exile.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+Bot1.Exile.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Gleemox; Grizzly Bears; Grizzly Bears; Grizzly Bears; Mox Emerald; Mox Jet; Mox Ruby; Spider-Verse

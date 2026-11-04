@@ -1,0 +1,64 @@
+# Spider-Verse: "Whenever you cast a spell from anywhere other than your hand" - "you" and "other than your hand". On turn two Bot2 casts a
+# Grizzly Bears from exile (Wrenn's Resolve): not a spell Bot1 cast, so Bot1 is never asked. On turn three Bot1 casts its own Grizzly Bears
+# from hand: not from anywhere other than its hand, so no copy is offered, and one Bears is all Bot1 has.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Gleemox
+Spider-Verse
+Grizzly Bears
+Island
+Island
+Island x17
+
+[Bot2 Deck]
+Black Lotus
+Gleemox
+Wrenn's Resolve
+Island
+Island
+Island
+Island
+Island
+Grizzly Bears
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Spider-Verse.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Gleemox.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wrenn's Resolve.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Gleemox.Activate(Color: Green)
+Bot2.Exile.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Gleemox; Grizzly Bears; Mox Ruby; Spider-Verse
+Bot2.Battlefield = Gleemox; Grizzly Bears

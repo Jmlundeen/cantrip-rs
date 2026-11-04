@@ -1,0 +1,67 @@
+# Spider-Verse: "Do this only once each turn", and "Any instances of the ability already on the stack when you choose to copy a spell will
+# have no effect" (the ruling). Wrenn's Resolve exiles two Lightning Bolts; on turn five the first is cast at Bot2 and, holding priority,
+# the second at Bot2's Ornithopter, so both triggers are on the stack. The later one resolves first: it is asked, and the copy "may choose
+# new targets" - Bot2 in place of the Ornithopter. The earlier trigger then asks nothing. The Bolt at the Ornithopter kills it, so Bot2 takes
+# the first Bolt and the copy, six in all, and the Ornithopter is dead. The copy of an instant gains no haste (it is no permanent).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Gleemox
+Spider-Verse
+Island
+Island
+Island
+Wrenn's Resolve
+Lightning Bolt
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x23
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Spider-Verse.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wrenn's Resolve.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Exile.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 14
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter; Island
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Wrenn's Resolve; Black Lotus
