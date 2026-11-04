@@ -1,0 +1,74 @@
+# Cosmic Spider-Man: "OTHER Spiders you control gain flying, first strike, trample, lifelink, and haste until end of turn" (CR 611.2c). With
+# his beginning of combat trigger on the stack on turn 3, Bot2 flashes in Dress Down ("Creatures lose all abilities"): Cosmic Spider-Man and
+# Attercop lose their own keywords. The trigger then resolves, its later effect (CR 613.7) giving the five back to Attercop, another Spider,
+# but not to Cosmic Spider-Man, who is not "other" and is left with none.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Cosmic Spider-Man
+Attercop
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Dress Down
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cosmic Spider-Man.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Attercop.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Dress Down.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cosmic Spider-Man.Keywords = (absent)
+? Bot1.Battlefield.Attercop.Keywords = (absent)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Attercop.Keywords = FirstStrike; Flying; Haste; Lifelink; Trample
+Bot1.Battlefield.Cosmic Spider-Man.Keywords = (absent)

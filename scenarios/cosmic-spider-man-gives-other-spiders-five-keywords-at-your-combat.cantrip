@@ -1,0 +1,64 @@
+# Cosmic Spider-Man ({W}{U}{B}{R}{G}, 5/5, flying, first strike, trample, lifelink, haste): "At the beginning of combat on your turn, other
+# Spiders you control gain flying, first strike, trample, lifelink, and haste until end of turn." Turn 1: the five Moxen cast him. Turn 3: a
+# Memnite (no Spider) and Attercop (a Spider with reach and deathtouch) are cast; at the beginning of combat Attercop has all five besides its
+# own two, Memnite gains nothing and Cosmic Spider-Man has just his own five. On Bot2's turn 4 the keywords are gone with the turn.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Cosmic Spider-Man
+Attercop
+Memnite
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cosmic Spider-Man.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Attercop.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Attercop.Keywords = Deathtouch; Reach
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Attercop.Keywords = Deathtouch; FirstStrike; Flying; Haste; Lifelink; Reach; Trample
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+? Bot1.Battlefield.Cosmic Spider-Man.Keywords = FirstStrike; Flying; Haste; Lifelink; Trample
+[T4 Bot2.BeginCombat]
+? Bot1.Battlefield.Attercop.Keywords = Deathtouch; Reach
+
+[Expect]
+Bot1.Battlefield.Attercop.Power = 2
