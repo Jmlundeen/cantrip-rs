@@ -1,0 +1,48 @@
+# Mm'menon, the Right Hand: "You may look at the top card of your library any time" (CR 401.2), "You may cast artifact spells from the top of your library" - Sol Ring on top is cast, the Lightning Bolt under it is not offered -
+# and "Artifacts you control have '{T}: Add {U}. Spend this mana only to cast a spell from anywhere other than your hand'". Bot1 pays {3}{U}{U} with Black Lotus
+# (UUU), Mox Sapphire and Mox Ruby, then casts Mox Jet. Mox Jet taps for the granted {U}: that mana is refused for the Sol Ring in the hand (CR 106.6, 601.2h)
+# and pays for the Sol Ring on top of the library.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mm'menon, the Right Hand
+Mox Jet
+Sol Ring
+Island
+Sol Ring
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mm'menon, the Right Hand.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate(Ability: {U})
+! Bot1.Hand.Sol Ring.Cast (Mana: short)
+Bot1.Library.Sol Ring.Cast
+Bot1.Pass
+? Bot1.Mana =
+! Bot1.Library.Lightning Bolt.Cast
+[Bot1.Main1]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Mm'menon, the Right Hand; Mox Jet; Mox Ruby; Mox Sapphire; Sol Ring
+Bot1.Graveyard = Black Lotus
+Bot1.MayLookAtLibraryTop = true

@@ -1,0 +1,36 @@
+# Mm'menon, the Right Hand: "Artifacts you control have '{T}: Add {U}...'" - an artifact under its controller's control, not an opponent's (Bot2's Mox
+# Emerald), and not Mm'menon itself, a creature that is not an artifact. Bot1 pays {3}{U}{U} with Black Lotus, Mox Sapphire and Mox Ruby in turn 1.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mm'menon, the Right Hand
+Island x16
+
+[Bot2 Deck]
+Mox Emerald
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mm'menon, the Right Hand.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+! Bot2.Battlefield.Mox Emerald.Activate(Ability: {U})
+! Bot1.Battlefield.Mm'menon, the Right Hand.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+? Bot2.Mana = {G}
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mm'menon, the Right Hand; Mox Ruby; Mox Sapphire
