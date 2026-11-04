@@ -1,0 +1,40 @@
+# Superior Foes of Spider-Man: "you may play that card" - play, not only cast (CR 305.1). Snuff Out (mana value 4, cast for 4
+# life) exiles a Forest after the turn's land play is made, so it can't be played then; on turn 5 it is Bot1's land play from
+# exile, its permission having lasted through two cleanups (CR 611.2a).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Superior Foes of Spider-Man
+Swamp
+Snuff Out
+Island
+Island
+Island
+Forest
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Superior Foes of Spider-Man.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Snuff Out.Cast(Bot2.Battlefield.Ornithopter; Ability: Pay 4 life)
+Bot1.Accept
+? Exile = Forest
+! Bot1.Exile.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Exile.Forest.Play
+
+[Expect]
+Bot1.Life = 16
+Exile =
+Bot1.Battlefield = Mountain; Superior Foes of Spider-Man; Swamp; Forest

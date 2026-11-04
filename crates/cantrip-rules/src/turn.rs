@@ -1638,7 +1638,7 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
                     Expiry::Never => true,
                     Expiry::EndOfTurn => false,
                     Expiry::EndOfYourNextTurn => !(p.player == active && number > p.turn),
-                    Expiry::UntilYourNextEndStep | Expiry::WhileControls(_) => true,
+                    Expiry::UntilYourNextEndStep | Expiry::WhileControls(_) | Expiry::UntilAnotherExiledWith(_) => true,
                 }
         });
     }

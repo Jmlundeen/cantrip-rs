@@ -1,0 +1,50 @@
+# Superior Foes of Spider-Man: "Whenever you cast a spell with mana value 4 or greater, you may exile the top card of your
+# library. If you do, you may play that card until you exile another card with this creature." Snuff Out (mana value 4, cast
+# for 4 life) exiles Lightning Bolt; a second Snuff Out exiles Shock, which ends Lightning Bolt's permission (CR 611.2a): with
+# the Mountain untapped, Bolt can no longer be cast from exile, and Shock can.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Superior Foes of Spider-Man
+Swamp
+Snuff Out
+Snuff Out
+Island
+Island
+Lightning Bolt
+Shock
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Plains x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Superior Foes of Spider-Man.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Snuff Out.Cast(Bot2.Battlefield.Ornithopter#1; Ability: Pay 4 life)
+Bot1.Accept
+? Exile = Lightning Bolt
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Snuff Out.Cast(Bot2.Battlefield.Ornithopter; Ability: Pay 4 life)
+Bot1.Accept
+? Exile = Lightning Bolt; Shock
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Shock.Cast(Bot2)
+
+[Expect]
+Bot1.Life = 12
+Bot2.Life = 18
+Exile = Lightning Bolt
+Bot2.Graveyard = Ornithopter; Ornithopter

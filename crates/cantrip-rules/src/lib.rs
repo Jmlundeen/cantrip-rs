@@ -1722,6 +1722,11 @@ impl Cx<'_> {
             _ => Grant { object: fallback, ability: AbilityRef::spell(self.g.state.obj(fallback).card) },
         };
         let permission = PlayPermission { what, player, grant, by, turn };
+        // "Until you exile another card with [this]": this card is that other card, so the holder's last one from the same
+        // object ends (CR 611.2a).
+        if let Expiry::UntilAnotherExiledWith(_) = grant.expiry {
+            self.g.state.permissions_retain(|p| !(p.player == player && p.grant.expiry == grant.expiry));
+        }
         // A "for as long as you control" duration that is already over as it would begin does nothing (CR 611.2b).
         if self.g.state.permission_lasts(&permission) {
             self.g.state.permission_push(permission);

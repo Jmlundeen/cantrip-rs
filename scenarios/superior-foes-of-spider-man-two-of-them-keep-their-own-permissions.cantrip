@@ -1,0 +1,50 @@
+# Superior Foes of Spider-Man: "until you exile another card with this creature" - with *this* one. Two Superior Foes each
+# trigger on one Snuff Out (mana value 4, cast for 4 life) and each exiles a card. Neither card was exiled with the other
+# creature, so both permissions go on (CR 611.2a): Lightning Bolt is cast from exile that turn and Shock on turn 5.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Superior Foes of Spider-Man
+Superior Foes of Spider-Man
+Swamp
+Snuff Out
+Mountain
+Lightning Bolt
+Shock
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Superior Foes of Spider-Man#1.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Superior Foes of Spider-Man.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Snuff Out.Cast(Bot2.Battlefield.Ornithopter; Ability: Pay 4 life)
+Bot1.Triggers(Superior Foes of Spider-Man; Superior Foes of Spider-Man)
+? Stack.Count = 3
+Bot1.Accept
+Bot1.Accept
+? Exile.Count = 2
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Exile.Shock.Cast(Bot2)
+
+[Expect]
+Bot1.Life = 16
+Bot2.Life = 15
+Exile.Count = 0

@@ -969,6 +969,16 @@ pub fn exile_top_play_while_you_control(g: &mut dyn Game, player: PlayerId, sour
     exile_top_may_play(g, player, 1, player, grant)
 }
 
+/// "Exile the top card of your library. You may play that card until you exile another card with [`source`]"
+/// (`exile_top_may_play`, CR 611.2a): the grant is to play, not only cast, so a land may be the turn's land drop (CR 305.1),
+/// and it lasts until `player` exiles another card with `source` this way, whose own permission ends it
+/// (`Expiry::UntilAnotherExiledWith`) - not when `source` leaves the battlefield. A card that did not reach exile ends
+/// nothing. Superior Foes of Spider-Man and Furious Rise print it.
+pub fn exile_top_play_until_another_exiled_with(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Vec<ObjectId> {
+    let grant = PlayGrant { lands: true, expiry: Expiry::UntilAnotherExiledWith(source), ..PlayGrant::CAST };
+    exile_top_may_play(g, player, 1, player, grant)
+}
+
 /// "[One] of `items` chosen at random": one is drawn from the game's own generator, so the same game picks
 /// the same one; no draw is made when there is no choice. None from an empty list. Crabomination picks a card at random
 /// from a graveyard and a hand, Chaos Defiler one of the creatures chosen, Ursine Monstrosity an opponent and Tersa

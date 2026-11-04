@@ -1,0 +1,51 @@
+# Superior Foes of Spider-Man: Snuff Out on Ornithopter exiles Lightning Bolt. A second Snuff Out, on Superior Foes itself,
+# triggers it too, and Bot1 declines: nothing is exiled, so Shock stays on top of the library (drawn on turn 5) and Bolt's
+# permission goes on. Superior Foes dies, which ends nothing either (CR 611.2a: only another card exiled with it would), and on
+# turn 5 Bot1 casts Lightning Bolt from exile.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Superior Foes of Spider-Man
+Swamp
+Snuff Out
+Snuff Out
+Island
+Island
+Lightning Bolt
+Shock
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Superior Foes of Spider-Man.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Snuff Out.Cast(Bot2.Battlefield.Ornithopter; Ability: Pay 4 life)
+Bot1.Accept
+? Exile = Lightning Bolt
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Snuff Out.Cast(Bot1.Battlefield.Superior Foes of Spider-Man; Ability: Pay 4 life)
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt
+? Bot1.Battlefield = Mountain; Swamp
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot1.Life = 12
+Bot2.Life = 17
+Exile = 
+Bot1.Hand = Island; Island; Shock

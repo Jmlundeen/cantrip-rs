@@ -533,9 +533,14 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
     }
     s.permissions.len().hash(h);
     for p in &s.permissions {
-        // The permanent a "for as long as you control" permission is about, by where it is, as every object is.
-        let source = p.grant.expiry.controlled().map(|id| canon.id(id));
-        let grant = PlayGrant { expiry: if source.is_some() { Expiry::WhileControls(ObjectId::NONE) } else { p.grant.expiry }, ..p.grant };
+        // The object a "for as long as you control" or "until you exile another card with" permission is about, by where it
+        // is, as every object is.
+        let (source, expiry) = match p.grant.expiry {
+            Expiry::WhileControls(id) => (Some(canon.id(id)), Expiry::WhileControls(ObjectId::NONE)),
+            Expiry::UntilAnotherExiledWith(id) => (Some(canon.id(id)), Expiry::UntilAnotherExiledWith(ObjectId::NONE)),
+            expiry => (None, expiry),
+        };
+        let grant = PlayGrant { expiry, ..p.grant };
         match p.what {
             Playable::Card(card) => (0u8, canon.id(card)).hash(h),
             Playable::ExiledWith { by, one } => (1u8, canon.id(by.object), by.text, by.acquired, one).hash(h),

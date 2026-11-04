@@ -1641,6 +1641,11 @@ pub enum Expiry {
     /// Lightning, Security Sergeant (exile the top card of your library, play it) print it; Victor Mancha, Runaway, Taster
     /// of Wares, Hama, the Bloodbender and Kotose, the Silent Spider word theirs about other cards they exile.
     WhileControls(ObjectId),
+    /// "Until you exile another card with [this]" (CR 611.2a): it lasts until its holder exiles another card with this same
+    /// object, and so ends as that card's own permission of this kind is given (`Game::allow_play`), the two coming together
+    /// from the one instruction. Nothing else ends it: not the object leaving the battlefield, and not a new object for its
+    /// card (CR 400.7), which is not "this" one. Superior Foes of Spider-Man and Furious Rise print it.
+    UntilAnotherExiledWith(ObjectId),
 }
 
 impl Expiry {
