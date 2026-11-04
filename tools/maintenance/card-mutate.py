@@ -201,7 +201,7 @@ def run_scenarios(card, few=False):
     """'caught', 'survived' or 'no build', with the command's output; 'cards missing' if a build of few cards lacks one."""
     proc = subprocess.run(
         ["cargo", "run", "--profile", PROFILE if few else "cards", "-q", "-p", "cantrip-script", "--bin", "corpus", "--", "--card", card, "--brief"],
-        cwd=ROOT, env=few_cards_env() if few else None, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        cwd=ROOT, env=corpus_env(few), capture_output=True, text=True, encoding="utf-8", errors="replace")
     out = proc.stdout + proc.stderr
     if "error[" in out or "could not compile" in out:
         return "no build", out
@@ -212,8 +212,14 @@ def run_scenarios(card, few=False):
     return ("survived" if proc.returncode == 0 else "caught"), out
 
 
-def few_cards_env():
-    return dict(os.environ, CANTRIP_CARDS_ONLY=FEW_CARDS)
+def corpus_env(few):
+    """The corpus as `tools/test.sh` runs it, under `CANTRIP_VERIFY`: a resolution that changes the game twice with no event and
+    says neither `Game::end_sentence` nor `Game::one_instruction` between is refused, so leaving either out is caught, not a
+    survivor. A build of few cards also names them (`CANTRIP_CARDS_ONLY`)."""
+    env = dict(os.environ, CANTRIP_VERIFY="1")
+    if few:
+        env["CANTRIP_CARDS_ONLY"] = FEW_CARDS
+    return env
 
 
 def name_few_cards(card):
@@ -287,7 +293,7 @@ def main():
         # The corpus binary was last built from a mutant: build it again from the restored file, so a scenario run
         # that uses the binary directly afterwards tests the card as it stands.
         rebuilt = subprocess.run(["cargo", "build", "--profile", PROFILE if few else "cards", "-q", "-p", "cantrip-script", "--bin", "corpus"],
-                                 cwd=ROOT, env=few_cards_env() if few else None, capture_output=True)
+                                 cwd=ROOT, env=corpus_env(few), capture_output=True)
         # The file was just written, so its time is newer than any build's: the next build of any profile rebuilds from it.
         if rebuilt.returncode != 0:
             print(f"WARNING: the build from the restored {rel} failed; the next run rebuilds the card from the file as it stands")
