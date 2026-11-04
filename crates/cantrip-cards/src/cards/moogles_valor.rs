@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let count = creatures_you_control(g, item.controller);
     tokens::create(g, item.controller, &tokens::MOOGLE_1_2_LIFELINK, count as u32)?;
-    effects::creatures_you_control_gain(g, item, Keyword::Indestructible);
+    effects::creatures_you_control_gain(g, item, &[Keyword::Indestructible]);
     Ok(())
 }
 
