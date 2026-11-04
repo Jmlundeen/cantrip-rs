@@ -1,0 +1,8 @@
+{
+  "name": "Illvoi Operative",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Jellyfish Rogue",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Whenever you cast your second spell each turn, put a +1/+1 counter on this creature."
+}
