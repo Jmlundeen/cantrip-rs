@@ -1288,6 +1288,17 @@ pub fn this_dies(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired
     }
 }
 
+/// `this_dies` for an ability about the card now in the graveyard, a new object (CR 400.7), its subject: "return it to its
+/// owner's hand", "put him on the bottom of his owner's library". Rancor and The Spot, Living Portal print it.
+pub fn this_dies_about_the_card(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, new, from, to, .. } if *old == source && from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard) => {
+            Fired::about(Target::Object(*new))
+        }
+        _ => None,
+    }
+}
+
 /// "When this leaves the battlefield" (CR 603.6c, 603.10a), looked back on whichever zone it goes to. Animate Dead and
 /// Cryogen Relic print it.
 pub fn this_leaves(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -1404,13 +1415,31 @@ pub fn each_upkeep(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     }
 }
 
+/// "At the beginning of each player's [step], that player ..." (CR 503.1a, 603.2): `step` began, in any player's turn; the
+/// ability is about the player whose turn it is (`StackItem::subject`), fixed as it triggers.
+fn each_players_step(q: &dyn Query, event: &Event, step: Step) -> Option<Fired> {
+    match event {
+        Event::StepBegan { step: began } if *began == step => Fired::about(Target::Player(q.state().turn.active)),
+        _ => None,
+    }
+}
+
 /// "At the beginning of each player's upkeep, that player ..." (CR 503.1a): as `each_upkeep`, but the ability is about the player
 /// whose upkeep it is (`StackItem::subject`), fixed as it triggers. Oath of Druids and Doom Foretold print it.
 pub fn each_players_upkeep(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::StepBegan { step: Step::Upkeep } => Fired::about(Target::Player(q.state().turn.active)),
-        _ => None,
-    }
+    each_players_step(q, event, Step::Upkeep)
+}
+
+/// "At the beginning of each player's draw step, that player ..." (CR 504.1, 603.2), about the player whose draw step it is.
+/// Mornsong Aria prints it.
+pub fn each_players_draw_step(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    each_players_step(q, event, Step::Draw)
+}
+
+/// "At the beginning of each player's first main phase, that player ..." (CR 505.1a, 603.2), about the player whose precombat
+/// main phase it is. Cheering Crowd prints it.
+pub fn each_players_first_main_phase(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    each_players_step(q, event, Step::PrecombatMain)
 }
 
 /// "At end of combat" (CR 511.2): it triggers as the end of combat step begins, in any player's turn - each combat phase's,
@@ -1613,6 +1642,16 @@ pub fn creature_dies(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
             Fired::about(Target::Player(q.controller(*old)))
         }
         _ => None,
+    }
+}
+
+/// "Whenever a creature an opponent controls dies" (CR 700.4, 603.10a): a creature as it last was on the battlefield, under the
+/// controller it last had, who is an opponent of this permanent's controller; the ability is about that player. Shriek,
+/// Treblemaker and The Meathook Massacre print it.
+pub fn creature_an_opponent_controls_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, .. } if q.controller(*old) == me.controller => None,
+        _ => creature_dies(q, me.source, event),
     }
 }
 
@@ -2049,6 +2088,8 @@ pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_st
 pub const ENCHANTED_PERMANENTS_CONTROLLERS_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, enchanted_permanents_controllers_upkeep);
 pub const EACH_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, each_upkeep);
 pub const EACH_PLAYERS_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, each_players_upkeep);
+pub const EACH_PLAYERS_DRAW_STEP: Trigger = when(EventMask::STEP_BEGAN, each_players_draw_step);
+pub const EACH_PLAYERS_FIRST_MAIN_PHASE: Trigger = when(EventMask::STEP_BEGAN, each_players_first_main_phase);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
 pub const END_OF_COMBAT: Trigger = when(EventMask::STEP_BEGAN, end_of_combat);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);
@@ -2067,6 +2108,7 @@ pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
 
 /// A different creature dies, using the characteristics it last had on the battlefield.
 pub const ANOTHER_CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, another_creature_dies);
+pub const CREATURE_AN_OPPONENT_CONTROLS_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_an_opponent_controls_dies);
 pub const CREATURE_YOU_CONTROL_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_dies);
 pub const ANOTHER_CREATURE_YOU_CONTROL_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_dies);
 /// "Whenever you cast an enchantment spell" (CR 603.2): the spell is the subject. Verduran Enchantress and Dathon, His Heart Open print it.
