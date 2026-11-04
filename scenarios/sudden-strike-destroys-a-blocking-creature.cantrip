@@ -1,0 +1,33 @@
+# Sudden Strike: "Destroy target attacking or blocking creature." Bot1 attacks with an Ornithopter and Bot2 blocks with its own;
+# Bot1 casts it on the blocker (CR 509.1g) and the blocker is destroyed (CR 701.8).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Ornithopter
+Sudden Strike
+Island x20
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Block(Ornithopter > Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sudden Strike.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Sudden Strike

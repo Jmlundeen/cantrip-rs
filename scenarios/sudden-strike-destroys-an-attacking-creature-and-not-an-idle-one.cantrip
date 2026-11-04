@@ -1,0 +1,31 @@
+# Sudden Strike: "Destroy target attacking or blocking creature." Bot1 attacks with one of two Ornithopters on turn 3. The idle
+# Ornithopter is no target (CR 508.1); the attacker is, and is destroyed (CR 701.8).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Ornithopter
+Ornithopter
+Sudden Strike
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Sudden Strike.Cast(Bot1.Battlefield.Ornithopter#2)
+Bot1.Hand.Sudden Strike.Cast(Bot1.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Sudden Strike; Ornithopter
+Bot1.Battlefield.Ornithopter.Tapped = false

@@ -1,0 +1,6 @@
+{
+  "name": "Sudden Strike",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Destroy target attacking or blocking creature."
+}
