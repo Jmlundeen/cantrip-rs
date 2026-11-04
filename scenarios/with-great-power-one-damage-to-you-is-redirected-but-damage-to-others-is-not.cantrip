@@ -1,0 +1,52 @@
+# With Great Power . . .: "All damage that would be dealt to you is dealt to enchanted creature instead" (CR 614.9) - all of it, even a single
+# point, and only damage dealt to its controller. Bot2's Lava Dart at Bot1 is redirected: Bot1 stays at 20 and the Ornithopter has 1 damage. A
+# second Lava Dart at Bot2 itself is not: Bot2 goes to 19 and the Ornithopter still has only 1 damage.
+
+[Bot1 Deck]
+With Great Power . . .
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Lava Dart
+Lava Dart
+Mox Ruby
+Mountain
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.With Great Power . . ..Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lava Dart.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 20
+? Bot1.Battlefield.Ornithopter.Damage = 1
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lava Dart.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 19
+Bot1.Battlefield.Ornithopter.Damage = 1
+Stack.Count = 0

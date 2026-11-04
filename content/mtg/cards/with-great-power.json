@@ -1,0 +1,6 @@
+{
+  "name": "With Great Power . . .",
+  "manaCost": "{3}{W}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature you control\nEnchanted creature gets +2/+2 for each Aura and Equipment attached to it.\nAll damage that would be dealt to you is dealt to enchanted creature instead."
+}

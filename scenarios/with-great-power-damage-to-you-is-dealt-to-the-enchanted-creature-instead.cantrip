@@ -1,0 +1,51 @@
+# With Great Power . . .: "All damage that would be dealt to you is dealt to enchanted creature instead" (CR 614.9). Bot1's Ornithopter is a 2/4
+# with it. Bot2 casts Lightning Bolt at Bot1 on turn 2: Bot1 stays at 20 life and the Ornithopter has 3 damage marked, surviving as a 2/4. A
+# second Bolt the same turn is again dealt to the Ornithopter: 6 damage is lethal (CR 704.5g), so it dies and Bot1 is still at 20.
+
+[Bot1 Deck]
+With Great Power . . .
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mox Ruby
+Mountain
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.With Great Power . . ..Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 20
+? Bot1.Battlefield.Ornithopter.Damage = 3
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Ornithopter = (absent)
+Stack.Count = 0
