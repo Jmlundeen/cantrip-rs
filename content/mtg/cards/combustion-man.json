@@ -1,0 +1,8 @@
+{
+  "name": "Combustion Man",
+  "manaCost": "{3}{R}{R}",
+  "type": "Legendary Creature — Human Assassin",
+  "power": 4,
+  "toughness": 6,
+  "oracleText": "Whenever Combustion Man attacks, destroy target permanent unless its controller has Combustion Man deal damage to them equal to his power."
+}

@@ -1,0 +1,55 @@
+# Combustion Man's damage is "equal to his power", and a creature with negative power deals no damage (CR 120.8). Bot1 casts
+# Dismember on its own Combustion Man (-1/1) while his ability targets Bot2's Llanowar Elves; Bot2 has him deal damage
+# instead, takes none (life stays 20), and the Elves is not destroyed.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Jet
+Mox Pearl
+Combustion Man
+Mox Sapphire
+Dismember
+Island x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Combustion Man.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Combustion Man > Bot2)
+Bot1.Target(Llanowar Elves)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dismember.Cast(Combustion Man)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Combustion Man.Power = -1
+Bot1.Pass
+Bot2.Accept
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Graveyard = 

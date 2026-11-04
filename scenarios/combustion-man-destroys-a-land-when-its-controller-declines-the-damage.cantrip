@@ -1,0 +1,43 @@
+# Combustion Man: "Whenever Combustion Man attacks, destroy target permanent unless its controller has Combustion Man deal damage to them equal
+# to his power." Any permanent is a target, a land included: Bot1 targets Bot2's Forest and Bot2, its controller, declines, so the Forest is
+# destroyed and Bot2 takes nothing from the ability (4 power: the Expect checks Bot2's life before combat damage).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Combustion Man
+Mox Emerald
+Island x13
+
+[Bot2 Deck]
+Forest
+Forest x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Combustion Man.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Combustion Man > Bot2)
+Bot1.Target(Bot2.Battlefield.Forest)
+Bot1.Pass
+Bot2.Decline
+
+[Expect]
+Bot2.Battlefield = 
+Bot2.Graveyard = Forest
+Bot2.Life = 20
