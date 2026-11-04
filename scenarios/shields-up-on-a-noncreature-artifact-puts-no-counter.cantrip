@@ -1,0 +1,25 @@
+# "Target artifact or creature you control gains hexproof and indestructible until end of turn. If it's a creature, put a
+# +1/+1 counter on it." (CR 608.2c.) The Mox Pearl is an artifact and no creature, so it gains both keywords and gets no
+# counter.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Shields Up!
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shields Up!.Cast(Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mox Pearl.Keywords = Hexproof; Indestructible
+Bot1.Battlefield.Mox Pearl.Counters.PlusOnePlusOne = (absent)

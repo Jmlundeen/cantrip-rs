@@ -1,0 +1,24 @@
+# "Target artifact or creature you control gains hexproof and indestructible until end of turn. If it's a creature, put a
+# +1/+1 counter on it." (CR 608.2.) The Ornithopter is both, so it gets the keywords and the counter.
+
+[Bot1 Deck]
+Black Lotus
+Shields Up!
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Shields Up!.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof; Indestructible
+Bot1.Battlefield.Ornithopter.Toughness = 3
