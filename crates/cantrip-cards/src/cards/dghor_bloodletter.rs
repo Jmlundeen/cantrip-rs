@@ -3,20 +3,9 @@ use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
 /// "All other creatures get -1/-1 until end of turn." The set of affected creatures is determined as this effect begins
-/// resolving (CR 611.2c); a creature that enters later is not among them.
+/// resolving (CR 611.2c); a creature that enters later is not among them (`effects::pump_creatures_other_than`).
 fn all_other_creatures_get_minus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let affected: Vec<ObjectId> = g
-        .state()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature))
-        .collect();
-    instruction(g, |g| {
-        for creature in affected {
-            cantrip_mechanics::pump(g, item.object, creature, -1, -1);
-        }
-    });
+    cantrip_mechanics::effects::pump_creatures_other_than(g, item.object, &[item.object], -1, -1);
     Ok(())
 }
 

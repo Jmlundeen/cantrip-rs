@@ -1,23 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, pump, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// Other creatures get -2/-2 until end of turn: the creatures on the battlefield as the ability resolves, this one not
-/// among them.
+/// among them (`effects::pump_creatures_other_than`).
 fn shrink_others(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let others: Vec<ObjectId> = g
-        .state()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature))
-        .collect();
-    instruction(g, |g| {
-        for id in others {
-            pump(g, item.object, id, -2, -2);
-        }
-    });
+    effects::pump_creatures_other_than(g, item.object, &[item.object], -2, -2);
     Ok(())
 }
 

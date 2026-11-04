@@ -241,7 +241,15 @@ pub fn creatures_you_control_gain(g: &mut dyn Game, item: &StackItem, keyword: K
 /// `source`'s spell or ability resolves, whoever controls it, and no creature that enters later. Toxic Deluge (-X/-X) and
 /// Withering Curse (-2/-2) print it.
 pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i16, toughness: i16) {
-    let creatures = creatures_on_the_battlefield(g);
+    pump_creatures_other_than(g, source, &[], power, toughness);
+}
+
+/// "Creatures other than [these] get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): `pump_all_creatures`, with
+/// the creatures `other_than` names left out. Harvester of Misery's "other creatures get -2/-2" and D'Ghor Bloodletter's
+/// "all other creatures get -1/-1" leave out their source; Zenos yae Galvus's "creatures other than Zenos yae Galvus and the
+/// chosen creature get -2/-2" its source and the creature it chose.
+pub fn pump_creatures_other_than(g: &mut dyn Game, source: ObjectId, other_than: &[ObjectId], power: i16, toughness: i16) {
+    let creatures: Vec<ObjectId> = creatures_on_the_battlefield(g).into_iter().filter(|id| !other_than.contains(id)).collect();
     instruction(g, |g| {
         for id in creatures {
             crate::pump(g, source, id, power, toughness);
