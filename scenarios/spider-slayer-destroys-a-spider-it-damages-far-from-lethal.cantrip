@@ -1,0 +1,41 @@
+# Spider-Slayer, Hatred Honed: "Whenever Spider-Slayer deals damage to a Spider, destroy that creature." A triggered ability, not deathtouch
+# (CR 603.2, 120.3): Bot1's Slayer (2/1) attacks and Bot2 blocks with Giant Spider, a 2/4 Spider with reach. The Slayer's 2 damage is far from
+# lethal, but it triggers the ability, which destroys the Giant Spider; the Giant Spider's 2 damage kills the Slayer.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Spider-Slayer, Hatred Honed
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Giant Spider
+Forest x5
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spider-Slayer, Hatred Honed.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Giant Spider.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Spider-Slayer, Hatred Honed)
+Bot2.Block(Giant Spider > Spider-Slayer, Hatred Honed)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Spider-Slayer, Hatred Honed
+Bot2.Graveyard = Giant Spider; Black Lotus
+Bot2.Life = 20

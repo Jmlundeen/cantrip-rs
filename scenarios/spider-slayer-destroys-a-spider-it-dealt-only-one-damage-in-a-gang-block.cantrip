@@ -1,0 +1,47 @@
+# Spider-Slayer, Hatred Honed: any damage is enough, even one point (CR 603.2, 120.3). Bot1's Slayer (2/1) attacks and Bot2 blocks with both
+# Giant Spider (a 2/4 Spider) and Llanowar Elves (a 1/1 that is no Spider). Bot1 divides the Slayer's 2 damage 1 and 1 (CR 510.1): the Giant Spider,
+# a long way from lethal, is destroyed by the trigger, the Elves die of their 1, and the Slayer dies of the 3 it takes.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Spider-Slayer, Hatred Honed
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Giant Spider
+Llanowar Elves
+Forest x3
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spider-Slayer, Hatred Honed.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Spider.Cast
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Spider-Slayer, Hatred Honed)
+Bot2.Block(Giant Spider > Spider-Slayer, Hatred Honed; Llanowar Elves > Spider-Slayer, Hatred Honed)
+Bot1.AssignDamage(Spider-Slayer, Hatred Honed > Giant Spider: 1; Spider-Slayer, Hatred Honed > Llanowar Elves: 1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Spider-Slayer, Hatred Honed
+Bot2.Graveyard = Giant Spider; Llanowar Elves; Black Lotus
+Bot2.Life = 20

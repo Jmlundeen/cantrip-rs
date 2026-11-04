@@ -1,0 +1,71 @@
+# Spider-Slayer, Hatred Honed: the destroy is only for a Spider. Bot1's Slayer (2/1) attacks and Bot2 blocks with Hill Giant, a 3/3 that is no
+# Spider: the Slayer's 2 damage leaves it alive (damage 2), and it kills the Slayer. Then "{6}, Exile this card from your graveyard: Create two
+# tapped 1/1 colorless Robot artifact creature tokens with flying." On turn 3 after combat five Moxen are not enough for {6} (the refusal), the
+# land drop makes the sixth, and the pool is empty afterwards: the Slayer is exiled and Bot1 has exactly two tapped colorless flying Robots.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Spider-Slayer, Hatred Honed
+Island
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Hill Giant
+Mountain x5
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spider-Slayer, Hatred Honed.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Hill Giant.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Spider-Slayer, Hatred Honed)
+Bot2.Block(Hill Giant > Spider-Slayer, Hatred Honed)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Hill Giant.Damage = 2
+? Bot1.Graveyard = Spider-Slayer, Hatred Honed
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Graveyard.Spider-Slayer, Hatred Honed.Activate(Mana: short)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Graveyard.Spider-Slayer, Hatred Honed.Activate
+? Bot1.Mana =
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard =
+Bot1.Exile.Spider-Slayer, Hatred Honed.Power = 2
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Robot Token#1.Tapped = true
+Bot1.Battlefield.Robot Token#2.Tapped = true
+Bot1.Battlefield.Robot Token#1.Keywords = Flying
+Bot1.Battlefield.Robot Token#2.Keywords = Flying
+Bot1.Battlefield.Robot Token#1.Colors = (absent)
+Bot1.Battlefield.Robot Token#1.Types.Count = 2
+Bot1.Battlefield.Robot Token#1.Power = 1
+Bot1.Battlefield.Robot Token#1.Toughness = 1
+Bot1.Battlefield.Robot Token#1.Subtypes = Robot
