@@ -1,0 +1,41 @@
+# Fire Sages: {1}{R}{R}: one +1/+1 counter, paid exactly (three Rubies, the pool empty afterwards); Sages 2/2 becomes 3/3.
+
+[Bot1 Deck]
+Mox Ruby x4
+Fire Sages
+Mountain x15
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Fire Sages.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Fire Sages.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+? Bot1.Battlefield.Fire Sages.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Fire Sages.Power = 3
+
+[Expect]
+Bot1.Battlefield.Fire Sages.Toughness = 3
