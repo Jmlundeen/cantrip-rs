@@ -10,10 +10,10 @@ catches is a decision of the card's own code that no expectation would catch bei
 
 The changes: a number one more and one less; `<` and `<=`, `>` and `>=` swapped, `==` and `!=`; `&&` and `||`;
 `true` and `false`; a `!` dropped; `+` and `-`; a statement that calls the game left out. Each is built and the card's
-scenarios run (`corpus -- --card`): one that fails is CAUGHT, one that passes SURVIVED (a missing expectation - or an
-equivalent change, which the report names as such when you have read it), one that does not compile is skipped. The
-file is restored after every change and at exit; it should be committed or staged first all the same
-(`git checkout -- <file>` restores it).
+scenarios run (`corpus -- --card`, under `CANTRIP_VERIFY` as the test suite runs them): one that fails is CAUGHT, one
+that passes SURVIVED (a missing expectation - or an equivalent change, which the report names as such when you have read
+it), one that does not compile is skipped. The file is restored after every change and at exit; it should be committed
+or staged first all the same (`git checkout -- <file>` restores it).
 
 A build holds only the cards the card's scenarios play (the `mutate` profile, with `CANTRIP_CARDS_ONLY` naming them, which
 crates/cantrip-cards/build.rs reads): seconds a change, where a build of every card takes most of a minute. The profile keeps
@@ -213,9 +213,9 @@ def run_scenarios(card, few=False):
 
 
 def corpus_env(few):
-    """The corpus as `tools/test.sh` runs it, under `CANTRIP_VERIFY`: a resolution that changes the game twice with no event and
-    says neither `Game::end_sentence` nor `Game::one_instruction` between is refused, so leaving either out is caught, not a
-    survivor. A build of few cards also names them (`CANTRIP_CARDS_ONLY`)."""
+    """The corpus as `tools/test.cmd` and `tools/test.sh` run it, under `CANTRIP_VERIFY`: a resolution that changes the
+    game twice with no event and says neither `Game::end_sentence` nor `Game::one_instruction` between is refused, so
+    leaving either out is caught, not a survivor. A build of few cards also names them (`CANTRIP_CARDS_ONLY`)."""
     env = dict(os.environ, CANTRIP_VERIFY="1")
     if few:
         env["CANTRIP_CARDS_ONLY"] = FEW_CARDS
