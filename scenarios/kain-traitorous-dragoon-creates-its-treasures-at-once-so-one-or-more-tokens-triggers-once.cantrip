@@ -1,0 +1,43 @@
+# Kain's "create that many tapped Treasure tokens" is one creation (CR 101.4 / one instruction), so Mister Fantastic's
+# "Whenever one or more tokens you control enter" triggers once for the two Treasures.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Kain, Traitorous Dragoon
+Black Lotus
+Mister Fantastic, Reed Richards
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kain, Traitorous Dragoon.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mister Fantastic, Reed Richards.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Kain, Traitorous Dragoon > Bot2)
+Bot1.Pass
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 5
