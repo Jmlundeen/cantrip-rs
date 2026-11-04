@@ -285,6 +285,17 @@ pub static MONK: CardDef = CardDef {
     ..token!(Monk)
 };
 
+/// A 1/1 red Monk creature token with prowess. Crescent Island Temple and Jaya, Fiery Negotiator make it.
+pub static RED_MONK: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Red)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[crate::triggers::PROWESS],
+    text: "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)",
+    ..token!(Monk)
+};
+
 /// The 1/1 blue and red Otter creature token with prowess. Ral, Crackling Wit's +1 and Stormchaser's Talent make it.
 pub static OTTER: CardDef = CardDef {
     colors: Some(ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Red).0)),
