@@ -17,7 +17,7 @@ fn sacrifice_another_to_draw_two(g: &mut dyn Game, item: &StackItem) -> Result<(
 
 /// "You may cast this card from exile" (CR 113.6e, 601.3): a static ability that functions while Khan is in exile, so it is
 /// his own permission there - the engine reads a card's `exile_casts` off the card itself in exile, not off a permanent
-/// (`cantrip-rules`' `own_exile_casts`) - and it is his controller who may cast him by it. It is a permission and no cost of
+/// (`cantrip-rules`' `own_zone_casts`) - and it is his controller who may cast him by it. It is a permission and no cost of
 /// its own: he is cast for his mana cost, or an alternative cost another object gives.
 fn may_cast_from_exile(_: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> bool {
     card == asker.source && player == asker.controller
@@ -31,6 +31,7 @@ pub static CARD: CardDef = CardDef {
     )],
     exile_casts: &[ExileCast {
         text: "Cast from exile",
+        from: ZoneKind::Exile,
         allows: may_cast_from_exile,
         additional: Cost::NONE,
         any_type: false,

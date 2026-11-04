@@ -1,0 +1,61 @@
+# Alien Symbiosis: "You may cast this card from your graveyard by discarding a card in addition to paying its other
+# costs" (CR 113.6e-f, 601.3, 118.8), cast at the time an Aura may be (its ruling: "You must follow all normal timing
+# rules"); "Enchanted creature gets +1/+1, has menace, and is a Symbiote in addition to its other types."
+# Turn 1: Faithless Looting draws two Swamps and discards Alien Symbiosis and one Swamp. On Bot2's turn Bot1 holds
+# priority in Bot2's main phase with Mox Jet and Mox Pearl untapped, and the Aura is not offered: it is no instant. On
+# turn 3 Mox Jet is tapped in the upkeep, and with Mox Ruby and Mox Pearl untapped the Aura is not offered: the
+# permission lets no mana of any type pay (CR 609.4b), so {B} needs black mana. A Swamp is played, it and Mox Pearl pay
+# {1}{B} exactly and Lightning Bolt is discarded for the additional cost. Ornithopter (0/2 Thopter, flying) becomes a
+# 1/3 Symbiote Thopter with flying and menace; Bolt is in the graveyard and the one card left in hand is a Swamp.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Alien Symbiosis
+Ornithopter
+Mox Jet
+Mox Pearl
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Alien Symbiosis; Swamp)
+? Bot1.Graveyard = Faithless Looting; Swamp; Alien Symbiosis
+[T2 Bot2.Main1]
+Bot2.Pass
+! Bot1.Graveyard.Alien Symbiosis.Cast(Ornithopter)
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Alien Symbiosis.Cast(Ornithopter; Mana: short)
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Alien Symbiosis.Cast(Ornithopter)
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana = 
+Bot1.Battlefield.Alien Symbiosis.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Menace
+Bot1.Battlefield.Ornithopter.Subtypes = Symbiote; Thopter
+Bot1.Graveyard = Lightning Bolt; Faithless Looting; Swamp
+Bot1.Hand = Swamp

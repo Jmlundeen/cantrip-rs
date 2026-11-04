@@ -1,0 +1,6 @@
+{
+  "name": "Alien Symbiosis",
+  "manaCost": "{1}{B}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nEnchanted creature gets +1/+1, has menace, and is a Symbiote in addition to its other types.\nYou may cast this card from your graveyard by discarding a card in addition to paying its other costs."
+}

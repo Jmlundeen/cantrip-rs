@@ -172,7 +172,7 @@ fn spells_you_cast(_: &dyn Query, asker: &Asker, _: ObjectId, player: PlayerId) 
 static EXILE_PERMISSION: CardDef = CardDef {
     name: "Route Exile Permission",
     types: TypeSet::of(&[CardType::Artifact]),
-    exile_casts: &[ExileCast { text: "Cast from exile", allows: any_card, additional: Cost::NONE, any_type: false, lands: false, life_for_mana_value: false, instead: None }],
+    exile_casts: &[ExileCast { text: "Cast from exile", from: ZoneKind::Exile, allows: any_card, additional: Cost::NONE, any_type: false, lands: false, life_for_mana_value: false, instead: None }],
     ..CardDef::BLANK
 };
 
@@ -186,6 +186,7 @@ static SELF_EXILE_PROBE: CardDef = CardDef {
     cost: ManaCost { generic: 1, ..ManaCost::ZERO },
     exile_casts: &[ExileCast {
         text: "Cast from exile",
+        from: ZoneKind::Exile,
         allows: this_card_only,
         additional: Cost::NONE,
         any_type: false,

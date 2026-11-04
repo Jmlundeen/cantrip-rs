@@ -2213,12 +2213,18 @@ pub struct SpellAlternative {
 /// and `additional` is owed on top of whatever it is cast for (CR 118.8, 601.2f). A permanent's functions while it is on the
 /// battlefield and has its abilities; a cast begun by it goes on if the permanent leaves while it is paid for (the same
 /// card's ruling: sacrificed to pay an additional cost, or destroyed in response). A card may also list one for itself - "you
-/// may cast this card from exile" - which functions while the card is in exile (CR 113.6e), read off the card there
-/// (`cantrip-rules`' `own_exile_casts`) with the card's controller, its owner, as "you".
+/// may cast this card from exile" (Khan, Vengeful Heart), or "you may cast this card from your graveyard by discarding a card
+/// in addition to paying its other costs" (Alien Symbiosis, Wickerfolk Indomitable) - which functions while the card is in
+/// that zone (CR 113.6e-f), read off the card there (`cantrip-rules`' `own_zone_casts`) with the card's controller, its
+/// owner, as "you". It is named for exile, where every permanent's is.
 #[derive(Clone, Copy)]
 pub struct ExileCast {
     /// What a cast by it is called on the menu, and on the card in exile it may cast.
     pub text: &'static str,
+    /// The zone the card cast by it is in: `Exile` for every permanent's, which only cards in exile are cast by; a card's own
+    /// may name its owner's graveyard instead ("you may cast this card from your graveyard by ..."), and is then read off the
+    /// card only there.
+    pub from: ZoneKind,
     /// Whether `player` may cast `card`, a card in exile, by it now: asked of what the permission belongs to (`Asker`, its
     /// controller "you" - the permanent's, or for a card's own permission the card itself, in exile), with the card as the
     /// spell it would be (its Adventure or Omen through a view of that face, CR 715.3a, 720.3a), so "creature spells" refuses

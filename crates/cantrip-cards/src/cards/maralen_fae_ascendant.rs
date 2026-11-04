@@ -61,6 +61,7 @@ pub static CARD: CardDef = CardDef {
     .targets(&[targets::OPPONENT])],
     exile_casts: &[ExileCast {
         text: "Cast without paying its mana cost",
+        from: ZoneKind::Exile,
         allows: once_each_turn,
         additional: Cost::NONE,
         any_type: false,

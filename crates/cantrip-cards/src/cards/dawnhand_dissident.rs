@@ -38,6 +38,7 @@ pub static CARD: CardDef = CardDef {
     // 601.2f): an additional cost on each cast by it, of any kinds of counter, from any of their creatures (CR 118.3).
     exile_casts: &[ExileCast {
         text: "Cast by removing three counters from among creatures you control",
+        from: ZoneKind::Exile,
         allows,
         additional: remove_counters_among(3, targets::filters::creature),
         any_type: false,

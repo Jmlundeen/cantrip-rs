@@ -33,6 +33,7 @@ pub static CARD: CardDef = CardDef {
     // other alternative cost, additional costs as usual (the rulings).
     exile_casts: &[ExileCast {
         text: "Play during your turn; a spell for life equal to its mana value",
+        from: ZoneKind::Exile,
         allows,
         additional: Cost::NONE,
         any_type: false,

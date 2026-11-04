@@ -5972,7 +5972,7 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
                 }
             }
             // A card in exile its own static ability lets be played there (CR 113.6e, 305.1), as Valgavoth's lets a land card.
-            for c in own_exile_casts(cx.cards(), cx.s(), &cx.g.log, id, player).iter() {
+            for c in own_zone_casts(cx.cards(), cx.s(), &cx.g.log, id, player).iter() {
                 if c.what.lands && (c.what.allows)(cx, &c.asker(), id, player) {
                     offer(id, Some(c.grant), options);
                 }
@@ -6136,29 +6136,36 @@ fn granted_ways_of(cards: &CardTable, s: &GameState, log: &[Record]) -> Vec<Give
 
 /// The permissions the permanents on the battlefield give to cast cards in exile (CR 601.3, 604.1).
 fn exile_casts_of(cards: &CardTable, s: &GameState, log: &[Record]) -> Vec<Given<ExileCast>> {
-    given(cards, s, log, |d| d.exile_casts, AbilityRef::exile_cast)
+    let mut all = given(cards, s, log, |d| d.exile_casts, AbilityRef::exile_cast);
+    // A card's own permission to cast it from its owner's graveyard is no permanent's to cast cards in exile by.
+    all.retain(|c| c.what.from == ZoneKind::Exile);
+    all
 }
 
-/// The permission a card in exile gives itself, "you may cast this card from exile" (CR 113.6e, 601.3): a static ability that
-/// functions while the card is in exile, so it is read off the card there, where `given` reads only the battlefield's and the
+/// The permission a card in exile or in a graveyard gives itself there, "you may cast this card from exile" (Khan, Vengeful
+/// Heart) or "you may cast this card from your graveyard by discarding a card in addition to paying its other costs" (Alien
+/// Symbiosis) (CR 113.6e-f, 601.3): a static ability that functions while the card is in that zone, so it is read off the
+/// card there - each entry whose `from` is the zone the card is in - where `given` reads only the battlefield's and the
 /// emblems' - with the card's controller (its owner, CR 108.4a) as "you" and the card as the object the grant is made by, so
 /// the permission is the card's own and not another card's in exile (`named_exile_cast` reads it back off the same card). A
 /// card exiled face down (hideaway, foretell) has no characteristics and so no abilities while it is (CR 406.3a, 708.2):
 /// it gives itself none (`cards.current` reads only a face-down permanent's face-down values). A copy of a card is cast only as the prepare spell it is, never by a permission of the card it copies.
 /// `player` is who would cast it: "you" on the card is its controller (CR 109.5), so no other player is offered it.
-fn own_exile_casts(cards: &CardTable, s: &GameState, log: &[Record], card: ObjectId, player: PlayerId) -> Vec<Given<ExileCast>> {
+fn own_zone_casts(cards: &CardTable, s: &GameState, log: &[Record], card: ObjectId, player: PlayerId) -> Vec<Given<ExileCast>> {
     let obj = s.obj(card);
-    if obj.card_copy || obj.face_down_card() || !obj.zone.is(ZoneKind::Exile) || obj.controller != player {
+    let zone = obj.zone.kind();
+    if obj.card_copy || obj.face_down_card() || !matches!(zone, ZoneKind::Exile | ZoneKind::Graveyard) || obj.controller != player {
         return Vec::new();
     }
     let printed = cards.current(obj);
     let items = cards.get(printed).exile_casts;
-    if items.is_empty() || crate::layers::lost_all_abilities(cards, s, log, card) {
+    if !items.iter().any(|c| c.from == zone) || crate::layers::lost_all_abilities(cards, s, log, card) {
         return Vec::new();
     }
     items
         .iter()
         .enumerate()
+        .filter(|(_, what)| what.from == zone)
         .map(|(k, what)| Given { source: card, controller: obj.controller, grant: Grant { object: card, ability: AbilityRef::exile_cast(printed, k) }, what, by: None, words: None })
         .collect()
 }
@@ -6219,7 +6226,7 @@ pub fn exile_cast_texts(game: &crate::Game, card: ObjectId) -> Vec<(PlayerId, &'
     // The permanents' permissions, and the card's own (CR 113.6e), with its controller as "you".
     exile_casts_of(cards, s, log)
         .into_iter()
-        .chain(own_exile_casts(cards, s, log, card, s.obj(card).controller))
+        .chain(own_zone_casts(cards, s, log, card, s.obj(card).controller))
         .filter(|c| (c.what.allows)(q, &c.asker(), card, c.controller))
         .map(|c| (c.controller, c.what.text))
         .collect()
@@ -6502,9 +6509,9 @@ impl Route {
         Route { by, terms, ..Route::RULES }
     }
 
-    /// A permanent's permission to cast cards in exile (CR 601.3, 604.1), judged on each face: what it adds is owed with every
-    /// cast by it (CR 118.8), it may let mana of any type pay (CR 609.4b), and it may name life equal to the mana value as the
-    /// cost paid rather than the mana cost (CR 118.9, 119.4).
+    /// A permanent's permission to cast cards in exile, or a card's own to be cast from where it is (CR 601.3, 604.1, 113.6e),
+    /// judged on each face: what it adds is owed with every cast by it (CR 118.8), it may let mana of any type pay (CR
+    /// 609.4b), and it may name life equal to the mana value as the cost paid rather than the mana cost (CR 118.9, 119.4).
     fn exile_cast(c: &Given<ExileCast>) -> Route {
         Route {
             by: Some(c.grant),
@@ -6841,6 +6848,9 @@ impl<'a> Offer<'a> {
                 {
                     routes.push(Route::retrace(card, obj.card));
                 }
+                // The card's own permission there that says more of the cast (CR 113.6e-f, 118.8): "you may cast this card
+                // from your graveyard by discarding a card in addition to paying its other costs" (Alien Symbiosis).
+                routes.extend(own_zone_casts(cx.cards(), cx.s(), &cx.g.log, card, player).iter().map(Route::exile_cast));
                 // A way a permanent gives that is a permission (Lurrus of the Dream-Den), judged on each face.
                 for way in self.granted() {
                     if way.what.permission && way.what.from == ZoneKind::Graveyard {
@@ -6867,7 +6877,7 @@ impl<'a> Offer<'a> {
                 if !obj.card_copy {
                     routes.extend(self.exile_casts().iter().map(Route::exile_cast));
                     // A card's own permission, which functions where it is (CR 113.6e): "you may cast this card from exile".
-                    routes.extend(own_exile_casts(cx.cards(), cx.s(), &cx.g.log, card, player).iter().map(Route::exile_cast));
+                    routes.extend(own_zone_casts(cx.cards(), cx.s(), &cx.g.log, card, player).iter().map(Route::exile_cast));
                 }
             }
             _ => {}
@@ -12258,7 +12268,7 @@ mod tests {
     static EXILER: CardDef = CardDef {
         name: "Alternative Test Exiler",
         types: TypeSet::of(&[CardType::Enchantment]),
-        exile_casts: &[ExileCast { text: "Cast from exile", allows: any_card, additional: Cost::NONE, any_type: false, lands: false, life_for_mana_value: false, instead: None }],
+        exile_casts: &[ExileCast { text: "Cast from exile", from: ZoneKind::Exile, allows: any_card, additional: Cost::NONE, any_type: false, lands: false, life_for_mana_value: false, instead: None }],
         ..CardDef::BLANK
     };
     /// "You may cast spells from the top of your library" (CR 601.3).
