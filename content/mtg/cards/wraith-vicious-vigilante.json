@@ -1,0 +1,12 @@
+{
+  "name": "Wraith, Vicious Vigilante",
+  "manaCost": "{1}{W}{U}",
+  "type": "Legendary Creature — Human Detective Hero",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Double strike\nFear Gas — Wraith can't be blocked.",
+  "keywords": [
+    "DoubleStrike",
+    "CantBeBlocked"
+  ]
+}
