@@ -1,0 +1,48 @@
+# Perigee Beckoner ({4}{B}, paid with Black Lotus, Mox Jet and Mox Pearl): "When this creature enters, until end of turn, another
+# target creature you control gets +2/+0 and gains 'When this creature dies, return it to the battlefield tapped under its owner's
+# control.'" The Memnite becomes 3/1, then Bot1's own Lightning Bolt (Mox Ruby) kills it the same turn and it comes back tapped as
+# a new object (a 1/1 again). The Beckoner is not a legal target of its own trigger, being the only other creature: it has "another".
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Black Lotus
+Memnite
+Perigee Beckoner
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: B)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Perigee Beckoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 3
+? Bot1.Battlefield.Memnite.Toughness = 1
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Battlefield.Memnite.Tapped = true
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Memnite.Toughness = 1
+Bot1.Battlefield.Perigee Beckoner.Power = 4
+Bot1.Battlefield.Perigee Beckoner.Toughness = 5
