@@ -1,0 +1,11 @@
+{
+  "name": "Kavaron Skywarden",
+  "manaCost": "{4}{R}",
+  "type": "Creature — Kavu Soldier",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "Reach\nVoid — At the beginning of your end step, if a nonland permanent left the battlefield this turn or a spell was warped this turn, put a +1/+1 counter on this creature.",
+  "keywords": [
+    "Reach"
+  ]
+}

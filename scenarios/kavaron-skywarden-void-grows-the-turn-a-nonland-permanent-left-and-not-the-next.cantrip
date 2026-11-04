@@ -1,0 +1,32 @@
+# Kavaron Skywarden (a 4/5 with reach): "Void - At the beginning of your end step, if a nonland permanent left the battlefield this turn or a spell was warped this turn, put a +1/+1 counter on this creature." Turn 1 Black Lotus is sacrificed for mana to pay for it, so at Bot1's end step the "if" holds and it gets a +1/+1 counter: a 5/6. On turn 3 nothing leaves the battlefield, and the departure of turn 1 does not count (it is not "this turn"), so the counter stays at one at the end of that turn.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Kavaron Skywarden
+Island x23
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kavaron Skywarden.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Kavaron Skywarden.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Kavaron Skywarden.Power = 5
+? Bot1.Battlefield.Kavaron Skywarden.Toughness = 6
+? Bot1.Battlefield.Kavaron Skywarden.Keywords = Reach
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Kavaron Skywarden.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Kavaron Skywarden.Power = 5

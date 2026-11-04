@@ -1,0 +1,34 @@
+# Kavaron Skywarden: five Moxen pay for it, so no permanent leaves the battlefield and no spell is warped this turn; at Bot1's end step the Void "if" is false and it stays a 4/5 with no counter (CR 603.4).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Kavaron Skywarden
+Island x22
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Kavaron Skywarden.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Kavaron Skywarden.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Kavaron Skywarden.Power = 4
+Bot1.Battlefield.Kavaron Skywarden.Toughness = 5
