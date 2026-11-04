@@ -1,0 +1,58 @@
+# Pain for All on Bot1's Grizzly Bears (2/2). Its enters ability has the Bears deal damage equal to their power (2) to Bot2
+# (20 -> 18); the Bears can't be the "other" target. Then Bot2 bolts the Bears: the damage is lethal, and the Bears are still dealt
+# it, so the Aura triggers and the Bears (already dead by the time it resolves) deal that much (3) to the opponent: 18 -> 15.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Grizzly Bears
+Pain for All
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pain for All.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Grizzly Bears)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot1.Battlefield.Pain for All.AttachedTo = Grizzly Bears
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Pain for All; Grizzly Bears
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Pain for All; Grizzly Bears

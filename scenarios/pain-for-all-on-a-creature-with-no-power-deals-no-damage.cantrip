@@ -1,0 +1,34 @@
+# Pain for All on Bot1's Ornithopter (0/2): the enchanted creature deals damage equal to its power, 0, to Bot2, so Bot2 stays at 20
+# (a creature with power 0 deals no damage, CR 120.8).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ornithopter
+Pain for All
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pain for All.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Pain for All.AttachedTo = Ornithopter
