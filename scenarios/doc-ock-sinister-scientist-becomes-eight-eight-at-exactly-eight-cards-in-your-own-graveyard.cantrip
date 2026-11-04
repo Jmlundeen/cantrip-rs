@@ -1,0 +1,72 @@
+# Doc Ock, Sinister Scientist (4/5, {4}{U}): "As long as there are eight or more cards in your graveyard, Doc Ock has base power and
+# toughness 8/8." (CR 604.1, 613.4b.) T1 the five Moxen pay for him. T2 Bot2's Lightning Bolt (aimed at Bot1) lands in the OTHER graveyard.
+# T3 Bot1 casts a Memnite and then Brain Freeze on itself with storm 1: two mills of three, so six cards plus Brain Freeze are seven
+# in Bot1's graveyard - and with Bot2's Bolt eight cards between both, but he stays 4/5 (only "your graveyard" counts). T5 Bot1's
+# own Lightning Bolt (aimed at Bot2) makes the eighth card in Bot1's graveyard: he is an 8/8, one more card than seven.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Doc Ock, Sinister Scientist
+Brain Freeze
+Memnite
+Island x6
+Lightning Bolt
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Doc Ock, Sinister Scientist.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 17
+? Bot2.Graveyard = Lightning Bolt
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Graveyard.Count = 7
+? Bot1.Battlefield.Doc Ock, Sinister Scientist.Power = 4
+? Bot1.Battlefield.Doc Ock, Sinister Scientist.Toughness = 5
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 8
+Bot2.Life = 17
+Bot1.Battlefield.Doc Ock, Sinister Scientist.Power = 8
+Bot1.Battlefield.Doc Ock, Sinister Scientist.Toughness = 8

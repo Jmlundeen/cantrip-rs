@@ -1,0 +1,78 @@
+# Doc Ock, Sinister Scientist: "As long as you control another Villain, Doc Ock has hexproof." (CR 702.11, 604.1.) T1 the five Moxen pay
+# for him. T2 Bot2 casts an Aerial Doombot (a Villain on the OTHER side: it gives him nothing) and Bolts Doc Ock - allowed, as he is
+# a Villain himself but not "another" one; he takes 3 and lives. T3 Bot1 casts its own Aerial Doombot: now Bolting him is refused.
+# T4 Bot2 Bolts the Doombot instead (allowed: hexproof is his alone), it dies, and a second Bolt at Doc Ock is legal again.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Doc Ock, Sinister Scientist
+Aerial Doombot
+Island x30
+
+[Bot2 Deck]
+Island
+Aerial Doombot
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Doc Ock, Sinister Scientist.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Doc Ock, Sinister Scientist)
+Bot1.Pass
+? Bot1.Battlefield.Doc Ock, Sinister Scientist.Damage = 3
+? Bot1.Battlefield.Doc Ock, Sinister Scientist.Keywords = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Doc Ock, Sinister Scientist.Keywords = Hexproof
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Doc Ock, Sinister Scientist)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Aerial Doombot)
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Doc Ock, Sinister Scientist)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Aerial Doombot
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot1.Battlefield.Doc Ock, Sinister Scientist.Damage = 3
+Bot1.Battlefield.Doc Ock, Sinister Scientist.Keywords = (absent)
