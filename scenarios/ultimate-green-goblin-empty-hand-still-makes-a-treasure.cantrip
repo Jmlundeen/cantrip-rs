@@ -1,0 +1,52 @@
+# Ultimate Green Goblin: "discard a card, then create a Treasure token" (CR 701.9, 111.10a). With no cards in hand at the upkeep there is nothing to
+# discard and nothing is asked, but the Treasure is still made. Turn 1 spends the whole opening hand: six Moxen and the Goblin.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Gleemox
+Ultimate Green Goblin
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ultimate Green Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 0
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 8
+? Bot1.Graveyard.Count = 0
+
+[Expect]
+Bot1.Battlefield.Treasure Token.Types = Artifact
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 0

@@ -1,0 +1,44 @@
+# Ultimate Green Goblin ({1}{B/R}{B/R}, 5/4): "At the beginning of your upkeep, discard a card, then create a Treasure token." Cast on turn 1 with
+# three Islands left in hand. Bot2's upkeep on turn 2 triggers nothing (the board is still four permanents). On turn 3 Bot1's upkeep discards an
+# Island, then makes a Treasure: five permanents, two cards in hand before the draw and three after it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ultimate Green Goblin
+Island x3
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ultimate Green Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Upkeep]
+? Stack.Count = 0
+? Bot1.Battlefield.Count = 4
+? Bot1.Hand.Count = 3
+[T3 Bot1.Upkeep]
+Bot1.Choose(Island)
+? Bot1.Battlefield.Count = 5
+? Bot1.Hand.Count = 2
+
+[Expect]
+Bot1.Battlefield.Treasure Token.Types = Artifact
+Bot1.Hand.Count = 2
+Bot1.Graveyard.Count = 1
