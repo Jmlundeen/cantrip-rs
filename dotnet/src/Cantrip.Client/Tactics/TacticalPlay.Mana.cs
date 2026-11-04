@@ -142,7 +142,8 @@ public sealed partial class TacticalPlay
         }
 
         List<ActionOptionMessage> abilities = [.. prompt.Options.Where(option => option.Kind == ActionKindView.ActivateAbility
-            && !option.PaysNothing && option.ProducesOfAnyColorEach == 0 && option.SacrificeCandidates.Count == 0)];
+            && !option.PaysNothing && option.ProducesOfAnyColorEach == 0 && option.SacrificeCandidates.Count == 0
+            && option.TargetsRequired == 0)];
         if (abilities.Count == 0 || abilities.Count != prompt.Options.Count(option => option.Kind == ActionKindView.ActivateAbility))
         {
             return null;

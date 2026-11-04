@@ -69,6 +69,25 @@ public sealed partial class MainPage
             // A cost that depends on the target (Dragonfire Blade's equip) is said with each, as a menu row says it: a card
             // with one thing to do comes straight here, with no row to have read it on.
             string costs = CardActions.CostsByTarget(announced);
+
+            // A mana ability has no targets (CR 605.1a): what it is aimed at is the permanents its cost taps, more than one
+            // of them (Supportive Parents' two creatures), and the dock says the cost and how many are picked.
+            if (announced.TargetsRequired > 1)
+            {
+                Prompt(
+                    $"{announced.CostText} for {client.Object(announced.Source)?.Name ?? "it"}",
+                    $"{_pickedTargets.Count} of {announced.TargetsRequired} chosen, from {candidates}");
+                AddCancelButton(() =>
+                {
+                    _targeting = null;
+                    _pickedTargets.Clear();
+                    _needsRedraw = true;
+                });
+
+                ShowErrors(client);
+                return;
+            }
+
             Prompt(
                 $"{(announced.TargetsOptional ? "Up to one target" : "Target")} for {client.Object(announced.Source)?.Name ?? "it"}",
                 (costs.Length > 0 ? costs + "  ·  " : string.Empty)

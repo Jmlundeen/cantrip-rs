@@ -678,7 +678,10 @@ public sealed partial class MainPage
             null => string.Empty,
             ModesChosenAnswer modes => $"{nameof(ModesChosenAnswer)} {string.Join(",", modes.Modes)}",
             AnnounceAnswer announced => $"{nameof(AnnounceAnswer)} {announced.Value}",
-            TakeActionAnswer action => $"{nameof(TakeActionAnswer)} {action.Kind} {action.Source.Value}",
+            // A taken action's targets and colour, where it has them: "TakeActionAnswer ActivateAbility 4 > 4,27 Green".
+            TakeActionAnswer action => $"{nameof(TakeActionAnswer)} {action.Kind} {action.Source.Value}"
+                + (action.Targets.Count > 0 ? $" > {string.Join(",", action.Targets.Select(t => t.IsPlayer ? $"p{t.Player}" : $"{t.Object.Value}"))}" : string.Empty)
+                + (action.Color is { } color ? $" {color}" : string.Empty),
             BlockersDeclaredAnswer blocks => $"{nameof(BlockersDeclaredAnswer)} {string.Join(",", blocks.Blocks.Select(b => $"{b.Blocker.Value}>{b.Attacker.Value}"))}".TrimEnd(),
             CountersRemovedAnswer removed =>
                 $"{nameof(CountersRemovedAnswer)} {string.Join("; ", removed.Removals.Select(r => $"{r.Object.Value} {r.Counter} {r.Count}"))}".TrimEnd(),

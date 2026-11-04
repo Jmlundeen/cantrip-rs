@@ -925,6 +925,10 @@ public static class AutoPlay
 
         // A cost that sacrifices a permanent of the player's choosing takes any of the ones offered.
         Sacrifice = option.SacrificeCandidates.Count > 0 ? option.SacrificeCandidates[0] : null,
+
+        // A mana ability has no targets (CR 605.1a), so the targets its option offers are the permanents its cost taps,
+        // several of the player's choosing (Supportive Parents' two creatures): any that many different ones will do.
+        Targets = AutoMana.IsManaAbility(option) ? [.. option.TargetCandidates.Take(option.TargetsRequired)] : [],
     };
 
     /// <summary>

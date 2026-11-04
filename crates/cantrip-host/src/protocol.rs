@@ -738,6 +738,8 @@ pub struct ActionOptionMessage {
     /// are told apart. Opaque: it means nothing outside its question, and says nothing of what makes the option possible.
     #[serde(default)]
     pub option_id: i32,
+    /// How many targets the action needs. A mana ability has none (CR 605.1a): on one, these are the permanents its cost
+    /// taps or sacrifices when it takes more than one of the player's choosing (Supportive Parents' two creatures).
     pub targets_required: i32,
     pub target_candidates: Vec<TargetMessage>,
     /// For a mana ability: the mana it would add.

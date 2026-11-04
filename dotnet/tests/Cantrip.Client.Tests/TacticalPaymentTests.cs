@@ -40,6 +40,32 @@ public sealed class TacticalPaymentTests
         Assert.Equal(Handle(2), Assert.IsType<TakeActionAnswer>(paid).Source);
     }
 
+    /// <summary>
+    /// Supportive Parents' "Tap two untapped creatures you control: Add one mana of any color." is a cost paid by tapping
+    /// things, which the plan leaves to the ordinary way: the creatures it taps are named, two different ones (CR 605.1a).
+    /// </summary>
+    [Fact]
+    public void A_mana_ability_that_taps_two_creatures_is_paid_naming_both()
+    {
+        ObjectView parents = Creature(1, "Supportive Parents", 2, 3, text: "Tap two untapped creatures you control: Add one mana of any color.");
+        GameClient client = Seated([parents, Creature(2, "Bear", 2, 2), InHand(90, "Giant Growth", CardTypeView.Instant, 1)]);
+        ActionOptionMessage tapsTwo = new()
+        {
+            Kind = ActionKindView.ActivateAbility,
+            Source = Handle(1),
+            ProducesOfAnyOneColor = 1,
+            ColorChoices = [ColorView.White, ColorView.Blue, ColorView.Black, ColorView.Red, ColorView.Green],
+            TargetsRequired = 2,
+            TargetCandidates = [At(1), At(2)],
+            Affordable = true,
+        };
+
+        TakeActionAnswer paid = Assert.IsType<TakeActionAnswer>(Bot().Decide(client, Owing(90, "{G}", [ColorView.Green], 0, tapsTwo)));
+
+        Assert.Equal(ColorView.Green, paid.Color);
+        Assert.Equal([1, 2], paid.Targets.Select(target => target.Object.Value).Order());
+    }
+
     [Fact]
     public void One_generic_is_paid_with_a_source_of_one_and_not_with_a_source_of_two()
     {

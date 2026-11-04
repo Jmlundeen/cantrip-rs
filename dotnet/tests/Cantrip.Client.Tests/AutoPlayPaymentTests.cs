@@ -286,6 +286,34 @@ public sealed class AutoPlayPaymentTests
     }
 
     /// <summary>
+    /// A mana ability whose cost taps more than one permanent of the player's choosing (Supportive Parents: "Tap two untapped
+    /// creatures you control: Add one mana of any color.") is offered with those permanents as its option's targets, since
+    /// a mana ability has none of its own (CR 605.1a): the bot names as many different ones as the cost takes. An answer
+    /// short of them is refused, and the same payment offered again for ever.
+    /// </summary>
+    [Fact]
+    public void Names_every_permanent_a_mana_ability_taps_for_its_cost()
+    {
+        var parents = new ViewHandle(1);
+        var tapsTwo = new ActionOptionMessage
+        {
+            Kind = ActionKindView.ActivateAbility,
+            Source = parents,
+            ProducesOfAnyOneColor = 1,
+            ColorChoices = [ColorView.White, ColorView.Blue, ColorView.Black, ColorView.Red, ColorView.Green],
+            TargetsRequired = 2,
+            TargetCandidates = [.. new[] { 1, 2, 3 }.Select(handle => new TargetMessage { Object = new ViewHandle(handle) })],
+        };
+
+        TakeActionAnswer? answer = AutoPlay.Produce([tapsTwo], [ColorView.Green], owedGeneric: 0);
+
+        Assert.NotNull(answer);
+        Assert.Equal(ColorView.Green, answer.Color);
+        Assert.Equal(2, answer.Targets.Select(target => target.Object).Distinct().Count());
+        Assert.All(answer.Targets, target => Assert.Contains(tapsTwo.TargetCandidates, candidate => candidate.Object == target.Object));
+    }
+
+    /// <summary>
     /// Mana a rule tells apart by its source (CR 106.3) - Barracks of the Thousand's {W} beside a Plains' - is spent where the
     /// Barracks' text rewards it, on an artifact or creature spell, and kept otherwise: the plain {W} pays an enchantment.
     /// </summary>

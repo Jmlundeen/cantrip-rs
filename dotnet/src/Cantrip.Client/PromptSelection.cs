@@ -45,6 +45,14 @@ public sealed class PromptSelection
     public ActionOptionMessage? Targeting { get; set; }
 
     /// <summary>
+    /// The colour, or one per mana, already chosen for the mana ability being aimed (<see cref="Targeting"/>): a menu row names
+    /// it before the permanents its cost taps are picked (Supportive Parents' two creatures, CR 605.1a), and the answer sent
+    /// once they are carries it.
+    /// </summary>
+    public ColorView? TargetingColor { get; set; }
+    public List<ColorView> TargetingColors { get; } = [];
+
+    /// <summary>
     /// The options of one ability whose cost taps or sacrifices a permanent of the player's choosing (Urza, Lord High
     /// Artificer; Squandered Resources), held while that permanent is picked on the board. Nothing is activated yet.
     /// </summary>
@@ -95,6 +103,8 @@ public sealed class PromptSelection
         DividedShares.Clear();
         CounterRemovals.Clear();
         Targeting = null;
+        TargetingColor = null;
+        TargetingColors.Clear();
         CostChoice = null;
         NameTyped = string.Empty;
         Announced = null;

@@ -541,18 +541,29 @@ public sealed partial class MainPage
         IReadOnlyList<ColorView>? combination = null,
         ViewHandle? sacrifice = null)
     {
+        // The colour a mana row named is kept while the permanents its cost taps are picked (Supportive Parents).
         if (CardActions.NeedsATarget(option))
         {
             _targeting = option;
+            _selection.TargetingColor = color;
+            _selection.TargetingColors.Clear();
+            _selection.TargetingColors.AddRange(combination ?? []);
             PeekAtTargets(client, option.TargetCandidates);
             _needsRedraw = true;
             return;
         }
 
+        TakeActionAnswer answer = Taking(option, color, combination);
+        answer.Sacrifice = sacrifice;
+        Send(client, answer);
+    }
+
+    /// <summary>An action taken, with the colour or colours chosen for the mana it adds.</summary>
+    private static TakeActionAnswer Taking(ActionOptionMessage option, ColorView? color, IReadOnlyList<ColorView>? combination)
+    {
         TakeActionAnswer answer = AnswerFor(option);
         answer.Color = color;
         answer.Colors = [.. combination ?? []];
-        answer.Sacrifice = sacrifice;
 
         // Colorless is not a colour (CR 105.1), so a choice of colorless alone is answered as the mana type instead.
         if (CardActions.ChoosesColorless(option))
@@ -560,7 +571,7 @@ public sealed partial class MainPage
             answer.Mana = ManaTypeView.Colorless;
         }
 
-        Send(client, answer);
+        return answer;
     }
 
     private static string Sacrificed(GameClient client, ViewHandle? sacrifice) =>
@@ -597,7 +608,7 @@ public sealed partial class MainPage
     private void Aim(GameClient client, TargetMessage target)
     {
         (int count, bool upTo) = _targeting is { } announced
-            ? (1, announced.TargetsOptional)
+            ? (Math.Max(announced.TargetsRequired, 1), announced.TargetsOptional)
             : client.Prompt?.Prompt is ChooseTargetPromptMessage asked ? (asked.Count, asked.Optional || asked.Minimum > 0) : (1, false);
 
         if (_pickedTargets.RemoveAll(picked => Same(picked, target)) == 0)
@@ -625,9 +636,15 @@ public sealed partial class MainPage
 
     private void SendTargets(GameClient client)
     {
-        Send(client, _targeting is { } announced
-            ? AnswerFor(announced, _pickedTargets.Count > 0 ? _pickedTargets[0] : null)
-            : new TargetsChosenAnswer { Targets = [.. _pickedTargets] });
+        if (_targeting is { } announced)
+        {
+            TakeActionAnswer answer = Taking(announced, _selection.TargetingColor, _selection.TargetingColors);
+            answer.Targets = [.. _pickedTargets];
+            Send(client, answer);
+            return;
+        }
+
+        Send(client, new TargetsChosenAnswer { Targets = [.. _pickedTargets] });
     }
 
     /// <summary>
@@ -671,14 +688,13 @@ public sealed partial class MainPage
     /// </summary>
     private bool _tappedAfterMana;
 
-    private static TakeActionAnswer AnswerFor(ActionOptionMessage option, TargetMessage? target = null) => new()
+    private static TakeActionAnswer AnswerFor(ActionOptionMessage option) => new()
     {
         Kind = option.Kind,
         Source = option.Source,
         AbilityIndex = option.AbilityIndex,
         OptionId = option.OptionId,
         Tap = option.Tap,
-        Targets = target is null ? [] : [target],
         Mana = option.Kind is ActionKindView.AssignMana or ActionKindView.PayLifeForSymbol ? option.Produces[0] : null,
         Filter = option.Filter,
         Effect = option.Effect,

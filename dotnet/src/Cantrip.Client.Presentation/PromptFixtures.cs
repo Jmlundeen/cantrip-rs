@@ -189,6 +189,7 @@ public static class PromptFixtures
         "priority-animated-land",
         "priority-sacrifice-for-mana",
         "priority-tap-for-mana",
+        "priority-tap-two-for-mana",
         "targeting",
         "targeting-optional",
         "discard-one",
@@ -619,6 +620,12 @@ public static class PromptFixtures
             case "priority-tap-for-mana":
                 // Urza, Lord High Artificer, clicked: which artifact to tap is picked on the board, the way a target is.
                 return TapForMana(view);
+
+            case "priority-tap-two-for-mana":
+                // Supportive Parents, clicked: a mana ability whose cost taps two creatures of the player's choosing, offered
+                // as its option's targets since a mana ability has none of its own (CR 605.1a). The colour is named on the menu
+                // row, then both creatures are picked on the board.
+                return TapTwoForMana(view);
 
             case "targeting":
                 return Priority();
@@ -3471,6 +3478,43 @@ public static class PromptFixtures
                 Description = "Tap an untapped artifact you control: Add {U}.",
             });
         }
+        return priority;
+    }
+
+    private static PriorityPromptMessage TapTwoForMana(PlayerView view)
+    {
+        view.Objects.RemoveAll(o => o.Zone == ZoneKindView.Battlefield && o.Controller == Viewer);
+        var battlefield = Zone(view, ZoneKindView.Battlefield, 0);
+        battlefield.Contents.RemoveAll(h => h.Value is MySwamp or MySwampTwo or MySwampTapped or MyLurker or MyBrute);
+        var priority = new PriorityPromptMessage { Player = Viewer };
+        var tapsTwo = new ActionOptionMessage
+        {
+            Kind = ActionKindView.ActivateAbility, Source = new ViewHandle(MyLurker),
+            CostText = "Tap two untapped creatures you control", ProducesOfAnyOneColor = 1,
+            ColorChoices = [ColorView.White, ColorView.Blue, ColorView.Black, ColorView.Red, ColorView.Green],
+            Description = "Tap two untapped creatures you control: Add one mana of any color.",
+            TargetsRequired = 2,
+        };
+        foreach (var (id, name, text) in new[]
+        {
+            (MyLurker, "Supportive Parents", "Tap two untapped creatures you control: Add one mana of any color."),
+            (MyKey, "Grizzly Bears", string.Empty),
+            (MyKeyTwo, "Runeclaw Bear", string.Empty),
+        })
+        {
+            var creature = new ObjectView
+            {
+                Handle = new ViewHandle(id), Zone = ZoneKindView.Battlefield,
+                Kind = ObjectKindView.Card, Owner = Viewer, Controller = Viewer,
+                Name = name, CardTypes = [CardTypeView.Creature], Colors = [ColorView.Green], Power = 2, Toughness = 2,
+                OracleText = text,
+            };
+            view.Objects.Add(creature);
+            battlefield.Contents.Add(creature.Handle);
+            tapsTwo.TargetCandidates.Add(new TargetMessage { Object = creature.Handle });
+        }
+
+        priority.Options.Add(tapsTwo);
         return priority;
     }
 

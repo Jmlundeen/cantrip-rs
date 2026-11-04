@@ -62,6 +62,36 @@ public sealed class PromptGalleryTests(WebClient web)
     }
 
     /// <summary>
+    /// Supportive Parents' "Tap two untapped creatures you control: Add one mana of any color.": the colour is named on the
+    /// menu row, the dock then asks for the two creatures the cost taps, and the second click activates it with both and the
+    /// colour (CR 605.1a - the option's targets are its cost's permanents).
+    /// </summary>
+    [Fact]
+    public async Task A_mana_ability_that_taps_two_creatures_is_activated_with_both_and_its_colour()
+    {
+        const string Fixture = "priority-tap-two-for-mana";
+        await using TablePage table = await TablePage.OpenAsync(
+            web, $"prompt={Fixture}", WebClient.Pictures(nameof(PromptGalleryTests)));
+        TableState opened = await table.SettledAsync(state => state.Fixture == Fixture);
+        int parents = opened.Cards.First(card => card.Name == "Supportive Parents").Handle;
+        int bears = opened.Cards.First(card => card.Name == "Grizzly Bears").Handle;
+
+        await table.ClickCardAsync("Supportive Parents");
+        await table.ClickAsync("Add {G}");
+        TableState asked = await table.SettledAsync(state => state.Title.StartsWith("Tap two untapped creatures", StringComparison.Ordinal));
+        Assert.Contains("0 of 2 chosen, from 3", asked.Detail, StringComparison.Ordinal);
+
+        await table.ClickCardAsync("Supportive Parents");
+        await table.SettledAsync(state => state.Detail.Contains("1 of 2 chosen", StringComparison.Ordinal));
+        Assert.Empty((await table.SettledAsync()).Answered);
+        await table.ClickCardAsync("Grizzly Bears");
+        TableState activated = await table.SettledAsync(state => state.Answered.Length > 0);
+
+        Assert.Equal($"TakeActionAnswer ActivateAbility {parents} > {parents},{bears} Green", activated.Answered);
+        Assert.Empty(table.Errors);
+    }
+
+    /// <summary>
     /// A list of options too long for a button each - every creature type - is found by typing: the box narrows the
     /// buttons to what matches, a click on one answers with that option, and Enter takes the one the typing settles on.
     /// </summary>

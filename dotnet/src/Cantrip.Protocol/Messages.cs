@@ -2253,7 +2253,11 @@ public sealed class ActionOptionMessage
     [Key(2)]
     public int AbilityIndex { get; set; }
 
-    /// <summary>How many targets this action needs, zero for none.</summary>
+    /// <summary>
+    /// How many targets this action needs, zero for none. A mana ability has no targets (CR 605.1a): on one, these are the
+    /// permanents its cost taps or sacrifices when it takes more than one of the player's choosing (Supportive Parents' two
+    /// creatures), named in the answer's targets, all different.
+    /// </summary>
     [Key(3)]
     public int TargetsRequired { get; set; }
 
