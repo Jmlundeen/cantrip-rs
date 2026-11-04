@@ -1,0 +1,65 @@
+# Summon: Fat Chocobo ({4}{G}, 4/4 Enchantment Creature - Saga Bird): "I - Wark - Create a 2/2 green Bird creature token with 'Whenever
+# a land you control enters, this token gets +1/+0 until end of turn.' II, III, IV - Kerplunk - Creatures you control gain trample
+# until end of turn." Bot1 casts it on turn 1 (Black Lotus's three green, Mox Emerald and Mox Ruby: exactly five): chapter I makes the
+# Bird token. On turn 3 chapter II gives the token and the Saga trample; Birds of Paradise, cast afterwards, does not have it (CR
+# 611.2c), and on turn 4 it has ended. Chapter III (turn 5) does it again, now for Birds of Paradise too; chapter IV (turn 7) the
+# same, and the Saga, with as many lore counters as its last chapter, is sacrificed once IV has left the stack (CR 714.4) - the token
+# keeps the trample it was given that turn.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Summon: Fat Chocobo
+Birds of Paradise
+Forest
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Summon: Fat Chocobo.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bird Token.Power = 2
+? Bot1.Battlefield.Bird Token.Keywords = (absent)
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Summon: Fat Chocobo.Keywords = Trample
+? Bot1.Battlefield.Bird Token.Keywords = Trample
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Birds of Paradise.Keywords = Flying
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Bird Token.Keywords = (absent)
+? Bot1.Battlefield.Summon: Fat Chocobo.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Birds of Paradise.Keywords = Flying; Trample
+? Bot1.Battlefield.Summon: Fat Chocobo.Keywords = Trample
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Summon: Fat Chocobo.Keywords = (absent)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bird Token.Keywords = Trample
+
+[Expect]
+Bot1.Graveyard = Summon: Fat Chocobo; Black Lotus
