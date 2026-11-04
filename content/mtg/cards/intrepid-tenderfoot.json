@@ -1,0 +1,8 @@
+{
+  "name": "Intrepid Tenderfoot",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Insect Citizen",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{3}: Put a +1/+1 counter on this creature. Activate only as a sorcery."
+}

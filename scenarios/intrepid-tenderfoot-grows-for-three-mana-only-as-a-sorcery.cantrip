@@ -1,0 +1,49 @@
+# Intrepid Tenderfoot: "{3}: Put a +1/+1 counter on this creature. Activate only as a sorcery." Three mana adds one counter (the pool is spent exactly); it is refused on the opponent's turn even with three mana available (a Black Lotus is up) (CR 307.1 timing restriction), but can again on its controller's next main phase.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Intrepid Tenderfoot
+Black Lotus
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Intrepid Tenderfoot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Intrepid Tenderfoot.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Intrepid Tenderfoot.Power = 3
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+! Bot1.Battlefield.Intrepid Tenderfoot.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Intrepid Tenderfoot.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Intrepid Tenderfoot.Power = 4
+Bot1.Battlefield.Intrepid Tenderfoot.Toughness = 4
