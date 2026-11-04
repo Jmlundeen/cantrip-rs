@@ -1,0 +1,36 @@
+# Tifa's Limit Break ({G}, tiered), Somersault - {0}: "Target creature gets +2/+2 until end of turn." Bot1 casts Savannah Lions (2/1)
+# with a Mox Pearl, then the instant with a Forest alone, and the Lions are 4/3 with the pool empty (the tier costs nothing more); on
+# turn 3 they are 2/1 again.
+
+[Bot1 Deck]
+Mox Pearl
+Forest
+Tifa's Limit Break
+Savannah Lions
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Tifa's Limit Break.Cast
+Bot1.Modes(Somersault)
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Savannah Lions.Power = 4
+? Bot1.Battlefield.Savannah Lions.Toughness = 3
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Savannah Lions.Power = 2
+Bot1.Battlefield.Savannah Lions.Toughness = 1
+Bot1.Graveyard = Tifa's Limit Break

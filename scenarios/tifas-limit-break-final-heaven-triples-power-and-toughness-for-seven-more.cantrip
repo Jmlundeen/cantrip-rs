@@ -1,0 +1,55 @@
+# Tifa's Limit Break ({G}, tiered), Final Heaven - {6}{G}: "Triple target creature's power and toughness until end of turn" (CR 701.11): eight
+# mana in all, {G}{G} and six more, paid exactly. Bot1 casts Savannah Lions (2/1) off a Plains on turn 1, with a Black Lotus
+# and a Sol Ring and Mox Emerald held back; on turn 3 the Lotus (three green), Sol Ring (two), Mox Emerald, Mox Ruby and the drawn
+# Forest pay it, and the Lions are 6/3 - tripling, not doubling (4/2) or +2/+2 (4/3); the pool is empty. On turn 5 they are 2/1.
+
+
+[Bot1 Deck]
+Plains
+Savannah Lions
+Tifa's Limit Break
+Black Lotus
+Sol Ring
+Mox Emerald
+Mox Ruby
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Tifa's Limit Break.Cast
+Bot1.Modes(Final Heaven)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Savannah Lions.Power = 6
+? Bot1.Battlefield.Savannah Lions.Toughness = 3
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Savannah Lions.Power = 2
+Bot1.Battlefield.Savannah Lions.Toughness = 1

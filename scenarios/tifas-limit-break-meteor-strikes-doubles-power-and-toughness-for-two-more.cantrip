@@ -1,0 +1,44 @@
+# Tifa's Limit Break ({G}, tiered), Meteor Strikes - {2}: "Double target creature's power and toughness until end of turn." The cost is
+# {G} and {2}: three mana, paid exactly (the pool is empty after Mox Emerald, Mox Ruby and Mox Jet). Bot1 plays a Plains for
+# Savannah Lions (2/1), then the Lions are 4/2 - doubling, not +2/+2 (4/3) or tripling (6/3); on turn 3 they are 2/1 again.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Mox Jet
+Tifa's Limit Break
+Savannah Lions
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Tifa's Limit Break.Cast
+Bot1.Modes(Meteor Strikes)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Savannah Lions.Power = 4
+? Bot1.Battlefield.Savannah Lions.Toughness = 2
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Savannah Lions.Power = 2
+Bot1.Battlefield.Savannah Lions.Toughness = 1

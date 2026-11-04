@@ -1,0 +1,66 @@
+# Tifa's Limit Break, Final Heaven (CR 701.11): power and toughness are 32-bit, so tripling past 16,384 is exact. Jumbo Cactuar
+# (1/7) is cast on turn 1 with two Black Lotuses and Mox Emerald, exactly seven mana. On turn 5 it attacks and Bot2's Steel Wall blocks; it is a 10000/7
+# (+9999/+0 until end of turn); then Final Heaven ({G} and {6}{G}, eight mana: a third Black Lotus, Sol Ring, Mox Emerald, Mox
+# Ruby and a Forest) gives it +20000/+14, so it is a 30000/21 - not wrapped, not clamped - and the pool is empty. On turn 6 it is
+# a 1/7 again.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Jumbo Cactuar
+Black Lotus
+Tifa's Limit Break
+Sol Ring
+Mox Ruby
+Forest
+Forest x14
+
+[Bot2 Deck]
+Black Lotus
+Steel Wall
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jumbo Cactuar.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Steel Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Attack(Jumbo Cactuar > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Block(Steel Wall > Jumbo Cactuar)
+? Bot1.Battlefield.Jumbo Cactuar.Power = 10000
+Bot1.Hand.Tifa's Limit Break.Cast
+Bot1.Modes(Final Heaven)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jumbo Cactuar.Power = 30000
+? Bot1.Battlefield.Jumbo Cactuar.Toughness = 21
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Jumbo Cactuar.Power = 1
+? Bot1.Battlefield.Jumbo Cactuar.Toughness = 7
+
+[Expect]
+Bot1.Battlefield.Jumbo Cactuar.Power = 1
+Bot2.Graveyard = Steel Wall; Black Lotus
