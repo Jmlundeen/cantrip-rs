@@ -1,0 +1,38 @@
+# Germinating Wurm: {4}{G} is paid exactly by five Moxen (the pool is empty after the cast), and "When this creature enters, you gain 2 life" takes Bot1 from 20 to 22
+# when the trigger resolves, not when the Wurm is cast. The 5/5 stays on the battlefield.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Germinating Wurm
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Germinating Wurm.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Germinating Wurm.Power = 5
+Bot1.Battlefield.Germinating Wurm.Toughness = 5

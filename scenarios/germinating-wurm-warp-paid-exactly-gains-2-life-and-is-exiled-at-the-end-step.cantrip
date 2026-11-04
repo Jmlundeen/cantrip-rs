@@ -1,0 +1,30 @@
+# Germinating Wurm's warp {1}{G} (CR 702.185a): Mox Emerald's {G} and Mox Pearl's {W} pay it exactly, with the pool empty after; a Mox Pearl alone is refused ({G} is needed).
+# The enters trigger gains Bot1 2 life, then at the beginning of the next end step the Wurm is exiled.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Germinating Wurm
+Island x17
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Germinating Wurm.Cast(Ability: Warp; Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Germinating Wurm.Cast(Ability: Warp)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+[Bot1.End]
+
+[Expect]
+Bot1.Life = 22
+Exile = Germinating Wurm
