@@ -1,0 +1,29 @@
+# Temporal Intervention's void (CR 601.2f): a spell warped this turn counts too. Susurian Voidborn is cast for its warp cost {B} from a Swamp, and then Temporal Intervention costs {B}, paid exactly
+# by Mox Jet (at full price it could not be paid by one Mox).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Susurian Voidborn
+Temporal Intervention
+Swamp x14
+
+[Bot2 Deck]
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Susurian Voidborn.Cast(Ability: Warp)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Temporal Intervention.Cast(Bot2)
+? Bot1.Mana = 
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt

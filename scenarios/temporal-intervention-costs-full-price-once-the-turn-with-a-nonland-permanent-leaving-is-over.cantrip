@@ -1,0 +1,41 @@
+# Temporal Intervention: "Void — This spell costs {2} less to cast if a nonland permanent left the battlefield this turn or a
+# spell was warped this turn." On turn 1 Black Lotus is sacrificed for mana (a nonland permanent left), which counts only for that
+# turn. On turn 3 it costs its full {2}{B}: two Moxen cannot pay it (refused), the third pays it exactly (the pool is empty).
+# Target opponent reveals their hand and Bot1 chooses a nonland card (an Island is refused): Bot2 discards the Gorilla (and, earlier,
+# an Island to hand size).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Temporal Intervention
+Swamp x15
+
+[Bot2 Deck]
+Lightning Bolt
+Guerrilla Gorilla
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Temporal Intervention.Cast(Bot2; Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Temporal Intervention.Cast(Bot2)
+? Bot1.Mana = 
+Bot1.Pass
+! Bot1.Choose(Island)
+Bot1.Choose(Guerrilla Gorilla)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Temporal Intervention; Black Lotus
+Bot2.Graveyard = Guerrilla Gorilla; Island
+Bot2.Hand.Count = 6

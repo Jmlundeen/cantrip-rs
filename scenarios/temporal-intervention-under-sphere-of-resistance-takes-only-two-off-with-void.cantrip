@@ -1,0 +1,41 @@
+# Temporal Intervention's void reduction is {2}, applied after increases (CR 601.2f): under Bot2's Sphere of Resistance it costs
+# {3}{B}, and after Black Lotus is sacrificed this turn {1}{B}. Of the four black mana (the Lotus and Mox Jet), two are left.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Temporal Intervention
+Swamp x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Sphere of Resistance
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sphere of Resistance.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Temporal Intervention.Cast(Bot2)
+? Bot1.Mana = {B}{B}
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt

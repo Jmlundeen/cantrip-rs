@@ -1,0 +1,6 @@
+{
+  "name": "Temporal Intervention",
+  "manaCost": "{2}{B}",
+  "type": "Sorcery",
+  "oracleText": "Void — This spell costs {2} less to cast if a nonland permanent left the battlefield this turn or a spell was warped this turn.\nTarget opponent reveals their hand. You choose a nonland card from it. That player discards that card."
+}

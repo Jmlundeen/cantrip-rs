@@ -1,0 +1,27 @@
+# Temporal Intervention's void (CR 601.2f): Black Lotus is sacrificed for mana (a nonland permanent left the battlefield this turn), so the spell costs {2} less, {B}: of
+# the four black mana (Mox Jet and the Lotus) three are left after paying. It targets an opponent only: Bot1 itself is refused.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Temporal Intervention
+Swamp x16
+
+[Bot2 Deck]
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Hand.Temporal Intervention.Cast(Bot1)
+Bot1.Hand.Temporal Intervention.Cast(Bot2)
+? Bot1.Mana = {B}{B}{B}
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
