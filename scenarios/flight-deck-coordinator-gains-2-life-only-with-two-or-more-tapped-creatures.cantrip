@@ -1,0 +1,38 @@
+# Flight-Deck Coordinator: "At the beginning of your end step, if you control two or more tapped creatures, you gain 2 life" (CR 603.4).
+# On turn three the Coordinator and a Memnite attack (two tapped creatures, the lower bound, the Coordinator itself one) and Bot1 gains 2
+# life at the end step (the attacks hit Bot2, so Bot1 is at 20 in the main phase and 22 after the end step). On turn
+# five only the Memnite attacks (one tapped creature, just under the bound) and Bot1 gains nothing.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Flight-Deck Coordinator
+Memnite
+Plains x11
+
+[Bot2 Deck]
+Plains x13
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Flight-Deck Coordinator.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Flight-Deck Coordinator > Bot2; Memnite > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Life = 20
+[T4 Bot2.Main1]
+? Bot1.Life = 22
+[T5 Bot1.Main1]
+Bot1.Attack(Memnite > Bot2)
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 15
