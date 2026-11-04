@@ -1,0 +1,45 @@
+# Codecracker Hound, Warp {2}{U}: Bot1 has Mox Sapphire, Mox Jet and Mox Ruby, exactly {2}{U} with the {U} from the Sapphire. With only the Jet and
+# the Ruby the warp cast is refused (short). Cast with warp, its enters trigger looks at the top two (Ancestral Recall, Lightning Bolt): Bot1 takes the
+# Bolt, the Recall goes to the graveyard. At the beginning of the next end step the Hound is exiled.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Codecracker Hound
+Island
+Island
+Island
+Ancestral Recall
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Codecracker Hound.Cast(Ability: Warp; Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Codecracker Hound.Cast(Ability: Warp)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Lightning Bolt | Ancestral Recall)
+? Bot1.Battlefield.Codecracker Hound.Power = 2
+[Bot1.End]
+
+[Expect]
+Bot1.Exile.Codecracker Hound.Power = 2
+Bot1.Hand = Island; Island; Island; Lightning Bolt
+Bot1.Graveyard = Ancestral Recall

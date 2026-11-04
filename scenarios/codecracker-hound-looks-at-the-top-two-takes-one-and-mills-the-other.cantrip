@@ -1,0 +1,46 @@
+# Codecracker Hound, cast for {2}{U}: "When this creature enters, look at the top two cards of your library. Put one into your hand and the other
+# into your graveyard." With Mox Sapphire ({U}) and Mox Jet only (2 mana) it cannot be cast (short by one); with Mox Ruby it is, paid exactly. The
+# top two are Ancestral Recall and Lightning Bolt: Bot1 takes the Recall, the Bolt goes to the graveyard; the rest of the library is untouched,
+# and so is the other player's.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Codecracker Hound
+Island
+Island
+Island
+Ancestral Recall
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Codecracker Hound.Cast(Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Codecracker Hound.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Ancestral Recall | Lightning Bolt)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Ancestral Recall
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 11
+Bot2.Library.Count = 13
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Codecracker Hound
