@@ -291,6 +291,22 @@ pub fn counters_on_each_of_subtype_you_control(g: &mut dyn Game, item: &StackIte
     of_subtype_you_control(g, item, subtype, false, kind, n)
 }
 
+/// "Other [subtype]s you control gain [keywords] until end of turn" (CR 611.2, 611.2c, 702): every permanent with the subtype that `item`'s
+/// controller controls as it resolves but its source, the subtype read through the words of the source's text (CR 612.2), and none that
+/// enters later. `SUBTYPE` is a `Subtype` as `u16` (`lands::sub`), `KEYWORDS` a `Keywords` as `u64` (`Keywords::of(&[Keyword::Flying]).0`).
+/// Cosmic Spider-Man (Spiders, five keywords) and Vulture, Scheming Scavenger (Villains, flying) print it.
+pub fn other_of_subtype_you_control_gain_until_end_of_turn<const SUBTYPE: u16, const KEYWORDS: u64>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let word = g.words(item.object).subtype(crate::lands::printed(SUBTYPE));
+    let others: Vec<ObjectId> =
+        g.permanents_of(item.controller).into_iter().filter(|&id| id != item.object && g.chars(id).has_subtype(word)).collect();
+    instruction(g, |g| {
+        for id in others {
+            g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords(KEYWORDS)), Duration::EndOfTurn);
+        }
+    });
+    Ok(())
+}
+
 /// "Put `n` `kind` counters on each other [subtype] you control": `counters_on_each_of_subtype_you_control` without the
 /// source. Thalia's Lieutenant (Humans), Rescue Retriever (Soldiers), Camellia, the Seedmiser (Squirrels), Agent Phil
 /// Coulson and Doctor Spectrum (Heroes) and Vampire Socialite (Vampires) print it, with one +1/+1 counter:
