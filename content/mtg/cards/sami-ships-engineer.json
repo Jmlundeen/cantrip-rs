@@ -1,0 +1,8 @@
+{
+  "name": "Sami, Ship's Engineer",
+  "manaCost": "{2}{R}{W}",
+  "type": "Legendary Creature — Human Artificer",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "At the beginning of your end step, if you control two or more tapped creatures, create a tapped 2/2 colorless Robot artifact creature token."
+}
