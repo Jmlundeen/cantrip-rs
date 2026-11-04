@@ -1,0 +1,32 @@
+# Uthros Scanship: "When this Spacecraft enters, draw two cards, then discard a card." Bot1 casts it ({3}{U}) and draws Phyrexian Soulgorger and Mox Ruby, neither in hand before, then discards the Mox Ruby it just drew: the discard comes after the draw, so a card just drawn can be the one discarded (CR 603.1, 701.9, 121.1). The hand ends two cards up from the cast and one down from the discard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Uthros Scanship
+Island
+Island
+Island
+Island
+Phyrexian Soulgorger
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Uthros Scanship.Cast
+Bot1.Pass
+Bot1.Choose(Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Phyrexian Soulgorger
+Bot1.Graveyard = Mox Ruby; Black Lotus
+Bot1.Battlefield.Uthros Scanship.Types = Artifact

@@ -1,0 +1,39 @@
+# Uthros Scanship: "It's an artifact creature at 8+" and "8+ | Flying": with seven charge counters, one short, it is not a creature, has no flying and no printed 4/4 (CR 721.2b). Bot1 taps Bebop & Rocksteady (power 7) to station it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Uthros Scanship
+Bebop & Rocksteady
+Island x24
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Uthros Scanship.Cast
+Bot1.Pass
+Bot1.Choose(Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bebop & Rocksteady.Cast
+Bot1.Pass
+Bot1.Battlefield.Uthros Scanship.Activate(Ability: Station)
+Bot1.Choose(Bebop & Rocksteady)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Uthros Scanship.Counters.Charge = 7
+Bot1.Battlefield.Uthros Scanship.Types = Artifact

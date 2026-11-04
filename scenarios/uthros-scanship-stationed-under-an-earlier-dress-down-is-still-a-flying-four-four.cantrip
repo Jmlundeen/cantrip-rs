@@ -1,0 +1,75 @@
+# Dress Down is on the battlefield before Uthros Scanship enters. Eight charge counters (Colossal Dreadmaw's 6, Grizzly
+# Bears' 2) turn on "8+ | Flying": one static ability whose effect began in layer 4, so its layer 6 and 7b parts keep
+# applying although Dress Down, earlier in layer 6, took the Scanship's abilities - a 4/4 with flying (CR 613.6, 721.2b).
+# It entered before it was a creature, so its enters trigger still drew two and discarded one.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Colossal Dreadmaw
+Grizzly Bears
+Dress Down
+Uthros Scanship
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Uthros Scanship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Uthros Scanship.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Uthros Scanship.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+? Bot1.Battlefield.Uthros Scanship.Counters.Charge = 8
+? Bot1.Battlefield.Uthros Scanship.Types = Artifact; Creature
+? Bot1.Battlefield.Uthros Scanship.Power = 4
+? Bot1.Battlefield.Uthros Scanship.Toughness = 4
+? Bot1.Battlefield.Uthros Scanship.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.Uthros Scanship.Types = Artifact; Creature
+Bot1.Battlefield.Uthros Scanship.Toughness = 4

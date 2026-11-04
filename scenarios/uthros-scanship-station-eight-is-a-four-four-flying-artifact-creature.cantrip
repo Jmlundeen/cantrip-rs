@@ -1,0 +1,43 @@
+# Uthros Scanship: "Station ... 8+ | Flying" and "It's an artifact creature at 8+": printed 4/4. Below eight charge counters it is only an artifact; Bot1 taps Phyrexian Soulgorger (power 8) to station it, putting eight counters, and it becomes a 4/4 artifact creature with flying (CR 702.184a, 721.2b).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Uthros Scanship
+Phyrexian Soulgorger
+Island x24
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Uthros Scanship.Cast
+Bot1.Pass
+Bot1.Choose(Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Phyrexian Soulgorger.Cast
+Bot1.Pass
+?Bot1.Battlefield.Uthros Scanship.Types = Artifact
+Bot1.Battlefield.Uthros Scanship.Activate(Ability: Station)
+Bot1.Choose(Phyrexian Soulgorger)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Uthros Scanship.Counters.Charge = 8
+Bot1.Battlefield.Uthros Scanship.Types = Artifact; Creature
+Bot1.Battlefield.Uthros Scanship.Power = 4
+Bot1.Battlefield.Uthros Scanship.Toughness = 4
+Bot1.Battlefield.Uthros Scanship.Keywords = Flying
