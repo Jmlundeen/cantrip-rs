@@ -1,0 +1,12 @@
+{
+  "name": "Hobgoblin, Mantled Marauder",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Creature — Goblin Human Villain",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Flying, haste\nWhenever you discard a card, Hobgoblin gets +2/+0 until end of turn.",
+  "keywords": [
+    "Flying",
+    "Haste"
+  ]
+}
