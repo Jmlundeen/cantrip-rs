@@ -1,0 +1,59 @@
+# Galvanizing Sawship: "It's an artifact creature at 3+" and "3+ | Flying, haste", printed 6/5. Bot1 taps three Raging Goblins (power 1 each) in turn on its turn five. With two charge counters, one short, it is only an artifact; with the third it is a 6/5 artifact creature with flying and haste, and it attacks the turn it was cast: Bot2 goes from 20 to 14 (CR 702.184a, 721.2b, 702.10).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Raging Goblin
+Raging Goblin
+Raging Goblin
+Mox Ruby
+Galvanizing Sawship
+Mox Jet
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Galvanizing Sawship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Galvanizing Sawship.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Galvanizing Sawship.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Galvanizing Sawship.Types = Artifact
+Bot1.Battlefield.Galvanizing Sawship.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin#3)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Galvanizing Sawship.Types = Artifact; Creature
+Bot1.Attack(Galvanizing Sawship > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Galvanizing Sawship.Counters.Charge = 3
+Bot1.Battlefield.Galvanizing Sawship.Power = 6
+Bot1.Battlefield.Galvanizing Sawship.Toughness = 5
+Bot1.Battlefield.Galvanizing Sawship.Keywords = Flying; Haste

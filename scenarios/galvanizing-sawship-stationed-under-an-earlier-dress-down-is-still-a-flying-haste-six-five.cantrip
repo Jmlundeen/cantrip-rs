@@ -1,0 +1,61 @@
+# Dress Down is on the battlefield before Galvanizing Sawship enters. Three charge counters turn on "3+ | Flying, haste": one static ability whose effect began in layer 4, so its layer 6 and 7b parts keep applying although Dress Down took the Sawship's abilities - a 6/5 with flying and haste that attacks the turn it was cast: Bot2 goes from 20 to 14 (CR 613.6, 721.2b). Without the continuing parts it would be a 0/0 and die.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Raging Goblin
+Raging Goblin
+Raging Goblin
+Dress Down
+Galvanizing Sawship
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Galvanizing Sawship.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dress Down.Types = Enchantment
+Bot1.Battlefield.Galvanizing Sawship.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Galvanizing Sawship.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Galvanizing Sawship.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin#3)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Galvanizing Sawship.Types = Artifact; Creature
+Bot1.Attack(Galvanizing Sawship > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Galvanizing Sawship.Power = 6
+Bot1.Battlefield.Galvanizing Sawship.Toughness = 5
+Bot1.Battlefield.Galvanizing Sawship.Keywords = Flying; Haste
