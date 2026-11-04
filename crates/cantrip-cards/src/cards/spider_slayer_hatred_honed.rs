@@ -29,13 +29,10 @@ fn destroy_that_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
     Ok(())
 }
 
-/// A colorless 1/1 Robot artifact creature token with flying: the 1/1 Robot with the keyword. Only Spider-Slayer makes it.
-static ROBOT_1_1_FLYING: CardDef = CardDef { keywords: Keywords::of(&[Keyword::Flying]), ..tokens::ROBOT_1_1 };
-
 /// "{6}, Exile this card from your graveyard: Create two tapped 1/1 colorless Robot artifact creature tokens with flying"
 /// (CR 111.1): both tokens made together, tapped (CR 701.7).
 fn make_robots(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let robot = g.card_id(&ROBOT_1_1_FLYING);
+    let robot = g.card_id(&tokens::ROBOT_1_1_FLYING);
     g.create_tokens(robot, item.controller, 2, true)?;
     Ok(())
 }
@@ -53,4 +50,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::SPIDER_SLAYER_HATRED_HONED
 };
 
-pub static EXTRA: &[&CardDef] = &[&ROBOT_1_1_FLYING];
+pub static EXTRA: &[&CardDef] = &[&tokens::ROBOT_1_1_FLYING];

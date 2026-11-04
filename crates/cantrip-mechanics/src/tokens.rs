@@ -196,6 +196,10 @@ pub static ROBOT_1_1: CardDef = CardDef {
     ..token!(Robot)
 };
 
+/// A colorless 1/1 Robot artifact creature token with flying: the 1/1 Robot with the keyword. Spider-Slayer, Hatred Honed and
+/// Robotics Mastery create it.
+pub static ROBOT_1_1_FLYING: CardDef = CardDef { keywords: Keywords::of(&[Keyword::Flying]), ..ROBOT_1_1 };
+
 /// A colorless 2/2 Robot artifact creature token. Melded Moxite and Pinnacle Starcage create it. It shares its name with
 /// the 1/1 Robot, a definition of its own.
 pub static ROBOT_2_2: CardDef = CardDef {
