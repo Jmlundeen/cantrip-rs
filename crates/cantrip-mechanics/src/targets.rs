@@ -383,6 +383,17 @@ fn instant_or_sorcery_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: 
 pub const INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD: TargetSpec =
     target(instant_or_sorcery_in_your_graveyard_filter);
 
+fn exiled_card_with_flashback_you_own_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if {
+        let obj = q.obj(id);
+        obj.zone.is(ZoneKind::Exile) && obj.became.is_none() && obj.owner == asker.controller && crate::flashback::has_flashback(q, id)
+    })
+}
+
+/// "Target exiled card with flashback you own" (CR 115.1, 702.34a): a card in exile that the controller owns, whoever exiled it,
+/// that has flashback itself. Runic Repetition, Rootcoil Creeper and Sorceress's Schemes print it.
+pub const EXILED_CARD_WITH_FLASHBACK_YOU_OWN: TargetSpec = target(exiled_card_with_flashback_you_own_filter);
+
 fn artifact_or_enchantment_card_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     card_in_graveyard(q, t, &[CardType::Artifact, CardType::Enchantment])
         && matches!(t, Target::Object(id) if q.obj(id).zone == Zone::graveyard(asker.controller))

@@ -1883,6 +1883,8 @@ pub enum WayKind {
     /// Mutate (CR 702.140a): cast for it, the card is a mutating creature spell (`mutating_face`) that targets a non-Human
     /// creature with the same owner (`intrinsic::MUTATE_TARGET`), and merges with it as it resolves (CR 702.140c, 730).
     Mutate,
+    /// Flashback (CR 702.34a): "a card with flashback" asks it of the card's own ways.
+    Flashback,
 }
 
 impl WayKind {
