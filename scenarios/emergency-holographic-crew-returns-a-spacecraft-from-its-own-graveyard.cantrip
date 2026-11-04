@@ -1,0 +1,31 @@
+# Crew's first mode returns a Spacecraft card from its controller's graveyard (CR 700.2c, 608.2c).
+# Entomb deliberately puts the ship there before Crew enters, without relying on combat.
+[Bot1 Deck]
+Emergency Holographic Crew
+Entomb
+Black Lotus
+Black Lotus
+Mox Sapphire
+Island x2
+Suurok-Class Science Vessel
+Island x12
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Suurok-Class Science Vessel)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Emergency Holographic Crew.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Hand = Island; Island; Suurok-Class Science Vessel
+Bot1.Graveyard = Black Lotus; Entomb; Black Lotus
+Bot1.Battlefield = Mox Sapphire; Emergency Holographic Crew
+
