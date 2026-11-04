@@ -1,0 +1,54 @@
+# Syr Vondam, Sunstar Exemplar {W}{B} 2/2: "Whenever another creature you control dies or is put into exile, put a +1/+1 counter on Syr Vondam and you gain 1 life." Bot1 casts Syr Vondam with the Pearl's W and the
+# Jet's B on turn 1, then a Memnite and an Ornithopter, and a Lightning Bolt from the Ruby kills its own Memnite: dies, so one counter (a 3/3) and 1 life (21). On turn 3 a Swords to Plowshares from the Pearl
+# exiles its own Ornithopter, a 0/2: put into exile, so a second counter (a 4/4) and 1 life more, besides the 0 the Swords gives for the Ornithopter's power: 22.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Syr Vondam, Sunstar Exemplar
+Memnite
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Swords to Plowshares
+Island x22
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Syr Vondam, Sunstar Exemplar.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Syr Vondam, Sunstar Exemplar.Counters.PlusOnePlusOne = 1
+? Bot1.Life = 21
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Syr Vondam, Sunstar Exemplar.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Syr Vondam, Sunstar Exemplar.Power = 4
+Bot1.Battlefield.Syr Vondam, Sunstar Exemplar.Toughness = 4

@@ -1,0 +1,59 @@
+# Syr Vondam, Sunstar Exemplar {W}{B} 2/2: "Whenever another creature YOU control dies or is put into exile, ..." Bot2's Memnite killed by Bot1's Lightning Bolt gives Bot1 no counter and no life (20 stays 20), nor does its own Black Lotus, a permanent that is no creature, sacrificed to pay for the Bolt.
+# "When Syr Vondam dies or is put into exile WHILE ITS POWER IS 4 OR GREATER, destroy up to one target nonland permanent": Bot1 then exiles its own Syr Vondam, a 2/2, with Swords to Plowshares (2 life
+# for its power, 22): the trigger does not happen: nothing is on the stack, no target is asked for, and Bot2's Mox Jet, a nonland permanent it could have chosen, stays.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Syr Vondam, Sunstar Exemplar
+Mox Ruby
+Lightning Bolt
+Black Lotus
+Island
+Swords to Plowshares
+Island x22
+
+[Bot2 Deck]
+Memnite
+Mox Jet
+Island x28
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Syr Vondam, Sunstar Exemplar.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Syr Vondam, Sunstar Exemplar.Power = 2
+? Bot1.Life = 20
+? Bot2.Battlefield.Count = 1
+? Stack.Count = 0
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Syr Vondam, Sunstar Exemplar)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 22
+Bot2.Battlefield = Mox Jet
+Bot1.Exile.Syr Vondam, Sunstar Exemplar.Power = 2

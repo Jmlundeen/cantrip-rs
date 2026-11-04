@@ -1,0 +1,55 @@
+# Syr Vondam, Sunstar Exemplar: "When Syr Vondam dies or is put into exile while its power is 4 or greater, ..." Bot1's Memnite is killed by one of Bot2's Lightning Bolts (one counter: a 3/3, 21 life), then
+# a second Bolt kills Syr Vondam itself, a 3/3 as it last was: its power is not 4 or greater, so the trigger does not happen: nothing is on the stack, no target is asked for, and Bot2's Mox Jet stays.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Syr Vondam, Sunstar Exemplar
+Memnite
+Island
+Island
+Island x24
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Lightning Bolt
+Lightning Bolt
+Island
+Island
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Syr Vondam, Sunstar Exemplar.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Syr Vondam, Sunstar Exemplar.Power = 3
+? Bot1.Life = 21
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Syr Vondam, Sunstar Exemplar)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Target
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 21
+Bot2.Battlefield = Mox Jet
+Bot1.Graveyard.Syr Vondam, Sunstar Exemplar.Power = 2
