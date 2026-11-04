@@ -1,0 +1,63 @@
+# Costume Closet: "Whenever a modified creature you control leaves the battlefield" looks back (CR 603.10a, 700.9). Bot2's Pest Control
+# destroys every nonland permanent with mana value 1 or less at once: Bot1's Ornithopter with Paradise Mantle attached and its Memnite
+# enchanted by Bot1's Holy Strength go to the graveyard together with the Equipment and the Aura. Each creature was modified as it last
+# existed, so the Closet (mana value 2, still there) triggers twice and has four counters.
+
+[Bot1 Deck]
+Costume Closet
+Mox Pearl
+Mox Jet
+Ornithopter
+Memnite
+Paradise Mantle
+Holy Strength
+Plains x20
+
+[Bot2 Deck]
+Pest Control
+Mox Pearl
+Mox Jet
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Costume Closet.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Holy Strength.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Pest Control.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Triggers(Costume Closet; Costume Closet)
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Costume Closet; Plains
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Costume Closet.Counters.PlusOnePlusOne = 4
+Stack.Count = 0
