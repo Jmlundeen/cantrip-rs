@@ -1,0 +1,82 @@
+# Susur Secundi, Void Altar: Raging Goblin (1) and Gigantosaurus (10) make eleven counters and the 12+ ability is not there (CR 721.2a);
+# the Grizzly Bears' 2 more make thirteen, and it is (twelve or more, not exactly twelve). It is sorcery speed: with a station ability
+# of the Ornithopter on the stack it is refused, though the land and the mana are ready. Sacrificing the Ornithopter, power 0, draws
+# no cards (CR 121.1, 608.2h), but its 2 life is paid (20 -> 18).
+
+[Bot1 Deck]
+Susur Secundi, Void Altar
+Mox Emerald
+Mox Jet
+Mox Ruby
+Raging Goblin
+Ornithopter
+Grizzly Bears
+Forest
+Black Lotus
+Gigantosaurus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Susur Secundi, Void Altar.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Susur Secundi, Void Altar.Counters.Charge = 11
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: {1}{B})
+Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Susur Secundi, Void Altar.Counters.Charge = 13
+Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: Station)
+Bot1.Choose(Ornithopter)
+! Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: {1}{B})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: {1}{B})
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot1.Battlefield.Susur Secundi, Void Altar.Counters.Charge = 13
+Bot1.Battlefield.Susur Secundi, Void Altar.Tapped = true

@@ -1,0 +1,64 @@
+# Susur Secundi, Void Altar: Gigantosaurus (10 power) stations it for ten counters, where the 12+ ability is not yet there (CR 721.2a);
+# Grizzly Bears (2) make exactly twelve, and now {1}{B}, {T}, pay 2 life, sacrifice a creature draws as many cards as the sacrificed
+# creature's power: Gigantosaurus, so ten (20 -> 18 life). The land entered tapped on turn 1 and is untapped to pay {T} on turn 5.
+
+[Bot1 Deck]
+Susur Secundi, Void Altar
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Grizzly Bears
+Gigantosaurus
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Susur Secundi, Void Altar.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Susur Secundi, Void Altar.Counters.Charge = 10
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: {1}{B})
+Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Susur Secundi, Void Altar.Counters.Charge = 12
+Bot1.Battlefield.Susur Secundi, Void Altar.Activate(Ability: {1}{B})
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand.Count = 10
+Bot1.Graveyard = Gigantosaurus; Black Lotus
+Bot1.Battlefield.Susur Secundi, Void Altar.Tapped = true
+Bot1.Battlefield.Grizzly Bears.Tapped = true
+Bot1.Mana =
