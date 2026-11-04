@@ -1,0 +1,23 @@
+# Power to Engines completes surveil before drawing (CR 701.25a, 608.2c).
+# Keeping Bolt and binning Counterspell proves the draw takes the kept card.
+[Bot1 Deck]
+Test of Priorities
+Black Lotus
+Island x5
+Lightning Bolt
+Counterspell
+Island x12
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Test of Priorities.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Lightning Bolt | Counterspell)
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Island; Lightning Bolt
+Bot1.Graveyard = Test of Priorities; Counterspell; Black Lotus
+Bot1.Library.Count = 12

@@ -1,0 +1,35 @@
+# Power to Life Support exiles a creature you control and returns it at the beginning of the next end step (CR 603.7c):
+# it is in exile while the ability waits, and back on the battlefield under its owner's control once that step begins.
+
+[Bot1 Deck]
+Test of Priorities
+Ornithopter
+Black Lotus
+Mox Sapphire
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Test of Priorities.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+? Bot1.Battlefield.Count = 0
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Ornithopter
+? Exile.Count = 0
+
+[Expect]
+Bot1.Battlefield = Ornithopter
+Exile.Count = 0
