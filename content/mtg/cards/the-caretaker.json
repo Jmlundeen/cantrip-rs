@@ -1,0 +1,11 @@
+{
+  "name": "The Caretaker",
+  "manaCost": "{5}{U}",
+  "type": "Legendary Creature — Elemental",
+  "power": 5,
+  "toughness": 6,
+  "oracleText": "Vigilance, ward {2}\nAt the beginning of each end step, if you faced a dilemma this turn, target opponent exiles cards from the top of their library until they exile a nonland card. You may cast that card without paying its mana cost. (You face a dilemma as you choose one or more modes for a spell or ability.)",
+  "keywords": [
+    "Vigilance"
+  ]
+}

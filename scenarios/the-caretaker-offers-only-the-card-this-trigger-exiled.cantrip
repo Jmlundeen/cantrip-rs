@@ -1,0 +1,61 @@
+# The Caretaker's first trigger (turn 3) exiles a Swamp and the Grizzly Bears and is declined; the second (turn 5) stops on
+# the Llanowar Elves, and only that card of this resolution may be cast: the Bears an earlier resolution exiled are
+# not offered (CR 608.2g, 607.2a).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+The Caretaker
+Archdruid's Charm
+Archdruid's Charm
+Mox Emerald
+Mox Emerald
+Forest
+Island x10
+
+[Bot2 Deck]
+Swamp x8
+Swamp
+Grizzly Bears
+Swamp
+Swamp
+Llanowar Elves
+Swamp x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.The Caretaker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(1)
+Bot1.Search()
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+Bot1.Choose()
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(1)
+Bot1.Search()
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.End]
+! Bot1.Choose(Grizzly Bears)
+Bot1.Choose(Llanowar Elves)
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Exile = Grizzly Bears; Swamp; Swamp

@@ -1,0 +1,46 @@
+# The Caretaker is cast on turn 1 (two Black Lotuses pay {5}{U}), then on turn 3 a modal Archdruid's Charm is cast with one
+# mode chosen - facing a dilemma - so at that end step the Caretaker targets Bot2, who exiles Swamps until a Grizzly Bears
+# is exiled, and Bot1 may cast the Bears without paying its mana cost.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+The Caretaker
+Archdruid's Charm
+Mox Emerald
+Mox Emerald
+Forest
+Island x10
+
+[Bot2 Deck]
+Swamp x10
+Grizzly Bears
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.The Caretaker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(1)
+Bot1.Search()
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+Bot1.Choose(Grizzly Bears)
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.The Caretaker.Power = 5
+Exile.Count = 2
