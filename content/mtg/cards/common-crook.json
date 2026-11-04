@@ -1,0 +1,8 @@
+{
+  "name": "Common Crook",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Human Rogue Villain",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature dies, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+}

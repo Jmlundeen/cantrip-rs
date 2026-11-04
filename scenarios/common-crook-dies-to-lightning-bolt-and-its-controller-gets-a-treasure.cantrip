@@ -1,0 +1,38 @@
+# Common Crook {1}{B} (2/2): "When this creature dies, create a Treasure token." On turn 2 Bot2 kills Bot1's Crook with Lightning Bolt;
+# the trigger makes a Treasure for Bot1, the Crook's controller, not for Bot2, who owns the Bolt. The Treasure is a real one:
+# it taps and is sacrificed for one mana of any color, and Bot1's mana pool shows it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Common Crook
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Common Crook.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Common Crook)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Common Crook
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Jet; Mox Ruby; Treasure Token
+? Bot2.Battlefield = Mox Ruby
+Bot1.Battlefield.Treasure Token.Activate(Color: B)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby
