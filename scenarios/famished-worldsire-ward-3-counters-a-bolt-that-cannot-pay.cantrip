@@ -1,0 +1,66 @@
+# Famished Worldsire's ward {3} (CR 702.21a): on Bot2's turn, a Lightning Bolt (3 damage, which would kill the 3/3 Worldsire) aimed at it with only one Mox Ruby's mana left, so Bot2 can't pay the ward cost: the Bolt is countered and Worldsire is unhurt. (The two Islands are Bot2's discards at its cleanups, over seven cards.)
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Famished Worldsire
+Forest
+Island
+Lightning Bolt
+Forest
+Swamp
+Grizzly Bears
+Mountain
+Plains x6
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Famished Worldsire.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Grizzly Bears)
+Bot1.Choose(Forest; Swamp)
+[T6 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Famished Worldsire)
+? Bot2.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Famished Worldsire.Damage = 0
+Bot1.Battlefield.Famished Worldsire.Toughness = 3
+Bot2.Graveyard = Lightning Bolt; Island; Island

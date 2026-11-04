@@ -1,0 +1,62 @@
+# Famished Worldsire: devour land 3 (CR 702.82a) - Bot1 sacrifices one of its two lands (the Island, not the Forest) as it enters: three +1/+1 counters, a 3/3. Its trigger then looks at the top
+# X = 3 cards (Lightning Bolt, Forest, Swamp; the fourth, a Grizzly Bears, is not looked at), Bot1 takes the Forest and the Swamp (not the Bolt), they enter tapped and the library is shuffled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Famished Worldsire
+Forest
+Island
+Lightning Bolt
+Forest
+Swamp
+Grizzly Bears
+Mountain
+Plains x6
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Famished Worldsire.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Grizzly Bears)
+Bot1.Choose(Forest; Swamp)
+
+[Expect]
+Bot1.Battlefield.Famished Worldsire.Power = 3
+Bot1.Battlefield.Famished Worldsire.Toughness = 3
+Bot1.Battlefield.Famished Worldsire.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Swamp.Tapped = true
+Bot1.Looked.Count = 3
+Bot1.Graveyard = Island; Black Lotus
+Bot1.Battlefield.Count = 9

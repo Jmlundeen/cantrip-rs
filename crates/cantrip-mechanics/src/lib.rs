@@ -164,6 +164,7 @@ pub mod ingest;
 pub mod provoke;
 pub mod flanking;
 pub mod dethrone;
+pub mod devour;
 pub mod sunburst;
 pub mod untap;
 pub mod vivid;

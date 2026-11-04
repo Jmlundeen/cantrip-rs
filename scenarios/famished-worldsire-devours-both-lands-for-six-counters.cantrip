@@ -1,0 +1,56 @@
+# Famished Worldsire: devour land 3 on both lands (CR 702.82a): six +1/+1 counters, a 6/6 (three times the number sacrificed), and its trigger looks at X = 6 cards: the Bolt, a Forest, a Swamp, a Grizzly Bears, a Mountain and a Plains; Bot1 takes the Forest and the Swamp.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Famished Worldsire
+Forest
+Island
+Lightning Bolt
+Forest
+Swamp
+Grizzly Bears
+Mountain
+Plains x6
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Famished Worldsire.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+Bot1.Choose(Island; Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Forest; Swamp)
+
+[Expect]
+Bot1.Battlefield.Famished Worldsire.Power = 6
+Bot1.Battlefield.Famished Worldsire.Counters.PlusOnePlusOne = 6
+Bot1.Looked.Count = 6
+Bot1.Graveyard = Forest; Island; Black Lotus
