@@ -1,0 +1,6 @@
+{
+  "name": "Dual-Sun Technique",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Target creature you control gains double strike until end of turn. If it has a +1/+1 counter on it, draw a card."
+}

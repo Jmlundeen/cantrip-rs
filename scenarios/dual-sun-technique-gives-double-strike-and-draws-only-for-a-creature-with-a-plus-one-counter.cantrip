@@ -1,0 +1,54 @@
+# Dual-Sun Technique: "Target creature you control gains double strike until end of turn. If it has a +1/+1 counter on it, draw a
+# card" (CR 702.4, 611.2a, 608.2c). It is refused for Bot2's Ornithopter (Bot1's creatures only). Aimed at Bot1's Dockworker Drone,
+# which entered with a +1/+1 counter, it gives double strike and draws a card; aimed at Bot1's Memnite, with no counter, it gives
+# double strike and draws nothing. On Bot2's turn neither has double strike any more.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Dockworker Drone
+Dual-Sun Technique
+Dual-Sun Technique
+Memnite
+Plains
+Plains x11
+
+[Bot2 Deck]
+Ornithopter
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Dockworker Drone.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+! Bot1.Hand.Dual-Sun Technique.Cast(Bot2.Battlefield.Ornithopter)
+? Bot1.Hand.Count = 4
+Bot1.Hand.Dual-Sun Technique.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Keywords = DoubleStrike
+? Bot1.Hand.Count = 3
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+? Bot1.Hand.Count = 4
+Bot1.Hand.Dual-Sun Technique.Cast(Bot1.Battlefield.Dockworker Drone)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dockworker Drone.Keywords = DoubleStrike
+? Bot1.Hand.Count = 4
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Memnite.Keywords = (absent)
+Bot1.Battlefield.Dockworker Drone.Keywords = (absent)
