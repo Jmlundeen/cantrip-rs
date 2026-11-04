@@ -1,0 +1,8 @@
+{
+  "name": "Selfcraft Mechan",
+  "manaCost": "{3}{U}",
+  "type": "Artifact Creature — Robot Artificer",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "When this creature enters, you may sacrifice an artifact. When you do, put a +1/+1 counter on target creature and draw a card."
+}

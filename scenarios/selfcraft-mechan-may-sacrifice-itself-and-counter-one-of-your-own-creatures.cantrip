@@ -1,0 +1,43 @@
+# Selfcraft Mechan is an artifact itself and "an artifact" (not "another") leaves it in (CR 701.21a): Bot1 sacrifices the Mechan
+# as the ability resolves, and the reflexive ability still happens (CR 603.12) - its target is Bot1's own Memnite, the only creature left (so
+# it is chosen without asking), and a creature of its own controller is a legal target. Memnite becomes 2/2, one card is drawn, and the four Moxen all stay.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Selfcraft Mechan
+Memnite
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Selfcraft Mechan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Selfcraft Mechan)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Selfcraft Mechan
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Memnite
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Hand.Count = 2
+Bot1.Library.Count = 12

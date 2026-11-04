@@ -1,0 +1,54 @@
+# Selfcraft Mechan {3}{U}, 3/4: "When this creature enters, you may sacrifice an artifact. When you do, put a +1/+1 counter on
+# target creature and draw a card." Bot1 sacrifices a Mox Jet as the ability resolves (CR 701.21a; at most one is asked for), and
+# the reflexive ability (CR 603.12) takes an opponent's creature, Memnite, as its target: a Mox is not a creature, so the other
+# Mox is refused. Memnite becomes 2/2 and Bot1 draws exactly one card.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Selfcraft Mechan
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Selfcraft Mechan.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mox Jet; Mox Ruby)
+Bot1.Choose(Mox Jet)
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Mox Jet
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Pearl; Selfcraft Mechan
+Bot2.Battlefield.Memnite.Power = 2
+Bot2.Battlefield.Memnite.Toughness = 2
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 11
