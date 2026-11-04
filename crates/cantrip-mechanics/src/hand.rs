@@ -204,10 +204,16 @@ pub fn may_put_onto_battlefield_attacking(
     let Some(card) = choose_from_hand(g, player, source, eligible)? else {
         return Ok(None);
     };
-    Ok(Some(match crate::combat::choose_attack_target(g, player, source)? {
+    Ok(Some(put_tapped_and_attacking(g, card, player, source)?))
+}
+
+/// `card` onto the battlefield tapped and attacking what its controller chooses (CR 508.4), or just tapped when there is nothing
+/// to attack (outside combat it is only tapped). The new object.
+pub fn put_tapped_and_attacking(g: &mut dyn Game, card: ObjectId, player: PlayerId, source: ObjectId) -> Result<ObjectId, Suspend> {
+    Ok(match crate::combat::choose_attack_target(g, player, source)? {
         Some(defender) => g.put_onto_battlefield_attacking(card, player, defender, &[])?,
         None => g.put_onto_battlefield(card, player, true)?,
-    }))
+    })
 }
 
 fn put_from_hand(
