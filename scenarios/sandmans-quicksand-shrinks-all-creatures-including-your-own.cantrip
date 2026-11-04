@@ -1,0 +1,40 @@
+# Sandman's Quicksand cast for {1}{B}{B} (no mayhem): all creatures get -2/-2 until end of turn. Bot1's own Ornithopter (0/2) dies,
+# and Bot2's Cogwork Librarian (3/3) is a 1/1.
+
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Sandman's Quicksand
+Swamp x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cogwork Librarian
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Cogwork Librarian.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sandman's Quicksand.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Ornithopter; Sandman's Quicksand; Black Lotus
+Bot2.Battlefield.Cogwork Librarian.Power = 1
+Bot2.Battlefield.Cogwork Librarian.Toughness = 1

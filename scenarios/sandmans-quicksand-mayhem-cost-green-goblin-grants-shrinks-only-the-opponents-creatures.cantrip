@@ -1,0 +1,71 @@
+# Sandman's Quicksand cast for the mayhem cost Green Goblin (Norman Osborn's back face) gives it ({1}{B}{B}, {2} less from the graveyard): that is a mayhem
+# cost too (CR 702.187b), so only the opponents' creatures shrink; Bot1's Ornithopter stays 0/2 and Bot2's Cogwork Librarian is 1/1.
+
+[Bot1 Deck]
+Norman Osborn
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Faithless Looting
+Sandman's Quicksand
+Island
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cogwork Librarian
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Norman Osborn.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Cogwork Librarian.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Norman Osborn.Activate(Ability: Transform)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Sandman's Quicksand; Swamp)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Graveyard.Sandman's Quicksand.Cast(Ability: #1)
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Cogwork Librarian.Power = 1

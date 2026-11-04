@@ -1,0 +1,51 @@
+# Sandman's Quicksand cast for its mayhem cost {3}{B} (CR 702.187a), discarded to Faithless Looting the same turn: "creatures your
+# opponents control get -2/-2 ... instead". Bot2's Cogwork Librarian (3/3) is a 1/1; Bot1's own Ornithopter (0/2) is untouched.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Sandman's Quicksand
+Ornithopter
+Black Lotus
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cogwork Librarian
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Cogwork Librarian.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Sandman's Quicksand; Swamp)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Graveyard.Sandman's Quicksand.Cast(Ability: Mayhem)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Cogwork Librarian.Power = 1
+Bot2.Battlefield.Cogwork Librarian.Toughness = 1
+Bot2.Graveyard.Count = 0
