@@ -1,0 +1,44 @@
+# Spider-Man Noir {4}{B} 4/4 menace: "Whenever a creature you control attacks alone, put a +1/+1 counter on it. Then surveil X, where
+# X is the number of counters on it" (CR 508.1, 122.1, 701.25). The first attack makes one counter and surveils 1 (Forest to the
+# graveyard); the second makes two counters and surveils 2 (Island and Savannah to the graveyard), so X counts every counter on it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Spider-Man Noir
+Swamp x3
+Plains
+Forest
+Mountain
+Island
+Savannah
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Man Noir.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Spider-Man Noir > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Forest)
+[T5 Bot1.Main1]
+Bot1.Attack(Spider-Man Noir > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Island; Savannah)
+
+[Expect]
+Bot1.Battlefield.Spider-Man Noir.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Spider-Man Noir.Power = 6
+Bot1.Graveyard = Savannah; Island; Forest; Black Lotus

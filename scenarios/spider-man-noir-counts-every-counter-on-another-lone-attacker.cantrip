@@ -1,0 +1,64 @@
+# Spider-Man Noir: "Whenever a creature you control attacks alone, put a +1/+1 counter on it. Then surveil X, where X is the number
+# of counters on it" (CR 506.5, 122.1, 701.25). "It" is the attacker, not Noir: Aboroth attacks alone while Noir stays home. Aboroth
+# already has an age counter and a -1/-1 counter from its cumulative upkeep (CR 702.24a), so with the +1/+1 counter it has three
+# counters of three kinds - the +1/+1 and -1/-1 pair is not removed until state-based actions are next checked (CR 704.5q) - and
+# Bot1 surveils 3, putting Plains, Mountain and an Island into the graveyard. Noir gets no counter and stays a 4/4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Gleemox
+Forest
+Aboroth
+Mox Jet
+Spider-Man Noir
+Swamp
+Plains
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Aboroth.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Aboroth.Counters.MinusOneMinusOne = 1
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Spider-Man Noir.Cast
+Bot1.Pass
+Bot1.Attack(Aboroth > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Plains; Mountain; Island)
+
+[Expect]
+Bot1.Graveyard.Count = 4
+Bot1.Graveyard.Plains.Colors.Count = 0
+Bot1.Graveyard.Mountain.Colors.Count = 0
+Bot1.Battlefield.Aboroth.Power = 9
+Bot1.Battlefield.Spider-Man Noir.Power = 4
