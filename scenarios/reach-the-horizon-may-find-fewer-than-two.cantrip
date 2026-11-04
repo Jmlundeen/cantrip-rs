@@ -1,0 +1,32 @@
+# Reach the Horizon: "up to two" (CR 701.23b): Bot1 takes just one of the two cards it may find, a Town, and the library is
+# still shuffled once; a second land is not forced on it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Reach the Horizon
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Forest
+Capital City
+Forest x18
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Reach the Horizon.Cast
+Bot1.Search(Capital City)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Battlefield.Capital City.Tapped = true
+Bot1.Shuffles = 1

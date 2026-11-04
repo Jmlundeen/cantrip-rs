@@ -1,0 +1,43 @@
+# Reach the Horizon ({3}{G}, sorcery): "Search your library for up to two basic land cards and/or Town cards with different
+# names, put them onto the battlefield tapped, then shuffle." Two Forests are one name too many (CR 201.2b) and a Tropical
+# Island is neither basic nor a Town, and three differently named cards are one more than "up to two", so all are refused;
+# a Forest and Capital City (a Town) are found, enter tapped, and
+# the library is shuffled once. Bot2's Forest stays in its own library.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Reach the Horizon
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Forest
+Forest
+Capital City
+Tropical Island
+Plains
+Forest x15
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Reach the Horizon.Cast
+! Bot1.Search(Forest; Forest)
+! Bot1.Search(Tropical Island)
+! Bot1.Search(Forest; Capital City; Plains)
+Bot1.Search(Forest; Capital City)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Capital City.Tapped = true
+Bot1.Shuffles = 1
+Bot2.Battlefield.Count = 0
