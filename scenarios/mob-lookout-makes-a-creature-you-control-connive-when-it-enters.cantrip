@@ -1,0 +1,47 @@
+# Mob Lookout ({1}{U/B}, 0/3): "When this creature enters, target creature you control connives." Turn 1 Bot1 casts an Ornithopter (0/2);
+# Bot2 casts its own on turn 2. Turn 3 Mob Lookout is paid with Mox Sapphire ({U}, the hybrid symbol) and Mox Jet. Its trigger may not
+# target Bot2's Ornithopter (the refusal); aimed at Bot1's Ornithopter, which connives (CR 701.50a): Bot1 draws an Island and
+# discards the Savannah Lions drawn for the turn, a nonland card, so the Ornithopter (not Mob Lookout) gets a +1/+1 counter (1/3).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Ornithopter
+Mob Lookout
+Island x3
+Savannah Lions
+Island x4
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mob Lookout.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Savannah Lions)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mob Lookout.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Savannah Lions

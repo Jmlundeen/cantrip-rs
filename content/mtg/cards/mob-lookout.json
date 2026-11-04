@@ -1,0 +1,8 @@
+{
+  "name": "Mob Lookout",
+  "manaCost": "{1}{U/B}",
+  "type": "Creature — Human Rogue Villain",
+  "power": 0,
+  "toughness": 3,
+  "oracleText": "When this creature enters, target creature you control connives. (Draw a card, then discard a card. If you discarded a nonland card, put a +1/+1 counter on that creature.)"
+}
