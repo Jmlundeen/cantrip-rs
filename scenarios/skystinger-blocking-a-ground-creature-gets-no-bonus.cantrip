@@ -1,0 +1,37 @@
+# Skystinger: blocking Bot2's Grizzly Bears (no flying) gives no +5/+0: it stays 3/3 (and kills the 2/2).
+
+[Bot1 Deck]
+Black Lotus
+Skystinger
+Island x18
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Skystinger.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Grizzly Bears > Bot1)
+Bot1.Block(Skystinger > Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Skystinger.Power = 3
+Bot1.Battlefield.Skystinger.Toughness = 3
+Bot2.Graveyard = Grizzly Bears

@@ -1,0 +1,39 @@
+# Skystinger: "Whenever this creature blocks a creature with flying, this creature gets +5/+0 until end of turn." It blocks Bot2's
+# Suntail Hawk (1/1 flying): 8/3 with the toughness untouched, the Hawk dies, and next turn it is 3/3 again.
+
+[Bot1 Deck]
+Black Lotus
+Skystinger
+Island x18
+
+[Bot2 Deck]
+Mox Pearl
+Suntail Hawk
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Skystinger.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Suntail Hawk.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Suntail Hawk > Bot1)
+Bot1.Block(Skystinger > Suntail Hawk)
+? Bot1.Battlefield.Skystinger.Power = 3
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Skystinger.Power = 8
+? Bot1.Battlefield.Skystinger.Toughness = 3
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Skystinger.Power = 3
+Bot1.Battlefield.Skystinger.Toughness = 3
+Bot2.Graveyard = Suntail Hawk

@@ -1,0 +1,40 @@
+# Bot2's Benalish Hero (banding) and Suntail Hawk (flying) attack as a band. Skystinger is declared to block the Hero, so
+# it blocks the Hawk too (CR 702.22h); "whenever this creature blocks a creature with flying" triggers for each attacker it
+# blocks (CR 509.3b), so it gets +5/+0 for the Hawk.
+
+[Bot1 Deck]
+Mox Emerald
+Black Lotus
+Skystinger
+Island x17
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Benalish Hero
+Suntail Hawk
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Skystinger.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Benalish Hero.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Suntail Hawk.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Benalish Hero > Bot1; Suntail Hawk > Bot1)
+Bot2.Choose(Suntail Hawk)
+Bot1.Block(Skystinger > Benalish Hero)
+[T4 Bot2.CombatDamage]
+? Bot1.Battlefield.Skystinger.Power = 8
+
+[Expect]
+Bot1.Life = 20

@@ -1,0 +1,11 @@
+{
+  "name": "Skystinger",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Insect Warrior",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Reach\nWhenever this creature blocks a creature with flying, this creature gets +5/+0 until end of turn.",
+  "keywords": [
+    "Reach"
+  ]
+}
