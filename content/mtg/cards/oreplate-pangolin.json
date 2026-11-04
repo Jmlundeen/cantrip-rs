@@ -1,0 +1,8 @@
+{
+  "name": "Oreplate Pangolin",
+  "manaCost": "{1}{R}",
+  "type": "Artifact Creature — Robot Pangolin",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Whenever another artifact you control enters, you may pay {1}. If you do, put a +1/+1 counter on this creature."
+}

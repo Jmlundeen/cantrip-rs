@@ -1,0 +1,51 @@
+# Oreplate Pangolin (2/2): "Whenever another artifact you control enters, you may pay {1}. If you do, put a +1/+1 counter on this
+# creature." The Pangolin itself entering triggers nothing ("another"). Memnite entering is paid for exactly with Mox Pearl's {W}
+# (the pool ends empty) and the Pangolin becomes 3/3 - a counter, both stats. Ornithopter entering is declined: still 3/3, and
+# the Pearl, left untapped, stays unspent.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Oreplate Pangolin
+Memnite
+Ornithopter
+Island x21
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Oreplate Pangolin.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Oreplate Pangolin.Power = 2
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Oreplate Pangolin.Power = 3
+? Bot1.Battlefield.Oreplate Pangolin.Toughness = 3
+? Bot1.Battlefield.Oreplate Pangolin.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield.Oreplate Pangolin.Power = 3
+Bot1.Battlefield.Oreplate Pangolin.Toughness = 3
+Bot1.Battlefield.Mox Pearl.Tapped = true
