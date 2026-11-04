@@ -952,6 +952,11 @@ pub trait Game: Query {
     /// "After this phase, there is an additional combat phase" (CR 500.8), from the precombat main phase or a combat phase: a
     /// whole combat phase, from its beginning, follows the combat phase that is under way (or the one that is next).
     fn add_combat_phase(&mut self);
+    /// "There is an additional end step after this step", from the end step: another end step follows the one under way,
+    /// with no other step between them: Y'shtola Rhul's ruling, "Additional end steps don't come with any other additional
+    /// steps (such as cleanup)". Abilities that trigger "at the beginning of the end step" trigger at its beginning too, and
+    /// "until end of turn" effects last until the cleanup step that follows the last of them (CR 514.2).
+    fn add_end_step(&mut self);
     /// "End the turn" (CR 724.1), from a resolving spell or ability: triggered abilities waiting to be put on the stack
     /// cease to exist (724.1a); every object on the stack is exiled, the resolving one included (724.1b), whose
     /// remaining instructions still happen after this; state-based actions are checked with no player given priority

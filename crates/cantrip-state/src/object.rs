@@ -2678,6 +2678,9 @@ pub struct Turn {
     /// Additional combat phases still to come this turn (CR 500.8): each follows the combat phase it was created in, or the
     /// precombat main phase's, as the end of combat step ends.
     pub extra_combats: u32,
+    /// Additional end steps still to come this turn ("there is an additional end step after this step"): each follows the
+    /// end step under way, as an end step alone, with no cleanup step between them (Y'shtola Rhul's ruling).
+    pub extra_end_steps: u32,
     /// The player whose turn in the ordinary rotation was taken last, while extra turns are being taken (CR 500.7: an
     /// extra turn is taken between turns and does not move the rotation); none while no extra turn has been taken.
     pub rotation: Option<PlayerId>,

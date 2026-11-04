@@ -106,6 +106,9 @@ pub fn next_step(game: &mut Game) {
             Some(Step::PostcombatMain) if ending == Step::EndOfCombat && turn.extra_combats > 0 => {
                 (turn.number, turn.active, Step::BeginCombat)
             }
+            // An additional end step follows the end step that ends, alone: the cleanup step comes after the last of them
+            // (Y'shtola Rhul's ruling).
+            Some(Step::Cleanup) if ending == Step::End && turn.extra_end_steps > 0 => (turn.number, turn.active, Step::End),
             Some(next) => (turn.number, turn.active, next),
             None => (turn.number + 1, next_turn_taker(s, turn.active), Step::Untap),
         }
@@ -119,8 +122,11 @@ pub fn next_step(game: &mut Game) {
         t.active = active;
         if number != turn.number {
             t.extra_combats = 0;
+            t.extra_end_steps = 0;
         } else if ending == Step::EndOfCombat && step == Step::BeginCombat {
             t.extra_combats -= 1;
+        } else if ending == Step::End && step == Step::End {
+            t.extra_end_steps -= 1;
         }
         t.set_step(step);
         t.priority = active;
