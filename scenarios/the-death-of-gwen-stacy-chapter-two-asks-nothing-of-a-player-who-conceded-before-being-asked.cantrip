@@ -1,0 +1,41 @@
+# The Death of Gwen Stacy chapter II in a three-player game: "Each player may discard a card." Bot1 discards a Swamp; then Bot3
+# concedes (CR 104.3a) while Bot2's choice is outstanding, and leaves the game (CR 800.4a), so it is never asked: the refusal of its
+# Choose holds and it loses no life. Bot2 declines and loses 3 (17) (CR 101.4, 608.2c).
+
+[Bot1 Deck]
+Black Lotus
+Memnite
+The Death of Gwen Stacy
+Swamp x4
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Death of Gwen Stacy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T4 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Choose(Swamp)
+Bot3.Concede
+Bot2.Choose()
+! Bot3.Choose(Island)
+
+[Expect]
+Bot3.Status = Lost
+Bot1.Life = 20
+Bot2.Life = 17

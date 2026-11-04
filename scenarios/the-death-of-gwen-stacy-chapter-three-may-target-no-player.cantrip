@@ -1,0 +1,33 @@
+# The Death of Gwen Stacy chapter III says "any number" of target players (CR 115.1d), and any number includes none: Bot1 chooses no
+# player, so no graveyard is exiled and Black Lotus stays in Bot1's. Both players discard a card to chapter II to lose nothing.
+
+[Bot1 Deck]
+Black Lotus
+The Death of Gwen Stacy
+Swamp x5
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Death of Gwen Stacy.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Swamp)
+Bot2.Choose(Island)
+[T5 Bot1.Main1]
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = The Death of Gwen Stacy; Swamp; Black Lotus
+Bot2.Graveyard.Count = 2

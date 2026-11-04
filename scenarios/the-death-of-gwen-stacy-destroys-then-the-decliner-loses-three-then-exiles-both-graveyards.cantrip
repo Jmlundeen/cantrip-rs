@@ -1,0 +1,41 @@
+# The Death of Gwen Stacy {2}{B} Saga. I: destroy target creature (Bot1's own Memnite). II (turn 3): each player may discard a card and each
+# who doesn't loses 3 life (CR 101.4, 608.2c): Bot1 discards a Swamp and loses nothing, Bot2 declines and goes to 17. III (turn 5): any
+# number of target players' graveyards are exiled (CR 115.1d, 406.2): both of them here, so Bot1's Black Lotus, Memnite and Swamp
+# leave, and the Saga, sacrificed after III (CR 714.4), is all that is left in Bot1's graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Memnite
+The Death of Gwen Stacy
+Swamp x4
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Death of Gwen Stacy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Memnite; Black Lotus
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Swamp; Swamp)
+Bot1.Choose(Swamp)
+Bot2.Choose()
+[T5 Bot1.Main1]
+Bot1.Target(Bot1; Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = The Death of Gwen Stacy

@@ -1,0 +1,35 @@
+# The Death of Gwen Stacy with no creature to destroy (chapter I is taken off the stack with no target, CR 603.3d). Chapter II
+# (turn 3): Bot1 declines and loses 3 life while Bot2 discards its Mountain (CR 701.9). Chapter III (turn 5) targets only Bot2, so Bot2's
+# graveyard (the Mountain) is exiled and Bot1's (Black Lotus) stays.
+
+[Bot1 Deck]
+Black Lotus
+The Death of Gwen Stacy
+Swamp x5
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Death of Gwen Stacy.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+Bot2.Choose(Mountain)
+[T5 Bot1.Main1]
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 20
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = The Death of Gwen Stacy; Black Lotus
