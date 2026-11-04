@@ -87,9 +87,10 @@ PROMPT = f"""Clear the pull-request queue of {REPO}.
 
 List the open pull requests (`gh pr list --repo {REPO} --state open`) and land each one through the `review-card-pr`
 skill and `add-cards/coordinator.md`, oldest first: a lease and a cherry-pick, an Opus review agent, a Sonnet fix agent
-for findings that change code, the reviewer's confirmation, then the landing (the test run it names, fetch and rebase,
-push, `card-issues.py log N landed` where the card has an issue, `gh pr comment` with the hashes and what the review
-found, `gh pr close`, release the lease). A pull request that adds no card still gets a review agent, against
+for findings that change code, the reviewer's confirmation, then the landing by merging the PR itself (the test run it
+names on the final head, force-push that head to the PR's branch, fast-forward `main` to it so GitHub marks the PR
+merged - never `gh pr close`; `card-issues.py log N landed` where the card has an issue, `gh pr comment` with the
+hashes and what the review found, release the lease). A pull request that adds no card still gets a review agent, against
 CLAUDE.md. List the queue again after each landing: new pull requests that arrive while you work are part of it.
 
 Before taking a new lease, read `tools\\worktree.cmd status`: a slot leased "for PR #N" whose pull request is still open

@@ -75,13 +75,32 @@ once the fix agent has left) to confirm each finding is resolved and
 nothing new is broken; loop until it passes, or stop and tell the user when a finding needs a decision only they can
 make. No blocking findings: nothing to fix.
 
-## 4. Land, and close the PR
+## 4. Land by merging the PR itself
 
-Land as `coordinator.md` step 5 says (the test run it names, `git fetch` and rebase before the push, push, `log <N>
-landed`). Then on the PR: `gh pr comment <N>` saying it landed, with the commit hashes on `main` and a short list of
-what the review found and what was changed, and `gh pr close <N>`. Delete `pr-<N>`, then `tools\worktree.cmd release
-<lease>`; the next PR takes a new lease. A PR that does not land: `release --discard --reason "PR #<N> not landed:
-..."`, since its commits stay on the PR.
+A PR lands **merged**, never closed: the reviewed and fixed commits go onto the PR's own branch, and `main` is
+fast-forwarded to that branch, so GitHub marks the PR merged with exactly the commits that were tested.
+
+- **A card that needs a rewrite from scratch** (the review finds its file unusable as a base, not a set of fixes) is
+  dropped from the PR, not rewritten in it: remove that card's commits, leave its issue open with a comment saying why,
+  and merge the rest. A PR whose every card needs that is not landed (below).
+- **Land** as `coordinator.md` step 5 says, but on the PR's branch:
+  1. Check that maintainers may push to it: `gh pr view <N> --json maintainerCanModify,headRepositoryOwner,headRefName`.
+     If `maintainerCanModify` is false, comment on the PR asking the contributor to allow edits by maintainers, and
+     wait; never close the PR to land it.
+  2. In the main checkout, put the slot's final commits on `main` (`git fetch`, `git rebase origin/main`, cherry-pick
+     `origin/main..<slot branch>`), and run the test run step 5 names on exactly that head.
+  3. If it passes, `git fetch` again. If `origin/main` moved, rebase, and run only the touched cards' scenarios (the
+     whole run again if the core moved).
+  4. Force-push that head to the PR's branch:
+     `git push --force-with-lease https://github.com/<owner>/<repo>.git HEAD:<headRefName>`.
+  5. Then fast-forward `main` to the same commit: `git push origin HEAD:main`. GitHub marks the PR merged by itself,
+     because its head is now on `main`.
+  6. Check with `gh pr view <N> --json state` that it says `MERGED`. Never `gh pr close`.
+- **Afterwards:** `card-issues.py log <N> landed --commit <sha>` for each card, and a `gh pr comment <N>` with the
+  commit range, what the review found and what was changed (and any card dropped, with why). Delete `pr-<N>`, then
+  `tools\worktree.cmd release <lease>`; the next PR takes a new lease.
+- **A PR that does not land at all:** comment on it with why, leave it open for the contributor, and `release --discard
+  --reason "PR #<N> not landed: ..."`, since its commits stay on the PR.
 
 ## 5. Report
 
