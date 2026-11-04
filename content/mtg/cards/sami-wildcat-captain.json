@@ -1,0 +1,12 @@
+{
+  "name": "Sami, Wildcat Captain",
+  "manaCost": "{4}{R}{W}",
+  "type": "Legendary Creature — Human Artificer Rogue",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Double strike, vigilance\nSpells you cast have affinity for artifacts. (They cost {1} less to cast for each artifact you control.)",
+  "keywords": [
+    "DoubleStrike",
+    "Vigilance"
+  ]
+}

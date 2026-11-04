@@ -1,0 +1,75 @@
+# Sami, Wildcat Captain {4}{R}{W} 4/4, double strike, vigilance: "Spells you cast have affinity for artifacts" (CR 702.41a, 604.1). Bot1 pays its {4}{R}{W} on turn one with Black Lotus and three Moxen. On turn two
+# Bot2, with two artifacts of its own, cannot cast Cost of Brilliance ({2}{B}) from two mana: Sami reduces only Bot1's spells. On turn three the Mox Emerald makes Bot1's fourth artifact (the Lotus is gone),
+# Sami attacks and, with double strike and vigilance, deals 8 and stays untapped; Cost of Brilliance then costs {B} from the Mox Jet alone (the reduction is of the generic {2} and no more). On turn
+# five the creature spell Pest Mascot ({1}{B}{G}) costs {B}{G}: four artifacts take only its one generic mana (CR 118.7c), and the Jet and Emerald pay exactly.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Black Lotus
+Sami, Wildcat Captain
+Mox Emerald
+Pest Mascot
+Cost of Brilliance
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Cost of Brilliance
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sami, Wildcat Captain.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Hand.Cost of Brilliance.Cast(Mana: short)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Sami, Wildcat Captain > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 12
+? Bot1.Battlefield.Sami, Wildcat Captain.Tapped = false
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cost of Brilliance.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Count: 0)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 10
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pest Mascot.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 10
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Pest Mascot; Sami, Wildcat Captain
+Bot2.Battlefield = Mox Jet; Mox Ruby
