@@ -1,0 +1,8 @@
+{
+  "name": "Cheering Crowd",
+  "manaCost": "{1}{R/G}",
+  "type": "Creature — Human Citizen",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "At the beginning of each player's first main phase, that player may put a +1/+1 counter on this creature. If they do, they add {C} for each counter on it."
+}

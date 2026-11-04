@@ -1,0 +1,39 @@
+# Cheering Crowd: if the Crowd is gone when its ability resolves (Bot1 bolts it in response, CR 400.7) there is no creature to put a counter on, so Bot1 is not
+# asked (the refusal) and adds no mana.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Cheering Crowd
+Lightning Bolt
+Mountain x35
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cheering Crowd.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Cheering Crowd)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Cheering Crowd; Lightning Bolt
+Bot1.Battlefield = Mox Emerald; Mox Ruby

@@ -1,0 +1,54 @@
+# Cheering Crowd: at the beginning of EACH player's first main phase, THAT player may put a +1/+1 counter on it and, if they do, add {C} for each counter on it
+# (CR 505.1a, 122.1). Bot2 accepts on turn 2: one counter, {C} - spent on its own Sol Ring (cost {1}), so the mana was Bot2's. Bot1 accepts on turn 3: two counters,
+# {C}{C} - paying for both of Bot1's Sol Rings, so the count is of the counters on it, not a fixed amount.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Cheering Crowd
+Sol Ring
+Sol Ring
+Mountain x35
+
+[Bot2 Deck]
+Sol Ring
+Island x35
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cheering Crowd.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield = Sol Ring
+? Bot1.Battlefield.Cheering Crowd.Power = 3
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Cheering Crowd; Mox Emerald; Mox Ruby; Sol Ring; Sol Ring
+Bot1.Battlefield.Cheering Crowd.Power = 4
+Bot1.Battlefield.Cheering Crowd.Toughness = 4
+Stack.Count = 0
