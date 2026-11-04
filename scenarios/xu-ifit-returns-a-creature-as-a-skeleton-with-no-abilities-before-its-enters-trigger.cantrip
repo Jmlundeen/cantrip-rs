@@ -1,0 +1,59 @@
+# Xu-Ifit, Osteoharmonist: "{T}: Return target creature card from your graveyard to the battlefield. It's a Skeleton in addition to its
+# other types and has no abilities. Activate only as a sorcery." The ruling: a "when this enters" ability is lost before it can
+# trigger. Bot1's Cauldron Familiar drained 1 on entering (Bot2 19, Bot1 21); Bot2 Bolts it on turn 2 and Bolts its own Memnite.
+# On turn 3 Xu-Ifit may not take Bot2's Memnite; it returns the Familiar, which does not drain again (still 19 and 21).
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Xu-Ifit, Osteoharmonist
+Cauldron Familiar
+Island x16
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Memnite
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Xu-Ifit, Osteoharmonist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cauldron Familiar.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Life = 21
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cauldron Familiar)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 2
+! Bot1.Battlefield.Xu-Ifit, Osteoharmonist.Activate(Bot2.Graveyard.Memnite)
+Bot1.Battlefield.Xu-Ifit, Osteoharmonist.Activate(Bot1.Graveyard.Cauldron Familiar)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 21
+Bot2.Graveyard = Memnite; Lightning Bolt; Lightning Bolt
+Bot1.Battlefield.Cauldron Familiar.Subtypes = Cat; Skeleton

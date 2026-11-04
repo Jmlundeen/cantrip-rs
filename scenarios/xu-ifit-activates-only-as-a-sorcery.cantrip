@@ -1,0 +1,40 @@
+# Xu-Ifit, Osteoharmonist: "Activate only as a sorcery." Bot1's Memnite is in its graveyard (Bolted by Bot2) and Xu-Ifit, no longer
+# summoning sick, is untapped on Bot2's turn 4, yet it may not be activated then (CR 307.5); on Bot1's turn 5 it may.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Xu-Ifit, Osteoharmonist
+Memnite
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Xu-Ifit, Osteoharmonist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Xu-Ifit, Osteoharmonist.Tapped = false
+! Bot1.Battlefield.Xu-Ifit, Osteoharmonist.Activate(Bot1.Graveyard.Memnite)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Xu-Ifit, Osteoharmonist.Activate(Bot1.Graveyard.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Subtypes = Construct; Skeleton
+Bot1.Graveyard = Black Lotus
