@@ -1,0 +1,26 @@
+# "At the beginning of your upkeep, create a token that's a copy of this creature" (CR 707.2, 111.1): on turn 2's upkeep
+# there are two Tribbles, the token a copy of the card.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Troubling Tribbles
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Troubling Tribbles.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Battlefield.Troubling Tribbles#1.Toughness = 1
+Bot1.Battlefield.Troubling Tribbles#2.Toughness = 1

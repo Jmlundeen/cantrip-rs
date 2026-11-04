@@ -1,0 +1,8 @@
+{
+  "name": "Troubling Tribbles",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Tribble",
+  "power": 0,
+  "toughness": 1,
+  "oracleText": "This creature can't block.\nAt the beginning of your upkeep, create a token that's a copy of this creature."
+}
