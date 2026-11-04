@@ -727,6 +727,14 @@ pub fn zone_cast_from(q: &dyn Query, spell: ObjectId) -> Option<ZoneKind> {
     if obj.zone.is(ZoneKind::Stack) { obj.cast_from } else { Some(obj.zone.kind()) }
 }
 
+/// "Cast from your graveyard" (CR 601.2f, 404.1): the spell is cast from a graveyard (`zone_cast_from`), and that graveyard is
+/// `player`'s. A card in a graveyard is in its owner's, so the graveyard was `player`'s only if `player` owns the spell: one cast
+/// from an opponent's graveyard (Tinybones, the Pickpocket) was not cast from yours, though you cast it. Norman Osborn's Green
+/// Goblin and Doc Aurlock, Grizzled Genius ask it.
+pub fn cast_from_your_graveyard(q: &dyn Query, spell: ObjectId, player: PlayerId) -> bool {
+    zone_cast_from(q, spell) == Some(ZoneKind::Graveyard) && q.obj(spell).owner == player
+}
+
 /// "The number of creatures [player] controls": every creature on the battlefield they control, read through the layers.
 /// Ajani, Nacatl Pariah, Emeritus of Truce, Oath of Druids and Stadium Headliner count it exactly so.
 pub fn creatures_you_control(q: &dyn Query, player: PlayerId) -> usize {

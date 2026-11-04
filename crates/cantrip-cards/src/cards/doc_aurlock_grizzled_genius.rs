@@ -1,13 +1,15 @@
 use cantrip_api::*;
-use cantrip_mechanics::zone_cast_from;
+use cantrip_mechanics::{cast_from_your_graveyard, zone_cast_from};
 use cantrip_oracle as oracle;
 
 /// "Spells you cast from your graveyard or from exile cost {2} less to cast" (CR 601.2f, 118.7a): the zone the card is in as
-/// its cost is worked out, or the one it was cast from once it is on the stack; generic mana only, never below {0}. Spells
-/// of other players, and spells cast from anywhere else, are not affected.
+/// its cost is worked out, or the one it was cast from once it is on the stack; generic mana only, never below {0}. A card in
+/// a graveyard is in its owner's (CR 404.1), so a card cast from an opponent's graveyard (Tinybones, the Pickpocket) is not
+/// cast from yours; exile is one zone shared by all players (CR 406.1), so a card cast from it is, whoever owns it. Spells of
+/// other players, and spells cast from anywhere else, are not affected.
 fn graveyard_and_exile_spells_cost_two_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     let Costed::Spell(spell) = costed else { return CostDelta::NONE };
-    if player == q.controller(source) && matches!(zone_cast_from(q, spell), Some(ZoneKind::Graveyard | ZoneKind::Exile)) {
+    if player == q.controller(source) && (cast_from_your_graveyard(q, spell, player) || zone_cast_from(q, spell) == Some(ZoneKind::Exile)) {
         CostDelta::less(2)
     } else {
         CostDelta::NONE

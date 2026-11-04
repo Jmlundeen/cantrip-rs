@@ -1,0 +1,43 @@
+# Doc Aurlock, Grizzled Genius: "Spells you cast from your graveyard or from exile cost {2} less to cast." Exile is one zone
+# shared by all players (CR 406.1), unlike the graveyards, so a card Bot1 casts from exile gets the reduction whoever owns it.
+# On turn 3 Bot1's Ragavan, Nimble Pilferer hits Bot2, makes a Treasure and exiles the top card of Bot2's library, its Mind
+# Stone. Bot1 casts the Mind Stone from exile in its second main phase: it costs {0}, so the Treasure and every Mox stay
+# untapped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Ragavan, Nimble Pilferer
+Doc Aurlock, Grizzled Genius
+Plains x15
+
+[Bot2 Deck]
+Island x8
+Mind Stone
+Island x11
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Doc Aurlock, Grizzled Genius.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ragavan, Nimble Pilferer > Bot2)
+[T3 Bot1.Main2]
+? Exile = Mind Stone
+Bot1.Exile.Mind Stone.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Sapphire; Ragavan, Nimble Pilferer; Doc Aurlock, Grizzled Genius; Treasure Token; Mind Stone
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Battlefield.Treasure Token.Tapped = false

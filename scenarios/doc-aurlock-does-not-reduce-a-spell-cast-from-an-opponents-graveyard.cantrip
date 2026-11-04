@@ -1,0 +1,55 @@
+# Doc Aurlock, Grizzled Genius: "Spells you cast from your graveyard or from exile cost {2} less to cast." A card in a
+# graveyard is in its owner's (CR 404.1), so a card Bot1 casts from Bot2's graveyard was not cast from Bot1's. Bot2 loots its
+# Mind Stone away with Faithless Looting on turn 2. On turn 3 Bot1's Tinybones hits Bot2 and Bot1 casts the Mind Stone from
+# Bot2's graveyard: it costs its full {2}, which Mox Pearl and Mox Ruby pay with nothing left over.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Tinybones, the Pickpocket
+Doc Aurlock, Grizzled Genius
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Faithless Looting
+Mind Stone
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tinybones, the Pickpocket.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Doc Aurlock, Grizzled Genius.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Mind Stone; Island)
+? Bot2.Graveyard = Faithless Looting; Island; Mind Stone
+[T3 Bot1.Main1]
+Bot1.Attack(Tinybones, the Pickpocket)
+Bot1.Accept
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Stack.Count = 0
+Bot2.Graveyard = Faithless Looting; Island
+Bot1.Battlefield.Mind Stone.Types = Artifact
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
