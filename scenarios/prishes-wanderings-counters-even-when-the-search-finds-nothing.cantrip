@@ -1,0 +1,37 @@
+# Prishe's Wanderings: "When you search your library this way, put a +1/+1 counter on target creature you control." The
+# reflexive ability triggers on the search itself (CR 603.12, 701.23b), not on a card being found: with only nonbasic,
+# non-Town lands in the library, Bot1 finds nothing (Tropical Island is refused), the library is still shuffled, no land
+# enters, and Llanowar Elves still gets its +1/+1 counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Prishe's Wanderings
+Mox Jet
+Mox Ruby
+Mox Pearl
+Tropical Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Prishe's Wanderings.Cast
+! Bot1.Search(Tropical Island)
+Bot1.Search()
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Shuffles = 1

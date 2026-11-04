@@ -1,0 +1,52 @@
+# Prishe's Wanderings ({2}{G}, instant): "Search your library for a basic land card or Town card, put it onto the battlefield
+# tapped, then shuffle. When you search your library this way, put a +1/+1 counter on target creature you control." Tropical
+# Island is a land but neither basic nor a Town and can't be found (CR 701.23, 205.4a); Capital City, a Town, is, and enters
+# tapped; the library is shuffled once. The reflexive ability (CR 603.12) is put on the stack afterwards and chooses its
+# target then: Bot2's Llanowar Elves (an opponent's creature) and Bot1's Moxen (not creatures) are not legal, so Bot1's own
+# Llanowar Elves is the only target, chosen without a prompt, and becomes 2/2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Prishe's Wanderings
+Mox Jet
+Mox Ruby
+Mox Pearl
+Forest
+Tropical Island
+Capital City
+Forest x17
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Prishe's Wanderings.Cast
+! Bot1.Search(Tropical Island)
+Bot1.Search(Capital City)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Capital City.Tapped = true
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 2
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Shuffles = 1
