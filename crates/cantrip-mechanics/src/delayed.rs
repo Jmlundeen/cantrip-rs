@@ -135,6 +135,20 @@ pub fn at_next_end_step_about(g: &mut dyn Game, item: &StackItem, ability: u8, c
     );
 }
 
+/// `at_next_end_step_about` for "at the beginning of the next upkeep" (CR 503.1, 603.7): the next upkeep step to begin,
+/// whoever's turn it is in, carrying the objects `created` (CR 603.7c). Firion, Wild Rose Warrior sacrifices its token then
+/// (`sacrifice_created`); The Eagles Are Coming! carries the creatures it returned.
+pub fn at_next_upkeep_about(g: &mut dyn Game, item: &StackItem, ability: u8, created: &[ObjectId]) {
+    let card = ability_card(g, item);
+    g.delayed_trigger_about(
+        DelayedWhen::Step { step: Step::Upkeep, on_turn_of: None },
+        item.object,
+        item.controller,
+        AbilityRef::delayed(card, ability),
+        created,
+    );
+}
+
 /// "Destroy it at the beginning of the next end step": destroy the carried objects that are still
 /// permanents (CR 603.7c, 400.7, 701.8). Glyph of Destruction and Old Hob, Alleycat Blues use it.
 pub fn destroy_carried(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

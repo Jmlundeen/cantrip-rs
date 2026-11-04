@@ -17,6 +17,14 @@ pub fn your_creatures_with_plus_one_counters(q: &dyn LayerQuery, source: ObjectI
     your_creatures(q, source, affected, so_far) && q.state().obj(affected).counters(CounterKind::PlusOne) > 0
 }
 
+/// "Equipped creatures you control" (CR 301.5a, 613.1f): `your_creatures` that an Equipment is attached to, whoever controls
+/// the Equipment, judged on what the earlier layers made it (an animated Equipment still counts, one that stopped being an
+/// Equipment does not). Firion, Wild Rose Warrior, Dalakos, Crafter of Wonders and Kemba, Kha Enduring print it.
+pub fn equipped_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    your_creatures(q, source, affected, so_far)
+        && q.state().battlefield().iter().any(|&id| q.state().obj(id).attached_to == Some(affected) && q.chars(id).has_subtype(Subtype::Equipment))
+}
+
 /// "Artifact creatures you control" (CR 613.1): Tempered Steel and Vraska, Soul of Stone use it;
 /// `other_artifact_creatures_you_control` excludes the source from the same group.
 pub fn your_artifact_creatures(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {

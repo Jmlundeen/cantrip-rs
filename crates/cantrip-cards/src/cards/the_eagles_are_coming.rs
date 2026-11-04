@@ -11,8 +11,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let chosen = targets::legal_objects(g, item);
     let returned: Vec<ObjectId> = g.return_to_hand(&chosen).into_iter().filter(|&new| g.obj(new).zone == Zone::hand(you)).collect();
-    let this = g.obj(item.object).card;
-    g.delayed_trigger_about(DelayedWhen::Step { step: Step::Upkeep, on_turn_of: None }, item.object, you, AbilityRef::delayed(this, 0), &returned);
+    cantrip_mechanics::delayed::at_next_upkeep_about(g, item, 0, &returned);
     Ok(())
 }
 

@@ -1,0 +1,71 @@
+# Firion, Wild Rose Warrior: the token's "This Equipment's equip abilities cost {2} less to activate" is part of its copiable
+# values (CR 707.9b), so a copy of the token has it too, and a copy of that copy made by Firion's own exception has it twice,
+# each instance reducing the cost (CR 113.2c). Turn 3: Loxodon Warhammer enters and Firion makes token #2. Phyrexian Metamorph
+# enters as a copy of that token (#3, a nontoken Equipment with the text), and Firion makes token #4 of it. Token #4's
+# Equip {3} costs {0} with the pool empty; the Metamorph's costs exactly {1}. Turn 4: both tokens are sacrificed at Bot2's
+# upkeep; the card and the Metamorph stay, the Metamorph equipping Firion.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Black Lotus
+Sol Ring
+Firion, Wild Rose Warrior
+Phyrexian Metamorph
+Loxodon Warhammer
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Firion, Wild Rose Warrior.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Loxodon Warhammer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loxodon Warhammer#2.Token = true
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Loxodon Warhammer#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loxodon Warhammer#3.Token = (absent)
+? Bot1.Battlefield.Loxodon Warhammer#4.Token = true
+? Bot1.Mana =
+Bot1.Battlefield.Loxodon Warhammer#4.Activate(Firion, Wild Rose Warrior)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}
+Bot1.Battlefield.Loxodon Warhammer#3.Activate(Firion, Wild Rose Warrior)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Firion, Wild Rose Warrior; Loxodon Warhammer; Loxodon Warhammer; Mountain; Mox Jet; Mox Ruby; Sol Ring
+Bot1.Battlefield.Loxodon Warhammer#2.AttachedTo = Firion, Wild Rose Warrior
+Bot1.Battlefield.Firion, Wild Rose Warrior.Power = 6
+Bot1.Graveyard = Black Lotus
+Bot1.Life = 20
