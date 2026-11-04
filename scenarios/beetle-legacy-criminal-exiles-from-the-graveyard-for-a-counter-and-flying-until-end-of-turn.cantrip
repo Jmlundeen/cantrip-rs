@@ -1,0 +1,63 @@
+# Beetle, Legacy Criminal (3/3 flier, {3}{U}): "{1}{U}, Exile this card from your graveyard: Put a +1/+1 counter on target creature. It gains
+# flying until end of turn. Activate only as a sorcery." In turn 1 Black Lotus (UUU) and a Mox Ruby pay for Beetle, and Bot1's own Lightning
+# Bolt (Mox Ruby) kills it (a 3/3 flier on the battlefield shows its Flying first). In turn 3 Bot1 draws Mox Sapphire; Sapphire and the third Ruby pay
+# {1}{U} exactly. A Mox Pearl (not a creature) is refused, Bot2's Memnite is accepted and becomes a 2/2 flier, the Beetle card is exiled
+# (CR 602.2, 400.7), and nothing is left in the pool. In turn 5 the flying is gone (until end of turn) while the counter stays.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Beetle, Legacy Criminal
+Lightning Bolt
+Island
+Mox Sapphire
+Island x12
+
+[Bot2 Deck]
+Memnite
+Mox Pearl
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Beetle, Legacy Criminal.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Beetle, Legacy Criminal.Keywords = Flying
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Beetle, Legacy Criminal)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+! Bot1.Graveyard.Beetle, Legacy Criminal.Activate(Bot2.Battlefield.Mox Pearl)
+Bot1.Graveyard.Beetle, Legacy Criminal.Activate(Bot2.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Power = 2
+? Bot2.Battlefield.Memnite.Toughness = 2
+? Bot2.Battlefield.Memnite.Keywords = Flying
+? Bot2.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Memnite.Keywords = (absent)
+? Bot2.Battlefield.Memnite.Power = 2
+
+[Expect]
+Exile = Beetle, Legacy Criminal
+Bot1.Graveyard.Count = 2

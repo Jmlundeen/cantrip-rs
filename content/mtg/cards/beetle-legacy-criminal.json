@@ -1,0 +1,11 @@
+{
+  "name": "Beetle, Legacy Criminal",
+  "manaCost": "{3}{U}",
+  "type": "Legendary Creature — Human Rogue Villain",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\n{1}{U}, Exile this card from your graveyard: Put a +1/+1 counter on target creature. It gains flying until end of turn. Activate only as a sorcery.",
+  "keywords": [
+    "Flying"
+  ]
+}
