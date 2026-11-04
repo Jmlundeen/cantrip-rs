@@ -1,0 +1,33 @@
+# Goobbue Gardener ({1}{G}, 1/3): "{T}: Add {G}." A creature's {T} ability cannot be activated unless its controller has
+# controlled it continuously since the start of their most recent turn (CR 302.6, 602.5): on turn 1, the turn it enters, the
+# ability is refused; on turn 3 it is activated (the positive control) and adds {G} - green only: red, blue, white, black and
+# colorless are refused. Forest and Mox Emerald pay its {1}{G} exactly, leaving the pool empty.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Goobbue Gardener
+Forest x15
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Goobbue Gardener.Cast
+? Bot1.Mana =
+! Bot1.Battlefield.Goobbue Gardener.Activate
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Goobbue Gardener.Activate(Color: Red)
+! Bot1.Battlefield.Goobbue Gardener.Activate(Color: Blue)
+! Bot1.Battlefield.Goobbue Gardener.Activate(Color: White)
+! Bot1.Battlefield.Goobbue Gardener.Activate(Color: Black)
+! Bot1.Battlefield.Goobbue Gardener.Activate(Color: Colorless)
+Bot1.Battlefield.Goobbue Gardener.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Goobbue Gardener.Tapped = true
