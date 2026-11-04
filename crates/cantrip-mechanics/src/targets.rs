@@ -1275,6 +1275,12 @@ pub fn is_permanent_card(c: &Chars) -> bool {
     PERMANENT_CARD_TYPES.iter().any(|&t| c.is(t))
 }
 
+/// How many permanent cards (CR 110.4a) are in a player's graveyard, each judged as it is there: an artifact, battle, creature,
+/// enchantment, land or planeswalker card; never a token. Diamond Weapon and Gran Pulse Ochu count them.
+pub fn permanent_cards_in_graveyard(q: &dyn Query, player: PlayerId) -> usize {
+    q.state().zone(Zone::graveyard(player)).iter().filter(|&&id| is_permanent_card(&q.chars(id))).count()
+}
+
 /// Whether these are the characteristics of a nonland permanent card (CR 110.4a): an artifact land is a land. Six,
 /// Guardian Scalelord and Loamcrafter Faun ask it.
 pub fn is_nonland_permanent_card(c: &Chars) -> bool {

@@ -12,8 +12,7 @@ fn prevents_combat_damage_to_this(_: &dyn Query, asker: &Asker, e: &DamageEvent)
 /// "This spell costs {1} less to cast for each permanent card in your graveyard" (CR 601.2f, 118.7a, 110.4a): counted as the
 /// cost is determined, the cards as they are in the graveyard; only the cost of casting it, its mana value unchanged (CR 118.7).
 fn costs_one_less_for_each_permanent_card(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
-    let cards = q.state().zone(Zone::graveyard(player)).iter().filter(|&&id| targets::is_permanent_card(&q.chars(id))).count();
-    CostDelta::less(cards as u32)
+    CostDelta::less(targets::permanent_cards_in_graveyard(q, player) as u32)
 }
 
 pub static CARD: CardDef = CardDef {
