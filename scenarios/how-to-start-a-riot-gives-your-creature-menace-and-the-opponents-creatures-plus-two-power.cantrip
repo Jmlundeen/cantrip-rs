@@ -1,0 +1,52 @@
+# How to Start a Riot {2}{R}: "Target creature gains menace until end of turn. Creatures target player controls get +2/+0 until end
+# of turn." Its two targets are chosen separately: Bot1 aims the menace at its own Memnite and the +2/+0 at Bot2, so Bot2's
+# Ornithopter (0/2) becomes a 2/2 -- power only -- while Bot1's own Memnite stays 1/1. Three Mox Rubies pay it exactly. It ends with
+# the turn (CR 514.2), and the Lesson is in Bot1's graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Memnite
+How to Start a Riot
+Mountain x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.How to Start a Riot.Cast
+Bot1.Target(Memnite)
+Bot1.Target(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Keywords = Menace
+? Bot1.Battlefield.Memnite.Power = 1
+? Bot1.Battlefield.Memnite.Toughness = 1
+? Bot2.Battlefield.Ornithopter.Power = 2
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = How to Start a Riot
+Bot1.Battlefield.Memnite.Keywords = (absent)
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
