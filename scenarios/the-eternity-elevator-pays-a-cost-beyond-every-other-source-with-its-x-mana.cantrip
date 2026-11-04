@@ -1,0 +1,90 @@
+# The Eternity Elevator with twenty charge counters pays Coveted Jewel's {6}, which the four untapped Moxen beside it can't: its one
+# ability adds X mana (CR 106.3, 605.1a), so the cast is offered (CR 601.2g: mana abilities are activated while paying) and the Elevator's
+# twenty {R} pay it, though the ability lists its yield as one mana of any color.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+The Eternity Elevator
+Sunset Saboteur
+Raging Goblin
+Coveted Jewel
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Eternity Elevator.Cast
+Bot1.Hand.Sunset Saboteur.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Eternity Elevator.Counters.Charge = 4
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Eternity Elevator.Counters.Charge = 9
+[T5 Bot1.Main1]
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Eternity Elevator.Counters.Charge = 14
+[T7 Bot1.Main1]
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Eternity Elevator.Counters.Charge = 19
+! Bot1.Battlefield.The Eternity Elevator.Activate(Ability: any one color; Color: Red)
+[T9 Bot1.Main1]
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: Station)
+Bot1.Choose(Raging Goblin)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Eternity Elevator.Counters.Charge = 20
+Bot1.Hand.Coveted Jewel.Cast
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: any one color; Color: Red)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Coveted Jewel.Tapped = false
+Bot1.Battlefield.The Eternity Elevator.Tapped = true

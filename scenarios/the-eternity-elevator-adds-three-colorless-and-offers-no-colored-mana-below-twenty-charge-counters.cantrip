@@ -1,0 +1,52 @@
+# The Eternity Elevator: "{T}: Add {C}{C}{C}" with no counters at all, and with ten charge counters (Bot1's Gigantosaurus, 10 power,
+# stationed on turn 3) the 20+ ability is still not there (CR 721.2a), though the Elevator is untapped and could be tapped for it.
+# Black Lotus, Mox Emerald and a Forest pay the Gigantosaurus on turn 1; on turn 3 the Moxen and the Forest pay the Elevator's {5}.
+
+[Bot1 Deck]
+Gigantosaurus
+Black Lotus
+Mox Emerald
+Forest
+The Eternity Elevator
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Ability: Sacrifice; Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Eternity Elevator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Eternity Elevator.Counters.Charge = 10
+! Bot1.Battlefield.The Eternity Elevator.Activate(Ability: any one color; Color: Red)
+Bot1.Battlefield.The Eternity Elevator.Activate(Ability: {T}: Add {C}{C}{C}.)
+? Bot1.Mana = {C}{C}{C}
+
+[Expect]
+Bot1.Battlefield.The Eternity Elevator.Tapped = true
+Bot1.Battlefield.Gigantosaurus.Tapped = true
