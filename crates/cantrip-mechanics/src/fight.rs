@@ -53,7 +53,8 @@ pub fn bite(g: &mut dyn Game, creature: ObjectId, victim: ObjectId) {
 }
 
 /// "Damage equal to its power" (CR 120.3, 608.2h): the power `creature` has now, as the spell or ability resolves, as an amount
-/// of damage - none for a creature with no power or a negative one (CR 120.8). `bite` and Chocobo Kick use it.
+/// of damage - none for a creature with no power or a negative one (CR 120.8). `bite`, Chocobo Kick, Self-Destruct, Blazing
+/// Bomb and Iron Fist, Living Weapon use it.
 pub fn damage_equal_to_power(q: &dyn Query, creature: ObjectId) -> u32 {
     q.chars(creature).power.unwrap_or(0).max(0) as u32
 }
