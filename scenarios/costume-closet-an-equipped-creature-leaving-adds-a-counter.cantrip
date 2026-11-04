@@ -1,0 +1,53 @@
+# Costume Closet: "Equipment, Auras you control, and counters are modifications" (CR 700.9). Bot1's Ornithopter carries Web-Shooters, so it is
+# a modified creature though it has no counter. When Bot2 exiles it with Swords to Plowshares the Equipment is still attached as it
+# leaves (CR 603.10a), so the Closet gets a counter and has three.
+
+[Bot1 Deck]
+Costume Closet
+Mox Pearl
+Mox Jet
+Ornithopter
+Web-Shooters
+Mox Ruby
+Mox Sapphire
+Plains x20
+
+[Bot2 Deck]
+Swords to Plowshares
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Costume Closet.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Web-Shooters.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Web-Shooters.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Costume Closet.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Ornithopter = (absent)
+Stack.Count = 0

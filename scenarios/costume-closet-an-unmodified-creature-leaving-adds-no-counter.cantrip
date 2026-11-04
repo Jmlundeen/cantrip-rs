@@ -1,0 +1,35 @@
+# Costume Closet: "Whenever a modified creature you control leaves the battlefield, put a +1/+1 counter on this artifact." Bot1's Ornithopter
+# has no counter, no Equipment and no Aura (CR 700.9), so when Bot2 exiles it with Swords to Plowshares nothing triggers: the Closet keeps
+# its two counters.
+
+[Bot1 Deck]
+Costume Closet
+Mox Pearl
+Mox Jet
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Swords to Plowshares
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Costume Closet.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Costume Closet.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter = (absent)
+Stack.Count = 0

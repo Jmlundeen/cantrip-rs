@@ -1,0 +1,44 @@
+# Costume Closet: "This artifact enters with two +1/+1 counters on it. {T}: Move a +1/+1 counter from this artifact onto target creature you
+# control. Activate only as a sorcery. Whenever a modified creature you control leaves the battlefield, put a +1/+1 counter on this
+# artifact." Bot1 casts it (two counters), then moves one onto its Ornithopter (one left, and the Ornithopter is a modified 1/3, CR 700.9).
+# On turn 2 Bot2 exiles the Ornithopter with Swords to Plowshares: it left the battlefield modified (CR 603.10a), so the Closet gets a
+# counter back (CR 122.1) and has two again.
+
+[Bot1 Deck]
+Costume Closet
+Mox Pearl
+Mox Jet
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Swords to Plowshares
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Costume Closet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Costume Closet.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Costume Closet.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter.Power = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Costume Closet.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter = (absent)
+Stack.Count = 0
