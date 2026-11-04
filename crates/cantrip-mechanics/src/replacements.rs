@@ -392,9 +392,15 @@ pub const DAMAGE_TO_YOU_AND_YOUR_OTHER_PERMANENTS_IS_DEALT_TO_THIS: ReplacementD
 /// an opponent of the controller or a permanent an opponent controls. Artist's Talent (at level 3, with `plus::<2>`) and
 /// Tomik, Izzet Sparkmage (with `plus::<1>`) print it.
 pub fn noncombat_damage_you_deal_to_an_opponent_or_their_permanent(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::Damage(d) if !d.combat) && damage_you_deal_to_an_opponent_or_their_permanent(q, asker, proposal)
+}
+
+/// "If a source you control would deal damage to an opponent or a permanent an opponent controls" (CR 614.1, 120.3): damage of
+/// any source its controller controls, combat or not, of an amount above zero (CR 615.6), dealt to an opponent of the
+/// controller or a permanent an opponent controls. Fated Firepower prints it, and the noncombat form above narrows it.
+pub fn damage_you_deal_to_an_opponent_or_their_permanent(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
     let Proposal::Damage(d) = proposal else { return false };
     d.amount > 0
-        && !d.combat
         && q.controller(d.source) == asker.controller
         && match d.target {
             Target::Player(player) => q.state().opponents(asker.controller).any(|opponent| opponent == player),
