@@ -1,0 +1,43 @@
+# Starfleet Spanner Jockey has defender, but attacks as though it didn't once its controller has cast a noncreature spell
+# this turn (CR 702.3b): a Mox Sapphire lets it attack, and the defender it still has does not stop it. On turn 3 it can't:
+# the Black Lotus it was cast with was a noncreature spell of an earlier turn, the Ornithopter cast that turn is a creature
+# spell, and the Ancestral Recall cast that turn is the opponent's - none is a noncreature spell its controller cast this
+# turn. The first Ornithopter is there to be offered in the same declaration.
+
+[Bot1 Deck]
+Starfleet Spanner Jockey
+Black Lotus
+Mox Sapphire
+Ornithopter
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Ancestral Recall
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Starfleet Spanner Jockey.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Attack(Starfleet Spanner Jockey > Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Attack(Starfleet Spanner Jockey > Bot2)
+[T5 Bot1.End]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Library.Count = 9
