@@ -1,0 +1,53 @@
+# Dubious Delicacy has Flash: Bot1 casts it during Bot2's turn 2, after Bot2's Ornithopter resolves. Two sources of mana are not
+# enough for {2}{B} (the refusal on turn 1), three are. The target of "up to one target creature" is optional: Bot1 chooses nobody, so
+# the Ornithopter lives. "{2}, {T}, Sacrifice this artifact: Target opponent loses 3 life." is the other ability of the same cost: Bot2 goes
+# from 20 to 17, not 18 or 16, and the Delicacy is sacrificed. Bot1 itself is no target opponent (the refusal before it).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Dubious Delicacy
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+! Bot1.Hand.Dubious Delicacy.Cast(Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dubious Delicacy.Cast
+Bot1.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Dubious Delicacy.Activate(Bot1; Ability: {2}, {T}, Sacrifice this artifact: Target opponent loses 3 life.)
+Bot1.Battlefield.Dubious Delicacy.Activate(Bot2; Ability: {2}, {T}, Sacrifice this artifact: Target opponent loses 3 life.)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 20
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Graveyard = Dubious Delicacy

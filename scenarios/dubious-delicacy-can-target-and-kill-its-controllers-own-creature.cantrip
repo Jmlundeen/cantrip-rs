@@ -1,0 +1,36 @@
+# "Up to one target creature" is any creature: with Bot1's own Ornithopter and Bot2's both in play, Bot1 chooses its own, which gets
+# -3/-3 and dies, while Bot2's lives.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Ornithopter
+Dubious Delicacy
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dubious Delicacy.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot2.Battlefield.Ornithopter.Toughness = 2

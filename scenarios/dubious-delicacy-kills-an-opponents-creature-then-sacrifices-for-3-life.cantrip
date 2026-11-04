@@ -1,0 +1,50 @@
+# Dubious Delicacy {2}{B} (Flash): "When this artifact enters, up to one target creature gets -3/-3 until end of turn." Bot1 casts it on turn 3
+# with Mox Jet, Mox Pearl and Mox Emerald and chooses Bot2's Ornithopter (0/2), which dies. The Delicacy itself is no creature to
+# choose. "{2}, {T}, Sacrifice this artifact: You gain 3 life." then costs exactly {2} (Mox Ruby, Mox Sapphire): the pool is empty after
+# paying, and Bot1 gains 3 life, not 2 or 4.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Dubious Delicacy
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dubious Delicacy.Cast
+Bot1.Pass
+! Bot1.Target(Bot1.Battlefield.Dubious Delicacy)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Dubious Delicacy.Activate(Ability: {2}, {T}, Sacrifice this artifact: You gain 3 life.)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Dubious Delicacy
+Bot1.Battlefield.Count = 5
