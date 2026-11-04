@@ -389,7 +389,10 @@ creature that must attack sent where attacking is free (a creature that must att
 planeswalker while attacking the player costs nothing, CR 508.1d).
 The pairs of one refusal are one declaration, judged by the engine's own check: a cap each attack alone obeys
 holds as a refusal once they are named together - `! Bot1.Attack(Bear > Wrenn; Giant > Wrenn)` for Tomik's "no more
-than one creature can attack this planeswalker" (CR 508.1c). Written as separate refusal lines each would fail, since each attack alone is allowed. The refusal also holds when
+than one creature can attack this planeswalker" (CR 508.1c). Written as separate refusal lines each would fail, since each attack alone is allowed.
+One attack is judged the same way, as the whole declaration, with `Alone: yes`: `! Bot1.Attack(Pet Sehlat > Bot2; Alone: yes)`
+refuses declaring Pet Sehlat with no other attacker ("can't attack alone", CR 508.1c), where the plain line would fail
+because Pet Sehlat may attack beside another creature. The refusal also holds when
 the pairs named fall short of a requirement (a creature that must attack, CR 508.1d), as a refusal of blocks does.
 
 A search, `! Bot1.Search(Plains)`, is checked at that player's next library search, and fails if a Plains is among
@@ -486,6 +489,9 @@ A bare `! Bot2.Block` is the same for the declaration of blockers: it fails if B
 priority, which shows that no block is possible at all ("creatures can't block this turn" leaves nothing to refuse with
 `! Bot2.Block(Blocker > Attacker)`, since the engine then asks nothing). Put `[T3 Bot1.DeclareBlockers]` before it, because Bot2
 gets priority earlier in the turn, in the declare attackers step; pair it with a scenario in which a block is possible.
+A bare `! Bot1.Attack` is the same for the declaration of attackers: it fails if Bot1 is asked to declare attackers before
+their next priority, which shows that no attack is possible at all (Peace in Our Time's "they can't attack this turn"), unlike
+`! Bot1.Attack()`, a declaration of no attackers that the question must refuse. Put `[T3 Bot1.DeclareAttackers]` before it.
 
 A refusal answers nothing, and the player goes on to the next line. Because it lands on the *next* question of its
 kind, place it where the action could otherwise be taken, with a wait or `BotN.Pass` before it:

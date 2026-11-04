@@ -616,8 +616,10 @@ impl<'s> Run<'s> {
                 && ((action.verb.is_question() && !(matches!(action.verb, ScriptVerb::Choose | ScriptVerb::Colors | ScriptVerb::Name) && action.positional().next().is_some())
                     && !(matches!(action.verb, ScriptVerb::Choose) && action.text.contains('('))
                     && !(matches!(action.verb, ScriptVerb::Arrange) && !action.raw_arguments.trim().is_empty()))
-                    || (matches!(action.verb, ScriptVerb::Target | ScriptVerb::Modes | ScriptVerb::Block)
+                    || (matches!(action.verb, ScriptVerb::Target | ScriptVerb::Modes | ScriptVerb::Block | ScriptVerb::Attack)
                         && action.positional().next().is_none()
+                        // `! Bot1.Attack()` is the declaration of no attackers, not the absence of the question.
+                        && !(action.verb == ScriptVerb::Attack && action.text.contains('('))
                         && action.named("Count").is_none()))
                 && request.player == player_of(action.bot)
             {
@@ -1748,8 +1750,10 @@ impl<'s> Run<'s> {
                 }
                 // Several attacks named together are one declaration (CR 508.1a), judged as a whole by the core's validator:
                 // refused when it may not be declared as it is, even though each attack alone is legal - a cap on how many
-                // creatures may attack one target (CR 508.1c) is what such a line proves.
-                if action.positional().count() > 1 {
+                // creatures may attack one target (CR 508.1c) is what such a line proves. One attack with `Alone: yes` is a
+                // declaration of that attack and nothing else: "can't attack alone" (CR 508.1c) refuses it, though the same
+                // attack beside another is legal.
+                if action.positional().count() > 1 || action.named("Alone").is_some_and(|v| v.trim().eq_ignore_ascii_case("yes")) {
                     let on_battlefield: Vec<ObjectId> = self.game.state.battlefield().to_vec();
                     let mut pairs: Vec<(ObjectId, Target)> = Vec::new();
                     for spec in action.positional() {
@@ -2443,7 +2447,7 @@ impl<'s> Run<'s> {
                     // stack empty (CR 500.2).
                     Event::StepBegan { step } => {
                         !(window.header && at == 0)
-                            || matches!((verb, step), (ScriptVerb::Block, Step::DeclareBlockers) | (ScriptVerb::Discard, Step::Cleanup) | (ScriptVerb::Accept | ScriptVerb::Decline, Step::Draw))
+                            || matches!((verb, step), (ScriptVerb::Block, Step::DeclareBlockers) | (ScriptVerb::Attack, Step::DeclareAttackers) | (ScriptVerb::Discard, Step::Cleanup) | (ScriptVerb::Accept | ScriptVerb::Decline, Step::Draw))
                     }
                     _ => false,
                 }

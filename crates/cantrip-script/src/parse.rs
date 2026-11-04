@@ -362,7 +362,7 @@ pub struct ScriptArgument {
 impl ScriptArgument {
     /// The keys recognised before a colon. Anything else is a name, so "Circle of Protection:
     /// Red" stays whole.
-    const KEYS: [&'static str; 15] = ["X", "Kicked", "Times", "Color", "Colors", "Ability", "Target", "Attacker", "Sacrifice", "Tap", "Spend", "Convoke", "Delve", "Count", "Mana"];
+    const KEYS: [&'static str; 16] = ["X", "Kicked", "Times", "Color", "Colors", "Ability", "Target", "Attacker", "Sacrifice", "Tap", "Spend", "Convoke", "Delve", "Count", "Mana", "Alone"];
 
     pub fn split(raw: &str) -> Vec<ScriptArgument> {
         let mut arguments = Vec::new();
@@ -836,6 +836,9 @@ mod tests {
         assert_eq!(step.positional().collect::<Vec<_>>(), vec!["Bot2.Battlefield.Grizzly Bears#2"]);
         let copy = ActionStep::parse("Bot1.Battlefield.Island#2.Activate", 1).unwrap();
         assert_eq!((copy.card.as_deref(), copy.copy), (Some("Island"), Some(2)));
+        let alone = ActionStep::parse("Bot1.Attack(Pet Sehlat > Bot2; Alone: yes)", 1).unwrap();
+        assert_eq!(alone.named("Alone"), Some("yes"));
+        assert_eq!(alone.positional().collect::<Vec<_>>(), vec!["Pet Sehlat > Bot2"]);
     }
 
     #[test]
