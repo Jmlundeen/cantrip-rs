@@ -1,0 +1,47 @@
+# Spider-Suit: "Equipped creature gets +2/+2 and is a Spider Hero in addition to its other types." "Equip {3}" (CR 702.6a): on turn 1, with only two
+# Moxen untapped after the Suit is cast, it is refused (short by one). On turn 3 a fourth Mox makes the third mana exactly and the pool is empty
+# afterwards: Bot1's Ornithopter (0/2 Thopter) becomes a 2/4 Hero Spider Thopter.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Spider-Suit
+Ornithopter
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spider-Suit.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Spider-Suit.Activate(Ornithopter; Mana: short)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Spider-Suit.Activate(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Subtypes = Hero; Spider; Thopter
+Bot1.Battlefield.Spider-Suit.AttachedTo = Ornithopter
