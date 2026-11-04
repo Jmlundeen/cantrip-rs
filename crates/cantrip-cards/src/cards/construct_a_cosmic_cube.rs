@@ -11,14 +11,6 @@ fn villain_and_plan(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "You control target opponent during their next turn." (CR 723.1): you make every choice and decision that player would make
-/// during the next turn they actually take, seeing what they see; a target that is no longer legal does nothing (CR 608.2b).
-fn control_next_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(player) = targets::player(g, item, 0) else { return Ok(()) };
-    g.control_next_turn(item, player);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
@@ -32,7 +24,7 @@ pub static CARD: CardDef = CardDef {
             "When the seventh plan counter is put on this enchantment, sacrifice it. When you do, you control target opponent during their next turn.",
         ),
     ],
-    delayed: &[delayed_trigger(control_next_turn, "When you do, you control target opponent during their next turn.").targets(&[targets::OPPONENT])],
+    delayed: &[delayed_trigger(effects::control_target_player_next_turn, "When you do, you control target opponent during their next turn.").targets(&[targets::OPPONENT])],
     ..oracle::CONSTRUCT_A_COSMIC_CUBE
 };
 

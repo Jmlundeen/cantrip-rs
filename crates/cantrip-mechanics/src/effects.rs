@@ -2163,3 +2163,12 @@ pub fn may_pay_to_return_this_to_the_battlefield(
     }
     Ok(())
 }
+
+/// "You control target opponent during their next turn" (CR 723.1), the player being the ability's first target: its controller
+/// makes every choice and decision that player would make during the next turn they actually take; nothing if the target is no
+/// longer legal as it resolves (CR 608.2b). Construct a Cosmic Cube and The Dominion Bracelet print it.
+pub fn control_target_player_next_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(player) = crate::targets::player(g, item, 0) else { return Ok(()) };
+    g.control_next_turn(item, player);
+    Ok(())
+}
