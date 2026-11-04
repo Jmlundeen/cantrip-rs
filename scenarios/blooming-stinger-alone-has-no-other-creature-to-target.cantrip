@@ -1,0 +1,32 @@
+# Blooming Stinger's enter trigger says "another target creature you control": with no other creature of Bot1's, only Bot2's
+# Ornithopter, it has no legal target and never goes on the stack, so nothing gains deathtouch beyond the Stinger's own.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Blooming Stinger
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Blooming Stinger.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Blooming Stinger.Keywords = Deathtouch
+Bot2.Battlefield.Ornithopter.Keywords = Flying
