@@ -1,0 +1,52 @@
+# Chocobo Racetrack, {3}{G}{G}: "Whenever a land you control enters, create a 2/2 green Bird creature token with 'Whenever a land
+# you control enters, this token gets +1/+0 until end of turn'" (CR 603.2, 111.1, 611.2a). Bot1 pays exactly with Black Lotus
+# (GGG), Mox Emerald and Mox Pearl; the Forest it plays afterwards makes the first Bird, a 2/2 green Bird that did not see the
+# land. Bot2's Island on turn 2 does nothing (it is not a land Bot1 controls). The turn-3 Forest makes a second Bird (2/2) and
+# the first Bird gets +1/+0 (3/2); on turn 5 the first Bird is 2/2 again, the pump having ended with that turn.
+
+[Bot1 Deck]
+Chocobo Racetrack
+Black Lotus
+Mox Emerald
+Mox Pearl
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Chocobo Racetrack.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bird Token.Power = 2
+? Bot1.Battlefield.Bird Token.Toughness = 2
+? Bot1.Battlefield.Bird Token.Colors = Green
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+? Bot1.Battlefield.Bird Token.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bird Token#1.Power = 3
+? Bot1.Battlefield.Bird Token#1.Toughness = 2
+? Bot1.Battlefield.Bird Token#2.Power = 2
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Bird Token#1.Power = 2
+Bot1.Battlefield.Bird Token#1.Toughness = 2
+Bot1.Battlefield.Bird Token#2.Power = 2
