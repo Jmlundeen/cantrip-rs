@@ -2,12 +2,17 @@
 
 use cantrip_api::*;
 
-/// "Regenerate this creature" (CR 701.19a): a regeneration shield on the ability's source until end of turn, if it is still
-/// the permanent it was (CR 400.7). Golgari Grave-Troll prints it, and River Boa and Drudge Skeletons.
-pub fn this(g: &mut dyn Game, item: &StackItem) {
-    if crate::targets::permanent(g, item.object) {
-        g.add_effect(item.object, item.object, EffectKind::RegenerationShield, Duration::EndOfTurn);
+/// Regenerate a permanent (CR 701.19a): create its shield until end of turn if it is still the same permanent.
+/// Regeneration, Golgari Grave-Troll, Welding Jar and Yavimaya Hollow use this keyword action.
+pub fn permanent(g: &mut dyn Game, source: ObjectId, object: ObjectId) {
+    if crate::targets::permanent(g, object) {
+        g.add_effect(source, object, EffectKind::RegenerationShield, Duration::EndOfTurn);
     }
+}
+
+/// "Regenerate this creature" (CR 701.19a): the ability's source. Golgari Grave-Troll prints it.
+pub fn this(g: &mut dyn Game, item: &StackItem) {
+    permanent(g, item.object, item.object);
 }
 
 /// "Regenerate this creature" as a whole ability effect (CR 701.19a): Scavenging Ghoul and Golgari Grave-Troll.
@@ -16,13 +21,12 @@ pub fn this_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Regenerate target permanent" (CR 701.19a): a regeneration shield on it until end of turn, if it is still a legal
-/// target. Welding Jar and Yavimaya Hollow print it.
+/// "Regenerate target permanent" (CR 701.19a): if it is still a legal target. Welding Jar and Yavimaya Hollow print it.
 pub fn target(g: &mut dyn Game, item: &StackItem, slot: usize) {
     if !g.target_legal(item, slot) {
         return;
     }
-    if let Target::Object(permanent) = g.state().target(item, slot) {
-        g.add_effect(item.object, permanent, EffectKind::RegenerationShield, Duration::EndOfTurn);
+    if let Target::Object(object) = g.state().target(item, slot) {
+        permanent(g, item.object, object);
     }
 }
