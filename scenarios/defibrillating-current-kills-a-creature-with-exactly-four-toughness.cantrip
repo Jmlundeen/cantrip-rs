@@ -1,0 +1,42 @@
+# Defibrillating Current deals exactly 4 damage: a 1/4 Border Guard (toughness 4) dies to it, and its controller gains 2.
+
+[Bot1 Deck]
+Defibrillating Current
+Mox Ruby
+Mox Pearl
+Mox Jet
+Island x3
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Border Guard
+Swamp x3
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Border Guard.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Defibrillating Current.Cast(Bot2.Battlefield.Border Guard)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard = Border Guard

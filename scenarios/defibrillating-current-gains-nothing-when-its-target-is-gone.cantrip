@@ -1,0 +1,45 @@
+# Defibrillating Current with its only target gone: Bot2 answers with Lightning Bolt on its own Llanowar Elves, so the
+# Current has no legal target when it would resolve, is countered by the rules (CR 608.2b), and Bot1 gains no life.
+
+[Bot1 Deck]
+Defibrillating Current
+Mox Ruby
+Mox Pearl
+Mox Jet
+Island x3
+Island x16
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Swamp x3
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Defibrillating Current.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot1.Graveyard = Defibrillating Current

@@ -1,0 +1,49 @@
+# Defibrillating Current deals exactly 4 damage: Bot2's Effortless Master (cast as its fifth spell of the turn, so a 6/5)
+# survives it with 4 damage marked, and Bot1 still gains 2 life.
+
+[Bot1 Deck]
+Defibrillating Current
+Mox Ruby
+Mox Pearl
+Mox Jet
+Island x3
+Island x16
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Jet
+Effortless Master
+Swamp x2
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Effortless Master.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Defibrillating Current.Cast(Bot2.Battlefield.Effortless Master)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Battlefield.Effortless Master.Damage = 4
+Bot2.Battlefield.Effortless Master.Toughness = 5

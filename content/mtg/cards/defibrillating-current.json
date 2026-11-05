@@ -1,0 +1,6 @@
+{
+  "name": "Defibrillating Current",
+  "manaCost": "{2/R}{2/W}{2/B}",
+  "type": "Sorcery",
+  "oracleText": "Defibrillating Current deals 4 damage to target creature or planeswalker and you gain 2 life."
+}
