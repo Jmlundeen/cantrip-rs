@@ -1,0 +1,50 @@
+# Crabomination's "Emerge from artifact {5}{B}{B}" chooses the artifact to sacrifice as its total cost is determined, before
+# the mana is paid: the total comes down by that artifact's mana value (CR 702.119a, 601.2f). Bot1 chooses Lotus Petal,
+# then pays with two Black Lotuses and the Petal itself, sacrificing it for {B}: the artifact chosen is gone, so the emerge
+# sacrifice can't be paid with it (CR 118.3, 400.7, 601.2h), and the cast is taken back (CR 733.1) rather than made
+# without one - Crabomination is back in hand, the Lotuses and the Petal on the battlefield, the pool empty. Then Bot1
+# chooses the Petal again and pays with the two Lotuses and the Swamp: the Petal is sacrificed and Crabomination resolves.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Black Lotus
+Lotus Petal
+Crabomination
+Swamp x15
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Crabomination.Cast(Ability: Emerge)
+Bot1.Choose(Lotus Petal)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+? Stack.Count = 0
+? Bot1.Mana =
+? Bot1.Battlefield = Swamp; Black Lotus; Black Lotus; Lotus Petal
+? Bot1.Graveyard.Count = 0
+Bot1.Hand.Crabomination.Cast(Ability: Emerge)
+Bot1.Choose(Lotus Petal)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Graveyard = Lotus Petal; Black Lotus; Black Lotus
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Crabomination

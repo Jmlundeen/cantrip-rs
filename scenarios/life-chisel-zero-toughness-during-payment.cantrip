@@ -48,8 +48,8 @@ Bot1.Pass
 [T7 Bot1.Upkeep]
 ? Bot1.Battlefield.Force of Savagery.Toughness = 1
 Bot1.Battlefield.Life Chisel.Activate(Sacrifice: Force of Savagery)
-Bot1.Choose(Force of Savagery)
 Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: Captain Jean-Luc Picard)
+Bot1.Choose(Force of Savagery)
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Life = 20

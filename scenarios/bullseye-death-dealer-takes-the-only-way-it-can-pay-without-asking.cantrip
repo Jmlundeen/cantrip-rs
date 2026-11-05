@@ -31,10 +31,10 @@ Bot2.Pass
 [T3 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Bullseye, Death Dealer.Activate(Bot2)
-Bot1.Choose(Mox Sapphire)
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Mox Sapphire)
 ? Bot1.Graveyard = Mox Sapphire
 Bot1.Pass
 Bot2.Pass

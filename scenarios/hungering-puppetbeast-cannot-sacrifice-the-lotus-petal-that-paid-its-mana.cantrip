@@ -1,0 +1,49 @@
+# Hungering Puppetbeast's "{1}, Sacrifice another artifact" chooses the artifact as the cost is paid, once the mana
+# abilities have been activated (CR 601.2g-h by way of 602.2b). Bot1 pays the {1} with Lotus Petal, sacrificing it for
+# its own cost; it is no longer on the battlefield, so it can't also be the artifact sacrificed for Puppetbeast's (CR
+# 118.3, 400.7): the Heartwood token Puppetbeast made as it entered is the only one offered, and is the one sacrificed.
+# Puppetbeast gets its +1/+1 counter and haste.
+
+[Bot1 Deck]
+Forest
+Forest
+Black Lotus
+Hungering Puppetbeast
+Lotus Petal
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Hungering Puppetbeast.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Hungering Puppetbeast.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+! Bot1.Choose(Lotus Petal)
+Bot1.Choose(Heartwood Token)
+? Bot1.Mana =
+? Bot1.Graveyard = Lotus Petal; Black Lotus
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Haste)
+? Bot1.Battlefield.Hungering Puppetbeast.Keywords = Haste
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Hungering Puppetbeast
+Bot1.Battlefield.Hungering Puppetbeast.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Hungering Puppetbeast.Power = 6

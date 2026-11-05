@@ -38,9 +38,9 @@ Bot1.Hand.Ravine Raider.Cast
 Bot1.Battlefield.Swamp#1.Activate
 Bot1.Pass
 Bot1.Battlefield.Fiend Artisan.Activate(X: 0)
-Bot1.Choose(Ravine Raider)
 Bot1.Battlefield.Mox Emerald.Activate
-? Bot1.Mana = 
+Bot1.Choose(Ravine Raider)
+? Bot1.Mana =
 ! Bot1.Search(Misshapen Fiend)
 Bot1.Search(Walking Ballista)
 Bot1.Pass

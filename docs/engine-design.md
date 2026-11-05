@@ -1405,10 +1405,16 @@ fingerprint per priority with something on the stack but the first two of each r
 
 ### Casting: when a cost's choices are made
 
-A spell's costs are chosen and paid in the order of CR 601.2b-h: the permanents a cost sacrifices or returns are chosen
-before the mana is paid, an additional cost's choices after it, and so are the cards a cost discards or exiles from a hand
-or a graveyard, since a mana ability activated while paying may have put them there (CR 601.2g-h: a Lotus Petal sacrificed
-for an escape cost's mana is a card it may exile). Those parts are offered while the mana abilities the player could
+A spell's costs are chosen and paid in the order of CR 601.2b-h: the permanents its own cost sacrifices or returns are
+chosen before the mana is paid (emerge's, which determine the total, CR 702.119a, 601.2f), an additional cost's choices
+after it, and so are the permanents a cost taps ("tap an untapped creature you control") and the cards a cost discards
+or exiles from a hand or a graveyard, since a mana ability activated while paying may have tapped or put them there
+(CR 601.2g-h: a Lotus Petal sacrificed for an escape cost's mana is a card it may exile). An activated ability chooses
+all the permanents its cost names once its mana is paid (CR 602.2b), so a Rebel Springleaf Drum tapped for the mana is
+not offered as the Rebel Otharri's return taps, nor a Lotus Petal sacrificed for the {1} as Hungering Puppetbeast's
+artifact (CR 118.3). Permanents chosen before the mana (emerge's, a mana ability's, which come with its activation) are
+judged again once it is paid (`chosen_still_pay`): one a mana ability sacrificed or tapped meanwhile can't pay the cost,
+and the cast or activation is taken back (CR 733.1), never paid with less. Those parts are offered while the mana abilities the player could
 activate as the cost is paid could make them payable (`actions::ManaFeed`: the cards their costs could sacrifice, discard
 or return, and anything at all where an ability's own effect does more than its listing says), and refused by the payment,
 with the cast taken back (CR 733.1), where they did not; delve counts those cards too. A cost with no mana in it gives the mana

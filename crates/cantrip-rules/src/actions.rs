@@ -1554,10 +1554,23 @@ fn cards_represented(cx: &Cx, player: PlayerId, id: ObjectId) -> (u32, u32) {
     (cards, value)
 }
 
-/// Whether a cost's permanents are chosen once its mana is paid (CR 601.2h): those that must be tapped, which a mana
-/// ability activated while paying (CR 601.2g) may have tapped. The others are chosen with the rest of the cost, before.
+/// Whether a spell's own cost chooses its permanents once its mana is paid (CR 601.2h): those that must be tapped, and
+/// those it taps ("tap an untapped creature you control"), which a mana ability activated while paying (CR 601.2g) may
+/// have tapped. The others are chosen with the rest of the cost, before: emerge's sacrifice determines the total
+/// (CR 702.119a, 601.2f). An activated ability's are all chosen once its mana is paid (`activate`).
 fn permanents_after_mana(cost: &Cost) -> bool {
-    cost.permanents.is_some_and(|p| p.tapped)
+    cost.permanents.is_some_and(|p| p.tapped) || cost.tap_permanents
+}
+
+/// Whether the permanents a cost chose before its mana was paid can still pay it (CR 601.2h, 118.3): each still the
+/// permanent it was (CR 400.7), and untapped if the cost taps it. A mana ability activated while paying (CR 601.2g) may
+/// have sacrificed or tapped one - the Lotus Petal Crabomination emerges from, sacrificed for {B} - and then the cost
+/// can't be paid with it: what it was paid for is taken back, never paid with less.
+fn chosen_still_pay(cx: &Cx, cost: &Cost, chosen: &[ObjectId]) -> bool {
+    chosen.iter().all(|&id| {
+        let o = cx.s().obj(id);
+        live(cx.s(), id) && o.zone.is(ZoneKind::Battlefield) && !(cost.tap_permanents && o.tapped)
+    })
 }
 
 /// Chooses the permanents a cost names (CR 601.2h), always asked, even when the choice is forced. Too few to choose
@@ -8563,8 +8576,9 @@ fn cast(
         o.x = item.x;
     });
     // The energy and life are judged again now the mana is paid: a mana ability activated while paying (CR 601.2g) may have
-    // spent what they needed, and a cost that can't be paid takes the cast back (CR 601.2h, 119.4, 107.14).
-    if !rest_payable(cx, player, cost.energy as u32 + extra.energy as u32, life_owed, Some(CostFor::Spell)) {
+    // spent what they needed, and a cost that can't be paid takes the cast back (CR 601.2h, 119.4, 107.14). So are the
+    // permanents chosen before the mana (emerge's): one may have sacrificed one.
+    if !rest_payable(cx, player, cost.energy as u32 + extra.energy as u32, life_owed, Some(CostFor::Spell)) || !chosen_still_pay(cx, &cost, &chosen) {
         return Err(Stop::Cancel);
     }
     // The permanents tapped for an optional cost an ability gave the spell are tapped first: one may be sacrificed to another cost.
@@ -10085,12 +10099,6 @@ fn activate(
         return Err(Stop::Cancel);
     }
 
-    // CR 601.2g-h by way of 602.2b: the permanents the cost names are chosen with the rest of the cost, before the mana,
-    // except tapped ones ("return a tapped creature you control"), chosen once the mana is paid, as a spell's are
-    // (`cast`): a mana ability activated while paying may have tapped them. So are the cards it discards or exiles from
-    // the graveyard: one may have put them there.
-    let late = permanents_after_mana(&whole);
-    let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, source, &whole, paid, by)? };
     let counter = choose_counter_kind(cx, player, source, &whole)?;
     pay_mana_with(
         cx,
@@ -10106,9 +10114,12 @@ fn activate(
             ..Helpers::NONE
         },
     )?;
-    if late {
-        chosen = choose_permanents(cx, player, source, &whole, paid, by)?;
-    }
+    // CR 601.2g-h by way of 602.2b: the permanents the cost names are chosen as it is paid, once the mana abilities have
+    // been activated, as a spell's additional cost's are (`cast`): a mana ability activated while paying may have tapped
+    // one (Otharri's "Tap an untapped Rebel you control": a Rebel Springleaf Drum tapped for the mana can't also pay it,
+    // CR 118.3), sacrificed one (a Lotus Petal) or made one tapped ("return a tapped creature you control"). So are the
+    // cards it discards or exiles from the graveyard: one may have put them there.
+    let chosen = choose_permanents(cx, player, source, &whole, paid, by)?;
     let discards = choose_discards(cx, player, source, &whole, by)?;
     let exiles = choose_exiles(cx, player, source, &whole, &[])?;
     // The creatures a crew or saddle cost taps, once the mana is paid (CR 601.2g-h by way of 602.2b), as a spell's are
@@ -10371,19 +10382,15 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     let split = announce_reduction(cx, player, source, costed, &printed, &[], AnyMana::No)?;
     let (mana, _, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, printed, None, &[], &split);
     let mana = at_least(mana, least);
-    // The rest of the cost is chosen with it (CR 601.2h by way of 602.2b): permanents (tapped ones once the mana is paid),
-    // and once the mana is paid the cards to discard or exile, which a mana ability activated while paying (CR 601.2g) may
-    // have put in the hand or graveyard.
-    let late = permanents_after_mana(&whole);
-    let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, source, &whole, None, None)? };
-    let tappers = choose_tappers(cx, player, source, &whole)?;
     let counter = choose_counter_kind(cx, player, source, &whole)?;
     if mana != ManaCost::ZERO {
         pay_mana(cx, player, source, mana)?;
     }
-    if late {
-        chosen = choose_permanents(cx, player, source, &whole, None, None)?;
-    }
+    // The rest of the cost is chosen as it is paid (CR 601.2h by way of 602.2b), once the mana is: the permanents and the
+    // creatures to tap, which a mana ability activated while paying (CR 601.2g) may have tapped or sacrificed, and the cards
+    // to discard or exile, which one may have put in the hand or graveyard (`activate`).
+    let chosen = choose_permanents(cx, player, source, &whole, None, None)?;
+    let tappers = choose_tappers(cx, player, source, &whole)?;
     let discards = choose_discards(cx, player, source, &whole, None)?;
     let exiles = choose_exiles(cx, player, source, &whole, &[])?;
     if whole.blight > 0 && blight_candidates(cx, player).is_empty() {
@@ -10481,8 +10488,9 @@ fn activate_mana_as(
     // "Sacrifice a creature: Add ..." (Phyrexian Altar): the permanents come with the activation, as its option's
     // candidates (a mana ability never targets, CR 605.1a, so the slots are free for them). Tapped ones ("return a tapped
     // creature you control") are chosen once the ability's own mana is paid, as a spell's are (CR 605.3a, 601.2g-h): a mana
-    // ability activated while paying it may have tapped them.
-    let late = permanents_after_mana(&def.cost);
+    // ability activated while paying it may have tapped them. The others, chosen with the activation, are judged again
+    // once that mana is paid (`chosen_still_pay`).
+    let late = def.cost.permanents.is_some_and(|p| p.tapped);
     let mut chosen: Vec<ObjectId> = if late { Vec::new() } else { sacrifice.iter().filter_map(|t| t.object()).collect() };
     // "Any type the sacrificed permanent could produce" (CR 106.7): read before it is gone, and the type named must be one.
     let mut adds_nothing = false;
@@ -10532,6 +10540,8 @@ fn activate_mana_as(
         if def.colors_from_sacrifice {
             adds_nothing = sacrificed_names(cx, &chosen, color, colorless)?;
         }
+    } else if !chosen_still_pay(cx, &def.cost, &chosen) {
+        return Err(Stop::Cancel);
     }
     pay_exert_and_tappers(cx, source, &def.cost, &[], &mut tapped);
     if def.cost.discard_hand {

@@ -62,8 +62,8 @@ Bot2.Pass
 [T7 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Hostile Hostel.Activate(Ability: Sacrifice)
-Bot1.Choose(Ornithopter)
 Bot1.Battlefield.Island.Activate
+Bot1.Choose(Ornithopter)
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Hostile Hostel.Counters.Soul = 2
@@ -71,8 +71,8 @@ Bot2.Pass
 [T9 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Hostile Hostel.Activate(Ability: Sacrifice)
-Bot1.Choose(Ornithopter)
 Bot1.Battlefield.Island.Activate
+Bot1.Choose(Ornithopter)
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Creeping Inn.Transformed = true
