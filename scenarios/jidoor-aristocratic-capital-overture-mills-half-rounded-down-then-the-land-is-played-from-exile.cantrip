@@ -1,0 +1,50 @@
+# Jidoor, Aristocratic Capital, a Town with an Adventure (CR 715): Overture ({4}{U}{U}, sorcery) "Target opponent mills half their library, rounded down", then the land waits in exile
+# to be played. Bot2's library holds 13 cards: 6 are milled (not 7), 7 stay. The land enters tapped (refused for mana), and taps for {U} the turn after.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Black Lotus
+Jidoor, Aristocratic Capital
+Island x2
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Jidoor, Aristocratic Capital.Cast(Bot2; Ability: Adventure)
+? Stack = Overture
+Bot1.Pass
+Bot2.Pass
+? Bot2.Library.Count = 7
+? Bot2.Graveyard.Count = 6
+? Exile = Jidoor, Aristocratic Capital
+[T3 Bot1.Main1]
+Bot1.Exile.Jidoor, Aristocratic Capital.Play
+? Bot1.Battlefield.Jidoor, Aristocratic Capital.Tapped = true
+? Bot1.Battlefield.Jidoor, Aristocratic Capital.Subtypes = Town
+! Bot1.Battlefield.Jidoor, Aristocratic Capital.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Jidoor, Aristocratic Capital.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Exile.Count = 0
