@@ -1,0 +1,8 @@
+{
+  "name": "Bone-Cairn Butcher",
+  "manaCost": "{1}{R}{W}{B}",
+  "type": "Creature — Demon",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Mobilize 2 (Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)\nAttacking tokens you control have deathtouch."
+}

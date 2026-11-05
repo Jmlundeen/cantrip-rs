@@ -1,0 +1,38 @@
+# Bone-Cairn Butcher: "Attacking tokens you control have deathtouch." On turn 3 the Butcher and an Ornithopter attack and
+# the Butcher mobilizes two Warrior tokens: the attacking tokens have deathtouch, the attacking Ornithopter (not a token)
+# keeps only flying, and the Butcher itself has none.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Plains
+Bone-Cairn Butcher
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bone-Cairn Butcher.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Bone-Cairn Butcher > Bot2; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Warrior Token#1.Keywords = Deathtouch
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Count = 8
