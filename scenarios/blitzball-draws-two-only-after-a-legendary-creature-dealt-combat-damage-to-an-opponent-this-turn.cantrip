@@ -1,0 +1,64 @@
+# Blitzball: "GOOOOAAAALLL! - {T}, Sacrifice this artifact: Draw two cards. Activate only if an opponent was dealt combat damage by a legendary
+# creature this turn." On turn 3 it is refused before combat; after Isamaru (a legendary creature) is unblocked, the first Blitzball is
+# sacrificed to draw two. On turn 5 Bot2's Ornithopter blocks Isamaru, no combat damage is dealt to the opponent, and the second
+# Blitzball is refused again (it is a new turn, too).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Blitzball
+Blitzball
+Isamaru, Hound of Konda
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Blitzball.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Blitzball.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Blitzball#1.Activate(Ability: GOOOOAAAALLL!)
+Bot1.Attack(Isamaru, Hound of Konda > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+Bot1.Battlefield.Blitzball#1.Activate(Ability: GOOOOAAAALLL!)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 3
+? Bot1.Battlefield.Blitzball.Tapped = false
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Isamaru, Hound of Konda > Bot2)
+Bot2.Block(Ornithopter > Isamaru, Hound of Konda)
+[T5 Bot1.Main2]
+! Bot1.Battlefield.Blitzball.Activate(Ability: GOOOOAAAALLL!)
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Blitzball.Tapped = false
