@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::select::{self, Part, Selection};
+use cantrip_mechanics::select;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::{choose, tokens};
 use cantrip_oracle as oracle;
@@ -14,21 +14,13 @@ pub static WORM: CardDef = CardDef {
     ..token!(Worm)
 };
 
-fn creature_or_land(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
-    Verdict::each(choice, |card| q.chars(card).is(CardType::Creature) || q.chars(card).is(CardType::Land))
-}
-
-/// "A creature or land card" (CR 205.2a): a card with either type, judged by the types it has where it went.
-const CREATURE_OR_LAND_CARD: Part = select::part(&(creature_or_land as SelectFn), 0, "");
-
 /// "Mill four cards, then you may put a creature or land card from among the milled cards on top of your library" (CR 701.17,
 /// 401.3): the cards are found where they went (a graveyard, or exile by a replacement effect), each judged by the types it has
 /// there; choosing none declines.
 fn mill_and_put_back(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
     let milled = g.mill(player, 4);
-    let rule = Selection::of(select::up_to(1), &[CREATURE_OR_LAND_CARD]).called("creature or land");
-    let chosen = choose::select(g, player, item.object, Purpose::PutOnTop, milled, rule)?;
+    let chosen = choose::select(g, player, item.object, Purpose::PutOnTop, milled, select::CREATURE_OR_LAND_CARD)?;
     g.put_into_library(&chosen, LibraryPlace::Top);
     Ok(())
 }

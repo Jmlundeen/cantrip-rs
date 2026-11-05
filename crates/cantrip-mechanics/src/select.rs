@@ -163,6 +163,17 @@ pub const fn basic_land_of_type(subtype: Subtype) -> Part {
 /// "A basic land card or Planet card": Final Frontier and Genesis Device search for it.
 pub const BASIC_LAND_OR_PLANET: Part = basic_land_or_subtype(Subtype::Planet);
 
+fn creature_or_land(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |card| q.chars(card).is(CardType::Creature) || q.chars(card).is(CardType::Land))
+}
+
+/// "A creature or land card" (CR 205.2a): a card with the card type creature or the card type land, judged by the types it has
+/// where it is. Lluwen, Imperfect Naturalist (from the cards milled) and Say Its Name (from the graveyard) print it.
+pub const CREATURE_OR_LAND: Part = part(&(creature_or_land as SelectFn), 0, "");
+
+/// "A creature or land card", up to one: the choice may be left empty.
+pub const CREATURE_OR_LAND_CARD: Selection = Selection::of(up_to(1), &[CREATURE_OR_LAND]).called("creature or land");
+
 /// "A creature card". Survival of the Fittest, Worldly Tutor and Formidable Speaker search for it.
 pub const CREATURE: Part = part(&(creature as SelectFn), 0, "");
 
