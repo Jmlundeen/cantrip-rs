@@ -1,0 +1,40 @@
+# {2/R}{2/W}{2/B} (Mox Ruby, Pearl, Jet pay one coloured mana each), "When this creature enters, target creature gets +1/+0 and gains
+# indestructible until end of turn." A Mox is no creature (refused); the Ornithopter targeted is 1/2 and indestructible for the turn
+# only, so on turn 3 it is 0/2 again.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Reigning Victor
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reigning Victor.Cast
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Mox Ruby)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+? Bot1.Battlefield.Reigning Victor.Power = 3
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Keywords = Flying

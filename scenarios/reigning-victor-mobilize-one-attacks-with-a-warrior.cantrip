@@ -1,0 +1,40 @@
+# Reigning Victor's mobilize 1 (CR 702.181a): attacking on turn 3 with a 3/3 it creates one tapped and attacking 1/1 red Warrior, so
+# Bot2 takes 3 + 1 = 4; the Warrior is sacrificed at the next end step. The enters trigger targeted the Victor itself (4/3 on turn 1 only).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Reigning Victor
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reigning Victor.Cast
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Reigning Victor.Power = 4
+? Bot1.Battlefield.Reigning Victor.Toughness = 3
+[T3 Bot1.Main1]
+Bot1.Attack(Reigning Victor)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Warrior Token.Tapped = true
+? Bot2.Life = 16
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 16
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Reigning Victor
