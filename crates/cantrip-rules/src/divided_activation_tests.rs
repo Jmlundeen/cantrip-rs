@@ -183,7 +183,7 @@ fn a_loyalty_ability_divides_its_counters_before_its_loyalty_is_paid() {
     let ranger = put(&mut g, &RANGER, YOU, Zone::BATTLEFIELD);
     crate::counters::put(&mut cx(&mut g), ranger, CounterKind::Loyalty, 3, YOU, crate::counters::How::Effect);
     let divide = activate(&mut g, ranger);
-    let RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional } = &divide.kind else {
+    let RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional, .. } = &divide.kind else {
         panic!("the division is asked as it is activated: {:?}", divide.kind)
     };
     assert_eq!((*source, *total, *max_targets, *optional), (ranger, 2, 2, true));

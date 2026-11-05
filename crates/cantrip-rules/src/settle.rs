@@ -679,6 +679,10 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
         return Ok(());
     }
     let def = triggered(cx, trigger.ability);
+    // Its text as it is put on the stack (CR 603.3, 113.7a): its source's words now, or last, if it has left. A reflexive or
+    // delayed ability's are those of the text that made it (`PendingTrigger::words`). Worked out once, for the question a
+    // divided total asks and for the item alike.
+    let words = trigger.words.unwrap_or_else(|| cantrip_api::words(cx.s(), trigger.source));
     // Asked as the ability it is (CR 607.5): one an effect gave its source reads only its own links.
     let asker = Asker { source: trigger.source, controller: trigger.controller, by: layers::given_link(cx.cards(), cx.s(), trigger.source, trigger.ability, trigger.acquired), spell: false };
     let mut targets = Vec::new();
@@ -745,7 +749,7 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
         if left_the_game(cx, trigger.controller) {
             return Ok(());
         }
-        match crate::actions::ask_divided(cx, trigger.controller, trigger.source, false, spec, total, None, false, by)? {
+        match crate::actions::ask_divided(cx, trigger.controller, trigger.source, false, spec, total, None, false, by, Some((trigger.ability, words)))? {
             crate::actions::Divided::Chosen(chosen, given) => {
                 targets = chosen;
                 shares = given;
@@ -792,9 +796,7 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
         copied: false,
         cast_known: u32::MAX,
         acquired: trigger.acquired,
-        // Its text as it is put on the stack (CR 603.3, 113.7a): its source's words now, or last, if it has left.
-        // A reflexive or delayed ability's are those of the text that made it (`PendingTrigger::words`).
-        words: trigger.words.unwrap_or_else(|| cantrip_api::words(cx.s(), trigger.source)),
+        words,
     };
     // Its controller left as one of its choices was asked (CR 800.4d).
     if cx.s().player(trigger.controller).lost {

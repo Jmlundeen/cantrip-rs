@@ -1293,21 +1293,29 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 .map(|p| CounterPoolMessage { object: handles.handle(p.object), counter: p.kind.name().to_string(), count: p.count as i32 })
                 .collect(),
         }),
-        RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional } => {
+        RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional, trigger } => {
             let source_handle = source_handle(game, handles, *source);
             // What divides, in its own words, so the division reads as damage or as counters: the spell being cast or the
-            // ability being activated, each on the stack as it is announced (CR 601.2a, 602.2a). A triggered ability is put
-            // on the stack only once its targets are chosen (CR 603.3d): it has none.
-            let text = match game.state.stack.last() {
-                Some(item) if item.object == *source && item.kind == StackKind::Spell => game.cards.get(game.chars(*source).card).text,
-                Some(item) if item.object == *source && item.kind == StackKind::Activated => game.cards.ability(item.ability).text(),
-                _ => "",
+            // ability being activated, each on the stack as it is announced (CR 601.2a, 602.2a): the spell in the words its
+            // object has, the ability in the words its item announces (a granted ability, a text-changing effect). A triggered
+            // ability is put on the stack only once its targets are chosen (CR 603.3d), so the request carries it, with the
+            // words it will have there.
+            let name = game.cards.get(game.chars(*source).card).name;
+            let text = match (game.state.stack.last(), trigger) {
+                (_, Some((ability, words))) => crate::text::changed_text(game.cards.ability(*ability).text(), name, *words),
+                (Some(item), None) if item.object == *source && item.kind == StackKind::Spell => {
+                    crate::text::changed_text(game.cards.get(game.chars(*source).card).text, name, Query::words(game, *source))
+                }
+                (Some(item), None) if item.object == *source && item.kind == StackKind::Activated => {
+                    crate::text::changed_text(game.cards.ability(item.ability).text(), name, item.words)
+                }
+                _ => String::new(),
             };
             PromptPayload::ChooseDividedTargetsPromptMessage(ChooseDividedTargetsPrompt {
                 player,
                 ability: source_handle,
                 source: source_handle,
-                text: text.to_string(),
+                text,
                 candidates: candidates.iter().filter_map(|t| target_message(handles, *t)).collect(),
                 total: wire(*total),
                 max_targets: wire(*max_targets),

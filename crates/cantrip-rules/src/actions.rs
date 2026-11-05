@@ -9322,7 +9322,7 @@ fn announce_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool
     let x = announced_x(item);
     let total = divide.total_for(&*cx, &Asker { source, controller: player, by, spell }, item.x);
     let mut targets = Vec::new();
-    match ask_divided(cx, player, source, spell, &specs[0], total, x, true, by)? {
+    match ask_divided(cx, player, source, spell, &specs[0], total, x, true, by, None)? {
         Divided::Chosen(chosen, shares) => {
             targets = chosen;
             set_item_targets(cx, &targets, &[]);
@@ -9376,7 +9376,7 @@ fn divided_activation_possible(cx: &Cx, asker: &Asker, def: &ActivatedDef, divid
 /// question, as the C# engine does: a total of nothing is not asked, and is no legal announcement of a slot that requires
 /// a target, each of which must receive at least one; with no candidate an optional slot takes no target. `may_cancel` is
 /// for a spell or ability still being announced; `x` is the X announced for it (`resolve::announced_x`).
-pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, spec: &TargetSpec, total: u32, x: Option<u32>, may_cancel: bool, by: Option<Linked>) -> R<Divided> {
+pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, spec: &TargetSpec, total: u32, x: Option<u32>, may_cancel: bool, by: Option<Linked>, trigger: Option<(AbilityRef, Words)>) -> R<Divided> {
     if total == 0 {
         return Ok(if spec.required() { Divided::Impossible } else { Divided::Skipped });
     }
@@ -9387,7 +9387,7 @@ pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spell
     }
     // 0 is no limit but the candidates: a slot counted by X (the total divided is X too) or of any number of targets.
     let max_targets = if spec.max >= TargetSpec::ANY_NUMBER { 0 } else { spec.max };
-    let ask = RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional: spec.min == 0 };
+    let ask = RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional: spec.min == 0, trigger };
     match cx.ask_core(player, ask, may_cancel)? {
         Answer::Divided(shares) if shares.is_empty() => Ok(Divided::Skipped),
         Answer::Divided(shares) => Ok(Divided::Chosen(

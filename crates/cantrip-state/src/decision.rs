@@ -490,7 +490,11 @@ pub enum RequestKind {
     /// The targets of a slot that divides a total among them, and each one's share (CR 601.2d): "distribute two +1/+1
     /// counters among up to two target creatures". At most `max_targets` of `candidates` (any number when 0), each with a
     /// share of at least 1, adding up to `total`; none at all when the slot is `optional`.
-    ChooseDividedTargets { source: ObjectId, candidates: Vec<Target>, total: u32, max_targets: u32, optional: bool },
+    ///
+    /// `trigger` is the triggered ability that divides, with the words its text has as it is put on the stack (CR 603.3,
+    /// 113.7a), for a request that asks before the ability is on the stack (CR 603.3d): what a client reads to say what is
+    /// divided. None for a spell or an activated ability, which is on the stack as it is announced (CR 601.2a, 602.2a).
+    ChooseDividedTargets { source: ObjectId, candidates: Vec<Target>, total: u32, max_targets: u32, optional: bool, trigger: Option<(AbilityRef, Words)> },
     /// Declare attackers (CR 508.1): any of `eligible`, each at one of `players`; `requirements` are the requirements on
     /// the declaration (CR 508.1d), counted and judged by `AttackRules::judge`.
     /// Who attacks what (CR 508.1): each attacker names a player, a planeswalker a defending player controls, or a battle a defending player protects (`battles`,

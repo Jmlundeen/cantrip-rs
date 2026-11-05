@@ -505,6 +505,7 @@ pub(crate) fn ask_of(
             total,
             max_targets,
             optional,
+            ..
         } => {
             source = r(*s);
             let mut candidates: Vec<Ref> = candidates.iter().map(|&c| t(c)).collect();
