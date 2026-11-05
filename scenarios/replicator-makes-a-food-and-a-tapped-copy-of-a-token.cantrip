@@ -1,0 +1,28 @@
+# Replicator makes a Food token as it enters, then its ability makes a tapped copy of that token: two Foods, the copy
+# tapped and the original untapped (CR 111.10b, 111.1, 707.2).
+
+[Bot1 Deck]
+Replicator
+Island x19
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Replicator.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Replicator.Activate(Bot1.Battlefield.Food Token)
+
+[Expect]
+Bot1.Battlefield.Food Token#1.Tapped = false
+Bot1.Battlefield.Food Token#2.Tapped = true
+Bot1.Battlefield.Food Token#2.Types = Artifact
