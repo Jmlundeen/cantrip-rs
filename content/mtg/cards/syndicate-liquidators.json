@@ -1,0 +1,11 @@
+{
+  "name": "Syndicate Liquidators",
+  "manaCost": "{4}{G}",
+  "type": "Creature — Orion Pirate",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Trample\nLandfall — Whenever a land you control enters, put two +1/+1 counters on target creature you control.",
+  "keywords": [
+    "Trample"
+  ]
+}

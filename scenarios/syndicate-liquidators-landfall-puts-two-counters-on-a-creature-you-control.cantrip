@@ -1,0 +1,39 @@
+# Syndicate Liquidators: "Landfall — Whenever a land you control enters, put two +1/+1 counters on target creature you
+# control." (CR 122.1, 603.6a): Bot2's Ornithopter is no legal target, its own 4/4 body takes the two counters and becomes
+# 6/6, and its trample is printed.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Syndicate Liquidators
+Forest x3
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Syndicate Liquidators.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Syndicate Liquidators.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Syndicate Liquidators.Power = 6
+Bot1.Battlefield.Syndicate Liquidators.Toughness = 6
+Bot1.Battlefield.Syndicate Liquidators.Keywords = Trample
