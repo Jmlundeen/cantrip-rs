@@ -1,0 +1,75 @@
+# Q, Stacking the Deck {2}{R}{R}. Its enters trigger shuffles Bot1's library and exiles from the top until a nonland card:
+# Crimson Kobolds is the library's only nonland, so it is the card exiled however the shuffle falls. That card gains
+# "Exile a card from your hand: Create a copy of this card. You may cast the copy. Activate only during your turn and only if
+# this card is exiled." - Bot1 pays its cost by exiling the Swamp from its hand, leaving the Mountain there (CR 602.2b,
+# 601.2h), and casts the copy, which becomes a token (CR 707.12b). Then Bot2's Binding Negotiation puts the exiled card
+# into Bot1's graveyard, and the ability is offered no more: only a card in exile can use it (CR 113.6b, 400.7).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Q, Stacking the Deck
+Mountain
+Swamp
+Mountain x6
+Crimson Kobolds
+Mountain x6
+
+[Bot2 Deck]
+Swamp
+Swamp
+Binding Negotiation
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Q, Stacking the Deck.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Crimson Kobolds.Activate
+Bot1.Choose(Swamp)
+? Bot1.Hand = Mountain
+? Bot1.Exile.Swamp.Colors.Count = 0
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Crimson Kobolds.Token = true
+[T4 Bot2.Main1]
+! Bot1.Exile.Crimson Kobolds.Activate
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Binding Negotiation.Cast(Bot1)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Crimson Kobolds)
+[T5 Bot1.Main1]
+! Bot1.Exile.Crimson Kobolds.Activate
+
+[Expect]
+Bot1.Battlefield.Crimson Kobolds.Token = true
+Bot1.Graveyard.Crimson Kobolds.Power = 0
+Bot1.Exile.Crimson Kobolds = (absent)
+Bot2.Graveyard.Binding Negotiation.Colors = Black
+Bot1.Shuffles = 1

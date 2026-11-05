@@ -1,0 +1,38 @@
+# Q, Stacking the Deck {2}{R}{R}: "When Q enters, shuffle your library, then exile cards from the top of your library
+# until you exile a nonland card. That nonland card gains ..." (CR 701.13a): with a library of nothing but lands, the
+# whole library is exiled and no card gains the ability. Every nonland card is in the opening hand or already cast, so the
+# library the trigger shuffles and exiles holds thirteen Mountains.
+
+[Bot1 Deck]
+Q, Stacking the Deck
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Q, Stacking the Deck.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Library.Count = 0
+Exile.Count = 13
+Bot1.Battlefield.Count = 6

@@ -28,7 +28,7 @@ const CAST_KEYWORDS: [&str; 6] = ["storm", "replicate", "ripple", "conspire", "c
 ///   ability that functions on the battlefield);
 /// - otherwise on the battlefield (CR 113.6).
 fn said_zones(text: &str, name: &str) -> ZoneKinds {
-    let text = without_reminders(&text.to_ascii_lowercase().replace('\u{2014}', "-"));
+    let text = without_reminders(&without_quotes(&text.to_ascii_lowercase().replace('\u{2014}', "-")));
     let name = name.to_ascii_lowercase();
     if CAST_KEYWORDS.iter().any(|k| text.starts_with(k)) {
         return ON_THE_STACK;
@@ -134,9 +134,27 @@ fn the_reader_reads_the_printed_forms() {
         ("Whenever you cycle or discard another card, scry 1.", "Test", ON_THE_BATTLEFIELD),
         ("Offspring {2} (You may pay an additional {2} as you cast this spell.)", "Pawpatch Recruit", ON_THE_BATTLEFIELD),
         ("Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", "Ugin, Eye of the Storms", ON_THE_BATTLEFIELD),
+        // The quoted ability is the exiled card's, not the trigger's: only it is at home in exile.
+        ("When Q enters, shuffle your library, then exile cards from the top of your library until you exile a nonland card. That nonland card gains \"Exile a card from your hand: Create a copy of this card. You may cast the copy. Activate only during your turn and only if this card is exiled.\"", "Q, Stacking the Deck", ON_THE_BATTLEFIELD),
     ] {
         assert_eq!(names(said_zones(text, name)), names(zones), "{text}");
     }
+}
+
+/// The text without the abilities it quotes, which are abilities of what the card makes or grants (CR 113.6), not this
+/// ability's own words: "That nonland card gains \"... only if this card is exiled.\"" says nothing about where the trigger
+/// itself functions.
+fn without_quotes(text: &str) -> String {
+    let mut out = String::new();
+    let mut quoted = false;
+    for c in text.chars() {
+        match c {
+            '"' | '\u{201c}' | '\u{201d}' => quoted = !quoted,
+            _ if !quoted => out.push(c),
+            _ => {}
+        }
+    }
+    out.trim().to_string()
 }
 
 /// The text without its reminder text, which says what a keyword does rather than being an ability (CR 207.2).
