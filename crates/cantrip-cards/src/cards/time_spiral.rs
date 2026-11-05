@@ -7,7 +7,8 @@ use cantrip_oracle as oracle;
 /// be shuffled in, and leaves the stack for nowhere more when it finishes.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.exile(item.object);
-    shuffle_hands_and_graveyards_in_and_draw_seven(g);
+    let players: Vec<PlayerId> = g.state().apnap().collect();
+    shuffle_hands_and_graveyards_in_and_draw_seven(g, &players);
     untap::up_to_lands(g, item.object, item.controller, 6)
 }
 

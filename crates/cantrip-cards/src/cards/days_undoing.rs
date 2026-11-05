@@ -7,7 +7,8 @@ use cantrip_oracle as oracle;
 /// turn ends (CR 724.1), and the abilities that triggered while the cards moved and were drawn cease to exist (724.1a);
 /// on another player's turn (cast with flash, or as an effect resolves) the turn goes on.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    shuffle_hands_and_graveyards_in_and_draw_seven(g);
+    let players: Vec<PlayerId> = g.state().apnap().collect();
+    shuffle_hands_and_graveyards_in_and_draw_seven(g, &players);
     if g.state().turn.active == item.controller {
         g.end_the_turn()?;
     }

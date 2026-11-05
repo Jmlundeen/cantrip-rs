@@ -4,7 +4,8 @@ use cantrip_mechanics::shuffle_hands_and_graveyards_in_and_draw_seven;
 use cantrip_oracle as oracle;
 
 fn effect(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
-    shuffle_hands_and_graveyards_in_and_draw_seven(g);
+    let players: Vec<PlayerId> = g.state().apnap().collect();
+    shuffle_hands_and_graveyards_in_and_draw_seven(g, &players);
     Ok(())
 }
 

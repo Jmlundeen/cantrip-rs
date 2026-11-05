@@ -1102,20 +1102,20 @@ fn look_for_one(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usi
     Ok(())
 }
 
-/// "Each player shuffles their hand and graveyard into their library, then draws seven cards": every hand and
-/// graveyard moves together (CR 701.24), the libraries are shuffled, and each player draws in turn order from the
-/// active player (CR 101.4); nobody is asked. Echo of Eons, Timetwister, Time Spiral and Day's Undoing print it.
-pub fn shuffle_hands_and_graveyards_in_and_draw_seven(g: &mut dyn Game) {
-    let players: Vec<PlayerId> = g.state().apnap().collect();
+/// "[Players] shuffle their hand and graveyard into their library, then draw seven cards": the hands and graveyards of
+/// `players` (in turn order from the active player, CR 101.4) move together (CR 701.24), each of their libraries is shuffled,
+/// and each of them draws seven in that order; nobody is asked. Echo of Eons, Timetwister, Time Spiral and Day's Undoing pass
+/// every player; Weftwalking (its controller) and Turtles in Time (those who chose to) pass some.
+pub fn shuffle_hands_and_graveyards_in_and_draw_seven(g: &mut dyn Game, players: &[PlayerId]) {
     let mut cards: Vec<ObjectId> = Vec::new();
-    for &p in &players {
+    for &p in players {
         cards.extend(g.state().zone(Zone::hand(p)).iter().chain(g.state().zone(Zone::graveyard(p)).iter()).copied());
     }
     g.put_into_library(&cards, LibraryPlace::Top);
-    for &p in &players {
+    for &p in players {
         g.shuffle(p);
     }
-    for &p in &players {
+    for &p in players {
         g.draw(p, 7);
     }
 }

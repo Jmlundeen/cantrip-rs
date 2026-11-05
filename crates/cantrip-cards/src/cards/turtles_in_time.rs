@@ -1,5 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::ask_may;
+use cantrip_mechanics::shuffle_hands_and_graveyards_in_and_draw_seven;
 use cantrip_oracle as oracle;
 
 const SHUFFLE_IN: Question = Question::new("ShuffleIn", "shuffle your hand and graveyard into your library?", "Chosen as the spell resolves", "Shuffle", "Don't");
@@ -21,17 +22,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             shuffling.push(p);
         }
     }
-    let mut cards: Vec<ObjectId> = Vec::new();
-    for &p in &shuffling {
-        cards.extend(g.state().zone(Zone::hand(p)).iter().chain(g.state().zone(Zone::graveyard(p)).iter()).copied());
-    }
-    g.put_into_library(&cards, LibraryPlace::Top);
-    for &p in &shuffling {
-        g.shuffle(p);
-    }
-    for &p in &shuffling {
-        g.draw(p, 7);
-    }
+    shuffle_hands_and_graveyards_in_and_draw_seven(g, &shuffling);
     g.end_sentence();
     g.exile(item.object);
     Ok(())
