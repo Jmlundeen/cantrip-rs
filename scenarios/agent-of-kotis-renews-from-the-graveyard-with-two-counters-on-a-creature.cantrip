@@ -1,0 +1,59 @@
+# Agent of Kotis: "Renew — {3}{U}, Exile this card from your graveyard: Put two +1/+1 counters on target creature. Activate only
+# as a sorcery." Bot1 casts it on turn 1 (two Mox Sapphires) and Bot2 Lightning Bolts it on turn 2. On turn 3 Bot1 casts an
+# Embereth Shieldbreaker (2/1) and a Black Lotus, left untapped. On Bot2's turn 4 the ability is not offered though Bot1 holds
+# the four mana (only as a sorcery, CR 602.5d); on turn 5 it is, and puts two +1/+1 counters on the Shieldbreaker (4/3). The
+# Agent is exiled as the cost.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Agent of Kotis
+Mox Ruby
+Embereth Shieldbreaker
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Agent of Kotis.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Agent of Kotis)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+! Bot1.Graveyard.Agent of Kotis.Activate(Embereth Shieldbreaker)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Graveyard.Agent of Kotis.Activate(Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Embereth Shieldbreaker.Counters.PlusOnePlusOne = 2
+
+[Expect]
+Bot1.Battlefield.Embereth Shieldbreaker.Power = 4
+Bot1.Battlefield.Embereth Shieldbreaker.Toughness = 3
+Exile = Agent of Kotis
+Bot1.Graveyard = Black Lotus

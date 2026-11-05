@@ -1,0 +1,64 @@
+# Agent of Kotis: the renew ability targets the Embereth Shieldbreaker; in response Bot2 Lightning Bolts it, so the target is
+# illegal as the ability resolves and nothing happens (CR 608.2b). The Agent stays exiled: exiling it was the cost. Set up as
+# in the neighbouring scenario, with a second Bolt in Bot2's hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Agent of Kotis
+Mox Ruby
+Embereth Shieldbreaker
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Agent of Kotis.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Agent of Kotis)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+! Bot1.Graveyard.Agent of Kotis.Activate(Embereth Shieldbreaker)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Graveyard.Agent of Kotis.Activate(Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Embereth Shieldbreaker)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Embereth Shieldbreaker = (absent)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Agent of Kotis
+Bot1.Graveyard = Embereth Shieldbreaker; Black Lotus
