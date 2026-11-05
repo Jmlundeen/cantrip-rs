@@ -3,7 +3,8 @@
 # {3}{R}{R}" (Equip is not, with no creature to equip). Activated, the choice of materials is asked as craft's own: the
 # artifacts Bot1 controls (two Moxen, a Sol Ring) and the Black Lotus card in its graveyard are offered together, and the
 # caption says where they may come from and that they are exiled. The Lotus is chosen from the graveyard and confirmed
-# with "Exile it"; the Flail returns as Dire Blunderbuss.
+# with "Exile it"; the Flail returns as Dire Blunderbuss. The mana is paid exactly (the Lotus's leftover red, the Mountain, one
+# Mox and the Ring): mana left over in the pool would ask which to spend first, and the title is read at that question.
 
 [Bot1 Deck]
 Mountain
@@ -30,7 +31,6 @@ Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
 ? Client.Bot1.Menu = Craft with artifact {3}{R}{R}
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Ruby#1.Activate
-Bot1.Battlefield.Mox Ruby#2.Activate
 Bot1.Battlefield.Sol Ring.Activate
 ? Client.Bot1.Prompt.Title = Dire Flail: craft - choose an artifact you control or an artifact card from your graveyard to exile
 Bot1.Choose(Graveyard.Black Lotus)
