@@ -1,0 +1,43 @@
+# Savvy Profiteer {1}{R}: "{T}: Add {R}." and "{3}, {T}: Create a Treasure token." Played on turn 1 for a Mountain and a
+# Mox Ruby; the mana ability is tapped on turn 3 and the Treasure ability, needing its own untapped body, on turn 5, paid
+# with three Mountains, so one Treasure token is on the battlefield.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Savvy Profiteer
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Savvy Profiteer.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Savvy Profiteer.Activate(Ability: #1)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Savvy Profiteer.Activate(Ability: #2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Treasure Token.Token = true
+Bot1.Battlefield.Savvy Profiteer.Power = 2
+Bot1.Battlefield.Savvy Profiteer.Toughness = 1

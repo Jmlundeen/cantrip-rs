@@ -1,0 +1,8 @@
+{
+  "name": "Savvy Profiteer",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Ferengi Rogue",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "{T}: Add {R}.\n{3}, {T}: Create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+}
