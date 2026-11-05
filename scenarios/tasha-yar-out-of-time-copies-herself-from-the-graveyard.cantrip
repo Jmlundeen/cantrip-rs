@@ -1,0 +1,50 @@
+# Tasha Yar, Out of Time {1}{R} 2/1 with haste: "When Tasha Yar dies, exile the top card of your library. Until the end of
+# your next turn, you may play that card." and "{2}{R}, Exile this card from your graveyard: Create a token that's a copy of
+# this card. Sacrifice it at the beginning of the next end step. Activate only as a sorcery." A Bolt kills her on turn 1, so
+# a Mountain is exiled to be played; on turn 3 the graveyard ability makes a 2/1 token copy, which that turn's end step
+# sacrifices.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Tasha Yar, Out of Time
+Lightning Bolt
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tasha Yar, Out of Time.Cast
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Tasha Yar, Out of Time)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Mountain
+? Bot1.Graveyard = Tasha Yar, Out of Time; Lightning Bolt
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Tasha Yar, Out of Time.Activate(Ability: #2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 5
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Exile = Mountain; Mountain; Tasha Yar, Out of Time
