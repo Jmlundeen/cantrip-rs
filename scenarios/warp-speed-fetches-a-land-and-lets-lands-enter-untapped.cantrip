@@ -1,0 +1,35 @@
+# Warp Speed's enter trigger searches for a basic land card, reveals it and puts it into hand (CR 701.23b, 701.20), and "Lands you control enter
+# untapped" (CR 614.1d) makes Creeping Tar Pit, which enters tapped, arrive untapped.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Warp Speed
+Creeping Tar Pit
+Forest x2
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Warp Speed.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Forest)
+? Bot1.Library.Count = 11
+[T3 Bot1.Main1]
+Bot1.Hand.Creeping Tar Pit.Play
+
+[Expect]
+Bot1.Battlefield.Creeping Tar Pit.Tapped = false
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 10
+Bot1.Revealed = Forest

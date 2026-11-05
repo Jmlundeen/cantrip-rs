@@ -1,0 +1,48 @@
+# Warp Speed: "Strange new worlds — {7}{U}{U}, Sacrifice this enchantment: Draw two cards. This ability costs {X} less to
+# activate, where X is the number of differently named lands you control." (CR 601.2f by way of 602.2b): Forest, Island and
+# Mountain reduce the cost by three, so {4}{U}{U} is paid and two cards are drawn.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Warp Speed
+Island
+Mountain
+Sol Ring
+Forest x5
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Warp Speed.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Warp Speed.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Warp Speed
+Bot1.Hand.Count = 5
