@@ -1,0 +1,34 @@
+# World Map: "{1}, {T}, Sacrifice this artifact: Search your library for a basic land card, reveal it, put it into your hand". With no
+# mana the ability is refused (CR 118.3). With one Mox Pearl tapped, the Volcanic Island (a nonbasic land) and the Ornithopter are
+# not basic land cards (! Search) and the Mountain is: it goes to Bot1's hand and the Map is sacrificed.
+
+[Bot1 Deck]
+Mox Pearl
+World Map
+Island
+Island
+Island
+Island
+Island
+Ornithopter
+Volcanic Island
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.World Map.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.World Map.Activate(Ability: #1)
+! Bot1.Search(Ornithopter)
+! Bot1.Search(Volcanic Island)
+Bot1.Search(Mountain)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Island; Mountain
+Bot1.Graveyard = World Map
+Bot1.Revealed = Mountain

@@ -1,0 +1,40 @@
+# World Map: "{3}, {T}, Sacrifice this artifact: Search your library for a land card, reveal it, put it into your hand". With only two Moxen
+# left to pay with the ability is refused for being short of mana (CR 118.3); with the third it is activated, and the Ornithopter is not a land card
+# (! Search) while the Volcanic Island, a nonbasic land, is: it goes to Bot1's hand and the Map is sacrificed.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+World Map
+Island
+Island
+Ornithopter
+Volcanic Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.World Map.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.World Map.Activate(Ability: {3}; Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.World Map.Activate(Ability: {3})
+! Bot1.Search(Ornithopter)
+Bot1.Search(Volcanic Island)
+
+[Expect]
+Bot1.Hand = Island; Island; Volcanic Island
+Bot1.Graveyard = World Map
+Bot1.Revealed = Volcanic Island
