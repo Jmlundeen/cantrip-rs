@@ -1,0 +1,77 @@
+# Worf, Intelligence Contractor {2}{R} 3/2: "When Worf enters, for each opponent, gain control of up to one target creature
+# that player controls with mana value 3 or less until end of turn. Untap those creatures. Until end of turn, they become
+# Warriors in addition to their other types and gain haste." In a game of three, Bot2's Grizzly Bears (mana value 2) and
+# Bot3's are both taken, untapped and made hasty Warriors; Bot2's Hill Giant (mana value 4) is not even a candidate.
+
+[Bot1 Deck]
+Worf, Intelligence Contractor
+Mox Ruby
+Mox Emerald
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Hill Giant
+Grizzly Bears
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Forest
+Forest x13
+
+[Bot3 Deck]
+Grizzly Bears
+Forest
+Mox Emerald
+Forest x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Hill Giant.Cast
+Bot2.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Hand.Mox Emerald.Cast
+Bot3.Battlefield.Forest.Activate
+Bot3.Battlefield.Mox Emerald.Activate
+Bot3.Hand.Grizzly Bears.Cast
+Bot3.Pass
+[T4 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Worf, Intelligence Contractor.Cast
+! Bot1.Target(Bot2.Battlefield.Hill Giant)
+Bot1.Target(Bot2.Battlefield.Grizzly Bears)
+Bot1.Target(Bot3.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Grizzly Bears#1.Power = 2
+Bot1.Battlefield.Grizzly Bears#1.Subtypes = Bear; Warrior
+Bot1.Battlefield.Grizzly Bears#1.Keywords = Haste
+Bot1.Battlefield.Grizzly Bears#2.Subtypes = Bear; Warrior
+Bot1.Battlefield.Grizzly Bears#2.Keywords = Haste
+Bot2.Battlefield = Hill Giant; Forest; Mox Ruby; Mox Emerald; Mox Pearl
+Bot3.Battlefield = Forest; Mox Emerald

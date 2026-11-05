@@ -1,0 +1,8 @@
+{
+  "name": "Worf, Intelligence Contractor",
+  "manaCost": "{2}{R}",
+  "type": "Legendary Creature — Klingon Warrior Spy",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "When Worf enters, for each opponent, gain control of up to one target creature that player controls with mana value 3 or less until end of turn. Untap those creatures. Until end of turn, they become Warriors in addition to their other types and gain haste."
+}

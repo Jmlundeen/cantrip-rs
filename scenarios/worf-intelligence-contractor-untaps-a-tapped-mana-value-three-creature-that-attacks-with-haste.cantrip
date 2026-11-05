@@ -1,0 +1,77 @@
+# Worf, Intelligence Contractor {2}{R} 3/2: "When Worf enters, for each opponent, gain control of up to one target creature
+# that player controls with mana value 3 or less until end of turn. Untap those creatures. Until end of turn, they become
+# Warriors in addition to their other types and gain haste." Bot2's Centaur Courser (mana value 3, the limit) attacked on
+# turn 4 and is still tapped on turn 5; Bot2's Hill Giant (mana value 4) is refused as Worf's target. The Courser is taken,
+# untapped and given haste, so it attacks its owner the turn it changed hands (CR 302.6, 702.10b).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mountain
+Mountain
+Worf, Intelligence Contractor
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Centaur Courser
+Hill Giant
+Forest
+Forest
+Forest x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Centaur Courser.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Attack(Centaur Courser > Bot1)
+[T4 Bot2.Main2]
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Hill Giant.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Centaur Courser.Tapped = true
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Worf, Intelligence Contractor.Cast
+! Bot1.Target(Bot2.Battlefield.Hill Giant)
+Bot1.Target(Bot2.Battlefield.Centaur Courser)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Centaur Courser.Tapped = false
+Bot1.Attack(Centaur Courser > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 17
+Bot1.Battlefield.Centaur Courser.Keywords = Haste
+Bot1.Battlefield.Centaur Courser.Subtypes = Centaur; Warrior
+Bot2.Battlefield = Forest; Forest; Hill Giant; Mox Emerald; Mox Ruby
