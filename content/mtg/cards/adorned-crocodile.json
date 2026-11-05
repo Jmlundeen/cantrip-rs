@@ -1,0 +1,8 @@
+{
+  "name": "Adorned Crocodile",
+  "manaCost": "{4}{B}",
+  "type": "Creature — Crocodile",
+  "power": 5,
+  "toughness": 3,
+  "oracleText": "When this creature dies, create a 2/2 black Zombie Druid creature token.\nRenew — {B}, Exile this card from your graveyard: Put a +1/+1 counter on target creature. Activate only as a sorcery."
+}

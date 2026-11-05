@@ -1,0 +1,51 @@
+# Adorned Crocodile (5/3): "When this creature dies, create a 2/2 black Zombie Druid creature token." and "Renew - {B}, Exile
+# this card from your graveyard: Put a +1/+1 counter on target creature. Activate only as a sorcery."
+# Turn 1: Black Lotus and two Moxen pay for the Crocodile, a Mox Jet is left. Bot2 Bolts the Crocodile on turn 2 and Bot1
+# gets a Zombie Druid. On turn 3 the renew is refused with the Memnite spell on the stack (CR 307.1), and with a land as the
+# target; once the Memnite resolves it puts a +1/+1 counter on the Druid, and the Crocodile is exiled for it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Adorned Crocodile
+Memnite
+Swamp x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Adorned Crocodile.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Adorned Crocodile)
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Graveyard.Adorned Crocodile.Activate(Zombie Druid Token)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Graveyard.Adorned Crocodile.Activate(Bot1.Battlefield.Mox Jet)
+Bot1.Graveyard.Adorned Crocodile.Activate(Zombie Druid Token)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Zombie Druid Token.Power = 3
+Bot1.Battlefield.Zombie Druid Token.Toughness = 3
+Bot1.Battlefield.Zombie Druid Token.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Black Lotus
+Exile = Adorned Crocodile
