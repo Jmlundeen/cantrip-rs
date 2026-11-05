@@ -1,0 +1,26 @@
+# Type-2 Phaser taps an opposing creature and puts one stun counter on it as it enters; that creature then stays tapped
+# through its controller's untap step, since a stun counter replaces the untap (CR 614.1c, 122.1).
+
+[Bot1 Deck]
+Type-2 Phaser
+Mountain x19
+
+[Bot2 Deck]
+Llanowar Elves
+Forest x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Type-2 Phaser.Cast
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Counters.Stun = 1
