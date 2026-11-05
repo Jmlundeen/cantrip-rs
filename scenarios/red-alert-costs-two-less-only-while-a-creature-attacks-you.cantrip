@@ -1,0 +1,40 @@
+# Red Alert! {2}{R}: "This spell costs {2} less to cast if a creature is attacking you. Creatures you control get +2/+0
+# until end of turn." With nothing attacking Bot1 on turn 3 its two Mox Rubies are short of the full price: refused. On
+# turn 4 Bot2's Memnite attacks Bot1, so it costs {R}, paid exactly by one Mox Ruby (the pool ends empty); Bot1's Crimson
+# Kobolds is a 2/1, and Bot2's own Kobolds is left as printed (CR 611.2a, 611.2c).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Red Alert!
+Crimson Kobolds
+Mountain x16
+
+[Bot2 Deck]
+Memnite
+Crimson Kobolds
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Crimson Kobolds.Cast
+! Bot1.Hand.Red Alert!.Cast(Mana: short)
+[T4 Bot2.Main1]
+Bot2.Attack(Memnite > Bot1)
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Red Alert!.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Crimson Kobolds.Power = 2
+Bot1.Battlefield.Crimson Kobolds.Toughness = 1
+Bot1.Graveyard = Red Alert!
+Bot2.Battlefield.Memnite.Power = 1
