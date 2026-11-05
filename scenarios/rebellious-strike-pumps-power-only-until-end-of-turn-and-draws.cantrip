@@ -1,0 +1,42 @@
+# Rebellious Strike: "Target creature gets +3/+0 until end of turn. Draw a card." Cast on turn 3 at Bot1's Ornithopter (0/2) it becomes
+# 3/2 (power only), Bot1 draws exactly one card, and Bot2 loses exactly 3 when it attacks. A Mox Pearl, not a creature, is refused. On
+# turn 5 the pump has ended: the Ornithopter is 0/2 and its attack deals nothing.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Rebellious Strike
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Rebellious Strike.Cast(Mox Pearl)
+Bot1.Hand.Rebellious Strike.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 5
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+
+[Expect]
+Bot1.Graveyard = Rebellious Strike
+Bot2.Life = 17

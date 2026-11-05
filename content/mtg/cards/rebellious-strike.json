@@ -1,0 +1,6 @@
+{
+  "name": "Rebellious Strike",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Target creature gets +3/+0 until end of turn.\nDraw a card."
+}
