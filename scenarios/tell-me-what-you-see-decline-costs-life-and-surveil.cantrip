@@ -1,0 +1,28 @@
+# The targeted opponent declines, losing 4 life while the controller surveils the top card (CR 118.12, 119.3, 701.25).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Tell Me What You See
+Plains x4
+Island
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tell Me What You See.Cast
+Bot2.Decline
+Bot1.Arrange(| Island)
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield = Mox Jet; Swamp; Tell Me What You See
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Island
+Bot1.Library = Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains

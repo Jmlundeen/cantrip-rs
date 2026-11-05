@@ -1,0 +1,33 @@
+# Choosing a mode for Test of Loyalty faces a dilemma; Tell Me What You See may return from the battlefield to its owner's hand (CR 700.2a, 603.2).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Tell Me What You See
+Test of Loyalty
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Tell Me What You See.Cast
+Bot2.Accept
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Test of Loyalty.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Tell Me What You See
+Bot1.Graveyard = Test of Loyalty
+Exile = Black Lotus
+Bot1.Battlefield = Mox Jet; Swamp

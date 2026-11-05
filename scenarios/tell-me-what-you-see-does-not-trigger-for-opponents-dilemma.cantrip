@@ -1,0 +1,36 @@
+# Test of Loyalty's modal choice is made by Bot2; Tell Me What You See only triggers when its controller Bot1 faces a dilemma (CR 603.2, 700.2a).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Tell Me What You See
+Island x20
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Test of Loyalty
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tell Me What You See.Cast
+Bot2.Accept
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Test of Loyalty.Cast
+Bot2.Modes(1)
+Bot2.Target(Bot2.Graveyard.Black Lotus)
+! Bot1.Accept
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Swamp; Tell Me What You See
+Bot2.Graveyard = Test of Loyalty
+Exile = Black Lotus
