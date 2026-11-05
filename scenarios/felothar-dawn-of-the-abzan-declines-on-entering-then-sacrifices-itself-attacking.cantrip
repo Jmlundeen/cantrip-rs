@@ -1,0 +1,41 @@
+# Felothar's sacrifice is a choice made as the trigger resolves (CR 701.21a, 603.12): declining it on entering puts no counters
+# on anything. On turn 3 it attacks and Bot1 sacrifices Felothar itself, a nonland permanent: the reflexive ability still
+# resolves and puts a counter on the Ornithopter, the one creature left, though Felothar deals no damage.
+
+[Bot1 Deck]
+Ornithopter
+Mox Pearl
+Mox Jet
+Mox Emerald
+Felothar, Dawn of the Abzan
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Felothar, Dawn of the Abzan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+? Bot1.Battlefield.Felothar, Dawn of the Abzan.Power = 3
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Felothar, Dawn of the Abzan > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Felothar, Dawn of the Abzan)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Ornithopter; Mox Pearl; Mox Jet; Mox Emerald
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Felothar, Dawn of the Abzan
+Bot2.Life = 20

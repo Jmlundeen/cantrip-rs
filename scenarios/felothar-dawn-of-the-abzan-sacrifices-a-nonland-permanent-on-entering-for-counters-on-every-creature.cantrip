@@ -1,0 +1,34 @@
+# Felothar, Dawn of the Abzan: "Whenever Felothar enters or attacks, you may sacrifice a nonland permanent. When you do, put a
+# +1/+1 counter on each creature you control." Bot1 has an Ornithopter and casts Felothar with three Moxen; on entering it
+# sacrifices Mox Pearl: Felothar and the Ornithopter each get a counter, the other Moxen (not creatures) none.
+
+[Bot1 Deck]
+Ornithopter
+Mox Pearl
+Mox Jet
+Mox Emerald
+Felothar, Dawn of the Abzan
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Felothar, Dawn of the Abzan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Ornithopter; Mox Jet; Mox Emerald; Felothar, Dawn of the Abzan
+Bot1.Battlefield.Felothar, Dawn of the Abzan.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
