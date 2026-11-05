@@ -1,0 +1,57 @@
+# Cubwarden mutates over Archon of Emeria, on top (CR 702.140c): the merged creature is Cubwarden, with all the abilities of
+# both its cards (CR 702.140e), so the Archon's "each player can't cast more than one spell each turn" (CR 101.2) still
+# applies. On its next turn Bot2 casts Dark Ritual and may not cast Duress with the mana still in its pool.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Archon of Emeria
+Cubwarden
+Plains x20
+
+[Bot2 Deck]
+Swamp
+Dark Ritual
+Duress
+Swamp x21
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Archon of Emeria.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Hand.Cubwarden.Cast(Archon of Emeria; Ability: Mutate)
+Bot1.Pass
+Bot1.Modes(1)
+Bot1.Pass
+[T8 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Mana = {B}{B}{B}
+! Bot2.Hand.Duress.Cast
+
+[Expect]
+Turn = 8
+Bot1.Battlefield = Cat Token; Cat Token; Cubwarden; Plains; Plains; Plains; Plains
+Bot2.Graveyard = Dark Ritual

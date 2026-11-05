@@ -6114,13 +6114,11 @@ fn cast_limit(cx: &Cx) -> Option<u8> {
     cx.s()
         .battlefield()
         .iter()
-        .map(|&id| {
-            let obj = cx.s().obj(id);
-            // A permanent that has lost all its abilities limits nothing (CR 613.1f).
-            let limit = cx.card(obj.copied_card().unwrap_or(obj.card)).cast_limit;
-            if limit > 0 && cx.lost_all_abilities(id) { 0 } else { limit }
-        })
-        .filter(|&n| n > 0)
+        // Every rules text a permanent has: a merged permanent's other components' too (CR 702.140e), the face up (CR 712.8d-f).
+        .flat_map(|&id| cx.cards().texts(cx.s(), cx.s().obj(id)).map(move |card| (id, cx.card(card).cast_limit)))
+        // A permanent that has lost all its abilities limits nothing (CR 613.1f).
+        .filter(|&(id, n)| n > 0 && !cx.lost_all_abilities(id))
+        .map(|(_, n)| n)
         .min()
 }
 
