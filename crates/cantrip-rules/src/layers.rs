@@ -2481,7 +2481,7 @@ fn contract_pairs(base: Chars, ability: AbilityRef) -> Vec<(Chars, Chars)> {
 /// not, a counter of every kind on both, the source at its highest class level and with choices made (a creature type, a
 /// color, a player), the object under the other player's control, and life totals high; a crowded game (another of the
 /// source's card, an artifact, a black and a white permanent, a land that is a Mountain and a Forest, an Equipment attached to
-/// the source, creature cards in the graveyards and cards in hand); and the source in a hand.
+/// the source, creature cards and an instant card in the graveyards and cards in hand); and the source in a hand.
 const SCENES: usize = 7;
 
 fn contract_scene(cards: &CardTable, card: CardId, target: CardId, scene: usize) -> (GameState, ObjectId, ObjectId) {
@@ -2534,10 +2534,13 @@ fn contract_scene(cards: &CardTable, card: CardId, target: CardId, scene: usize)
         // A creature card with an activated ability, whatever the object is: what an ability that reads the graveyards' cards
         // (Necrotic Ooze's "all activated abilities of all creature cards in all graveyards") has to find there.
         let graveyard_card = cards.find("Llanowar Elves").unwrap_or(target);
+        // Lightning Bolt: a noncreature, nonland card, for what counts those in its controller's graveyard (Xande, Dark Mage).
+        let noncreature_card = cards.find("Lightning Bolt");
         for p in [PlayerId(0), PlayerId(1)] {
             for _ in 0..8 {
                 put(Some(graveyard_card), Zone::graveyard(p), None);
             }
+            put(noncreature_card, Zone::graveyard(p), None);
             for _ in 0..3 {
                 put(Some(target), Zone::hand(p), None);
             }
