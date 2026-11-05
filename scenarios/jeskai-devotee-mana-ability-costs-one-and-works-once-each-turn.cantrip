@@ -1,0 +1,36 @@
+# Jeskai Devotee: "{1}: Add {U}, {R}, or {W}. Activate only once each turn." Spent out on T1 it cannot pay the {1}; after a
+# Mox Jet's {B} pays it, the pool is exactly the {U} chosen, green is refused, and a second activation is refused although
+# the {U} could pay for it. On T3 it works again, making {R}.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Jeskai Devotee
+Mox Jet
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Jeskai Devotee.Cast
+! Bot1.Battlefield.Jeskai Devotee.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}
+! Bot1.Battlefield.Jeskai Devotee.Activate(Color: Green)
+! Bot1.Battlefield.Jeskai Devotee.Activate(Color: Black)
+Bot1.Battlefield.Jeskai Devotee.Activate(Color: Blue)
+? Bot1.Mana = {U}
+! Bot1.Battlefield.Jeskai Devotee.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Jeskai Devotee.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Mana = {R}

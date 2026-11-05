@@ -1,0 +1,8 @@
+{
+  "name": "Jeskai Devotee",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Orc Monk",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flurry — Whenever you cast your second spell each turn, this creature gets +1/+1 until end of turn.\n{1}: Add {U}, {R}, or {W}. Activate only once each turn."
+}

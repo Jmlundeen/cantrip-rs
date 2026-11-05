@@ -1,0 +1,57 @@
+# Jeskai Devotee: flurry gives it +1/+1 on its controller's second spell of a turn, not the first (Mox Jet), not the third
+# (Mox Emerald), and not Bot2's own second spell on T2; the Devotee cast as Bot1's second spell on T1 does not trigger itself.
+# The bonus lasts until end of turn: the Devotee is 2/2 again on T4.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Jeskai Devotee
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mountain x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Jeskai Devotee.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jeskai Devotee.Power = 2
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Jeskai Devotee.Power = 2
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jeskai Devotee.Power = 2
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jeskai Devotee.Power = 3
+? Bot1.Battlefield.Jeskai Devotee.Toughness = 3
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jeskai Devotee.Power = 3
+Bot1.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Jeskai Devotee.Power = 2
+Bot1.Battlefield.Jeskai Devotee.Toughness = 2
