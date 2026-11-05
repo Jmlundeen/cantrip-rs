@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::{self, creature_you_control_deals_combat_damage_to_player};
+use cantrip_mechanics::triggers::{self, creature_you_control_with_a_counter_deals_combat_damage_to_player};
 use cantrip_oracle as oracle;
 
 const DRAW: Question = Question::new("DrawCard", "pay {cost} to draw a card?", "", "Pay {cost}", "Don't pay");
@@ -9,17 +9,6 @@ const DRAW: Question = Question::new("DrawCard", "pay {cost} to draw a card?", "
 fn counters_for_the_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, item.data[0] as i32);
     Ok(())
-}
-
-/// "Whenever a creature you control with a counter on it deals combat damage to a player" (CR 510.2, 603.2, 122.1): a counter
-/// of any kind, on the creature as it dealt the damage.
-fn creature_with_a_counter_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Damage { source: from, .. } if q.state().obj(*from).has_counters() => {
-            creature_you_control_deals_combat_damage_to_player(q, me, event)
-        }
-        _ => None,
-    }
 }
 
 /// "You may pay {U}. If you do, draw a card." (CR 118.12, 608.2d): the controller of the ability pays and draws.
@@ -39,7 +28,7 @@ pub static CARD: CardDef = CardDef {
         )
         .sums_per_subject(),
         triggered(
-            when_asked(EventMask::DAMAGE, creature_with_a_counter_deals_combat_damage_to_player),
+            when_asked(EventMask::DAMAGE, creature_you_control_with_a_counter_deals_combat_damage_to_player),
             pay_to_draw,
             "Whenever a creature you control with a counter on it deals combat damage to a player, you may pay {U}. If you do, draw a card.",
         ),

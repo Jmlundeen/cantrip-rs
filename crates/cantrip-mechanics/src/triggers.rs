@@ -2017,6 +2017,18 @@ pub fn creature_you_control_deals_combat_damage_to_player_for_amount(q: &dyn Que
     }
 }
 
+/// "Whenever a creature you control with a counter on it deals combat damage to a player" (CR 510.2, 603.2, 122.1): a
+/// counter of any kind on the creature as it dealt the damage. Venus, Torn Between Worlds and Phlox, Unorthodox Doctor
+/// print it.
+pub fn creature_you_control_with_a_counter_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: from, .. } if q.state().obj(*from).has_counters() => {
+            creature_you_control_deals_combat_damage_to_player(q, me, event)
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you commit a crime" (CR 700.13): the ability's controller cast a spell, activated an ability or put a
 /// triggered ability on the stack that targets an opponent, anything an opponent controls and/or a card in an opponent's
 /// graveyard - once for that spell or ability, however many such targets it has. Magda, the Hoardmaster, Raven of Fell
