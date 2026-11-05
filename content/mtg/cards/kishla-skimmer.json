@@ -1,0 +1,11 @@
+{
+  "name": "Kishla Skimmer",
+  "manaCost": "{G}{U}",
+  "type": "Creature — Bird Scout",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying\nWhenever a card leaves your graveyard during your turn, draw a card. This ability triggers only once each turn.",
+  "keywords": [
+    "Flying"
+  ]
+}
