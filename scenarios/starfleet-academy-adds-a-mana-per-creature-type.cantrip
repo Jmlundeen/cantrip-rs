@@ -1,0 +1,35 @@
+# Starfleet Academy taps for one colorless mana, then its Federation ability names a color and adds one mana of it for each
+# creature type among the non-Borg creatures its controller has: Llanowar Elves alone is Elf and Druid, so two (CR 106.5,
+# 205.3m, 608.2h).
+
+[Bot1 Deck]
+Starfleet Academy
+Llanowar Elves
+Mox Emerald x3
+Forest x15
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Starfleet Academy.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Starfleet Academy.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+[T3 Bot1.Main1]
+Bot1.Hand.Forest#1.Play
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest#2.Play
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Starfleet Academy.Activate(Ability: Federation; Color: Green)
+
+[Expect]
+Bot1.Mana = {G}{G}
