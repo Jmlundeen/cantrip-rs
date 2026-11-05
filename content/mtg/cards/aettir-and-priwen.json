@@ -1,0 +1,6 @@
+{
+  "name": "Aettir and Priwen",
+  "manaCost": "{6}",
+  "type": "Legendary Artifact — Equipment",
+  "oracleText": "Equipped creature has base power and toughness X/X, where X is your life total.\nEquip {5}"
+}
