@@ -54,6 +54,13 @@ public sealed partial class MainPage
     /// <summary>A zone looked into in the choice window, while no prompt needs it: exile, a sideboard, a library, a hand.</summary>
     private (ZoneKindView Kind, int Owner)? _peek;
 
+    /// <summary>The owner a peek at exile names to show everyone's share at once, for targets of several owners.</summary>
+    private const int AllExile = -1;
+
+    /// <summary>Whether <see cref="_peek"/> was set to exile for a target, and what it was before, to put back after.</summary>
+    private bool _peekedExileForTargets;
+    private (ZoneKindView Kind, int Owner)? _peekBeforeExileTargets;
+
     private ResizeGrip _graveyardGrip = null!;
     private float? _graveyardDragFrom;
     private float _graveyardDragWidth;
@@ -214,20 +221,43 @@ public sealed partial class MainPage
     /// </summary>
     private void PeekAtTargets(GameClient client, IReadOnlyList<TargetMessage> candidates)
     {
-        if (AllInGraveyards(client, candidates))
+        if (!AllInHiddenPiles(client, candidates))
+        {
+            return;
+        }
+
+        List<ObjectView> objects = [.. candidates.Select(c => client.Object(c.Object)).OfType<ObjectView>()];
+
+        if (objects.Any(o => o.Zone == ZoneKindView.Graveyard))
         {
             OpenGraveyardsForTargets();
         }
+
+        // Exile is looked into through the choice window, one owner's share at a time; cards of several owners open it whole.
+        List<ObjectView> exiled = [.. objects.Where(o => o.Zone == ZoneKindView.Exile)];
+        if (exiled.Count > 0)
+        {
+            if (!_peekedExileForTargets)
+            {
+                _peekBeforeExileTargets = _peek;
+                _peekedExileForTargets = true;
+            }
+
+            _peek = (ZoneKindView.Exile, exiled.Select(o => o.Owner).Distinct().Count() == 1 ? exiled[0].Owner : AllExile);
+            _choiceCollapsed = false;
+        }
     }
 
-    private static bool AllInGraveyards(GameClient client, IReadOnlyList<TargetMessage> candidates)
+    /// <summary>Whether every candidate is a card in a graveyard or in exile, which cannot be clicked until its pile is looked into.</summary>
+    private static bool AllInHiddenPiles(GameClient client, IReadOnlyList<TargetMessage> candidates)
     {
         List<ObjectView> objects = [.. candidates.Where(c => !c.IsPlayer).Select(c => client.Object(c.Object)).OfType<ObjectView>()];
 
         return objects.Count > 0
             && candidates.All(c => !c.IsPlayer)
-            && objects.All(o => o.Zone == ZoneKindView.Graveyard);
+            && objects.All(o => o.Zone is ZoneKindView.Graveyard or ZoneKindView.Exile);
     }
+
 
     /// <summary>
     /// Notes a spell or ability just put on the stack if it is aimed at a card in a graveyard, and opens the graveyards
@@ -258,6 +288,15 @@ public sealed partial class MainPage
     /// </summary>
     private void LetGraveyardsGo(GameClient client)
     {
+        // The exile window opened for a target goes back to how it was once nothing is aimed into a pile.
+        if (_peekedExileForTargets && !(AimCandidates(client) is { } aiming && AllInHiddenPiles(client, aiming)))
+        {
+            _peek = _peekBeforeExileTargets;
+            _peekBeforeExileTargets = null;
+            _peekedExileForTargets = false;
+            _needsRedraw = true;
+        }
+
         foreach (ViewHandle onStack in _aimedAtGraveyards.Keys.ToList())
         {
             bool stillAimed = client.Object(onStack)?.Zone == ZoneKindView.Stack
@@ -271,7 +310,7 @@ public sealed partial class MainPage
 
         if (_graveyardsBeforeTargets is not { } before
             || _aimedAtGraveyards.Count > 0
-            || AimCandidates(client) is { } candidates && AllInGraveyards(client, candidates))
+            || AimCandidates(client) is { } candidates && AllInHiddenPiles(client, candidates))
         {
             return;
         }
@@ -533,7 +572,7 @@ public sealed partial class MainPage
     /// whole under seat zero, so a seat's share of it is picked out by owner.
     /// </summary>
     private static List<ObjectView> ExileOf(GameClient client, int seat) =>
-        [.. client.Zone(ZoneKindView.Exile, 0).Where(card => card.Owner == seat)];
+        [.. client.Zone(ZoneKindView.Exile, 0).Where(card => seat == AllExile || card.Owner == seat)];
 
     /// <summary>
     /// The pool, one chip per kind of mana: mana that may only be spent on certain things is a chip
@@ -815,7 +854,7 @@ public sealed partial class MainPage
             return;
         }
 
-        string whose = owner == client.Seat ? "Your" : $"{NameOf(client, owner)}'s";
+        string whose = owner == AllExile ? "The" : owner == client.Seat ? "Your" : $"{NameOf(client, owner)}'s";
         OpenChoices($"{whose} exile  ·  {contents.Count} card{(contents.Count == 1 ? string.Empty : "s")}", closable: true, contents.Count);
 
         foreach (ObjectView card in contents)
