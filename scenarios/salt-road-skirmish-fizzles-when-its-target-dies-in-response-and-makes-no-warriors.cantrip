@@ -1,0 +1,39 @@
+# CR 608.2b: Salt Road Skirmish's only target, Bot2's Ornithopter, is bolted in response (Bot1's Mox Ruby), so the spell does not
+# resolve at all and no Warrior tokens are made.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Salt Road Skirmish
+Lightning Bolt
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Salt Road Skirmish.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Mox Jet; Mox Ruby
+Delayed.Count = 0

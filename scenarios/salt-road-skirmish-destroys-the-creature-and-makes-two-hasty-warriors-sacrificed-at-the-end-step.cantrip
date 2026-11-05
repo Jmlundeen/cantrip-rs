@@ -1,0 +1,42 @@
+# Salt Road Skirmish ({3}{B}, sorcery): "Destroy target creature. Create two 1/1 red Warrior creature tokens. They gain haste until end
+# of turn. Sacrifice them at the beginning of the next end step." Turn 3, Bot1 (Black Lotus and Mox Jet) destroys Bot2's Ornithopter;
+# the two Warriors have haste and attack at once for 2 (20 -> 18), are still there in the second main phase, and are gone at the end
+# step (CR 603.7c).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Salt Road Skirmish
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Salt Road Skirmish.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+? Bot1.Battlefield.Warrior Token#1.Keywords = Haste
+[T3 Bot1.Attackers]
+Bot1.Attack(Warrior Token#1 > Bot2; Warrior Token#2 > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Battlefield.Count = 3
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Count = 1
+
+[Expect]
+Bot1.Battlefield = Mox Jet
+Bot2.Life = 18
