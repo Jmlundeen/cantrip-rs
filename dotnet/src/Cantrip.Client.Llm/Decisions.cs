@@ -1111,16 +1111,18 @@ public sealed class Decisions
             prompt.Total,
             prompt.MaxTargets > 0 ? Math.Min(prompt.MaxTargets, prompt.Candidates.Count) : prompt.Candidates.Count);
 
+        // "Up to" may be aimed at nothing, and then nothing is divided (CR 601.2c-d): Vivien, Arkbow Ranger's +1 with only
+        // the opponent's creatures to give its counters to.
         List<TargetMessage> chosen = Aim(
             client,
             prompt.Candidates,
             most,
-            least: 1,
+            least: prompt.Optional ? 0 : 1,
             what: $"{GameText.Named(client, prompt.Ability)} divides {prompt.Total} among its targets: \"{prompt.Text}\".");
 
         if (chosen.Count == 0)
         {
-            return prompt.Default();
+            return prompt.Optional ? new TargetsDividedAnswer() : prompt.Default();
         }
 
         List<int[]> splits = Splits(prompt.Total, chosen.Count);

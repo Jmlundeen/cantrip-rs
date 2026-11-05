@@ -1,0 +1,37 @@
+# Browser
+# A divided total given to a player at a table (CR 601.2d, 115.4): Pyrotechnics deals 4 damage divided as you choose among any
+# number of targets, and Bot1's page divides it as 2 to Bot2 and 2 to Bot2's Ornithopter. The Ornithopter on the board wears
+# its share and is clicked for it; Bot2 has a − and + of their own in the dock. The dock reads the spell's own words, and the
+# Ornithopter dies while Bot2 goes to 18.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Pyrotechnics
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyrotechnics.Cast
+? Client.Bot1.Prompt.Title = Divide 4 for Pyrotechnics
+? Client.Bot1.Prompt.Detail = Pyrotechnics deals 4 damage divided as you choose among any number of targets.  ·  0 of 4 assigned, among 0 targets  ·  or no target at all  ·  click a card to add one, or use its − and +
+Bot1.Divide(Bot2: 2; Bot2.Battlefield.Ornithopter: 2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Pyrotechnics; Black Lotus

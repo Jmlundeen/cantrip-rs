@@ -35,6 +35,13 @@ public sealed partial class MainPage
     private List<int> _blockQueue => _selection.BlockQueue;
     private Dictionary<(int Source, int Creature), int> _shares => _selection.DamageShares;
     private Dictionary<int, int> _dividedShares => _selection.DividedShares;
+    private Dictionary<int, int> _dividedPlayerShares => _selection.DividedPlayerShares;
+
+    /// <summary>How much of a divided total is given so far, to cards and to players together (CR 601.2d).</summary>
+    private int DividedAssigned => _dividedShares.Values.Sum() + _dividedPlayerShares.Values.Sum();
+
+    /// <summary>How many targets a divided total has so far: each card and player given some of it (CR 601.2d).</summary>
+    private int DividedTargeted => _dividedShares.Count(pair => pair.Value > 0) + _dividedPlayerShares.Count(pair => pair.Value > 0);
     private ActionOptionMessage? _targeting { get => _selection.Targeting; set => _selection.Targeting = value; }
 
     // Rebuilt from the outstanding prompt on every redraw, so no stale offer can survive into a later decision.

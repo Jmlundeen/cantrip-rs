@@ -444,6 +444,28 @@ public sealed class DecisionTests
     }
 
     [Fact]
+    public void Aims_an_up_to_division_at_nothing_when_it_says_so()
+    {
+        // The first question offers the two creatures and then "Aim it at nothing.": the third choice.
+        var chooser = new ScriptedChooser([2]);
+
+        AnswerPayload answer = new Decisions(chooser).Answer(
+            Seated(Creature(5, "Grizzly Bears", 2, 2, Them), Creature(6, "Serra Angel", 4, 4, Them)),
+            new ChooseDividedTargetsPromptMessage
+            {
+                Player = Me,
+                Ability = Handle(9),
+                Text = "+1: Distribute two +1/+1 counters among up to two target creatures. They gain trample until end of turn.",
+                Total = 2,
+                MaxTargets = 2,
+                Optional = true,
+                Candidates = [new() { Object = Handle(5) }, new() { Object = Handle(6) }],
+            });
+
+        Assert.Empty(Assert.IsType<TargetsDividedAnswer>(answer).Shares);
+    }
+
+    [Fact]
     public void Removes_counters_for_a_cost_one_question_per_counter_naming_kind_and_creature()
     {
         // The Ballista's one counter is taken first; then only the Caryatid's are left, which needs no question.

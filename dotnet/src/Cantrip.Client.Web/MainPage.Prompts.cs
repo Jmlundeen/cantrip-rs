@@ -901,7 +901,8 @@ public sealed partial class MainPage
     /// <summary>
     /// Choosing a divided slot's targets and how its total splits among them together (CR 601.2d). The candidates on the
     /// battlefield wear their shares, with a step down and up, the way blockers wear combat damage, so whose creature
-    /// gets what is read off the board; the dock says what has been chosen, and whose each one is.
+    /// gets what is read off the board; the dock says what has been chosen, and whose each one is. A player who may be a
+    /// target ("among one or two targets", CR 115.4) has a − and + of their own in the dock, named for whom they give to.
     /// </summary>
     private void FillDivideTargets(GameClient client, ChooseDividedTargetsPromptMessage prompt)
     {
@@ -912,8 +913,8 @@ public sealed partial class MainPage
         }
 
         string source = client.Object(prompt.Source)?.Name ?? client.Object(prompt.Ability)?.Name ?? "An ability";
-        int assigned = _dividedShares.Values.Sum();
-        int targeted = _dividedShares.Count(pair => pair.Value > 0);
+        int assigned = DividedAssigned;
+        int targeted = DividedTargeted;
 
         Prompt(
             $"Divide {prompt.Total} for {source}",
@@ -925,15 +926,15 @@ public sealed partial class MainPage
             none ? "Divide nothing" : "Divide",
             () => Send(client, new TargetsDividedAnswer
             {
+                // In the order the question offers the candidates, players and cards alike.
                 Shares =
                 [
-                    .. _dividedShares
-                        .Where(pair => pair.Value > 0)
-                        .Select(pair => new TargetShareMessage
-                        {
-                            Target = new TargetMessage { Object = new ViewHandle(pair.Key) },
-                            Amount = pair.Value,
-                        }),
+                    .. prompt.Candidates
+                        .Select(candidate => (candidate, amount: candidate.IsPlayer
+                            ? _dividedPlayerShares.GetValueOrDefault(candidate.Player)
+                            : _dividedShares.GetValueOrDefault(candidate.Object.Value)))
+                        .Where(pair => pair.amount > 0)
+                        .Select(pair => new TargetShareMessage { Target = pair.candidate, Amount = pair.amount }),
                 ],
             }),
             enabled: none || assigned == prompt.Total && (prompt.MaxTargets == 0 || targeted <= prompt.MaxTargets),
@@ -944,6 +945,7 @@ public sealed partial class MainPage
             AddButton("Clear", () =>
             {
                 _dividedShares.Clear();
+                _dividedPlayerShares.Clear();
                 _needsRedraw = true;
             });
         }
@@ -952,6 +954,15 @@ public sealed partial class MainPage
         {
             if (candidate.IsPlayer)
             {
+                int seat = candidate.Player;
+                int given = _dividedPlayerShares.GetValueOrDefault(seat);
+                string who = seat == client.Seat ? "you" : NameOf(client, seat);
+                bool room = given > 0 || prompt.MaxTargets == 0 || targeted < prompt.MaxTargets;
+                DockButton less = Step("−", given > 0, () => _dividedPlayerShares[seat] = Math.Max(0, given - 1));
+                DockButton more = Step("+", assigned < prompt.Total && room, () => _dividedPlayerShares[seat] = given + 1);
+                Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(less, $"Less to {who} (seat {seat}, now {given})");
+                Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(more, $"More to {who} (seat {seat}, now {given})");
+                _buttons.Children.Add(Stepper(6, less, new SymbolText(13, Theme.Fg) { Text = $"{given}  {who}" }, more));
                 continue;
             }
 

@@ -567,6 +567,33 @@ public sealed class ScenarioPlayer
                 await DistributeAsync(distributed, state);
                 return;
 
+            case TargetsDividedAnswer divided:
+            {
+                // A divided slot's targets and their shares (CR 601.2d): a click on a candidate card adds one to its share,
+                // as a person does; a player's share is stepped with the dock's + named for that seat, "More to Bot2 (seat 2,
+                // now 0)". Then Divide (or, with no target, Divide nothing).
+                foreach (TargetShareMessage share in divided.Shares)
+                {
+                    for (int n = 0; n < share.Amount; n++)
+                    {
+                        if (!share.Target.IsPlayer)
+                        {
+                            await ClickHandleAsync(share.Target.Object.Value);
+                            continue;
+                        }
+
+                        TableState now = await _page.SettledAsync();
+                        ControlState more = now.Controls.FirstOrDefault(c => c.Kind == "button" && c.Label.StartsWith("More to ", StringComparison.Ordinal)
+                            && c.Label.Contains($"(seat {share.Target.Player}, now {n})", StringComparison.Ordinal))
+                            ?? throw new NotDrivenException($"a + for seat {share.Target.Player}'s share (now {n})", now);
+                        await _page.TapAsync(more.X, more.Y);
+                    }
+                }
+
+                await ClickButtonStartingAsync("Divide");
+                return;
+            }
+
             case CountersRemovedAnswer removed:
             {
                 // Counters removed from among permanents as a cost (CR 118.3): the dock's button for each kind on each permanent

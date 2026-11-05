@@ -40,6 +40,8 @@ public sealed class PromptSelection
     public Dictionary<(int Source, int Creature), int> DamageShares { get; } = [];
     /// <summary>A divided target's own share (CR 601.2d), keyed by candidate handle.</summary>
     public Dictionary<int, int> DividedShares { get; } = [];
+    /// <summary>A divided target player's own share (CR 601.2d: "among any number of targets"), keyed by seat.</summary>
+    public Dictionary<int, int> DividedPlayerShares { get; } = [];
     /// <summary>The counters taken so far for a cost that removes them from among permanents (CR 118.3), by permanent and kind.</summary>
     public Dictionary<(int Object, string Counter), int> CounterRemovals { get; } = [];
     public ActionOptionMessage? Targeting { get; set; }
@@ -101,6 +103,7 @@ public sealed class PromptSelection
         BlockQueue.Clear();
         DamageShares.Clear();
         DividedShares.Clear();
+        DividedPlayerShares.Clear();
         CounterRemovals.Clear();
         Targeting = null;
         TargetingColor = null;

@@ -49,8 +49,8 @@ public sealed partial class MainPage
             return;
         }
 
-        int assigned = _dividedShares.Values.Sum();
-        int targeted = _dividedShares.Count(pair => pair.Value > 0);
+        int assigned = DividedAssigned;
+        int targeted = DividedTargeted;
         bool counters = divide.Text.Contains("counter", StringComparison.OrdinalIgnoreCase);
 
         foreach (TargetMessage candidate in divide.Candidates)
