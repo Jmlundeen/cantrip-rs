@@ -1,0 +1,34 @@
+# Nightblade Brigade: Bot1 keeps the top card on the library (CR 701.25a), so nothing is in the graveyard but the Lotus. On turn 3
+# Bot2's Ornithopter (0/2) blocks the Brigade; its 1 damage kills the Ornithopter only because of deathtouch (CR 702.2b).
+
+[Bot1 Deck]
+Black Lotus
+Nightblade Brigade
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Nightblade Brigade.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Swamp |)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Attackers]
+Bot1.Attack(Nightblade Brigade > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Blockers]
+Bot2.Block(Ornithopter > Nightblade Brigade)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Ornithopter
+Bot2.Life = 19
+Bot1.Battlefield.Nightblade Brigade.Damage = 0
