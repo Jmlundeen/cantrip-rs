@@ -1,0 +1,58 @@
+# Ambulatory Reactor: "Artifact creatures you control have "{T}: Add {C}. Spend this mana only to cast an artifact spell
+# or activate an ability of an artifact source."" (CR 613.1f, layer 6; CR 605.1a.) Turn 3: the Reactor itself and
+# Bot1's Ornithopter each tap for {C}, so the pool is exactly {C}{C}; Bot1's Kobolds of Kher Keep is a creature but not
+# an artifact, and Bot2's own Ornithopter (cast on turn 2, so not summoning sick by turn 4) is not one Bot1 controls:
+# neither has the ability. Bot1's Tormod's Crypt is an artifact but not a creature, so it cannot tap for mana either.
+# Naming "Add {C}" in that refusal distinguishes the granted mana ability from the Crypt's printed ability.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Ambulatory Reactor
+Ornithopter
+Kobolds of Kher Keep
+Tormod's Crypt
+Island
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ambulatory Reactor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Kobolds of Kher Keep.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Tormod's Crypt.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ambulatory Reactor.Activate
+Bot1.Battlefield.Ornithopter.Activate
+? Bot1.Mana = {C}{C} (ArtifactSpellsOrAbilities)
+! Bot1.Battlefield.Kobolds of Kher Keep.Activate
+! Bot1.Battlefield.Tormod's Crypt.Activate(Ability: Add {C})
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Ornithopter.Activate
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Ambulatory Reactor.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Kobolds of Kher Keep.Tapped = false
+Bot1.Battlefield.Tormod's Crypt.Tapped = false
+Bot2.Battlefield.Ornithopter.Tapped = false
