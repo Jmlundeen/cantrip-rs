@@ -1,0 +1,38 @@
+# Skrelv, Defector Mite: "Toxic 1" (CR 702.164) and "Skrelv can't block" (CR 509.1b). Skrelv and Memnite wait through Bot2's
+# turn 4 attack by Devoted Hero: Memnite may block it (the control), Skrelv, untapped, may not. Unblocked, Hero deals 1
+# to Bot1. On turn 5 Skrelv attacks Bot2 (the Hero is still tapped), who loses 1 life and gets a poison counter.
+
+[Bot1 Deck]
+Skrelv, Defector Mite
+Memnite
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Devoted Hero
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Skrelv, Defector Mite.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Devoted Hero.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Devoted Hero > Bot1)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Block(Skrelv, Defector Mite > Devoted Hero)
+Bot1.Block(Memnite > Devoted Hero)
+[T5 Bot1.Main1]
+Bot1.Attack(Skrelv, Defector Mite > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Poison = 1
+Bot1.Battlefield.Memnite = (absent)

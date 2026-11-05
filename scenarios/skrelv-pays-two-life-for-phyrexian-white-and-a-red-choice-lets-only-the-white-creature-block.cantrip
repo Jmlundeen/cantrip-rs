@@ -1,0 +1,58 @@
+# Skrelv, Defector Mite: {W/P} paid with 2 life (CR 107.4f) though a Plains could pay, and red chosen for Memnite: Bot2's
+# Dwarven Trader (red) and Figure of Destiny (red and white) can't block it (CR 509.1b) while Devoted Hero (white) can, as
+# the restriction is only of the color chosen, and a creature of that color among others is of it (CR 105.2). The Trader
+# may still block Phyrexian Walker: the restriction is on Memnite alone. Memnite, blocked, deals no combat damage to a
+# player and dies to the Hero (1/2). Bot2's Lightning Bolt (red) can't target Memnite this turn: hexproof from red.
+
+[Bot1 Deck]
+Skrelv, Defector Mite
+Memnite
+Phyrexian Walker
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Devoted Hero
+Dwarven Trader
+Lightning Bolt
+Figure of Destiny
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Skrelv, Defector Mite.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Phyrexian Walker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Devoted Hero.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dwarven Trader.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Figure of Destiny.Cast
+Bot2.Battlefield.Plains.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Skrelv, Defector Mite.Activate(Bot1.Battlefield.Memnite)
+Bot1.Modes(1)
+Bot1.Colors(Red)
+? Bot1.Life = 18
+Bot1.Pass
+Bot2.Pass
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot1.Attack(Memnite > Bot2; Phyrexian Walker > Bot2)
+Bot1.Pass
+! Bot2.Block(Dwarven Trader > Memnite)
+! Bot2.Block(Figure of Destiny > Memnite)
+Bot2.Block(Devoted Hero > Memnite; Dwarven Trader > Phyrexian Walker)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Poison = 0
+Bot1.Battlefield.Memnite = (absent)
+Bot1.Battlefield.Phyrexian Walker.Tapped = true

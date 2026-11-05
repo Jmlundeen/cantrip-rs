@@ -1,0 +1,59 @@
+# Skrelv, Defector Mite: "{W/P}, {T}: Choose a color. Another target creature you control gains toxic 1 and hexproof from
+# that color until end of turn. It can't be blocked by creatures of that color this turn." (CR 702.164, 702.11d, 509.1b).
+# On Bot1's turn 3 Skrelv's {W/P} is paid with a Plains (the pool is empty right after) and white is chosen for Memnite.
+# Skrelv itself and Bot2's Devoted Hero are not targets; Bot2's Swords to Plowshares (white) can't target Memnite and
+# Devoted Hero (white) can't block it, so it connects: Bot2 loses 1 life and gets a poison counter (toxic 1 granted, not
+# the printed one). On turn 4 the effects are over - Memnite has no toxic and no restriction - and Swords to Plowshares
+# exiles Memnite.
+
+[Bot1 Deck]
+Skrelv, Defector Mite
+Memnite
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Devoted Hero
+Swords to Plowshares
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Skrelv, Defector Mite.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Devoted Hero.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Battlefield.Skrelv, Defector Mite.Activate(Bot2.Battlefield.Devoted Hero)
+! Bot1.Battlefield.Skrelv, Defector Mite.Activate(Bot1.Battlefield.Skrelv, Defector Mite)
+Bot1.Battlefield.Skrelv, Defector Mite.Activate(Bot1.Battlefield.Memnite)
+Bot1.Battlefield.Plains.Activate
+Bot1.Colors(White)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Toxic = 1
+? Bot1.Battlefield.Skrelv, Defector Mite.Toxic = 1
+! Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Memnite)
+Bot1.Attack(Memnite > Bot2)
+Bot1.Pass
+! Bot2.Block(Devoted Hero > Memnite)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Memnite.Toxic = (absent)
+? Bot1.Battlefield.Memnite.BlockRestriction = (absent)
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Memnite)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot2.Poison = 1
+Bot1.Battlefield.Memnite = (absent)
+Exile = Memnite
+Bot1.Battlefield.Skrelv, Defector Mite.Tapped = true
