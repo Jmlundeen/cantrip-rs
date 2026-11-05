@@ -1,0 +1,45 @@
+# Devoted Duelist: haste lets it attack the turn it is cast (Bot1 T1), and flurry pings each opponent on Bot1's second spell
+# of a turn only: not its first, not its third, and not Bot2's own second spell (T2), which also leaves Ajani, an opponent's
+# planeswalker, untouched since the damage goes to each opponent and not to what they control. The Duelist cast as Bot1's
+# second spell on T1 does not trigger itself.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Devoted Duelist
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mountain x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ajani Resolute
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Devoted Duelist.Cast
+[T1 Bot1.BeginCombat]
+Bot1.Attack(Devoted Duelist > Bot2)
+[T1 Bot1.Main2]
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot2.Battlefield.Ajani Resolute.Counters.Loyalty = 2

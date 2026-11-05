@@ -1,0 +1,11 @@
+{
+  "name": "Devoted Duelist",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Goblin Monk",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Haste\nFlurry — Whenever you cast your second spell each turn, this creature deals 1 damage to each opponent.",
+  "keywords": [
+    "Haste"
+  ]
+}
