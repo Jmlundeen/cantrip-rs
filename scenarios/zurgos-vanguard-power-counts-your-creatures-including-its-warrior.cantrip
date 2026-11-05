@@ -1,0 +1,53 @@
+# Zurgo's Vanguard: its power is the number of creatures you control (CR 604.3): itself and an Ornithopter make 2, Bot2's
+# Ornithopter on T2 does not count; attacking with mobilize 1 (CR 702.181a) its Warrior token makes 3, so Bot2 takes 3 + 1;
+# after the Warrior is sacrificed at the end step it is 2/3 again.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Zurgo's Vanguard
+Ornithopter
+Mountain x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zurgo's Vanguard.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Zurgo's Vanguard.Power = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Zurgo's Vanguard.Power = 2
+? Bot1.Battlefield.Zurgo's Vanguard.Toughness = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Zurgo's Vanguard.Power = 2
+[T3 Bot1.Main1]
+Bot1.Attack(Zurgo's Vanguard > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Zurgo's Vanguard.Power = 3
+? Bot2.Life = 16
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 16
+Bot1.Battlefield.Zurgo's Vanguard.Power = 2

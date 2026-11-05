@@ -1,0 +1,8 @@
+{
+  "name": "Zurgo's Vanguard",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Dog Soldier",
+  "power": "*",
+  "toughness": 3,
+  "oracleText": "Mobilize 1 (Whenever this creature attacks, create a tapped and attacking 1/1 red Warrior creature token. Sacrifice it at the beginning of the next end step.)\nZurgo's Vanguard's power is equal to the number of creatures you control."
+}
