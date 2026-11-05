@@ -1,0 +1,26 @@
+# "{T}: Add {W} or {B}." The color is chosen as the ability is activated, one each turn (white, black); the other colors and
+# colorless are refused beside those positive controls.
+
+[Bot1 Deck]
+Scoured Barrens
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Scoured Barrens.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Scoured Barrens.Activate(Color: Blue)
+! Bot1.Battlefield.Scoured Barrens.Activate(Color: Red)
+! Bot1.Battlefield.Scoured Barrens.Activate(Color: Green)
+! Bot1.Battlefield.Scoured Barrens.Activate(Color: Colorless)
+Bot1.Battlefield.Scoured Barrens.Activate(Color: White)
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Scoured Barrens.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Scoured Barrens.Tapped = true
