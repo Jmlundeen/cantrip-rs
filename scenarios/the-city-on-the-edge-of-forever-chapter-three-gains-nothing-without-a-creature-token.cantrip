@@ -1,0 +1,43 @@
+# The City on the Edge of Forever: "III -- Sacrifice a creature token. If you do, you gain 5 life." (CR 701.21a, 608.2c)
+# Bot2 Shocks the Human token, so when chapter III resolves Bot1 controls no creature token: its Memnite, a nontoken
+# creature, is not sacrificed, and Bot1 gains no life. (With the Human gone, the Moxen phased in on turn 3.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+The City on the Edge of Forever
+Memnite
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Shock
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The City on the Edge of Forever.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Human Token)
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Count = 6

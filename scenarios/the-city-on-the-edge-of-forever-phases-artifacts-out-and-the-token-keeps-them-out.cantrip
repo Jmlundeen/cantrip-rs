@@ -1,0 +1,39 @@
+# The City on the Edge of Forever: "I -- All artifacts and creatures phase out. Create a 0/1 white Human creature token with
+# 'Permanents can't phase in.'" (CR 702.26b, 702.26a) Bot1's five Moxen phase out with chapter I. They would phase back in
+# during Bot1's next untap step (CR 502.1), but the Human token says they can't: on turn 3 they are still phased out, and
+# chapter II has made each player lose 2 life.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+The City on the Edge of Forever
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The City on the Edge of Forever.Cast
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.PhasedOut.Count = 5
+Bot1.Battlefield.Count = 2
+Bot1.Battlefield.Human Token.Power = 0
+Bot1.Battlefield.Human Token.Toughness = 1
+Bot1.Battlefield.Human Token.Colors = White
+Bot1.Life = 18
+Bot2.Life = 18

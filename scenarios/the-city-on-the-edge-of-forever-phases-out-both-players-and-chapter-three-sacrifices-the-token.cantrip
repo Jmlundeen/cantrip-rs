@@ -1,0 +1,51 @@
+# The City on the Edge of Forever: "I -- All artifacts and creatures phase out. Create a 0/1 white Human creature token with
+# 'Permanents can't phase in.' II -- You draw two cards and each player loses 2 life. III -- Sacrifice a creature token. If
+# you do, you gain 5 life." (CR 702.26b, 121.1, 119.3, 701.21a) Chapter I phases out Bot1's Moxen and Bot2's Memnite too;
+# the Human keeps the Memnite out through Bot2's untap step on turn 4. Chapter II draws Bot1 two cards and costs each player
+# 2 life. Chapter III sacrifices the Human - nobody may decline - and Bot1 gains 5; with the Human gone, Bot2's Memnite
+# phases in on turn 8.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+The City on the Edge of Forever
+Plains x14
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The City on the Edge of Forever.Cast
+[T4 Bot2.Main1]
+? Bot2.PhasedOut.Count = 1
+? Bot2.Battlefield.Count = 0
+[T6 Bot2.Main1]
+? Bot1.Hand.Count = 5
+? Bot1.Life = 18
+? Bot2.Life = 18
+[T8 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 18
+Bot1.Battlefield.Count = 0
+Bot1.PhasedOut.Count = 5
+Bot2.PhasedOut.Count = 0
+Bot2.Battlefield.Memnite.Power = 1
