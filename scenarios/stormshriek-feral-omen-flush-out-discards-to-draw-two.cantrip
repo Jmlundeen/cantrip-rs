@@ -1,0 +1,34 @@
+# Stormshriek Feral cast as its Omen, Flush Out (CR 720.3): a sorcery for {1}{R} (Mox Ruby, Mox Jet), "Discard a card. If you do, draw
+# two cards." Bot1 discards Mox Pearl and draws two Islands (hand 4 -> 3 -> 5), and the Omen is shuffled into the library (CR 720.3d), none
+# in the graveyard but the Mox Pearl.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Stormshriek Feral
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Stormshriek Feral.Cast(Ability: Omen)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mox Pearl)
+? Bot1.Graveyard = Mox Pearl
+? Bot1.Hand.Count = 5
+? Bot1.Library.Count = 13
+
+[Expect]
+Bot1.Graveyard = Mox Pearl

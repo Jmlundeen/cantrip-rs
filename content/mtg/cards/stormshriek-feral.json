@@ -1,0 +1,18 @@
+{
+  "name": "Stormshriek Feral",
+  "manaCost": "{4}{R}",
+  "type": "Creature — Dragon",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying, haste\n{1}{R}: This creature gets +1/+0 until end of turn.",
+  "keywords": [
+    "Flying",
+    "Haste"
+  ],
+  "omen": {
+    "name": "Flush Out",
+    "manaCost": "{1}{R}",
+    "type": "Sorcery — Omen",
+    "oracleText": "Discard a card. If you do, draw two cards. (Then shuffle this card into its owner's library.)"
+  }
+}

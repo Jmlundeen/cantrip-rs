@@ -1,0 +1,23 @@
+# Stormshriek Feral costs {4}{R}: Black Lotus (green), Mox Jet and Mox Pearl make 5 mana with no red, so it is refused with no source left.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Stormshriek Feral
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Stormshriek Feral.Cast(Mana: short)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Stormshriek Feral

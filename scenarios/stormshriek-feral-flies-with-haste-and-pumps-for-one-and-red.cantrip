@@ -1,0 +1,50 @@
+# Stormshriek Feral: {4}{R}, 3/3 flying, haste; "{1}{R}: This creature gets +1/+0 until end of turn." Black Lotus (red), Mox Jet and Mox Pearl
+# pay it exactly (the pool is empty after) and it has flying and haste. Two Mox Rubies pay {1}{R} exactly
+# (4/3, only the power); Mox Emerald alone cannot pay another (no red). On turn 3 the pump has ended (3).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Ruby
+Mox Emerald
+Stormshriek Feral
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Stormshriek Feral.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Stormshriek Feral.Keywords = Flying; Haste
+? Bot1.Battlefield.Stormshriek Feral.Power = 3
+? Bot1.Battlefield.Stormshriek Feral.Toughness = 3
+? Bot1.Mana = 
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Stormshriek Feral.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+? Bot1.Battlefield.Stormshriek Feral.Power = 4
+? Bot1.Battlefield.Stormshriek Feral.Toughness = 3
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Stormshriek Feral.Activate(Mana: short)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Stormshriek Feral.Power = 3
+
+[Expect]
+Bot1.Battlefield.Stormshriek Feral.Power = 3
+Bot1.Battlefield.Stormshriek Feral.Toughness = 3
