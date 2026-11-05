@@ -1,0 +1,107 @@
+# O'Brien targets an artifact-only Chalice you control, not either opponent's artifact or your land (CR 603.3d).
+# Bot2 drawing its second card never triggers him. On turn 3 your first draw does not trigger; Opt's single draw
+# is the second and doubles two charge counters to four (CR 121.1, 701.10e). Recall's third/fourth/fifth draws do not.
+# On the opponent's turn, Recall draws your first/second/third: a fresh second draw doubles four to eight, not sixteen.
+# Turn 5's first draw does not trigger; its second targets the creature-only O'Brien himself, which has no counters
+# and gains none. Thus the target need not be an artifact, another permanent, or already have counters.
+
+[Bot1 Deck]
+Chief Miles O'Brien
+Black Lotus
+Everflowing Chalice
+Mox Sapphire x2
+Sol Ring
+Island
+Opt
+Ancestral Recall
+Ancestral Recall
+Opt
+Island x12
+
+[Bot2 Deck]
+Everflowing Chalice
+Sol Ring
+Mox Sapphire
+Ancestral Recall
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Chief Miles O'Brien.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Everflowing Chalice.Cast(Kicked: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Everflowing Chalice.Cast(Kicked: 1)
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Target
+[T3 Bot1.Draw]
+! Bot1.Target
+? Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Ancestral Recall)
+! Bot1.Target(Bot2.Battlefield.Everflowing Chalice)
+! Bot1.Target(Bot2.Battlefield.Mox Sapphire)
+! Bot1.Target(Bot1.Battlefield.Island)
+! Bot1.Target(Count: 0)
+Bot1.Target(Bot1.Battlefield.Everflowing Chalice)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 4
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+? Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 4
+[T4 Bot2.Main1]
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Everflowing Chalice)
+! Bot1.Target
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 8
+[T5 Bot1.Draw]
+! Bot1.Target
+? Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 8
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island)
+Bot1.Target(Bot1.Battlefield.Chief Miles O'Brien)
+
+[Expect]
+Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 8
+Bot2.Battlefield.Everflowing Chalice.Counters.Charge = 1
+Bot1.Battlefield.Chief Miles O'Brien.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Chief Miles O'Brien.Counters.Charge = (absent)
+Bot1.Battlefield.Sol Ring.Counters.Charge = (absent)
