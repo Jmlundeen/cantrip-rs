@@ -1,0 +1,44 @@
+# Aggressive Negotiations: "Target opponent reveals their hand. You choose a nonland card from it and exile that card. Put a
+# +1/+1 counter on up to one target creature you control." Bot1 has a Memnite and an Ornithopter; Bot2 a Memnite of its own.
+# On turn 3 Bot1 pays with Black Lotus and targets Bot2 and its own Memnite: the counter is refused for Bot2's Memnite and for
+# two creatures at once (up to one), and Bot2's Duress is chosen and exiled (the Island is not offered: nonland only). Bot2's
+# Elvish Mystic stays in its hand, and only the Memnite gets the counter.
+
+[Bot1 Deck]
+Black Lotus
+Memnite
+Ornithopter
+Aggressive Negotiations
+Swamp x16
+
+[Bot2 Deck]
+Memnite
+Duress
+Elvish Mystic
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Aggressive Negotiations.Cast
+Bot1.Target(Bot2)
+! Bot1.Target(Bot2.Battlefield.Memnite)
+! Bot1.Target(Memnite; Ornithopter)
+Bot1.Target(Memnite)
+! Bot1.Choose(Island)
+Bot1.Choose(Duress)
+
+[Expect]
+Stack.Count = 0
+Exile = Duress
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Memnite.Power = 1
+Bot1.Graveyard = Aggressive Negotiations; Black Lotus
+Bot2.Revealed = Duress; Elvish Mystic; Island; Island; Island; Island; Island

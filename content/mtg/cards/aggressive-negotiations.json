@@ -1,0 +1,6 @@
+{
+  "name": "Aggressive Negotiations",
+  "manaCost": "{2}{B}",
+  "type": "Sorcery",
+  "oracleText": "Target opponent reveals their hand. You choose a nonland card from it and exile that card. Put a +1/+1 counter on up to one target creature you control."
+}

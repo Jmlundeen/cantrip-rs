@@ -1,0 +1,25 @@
+# Aggressive Negotiations against a hand of only lands: nothing can be chosen, so none is asked for and nothing is exiled
+# (CR 608.2d), and "up to one target creature" is cast with no creature (CR 601.2c), so no counter is put anywhere.
+
+[Bot1 Deck]
+Black Lotus
+Memnite
+Aggressive Negotiations
+Swamp x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Aggressive Negotiations.Cast
+Bot1.Target(Bot2)
+Bot1.Target()
+
+[Expect]
+Stack.Count = 0
+Exile = 
+Bot1.Battlefield.Memnite.Power = 1
+Bot2.Hand.Count = 7

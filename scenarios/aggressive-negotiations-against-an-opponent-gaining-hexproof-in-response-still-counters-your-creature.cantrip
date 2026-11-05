@@ -1,0 +1,44 @@
+# Aggressive Negotiations: "Target opponent reveals their hand. You choose a nonland card from it and exile that card. Put a
+# +1/+1 counter on up to one target creature you control." Each target is judged as the spell resolves (CR 608.2b). On turn 3
+# Bot1 targets Bot2 and its own Memnite; in response Bot2 casts Surge of Salvation ("You and permanents you control gain
+# hexproof until end of turn"), so Bot2 is no longer a legal target: Bot2 reveals nothing and keeps its Duress, but the
+# Memnite, still legal, gets its counter.
+
+[Bot1 Deck]
+Black Lotus
+Memnite
+Aggressive Negotiations
+Swamp x17
+
+[Bot2 Deck]
+Mox Pearl
+Surge of Salvation
+Duress
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Aggressive Negotiations.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Memnite)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Surge of Salvation.Cast
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile =
+Bot2.Hand.Duress.Colors = Black
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Graveyard = Aggressive Negotiations; Black Lotus
