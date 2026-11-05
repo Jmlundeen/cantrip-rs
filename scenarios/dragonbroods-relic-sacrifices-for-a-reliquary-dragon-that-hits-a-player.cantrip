@@ -1,0 +1,52 @@
+# Dragonbroods' Relic: "{3}{W}{U}{B}{R}{G}, Sacrifice this artifact: Create a 4/4 Dragon creature token named Reliquary Dragon that's all colors ... Activate only as a sorcery." With only the five Moxen's {W}{U}{B}{R}{G} it is refused for want of the three generic; with Black Lotus's three more it is refused with Ornithopter on the stack (sorcery timing), then made: the Relic is sacrificed and the 4/4 all-colored flying lifelink Dragon deals 3 to Bot2 as it enters, and lifelink gains Bot1 3 life.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Dragonbroods' Relic
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dragonbroods' Relic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Dragonbroods' Relic.Activate(Ability: Reliquary Dragon; Mana: short)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Battlefield.Dragonbroods' Relic.Activate(Ability: Reliquary Dragon)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dragonbroods' Relic.Activate(Ability: Reliquary Dragon)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Reliquary Dragon.Power = 4
+Bot1.Battlefield.Reliquary Dragon.Toughness = 4
+Bot1.Battlefield.Reliquary Dragon.Colors.Count = 5
+Bot1.Graveyard = Dragonbroods' Relic; Black Lotus
+Bot1.Life = 23

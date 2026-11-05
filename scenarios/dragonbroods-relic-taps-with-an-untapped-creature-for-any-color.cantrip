@@ -1,0 +1,36 @@
+# Dragonbroods' Relic ({1}{G}): "{T}, Tap an untapped creature you control: Add one mana of any color." With no creature the Relic's mana is refused; with Bot1's Ornithopter it adds {R}, which pays Lightning Bolt (Bot2 at 17). A second tap is refused: the Relic and the Ornithopter are both tapped.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Dragonbroods' Relic
+Ornithopter
+Lightning Bolt
+Island x2
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dragonbroods' Relic.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Dragonbroods' Relic.Activate(Color: Red)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dragonbroods' Relic.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Dragonbroods' Relic.Activate(Color: Red)
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Mana = 
