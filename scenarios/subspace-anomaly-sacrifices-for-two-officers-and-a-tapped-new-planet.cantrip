@@ -1,0 +1,32 @@
+# Subspace Anomaly taps for one colorless mana, then its sacrifice ability makes exactly two 1/1 red Officer tokens and
+# a tapped New Planet token (CR 605.1a, 701.21a, 111.1, 111.4).
+
+[Bot1 Deck]
+Subspace Anomaly
+Plains
+Black Lotus
+Mox Pearl
+Plains x16
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Subspace Anomaly.Play
+Bot1.Battlefield.Subspace Anomaly.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Subspace Anomaly.Activate(Ability: Sacrifice this land)
+
+[Expect]
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.New Planet.Tapped = true
+Bot1.Graveyard = Subspace Anomaly; Black Lotus
+Bot1.Mana =
