@@ -1,0 +1,58 @@
+# Call the Spirit Dragons: "for each color, put a +1/+1 counter on a Dragon you control of that color." Kheru Goldkeeper (3/3, black,
+# green and blue) is Bot1's only Dragon, so at the next upkeep black, blue and green each find it alone: each is asked and has only the one to choose, red and
+# white find none and are skipped, and it gets three counters, one per color (6/6). Then Mutable Explorer (a green changeling, 1/1) comes
+# down: at the following upkeep green has two Dragons to choose between and Bot1 picks the Explorer, so Kheru gets black and blue only
+# (8/8) and the Explorer gets green (2/2). Counters on fewer than five Dragons win nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Call the Spirit Dragons
+Kheru Goldkeeper
+Mutable Explorer
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Call the Spirit Dragons.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kheru Goldkeeper.Cast
+[T5 Bot1.Upkeep]
+Bot1.Choose(Kheru Goldkeeper)
+Bot1.Choose(Kheru Goldkeeper)
+Bot1.Choose(Kheru Goldkeeper)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Kheru Goldkeeper.Power = 6
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mutable Explorer.Cast
+[T7 Bot1.Upkeep]
+Bot1.Choose(Kheru Goldkeeper)
+Bot1.Choose(Kheru Goldkeeper)
+Bot1.Choose(Mutable Explorer)
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Kheru Goldkeeper.Power = 8
+
+[Expect]
+Bot1.Battlefield.Kheru Goldkeeper.Power = 8
+Bot1.Battlefield.Mutable Explorer.Power = 2

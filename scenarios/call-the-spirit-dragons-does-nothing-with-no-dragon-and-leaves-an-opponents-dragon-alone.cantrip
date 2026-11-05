@@ -1,0 +1,49 @@
+# Call the Spirit Dragons: "Dragons you control", "a Dragon you control of that color". Bot1 controls no Dragon, so its upkeep puts no
+# counter anywhere and asks nothing; Bot2's Flock Impostor (a white changeling Dragon) gets none, stays a 2/2, and has no indestructible:
+# Bot1's Lightning Bolt kills it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Call the Spirit Dragons
+Island
+Lightning Bolt
+Island x30
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Flock Impostor
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Call the Spirit Dragons.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Flock Impostor.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Flock Impostor.Power = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Flock Impostor)
+
+[Expect]
+Bot2.Graveyard = Flock Impostor

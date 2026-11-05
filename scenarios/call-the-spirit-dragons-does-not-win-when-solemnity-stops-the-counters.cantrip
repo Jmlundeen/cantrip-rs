@@ -1,0 +1,71 @@
+# Call the Spirit Dragons: "If you put +1/+1 counters on five Dragons this way" - only counters that were actually put count. Bot1
+# has all five single-color Dragons by T11 (see the win scenario), but casts Solemnity ("Counters can't be put on ... creatures") that
+# turn too, a noncreature spell, which also makes Traxos, Academy Guardian cost {2} less. At the T13 upkeep every color still finds
+# its Dragon and nothing is put on any of them: Traxos stays 1/5, the Flock Impostor keeps the four counters it already had (6/6) and
+# nobody wins.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Call the Spirit Dragons
+Flock Impostor
+Sizzling Changeling
+Mutable Explorer
+Graveshifter
+Traxos, Academy Guardian
+Solemnity
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Call the Spirit Dragons.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Flock Impostor.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sizzling Changeling.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mutable Explorer.Cast
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Graveshifter.Cast
+[T11 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Solemnity.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Traxos, Academy Guardian.Cast
+[T13 Bot1.Main1]
+? Bot1.Battlefield.Traxos, Academy Guardian.Power = 1
+? Bot1.Battlefield.Flock Impostor.Power = 6
+
+[Expect]
+Bot1.Battlefield.Traxos, Academy Guardian.Power = 1

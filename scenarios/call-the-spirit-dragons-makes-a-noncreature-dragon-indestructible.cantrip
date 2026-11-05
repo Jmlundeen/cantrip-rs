@@ -1,0 +1,50 @@
+# Call the Spirit Dragons: "Dragons you control have indestructible." Every permanent its controller controls that is a Dragon
+# (CR 613.1f), not only creatures: Firdoch Core is a Kindred Artifact with changeling, so a Dragon, and not a creature. Bot2's
+# Shatter destroys target artifact; the Core is indestructible and stays.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Call the Spirit Dragons
+Firdoch Core
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Mountain
+Shatter
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Call the Spirit Dragons.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shatter.Cast(Bot1.Battlefield.Firdoch Core)
+[T4 Bot2.End]
+? Bot2.Graveyard = Shatter
+
+[Expect]
+Bot1.Battlefield.Firdoch Core.Tapped = false
+Bot1.Graveyard.Count = 0

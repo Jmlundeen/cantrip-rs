@@ -1,0 +1,66 @@
+# Call the Spirit Dragons: "If you put +1/+1 counters on five Dragons this way, you win the game." Changelings are Dragons, so the five
+# single-color ones - Flock Impostor (white), Sizzling Changeling (red), Mutable Explorer (green), Graveshifter (black), Traxos,
+# Academy Guardian (blue) - are cast one a turn (T3 to T11), each upkeep from T5 putting counters on those out, one Dragon to a color
+# so nothing is asked. At Bot1's T13 upkeep all five colors find a different Dragon and Bot1 wins.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Call the Spirit Dragons
+Flock Impostor
+Sizzling Changeling
+Mutable Explorer
+Graveshifter
+Traxos, Academy Guardian
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Call the Spirit Dragons.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Flock Impostor.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sizzling Changeling.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mutable Explorer.Cast
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Graveshifter.Cast
+[T11 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Traxos, Academy Guardian.Cast
+[T13 Bot1.Upkeep]
+Bot1.Pass
+
+[Expect]
+Bot2.Status = Lost

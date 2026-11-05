@@ -147,6 +147,23 @@ pub const fn subtype_card(subtype: Subtype) -> Part {
     part(&(self::subtype as SelectFn), crate::lands::sub(subtype) as u32, "")
 }
 
+fn color_rule(q: &dyn Query, choice: &Choice, color: u32) -> Verdict {
+    let color = Color::ALL.get(color as usize).copied();
+    Verdict::each(choice, |card| color.is_some_and(|color| q.chars(card).colors.has(color)))
+}
+
+/// "Of [color]" (CR 105.2): an object that is `color`, as it is now. Call the Spirit Dragons puts a counter on a Dragon of each.
+pub const fn of_color(color: Color) -> Part {
+    part(&(color_rule as SelectFn), color as u32, "")
+}
+
+fn controlled_by_chooser(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |card| q.controller(card) == choice.chooser)
+}
+
+/// "You control" (CR 108.4): a permanent controlled by the player choosing. Call the Spirit Dragons chooses a Dragon with it.
+pub const CONTROLLED_BY_YOU: Part = part(&(controlled_by_chooser as SelectFn), 0, "");
+
 /// "An Equipment card" (CR 205.3g, 205.4a): a card with the subtype Equipment, the type read through the words of the text of the
 /// card that asks (CR 612.2) and a card as it is where it is. Cloud, Midgar Mercenary and Honored Knight-Captain search for it.
 pub const EQUIPMENT: Part = subtype_card(Subtype::Equipment);

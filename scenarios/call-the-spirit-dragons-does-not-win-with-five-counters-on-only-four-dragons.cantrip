@@ -1,0 +1,68 @@
+# Call the Spirit Dragons: the win needs counters on five different Dragons, not five counters. Bot1 has four - Flock Impostor (white),
+# Sizzling Changeling (red), Mutable Explorer (green) and Kheru Goldkeeper (black, green and blue) - and at its T11 upkeep five colors
+# each get a counter (each is asked, as each has a Dragon to choose): Bot1 picks the Explorer for green, so Kheru gets two (black and blue, 5/5) and the four Dragons hold five new
+# counters between them. Nobody wins.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Call the Spirit Dragons
+Flock Impostor
+Sizzling Changeling
+Mutable Explorer
+Kheru Goldkeeper
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Call the Spirit Dragons.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Flock Impostor.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sizzling Changeling.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mutable Explorer.Cast
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kheru Goldkeeper.Cast
+[T11 Bot1.Upkeep]
+Bot1.Choose(Flock Impostor)
+Bot1.Choose(Kheru Goldkeeper)
+Bot1.Choose(Kheru Goldkeeper)
+Bot1.Choose(Sizzling Changeling)
+Bot1.Choose(Mutable Explorer)
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Kheru Goldkeeper.Power = 5
+? Bot1.Battlefield.Mutable Explorer.Power = 3
+? Bot1.Battlefield.Flock Impostor.Power = 6
+? Bot1.Battlefield.Sizzling Changeling.Power = 6
+
+[Expect]
+Bot1.Battlefield.Kheru Goldkeeper.Power = 5
