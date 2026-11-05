@@ -1,0 +1,35 @@
+# Dusyut Earthcarver ({5}{G}, 4/4 reach): "When this creature enters, it endures 3." (CR 701.63a) Bot1 casts it with a Black Lotus
+# and three Moxen. Bot1 declines the counters, so the Earthcarver stays a 4/4 and a 3/3 white Spirit creature token is created.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Jet
+Dusyut Earthcarver
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dusyut Earthcarver.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield.Dusyut Earthcarver.Power = 4
+Bot1.Battlefield.Dusyut Earthcarver.Toughness = 4
+Bot1.Battlefield.Dusyut Earthcarver.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spirit Token.Power = 3
+Bot1.Battlefield.Spirit Token.Toughness = 3
+Bot1.Battlefield.Spirit Token.Colors = White

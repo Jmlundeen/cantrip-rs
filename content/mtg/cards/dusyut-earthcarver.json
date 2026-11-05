@@ -1,0 +1,11 @@
+{
+  "name": "Dusyut Earthcarver",
+  "manaCost": "{5}{G}",
+  "type": "Creature — Elephant Druid",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Reach\nWhen this creature enters, it endures 3. (Put three +1/+1 counters on it or create a 3/3 white Spirit creature token.)",
+  "keywords": [
+    "Reach"
+  ]
+}
