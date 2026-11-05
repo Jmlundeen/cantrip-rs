@@ -1,0 +1,39 @@
+# War Effort: creatures you control get +1/+0, and whenever you attack a 1/1 red Warrior comes in tapped and attacking, sacrificed at the
+# next end step. One Ornithopter (0/2, so 1/2) attacks on turn 3: it and the Warrior (2/1) deal 3. The opponent's creature gets no bonus.
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+War Effort
+Ornithopter
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.War Effort.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot2.Battlefield.Ornithopter.Power = 0
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Damage]
+? Bot1.Battlefield.Warrior Token.Tapped = true
+? Bot1.Battlefield.Warrior Token.Power = 2
+? Bot1.Battlefield.Warrior Token.Toughness = 1
+? Bot2.Life = 17
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Count = 4
+[T5 Bot1.Main1]
+? Bot1.Battlefield = Mox Ruby; Ornithopter; War Effort
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

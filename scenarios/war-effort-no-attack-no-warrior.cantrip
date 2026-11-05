@@ -1,0 +1,26 @@
+# War Effort triggers only when you attack: nothing attacking on turn 3 makes no Warrior, and the opponent attacking on turn 4 does not either.
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+War Effort
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.War Effort.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Count = 2
+[T4 Bot2.Main1]
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Count = 2
+[Expect]
+Bot1.Battlefield.Count = 2
