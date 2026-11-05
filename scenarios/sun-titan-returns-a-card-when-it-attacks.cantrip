@@ -1,0 +1,50 @@
+# Sun Titan ({4}{W}{W}): "Whenever this creature enters or attacks, you may return target permanent card with mana value 3
+# or less from your graveyard to the battlefield." It enters on turn three with an empty graveyard, so its enters trigger has
+# no target; Bot2's Shock then kills Memnite on turn four, and the attack trigger on turn five returns it.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Memnite
+Sun Titan
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Shock
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Sun Titan.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Sun Titan > Bot2)
+Bot1.Target(Bot1.Graveyard.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Graveyard = Black Lotus; Black Lotus
+Bot2.Life = 14
