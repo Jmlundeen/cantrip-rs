@@ -1,0 +1,23 @@
+# Cycling {W}{U}: with Mox Sapphire's {U} and two Moxen of other colors but nothing that makes {W}, the ability is not offered (CR 702.29a, 118.3).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cid, Timeless Artificer
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+! Bot1.Hand.Cid, Timeless Artificer.Activate(Mana: short)
+
+[Expect]
+Bot1.Hand.Count = 4

@@ -1,0 +1,66 @@
+# Cid, Timeless Artificer (4/4, a Human Artificer): "Artifact creatures and Heroes you control get +1/+1 for each Artificer you control and each Artificer card in your graveyard."
+# Turn 1 Bot1 casts Cid (the one Artificer, itself) and Memnite (an artifact creature, 1/1 -> 2/2); Cid is neither an artifact creature nor a Hero, so stays 4/4. Turn 2 Bot2 casts a
+# Memnite and a Goblin Welder (an Artificer of its own): neither is boosted (not "you control") and Bot2's Welder does not count for Bot1's Memnite, still 2/2. Turn 3 Bot1 casts
+# Hero in Training (2/2, a Hero): 3/3.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cid, Timeless Artificer
+Memnite
+Island
+Hero in Training
+Island x12
+
+[Bot2 Deck]
+Mountain
+Goblin Welder
+Memnite
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Cid, Timeless Artificer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Toughness = 2
+? Bot1.Battlefield.Cid, Timeless Artificer.Power = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Goblin Welder.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Hero in Training.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hero in Training.Power = 3
+? Bot1.Battlefield.Hero in Training.Toughness = 3
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot2.Battlefield.Memnite.Power = 1
+? Bot2.Battlefield.Memnite.Toughness = 1
+
+[Expect]
+Bot1.Battlefield.Cid, Timeless Artificer.Toughness = 4

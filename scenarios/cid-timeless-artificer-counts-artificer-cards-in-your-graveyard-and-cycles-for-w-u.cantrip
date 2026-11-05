@@ -1,0 +1,72 @@
+# Cid, Timeless Artificer: Cycling {W}{U} (CR 702.29a) - Turn 1 Bot1 casts Cid and Memnite (2/2: one Artificer, Cid). Turn 2 Bot2 cycles its own Cid, leaving an Artificer card in
+# Bot2's graveyard that counts for no one but Bot2. Turn 3 Bot1 cycles its second Cid from the hand with Pearl's {W} and Sapphire's {U} (the pool ends empty), drawing the Island on top:
+# Cid in its graveyard is the second Artificer counted, so Memnite is 3/3 - and Bot2's Memnite stays 1/1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cid, Timeless Artificer
+Memnite
+Cid, Timeless Artificer
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Cid, Timeless Artificer
+Memnite
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Cid, Timeless Artificer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Cid, Timeless Artificer.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot2.Battlefield.Memnite.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Cid, Timeless Artificer.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+? Bot1.Graveyard = Cid, Timeless Artificer
+? Bot1.Battlefield.Memnite.Power = 3
+? Bot1.Battlefield.Memnite.Toughness = 3
+? Bot2.Battlefield.Memnite.Power = 1
+
+[Expect]
+Bot2.Graveyard = Cid, Timeless Artificer
