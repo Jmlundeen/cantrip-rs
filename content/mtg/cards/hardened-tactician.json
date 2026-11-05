@@ -1,0 +1,8 @@
+{
+  "name": "Hardened Tactician",
+  "manaCost": "{1}{W}{B}",
+  "type": "Creature — Human Warrior",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "{1}, Sacrifice a token: Draw a card."
+}

@@ -1,0 +1,40 @@
+# Hardened Tactician ({1}{W}{B}, 2/4): "{1}, Sacrifice a token: Draw a card." After Lingering Souls makes two Spirit tokens
+# the ability is activated: a nontoken permanent (Mox Jet) is refused as the sacrifice, a Spirit token is sacrificed as the cost
+# and a card is drawn; the other token stays.
+
+[Bot1 Deck]
+Hardened Tactician
+Lingering Souls
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Island
+Island x16
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hardened Tactician.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Hardened Tactician.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Choose(Mox Jet)
+Bot1.Choose(Spirit Token)
+
+[Expect]
+Bot1.Hand = Island; Island; Island
+Bot1.Battlefield = Hardened Tactician; Mox Pearl; Mox Jet; Mox Ruby; Spirit Token
+Bot1.Graveyard = Lingering Souls; Black Lotus
