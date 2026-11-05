@@ -1,0 +1,11 @@
+{
+  "name": "Unrooted Ancestor",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Spirit Cleric",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Flash\n{1}, Sacrifice another creature: This creature gains indestructible until end of turn. Tap it. (Damage and effects that say \"destroy\" don't destroy it.)",
+  "keywords": [
+    "Flash"
+  ]
+}
