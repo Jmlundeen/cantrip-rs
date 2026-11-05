@@ -1,0 +1,27 @@
+# Wastes is a basic land with no land type (CR 205.3i, 305.6): it taps for {C} by its own ability, and that mana pays the generic part
+# of a cost. Bot1 plays Wastes and pays Sol Ring's {1}, leaving no mana (paid exactly); it is a Basic Land with no subtypes.
+
+[Bot1 Deck]
+Wastes
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Wastes.Play
+Bot1.Battlefield.Wastes.Activate
+? Bot1.Mana = {C}
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Sol Ring; Wastes
+Bot1.Battlefield.Wastes.Types = Land
+Bot1.Battlefield.Wastes.Supertypes = Basic
+Bot1.Battlefield.Wastes.Subtypes = (absent)
+Bot1.Battlefield.Wastes.Tapped = true
