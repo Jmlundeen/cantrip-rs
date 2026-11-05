@@ -1,0 +1,37 @@
+# Scavenging Ooze exiles the spell's only target in response, so Test of Loyalty has no legal target and does not draw (CR 608.2b).
+
+[Bot1 Deck]
+Swamp
+Test of Loyalty
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Scavenging Ooze
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Scavenging Ooze.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Test of Loyalty.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot2.Graveyard.Black Lotus)
+Bot1.Battlefield.Swamp.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Scavenging Ooze.Activate(Bot2.Graveyard.Black Lotus)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Test of Loyalty
+Exile = Black Lotus

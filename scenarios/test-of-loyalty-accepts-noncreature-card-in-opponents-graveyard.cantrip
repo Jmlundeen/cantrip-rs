@@ -1,0 +1,31 @@
+# Plain, Simple Garak accepts a noncreature card from an opponent's graveyard, then draws (CR 115.1, 701.11, 121.1).
+
+[Bot1 Deck]
+Swamp
+Test of Loyalty
+Island x20
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+[T3 Bot1.Main1]
+Bot1.Hand.Test of Loyalty.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot2.Graveyard.Black Lotus)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Graveyard = Test of Loyalty
+Bot2.Graveyard =
+Exile = Black Lotus

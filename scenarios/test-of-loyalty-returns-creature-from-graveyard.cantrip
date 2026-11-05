@@ -1,0 +1,47 @@
+# Of the Obsidian Order returns a creature card in its controller's graveyard; combat puts Tenacious Drone there first (CR 400.3).
+# Both modes have legal targets, but it is "choose one": neither no mode nor both is allowed (CR 700.2a).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Tenacious Drone
+Test of Loyalty
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tenacious Drone.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Tenacious Drone > Bot2)
+Bot2.Block(Llanowar Elves > Tenacious Drone)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Test of Loyalty.Cast
+! Bot1.Modes(Count: 0)
+! Bot1.Modes(1; 2)
+Bot1.Modes(2)
+! Bot1.Target(Bot1.Graveyard.Black Lotus)
+! Bot1.Target(Bot2.Graveyard.Llanowar Elves)
+Bot1.Target(Bot1.Graveyard.Tenacious Drone)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Tenacious Drone
+Bot1.Graveyard = Test of Loyalty; Black Lotus
+Bot1.Battlefield = Borg Token; Mox Jet; Swamp

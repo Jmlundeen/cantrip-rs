@@ -1,0 +1,23 @@
+# Plain, Simple Garak exiles its targeted graveyard card and draws; Black Lotus supplies both setup and mana (CR 701.11, 121.1).
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Test of Loyalty
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Test of Loyalty.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+
+[Expect]
+Exile = Black Lotus
+Bot1.Graveyard = Test of Loyalty
+Bot1.Hand.Count = 5
