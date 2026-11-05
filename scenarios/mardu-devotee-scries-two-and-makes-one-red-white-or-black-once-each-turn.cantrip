@@ -1,0 +1,49 @@
+# Mardu Devotee: "When this creature enters, scry 2" - Bot1 casts it on turn 1 and sees Island and Mountain: the Mountain
+# stays on top (drawn on turn 3) and the Island goes to the bottom (CR 701.22). "{1}: Add {R}, {W}, or {B}. Activate only once each turn":
+# on turn 3 a Plains pays the {1} and Bot1 chooses red, which pays for Lightning Bolt (Bot2 20 to 17). The second Plains
+# could pay for another activation, but it is refused: once each turn (CR 602.5b). On turn 5 the ability can be activated
+# again, so the second Bolt resolves (Bot2 to 14).
+
+[Bot1 Deck]
+Plains
+Mardu Devotee
+Plains
+Plains
+Lightning Bolt
+Lightning Bolt
+Plains
+Island
+Mountain
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mardu Devotee.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Arrange(Mountain | Island)
+[T3 Bot1.Main1]
+? Bot1.Library = Forest; Forest; Forest; Island
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mardu Devotee.Activate(Color: Red)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Battlefield.Mardu Devotee.Activate
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot2.Life = 17
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mardu Devotee.Activate(Color: Red)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt
