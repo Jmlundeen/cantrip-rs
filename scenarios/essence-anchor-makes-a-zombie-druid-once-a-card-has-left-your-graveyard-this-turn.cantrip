@@ -1,0 +1,49 @@
+# Essence Anchor: "{T}: Create a 2/2 black Zombie Druid creature token. Activate only during your turn and only if a card left your
+# graveyard this turn." Bot1 casts the Anchor and a Tormod's Crypt on turn 1 and Faithless Looting discards two cards. Cards went
+# into the graveyard, not out: the Anchor is refused. Then the Crypt exiles Bot1's own graveyard (a card leaving it, CR 602.5)
+# and the Anchor makes the token, a 2/2 black Zombie Druid. On turn 3, nothing having left the graveyard that turn, the untapped
+# Anchor is refused again.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Tormod's Crypt
+Essence Anchor
+Faithless Looting
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Tormod's Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Essence Anchor.Cast
+Bot1.Pass
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Island; Island)
+! Bot1.Battlefield.Essence Anchor.Activate
+Bot1.Battlefield.Tormod's Crypt.Activate(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Essence Anchor.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Zombie Druid Token.Power = 2
+? Bot1.Battlefield.Zombie Druid Token.Toughness = 2
+? Bot1.Battlefield.Zombie Druid Token.Colors = Black
+? Bot1.Battlefield.Essence Anchor.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Essence Anchor.Activate
+
+[Expect]
+Bot1.Battlefield.Count = 3

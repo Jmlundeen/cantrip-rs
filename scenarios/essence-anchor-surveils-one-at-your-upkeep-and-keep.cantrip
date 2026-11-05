@@ -1,0 +1,42 @@
+# Essence Anchor: "At the beginning of your upkeep, surveil 1" (CR 701.25). In Bot1's turn 3 upkeep Bot1 looks at the Ornithopter
+# on top of the library (and only it: the Forest under it is not looked at) and keeps the Ornithopter on top, and draws it. Bot2's upkeep on turn 2 is not its.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Essence Anchor
+Island
+Island
+Island
+Ornithopter
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Essence Anchor.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Upkeep]
+Bot2.Pass
+Bot1.Pass
+! Bot1.Arrange
+[T3 Bot1.Upkeep]
+Bot1.Arrange(Ornithopter | )
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Ornithopter
+Bot1.Graveyard.Count = 0
