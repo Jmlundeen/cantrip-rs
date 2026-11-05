@@ -1,0 +1,53 @@
+# Circle of Protection: White's shield is for the object chosen as the ability resolves (CR 609.7a): Bot1 chooses Bot2's
+# Skyknight Legionnaire, then Bot2 exiles it and returns it with Ephemerate. The Legionnaire that returns is a new object
+# (CR 400.7), not the chosen source, so its combat damage (it has haste) is not prevented.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Circle of Protection: White
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Skyknight Legionnaire
+Ephemerate
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Circle of Protection: White.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Skyknight Legionnaire.Cast
+[T4 Bot2.BeginCombat]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Circle of Protection: White.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Skyknight Legionnaire)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ephemerate.Cast(Skyknight Legionnaire)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Exile = Ephemerate
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Skyknight Legionnaire > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18

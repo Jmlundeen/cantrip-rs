@@ -1,0 +1,42 @@
+# Red and black mana cannot pay Circle of Protection: White's {W} (CR 601.2h); with white it is cast. Its ability can be
+# activated with no damage to prevent and resolves (the ruling: "Can be used even when there is no damage to prevent";
+# CR 609.7a). The Circle is itself a white permanent, and a source need not be able to deal damage to be a legal
+# choice (the ruling), so it is the one source offered: colorless Ornithopter is refused (CR 105.2).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Circle of Protection: White
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Circle of Protection: White.Cast(Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Circle of Protection: White.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Circle of Protection: White.Activate
+? Bot1.Mana =
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Circle of Protection: White)
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 20

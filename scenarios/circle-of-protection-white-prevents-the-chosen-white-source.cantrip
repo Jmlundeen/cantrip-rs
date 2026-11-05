@@ -1,0 +1,57 @@
+# Circle of Protection: White prevents the chosen white source's next damage this turn (CR 615.1). Colorless Ornithopter
+# and red Raging Goblin are not white sources, so they are refused (CR 105.2); one shield stops only the next damage of
+# the chosen source, so the same creature deals damage the next turn.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Circle of Protection: White
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Savannah Lions
+Savannah Lions
+Raging Goblin
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Circle of Protection: White.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Raging Goblin.Cast
+[T4 Bot2.BeginCombat]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Circle of Protection: White.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Ornithopter)
+! Bot1.Choose(Raging Goblin)
+Bot1.Choose(Savannah Lions#1)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Savannah Lions#1; Savannah Lions#2; Raging Goblin > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 17
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Savannah Lions#1; Savannah Lions#2; Raging Goblin > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 12
