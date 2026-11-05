@@ -1,0 +1,41 @@
+# Evasive Maneuvers ({W}): "Target blocking creature you control gets +2/+2 until end of turn. Draw a card." Bot2's Elite
+# Vanguard attacks on turn 4; Savannah Lions blocks it, and the instant makes the Lions a 4/3, which survives the 2 damage
+# and destroys the 2/1.
+
+[Bot1 Deck]
+Plains
+Plains
+Savannah Lions
+Evasive Maneuvers
+Plains x36
+
+[Bot2 Deck]
+Plains
+Elite Vanguard
+Plains x38
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Elite Vanguard.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Attack(Elite Vanguard > Bot1)
+Bot1.Block(Savannah Lions > Elite Vanguard)
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Evasive Maneuvers.Cast(Bot1.Battlefield.Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Savannah Lions.Power = 4
+Bot1.Life = 20
+Bot2.Graveyard = Elite Vanguard
