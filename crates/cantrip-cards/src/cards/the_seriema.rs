@@ -11,9 +11,13 @@ fn fetch_a_legendary_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), 
     Ok(())
 }
 
-/// "Other tapped legendary creatures you control": a legendary creature you control other than this one, tapped now (CR 613.1f).
+/// "Other tapped legendary creatures you control", printed in the 7+ striation (CR 721.2a): only while this Spacecraft has seven
+/// or more charge counters, a legendary creature you control other than this one, tapped now (CR 613.1f).
 fn other_tapped_legendary_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    statics::other_creatures_you_control(q, source, affected, so_far) && so_far.supertypes.legendary && q.state().obj(affected).tapped
+    station::charged::<7>(q, source, source, so_far)
+        && statics::other_creatures_you_control(q, source, affected, so_far)
+        && so_far.supertypes.legendary
+        && q.state().obj(affected).tapped
 }
 
 pub static CARD: CardDef = CardDef {
@@ -33,7 +37,7 @@ pub static CARD: CardDef = CardDef {
             Layer::Ability,
             other_tapped_legendary_creatures_you_control,
             statics::have_indestructible,
-            "Other tapped legendary creatures you control have indestructible.",
+            "7+ | Other tapped legendary creatures you control have indestructible.",
         ),
     ],
     ..oracle::THE_SERIEMA

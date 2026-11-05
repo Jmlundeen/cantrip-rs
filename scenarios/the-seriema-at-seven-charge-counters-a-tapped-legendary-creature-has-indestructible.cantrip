@@ -1,0 +1,59 @@
+# The Seriema stations with a 6-power Colossal Dreadmaw and a tapped Agent Maria Hill (2): eight charge counters. "Other tapped
+# legendary creatures you control have indestructible" is in its 7+ striation (CR 721.2a, 702.12), so the tapped legendary Maria Hill
+# has it, and The Seriema is a flying 5/5.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Colossal Dreadmaw
+The Seriema
+Black Lotus
+Plains
+Agent Maria Hill
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Seriema.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Agent Maria Hill)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Agent Maria Hill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Agent Maria Hill)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.The Seriema.Counters.Charge = 8
+Bot1.Battlefield.The Seriema.Types = Artifact; Creature
+Bot1.Battlefield.Agent Maria Hill.Tapped = true
+Bot1.Battlefield.Agent Maria Hill.Keywords = Indestructible

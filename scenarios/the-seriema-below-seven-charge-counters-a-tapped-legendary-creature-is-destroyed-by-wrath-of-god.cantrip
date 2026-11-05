@@ -1,7 +1,7 @@
-# The Seriema: "Other tapped legendary creatures you control have indestructible." Bot1 controls Agent Maria Hill, tapped to
-# station (CR 702.184a), Agent Phil Coulson, untapped, and a tapped Ornithopter, which is not legendary. Bot2's own Agent Maria Hill
-# attacked and is tapped, but The Seriema gives nothing to a creature Bot2 controls. Bot2's Wrath of God (CR 701.8) destroys all
-# of them except Bot1's tapped Maria Hill (CR 702.12b); The Seriema, no creature at two charge counters, is not destroyed either.
+# The Seriema: "Other tapped legendary creatures you control have indestructible" is in its 7+ striation (CR 721.2a), so at two
+# charge counters it gives nothing. Bot1 controls Agent Maria Hill, tapped to station (CR 702.184a), Agent Phil Coulson, untapped,
+# and a tapped Ornithopter. Bot2's Wrath of God (CR 701.8) destroys all of them, the tapped legendary Maria Hill included; The
+# Seriema, no creature at two charge counters, is not destroyed.
 
 [Bot1 Deck]
 Plains
@@ -78,7 +78,7 @@ Bot1.Pass
 [T4 Bot2.End]
 
 [Expect]
-Bot1.Battlefield = Agent Maria Hill; Mox Pearl; Mox Sapphire; Plains; Plains; The Seriema
-Bot1.Battlefield.Agent Maria Hill.Tapped = true
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Plains; Plains; The Seriema
+Bot1.Graveyard = Agent Phil Coulson; Agent Maria Hill; Ornithopter
 Bot2.Battlefield = Mox Jet; Mox Pearl
 Bot2.Graveyard = Wrath of God; Agent Maria Hill; Black Lotus
