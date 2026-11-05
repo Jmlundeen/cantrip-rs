@@ -1,0 +1,38 @@
+# Iridescent Tiger {4}{R}, 3/4: "When this creature enters, if you cast it, add {W}{U}{B}{R}{G}." Bot1 casts it on turn 1 with five
+# Moxen. The ability is not a mana ability (CR 605.1b): it waits on the stack with the pool empty until both players pass, and
+# then the pool is exactly {W}{U}{B}{R}{G}, one of each.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Iridescent Tiger
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Iridescent Tiger.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana = {W}{U}{B}{R}{G}
+Bot1.Battlefield.Iridescent Tiger.Power = 3

@@ -1,0 +1,32 @@
+# Iridescent Tiger: "if you cast it" (CR 603.4): reanimated from the graveyard by Reanimate (not cast), it adds nothing. Bot1 puts the
+# Tiger into the graveyard with Entomb, then brings it back with Reanimate; the pool stays empty.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Entomb
+Reanimate
+Mountain x14
+Iridescent Tiger
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Iridescent Tiger)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Iridescent Tiger)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Iridescent Tiger; Mox Jet
+Bot1.Mana =
