@@ -1,0 +1,28 @@
+# Dispatch: "Tap target creature. Metalcraft — If you control three or more artifacts, exile that creature" (CR
+# 701.26a, 608.2c). Bot1 casts it on Bot2's Elite Vanguard with no artifacts on turn 3: the Bears are tapped and stay on
+# the battlefield. With three Moxen the artifact count is three and the same cast exiles them instead (CR 608.2h).
+
+[Bot1 Deck]
+Plains
+Dispatch
+Island x18
+
+[Bot2 Deck]
+Plains
+Elite Vanguard
+Plains x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Elite Vanguard.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Dispatch.Cast(Bot2.Battlefield.Elite Vanguard)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Elite Vanguard.Tapped = true
+Bot2.Graveyard.Count = 0
