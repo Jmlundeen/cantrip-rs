@@ -48,6 +48,13 @@ fn combat_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// The 8+ striation: a 3/4 artifact creature with flying (CR 721.2b).
 const EIGHT_PLUS: &str = "8+ | Flying (3/4)";
 
+/// The 8+ striation's layer 6 part: flying and the combat damage trigger, together, so that both continue the one effect that
+/// began in layer 4 (CR 613.6, 721.2a-b) and keep applying under an earlier "loses all abilities".
+fn flying_and_the_combat_damage_trigger(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    statics::have_flying(q, source, chars);
+    station::has::<0>(q, source, chars);
+}
+
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
@@ -61,12 +68,6 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(
-            Layer::Ability,
-            station::charged::<8>,
-            station::has::<0>,
-            EIGHT_PLUS,
-        ),
-        static_ability(
             Layer::Type,
             station::charged::<8>,
             station::is_a_creature,
@@ -75,7 +76,7 @@ pub static CARD: CardDef = CardDef {
         static_ability(
             Layer::Ability,
             station::charged::<8>,
-            statics::have_flying,
+            flying_and_the_combat_damage_trigger,
             EIGHT_PLUS,
         )
         .continues(),

@@ -1,0 +1,79 @@
+# Dress Down is on the battlefield before H.M.S. Bounty enters, and Yargle stations Bounty to nine charge counters. Its 8+
+# striation is one static ability whose effect began in layer 4 (CR 721.2a-b), so its layer 6 part keeps applying although Dress
+# Down, earlier in layer 6, took Bounty's abilities (CR 613.6) - and that part gives Bounty, after Dress Down, flying and "Whenever
+# H.M.S. Bounty deals combat damage to a player, draw a card. ..." (CR 613.1f). Lightning Greaves, attached after Dress Down,
+# gives it haste: it hits for 3 and its controller draws a card.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Island
+Yargle, Glutton of Urborg
+Black Lotus
+Lightning Greaves
+Dress Down
+H.M.S. Bounty, Unlikely Timeship
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Yargle, Glutton of Urborg.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.H.M.S. Bounty, Unlikely Timeship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Battlefield.H.M.S. Bounty, Unlikely Timeship.Activate(Ability: Station)
+Bot1.Choose(Yargle, Glutton of Urborg)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Lightning Greaves.Activate(H.M.S. Bounty, Unlikely Timeship)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.H.M.S. Bounty, Unlikely Timeship.Keywords = Flying; Haste; Shroud
+? Bot1.Hand.Count = 0
+Bot1.Attack(H.M.S. Bounty, Unlikely Timeship > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Dress Down.Types = Enchantment
+Bot1.Battlefield.H.M.S. Bounty, Unlikely Timeship.Counters.Charge = 9
+Bot1.Battlefield.H.M.S. Bounty, Unlikely Timeship.Types = Artifact; Creature
