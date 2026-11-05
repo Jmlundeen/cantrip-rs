@@ -9,17 +9,25 @@ use crate::Cx;
 /// The permanents with a static ability of this kind, with the player who controls each, once for each definition it has
 /// one in: a merged permanent has its other components' (CR 702.140e, `CardTable::texts`).
 fn sources<'a>(cx: &'a Cx, has: impl Fn(&CardDef) -> bool + Copy + 'a) -> impl Iterator<Item = (ObjectId, PlayerId, &'static CardDef, Option<Linked>)> + 'a {
-    cx.s().battlefield().iter().flat_map(move |&id| {
-        let obj = cx.s().obj(id);
-        // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
-        let lost = std::cell::OnceCell::new();
-        // Each asked as the card it is printed on (CR 607.1): a component's other than the one it has now by its own link.
-        cx.cards()
-            .texts_linked(cx.s(), id)
-            .map(|(c, by)| (cx.card(c), by))
-            .filter(move |&(def, _)| has(def) && !*lost.get_or_init(|| cx.lost_all_abilities(id)))
-            .map(move |(def, by)| (id, obj.controller, def, by))
-    })
+    cx.s().battlefield().iter().flat_map(move |&id| source_texts(cx, id, has))
+}
+
+/// The definitions of the permanent `id` with a static ability of this kind, as `sources` gives them for one permanent on
+/// the battlefield.
+fn source_texts<'a>(
+    cx: &'a Cx,
+    id: ObjectId,
+    has: impl Fn(&CardDef) -> bool + Copy + 'a,
+) -> impl Iterator<Item = (ObjectId, PlayerId, &'static CardDef, Option<Linked>)> + 'a {
+    let obj = cx.s().obj(id);
+    // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
+    let lost = std::cell::OnceCell::new();
+    // Each asked as the card it is printed on (CR 607.1): a component's other than the one it has now by its own link.
+    cx.cards()
+        .texts_linked(cx.s(), id)
+        .map(|(c, by)| (cx.card(c), by))
+        .filter(move |&(def, _)| has(def) && !*lost.get_or_init(|| cx.lost_all_abilities(id)))
+        .map(move |(def, by)| (id, obj.controller, def, by))
 }
 
 /// "Each power-up ability of permanents you control can be activated an additional time" (CR 702.193a, 602.5b): how many more
@@ -453,6 +461,22 @@ pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u32 {
         return power.unsigned_abs();
     }
     power.max(0) as u32
+}
+
+/// What `creature`, with `power`, counts as towards a crew, saddle or station cost of `permanent` (CR 702.122b, 702.171a,
+/// 702.184a): its power, or what a static ability of its own makes it count as - "Sulu stations Spacecraft and crews
+/// Vehicles as though his power were tripled" (Sulu, Heroic Helmsman, `CardDef::tap_power`). Such an ability is about the
+/// creature that has it and no other, so only `creature`'s own are asked, while it is on the battlefield with its abilities
+/// (CR 613.1f). Asked of each creature tapped for such a cost.
+pub fn tapped_power(cx: &Cx, creature: ObjectId, power: i32, permanent: ObjectId) -> i32 {
+    let obj = cx.s().obj(creature);
+    if !obj.zone.is(ZoneKind::Battlefield) || obj.became.is_some() || obj.last_known.is_some() {
+        return power;
+    }
+    source_texts(cx, creature, |d| !d.tap_power.is_empty()).fold(power, |power, (id, controller, def, by)| {
+        let asker = Asker { instance: None, source: id, controller, by, spell: false };
+        def.tap_power.iter().fold(power, |power, rule| rule(cx, &asker, power, permanent))
+    })
 }
 
 /// The card types `player` may cast as though they had flash (CR 307.5, 702.8): from effects that gave them that.

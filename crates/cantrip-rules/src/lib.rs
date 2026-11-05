@@ -2800,7 +2800,9 @@ impl cantrip_api::Game for Cx<'_> {
         static_rules::stations_by_toughness(self, creature)
     }
 
-
+    fn tapped_power(&self, creature: ObjectId, permanent: ObjectId) -> i32 {
+        static_rules::tapped_power(self, creature, self.chars(creature).power.unwrap_or(0), permanent)
+    }
 
     fn lose_life(&mut self, player: PlayerId, amount: i32) {
 
