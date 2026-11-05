@@ -1,0 +1,49 @@
+# Seize Opportunity's permission lasts "until the end of your next turn" and no longer: the Mox Sapphire is cast on turn 3, but
+# the Forest, left in exile, cannot be played on turn 5 (CR 514.2) with a land drop open; the Island played right after is the
+# control that the drop was open.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Seize Opportunity
+Island
+Island
+Island
+Forest
+Mox Sapphire
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Seize Opportunity.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Exile.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+! Bot1.Exile.Forest.Play
+Bot1.Hand.Island.Play
+
+[Expect]
+Turn = 5
+Exile = Forest
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire; Island

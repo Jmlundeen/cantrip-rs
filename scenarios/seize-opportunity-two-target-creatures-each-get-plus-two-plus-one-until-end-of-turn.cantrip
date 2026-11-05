@@ -1,0 +1,60 @@
+# Seize Opportunity's second mode: "up to two target creatures each get +2/+1 until end of turn". Two targets - one of Bot1's
+# Ornithopters and Bot2's - are each 2/3 (CR 611.2a), the third creature untargeted stays 0/2; a third target is refused. The bonus
+# ends with the turn: both are 0/2 again on turn 3.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Seize Opportunity
+Ornithopter
+Ornithopter
+Island
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Seize Opportunity.Cast
+Bot1.Modes(2)
+! Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot1.Battlefield.Ornithopter#2; Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#1.Power = 2
+? Bot1.Battlefield.Ornithopter#1.Toughness = 3
+? Bot2.Battlefield.Ornithopter.Power = 2
+? Bot2.Battlefield.Ornithopter.Toughness = 3
+? Bot1.Battlefield.Ornithopter#2.Power = 0
+? Bot1.Battlefield.Ornithopter#2.Toughness = 2
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot1.Battlefield.Ornithopter#1.Toughness = 2
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
