@@ -6126,6 +6126,12 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     for &id in cx.s().zone(Zone::graveyard(player)) {
         by_way(id, ZoneKind::Graveyard, options);
     }
+    // The land cards outside the game that a way a permanent gives lets this player play (CR 400.11b, 604.1): The Holodeck's
+    // "you may play a permanent card you own from outside the game". The sideboard holds nothing the rules let one play from
+    // (CR 400.11a), so only such a way reaches it, and only what the player has outside the game (`Query::outside_the_game`).
+    for id in outside_reached(cx, player) {
+        by_way(id, ZoneKind::Sideboard, options);
+    }
     // A land a card lets this player play from where it is (CR 305.1): "you may play that card". Each permission is its own.
     for p in &cx.s().permissions {
         if p.player != player || !p.grant.lands || !permission_stands(cx, p, player) {
@@ -6955,7 +6961,7 @@ impl<'a> Offer<'a> {
         for route in self.routes(card, zone, def) {
             self.by_route(card, def, &route, |way| way.from == ZoneKind::Hand && !way.only_from, options);
         }
-        if own && matches!(zone.kind(), ZoneKind::Graveyard | ZoneKind::Hand) {
+        if own && matches!(zone.kind(), ZoneKind::Graveyard | ZoneKind::Hand | ZoneKind::Sideboard) {
             self.granted_ways(card, def, zone, options);
         }
     }
@@ -7088,7 +7094,10 @@ impl<'a> Offer<'a> {
     fn granted_ways(&self, card: ObjectId, def: &'static CardDef, zone: Zone, options: &mut Vec<ActionOption>) {
         let (cx, player) = (self.cx, self.player);
         let ways = self.granted();
-        if !ways.iter().any(|w| !w.what.permission && w.what.from == zone.kind()) {
+        // A permission is offered by its route (CR 601.3), not here - but from outside the game there is no route to offer it by:
+        // a card in a sideboard is never cast or played by the rules, only by a way a permanent gives (CR 400.11b, 604.1).
+        let open = |w: &Given<GrantedWay>| !w.what.permission || zone.is(ZoneKind::Sideboard);
+        if !ways.iter().any(|w| open(w) && w.what.from == zone.kind()) {
             return;
         }
         let land = def.is(CardType::Land);
@@ -7101,7 +7110,7 @@ impl<'a> Offer<'a> {
                 None => cx,
             };
             for way in ways {
-                if way.what.permission || way.what.from != zone.kind() {
+                if !open(way) || way.what.from != zone.kind() {
                     continue;
                 }
                 // A way for any time an instant could be cast (sneak, CR 702.190a) is offered then, whatever the card is.
@@ -7157,6 +7166,12 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             offer.card(card, zone, options);
         }
     }
+    // The cards outside the game a way a permanent gives reaches (CR 400.11b, 604.1).
+    if !barred.contains(ZoneKind::Sideboard) {
+        for card in outside_reached(cx, player) {
+            offer.card(card, Zone::sideboard(player), options);
+        }
+    }
     // The top card of the library, for a player a permanent or a resolved effect lets cast spells from there (CR 601.3): for
     // life rather than its mana cost (Bolas's Citadel, Gwenom, Remorseless, CR 118.9), or for its costs (Mystic Forge, Case
     // of the Locked Hothouse), each its own.
@@ -7196,6 +7211,18 @@ fn cast_zones<'a>(cx: &'a Cx, player: PlayerId, barred: ZoneKinds) -> impl Itera
     }).into_iter().flatten();
     [Zone::hand(player), Zone::graveyard(player), Zone::COMMAND].into_iter().chain(cx.s().seats().map(Zone::exile)).chain(borrowed)
         .filter(move |zone| !barred.contains(zone.kind()))
+}
+
+/// The cards `player` owns outside the game (`Query::outside_the_game`: none in a Commander game, CR 903.11, nor while
+/// another player controls them, CR 723.4) when a way a permanent gives names them (CR 400.11b, 604.1): The Holodeck's "you
+/// may play a permanent card you own from outside the game or from your graveyard". The sideboard is not a zone a card is
+/// cast or played from by any rule (CR 601.3, 305.1): only such a way reaches it. Nothing when none does.
+fn outside_reached(cx: &Cx, player: PlayerId) -> Vec<ObjectId> {
+    let outside = Query::outside_the_game(cx, player);
+    if outside.is_empty() || !granted_ways_of(cx.cards(), cx.s(), &cx.g.log).iter().any(|w| w.what.from == ZoneKind::Sideboard) {
+        return Vec::new();
+    }
+    outside
 }
 
 /// The top card of `player`'s library, where a permanent or a resolved effect may let them cast spells from there (CR 601.3)

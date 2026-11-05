@@ -552,6 +552,13 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
         let m = &m;
         let row = cx.st().last_known_push(last_known);
         cx.st().zone_remove(from, m.id);
+        // A basic land of a Limited event's supply (`GameState::outside_supply`) that leaves the sideboard, however it is
+        // brought into the game (CR 400.11b), is replaced there by another, since a Limited sideboard holds any number of them.
+        if from.is(ZoneKind::Sideboard) && cx.s().outside_supply.contains(&cx.s().obj(m.id).card) {
+            let supplied = *cx.s().obj(m.id);
+            let fresh = cx.st().push_obj(supplied);
+            cx.st().zone_push(from, fresh);
+        }
         // A spell that leaves the stack by any move other than resolving or being countered (exiled, bounced) does not
         // resolve: it is gone from the stack.
         if from.is(ZoneKind::Stack)
@@ -4407,21 +4414,13 @@ fn bring_into_hand_inner(cx: &mut Cx, ids: &[ObjectId], revealed: bool, companio
     if cx.s().commander && !companion {
         return Vec::new();
     }
-    let outside: Vec<Obj> =
-        live_ones(cx, ids).into_iter().map(|id| *cx.s().obj(id)).filter(|o| o.zone.is(ZoneKind::Sideboard)).collect();
+    // A basic land of the supply leaves another in its place as it moves (`move_together`).
     let moves: Vec<Moving> = live_ones(cx, ids)
         .into_iter()
         .filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Sideboard))
         .map(|id| Moving { revealed, ..Moving::to(id, Zone::hand(cx.s().obj(id).owner)) })
         .collect();
-    let brought = move_together(cx, &moves, ZoneReason::Other);
-    for row in outside {
-        if cx.s().outside_supply.contains(&row.card) {
-            let fresh = cx.st().push_obj(row);
-            cx.st().zone_push(row.zone, fresh);
-        }
-    }
-    brought
+    move_together(cx, &moves, ZoneReason::Other)
 }
 
 /// Ends the effects on `id` whose "for as long as" duration is no longer true of it (CR 611.2b), the moment it stops
