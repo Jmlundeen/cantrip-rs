@@ -1,0 +1,52 @@
+# Monk's Fist: job select makes a 1/1 Hero and attaches the Fist to it: "Equipped creature gets +1/+0 and is a Monk in addition to its other types", so the Hero is a 2/1 Hero Monk.
+# Equip {2} (CR 702.6a): with both Moxen tapped it is refused, and on turn 3 it moves the Fist to Bot1's Ornithopter (0/2 Thopter -> 1/2 Thopter Monk) paying exactly {2};
+# the Hero is a plain 1/1 Hero again.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Monk's Fist
+Ornithopter
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Monk's Fist.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hero Token.Power = 2
+? Bot1.Battlefield.Hero Token.Toughness = 1
+? Bot1.Battlefield.Hero Token.Subtypes = Hero; Monk
+? Bot1.Battlefield.Monk's Fist.AttachedTo = Hero Token
+! Bot1.Battlefield.Monk's Fist.Activate(Ornithopter; Mana: short)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Monk's Fist.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Hero Token.Power = 1
+Bot1.Battlefield.Hero Token.Subtypes = Hero
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Subtypes = Monk; Thopter
+Bot1.Battlefield.Monk's Fist.AttachedTo = Ornithopter
