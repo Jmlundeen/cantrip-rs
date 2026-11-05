@@ -1,0 +1,44 @@
+# Coordinated Maneuver: its first mode may target a planeswalker. Bot1 controls three Ornithopters, so 3 damage removes all three
+# loyalty counters from Bot2's Liliana of the Veil (CR 120.3c) and she goes to the graveyard (CR 704.5i).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Ornithopter
+Ornithopter
+Coordinated Maneuver
+Plains x14
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Mox Jet
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Coordinated Maneuver.Cast
+Bot1.Modes(Coordinated Maneuver deals damage)
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Liliana of the Veil; Black Lotus
+
+[Expect]
+Bot2.Graveyard = Liliana of the Veil; Black Lotus
+Bot2.Battlefield = Mox Jet

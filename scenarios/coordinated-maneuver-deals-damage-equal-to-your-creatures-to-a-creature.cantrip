@@ -1,0 +1,41 @@
+# Coordinated Maneuver, first mode: "deals damage equal to the number of creatures you control to target creature or planeswalker"
+# (CR 120.3, 608.2h). Bot1 controls two Ornithopters, so it deals exactly 2: it kills Bot2's Ornithopter (0/2) and, being counted for
+# Bot1's creatures only, would not if Bot1 had one fewer. It cannot be aimed at Bot2's Mox Pearl, which is no creature.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Ornithopter
+Coordinated Maneuver
+Plains x14
+
+[Bot2 Deck]
+Ornithopter
+Mox Pearl
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Coordinated Maneuver.Cast
+Bot1.Modes(Coordinated Maneuver deals damage)
+! Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Mox Pearl
+Bot1.Graveyard = Coordinated Maneuver
