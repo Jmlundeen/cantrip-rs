@@ -1,0 +1,50 @@
+# Transporter Malfunction {1}{R}: "Transporter Malfunction deals 3 damage to any target. Beam me up {3}{R}{R}{R}." Hard
+# cast on turn 1 for {1}{R}, exactly two mana (a Mountain and a Mox Ruby), at Bot2: 20 to 17. Beamed up from the graveyard
+# on turn 3 for six mana, returning Crimson Kobolds to Bot1's hand and exiling the spell (CR 702.185a).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Crimson Kobolds
+Transporter Malfunction
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Crimson Kobolds.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Transporter Malfunction.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Graveyard.Transporter Malfunction.Cast(Ability: Beam me up {3}{R}{R}{R}; Bot2)
+Bot1.Choose(Bot1.Battlefield.Crimson Kobolds)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 14
+Bot1.Hand = Crimson Kobolds
+Bot1.Graveyard.Count = 0
+Exile = Transporter Malfunction
