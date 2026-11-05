@@ -1,0 +1,32 @@
+# Rally the Monastery, second mode: "Up to two" takes none (CR 601.2c): Bot1 casts it with no target (no creatures are even in play on
+# the opponent's side to choose from), and it resolves, doing nothing. Mox Pearl and Mox Ruby pay {1}{W}.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Memnite
+Rally the Monastery
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rally the Monastery.Cast
+Bot1.Modes(Up to two target creatures you control)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Rally the Monastery
+Bot1.Battlefield.Memnite.Power = 1

@@ -1,0 +1,55 @@
+# Rally the Monastery, second mode: "Up to two target creatures you control each get +2/+2 until end of turn". Bot1 has Memnite,
+# Ornithopter and Phyrexian Walker; Bot2 has its own Memnite. The opponent's creature is no target (CR 115.1) and neither are three
+# at once (CR 601.2c). Targeting Memnite and the Ornithopter makes them 3/3 and 2/4; the Walker is untouched. The bonus lasts until
+# end of turn (CR 514.2): on turn 5 they are 1/1 and 0/2 again. Casting the Walker first makes Rally cost {1}{W}.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Memnite
+Ornithopter
+Phyrexian Walker
+Rally the Monastery
+Plains
+Plains x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Phyrexian Walker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rally the Monastery.Cast
+Bot1.Modes(Up to two target creatures you control)
+! Bot1.Target(Bot2.Battlefield.Memnite)
+! Bot1.Target(Bot1.Battlefield.Memnite; Bot1.Battlefield.Ornithopter; Bot1.Battlefield.Phyrexian Walker)
+Bot1.Target(Bot1.Battlefield.Memnite; Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 3
+? Bot1.Battlefield.Memnite.Toughness = 3
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot1.Battlefield.Phyrexian Walker.Toughness = 3
+? Bot2.Battlefield.Memnite.Power = 1
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Rally the Monastery
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2

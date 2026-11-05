@@ -1,0 +1,57 @@
+# Rally the Monastery, third mode: "Destroy target creature with power 4 or greater". Bot2's Devilthorn Fox (3/1) is no legal target
+# (CR 115.1) while its Viashino Warrior (4/2) is, and is destroyed (CR 701.8). Bot1's Memnite, cast first on turn 5, makes Rally cost
+# {1}{W}, which the Mox Pearl and Mox Ruby pay.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Memnite
+Rally the Monastery
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Viashino Warrior
+Devilthorn Fox
+Island x1
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Viashino Warrior.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Devilthorn Fox.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rally the Monastery.Cast
+Bot1.Modes(Destroy target creature with power 4 or greater)
+! Bot1.Target(Bot2.Battlefield.Devilthorn Fox)
+! Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Target(Bot2.Battlefield.Viashino Warrior)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Viashino Warrior
+Bot2.Battlefield.Devilthorn Fox.Power = 3
+Bot1.Graveyard = Rally the Monastery

@@ -1,0 +1,45 @@
+# Rally the Monastery, first mode: "This spell costs {2} less to cast if you've cast another spell this turn" (CR 601.2f) and "Create
+# two 1/1 white Monk creature tokens with prowess". Bot1 casts both Moxen on turn 1 and plays a Plains on turn 3, so it has three mana:
+# Rally at {3}{W} is out of reach, and the Moxen cast on an earlier turn do not count. Casting Memnite makes it {1}{W}: the Pearl and
+# the Ruby pay exactly that (the pool is empty after) and the Plains stays untapped.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Plains
+Memnite
+Rally the Monastery
+Plains x2
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Hand.Rally the Monastery.Cast(Mana: short)
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rally the Monastery.Cast
+Bot1.Modes(Create two 1/1 white Monk)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Rally the Monastery
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Plains; Memnite; Monk Token; Monk Token
+Bot1.Battlefield.Monk Token#1.Power = 1
+Bot1.Battlefield.Monk Token#1.Toughness = 1
+Bot1.Battlefield.Monk Token#1.Colors = White
+Bot1.Battlefield.Monk Token#1.Subtypes = Monk
+Bot1.Battlefield.Monk Token#2.Power = 1
