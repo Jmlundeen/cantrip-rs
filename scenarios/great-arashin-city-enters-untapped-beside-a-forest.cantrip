@@ -1,0 +1,18 @@
+# The Forest half of "unless you control a Forest or a Plains" (CR 614.12): a Forest on turn 1, the City on turn 3, untapped.
+
+[Bot1 Deck]
+Forest
+Great Arashin City
+Swamp x25
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Great Arashin City.Play
+? Bot1.Battlefield.Great Arashin City.Tapped = false
+
+[Expect]
+Bot1.Battlefield.Great Arashin City.Tapped = false

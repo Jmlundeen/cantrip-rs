@@ -1,0 +1,31 @@
+# "Exile a creature card from your graveyard" is a cost (CR 118.3): with only an Entomb, a noncreature card, in the graveyard
+# the ability is refused although the mana is there. Entomb buries a Forest.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Entomb
+Great Arashin City
+Forest x3
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Great Arashin City.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+! Bot1.Battlefield.Great Arashin City.Activate(Ability: Spirit)
+
+[Expect]
+Bot1.Battlefield.Great Arashin City.Tapped = false
+Bot1.Graveyard = Entomb; Forest

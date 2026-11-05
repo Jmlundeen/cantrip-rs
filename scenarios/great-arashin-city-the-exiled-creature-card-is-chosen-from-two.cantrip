@@ -1,0 +1,44 @@
+# The exiled card is part of the cost, chosen by its controller as the cost is paid (CR 602.2b, 601.2h): with a Memnite and an
+# Ornithopter both in the graveyard, Bot1 answers the mana first and then chooses the Ornithopter; the Memnite stays in the graveyard.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Jet
+Entomb
+Entomb
+Great Arashin City
+Forest
+Memnite
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Memnite)
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Great Arashin City.Play
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Great Arashin City.Activate(Ability: Spirit)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Graveyard = Entomb; Entomb; Memnite
+Bot1.Battlefield.Spirit Token.Power = 1

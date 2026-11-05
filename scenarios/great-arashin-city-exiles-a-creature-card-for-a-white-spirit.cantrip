@@ -1,0 +1,42 @@
+# Great Arashin City: "{1}{B}, {T}, Exile a creature card from your graveyard: Create a 1/1 white Spirit creature token."
+# Entomb buries a Memnite on turn 1 and a Forest keeps the City untapped (turn 3). Mox Jet and the Forest pay {1}{B}; the
+# City taps and exiles the Memnite as the cost, and the 1/1 white Spirit token appears.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Entomb
+Great Arashin City
+Forest
+Forest
+Forest
+Memnite
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Memnite)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Great Arashin City.Play
+? Bot1.Battlefield.Great Arashin City.Tapped = false
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Great Arashin City.Activate(Ability: Spirit)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spirit Token.Colors = White
+
+[Expect]
+Bot1.Battlefield.Great Arashin City.Tapped = true
+Bot1.Battlefield.Spirit Token.Power = 1
+Bot1.Battlefield.Spirit Token.Toughness = 1
+Exile = Memnite
+Bot1.Graveyard = Entomb
