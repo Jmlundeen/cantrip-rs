@@ -1,0 +1,38 @@
+# Will Riker: "When Will Riker enters, put a +1/+1 counter on another target creature you control" (CR 603.6a,
+# 115.1). Starfleet Crew is cast with one Black Lotus on turn 1 and resolves before Will Riker is cast with a second
+# Black Lotus, a Mox Pearl and a Plains (CR 608.2f: the Crew must be a creature on the battlefield when Will Riker's
+# enters ability is put on the stack, or it would have no legal target, CR 603.3d). The Crew is the legal target and
+# grows to 3/4; the counter is put on that creature, not on Will Riker, whose power stays 4 (CR 122.1a, 608.2c).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Black Lotus
+Mox Pearl
+Starfleet Crew
+Will Riker, Assuming Command
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Starfleet Crew.Cast
+? Bot1.Mana = {W}
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Will Riker, Assuming Command.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Starfleet Crew.Power = 3
+Bot1.Battlefield.Will Riker, Assuming Command.Power = 4

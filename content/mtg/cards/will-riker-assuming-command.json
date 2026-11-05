@@ -1,0 +1,8 @@
+{
+  "name": "Will Riker, Assuming Command",
+  "manaCost": "{4}{W}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "When Will Riker enters, put a +1/+1 counter on another target creature you control."
+}
