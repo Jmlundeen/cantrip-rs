@@ -1,0 +1,36 @@
+# Merciful Mandate ({1}{W}): "Untap all creatures you control. If it's a combat phase, you may end the combat phase." Cast in
+# the postcombat main phase of turn 3 it untaps the Savannah Lions that attacked, asks no question (it is not a combat phase,
+# CR 724.2g) and resolves into the graveyard like any other instant.
+
+[Bot1 Deck]
+Plains
+Plains
+Black Lotus
+Savannah Lions
+Merciful Mandate
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Savannah Lions > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Merciful Mandate.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Savannah Lions.Tapped = false
+Bot1.Graveyard = Merciful Mandate; Black Lotus

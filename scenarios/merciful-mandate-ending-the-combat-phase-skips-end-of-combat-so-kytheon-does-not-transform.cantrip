@@ -1,0 +1,40 @@
+# Merciful Mandate ({1}{W}) ends the combat phase: the game skips straight to the postcombat main phase, and the end of
+# combat step is skipped, so "at end of combat" abilities don't trigger (CR 724.2d-e). Kytheon, Hero of Akros and two
+# Ornithopters attack on turn three, which would transform Kytheon at end of combat (his own scenarios show it); Bot1 casts
+# the Mandate in the declare attackers step and ends the phase. No damage is dealt, Kytheon stays Kytheon, and the
+# attackers are untapped by the spell's first sentence. The spell is exiled (724.2b).
+
+[Bot1 Deck]
+Plains
+Kytheon, Hero of Akros
+Ornithopter
+Ornithopter
+Merciful Mandate
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Kytheon, Hero of Akros.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Kytheon, Hero of Akros > Bot2; Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Merciful Mandate.Cast
+Bot1.Accept
+[T3 Bot1.Main2]
+? Step = Main2
+? Bot1.Battlefield.Kytheon, Hero of Akros.Tapped = false
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield = Kytheon, Hero of Akros; Ornithopter; Ornithopter; Plains; Plains
+Bot1.Exile.Merciful Mandate.Colors.Count = 1
