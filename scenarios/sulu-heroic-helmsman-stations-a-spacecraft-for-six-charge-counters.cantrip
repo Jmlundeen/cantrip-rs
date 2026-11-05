@@ -1,0 +1,41 @@
+# Sulu, Heroic Helmsman (2/2): "Sulu stations Spacecraft and crews Vehicles as though his power were tripled"
+# (CR 702.184a-c). Borg Cube's station ability puts charge counters on it equal to the tapped creature's power, and it has
+# no toughness-special ability: Sulu's 2 stations it for 6 counters, a plain 2-power creature for 2. All on turn one, where
+# three Black Lotuses pay for both Sulu ({1}{W}) and the Cube ({5}{W}{B}). The Cube's enters trigger offers to exile up to
+# one target creature, and it is declined: the target of the station is Sulu. Its striation is 12+, so 6 counters leave it
+# an artifact alone.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Sulu, Heroic Helmsman
+Borg Cube
+Plains
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sulu, Heroic Helmsman.Cast
+Bot1.Hand.Borg Cube.Cast
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Borg Cube.Activate(Ability: Station)
+Bot1.Choose(Sulu, Heroic Helmsman)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Borg Cube.Counters.Charge = 6
+Bot1.Battlefield.Borg Cube.Types = Artifact
+Bot1.Battlefield.Sulu, Heroic Helmsman.Tapped = true

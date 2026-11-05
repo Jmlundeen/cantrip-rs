@@ -1,0 +1,47 @@
+# Sulu, Heroic Helmsman ({1}{W}, 2/2): "Sulu stations Spacecraft and crews Vehicles as though his power were tripled"
+# (CR 702.122b). Reckoner Bankbuster is Crew 3, which a 2-power creature cannot pay alone; Sulu counts as 6, so he crews it
+# by himself and the Bankbuster becomes a 4/4 artifact creature.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Sulu, Heroic Helmsman
+Reckoner Bankbuster
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Sulu, Heroic Helmsman.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Reckoner Bankbuster.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Reckoner Bankbuster.Activate(Ability: Crew 3)
+Bot1.Choose(Sulu, Heroic Helmsman)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Reckoner Bankbuster.Types = Artifact; Creature
+? Bot1.Battlefield.Sulu, Heroic Helmsman.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Reckoner Bankbuster.Power = 4
+Bot1.Battlefield.Reckoner Bankbuster.Toughness = 4

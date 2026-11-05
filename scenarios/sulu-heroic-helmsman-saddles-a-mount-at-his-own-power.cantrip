@@ -1,0 +1,44 @@
+# Sulu, Heroic Helmsman: "Sulu stations Spacecraft and crews Vehicles as though his power were tripled" - Spacecraft and
+# Vehicles only. Caustic Bronco is a Mount with Saddle 3 and neither, so Sulu counts his own 2 towards it: he alone cannot
+# saddle it, while Sulu and Savannah Lions together (2 + 1) can.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Caustic Bronco
+Sulu, Heroic Helmsman
+Savannah Lions
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Caustic Bronco.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sulu, Heroic Helmsman.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Caustic Bronco.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Caustic Bronco.Activate
+Bot1.Choose(Sulu, Heroic Helmsman; Savannah Lions)
+
+[Expect]
+Bot1.Battlefield.Caustic Bronco.Saddled = true
+Bot1.Battlefield.Sulu, Heroic Helmsman.Tapped = true
+Bot1.Battlefield.Savannah Lions.Tapped = true
