@@ -1,0 +1,32 @@
+# Romulus enters tapped (so it cannot tap the turn it is played) and gains exactly 1 life; untapped, its mana ability
+# produces exactly one mana of either of its colors and refuses a color it does not have (CR 614.1d, 605.1a, 605.3b,
+# 118.3, 106.4, 119.3, 603.6a).
+
+[Bot1 Deck]
+Romulus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Romulus.Play
+? Bot1.Battlefield.Romulus.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+! Bot1.Battlefield.Romulus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Romulus.Activate(Color: Red)
+Bot1.Battlefield.Romulus.Activate(Color: Blue)
+? Bot1.Mana = {U}
+? Bot1.Battlefield.Romulus.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Romulus.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Life = 21
+Bot1.Mana = {B}
+Bot1.Battlefield.Romulus.Tapped = true
+Stack.Count = 0
