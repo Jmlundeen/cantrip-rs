@@ -1,0 +1,60 @@
+# Anafenza, Unyielding Lineage with two Savannah Lions: Pyroclasm kills all three at once (CR 700.4, 603.10a). Anafenza leaves the
+# battlefield in the same event, yet sees both Lions die and triggers twice; as each trigger resolves Anafenza cannot take counters
+# (it is no longer on the battlefield), so no question is asked and each makes a 2/2 white Spirit token (CR 701.63a, rulings
+# 2025-04-04): two Spirit tokens.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Savannah Lions
+Savannah Lions
+Anafenza, Unyielding Lineage
+Pyroclasm
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Anafenza, Unyielding Lineage.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Triggers(Anafenza, Unyielding Lineage; Anafenza, Unyielding Lineage)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 4
+Bot1.Battlefield.Spirit Token#1.Power = 2
+Bot1.Battlefield.Spirit Token#2.Power = 2
+Bot1.Battlefield.Spirit Token#1.Toughness = 2
+Bot1.Battlefield.Count = 7

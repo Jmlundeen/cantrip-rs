@@ -1,0 +1,12 @@
+{
+  "name": "Anafenza, Unyielding Lineage",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Spirit Soldier",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flash\nFirst strike\nWhenever another nontoken creature you control dies, Anafenza endures 2. (Put two +1/+1 counters on it or create a 2/2 white Spirit creature token.)",
+  "keywords": [
+    "Flash",
+    "FirstStrike"
+  ]
+}
