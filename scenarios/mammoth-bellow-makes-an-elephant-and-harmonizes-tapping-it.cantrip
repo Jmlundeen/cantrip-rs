@@ -1,0 +1,47 @@
+# {2}{G}{U}{R}, "Create a 5/5 green Elephant creature token", harmonize {5}{G}{U}{R} (CR 702.180a). Turn 1: with three Moxen it is refused for want of mana; five Moxen pay {2}{G}{U}{R}
+# and the Elephant is made. Turn 3: harmonizing needs {5}{G}{U}{R} less the power of the tapped creature, so the Elephant (power 5, summoning sick
+# but tapped for a cost that is no {T} ability's) cuts it to {G}{U}{R}: three coloured Moxen pay it, a
+# second Elephant is made and the spell is exiled, not put into the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mammoth Bellow
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Mammoth Bellow.Cast(Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mammoth Bellow.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Elephant Token.Power = 5
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Mammoth Bellow.Cast(Ability: Harmonize)
+Bot1.Choose(Elephant Token)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Mammoth Bellow
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Count = 7
