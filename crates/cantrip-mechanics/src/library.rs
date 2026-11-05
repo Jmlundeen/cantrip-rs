@@ -119,6 +119,23 @@ pub fn search_zone_and_or_library(
     Ok((found, false))
 }
 
+/// "Search your [`zones`] and/or library for [`rule`] and put it onto the battlefield. If you search your library this way,
+/// shuffle." (CR 701.23, 701.24): `search_zone_and_or_library` for the card, the one card found (if any) put onto the
+/// battlefield under the player's control, and the library shuffled afterwards if it was searched, found or not. Last Light of
+/// Durin's Day (a Dragon card from the hand) and Say Its Name print it, as do Dark Supplicant, Gate to the Afterlife and
+/// Mishra, Artificer Prodigy.
+pub fn search_zone_and_or_library_onto_battlefield(g: &mut dyn Game, player: PlayerId, source: ObjectId, zones: &[Zone], ask: &'static Question, rule: Selection) -> Result<(), Suspend> {
+    let (found, searched_library) = search_zone_and_or_library(g, player, source, zones, SearchDestination::Battlefield, Purpose::PutOntoBattlefield, ask, rule)?;
+    if let Some(&card) = found.first() {
+        g.put_onto_battlefield(card, player, false)?;
+    }
+    g.end_sentence();
+    if searched_library {
+        g.shuffle(player);
+    }
+    Ok(())
+}
+
 /// The cards found put into the hand, by the instruction that reveals them when the search says "reveal it" (CR 701.20a:
 /// `Game::move_together_revealed`).
 fn into_hand(g: &mut dyn Game, player: PlayerId, found: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
