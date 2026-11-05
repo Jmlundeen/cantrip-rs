@@ -1,0 +1,35 @@
+# Seven creature deaths trigger Vengeance Mission seven times: each puts its counter on before checking the threshold, so total life loss is eight.
+[Bot1 Deck]
+Vengeance Mission
+Black Lotus
+Black Lotus
+Mox Pearl x2
+Wrath of God
+Plains x20
+[Bot2 Deck]
+Ornithopter x7
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vengeance Mission.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Wrath of God.Cast
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Vengeance Mission.Counters.Quest = 7
+Bot2.Life = 12
+Bot2.Battlefield.Ornithopter = (absent)

@@ -1,0 +1,59 @@
+# After six counters, a seventh death trigger stays on the stack while Disenchant removes its source. LKI leaves the count at six, so it drains 1.
+[Bot1 Deck]
+Swamp
+Plains
+Mox Pearl x2
+Sol Ring
+Vengeance Mission
+Wrath of God
+Wrath of God
+Disenchant
+Island x20
+
+[Bot2 Deck]
+Ornithopter x7
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Vengeance Mission.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Wrath of God.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Wrath of God.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Vengeance Mission.Counters.Quest = 6
+Bot1.Hand.Disenchant.Cast(Vengeance Mission)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Graveyard.Vengeance Mission.Colors.Count = 1
+Bot2.Life = 13
+Bot2.Battlefield.Ornithopter = (absent)
