@@ -1,0 +1,56 @@
+# Dragonstorm Globe (CR 614.12, 122.6): Bot1's Phyrexian Dragon Engine that entered before the Globe has no counter, the Swashbuckler
+# Extraordinaire cast after it enters with a +1/+1 counter, Memnite (not a Dragon) gets none, and the Globe taps for any color.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Phyrexian Dragon Engine
+Swashbuckler Extraordinaire
+Dragonstorm Globe
+Memnite
+Mountain x33
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dragonstorm Globe.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swashbuckler Extraordinaire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dragonstorm Globe.Activate(Color: Blue)
+
+[Expect]
+Bot1.Battlefield.Swashbuckler Extraordinaire.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Swashbuckler Extraordinaire.Power = 3
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Phyrexian Dragon Engine.Counters.PlusOnePlusOne = (absent)
+Bot1.Mana = {U}

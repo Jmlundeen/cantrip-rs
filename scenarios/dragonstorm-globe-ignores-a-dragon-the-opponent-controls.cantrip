@@ -1,0 +1,46 @@
+# Dragonstorm Globe counts only Dragons its controller's: Bot2's Phyrexian Dragon Engine enters with no counter.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Dragonstorm Globe
+Mountain x36
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Phyrexian Dragon Engine
+Island x36
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dragonstorm Globe.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Phyrexian Dragon Engine.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Phyrexian Dragon Engine.Power = 2
+Bot2.Battlefield.Phyrexian Dragon Engine.Counters.PlusOnePlusOne = (absent)
