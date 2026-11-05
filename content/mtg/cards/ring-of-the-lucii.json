@@ -1,0 +1,6 @@
+{
+  "name": "Ring of the Lucii",
+  "manaCost": "{4}",
+  "type": "Legendary Artifact",
+  "oracleText": "{T}: Add {C}{C}.\n{2}, {T}, Pay 1 life: Tap target nonland permanent."
+}
