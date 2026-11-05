@@ -1,0 +1,63 @@
+# Duty Beyond Death: "Put a +1/+1 counter on each creature you control" is one event (CR 122.6, 101.4). Bot1 sacrifices a Memnite
+# with Invisible Woman, Sue Storm and two Masked Meowers out; the counters go on the two other Heroes together, so her trigger
+# ("Whenever you put one or more +1/+1 counters on one or more other Heroes you control") fires once and makes a single Wall.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Invisible Woman, Sue Storm
+Memnite
+Masked Meower
+Masked Meower
+Duty Beyond Death
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Invisible Woman, Sue Storm.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Duty Beyond Death.Cast
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Invisible Woman, Sue Storm; Masked Meower; Masked Meower; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Wall Token
+Bot1.Battlefield.Invisible Woman, Sue Storm.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Masked Meower#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Masked Meower#2.Counters.PlusOnePlusOne = 1
