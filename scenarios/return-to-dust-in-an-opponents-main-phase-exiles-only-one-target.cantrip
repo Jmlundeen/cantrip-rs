@@ -1,0 +1,36 @@
+# Return to Dust ({2}{W}{W}): "If you cast this spell during your main phase, you may exile up to one other target". Bot1 casts
+# it (an instant) in response to Bot2's spell during Bot2's precombat main phase, which is a main phase but not Bot1's, so only the
+# Ornithopter is exiled and the Mox Pearl stays (CR 601.2i).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Ornithopter
+Mox Pearl
+Return to Dust
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Return to Dust.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Mox Pearl)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Exile.Ornithopter.Colors.Count = 0
+Bot1.Battlefield = Mox Pearl
+Bot1.Battlefield.Mox Pearl.Types = Artifact

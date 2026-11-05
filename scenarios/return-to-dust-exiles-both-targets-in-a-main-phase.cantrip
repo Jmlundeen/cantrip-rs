@@ -1,0 +1,34 @@
+# Return to Dust ({2}{W}{W}): "Exile target artifact or enchantment. If you cast this spell during your main phase, you may
+# exile up to one other target artifact or enchantment" (CR 701.13a, ruling 2021-03-19). Cast in the precombat main phase
+# with an Ornithopter and a Mox Pearl, both are exiled; two Black Lotuses pay the {2}{W}{W}.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Ornithopter
+Mox Pearl
+Return to Dust
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Return to Dust.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Exile.Ornithopter.Colors.Count = 0
+Bot1.Exile.Mox Pearl.Colors.Count = 0

@@ -1,0 +1,6 @@
+{
+  "name": "Return to Dust",
+  "manaCost": "{2}{W}{W}",
+  "type": "Instant",
+  "oracleText": "Exile target artifact or enchantment. If you cast this spell during your main phase, you may exile up to one other target artifact or enchantment."
+}

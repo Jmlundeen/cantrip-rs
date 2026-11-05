@@ -1,0 +1,38 @@
+# Return to Dust ({2}{W}{W}): "Exile target artifact or enchantment. If you cast this spell during your main phase, you may
+# exile up to one other target artifact or enchantment." Cast in Bot1's end step, both target slots are still offered but the
+# second is not exiled, so only the Ornithopter leaves and the Mox Pearl stays.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Ornithopter
+Mox Pearl
+Return to Dust
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+[T3 Bot1.End]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Return to Dust.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Exile.Ornithopter.Colors.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl
+Bot1.Battlefield.Mox Pearl.Types = Artifact
