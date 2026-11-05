@@ -1,0 +1,49 @@
+# Vivien, Arkbow Ranger, -5 is a "may": Bot1 reaches five loyalty (+1 on turn 3), activates -5 on turn 5 and answers the choice of
+# a creature card with none. Nothing is revealed or brought in: Grizzly Bears and Lightning Bolt are both still outside the game
+# and Bot1's hand has no Bears; Vivien, her cost paid, is at 0 loyalty and gone (CR 704.5i).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Vivien, Arkbow Ranger
+Island x20
+
+[Bot1 Sideboard]
+Grizzly Bears
+Lightning Bolt
+
+[Bot2 Deck]
+Forest x20
+
+[Bot2 Sideboard]
+Kalonian Tusker
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Vivien, Arkbow Ranger.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: +1)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: reveal a creature card)
+Bot1.Pass
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Kalonian Tusker)
+Bot1.Choose()
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Grizzly Bears = (absent)
+Bot1.Sideboard = Grizzly Bears; Lightning Bolt
+Bot2.Sideboard = Kalonian Tusker
+Bot1.Battlefield.Vivien, Arkbow Ranger = (absent)
+Bot1.Revealed = (absent)

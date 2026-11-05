@@ -1,0 +1,59 @@
+# Vivien, Arkbow Ranger, +1 with a target gone: Bot1 divides one counter each over its Llanowar Elves and Bot2's Elvish Mystic,
+# then bolts the Mystic in response. The Mystic's counter is lost, not put on the Elves (the ruling, CR 608.2b), and only the Elves
+# still gain trample. Turn 5: "up to two" allows no target at all (the ruling): nothing is put anywhere and the loyalty still
+# rises, 5 then 6.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Vivien, Arkbow Ranger
+Llanowar Elves
+Mountain
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Vivien, Arkbow Ranger.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: +1)
+Bot1.Divide(Llanowar Elves: 1; Bot2.Battlefield.Elvish Mystic: 1)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+? Bot2.Graveyard = Elvish Mystic
+[T5 Bot1.Main1]
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: +1)
+Bot1.Divide()
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Vivien, Arkbow Ranger.Counters.Loyalty = 6

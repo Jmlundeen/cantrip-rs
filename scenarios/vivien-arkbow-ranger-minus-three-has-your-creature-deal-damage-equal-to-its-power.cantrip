@@ -1,0 +1,57 @@
+# Vivien, Arkbow Ranger, -3: "Target creature you control deals damage equal to its power to target creature or planeswalker."
+# Turn 1: the +1 makes Bot1's Llanowar Elves 3/3 (loyalty 5). Turn 3: the first target must be a creature Bot1 controls (Bot2's
+# Kalonian Tusker is refused) and the second may be any creature or planeswalker but not a Mox. The Elves deal exactly 3, killing Bot2's
+# Kalonian Tusker (3/3); power is read as it resolves (3, not the 1 it printed). Loyalty 5 - 3 = 2.
+# The Elves take nothing back (it is not a fight).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Vivien, Arkbow Ranger
+Llanowar Elves
+Island x20
+
+[Bot2 Deck]
+Forest
+Kalonian Tusker
+Mox Emerald
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Vivien, Arkbow Ranger.Cast
+Bot1.Pass
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: +1)
+Bot1.Divide(Llanowar Elves: 2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Kalonian Tusker.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: Target creature you control)
+! Bot1.Target(Bot2.Battlefield.Kalonian Tusker)
+Bot1.Target(Llanowar Elves)
+! Bot1.Target(Bot2.Battlefield.Mox Emerald)
+Bot1.Target(Bot2.Battlefield.Kalonian Tusker)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Kalonian Tusker
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Vivien, Arkbow Ranger.Counters.Loyalty = 2

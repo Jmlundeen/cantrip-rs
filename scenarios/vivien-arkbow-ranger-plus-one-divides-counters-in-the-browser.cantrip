@@ -1,0 +1,51 @@
+# Browser
+# A loyalty ability that divides counters, at a table (CR 601.2d, 602.2b): Bot1's page activates Vivien, Arkbow Ranger's +1 and
+# divides its two +1/+1 counters as one to its Llanowar Elves and one to Bot2's Elvish Mystic, each clicked on the board. The
+# dock reads the ability's own words, so the division reads as counters, not damage; both creatures get their counter and
+# trample.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Vivien, Arkbow Ranger
+Llanowar Elves
+Island x20
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Vivien, Arkbow Ranger.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: +1)
+? Client.Bot1.Prompt.Title = Divide 2 for Vivien, Arkbow Ranger
+? Client.Bot1.Prompt.Detail = +1: Distribute two +1/+1 counters among up to two target creatures. They gain trample until end of turn.  ·  0 of 2 assigned, among 0 targets (up to 2)  ·  or no target at all  ·  click a card to add one, or use its − and +
+Bot1.Divide(Llanowar Elves: 1; Bot2.Battlefield.Elvish Mystic: 1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+Bot2.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Elvish Mystic.Keywords = Trample
+Bot1.Battlefield.Vivien, Arkbow Ranger.Counters.Loyalty = 5

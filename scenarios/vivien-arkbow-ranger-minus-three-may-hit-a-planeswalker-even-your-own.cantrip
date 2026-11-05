@@ -1,0 +1,39 @@
+# Vivien, Arkbow Ranger, -3: "... to target creature or planeswalker." The second target is any creature or planeswalker, a
+# planeswalker of Bot1's own included: no "an opponent controls". Turn 1: Vivien comes in at 4 and -3 takes her to 1; Bot1's
+# Llanowar Elves (power 1) deal 1 damage to Vivien herself, which removes that much loyalty (CR 120.3c), and at 0 she is put
+# into the graveyard (CR 704.5i). The Elves take nothing back (it is not a fight, CR 701.14a).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Vivien, Arkbow Ranger
+Llanowar Elves
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Vivien, Arkbow Ranger.Cast
+Bot1.Pass
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: Target creature you control)
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Bot1.Battlefield.Vivien, Arkbow Ranger)
+? Bot1.Battlefield.Vivien, Arkbow Ranger.Counters.Loyalty = 1
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Vivien, Arkbow Ranger; Black Lotus
+Bot1.Battlefield.Llanowar Elves.Damage = 0

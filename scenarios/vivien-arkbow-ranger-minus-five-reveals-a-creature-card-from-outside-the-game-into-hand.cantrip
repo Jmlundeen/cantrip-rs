@@ -1,0 +1,50 @@
+# Vivien, Arkbow Ranger, -5: "You may reveal a creature card you own from outside the game and put it into your hand." Turn 3:
+# +1 with no creature to target takes her from 4 to 5 loyalty. Turn 5: -5 is paid exactly (she goes to 0 and dies, CR 704.5i). Only a creature
+# card of Bot1's own sideboard may be chosen - its Lightning Bolt is refused - and Bot2's sideboard creature stays where it is
+# (CR 400.11a, 108.3b). The Grizzly Bears come into Bot1's hand; Bot1 keeps the Bolt outside the game.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Vivien, Arkbow Ranger
+Island x20
+
+[Bot1 Sideboard]
+Grizzly Bears
+Lightning Bolt
+
+[Bot2 Deck]
+Forest x20
+
+[Bot2 Sideboard]
+Kalonian Tusker
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Vivien, Arkbow Ranger.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: +1)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Vivien, Arkbow Ranger.Activate(Ability: reveal a creature card)
+Bot1.Pass
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Kalonian Tusker)
+Bot1.Choose(Grizzly Bears)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Grizzly Bears.Power = 2
+Bot1.Sideboard = Lightning Bolt
+Bot2.Sideboard = Kalonian Tusker
+Bot1.Battlefield.Vivien, Arkbow Ranger = (absent)
+Bot1.Revealed = Grizzly Bears
