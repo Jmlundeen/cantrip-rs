@@ -1,0 +1,6 @@
+{
+  "name": "Duelist's Heritage",
+  "manaCost": "{2}{W}",
+  "type": "Enchantment",
+  "oracleText": "Whenever one or more creatures attack, you may have target attacking creature gain double strike until end of turn."
+}
