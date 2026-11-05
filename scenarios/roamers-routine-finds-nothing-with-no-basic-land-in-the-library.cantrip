@@ -1,0 +1,21 @@
+# Roamer's Routine: "Search your library for a basic land card": with only a nonbasic land (Volcanic Island) in the library
+# there is nothing to find, the Routine resolves anyway and goes to the graveyard, and no land enters.
+
+[Bot1 Deck]
+Black Lotus
+Roamer's Routine
+Volcanic Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Roamer's Routine.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Roamer's Routine; Black Lotus
+Bot1.Battlefield =

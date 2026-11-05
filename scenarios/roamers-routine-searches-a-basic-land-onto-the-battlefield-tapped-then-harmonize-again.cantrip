@@ -1,0 +1,48 @@
+# Roamer's Routine ({2}{G} sorcery, Harmonize {4}{G}): "Search your library for a basic land card, put it onto the battlefield
+# tapped, then shuffle." Turn 1, with a Black Lotus, Bot1 may take a Forest but not the nonbasic Volcanic Island; it comes in
+# tapped. Turn 3 the Routine is cast from the graveyard for its harmonize cost with five Moxen, finds a second Forest (tapped),
+# and is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Roamer's Routine
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Volcanic Island
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Roamer's Routine.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Volcanic Island)
+Bot1.Search(Forest)
+? Bot1.Battlefield.Forest.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Roamer's Routine.Cast(Ability: Harmonize)
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Forest)
+
+[Expect]
+Exile = Roamer's Routine
+Bot1.Battlefield.Forest#2.Tapped = true
+Bot1.Battlefield.Forest#1.Tapped = false
