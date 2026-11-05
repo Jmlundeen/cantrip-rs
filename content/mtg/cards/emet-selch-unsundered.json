@@ -1,0 +1,25 @@
+{
+  "name": "Emet-Selch, Unsundered",
+  "manaCost": "{1}{U}{B}",
+  "type": "Legendary Creature — Elder Wizard",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Vigilance\nWhenever Emet-Selch enters or attacks, draw a card, then discard a card.\nAt the beginning of your upkeep, if there are fourteen or more cards in your graveyard, you may transform Emet-Selch.",
+  "keywords": [
+    "Vigilance"
+  ],
+  "backFace": {
+    "name": "Hades, Sorcerer of Eld",
+    "colorIndicator": [
+      "Black",
+      "Blue"
+    ],
+    "type": "Legendary Creature — Avatar",
+    "power": 6,
+    "toughness": 6,
+    "oracleText": "Vigilance\nEcho of the Lost — During your turn, you may play cards from your graveyard.\nIf a card or token would be put into your graveyard from anywhere, exile it instead.",
+    "keywords": [
+      "Vigilance"
+    ]
+  }
+}

@@ -1,0 +1,92 @@
+# Emet-Selch, Unsundered: "At the beginning of your upkeep, if there are fourteen or more cards in your graveyard, you may transform Emet-Selch." Turn 1 Bot1 casts it (the loot
+# puts an Island in its graveyard). On turn 3 two Ancestral Recalls, a Breaking (mill eight) and a sacrificed Black Lotus make exactly fourteen cards in its graveyard once the
+# attack's loot has discarded one more. It accepts at the turn 5 upkeep and Hades, Sorcerer of Eld (6/6) is there: "During your turn, you may play cards from your graveyard" - a Black Lotus
+# cast from it, a Gush cast from it for its alternative cost (returning two Islands: the permission lets it) and an Island played from it - and "If a card or token would be put into your graveyard from anywhere, exile it instead": the Lotus sacrificed again and an Ancestral Recall
+# cast from the graveyard go to exile. On turn 6, Bot2's, the other graveyard is not Bot1's: Bot2's sacrificed Black Lotus (and the two Islands it discarded to hand size) stay in it, and Bot1 cannot cast the Recall left in its own.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Emet-Selch, Unsundered
+Black Lotus
+Breaking // Entering
+Ancestral Recall
+Island
+Ancestral Recall
+Island x14
+Gush
+Island x15
+
+[Bot2 Deck]
+Black Lotus
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Emet-Selch, Unsundered.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Breaking // Entering.Cast(Bot1; Ability: Breaking)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Emet-Selch, Unsundered)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Gush)
+[T5 Bot1.Upkeep]
+? Bot1.Graveyard.Count = 14
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Hades, Sorcerer of Eld.Power = 6
+Bot1.Graveyard.Black Lotus.Cast(Ability: Echo of the Lost)
+Bot1.Pass
+Bot2.Pass
+Bot1.Graveyard.Island.Play(Ability: Echo of the Lost)
+Bot1.Graveyard.Gush.Cast(Ability: Return two Islands)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Graveyard.Ancestral Recall.Cast(Bot1; Ability: Echo of the Lost)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+? Bot1.Exile.Ancestral Recall.Colors.Count = 1
+? Bot1.Exile.Black Lotus.Colors.Count = 0
+? Bot1.Graveyard.Count = 10
+? Bot1.Exile.Gush.Colors.Count = 1
+[T6 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Pass
+! Bot1.Graveyard.Ancestral Recall.Cast(Bot1; Ability: Echo of the Lost)
+
+[Expect]
+Bot2.Graveyard = Black Lotus; Island; Island

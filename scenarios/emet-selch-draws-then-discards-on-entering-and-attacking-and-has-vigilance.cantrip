@@ -1,0 +1,56 @@
+# Emet-Selch, Unsundered (2/4 vigilance): "Whenever Emet-Selch enters or attacks, draw a card, then discard a card." Turn 1 Bot1 casts every other card of its hand, so its hand is empty when
+# Emet-Selch enters: the card it draws (a Memnite) is the only one it can discard, which discarding first could not do. On turn 3 it draws a Savannah Lions, attacks (the Island
+# the trigger draws joins it in hand) and discards the older Lions: the discard is chosen among both. Vigilance leaves it untapped; Bot2 takes 2.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Black Lotus
+Emet-Selch, Unsundered
+Memnite
+Savannah Lions
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Emet-Selch, Unsundered.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Memnite)
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 1
+? Bot1.Graveyard = Memnite
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Emet-Selch, Unsundered)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Savannah Lions)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Savannah Lions; Memnite
+Bot1.Hand = Island
+Bot1.Battlefield.Emet-Selch, Unsundered.Tapped = false
+Bot2.Life = 18

@@ -1,0 +1,66 @@
+# Emet-Selch, Unsundered: the upkeep ability's "you may transform" is a choice. With exactly fourteen cards in its graveyard at the turn 5 upkeep (two Ancestral Recalls, a Breaking, a sacrificed
+# Black Lotus and two discards) the trigger is asked and Bot1 declines: Emet-Selch stays a 2/4 and the Lotus stays in the graveyard, where nothing lets it be cast.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Emet-Selch, Unsundered
+Black Lotus
+Breaking // Entering
+Ancestral Recall
+Island
+Ancestral Recall
+Island x30
+
+[Bot2 Deck]
+Black Lotus
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Emet-Selch, Unsundered.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Breaking // Entering.Cast(Bot1; Ability: Breaking)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Emet-Selch, Unsundered)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+[T5 Bot1.Upkeep]
+? Bot1.Graveyard.Count = 14
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Emet-Selch, Unsundered.Power = 2
+! Bot1.Graveyard.Black Lotus.Cast
+
+[Expect]
+Bot1.Graveyard.Count = 14
