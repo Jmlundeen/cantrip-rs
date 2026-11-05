@@ -1,0 +1,39 @@
+# Mountainwalk (CR 702.14c) stops a block only "as long as defending player controls a Mountain": Bot2 controls an Island
+# and no Mountain, so its Ornithopter blocks the enchanted Grizzly Bears (positive control of
+# burrowing-gives-mountainwalk-so-a-mountain-player-cannot-block). The Bears deal 2 to the 0/2 blocker, which dies.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Grizzly Bears
+Burrowing
+Mountain x20
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Burrowing.Cast(Bot1.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot2.Block(Ornithopter > Bot1.Battlefield.Grizzly Bears)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter

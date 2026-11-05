@@ -1,0 +1,6 @@
+{
+  "name": "Burrowing",
+  "manaCost": "{R}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nEnchanted creature has mountainwalk. (It can't be blocked as long as defending player controls a Mountain.)"
+}

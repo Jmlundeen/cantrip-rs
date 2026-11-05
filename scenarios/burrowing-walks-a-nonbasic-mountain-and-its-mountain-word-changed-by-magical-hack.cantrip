@@ -1,0 +1,54 @@
+# Mountainwalk looks for a land with the subtype Mountain, basic or not (CR 702.14c): Bot2's only land is Taiga, so
+# its Ornithopter can't block the enchanted Grizzly Bears on turn 3. "Mountain" is a land type word of Burrowing's own text
+# (CR 612.2): Magical Hack on the Aura replaces it with Island, the Bears have islandwalk and no mountainwalk, Bot2
+# controls no Island, and on turn 5 the Ornithopter blocks them and dies. Bot2 takes 2, once.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Grizzly Bears
+Burrowing
+Magical Hack
+Mountain x13
+
+[Bot2 Deck]
+Taiga
+Ornithopter
+Forest x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Burrowing.Cast(Bot1.Battlefield.Grizzly Bears)
+[T2 Bot2.Main1]
+Bot2.Hand.Taiga.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears > Bot2)
+! Bot2.Block(Ornithopter > Bot1.Battlefield.Grizzly Bears)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magical Hack.Cast(Bot1.Battlefield.Burrowing)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Mountain)
+Bot1.Modes(Island)
+? Bot1.Battlefield.Grizzly Bears.Keywords = Islandwalk
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot2.Block(Ornithopter > Bot1.Battlefield.Grizzly Bears)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Burrowing.AttachedTo = Grizzly Bears
+Bot1.Battlefield.Grizzly Bears.Keywords = Islandwalk
+Bot2.Graveyard = Ornithopter
+Bot2.Life = 18
