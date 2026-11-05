@@ -1,0 +1,30 @@
+# "{T}: Add {W}, {B}, or {G}." The color is chosen as the ability is activated, one each turn (white, black, green); the other colors and
+# colorless are refused beside those positive controls.
+
+[Bot1 Deck]
+Sandsteppe Citadel
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Sandsteppe Citadel.Play
+? Bot1.Battlefield.Sandsteppe Citadel.Tapped = true
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Sandsteppe Citadel.Activate(Color: Blue)
+! Bot1.Battlefield.Sandsteppe Citadel.Activate(Color: Red)
+! Bot1.Battlefield.Sandsteppe Citadel.Activate(Color: Colorless)
+Bot1.Battlefield.Sandsteppe Citadel.Activate(Color: White)
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sandsteppe Citadel.Activate(Color: Black)
+? Bot1.Mana = {B}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Sandsteppe Citadel.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Sandsteppe Citadel.Tapped = true

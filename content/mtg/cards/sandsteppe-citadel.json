@@ -1,0 +1,5 @@
+{
+  "name": "Sandsteppe Citadel",
+  "type": "Land",
+  "oracleText": "This land enters tapped.\n{T}: Add {W}, {B}, or {G}."
+}
