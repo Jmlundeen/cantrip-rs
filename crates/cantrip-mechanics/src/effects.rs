@@ -151,6 +151,52 @@ pub fn destroy_nonland_permanents_with_mana_value_at_most(g: &mut dyn Game, limi
     g.destroy_all(&doomed)
 }
 
+/// "Creatures you control gain flying until end of turn if a creature you control has flying. The same is true for
+/// first strike, double strike, ..." (CR 611.2a, 613.1f, 702): each ability in `keywords` that at least one creature its
+/// controller controls has as the ability resolves is granted to every creature that controller controls until end of
+/// turn. The list is the card's (Concerted Effort's, Odric, Lunarch Marshal's hexproof, indestructible, lifelink...);
+/// what a card's list holds beyond keywords, such as protection, is that card's own to hand out.
+pub fn creatures_you_control_gain_keywords_they_have(g: &mut dyn Game, item: &StackItem, keywords: &[Keyword]) {
+    let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    let present: Vec<Keyword> = keywords.iter().copied().filter(|&k| creatures.iter().any(|&id| g.chars(id).has(k))).collect();
+    instruction(g, |g| {
+        for keyword in present {
+            for &id in &creatures {
+                gain_until_end_of_turn(g, item.object, id, keyword);
+            }
+        }
+    });
+}
+
+/// "Destroy all creatures with mana value `min` or more and `max` or less" (CR 701.8a, 202.3): every creature on the
+/// battlefield whose mana value is in the range, destroyed at once (CR 101.4). A card in play with {X} in its cost has the
+/// X it was cast with (CR 202.3e), which `Query::mana_value` reads. The mana-value-bounded destruction both halves of
+/// Austere Command use; the two wrappers below name each half.
+pub fn destroy_creatures_with_mana_value_between(g: &mut dyn Game, min: u32, max: u32) -> Vec<ObjectId> {
+    let doomed: Vec<ObjectId> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| g.chars(id).is(CardType::Creature) && (min..=max).contains(&g.mana_value(id)))
+        .collect();
+    g.destroy_all(&doomed)
+}
+
+/// "Destroy all creatures with mana value `N` or less" (CR 701.8a): `destroy_creatures_with_mana_value_between` from 0.
+/// Austere Command's third mode and Ritual of Soot (3) print it.
+pub fn destroy_creatures_with_mana_value_at_most<const N: u32>(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+    destroy_creatures_with_mana_value_between(g, 0, N);
+    Ok(())
+}
+
+/// "Destroy all creatures with mana value `N` or greater" (CR 701.8a): `destroy_creatures_with_mana_value_between` with no
+/// upper bound. Austere Command's fourth mode prints it.
+pub fn destroy_creatures_with_mana_value_at_least<const N: u32>(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+    destroy_creatures_with_mana_value_between(g, N, u32::MAX);
+    Ok(())
+}
+
 /// "Destroy all artifacts with mana value `limit` or less" (CR 701.8a): every such artifact on the battlefield, destroyed at
 /// once. The artifacts it destroyed. Brotherhood's End (3), Hammer Mage (X) and Meltdown (X) print it.
 pub fn destroy_artifacts_with_mana_value_at_most(g: &mut dyn Game, limit: u32) -> Vec<ObjectId> {

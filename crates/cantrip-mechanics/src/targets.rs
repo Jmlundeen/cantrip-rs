@@ -1360,6 +1360,22 @@ pub fn permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target)
 /// "Target permanent card in your graveyard". Shifting Woodland prints it.
 pub const PERMANENT_CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(permanent_card_in_your_graveyard);
 
+/// "A permanent card in your graveyard with mana value `max` or less" (CR 115.1, 202.3): a quality of the target alone, so
+/// it is judged again as the spell or ability resolves (CR 608.2b), and a card in a graveyard with {X} in its cost has X of
+/// 0 (CR 202.3e), which `Query::mana_value` reads. The mana-value-bounded selection Sun Titan prints; one bound of several
+/// cards, `card_in_your_graveyard_with_mana_value_at_most` being its shared body.
+pub fn permanent_card_in_your_graveyard_with_mana_value_at_most(q: &dyn Query, asker: &Asker, t: Target, max: u32) -> bool {
+    card_in_your_graveyard_with_mana_value_at_most(q, asker, t, &PERMANENT_CARD_TYPES, max)
+}
+
+fn permanent_card_in_your_graveyard_with_mana_value_three_or_less(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    permanent_card_in_your_graveyard_with_mana_value_at_most(q, asker, t, 3)
+}
+
+/// "Target permanent card with mana value 3 or less from your graveyard" (CR 115.1, 202.3). Sun Titan prints it.
+pub const PERMANENT_CARD_IN_YOUR_GRAVEYARD_WITH_MANA_VALUE_3_OR_LESS: TargetSpec =
+    target(permanent_card_in_your_graveyard_with_mana_value_three_or_less);
+
 /// "Target nonland permanent card from your graveyard" (CR 115.1, 110.4a). Loamcrafter Faun prints it; Guardian
 /// Scalelord asks it of a card with mana value up to its power.
 pub fn nonland_permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
