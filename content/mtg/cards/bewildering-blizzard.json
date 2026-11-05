@@ -1,0 +1,6 @@
+{
+  "name": "Bewildering Blizzard",
+  "manaCost": "{4}{U}{U}",
+  "type": "Instant",
+  "oracleText": "Draw three cards. Creatures your opponents control get -3/-0 until end of turn."
+}

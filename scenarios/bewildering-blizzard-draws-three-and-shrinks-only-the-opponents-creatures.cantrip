@@ -1,0 +1,58 @@
+# Bewildering Blizzard: "Draw three cards. Creatures your opponents control get -3/-0 until end of turn." Bot1 holds the six
+# mana (three Mox Sapphires, a Black Lotus) untapped through turn 1 and casts it at the end of Bot2's turn 2, after Bot2's
+# Embereth Shieldbreaker (2/1) came down: it is -1/1 until the turn ends (1 toughness, unchanged), and Bot1's own Ornithopter (0/2) is untouched.
+# Bot1 draws three. A creature entering afterwards would not be affected (CR 611.2c): Bot2's Shieldbreaker at the next turn is
+# a 2/1 again, as the effect has ended.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Bewildering Blizzard
+Ornithopter
+Island
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Embereth Shieldbreaker
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Bewildering Blizzard.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 4
+? Bot2.Battlefield.Embereth Shieldbreaker.Power = -1
+? Bot2.Battlefield.Embereth Shieldbreaker.Toughness = 1
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield.Embereth Shieldbreaker.Power = 2
+Bot2.Battlefield.Embereth Shieldbreaker.Toughness = 1
+Bot1.Graveyard = Bewildering Blizzard; Black Lotus
