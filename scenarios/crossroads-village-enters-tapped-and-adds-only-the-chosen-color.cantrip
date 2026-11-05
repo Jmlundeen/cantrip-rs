@@ -1,0 +1,24 @@
+# Crossroads Village, a Town: "This land enters tapped. As it enters, choose a color. {T}: Add one mana of the chosen color" (CR 614.1c, 605.1a, 607.2d, 305.6). Bot1 plays it on
+# turn 1 and chooses green: it enters tapped and cannot be tapped (refused). On turn 3 it adds green and no other color (refused for blue).
+
+[Bot1 Deck]
+Crossroads Village
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Crossroads Village.Play
+Bot1.Colors(Green)
+? Bot1.Battlefield.Crossroads Village.Tapped = true
+? Bot1.Battlefield.Crossroads Village.ChosenColor = Green
+? Bot1.Battlefield.Crossroads Village.Subtypes = Town
+! Bot1.Battlefield.Crossroads Village.Activate(Color: Green)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Crossroads Village.Activate(Color: Blue)
+Bot1.Battlefield.Crossroads Village.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Crossroads Village.ChosenColor = Green
