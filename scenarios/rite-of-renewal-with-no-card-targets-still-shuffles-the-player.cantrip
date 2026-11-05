@@ -1,0 +1,45 @@
+# Rite of Renewal: both "up to" slots may be empty (CR 601.2c); Bot1's graveyard is empty, so only the player and Bot2's cards are asked. Bot1 targets only Bot2 as the player: no card returns, none is shuffled, but Bot2 still shuffles its library (CR 701.24a, "shuffles up to four target cards ... into their library" with none chosen) and the Rite is exiled. Bot2's graveyard card, a Lightning Bolt, stays in the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Rite of Renewal
+Island x2
+Island x15
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Island x2
+Island x17
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rite of Renewal.Cast
+Bot1.Target(Bot2)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Rite of Renewal
+Bot2.Shuffles = 1
+Bot2.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Shuffles = 0
+Bot1.Mana =

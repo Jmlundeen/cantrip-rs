@@ -1,0 +1,39 @@
+# Rite of Renewal: Bot1 targets itself as the player, and a Black Lotus is both a card to return and a card to shuffle (CR 608.2c: each sentence is done in turn). The Lotus is in Bot1's hand by the time the shuffling is read, so it is no longer a legal target (CR 400.7, 608.2b) and stays there; the Lightning Bolt and the other Lotus are shuffled into the library (two more cards in it) and the Rite is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Lightning Bolt
+Mox Emerald
+Rite of Renewal
+Island x2
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rite of Renewal.Cast
+Bot1.Target(Bot1.Graveyard.Black Lotus#1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1.Graveyard.Black Lotus#1; Bot1.Graveyard.Black Lotus#2; Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Rite of Renewal
+Bot1.Hand = Black Lotus; Island; Island; Island
+Bot1.Graveyard =
+Bot1.Shuffles = 1
+Bot1.Library.Count = 16
+Bot1.Mana =

@@ -1,0 +1,46 @@
+# Rite of Renewal: "up to two target permanent cards" and "up to four target cards" (CR 115.1), with the mana there. Bot1 has a Lightning Bolt and five sacrificed Black Lotuses in its graveyard and targets itself as the player. Three cards to return are refused, and so are five cards to shuffle and the player as a card to shuffle; two return, four are shuffled (the Bolt among them).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Lightning Bolt
+Rite of Renewal
+Island x2
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Rite of Renewal.Cast
+! Bot1.Target(Bot1.Graveyard.Black Lotus#1; Bot1.Graveyard.Black Lotus#2; Bot1.Graveyard.Black Lotus#3)
+Bot1.Target(Bot1.Graveyard.Black Lotus#1; Bot1.Graveyard.Black Lotus#2)
+Bot1.Target(Bot1)
+! Bot1.Target(Bot1.Graveyard.Black Lotus#1; Bot1.Graveyard.Black Lotus#2; Bot1.Graveyard.Black Lotus#3; Bot1.Graveyard.Black Lotus#4; Bot1.Graveyard.Lightning Bolt)
+! Bot1.Target(Bot2)
+Bot1.Target(Bot1.Graveyard.Black Lotus#3; Bot1.Graveyard.Black Lotus#4; Bot1.Graveyard.Black Lotus#5; Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Rite of Renewal
+Bot1.Graveyard =
+Bot1.Hand = Black Lotus; Black Lotus; Island
+Bot1.Shuffles = 1

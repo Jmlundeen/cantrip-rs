@@ -1,0 +1,51 @@
+# Rite of Renewal: the player and their cards are targets (CR 115.1). Bot2 answers with Dawn's Truce and gains hexproof, so the player target is illegal as the Rite resolves (CR 608.2b) and so are Bot2's cards, which need that player: nothing is shuffled and Bot2 does not shuffle. The Rite still resolves for the card Bot1 chose to return, and is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Rite of Renewal
+Island x3
+Island x15
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Dawn's Truce
+Mox Pearl
+Plains x3
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rite of Renewal.Cast
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Rite of Renewal
+Bot2.Graveyard = Dawn's Truce; Lightning Bolt; Black Lotus
+Bot2.Shuffles = 0
+Bot1.Hand = Black Lotus; Island; Island; Island; Island

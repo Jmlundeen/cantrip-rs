@@ -1,0 +1,52 @@
+# Rite of Renewal ({3}{G}): "Return up to two target permanent cards from your graveyard to your hand. Target player shuffles up to four target cards from their graveyard into their library. Exile Rite of Renewal." Bot1 has two sacrificed Black Lotuses and a Lightning Bolt in its graveyard; Bot2 has a Lightning Bolt and a Black Lotus in its. Refused, with the mana there: the Bolt (not a permanent card) as a card to return, Bot2's Lotus as a card to return (not from Bot1's graveyard), and Bot1's Bolt as a card to shuffle from Bot2's graveyard. Then both Lotuses return to Bot1's hand, Bot2 shuffles both of its cards away (two more in its library, one shuffle) and the Rite is exiled, not in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Lightning Bolt
+Mox Emerald
+Rite of Renewal
+Island x2
+Island x15
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Island x2
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rite of Renewal.Cast
+! Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+! Bot1.Target(Bot2.Graveyard.Black Lotus)
+Bot1.Target(Bot1.Graveyard.Black Lotus#1; Bot1.Graveyard.Black Lotus#2)
+Bot1.Target(Bot2)
+! Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt; Bot2.Graveyard.Black Lotus)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Rite of Renewal
+Bot1.Hand = Black Lotus; Black Lotus; Island; Island; Island
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard =
+Bot2.Shuffles = 1
+Bot1.Shuffles = 0
+Bot1.Mana =
