@@ -1,0 +1,38 @@
+# Spatial Anomaly taps for one colorless mana, then - untapped again - its sacrifice ability deals exactly 2 damage
+# (lethal to a 0/2 Ornithopter, so an amount off would show) and makes a tapped New Planet token (CR 605.1a, 120.3,
+# 701.21a, 111.1, 111.4).
+
+[Bot1 Deck]
+Spatial Anomaly
+Mountain
+Black Lotus
+Mox Ruby
+Mountain x16
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Spatial Anomaly.Play
+Bot1.Battlefield.Spatial Anomaly.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Spatial Anomaly.Activate(Bot2.Battlefield.Ornithopter; Ability: Sacrifice this land)
+
+[Expect]
+Bot2.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.New Planet.Tapped = true
+Bot1.Battlefield.New Planet.Subtypes = Planet
+Bot1.Graveyard = Spatial Anomaly; Black Lotus
+Bot1.Mana =
