@@ -58,6 +58,8 @@ mod cloak_tests;
 #[cfg(test)]
 mod coin_flip_rules_tests;
 #[cfg(test)]
+mod sideboard_tests;
+#[cfg(test)]
 mod morph_tests;
 #[cfg(test)]
 mod face_down_reveal_tests;
