@@ -1,0 +1,50 @@
+# Cubwarden mutates over Spirit of the Labyrinth, on top (CR 702.140c): the merged creature is Cubwarden, with all the
+# abilities of both its cards (CR 702.140e), so Spirit's "each player can't draw more than one card each turn" still applies.
+# Bot2, having drawn for its turn, casts Ancestral Recall on itself and draws none of the three (CR 121.2b): its hand is the
+# seven it holds after the draw and the Island played, Ancestral Recall gone.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Spirit of the Labyrinth
+Black Lotus
+Cubwarden
+Plains x20
+
+[Bot2 Deck]
+Island
+Ancestral Recall
+Swamp x22
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Cubwarden.Cast(Spirit of the Labyrinth; Ability: Mutate)
+Bot1.Pass
+Bot1.Modes(1)
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot2.Hand.Count = 8
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Cat Token; Cat Token; Cubwarden; Mox Pearl; Plains
+Bot2.Hand.Count = 7
+Bot2.Graveyard = Ancestral Recall

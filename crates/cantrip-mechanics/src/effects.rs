@@ -782,7 +782,7 @@ pub fn each_player_may_discard_hand_and_draw_seven(g: &mut dyn Game, item: &Stac
     let players: Vec<PlayerId> = g.state().apnap().collect();
     let mut willing = Vec::new();
     for player in players {
-        if !cant_draw(g, player, 7) && ask_may(g, player, item.object, Purpose::Ask(&WHEEL))? {
+        if !g.cant_draw(player, 7) && ask_may(g, player, item.object, Purpose::Ask(&WHEEL))? {
             willing.push(player);
         }
     }
@@ -1320,7 +1320,7 @@ pub fn may_cast_without_paying(g: &mut dyn Game, player: PlayerId, card: ObjectI
 /// `question`, and the cards drawn on a yes. Whether they chose to draw. Leovold, Emissary of Trest, Consecrated Sphinx and
 /// Sylvan Library print it.
 pub fn may_draw(g: &mut dyn Game, player: PlayerId, source: ObjectId, n: u32, question: &'static Question) -> Result<bool, Suspend> {
-    if cant_draw(g, player, n) || !ask_may(g, player, source, Purpose::Ask(question))? {
+    if g.cant_draw(player, n) || !ask_may(g, player, source, Purpose::Ask(question))? {
         return Ok(false);
     }
     g.draw(player, n);

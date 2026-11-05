@@ -768,6 +768,13 @@ pub trait Game: Query {
     /// of a permanent entering as its own replacement is applied, it is judged as it would exist on the battlefield
     /// (CR 614.12), which is how riot learns that the +1/+1 counter it chose can't be put on it (its ruling).
     fn counters_banned(&self, object: ObjectId, controller: PlayerId, kind: CounterKind) -> bool;
+    /// Whether `player` can't draw `n` more cards right now (CR 121.2b, 121.3, 614.17): a static ability of a permanent with its
+    /// abilities, or of an emblem, says so (`CardDef::cant_draw`), each rules text of a merged permanent included (CR
+    /// 702.140e). With `n` of 1 it is about the card about to be drawn, which then is not drawn and which no replacement
+    /// effect may replace (CR 614.17c, Spirit of the Labyrinth's ruling); with more, about an effect that offers the player
+    /// the choice to draw that many, which they can't take (CR 121.2b: "you may draw two cards" under "can't draw more than
+    /// one card each turn"), the same as a choice to draw one they can't (CR 121.3).
+    fn cant_draw(&self, player: PlayerId, n: u32) -> bool;
     /// The characteristics of the permanent `entering` would be on the battlefield (CR 614.12): "taking into account
     /// replacement effects that have already modified how it enters the battlefield ..., continuous effects from the
     /// permanent's own static abilities that would apply to it once it's on the battlefield, and continuous effects that

@@ -394,7 +394,7 @@ fn graveyard_replaces_draws(cx: &Cx, player: PlayerId) -> bool {
 /// this draw does (Hullbreacher).
 pub fn draws_only_repeat_an_attempt_from_an_empty_library(cx: &Cx, player: PlayerId) -> bool {
     cx.s().zone(Zone::library(player)).is_empty()
-        && (cx.s().player(player).drew_from_empty || cantrip_api::cant_draw(cx, player, 1))
+        && (cx.s().player(player).drew_from_empty || crate::static_rules::cant_draw(cx, cx.cards(), player, 1))
         && !graveyard_replaces_draws(cx, player)
         && (!possible(cx, None) || candidates(cx, &Proposal::Draw(CardDraw { player, replaced: false }), &[], None).is_empty())
 }

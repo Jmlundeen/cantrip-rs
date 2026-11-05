@@ -3145,7 +3145,7 @@ pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> 
 pub fn draw(cx: &mut Cx, player: PlayerId) {
     // CR 121.2b, 614.17c: a card the player can't draw is not drawn, and no replacement effect replaces the draw that can't
     // happen (Spirit of the Labyrinth's ruling), so neither does a player who can't draw from an empty library lose for it.
-    if cantrip_api::cant_draw(&*cx, player, 1) {
+    if crate::static_rules::cant_draw(&*cx, cx.cards(), player, 1) {
         return;
     }
     // CR 121.6: a replacement applies even with no cards in the library to draw.

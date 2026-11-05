@@ -2120,6 +2120,10 @@ impl cantrip_api::Game for Cx<'_> {
         static_rules::counters_banned(self, self.cards(), object, controller, kind)
     }
 
+    fn cant_draw(&self, player: PlayerId, n: u32) -> bool {
+        static_rules::cant_draw(self, self.cards(), player, n)
+    }
+
     fn entering_chars(&mut self, entering: &Entering) -> Chars {
         ops::as_it_would_exist(self, entering).chars
     }

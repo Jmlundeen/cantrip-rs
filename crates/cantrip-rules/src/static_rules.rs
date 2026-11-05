@@ -724,6 +724,12 @@ pub fn doesnt_lose(q: &dyn Query, cards: &'static CardTable, player: PlayerId, r
     any_static(q, cards, |d| d.loss_rules, |rule, asker| rule(q, asker, player, reason))
 }
 
+/// Whether `player` can't draw `n` more cards right now (CR 121.2b, 121.3, 614.17, `Game::cant_draw`): "each player can't
+/// draw more than one card each turn" (`CardDef::cant_draw`: Spirit of the Labyrinth).
+pub fn cant_draw(q: &dyn Query, cards: &'static CardTable, player: PlayerId, n: u32) -> bool {
+    any_static(q, cards, |d| d.cant_draw, |rule, asker| rule(q, asker, player, n))
+}
+
 /// Whether `player` can't win the game (CR 104.2b): Platinum Angel's "your opponents can't win the game" (`CardDef::win_rules`).
 pub fn cant_win(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> bool {
     any_static(q, cards, |d| d.win_rules, |rule, asker| rule(q, asker, player))
