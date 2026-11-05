@@ -1,0 +1,26 @@
+# "{T}: Add {G} or {U}." The color is chosen as the ability is activated, one each turn (green, blue); the other colors and
+# colorless are refused beside those positive controls.
+
+[Bot1 Deck]
+Thornwood Falls
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Thornwood Falls.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Thornwood Falls.Activate(Color: White)
+! Bot1.Battlefield.Thornwood Falls.Activate(Color: Black)
+! Bot1.Battlefield.Thornwood Falls.Activate(Color: Red)
+! Bot1.Battlefield.Thornwood Falls.Activate(Color: Colorless)
+Bot1.Battlefield.Thornwood Falls.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Thornwood Falls.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Thornwood Falls.Tapped = true
