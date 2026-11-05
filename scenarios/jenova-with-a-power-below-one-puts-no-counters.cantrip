@@ -1,0 +1,61 @@
+# Jenova, Ancient Calamity (1/5): "put a number of +1/+1 counters equal to Jenova's power on up to one other target creature" puts
+# none for a power below one (CR 122.1, 608.2h). Turn 1 the Memnite gets one counter (2/2). Turn 3 Last Gasp makes Jenova -2/2
+# before combat: the Memnite is targeted again, becomes no bigger and loses no counter, and stays a Mutant.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Jenova, Ancient Calamity
+Memnite
+Last Gasp
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jenova, Ancient Calamity.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Memnite.Power = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Last Gasp.Cast(Bot1.Battlefield.Jenova, Ancient Calamity)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jenova, Ancient Calamity.Power = -2
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Battlefield.Memnite.Toughness = 2
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Memnite.Subtypes = Construct; Mutant
+Bot1.Battlefield.Jenova, Ancient Calamity.Power = -2

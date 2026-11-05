@@ -1,0 +1,63 @@
+# Jenova, Ancient Calamity (1/5): "At the beginning of combat on your turn, put a number of +1/+1 counters equal to Jenova's power on up to one other target creature. That creature becomes a Mutant in addition
+# to its other types." and "Whenever a Mutant you control dies during your turn, you draw cards equal to its power." Turn 1 Bot1 casts a Memnite and Jenova: at combat the Memnite (1/1) gets one counter
+# and is a Mutant (2/2). Turn 3 it gets a second counter (3/3). Still on turn 3 a Lightning Bolt kills it and Bot1 draws exactly 3, the power it last had with both counters - not its base 1, not the 2
+# of the first combat. Bot2's hand stays full (Jenova's own controller draws).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Jenova, Ancient Calamity
+Memnite
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jenova, Ancient Calamity.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Toughness = 2
+? Bot1.Battlefield.Memnite.Subtypes = Construct; Mutant
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Memnite.Power = 3
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 4
+
+[Expect]
+Bot1.Graveyard = Memnite; Lightning Bolt

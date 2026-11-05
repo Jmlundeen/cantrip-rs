@@ -1,0 +1,79 @@
+# Jenova, Ancient Calamity: "Whenever a Mutant you control dies during your turn, you draw cards equal to its power." Turn 1 Bot1's Memnite becomes a Mutant (2/2). On turn 2, Bot2's turn, Bot2 casts a Savannah Lions and
+# Lightning Bolts the Memnite: it dies on the wrong turn, Bot1 draws nothing. On turn 3 Jenova's trigger targets the opponent's Savannah Lions ("up to one other target creature", any controller): it gets a counter
+# and is a Mutant (3/2), and when Bot1 kills it with its own Lightning Bolt on its own turn it draws nothing either, the Mutant not being under its control.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Jenova, Ancient Calamity
+Memnite
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Lightning Bolt
+Savannah Lions
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jenova, Ancient Calamity.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Memnite.Subtypes = Construct; Mutant
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Count = 5
+? Bot1.Hand.Count = 1
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Savannah Lions.Power = 3
+? Bot2.Battlefield.Savannah Lions.Subtypes = Cat; Mutant
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard.Count = 2
+? Bot1.Hand.Count = 1
+
+[Expect]
+Bot1.Life = 20
