@@ -1,0 +1,46 @@
+# Temur Devotee ({1}{U}, 3/3 defender): "{1}: Add {G}, {U}, or {R}. Activate only once each turn." Cast on turn 1 with a Mox Ruby and
+# a Mox Sapphire. Turn 3: Bot1 pays {1} with the Ruby's {R} and names green: the pool holds {G}; white and black are refused (not
+# among its colors), and a second activation the same turn is refused (CR 602.5b) even with the Sapphire to pay it. Turn 5 it names
+# blue, turn 7 red.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Temur Devotee
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Temur Devotee.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Temur Devotee.Activate(Color: White)
+! Bot1.Battlefield.Temur Devotee.Activate(Color: Black)
+Bot1.Battlefield.Temur Devotee.Activate(Color: Green)
+? Bot1.Mana = {G}
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Temur Devotee.Activate(Color: Blue)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Temur Devotee.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Temur Devotee.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Temur Devotee.Tapped = false

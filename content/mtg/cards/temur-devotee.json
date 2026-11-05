@@ -1,0 +1,11 @@
+{
+  "name": "Temur Devotee",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Human Druid",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Defender\n{1}: Add {G}, {U}, or {R}. Activate only once each turn.",
+  "keywords": [
+    "Defender"
+  ]
+}
