@@ -1,0 +1,97 @@
+# Sarek, Federation Ambassador: fifteen creature types among non-Borg creatures you control (CR 205.3m) draw one card for
+# each five - three cards - and three is enough for "if you draw three or more cards this way, put two +1/+1 counters on
+# each creature you control" (CR 121.1, 122.1). Sarek, Expedition Envoy, Kyoshi Warrior Guard, Norwood Ranger, Black Widow,
+# Phyrexian Walker, Woodland Druid and Staunch Shieldmate supply Vulcan, Advisor, Human, Scout, Ally, Warrior, Elf, Ranger,
+# Assassin, Hero, Construct, Phyrexian, Druid, Dwarf and Soldier; each cheap one is cast with the lands as it is drawn and
+# Sarek on turn 17 with the three Black Lotuses, which keeps the hand under the seven-card limit.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Sapphire
+Forest
+Norwood Ranger
+Expedition Envoy
+Plains
+Kyoshi Warrior Guard
+Mountain
+Phyrexian Walker
+Staunch Shieldmate
+Woodland Druid
+Black Widow, Natasha Romanoff
+Sarek, Federation Ambassador
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Norwood Ranger.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Kyoshi Warrior Guard.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Phyrexian Walker.Cast
+Bot1.Pass
+Bot2.Pass
+[T11 Bot1.Main1]
+Bot1.Hand.Staunch Shieldmate.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+[T13 Bot1.Main1]
+Bot1.Hand.Woodland Druid.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+[T15 Bot1.Main1]
+Bot1.Hand.Black Widow, Natasha Romanoff.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+[T17 Bot1.Main1]
+Bot1.Hand.Expedition Envoy.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Sarek, Federation Ambassador.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T17 Bot1.Main2]
+? Bot1.Hand.Count = 3
+
+[Expect]
+Bot1.Battlefield.Sarek, Federation Ambassador.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Norwood Ranger.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Expedition Envoy.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Phyrexian Walker.Counters.PlusOnePlusOne = 2
+Bot1.Hand.Count = 3

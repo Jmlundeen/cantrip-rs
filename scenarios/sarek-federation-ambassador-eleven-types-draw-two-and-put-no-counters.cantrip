@@ -1,0 +1,74 @@
+# Sarek, Federation Ambassador: eleven creature types among non-Borg creatures you control (CR 205.3m) - Vulcan, Advisor,
+# Elf, Scout, Ranger, Phyrexian, Construct, Human, Ally, Dwarf and Soldier - are two complete fives, so two cards are drawn
+# (CR 107.1a: the eleventh type is no third card), and two is not "three or more", so no creature gets the two +1/+1
+# counters (CR 121.1, 122.1). Sarek, Norwood Ranger, Phyrexian Walker, Expedition Envoy and Staunch Shieldmate supply the
+# types; Sarek comes last, on turn 9, and his trigger is the first of that combat.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Sapphire
+Sarek, Federation Ambassador
+Phyrexian Walker
+Forest
+Norwood Ranger
+Plains
+Expedition Envoy
+Staunch Shieldmate
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Phyrexian Walker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Norwood Ranger.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Expedition Envoy.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Staunch Shieldmate.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Sarek, Federation Ambassador.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+? Bot1.Hand.Count = 0
+[T9 Bot1.Main2]
+
+[Expect]
+Turn = 9
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Sarek, Federation Ambassador.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Norwood Ranger.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Staunch Shieldmate.Counters.PlusOnePlusOne = (absent)

@@ -1,0 +1,64 @@
+# Sarek, Federation Ambassador: "draw a card for every five creature types among non-Borg creatures you control" (CR 205.3m).
+# Sarek (Vulcan, Advisor) and Phyrexian Walker (Construct, Phyrexian) give four types - not five, so no card is drawn - and
+# the Borg Revolutionary (Borg, Rebel) and Bot2's Woodland Druid (Druid, Human) are not Sarek's controller's non-Borg
+# creatures: counting either would make six types and draw a card.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Sapphire
+Sarek, Federation Ambassador
+Phyrexian Walker
+Free Borg Revolutionaries
+Plains x10
+
+[Bot2 Deck]
+Woodland Druid
+Forest x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sarek, Federation Ambassador.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Phyrexian Walker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Free Borg Revolutionaries.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Woodland Druid.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Sarek, Federation Ambassador.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Free Borg Revolutionaries.Counters.PlusOnePlusOne = (absent)
