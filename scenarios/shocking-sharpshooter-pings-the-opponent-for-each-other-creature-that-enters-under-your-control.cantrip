@@ -1,0 +1,51 @@
+# Shocking Sharpshooter: "Whenever another creature you control enters, this creature deals 1 damage to target opponent."
+# Bot1 casts it for {1}{R} (its own entering is not "another": Bot2 stays at 20), then two Ornithopters, each pinging Bot2
+# (19, then 18). Bot2's Ornithopter entering on turn 2 deals nothing ("you control"), and Bot1's Mox Ruby on turn 3 is not
+# a creature.
+
+[Bot1 Deck]
+Mox Ruby x2
+Shocking Sharpshooter
+Ornithopter
+Ornithopter
+Mox Ruby
+Mountain x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Shocking Sharpshooter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 18
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
