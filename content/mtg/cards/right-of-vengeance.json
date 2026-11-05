@@ -1,0 +1,6 @@
+{
+  "name": "Right of Vengeance",
+  "manaCost": "{3}{W}",
+  "type": "Instant",
+  "oracleText": "Until end of turn, whenever a creature deals combat damage to you, destroy that creature and create a 2/1 red Klingon Warrior creature token with haste."
+}
