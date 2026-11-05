@@ -1,0 +1,8 @@
+{
+  "name": "Reputable Merchant",
+  "manaCost": "{2/W}{2/B}{2/G}",
+  "type": "Creature — Human Citizen",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature enters or dies, put a +1/+1 counter on target creature you control."
+}
