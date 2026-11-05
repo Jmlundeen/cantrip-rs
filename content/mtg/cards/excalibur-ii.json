@@ -1,0 +1,6 @@
+{
+  "name": "Excalibur II",
+  "manaCost": "{1}",
+  "type": "Legendary Artifact — Equipment",
+  "oracleText": "Whenever you gain life, put a charge counter on Excalibur II.\nEquipped creature gets +1/+1 for each charge counter on Excalibur II.\nEquip {3}"
+}
