@@ -1,0 +1,27 @@
+# Backup 1 (CR 702.165a) targeting itself: it gets the counter (0/2 -> 1/3) and, printed with the ability, assigns
+# combat damage equal to its toughness (CR 510.1a): 3, not its power 1. Not "another creature", so nothing else is granted.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Streetwise Negotiator
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Streetwise Negotiator.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Attack(Streetwise Negotiator > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+
+[Expect]
+Bot1.Battlefield.Streetwise Negotiator.Power = 1
+Bot1.Battlefield.Streetwise Negotiator.Toughness = 3
+Bot1.Battlefield.Streetwise Negotiator.Counters.PlusOnePlusOne = 1

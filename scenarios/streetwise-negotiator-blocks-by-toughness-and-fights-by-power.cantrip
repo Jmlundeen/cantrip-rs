@@ -1,0 +1,50 @@
+# Assigning by toughness is about combat damage only (CR 510.1a and the card's ruling). Streetwise Negotiator backs itself up
+# (1/3) and blocks Grizzly Bears: it assigns 3 (the Bears die, as its power 1 would not kill them) and is dealt 2. Then it
+# fights Ornithopter (CR 701.14a) and deals its power, 1, not its toughness: the 0/2 lives with 1 damage.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Streetwise Negotiator
+Bushwhack
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Streetwise Negotiator.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Grizzly Bears > Bot1)
+Bot1.Block(Streetwise Negotiator > Grizzly Bears)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Streetwise Negotiator.Damage = 2
+? Bot2.Graveyard = Grizzly Bears
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bushwhack.Cast
+Bot1.Modes(2)
+Bot1.Target(Streetwise Negotiator)
+Bot1.Target(Ornithopter)
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Damage = 1
+
+[Expect]
+Bot1.Battlefield.Streetwise Negotiator.Power = 1
+Bot1.Battlefield.Streetwise Negotiator.Toughness = 3
+Bot1.Battlefield.Streetwise Negotiator.Damage = 0

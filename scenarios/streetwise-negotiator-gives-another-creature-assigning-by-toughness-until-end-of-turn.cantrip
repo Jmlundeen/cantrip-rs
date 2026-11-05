@@ -1,0 +1,44 @@
+# Browser
+# Backup 1 (CR 702.165a) on another creature, cast on turn three so Ornithopter can attack the turn the ability lasts:
+# Ornithopter (0/2) gets the counter (1/3) and the ability until end of turn, and its face says so, so it hits for its toughness
+# 3 (CR 510.1a), not its power 1: 20 - 3. Negotiator keeps the ability (the rulings), and has no counter. On turn five the
+# granted ability is gone and the counter stays: Ornithopter hits for its power 1, and Negotiator, a 0/2 that would assign
+# nothing by power, for its toughness 2: 17 - 3.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Ornithopter
+Streetwise Negotiator
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Streetwise Negotiator.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Target(Ornithopter)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+? Bot1.Battlefield.Streetwise Negotiator.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Ornithopter.Keywords = AssignsDamageByToughness; Flying
+? Client.Bot1.Battlefield.Ornithopter.Rules = Flying / This creature assigns combat damage equal to its toughness rather than its power.
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+? Client.Bot1.Battlefield.Ornithopter.Rules = Flying
+Bot1.Attack(Ornithopter; Streetwise Negotiator > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Life = 14
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Streetwise Negotiator.Keywords = AssignsDamageByToughness
