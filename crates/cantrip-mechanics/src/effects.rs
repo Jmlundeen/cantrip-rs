@@ -934,6 +934,12 @@ pub fn subject_player_loses_half_their_life(g: &mut dyn Game, item: &StackItem) 
     Ok(())
 }
 
+/// "Each opponent loses life equal to the life that player lost this turn" (CR 119.3, 608.2h): Archfiend of Despair and Gul Dukat, Colonial Prefect read all losses before losing them together (CR 101.4); returns the actual loss.
+pub fn each_opponent_loses_life_lost_this_turn(g: &mut dyn Game, player: PlayerId) -> i32 {
+    let losses: Vec<_> = g.state().opponents(player).map(|opponent| (opponent, g.history().life_lost(opponent) as i32)).collect();
+    g.lose_life_together(&losses)
+}
+
 /// "Each opponent loses `N` life and you gain `N` life" (CR 119.3): every opponent still in the game loses it together, and the
 /// ability's controller gains `N`. Gollum, Riddle Master, Unholy Annex and Sneering Shadewriter print it of 2, and
 /// `each_opponent_loses_1_life_you_gain_1` is of 1.
