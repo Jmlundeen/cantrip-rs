@@ -1,0 +1,26 @@
+# Fanatical Firebrand sacrifices itself to the graveyard; Reliant's entry trigger returns it with a finality counter.
+[Bot1 Deck]
+Black Lotus
+Fanatical Firebrand
+Black Lotus
+Mox Jet
+U.S.S. Reliant, From Hell's Heart
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.U.S.S. Reliant, From Hell's Heart.Cast
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Activate(Ability: Station)
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Fanatical Firebrand.Counters.Finality = 1
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Counters.Charge = 1

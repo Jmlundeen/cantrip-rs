@@ -1,0 +1,77 @@
+# Entomb fills Bot1's graveyard before shuffling can affect the setup. It holds a mana-value-5 creature, Clone (4), Grizzly Bears (2), and Entomb itself. At exactly ten charge counters Reliant becomes a 4/3 flyer. Its entry trigger returns Clone, which copies Gigantosaurus; combat damage returns Grizzly Bears, untapped. Opponent graveyard, noncreature, and mana-value-5 targets are refused at both triggers (CR 702.184, 608.2b).
+
+[Bot1 Deck]
+Black Lotus x3
+Gigantosaurus
+U.S.S. Reliant, From Hell's Heart
+Entomb x2
+Entomb
+Black Lotus
+Elder Gargaroth
+Clone
+Grizzly Bears
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Fanatical Firebrand
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Fanatical Firebrand.Cast
+Bot2.Battlefield.Fanatical Firebrand.Activate(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Search(Elder Gargaroth)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Clone)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Grizzly Bears)
+Bot1.Hand.U.S.S. Reliant, From Hell's Heart.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Target(Bot1.Graveyard.Elder Gargaroth)
+! Bot1.Target(Bot1.Graveyard.Entomb)
+! Bot1.Target(Bot2.Graveyard.Fanatical Firebrand)
+Bot1.Target(Bot1.Graveyard.Clone)
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Types = Artifact
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Attack(U.S.S. Reliant, From Hell's Heart > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Counters.Charge = 10
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Types = Artifact; Creature
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Power = 4
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Toughness = 3
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Keywords = Flying
+Bot1.Battlefield.Gigantosaurus#2.Counters.Finality = 1
+Bot1.Battlefield.Gigantosaurus#2.Power = 10
+Bot1.Battlefield.Grizzly Bears.Counters.Finality = 1
+Bot1.Battlefield.Grizzly Bears.Tapped = false
+Bot1.Graveyard = Black Lotus; Entomb; Entomb; Entomb; Elder Gargaroth; Black Lotus; Black Lotus; Black Lotus

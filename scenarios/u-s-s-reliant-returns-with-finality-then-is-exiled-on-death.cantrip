@@ -1,0 +1,43 @@
+# Firebrand sacrifices itself, Reliant returns it with finality, station taps it for one charge, and a later Wrath exiles it when it dies.
+[Bot1 Deck]
+Black Lotus
+Fanatical Firebrand
+Black Lotus
+Mox Jet
+U.S.S. Reliant, From Hell's Heart
+Plains x4
+Wrath of God
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.U.S.S. Reliant, From Hell's Heart.Cast
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Activate(Ability: Station)
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Hand.Wrath of God.Cast
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Vengeance Mission = (absent)
+Bot1.Battlefield.Fanatical Firebrand = (absent)
+Bot1.Graveyard.Fanatical Firebrand = (absent)
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Counters.Charge = 1
+Bot1.Exile.Fanatical Firebrand.Power = 1

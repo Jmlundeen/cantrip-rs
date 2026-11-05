@@ -1,0 +1,50 @@
+# U.S.S. Reliant, From Hell's Heart: Giant Growth makes Colossal Dreadmaw 9/9, and stationing with it puts nine charge
+# counters on Reliant (CR 702.184a). One short of its 10+ striation, Reliant is still only an artifact, not a creature
+# (CR 702.184b-c). Its enters trigger had no creature card in Bot1's graveyard to target, so it did nothing (CR 603.3d).
+
+[Bot1 Deck]
+Gleemox x4
+Black Lotus x2
+U.S.S. Reliant, From Hell's Heart
+Colossal Dreadmaw
+Giant Growth
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.U.S.S. Reliant, From Hell's Heart.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#2.Activate(Color: Green)
+Bot1.Battlefield.Gleemox#3.Activate(Color: Green)
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Hand.Giant Growth.Cast(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Counters.Charge = 9
+Bot1.Battlefield.U.S.S. Reliant, From Hell's Heart.Types = Artifact
+Bot1.Battlefield.Colossal Dreadmaw.Tapped = true
