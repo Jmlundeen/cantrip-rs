@@ -1,0 +1,46 @@
+# Abzan Devotee (2/1): "{1}: Add {W}, {B}, or {G}. Activate only once each turn." and "{2}{B}: Return this card from your
+# graveyard to your hand." Turn 1: Mox Jet and Mox Pearl pay for it; Mox Ruby's {R} pays the first {1} for {G}, and with
+# Mox Sapphire's mana floating a second activation is refused (CR 602.5b), as is the return while it is on the battlefield
+# (CR 113.6k). Bot2 Bolts it on turn 2; on turn 3 three Moxen pay to return it to the hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Abzan Devotee
+Swamp x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Abzan Devotee.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Abzan Devotee.Activate(Color: Green)
+? Bot1.Mana = {G}
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Abzan Devotee.Activate(Color: Black)
+! Bot1.Battlefield.Abzan Devotee.Activate(Ability: Return)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Abzan Devotee)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Abzan Devotee.Activate
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Abzan Devotee.Power = 2
+Bot1.Graveyard = 

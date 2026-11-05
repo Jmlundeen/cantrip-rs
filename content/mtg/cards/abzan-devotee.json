@@ -1,0 +1,8 @@
+{
+  "name": "Abzan Devotee",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Dog Cleric",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "{1}: Add {W}, {B}, or {G}. Activate only once each turn.\n{2}{B}: Return this card from your graveyard to your hand."
+}
