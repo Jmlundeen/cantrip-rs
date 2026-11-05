@@ -1,0 +1,66 @@
+# Wayspeaker Bodyguard: "When this creature enters, return target nonland permanent card with mana value 2 or less from your
+# graveyard to your hand." Bot2's three Bolts (one Black Lotus) kill Bot1's Ornithopter (mana value 0), Memnite (0) and Hill Giant
+# (4) on turn 2. Hill Giant is refused as a target (mana value 4) and the Bodyguard returns the Memnite, leaving the other two.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Memnite
+Hill Giant
+Wayspeaker Bodyguard
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hill Giant)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard.Count = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wayspeaker Bodyguard.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Graveyard.Hill Giant)
+Bot1.Target(Bot1.Graveyard.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Memnite
+Bot1.Graveyard.Count = 2
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Wayspeaker Bodyguard

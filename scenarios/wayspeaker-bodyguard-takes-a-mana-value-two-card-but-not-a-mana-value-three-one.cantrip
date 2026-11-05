@@ -1,0 +1,70 @@
+# Wayspeaker Bodyguard: "return target nonland permanent card with mana value 2 or less from your graveyard to your hand" - the
+# boundary. On turn 2 Bot2's two Bolts kill Bot1's Grizzly Bears (mana value 2) and Gray Ogre (3), and its Shatter destroys Bot1's
+# spare Mox Emerald (0). With two legal targets the Bodyguard asks: Gray Ogre is refused, and the Bears, exactly mana value 2, is
+# taken and returned.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Grizzly Bears
+Gray Ogre
+Wayspeaker Bodyguard
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Shatter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Gray Ogre.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gray Ogre)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Shatter.Cast(Bot1.Battlefield.Mox Emerald)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard.Count = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wayspeaker Bodyguard.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Graveyard.Gray Ogre)
+Bot1.Target(Bot1.Graveyard.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Grizzly Bears
+Bot1.Graveyard = Mox Emerald; Gray Ogre

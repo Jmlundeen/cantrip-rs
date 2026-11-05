@@ -1,0 +1,60 @@
+# Wayspeaker Bodyguard: "Flurry - Whenever you cast your second spell each turn, tap target creature an opponent controls."
+# Turn 3: the first spell (Ornithopter) taps nothing; the second (Memnite) taps one of Bot2's two untapped creatures - the Bodyguard's
+# own controller's creature is refused as the target - and the third (Mox Jet) taps no other.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Wayspeaker Bodyguard
+Plains
+Ornithopter
+Memnite
+Mox Jet
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Wayspeaker Bodyguard.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Tapped = false
+Bot1.Hand.Memnite.Cast
+! Bot1.Target(Bot1.Battlefield.Wayspeaker Bodyguard)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Tapped = true
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Memnite.Tapped = false
+Stack.Count = 0
