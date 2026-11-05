@@ -1327,6 +1327,16 @@ pub fn nonland_permanent_card_with_mana_value_3_or_less_in_your_graveyard(q: &dy
 pub const NONLAND_PERMANENT_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD: TargetSpec =
     target(nonland_permanent_card_with_mana_value_3_or_less_in_your_graveyard);
 
+/// "Target permanent card with mana value 3 or less from your graveyard" (CR 115.1, 202.3, 110.4a): a land card is one, and X in
+/// a graveyard is 0 (CR 202.3e). Sevinne's Reclamation and Squall, SeeD Mercenary print it.
+pub fn permanent_card_with_mana_value_3_or_less_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard_with_mana_value_at_most(q, asker, t, &PERMANENT_CARD_TYPES, 3)
+}
+
+/// "Target permanent card with mana value 3 or less from your graveyard". Sevinne's Reclamation and Squall, SeeD Mercenary print it.
+pub const PERMANENT_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD: TargetSpec =
+    target(permanent_card_with_mana_value_3_or_less_in_your_graveyard);
+
 /// "Target land card from your graveyard" (CR 115.1, 400.7). Titania, Protector of Argoth, Wrenn and Six (up to one) and
 /// Carnivorous Cultivator print it.
 pub fn land_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {

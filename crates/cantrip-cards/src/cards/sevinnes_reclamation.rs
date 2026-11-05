@@ -6,17 +6,6 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("CopyThisSpell", "copy this spell?", "You may choose a new target for the copy", "Copy it", "Don't copy");
 
-/// "Target permanent card with mana value 3 or less from your graveyard."
-fn permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard_with_mana_value_at_most(
-        q,
-        asker,
-        t,
-        &targets::PERMANENT_CARD_TYPES,
-        3,
-    )
-}
-
 /// Return the target to the battlefield; then, if this spell was cast from a graveyard (any way), the controller may
 /// copy it and choose a new target for the copy. A copy was never cast (CR 707.10), so it does not copy itself again.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -32,7 +21,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(permanent_card_in_your_graveyard)], effect),
+    spell: spell(&[targets::PERMANENT_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD], effect),
     ways: &[flashback::way(cost("{4}{W}"), "Flashback {4}{W}")],
     ..oracle::SEVINNES_RECLAMATION
 };
