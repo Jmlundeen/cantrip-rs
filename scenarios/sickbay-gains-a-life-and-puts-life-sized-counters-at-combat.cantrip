@@ -1,0 +1,44 @@
+# Sickbay gains 1 life when a creature its controller controls enters - not when Bot2's Llanowar Elves enters - then at the
+# beginning of that turn's combat puts X +1/+1 counters on a creature, X being one plus the life gained this turn: 2 after
+# the one creature, the life Orion gained on an earlier turn not counted (CR 603.6a, 119.3, 608.2h, 122.6).
+
+[Bot1 Deck]
+Orion
+Black Lotus x2
+Sickbay
+Llanowar Elves
+Forest x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mountain x18
+
+[Actions]
+Bot1.Hand.Orion.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.Sickbay.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 21
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[Bot1.BeginCombat]
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
+Bot1.Life = 22
