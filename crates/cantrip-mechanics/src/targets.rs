@@ -441,6 +441,16 @@ pub fn controlled_by_slot_opponent(q: &dyn Query, id: ObjectId) -> bool {
     permanent(q, id) && Some(q.controller(id)) == q.slot_opponent()
 }
 
+fn nonland_permanent_the_slots_opponent_controls(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if controlled_by_slot_opponent(q, id) && !q.chars(id).is(CardType::Land))
+}
+
+/// "For each opponent, ... up to one target nonland permanent that player controls" (CR 601.2c, 115.1, 115.1d): a slot for each
+/// opponent, in seat order, of a nonland permanent that opponent controls, none chosen allowed. A card words its own prompt
+/// with `.labelled(..)`. Riptide Gearhulk and Omega, Heartless Evolution print it.
+pub const UP_TO_ONE_NONLAND_PERMANENT_OF_EACH_OPPONENT: TargetSpec =
+    target(nonland_permanent_the_slots_opponent_controls).between(0, TargetSpec::EACH_OPPONENT);
+
 /// "With mana value X" in a target filter (CR 107.3a, 202.3): `id`'s mana value is the X announced for the spell or ability
 /// whose target is judged (`Query::announced_x`): its own X, as it is announced, as it is judged again on resolution
 /// (CR 608.2b) and as its targets change (CR 115.7), never another activation's of the same source (CR 107.3k). Before X
