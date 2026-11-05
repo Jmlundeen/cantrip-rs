@@ -1,0 +1,78 @@
+# Dragonback Assault ({3}{G}{U}{R}): "When this enchantment enters, it deals 3 damage to each creature and each planeswalker."
+# On turn 3 it kills Bot2's Llanowar Elves, leaves Bot1's own Border Guard (1/4) with 3 damage and takes Bot2's Chandra,
+# Acolyte of Flame from 4 loyalty to 1 (damage to a planeswalker removes that many loyalty counters, CR 120.3c). "Landfall -
+# Whenever a land you control enters, create a 4/4 red Dragon creature token with flying": Bot2's land on turn 4 makes none;
+# Bot1's own on turn 5 makes one.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Border Guard
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Dragonback Assault
+Island
+Island x15
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Chandra, Acolyte of Flame
+Llanowar Elves
+Island
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Border Guard.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Chandra, Acolyte of Flame.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Dragonback Assault.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Border Guard.Damage = 3
+? Bot2.Graveyard = Llanowar Elves; Black Lotus
+? Bot2.Battlefield.Chandra, Acolyte of Flame.Counters.Loyalty = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Count = 7
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Dragon Token.Token = true
+Bot1.Battlefield.Dragon Token.Power = 4
+Bot1.Battlefield.Dragon Token.Toughness = 4
+Bot1.Battlefield.Dragon Token.Keywords = Flying
+Bot1.Battlefield.Dragon Token.Colors = Red
+Bot1.Battlefield.Border Guard.Damage = 0
