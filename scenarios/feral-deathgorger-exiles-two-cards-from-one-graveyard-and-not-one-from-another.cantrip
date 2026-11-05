@@ -1,0 +1,58 @@
+# Feral Deathgorger: "When this creature enters, exile up to two target cards from a single graveyard" (CR 608.2b). Bot1 Bolted
+# Bot2 on turn 1 and Bot2 Bolted Bot1 on turn 2, so each graveyard holds a Bolt; a Black Lotus paying for the Deathgorger on
+# turn 3 lands in Bot1's, which then holds two. The first card taken is Bot1's Bolt, so Bot2's Bolt cannot be the second
+# (the refusal beside the allowed Lotus), and Bot2's graveyard keeps it. The Deathgorger is a 3/5 flier with deathtouch.
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Feral Deathgorger
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Feral Deathgorger.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+! Bot1.Target(Bot2.Graveyard.Lightning Bolt)
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 2
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Feral Deathgorger.Power = 3
+Bot1.Battlefield.Feral Deathgorger.Toughness = 5

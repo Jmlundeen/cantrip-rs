@@ -1,0 +1,33 @@
+# Feral Deathgorger cast as Dusk Sight chooses no target ("up to one"): the Memnite stays a 1/1 and the card is still drawn (CR 608.2b), then the Omen is shuffled into the library (CR 720.3d): 13, 12 after the draw, 13 again.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Memnite
+Feral Deathgorger
+Forest x16
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Feral Deathgorger.Cast(Ability: Omen)
+? Stack = Dusk Sight
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Memnite.Toughness = 1
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 13
+Bot1.Graveyard.Count = 0
+Exile.Count = 0
