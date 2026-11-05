@@ -349,11 +349,14 @@ fn an_aura_cannot_enchant_an_object_entering_with_it() {
 
 /// Whether `card` could be put onto the battlefield under `controller` attached to `host` (`Game::could_enter_attached`), the
 /// question a card asks before its player chooses - checked against the move itself, made on a copy of the game: the move
-/// puts it there attached to `host` exactly when the question said it could. Asking moves nothing and records nothing.
+/// puts it there attached to `host` exactly when the question said it could. Asking moves nothing and records nothing: the
+/// position after it is the one before (`GameState`'s `PartialEq`: every object, zone order, timestamp counter, effect and
+/// pending trigger), and the history has no new event.
 fn offered(g: &mut Game, card: ObjectId, controller: PlayerId, host: ObjectId) -> bool {
-    let (zone, events) = (g.state.obj(card).zone, g.log.len());
+    let (before, events) = (g.state.clone(), g.log.len());
     let offered = cantrip_api::Game::could_enter_attached(&mut cx(g), card, controller, host);
-    assert_eq!((g.state.obj(card).zone, g.log.len()), (zone, events), "asking changed nothing");
+    assert!(g.state == before, "asking left the position as it was");
+    assert_eq!(g.log.len(), events, "asking recorded no event");
     let mut moved = g.clone();
     let new = cantrip_api::Game::put_onto_battlefield_attached(&mut cx(&mut moved), card, controller, host).expect("nothing is asked: the host is named");
     let attached = new.is_some_and(|n| moved.state.obj(n).attached_to == Some(host));
@@ -426,6 +429,30 @@ fn an_aura_could_not_enter_attached_to_itself_or_to_an_object_gone() {
     let gone = crate::ops::move_to(&mut cx(&mut g), bear, Zone::graveyard(YOU));
     assert_ne!(gone, bear);
     assert!(!offered(&mut g, card, YOU, bear));
+}
+
+/// The question's moment on the battlefield (`ops::as_it_would_exist`) is journalled and taken back, so the journal still undoes
+/// past it: an Aura card in the middle of a graveyard is asked about, the move then made, and reverting to a mark from before
+/// the question gives the position before it, the card in its place in its graveyard (CR 404.2: order kept); asking and moving
+/// again reaches the same position as the first time.
+#[test]
+fn asking_is_taken_back_with_the_journal() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    put(&mut g, &LAND, YOU, Zone::graveyard(YOU));
+    let card = put(&mut g, &AURA, YOU, Zone::graveyard(YOU));
+    put(&mut g, &LAND, YOU, Zone::graveyard(YOU));
+    let (before, mark) = (g.state.clone(), g.state.mark());
+    assert!(offered(&mut g, card, YOU, bear));
+    let new = put_attached(&mut g, card, bear).expect("it entered");
+    assert_eq!(g.state.obj(new).attached_to, Some(bear));
+    let after = g.state.clone();
+    g.state.revert(mark);
+    assert!(g.state == before, "undone to before the question");
+    assert_eq!(g.state.zone(Zone::graveyard(YOU))[1], card, "in its place in the graveyard");
+    assert!(offered(&mut g, card, YOU, bear));
+    put_attached(&mut g, card, bear).expect("it entered");
+    assert!(g.state == after, "the same position again");
 }
 
 /// An Equipment card could enter attached to a creature and not to an artifact that is no creature, where it enters unattached
