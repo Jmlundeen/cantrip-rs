@@ -1,0 +1,52 @@
+# Julian Bashir, Frontier Doctor ({2}{W}): "Seek out — Whenever you draw your second card each turn, put a +1/+1 counter on
+# Julian Bashir. Whenever Julian Bashir attacks, return target creature card with mana value X or less from your graveyard
+# to the battlefield, where X is Julian Bashir's power." Bot1's Memnite dies blocking on turn 3; on turn 5 Bot1's second
+# draw (Ancestral Recall's first) makes Julian a 2/2, and his attack returns the Memnite, whose mana value 0 is at most
+# his power of 2.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Memnite
+Julian Bashir, Frontier Doctor
+Ancestral Recall
+Plains
+Plains x12
+
+[Bot2 Deck]
+Savannah Lions
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Memnite > Bot2)
+Bot2.Block(Savannah Lions > Memnite)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Julian Bashir, Frontier Doctor.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Julian Bashir, Frontier Doctor > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Julian Bashir, Frontier Doctor.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Julian Bashir, Frontier Doctor.Power = 2
+Bot1.Battlefield.Memnite.Power = 1
+Bot2.Life = 18
