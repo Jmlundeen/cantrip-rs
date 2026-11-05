@@ -1576,6 +1576,13 @@ fn chosen_still_pay(cx: &Cx, cost: &Cost, chosen: &[ObjectId]) -> bool {
     })
 }
 
+/// Whether the permanent that gave an ability can pay its "Sacrifice [the card that gives this ability]" cost (CR 201.5a):
+/// still the permanent it was, on the battlefield (`chosen_still_pay`, CR 400.7), and the payer's (CR 701.21a). Asked as
+/// the ability is activated and again once its mana is paid (CR 601.2g-h by way of 602.2b).
+fn granter_pays(cx: &Cx, player: PlayerId, granter: ObjectId) -> bool {
+    chosen_still_pay(cx, &Cost::NONE, &[granter]) && cx.s().obj(granter).controller == player
+}
+
 /// Chooses the permanents a cost names (CR 601.2h), always asked, even when the choice is forced. Too few to choose
 /// among (tapped ones, judged once the mana is paid) is a cost that can't be paid: the announcement is taken back. `paid` is
 /// what the cost is paid for (`permanent_allowed`).
@@ -10010,9 +10017,10 @@ fn activate(
     // What gave the source this ability (CR 113.2c, 613.1f): the option names it; read now, before any cost moves it (a cost
     // may sacrifice the very permanent that gave it).
     let granted = granted.or_else(|| granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
-    // "Sacrifice [the card that gives this ability]" (CR 201.5a): that permanent, which the payer must control.
+    // "Sacrifice [the card that gives this ability]" (CR 201.5a): that permanent, which the payer must control; judged again
+    // once the mana is paid (`granter_pays`).
     let granter = if def.cost.sacrifice_granter {
-        match granted.map(|g| g.object).filter(|&g| live(cx.s(), g) && cx.s().obj(g).zone.is(ZoneKind::Battlefield) && cx.s().obj(g).controller == player) {
+        match granted.map(|g| g.object).filter(|&g| granter_pays(cx, player, g)) {
             Some(g) => Some(g),
             None => return Err(Stop::Cancel),
         }
@@ -10199,10 +10207,13 @@ fn activate(
     }
     let beheld = choose_behold(cx, player, source, &whole)?;
     // The energy and life, judged again after the mana abilities (CR 601.2g-h by way of 602.2b), and the permanents the cost
-    // sacrifices by naming them, which a static ability may forbid it to (CR 101.2, `may_sacrifice_for`).
+    // sacrifices by naming them, which a static ability may forbid it to (CR 101.2, `may_sacrifice_for`). The granter a
+    // granted cost sacrifices is judged again too, as the permanents chosen before the mana are (`chosen_still_pay`): a mana
+    // ability activated while paying may have sacrificed it (Krark-Clan Ironworks), and then the cost can't be paid
+    // (CR 601.2h, 400.7, 118.3) and the activation is taken back (CR 733.1).
     if !rest_payable(cx, player, whole.energy as u32, life + whole.life, paid)
         || whole.sacrifice_self && !may_sacrifice_for(cx, player, source, paid)
-        || granter.is_some_and(|g| !may_sacrifice_for(cx, player, g, paid))
+        || granter.is_some_and(|g| !granter_pays(cx, player, g) || !may_sacrifice_for(cx, player, g, paid))
     {
         return Err(Stop::Cancel);
     }

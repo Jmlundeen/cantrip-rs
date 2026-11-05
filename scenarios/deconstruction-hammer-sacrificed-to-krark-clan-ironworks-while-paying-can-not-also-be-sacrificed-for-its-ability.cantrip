@@ -1,0 +1,58 @@
+# The Ornithopter's granted "{3}, {T}, Sacrifice Deconstruction Hammer" is paid with Mox Pearl, Mox Jet and Krark-Clan
+# Ironworks' "Sacrifice an artifact: Add {C}{C}" sacrificing the Hammer itself. Once the mana is paid the Hammer is gone
+# (CR 400.7), so its sacrifice can't be paid (CR 601.2g-h by way of 602.2b, 118.3): the activation is taken back with its
+# mana abilities (CR 733.1). Nothing goes on the stack, the Hammer is on the battlefield untapped, the Ornithopter is not
+# tapped and Bot2's Sol Ring is not destroyed.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Krark-Clan Ironworks
+Ornithopter
+Deconstruction Hammer
+Black Lotus
+Island x14
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Krark-Clan Ironworks.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Sol Ring)
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Deconstruction Hammer)
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Deconstruction Hammer.Tapped = false
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island; Sol Ring
+Bot1.Battlefield.Ornithopter.Tapped = false
