@@ -1,7 +1,8 @@
 # Browser
 # Bot2 casts Dispelling Exhale at Bot1's Lightning Bolt and beholds the Kokusho in its hand (CR 701.4a): the card is revealed, so while
 # the Exhale is on the stack Bot1's page shows it among the cards known in Bot2's hand and says so in its game log ("Bot2 reveals
-# Kokusho, the Evening Star"); it knew nothing of Bot2's hand before and, a step later, shows it hidden again. Bot1 cannot pay {4}
+# Kokusho, the Evening Star"); it knew nothing of Bot2's hand before, still shows it while the Exhale resolves and asks for the {4} (a spell is on the stack
+# until it has resolved, and the reveal lasts until then, CR 701.20a), and shows it hidden again once the Exhale is gone. Bot1 cannot pay {4}
 # and declines. The log does not call the spell "kicked": behold is no kicker.
 
 [Bot1 Deck]
@@ -38,9 +39,10 @@ Bot2.Choose(Kokusho, the Evening Star)
 ? Client.Bot1.Log.Has = Bot2 reveals [Kokusho, the Evening Star].
 ? Client.Bot1.Log.Has = Bot2 casts [Dispelling Exhale] targeting [Lightning Bolt].
 Bot1.Pass
-? Client.Bot1.OpponentHand =
+? Client.Bot1.OpponentHand = Kokusho, the Evening Star
 Bot1.Decline
 [T3 Bot1.Main2]
+? Client.Bot1.OpponentHand =
 
 [Expect]
 Bot2.Life = 20
