@@ -1,0 +1,29 @@
+# Emergency Regeneration: "Artifacts you control gain hexproof and indestructible until end of turn" (CR 611.2,
+# 702.11, 702.12). Memnite is the only artifact Bot1 controls, and the spell's resolution gives it both keywords.
+
+[Bot1 Deck]
+Memnite
+Plains
+Plains
+Emergency Regeneration
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Emergency Regeneration.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Keywords.Count = 2
