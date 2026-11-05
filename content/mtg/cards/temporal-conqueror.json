@@ -1,0 +1,8 @@
+{
+  "name": "Temporal Conqueror",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Na'kuhl Warrior",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "When this creature enters, mill three cards. Then return a land card from your graveyard to your hand. If you can't, create a Treasure token. (To mill three cards, put the top three cards from your library into your graveyard.)"
+}

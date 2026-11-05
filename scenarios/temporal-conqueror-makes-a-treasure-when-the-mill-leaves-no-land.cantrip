@@ -1,0 +1,28 @@
+# Temporal Conqueror: with no land card in the graveyard after the three milled nonland cards, it "can't" return one, so it
+# creates a Treasure token instead (CR 111.10a, 608.2c) and asks nothing.
+
+[Bot1 Deck]
+Black Lotus
+Temporal Conqueror
+Island x5
+Grizzly Bears
+Lightning Bolt
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Temporal Conqueror.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Counterspell; Lightning Bolt; Grizzly Bears; Black Lotus
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Treasure Token.Token = true
+Bot1.Battlefield.Treasure Token.Types = Artifact

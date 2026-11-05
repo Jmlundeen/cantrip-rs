@@ -1,0 +1,30 @@
+# Temporal Conqueror mills three, then returns a land card from the graveyard to hand (CR 701.17, 608.2c): the milled Mountain
+# is a land the mill itself put there, so it comes back, and the two nonland cards stay.
+
+[Bot1 Deck]
+Black Lotus
+Temporal Conqueror
+Island x5
+Mountain
+Forest
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Temporal Conqueror.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mountain)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Island; Mountain
+Bot1.Graveyard = Grizzly Bears; Forest; Black Lotus
+Bot1.Library.Count = 12
