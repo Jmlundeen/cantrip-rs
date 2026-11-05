@@ -1,0 +1,50 @@
+# Harmonize {5}{U} (CR 702.180a). Turn 1: Bot1 casts Unending Whisper for {U} and it goes to the graveyard. Turn 3: Bot1 casts it
+# from the graveyard tapping Llanowar Elves (power 1) to take {1} off the generic part, so the five mana ({4}{U}) of a Black Lotus, a
+# Mox Sapphire and a Mox Emerald pay for it. It draws a card, and the harmonize cast leaves the card in exile, not the graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Llanowar Elves
+Unending Whisper
+Island x22
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unending Whisper.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Unending Whisper.Cast(Ability: Harmonize)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Unending Whisper
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Mana =

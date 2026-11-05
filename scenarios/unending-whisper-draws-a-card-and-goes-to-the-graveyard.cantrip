@@ -1,0 +1,25 @@
+# Unending Whisper: "Draw a card." Bot1 casts it for {U} on turn 1 off a Mox Sapphire: seven cards in hand, minus the Mox and the
+# sorcery, plus the one drawn is six, and the sorcery is in the graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Unending Whisper
+Island x25
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unending Whisper.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 19
+Bot1.Graveyard = Unending Whisper
