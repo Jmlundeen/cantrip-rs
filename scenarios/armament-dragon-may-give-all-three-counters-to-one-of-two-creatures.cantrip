@@ -1,0 +1,34 @@
+# Armament Dragon: "one, two, or three target creatures" (CR 601.2d): with a Llanowar Elves also on the battlefield, a division
+# among no creature is refused, and all three counters may go on the Elves alone, the Dragon getting none.
+
+[Bot1 Deck]
+Mox Emerald
+Llanowar Elves
+Black Lotus
+Mox Pearl
+Mox Jet
+Armament Dragon
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Armament Dragon.Cast
+! Bot1.Divide()
+Bot1.Divide(Llanowar Elves: 3)
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Armament Dragon.Power = 3

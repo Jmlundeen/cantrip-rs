@@ -1,0 +1,42 @@
+# Armament Dragon: "distribute three +1/+1 counters among one, two, or three target creatures you control" (CR 601.2d). Bot1
+# has a Llanowar Elves and casts the Dragon on turn 3 (Black Lotus and three Moxen): the three counters go two to the Dragon and
+# one to the Elves, two targets. Bot1 kills its own Elves in response with Lightning Bolt (Mox Ruby): the Elves' share is
+# lost (CR 608.2b) and the Dragon keeps its two.
+
+[Bot1 Deck]
+Mox Emerald
+Llanowar Elves
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Ruby
+Armament Dragon
+Lightning Bolt
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Armament Dragon.Cast
+Bot1.Divide(Armament Dragon: 2; Llanowar Elves: 1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt; Black Lotus
+Bot1.Battlefield.Armament Dragon.Counters.PlusOnePlusOne = 2

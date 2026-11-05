@@ -1,0 +1,11 @@
+{
+  "name": "Armament Dragon",
+  "manaCost": "{3}{W}{B}{G}",
+  "type": "Creature — Dragon",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Flying\nWhen this creature enters, distribute three +1/+1 counters among one, two, or three target creatures you control.",
+  "keywords": [
+    "Flying"
+  ]
+}
