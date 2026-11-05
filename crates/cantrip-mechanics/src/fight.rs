@@ -69,6 +69,14 @@ pub fn targets_bite(g: &mut dyn Game, item: &StackItem, source_slot: usize, vict
     }
 }
 
+/// "Target creature you control deals damage equal to its power to target [creature or planeswalker]" as a whole effect
+/// (CR 120.3, 609.7, 608.2b): `targets_bite` from the first target to the second. Giantfall, Hard-Hitting Question, Quarrel,
+/// Tenderize, Compel Brutality and Vivien, Arkbow Ranger print it.
+pub fn first_target_bites_second(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    targets_bite(g, item, 0, 1);
+    Ok(())
+}
+
 /// "One or two target creatures you control each deal damage equal to their power to target creature an opponent controls"
 /// (CR 120.2, 120.3, 120.4b, 608.2b): the targets before the last are the sources, the last the recipient. The powers are read as
 /// this resolves and all the damage is dealt together; a source that is no longer a legal target deals none, and with the
