@@ -1,0 +1,25 @@
+# Gohn, Town of Ruin, a Town: "This land enters tapped. {T}: Add {B} or {G}" (CR 614.1d, 305.6). It enters tapped and cannot be tapped for mana that turn (refused). On turn 3 it
+# taps for {B}; on turn 5, the other of its colors, {G}, and never red.
+
+[Bot1 Deck]
+Gohn, Town of Ruin
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Gohn, Town of Ruin.Play
+? Bot1.Battlefield.Gohn, Town of Ruin.Tapped = true
+? Bot1.Battlefield.Gohn, Town of Ruin.Subtypes = Town
+! Bot1.Battlefield.Gohn, Town of Ruin.Activate(Color: Black)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gohn, Town of Ruin.Activate(Color: Black)
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gohn, Town of Ruin.Activate(Color: Green)
+? Bot1.Mana = {G}
+! Bot1.Battlefield.Gohn, Town of Ruin.Activate(Color: Red)
+
+[Expect]
+Bot1.Battlefield.Gohn, Town of Ruin.Tapped = true
