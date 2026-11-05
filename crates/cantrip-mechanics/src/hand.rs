@@ -304,6 +304,14 @@ pub fn discarded_chars(q: &dyn Query, card: ObjectId) -> Option<Chars> {
     discard_of(q, card).and_then(|e| discarded_card(q, e)).and_then(|(_, chars)| chars)
 }
 
+/// "Each card type among cards discarded this way" (CR 205.2a, `discarded_chars`): how many card types the cards a discard put
+/// where they went have between them, each counted once however many cards have it. A card with no defined characteristics (put
+/// into a hidden zone unrevealed, CR 701.9c) has no type. Occult Epiphany and Kefka, Court Mage print it.
+pub fn card_types_among_discarded(q: &dyn Query, cards: &[ObjectId]) -> usize {
+    let known: Vec<Chars> = cards.iter().filter_map(|&c| discarded_chars(q, c)).collect();
+    CardType::ALL.iter().filter(|&&kind| known.iter().any(|c| c.is(kind))).count()
+}
+
 /// "A nonland card discarded this way" (`discarded_chars`): an undefined card is no nonland card (CR 701.9c). Connive (CR
 /// 701.50a), Seasoned Pyromancer, Seasoned Cryomancer, Glacial Dragonhunt and Garruk, Veiled Butcher ask it.
 pub fn discarded_nonland_card(q: &dyn Query, card: ObjectId) -> bool {

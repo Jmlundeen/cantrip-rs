@@ -15,8 +15,7 @@ fn epiphany(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(you, x as u32);
     let chosen = choose_from_hand(g, you, item.object, u32::from(x))?;
     let discarded = g.discard_together(&chosen);
-    let known: Vec<Chars> = discarded.iter().filter_map(|&c| hand::discarded_chars(&*g, c)).collect();
-    let types = CardType::ALL.iter().filter(|&&kind| known.iter().any(|c| c.is(kind))).count();
+    let types = hand::card_types_among_discarded(&*g, &discarded);
     if types == 0 {
         return Ok(());
     }
