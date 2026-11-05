@@ -1,0 +1,43 @@
+# Hollowmurk Siege, Abzan: "Whenever you attack, put a +1/+1 counter on target attacking creature. It gains menace until end
+# of turn." Bot1 has an Ornithopter and a Llanowar Elves; on turn 3 only the Ornithopter attacks: it gets the counter and
+# menace (Flying; Menace) through that turn, the Elves nothing, and menace is gone on turn 4 with the counter kept. The
+# Siege's Sultai ability draws nothing here: the counter put by the Abzan trigger on the Ornithopter does not draw.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Hollowmurk Siege
+Ornithopter
+Llanowar Elves
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hollowmurk Siege.Cast
+Bot1.Name(Abzan)
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Menace
+? Bot1.Battlefield.Ornithopter.Power = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot2.Life = 19
+Bot1.Library.Count = 12

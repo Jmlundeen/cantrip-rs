@@ -1,0 +1,46 @@
+# Hollowmurk Siege, Sultai: "Whenever a counter is put on a creature you control, draw a card. This ability triggers only once
+# each turn." Bot1 casts an Ornithopter, a Barrensteppe Siege (Abzan: a +1/+1 counter on each creature you control at Bot1's end
+# step) and the Hollowmurk Siege (Sultai). Turn 1's end step puts a counter on the one Ornithopter: Bot1 draws (library 13 to 12).
+# Turn 3 Bot1 draws the second Ornithopter for the turn (11) and casts it: the end step puts counters on both, two creatures
+# and two counters, and the Hollowmurk Siege draws once (10), not twice.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Emerald
+Barrensteppe Siege
+Hollowmurk Siege
+Ornithopter
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Barrensteppe Siege.Cast
+Bot1.Name(Abzan)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hollowmurk Siege.Cast
+Bot1.Name(Sultai)
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Library.Count = 12
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 11
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Library.Count = 10
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Hollowmurk Siege.ChosenOption = Sultai
