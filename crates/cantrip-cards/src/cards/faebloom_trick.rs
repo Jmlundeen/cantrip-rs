@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, tokens};
+use cantrip_mechanics::{effects, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// The 1/1 blue Faerie creature token with flying (colors and creature type are those of the text that makes it, CR 612.4).
@@ -26,17 +26,10 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Tap target creature an opponent controls" (CR 701.26a): a target that has become illegal is left alone (CR 608.2b).
-fn tap_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.tap(creature);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], effect),
-    delayed: &[delayed_trigger(tap_it, "When you do, tap target creature an opponent controls.").targets(&[targets::CREATURE_AN_OPPONENT_CONTROLS])],
+    // "Tap target creature an opponent controls" (CR 701.26a): a target that has become illegal is left alone (CR 608.2b).
+    delayed: &[delayed_trigger(effects::tap_targets,"When you do, tap target creature an opponent controls.").targets(&[targets::CREATURE_AN_OPPONENT_CONTROLS])],
     ..oracle::FAEBLOOM_TRICK
 };
 
