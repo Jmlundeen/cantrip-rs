@@ -1,0 +1,46 @@
+# The Emperor of Palamecia (CR 603.4, 601.2h): a Fireball cast with exactly four mana spent (X of 3) puts a +1/+1 counter on him, a 2/2 now 3/3.
+
+[Bot1 Deck]
+The Emperor of Palamecia
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Pearl
+Gleemox
+Fireball
+Ornithopter x30
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Emperor of Palamecia.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fireball.Cast(X: 3)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Battlefield.The Emperor of Palamecia.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.The Emperor of Palamecia.Power = 3
+Bot1.Battlefield.The Emperor of Palamecia.Toughness = 3

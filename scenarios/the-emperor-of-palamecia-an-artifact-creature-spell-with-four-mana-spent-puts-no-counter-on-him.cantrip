@@ -1,0 +1,43 @@
+# The Emperor of Palamecia (CR 603.4, 205.2): Juggernaut, an artifact creature spell, is cast with four mana spent: it is a creature spell, so he gets no counter.
+
+[Bot1 Deck]
+The Emperor of Palamecia
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Pearl
+Gleemox
+Juggernaut
+Ornithopter x30
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Emperor of Palamecia.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Juggernaut.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Juggernaut.Power = 5
+Bot1.Battlefield.The Emperor of Palamecia.Power = 2

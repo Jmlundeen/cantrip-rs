@@ -1,0 +1,82 @@
+# The Emperor of Palamecia (CR 603.4, 122.1, 701.27, 120.3): Bot1 casts a Fireball with four mana spent on each of turns 3, 5 and 7, each putting a +1/+1 counter
+# on him; the third transforms him into The Lord Master of Hell (3/3 with the three counters). On turn 9 Faithless Looting puts an Island and an Ornithopter into
+# the graveyard beside the three Fireballs and itself; attacking, Starfall counts the four noncreature, nonland cards - not the creature or the land.
+
+[Bot1 Deck]
+The Emperor of Palamecia
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Pearl
+Gleemox
+Fireball
+Fireball
+Fireball
+Faithless Looting
+Island
+Ornithopter
+Ornithopter x30
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Emperor of Palamecia.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fireball.Cast(X: 3)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fireball.Cast(X: 3)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fireball.Cast(X: 3)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(The Lord Master of Hell > Bot2)
+
+[Expect]
+Bot2.Life = 7
+Bot1.Battlefield.The Lord Master of Hell.Transformed = true
+Bot1.Battlefield.The Lord Master of Hell.Power = 6
+Bot1.Battlefield.The Lord Master of Hell.Toughness = 6
+Bot1.Battlefield.The Lord Master of Hell.Counters.PlusOnePlusOne = 3
+Bot1.Graveyard.Count = 6

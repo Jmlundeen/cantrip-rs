@@ -1,0 +1,79 @@
+# The Emperor of Palamecia (CR 701.27f, 603.4, 122.1): Fireballs cast on turns 3 and 5 with four mana spent put two +1/+1 counters on him. On turn 7 Bot1 casts a
+# Fireball and, with its trigger on the stack, an Aetherize, each with four mana spent: the Aetherize trigger resolves first, the third counter transforms him into
+# The Lord Master of Hell, and the Fireball trigger then adds a fourth counter but does not turn him back, as he has transformed since it was put on the stack.
+
+[Bot1 Deck]
+The Emperor of Palamecia
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Sol Ring
+Sol Ring
+Fireball
+Fireball
+Fireball
+Aetherize
+Ornithopter x30
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Emperor of Palamecia.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Fireball.Cast(X: 3)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Fireball.Cast(X: 3)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Fireball.Cast(X: 3)
+Bot1.Target(Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.The Emperor of Palamecia.Activate(Color: Red)
+Bot1.Hand.Aetherize.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 11
+Bot1.Battlefield.The Lord Master of Hell.Transformed = true
+Bot1.Battlefield.The Lord Master of Hell.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.The Lord Master of Hell.Power = 7
+Bot1.Battlefield.The Lord Master of Hell.Toughness = 7
