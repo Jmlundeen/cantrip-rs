@@ -1,0 +1,77 @@
+# Sephiroth, Planet's Heir (CR 611.2c, 700.4, 122.1): when he enters, creatures Bot2 controls get -2/-2 until end of turn - Bot2's
+# Ornithopter (0/2) dies and Bot2's Hill Giant (3/3) is a 1/1 - while Bot1's own Ornithopter is untouched. Whenever a creature an
+# opponent controls dies he gets a +1/+1 counter, one for the Ornithopter: a 5/5 with vigilance.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Sephiroth, Planet's Heir
+Island
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Black Lotus
+Hill Giant
+Ornithopter
+Mountain x3
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Hill Giant.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sephiroth, Planet's Heir.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield.Hill Giant.Power = 1
+Bot2.Battlefield.Hill Giant.Toughness = 1
+Bot2.Graveyard = Ornithopter; Black Lotus
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Sephiroth, Planet's Heir.Power = 5
+Bot1.Battlefield.Sephiroth, Planet's Heir.Toughness = 5
+Bot1.Battlefield.Sephiroth, Planet's Heir.Keywords = Vigilance
