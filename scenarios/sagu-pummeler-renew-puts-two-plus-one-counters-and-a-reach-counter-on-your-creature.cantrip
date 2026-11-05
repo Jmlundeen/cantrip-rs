@@ -1,0 +1,60 @@
+# Sagu Pummeler ({3}{G}, 4/4 reach): "Renew -- {4}{G}, Exile this card from your graveyard: Put two +1/+1 counters and a reach
+# counter on target creature. Activate only as a sorcery." Bot1 casts it on turn 1 (Black Lotus's {G}{G}{G} and Mox Emerald)
+# and kills it on turn 3 with Go for the Throat; Bot2 casts an Ornithopter on turn 2. On turn 5, with Bot1's Ornithopter on the
+# stack and five Moxen to pay, renew is refused (sorcery timing); after it resolves renew is refused on Mox Emerald (not a
+# creature), then puts two +1/+1 counters and a reach counter on Bot1's Ornithopter, exiling the Pummeler as the cost.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Sagu Pummeler
+Go for the Throat
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sagu Pummeler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Go for the Throat.Cast(Sagu Pummeler)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Graveyard.Sagu Pummeler.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+! Bot1.Graveyard.Sagu Pummeler.Activate(Bot1.Battlefield.Mox Emerald)
+Bot1.Graveyard.Sagu Pummeler.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Ornithopter.Counters.Reach = 1
+
+[Expect]
+Exile = Sagu Pummeler
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Reach
