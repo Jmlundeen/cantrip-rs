@@ -1,0 +1,75 @@
+# Terra, Magical Adept (CR 701.27, 712.14a, 707.2, 714.3a, 603.7): on turn 1 she enters and Bot1 mills The Misty Mountains Cold into hand and
+# casts it (a Treasure for chapter I). On turn 3 Misty has a second lore counter and a second Treasure. Trance ({4}{R}{G}, {T}) exiles
+# Terra and returns her transformed as Esper Terra, a Saga with a lore counter: chapter I targets the nonlegendary enchantment Misty (not
+# Esper Terra, legendary) and makes a token copy with haste - a Saga, so up to three lore counters: none this time, so only its own
+# chapter I made a Treasure (three). At the beginning of Bot1's end step the copy is sacrificed; the original Misty stays.
+
+[Bot1 Deck]
+Terra, Magical Adept
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Gleemox
+Ornithopter
+The Misty Mountains Cold
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Terra, Magical Adept.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(The Misty Mountains Cold)
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Misty Mountains Cold.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Terra, Magical Adept.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Number(0)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 12
+Bot1.Battlefield.Esper Terra.Power = 6
+Bot1.Battlefield.Esper Terra.Toughness = 6
+Bot1.Battlefield.Esper Terra.Transformed = true
+Bot1.Battlefield.Esper Terra.Counters.Lore = 1
+Bot1.Battlefield.The Misty Mountains Cold#1.Counters.Lore = 2
+Bot1.Battlefield.The Misty Mountains Cold#2.Token = true
+Bot1.Battlefield.The Misty Mountains Cold#2.Counters.Lore = 1
+Bot1.Battlefield.The Misty Mountains Cold#2.Keywords = Haste
+Bot1.Battlefield.Treasure Token#1.Types = Artifact
+Bot1.Battlefield.Treasure Token#3.Types = Artifact

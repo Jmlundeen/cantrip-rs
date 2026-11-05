@@ -1,0 +1,37 @@
+# Terra, Magical Adept (CR 701.17c): "up to one enchantment card milled this way" may be none. Propaganda and Phyrexian Arena are milled
+# with three Ornithopters, Bot1 takes neither (Choose() takes nothing): all five are in the graveyard and the hand is the three Islands.
+
+[Bot1 Deck]
+Terra, Magical Adept
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Island
+Island
+Island
+Propaganda
+Ornithopter
+Phyrexian Arena
+Ornithopter
+Ornithopter
+Ornithopter x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Terra, Magical Adept.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Island; Island; Island
+Bot1.Graveyard = Ornithopter; Ornithopter; Phyrexian Arena; Ornithopter; Propaganda

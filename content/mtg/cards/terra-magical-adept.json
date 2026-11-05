@@ -1,0 +1,22 @@
+{
+  "name": "Terra, Magical Adept",
+  "manaCost": "{1}{R}{G}",
+  "type": "Legendary Creature — Human Wizard Warrior",
+  "power": 4,
+  "toughness": 2,
+  "oracleText": "When Terra enters, mill five cards. Put up to one enchantment card milled this way into your hand.\nTrance — {4}{R}{G}, {T}: Exile Terra, then return it to the battlefield transformed under its owner's control. Activate only as a sorcery.",
+  "backFace": {
+    "name": "Esper Terra",
+    "colorIndicator": [
+      "Green",
+      "Red"
+    ],
+    "type": "Legendary Enchantment Creature — Saga Wizard",
+    "power": 6,
+    "toughness": 6,
+    "oracleText": "(As this Saga enters and after your draw step, add a lore counter.)\nI, II, III — Create a token that's a copy of target nonlegendary enchantment you control. It gains haste. If it's a Saga, put up to three lore counters on it. Sacrifice it at the beginning of your next end step.\nIV — Add {W}{W}, {U}{U}, {B}{B}, {R}{R}, and {G}{G}. Exile Esper Terra, then return it to the battlefield (front face up).\nFlying",
+    "keywords": [
+      "Flying"
+    ]
+  }
+}
