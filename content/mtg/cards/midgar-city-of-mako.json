@@ -1,0 +1,11 @@
+{
+  "name": "Midgar, City of Mako",
+  "type": "Land — Town",
+  "oracleText": "This land enters tapped.\n{T}: Add {B}.",
+  "adventure": {
+    "name": "Reactor Raid",
+    "manaCost": "{2}{B}",
+    "type": "Sorcery — Adventure",
+    "oracleText": "You may sacrifice an artifact or creature. If you do, draw two cards. (Then exile this card. You may play the land later from exile.)"
+  }
+}

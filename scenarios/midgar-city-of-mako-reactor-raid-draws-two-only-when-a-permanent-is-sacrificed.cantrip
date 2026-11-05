@@ -1,0 +1,48 @@
+# Midgar, City of Mako, a Town with an Adventure (CR 715): Reactor Raid ({2}{B}, sorcery) "You may sacrifice an artifact or creature. If you do, draw two cards", then the land waits in
+# exile to be played. Turn 1: Bot1 declines the sacrifice, so nothing is drawn (CR 608.2c), and the land is played from exile on turn 3 (tapped, so refused for mana).
+# A second Reactor Raid on turn 3 sacrifices a Mox Ruby and draws two.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Midgar, City of Mako
+Midgar, City of Mako
+Island x2
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Midgar, City of Mako#1.Cast(Ability: Adventure)
+? Stack = Reactor Raid
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+? Bot1.Hand.Count = 3
+? Bot1.Graveyard.Count = 0
+? Exile = Midgar, City of Mako
+[T3 Bot1.Main1]
+Bot1.Exile.Midgar, City of Mako.Play
+? Bot1.Battlefield.Midgar, City of Mako.Tapped = true
+? Bot1.Battlefield.Midgar, City of Mako.Subtypes = Town
+! Bot1.Battlefield.Midgar, City of Mako.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Midgar, City of Mako.Cast(Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mox Ruby; Mox Jet)
+Bot1.Choose(Mox Ruby)
+
+[Expect]
+Bot1.Graveyard = Mox Ruby
+Bot1.Hand.Count = 5

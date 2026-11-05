@@ -1,0 +1,38 @@
+# Midgar, City of Mako: Reactor Raid "You may sacrifice an artifact or creature. If you do, draw two cards" (CR 701.21a). A creature that is
+# no artifact is an allowed choice as well as an artifact: Bot1's Island (a land, neither) is refused, and the Grizzly Bears are sacrificed
+# to draw two. Black Lotus's three green pay for the Bears and one of Reactor Raid's generic, Mox Jet its {B} and the Island the rest.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Grizzly Bears
+Midgar, City of Mako
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Midgar, City of Mako.Cast(Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Island)
+Bot1.Choose(Grizzly Bears)
+
+[Expect]
+Bot1.Graveyard = Grizzly Bears; Black Lotus
+Bot1.Battlefield.Grizzly Bears = (absent)
+Bot1.Hand.Count = 4
