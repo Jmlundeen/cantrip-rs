@@ -1,0 +1,35 @@
+# Reverberating Summons: "{1}{R}, Discard your hand, Sacrifice this enchantment: Draw two cards." With only white and black mana it is
+# short (the {R} is unpaid). Paid, it discards all of Bot1's hand (Bot2's untouched), sacrifices itself and draws exactly two.
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Reverberating Summons
+Mountain
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Reverberating Summons.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Reverberating Summons.Activate(Mana: short)
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Reverberating Summons.Activate(Spend: R, W)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}
+? Bot1.Hand.Count = 2
+? Bot2.Hand.Count = 7
+[Expect]
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mountain

@@ -1,0 +1,41 @@
+# Reverberating Summons {1}{R}: at the beginning of combat with two spells cast this turn it is a 3/3 Monk creature with haste until end of
+# turn, and still an enchantment. It attacks for 3 on turn 3 and, after the turn, is an enchantment again.
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Reverberating Summons
+Ornithopter
+Ornithopter
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reverberating Summons.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Reverberating Summons.Types = Enchantment
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Reverberating Summons.Types = Enchantment; Creature
+? Bot1.Battlefield.Reverberating Summons.Power = 3
+? Bot1.Battlefield.Reverberating Summons.Toughness = 3
+? Bot1.Battlefield.Reverberating Summons.Keywords = Haste
+Bot1.Attack(Reverberating Summons > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Reverberating Summons.Types = Enchantment
+[Expect]
+Bot2.Life = 17

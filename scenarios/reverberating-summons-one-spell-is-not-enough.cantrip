@@ -1,0 +1,28 @@
+# Reverberating Summons needs two spells this turn: with one cast it stays an enchantment through combat and cannot attack.
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Reverberating Summons
+Ornithopter
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reverberating Summons.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Reverberating Summons.Types = Enchantment
+! Bot1.Attack(Reverberating Summons > Bot2)
+[Expect]
+Bot2.Life = 20

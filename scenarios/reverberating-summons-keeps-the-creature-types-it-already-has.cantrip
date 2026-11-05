@@ -1,0 +1,41 @@
+# "Becomes a 3/3 Monk creature with haste in addition to its other types" (CR 205.1b, 613.1d): the Monk is added, and no creature
+# type it already has is taken away. Under Opalescence the Summons is a creature already, and Arcane Adaptation (Elf) makes it an
+# Elf; at the beginning of combat it is an Elf Monk, a 3/3 with haste.
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Pearl
+Opalescence
+Arcane Adaptation
+Reverberating Summons
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Elf)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Reverberating Summons.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Reverberating Summons.Subtypes = Elf
+[T1 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Reverberating Summons.Subtypes = Elf; Monk
+Bot1.Battlefield.Reverberating Summons.Power = 3
+Bot1.Battlefield.Reverberating Summons.Keywords = Haste

@@ -1,0 +1,47 @@
+# "Each combat" is on either player's turn, and "you've cast" is its controller's casts alone: on turn 4 Bot2 casts two spells, so Bot2's
+# Summons becomes a 3/3 Monk creature and attacks for 3, and Bot1's, whose controller cast none, stays an enchantment.
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Reverberating Summons
+Island x20
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Reverberating Summons
+Ornithopter
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reverberating Summons.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Reverberating Summons.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.BeginCombat]
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Reverberating Summons.Types = Enchantment; Creature
+? Bot1.Battlefield.Reverberating Summons.Types = Enchantment
+Bot2.Attack(Reverberating Summons > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 17
+[Expect]
+Bot1.Life = 17
