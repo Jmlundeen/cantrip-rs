@@ -1,0 +1,65 @@
+# Rinoa Heartilly (CR 603.6a, 603.2, 611.2c): when she enters Bot1 gets Angelo, a legendary 1/1 green and white Dog. When she attacks
+# on turn 3, another target creature Bot1 controls gets +1/+1 for each creature Bot1 controls: Rinoa, Angelo and Bot1's Ornithopter
+# are three, Bot2's Ornithopter is not counted, so Angelo becomes 4/4 until end of turn. Rinoa herself and Bot2's Ornithopter are
+# refused as targets; Rinoa is not pumped and deals her 4 damage to Bot2 (16).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Rinoa Heartilly
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rinoa Heartilly.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Rinoa Heartilly > Bot2)
+! Bot1.Target(Bot1.Battlefield.Rinoa Heartilly)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Angelo)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Angelo.Token = true
+Bot1.Battlefield.Angelo.Supertypes = Legendary
+Bot1.Battlefield.Angelo.Colors = Green; White
+Bot1.Battlefield.Angelo.Subtypes = Dog
+Bot1.Battlefield.Angelo.Power = 4
+Bot1.Battlefield.Angelo.Toughness = 4
+Bot1.Battlefield.Rinoa Heartilly.Power = 4
+Bot2.Life = 16
