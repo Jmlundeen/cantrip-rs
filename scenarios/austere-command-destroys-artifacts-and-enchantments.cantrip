@@ -1,0 +1,55 @@
+# Austere Command ({4}{W}{W}): "Choose two — destroy all artifacts; destroy all enchantments; ..." The other scenario takes
+# the two creature modes; this one takes the first two, so every artifact on both battlefields and every enchantment is
+# destroyed and the creatures stand: Savannah Lions on Bot1's side and the Plains on Bot2's.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Savannah Lions
+Mox Pearl
+Austere Command
+Plains x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Ornithopter
+Glorious Anthem
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Glorious Anthem.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Austere Command.Cast
+Bot1.Modes(Destroy all artifacts; Destroy all enchantments)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Plains; Savannah Lions
+Bot1.Graveyard.Count = 5
+Bot2.Battlefield = Plains
+Bot2.Graveyard.Count = 4

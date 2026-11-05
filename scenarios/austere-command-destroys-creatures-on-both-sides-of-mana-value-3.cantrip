@@ -1,0 +1,63 @@
+# Austere Command ({4}{W}{W}), "Choose two": on turn 5 Bot1 picks "Destroy all creatures with mana value 3 or less" and
+# "Destroy all creatures with mana value 4 or greater", so Bot2's Savannah Lions (mana value 1) and Air Elemental (mana
+# value 5) both die, while nothing else on the battlefield is a creature.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Austere Command
+Plains
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Savannah Lions
+Island
+Air Elemental
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Savannah Lions.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Air Elemental.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Austere Command.Cast
+Bot1.Modes(3; 4)
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard.Savannah Lions.Power = 2
+Bot2.Graveyard.Air Elemental.Power = 4
+Bot1.Battlefield.Austere Command = (absent)
+Bot1.Graveyard.Count = 1
