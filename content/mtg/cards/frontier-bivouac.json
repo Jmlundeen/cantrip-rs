@@ -1,0 +1,5 @@
+{
+  "name": "Frontier Bivouac",
+  "type": "Land",
+  "oracleText": "This land enters tapped.\n{T}: Add {G}, {U}, or {R}."
+}

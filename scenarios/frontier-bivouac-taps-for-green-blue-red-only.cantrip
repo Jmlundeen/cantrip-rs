@@ -1,0 +1,30 @@
+# "{T}: Add {G}, {U}, or {R}." The color is chosen as the ability is activated, one each turn (green, blue, red); the other colors and
+# colorless are refused beside those positive controls.
+
+[Bot1 Deck]
+Frontier Bivouac
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Frontier Bivouac.Play
+? Bot1.Battlefield.Frontier Bivouac.Tapped = true
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Frontier Bivouac.Activate(Color: White)
+! Bot1.Battlefield.Frontier Bivouac.Activate(Color: Black)
+! Bot1.Battlefield.Frontier Bivouac.Activate(Color: Colorless)
+Bot1.Battlefield.Frontier Bivouac.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Frontier Bivouac.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Frontier Bivouac.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Frontier Bivouac.Tapped = true
