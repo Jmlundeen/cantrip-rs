@@ -3,7 +3,7 @@ use cantrip_mechanics::backup;
 use cantrip_mechanics::dash;
 use cantrip_oracle as oracle;
 
-/// Backup 1 (CR 702.157a): put a +1/+1 counter on target creature; if that's another creature, it gains double strike.
+/// Backup 1 (CR 702.165a): put a +1/+1 counter on target creature; if that's another creature, it gains double strike.
 fn backup(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     backup::resolve(g, item, 1, &[Keyword::DoubleStrike], None)
 }
