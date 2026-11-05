@@ -1,0 +1,67 @@
+# Ensign Harry Kim: "Whenever another creature you control enters, if it has greater power than Ensign Kim, put a
+# +1/+1 counter on Ensign Kim" (CR 603.4) and "{2}, Remove two +1/+1 counters from among creatures you control: Draw a
+# card" (CR 118.3). Elite Vanguard (2/1) and Serra Angel (4/4) both have greater power than Kim as he is when each
+# enters, so he collects two counters; Savannah Lions (2/1) enters on turn 7 with power equal to his 2, not greater, and
+# gives none. Paying the two with {2} on turn 13 shrinks him back to 1/2 and draws one card.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Ensign Harry Kim, Operations
+Elite Vanguard
+Savannah Lions
+Serra Angel
+Plains x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Ensign Harry Kim, Operations.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ensign Harry Kim, Operations.Power = 2
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Battlefield.Plains#5.Activate
+Bot1.Hand.Serra Angel.Cast
+Bot1.Pass
+Bot2.Pass
+[T13 Bot1.Main1]
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Ensign Harry Kim, Operations.Activate
+
+[Expect]
+Bot1.Battlefield.Ensign Harry Kim, Operations.Power = 1
+Bot1.Hand.Count = 4
