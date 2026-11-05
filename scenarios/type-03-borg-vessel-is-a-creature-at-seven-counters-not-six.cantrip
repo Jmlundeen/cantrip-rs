@@ -1,0 +1,59 @@
+# Type-03 Borg Vessel: "7+ | Flying" (CR 721.2a, 702.184a). Sulu, Heroic Helmsman stations it as though his power were
+# tripled, so it has exactly six charge counters: still a noncreature artifact, without flying. Memnite then stations it
+# once more, to exactly seven: it is a 5/5 artifact creature with flying.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Black Lotus
+Memnite
+Sulu, Heroic Helmsman
+Type-03 Borg Vessel
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sulu, Heroic Helmsman.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Type-03 Borg Vessel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Type-03 Borg Vessel.Activate(Ability: Station)
+Bot1.Choose(Sulu, Heroic Helmsman)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Type-03 Borg Vessel.Counters.Charge = 6
+? Bot1.Battlefield.Type-03 Borg Vessel.Types = Artifact
+? Bot1.Battlefield.Type-03 Borg Vessel.Keywords = (absent)
+Bot1.Battlefield.Type-03 Borg Vessel.Activate(Ability: Station)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Type-03 Borg Vessel.Counters.Charge = 7
+
+[Expect]
+Bot1.Battlefield.Type-03 Borg Vessel.Types = Artifact; Creature
+Bot1.Battlefield.Type-03 Borg Vessel.Keywords = Flying
+Bot1.Battlefield.Type-03 Borg Vessel.Power = 5
+Bot1.Battlefield.Type-03 Borg Vessel.Toughness = 5
