@@ -1,0 +1,6 @@
+{
+  "name": "Planetary Bombardment",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Planetary Bombardment deals 2 damage to target creature. Planetary Bombardment deals 4 damage to that creature instead if a creature died this turn."
+}

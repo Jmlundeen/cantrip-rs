@@ -1,0 +1,60 @@
+# Planetary Bombardment {R}: "Planetary Bombardment deals 2 damage to target creature. Planetary Bombardment deals 4
+# damage to that creature instead if a creature died this turn." On turn 5 the first copy deals 2 to Memnite, a 1/1, which
+# dies; the second copy then deals 4 to Grizzly Bears, a 2/2 that 2 damage would have left alive.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Planetary Bombardment
+Planetary Bombardment
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Memnite
+Grizzly Bears
+Forest
+Forest
+Forest x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Planetary Bombardment.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Memnite
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Planetary Bombardment.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Grizzly Bears; Memnite
+Bot1.Graveyard = Planetary Bombardment; Planetary Bombardment

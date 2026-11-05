@@ -1,0 +1,63 @@
+# Planetary Bombardment {R}: "Planetary Bombardment deals 2 damage to target creature. Planetary Bombardment deals 4
+# damage to that creature instead if a creature died this turn." On turn 3, before anything has died this turn, the first
+# copy marks exactly 2 damage on an Aegis Turtle (0/5). Lightning Bolt then kills Memnite, and the second copy marks
+# exactly 4 on the other Turtle, which survives it (CR 614.1a, 700.4).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Planetary Bombardment
+Planetary Bombardment
+Lightning Bolt
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Aegis Turtle
+Aegis Turtle
+Memnite
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aegis Turtle.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Aegis Turtle.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Planetary Bombardment.Cast(Bot2.Battlefield.Aegis Turtle#1)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Aegis Turtle#1.Damage = 2
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Memnite
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Planetary Bombardment.Cast(Bot2.Battlefield.Aegis Turtle#2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Aegis Turtle#1.Damage = 2
+Bot2.Battlefield.Aegis Turtle#2.Damage = 4
+Bot1.Graveyard = Planetary Bombardment; Lightning Bolt; Planetary Bombardment
