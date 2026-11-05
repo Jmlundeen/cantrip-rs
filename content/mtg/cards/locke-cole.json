@@ -1,0 +1,12 @@
+{
+  "name": "Locke Cole",
+  "manaCost": "{1}{U}{B}",
+  "type": "Legendary Creature — Human Rogue",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Deathtouch, lifelink\nWhenever Locke Cole deals combat damage to a player, draw a card, then discard a card.",
+  "keywords": [
+    "Deathtouch",
+    "Lifelink"
+  ]
+}

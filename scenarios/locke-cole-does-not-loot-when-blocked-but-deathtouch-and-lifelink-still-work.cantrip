@@ -1,0 +1,57 @@
+# Locke Cole: the loot is for combat damage to a PLAYER only. Cast on turn 1 with three Moxen; Bot2 casts Grizzly Bears on turn 2. On
+# turn 3 Locke attacks and the Bears block: his 2 deathtouch damage destroys the Bears (Bot2 stays at 20), lifelink still gains Bot1 2
+# (22), and no card is drawn or discarded (the hand is the 3 left after casting plus the turn's draw).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Locke Cole
+Plains
+Swamp
+Island
+Mountain
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Locke Cole.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Locke Cole > Bot2)
+Bot2.Block(Grizzly Bears > Locke Cole)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 22
+Bot2.Graveyard = Grizzly Bears
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 0

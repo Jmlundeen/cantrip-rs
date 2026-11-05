@@ -1,0 +1,44 @@
+# Locke Cole: "Whenever Locke Cole deals combat damage to a player, draw a card, then discard a card", with deathtouch and lifelink.
+# Cast on turn 1 with three Moxen. On turn 3 he attacks into an empty board: Bot2 takes 2 (18), lifelink gains Bot1 2 (22), and the
+# trigger draws the Mountain, then discards the Plains chosen: the drawn card is in hand when chosen.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Locke Cole
+Plains
+Swamp
+Island
+Mountain
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Locke Cole.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Locke Cole > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Plains)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 22
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Plains
