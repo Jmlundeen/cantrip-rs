@@ -1,0 +1,42 @@
+# "Unless they pay {B} or {3}": Bot2, whose pool cannot pay {B}, declines it and pays exactly {3} (its fourth Mox left
+# untapped), taking no damage; Bot1, who declines both, takes 1 (CR 118.12a, 101.4).
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Lim-Dûl's Hex
+Island x17
+[Bot2 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island x16
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lim-Dûl's Hex.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Decline
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+! Bot2.PayCost
+Bot2.Decline
+Bot2.PayCost
+? Bot2.Mana =
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20
+Bot2.Battlefield.Mox Emerald.Tapped = false
