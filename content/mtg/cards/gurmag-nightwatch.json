@@ -1,0 +1,8 @@
+{
+  "name": "Gurmag Nightwatch",
+  "manaCost": "{2/B}{2/G}{2/U}",
+  "type": "Creature — Human Ranger",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When this creature enters, look at the top three cards of your library. You may put one of those cards back on top of your library. Put the rest into your graveyard."
+}
