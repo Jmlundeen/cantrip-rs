@@ -1,0 +1,75 @@
+# Roar of Endless Song: "I, II - Create a 5/5 green Elephant creature token. III - Double the power and toughness of each creature you control until end of
+# turn." Cast on turn 1 with an Ornithopter out, chapter I makes an Elephant; chapter II on turn 3 makes another. On turn 5 chapter III doubles every creature
+# Bot1 controls (two 5/5 Elephants become 10/10, the 0/2 Ornithopter 0/4) while Bot2's Ornithopter is untouched, the doubling ends with the turn, and the
+# Saga is then sacrificed (CR 714.4).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Jet
+Ornithopter
+Roar of Endless Song
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Roar of Endless Song.Cast(Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Roar of Endless Song.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Elephant Token.Power = 5
+? Bot1.Battlefield.Count = 8
+? Stack.Count = 0
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 9
+? Bot1.Battlefield.Elephant Token#2.Toughness = 5
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Elephant Token#1.Power = 10
+? Bot1.Battlefield.Elephant Token#1.Toughness = 10
+? Bot1.Battlefield.Elephant Token#2.Power = 10
+? Bot1.Battlefield.Elephant Token#2.Toughness = 10
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Elephant Token#1.Power = 5
+? Bot1.Battlefield.Elephant Token#2.Toughness = 5
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+
+[Expect]
+Bot1.Graveyard = Roar of Endless Song
