@@ -586,6 +586,9 @@ struct ObjCtx<'a> {
     room: bool,
     spell: bool,
     on_battlefield: bool,
+    /// A card in exile, read as itself (CR 400.7): no continuous effect reaches one there but a resolved effect's grant of an
+    /// ability (CR 113.6b, 613.1f), which is all that is applied to it.
+    in_exile: bool,
     has_counters: bool,
     has_hone: bool,
 }
@@ -661,7 +664,7 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
     // card-only cache can hold, as they are the object's. In every other zone the card has both halves (CR 709.4).
     let room = def.is_room() && obj.zone.is(ZoneKind::Battlefield);
     let sources = crate::merge::sources(state, copy);
-    let o = ObjCtx { id, obj, card, def, copy, sources, room, spell, on_battlefield: false, has_counters: false, has_hone: false };
+    let o = ObjCtx { id, obj, card, def, copy, sources, room, spell, on_battlefield: false, in_exile: false, has_counters: false, has_hone: false };
     // An object that has ceased to be itself - changed zones or ceased to exist - is as it last was (CR 400.7, 608.2h,
     // 603.10).
     if let Some(last) = state.last_known(id) {
@@ -670,10 +673,15 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
     // A phased-out permanent keeps its counters and the effects on it (CR 702.26d, 702.26f), so it is worked out as it is on
     // the battlefield, though no rule asks while it is phased out: what it shows, and what it is again as it phases in.
     let on_battlefield = (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) && obj.became.is_none();
+    // A card in exile is as its card is, but for an ability an effect gave it there (CR 113.6b, 613.1f: Q, Stacking the
+    // Deck's). The effects list holds only what is live, so the grant ends with its duration, and an object that has become
+    // another (CR 400.7) is read as it last was, before any of this (`last_known`), so nothing follows a card across zones.
+    let in_exile = obj.zone.is(ZoneKind::Exile) && obj.became.is_none();
+    let granted_in_exile = in_exile && state.effects.iter().any(|e| e.affected == id && matches!(e.kind, EffectKind::AddAbility(_)));
     // What could apply at all, found once: most objects have no effects, no statics touch them, and no counters.
     // A spell's text can be changed too (CR 612.1: "target spell or permanent").
     // The effects on a card do not follow it to the stack (CR 400.7): a card judged as a spell has none.
-    let has_effects = (on_battlefield || spell) && judged_as.is_none() && state.effects.iter().any(|e| e.affected == id);
+    let has_effects = (on_battlefield || spell || granted_in_exile) && judged_as.is_none() && state.effects.iter().any(|e| e.affected == id);
     let has_counters = on_battlefield && obj.has_counters();
     let has_own = !def.statics.is_empty() || sources.iter().any(|v| !cards.get(v.card).statics.is_empty());
     // `statics_seen` is set by hone counters as well (CR 122.1j), which need no card with a static ability.
@@ -692,7 +700,7 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
             return Object::Bare(card, true);
         }
     }
-    Object::Full(ObjCtx { on_battlefield, has_counters, has_hone, ..o })
+    Object::Full(ObjCtx { on_battlefield, in_exile, has_counters, has_hone, ..o })
 }
 
 // --- The layer pass (CR 613.7, 613.8) ------------------------------------------------------------------------------------
@@ -1760,7 +1768,7 @@ fn applies(view: &View, o: &ObjCtx, entry: &GEntry, snap: &Snap) -> bool {
         }
         GKind::Effect(e) => {
             e.affected == id
-                && (o.on_battlefield || o.spell)
+                && (o.on_battlefield || o.spell || (o.in_exile && matches!(e.kind, EffectKind::AddAbility(_))))
                 && match e.kind {
                     EffectKind::ChangeText { from: Word::Subtype(from), .. } => {
                         let chars = &snap.chars;

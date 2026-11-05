@@ -5438,7 +5438,21 @@ fn any_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef, by: Op
 
 /// The activated abilities `player` may activate now, judged with the mana `available` could pay.
 fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, options: &mut Vec<ActionOption>) {
-    // Abilities of permanents, then abilities that function from the hand (cycling) and the graveyard (unearth).
+    // A card in exile has no activated ability of its own that functions there (CR 113.6b): only one an effect gave it, and
+    // said it functions there (Q, Stacking the Deck's). Taken from the effects that grant abilities, so a game where none
+    // grants one pays nothing for the exile.
+    let mut granted_in_exile: Vec<ObjectId> = Vec::new();
+    for e in &cx.s().effects {
+        if !matches!(e.kind, EffectKind::AddAbility(_)) || granted_in_exile.contains(&e.affected) {
+            continue;
+        }
+        let obj = cx.s().obj(e.affected);
+        if obj.controller == player && obj.zone.is(ZoneKind::Exile) {
+            granted_in_exile.push(e.affected);
+        }
+    }
+    // Abilities of permanents, then abilities that function from the hand (cycling) and the graveyard (unearth), then the
+    // exile zone's granted ones.
     let sources: Vec<ObjectId> = cx
         .s()
         .battlefield()
@@ -5447,6 +5461,7 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
         .filter(|&id| cx.s().obj(id).controller == player)
         .chain(cx.s().zone(Zone::hand(player)).iter().copied())
         .chain(cx.s().zone(Zone::graveyard(player)).iter().copied())
+        .chain(granted_in_exile)
         .collect();
     let forbidders = static_rules::activation_forbidders(cx);
     // The permanents that let a player pay another cost for an ability (CR 118.9, 602.2b): none, nearly always.
