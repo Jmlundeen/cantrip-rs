@@ -1,0 +1,41 @@
+# Sonic Shrieker: only a player dealt damage discards. Targeting itself (4/4), it deals 2 damage to a creature, gains 2 life (22), and no player discards.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Island
+Sonic Shrieker
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sonic Shrieker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Sonic Shrieker)
+Bot1.Pass
+Bot2.Pass
+
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Sonic Shrieker.Damage = 2
+Bot2.Life = 20
+Bot2.Hand.Count = 7

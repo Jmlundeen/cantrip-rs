@@ -447,6 +447,22 @@ pub fn permanents_dealt_damage_by(history: History, source: ObjectId, since: usi
     dealt
 }
 
+/// The players `source` dealt damage to (CR 120.3) in the records from index `since` on (`history().head()` noted before the
+/// damage), each once, in the order dealt: read from the damage events, so damage that was prevented names none and a
+/// redirection (CR 614.9) names the player the damage was dealt to, not the one aimed at. Screaming Nemesis and Sonic Shrieker
+/// print "if a player is dealt damage this way" about them.
+pub fn players_dealt_damage_by(history: History, source: ObjectId, since: usize) -> Vec<PlayerId> {
+    let mut dealt: Vec<PlayerId> = Vec::new();
+    for r in &history.all()[since..] {
+        if let Event::Damage { source: s, target: Target::Player(p), amount, .. } = r.event {
+            if s == source && amount > 0 && !dealt.contains(&p) {
+                dealt.push(p);
+            }
+        }
+    }
+    dealt
+}
+
 /// "If you cast this spell during your main phase" (CR 505.1, 601.2i): a `CardDef::cast_fact`, 1 if the spell's caster was
 /// the active player in a precombat or postcombat main phase as it became cast, else 0. Read with
 /// `history().fact_as_cast`, so a copy (not cast, CR 707.10) never has it. Tail Swipe, Might of Old Krosa, Haunting Hymn and

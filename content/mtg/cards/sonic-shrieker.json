@@ -1,0 +1,11 @@
+{
+  "name": "Sonic Shrieker",
+  "manaCost": "{2}{R}{W}{B}",
+  "type": "Creature — Dragon",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Flying\nWhen this creature enters, it deals 2 damage to any target and you gain 2 life. If a player is dealt damage this way, they discard a card.",
+  "keywords": [
+    "Flying"
+  ]
+}
