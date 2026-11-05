@@ -1,0 +1,42 @@
+# Imperial Hullbreachers ({2}{W}, 2/2 flying): Squad {2} (CR 702.157a) paid once on turn 9 makes one token copy of it,
+# so two Hullbreachers enter. Battle cry (CR 702.91a) is worded for each of them: when both attack, each other attacking
+# creature gets +1/+0 until end of turn, so both are 3/2 while attacking.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Plains
+Imperial Hullbreachers
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Battlefield.Plains#5.Activate
+Bot1.Hand.Imperial Hullbreachers.Cast(Kicked: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Imperial Hullbreachers#1 > Bot2; Imperial Hullbreachers#2 > Bot2)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Imperial Hullbreachers#1.Power = 3
+Bot1.Battlefield.Imperial Hullbreachers#2.Power = 3
+Bot1.Battlefield.Count = 7
