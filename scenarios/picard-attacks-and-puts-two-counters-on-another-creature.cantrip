@@ -1,0 +1,37 @@
+# Picard, Steadfast Captain ({4}{W}{W}): "Whenever Picard enters or attacks, put two +1/+1 counters on another target creature
+# you control." Picard is cast first, so there is no other creature for his enters trigger; the Savannah Lions comes after
+# him and gains two counters only from the attack trigger on turn three, becoming a 4/3 that deals 4.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Savannah Lions
+Picard, Steadfast Captain
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Picard, Steadfast Captain.Cast
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Picard, Steadfast Captain > Bot2; Savannah Lions > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Savannah Lions.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Savannah Lions.Power = 4
+Bot1.Battlefield.Savannah Lions.Toughness = 3
+Bot2.Life = 12
