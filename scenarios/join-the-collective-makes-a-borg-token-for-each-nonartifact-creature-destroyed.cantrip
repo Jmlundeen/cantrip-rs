@@ -1,0 +1,41 @@
+# Join the Collective ({5}{W}{W}): "Destroy all creatures. Create X 1/1 colorless Borg artifact creature tokens, where X is
+# the number of nonartifact creatures destroyed this way." Bot1 has an Ornithopter (an artifact creature) and Savannah
+# Lions (not an artifact); both are destroyed, and only the Lions counts, so one Borg token is made.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Ornithopter
+Savannah Lions
+Join the Collective
+Plains x15
+Plains x17
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Join the Collective.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Borg Token.Power = 1
+Bot1.Battlefield.Count = 5

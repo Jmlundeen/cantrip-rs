@@ -1,0 +1,6 @@
+{
+  "name": "Join the Collective",
+  "manaCost": "{5}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all creatures. Create X 1/1 colorless Borg artifact creature tokens, where X is the number of nonartifact creatures destroyed this way."
+}

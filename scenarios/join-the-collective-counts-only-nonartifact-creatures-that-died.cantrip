@@ -1,0 +1,51 @@
+# Join the Collective ({5}{W}{W}): "Create X 1/1 colorless Borg artifact creature tokens, where X is the number of nonartifact
+# creatures destroyed this way." A creature that survives the destruction was not destroyed by it and is not counted
+# (CR 701.8, 702.12b). Seraph of the Suns is an indestructible nonartifact creature and stands; Bot2's Savannah Lions dies;
+# X is therefore 1, and one Borg token is made.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Seraph of the Suns
+Join the Collective
+Plains x10
+
+[Bot2 Deck]
+Plains
+Plains
+Savannah Lions
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Seraph of the Suns.Cast
+Bot1.Hand.Join the Collective.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Seraph of the Suns.Power = 4
+Bot1.Battlefield.Borg Token.Power = 1
+Bot1.Battlefield.Count = 2
+Bot2.Graveyard = Savannah Lions
