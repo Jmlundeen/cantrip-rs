@@ -1,0 +1,33 @@
+# Caustic Exhale needs a Dragon to behold or {1} more. Bot1 has no Dragon card (a Grizzly Bears in hand instead) and only the {B}
+# of a Mox Jet: the cast is refused with nothing spent, and Bot2's Grizzly Bears lives (Bot2 casts it first as the would-be target).
+
+[Bot1 Deck]
+Mox Jet
+Grizzly Bears
+Caustic Exhale
+Plains x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Caustic Exhale.Cast(Mana: short)
+
+[Expect]
+Bot2.Battlefield = Mox Emerald; Mox Ruby; Grizzly Bears
+Bot1.Hand = Grizzly Bears; Caustic Exhale; Plains; Plains; Plains; Plains; Plains

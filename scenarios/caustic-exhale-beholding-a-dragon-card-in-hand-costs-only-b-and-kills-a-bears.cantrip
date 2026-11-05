@@ -1,0 +1,42 @@
+# Caustic Exhale: "As an additional cost to cast this spell, behold a Dragon or pay {1}. Target creature gets -3/-3 until end of
+# turn." Bot1 has only a Mox Jet, {B}: with the Feral Deathgorger (a Dragon card) beheld from the hand - revealed, and it stays - that
+# is the whole cost. Bot2's Grizzly Bears (2/2) gets -3/-3 and dies. The positive control for
+# caustic-exhale-with-no-dragon-and-only-b-cannot-be-cast.
+
+[Bot1 Deck]
+Mox Jet
+Feral Deathgorger
+Caustic Exhale
+Plains x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Caustic Exhale.Cast
+Bot1.Modes(Behold a Dragon)
+Bot1.Target(Bot2.Battlefield.Grizzly Bears)
+Bot1.Choose(Feral Deathgorger)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Grizzly Bears
+Bot1.Revealed = Feral Deathgorger
+Bot1.Hand = Feral Deathgorger; Plains; Plains; Plains; Plains; Plains
