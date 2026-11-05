@@ -1,0 +1,60 @@
+# Unsparing Boltcaster: "target creature an opponent controls that was dealt damage this turn" (CR 115.1, 120.2). On turn 3
+# Pyroclasm (2 damage to each creature) hits Bot1's own Wall of Wood and both of Bot2's Walls of Wood, all three surviving. The
+# Boltcaster's ability then refuses Bot1's own damaged Wall (an opponent does not control it) and kills one of Bot2's (2 + 5 is
+# more than its toughness 3); the other keeps its 2 damage.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mountain
+Wall of Wood
+Pyroclasm
+Unsparing Boltcaster
+Mountain x13
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Wall of Wood
+Wall of Wood
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wall of Wood.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Wall of Wood.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wall of Wood.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Unsparing Boltcaster.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Wall of Wood)
+Bot1.Target(Bot2.Battlefield.Wall of Wood)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Wall of Wood
+Bot1.Battlefield.Wall of Wood.Damage = 2
+Bot1.Battlefield.Unsparing Boltcaster.Damage = 0

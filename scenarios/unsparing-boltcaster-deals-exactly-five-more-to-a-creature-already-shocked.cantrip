@@ -1,0 +1,62 @@
+# Unsparing Boltcaster {2}{R}, 3/3: "When this creature enters, it deals 5 damage to target creature an opponent controls that was
+# dealt damage this turn." On turn 3 Shock (2) hits Bot2's Wall of Stone (0/8), so it was dealt damage this turn and is a legal
+# target; the Boltcaster's 5 more make 7 marked damage, exactly, and the Wall survives (not 6 or 8). The Boltcaster is on the
+# battlefield as a 3/3. Bot2's other creature, Wall of Wood, was not dealt damage: it is not a legal target (the ability would
+# otherwise ask for a choice between the two), and takes none.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Mountain
+Shock
+Unsparing Boltcaster
+Mountain x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mountain
+Wall of Stone
+Mox Emerald
+Wall of Wood
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wall of Stone.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wall of Wood.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Wall of Stone)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Wall of Stone.Damage = 2
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Unsparing Boltcaster.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Wall of Stone.Damage = 7
+Bot2.Battlefield.Wall of Wood.Damage = 0
+Bot1.Battlefield.Unsparing Boltcaster.Power = 3

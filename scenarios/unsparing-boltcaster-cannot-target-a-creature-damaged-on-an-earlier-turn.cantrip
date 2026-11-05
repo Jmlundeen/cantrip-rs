@@ -1,0 +1,49 @@
+# Unsparing Boltcaster: only damage dealt this turn counts (CR 120.2). Shock hits Bot2's Wall of Wood on turn 3, which survives
+# with 2 damage, and the damage wears off at the end of that turn (CR 514.2). On turn 5 the Boltcaster enters: the Wall is not a
+# legal target any more, so its ability has none and does nothing; the Wall has no damage.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Mountain
+Shock
+Unsparing Boltcaster
+Mountain x13
+
+[Bot2 Deck]
+Mox Emerald
+Wall of Wood
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wall of Wood.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Wall of Wood)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Wall of Wood.Damage = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Unsparing Boltcaster.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Wall of Wood.Damage = 0
+Bot1.Battlefield.Unsparing Boltcaster.Power = 3

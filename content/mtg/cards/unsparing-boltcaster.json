@@ -1,0 +1,8 @@
+{
+  "name": "Unsparing Boltcaster",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Ogre Wizard",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When this creature enters, it deals 5 damage to target creature an opponent controls that was dealt damage this turn."
+}
