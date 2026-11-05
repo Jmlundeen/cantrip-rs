@@ -11424,8 +11424,9 @@ fn spendable(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> Ma
     pool
 }
 
-/// Takes `spent` out of the pool, restricted mana first (it is what the C# engine prefers spending), each unit's source
-/// pushed onto `taken`. What the mana taken does to what it pays for (`ManaRestriction::effects`).
+/// Takes `spent` out of the pool, each unit's source pushed onto `taken`: the pool's one way of paying, where no type is left
+/// with a choice of which kind to spend (`pay_mana_inner`), so the order it takes them in decides nothing. What the mana
+/// taken does to what it pays for (`ManaRestriction::effects`).
 fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, spent: &[u32; 6], taken: &mut Vec<(ObjectId, Mana, u32)>, record: bool) -> u8 {
     let restricted = restricted_for(cx, player, source, purpose);
     let mut used = 0u8;
@@ -11743,33 +11744,20 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
         // Ordinary mana a rule tells apart by its source (CR 106.3), by the source that produced it.
         let told = if helpers.no_mana { Vec::new() } else { static_rules::mana_told_apart(cx, cx.cards(), player) };
         let told_mana = told_pools(cx, player, &told);
-        // Ordinary mana and restricted mana of a kind are different units (CR 106.6): spending only some of that kind
-        // is the player's choice, even when the pool pays the cost one way. So is spending only some of the mana of a kind
-        // that came from sources a rule tells apart (CR 106.3, 601.2h).
-        if let Ways::One(spent) = decided
-            && !told.is_empty()
-        {
-            let plain = cx.s().player(player).pool;
-            let split = Mana::ALL.iter().any(|&m| {
-                let apart: u32 = told_mana.iter().map(|(_, p)| p.get(m)).sum();
-                let groups = told_mana.iter().filter(|(_, p)| p.get(m) > 0).count() + usize::from(plain.get(m) > apart);
-                groups > 1 && spent[m as usize] > 0 && spent[m as usize] < pool.get(m)
-            });
-            if split {
-                decided = Ways::Many;
-            }
-        }
+        // Mana of one type comes in kinds that are different units: each restriction's (CR 106.6), each source's a rule tells
+        // apart (CR 106.3), and the ordinary rest. Spending only some of a type held in more than one kind is the player's
+        // choice (CR 601.2h), even when the pool pays the cost one way: it decides what the mana does and what stays floating.
         if let Ways::One(spent) = decided {
-            let player_state = cx.s().player(player);
+            let plain = cx.s().player(player).pool;
             let restricted = restricted_for(cx, player, source, helpers.purpose);
-            let mixed = Mana::ALL.iter().any(|&m| {
-                let held_restricted: u32 = restricted.iter().map(|(_, p)| p.get(m)).sum();
-                held_restricted > 0
-                    && player_state.pool.get(m) > 0
-                    && spent[m as usize] > 0
-                    && spent[m as usize] < player_state.pool.get(m) + held_restricted
+            let choice = Mana::ALL.iter().any(|&m| {
+                let apart: u32 = told_mana.iter().map(|(_, p)| p.get(m)).sum();
+                let kinds = restricted.iter().filter(|(_, p)| p.get(m) > 0).count()
+                    + told_mana.iter().filter(|(_, p)| p.get(m) > 0).count()
+                    + usize::from(plain.get(m) > apart);
+                kinds > 1 && spent[m as usize] > 0 && spent[m as usize] < pool.get(m)
             });
-            if mixed {
+            if choice {
                 decided = Ways::Many;
             }
         }

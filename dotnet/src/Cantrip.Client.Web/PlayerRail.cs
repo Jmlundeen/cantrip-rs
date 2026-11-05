@@ -17,8 +17,9 @@ public sealed class PlayerRail : Border
     /// <summary>
     /// A chip in the mana row: mana in the pool, or with <paramref name="Ability"/> a mana ability the player has of
     /// their own (CR 611.2a) — no card offers it — which reads as its caption alone and activates on a click.
+    /// <paramref name="Assign"/> is the server's option a click on pool mana answers with.
     /// </summary>
-    public sealed record ManaChipSpec(ManaTypeView Type, int Count, string? Caption, string? Tooltip, Action? Click, bool Ability = false);
+    public sealed record ManaChipSpec(ManaTypeView Type, int Count, string? Caption, string? Tooltip, Action? Click, bool Ability = false, ActionOptionMessage? Assign = null);
 
     /// <summary>
     /// A pile at the rail's foot: how many cards, the one drawn on top if any is known, what a click on it does, whether

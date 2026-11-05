@@ -87,8 +87,27 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-150](#ki-150-text-changes-are-interned-for-at-most-4294967295-distinct-lists-in-a-process) | Text changes are interned for at most 4,294,967,295 distinct lists in a process | Pri-3 | Won't fix: beyond practical scale |
 | [KI-146](#ki-146-the-booster-drafts-dragged-pick-test-once-saw-the-pick-fly-from-the-pack) | The booster draft's dragged-pick test once saw the pick fly from the pack | Pri-3 | Suspected |
 | [KI-147](#ki-147-two-tablet-browser-tests-wait-forever-for-unos-splash-to-go) | Two tablet browser tests wait forever for Uno's splash to go | Pri-3 | Open |
+| [KI-158](#ki-158-a-scenarios-spend-that-no-payment-asks-about-is-ignored) | A scenario's `Spend:` that no payment asks about is ignored | Pri-3 | Open |
 
 ## Issues
+
+### KI-158: A scenario's `Spend:` that no payment asks about is ignored
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Open | harness | 2026-11-05, fixing the choice between two restricted kinds of one type of mana |
+
+**Notes.** `cantrip_engine::pay::auto_pay` only reads a line's `Spend:` when the payment offers `AssignMana`. A payment the pool
+pays one way asks nothing, so what the line said is dropped without a word, and the scenario goes on with whatever the engine
+spent. That is how a `Spend:` naming a restricted kind passed unheard until a later check on the mana said otherwise. A fix
+fails the line when a cast or activation ends with `Spend:` unread (in `cantrip-script`'s `Run::intend`, where the next priority
+drops `casting` and `assisting`). Tried on 2026-11-05, that check failed 49 of the corpus's 16,943 scenarios, each with a
+`Spend:` its payment never asked about: the echo-paid-exactly scenarios, the restricted-mana pages (Flamebraider, Sunken
+Citadel, Ronin Shadow Stalker, Maelstrom of the Spirit Dragon), and others. Several are `# Browser` scenarios whose `Spend:`
+may still drive a click on the page, so each needs looking at - dropped where it says nothing, kept and the check taught why
+where the browser reads it - before the check can go in.
+
+**Scenarios.** Any `Spend:` on a payment with one way shows it; `acridian-echo-paid-exactly` is one.
 
 ### KI-151: An ability on the stack is shown with its printed text, not the words it kept
 

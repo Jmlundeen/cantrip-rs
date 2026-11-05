@@ -1,0 +1,48 @@
+# Browser
+# CR 106.6, 601.2h: two restricted kinds of {R} float, and either may pay Ragavan's {R}. Which pays is the player's to choose,
+# whichever was made first. Rockface Village's is made first and the Halfling's is spent, by a click on its chip: Rockface's stays
+# floating, and Counterspell can't counter the spell.
+
+[Bot1 Deck]
+Forest
+Delighted Halfling
+Rockface Village
+Ragavan, Nimble Pilferer
+Forest x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Delighted Halfling.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Rockface Village.Play
+Bot1.Battlefield.Rockface Village.Activate(Ability: creature spell)
+Bot1.Battlefield.Delighted Halfling.Activate(Ability: any color; Color: Red)
+? Bot1.Mana = {R} (LegendarySpells, CantBeCountered) {R} (CreatureSpells)
+? Client.Bot1.Mana = 1 Red (creatures); 1 Red (legendary · uncounterable)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast(Spend: R LegendarySpells, CantBeCountered)
+Bot1.Pass
+? Bot1.Mana = {R} (CreatureSpells)
+? Client.Bot1.Mana = 1 Red (creatures)
+Bot2.Hand.Counterspell.Cast(Stack.Ragavan, Nimble Pilferer)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana = {R} (CreatureSpells)
+Bot1.Battlefield = Delighted Halfling; Forest; Ragavan, Nimble Pilferer; Rockface Village
+Bot2.Graveyard = Counterspell

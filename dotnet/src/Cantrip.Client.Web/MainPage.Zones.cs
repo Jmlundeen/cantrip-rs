@@ -670,11 +670,11 @@ public sealed partial class MainPage
             {
                 Send(client, AnswerFor(assign));
                 RedrawNow();
-            });
+            }, Assign: assign);
         }
     }
 
-    private static string RestrictionCaption(ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue) => (filter, effect) switch
+    internal static string RestrictionCaption(ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue) => (filter, effect) switch
     {
         (ManaSpendFilterView.NoncreatureSpells, _) => "noncreature spells",
         (ManaSpendFilterView.ManaValueSpells, _) => $"mana value {manaValue}+",

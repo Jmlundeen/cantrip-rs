@@ -617,7 +617,10 @@ public sealed partial class TabletPage : UserControl
 
         foreach (RestrictedManaView restricted in player.RestrictedMana)
         {
-            mana.Add(new PlayerRail.ManaChipSpec(restricted.Type, restricted.Amount, "restricted", null, null));
+            string caption = restricted.Source.IsNone
+                ? MainPage.RestrictionCaption(restricted.Filter, restricted.Effect, restricted.SpendSubtypes, restricted.SpendManaValue)
+                : $"from {_client.Object(restricted.Source)?.Name ?? "a permanent"}";
+            mana.Add(new PlayerRail.ManaChipSpec(restricted.Type, restricted.Amount, caption, null, null));
         }
 
         half.Rail.Update(

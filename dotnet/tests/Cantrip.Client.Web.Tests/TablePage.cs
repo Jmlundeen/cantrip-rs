@@ -519,9 +519,23 @@ public sealed record ZoneButtonState(string Text, string Tooltip, bool Lit, bool
 
 /// <summary>
 /// A kind of mana in a pool, how much, whether a click spends one, and where it is; its caption says what restricts it
-/// ("land abilities") and how much of it is spoken for.
+/// ("land abilities") and how much of it is spoken for. A clickable one also says which of the server's options a click
+/// answers with: its restriction, and the permanent a rule tells its mana apart by, as an answer names them.
 /// </summary>
-public sealed record ManaChipState(string Type, int Count, bool Clickable, float X, float Y, float W, float H, string Caption = "");
+public sealed record ManaChipState(
+    string Type,
+    int Count,
+    bool Clickable,
+    float X,
+    float Y,
+    float W,
+    float H,
+    string Caption = "",
+    string Filter = "",
+    string Effect = "",
+    string SpendSubtypes = "",
+    int SpendManaValue = 0,
+    int Source = 0);
 
 /// <summary>An ability shown resolving: the way it cut, and each arrow's target and way.</summary>
 public sealed record EffectState(string Feeling, bool Lit, IReadOnlyList<ArrowState> Arrows);

@@ -807,19 +807,18 @@ public sealed class ScenarioPlayer
             {
                 PlayerState me = state.Players?.FirstOrDefault(p => p.Seat == state.Seat)
                     ?? throw new NotDrivenException("AssignMana, with no pool shown", state);
-                // Restricted mana is a chip of its own, captioned with what it is for, and so is mana a rule tells apart by
-                // the permanent that produced it, captioned "from" that permanent (CR 106.3); plain mana's caption says at
-                // most how much is spoken for ("1 to spell"). The answer's restriction, or its source, says which to click.
-                bool restricted = action.Filter != ManaSpendFilterView.None || action.Effect != ManaSpendEffectView.None;
-                bool sourced = !action.Source.IsNone;
-                static bool Captioned(ManaChipState c) => c.Caption.Length > 0 && !Regex.IsMatch(c.Caption, @"^\d+ to spell$");
-                static bool From(ManaChipState c) => c.Caption.StartsWith("from ", StringComparison.Ordinal);
-                List<ManaChipState> ofType = [.. me.Mana.Where(c => c.Type == action.Mana?.ToString() && c.Clickable)];
-                ManaChipState chip = (sourced
-                        ? ofType.FirstOrDefault(From)
-                        : ofType.FirstOrDefault(c => Captioned(c) == restricted && !From(c)))
+                // Each kind of mana is a chip of its own, however many of a type float: each restriction's (CR 106.6), each
+                // source's a rule tells apart (CR 106.3), and the ordinary rest. The answer says which kind to click, and each
+                // clickable chip which it answers with, so that two restricted kinds of one color are never taken for each other.
+                ManaChipState chip = me.Mana.FirstOrDefault(c => c.Clickable
+                        && c.Type == action.Mana?.ToString()
+                        && c.Filter == action.Filter.ToString()
+                        && c.Effect == action.Effect.ToString()
+                        && c.SpendSubtypes == string.Join(",", action.SpendSubtypes)
+                        && c.SpendManaValue == action.SpendManaValue
+                        && c.Source == action.Source.Value)
                     ?? throw new Xunit.Sdk.XunitException(
-                        $"No {(sourced ? "source's" : restricted ? "restricted" : "plain")} {action.Mana} in the pool to click: "
+                        $"No {action.Mana} of {action.Filter}/{action.Effect} from {action.Source} in the pool to click: "
                         + string.Join(", ", me.Mana.Select(c => $"{c.Count} {c.Type}{(c.Caption.Length > 0 ? $" ({c.Caption})" : string.Empty)}")));
                 await _page.TapAsync(chip.X, chip.Y);
                 return;
