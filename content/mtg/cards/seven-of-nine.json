@@ -1,0 +1,8 @@
+{
+  "name": "Seven of Nine",
+  "manaCost": "{2}{U}{B}",
+  "type": "Legendary Artifact Creature — Human Scientist",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Whenever you face a dilemma, draw a card. (You face a dilemma as you choose one or more modes for a spell or ability.)"
+}

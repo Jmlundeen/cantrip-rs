@@ -1,0 +1,43 @@
+# Seven of Nine: "Whenever you face a dilemma, draw a card." Choosing one mode of Archdruid's Charm is facing a dilemma
+# (CR 700.2a), so its controller draws one card - the Island on top of the library - and the charm still resolves.
+
+[Bot1 Deck]
+Seven of Nine
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Pearl
+Black Lotus
+Archdruid's Charm
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Seven of Nine.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(1)
+Bot1.Search()
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Seven of Nine.Power = 2
