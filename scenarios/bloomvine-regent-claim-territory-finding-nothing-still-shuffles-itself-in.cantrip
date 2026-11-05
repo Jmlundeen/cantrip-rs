@@ -1,0 +1,37 @@
+# Claim Territory, Bloomvine Regent's Omen: the search may find nothing (CR 701.23b), even with a basic Forest in the library.
+# No land arrives and the hand is unchanged; the Omen is still shuffled into Bot1's library (CR 720.3d): twelve cards.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Sol Ring
+Bloomvine Regent
+Island
+Island
+Island
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloomvine Regent.Cast(Ability: Omen)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot1.Search()
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Jet; Sol Ring
+Bot1.Hand = Island; Island; Island
+Bot1.Library.Count = 12
+Bot1.Graveyard.Count = 0
+Exile.Count = 0

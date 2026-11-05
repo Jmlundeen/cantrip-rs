@@ -441,6 +441,28 @@ pub enum Rest {
     BottomChosen,
 }
 
+/// "Search your library for up to two [cards matching `rule`], reveal them, put one onto the battlefield tapped and the other into
+/// your hand, then shuffle" (CR 701.23, 701.20, 701.24): the player finds none, one or two. A lone card found goes onto the
+/// battlefield tapped (the ruling); of two, the player says which one does, and the other goes into the hand, revealed. The library
+/// is shuffled whether or not anything was found, unless the search could not be made (CR 101.2). `rule` is what the cards must be
+/// and how many (up to two). Bloomvine Regent's Claim Territory (basic Forest cards) and Troop of Ponies (basic land cards) print it.
+pub fn search_two_one_onto_battlefield_tapped_other_into_hand(g: &mut dyn Game, item: &StackItem, rule: Selection) -> Result<(), Suspend> {
+    let you = item.controller;
+    let found = search(g, you, you, item.object, SearchDestination::Found, rule)?;
+    g.reveal(you, &found);
+    let onto_battlefield = match found.len() {
+        0 | 1 => found.clone(),
+        _ => crate::choose::select(g, you, item.object, Purpose::PutOntoBattlefield, found.clone(), crate::select::cards(crate::select::exactly(1)))?,
+    };
+    if let Some(&land) = onto_battlefield.first() {
+        g.put_onto_battlefield(land, you, true)?;
+    }
+    let to_hand: Vec<(ObjectId, Zone)> = found.iter().filter(|c| !onto_battlefield.contains(c)).map(|&c| (c, Zone::hand(you))).collect();
+    g.move_together_revealed(&to_hand, MoveReason::Search);
+    g.shuffle(you);
+    Ok(())
+}
+
 /// "Look at the top `count` cards of your library. Put between `min` and `max` of them that pass `wanted` into your hand
 /// and the rest on the bottom of your library" (CR 401.2, 701.20-ish "look"): `reveal` makes it "you may reveal". A
 /// library with fewer cards shows what it has (CR 609.3), and `min` and `max` shrink to the cards that qualify. With

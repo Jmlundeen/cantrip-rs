@@ -1,0 +1,17 @@
+{
+  "name": "Bloomvine Regent",
+  "manaCost": "{3}{G}{G}",
+  "type": "Creature — Dragon",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "Flying\nWhenever this creature or another Dragon you control enters, you gain 3 life.",
+  "keywords": [
+    "Flying"
+  ],
+  "omen": {
+    "name": "Claim Territory",
+    "manaCost": "{2}{G}",
+    "type": "Sorcery — Omen",
+    "oracleText": "Search your library for up to two basic Forest cards, reveal them, put one onto the battlefield tapped and the other into your hand, then shuffle. (Also shuffle this card.)"
+  }
+}

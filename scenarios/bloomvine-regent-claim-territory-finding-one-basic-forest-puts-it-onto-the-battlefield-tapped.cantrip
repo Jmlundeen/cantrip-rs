@@ -1,0 +1,40 @@
+# Claim Territory, Bloomvine Regent's Omen: with only one basic Forest found, that card goes onto the battlefield tapped (the
+# rulings: "put one onto the battlefield tapped" is done first) and nothing goes into the hand. The library is still shuffled
+# and the Omen shuffled into it: eleven cards, one taken and one added.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Sol Ring
+Bloomvine Regent
+Island
+Island
+Island
+Forest
+Mountain
+Bayou
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloomvine Regent.Cast(Ability: Omen)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot1.Search(Forest)
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Jet; Sol Ring; Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Hand = Island; Island; Island
+Bot1.Library.Count = 11
+Exile.Count = 0

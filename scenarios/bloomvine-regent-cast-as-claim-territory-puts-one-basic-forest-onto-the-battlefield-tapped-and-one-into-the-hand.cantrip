@@ -1,0 +1,52 @@
+# Bloomvine Regent cast from the hand as its Omen, Claim Territory ({2}{G}, CR 720.3): "Search your library for up to two basic
+# Forest cards, reveal them, put one onto the battlefield tapped and the other into your hand, then shuffle." The nonbasic
+# Bayou (a Forest) and the basic Mountain are refused, and so are three Forests (it is up to two). Bot1 finds two Forests,
+# both revealed, and chooses one for the battlefield: it enters tapped, and the other goes into the hand. As Claim Territory
+# resolves it is shuffled into Bot1's library (CR 720.3d): ten cards, two taken and one added. The creature was never cast,
+# so no enters trigger gained Bot1 3 life.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Sol Ring
+Bloomvine Regent
+Island
+Island
+Island
+Forest
+Forest
+Forest
+Mountain
+Bayou
+Island x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloomvine Regent.Cast(Ability: Omen)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Stack = Claim Territory
+Bot1.Pass
+! Bot1.Search(Bayou)
+! Bot1.Search(Mountain)
+! Bot1.Search(Forest; Forest; Forest)
+Bot1.Search(Forest; Forest)
+? Bot1.Revealed = Forest; Forest
+Bot1.Choose(Forest)
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Battlefield = Mox Emerald; Mox Jet; Sol Ring; Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Hand = Island; Island; Island; Forest
+Bot1.Library.Count = 10
+Bot1.Graveyard.Count = 0
+Exile.Count = 0
