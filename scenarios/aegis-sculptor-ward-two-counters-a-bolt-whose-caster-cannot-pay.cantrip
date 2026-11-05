@@ -1,0 +1,35 @@
+# Aegis Sculptor, "ward {2}": Bot2's only mana is a Mox Ruby, which pays for the Lightning Bolt, so the ward trigger counters
+# it and the Sculptor takes no damage. The Sculptor came down on turn 1 off a Mox Sapphire and a Black Lotus.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Aegis Sculptor
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Aegis Sculptor.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Aegis Sculptor)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Aegis Sculptor.Damage = 0
+Bot2.Graveyard = Lightning Bolt

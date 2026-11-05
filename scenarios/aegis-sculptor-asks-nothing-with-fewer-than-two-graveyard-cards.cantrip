@@ -1,0 +1,30 @@
+# Aegis Sculptor: "exile two cards from your graveyard" cannot be paid from a graveyard of one (the Black Lotus), so the
+# upkeep trigger asks nothing and the creature gets no counter.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Aegis Sculptor
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Aegis Sculptor.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Draw]
+
+[Expect]
+Bot1.Battlefield.Aegis Sculptor.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Black Lotus
+Exile.Count = 0

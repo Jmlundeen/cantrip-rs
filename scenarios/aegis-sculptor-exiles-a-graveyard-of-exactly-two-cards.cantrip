@@ -1,0 +1,47 @@
+# Aegis Sculptor: a graveyard of exactly two cards (Black Lotus and a Lightning Bolt) pays "exile two cards from your graveyard":
+# Bot1 accepts at its upkeep, both go, and the creature has its counter (3/4). Bot2's own graveyard Bolt is untouched.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Mox Ruby
+Aegis Sculptor
+Lightning Bolt
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Aegis Sculptor.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Accept
+[T3 Bot1.Draw]
+? Bot1.Battlefield.Aegis Sculptor.Counters.PlusOnePlusOne = 1
+
+[Expect]
+Bot1.Battlefield.Aegis Sculptor.Power = 3
+Bot1.Battlefield.Aegis Sculptor.Toughness = 4
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Lightning Bolt
+Exile.Count = 2
