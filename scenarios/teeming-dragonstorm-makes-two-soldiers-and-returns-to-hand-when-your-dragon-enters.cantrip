@@ -1,0 +1,53 @@
+# Teeming Dragonstorm: "When this enchantment enters, create two 2/2 white Soldier creature tokens." Bot1 casts it off four Mox
+# Pearls and gets exactly two Soldier tokens, each 2/2 (a one-off amount or size would fail the checks). "When a Dragon you control
+# enters, return this enchantment to its owner's hand": an Ornithopter (not a Dragon) enters and the Enchantment stays; Clarion
+# Conqueror (a Dragon) cast with Black Lotus's {W}{W}{W} returns it to hand and the Soldiers stay.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Black Lotus
+Teeming Dragonstorm
+Clarion Conqueror
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Teeming Dragonstorm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Soldier Token#1.Power = 2
+? Bot1.Battlefield.Soldier Token#1.Toughness = 2
+? Bot1.Battlefield.Soldier Token#2.Power = 2
+? Bot1.Battlefield.Soldier Token#2.Toughness = 2
+? Bot1.Battlefield.Count = 8
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Teeming Dragonstorm.Types = Enchantment
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Teeming Dragonstorm
+Bot1.Battlefield.Count = 8

@@ -1,0 +1,6 @@
+{
+  "name": "Teeming Dragonstorm",
+  "manaCost": "{3}{W}",
+  "type": "Enchantment",
+  "oracleText": "When this enchantment enters, create two 2/2 white Soldier creature tokens.\nWhen a Dragon you control enters, return this enchantment to its owner's hand."
+}
