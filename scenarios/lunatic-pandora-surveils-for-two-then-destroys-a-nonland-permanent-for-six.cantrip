@@ -1,0 +1,67 @@
+# Lunatic Pandora ({1}): "{2}, {T}: Surveil 1" and "{6}, {T}, Sacrifice: Destroy target nonland permanent". Turn 1: Bot1 pays {2} and surveils 1, binning the Forest on top
+# (the Pandora stays, untapped mana spent exactly). Turn 3: a land is refused as the destroy target, and Bot1 pays {6} (Black Lotus's three and three Moxen) to destroy Bot2's Ornithopter.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Lunatic Pandora
+Island
+Forest
+Island x13
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lunatic Pandora.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Lunatic Pandora.Activate(Ability: Surveil)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Forest)
+? Bot1.Mana =
+? Bot1.Graveyard = Forest
+? Bot1.Battlefield.Lunatic Pandora.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Lunatic Pandora.Activate(Ability: Destroy; Bot2.Battlefield.Mountain)
+Bot1.Battlefield.Lunatic Pandora.Activate(Ability: Destroy; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Lunatic Pandora = (absent)
+Bot1.Graveyard = Lunatic Pandora; Black Lotus; Forest

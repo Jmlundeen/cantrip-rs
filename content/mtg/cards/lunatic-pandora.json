@@ -1,0 +1,6 @@
+{
+  "name": "Lunatic Pandora",
+  "manaCost": "{1}",
+  "type": "Legendary Artifact",
+  "oracleText": "{2}, {T}: Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\n{6}, {T}, Sacrifice Lunatic Pandora: Destroy target nonland permanent."
+}
