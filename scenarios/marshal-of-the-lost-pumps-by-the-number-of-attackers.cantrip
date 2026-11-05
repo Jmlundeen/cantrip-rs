@@ -1,0 +1,41 @@
+# Marshal of the Lost: {2}{W}{B}, 3/3 deathtouch; "Whenever you attack, target creature gets +X/+X until end of turn, where X is the
+# number of attacking creatures." Marshal and an Ornithopter attack (X = 2): the Ornithopter targeted is 2/4 for the turn. A Mox
+# is no creature, so it is not a legal target.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Marshal of the Lost
+Ornithopter
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Marshal of the Lost.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Marshal of the Lost > Bot2; Ornithopter > Bot2)
+! Bot1.Target(Mox Pearl)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+
+[Expect]
+Bot1.Battlefield.Marshal of the Lost.Power = 3
