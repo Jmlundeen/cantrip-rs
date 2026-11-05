@@ -1,0 +1,8 @@
+{
+  "name": "Tidus, Blitzball Star",
+  "manaCost": "{1}{W}{U}",
+  "type": "Legendary Creature — Human Warrior",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Whenever an artifact you control enters, put a +1/+1 counter on Tidus.\nWhenever Tidus attacks, tap target creature an opponent controls."
+}

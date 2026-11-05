@@ -1,0 +1,47 @@
+# Tidus, Blitzball Star (CR 603.2, 122.1): Bot1 casts Tidus, a 2/1, then three more artifacts (Mox Ruby, Mox Emerald, Gleemox): each puts a +1/+1 counter on him, a 5/4.
+# He was not on the battlefield for the three Moxen before him, and Bot2's Mox Ruby entering on turn 2 puts no counter on him.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Tidus, Blitzball Star
+Mox Ruby
+Mox Emerald
+Gleemox
+Ornithopter x30
+
+[Bot2 Deck]
+Mox Ruby
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tidus, Blitzball Star.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Mox Ruby
+Bot1.Battlefield.Tidus, Blitzball Star.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Tidus, Blitzball Star.Power = 5
+Bot1.Battlefield.Tidus, Blitzball Star.Toughness = 4

@@ -1,0 +1,56 @@
+# Tidus, Blitzball Star (CR 603.2, 701.26a): Tidus attacks on turn 3 and his trigger taps Bot2's Grizzly Bears, the only creature an opponent controls, so it cannot block him:
+# Bot2 takes his 2 damage.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Tidus, Blitzball Star
+Ornithopter
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Grizzly Bears
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tidus, Blitzball Star.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Tidus, Blitzball Star > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Grizzly Bears.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Tidus, Blitzball Star.Counters.PlusOnePlusOne = 1
