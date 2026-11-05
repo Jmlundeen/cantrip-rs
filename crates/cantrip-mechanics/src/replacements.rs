@@ -92,6 +92,25 @@ pub const PLUS_ONE_COUNTERS_ON_YOUR_CREATURES: ReplacementDef = replacement(
     "puts that many plus one +1/+1 counters instead",
 );
 
+/// "... twice that many +1/+1 counters are put on it instead": the +1/+1 counters alone; counters of other kinds put with
+/// them are left as they are.
+fn twice_that_many_plus_one_counters(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::Counters(c) = proposal {
+        c.counts[CounterKind::PlusOne as usize] *= 2;
+    }
+}
+
+/// "If one or more +1/+1 counters would be put on a creature you control, twice that many +1/+1 counters are put on it
+/// [that creature] instead" (CR 122.6, 614.1a): on a creature its controller controls, or one entering under them with
+/// counters, whoever puts them. Each applies once (CR 614.5), so two make four times as many. Corpsejack Menace and The
+/// Earth Crystal print it.
+pub const DOUBLE_PLUS_ONE_COUNTERS_ON_YOUR_CREATURES: ReplacementDef = replacement(
+    ReplacementKind::Counters,
+    plus_one_counters_on_your_creatures,
+    twice_that_many_plus_one_counters,
+    "puts twice that many +1/+1 counters instead",
+);
+
 /// "If one or more tokens would be created under your control, twice that many of those tokens are created instead."
 /// Elspeth, Storm Slayer and Exalted Sunborn print it.
 pub const DOUBLE_TOKENS: ReplacementDef =

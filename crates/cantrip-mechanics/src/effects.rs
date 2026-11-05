@@ -381,6 +381,15 @@ pub fn two_plus_one_counters_on_target(g: &mut dyn Game, item: &StackItem) -> Re
     Ok(())
 }
 
+/// "Distribute N +1/+1 counters among [one or more target creatures]" (CR 601.2d, 122.1): each target its share, fixed as
+/// the spell or ability was put on the stack, a target illegal as it resolves left out with its share (CR 608.2b; the
+/// rulings of Jade Seedstones and The Earth Crystal). Jade Seedstones, Elusive Otter's Grove's Bounty and The Earth
+/// Crystal print it.
+pub fn distribute_plus_one_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    crate::counters_divided(g, item, CounterKind::PlusOne);
+    Ok(())
+}
+
 /// "Put a +1/+1 counter on [this permanent]" (CR 122.1), the ability's source: none once it has left the battlefield, as a
 /// new object it is another (CR 400.7). The whole effect of a trigger or ability of Essence Channeler, Ajani Resolute's
 /// Ajani's Pridemate token, Leonardo, Cutting Edge, Blood Hustler, Cryptic Trilobite, Gau, Feral Youth, Hired Claw, Ivora,
