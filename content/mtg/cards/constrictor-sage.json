@@ -1,0 +1,8 @@
+{
+  "name": "Constrictor Sage",
+  "manaCost": "{4}{U}",
+  "type": "Creature — Snake Wizard",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "When this creature enters, tap target creature an opponent controls and put a stun counter on it. (If a permanent with a stun counter would become untapped, remove one from it instead.)\nRenew — {2}{U}, Exile this card from your graveyard: Tap target creature an opponent controls and put a stun counter on it. Activate only as a sorcery."
+}

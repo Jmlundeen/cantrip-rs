@@ -1,0 +1,43 @@
+# Constrictor Sage: "Renew — {2}{U}, Exile this card from your graveyard: Tap target creature an opponent controls and put a
+# stun counter on it. Activate only as a sorcery." Bot1 discards the Sage to Faithless Looting on turn 1 and keeps a Black Lotus
+# untapped. On Bot2's turn 2 the ability is not offered though the mana is there (CR 602.5d); on turn 3 it taps and stuns
+# Bot2's Ornithopter, and the Sage is exiled as the cost.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Constrictor Sage
+Black Lotus
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Constrictor Sage; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+! Bot1.Graveyard.Constrictor Sage.Activate(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Graveyard.Constrictor Sage.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Ornithopter.Counters.Stun = 1
+Exile = Constrictor Sage
