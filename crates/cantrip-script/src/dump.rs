@@ -543,8 +543,19 @@ impl StateDump {
             let makers: Vec<Linked> = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p).filter_map(|&id| s.made_by(id)).collect();
             if !makers.is_empty() {
                 d.list(&format!("{b}.Emblems.MadeBy"), makers.iter().map(|by| game.known_name(by.object).to_string()).collect(), false);
-                let exiled: Vec<String> = makers.iter().flat_map(|&by| Query::exiled_with(game, by)).map(|id| game.known_name(id).to_string()).collect();
-                d.list(&format!("{b}.Emblems.ExiledWithMakers"), exiled, false);
+                // Each emblem's cards sorted, the emblems' groups apart by a `|` item, in emblem order.
+                let mut exiled: Vec<String> = Vec::new();
+                for (i, &by) in makers.iter().enumerate() {
+                    let mut group: Vec<String> = Query::exiled_with(game, by).into_iter().map(|id| game.known_name(id).to_string()).collect();
+                    group.sort();
+                    if i > 0 {
+                        exiled.push("|".to_string());
+                    }
+                    exiled.extend(group);
+                }
+                let cards = exiled.iter().filter(|e| *e != "|").count();
+                d.set(format!("{b}.Emblems.ExiledWithMakers.Count"), cards);
+                d.set(format!("{b}.Emblems.ExiledWithMakers"), exiled.join("; "));
             }
 
             // The battlefield, and its phased-out permanents (CR 702.26b) apart, as `BotN.PhasedOut` under the player who controlled
