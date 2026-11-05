@@ -1,0 +1,47 @@
+# Year of Hell: chapters I, II and III each have every player draw a card and the Saga deal 2 damage to each player
+# (CR 121.1, 120.2, 714.2). The first chapter answers the cast, the next two arrive after each draw step; after III the Saga
+# is sacrificed (CR 714.4), and both players have taken 6. Each chapter is checked as it resolves - 2 damage and a card
+# each - and Bot2 discards back to seven in each of its cleanup steps (CR 514.1).
+
+[Bot1 Deck]
+Year of Hell
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Year of Hell.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Life = 18
+? Bot2.Life = 18
+? Bot1.Hand.Count = 5
+? Bot2.Hand.Count = 8
+[T5 Bot1.Main2]
+? Bot1.Life = 16
+? Bot2.Life = 16
+? Bot1.Hand.Count = 7
+? Bot2.Hand.Count = 8
+[T7 Bot1.Main1]
+Bot1.Pass
+
+[Expect]
+Turn = 7
+Bot1.Life = 14
+Bot2.Life = 14
+Bot1.Hand.Count = 9
+Bot2.Hand.Count = 8
+Bot1.Battlefield.Year of Hell = (absent)
