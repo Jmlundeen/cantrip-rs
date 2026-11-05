@@ -1,0 +1,28 @@
+# Desperate Measures ({B}, instant): "Target creature gets +1/-1 until end of turn. When it dies under your control this turn, draw
+# two cards." Bot1's Memnite (1/1) becomes 2/0 and dies as the spell finishes resolving: Bot1 draws exactly two cards (Forest,
+# Forest), under its control.
+
+[Bot1 Deck]
+Mox Jet
+Memnite
+Desperate Measures
+Island x4
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Desperate Measures.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Memnite; Desperate Measures
+Bot1.Hand = Island; Island; Island; Island; Forest; Forest

@@ -1,0 +1,29 @@
+# Desperate Measures may target any creature, but "dies under your control" is Bot1's: Bot2's Memnite becomes 2/0 and dies under
+# Bot2's control, so Bot1 draws nothing (it is not like A Good Day to Die, which draws whoever's creature it was).
+
+[Bot1 Deck]
+Mox Jet
+Desperate Measures
+Island x5
+Forest x10
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Desperate Measures.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Memnite
+Bot1.Hand.Count = 6

@@ -1,0 +1,6 @@
+{
+  "name": "Desperate Measures",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "Target creature gets +1/-1 until end of turn. When it dies under your control this turn, draw two cards."
+}

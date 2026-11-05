@@ -1,0 +1,36 @@
+# Desperate Measures: "this turn" is the turn it was cast. Bot1's Ornithopter becomes 1/1 and lives; it is back to 0/2 on turn
+# 3, where Bot1 bolts it and draws no cards from the delayed ability (the turn-3 draw is the only one).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Ornithopter
+Desperate Measures
+Lightning Bolt
+Island x2
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Desperate Measures.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Lightning Bolt; Desperate Measures
+Bot1.Hand = Island; Island; Forest
