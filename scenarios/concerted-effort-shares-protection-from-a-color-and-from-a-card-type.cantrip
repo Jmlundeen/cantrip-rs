@@ -1,0 +1,57 @@
+# Concerted Effort ({2}{W}{W}): "...creatures you control gain [protection] until end of turn if a creature you control has
+# [it]." White Knight has protection from black and Angelic Curator protection from artifacts, so at each upkeep the Savannah
+# Lions gains both: on turn 7 it is protected from black, and Bot2's Ornithopter (an artifact creature) can't block it, so
+# it deals its 2 damage. Protection from a card type is not one of the five colors the grant used to cover (CR 702.16a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+White Knight
+Angelic Curator
+Savannah Lions
+Concerted Effort
+Mox Sapphire
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Concerted Effort.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Angelic Curator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.White Knight.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Savannah Lions.ProtectionFrom = Black
+Bot1.Attack(Savannah Lions > Bot2)
+! Bot2.Block(Ornithopter > Savannah Lions)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Savannah Lions.ProtectionFrom = Black

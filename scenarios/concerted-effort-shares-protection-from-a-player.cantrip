@@ -1,0 +1,53 @@
+# Concerted Effort ({2}{W}{W}): creatures you control gain protection until end of turn from whatever a creature you control has
+# protection from. True-Name Nemesis has protection from the player it chose, Bot2, so at Bot2's upkeep (turn 6) the Savannah
+# Lions gains protection from Bot2 too and Bot2's Shock can't target it (CR 702.16a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+True-Name Nemesis
+Savannah Lions
+Concerted Effort
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mountain
+Shock
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.True-Name Nemesis.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Concerted Effort.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+! Bot2.Hand.Shock.Cast(Bot1.Battlefield.Savannah Lions)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Savannah Lions.Damage = 0

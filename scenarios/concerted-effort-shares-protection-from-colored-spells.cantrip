@@ -1,0 +1,59 @@
+# Concerted Effort ({2}{W}{W}): creatures you control gain protection until end of turn from whatever a creature you control has
+# protection from - from spells that are one or more colors too (CR 702.16a). Show and Tell puts Emrakul, the Aeons Torn onto
+# the battlefield on turn 3 (not cast, so no extra turn), and at Bot2's upkeep on turn 6 the Grizzly Bears gains its protection
+# from colored spells: Bot2's red Shock can't target it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Concerted Effort
+Show and Tell
+Emrakul, the Aeons Torn
+Grizzly Bears
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Shock
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Concerted Effort.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Emrakul, the Aeons Torn)
+Bot2.Choose()
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Grizzly Bears.Keywords = Flying
+? Bot1.Battlefield.Grizzly Bears.ProtectionFromColoredSpells = true
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Shock.Cast(Bot1.Battlefield.Grizzly Bears)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Damage = 0
+Bot1.Battlefield.Grizzly Bears.ProtectionFromColoredSpells = true

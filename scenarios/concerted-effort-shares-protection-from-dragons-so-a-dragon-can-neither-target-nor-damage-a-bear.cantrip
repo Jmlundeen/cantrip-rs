@@ -1,0 +1,87 @@
+# Concerted Effort ({2}{W}{W}): creatures you control gain protection until end of turn from whatever a creature you control has
+# protection from - from creature types too (CR 702.16a; its ruling: protection from something spreads that something).
+# Baneslayer Angel has protection from Demons and from Dragons, flying and first strike, so at Bot2's upkeep on turn 6 the
+# Grizzly Bears gains all of them. Bot2's Nova Hellkite, a Dragon, then enters: its trigger has no creature of Bot1's it can
+# target, so it deals nothing. It attacks and the Bears (flying now) blocks it: the Dragon's 4 damage to it is prevented, and
+# the Bears' first-strike 2 is dealt.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Baneslayer Angel
+Grizzly Bears
+Concerted Effort
+Mox Emerald
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Nova Hellkite
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Baneslayer Angel.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Concerted Effort.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Grizzly Bears.ProtectionFromSubtypes = Demon; Dragon
+? Bot1.Battlefield.Grizzly Bears.Keywords = FirstStrike; Flying
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Nova Hellkite.Cast
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.DeclareAttackers]
+? Bot1.Battlefield.Grizzly Bears.Damage = 0
+? Bot1.Battlefield.Baneslayer Angel.Damage = 0
+Bot2.Attack(Nova Hellkite > Bot1)
+[T6 Bot2.DeclareBlockers]
+Bot1.Block(Grizzly Bears > Nova Hellkite)
+[T6 Bot2.Main2]
+? Bot1.Battlefield.Grizzly Bears.Damage = 0
+? Bot2.Battlefield.Nova Hellkite.Damage = 2
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Grizzly Bears.Damage = 0
+Bot2.Battlefield.Nova Hellkite.Damage = 2

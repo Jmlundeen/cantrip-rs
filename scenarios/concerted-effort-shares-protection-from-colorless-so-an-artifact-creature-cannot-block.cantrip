@@ -1,0 +1,58 @@
+# Concerted Effort ({2}{W}{W}): creatures you control gain protection until end of turn from whatever a creature you control
+# has protection from - from colorless too (CR 702.16a). At Bot1's upkeep on turn 5, with Concerted Effort's trigger on the
+# stack, Giver of Runes gives the Llanowar Elves protection from colorless; the trigger resolves after it, so the Savannah
+# Lions gains it too. Bot2's Ornithopter (colorless) can't block the attacking Lions (the refusal). On turn 7, the
+# protection over, it can (the control).
+
+[Bot1 Deck]
+Mox Pearl
+Giver of Runes
+Black Lotus
+Concerted Effort
+Mox Emerald
+Llanowar Elves
+Savannah Lions
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Giver of Runes.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Concerted Effort.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Giver of Runes.Activate(Llanowar Elves)
+Bot1.Accept
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Savannah Lions > Bot2)
+! Bot2.Block(Bot2.Battlefield.Ornithopter > Savannah Lions)
+[T5 Bot1.Main2]
+? Bot2.Life = 18
+[T7 Bot1.Main1]
+Bot1.Attack(Savannah Lions > Bot2)
+Bot2.Block(Bot2.Battlefield.Ornithopter > Savannah Lions)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Savannah Lions.Damage = 0
+Bot2.Battlefield.Count = 0

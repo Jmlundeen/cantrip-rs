@@ -1,0 +1,74 @@
+# Concerted Effort ({2}{W}{W}): creatures you control gain protection until end of turn from whatever a creature you control has
+# protection from. Hexdrinker at level 8 or more has protection from everything (CR 702.16e), so at Bot2's upkeep (turn 6) the
+# Savannah Lions gains it too and Bot2's Shock can't target it. Level 4 on turn 3 (protection from instants only) and level 9
+# on turn 5, from the five Moxen.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Jet
+Hexdrinker
+Concerted Effort
+Savannah Lions
+Mox Sapphire
+Mox Ruby
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mountain
+Shock
+Mountain x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Concerted Effort.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hexdrinker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+! Bot2.Hand.Shock.Cast(Bot1.Battlefield.Savannah Lions)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Hexdrinker.Counters.Level = 9
+Bot1.Battlefield.Savannah Lions.Damage = 0
