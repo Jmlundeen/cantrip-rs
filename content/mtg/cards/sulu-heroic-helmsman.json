@@ -1,0 +1,8 @@
+{
+  "name": "Sulu, Heroic Helmsman",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Human Pilot",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Sulu stations Spacecraft and crews Vehicles as though his power were tripled."
+}
