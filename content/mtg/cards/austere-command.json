@@ -1,0 +1,6 @@
+{
+  "name": "Austere Command",
+  "manaCost": "{4}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "Choose two —\n• Destroy all artifacts.\n• Destroy all enchantments.\n• Destroy all creatures with mana value 3 or less.\n• Destroy all creatures with mana value 4 or greater."
+}
