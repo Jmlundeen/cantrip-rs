@@ -1,0 +1,55 @@
+# Wingblade Disciple ({2}{U}, 2/2 flying): "Flurry - Whenever you cast your second spell each turn, create a 1/1 white Bird creature
+# token with flying." On turn 3 Bot1 casts Mox Jet (the first spell: nothing yet), Black Lotus (the second: one Bird) and Mox
+# Emerald (a third spell, the negative control: still one Bird).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Wingblade Disciple
+Mox Jet
+Black Lotus
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wingblade Disciple.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 5
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 7
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Bird Token.Power = 1
+Bot1.Battlefield.Bird Token.Toughness = 1
+Bot1.Battlefield.Bird Token.Colors = White
+Bot1.Battlefield.Bird Token.Keywords = Flying

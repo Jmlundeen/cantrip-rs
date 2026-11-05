@@ -1,0 +1,11 @@
+{
+  "name": "Wingblade Disciple",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Human Monk",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying\nFlurry — Whenever you cast your second spell each turn, create a 1/1 white Bird creature token with flying.",
+  "keywords": [
+    "Flying"
+  ]
+}
