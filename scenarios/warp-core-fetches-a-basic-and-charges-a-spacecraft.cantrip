@@ -1,0 +1,35 @@
+# Warp Core may search up a basic land into hand as it enters, then puts exactly two charge counters on a target
+# Spacecraft, tapping itself (CR 701.23, 122.6).
+
+[Bot1 Deck]
+Warp Core
+Class-F Shuttlecraft
+Island x18
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Warp Core.Cast
+Bot1.Accept
+Bot1.Search(Island)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Class-F Shuttlecraft.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#4.Activate
+Bot1.Battlefield.Warp Core.Activate(Bot1.Battlefield.Class-F Shuttlecraft)
+
+[Expect]
+Bot1.Battlefield.Class-F Shuttlecraft.Counters.Charge = 2
+Bot1.Battlefield.Warp Core.Tapped = true
+Bot1.Hand.Count = 5
