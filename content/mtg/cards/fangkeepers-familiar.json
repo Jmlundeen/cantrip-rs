@@ -1,0 +1,11 @@
+{
+  "name": "Fangkeeper's Familiar",
+  "manaCost": "{1}{B}{G}{U}",
+  "type": "Creature — Snake",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flash\nWhen this creature enters, choose one —\n• You gain 3 life and surveil 3. (Look at the top three cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.)\n• Destroy target enchantment.\n• Counter target creature spell.",
+  "keywords": [
+    "Flash"
+  ]
+}

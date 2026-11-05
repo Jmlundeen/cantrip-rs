@@ -1,0 +1,39 @@
+# Fangkeeper's Familiar, second mode: "Destroy target enchantment." Bot2 casts Intruder Alarm on turn 2; Bot1 casts the
+# Familiar on turn 3, chooses the second mode and destroys it (CR 701.8a).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Fangkeeper's Familiar
+Island x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Intruder Alarm
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Intruder Alarm.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fangkeeper's Familiar.Cast
+Bot1.Modes(2)
+
+[Expect]
+Bot2.Graveyard = Intruder Alarm; Black Lotus
+Bot2.Battlefield = Mox Sapphire
+Bot1.Battlefield.Count = 5

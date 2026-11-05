@@ -1,0 +1,34 @@
+# Fangkeeper's Familiar, first mode: "You gain 3 life and surveil 3." Bot1 casts it from three Moxen and an Island, chooses the
+# first mode, gains 3 (23) and surveils 3: Lightning Bolt, Counterspell and an Island are on top; Counterspell goes to the
+# graveyard and the Bolt and the Island stay on top in that order (CR 701.25a).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Fangkeeper's Familiar
+Island x3
+Lightning Bolt
+Counterspell
+Island x2
+Forest x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fangkeeper's Familiar.Cast
+Bot1.Arrange(Lightning Bolt; Island | Counterspell)
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Counterspell
+Bot1.Library.Count = 12
