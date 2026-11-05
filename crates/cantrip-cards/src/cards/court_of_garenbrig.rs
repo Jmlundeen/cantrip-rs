@@ -22,7 +22,7 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, cantrip_mechanics::effects::become_monarch, "When this enchantment enters, you become the monarch."),
         triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, distribute_then_double, "At the beginning of your upkeep, distribute two +1/+1 counters among up to two target creatures. Then if you're the monarch, double the number of +1/+1 counters on each creature you control.")
             .targets(&[targets::CREATURE.between(0, 2)])
-            .divide(Divide { total: 2, of_x: None }),
+            .divide(Divide { total: 2, reads: None }),
     ],
     ..oracle::COURT_OF_GARENBRIG
 };

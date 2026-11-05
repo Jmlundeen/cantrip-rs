@@ -104,6 +104,8 @@ mod special_action_cost_tests;
 #[cfg(test)]
 mod slot_targets_cost_tests;
 #[cfg(test)]
+mod divided_activation_tests;
+#[cfg(test)]
 mod waterbend_x_tests;
 #[cfg(test)]
 mod x_minimum_tests;

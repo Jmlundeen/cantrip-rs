@@ -210,7 +210,7 @@ static SPLIT_AND_PAIR: CardDef = CardDef {
     name: "Slot Test Split And Pair", has_cost: true, cost: ManaCost { generic: 1, ..ManaCost::ZERO },
     types: TypeSet::of(&[CardType::Instant]),
     spell: spell(&[target(permanent).between(1, 2), target(permanent).between(2, 2)], gain_three),
-    divide: Some(Divide { total: 2, of_x: None }),
+    divide: Some(Divide { total: 2, reads: None }),
     ..CardDef::BLANK
 };
 
@@ -224,7 +224,7 @@ static SPLIT_AND_PAIR_TRIGGER: CardDef = CardDef {
     toughness: Some(1),
     abilities: &[triggered(cantrip_mechanics::triggers::THIS_ENTERS, gain_three, "When this creature enters, divided damage and a pair.")
         .targets(&[target(permanent).between(1, 2), target(permanent_after_the_divided_slot).between(2, 2)])
-        .divide(Divide { total: 2, of_x: None })],
+        .divide(Divide { total: 2, reads: None })],
     ..CardDef::BLANK
 };
 
@@ -238,7 +238,7 @@ static SPLIT: CardDef = CardDef {
     has_cost: true,
     types: TypeSet::of(&[CardType::Sorcery]),
     spell: spell(&ONE_OR_TWO, gain_three),
-    divide: Some(Divide { total: 2, of_x: None }),
+    divide: Some(Divide { total: 2, reads: None }),
     own_cost_changes: &[less_if_yours],
     ..CardDef::BLANK
 };
@@ -411,7 +411,7 @@ static COVENANT: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Instant]),
     spell: spell(&X_DIVIDED, gain_three),
     additional_cost: Some(Cost { pay_x_life: true, ..Cost::NONE }),
-    divide: Some(Divide { total: TargetSpec::COUNTED, of_x: None }),
+    divide: Some(Divide { total: TargetSpec::COUNTED, reads: None }),
     own_cost_changes: &[less_if_yours],
     ..CardDef::BLANK
 };

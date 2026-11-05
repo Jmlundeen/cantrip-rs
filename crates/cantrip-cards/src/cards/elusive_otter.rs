@@ -19,7 +19,7 @@ fn grove_s_bounty(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// The Adventure (CR 715): Grove's Bounty.
 pub static GROVES_BOUNTY: CardDef = CardDef {
     spell: spell(&[targets::CREATURE_YOU_CONTROL.between(0, TargetSpec::COUNTED)], grove_s_bounty),
-    divide: Some(Divide { total: TargetSpec::COUNTED, of_x: None }),
+    divide: Some(Divide { total: TargetSpec::COUNTED, reads: None }),
     ..oracle::GROVES_BOUNTY
 };
 

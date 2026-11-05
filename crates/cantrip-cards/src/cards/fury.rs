@@ -18,7 +18,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, divided_damage, "When this creature enters, it deals 4 damage divided as you choose among any number of target creatures and/or planeswalkers.")
             .targets(&[targets::CREATURE_OR_PLANESWALKER.between(0, TargetSpec::COUNTED)])
-            .divide(Divide { total: 4, of_x: None }),
+            .divide(Divide { total: 4, reads: None }),
         evoke::sacrifice_trigger("When Fury enters, if its evoke cost was paid, its controller sacrifices it."),
     ],
     // Evoke: exile a red card from your hand rather than pay this spell's mana cost (CR 118.9).

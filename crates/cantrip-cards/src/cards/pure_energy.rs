@@ -12,7 +12,7 @@ fn distribute(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::CREATURE.between(1, 2)], distribute),
-    divide: Some(Divide { total: 2, of_x: None }),
+    divide: Some(Divide { total: 2, reads: None }),
     ways: &[beam_me_up::way(mana("{2}{W}"), "Beam me up {2}{W}")],
     ..oracle::PURE_ENERGY
 };

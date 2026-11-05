@@ -56,7 +56,7 @@ static BLAST: CardDef = CardDef {
     name: "Probe Blast",
     types: TypeSet::of(&[CardType::Sorcery]),
     spell: spell(&[up_to(2, creature).between(1, 2)], blast),
-    divide: Some(Divide { total: 300, of_x: None }),
+    divide: Some(Divide { total: 300, reads: None }),
     ..CardDef::BLANK
 };
 

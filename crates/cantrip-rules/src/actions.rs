@@ -2170,9 +2170,10 @@ pub fn targets_with_action(specs: &[TargetSpec]) -> bool {
 }
 
 /// Whether an activated ability's targets are announced with the action: one slot of one target, unless they wait for X
-/// (`ActivatedDef::late_targets`, CR 601.2b-c by way of 602.2b).
+/// (`ActivatedDef::late_targets`, CR 601.2b-c by way of 602.2b) or are announced with their shares of a total
+/// (`ActivatedDef::divide`, CR 601.2d).
 fn targets_with_activation(def: &ActivatedDef) -> bool {
-    !def.late_targets && targets_with_action(def.targets)
+    !def.late_targets && def.divide.is_none() && targets_with_action(def.targets)
 }
 
 /// Whether every required slot has at least its minimum number of legal targets (CR 601.2c): fewer is no legal announcement, so the
@@ -2771,13 +2772,7 @@ fn some_cast(
     let splice_specs = splices.iter().flat_map(|&c| cx.card(cx.s().obj(c).card).spell.map_or(&[][..], |s| s.targets).iter());
     let mut bound = count_bound(cx, asker, own.iter().chain(mode_specs_all).chain(splice_specs));
     // A total divided that X sets (CR 601.2d): as many targets as there are candidates need a total that large.
-    if let Some(divide) = def.divide.filter(|d| d.of_x.is_some() || d.total == TargetSpec::COUNTED)
-        && let Some(spec) = own.first()
-    {
-        let there = cantrip_state::count_u32(target_candidates(cx, asker, spec).len());
-        let total = |x: u16| divide.of_x.map_or(u32::from(x), |f| u32::from(f(x)));
-        bound = bound.max((0..=1000u16).find(|&x| total(x) >= there).unwrap_or(1000));
-    }
+    bound = bound.max(divided_x_bound(cx, asker, def.divide, own));
     let kicks = match def.kicker {
         Some(k) if k.multi || k.cost.x > 0 => 0..=bound.max(1),
         Some(_) => 0..=1,
@@ -2842,15 +2837,10 @@ fn some_cast(
                         let mine: Vec<TargetSpec> = match (prefix, def.modal, def.divide) {
                             (Some(_), _, _) => Vec::new(),
                             (None, Some(modal), _) => mode_specs(modal, mask.unwrap_or(0)),
-                            (None, None, Some(divide)) => {
-                                let total = match divide.of_x {
-                                    Some(of_x) => u32::from(of_x(x)),
-                                    None if divide.total == TargetSpec::COUNTED => u32::from(x),
-                                    None => divide.total,
-                                };
-                                // Each target is given at least one of the total (CR 601.2d); none, for a total of nothing.
-                                own.iter().map(|s| TargetSpec { min: if total == 0 { 0 } else { s.min }, max: s.max.min(total), ..*s }).collect()
-                            }
+                            (None, None, Some(divide)) => match divided_slots(own, divide.total_for(cx, asker, x)) {
+                                Some(slots) => slots,
+                                None => continue,
+                            },
                             (None, None, None) => own.to_vec(),
                         };
                         let found = each_splice_order(&splices, &mut Vec::new(), &mut |order| {
@@ -2904,10 +2894,12 @@ fn some_activation(
     };
     let named = named_by_changes(cx, a, id);
     let mode_specs_all = def.modal.iter().flat_map(|m| m.modes.iter().flat_map(|mode| mode.targets.iter()));
-    let bound = count_bound(cx, asker, def.targets.iter().chain(mode_specs_all));
     let least = least_x(def.x_cant_be_zero);
     // X of the mana cost (CR 107.3a), or of a "−X" loyalty cost (CR 606.4), which costs no mana.
-    let xs = if cost.x > 0 || def.cost.loyalty == Some(LOYALTY_MINUS_X) { least..=bound.max(least) } else { 0..=0 };
+    let announces_x = cost.x > 0 || def.cost.loyalty == Some(LOYALTY_MINUS_X);
+    let bound = count_bound(cx, asker, def.targets.iter().chain(mode_specs_all));
+    let bound = if announces_x { bound.max(divided_x_bound(cx, asker, def.divide, def.targets)) } else { bound };
+    let xs = if announces_x { least..=bound.max(least) } else { 0..=0 };
     let masks: Vec<u32> = match def.modal {
         Some(modal) => mode_masks(cx, asker, modal, (modal.min, modal.max)),
         None => vec![0],
@@ -2920,9 +2912,13 @@ fn some_activation(
             owed.x = 0;
         }
         for &mask in &masks {
-            let specs = match def.modal {
-                Some(modal) => mode_specs(modal, mask),
-                None => def.targets.to_vec(),
+            let specs = match (def.modal, def.divide) {
+                (Some(modal), _) => mode_specs(modal, mask),
+                (None, Some(divide)) => match divided_slots(def.targets, divide.total_for(cx, asker, x)) {
+                    Some(slots) => slots,
+                    None => continue,
+                },
+                (None, None) => def.targets.to_vec(),
             };
             let found = some_announcement(cx, cx, asker, &[], &[specs], (u32::from(x), 0, false), &mut budget, &named, &key, &mut |t| covered(owed, t));
             if found != Found::No || budget == 0 {
@@ -5634,7 +5630,10 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             let possible = match def.modal {
                 Some(modal) => modes_possible(cx, &asker, modal),
                 None if def.late_targets => slots_satisfiable(cx, &asker, def.targets),
-                None => with_targets(cx, &asker, def.targets, &mut option),
+                None => match def.divide {
+                    Some(divide) => divided_activation_possible(cx, &asker, def, divide),
+                    None => with_targets(cx, &asker, def.targets, &mut option),
+                },
             };
             if !possible {
                 continue;
@@ -8347,31 +8346,9 @@ fn cast(
         (targets, of) = choose_slots(cx, player, spell, true, &mode_specs(modal, mask), counted, item.kicked, announced_x(&item), None)?;
         set_item_targets(cx, &targets, &of);
     } else if let Some(divide) = def.divide
-        && let Some(spec) = specs.first()
+        && !specs.is_empty()
     {
-        // CR 601.2d: the targets and their shares of a total, in one question; the total may be X.
-        let total = match divide.of_x {
-            Some(of_x) => u32::from(of_x(item.x)),
-            None if divide.total == TargetSpec::COUNTED => u32::from(item.x),
-            None => divide.total,
-        };
-        match ask_divided(cx, player, spell, true, spec, total, announced_x(&item), true, None)? {
-            Divided::Chosen(chosen, shares) => {
-                targets = chosen;
-                set_item_targets(cx, &targets, &[]);
-                set_item_shares(cx, &shares);
-            }
-            Divided::Skipped => {}
-            // A total that needs a target and has none to give it is not a legal announcement.
-            Divided::Impossible => return Err(Stop::Cancel),
-        }
-        // A spell that divides in its first slot goes on to announce the slots after it.
-        // Later slots retain their own numbers and may reuse a target of the divided slot (CR 115.3).
-        of.resize(targets.len(), 0);
-        let (later, later_of) = choose_slots_after(cx, player, spell, true, &specs[1..], counted, item.kicked, announced_x(&item), None, &targets, 1)?;
-        targets.extend(later);
-        of.extend(later_of);
-        set_item_targets(cx, &targets, &of);
+        (targets, of) = announce_divided(cx, player, spell, true, divide, specs, &item, counted, None)?;
     } else if (resolving || !targets_with_cast(cx.cards(), def)) && !specs.is_empty() {
         (targets, of) = choose_slots(cx, player, spell, true, specs, counted, item.kicked, announced_x(&item), None)?;
         set_item_targets(cx, &targets, &of);
@@ -9332,13 +9309,72 @@ pub(crate) enum Divided {
     Impossible,
 }
 
+/// The targets of a spell or activated ability being announced (the top of the stack) whose first slot divides a total
+/// (CR 601.2c-d, 602.2b): the total read as the division is announced, the slot's targets and their shares in one question,
+/// then the slots after it, which keep their own numbers and may reuse a target of the divided slot (CR 115.3). Set on the
+/// item, and returned with the slot each target is of.
+#[allow(clippy::too_many_arguments)]
+fn announce_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, divide: Divide, specs: &[TargetSpec], item: &StackItem, counted: u32, by: Option<Linked>) -> R<(Vec<Target>, Vec<u8>)> {
+    let x = announced_x(item);
+    let total = divide.total_for(&*cx, &Asker { source, controller: player, by, spell }, item.x);
+    let mut targets = Vec::new();
+    match ask_divided(cx, player, source, spell, &specs[0], total, x, true, by)? {
+        Divided::Chosen(chosen, shares) => {
+            targets = chosen;
+            set_item_targets(cx, &targets, &[]);
+            set_item_shares(cx, &shares);
+        }
+        Divided::Skipped => {}
+        // A total that needs a target and has none to give it, or none to give one, is not a legal announcement.
+        Divided::Impossible => return Err(Stop::Cancel),
+    }
+    let mut of = vec![0; targets.len()];
+    let (later, later_of) = choose_slots_after(cx, player, source, spell, &specs[1..], counted, item.kicked, x, by, &targets, 1)?;
+    targets.extend(later);
+    of.extend(later_of);
+    set_item_targets(cx, &targets, &of);
+    Ok((targets, of))
+}
+
+/// A divided spell's or ability's slots as a total of `total` lets them be announced: the first slot, the divided one, has
+/// no more targets than the total can give at least one each (CR 601.2d). A total of nothing has no target to give
+/// anything, so a slot that requires one can't be announced with it: none.
+fn divided_slots(specs: &[TargetSpec], total: u32) -> Option<Vec<TargetSpec>> {
+    let mut slots = specs.to_vec();
+    if let Some(first) = slots.first_mut() {
+        if total == 0 && first.required() {
+            return None;
+        }
+        first.max = first.max.min(total);
+    }
+    Some(slots)
+}
+
+/// How far the X of a divided total needs to be looked at for its legal announcements: until the total is large enough for
+/// every candidate of the divided slot to be given one (CR 601.2d). 0 for a total X doesn't set.
+fn divided_x_bound(cx: &Cx, asker: &Asker, divide: Option<Divide>, specs: &[TargetSpec]) -> u16 {
+    let Some(divide) = divide.filter(|d| d.reads.is_some() || d.total == TargetSpec::COUNTED) else { return 0 };
+    let Some(spec) = specs.first() else { return 0 };
+    let there = cantrip_state::count_u32(target_candidates(cx, asker, spec).len());
+    (0..=1000u16).find(|&x| divide.total_for(cx, asker, x) >= there).unwrap_or(1000)
+}
+
+/// Whether activating an ability that divides a total could be announced (CR 601.2c-d by way of 602.2b): its required slots
+/// have targets, and, where the total is read now and not from an X yet to be announced, it has something to give a target
+/// its slot requires. An X that comes to too little is taken back as it is announced.
+fn divided_activation_possible(cx: &Cx, asker: &Asker, def: &ActivatedDef, divide: Divide) -> bool {
+    let announces_x = def.cost.mana.x > 0 || def.cost.loyalty == Some(LOYALTY_MINUS_X) || def.cost.variable.is_some() || !def.cost_choice.is_empty();
+    slots_satisfiable(cx, asker, def.targets)
+        && (announces_x || !def.targets.first().is_some_and(TargetSpec::required) || divide.total_for(cx, asker, 0) > 0)
+}
+
 /// Asks for the targets of a slot that divides a total among them, and each target's share (CR 601.2d), in one
-/// question, as the C# engine does: a total of nothing is not asked; with no candidate an optional slot takes no
-/// target. `may_cancel` is for a spell or ability still being announced; `x` is the X announced for it
-/// (`resolve::announced_x`).
+/// question, as the C# engine does: a total of nothing is not asked, and is no legal announcement of a slot that requires
+/// a target, each of which must receive at least one; with no candidate an optional slot takes no target. `may_cancel` is
+/// for a spell or ability still being announced; `x` is the X announced for it (`resolve::announced_x`).
 pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, spec: &TargetSpec, total: u32, x: Option<u16>, may_cancel: bool, by: Option<Linked>) -> R<Divided> {
     if total == 0 {
-        return Ok(Divided::Skipped);
+        return Ok(if spec.required() { Divided::Impossible } else { Divided::Skipped });
     }
     let asker = Asker { source, controller: player, by, spell };
     let candidates = target_candidates_given(cx, &asker, spec, &[], Target::None, None, x);
@@ -10126,6 +10162,11 @@ fn activate(
         let of;
         (targets, of) = choose_slots(cx, player, source, false, &mode_specs(modal, mask), u32::from(item.x), 0, announced_x(&item), by)?;
         set_item_targets(cx, &targets, &of);
+    } else if let Some(divide) = def.divide
+        && !def.targets.is_empty()
+    {
+        // CR 601.2c-d by way of 602.2b: the targets and their shares of the total, the one read now, before the costs.
+        (targets, _) = announce_divided(cx, player, source, false, divide, def.targets, &item, u32::from(item.x), by)?;
     } else if !targets_with_activation(def) && !def.targets.is_empty() {
         // CR 601.2c by way of 602.2b: slots that are not announced with the action are chosen now, after X (a slot
         // counted by X, as Candelabra of Tawnos's "untap X target lands", reads the X just announced).

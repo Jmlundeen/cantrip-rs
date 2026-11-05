@@ -29,7 +29,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, distribute, "When this artifact enters, distribute three +1/+1 counters among one, two, or three target creatures you control.")
             .targets(&[targets::CREATURE_YOU_CONTROL.between(1, 3)])
-            .divide(Divide { total: 3, of_x: None }),
+            .divide(Divide { total: 3, reads: None }),
         craft::ability(mana("{5}{G}{G}"), &craft::CREATURE, "Craft with creature {5}{G}{G}"),
     ],
     back: Some(&BACK),

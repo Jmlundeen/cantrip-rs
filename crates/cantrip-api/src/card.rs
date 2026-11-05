@@ -1561,6 +1561,9 @@ pub struct ActivatedDef {
     /// "This ability can't be copied" (CR 101.2, 707.10): no effect copies it while it is on the stack, and an effect that
     /// would does nothing (Gogo, Master of Mimicry).
     pub cant_be_copied: bool,
+    /// Its first target slot divides a total among its targets (CR 601.2d by way of 602.2b): the targets and each one's share
+    /// are announced together, after X and before the total cost (CR 601.2f), never with the action.
+    pub divide: Option<Divide>,
 }
 
 /// An effect that does nothing: a mode that only names its targets for a `ModalDef::shared` instruction.
@@ -1624,6 +1627,7 @@ impl ActivatedDef {
         ninjutsu: false,
         x_cant_be_zero: false,
         cant_be_copied: false,
+        divide: None,
         special_action: false,
         modal: None,
         cost_choice: &[],
@@ -1970,9 +1974,23 @@ pub struct ExtraCost {
 pub struct Divide {
     /// The total to divide, or `TargetSpec::COUNTED` for the X announced.
     pub total: u32,
-    /// The total as a function of the X announced, where it is not `total` itself: "if X is 6 or more, twice X damage
-    /// divided instead" (Shatterskull Smashing).
-    pub of_x: Option<fn(u16) -> u16>,
+    /// The total where it is neither of those, worked out as the division is announced (CR 601.2d), from the X announced
+    /// ("if X is 6 or more, twice X damage divided instead": Shatterskull Smashing) or from the game ("damage equal to its
+    /// power divided as you choose": Living Inferno; "where X is the greatest power among creatures you control as you
+    /// activate this ability": Lukka, Bound to Ruin). It is locked in there, and what is divided stays as it was announced
+    /// whatever later changes what it was read from. A negative value is a total of nothing (CR 107.1b, 120.8).
+    pub reads: Option<fn(&dyn crate::Query, &Asker, u16) -> u32>,
+}
+
+impl Divide {
+    /// The total to divide with `x` announced, for what `asker` names.
+    pub fn total_for(&self, q: &dyn crate::Query, asker: &Asker, x: u16) -> u32 {
+        match self.reads {
+            Some(reads) => reads(q, asker, x),
+            None if self.total == TargetSpec::COUNTED => u32::from(x),
+            None => self.total,
+        }
+    }
 }
 
 /// An optional additional cost that is not mana (CR 601.2b): teamwork's "tap any number of creatures you control with

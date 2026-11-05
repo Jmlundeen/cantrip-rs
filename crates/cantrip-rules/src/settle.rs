@@ -741,11 +741,7 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
     {
         // CR 601.2d, 603.3d: a divided slot's targets and shares are chosen as the ability goes on the stack.
         let x = trigger.count.unwrap_or(cx.s().obj(trigger.source).x);
-        let total = match divide.of_x {
-            Some(of_x) => u32::from(of_x(x)),
-            None if divide.total == TargetSpec::COUNTED => u32::from(x),
-            None => divide.total,
-        };
+        let total = divide.total_for(&*cx, &Asker { source: trigger.source, controller: trigger.controller, by, spell: false }, x);
         if left_the_game(cx, trigger.controller) {
             return Ok(());
         }

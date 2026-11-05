@@ -31,7 +31,7 @@ pub static CARD: CardDef = CardDef {
         "Delirium \u{2014} Whenever this creature enters or attacks, if there are four or more card types among cards in your graveyard, distribute two +1/+1 counters among one or two target creatures. Then if there are six or more card types among cards in your graveyard, double the number of +1/+1 counters on those creatures.",
     )
     .targets(&[targets::CREATURE.between(1, 2)])
-    .divide(Divide { total: 2, of_x: None })
+    .divide(Divide { total: 2, reads: None })
     .condition(has_delirium)],
     ..oracle::OMNIVOROUS_FLYTRAP
 };

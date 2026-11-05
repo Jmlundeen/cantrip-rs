@@ -33,7 +33,7 @@ pub static CARD: CardDef = CardDef {
         )
         .from(ZoneKind::Hand),
     ],
-    divide: Some(Divide { total: 4, of_x: None }),
+    divide: Some(Divide { total: 4, reads: None }),
     ..oracle::MAGMA_OPUS
 };
 

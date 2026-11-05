@@ -775,7 +775,11 @@ impl AbilityDef {
 
     /// Its first target slot divides a total among its targets (CR 601.2d).
     pub const fn divide(self, divide: Divide) -> AbilityDef {
-        AbilityDef::Triggered(TriggeredDef { divide: Some(divide), ..triggered_def(self, "only a triggered ability divides this way") })
+        match self {
+            AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { divide: Some(divide), ..d }),
+            AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { divide: Some(divide), ..t }),
+            AbilityDef::Static(_) | AbilityDef::PlayRule(_) => panic!("a static ability has no targets to divide among"),
+        }
     }
 
     /// "That player chooses target ..." (CR 603.3d).

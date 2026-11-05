@@ -1295,11 +1295,19 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         }),
         RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional } => {
             let source_handle = source_handle(game, handles, *source);
+            // What divides, in its own words, so the division reads as damage or as counters: the spell being cast or the
+            // ability being activated, each on the stack as it is announced (CR 601.2a, 602.2a). A triggered ability is put
+            // on the stack only once its targets are chosen (CR 603.3d): it has none.
+            let text = match game.state.stack.last() {
+                Some(item) if item.object == *source && item.kind == StackKind::Spell => game.cards.get(game.chars(*source).card).text,
+                Some(item) if item.object == *source && item.kind == StackKind::Activated => game.cards.ability(item.ability).text(),
+                _ => "",
+            };
             PromptPayload::ChooseDividedTargetsPromptMessage(ChooseDividedTargetsPrompt {
                 player,
                 ability: source_handle,
                 source: source_handle,
-                text: String::new(),
+                text: text.to_string(),
                 candidates: candidates.iter().filter_map(|t| target_message(handles, *t)).collect(),
                 total: wire(*total),
                 max_targets: wire(*max_targets),

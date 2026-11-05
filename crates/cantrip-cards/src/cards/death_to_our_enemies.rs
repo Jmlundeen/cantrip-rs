@@ -28,7 +28,7 @@ pub static CARD: CardDef = CardDef {
     ],
     delayed: &[delayed_trigger(seven_damage, "When you do, it deals 7 damage divided as you choose among one or two targets.")
         .targets(&[targets::ANY.between(1, 2)])
-        .divide(Divide { total: 7, of_x: None })],
+        .divide(Divide { total: 7, reads: None })],
     ..oracle::DEATH_TO_OUR_ENEMIES
 };
 

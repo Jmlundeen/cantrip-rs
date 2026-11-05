@@ -16,6 +16,6 @@ pub static CARD: CardDef = CardDef {
         &[targets::ANY.between(0, TargetSpec::ANY_NUMBER)],
         pyrotechnics_deals_4_damage_divided,
     ),
-    divide: Some(Divide { total: 4, of_x: None }),
+    divide: Some(Divide { total: 4, reads: None }),
     ..oracle::PYROTECHNICS
 };

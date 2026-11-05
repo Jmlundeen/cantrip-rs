@@ -13,6 +13,6 @@ fn divided_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, divided_damage, "When Gandalf enters, he deals 3 damage divided as you choose among one, two, or three targets.")
         .targets(&[targets::ANY.between(1, 3)])
-        .divide(Divide { total: 3, of_x: None })],
+        .divide(Divide { total: 3, reads: None })],
     ..oracle::GANDALF_SPARK_STARTER
 };
