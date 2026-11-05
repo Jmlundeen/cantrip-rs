@@ -1,0 +1,72 @@
+# Combadge's granted ability needs a Communicator attached to another creature. With the copy unattached, Llanowar Elves
+# wearing the original attacks beside Grizzly Bears#1 wearing Basilisk Collar - an Equipment, but no Communicator - and
+# Ornithopter blocks the Elves. Once the copy is on Grizzly Bears#2 (which stays home), the Elves attack and can't be
+# blocked, while Grizzly Bears#1 beside them still can (CR 603.2, 613.1f, 509.1b, 301.5, 205.3g).
+
+[Bot1 Deck]
+Forest
+Mox Emerald x3
+Llanowar Elves
+Basilisk Collar
+Combadge
+Grizzly Bears x2
+Forest x11
+
+[Bot2 Deck]
+Ornithopter
+Forest x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basilisk Collar.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Combadge.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Combadge#1.Activate(Bot1.Battlefield.Llanowar Elves; Ability: Equip)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Basilisk Collar.Activate(Bot1.Battlefield.Grizzly Bears; Ability: Equip)
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Forest.Activate
+[Bot1.BeginCombat]
+Bot1.Attack(Llanowar Elves; Grizzly Bears)
+Bot2.Block(Ornithopter > Llanowar Elves)
+[Bot1.Main2]
+? Bot2.Life = 18
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Combadge#2.Activate(Bot1.Battlefield.Grizzly Bears#2; Ability: Equip)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+[Bot1.BeginCombat]
+Bot1.Attack(Llanowar Elves; Grizzly Bears#1)
+! Bot2.Block(Ornithopter > Llanowar Elves)
+Bot2.Block(Ornithopter > Grizzly Bears#1)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Grizzly Bears#2.Tapped = false
