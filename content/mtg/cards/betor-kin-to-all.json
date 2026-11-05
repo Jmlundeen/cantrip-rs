@@ -1,0 +1,11 @@
+{
+  "name": "Betor, Kin to All",
+  "manaCost": "{2}{W}{B}{G}",
+  "type": "Legendary Creature — Spirit Dragon",
+  "power": 5,
+  "toughness": 7,
+  "oracleText": "Flying\nAt the beginning of your end step, if creatures you control have total toughness 10 or greater, draw a card. Then if creatures you control have total toughness 20 or greater, untap each creature you control. Then if creatures you control have total toughness 40 or greater, each opponent loses half their life, rounded up.",
+  "keywords": [
+    "Flying"
+  ]
+}

@@ -1,0 +1,35 @@
+# Betor, Kin to All: "At the beginning of your end step, if creatures you control have total toughness 10 or greater, draw a
+# card. ..." is an intervening "if" (CR 603.4), and its ruling says that below 10 as the end step starts the ability doesn't
+# trigger at all. Betor alone has toughness 7: nothing goes on the stack at the end step and no card is drawn.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Betor, Kin to All
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Betor, Kin to All.Cast
+[T1 Bot1.End]
+? Stack.Count = 0
+? Bot1.Hand.Count = 1
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 1

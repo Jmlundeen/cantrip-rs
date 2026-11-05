@@ -1,0 +1,118 @@
+# Betor, Kin to All: "At the beginning of your end step, if creatures you control have total toughness 10 or greater, draw a card.
+# Then if 20 or greater, untap each creature you control. Then if 40 or greater, each opponent loses half their life, rounded up."
+# Each step is walked across its boundary: Betor alone (7) and with Ornithopter (9) draws nothing, a Llanowar Elves makes exactly
+# 10 and draws; 19 draws but does not untap (Betor attacked and stays tapped), exactly 20 untaps Betor; 39 loses no life and
+# exactly 40 makes the opponent, at 21 life, lose 11 (half rounded up) and keep 10. Each later end step halves again, 10, 5, 2, 1
+# (rounding up, so one life is lost at one) until the opponent has lost the game.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Betor, Kin to All
+Island
+Ornithopter
+Llanowar Elves
+Guardians of Meletis
+Ornithopter
+Llanowar Elves
+Llanowar Elves
+Living Wall
+Living Wall
+Guardians of Meletis
+Llanowar Elves
+Llanowar Elves
+Island x40
+
+[Bot2 Deck]
+Island x40
+
+[Life]
+Bot2: 31
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Betor, Kin to All.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T7 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guardians of Meletis.Cast
+[T9 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Attack(Betor, Kin to All > Bot2)
+[T10 Bot2.Upkeep]
+? Bot1.Battlefield.Betor, Kin to All.Tapped = true
+? Bot2.Life = 26
+[T11 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Attack(Betor, Kin to All > Bot2)
+[T12 Bot2.Upkeep]
+? Bot1.Battlefield.Betor, Kin to All.Tapped = false
+? Bot2.Life = 21
+[T13 Bot1.Main1]
+? Bot1.Hand.Count = 5
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Living Wall.Cast
+[T15 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Living Wall.Cast
+[T17 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guardians of Meletis.Cast
+[T19 Bot1.Main1]
+? Bot2.Life = 21
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T21 Bot1.Main1]
+? Bot2.Life = 21
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T22 Bot2.Upkeep]
+? Bot2.Life = 10
+[T24 Bot2.Upkeep]
+? Bot2.Life = 5
+[T26 Bot2.Upkeep]
+? Bot2.Life = 2
+[T28 Bot2.Upkeep]
+? Bot2.Life = 1
+[T29 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 0
+Bot2.Status = Lost
