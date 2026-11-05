@@ -1,0 +1,46 @@
+# Veteran Ice Climber mills cards equal to its power as the ability resolves (CR 608.2h). With its attack trigger on the stack Bot2
+# flashes in a Humbling Elder, whose enter trigger gives the Climber -2/-0 until end of turn: power -1, so nobody mills a card (a
+# negative number of cards is none, CR 107.1b).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Veteran Ice Climber
+Island x20
+
+[Bot2 Deck]
+Humbling Elder
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Veteran Ice Climber.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Veteran Ice Climber)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Humbling Elder.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Veteran Ice Climber.Power = -1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Veteran Ice Climber.Power = -1

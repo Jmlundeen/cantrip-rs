@@ -1,0 +1,41 @@
+# Veteran Ice Climber ({1}{U}, 1/3): vigilance, can't be blocked, and "Whenever this creature attacks, up to one target player mills
+# cards equal to this creature's power." Cast on turn 1; on turn 3 it attacks and Bot1 targets Bot2, who mills one card (its power).
+# Bot2's Ornithopter cannot block it (the refusal). It has vigilance, so it is not tapped by attacking.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Veteran Ice Climber
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Veteran Ice Climber.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Veteran Ice Climber)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+! Bot2.Block(Ornithopter > Veteran Ice Climber)
+
+[Expect]
+Bot2.Graveyard.Count = 1
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Veteran Ice Climber.Tapped = false

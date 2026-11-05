@@ -1,0 +1,44 @@
+# Veteran Ice Climber's target is "up to one target player": on turn 3 Bot1 chooses none (Target()) and nobody mills; on turn 5 Bot1
+# targets itself and mills one card (its power), which is its own graveyard's only card.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Veteran Ice Climber
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Veteran Ice Climber.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Veteran Ice Climber)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 0
+? Bot2.Graveyard.Count = 0
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Attack(Veteran Ice Climber)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 1
+Bot2.Graveyard.Count = 0
