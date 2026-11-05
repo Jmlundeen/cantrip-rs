@@ -1,0 +1,36 @@
+# Dr. Pulaski, Cynical Clinician ({1}{W}): "Seek out — Whenever you draw your second card each turn, you gain 4 life." On
+# turn 3 Bot1 draws for the turn and casts Ancestral Recall: only its first draw is the second card of the turn, so the
+# ability triggers once and Bot1 gains 4 life, not 12.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Dr. Pulaski, Cynical Clinician
+Ancestral Recall
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dr. Pulaski, Cynical Clinician.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield.Dr. Pulaski, Cynical Clinician.Power = 2
