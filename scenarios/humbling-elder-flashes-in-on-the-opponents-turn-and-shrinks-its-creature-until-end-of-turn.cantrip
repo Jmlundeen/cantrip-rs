@@ -1,0 +1,40 @@
+# Humbling Elder: "Flash. When this creature enters, target creature an opponent controls gets -2/-0 until end of turn." On turn 2 Bot2
+# casts Llanowar Elves; Bot1 flashes the Elder in on Bot2's turn and the trigger makes Bot2's 1/1 a -1/1 (CR 107.1b, 613.4c: the
+# power is not floored). The effect ends with the turn: on turn 4 the Elves are 1/1 again. Bot1's own creature is not a legal target.
+
+[Bot1 Deck]
+Mox Sapphire
+Humbling Elder
+Island x30
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Humbling Elder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Llanowar Elves.Power = -1
+? Bot2.Battlefield.Llanowar Elves.Toughness = 1
+? Bot1.Battlefield.Humbling Elder.Power = 1
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+
+[Expect]
+Stack.Count = 0

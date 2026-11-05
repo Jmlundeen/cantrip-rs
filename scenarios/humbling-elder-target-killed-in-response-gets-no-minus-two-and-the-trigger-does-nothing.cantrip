@@ -1,0 +1,49 @@
+# Humbling Elder: the enter trigger targets Bot2's Llanowar Elves and in response Bot2 Lightning Bolts it, so the target is illegal as
+# the trigger resolves and nothing happens (CR 608.2b); the Elder stays a 1/2 and the Elves are in the graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Humbling Elder
+Island x30
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Humbling Elder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves = (absent)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot1.Battlefield.Humbling Elder.Power = 1
