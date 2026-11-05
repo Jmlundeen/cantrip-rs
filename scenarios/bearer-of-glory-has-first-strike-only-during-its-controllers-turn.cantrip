@@ -1,0 +1,26 @@
+# Bearer of Glory: "During your turn, this creature has first strike." (CR 500.1, layer 6) It has it on Bot1's turn 3 and not on
+# Bot2's turn 4, and is a 2/1 either way.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Bearer of Glory
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bearer of Glory.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Bearer of Glory.Keywords = FirstStrike
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Bearer of Glory.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield.Bearer of Glory.Power = 2
+Bot1.Battlefield.Bearer of Glory.Toughness = 1
