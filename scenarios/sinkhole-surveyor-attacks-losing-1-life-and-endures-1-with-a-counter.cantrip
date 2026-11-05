@@ -1,0 +1,39 @@
+# Sinkhole Surveyor ({1}{B}, 1/3 flying): "Whenever this creature attacks, you lose 1 life and this creature endures 1."
+# (CR 119.3, 701.63a) Bot1 attacks on turn 3, loses 1 life (19) and takes the counter: a 2/4 that deals 2. Bot2's Memnite has no
+# flying or reach, so it cannot block (CR 702.9b).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Sinkhole Surveyor
+Swamp x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sinkhole Surveyor.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Attackers]
+Bot1.Attack(Sinkhole Surveyor > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Blockers]
+! Bot2.Block(Memnite > Sinkhole Surveyor)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 18
+Bot1.Battlefield.Sinkhole Surveyor.Power = 2
+Bot1.Battlefield.Sinkhole Surveyor.Toughness = 4
+Bot1.Battlefield.Sinkhole Surveyor.Counters.PlusOnePlusOne = 1

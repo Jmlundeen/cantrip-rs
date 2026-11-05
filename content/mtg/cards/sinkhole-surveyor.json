@@ -1,0 +1,11 @@
+{
+  "name": "Sinkhole Surveyor",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Bird Scout",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Flying\nWhenever this creature attacks, you lose 1 life and this creature endures 1. (Put a +1/+1 counter on it or create a 1/1 white Spirit creature token.)",
+  "keywords": [
+    "Flying"
+  ]
+}
