@@ -1,0 +1,43 @@
+# Beverly Crusher, Ship's Doctor ({2}{W}): "Seek out — Whenever you draw your second card each turn, put a +1/+1 counter
+# on each of up to three target creatures." On turn 5 Bot1 draws for the turn (the first card) and then casts Ancestral
+# Recall, whose first draw is the second of the turn: the ability triggers once, and its one counter goes on Beverly.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Beverly Crusher, Ship's Doctor
+Ancestral Recall
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Beverly Crusher, Ship's Doctor.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Beverly Crusher, Ship's Doctor)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Beverly Crusher, Ship's Doctor.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Beverly Crusher, Ship's Doctor.Power = 3
+Bot1.Battlefield.Beverly Crusher, Ship's Doctor.Toughness = 3

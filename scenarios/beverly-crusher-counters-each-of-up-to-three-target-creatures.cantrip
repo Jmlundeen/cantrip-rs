@@ -1,0 +1,53 @@
+# Beverly Crusher, Ship's Doctor ({2}{W}): "Seek out — Whenever you draw your second card each turn, put a +1/+1 counter on
+# each of up to three target creatures." On turn 5 Bot1 draws for the turn, then Ancestral Recall's first draw is the second
+# of the turn, so the ability triggers once; three different creatures are chosen and each gets exactly one counter, while
+# Beverly - not among the targets - gets none.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Memnite
+Savannah Lions
+Beverly Crusher, Ship's Doctor
+Plains
+Ancestral Recall
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Beverly Crusher, Ship's Doctor.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Ornithopter; Memnite; Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Savannah Lions.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Battlefield.Savannah Lions.Power = 3
+Bot1.Battlefield.Beverly Crusher, Ship's Doctor.Counters.PlusOnePlusOne = (absent)
