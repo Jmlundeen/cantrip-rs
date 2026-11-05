@@ -1700,7 +1700,7 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
     // ruling: "whether it's because the 'until end of turn' duration ended or ..."), and its trigger gives the active
     // player priority in this cleanup step and another one follows (CR 514.3a).
     for at in (0..cx.s().delayed.len()).rev() {
-        if matches!(cx.s().delayed[at].when, DelayedWhen::ThisTurn | DelayedWhen::NextThisTurn) {
+        if matches!(cx.s().delayed[at].when, DelayedWhen::ThisTurn | DelayedWhen::WatchingThisTurn | DelayedWhen::NextThisTurn) {
             cx.st().delayed_remove(at);
         }
     }

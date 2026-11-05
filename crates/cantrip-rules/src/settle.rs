@@ -1916,7 +1916,12 @@ pub fn step_began(cx: &mut Cx, step: Step) {
             DelayedWhen::EachStep { step: s, on_turn_of } => (s == step && on_turn_of.is_none_or(|p| p == active), false),
             DelayedWhen::ExtraTurnStep { step: s, turn } => (s == step && cx.s().turn.extra == turn, true),
             DelayedWhen::NextTurnStep { step: s, player, after } => (s == step && player == active && cx.s().turn.number > after, true),
-            DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::NextThisTurn | DelayedWhen::WhenEvent => {
+            DelayedWhen::ThisTurn
+            | DelayedWhen::WatchingThisTurn
+            | DelayedWhen::UntilEvent
+            | DelayedWhen::UntilNextTurnOf(_)
+            | DelayedWhen::NextThisTurn
+            | DelayedWhen::WhenEvent => {
                 (false, false)
             }
         };

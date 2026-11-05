@@ -2041,6 +2041,11 @@ pub enum DelayedWhen {
     /// "Whenever [event] this turn" (CR 603.7b): triggers each time the ability's own `listens`/`matches` accept an
     /// event, until the cleanup step ends the turn. The ability's `matches` is asked of `source`.
     ThisTurn,
+    /// "Whenever [that object] [event] this turn" (CR 603.7b): as `ThisTurn`, except that its `matches` is asked of the
+    /// object it was made for, its `subject` (`Delayed::watched`) — no ability of that object's, so nothing it loses or gains
+    /// changes it (CR 603.7c), and it goes on watching after that object has left the battlefield. The Inner Light's "Choose
+    /// target creature. Whenever it deals combat damage to a player this turn, you draw that many cards."
+    WatchingThisTurn,
     /// "Until [event]" (CR 610.3, 603.7): triggers once, the next time its `listens`/`matches` accept an event, whenever that is, and is
     /// then used up. The ability's `matches` is asked of `source`, which may be gone by then.
     UntilEvent,
@@ -2077,7 +2082,15 @@ pub enum DelayedWhen {
 impl DelayedWhen {
     /// Whether it triggers on events, as many times as they happen, rather than once at a step.
     pub fn is_event(self) -> bool {
-        matches!(self, DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::NextThisTurn | DelayedWhen::WhenEvent)
+        matches!(
+            self,
+            DelayedWhen::ThisTurn
+                | DelayedWhen::WatchingThisTurn
+                | DelayedWhen::UntilEvent
+                | DelayedWhen::UntilNextTurnOf(_)
+                | DelayedWhen::NextThisTurn
+                | DelayedWhen::WhenEvent
+        )
     }
 
     /// Whether the first event it triggers on uses it up (CR 603.7b): "until", "when you next" and "when [event]".
@@ -2087,11 +2100,12 @@ impl DelayedWhen {
 }
 
 impl Delayed {
-    /// The object whose events its ability's `matches` is asked about: the object a "when [event]" ability watches, its
-    /// `subject` (`DelayedWhen::WhenEvent`); for any other, its source.
+    /// The object whose events its ability's `matches` is asked about: the object a "when [event]" or "whenever [it] … this
+    /// turn" ability watches, its `subject` (`DelayedWhen::WhenEvent`, `DelayedWhen::WatchingThisTurn`); for any other, its
+    /// source.
     pub fn watched(&self) -> ObjectId {
         match (self.when, self.subject) {
-            (DelayedWhen::WhenEvent, Target::Object(id)) => id,
+            (DelayedWhen::WhenEvent | DelayedWhen::WatchingThisTurn, Target::Object(id)) => id,
             _ => self.source,
         }
     }

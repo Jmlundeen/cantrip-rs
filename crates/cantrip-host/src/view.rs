@@ -726,6 +726,7 @@ impl<'a> Projector<'a> {
                 && matches!(
                     d.when,
                     DelayedWhen::ThisTurn
+                        | DelayedWhen::WatchingThisTurn
                         | DelayedWhen::NextThisTurn
                         | DelayedWhen::UntilNextTurnOf(_)
                         | DelayedWhen::EachStep { .. }
