@@ -4,7 +4,6 @@
 use cantrip_api::select::part;
 use cantrip_api::*;
 
-use crate::choose;
 use crate::effects::may_discard_a_card;
 use crate::select::{up_to, Part, Selection};
 
@@ -32,10 +31,5 @@ pub fn learn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.draw(you, 1);
         return Ok(());
     }
-    let outside = g.outside_the_game(you);
-    if let Some(&card) = choose::select(g, you, item.object, Purpose::Reveal, outside, LESSON_CARD)?.first() {
-        g.reveal(you, &[card]);
-        g.bring_into_hand_revealed(&[card]);
-    }
-    Ok(())
+    crate::outside::may_reveal_card_into_hand(g, you, item.object, Purpose::Reveal, LESSON_CARD)
 }
