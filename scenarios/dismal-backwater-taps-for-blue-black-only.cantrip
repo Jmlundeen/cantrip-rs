@@ -1,0 +1,26 @@
+# "{T}: Add {U} or {B}." The color is chosen as the ability is activated, one each turn (blue, black); the other colors and
+# colorless are refused beside those positive controls.
+
+[Bot1 Deck]
+Dismal Backwater
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Dismal Backwater.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Dismal Backwater.Activate(Color: White)
+! Bot1.Battlefield.Dismal Backwater.Activate(Color: Red)
+! Bot1.Battlefield.Dismal Backwater.Activate(Color: Green)
+! Bot1.Battlefield.Dismal Backwater.Activate(Color: Colorless)
+Bot1.Battlefield.Dismal Backwater.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dismal Backwater.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Dismal Backwater.Tapped = true
