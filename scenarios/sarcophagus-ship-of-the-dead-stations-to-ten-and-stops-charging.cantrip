@@ -1,0 +1,61 @@
+# Sarcophagus, Ship of the Dead {2}{R}: "Station (Tap another creature you control: Put charge counters equal to its power
+# on this Spacecraft...) 10+ | Flying". Targ Wrangler is a 5/3 with +1/+0 from the Sarcophagus, so stationing with it twice,
+# a turn apart, puts twelve charge counters on: the Spacecraft is then a 4/4 artifact creature with flying, and a creature
+# dying afterwards adds no charge counter because the intervening "if this isn't a creature" is false (CR 603.4).
+
+[Bot1 Deck]
+Targ Wrangler
+Sarcophagus, Ship of the Dead
+Memnite
+Lightning Bolt
+Mox Ruby
+Mox Ruby
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Targ Wrangler.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Sarcophagus, Ship of the Dead.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Activate(Ability: Station)
+Bot1.Choose(Targ Wrangler)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sarcophagus, Ship of the Dead.Counters.Charge = 6
+[T7 Bot1.Main1]
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Activate(Ability: Station)
+Bot1.Choose(Targ Wrangler)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sarcophagus, Ship of the Dead.Power = 4
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Counters.Charge = 12
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Types = Artifact; Creature
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Power = 4
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Toughness = 4
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Keywords = Flying
+Bot1.Graveyard = Memnite; Lightning Bolt

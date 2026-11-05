@@ -1,0 +1,73 @@
+# Sarcophagus, Ship of the Dead {2}{R}: "Other creatures you control get +1/+0. Whenever a creature dies, if Sarcophagus
+# isn't a creature, put a charge counter on it. Station ... 10+ | Flying". On turn 5 Targ Wrangler (a 6/3 beside it) and
+# Grizzly Bears (a 3/2) station it to exactly nine charge counters: still a noncreature artifact without flying. Lightning
+# Bolt kills the Bears, the Spacecraft isn't a creature, so it gets its tenth counter and becomes a 4/4 flying artifact
+# creature (CR 702.184a, 603.4). The +1/+0 leaves the Wrangler's toughness alone.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Emerald
+Targ Wrangler
+Sarcophagus, Ship of the Dead
+Grizzly Bears
+Mountain
+Lightning Bolt
+Mountain x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Targ Wrangler.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Sarcophagus, Ship of the Dead.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Activate(Ability: Station)
+Bot1.Choose(Targ Wrangler)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sarcophagus, Ship of the Dead.Counters.Charge = 9
+? Bot1.Battlefield.Sarcophagus, Ship of the Dead.Types = Artifact
+? Bot1.Battlefield.Sarcophagus, Ship of the Dead.Keywords = (absent)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Grizzly Bears; Lightning Bolt
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Counters.Charge = 10
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Types = Artifact; Creature
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Power = 4
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Toughness = 4
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Keywords = Flying
+Bot1.Battlefield.Targ Wrangler.Power = 6
+Bot1.Battlefield.Targ Wrangler.Toughness = 3

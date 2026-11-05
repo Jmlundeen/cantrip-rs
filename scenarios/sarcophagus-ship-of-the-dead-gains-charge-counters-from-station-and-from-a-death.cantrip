@@ -1,0 +1,49 @@
+# Sarcophagus, Ship of the Dead {2}{R}: "Other creatures you control get +1/+0", "Whenever a creature dies, if Sarcophagus
+# isn't a creature, put a charge counter on it" and "Station (Tap another creature you control: Put charge counters equal to
+# its power on this Spacecraft.)". Llanowar Elves, a 1/1, is a 2/1 beside it; stationing with it puts two charge counters on,
+# and the Bolt that then kills it puts a third.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Lightning Bolt
+Sarcophagus, Ship of the Dead
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Sarcophagus, Ship of the Dead.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sarcophagus, Ship of the Dead.Counters.Charge = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Counters.Charge = 3
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt
+Bot1.Battlefield.Sarcophagus, Ship of the Dead.Keywords = (absent)
