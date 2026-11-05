@@ -1,0 +1,95 @@
+# U.S.S. Enterprise-D's trigger asks whether charge counters were put on it for the first time this turn (CR 603.2), not
+# how often it has triggered. At ten charge counters it is a creature, so Dress Down takes its abilities: Warp Core's two
+# charge counters then trigger nothing. Bot2 Disenchants Dress Down while Bot1's Mox Pearl is on the stack, and Station
+# puts ten more on the Enterprise, which has its trigger again - but these are not the first charge counters put on it
+# this turn, so nothing is exiled: only the Island its first Station exiled two turns earlier is in exile.
+
+[Bot1 Deck]
+U.S.S. Enterprise-D, Galaxy-Class
+Gigantosaurus
+Black Lotus
+Black Lotus
+Forest
+Mox Sapphire
+Warp Core
+Forest
+Island
+Dress Down
+Mox Pearl
+Forest x12
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Warp Core.Cast
+Bot1.Decline
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.U.S.S. Enterprise-D, Galaxy-Class.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Enterprise-D, Galaxy-Class.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Island
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Mox Pearl
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Warp Core.Activate(Bot1.Battlefield.U.S.S. Enterprise-D, Galaxy-Class)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Enterprise-D, Galaxy-Class.Counters.Charge = 12
+? Stack.Count = 0
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Dress Down)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Pearl.Types = Artifact
+Bot1.Battlefield.U.S.S. Enterprise-D, Galaxy-Class.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.U.S.S. Enterprise-D, Galaxy-Class.Counters.Charge = 22
+Bot1.Graveyard = Dress Down; Black Lotus; Black Lotus
+Exile = Island
+Stack.Count = 0

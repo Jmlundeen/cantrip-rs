@@ -1,0 +1,56 @@
+# U.S.S. Enterprise-D's trigger is for the first time each turn charge counters are put on it: Stationing with Llanowar
+# Elves puts one on it and exiles the top card, Grizzly Bears, which its controller then casts from exile; Stationing again
+# with Gigantosaurus the same turn puts ten more on it and exiles nothing, so the next Grizzly Bears stays on top of the
+# library (CR 122.6, 603.2, 721.2a, 601.3).
+
+[Bot1 Deck]
+U.S.S. Enterprise-D, Galaxy-Class
+Gigantosaurus
+Llanowar Elves
+Black Lotus x3
+Forest x2
+Grizzly Bears x2
+Forest x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.U.S.S. Enterprise-D, Galaxy-Class.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Enterprise-D, Galaxy-Class.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 1
+Bot1.Battlefield.U.S.S. Enterprise-D, Galaxy-Class.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 1
+Bot1.Exile.Grizzly Bears.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Types = Creature
+Bot1.Battlefield.U.S.S. Enterprise-D, Galaxy-Class.Counters.Charge = 11
+Exile.Count = 0
+Bot1.Library.Count = 13
