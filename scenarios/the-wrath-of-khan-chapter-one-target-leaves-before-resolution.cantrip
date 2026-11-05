@@ -1,0 +1,48 @@
+# The Wrath of Khan, chapter I: "This Saga deals 4 damage to target creature an opponent controls. At the beginning of the
+# next combat this turn, gain control of that creature ..." (CR 608.2b): the chapter's target is exiled with Swords to
+# Plowshares in response, so the chapter resolves with no target: no damage is dealt and no delayed ability is made.
+
+[Bot1 Deck]
+The Wrath of Khan
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mountain
+Swords to Plowshares
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The Wrath of Khan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Memnite
+Bot2.Life = 21
+Bot1.Graveyard = Swords to Plowshares
+Bot1.Battlefield = The Wrath of Khan; Mountain; Mountain; Mox Ruby; Mox Emerald; Mox Pearl

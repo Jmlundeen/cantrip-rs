@@ -1,0 +1,63 @@
+# The Wrath of Khan, chapter II is declined ("You may exile a card from your hand. If you do, draw a card"), so no card is
+# exiled and none drawn; chapter III then makes each opponent sacrifice a nontoken permanent of their choice (CR 701.21a,
+# 101.4), so Bot2's Treasure token is spared while its Mox Jet goes. Bot2 made the Treasure with Deadly Dispute.
+
+[Bot1 Deck]
+The Wrath of Khan
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Deadly Dispute
+Swamp x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Deadly Dispute.Cast
+Bot2.Choose(Mox Sapphire)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The Wrath of Khan.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Decline
+[T7 Bot1.Main1]
+Bot2.Choose(Mox Jet)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Hand.Count = 4
+Bot2.Battlefield.Treasure Token.Token = true
+Bot2.Battlefield.Treasure Token.Types = Artifact
+Bot2.Graveyard = Mox Jet; Swamp; Deadly Dispute; Mox Sapphire

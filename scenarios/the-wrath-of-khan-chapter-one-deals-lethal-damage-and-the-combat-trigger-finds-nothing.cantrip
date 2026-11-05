@@ -1,0 +1,44 @@
+# The Wrath of Khan, chapter I's damage and its delayed ability about a creature that is no longer there. Crimson Kobolds
+# (0/1) is the only creature an opponent controls, so chapter I's target is it: 4 damage is lethal, and it is in Bot2's
+# graveyard before the beginning of combat, where the delayed ability fires about it and does nothing (CR 603.7c, 400.7).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+The Wrath of Khan
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Crimson Kobolds
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Crimson Kobolds.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.The Wrath of Khan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Crimson Kobolds = (absent)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Crimson Kobolds
+
+[Expect]
+Bot2.Graveyard = Crimson Kobolds

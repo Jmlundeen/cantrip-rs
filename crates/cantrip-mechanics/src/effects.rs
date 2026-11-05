@@ -2057,13 +2057,20 @@ pub fn gain_control_untap_haste(g: &mut dyn Game, item: &StackItem) -> Option<Ob
 /// next turn when they control a Villain of greater mana value; the haste lasts until end of turn all the same.
 pub fn gain_control_untap_haste_for(g: &mut dyn Game, item: &StackItem, duration: Duration) -> Option<ObjectId> {
     let creature = crate::targets::object(g, item, 0)?;
+    gain_control_of_untap_haste(g, item, creature, duration);
+    Some(creature)
+}
+
+/// `gain_control_untap_haste_for` of a creature the ability names some other way than by targeting it: The Wrath of Khan's
+/// delayed ability, about the creature its chapter I dealt damage to (CR 603.7c). A creature that has left the battlefield
+/// is a new object none of the three instructions reaches (CR 400.7).
+pub fn gain_control_of_untap_haste(g: &mut dyn Game, item: &StackItem, creature: ObjectId, duration: Duration) {
     g.gain_control(item.object, creature, item.controller, duration);
     // Three sentences, each judged by the state triggers before the next (CR 603.8, 608.2c).
     g.end_sentence();
     g.untap(creature);
     g.end_sentence();
     crate::haste_until_end_of_turn(g, item.object, creature);
-    Some(creature)
 }
 
 const TRANSFORM: Question = Question::new("Transform", "pay {cost} to transform {subject}?", "", "Pay {cost}", "Don't transform");

@@ -1,0 +1,79 @@
+# The Wrath of Khan cast in the second main: chapter I deals its 4 damage, but the delayed ability waits for a combat
+# that never begins this turn, so it watches the end step begin instead and nothing is stolen (CR 603.7b). Bot1 plays out
+# its whole hand - the Moxen cost nothing - and the last card it draws is a flash creature, cast in response to chapter
+# II's trigger, so the hand is empty when that chapter resolves: no card is exiled and none is drawn (CR 608.2c).
+# Chapter III then makes each opponent sacrifice a nontoken permanent.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Sapphire
+Mox Sapphire
+Mountain
+The Wrath of Khan
+Mox Emerald
+Brazen Borrower
+Mountain x12
+
+[Bot2 Deck]
+Island
+Mox Emerald
+Mox Jet
+Drift of Phantasms
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Hand.Drift of Phantasms.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.The Wrath of Khan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Drift of Phantasms.Damage = 4
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Brazen Borrower.Cast
+? Bot1.Hand.Count = 0
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot2.Choose(Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Mox Emerald
+Bot1.Graveyard = The Wrath of Khan
+Bot1.Hand = Mountain
+Bot2.Battlefield.Drift of Phantasms.Keywords = Defender; Flying
+Bot2.Battlefield.Drift of Phantasms.Damage = 0

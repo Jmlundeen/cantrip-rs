@@ -1,0 +1,77 @@
+# The Wrath of Khan {2}{R} Saga, every chapter. I - "This Saga deals 4 damage to target creature an opponent controls. At the
+# beginning of the next combat this turn, gain control of that creature until end of turn. Untap it. It gains haste until end
+# of turn.": Drift of Phantasms (0/5), the only creature an opponent controls, is tapped by Procrastinate (X=0, so no stun
+# counters) and then takes the 4 damage on turn 3 and survives; at the beginning of that combat Bot1 gains control of it, it
+# is untapped and it has haste; it returns to Bot2 at the end of the turn. II - a Mountain is exiled to draw a card on turn
+# 5, the hand two cards before and after. III - Bot2 sacrifices a nontoken
+# permanent, its Mox Emerald, on turn 7, and the Saga is sacrificed after it.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Sapphire
+The Wrath of Khan
+Mountain
+Mountain
+Procrastinate
+Mountain x12
+
+[Bot2 Deck]
+Island
+Mox Emerald
+Mox Jet
+Drift of Phantasms
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Hand.Drift of Phantasms.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Procrastinate.Cast(Bot2.Battlefield.Drift of Phantasms; X: 0)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Drift of Phantasms.Tapped = true
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.The Wrath of Khan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Drift of Phantasms.Damage = 4
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Drift of Phantasms.Keywords = Defender; Flying; Haste
+? Bot1.Battlefield.Drift of Phantasms.Tapped = false
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Accept
+Bot1.Choose(Mountain)
+? Exile = Mountain
+? Bot1.Hand.Count = 2
+[T7 Bot1.Main1]
+Bot2.Choose(Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Mox Emerald
+Bot1.Graveyard = The Wrath of Khan; Procrastinate
+Bot2.Battlefield.Drift of Phantasms.Damage = 0
+Bot2.Battlefield.Drift of Phantasms.Keywords = Defender; Flying
