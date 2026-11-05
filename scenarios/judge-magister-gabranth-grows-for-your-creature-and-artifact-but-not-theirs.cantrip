@@ -1,0 +1,81 @@
+# Judge Magister Gabranth (2/2 menace): "Whenever another creature or artifact you control dies, put a +1/+1 counter on" it. Turn 1 Bot1 casts it with a Mons's Goblin
+# Raiders and a Memnite. On turn 2 Bot2's Lightning Bolt kills the Raiders (a creature, 3/3) and its Shatter destroys Bot1's Mox Jet (an artifact that is no creature, 4/4).
+# Bot2 casts its own Memnite there too, and on turn 3 Bot1's Lightning Bolt kills it: an opponent's creature and artifact, so Gabranth stays 4/4.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Judge Magister Gabranth
+Mons's Goblin Raiders
+Memnite
+Lightning Bolt
+Mountain x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Mountain
+Lightning Bolt
+Shatter
+Memnite
+Mountain
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Judge Magister Gabranth.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mons's Goblin Raiders.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Judge Magister Gabranth.Keywords = Menace
+? Bot1.Battlefield.Judge Magister Gabranth.Power = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mons's Goblin Raiders)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Judge Magister Gabranth.Power = 3
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Shatter.Cast(Bot1.Battlefield.Mox Jet)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Judge Magister Gabranth.Power = 4
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard.Count = 3
+
+[Expect]
+Bot1.Battlefield.Judge Magister Gabranth.Power = 4
+Bot1.Battlefield.Judge Magister Gabranth.Toughness = 4

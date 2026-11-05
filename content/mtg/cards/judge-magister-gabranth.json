@@ -1,0 +1,11 @@
+{
+  "name": "Judge Magister Gabranth",
+  "manaCost": "{W}{B}",
+  "type": "Legendary Creature — Human Advisor Knight",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Menace (This creature can't be blocked except by two or more creatures.)\nWhenever another creature or artifact you control dies, put a +1/+1 counter on Judge Magister Gabranth.",
+  "keywords": [
+    "Menace"
+  ]
+}

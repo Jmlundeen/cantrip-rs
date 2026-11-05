@@ -1,0 +1,68 @@
+# Judge Magister Gabranth: several creatures and artifacts you control dying together each trigger it, and an artifact creature only once. Turn 1 Bot1 casts it with a
+# Memnite (an artifact creature), an Ornithopter (an artifact creature, 0/2) and a Mons's Goblin Raiders. Turn 2 Lightning Bolt kills the Memnite: 3/3, one counter and not two.
+# Turn 4 Pyroclasm deals 2 damage to each creature: the Ornithopter and the Raiders die together and Gabranth, 3/3 with 2 damage, survives and takes two more counters (5/5).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Judge Magister Gabranth
+Memnite
+Ornithopter
+Mons's Goblin Raiders
+Mountain x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Pyroclasm
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Judge Magister Gabranth.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mons's Goblin Raiders.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Judge Magister Gabranth.Power = 3
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Pyroclasm.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Judge Magister Gabranth.Power = 5
+
+[Expect]
+Bot1.Battlefield.Judge Magister Gabranth.Toughness = 5
+Bot1.Graveyard.Count = 3
