@@ -1,0 +1,48 @@
+# Perils of the Past {1}{R}, both modes: "Use the Relic - Target creature gets +3/+2 until end of turn." and "Destroy the
+# Relic - Destroy target artifact." Bot1's Crimson Kobolds is a 3/3 after the first, and Bot2's Mox Jet is refused as a
+# target for the pump ("creature"), while Bot2's Mox Sapphire is destroyed by the second.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Perils of the Past
+Perils of the Past
+Crimson Kobolds
+Mountain x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Crimson Kobolds.Cast
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Perils of the Past.Cast
+Bot1.Modes(Use the Relic)
+! Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Target(Bot1.Battlefield.Crimson Kobolds)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Crimson Kobolds.Power = 3
+? Bot1.Battlefield.Crimson Kobolds.Toughness = 3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Perils of the Past.Cast
+Bot1.Modes(Destroy the Relic)
+Bot1.Target(Bot2.Battlefield.Mox Sapphire)
+
+[Expect]
+Bot2.Graveyard = Mox Sapphire
+Bot2.Battlefield = Mox Jet
+Bot1.Graveyard = Perils of the Past; Perils of the Past
