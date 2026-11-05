@@ -1,0 +1,54 @@
+# Balamb Garden, SeeD Academy: with no other Town Bot1 pays the full {5}{G}{U} (seven mana: Mox Emerald, Mox Sapphire, Mox Jet,
+# Mox Ruby and Black Lotus) and taps the land to transform it (CR 701.27a). On turn 5 the 5/4 flying Vehicle, Balamb Garden,
+# Airborne, is crewed by a Memnite (crew 1 needs total power 1: an Ornithopter, power 0, is no crew, CR 702.122a), attacks, and its trigger draws a card (CR 508.1m).
+
+[Bot1 Deck]
+Balamb Garden, SeeD Academy
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Black Lotus
+Memnite
+Ornithopter
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Balamb Garden, SeeD Academy.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Balamb Garden, SeeD Academy.Activate(Ability: Transform)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Balamb Garden, Airborne.Activate(Ability: Crew 1)
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Balamb Garden, Airborne > Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield = Balamb Garden, Airborne; Memnite; Ornithopter; Mox Emerald; Mox Sapphire; Mox Jet; Mox Ruby
+Bot1.Hand.Count = 2

@@ -1,0 +1,46 @@
+# Balamb Garden, SeeD Academy: "This ability costs {1} less to activate for each other Town you control." On turn 3 Bot1 controls one
+# other Town (a Gongaga) so the transformation costs {4}{G}{U}, six mana, and its five Moxen cannot pay it. On turn 5 a second Gongaga
+# makes it {3}{G}{U}: the five Moxen pay it exactly, leaving nothing in the pool (CR 601.2f, 118.7). Bot2's own Gongaga is not a Town
+# Bot1 controls and reduces nothing, and the colored {G}{U} are never reduced.
+
+[Bot1 Deck]
+Balamb Garden, SeeD Academy
+Gongaga, Reactor Town
+Gongaga, Reactor Town
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Forest x20
+
+[Bot2 Deck]
+Gongaga, Reactor Town
+Island x20
+
+[Actions]
+Bot1.Hand.Balamb Garden, SeeD Academy.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Gongaga, Reactor Town.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Gongaga, Reactor Town.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+! Bot1.Battlefield.Balamb Garden, SeeD Academy.Activate(Ability: Transform; Mana: short)
+[T5 Bot1.Main1]
+Bot1.Hand.Gongaga, Reactor Town.Play
+Bot1.Battlefield.Balamb Garden, SeeD Academy.Activate(Ability: Transform)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Balamb Garden, Airborne.Tapped = true
