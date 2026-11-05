@@ -3,8 +3,9 @@
 //! it.
 //!
 //! A card with backup lists `trigger(text, effect)` among its `abilities`, `effect` calling `resolve`. The abilities
-//! granted are the printed ones, fixed when backup triggers (CR 702.165d): the keywords it names, and, if it lists the
-//! creature's own ability as a delayed ability, that one.
+//! granted are the printed ones, fixed when backup triggers (CR 702.165d): the keywords it names, abilities of the kind
+//! `Keyword` holds included (`Keyword::AssignsDamageByToughness`), and, if it lists the creature's own ability as a delayed
+//! ability, that one.
 
 use crate::targets;
 use crate::triggers::THIS_ENTERS;

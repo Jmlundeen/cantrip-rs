@@ -430,12 +430,14 @@ pub fn stations_by_toughness(cx: &Cx, creature: ObjectId) -> bool {
     })
 }
 
-/// What `creature` assigns as combat damage (CR 510.1a): its power, or its toughness if a static ability says so.
+/// What `creature` assigns as combat damage (CR 510.1a): its power, or its toughness if it has the ability to
+/// (`Keyword::AssignsDamageByToughness`, printed or granted, as the layers left it), a static ability of a permanent says so
+/// (`CardDef::damage_by_toughness`), or an effect about its controller does (`EffectKind::CreaturesAssignDamageByToughness`).
 /// An "as though its power were positive" rule (CR 609.4) uses negative power's magnitude only when assigning by power;
 /// every other procedure still reads its actual negative power (CR 107.1b).
 pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
     let c = cx.chars(creature);
-    let by_toughness = sources(cx, |d| !d.damage_by_toughness.is_empty()).any(|(id, controller, def, by)| {
+    let by_toughness = c.has(Keyword::AssignsDamageByToughness) || sources(cx, |d| !d.damage_by_toughness.is_empty()).any(|(id, controller, def, by)| {
         let asker = Asker { source: id, controller, by, spell: false };
         def.damage_by_toughness.iter().any(|rule| rule(cx, &asker, creature))
     }) || (c.toughness.unwrap_or(0) > c.power.unwrap_or(0)

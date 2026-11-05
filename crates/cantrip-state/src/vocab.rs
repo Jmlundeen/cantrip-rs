@@ -1085,6 +1085,14 @@ pub enum Keyword {
     /// `settle`). Printed (Founding the Third Path, The Cruelty of Gix, Urza Assembles the Titans) or granted (Barbara
     /// Wright's "Sagas you control have read ahead"); instances are redundant (CR 702.155c).
     ReadAhead = 59,
+    /// "This creature assigns combat damage equal to its toughness rather than its power" (CR 510.1a): printed, or granted as
+    /// an ability ("has" or "gains", CR 113.1a), so the layers decide whether it has it (CR 613.1f, 613.7): "loses all
+    /// abilities" takes it from a creature, and one granted later is kept. It changes the damage assigned and nothing else:
+    /// everything that reads power, a fight included, reads its real power (Streetwise Negotiator's ruling). Where it is no
+    /// ability of the creature - "each creature you control assigns", "equipped creature assigns" - it is that permanent's
+    /// `CardDef::damage_by_toughness`, or a player's `EffectKind::CreaturesAssignDamageByToughness`; `static_rules::combat_damage_of`
+    /// reads all three.
+    AssignsDamageByToughness = 60,
 }
 
 impl Keyword {

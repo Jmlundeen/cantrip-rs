@@ -2530,7 +2530,13 @@ The quantity assigned is read by the core (`static_rules::combat_damage_of`, CR 
 and assignment choices. `CardDef::damage_by_absolute_power` selects creatures that assign as though negative power
 were positive (CR 609.4, Loot, the Anomaly); only this combat calculation uses the unsigned magnitude, with actual
 power unchanged everywhere else (CR 107.1b). A rule assigning by toughness uses toughness instead, without applying
-an exception about power to it.
+an exception about power to it. Three things say so, as they do for "can't be sacrificed": the creature has the ability
+(`Keyword::AssignsDamageByToughness`, printed or granted - backup gives Streetwise Negotiator's - so the layers decide it
+and "loses all abilities" takes it in timestamp order), another permanent's static ability does
+(`CardDef::damage_by_toughness`, read while that permanent has its abilities), or a resolved effect about the player does
+(`EffectKind::CreaturesAssignDamageByToughness`). A rule in a `CardDef` list is its source's, found by walking the battlefield
+(`static_rules::sources`), which sees a card's text and nothing granted; an ability that is about its holder alone is a
+characteristic of the holder, so a grant needs no such walk.
 
 Combat assignments themselves leave out a departed player (CR 800.4e), not merely the later damage operation.
 `turn::combat_defender_present` and `combat_assignments` exclude that defender from an unblocked or blocker-free

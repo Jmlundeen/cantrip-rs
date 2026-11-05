@@ -3448,7 +3448,8 @@ pub struct CardDef {
     /// its abilities: Frozen in Ice's "enchanted creature ... can't become untapped". See `CantBecomeUntapped`.
     pub cant_become_untapped: &'static [CantBecomeUntapped],
     /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a):
-    /// Assault Formation, Doran, the Siege Tower.
+    /// Assault Formation, Doran, the Siege Tower. A creature's own "this creature assigns ...", printed or granted, is
+    /// `Keyword::AssignsDamageByToughness`.
     pub damage_by_toughness: &'static [DamageByToughnessRule],
     /// "If [this creature]'s power is negative, it assigns combat damage as though its power were positive"
     /// (CR 510.1a, 609.4), while the source has its abilities: Loot, the Anomaly. The rule selects the creatures;
