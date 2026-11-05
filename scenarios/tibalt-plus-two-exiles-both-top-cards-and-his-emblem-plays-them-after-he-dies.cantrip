@@ -1,0 +1,75 @@
+# Tibalt, Cosmic Impostor (Valki's back face, cast for {5}{B}{R}) gets his emblem as he enters. +2 exiles the top card of each
+# player's library, together: Bot1's Mountain and Bot2's Grizzly Bears. Bot2 then kills Tibalt with Vampire Hexmage, but the
+# emblem names that Tibalt and keeps working (the card's rulings): on turn 3 Bot1 plays the exiled Mountain as a land and casts
+# Bot2's Grizzly Bears from exile with a white and a blue mana for the {G}, any color (CR 609.4b). Bot2 may not cast or play them.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Valki, God of Lies
+Mountain
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Vampire Hexmage
+Mox Pearl
+Island x3
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Valki, God of Lies.Cast(Ability: back face)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Emblems.Count = 1
+Bot1.Battlefield.Tibalt, Cosmic Impostor.Activate(Ability: +2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Tibalt, Cosmic Impostor.Counters.Loyalty = 7
+? Exile = Grizzly Bears; Mountain
+? Bot1.Emblems.ExiledWithMakers = Grizzly Bears; Mountain
+[T2 Bot2.Main1]
+! Bot2.Exile.Mountain.Play
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus#1.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus#1.Activate(Color: Black)
+! Bot2.Exile.Grizzly Bears.Cast
+Bot2.Hand.Vampire Hexmage.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Tibalt, Cosmic Impostor)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Tibalt, Cosmic Impostor = (absent)
+? Bot1.Emblems.Count = 1
+Bot1.Exile.Mountain.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Grizzly Bears.Cast
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.LandsPlayed = 1
+Exile.Count = 0
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Grizzly Bears.Power = 2

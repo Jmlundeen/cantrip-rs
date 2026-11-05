@@ -1,0 +1,66 @@
+# Valki's enters trigger has the opponent reveal their hand and Bot1 exile a creature card from it (the Grizzly Bears, not the
+# Llanowar Elves or the Lightning Bolt) until Valki leaves (CR 701.20, 610.3). {X} chooses among the creature cards exiled with
+# Valki with mana value exactly X: X=1 matches nothing (the Bears are 2) and Valki stays Valki, X=2 makes it a copy of the Bears
+# (CR 707.2). When Bot2 bolts it, the Bears return to Bot2's hand (CR 610.3).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Valki, God of Lies
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Grizzly Bears
+Llanowar Elves
+Island x3
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Valki, God of Lies.Cast
+? Bot1.Mana =
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Grizzly Bears)
+? Exile = Grizzly Bears
+? Bot2.Hand.Count = 6
+? Bot2.Revealed = Grizzly Bears; Island; Island; Island; Lightning Bolt; Llanowar Elves; Mox Ruby
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Valki, God of Lies.Activate(X: 1)
+Bot1.Pass
+! Bot1.Choose
+? Bot1.Mana =
+? Bot1.Battlefield.Valki, God of Lies.Toughness = 1
+? Exile = Grizzly Bears
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Valki, God of Lies.Activate(X: 2)
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Choose(Grizzly Bears)
+? Bot1.Battlefield.Valki, God of Lies = (absent)
+? Bot1.Battlefield.Grizzly Bears.Toughness = 2
+? Exile = Grizzly Bears
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grizzly Bears)
+[T2 Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Valki, God of Lies
+Bot1.Battlefield.Grizzly Bears = (absent)
+Bot2.Hand.Grizzly Bears.Power = 2
+Bot2.Hand.Llanowar Elves.Power = 1

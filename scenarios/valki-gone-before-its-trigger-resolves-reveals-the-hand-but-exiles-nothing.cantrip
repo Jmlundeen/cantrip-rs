@@ -1,0 +1,36 @@
+# Bot2 bolts Valki in response to its enters trigger. The trigger still resolves: the hand is revealed and Bot1 still chooses a
+# creature card, but Valki has already left the battlefield, so nothing is exiled at all (CR 610.3b; the card's ruling).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Valki, God of Lies
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Grizzly Bears
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Valki, God of Lies.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Valki, God of Lies)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Grizzly Bears)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Valki, God of Lies
+Exile.Count = 0
+Bot2.Hand.Grizzly Bears.Power = 2

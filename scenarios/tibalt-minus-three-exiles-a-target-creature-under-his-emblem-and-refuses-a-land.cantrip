@@ -1,0 +1,61 @@
+# Tibalt's -3 exiles target artifact or creature (CR 115, 701.13): Bot2's Grizzly Bears, never the Island beside it (refused as a
+# target). The Bears are exiled with this Tibalt (CR 607.2a), so its emblem lists them, and they stay exiled when Bot2's Vampire
+# Hexmage takes his last loyalty on turn 4: the -3 exile is no "until" (CR 610.3).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Valki, God of Lies
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Grizzly Bears
+Vampire Hexmage
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Valki, God of Lies.Cast(Ability: back face)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Tibalt, Cosmic Impostor.Activate(Bot2.Battlefield.Island; Ability: Exile target)
+Bot1.Battlefield.Tibalt, Cosmic Impostor.Activate(Bot2.Battlefield.Grizzly Bears; Ability: Exile target)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Tibalt, Cosmic Impostor.Counters.Loyalty = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Vampire Hexmage.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Tibalt, Cosmic Impostor)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Tibalt, Cosmic Impostor = (absent)
+Bot2.Battlefield.Grizzly Bears = (absent)
+Exile = Grizzly Bears
+Bot1.Emblems.ExiledWithMakers = Grizzly Bears

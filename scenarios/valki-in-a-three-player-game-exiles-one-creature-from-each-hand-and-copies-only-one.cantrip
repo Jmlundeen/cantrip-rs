@@ -1,0 +1,45 @@
+# With two opponents Valki's trigger has both reveal their hands and Bot1 exile one creature card from each (the Grizzly Bears
+# and the Balduvian Bears, both mana value 2), the Islands left (CR 608.2c, "for each opponent"). {X} with X=2 then
+# chooses one creature card of the two, not both, and Valki becomes a copy of that one (CR 707.2).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Valki, God of Lies
+Island x22
+
+[Bot2 Deck]
+Grizzly Bears
+Island x22
+
+[Bot3 Deck]
+Balduvian Bears
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Valki, God of Lies.Cast
+Bot1.Choose(Grizzly Bears)
+Bot1.Choose(Balduvian Bears)
+? Exile = Balduvian Bears; Grizzly Bears
+? Bot2.Hand.Count = 6
+? Bot3.Hand.Count = 6
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Valki, God of Lies.Activate(X: 2)
+Bot1.Pass
+Bot1.Choose(Balduvian Bears)
+? Bot1.Battlefield.Balduvian Bears.Toughness = 2
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Balduvian Bears.Power = 2
+Bot1.Battlefield.Valki, God of Lies = (absent)
+Exile = Balduvian Bears; Grizzly Bears

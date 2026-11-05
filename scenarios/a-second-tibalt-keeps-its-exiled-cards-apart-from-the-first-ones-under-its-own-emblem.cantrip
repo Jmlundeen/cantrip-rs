@@ -1,0 +1,68 @@
+# Two Tibalts (Valki's back face) in turn: the second is a new object even though it is the same card's other copy (the card's
+# ruling). Each makes its own emblem, and each emblem plays only the cards its own Tibalt exiled (CR 114.2, 607.2a): turn 1's +2
+# exiles Mountain and Grizzly Bears, turn 3's exiles Swamp and Llanowar Elves, and the emblems list them apart. The legend rule
+# puts the first Tibalt into the graveyard, but its emblem stays.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Valki, God of Lies
+Mountain
+Valki, God of Lies
+Swamp
+Island x20
+
+[Bot2 Deck]
+Island x7
+Grizzly Bears
+Island
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Valki, God of Lies.Cast(Ability: back face)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Tibalt, Cosmic Impostor.Activate(Ability: +2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Emblems.Count = 1
+? Bot1.Emblems.ExiledWithMakers = Grizzly Bears; Mountain
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Valki, God of Lies.Cast(Ability: back face)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Tibalt, Cosmic Impostor#2)
+? Bot1.Battlefield.Tibalt, Cosmic Impostor.Counters.Loyalty = 5
+Bot1.Battlefield.Tibalt, Cosmic Impostor.Activate(Ability: +2)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Emblems.Count = 2
+Bot1.Emblems.MadeBy.Count = 2
+Bot1.Emblems.ExiledWithMakers = Grizzly Bears; Mountain; |; Llanowar Elves; Swamp
+Bot1.Emblems.ExiledWithMakers.Count = 4
+Bot1.Battlefield.Tibalt, Cosmic Impostor.Counters.Loyalty = 7
+Bot1.Graveyard = Valki, God of Lies; Black Lotus; Black Lotus

@@ -1,0 +1,15 @@
+{
+  "name": "Valki, God of Lies",
+  "manaCost": "{1}{B}",
+  "type": "Legendary Creature — God",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "When Valki enters, each opponent reveals their hand. For each opponent, exile a creature card they revealed this way until Valki leaves the battlefield.\n{X}: Choose a creature card exiled with Valki with mana value X. Valki becomes a copy of that card.",
+  "backFace": {
+    "name": "Tibalt, Cosmic Impostor",
+    "manaCost": "{5}{B}{R}",
+    "type": "Legendary Planeswalker — Tibalt",
+    "loyalty": 5,
+    "oracleText": "As Tibalt enters, you get an emblem with \"You may play cards exiled with Tibalt, Cosmic Impostor, and you may spend mana as though it were mana of any color to cast those spells.\"\n+2: Exile the top card of each player's library.\n−3: Exile target artifact or creature.\n−8: Exile all graveyards. Add {R}{R}{R}."
+  }
+}
