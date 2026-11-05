@@ -1,0 +1,21 @@
+# Zanarkand, Ancient Metropolis, a Town: "This land enters tapped. {T}: Add {G}" (CR 614.1d, 305.6). It enters tapped and cannot be tapped for mana that turn (refused). On turn 3 it
+# taps for {G} and for no other colour.
+
+[Bot1 Deck]
+Zanarkand, Ancient Metropolis
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Zanarkand, Ancient Metropolis.Play
+? Bot1.Battlefield.Zanarkand, Ancient Metropolis.Tapped = true
+? Bot1.Battlefield.Zanarkand, Ancient Metropolis.Subtypes = Town
+! Bot1.Battlefield.Zanarkand, Ancient Metropolis.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Zanarkand, Ancient Metropolis.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Zanarkand, Ancient Metropolis.Tapped = true

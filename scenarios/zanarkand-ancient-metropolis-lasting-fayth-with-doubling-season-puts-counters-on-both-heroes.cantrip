@@ -1,0 +1,51 @@
+# Doubling Season doubles Lasting Fayth's token (CR 614.1): two Hero tokens are created, and "Put a +1/+1 counter on it for each land you control" is done for every token the
+# instruction made (the doubler's ruling). With two Forests, Doubling Season doubles each counter put (four on each): both Heroes are 5/5.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Doubling Season
+Zanarkand, Ancient Metropolis
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Doubling Season.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zanarkand, Ancient Metropolis.Cast(Ability: Adventure)
+? Stack = Lasting Fayth
+Bot1.Pass
+Bot2.Pass
+? Exile = Zanarkand, Ancient Metropolis
+? Bot1.Battlefield.Hero Token#1.Counters.PlusOnePlusOne = 4
+? Bot1.Battlefield.Hero Token#2.Counters.PlusOnePlusOne = 4
+? Bot1.Battlefield.Hero Token#1.Power = 5
+? Bot1.Battlefield.Hero Token#2.Power = 5
+
+[Expect]
+Bot1.Battlefield.Hero Token#1.Power = 5
