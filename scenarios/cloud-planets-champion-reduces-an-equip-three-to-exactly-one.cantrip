@@ -1,0 +1,51 @@
+# Cloud, Planet's Champion: "Equip abilities you activate that target Cloud cost {2} less to activate" (CR 601.2f, 602.2b). Novel Nunchaku's Equip {3} targeting Cloud costs {1}, not {0}
+# and not {3}: with a Mox Ruby's {R} in the pool, paying it leaves the pool empty. Turn 1 Bot1 casts Cloud off Black Lotus and two Moxen; turn 3 it casts the Nunchaku and equips it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Black Lotus
+Cloud, Planet's Champion
+Mox Emerald
+Mox Jet
+Novel Nunchaku
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cloud, Planet's Champion.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Novel Nunchaku.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+Bot1.Battlefield.Novel Nunchaku.Activate(Ability: Equip; Cloud, Planet's Champion)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Novel Nunchaku.AttachedTo = Cloud, Planet's Champion
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Cloud, Planet's Champion.Keywords = DoubleStrike; Indestructible; Trample

@@ -1,0 +1,60 @@
+# Cloud, Planet's Champion (4/4): "During your turn, as long as Cloud is equipped, it has double strike and indestructible. Equip abilities you activate that target Cloud cost {2} less
+# to activate." Turn 1 Bot1 casts it off Black Lotus and two Moxen. On turn 3 it has neither keyword unequipped. A Shadowspear (Equip {2}) is moved to a Memnite for the full {2}
+# (Sapphire and Pearl), then to Cloud for nothing with the pool empty (the reduction is for an equip that targets Cloud). Equipped on its controller's turn it has double strike and
+# indestructible; on turn 4, Bot2's, it has neither though still equipped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Black Lotus
+Cloud, Planet's Champion
+Mox Sapphire
+Shadowspear
+Memnite
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cloud, Planet's Champion.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Cloud, Planet's Champion.Keywords = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shadowspear.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Shadowspear.Activate(Ability: Equip; Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shadowspear.AttachedTo = Memnite
+? Bot1.Battlefield.Cloud, Planet's Champion.Keywords = (absent)
+? Bot1.Mana =
+Bot1.Battlefield.Shadowspear.Activate(Ability: Equip; Cloud, Planet's Champion)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shadowspear.AttachedTo = Cloud, Planet's Champion
+? Bot1.Battlefield.Cloud, Planet's Champion.Keywords = DoubleStrike; Indestructible; Lifelink; Trample
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Shadowspear.AttachedTo = Cloud, Planet's Champion
+? Bot1.Battlefield.Cloud, Planet's Champion.Keywords = Lifelink; Trample
+
+[Expect]
+Bot1.Battlefield.Cloud, Planet's Champion.Power = 5
