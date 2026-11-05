@@ -1,0 +1,36 @@
+# Mardu Monument {2} Artifact: "When this artifact enters, search your library for a basic Mountain, Plains, or Swamp card, reveal it, put it into
+# your hand, then shuffle" (CR 701.23). Two Moxen cast it on turn 1. The search refuses a Forest (the wrong type) and a
+# Badlands (it has a listed type, but is not basic), then refuses two cards at once (the search finds at most one) and finds the Plains: it reaches the hand, revealed.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mardu Monument
+Ornithopter x4
+Forest
+Badlands
+Plains x2
+Ornithopter x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mardu Monument.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Forest)
+! Bot1.Search(Badlands)
+! Bot1.Search(Plains; Plains)
+Bot1.Search(Plains)
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Plains; Ornithopter; Ornithopter; Ornithopter; Ornithopter
+Bot1.Revealed = Plains

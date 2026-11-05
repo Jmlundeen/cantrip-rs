@@ -1,0 +1,63 @@
+# "{2}{R}{W}{B}, {T}, Sacrifice this artifact: Create three 1/1 red Warrior creature tokens that gain menace and haste until end of turn. Activate only as a sorcery." (CR 602.5d, 111.2)
+# Bot1 casts the Monument on turn 1; on the opponent's turn 2 the activation is refused (sorcery speed); on turn 3 the
+# Moxen pay and the Monument is sacrificed as a cost, leaving only the tokens.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mardu Monument
+Ornithopter x4
+Ornithopter x20
+
+[Bot2 Deck]
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mardu Monument.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search()
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+! Bot1.Battlefield.Mardu Monument.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mardu Monument.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Warrior Token#1.Keywords = Haste; Menace
+? Bot1.Battlefield.Warrior Token#2.Keywords = Haste; Menace
+? Bot1.Battlefield.Warrior Token#3.Keywords = Haste; Menace
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Warrior Token#1.Keywords = (absent)
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Mardu Monument
+Bot1.Battlefield.Warrior Token#1.Power = 1
+Bot1.Battlefield.Warrior Token#1.Toughness = 1
+Bot1.Battlefield.Warrior Token#1.Colors = Red
+Bot1.Battlefield.Warrior Token#2.Power = 1
+Bot1.Battlefield.Warrior Token#2.Toughness = 1
+Bot1.Battlefield.Warrior Token#2.Colors = Red
+Bot1.Battlefield.Warrior Token#3.Power = 1
+Bot1.Battlefield.Warrior Token#3.Toughness = 1
+Bot1.Battlefield.Warrior Token#3.Colors = Red
+Bot1.Battlefield.Warrior Token#4 = (absent)
