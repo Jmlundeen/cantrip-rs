@@ -576,6 +576,7 @@ public sealed record CardState(
     string Note = "",
     string Counters = "",
     string Damage = "",
+    string Share = "",
     string FaceDownName = "",
     bool Picked = false);
 

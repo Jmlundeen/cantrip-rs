@@ -161,6 +161,7 @@ dependencies = [
  "cantrip-ai",
  "cantrip-api",
  "cantrip-engine",
+ "cantrip-mechanics",
  "cantrip-obs",
  "cantrip-oracle",
  "cantrip-script",

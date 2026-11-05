@@ -1613,7 +1613,7 @@ public sealed class ScenarioPlayer
     }
 
     private static readonly Regex CardKey = new(
-        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation|Note|Counters|Damage|FaceDownName|Halves)$",
+        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation|Note|Counters|Damage|Share|FaceDownName|Halves)$",
         RegexOptions.CultureInvariant);
 
     /// <summary>A card named with its number among the cards of that name: <c>Loxodon Warhammer#2</c>.</summary>
@@ -1627,6 +1627,7 @@ public sealed class ScenarioPlayer
         "Status" => card.Status,
         "Counters" => card.Counters,
         "Damage" => card.Damage,
+        "Share" => card.Share,
         "FaceDownName" => card.FaceDownName,
         // A split card's halves as its face draws them, side by side: a fused split spell on the stack is both (CR 702.102b).
         "Halves" => card.Halves,
@@ -1684,7 +1685,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Note (what the card's tooltip says of it below its rules, like Exiled with The Darkness Crystal.), .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3), .Halves (a split card's halves as drawn, like Turn; Burn; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Open (whether its window is open), .Caption, .Tooltip and OpponentExile.*; Sideboard.Caption, .Tooltip, OpponentSideboard.Caption, .Tooltip; Companion, OpponentCompanion (the card in each companion window, empty with none) and their .Corner (bottom-left, top-left); Graveyard.Lit, .Note; Button.<label> (shown or absent), Button.<label>.Enabled (true or false: whether the dock's button can be pressed; absent with none), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the menu the last card action opened; empty when it opened none), Targeting (the dock's title / line while the last card action's targets were picked), Dock (the dock's buttons), Combat (each combat group as its ground is captioned, with its attackers: Attacking Bot2: Ornithopter); TargetLabels (the labels on the arrows from the spell on the stack to its targets, like Turn; Burn); Hand.<Card>.Actions, Battlefield.<Card>.Actions (what the card offers to do, as its menu words it)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Note (what the card's tooltip says of it below its rules, like Exiled with The Darkness Crystal.), .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3), .Share (the share of a divided total it wears while one is divided, and what it is a share of: 1 counters in the counters' tone, 2 damage in the damage's), .Halves (a split card's halves as drawn, like Turn; Burn; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Open (whether its window is open), .Caption, .Tooltip and OpponentExile.*; Sideboard.Caption, .Tooltip, OpponentSideboard.Caption, .Tooltip; Companion, OpponentCompanion (the card in each companion window, empty with none) and their .Corner (bottom-left, top-left); Graveyard.Lit, .Note; Button.<label> (shown or absent), Button.<label>.Enabled (true or false: whether the dock's button can be pressed; absent with none), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the menu the last card action opened; empty when it opened none), Targeting (the dock's title / line while the last card action's targets were picked), Dock (the dock's buttons), Combat (each combat group as its ground is captioned, with its attackers: Attacking Bot2: Ornithopter); TargetLabels (the labels on the arrows from the spell on the stack to its targets, like Turn; Burn); Hand.<Card>.Actions, Battlefield.<Card>.Actions (what the card offers to do, as its menu words it)";
 
     private string? Read(string what, TableState state)
     {

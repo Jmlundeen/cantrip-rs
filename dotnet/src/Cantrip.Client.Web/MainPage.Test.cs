@@ -365,6 +365,9 @@ public sealed partial class MainPage
                         json.WriteString("status", string.Join(", ", CardFace.StatusWords(card)));
                         json.WriteString("counters", string.Join("; ", CardFace.ShownCounters(card).Select(counter => $"{counter.Count} × {counter.Name}")));
                         json.WriteString("damage", CardFace.MarkedDamage(card));
+                        // The share of a divided total the card is wearing (CR 601.2d), and what it is a share of: "1 counters" in
+                        // the counters' tone, "2 damage" in the damage's.
+                        json.WriteString("share", _wornShares.TryGetValue(card.Handle, out WornShare wearing) ? $"{wearing.Share} {(wearing.Counters ? "counters" : "damage")}" : string.Empty);
                         // Written over the art as the face writes it: what the look says, else a permanent's one chosen quality
                         // (a chosen name, color or player).
                         json.WriteString("annotation", _looks.TryGetValue(card.Handle, out CardLook? shown) && shown.Annotation is { Length: > 0 } written
