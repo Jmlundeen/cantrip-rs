@@ -1,0 +1,8 @@
+{
+  "name": "Rok-Tahk, Budding Scientist",
+  "manaCost": "{4}{G}{G}",
+  "type": "Legendary Creature — Brikar Scientist",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Creatures you control have \"{T}: Add {G}{G}.\"\nWhen Rok-Tahk enters, create Murf, a legendary 0/1 green Ooze Slug creature token with indestructible."
+}

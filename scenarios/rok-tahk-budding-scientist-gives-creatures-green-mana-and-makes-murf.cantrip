@@ -1,0 +1,52 @@
+# Rok-Tahk gives each creature its controller controls "{T}: Add {G}{G}." (CR 613.1f, layer 6, 113.7): Rok-Tahk itself and
+# Ornithopter each add two green, while Bot2's own Ornithopter has no such ability. Its enter trigger makes Murf, a legendary
+# 0/1 green Ooze Slug token with indestructible (CR 111.1, 111.4).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Rok-Tahk, Budding Scientist
+Ornithopter
+Forest
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rok-Tahk, Budding Scientist.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot2.Battlefield.Ornithopter.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Rok-Tahk, Budding Scientist.Activate
+Bot1.Battlefield.Ornithopter.Activate
+? Bot1.Mana = {G}{G}{G}{G}
+
+[Expect]
+Bot1.Battlefield.Murf.Token = true
+LeftBattlefield = Black Lotus (tapped)
+Bot1.Battlefield.Murf.Power = 0
+Bot1.Battlefield.Murf.Toughness = 1
+Bot1.Battlefield.Murf.Colors = Green
+Bot1.Battlefield.Murf.Subtypes = Ooze; Slug
+Bot1.Battlefield.Murf.Supertypes = Legendary
+Bot1.Battlefield.Murf.Keywords = Indestructible
+Bot1.Battlefield.Rok-Tahk, Budding Scientist.Power = 5
+Bot1.Battlefield.Rok-Tahk, Budding Scientist.Toughness = 5
