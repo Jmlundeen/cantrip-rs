@@ -16,6 +16,11 @@ pub struct Chars {
     pub colors: ColorSet,
     pub power: Option<i16>,
     pub toughness: Option<i16>,
+    /// Its base power: its power as layers 7a and 7b leave it (CR 613.4a, 613.4b; the rulings of the cards that ask), before
+    /// what modifies it (7c, counters among them) and what switches it (7d). The layers note it as 7c begins, so it is
+    /// settled in the finished characteristics and in a read from 7c on; a static ability's read in an earlier layer finds
+    /// the copiable value. `None` where `power` is none for having no power at all (CR 208.3).
+    pub base_power: Option<i16>,
     pub keywords: Keywords,
     pub protection: ColorSet,
     /// Protection from colorless (CR 702.16a).
@@ -103,6 +108,7 @@ impl Chars {
         self.colors = last.colors;
         self.power = last.power;
         self.toughness = last.toughness;
+        self.base_power = last.base_power;
         self.keywords = last.keywords;
         self.toxic = last.toxic;
         self.protection = last.protection;
@@ -122,6 +128,12 @@ impl Chars {
 
     pub fn is(&self, t: CardType) -> bool {
         self.types.has(t)
+    }
+
+    /// "With power greater than its base power": Kutzil, Malamet Exemplar, Ms. Marvel, Elastic Ally and Baird, Argivian
+    /// Recruiter print it. An object with no power has neither.
+    pub fn power_above_base(&self) -> bool {
+        matches!((self.power, self.base_power), (Some(power), Some(base)) if power > base)
     }
 
     pub fn has(&self, k: Keyword) -> bool {

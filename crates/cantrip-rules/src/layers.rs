@@ -479,6 +479,7 @@ fn noncreature_permanent_pt(state: &GameState, id: ObjectId, stop: Layer, chars:
     if (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) && obj.became.is_none() && obj.last_known.is_none() {
         chars.power = None;
         chars.toughness = None;
+        chars.base_power = None;
     }
 }
 
@@ -1009,6 +1010,10 @@ fn starting(cx: &Ctx, o: &ObjCtx, li: usize, snap: &mut Snap) {
     if layer == Layer::Ability && chars.is(CardType::Battle) {
         intrinsic_siege(cx.cards, chars);
     }
+    // CR 613.4a, 613.4b: layers 7a and 7b are done, and nothing of 7c has applied: this is its base power.
+    if layer == Layer::PtModify {
+        chars.base_power = chars.power;
+    }
     if o.has_counters && layer == Layer::PtModify {
         counters(o.obj, chars);
     }
@@ -1321,6 +1326,8 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         colors: colors.unwrap_or_else(|| words.colors(def.colors())),
         power: pt.map(|(p, _)| p).or(def.power),
         toughness: pt.map(|(_, t)| t).or(def.toughness),
+        // Until layer 7c notes what 7a and 7b made it (`starting`), and for good on an object nothing acts on (`bare`).
+        base_power: pt.map(|(p, _)| p).or(def.power),
         keywords: Keywords(printed_keywords.0 | extra_keywords.0),
         // CR 612.4: a color word of a token's text is the text's that made it.
         protection: words.colors(def.protection),
@@ -3406,6 +3413,7 @@ mod tests {
             colors: ColorSet::NONE,
             power: Some(1),
             toughness: Some(4),
+            base_power: Some(1),
             keywords: Keywords::NONE,
             protection: ColorSet::NONE,
             protection_colorless: false,

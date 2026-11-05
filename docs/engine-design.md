@@ -299,6 +299,12 @@ only the candidates the host's verdict on those picked says may be added.
 
 - **Computed on query** (`chars()`), through the layers (613), from the object's card, its counters and the
   continuous effects that apply.
+- **Base power (613.4a, 613.4b)** is `Chars::base_power`: the layers note the power as layer 7c begins, in the one place every
+  route through 7c passes (`layers::starting`), so reading it does no layer work and the order of each layer stays the pass's
+  (613.8). It is in the last-known row with the rest (`LastKnown::base_power`), so `chars` gives a creature's as it last was once
+  it has left (608.2h, 400.7) and `history::DamageDealt::chars` as it dealt damage. A combat-damage trigger is checked immediately
+  after the damage (603.10), on the source itself: `q.chars(source).power_above_base()`, which is Kutzil's, Ms. Marvel's and Baird's
+  question ("power greater than its base power").
 - **Control-changing effects (613.1b, layer 2)** set the permanent's stored controller (`Obj::controller`, with
   `marks.control_base` the one it had before any applied). They are resolved `EffectKind::Control(player)` effects
   (`Game::gain_control`, `exchange_control`) and static abilities of `Layer::Control` made with `control_changing(affects,

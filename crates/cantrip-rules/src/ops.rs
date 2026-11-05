@@ -2259,6 +2259,7 @@ pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
         colors: c.colors,
         power: c.power,
         toughness: c.toughness,
+        base_power: c.base_power,
         keywords: c.keywords,
         toxic: c.toxic,
         protection: c.protection,

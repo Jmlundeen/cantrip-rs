@@ -7,6 +7,8 @@ pub mod tree;
 mod actions;
 mod takeback;
 #[cfg(test)]
+mod base_power_tests;
+#[cfg(test)]
 mod takeback_tests;
 #[cfg(test)]
 mod as_transforms_tests;
@@ -922,6 +924,7 @@ impl Game {
                     colors: c.colors,
                     power: c.power,
                     toughness: c.toughness,
+                    base_power: c.base_power,
                     keywords: c.keywords,
                     toxic: c.toxic,
                     protection: c.protection,

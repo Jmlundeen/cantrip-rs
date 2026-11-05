@@ -81,6 +81,7 @@ mod tests {
                 colors: ColorSet::NONE,
                 power: None,
                 toughness: None,
+                base_power: None,
                 keywords: Keywords::NONE,
                 protection: ColorSet::NONE,
                 protection_colorless: false,

@@ -2000,6 +2000,8 @@ pub struct LastKnown {
     pub colors: ColorSet,
     pub power: Option<i16>,
     pub toughness: Option<i16>,
+    /// Its base power as it last had it (`Chars::base_power`).
+    pub base_power: Option<i16>,
     pub keywords: Keywords,
     /// Its total toxic value as it last had it (CR 702.164b).
     pub toxic: u16,
