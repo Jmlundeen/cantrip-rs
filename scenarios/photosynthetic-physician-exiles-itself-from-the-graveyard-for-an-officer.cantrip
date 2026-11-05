@@ -1,0 +1,56 @@
+# Photosynthetic Physician's "{G}, Exile this card from your graveyard: Create a 1/1 red Officer creature token. Activate only
+# as a sorcery." (CR 113.6m, 602.2, 602.5d): its own card is the cost, so it leaves the graveyard for exile and makes the token;
+# on Bot2's turn the same ability is not offered at all.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Pearl
+Photosynthetic Physician
+Forest x2
+Forest x14
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Bloodchief's Thirst
+Swamp x4
+Swamp x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Photosynthetic Physician.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Bloodchief's Thirst.Cast(Kicked: 1)
+Bot2.Target(Bot1.Battlefield.Photosynthetic Physician)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+! Bot1.Graveyard.Photosynthetic Physician.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Graveyard.Photosynthetic Physician.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Exile.Photosynthetic Physician.Colors = Green
+Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Officer Token.Power = 1
+Bot1.Battlefield.Officer Token.Toughness = 1
+Bot1.Battlefield.Officer Token.Colors = Red
+Bot1.Battlefield.Officer Token.Subtypes = Officer
+Bot1.Battlefield.Officer Token.Token = true

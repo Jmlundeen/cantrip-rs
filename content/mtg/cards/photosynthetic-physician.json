@@ -1,0 +1,11 @@
+{
+  "name": "Photosynthetic Physician",
+  "manaCost": "{4}{G}",
+  "type": "Creature — Plant Doctor",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Reach\n{G}, Exile this card from your graveyard: Create a 1/1 red Officer creature token. Activate only as a sorcery.",
+  "keywords": [
+    "Reach"
+  ]
+}
