@@ -1,0 +1,48 @@
+# Dirgur Island Dragon cast as the creature, a 4/4 flier with "ward {2}": Bot1 pays {5}{U} on turn 1 with Black Lotus and three
+# moxen. Bot2's Black Lotus makes three red, so after Lightning Bolt it can pay {2} and the Bolt deals 3 damage to the Dragon.
+# Nothing is left in Bot2's pool, so {2} was paid and no more.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Black Lotus
+Dirgur Island Dragon
+Island x30
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dirgur Island Dragon.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dirgur Island Dragon.Keywords = Flying
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Dirgur Island Dragon)
+Bot2.PayCost
+? Bot2.Mana =
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Dirgur Island Dragon.Damage = 3
+Bot2.Graveyard = Lightning Bolt; Black Lotus

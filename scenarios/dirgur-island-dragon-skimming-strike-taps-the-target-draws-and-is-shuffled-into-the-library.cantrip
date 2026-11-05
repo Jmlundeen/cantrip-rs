@@ -1,0 +1,41 @@
+# Dirgur Island Dragon cast as its Omen, Skimming Strike (CR 720.3): "Tap up to one target creature. Draw a card. (Then shuffle
+# this card into its owner's library.)" Bot1 pays {1}{U} with two moxen on turn 3 and taps Bot2's Ornithopter; the card is not
+# put into the graveyard but shuffled into the library (CR 720.3d), so the library ends one larger than after the draw for the
+# turn and the dragon is in no other zone. Hand: seven, less two moxen, plus the turn draw, less the dragon, plus Strike's draw.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Dirgur Island Dragon
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Dirgur Island Dragon.Cast(Bot2.Battlefield.Ornithopter; Ability: Omen)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Stack = Skimming Strike
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 9
+Bot1.Graveyard.Count = 0
+Exile.Count = 0

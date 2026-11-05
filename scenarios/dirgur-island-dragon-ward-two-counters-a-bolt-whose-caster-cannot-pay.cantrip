@@ -1,0 +1,43 @@
+# Dirgur Island Dragon, "ward {2}": Bot2's only mana is a Mox Ruby, which pays for the Lightning Bolt, so the ward trigger
+# counters it and the Dragon takes no damage.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Black Lotus
+Dirgur Island Dragon
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dirgur Island Dragon.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Dirgur Island Dragon)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Dirgur Island Dragon.Damage = 0
+Bot2.Graveyard = Lightning Bolt

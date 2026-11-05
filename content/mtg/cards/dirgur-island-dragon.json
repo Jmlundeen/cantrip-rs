@@ -1,0 +1,17 @@
+{
+  "name": "Dirgur Island Dragon",
+  "manaCost": "{5}{U}",
+  "type": "Creature — Dragon",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Flying\nWard {2} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)",
+  "keywords": [
+    "Flying"
+  ],
+  "omen": {
+    "name": "Skimming Strike",
+    "manaCost": "{1}{U}",
+    "type": "Instant — Omen",
+    "oracleText": "Tap up to one target creature. Draw a card. (Then shuffle this card into its owner's library.)"
+  }
+}
