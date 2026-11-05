@@ -1,0 +1,7 @@
+{
+  "name": "U.S.S. Discovery, at Black Alert",
+  "manaCost": "{3}{G}{G}",
+  "type": "Legendary Artifact — Spacecraft",
+  "stationPt": "5/5",
+  "oracleText": "Whenever U.S.S. Discovery enters or attacks, discover 5. (Exile cards from the top of your library until you exile a nonland card with mana value 5 or less. Cast it without paying its mana cost or put it into your hand. Put the rest on the bottom in a random order.)\nStation\n6+ | Flying"
+}

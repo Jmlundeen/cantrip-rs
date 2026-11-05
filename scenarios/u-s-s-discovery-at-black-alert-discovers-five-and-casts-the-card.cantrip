@@ -1,0 +1,42 @@
+# U.S.S. Discovery's "Whenever U.S.S. Discovery enters or attacks, discover 5" (CR 701.57a): Craw Wurm, mana value 6, is
+# exiled past, and Serra Angel, mana value exactly 5, is the first nonland card with mana value 5 or less, so it is cast from
+# exile without paying its mana cost; Craw Wurm goes to the bottom of the library, the Lightning Bolt under the Angel never
+# exiled.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+U.S.S. Discovery, at Black Alert
+Island
+Craw Wurm
+Serra Angel
+Lightning Bolt
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.U.S.S. Discovery, at Black Alert.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Serra Angel.Power = 4
+Bot1.Library = Lightning Bolt; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Craw Wurm
+Exile.Count = 0
