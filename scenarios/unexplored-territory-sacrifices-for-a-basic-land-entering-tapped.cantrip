@@ -1,0 +1,28 @@
+# Unexplored Territory taps for one colorless mana, then its sacrifice ability searches up a basic land, which enters
+# tapped, and the library is shuffled (CR 605.1a, 701.21a, 701.23, 701.20a).
+
+[Bot1 Deck]
+Unexplored Territory
+Island
+Plains x18
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Unexplored Territory.Play
+Bot1.Battlefield.Unexplored Territory.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Unexplored Territory.Activate(Ability: Sacrifice this land)
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Graveyard = Unexplored Territory
+Bot1.Shuffles = 1
+Bot1.Mana =
