@@ -1,0 +1,36 @@
+# Concerted Effort ({2}{W}{W}): "At the beginning of each upkeep, creatures you control gain flying until end of turn if a
+# creature you control has flying. The same is true for fear, first strike, double strike, landwalk, protection, trample, and
+# vigilance." Here Worf has vigilance, so at Bot1's next upkeep the Savannah Lions gains vigilance too. The other scenario
+# covers flying.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Savannah Lions
+Worf, Chief Tactical Officer
+Concerted Effort
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Hand.Worf, Chief Tactical Officer.Cast
+Bot1.Hand.Concerted Effort.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Savannah Lions.Keywords = Vigilance
+
+[Expect]
+Bot1.Battlefield.Worf, Chief Tactical Officer.Keywords = Vigilance
+Bot1.Battlefield.Savannah Lions.Keywords = Vigilance
+Bot1.Battlefield.Concerted Effort.Types = Enchantment

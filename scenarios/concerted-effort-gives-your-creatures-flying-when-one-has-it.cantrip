@@ -1,0 +1,44 @@
+# Concerted Effort ({2}{W}{W}): "At the beginning of each upkeep, creatures you control gain flying until end of turn if a
+# creature you control has flying. The same is true for fear, first strike, double strike, landwalk, protection, trample, and
+# vigilance." With an Ornithopter under Bot1's control, Bot2's upkeep hands flying to Bot1's Savannah Lions as well.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Mox Pearl
+Ornithopter
+Savannah Lions
+Concerted Effort
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Concerted Effort.Cast
+Bot1.Pass
+Bot2.Pass
+[T8 Bot2.Main1]
+? Bot1.Battlefield.Savannah Lions.Keywords = Flying
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.Savannah Lions.Keywords = Flying
+Bot1.Battlefield.Concerted Effort.Types = Enchantment
