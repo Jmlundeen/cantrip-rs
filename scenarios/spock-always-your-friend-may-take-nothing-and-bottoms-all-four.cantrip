@@ -1,0 +1,38 @@
+# Spock, Always Your Friend: "You may reveal a noncreature, nonland card from among them and put it into your hand"
+# (CR 701.20) - the look is the instruction and the taking only its option, so Bot1 may take nothing even with a Lightning
+# Bolt among the four; all four go to the bottom in its chosen order and the hand is unchanged.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Spock, Always Your Friend
+Island
+Island
+Island
+Island
+Grizzly Bears
+Lightning Bolt
+Forest
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spock, Always Your Friend.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Grizzly Bears; Lightning Bolt; Forest; Mountain)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Library.Count = 14

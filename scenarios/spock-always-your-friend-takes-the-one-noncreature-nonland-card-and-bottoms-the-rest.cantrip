@@ -1,0 +1,40 @@
+# Spock, Always Your Friend: "look at the top four cards of your library. You may reveal a noncreature, nonland card from
+# among them and put it into your hand. Put the rest on the bottom of your library in any order." (CR 701.20, 401.4) The
+# top four are Grizzly Bears, Lightning Bolt, Forest and Mountain; only the Bolt qualifies, so it is taken and the three
+# others go to the bottom in the order Bot1 chooses.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Spock, Always Your Friend
+Island
+Island
+Island
+Island
+Grizzly Bears
+Lightning Bolt
+Forest
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spock, Always Your Friend.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Lightning Bolt | Mountain; Forest; Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Lightning Bolt
+Bot1.Library.Count = 13
+Bot1.Graveyard.Lightning Bolt = (absent)
