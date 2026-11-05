@@ -13,7 +13,7 @@ fn tap_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::EQUIPPED_CREATURE_ATTACKS_SUBJECT, tap_target, "Whenever equipped creature attacks, tap target creature defending player controls.")
+        triggered(triggers::ATTACHED_CREATURE_ATTACKS_SUBJECT, tap_target, "Whenever equipped creature attacks, tap target creature defending player controls.")
             .targets(&[targets::CREATURE_DEFENDING_PLAYER_CONTROLS]),
         equip(mana("{2}"), "Equip {2}"),
     ],

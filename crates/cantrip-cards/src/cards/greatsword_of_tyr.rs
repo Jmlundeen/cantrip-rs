@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::equip;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS_SUBJECT;
+use cantrip_mechanics::triggers::ATTACHED_CREATURE_ATTACKS_SUBJECT;
 use cantrip_oracle as oracle;
 
 /// "Put a +1/+1 counter on it and tap up to one target creature defending player controls." The counter goes on the
@@ -20,7 +20,7 @@ fn counter_and_tap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            EQUIPPED_CREATURE_ATTACKS_SUBJECT,
+            ATTACHED_CREATURE_ATTACKS_SUBJECT,
             counter_and_tap,
             "Whenever equipped creature attacks, put a +1/+1 counter on it and tap up to one target creature defending player controls.",
         )

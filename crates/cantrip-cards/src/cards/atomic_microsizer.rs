@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::statics::plus_pt;
-use cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS_SUBJECT;
+use cantrip_mechanics::triggers::ATTACHED_CREATURE_ATTACKS_SUBJECT;
 use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
@@ -21,7 +21,7 @@ fn unblockable_one_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            EQUIPPED_CREATURE_ATTACKS_SUBJECT,
+            ATTACHED_CREATURE_ATTACKS_SUBJECT,
             unblockable_one_one,
             "Whenever equipped creature attacks, choose up to one target creature. That creature can't be blocked this turn and has base power and toughness 1/1 until end of turn.",
         )

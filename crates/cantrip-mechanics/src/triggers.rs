@@ -520,7 +520,7 @@ pub fn this_attacks_defender(_: &dyn Query, source: ObjectId, event: &Event) -> 
 }
 
 /// "Whenever equipped creature attacks" (CR 508.1m, 301.5): the creature this Equipment is attached to attacks. Adaptive
-/// Omnitool and Argentum Armor print it. `equipped_creature_attacks_subject` carries the creature as the subject.
+/// Omnitool and Argentum Armor print it. `attached_creature_attacks_subject` carries the creature as the subject.
 pub fn equipped_creature_attacks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::Attacks { attacker, .. } if q.attached_to(source) == Some(*attacker) => Fired::PLAIN,
@@ -529,8 +529,9 @@ pub fn equipped_creature_attacks(q: &dyn Query, source: ObjectId, event: &Event)
 }
 
 /// `equipped_creature_attacks` with the attacking creature as the trigger's subject, for an ability that does something
-/// to it ("it gains ..."). Bone Sabres and Strength-Testing Hammer print it.
-pub fn equipped_creature_attacks_subject(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+/// to it ("it gains ..."); the creature an Aura enchants is attached the same way ("enchanted creature attacks"). Bone Sabres
+/// and Strength-Testing Hammer (Equipment) and Chorale of the Void (an Aura) print it.
+pub fn attached_creature_attacks_subject(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::Attacks { attacker, .. } if q.attached_to(source) == Some(*attacker) => Fired::about(Target::Object(*attacker)),
         _ => None,
@@ -2080,7 +2081,7 @@ pub const THIS_ENTERS_OR_YOU_SACRIFICE_IT: Trigger = when_asked(EventMask::ZONE_
 pub const THIS_ENTERS_OR_ATTACKS: Trigger = when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0), this_enters_or_attacks);
 pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);
 pub const EQUIPPED_CREATURE_ATTACKS: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks);
-pub const EQUIPPED_CREATURE_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks_subject);
+pub const ATTACHED_CREATURE_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, attached_creature_attacks_subject);
 pub const EQUIPPED_CREATURE_DEALS_COMBAT_DAMAGE_TO_PLAYER: Trigger =
     when(EventMask::DAMAGE, equipped_creature_deals_combat_damage_to_player);
 pub const ENCHANTED_PLAYER_ATTACKED: Trigger = when(EventMask::ATTACKS, enchanted_player_attacked);
