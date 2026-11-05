@@ -1,0 +1,6 @@
+{
+  "name": "Sarkhan's Resolve",
+  "manaCost": "{1}{G}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Target creature gets +3/+3 until end of turn.\n• Destroy target creature with flying."
+}

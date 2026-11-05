@@ -1,0 +1,52 @@
+# Sarkhan's Resolve ({1}{G} instant): the second mode, "destroy target creature with flying". Bot1 destroys its own Ornithopter
+# (flying) on turn 1, refusing its Memnite (no flying) and a Mox (not a creature); on turn 2 it destroys Bot2's Ornithopter,
+# refusing Bot2's Memnite.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Ornithopter
+Memnite
+Sarkhan's Resolve
+Sarkhan's Resolve
+Forest x13
+
+[Bot2 Deck]
+Ornithopter
+Memnite
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sarkhan's Resolve.Cast
+Bot1.Modes(Destroy target creature with flying)
+! Bot1.Target(Bot1.Battlefield.Memnite)
+! Bot1.Target(Bot1.Battlefield.Mox Emerald)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Sarkhan's Resolve; Ornithopter; Black Lotus
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sarkhan's Resolve.Cast
+Bot1.Modes(Destroy target creature with flying)
+! Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Memnite
+Bot1.Battlefield.Memnite.Power = 1
