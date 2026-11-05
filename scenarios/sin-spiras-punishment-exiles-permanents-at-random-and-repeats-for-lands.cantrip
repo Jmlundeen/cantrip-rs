@@ -1,0 +1,71 @@
+# Sin, Spira's Punishment (CR 701.13, 707.2, 111.1, 110.4a, 700.7): Bot1's graveyard holds two Islands (discarded to Faithless
+# Looting) and the Black Lotus sacrificed to cast Sin (Faithless Looting itself is no permanent card); Bot2's holds a Black Lotus
+# (and later a discarded Island), never touched. When Sin enters the dice pick an Island first - a land, so the process repeats -
+# then the Black Lotus: nonland, so it ends, with a tapped Island token and a tapped Black Lotus token and one Island left. When Sin
+# attacks on turn 5 the die picks the last Island, a land that repeats the process on a graveyard with no permanent card left -
+# nothing more - while Bot2's cards are still there.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Faithless Looting
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Sin, Spira's Punishment
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Island x19
+
+[Dice]
+1; 2; 1
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sin, Spira's Punishment.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Graveyard = Faithless Looting; Island
+? Bot1.Battlefield.Island.Tapped = true
+? Bot1.Battlefield.Black Lotus.Tapped = true
+? Bot2.Graveyard = Black Lotus
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Sin, Spira's Punishment)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Faithless Looting
+Bot2.Graveyard = Island; Black Lotus
+Bot1.Battlefield.Count = 8

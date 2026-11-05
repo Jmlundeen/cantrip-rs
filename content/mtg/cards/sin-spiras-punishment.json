@@ -1,0 +1,11 @@
+{
+  "name": "Sin, Spira's Punishment",
+  "manaCost": "{4}{B}{G}{U}",
+  "type": "Legendary Creature — Leviathan Avatar",
+  "power": 7,
+  "toughness": 7,
+  "oracleText": "Flying\nWhenever Sin enters or attacks, exile a permanent card from your graveyard at random, then create a tapped token that's a copy of that card. If the exiled card is a land card, repeat this process.",
+  "keywords": [
+    "Flying"
+  ]
+}
