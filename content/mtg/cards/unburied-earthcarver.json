@@ -1,0 +1,8 @@
+{
+  "name": "Unburied Earthcarver",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Human Warrior",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{2}, Sacrifice another creature: Put a +1/+1 counter on this creature."
+}

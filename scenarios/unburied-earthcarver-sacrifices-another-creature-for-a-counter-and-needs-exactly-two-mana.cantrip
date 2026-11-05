@@ -1,0 +1,41 @@
+# Unburied Earthcarver (2/2): "{2}, Sacrifice another creature: Put a +1/+1 counter on this creature." On turn 1 a Black Lotus pays
+# its {1}{B} and leaves one mana floating: the {2} is refused (one too few, with the Memnite there to sacrifice). On turn 3 two
+# Moxen are cast and tapped for exactly {2}, the pool is left empty, the Memnite is sacrificed and the Earthcarver is a 3/3 with
+# one counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Memnite
+Unburied Earthcarver
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unburied Earthcarver.Cast
+! Bot1.Battlefield.Unburied Earthcarver.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Unburied Earthcarver.Activate
+Bot1.Choose(Memnite)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Unburied Earthcarver.Power = 3
+Bot1.Battlefield.Unburied Earthcarver.Toughness = 3
+Bot1.Battlefield.Unburied Earthcarver.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Memnite; Black Lotus
