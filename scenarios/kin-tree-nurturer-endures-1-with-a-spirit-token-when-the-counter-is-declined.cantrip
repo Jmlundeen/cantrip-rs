@@ -1,0 +1,26 @@
+# Kin-Tree Nurturer: Bot1 declines the counter, so the Nurturer stays a 2/1 and a 1/1 white Spirit creature token is created
+# (CR 701.63a).
+
+[Bot1 Deck]
+Black Lotus
+Kin-Tree Nurturer
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Kin-Tree Nurturer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield.Kin-Tree Nurturer.Power = 2
+Bot1.Battlefield.Kin-Tree Nurturer.Toughness = 1
+Bot1.Battlefield.Kin-Tree Nurturer.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spirit Token.Power = 1
+Bot1.Battlefield.Spirit Token.Toughness = 1
+Bot1.Battlefield.Spirit Token.Colors = White

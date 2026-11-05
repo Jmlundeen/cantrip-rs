@@ -1,0 +1,30 @@
+# Kin-Tree Nurturer ({2}{B}, 2/1 lifelink): "When this creature enters, it endures 1." (CR 701.63a) Bot1 casts it off a Black
+# Lotus and chooses the counter: a 3/2 with one +1/+1 counter and no Spirit token. On turn 3 it attacks for 3 and its lifelink
+# gains Bot1 3 life (CR 702.15b).
+
+[Bot1 Deck]
+Black Lotus
+Kin-Tree Nurturer
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Kin-Tree Nurturer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Battlefield.Count = 1
+[T3 Bot1.Attackers]
+Bot1.Attack(Kin-Tree Nurturer > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Kin-Tree Nurturer.Power = 3
+Bot1.Battlefield.Kin-Tree Nurturer.Toughness = 2
+Bot1.Battlefield.Kin-Tree Nurturer.Counters.PlusOnePlusOne = 1
+Bot2.Life = 17
+Bot1.Life = 23

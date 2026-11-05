@@ -1,0 +1,11 @@
+{
+  "name": "Kin-Tree Nurturer",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Human Druid",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Lifelink\nWhen this creature enters, it endures 1. (Put a +1/+1 counter on it or create a 1/1 white Spirit creature token.)",
+  "keywords": [
+    "Lifelink"
+  ]
+}
