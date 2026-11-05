@@ -1,0 +1,49 @@
+# Balthier and Fran: the additional combat phase is only for a player who pays {1}{R}{G} (CR 118.12). Same board as the paying case; Bot1 declines, so the crewed Ferry (5/4) attacks
+# once and the turn moves on: Bot2 on 15.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Jet
+Balthier and Fran
+Passenger Ferry
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Balthier and Fran.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Hand.Passenger Ferry.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Passenger Ferry.Activate(Ability: Crew)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Passenger Ferry.Power = 5
+? Bot1.Battlefield.Passenger Ferry.Toughness = 4
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Passenger Ferry)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15

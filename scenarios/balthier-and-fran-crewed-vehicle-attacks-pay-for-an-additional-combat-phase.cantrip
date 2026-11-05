@@ -1,0 +1,60 @@
+# Balthier and Fran (4/3, reach): "Vehicles you control get +1/+1 and have reach and vigilance. Whenever a Vehicle crewed by Balthier and Fran this turn attacks, if it's the first
+# combat phase of the turn, you may pay {1}{R}{G}. If you do, after this phase, there is an additional combat phase" (CR 500.8, 603.4). Turn 1 Bot1 casts Balthier off three
+# Moxen and a Passenger Ferry (a 4/3 Vehicle) off Black Lotus. On turn 3 Balthier crews the Ferry, which attacks as a 5/4 with vigilance (still untapped), and Bot1 pays {1}{R}{G}:
+# it attacks again in the additional combat phase, which is not the first, so nothing more: 5 damage in each, Bot2 on 10.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Jet
+Balthier and Fran
+Passenger Ferry
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Balthier and Fran.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Hand.Passenger Ferry.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Passenger Ferry.Activate(Ability: Crew)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Passenger Ferry.Power = 5
+? Bot1.Battlefield.Passenger Ferry.Toughness = 4
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Passenger Ferry)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.PayCost
+? Bot1.Battlefield.Passenger Ferry.Tapped = false
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 15
+Bot1.Attack(Passenger Ferry)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 10

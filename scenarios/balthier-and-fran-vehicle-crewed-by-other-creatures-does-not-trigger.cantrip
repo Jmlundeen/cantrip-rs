@@ -1,0 +1,58 @@
+# Balthier and Fran: "Whenever a Vehicle crewed by Balthier and Fran this turn attacks" (CR 702.122c). Turn 1 Bot1 casts Balthier and a Passenger Ferry (a 4/3 Vehicle). On turn 3 the Ferry
+# is crewed by a Savannah Lions (power 2), not by Balthier and Fran (untapped, in play): the Ferry attacks as a 5/4 (the +1/+1 is Balthier's static for any Vehicle he controls) and
+# only its own trigger asks anything, which Bot1 declines; there is no payment to make and no additional combat phase. Bot2 on 15.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Balthier and Fran
+Passenger Ferry
+Black Lotus
+Mox Pearl
+Savannah Lions
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Balthier and Fran.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Hand.Passenger Ferry.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Passenger Ferry.Activate(Ability: Crew)
+Bot1.Choose(Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Passenger Ferry)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Balthier and Fran.Tapped = false
