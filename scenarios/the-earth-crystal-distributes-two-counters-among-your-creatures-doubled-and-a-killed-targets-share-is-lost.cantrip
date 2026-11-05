@@ -1,0 +1,84 @@
+# The Earth Crystal: "{4}{G}{G}, {T}: Distribute two +1/+1 counters among one or two target creatures you control." The
+# targets and their shares are announced as it is activated, each target at least one (CR 601.2d by way of 602.2b; the
+# ruling). Turn 5: two Black Lotus mana, Forest, Llanowar Elves and Mox Emerald pay exactly; Bot2's Elvish Mystic can't be
+# a target, nor can the two counters be given two and none. One each goes to Grizzly Bears and Llanowar Elves, and Bot1
+# bolts the Elves in response: the Elves' share is lost, not given to the Bears (the ruling, CR 608.2b), and the Bears'
+# one is doubled by the Crystal's own replacement: 2. Turn 7: both counters on the Bears alone, doubled to 4: 6 in all.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Black Lotus
+The Earth Crystal
+Llanowar Elves
+Grizzly Bears
+Mountain
+Lightning Bolt
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The Earth Crystal.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.The Earth Crystal.Activate
+! Bot1.Divide(Grizzly Bears: 1; Bot2.Battlefield.Elvish Mystic: 1)
+! Bot1.Divide(Grizzly Bears: 2; Llanowar Elves: 0)
+Bot1.Divide(Grizzly Bears: 1; Llanowar Elves: 1)
+? Bot1.Mana =
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 2
+? Bot1.Graveyard = Llanowar Elves; Lightning Bolt; Black Lotus; Black Lotus
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.The Earth Crystal.Activate
+Bot1.Divide(Grizzly Bears: 2)
+? Bot1.Mana =
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 6
+Bot1.Battlefield.Grizzly Bears.Power = 8
+Bot2.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = (absent)

@@ -1,0 +1,49 @@
+# The Earth Crystal: "{4}{G}{G}, {T}: Distribute two +1/+1 counters among one or two target creatures you control." It
+# needs at least one target (CR 601.2c by way of 602.2b, 115.1c): turn 3, with the six mana in the pool and only Bot2's
+# Llanowar Elves on the battlefield, it can't be activated, and the mana stays.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Black Lotus
+Black Lotus
+The Earth Crystal
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The Earth Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{G}{G}{G}{G}{G}
+! Bot1.Battlefield.The Earth Crystal.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.The Earth Crystal.Tapped = false
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
