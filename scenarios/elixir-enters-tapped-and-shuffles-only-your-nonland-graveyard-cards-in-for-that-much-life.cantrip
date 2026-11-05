@@ -1,0 +1,66 @@
+# Elixir enters tapped. On turn 3, with {5} (Black Lotus's three mana, Mox Ruby and Mox Pearl; four mana is refused), Bot1 taps and exiles it:
+# Bot1's nonland graveyard cards (Lightning Bolt, Lotus Petal, Black Lotus) are shuffled into the library and Bot1 gains 3 life; the Island
+# Bot2's Stone Rain destroyed stays in the graveyard, and so does Bot2's own Stone Rain in Bot2's.
+
+[Bot1 Deck]
+Mox Ruby
+Island
+Elixir
+Lightning Bolt
+Lotus Petal
+Black Lotus
+Mox Pearl
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Stone Rain
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Island.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: White)
+Bot1.Hand.Elixir.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Elixir.Tapped = true
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Stone Rain.Cast(Bot1.Battlefield.Island)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Island; Lightning Bolt; Lotus Petal
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Elixir.Activate(Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Elixir.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot1.Shuffles = 1
+Bot1.Library.Count = 13
+Bot1.Graveyard = Island
+Bot2.Graveyard = Stone Rain
+Exile = Elixir
+Bot2.Life = 17
