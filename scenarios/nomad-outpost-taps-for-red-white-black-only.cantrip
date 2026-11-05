@@ -1,0 +1,30 @@
+# "{T}: Add {R}, {W}, or {B}." The color is chosen as the ability is activated, one each turn (red, white, black); the other colors and
+# colorless are refused beside those positive controls.
+
+[Bot1 Deck]
+Nomad Outpost
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Nomad Outpost.Play
+? Bot1.Battlefield.Nomad Outpost.Tapped = true
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Nomad Outpost.Activate(Color: Blue)
+! Bot1.Battlefield.Nomad Outpost.Activate(Color: Green)
+! Bot1.Battlefield.Nomad Outpost.Activate(Color: Colorless)
+Bot1.Battlefield.Nomad Outpost.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Nomad Outpost.Activate(Color: White)
+? Bot1.Mana = {W}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Nomad Outpost.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Nomad Outpost.Tapped = true

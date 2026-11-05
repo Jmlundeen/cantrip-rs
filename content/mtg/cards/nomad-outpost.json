@@ -1,0 +1,5 @@
+{
+  "name": "Nomad Outpost",
+  "type": "Land",
+  "oracleText": "This land enters tapped.\n{T}: Add {R}, {W}, or {B}."
+}
