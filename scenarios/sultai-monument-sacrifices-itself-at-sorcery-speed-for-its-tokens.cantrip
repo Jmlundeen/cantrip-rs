@@ -1,0 +1,55 @@
+# "{2}{B}{G}{U}, {T}, Sacrifice this artifact: Create two 2/2 black Zombie Druid creature tokens. Activate only as a sorcery." (CR 602.5d, 111.2)
+# Bot1 casts the Monument on turn 1; on the opponent's turn 2 the activation is refused (sorcery speed); on turn 3 the
+# Moxen pay and the Monument is sacrificed as a cost, leaving only the tokens.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Sultai Monument
+Ornithopter x4
+Ornithopter x20
+
+[Bot2 Deck]
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sultai Monument.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search()
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+! Bot1.Battlefield.Sultai Monument.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sultai Monument.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Sultai Monument
+Bot1.Battlefield.Zombie Druid Token#1.Power = 2
+Bot1.Battlefield.Zombie Druid Token#1.Toughness = 2
+Bot1.Battlefield.Zombie Druid Token#1.Colors = Black
+Bot1.Battlefield.Zombie Druid Token#2.Power = 2
+Bot1.Battlefield.Zombie Druid Token#2.Toughness = 2
+Bot1.Battlefield.Zombie Druid Token#2.Colors = Black
+Bot1.Battlefield.Zombie Druid Token#3 = (absent)

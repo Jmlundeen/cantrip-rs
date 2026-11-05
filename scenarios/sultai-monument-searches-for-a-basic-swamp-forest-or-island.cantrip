@@ -1,0 +1,36 @@
+# Sultai Monument {2} Artifact: "When this artifact enters, search your library for a basic Swamp, Forest, or Island card, reveal it, put it into
+# your hand, then shuffle" (CR 701.23). Two Moxen cast it on turn 1. The search refuses a Plains (the wrong type) and a
+# Tropical Island (it has a listed type, but is not basic), then refuses two cards at once (the search finds at most one) and finds the Swamp: it reaches the hand, revealed.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Sultai Monument
+Ornithopter x4
+Plains
+Tropical Island
+Swamp x2
+Ornithopter x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sultai Monument.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Plains)
+! Bot1.Search(Tropical Island)
+! Bot1.Search(Swamp; Swamp)
+Bot1.Search(Swamp)
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Swamp; Ornithopter; Ornithopter; Ornithopter; Ornithopter
+Bot1.Revealed = Swamp
