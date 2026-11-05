@@ -1,0 +1,42 @@
+# Worf, Honor-Bound Warrior: "Whenever you attack while creatures you control have total power 8 or greater, double Worf's
+# power until end of turn." (CR 508.3d, 603.4, 701.10a-b) Worf with a +1/+1 counter (2) and three 2/1 Elite Vanguards (6)
+# are exactly 8 power, the two 0/2 Ornithopters that tapped for the counter count with them, so the trigger doubles Worf's
+# 2 power to 4 - not 3 - and Worf and the Vanguards deal 10.
+
+[Bot1 Deck]
+Worf, Honor-Bound Warrior
+Elite Vanguard x3
+Ornithopter x2
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Hand.Elite Vanguard.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Worf, Honor-Bound Warrior.Cast
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Worf, Honor-Bound Warrior.Activate
+Bot1.Choose(Ornithopter#1; Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Worf, Honor-Bound Warrior; Elite Vanguard#1; Elite Vanguard#2; Elite Vanguard#3)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Worf, Honor-Bound Warrior.Power = 4
+Bot2.Life = 10

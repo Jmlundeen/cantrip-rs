@@ -1,0 +1,37 @@
+# Worf, Honor-Bound Warrior: "Tap two untapped artifacts and/or creatures you control: Put a +1/+1 counter on Worf.
+# Activate only as a sorcery." (CR 118.3, 602.5d) A plain artifact (Mox Pearl) and a plain creature (Worf himself) both
+# count, and the cost is exactly two: the Ornithopter is left untapped. Once the Mox is tapped it is no untapped artifact,
+# so Worf can't be activated again with it and the Ornithopter.
+
+[Bot1 Deck]
+Worf, Honor-Bound Warrior
+Mox Pearl
+Ornithopter
+Mountain x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Worf, Honor-Bound Warrior.Cast
+Bot1.Battlefield.Worf, Honor-Bound Warrior.Activate
+Bot1.Choose(Mox Pearl; Worf, Honor-Bound Warrior)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Worf, Honor-Bound Warrior.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Worf, Honor-Bound Warrior.Power = 2
+Bot1.Battlefield.Worf, Honor-Bound Warrior.Toughness = 2
+Bot1.Battlefield.Worf, Honor-Bound Warrior.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Worf, Honor-Bound Warrior.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = false
