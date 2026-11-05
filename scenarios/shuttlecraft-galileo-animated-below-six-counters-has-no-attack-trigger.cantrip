@@ -1,0 +1,50 @@
+# Shuttlecraft Galileo: "6+ | Flying / Whenever Shuttlecraft Galileo attacks, up to seven target attacking creatures gain
+# flying until end of turn." The attack trigger is part of the 6+ striation (CR 721.2a), so Galileo has it only with six or
+# more charge counters. With none, March of the Machines makes it a 4/4 artifact creature (its mana value), and it attacks
+# on turn 3: nothing triggers, and it has no flying.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Shuttlecraft Galileo
+March of the Machines
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shuttlecraft Galileo.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.March of the Machines.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shuttlecraft Galileo.Power = 4
+[T3 Bot1.Main1]
+Bot1.Attack(Shuttlecraft Galileo > Bot2)
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Shuttlecraft Galileo.Keywords = (absent)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
