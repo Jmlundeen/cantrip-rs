@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn put_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let Target::Object(spell) = item.subject else { return Ok(()) };
-    let x = g.mana_value(spell).min(i32::MAX as u32) as i32;
+    let x = g.mana_value(spell) as i32;
     g.add_counters(creature, CounterKind::PlusOne, x);
     Ok(())
 }

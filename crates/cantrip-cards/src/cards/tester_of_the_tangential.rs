@@ -30,8 +30,7 @@ fn pay_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// the counters put on it (Solemnity, CR 122.5): none come off this creature then.
 fn move_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    // A creature holds at most i32::MAX counters, so an X past that moves them all just the same.
-    g.move_counters(item.object, creature, CounterKind::PlusOne, i32::try_from(item.x).unwrap_or(i32::MAX));
+    g.move_counters(item.object, creature, CounterKind::PlusOne, item.x as i32);
     Ok(())
 }
 

@@ -17,10 +17,9 @@ pub static DEVIL: CardDef = CardDef {
 };
 
 /// "The copy isn't legendary and has starting loyalty X" (CR 707.9b, 707.10f): the copy of the spell, a token as it resolves,
-/// with X as announced for this spell. X is announced no higher than a power can be (`i32::MAX`), so a loyalty holds it.
+/// with X as announced for this spell.
 fn copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    // The announcement is capped at `i32::MAX` (`VariableCost::SacrificeWithPowerX`), so `try_from` cannot fail.
-    let Ok(loyalty) = i32::try_from(casualty::x(g, item)) else { return Ok(()) };
+    let loyalty = casualty::x(g, item) as i32;
     let values = g.copiable_values(item.object).nonlegendary().with_loyalty(loyalty);
     g.copy_spell_as(item.object, item.controller, true, values)?;
     Ok(())

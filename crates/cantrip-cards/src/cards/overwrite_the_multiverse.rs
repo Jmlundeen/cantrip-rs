@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// loyalty and goes to the graveyard (CR 704.5i, 701.71a), so nothing is left.
 fn overwrite(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let exiled = effects::exile_all_creatures(g);
-    empower::jace(g, item.controller, item.object, exiled.min(i32::MAX as usize) as i32)
+    empower::jace(g, item.controller, item.object, exiled as i32)
 }
 
 pub static CARD: CardDef = CardDef {

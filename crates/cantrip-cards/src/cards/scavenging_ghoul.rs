@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Count creatures that died this turn as the end-step ability resolves (CR 700.4, 608.2h).
 fn corpses(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let count = history::creatures_died_this_turn(g, None).min(i32::MAX as usize) as i32;
+    let count = history::creatures_died_this_turn(g, None) as i32;
     g.add_counters(item.object, CounterKind::Corpse, count);
     Ok(())
 }

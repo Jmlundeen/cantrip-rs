@@ -44,7 +44,7 @@ fn target_non_aura_enchantment_control(
     item: &StackItem,
 ) -> Result<(), Suspend> {
     let Some(object) = targets::object(g, item, 0) else { return Ok(()) };
-    let size = g.mana_value(object).min(i32::MAX as u32) as i32;
+    let size = g.mana_value(object) as i32;
     instruction(g, |g| {
         g.add_effect(item.object, object, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
         g.add_effect(item.object, object, EffectKind::SetPt(size, size), Duration::Indefinite);

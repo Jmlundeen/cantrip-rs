@@ -13,10 +13,10 @@ fn three_citizens(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Target creature gets +1/+1 until end of turn for each creature you control" (CR 611.2a): counted as the ability resolves, by the
 /// player who controls the ability - the land's controller, since the ability is the land's own (CR 113.8) - the target itself counting if it is
-/// one of theirs. Nothing if the target is no longer legal (CR 608.2b). Play cannot reach a count past `i32::MAX` (32,767) creatures.
+/// one of theirs. Nothing if the target is no longer legal (CR 608.2b).
 fn pump_for_each_creature_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let count = i32::try_from(creatures_you_control(g, item.controller)).unwrap_or(i32::MAX);
+    let count = creatures_you_control(g, item.controller) as i32;
     pump(g, item.object, creature, count, count);
     Ok(())
 }

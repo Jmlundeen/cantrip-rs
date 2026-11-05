@@ -30,7 +30,7 @@ fn deal_damage_and_amass_the_excess(g: &mut dyn Game, item: &StackItem) -> Resul
     {
         g.end_sentence();
         // A counter count holds at most what the engine's width does (RX-5).
-        amass(g, item.controller, item.object, &tokens::GOBLIN_ARMY, Subtype::Goblin, result.excess.min(i32::MAX as u32) as i32)?;
+        amass(g, item.controller, item.object, &tokens::GOBLIN_ARMY, Subtype::Goblin, result.excess as i32)?;
     }
     Ok(())
 }

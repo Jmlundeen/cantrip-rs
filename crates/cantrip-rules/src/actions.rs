@@ -1745,7 +1745,7 @@ fn tap_x_candidates(cx: &Cx, source: ObjectId, player: PlayerId, filter: ObjectF
 }
 
 /// The most a blight X may be announced as (CR 701.68a, 601.2b): the greatest toughness among the creatures its payer controls,
-/// and 0 with none to put the counters on (CR 701.68b) - never more than a toughness can be (`i32::MAX`).
+/// and 0 with none to put the counters on (CR 701.68b).
 fn blight_x_most(cx: &Cx, player: PlayerId) -> u32 {
     if blight_candidates(cx, player).is_empty() {
         return 0;
@@ -1754,7 +1754,7 @@ fn blight_x_most(cx: &Cx, player: PlayerId) -> u32 {
         .into_iter()
         .filter(|&id| cx.chars(id).is(CardType::Creature))
         .filter_map(|id| cx.chars(id).toughness)
-        .map(|t| i32::from(t).clamp(0, i32::from(i32::MAX)) as u32)
+        .map(|t| t.max(0) as u32)
         .max()
         .unwrap_or(0)
 }
@@ -10123,7 +10123,7 @@ fn activate(
     // number is the ability's X (CR 107.3), which its effect reads as "that many".
     let removes = match whole.variable {
         Some(VariableCost::RemoveAnyNumberOfCounters(kind)) => {
-            let cap = cx.s().obj(source).counters(kind).clamp(0, i32::MAX) as u32;
+            let cap = cx.s().obj(source).counters(kind).max(0) as u32;
             item.x = announce_x(cx, player, source, mana, None, 0, 0, cap, false, 0, 0, VariableCost::RemoveAnyNumberOfCounters(kind).governs())? ;
             Some((kind, item.x))
         }

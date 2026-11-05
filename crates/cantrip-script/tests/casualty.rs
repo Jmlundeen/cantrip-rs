@@ -35,7 +35,7 @@ static NEGATIVE: CardDef = body("Negative Body", -1);
 fn power_is_graveyard_cards(q: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     let state = q.state();
     let cards: usize = state.seats().map(|p| state.zone(Zone::graveyard(p)).len()).sum();
-    chars.power = Some(i32::try_from(cards).unwrap_or(i32::MAX));
+    chars.power = Some(cards as i32);
 }
 
 /// "This creature's power is equal to the number of creatures you control."
@@ -43,7 +43,7 @@ fn power_is_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, chars: &
     let state = q.state();
     let you = state.obj(source).controller;
     let creatures = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && q.chars(id).is(CardType::Creature)).count();
-    chars.power = Some(i32::try_from(creatures).unwrap_or(i32::MAX));
+    chars.power = Some(creatures as i32);
 }
 
 /// A */4 that grows with the graveyards, as a Lhurgoyf does.
@@ -94,8 +94,7 @@ static TWO_PROBE: CardDef = CardDef { name: "Casualty Two Probe", optional_cost:
 
 /// "The copy isn't legendary and has starting loyalty X."
 fn copy_nonlegendary(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    // X is announced no higher than a power can be (`i32::MAX`), so a loyalty holds it.
-    let Ok(loyalty) = i32::try_from(casualty::x(g, item)) else { return Ok(()) };
+    let loyalty = casualty::x(g, item) as i32;
     let values = g.copiable_values(item.object).nonlegendary().with_loyalty(loyalty);
     g.copy_spell_as(item.object, item.controller, true, values)?;
     Ok(())

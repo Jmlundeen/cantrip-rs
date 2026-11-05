@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// (CR 614.1c, 700.4): counted as it enters, from the event history; it is not yet on the battlefield, so it is not one.
 fn enters_with_counters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let died = history::creatures_died_this_turn(g, Some(entering.controller));
-    entering.counters[CounterKind::PlusOne as usize] += died.min(i32::MAX as usize) as i32;
+    entering.counters[CounterKind::PlusOne as usize] += died as i32;
     Ok(())
 }
 

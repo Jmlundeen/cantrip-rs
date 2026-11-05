@@ -734,7 +734,7 @@ pub fn enchantment_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// Set power and toughness each to the affected permanent's mana value (CR 613.4b, 202.3).
 /// Animate Artifact, March of the Machines and Opalescence use this operation.
 pub fn base_mana_value(q: &dyn LayerQuery, _: ObjectId, affected: ObjectId, chars: &mut Chars) {
-    let value = q.mana_value(affected, &q.chars(affected)).min(i32::MAX as u32) as i32;
+    let value = q.mana_value(affected, &q.chars(affected)) as i32;
     chars.power = Some(value);
     chars.toughness = Some(value);
 }

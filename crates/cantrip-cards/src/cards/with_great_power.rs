@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn plus_two_for_each_aura_and_equipment_attached(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let Some(host) = q.state().obj(source).attached_to else { return };
     let attached = auras_and_equipment_attached_to(q, host);
-    let bonus = i32::try_from(2 * attached).unwrap_or(i32::MAX);
+    let bonus = 2 * attached as i32;
     chars.power = chars.power.map(|v| v + bonus);
     chars.toughness = chars.toughness.map(|v| v + bonus);
 }
