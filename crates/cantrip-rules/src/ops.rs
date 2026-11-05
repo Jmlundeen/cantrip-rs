@@ -105,7 +105,7 @@ struct Plan {
     entering: bool,
     new: Obj,
     /// The counters it arrives with (CR 122.6), once the replacements have applied, and the player putting them.
-    counts: [i16; CounterKind::COUNT],
+    counts: [i32; CounterKind::COUNT],
     counts_by: PlayerId,
     last_known: LastKnown,
     /// Every player could see it as it moved (`seen_by_all`), for a move into a hand or a library (CR 603.10a).
@@ -1758,7 +1758,7 @@ pub fn put_onto_battlefield(cx: &mut Cx, objects: &[(ObjectId, PlayerId, bool)],
 }
 
 /// The counters an effect says a permanent enters with (CR 122.6, 614.1c): "return it with a -1/-1 counter on it".
-pub fn entry_counters(with: &[(CounterKind, i16)]) -> [i16; CounterKind::COUNT] {
+pub fn entry_counters(with: &[(CounterKind, i32)]) -> [i32; CounterKind::COUNT] {
     let mut counters = [0; CounterKind::COUNT];
     for &(kind, n) in with {
         counters[kind as usize] += n;
@@ -1767,7 +1767,7 @@ pub fn entry_counters(with: &[(CounterKind, i16)]) -> [i16; CounterKind::COUNT] 
 }
 
 /// `put_onto_battlefield`, each entering with these counters as well (CR 122.6).
-pub fn put_onto_battlefield_with(cx: &mut Cx, objects: &[(ObjectId, PlayerId, bool)], reason: ZoneReason, with: &[(CounterKind, i16)]) -> R<Vec<ObjectId>> {
+pub fn put_onto_battlefield_with(cx: &mut Cx, objects: &[(ObjectId, PlayerId, bool)], reason: ZoneReason, with: &[(CounterKind, i32)]) -> R<Vec<ObjectId>> {
     put_onto_battlefield_along(cx, Vec::new(), objects, reason, with, None)
 }
 
@@ -1778,7 +1778,7 @@ pub fn put_onto_battlefield_along(
     moves: Vec<Moving>,
     objects: &[(ObjectId, PlayerId, bool)],
     reason: ZoneReason,
-    with: &[(CounterKind, i16)],
+    with: &[(CounterKind, i32)],
     becomes: Option<Becomes>,
 ) -> R<Vec<ObjectId>> {
     put_onto_battlefield_into(cx, moves, objects, reason, with, becomes, None)
@@ -1789,7 +1789,7 @@ fn put_onto_battlefield_into(
     mut moves: Vec<Moving>,
     objects: &[(ObjectId, PlayerId, bool)],
     reason: ZoneReason,
-    with: &[(CounterKind, i16)],
+    with: &[(CounterKind, i32)],
     becomes: Option<Becomes>,
     attacking: Option<Target>,
 ) -> R<Vec<ObjectId>> {
@@ -1826,7 +1826,7 @@ pub(crate) fn instant_or_sorcery(def: &CardDef) -> bool {
 }
 
 /// Each of `objects` prepared to enter (`prepare_entry`) and added to `moves`.
-fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, PlayerId, bool)], with: &[(CounterKind, i16)], becomes: Option<Becomes>) -> R<()> {
+fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, PlayerId, bool)], with: &[(CounterKind, i32)], becomes: Option<Becomes>) -> R<()> {
     let bans = crate::static_rules::enter_bans(cx);
     for &(id, controller, tapped) in objects {
         // A card that has changed zones since it was chosen is a new object, not the one to put onto the battlefield
@@ -1879,7 +1879,7 @@ pub fn put_onto_battlefield_as(
     tapped: bool,
     transformed: bool,
     reason: ZoneReason,
-    with: &[(CounterKind, i16)],
+    with: &[(CounterKind, i32)],
 ) -> R<ObjectId> {
     // Only a double-faced card has a back face to enter with: any other stays where it is (CR 712.14a).
     if transformed && cx.cards().backs[cx.s().obj(id).card.0 as usize].is_none() {
@@ -1996,7 +1996,7 @@ pub fn put_onto_battlefield_becoming(cx: &mut Cx, id: ObjectId, controller: Play
 /// static ability keeps from entering stays where it is (CR 101.2, 101.3), judged as the card it is there, not as what the
 /// effect would make it (Grafdigger's Cage's ruling); nor does an instant or sorcery card, whatever the effect says it is
 /// (CR 304.4, 307.4). The permanents that entered.
-pub fn put_onto_battlefield_becoming_all(cx: &mut Cx, objects: &[(ObjectId, PlayerId, bool)], with: &[(CounterKind, i16)], becomes: Becomes) -> R<Vec<ObjectId>> {
+pub fn put_onto_battlefield_becoming_all(cx: &mut Cx, objects: &[(ObjectId, PlayerId, bool)], with: &[(CounterKind, i32)], becomes: Becomes) -> R<Vec<ObjectId>> {
     let moved = put_onto_battlefield_along(cx, Vec::new(), objects, ZoneReason::Other, with, Some(becomes))?;
     Ok(moved.into_iter().filter(|&n| live(cx.s(), n) && cx.s().obj(n).zone.is(ZoneKind::Battlefield)).collect())
 }
@@ -2344,7 +2344,7 @@ fn create_tokens_as(
     count: u32,
     tapped: bool,
     copy: Option<Copiable>,
-    with: &[(CounterKind, i16)],
+    with: &[(CounterKind, i32)],
 ) -> R<Vec<ObjectId>> {
     let tokens: Vec<(CardId, PlayerId)> = (0..count).map(|_| (card, controller)).collect();
     create_tokens_batch(cx, &tokens, tapped, copy, with)
@@ -2396,11 +2396,11 @@ enum AttackEntry {
 
 /// Creates tokens of several definitions as one instruction (CR 111.1, 101.4): all enter at once, and what watches
 /// them sees one event (CR 603.2c).
-pub fn create_tokens_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: bool, copy: Option<Copiable>, with: &[(CounterKind, i16)]) -> R<Vec<ObjectId>> {
+pub fn create_tokens_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: bool, copy: Option<Copiable>, with: &[(CounterKind, i32)]) -> R<Vec<ObjectId>> {
     create_tokens_batch_attacking(cx, tokens, tapped, copy, with, None)
 }
 
-fn create_tokens_batch_attacking(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: bool, copy: Option<Copiable>, with: &[(CounterKind, i16)], attacking: Option<Target>) -> R<Vec<ObjectId>> {
+fn create_tokens_batch_attacking(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: bool, copy: Option<Copiable>, with: &[(CounterKind, i32)], attacking: Option<Target>) -> R<Vec<ObjectId>> {
     // CR 612.4, 612.2a: a token is what the text that makes it says, so a changed text makes tokens of the colors and
     // creature types it names now - an ability's text as it was put on the stack (`Cx::own_text`, CR 113.7a).
     let words = match cx.cause() {
@@ -2422,7 +2422,7 @@ pub fn create_tokens_worded(
     tokens: &[(CardId, PlayerId)],
     tapped: bool,
     copy: Option<Copiable>,
-    with: &[(CounterKind, i16)],
+    with: &[(CounterKind, i32)],
     words: Words,
     spell: Option<&StackItem>,
     attacking: Option<Target>,
@@ -2450,7 +2450,7 @@ fn create_tokens_onto(
     tokens: &[(CardId, PlayerId)],
     tapped: bool,
     copies: Copies,
-    with: &[(CounterKind, i16)],
+    with: &[(CounterKind, i32)],
     words: Words,
     spell: Option<&StackItem>,
     host: Option<ObjectId>,
@@ -3374,12 +3374,12 @@ fn mill_counted(cx: &mut Cx, counts: &[(PlayerId, u32)]) -> Vec<ObjectId> {
 
 /// Deals damage (CR 120): marked on a creature, removed as loyalty from a planeswalker, lost as life by a player.
 /// Protection prevents damage from sources of its colors (CR 702.16e).
-pub fn damage(cx: &mut Cx, source: ObjectId, target: Target, amount: u16, combat: bool) -> u16 {
+pub fn damage(cx: &mut Cx, source: ObjectId, target: Target, amount: u32, combat: bool) -> u32 {
     damage_result(cx, source, target, amount, combat).map_or(0, |result| result.amount)
 }
 
 /// Damage's final recipient and actual excess (CR 120.10), not the amount proposed before prevention or redirection.
-pub fn damage_result(cx: &mut Cx, source: ObjectId, target: Target, amount: u16, combat: bool) -> Option<DamageResult> {
+pub fn damage_result(cx: &mut Cx, source: ObjectId, target: Target, amount: u32, combat: bool) -> Option<DamageResult> {
     let mut batch = DamageBatch::default();
     let event = deal_damage_with(cx, source, target, amount, combat, &mut batch);
     let mut events: Vec<Event> = event.into_iter().collect();
@@ -3397,7 +3397,7 @@ pub fn damage_result(cx: &mut Cx, source: ObjectId, target: Target, amount: u16,
 
 /// Deals damage to several recipients at once (CR 120.2, 603.2c): announced as one batch, as combat damage is. How much
 /// each was dealt, in order.
-pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16> {
+pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u32)]) -> Vec<u32> {
     let mut batch = DamageBatch::new(cx, hits);
     let mut events = Vec::with_capacity(hits.len());
     let mut dealt = vec![0; hits.len()];
@@ -3445,7 +3445,7 @@ pub fn heal(cx: &mut Cx, permanent: ObjectId) {
 /// prevents" (CR 615.7). For each recipient a shield would not cover in full, its player or controller chooses a source
 /// whose damage the shield prevents first, then the next while some is left; the damage of the others is dealt normally
 /// once it is used up. Everything else keeps its order. Players with such choices make them in APNAP order (CR 616.1).
-pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: bool) -> Vec<usize> {
+pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u32)], combat: bool) -> Vec<usize> {
     let mut order: Vec<usize> = (0..hits.len())
         .filter(|&i| !matches!(hits[i].1, Target::Player(p) if !cx.s().in_game(p)))
         .collect();
@@ -3551,10 +3551,10 @@ pub struct DamageBatch {
 /// accounting used by prevention, rather than an independent record of past damage (CR 120.10).
 struct DamageRecipient {
     object: ObjectId,
-    marked: u16,
+    marked: u32,
     amount: u32,
     creature_toughness: Option<u32>,
-    prior_marked: u16,
+    prior_marked: u32,
     other_lethal: Option<u32>,
     deathtouch: bool,
 }
@@ -3574,7 +3574,7 @@ impl DamageBatch {
     /// Read every possible recipient before any assignment changes the state (CR 120.10). For example, damage to a
     /// player can change Serra Ascendant's toughness before the next assignment reaches that creature. Redirection
     /// can choose a recipient absent from `hits`, so active replacement effects require the whole battlefield.
-    pub fn new(cx: &Cx, hits: &[(ObjectId, Target, u16)]) -> Self {
+    pub fn new(cx: &Cx, hits: &[(ObjectId, Target, u32)]) -> Self {
         let mut batch = Self::default();
         if hits.len() < 2 {
             return batch;
@@ -3669,7 +3669,7 @@ pub fn deal_damage_with(
     cx: &mut Cx,
     source: ObjectId,
     target: Target,
-    amount: u16,
+    amount: u32,
     combat: bool,
     batch: &mut DamageBatch,
 ) -> Option<Event> {
@@ -3717,7 +3717,7 @@ pub fn deal_damage_with(
             if !infect {
                 change_life(cx, p, -(amount as i32));
             }
-            let poison = if infect { amount } else { 0 } + toxic;
+            let poison = (if infect { amount } else { 0 } + u32::from(toxic)).min(u32::from(u16::MAX)) as u16;
             if poison > 0 {
                 // "That source's controller" (CR 120.3b) and "that creature's controller" (CR 702.164c) gives them, at once
                 // as results of the one damage, so "if you would put one or more counters" is theirs.
@@ -3757,7 +3757,7 @@ pub fn deal_damage_with(
                     // 702.90a, 702.80a), static abilities create effects (CR 609.1), and it is their effect, not the turn-based action dealing
                     // combat damage, that puts the counters (CR 120.3d) - so "if an effect would put counters" applies.
                     let mut counts = [0; CounterKind::COUNT];
-                    counts[CounterKind::MinusOne as usize] = amount.min(i16::MAX as u16) as i16;
+                    counts[CounterKind::MinusOne as usize] = amount as i32;
                     batch.counters.push(counters::Placement { object: id, counts, by: source_controller });
                     cx.st().update_obj(id, |o| o.deathtouched |= deathtouch);
                 } else {
@@ -3775,12 +3775,12 @@ pub fn deal_damage_with(
             }
             // CR 120.3h, 310.6: damage dealt to a battle removes that many defense counters.
             if target_chars.is(CardType::Battle) {
-                let removed = amount.min(cx.s().obj(id).counters(CounterKind::Defense).max(0) as u16) as i16;
+                let removed = amount.min(cx.s().obj(id).counters(CounterKind::Defense).max(0) as u32) as i32;
                 counters::remove(cx, id, CounterKind::Defense, removed);
             }
             if target_chars.is(CardType::Planeswalker) {
                 // CR 120.3c: that many loyalty counters are removed.
-                counters::remove(cx, id, CounterKind::Loyalty, amount.min(i16::MAX as u16) as i16);
+                counters::remove(cx, id, CounterKind::Loyalty, amount as i32);
             }
             lifelink(cx, source, &source_chars, amount, batch);
             Some(Event::Damage { source, target, amount, kind: DamageKind::new(combat, source_chars.colors), controller: cx.controller(source), recipient_excess: 0, known: dealer_known(cx, source, &source_chars) })
@@ -3823,7 +3823,7 @@ pub(crate) fn damage_can_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -
 
 /// Damage dealt by a source with lifelink also causes its controller to gain that much life (CR 702.15b), as part of
 /// the damage event, not a trigger: added to what the source has dealt in this event, gained once it is all dealt.
-fn lifelink(cx: &mut Cx, source: ObjectId, chars: &Chars, amount: u16, batch: &mut DamageBatch) {
+fn lifelink(cx: &mut Cx, source: ObjectId, chars: &Chars, amount: u32, batch: &mut DamageBatch) {
     if chars.has(Keyword::Lifelink) {
         let controller = cx.controller(source);
         match batch.lifelink.iter_mut().find(|(s, _, _)| *s == source) {
@@ -4231,7 +4231,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     let Answer::Targets(chosen) = cx.ask_core(player, ask, false)? else { return Ok(()) };
     // Which kinds each one has, read first: objects' counters, then a player's poison, energy and experience.
     let one = |n: u8| u16::from(n > 0);
-    let plan: Vec<(Target, [i16; CounterKind::COUNT], counters::PlayerCounts)> = chosen
+    let plan: Vec<(Target, [i32; CounterKind::COUNT], counters::PlayerCounts)> = chosen
         .iter()
         .map(|&t| match t {
             Target::Object(id) => (t, cx.s().obj(id).counter_array(), counters::PlayerCounts::default()),
@@ -4248,7 +4248,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     let placements: Vec<counters::Placement> = plan
         .iter()
         .filter_map(|&(target, had, _)| match target {
-            Target::Object(object) => Some(counters::Placement { object, counts: had.map(|n| i16::from(n > 0)), by: player }),
+            Target::Object(object) => Some(counters::Placement { object, counts: had.map(|n| i32::from(n > 0)), by: player }),
             _ => None,
         })
         .collect();
@@ -4349,7 +4349,7 @@ pub fn exert(cx: &mut Cx, id: ObjectId) {
 
 /// Monstrosity N (CR 701.37a): a permanent that is not monstrous gets N +1/+1 counters and becomes monstrous, and what
 /// watches for it triggers (CR 701.37c). `by` puts the counters: the controller of the ability that does it.
-pub fn monstrosity(cx: &mut Cx, id: ObjectId, n: i16, by: PlayerId) {
+pub fn monstrosity(cx: &mut Cx, id: ObjectId, n: i32, by: PlayerId) {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || cx.s().obj(id).marks.monstrous {
         return;
     }
@@ -4401,7 +4401,7 @@ pub fn fight(cx: &mut Cx, first: ObjectId, second: ObjectId) {
     if !fights(cx, first) || !fights(cx, second) {
         return;
     }
-    let power = |cx: &Cx, id: ObjectId| layers::chars(cx.cards(), cx.s(), &cx.g.log, id).power.unwrap_or(0).max(0) as u16;
+    let power = |cx: &Cx, id: ObjectId| layers::chars(cx.cards(), cx.s(), &cx.g.log, id).power.unwrap_or(0).max(0) as u32;
     let (a, b) = (power(cx, first), power(cx, second));
     if first == second {
         damage(cx, first, Target::Object(first), a.saturating_mul(2), false);
@@ -4424,7 +4424,7 @@ pub fn attack_with_tokens(cx: &mut Cx, created: &[ObjectId], defender: Target) {
 /// Puts a card onto the battlefield tapped and attacking `defender` (CR 508.4): ninjutsu's "put this card onto the
 /// battlefield from your hand tapped and attacking". Outside combat it is only tapped. It enters with `counters` as well
 /// (CR 122.6, 614.1c): Grim Reaper's finality counter.
-pub fn put_onto_battlefield_attacking(cx: &mut Cx, object: ObjectId, controller: PlayerId, defender: Target, counters: &[(CounterKind, i16)]) -> R<ObjectId> {
+pub fn put_onto_battlefield_attacking(cx: &mut Cx, object: ObjectId, controller: PlayerId, defender: Target, counters: &[(CounterKind, i32)]) -> R<ObjectId> {
     // Thousand-Faced Shadow and Fallen Shinobi use this ninjutsu path.
     // It is attacking before its arrival is observed (CR 603.6a, 508.4).
     let new = put_onto_battlefield_into(cx, Vec::new(), &[(object, controller, true)], ZoneReason::Other, counters, None, Some(defender))?
@@ -5196,7 +5196,7 @@ mod tests {
 
     /// The counters each of Grown and Grown Relic would enter with, `on_battlefield` there first; each card is still in the
     /// hand afterwards.
-    fn entering_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i16)> {
+    fn entering_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i32)> {
         let (mut game, held) = game_with(on_battlefield);
         let hand = Zone::hand(PlayerId(0));
         let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
@@ -5283,7 +5283,7 @@ mod tests {
 
     /// The -1/-1 counters each of Grown and Grown Relic has, put onto the battlefield from the hand "with a -1/-1 counter on
     /// it" (persist's words, CR 702.79a), `on_battlefield` there first.
-    fn minus_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i16)> {
+    fn minus_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i32)> {
         let (mut game, held) = game_with(on_battlefield);
         let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
         let mut out = Vec::new();

@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// ability was activated (CR 107.3a, 601.2b by way of 602.2b; `tap_x_untapped`).
 fn target_creature_gets_x_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    cantrip_mechanics::pump(g, item.object, creature, item.x as i16, 0);
+    cantrip_mechanics::pump(g, item.object, creature, item.x as i32, 0);
     Ok(())
 }
 

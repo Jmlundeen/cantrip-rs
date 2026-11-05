@@ -25,7 +25,7 @@ fn aura_deals_much_damage_creatures(
     g: &mut dyn Game,
     item: &StackItem,
 ) -> Result<(), Suspend> {
-    let amount_0 = i64::from(item.data[0]) as u16;
+    let amount_0 = i64::from(item.data[0]) as u32;
     let recipients_0 = {
         let q: &dyn Query = g;
         item.subject
@@ -35,7 +35,7 @@ fn aura_deals_much_damage_creatures(
             .map(Target::Player)
             .collect::<Vec<Target>>()
     };
-    let batch: Vec<(ObjectId, Target, u16)> = recipients_0
+    let batch: Vec<(ObjectId, Target, u32)> = recipients_0
         .iter()
         .map(|t| (item.object, *t, amount_0))
         .collect();

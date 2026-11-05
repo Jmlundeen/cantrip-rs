@@ -18,7 +18,7 @@ fn embiggen_fist(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "your" is its controller's now (CR 109.5). +1/+1 counters and other modifiers apply on top, in layer 7c.
 fn base_power_is_cards_in_hand(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let state = q.state();
-    chars.power = Some(state.zone(Zone::hand(state.obj(source).controller)).len() as i16);
+    chars.power = Some(state.zone(Zone::hand(state.obj(source).controller)).len() as i32);
 }
 
 pub static CARD: CardDef = CardDef {

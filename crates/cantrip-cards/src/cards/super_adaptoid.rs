@@ -16,7 +16,7 @@ fn power_is_legendary_creatures(q: &dyn LayerQuery, source: ObjectId, chars: &mu
             c.is(CardType::Creature) && c.supertypes.legendary
         })
         .count();
-    chars.power = Some(count as i16);
+    chars.power = Some(count as i32);
 }
 
 /// The keywords it compares, in the order its text names them, each with the counter that gives it (CR 122.1b).

@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 
 /// A creature's power and toughness: as it has them now on the battlefield, or as it last had them there once it has left (CR 608.2h,
 /// 113.7a); none for one with neither.
-fn power_and_toughness(q: &dyn Query, id: ObjectId) -> (i16, i16) {
+fn power_and_toughness(q: &dyn Query, id: ObjectId) -> (i32, i32) {
     if targets::permanent(q, id) {
         let chars = q.chars(id);
         (chars.power.unwrap_or(0), chars.toughness.unwrap_or(0))

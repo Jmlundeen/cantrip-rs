@@ -21,7 +21,7 @@ fn choose_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(you, x);
     instruction(g, |g| {
         for creature in [first, second] {
-            pump(g, item.object, creature, x as i16, x as i16);
+            pump(g, item.object, creature, x as i32, x as i32);
             trample_until_end_of_turn(g, item.object, creature);
         }
     });

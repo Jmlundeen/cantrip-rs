@@ -16,7 +16,7 @@ pub static BIRTHRIGHT_BOON: CardDef = CardDef { spell: spell(&[], birthright_boo
 /// follows each attach and each Aura or Equipment that leaves. Each attached permanent counts once, judged on what the
 /// earlier layers made it.
 fn plus_one_per_attachment(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let n = attach::auras_and_equipment_attached_to(view, source) as i16;
+    let n = attach::auras_and_equipment_attached_to(view, source) as i32;
     chars.power = chars.power.map(|v| v + n);
 }
 

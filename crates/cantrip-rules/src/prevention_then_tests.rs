@@ -24,13 +24,13 @@ static BEAR: CardDef = CardDef {
 /// as it last existed (CR 608.2h).
 fn deflect(g: &mut dyn cantrip_api::Game, asker: &Asker, chosen: ObjectId, prevented: &[Prevented]) {
     let to = g.controller(chosen);
-    let amount = u16::try_from(Prevented::total(prevented)).expect("test damage is small");
+    let amount = u32::try_from(Prevented::total(prevented)).expect("test damage is small");
     g.damage(asker.source, Target::Player(to), amount);
 }
 
 /// "[The effect's source] deals that much damage to [the other player]" (Refraction Trap's "any target", as a fixed one).
 fn to_them(g: &mut dyn cantrip_api::Game, asker: &Asker, _: ObjectId, prevented: &[Prevented]) {
-    let amount = u16::try_from(Prevented::total(prevented)).expect("test damage is small");
+    let amount = u32::try_from(Prevented::total(prevented)).expect("test damage is small");
     g.damage(asker.source, Target::Player(THEM), amount);
 }
 
@@ -147,14 +147,14 @@ fn prevention_effects(cx: &Cx) -> Vec<Shield> {
 }
 
 /// The damage events in the history, in order: source, recipient, amount.
-fn dealt(cx: &Cx) -> Vec<(ObjectId, Target, u16)> {
+fn dealt(cx: &Cx) -> Vec<(ObjectId, Target, u32)> {
     cx.g.log.iter().filter_map(|r| match r.event {
         Event::Damage { source, target, amount, .. } => Some((source, target, amount)),
         _ => None,
     }).collect()
 }
 
-fn prevented(cx: &Cx) -> Vec<(ObjectId, Target, u16)> {
+fn prevented(cx: &Cx) -> Vec<(ObjectId, Target, u32)> {
     cx.g.log.iter().filter_map(|r| match r.event {
         Event::DamagePrevented { source, target, amount, .. } => Some((source, target, amount)),
         _ => None,

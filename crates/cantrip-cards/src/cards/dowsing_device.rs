@@ -24,7 +24,7 @@ fn pump_then_transform(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 /// "Until end of turn, target creature gains haste and gets +X/+0, where X is the number of artifacts you control."
 fn grotto_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        let x = artifacts_you_control(g, item.controller) as i16;
+        let x = artifacts_you_control(g, item.controller) as i32;
         instruction(g, |g| {
             pump(g, item.object, creature, x, 0);
             haste_until_end_of_turn(g, item.object, creature);

@@ -24,8 +24,8 @@ fn burn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if still_exiled == 0 {
         return Ok(());
     }
-    let amount = 2 * still_exiled as u16;
-    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), amount)).collect();
+    let amount = 2 * still_exiled as u32;
+    let hits: Vec<(ObjectId, Target, u32)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), amount)).collect();
     g.damage_together(&hits);
     Ok(())
 }

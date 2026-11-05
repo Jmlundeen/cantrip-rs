@@ -7,7 +7,7 @@ const DRAW: Question = Question::new("DrawCard", "pay {cost} to draw a card?", "
 /// "Put that many +1/+1 counters on her" (CR 120.2, 122.1): the damage dealt at once, the trigger's `data[0]`. Venus must have
 /// survived it (the reminder text, CR 400.7): the ability's source that has left the battlefield is another object and gets none.
 fn counters_for_the_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, item.data[0] as i16);
+    g.add_counters(item.object, CounterKind::PlusOne, item.data[0] as i32);
     Ok(())
 }
 

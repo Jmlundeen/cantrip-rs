@@ -656,7 +656,7 @@ pub fn with_classic<T>(classic: bool, run: impl FnOnce() -> T) -> T {
 /// What the AI player pays a payment with: for `PayCosts` (announcing `x` where it is being announced), `auto_pay`,
 /// then a mana ability that adds mana still owed; for `UnlessPays`, X raised or lowered to `x`, then paying once the
 /// pool covers it, a mana ability while it does not. `None` where it cannot pay: the caller cancels or declines.
-pub fn pay(game: &Game, request: &Request, x: Option<u16>) -> Option<Answer> {
+pub fn pay(game: &Game, request: &Request, x: Option<u32>) -> Option<Answer> {
     match &request.kind {
         RequestKind::PayCosts {
             remaining, options, ..

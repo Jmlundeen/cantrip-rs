@@ -12,9 +12,9 @@ use cantrip_api::*;
 /// How many colors of mana were spent to cast `object` (CR 702.44a, and converge, CR 207.2c: Prismatic Ending, Together as One,
 /// Archaic's Agony, Magmablood Archaic, Snarl Song and Wildgrowth Archaic print it). A `Query`, not a `Game`, so a replacement
 /// effect that reads the count, which has only that (Wildgrowth Archaic's), can ask it too.
-pub fn colors_spent(q: &dyn Query, object: ObjectId) -> i16 {
+pub fn colors_spent(q: &dyn Query, object: ObjectId) -> i32 {
     let spent = q.obj(object).spent;
-    [Mana::W, Mana::U, Mana::B, Mana::R, Mana::G].iter().filter(|&&m| spent.get(m) > 0).count() as i16
+    [Mana::W, Mana::U, Mana::B, Mana::R, Mana::G].iter().filter(|&&m| spent.get(m) > 0).count() as i32
 }
 
 /// The counters it enters with: +1/+1 counters if it is entering as a creature by its copiable values (type-changing effects

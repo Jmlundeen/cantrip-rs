@@ -151,7 +151,7 @@ fn play(game: &mut Game, casts: &[&str], mut after: impl FnMut(&Game, &str)) {
 }
 
 /// The first seat's land on the battlefield: whether it is an Island, and its flood counters.
-fn the_filler(game: &Game) -> (bool, i16) {
+fn the_filler(game: &Game) -> (bool, i32) {
     let id = game.state.battlefield().iter().copied().find(|&id| game.state.obj(id).controller == PlayerId(0)).expect("the land");
     (game.chars(id).has_subtype(Subtype::Island), game.state.obj(id).counters(CounterKind::Flood))
 }
@@ -163,7 +163,7 @@ fn a_counter_put_back_after_the_last_came_off_does_not_restart_the_effect() {
     let mut game = deal(&["Probe Flood", "Probe Drain", "Probe Refill", "Probe Flood"]);
     let mut seen = Vec::new();
     play(&mut game, &["Probe Flood", "Probe Drain", "Probe Refill", "Probe Flood"], |g, name| seen.push((name.to_string(), the_filler(g))));
-    let expected: Vec<(String, (bool, i16))> = [
+    let expected: Vec<(String, (bool, i32))> = [
         ("Probe Flood", (true, 1)),
         ("Probe Drain", (false, 0)),
         ("Probe Refill", (false, 1)),

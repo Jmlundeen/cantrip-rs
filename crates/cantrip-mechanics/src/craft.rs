@@ -118,7 +118,7 @@ pub fn exiled_cards_used_to_craft(q: &dyn Query, permanent: ObjectId) -> Vec<Obj
 
 /// The total power of the exiled cards used to craft `permanent` (CR 702.167c), each as it is in exile with its own
 /// characteristic-defining ability applied (the Mastercraft Raptor and Wretched Bonemass rulings), 0 for a card with none.
-fn total_crafted_power(q: &dyn LayerQuery, permanent: ObjectId) -> i16 {
+fn total_crafted_power(q: &dyn LayerQuery, permanent: ObjectId) -> i32 {
     used_to_craft(q.state(), permanent).into_iter().map(|c| q.chars_with_defined_pt(c).power.unwrap_or(0)).sum()
 }
 

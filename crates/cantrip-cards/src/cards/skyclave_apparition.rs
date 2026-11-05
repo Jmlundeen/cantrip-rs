@@ -23,7 +23,7 @@ fn target_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 fn illusion_for_owner(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(&card) = g.exiled_with(g.linked(item)).first() else { return Ok(()) };
     let owner = g.obj(card).owner;
-    let x = g.mana_value(card) as i16;
+    let x = g.mana_value(card) as i32;
     // The token is X/X as it is made (CR 111.4: the effect that creates it defines its characteristics, and those are its
     // copiable values, CR 707.2): never a 0/0, not for a moment, so what triggers on it entering sees an X/X.
     let values = Copiable::of(g.card_id(&ILLUSION)).sized(x, x);

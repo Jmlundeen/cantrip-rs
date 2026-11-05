@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// (CR 614.5, the rulings), so a second Fated Firepower adds its counters once more.
 fn plus_the_fire_counters(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) {
     if let Proposal::Damage(d) = proposal {
-        d.amount = d.amount.saturating_add(q.obj(asker.source).counters(CounterKind::Fire) as u16);
+        d.amount = d.amount.saturating_add(q.obj(asker.source).counters(CounterKind::Fire) as u32);
     }
 }
 

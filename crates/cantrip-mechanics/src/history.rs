@@ -350,7 +350,7 @@ pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
 /// `sacrificed` (the new object in the graveyard, as `effects::may_sacrifice` returns it) was before the sacrifice, as it last
 /// existed on the battlefield, pumps, counters and copy effects included. It is the old object of the zone change that made
 /// `sacrificed` (CR 400.7); zero for an object no zone change made. Bolg of the North and Rhovanion Rampager print it.
-pub fn power_of_sacrificed_permanent(q: &dyn Query, sacrificed: ObjectId) -> i16 {
+pub fn power_of_sacrificed_permanent(q: &dyn Query, sacrificed: ObjectId) -> i32 {
     sacrificed_permanent(q, sacrificed).map_or(0, |old| crate::targets::power_or_last_known(q, old))
 }
 

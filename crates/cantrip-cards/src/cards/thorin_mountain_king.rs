@@ -33,7 +33,7 @@ fn attach_equipment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn creature_deals_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(creature) = item.subject else { return Ok(()) };
     if g.target_legal(item, 0) {
-        let power = g.chars(creature).power.unwrap_or(0).max(0) as u16;
+        let power = g.chars(creature).power.unwrap_or(0).max(0) as u32;
         g.damage(creature, item.target(0), power);
     }
     Ok(())

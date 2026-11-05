@@ -28,7 +28,7 @@ fn your_vehicles_that_are_creatures(q: &dyn LayerQuery, source: ObjectId, affect
 fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let Some(x) = g.may_pay_x(you, item.object, item.object, cost("{X}"), &PAY_X)? else { return Ok(()) };
-    let revealed = top_of_library(g, you, usize::from(x));
+    let revealed = top_of_library(g, you, x as usize);
     if revealed.is_empty() {
         return Ok(());
     }

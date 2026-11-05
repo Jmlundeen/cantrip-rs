@@ -39,7 +39,7 @@ fn question(object: ObjectId, up_to: bool) -> Request {
     Request { id: 1, player: YOU, kind: RequestKind::RemoveCounters { source: object, pools, total: 3, up_to }, may_cancel: false }
 }
 
-fn allowed(game: &Game, request: &Request, taken: &[(ObjectId, CounterKind, u16)]) -> bool {
+fn allowed(game: &Game, request: &Request, taken: &[(ObjectId, CounterKind, u32)]) -> bool {
     validate::check(game, request, &Answer::Counters(taken.to_vec())).is_ok()
 }
 

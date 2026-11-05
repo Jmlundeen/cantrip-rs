@@ -17,7 +17,7 @@ fn shrink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .permanents_of(item.controller)
         .into_iter()
         .filter(|&p| g.obj(p).token && g.chars(p).has_subtype(Subtype::Blood))
-        .count() as i16;
+        .count() as i32;
     pump(g, item.object, creature, -2 * blood, -2 * blood);
     Ok(())
 }

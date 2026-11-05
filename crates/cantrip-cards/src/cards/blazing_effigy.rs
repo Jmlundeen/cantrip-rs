@@ -10,9 +10,9 @@ fn death_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         let Event::Damage { source, target, amount, kind, controller, known, .. } = record.event else { return None };
         let dealt = DamageDealt { source, target, amount, combat: kind.is_combat(), controller, known };
         (source != item.object && target == Target::Object(item.object) && dealt.chars(g).name == "Blazing Effigy")
-            .then_some(u64::from(amount))
-    }).sum::<u64>();
-    g.damage(item.object, Target::Object(target), u16::try_from(amount).unwrap_or(u16::MAX));
+            .then_some(amount)
+    }).sum::<u32>();
+    g.damage(item.object, Target::Object(target), amount);
     Ok(())
 }
 

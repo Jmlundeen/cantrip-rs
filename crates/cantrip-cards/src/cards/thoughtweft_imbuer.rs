@@ -13,7 +13,7 @@ fn pump_by_kithkin(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .battlefield()
         .iter()
         .filter(|&&id| g.controller(id) == item.controller && g.chars(id).has_subtype(kithkin))
-        .count() as i16;
+        .count() as i32;
     cantrip_mechanics::pump(g, item.object, creature, x, x);
     Ok(())
 }

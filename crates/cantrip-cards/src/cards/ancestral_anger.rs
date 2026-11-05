@@ -20,7 +20,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .count();
     instruction(g, |g| {
         cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
-        pump(g, item.object, creature, 1 + named as i16, 0);
+        pump(g, item.object, creature, 1 + named as i32, 0);
     });
     g.end_sentence();
     g.draw(item.controller, 1);

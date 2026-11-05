@@ -8,7 +8,7 @@ fn power_per_officer_token(q: &dyn LayerQuery, source: ObjectId, chars: &mut Cha
     let officer = q.words(source).subtype(Subtype::Officer);
     let n = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you
         && q.chars(id).has_subtype(officer) && state.obj(id).token)
-        .count() as i16;
+        .count() as i32;
     chars.power = chars.power.map(|v| v + n);
 }
 

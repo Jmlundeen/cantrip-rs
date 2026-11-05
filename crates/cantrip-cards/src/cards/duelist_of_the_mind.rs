@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// either player's turn (the history of the turn, CR 121).
 fn power_is_cards_drawn_this_turn(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let controller = q.state().obj(source).controller;
-    chars.power = Some(q.history().drawn(controller) as i16);
+    chars.power = Some(q.history().drawn(controller) as i32);
 }
 
 pub static CARD: CardDef = CardDef {

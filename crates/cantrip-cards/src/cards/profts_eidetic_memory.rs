@@ -11,7 +11,7 @@ fn drawn_more_than_one(q: &dyn Query, asker: &Asker) -> bool {
 /// Put X +1/+1 counters on target creature you control, X being the cards you've drawn this turn minus one, counted as the
 /// ability resolves (CR 608.2h).
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = drawn_this_turn(g, item.controller) as i16 - 1;
+    let x = drawn_this_turn(g, item.controller) as i32 - 1;
     if x > 0
         && let Some(creature) = targets::object(g, item, 0)
     {

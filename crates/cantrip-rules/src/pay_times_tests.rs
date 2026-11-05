@@ -100,7 +100,7 @@ fn option(r: &Request, kind: ActionKind) -> Option<ActionOption> {
 }
 
 /// The number of times and the cost at it, as the payment question shows them.
-fn shown(r: &Request) -> (Option<u16>, Option<u16>, ManaCost) {
+fn shown(r: &Request) -> (Option<u32>, Option<u32>, ManaCost) {
     match &r.kind {
         RequestKind::UnlessPays { x, times, total, .. } => (*x, *times, *total),
         other => panic!("expected the payment, got {other:?}"),
@@ -108,7 +108,7 @@ fn shown(r: &Request) -> (Option<u16>, Option<u16>, ManaCost) {
 }
 
 /// Raises the number of times to `n` and pays it, giving back the next question.
-fn pay_times(g: &mut Game, mut r: Request, n: u16) -> Request {
+fn pay_times(g: &mut Game, mut r: Request, n: u32) -> Request {
     while shown(&r).0 != Some(n) {
         let raise = option(&r, ActionKind::IncreaseX).expect("the number can be raised");
         answer(g, &r, Answer::Act(Action::of(&raise)));

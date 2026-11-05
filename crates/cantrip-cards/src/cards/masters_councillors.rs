@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// counts, counted as the layers are worked out.
 fn plus_two_for_each_big_graveyard(view: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     let state = view.state();
-    let big = state.seats().filter(|&player| state.zone(Zone::graveyard(player)).len() >= 7).count() as i16;
+    let big = state.seats().filter(|&player| state.zone(Zone::graveyard(player)).len() >= 7).count() as i32;
     chars.power = chars.power.map(|v| v + 2 * big);
 }
 

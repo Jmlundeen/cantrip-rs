@@ -9,7 +9,7 @@ fn plus_two_for_each_other_goblin(q: &dyn LayerQuery, source: ObjectId, chars: &
     let state = q.state();
     let you = state.obj(source).controller;
     let goblin = q.words(source).subtype(Subtype::Goblin);
-    let others = state.battlefield().iter().filter(|&&id| id != source && state.obj(id).controller == you && q.chars(id).has_subtype(goblin)).count() as i16;
+    let others = state.battlefield().iter().filter(|&&id| id != source && state.obj(id).controller == you && q.chars(id).has_subtype(goblin)).count() as i32;
     chars.power = chars.power.map(|p| p + 2 * others);
 }
 

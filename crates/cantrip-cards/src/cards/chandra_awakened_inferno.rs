@@ -26,7 +26,7 @@ fn sweep(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// (CR 700.4).
 fn burn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let before = g.history().head() as usize;
-    cantrip_mechanics::damage_target(g, item, 0, item.x);
+    cantrip_mechanics::damage_target(g, item, 0, u32::from(item.x));
     let dealt = history::permanents_dealt_damage_by(g.history(), item.object, before);
     g.end_sentence();
     instruction(g, |g| {

@@ -20,13 +20,13 @@ pub struct Obj {
     /// The turn it came under its controller's control: summoning sick (CR 302.6) while that is not before the
     /// turn its controller's most recent turn began on.
     pub controlled_since: u32,
-    pub damage: u16,
+    pub damage: u32,
     /// Dealt damage by a source with deathtouch since the last state-based action check (CR 704.5h).
     pub deathtouched: bool,
     /// The counters on it (CR 122). Private: they are read through `counters` and `counter_array`, taken off through
     /// `remove_counters`, and put on only by the put path, `cantrip_rules::counters`, which names the player who puts them
     /// (CR 122.6a) and lets the replacement effects of counters being put apply (CR 614.1a).
-    counters: [i16; CounterKind::COUNT],
+    counters: [i32; CounterKind::COUNT],
     /// When it entered its zone (CR 613.7d), for ordering and for layer timestamps.
     pub timestamp: u32,
     /// The copy effects on it (CR 707.2, 613.2, layer 1a): the values it copied, which are its copiable values unless it
@@ -98,7 +98,7 @@ pub struct Obj {
     /// battlefield with this Aura").
     pub entered_with: Option<ObjectId>,
     /// The X its spell was cast with (CR 107.3m), carried to the permanent: an enters trigger that reads X.
-    pub x: u16,
+    pub x: u32,
     /// Designations and choices a permanent carries that no counter or characteristic holds.
     pub marks: Marks,
     /// A double-faced permanent with its back face up (CR 711.2, 712.3): its characteristics are the back face's.
@@ -675,7 +675,7 @@ impl Obj {
         }
     }
 
-    pub fn counters(&self, kind: CounterKind) -> i16 {
+    pub fn counters(&self, kind: CounterKind) -> i32 {
         self.counters[kind as usize]
     }
 
@@ -736,13 +736,13 @@ impl Obj {
     }
 
     /// Every kind of counter on it, by `CounterKind` number.
-    pub fn counter_array(&self) -> [i16; CounterKind::COUNT] {
+    pub fn counter_array(&self) -> [i32; CounterKind::COUNT] {
         self.counters
     }
 
     /// Takes up to `n` counters of one kind off it (CR 122.1), never below none. Taking counters off is not putting
     /// them on, so anything may do it.
-    pub fn remove_counters(&mut self, kind: CounterKind, n: i16) {
+    pub fn remove_counters(&mut self, kind: CounterKind, n: i32) {
         let c = &mut self.counters[kind as usize];
         *c = (*c - n.max(0)).max(0);
     }
@@ -756,7 +756,7 @@ impl Obj {
     /// counters and applied the replacement effects of their being put (CR 122.6, 122.6a, 614.1a); a test there,
     /// `only_the_put_path_puts_counters`, fails the build of any other caller. Negative counts are ignored.
     #[doc(hidden)]
-    pub fn put_path_add(&mut self, counts: &[i16; CounterKind::COUNT]) {
+    pub fn put_path_add(&mut self, counts: &[i32; CounterKind::COUNT]) {
         for (n, &add) in self.counters.iter_mut().zip(counts) {
             if add > 0 {
                 *n = n.saturating_add(add);
@@ -850,7 +850,7 @@ pub struct Copiable {
     pub colors: Option<ColorSet>,
     /// "Except it's 4/4" (CR 707.9b, 707.9d): its power and toughness, whatever the copied card has or defines, when
     /// `stated` has `STATED_PT` (`pt`), and 0/0 otherwise.
-    pub stated_pt: (i16, i16),
+    pub stated_pt: (i32, i32),
     /// "Except its name is X" (CR 707.9b): its name, whatever the copied card is called.
     pub name: Option<&'static str>,
     /// The exceptions that are a yes or no, one bit each (`Copiable::STATED_*`): read and set through `types_stated`,
@@ -858,7 +858,7 @@ pub struct Copiable {
     /// `stated_pt` and `front`, into the bytes the values had to spare, so an `Obj` pays nothing for the rare exceptions.
     pub stated: u16,
     /// "Except it has starting loyalty X": the loyalty, when `stated` has `STATED_LOYALTY`, and 0 otherwise.
-    pub loyalty: i16,
+    pub loyalty: i32,
     /// The words of its text changed from the card's (CR 612.4, 612.2a): a token made by an ability whose text was
     /// changed has the colors and creature types the changed text names, and so does a copy of it.
     pub words: Words,
@@ -976,7 +976,7 @@ impl Copiable {
 
     /// "Except it has starting loyalty X" (CR 707.9b, 306.5b): its printed loyalty, which a planeswalker enters with as
     /// loyalty counters, whatever the copied card prints. Ob Nixilis, the Adversary's copy.
-    pub fn stated_loyalty(&self) -> Option<i16> {
+    pub fn stated_loyalty(&self) -> Option<i32> {
         (self.stated & Copiable::STATED_LOYALTY != 0).then_some(self.loyalty)
     }
 
@@ -1102,14 +1102,14 @@ impl Copiable {
     }
 
     /// "Except it's [power]/[toughness]."
-    pub fn sized(mut self, power: i16, toughness: i16) -> Copiable {
+    pub fn sized(mut self, power: i32, toughness: i32) -> Copiable {
         self.stated |= Copiable::STATED_PT;
         self.stated_pt = (power, toughness);
         self
     }
 
     /// "Except it's [power]/[toughness]" (`sized`), if it says so.
-    pub fn pt(&self) -> Option<(i16, i16)> {
+    pub fn pt(&self) -> Option<(i32, i32)> {
         (self.stated & Copiable::STATED_PT != 0).then_some(self.stated_pt)
     }
 
@@ -1133,7 +1133,7 @@ impl Copiable {
     }
 
     /// "Except it has starting loyalty N" (CR 707.9b, 306.5b): the loyalty it is printed with.
-    pub fn with_loyalty(mut self, loyalty: i16) -> Copiable {
+    pub fn with_loyalty(mut self, loyalty: i32) -> Copiable {
         self.stated |= Copiable::STATED_LOYALTY;
         self.loyalty = loyalty;
         self
@@ -1201,14 +1201,14 @@ pub struct StackItem {
     pub inline_spec_of: [u8; INLINE_TARGETS],
     /// The X announced for it (CR 107.3); for a reflexive triggered ability, the number its "that many" counts
     /// (CR 603.12, `PendingTrigger::count`).
-    pub x: u16,
+    pub x: u32,
     /// How many times it was kicked (CR 702.33).
     pub kicked: u8,
     /// What its target slots' `TargetSpec::COUNTED` read as they were chosen (CR 601.2c, 603.3d): a spell's X, or else the
     /// times it was kicked; an activated ability's X; a triggered ability's count it was given (`PendingTrigger::count`), or
     /// else its source's X or times kicked. Read again as its targets are judged together anew (`TargetSpec::together`, CR
     /// 115.7, 608.2b).
-    pub counted: u16,
+    pub counted: u32,
     /// How many times its `optional_cost` was paid (CR 601.2b, 707.10: a copy has the same).
     pub paid: u32,
     /// Which way it was cast (0 for the mana cost, n for the nth alternative cost), or activated.
@@ -1335,7 +1335,7 @@ pub enum EffectKind {
     /// Protection from everything (CR 702.16e), layer 6.
     ProtectionFromEverything,
     /// +N/+M (CR 613.4c), layer 7c.
-    Pump(i16, i16),
+    Pump(i32, i32),
     /// Gains these keywords, layer 6.
     AddKeywords(Keywords),
     /// Loses these keywords (CR 613.1f), layer 6, at the effect's timestamp: "permanents your opponents control lose hexproof
@@ -1382,7 +1382,7 @@ pub enum EffectKind {
     /// the counters.
     SwitchPt,
     /// Its power and toughness become these (CR 613.4b), layer 7b: "it becomes a 0/0 creature".
-    SetPt(i16, i16),
+    SetPt(i32, i32),
     /// Is exactly these card types (CR 205.1a, 613.1d), layer 4: an instant or sorcery stays one, and the subtypes it had stay
     /// only where they belong to a card type it still has (`Subtype::card_types`). An effect that also names its subtypes
     /// ("becomes an Equipment artifact") sets them with `LoseSubtypesOf` and `AddSubtype` after it.
@@ -1675,7 +1675,7 @@ pub enum Shield {
     /// creature this turn".
     All,
     /// The next N damage (CR 615.7): each 1 damage it prevents reduces it by 1, and once it is 0 the rest is dealt.
-    Next(u16),
+    Next(u32),
     /// The next time the damage it watches for would be dealt, all of that damage (CR 615.8): "the next time a source of your
     /// choice would deal damage to you this turn, prevent that damage". It prevents every part of the one damage event it
     /// first prevents some of - simultaneous damage is one event however many recipients it has (CR 120.2) - and is used up
@@ -1951,7 +1951,7 @@ pub struct PendingTrigger {
     pub members: Span,
     /// For a reflexive triggered ability whose effect counts what its first part did ("tap up to that many target
     /// creatures", CR 603.12): that number. A `TargetSpec::COUNTED` bound reads it, and it is the stack item's `x`.
-    pub count: Option<u16>,
+    pub count: Option<u32>,
     /// For a delayed triggered ability, the history's head when it was created (`Delayed::since`), which its stack item
     /// keeps (CR 701.27f); none for any other, whose item takes the head as it is put on the stack.
     pub since: Option<u32>,
@@ -2084,10 +2084,10 @@ pub struct LastKnown {
     pub types: TypeSet,
     pub subtypes: SubtypeSet,
     pub colors: ColorSet,
-    pub power: Option<i16>,
-    pub toughness: Option<i16>,
+    pub power: Option<i32>,
+    pub toughness: Option<i32>,
     /// Its base power as it last had it (`Chars::base_power`).
-    pub base_power: Option<i16>,
+    pub base_power: Option<i32>,
     pub keywords: Keywords,
     /// Its total toxic value as it last had it (CR 702.164b).
     pub toxic: u16,
@@ -3184,10 +3184,11 @@ mod copiable_tests {
 
     /// Every `Obj` holds an `Option<Copiable>`, so a copy's exceptions are packed: the yes-or-no ones and a stated loyalty
     /// take three bytes, and an object pays nothing for them. Each reads back as it was set, a later one over an earlier. A
-    /// merged permanent's run of other components (`merged`, CR 702.140e) took the last word: the values had no byte to spare.
+    /// merged permanent's run of other components (`merged`, CR 702.140e) took the last word. A stated power and toughness and a
+    /// stated loyalty are `i32`, since play can pass `i16` (#2336): that costs every object 8 bytes (168 to 176).
     #[test]
     fn the_rare_exceptions_cost_an_object_nothing_and_read_back() {
-        assert!(std::mem::size_of::<Option<Copiable>>() <= 168, "Option<Copiable> is {} bytes", std::mem::size_of::<Option<Copiable>>());
+        assert!(std::mem::size_of::<Option<Copiable>>() <= 176, "Option<Copiable> is {} bytes", std::mem::size_of::<Option<Copiable>>());
         let plain = Copiable::of(CardId(1));
         assert!(!plain.has_exceptions() && plain.legendary_stated().is_none() && plain.stated_loyalty().is_none());
         let ob = plain.nonlegendary().with_loyalty(0);

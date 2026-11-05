@@ -7,11 +7,11 @@ use cantrip_api::*;
 
 /// The delayed ability a card lists in its `delayed` slot: "whenever a creature attacks you or a planeswalker you control,
 /// it gets -`N`/-0 until end of turn".
-pub const fn delayed_ability<const N: i16>(text: &'static str) -> AbilityDef {
+pub const fn delayed_ability<const N: i32>(text: &'static str) -> AbilityDef {
     triggered(when_asked(EventMask::ATTACKS, triggers::creature_attacks_you_or_a_planeswalker_you_control), attacker_weakens::<N>, text)
 }
 
-fn attacker_weakens<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+fn attacker_weakens<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(creature) = item.subject {
         pump(g, item.object, creature, -N, 0);
     }

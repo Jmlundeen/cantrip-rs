@@ -361,7 +361,7 @@ pub fn you_gain_life(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> 
 /// again if counters were removed and the Nth is put once more, as a Saga's chapters count (CR 714.2b). Political
 /// Triumph, Death to Our Enemies and the other Plans print it with plan counters; Shang-Chi and the Ten Rings with +1/+1
 /// counters.
-pub fn nth_counter_put_on_this<const KIND: u8, const N: i16>(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+pub fn nth_counter_put_on_this<const KIND: u8, const N: i32>(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::CountersPut { object, kind, amount, total, .. } if *object == me.source && *kind as u8 == KIND && total - amount < N && *total >= N => {
             Fired::PLAIN
@@ -770,10 +770,10 @@ pub use cantrip_api::intrinsic::ward;
 
 /// Ward's life cost, paid or not (CR 702.21a, 118.12a): the payer may pay `amount` life when they have that much (CR
 /// 119.4), in one payment, and the spell or ability that targeted is countered unless they do.
-fn ward_pay_life(g: &mut dyn Game, item: &StackItem, life: u16) -> Result<(), Suspend> {
+fn ward_pay_life(g: &mut dyn Game, item: &StackItem, life: u32) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
-    let paid = g.state().player(payer).life >= i32::from(life)
+    let paid = g.state().player(payer).life >= life as i32
         && g.may_pay(payer, item.object, by, Cost { life: u32::from(life), ..Cost::NONE }, &crate::COUNTERED_UNLESS_PAID)?;
     if !paid {
         g.counter_item(by, item.data[1] as usize);
@@ -782,7 +782,7 @@ fn ward_pay_life(g: &mut dyn Game, item: &StackItem, life: u16) -> Result<(), Su
 }
 
 fn ward_life_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    ward_pay_life(g, item, u16::from(N))
+    ward_pay_life(g, item, u32::from(N))
 }
 
 /// Ward--Pay N life (CR 702.21a): "Whenever this becomes the target of a spell or ability an opponent controls, counter it

@@ -328,7 +328,7 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
             if !matches!(cx.ask_rule(p, RequestKind::May { source: card, purpose: Purpose::Ask(&BEGIN_ON_BATTLEFIELD) })?, Some(Answer::Yes)) {
                 continue;
             }
-            let with: Vec<(CounterKind, i16)> = action.counter.map(|(k, n)| (k, n as i16)).into_iter().collect();
+            let with: Vec<(CounterKind, i32)> = action.counter.map(|(k, n)| (k, n as i32)).into_iter().collect();
             ops::put_onto_battlefield_with(cx, &[(card, p, false)], ZoneReason::Other, &with)?;
             let hand = cx.s().zone(Zone::hand(p)).to_vec();
             if action.exile_from_hand > 0 && !hand.is_empty() {
@@ -1388,7 +1388,7 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
             divisions.push((by, d));
         }
     }
-    let mut chosen: Vec<(ObjectId, Option<ObjectId>, u16)> = Vec::new();
+    let mut chosen: Vec<(ObjectId, Option<ObjectId>, u32)> = Vec::new();
     let players: Vec<PlayerId> = cx.s().apnap().collect();
     for player in players {
         let mine: Vec<DamageDivision> = divisions.iter().filter(|(by, _)| *by == player).map(|(_, d)| d.clone()).collect();
@@ -1417,7 +1417,7 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
 }
 
 /// CR 510.1/800.4e: assignments are legal before damage or its replacements are attempted.
-fn combat_assignments(cx: &Cx, attackers: &[Attacker], blockers: &[ObjectId], chosen: &[(ObjectId, Option<ObjectId>, u16)]) -> Vec<(ObjectId, Target, u16)> {
+fn combat_assignments(cx: &Cx, attackers: &[Attacker], blockers: &[ObjectId], chosen: &[(ObjectId, Option<ObjectId>, u32)]) -> Vec<(ObjectId, Target, u32)> {
     let mut assignments = Vec::new();
     for attacker in attackers {
         if chosen.iter().any(|s| s.0 == attacker.id) {
@@ -1495,13 +1495,13 @@ fn combat_defender_present(cx: &Cx, target: Target) -> bool {
 
 /// Lethal damage for each of `creatures` from `source` (CR 702.19b, 120.4a): its toughness less the damage marked on it, or
 /// any 1 more from a source with deathtouch (CR 702.2c), unless it already has lethal damage marked.
-fn lethal_for(cx: &Cx, source: ObjectId, creatures: &[ObjectId]) -> Vec<u16> {
+fn lethal_for(cx: &Cx, source: ObjectId, creatures: &[ObjectId]) -> Vec<u32> {
     let deathtouch = cx.chars(source).has(Keyword::Deathtouch);
     creatures
         .iter()
         .map(|&c| {
             let chars = cx.chars(c);
-            let remaining = (i32::from(chars.toughness.unwrap_or(0)) - i32::from(cx.s().obj(c).damage)).max(0) as u16;
+            let remaining = (i64::from(chars.toughness.unwrap_or(0)) - i64::from(cx.s().obj(c).damage)).max(0) as u32;
             if deathtouch { remaining.min(1) } else { remaining }
         })
         .collect()
@@ -1509,7 +1509,7 @@ fn lethal_for(cx: &Cx, source: ObjectId, creatures: &[ObjectId]) -> Vec<u16> {
 
 /// The suggestion for a division the creature's controller makes: lethal to each in turn, the rest to the last creature, or
 /// with `rest_to_defender` (trample) to the player or planeswalker attacked. The amounts, and what goes past the creatures.
-fn lethal_in_turn(power: u16, lethal: &[u16], rest_to_defender: bool) -> (Vec<u16>, u16) {
+fn lethal_in_turn(power: u32, lethal: &[u32], rest_to_defender: bool) -> (Vec<u32>, u32) {
     let mut left = power;
     let mut suggested = Vec::new();
     for (i, &l) in lethal.iter().enumerate() {
@@ -1523,7 +1523,7 @@ fn lethal_in_turn(power: u16, lethal: &[u16], rest_to_defender: bool) -> (Vec<u1
 /// The suggestion for a division banding gives to the controller of the creatures it is divided among (CR 702.22j-k): all of
 /// it to one of them, one it would not kill if there is one (the toughest such), else the one worth least by its power and
 /// toughness. Each amount, index for index.
-fn spared(cx: &Cx, power: u16, creatures: &[ObjectId], lethal: &[u16]) -> Vec<u16> {
+fn spared(cx: &Cx, power: u32, creatures: &[ObjectId], lethal: &[u32]) -> Vec<u32> {
     let worth = |c: ObjectId| {
         let chars = cx.chars(c);
         i32::from(chars.power.unwrap_or(0)) + i32::from(chars.toughness.unwrap_or(0))

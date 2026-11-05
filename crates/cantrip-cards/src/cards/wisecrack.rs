@@ -8,9 +8,9 @@ use cantrip_oracle as oracle;
 /// the creature is still there, attacking or not, for the second sentence; Wisecrack itself is the source of the 2.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    // A power of 0 or less deals none (the core deals nothing for 0), so a negative never reaches the u16.
+    // A power of 0 or less deals none (the core deals nothing for 0), so a negative never reaches the u32.
     let power = g.chars(creature).power.unwrap_or_default();
-    g.damage(creature, Target::Object(creature), u16::try_from(power).unwrap_or_default());
+    g.damage(creature, Target::Object(creature), u32::try_from(power).unwrap_or_default());
     if g.is_attacking(creature) {
         let controller = g.controller(creature);
         g.damage(item.object, Target::Player(controller), 2);

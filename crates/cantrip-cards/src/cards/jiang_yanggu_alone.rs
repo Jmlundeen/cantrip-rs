@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 fn discard_draw_then_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     effects::discard_then_draw(g, item, 1)?;
     let Target::Object(attacker) = item.subject else { return Ok(()) };
-    let discarded = history::cards_discarded_this_turn(g, item.controller) as i16;
+    let discarded = history::cards_discarded_this_turn(g, item.controller) as i32;
     g.add_counters(attacker, CounterKind::PlusOne, discarded);
     Ok(())
 }

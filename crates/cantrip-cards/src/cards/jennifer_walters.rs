@@ -36,7 +36,7 @@ fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.history().done(item.object, item.ability, item.controller) || !g.target_legal(item, 0) {
         return Ok(());
     }
-    let amount = item.data[0] as u16;
+    let amount = item.data[0] as u32;
     if amount == 0 {
         return Ok(());
     }

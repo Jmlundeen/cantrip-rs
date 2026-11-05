@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// permanents you control" (CR 105.2). X is counted as the ability resolves (CR 608.2h), so a permanent that has left, or a
 /// color gained since, counts as it is then; the damage is dealt by this creature, last-known if it has left (CR 608.2b).
 fn deal_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = cantrip_mechanics::vivid::count(g, item.controller) as u16;
+    let x = cantrip_mechanics::vivid::count(g, item.controller) as u32;
     damage_target(g, item, 0, x);
     Ok(())
 }

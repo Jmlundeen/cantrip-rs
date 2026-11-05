@@ -55,7 +55,7 @@ fn bounce(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn ultimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.draw(you, 3);
-    let x = g.state().zone(Zone::hand(you)).len() as i16;
+    let x = g.state().zone(Zone::hand(you)).len() as i32;
     cantrip_mechanics::effects::counters_on_creatures_you_control(g, you, CounterKind::PlusOne, x);
     Ok(())
 }

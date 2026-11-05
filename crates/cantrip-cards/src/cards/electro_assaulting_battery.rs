@@ -41,7 +41,7 @@ fn pay_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "He deals X damage to target player" (CR 120.3): Electro, as he last existed on the battlefield (CR 113.7a), deals the X
 /// that was paid.
 fn deal_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, item.x);
+    damage_target(g, item, 0, u32::from(item.x));
     Ok(())
 }
 

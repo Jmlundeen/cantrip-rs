@@ -6,7 +6,7 @@ use cantrip_api::*;
 /// The greatest power among the creatures `player` controls, as the characteristics are now (CR 208.1). A creature has a
 /// power, so a creature whose power is not a number is not one to count; with no creature, or none above 0, the amount is
 /// 0, since a negative power used as an amount counts as 0 (CR 107.1b).
-pub fn among_creatures_you_control(q: &dyn Query, player: PlayerId) -> u16 {
+pub fn among_creatures_you_control(q: &dyn Query, player: PlayerId) -> u32 {
     q.permanents_of(player)
         .into_iter()
         .map(|id| q.chars(id))
@@ -14,5 +14,5 @@ pub fn among_creatures_you_control(q: &dyn Query, player: PlayerId) -> u16 {
         .filter_map(|c| c.power)
         .max()
         .unwrap_or(0)
-        .max(0) as u16
+        .max(0) as u32
 }

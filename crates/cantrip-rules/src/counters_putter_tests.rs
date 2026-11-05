@@ -99,7 +99,7 @@ fn fired(g: &Game, watcher: ObjectId) -> usize {
 }
 
 /// The putters of the counters announced, in order.
-fn putters(g: &Game) -> Vec<(ObjectId, i16, PlayerId)> {
+fn putters(g: &Game) -> Vec<(ObjectId, i32, PlayerId)> {
     g.log
         .iter()
         .filter_map(|r| match r.event {

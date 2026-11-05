@@ -124,7 +124,7 @@ fn spell_facts(game: &Game, spell: ObjectId) -> (Vec<Target>, Option<i32>, Vec<S
             }
         }
     }
-    let x = (def.cost.x > 0).then_some(i32::from(item.x));
+    let x = (def.cost.x > 0).then_some(item.x as i32);
     // The log says "kicked" for this count, so it is the kicker's alone: an optional additional cost (`paid`: behold, blight,
     // bargain) is not a kicker, and its payment shows in the log as what it did (a card revealed, a creature sacrificed).
     (game.state.targets(item).to_vec(), x, modes, i32::from(item.kicked), item.gift)
@@ -182,7 +182,7 @@ impl Tracker {
                 out.push(Proto::Life { player, delta, total: total.unwrap_or(game.state.player(player).life) });
             }
             Event::Damage { target: Target::Object(object), amount, .. } => {
-                out.push(Proto::Damage { object, amount: i32::from(amount) });
+                out.push(Proto::Damage { object, amount: amount as i32 });
             }
             Event::Tapped { permanent } => out.push(Proto::Tap { object: permanent, tapped: true }),
             Event::SpellCast { spell, player, .. } => {

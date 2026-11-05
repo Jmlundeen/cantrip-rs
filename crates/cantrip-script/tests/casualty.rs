@@ -19,11 +19,11 @@ use cantrip_mechanics::casualty;
 
 /// "You gain X life", X as announced.
 fn gain_x(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    g.gain_life(item.controller, i32::from(item.x));
+    g.gain_life(item.controller, item.x as i32);
     Ok(())
 }
 
-const fn body(name: &'static str, power: i16) -> CardDef {
+const fn body(name: &'static str, power: i32) -> CardDef {
     CardDef { name, types: TypeSet::of(&[CardType::Creature]), power: Some(power), toughness: Some(4), ..CardDef::BLANK }
 }
 
@@ -35,7 +35,7 @@ static NEGATIVE: CardDef = body("Negative Body", -1);
 fn power_is_graveyard_cards(q: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     let state = q.state();
     let cards: usize = state.seats().map(|p| state.zone(Zone::graveyard(p)).len()).sum();
-    chars.power = Some(i16::try_from(cards).unwrap_or(i16::MAX));
+    chars.power = Some(i32::try_from(cards).unwrap_or(i32::MAX));
 }
 
 /// "This creature's power is equal to the number of creatures you control."
@@ -43,7 +43,7 @@ fn power_is_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, chars: &
     let state = q.state();
     let you = state.obj(source).controller;
     let creatures = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && q.chars(id).is(CardType::Creature)).count();
-    chars.power = Some(i16::try_from(creatures).unwrap_or(i16::MAX));
+    chars.power = Some(i32::try_from(creatures).unwrap_or(i32::MAX));
 }
 
 /// A */4 that grows with the graveyards, as a Lhurgoyf does.
@@ -94,8 +94,8 @@ static TWO_PROBE: CardDef = CardDef { name: "Casualty Two Probe", optional_cost:
 
 /// "The copy isn't legendary and has starting loyalty X."
 fn copy_nonlegendary(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    // X is announced no higher than a power can be (`i16::MAX`), so a loyalty holds it.
-    let Ok(loyalty) = i16::try_from(casualty::x(g, item)) else { return Ok(()) };
+    // X is announced no higher than a power can be (`i32::MAX`), so a loyalty holds it.
+    let Ok(loyalty) = i32::try_from(casualty::x(g, item)) else { return Ok(()) };
     let values = g.copiable_values(item.object).nonlegendary().with_loyalty(loyalty);
     g.copy_spell_as(item.object, item.controller, true, values)?;
     Ok(())
@@ -269,7 +269,7 @@ fn casts_of(game: &Game, name: &str) -> usize {
 }
 
 /// The most a power can be: X is announced up to it, since the power is read only as the cost is paid (CR 601.2h).
-const MOST_POWER: u32 = i16::MAX as u32;
+const MOST_POWER: u32 = i32::MAX as u32;
 
 #[test]
 fn casualty_x_sacrifices_a_creature_with_power_x_or_greater() {

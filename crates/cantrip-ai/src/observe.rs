@@ -407,7 +407,7 @@ impl View<'_> {
                     }
                     Event::Damage { source, target, amount, .. } => {
                         obs.objects = vec![o(source), target_ref(target, refs)];
-                        obs.amount = i32::from(amount);
+                        obs.amount = amount as i32;
                     }
                     Event::LifeChange { delta, .. } => obs.amount = delta,
                     Event::Drew { card, .. } | Event::Discarded { card, .. } | Event::Revealed { card, .. } | Event::Cycled { card, .. } => obs.objects = vec![o(card)],

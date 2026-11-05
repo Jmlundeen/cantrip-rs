@@ -32,7 +32,7 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if amount > 0
         && let Some(creature) = targets::object(g, item, 0)
     {
-        g.add_counters(creature, CounterKind::PlusOne, amount as i16);
+        g.add_counters(creature, CounterKind::PlusOne, amount as i32);
     }
     Ok(())
 }

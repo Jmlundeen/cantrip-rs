@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// which was not cast (CR 707.10), never has it.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let x = item.x as i16;
+    let x = item.x as i32;
     pump(g, item.object, creature, -x, -x);
     // A sentence ends (CR 608.2c): the state triggers judge what it did before the next (`Game::end_sentence`).
     g.end_sentence();

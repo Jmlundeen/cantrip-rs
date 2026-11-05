@@ -22,7 +22,7 @@ fn proliferate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "When this creature dies, it deals damage equal to its power to any target." Its power is as it last existed on the
 /// battlefield (CR 608.2h, 113.7a); it is the source of the damage. A target no longer legal is dealt nothing (CR 608.2b).
 fn blast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u16;
+    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u32;
     damage_target(g, item, 0, power);
     Ok(())
 }

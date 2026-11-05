@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// Vehicle's own text (CR 612). Nothing happens if it is no longer on the battlefield.
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let spider = g.words(item.object).subtype(Subtype::Spider);
-    let spiders = permanents_with_subtype_you_control(g, item.controller, spider) as i16;
+    let spiders = permanents_with_subtype_you_control(g, item.controller, spider) as i32;
     pump(g, item.object, item.object, spiders, spiders);
     Ok(())
 }

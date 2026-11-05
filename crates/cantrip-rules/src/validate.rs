@@ -341,8 +341,8 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         }
         (RequestKind::AssignCombatDamage { divisions }, Answer::Shares(shares)) => {
             for d in divisions {
-                let mine: Vec<&(ObjectId, Option<ObjectId>, u16)> = shares.iter().filter(|s| s.0 == d.source).collect();
-                let total: u16 = mine.iter().map(|s| s.2).sum();
+                let mine: Vec<&(ObjectId, Option<ObjectId>, u32)> = shares.iter().filter(|s| s.0 == d.source).collect();
+                let total: u32 = mine.iter().map(|s| s.2).sum();
                 if total != d.damage {
                     return no("a creature's combat damage must all be assigned, and no more (CR 510.1a)");
                 }
@@ -353,10 +353,10 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                         _ => {}
                     }
                 }
-                let to_defender: u16 = mine.iter().filter(|s| s.1.is_none()).map(|s| s.2).sum();
+                let to_defender: u32 = mine.iter().filter(|s| s.1.is_none()).map(|s| s.2).sum();
                 if to_defender > 0 {
                     for (i, &c) in d.creatures.iter().enumerate() {
-                        let got: u16 = mine.iter().filter(|s| s.1 == Some(c)).map(|s| s.2).sum();
+                        let got: u32 = mine.iter().filter(|s| s.1 == Some(c)).map(|s| s.2).sum();
                         if got < d.lethal[i] {
                             return no("nothing reaches the player until every blocker is assigned lethal damage (CR 702.19b)");
                         }

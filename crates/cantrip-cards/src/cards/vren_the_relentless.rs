@@ -11,7 +11,7 @@ fn plus_one_for_each_other_rat(q: &dyn LayerQuery, source: ObjectId, chars: &mut
     let state = q.state();
     let you = state.obj(source).controller;
     let rat = q.words(source).subtype(Subtype::Rat);
-    let count = state.battlefield().iter().filter(|&&id| id != source && state.obj(id).controller == you && q.chars(id).has_subtype(rat)).count() as i16;
+    let count = state.battlefield().iter().filter(|&&id| id != source && state.obj(id).controller == you && q.chars(id).has_subtype(rat)).count() as i32;
     chars.power = chars.power.map(|v| v + count);
     chars.toughness = chars.toughness.map(|v| v + count);
 }

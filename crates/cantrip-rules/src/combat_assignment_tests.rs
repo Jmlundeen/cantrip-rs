@@ -53,7 +53,7 @@ fn table(cards: &[(&'static CardDef, PlayerId)]) -> (Game, Vec<ObjectId>) {
 /// Even the minimum signed power has an exact unsigned magnitude, and an ordinary creature keeps assigning zero.
 #[test]
 fn absolute_power_assignment_preserves_actual_power_across_the_signed_range() {
-    for power in [i16::MIN, -6, -2, 0, 3, i16::MAX] {
+    for power in [i32::MIN, -6, -2, 0, 3, i32::MAX] {
         let (mut game, ids) = table(&[(&ABSOLUTE, ME), (&NEGATIVE, ME)]);
         let card = game.cards.id_of(&ABSOLUTE);
         game.state.update_obj(ids[0], |o| o.copy = Some(Copiable::of(card).sized(power, 4)));
@@ -119,20 +119,20 @@ fn absolute_power_is_used_for_unblocked_attackers_blocked_attackers_and_blockers
     }
 }
 
-/// CR 510.1a, 704.5g: the minimum signed power assigns 32,768 damage, which is lethal to a positive-toughness blocker.
+/// CR 510.1a, 704.5g: the minimum signed power assigns 2,147,483,648 damage, which is lethal to a positive-toughness blocker.
 /// Marked damage must not become negative when the next state-based check compares it with toughness.
 #[test]
-fn minimum_signed_power_deals_32768_combat_damage_and_destroys_its_blocker() {
+fn minimum_signed_power_deals_its_exact_magnitude_and_destroys_its_blocker() {
     let (mut game, ids) = table(&[(&ABSOLUTE, ME), (&NEGATIVE, THEM)]);
     let [attacker, blocker] = ids[..] else { unreachable!() };
     let card = game.cards.id_of(&ABSOLUTE);
-    game.state.update_obj(attacker, |o| o.copy = Some(Copiable::of(card).sized(i16::MIN, 4)));
+    game.state.update_obj(attacker, |o| o.copy = Some(Copiable::of(card).sized(i32::MIN, 4)));
     game.state.set_attackers(vec![Attacker { blocked: true, ..Attacker::new(attacker, Target::Player(THEM), THEM, TypeSet::NONE) }]);
     game.state.set_blocks(vec![Block { blocker, attacker, first_strike: false }]);
     game.state.update_turn(|t| t.set_step(Step::CombatDamage));
     crate::turn::begin_step(&mut cx(&mut game)).expect("no assignment choice");
-    assert_eq!(game.state.obj(blocker).damage, 32768);
-    assert_eq!(cx(&mut game).chars(attacker).power, Some(i16::MIN));
+    assert_eq!(game.state.obj(blocker).damage, 2_147_483_648);
+    assert_eq!(cx(&mut game).chars(attacker).power, Some(i32::MIN));
     crate::settle::state_based_actions_alone(&mut cx(&mut game)).expect("no choices");
     assert!(!crate::live(&game.state, blocker));
     assert!(crate::live(&game.state, attacker));
@@ -142,11 +142,11 @@ fn minimum_signed_power_deals_32768_combat_damage_and_destroys_its_blocker() {
 }
 
 /// CR 702.19b: an indestructible blocker already marked with at least 32,768 damage needs zero more assigned as lethal.
-/// The assignment prompt and actual trample damage use that exact subtraction up to u16::MAX, even with deathtouch;
+/// The assignment prompt and actual trample damage use that exact subtraction up to u32::MAX, even with deathtouch;
 /// with no marked damage, deathtouch needs one instead.
 #[test]
 fn trample_accounts_for_large_marked_damage_and_deathtouch_without_signed_narrowing() {
-    for (marked, deathtouch, to_blocker) in [(32768, false, 0), (u16::MAX, false, 0), (32768, true, 0), (u16::MAX, true, 0), (0, true, 1)] {
+    for (marked, deathtouch, to_blocker) in [(32768, false, 0), (u32::MAX, false, 0), (32768, true, 0), (u32::MAX, true, 0), (0, true, 1)] {
         let (mut game, ids) = table(&[(&ABSOLUTE, ME), (&NEGATIVE, THEM)]);
         let [attacker, blocker] = ids[..] else { unreachable!() };
         cantrip_api::Game::add_effect(&mut cx(&mut game), attacker, attacker, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
@@ -176,7 +176,7 @@ fn trample_accounts_for_large_marked_damage_and_deathtouch_without_signed_narrow
             f.answers.push((None, answer));
         });
         crate::turn::begin_step(&mut cx).expect("the assignment was answered");
-        assert_eq!(cx.s().player(THEM).life, 18 + i32::from(to_blocker));
+        assert_eq!(cx.s().player(THEM).life, 18 + to_blocker as i32);
         assert_eq!(cx.s().obj(blocker).damage, marked + to_blocker);
         crate::settle::state_based_actions_alone(&mut cx).expect("no choices");
         assert!(crate::live(cx.s(), blocker));
@@ -258,7 +258,7 @@ fn effect(game: &mut Game, on: ObjectId, kind: EffectKind) {
     cantrip_api::Game::add_effect(&mut cx(game), on, on, kind, Duration::EndOfTurn);
 }
 
-fn assigned(game: &mut Game, creature: ObjectId) -> u16 {
+fn assigned(game: &mut Game, creature: ObjectId) -> u32 {
     static_rules::combat_damage_of(&cx(game), creature)
 }
 

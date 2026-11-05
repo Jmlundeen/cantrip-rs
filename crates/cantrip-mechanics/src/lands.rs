@@ -475,7 +475,7 @@ pub const fn verge<const A: u16, const B2: u16>(
 pub fn becomes_creature_until_end_of_turn(
     g: &mut dyn Game,
     item: &StackItem,
-    (power, toughness): (i16, i16),
+    (power, toughness): (i32, i32),
     colors: ColorSet,
     subtype: Subtype,
     keywords: Keywords,
@@ -542,9 +542,9 @@ pub const FETCH_BASIC_TAPPED: Question = Question::new(
 /// count lands; `counts` is `|c| c.is(CardType::Land)` for them, and Desert Were-Worm's "for each Mountain you control" counts the permanents with the Mountain
 /// subtype. The controller of the source and of each counted permanent is read through the view (`LayerQuery::controller`, CR
 /// 613.1b): in layer 2 as the control-changing effects applied so far leave it, so a control-changing ability may use it too.
-pub fn count_you_control(q: &dyn LayerQuery, source: ObjectId, counts: &dyn Fn(&Chars) -> bool) -> i16 {
+pub fn count_you_control(q: &dyn LayerQuery, source: ObjectId, counts: &dyn Fn(&Chars) -> bool) -> i32 {
     let controller = q.controller(source);
-    q.state().battlefield().iter().filter(|&&id| q.controller(id) == controller && counts(&q.chars(id))).count() as i16
+    q.state().battlefield().iter().filter(|&&id| q.controller(id) == controller && counts(&q.chars(id))).count() as i32
 }
 
 /// Power and toughness each equal the number of a land subtype you control (CR 604.3, 613.4a).

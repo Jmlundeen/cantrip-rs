@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "When Omnath enters, it deals damage to any target equal to the number of Elementals you control." (CR 608.2, 120.3).
 fn deals_damage_any_target_equal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let elemental = g.words(item.object).subtype(Subtype::Elemental);
-    let amount = permanents_with_subtype_you_control(g, item.controller, elemental) as u16;
+    let amount = permanents_with_subtype_you_control(g, item.controller, elemental) as u32;
     damage_target(g, item, 0, amount);
     Ok(())
 }

@@ -16,8 +16,8 @@ use cantrip_api::*;
 /// battlefield, and as it last existed there once it has left (CR 608.2h, 113.7a).
 struct Stats {
     creature: bool,
-    power: Option<i16>,
-    toughness: Option<i16>,
+    power: Option<i32>,
+    toughness: Option<i32>,
 }
 
 fn stats(q: &dyn Query, id: ObjectId) -> Stats {
@@ -39,7 +39,7 @@ fn is_greater(q: &dyn Query, this: ObjectId, entered: ObjectId) -> bool {
     if !this.creature || !entered.creature {
         return false;
     }
-    let greater = |entered: Option<i16>, this: Option<i16>| matches!((entered, this), (Some(e), Some(t)) if e > t);
+    let greater = |entered: Option<i32>, this: Option<i32>| matches!((entered, this), (Some(e), Some(t)) if e > t);
     greater(entered.power, this.power) || greater(entered.toughness, this.toughness)
 }
 

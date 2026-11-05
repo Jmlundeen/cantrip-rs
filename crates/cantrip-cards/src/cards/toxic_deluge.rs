@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// All creatures get -X/-X until end of turn, for the X paid in life as an additional cost.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = item.x as i16;
+    let x = item.x as i32;
     pump_all_creatures(g, item.object, -x, -x);
     Ok(())
 }

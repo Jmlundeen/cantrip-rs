@@ -35,7 +35,7 @@ fn graveyard_power(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
         let obj = state.obj(card);
         let chars = q.chars(card);
         !obj.token && !obj.card_copy && (chars.is(CardType::Creature) || chars.is(CardType::Planeswalker))
-    }).count() as i16;
+    }).count() as i32;
     chars.power = chars.power.map(|power| power + n);
 }
 

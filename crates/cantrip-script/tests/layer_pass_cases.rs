@@ -269,7 +269,7 @@ static DOUBLER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-fn other_small_creatures(view: &dyn LayerQuery, holder: ObjectId) -> i16 {
+fn other_small_creatures(view: &dyn LayerQuery, holder: ObjectId) -> i32 {
     let you = view.state().obj(holder).controller;
     view.state()
         .battlefield()
@@ -279,7 +279,7 @@ fn other_small_creatures(view: &dyn LayerQuery, holder: ObjectId) -> i16 {
             let c = view.chars(other);
             c.is(CardType::Creature) && c.power.is_some_and(|p| p <= 2)
         })
-        .count() as i16
+        .count() as i32
 }
 
 fn plus_per_small_creature(view: &dyn LayerQuery, holder: ObjectId, c: &mut Chars) {
@@ -316,7 +316,7 @@ fn plus_per_small_creature_each(view: &dyn LayerQuery, source: ObjectId, id: Obj
             let o = view.chars(other);
             o.is(CardType::Creature) && !o.is(CardType::Artifact) && o.power.is_some_and(|p| p <= 2)
         })
-        .count() as i16;
+        .count() as i32;
     c.power = c.power.map(|p| p + n);
 }
 

@@ -8,8 +8,8 @@ use cantrip_oracle as oracle;
 fn recruit(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cadets = tokens::create(g, item.controller, &tokens::CADET, 2)?;
     if g.obj(item.object).cast_from == Some(ZoneKind::Graveyard) {
-        let counters = (g.state().zone(Zone::graveyard(item.controller)).len() / 3) as i16;
-        let puts: Vec<(ObjectId, CounterKind, i16)> = cadets.into_iter().map(|cadet| (cadet, CounterKind::PlusOne, counters)).collect();
+        let counters = (g.state().zone(Zone::graveyard(item.controller)).len() / 3) as i32;
+        let puts: Vec<(ObjectId, CounterKind, i32)> = cadets.into_iter().map(|cadet| (cadet, CounterKind::PlusOne, counters)).collect();
         g.add_counters_together(&puts);
     }
     Ok(())

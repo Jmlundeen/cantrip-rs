@@ -10,7 +10,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(&chosen) = g.cost_objects(item).first() else { return Ok(()) };
     let power = g.chars(chosen).power.unwrap_or(0).max(0);
-    damage_target(g, item, 0, power as u16);
+    damage_target(g, item, 0, power as u32);
     Ok(())
 }
 

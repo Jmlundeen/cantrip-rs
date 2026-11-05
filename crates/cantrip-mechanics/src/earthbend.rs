@@ -17,7 +17,7 @@ pub const TARGET: TargetSpec = crate::targets::LAND_YOU_CONTROL;
 /// The land becomes a 0/0 creature with haste that's still a land, with no duration (CR 611.2a); it gets `N` +1/+1
 /// counters; and `RETURN`, the delayed ability 0 of the card whose ability this is, is created, watching it: its source
 /// is this spell or this ability's source, its controller this spell or ability's (CR 603.7d-e).
-pub fn effect<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn effect<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.target_legal(item, 0) {
         return Ok(());
     }
@@ -37,7 +37,7 @@ pub fn effect<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
 }
 
 /// "When this enters, earthbend N": `text` names the card.
-pub const fn enters<const N: i16>(text: &'static str) -> AbilityDef {
+pub const fn enters<const N: i32>(text: &'static str) -> AbilityDef {
     triggered(THIS_ENTERS, effect::<N>, text)
         .targets(&[TARGET])
 }

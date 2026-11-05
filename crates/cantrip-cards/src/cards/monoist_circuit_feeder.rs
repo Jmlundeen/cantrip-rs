@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// resolves, the Circuit-Feeder itself among the artifacts; a target that is no longer legal is left alone while the other
 /// still gets its half (CR 608.2b). Flying is in the content JSON.
 fn pump_and_shrink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = artifacts_you_control(g, item.controller) as i16;
+    let x = artifacts_you_control(g, item.controller) as i32;
     g.one_instruction(&mut |g| {
         if let Some(mine) = targets::object(g, item, 0) {
             pump(g, item.object, mine, x, 0);

@@ -77,7 +77,7 @@ fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn damage_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(sacrificed) = item.subject else { return Ok(()) };
     let chars = g.chars(sacrificed);
-    let power = chars.power.unwrap_or(0).max(0) as u16;
+    let power = chars.power.unwrap_or(0).max(0) as u32;
     let hamster = chars.has_subtype(g.words(item.object).subtype(Subtype::Hamster));
     damage_target(g, item, 0, power);
     if hamster {

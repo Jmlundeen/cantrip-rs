@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// Island is read through the words of Jace's text (CR 612).
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let island = g.words(item.object).subtype(Subtype::Island);
-    let x = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Land) && g.chars(id).has_subtype(island)).count() as i16;
+    let x = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Land) && g.chars(id).has_subtype(island)).count() as i32;
     empower::jace(g, item.controller, item.object, x)
 }
 

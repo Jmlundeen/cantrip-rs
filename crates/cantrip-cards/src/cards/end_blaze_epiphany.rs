@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// back is a new object, CR 400.7). It is set up even if the damage is not dealt, as the creature may still die this turn.
 fn end_blaze_epiphany(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    damage_target(g, item, 0, item.x as u16);
+    damage_target(g, item, 0, item.x as u32);
     delayed::this_turn(g, item, creature);
     Ok(())
 }

@@ -614,7 +614,7 @@ fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
     if let Some(loyalty) = cost.loyalty
         && loyalty < 0
         && loyalty != LOYALTY_MINUS_X
-        && obj.counters(CounterKind::Loyalty) < -(loyalty as i16)
+        && obj.counters(CounterKind::Loyalty) < -(loyalty as i32)
     {
         return false;
     }
@@ -664,7 +664,7 @@ fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
         return false;
     }
     if let Some((kind, n)) = cost.remove_counters
-        && obj.counters(kind) < n as i16
+        && obj.counters(kind) < n as i32
     {
         return false;
     }
@@ -1003,7 +1003,7 @@ fn choose_blight(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x
 /// (CR 118.3, 122.6a).
 fn pay_blight(cx: &mut Cx, player: PlayerId, cost: &Cost, chosen: Option<ObjectId>, x: u32) {
     if let Some(creature) = chosen {
-        counters::put(cx, creature, CounterKind::MinusOne, blight_count(cost, x) as i16, player, counters::How::Cost);
+        counters::put(cx, creature, CounterKind::MinusOne, blight_count(cost, x) as i32, player, counters::How::Cost);
     }
 }
 
@@ -1024,7 +1024,7 @@ fn counter_pools(cx: &Cx, source: ObjectId, controller: PlayerId, among: Counter
             }
             let count = obj.counters(kind);
             if count > 0 {
-                pools.push(CounterPool { object: id, kind, count: count as u16 });
+                pools.push(CounterPool { object: id, kind, count: count as u32 });
             }
         }
     }
@@ -1039,7 +1039,7 @@ fn counters_among_payable(cx: &Cx, source: ObjectId, controller: PlayerId, cost:
 
 /// Chooses the counters a cost removes from among permanents (CR 601.2h), always asked, even when the choice is forced. Too
 /// few left (some gone since the action was offered) is a cost that can't be paid, and the spell or ability is taken back.
-fn choose_counters_among(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<(ObjectId, CounterKind, u16)>> {
+fn choose_counters_among(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<(ObjectId, CounterKind, u32)>> {
     let Some(among) = cost.remove_counters_among else { return Ok(Vec::new()) };
     let total = among.count;
     let pools = counter_pools(cx, source, player, among, None);
@@ -1053,15 +1053,15 @@ fn choose_counters_among(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: 
 }
 
 /// Pays a removal of counters from among permanents (CR 118.3): each chosen number of each kind comes off its permanent.
-fn pay_counters_among(cx: &mut Cx, taken: &[(ObjectId, CounterKind, u16)]) {
+fn pay_counters_among(cx: &mut Cx, taken: &[(ObjectId, CounterKind, u32)]) {
     for &(object, kind, n) in taken {
-        counters::remove(cx, object, kind, n.min(i16::MAX as u16) as i16);
+        counters::remove(cx, object, kind, n as i32);
     }
 }
 
 /// The creatures that could be tapped for crew or saddle (CR 702.122a, 702.171a): the controller's other untapped
 /// creatures, summoning sick or not, each with what it counts as towards the total power (CR 702.122b).
-fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatures) -> (Vec<ObjectId>, Vec<i16>) {
+fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatures) -> (Vec<ObjectId>, Vec<i32>) {
     let mut cards = Vec::new();
     let mut powers = Vec::new();
     for id in cx.permanents_of(controller) {
@@ -1649,12 +1649,12 @@ fn pay_life_and_counters(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: 
         ops::change_life(cx, player, -life_paid(cost.life));
     }
     if let Some((kind, n)) = cost.remove_counters {
-        counters::remove(cx, source, kind, n as i16);
+        counters::remove(cx, source, kind, n as i32);
     }
     // Counters a cost puts on its source are put by the player paying it (CR 118.3, 122.6a): what replaces counters being
     // put applies.
     if let Some((kind, n)) = cost.put_counters {
-        counters::put(cx, source, kind, n as i16, player, counters::How::Cost); // a counter count is an i16 everywhere in the engine
+        counters::put(cx, source, kind, n as i32, player, counters::How::Cost); // a counter count is an i32 everywhere in the engine
     }
 }
 
@@ -1745,7 +1745,7 @@ fn tap_x_candidates(cx: &Cx, source: ObjectId, player: PlayerId, filter: ObjectF
 }
 
 /// The most a blight X may be announced as (CR 701.68a, 601.2b): the greatest toughness among the creatures its payer controls,
-/// and 0 with none to put the counters on (CR 701.68b) - never more than a toughness can be (`i16::MAX`).
+/// and 0 with none to put the counters on (CR 701.68b) - never more than a toughness can be (`i32::MAX`).
 fn blight_x_most(cx: &Cx, player: PlayerId) -> u32 {
     if blight_candidates(cx, player).is_empty() {
         return 0;
@@ -1754,7 +1754,7 @@ fn blight_x_most(cx: &Cx, player: PlayerId) -> u32 {
         .into_iter()
         .filter(|&id| cx.chars(id).is(CardType::Creature))
         .filter_map(|id| cx.chars(id).toughness)
-        .map(|t| i32::from(t).clamp(0, i32::from(i16::MAX)) as u32)
+        .map(|t| i32::from(t).clamp(0, i32::from(i32::MAX)) as u32)
         .max()
         .unwrap_or(0)
 }
@@ -2089,7 +2089,7 @@ pub fn target_candidates_given(
     earlier: &[Target],
     subject: Target,
     slot_player: Option<PlayerId>,
-    x: Option<u16>,
+    x: Option<u32>,
 ) -> Vec<Target> {
     candidates(cx, asker, spec, earlier, subject, slot_player, x, false, None)
 }
@@ -2123,7 +2123,7 @@ fn candidates(
     earlier: &[Target],
     subject: Target,
     slot_player: Option<PlayerId>,
-    x: Option<u16>,
+    x: Option<u32>,
     gift: bool,
     text: Option<(ObjectId, Words)>,
 ) -> Vec<Target> {
@@ -2281,8 +2281,8 @@ const ANNOUNCEMENT_BUDGET: u32 = 4096;
 #[derive(Clone, Copy)]
 struct Earlier {
     modes: Option<u32>,
-    x: u16,
-    kicks: u16,
+    x: u32,
+    kicks: u32,
     paid: bool,
     splice: ManaCost,
     spell: Option<Obj>,
@@ -2662,7 +2662,7 @@ fn reads_count(spec: &TargetSpec) -> bool {
 /// candidates there are, or their mana values together for a slot whose rule of its targets together reads it - a mana
 /// value of the targets' (each at most X, or all of them together), which no X past their total changes; past that more
 /// only costs more. A part reading X as anything but a mana value (a total power) must widen this bound.
-fn count_bound<'a>(cx: &Cx, asker: &Asker, specs: impl Iterator<Item = &'a TargetSpec>) -> u16 {
+fn count_bound<'a>(cx: &Cx, asker: &Asker, specs: impl Iterator<Item = &'a TargetSpec>) -> u32 {
     let mut bound = 0u32;
     for spec in specs.filter(|s| reads_count(s)) {
         let candidates = target_candidates(cx, asker, &spec.when_kicked(1));
@@ -2673,7 +2673,7 @@ fn count_bound<'a>(cx: &Cx, asker: &Asker, specs: impl Iterator<Item = &'a Targe
         };
         bound = bound.max(n);
     }
-    bound.min(u32::from(u16::MAX)) as u16
+    bound
 }
 
 /// The choices of modes `modal` could be cast or activated with, between `range`'s numbers (CR 700.2), as masks: of the
@@ -2792,9 +2792,9 @@ fn some_cast(
     } else if let Some(v @ VariableCost::SacrificeX(_)) = variable {
         cantrip_state::count_u32(variable_candidates(cx, card, player, v, Some(CostFor::Spell), None).len())
     } else {
-        u32::from(u16::MAX)
+        u32::MAX
     };
-    let most = u16::try_from(u32::from(bound.max(least)).min(cap)).unwrap_or(u16::MAX).max(least);
+    let most = bound.max(least).min(cap).max(least);
     let xs = if def.kicker.is_some() || (x_symbols == 0 && !x_life && !x_sacrifices) {
         0..=0
     } else if open {
@@ -2810,7 +2810,7 @@ fn some_cast(
                     Some(k) if k.cost.x > 0 => (kicks, u8::from(kicks > 0)),
                     _ => (x, kicks.min(255) as u8),
                 };
-                let counted = u32::from(if x > 0 { x } else { u16::from(kicked) });
+                let counted = if x > 0 { x } else { u32::from(kicked) };
                 let mut obj = *cx.s().obj(card);
                 (obj.x, obj.kicked, obj.paid) = (x, kicked, u32::from(paid));
                 // A kicker that is not mana is kicked by paying it (CR 702.33a).
@@ -4793,10 +4793,10 @@ impl Available {
     }
 
     /// How much mana of no restriction it could pay at most (advice): the pool's and what the mana abilities add, less
-    /// what those abilities cost themselves; `u16::MAX` when some ability's yield is not stated.
-    pub fn most_unrestricted(&self) -> u16 {
+    /// what those abilities cost themselves; `u32::MAX` when some ability's yield is not stated.
+    pub fn most_unrestricted(&self) -> u32 {
         if self.unknown {
-            return u16::MAX;
+            return u32::MAX;
         }
         let complex: u32 = self
             .complex
@@ -4812,7 +4812,7 @@ impl Available {
             })
             .fold(0u32, u32::saturating_add);
         let total = self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex.iter().sum::<u32>() + self.linked.iter().map(|&(_, n)| n).sum::<u32>() + complex;
-        total.min(u16::MAX as u32) as u16
+        total
     }
 
     /// Whether `cost` could be paid (for `payment`, or with unrestricted mana alone) by some choice of the `complex` sources:
@@ -7295,7 +7295,7 @@ fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, 
     let up_to = later || most != fewest || targeted;
     let powers = eligible
         .iter()
-        .map(|&c| (if up_to { reduction_of(cx, c) } else { reduction_of(cx, c).min(most) }) as i16)
+        .map(|&c| (if up_to { reduction_of(cx, c) } else { reduction_of(cx, c).min(most) }) as i32)
         .collect();
     let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToReduce, cards: eligible, powers, minimum: 0, up_to };
     match cx.ask_core(player, ask, true)? {
@@ -8214,14 +8214,13 @@ fn cast(
         } else if matches!(extra.variable, Some(VariableCost::SacrificeWithPowerX(_))) {
             // A power read as the cost is paid (CR 601.2h), after the mana abilities that may change it (CR 601.2g): X up
             // to the most a power can be, the payment refusing one nothing has.
-            i16::MAX as u32
+            i32::MAX as u32
         } else if matches!(extra.variable, Some(VariableCost::BlightX)) {
             // The greatest toughness among the creatures you control (Soul Immolation), judged as X is announced (CR 601.2b).
             blight_x_most(cx, player)
         } else if let Some(variable) = extra.variable.filter(|_| sacrifices_x) {
             let there = u32::try_from(variable_candidates(cx, spell, player, variable, Some(CostFor::Spell), None).len()).unwrap_or(u32::MAX);
-            // An X ("sacrifice X creatures") is a u16 (`StackItem::x`); the number "any number" announces is not.
-            if less_each > 0 { there } else { there.min(u32::from(u16::MAX)) }
+            there
         } else if let Some(more) = def.kicker.and_then(|k| k.extra).filter(|_| def.kicker.is_some_and(|k| k.multi)) {
             // A multikicker whose cost is more than mana (Squad--Exile four cards from your graveyard): announced as many
             // times as its whole cost could be paid (CR 601.2b, 118.3), the kicker's mana apart, which the payment judges as it
@@ -8237,8 +8236,7 @@ fn cast(
         // has X 1 or more as it is.
         let least = if def.kicker.is_none() && less_each == 0 { u32::from(least_x(def.x_cant_be_zero)) } else { 0 };
         let announced = announce_x(cx, player, spell, base, def.kicker, x_symbols, least, cap, false, less_each, hand_reduction, extra.variable.map_or("", |v| v.governs()))?;
-        // Every announcement but "any number"'s is within an X's u16 (`cap`).
-        let n = announced.min(u32::from(u16::MAX)) as u16;
+        let n = announced;
         if let Some(k) = def.kicker {
             if k.cost.x > 0 {
                 // Kicker {X} (CR 702.33a, 107.3): X is the number announced, and kicked when it is not 0.
@@ -8335,7 +8333,7 @@ fn cast(
     }
     // CR 601.2c: targets slot by slot, where they were not announced with the action; a slot counted by X or by the
     // times it was kicked is judged by what was announced.
-    item.counted = if item.x > 0 { item.x } else { u16::from(item.kicked) };
+    item.counted = if item.x > 0 { item.x } else { u32::from(item.kicked) };
     let counted = u32::from(item.counted);
     item.since = cx.g.log.len() as u32;
     cx.st().stack_push(item);
@@ -9236,13 +9234,13 @@ pub(crate) fn enough_together(q: &dyn Query, asker: &Asker, together: &Option<Pa
 /// with the index of the spec it was chosen for (`StackItem::spec_of`), so a slot of several targets may stand anywhere.
 /// `x` is the X announced for the spell or ability (`resolve::announced_x`), which its filters read.
 #[allow(clippy::too_many_arguments)]
-fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, specs: &[TargetSpec], counted: u32, kicked: u8, x: Option<u16>, by: Option<Linked>) -> R<(Vec<Target>, Vec<u8>)> {
+fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, specs: &[TargetSpec], counted: u32, kicked: u8, x: Option<u32>, by: Option<Linked>) -> R<(Vec<Target>, Vec<u8>)> {
     choose_slots_after(cx, player, source, spell, specs, counted, kicked, x, by, &[], 0)
 }
 
 /// Announce slots after a divided slot, preserving the earlier targets for filters that read them.
 #[allow(clippy::too_many_arguments)]
-fn choose_slots_after(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, specs: &[TargetSpec], counted: u32, kicked: u8, x: Option<u16>, by: Option<Linked>, earlier: &[Target], first_spec: u8) -> R<(Vec<Target>, Vec<u8>)> {
+fn choose_slots_after(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, specs: &[TargetSpec], counted: u32, kicked: u8, x: Option<u32>, by: Option<Linked>, earlier: &[Target], first_spec: u8) -> R<(Vec<Target>, Vec<u8>)> {
     let asker = Asker { source, controller: player, by, spell };
     let slots = crate::resolve::expand_specs(cx.s(), player, specs);
     let mut targets = earlier.to_vec();
@@ -9352,11 +9350,11 @@ fn divided_slots(specs: &[TargetSpec], total: u32) -> Option<Vec<TargetSpec>> {
 
 /// How far the X of a divided total needs to be looked at for its legal announcements: until the total is large enough for
 /// every candidate of the divided slot to be given one (CR 601.2d). 0 for a total X doesn't set.
-fn divided_x_bound(cx: &Cx, asker: &Asker, divide: Option<Divide>, specs: &[TargetSpec]) -> u16 {
+fn divided_x_bound(cx: &Cx, asker: &Asker, divide: Option<Divide>, specs: &[TargetSpec]) -> u32 {
     let Some(divide) = divide.filter(|d| d.reads.is_some() || d.total == TargetSpec::COUNTED) else { return 0 };
     let Some(spec) = specs.first() else { return 0 };
     let there = cantrip_state::count_u32(target_candidates(cx, asker, spec).len());
-    (0..=1000u16).find(|&x| divide.total_for(cx, asker, x) >= there).unwrap_or(1000)
+    (0..=1000u32).find(|&x| divide.total_for(cx, asker, x) >= there).unwrap_or(1000)
 }
 
 /// Whether activating an ability that divides a total could be announced (CR 601.2c-d by way of 602.2b): its required slots
@@ -9372,7 +9370,7 @@ fn divided_activation_possible(cx: &Cx, asker: &Asker, def: &ActivatedDef, divid
 /// question, as the C# engine does: a total of nothing is not asked, and is no legal announcement of a slot that requires
 /// a target, each of which must receive at least one; with no candidate an optional slot takes no target. `may_cancel` is
 /// for a spell or ability still being announced; `x` is the X announced for it (`resolve::announced_x`).
-pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, spec: &TargetSpec, total: u32, x: Option<u16>, may_cancel: bool, by: Option<Linked>) -> R<Divided> {
+pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bool, spec: &TargetSpec, total: u32, x: Option<u32>, may_cancel: bool, by: Option<Linked>) -> R<Divided> {
     if total == 0 {
         return Ok(if spec.required() { Divided::Impossible } else { Divided::Skipped });
     }
@@ -9790,7 +9788,7 @@ fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut Man
 
 /// A cost with its kicker paid `n` times (CR 702.33); a kicker with {X} in it is paid once for the X announced, which
 /// is `n`, so it adds that much generic mana (and its other symbols once, when n is not 0).
-fn kicker_total(base: ManaCost, k: Kicker, n: u16) -> ManaCost {
+fn kicker_total(base: ManaCost, k: Kicker, n: u32) -> ManaCost {
     let mut total = base;
     if k.cost.x > 0 {
         if n > 0 {
@@ -9952,14 +9950,14 @@ fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 
 /// Announcing X or the number of times a spell is kicked (CR 601.2b), as the C# engine asks it: a pay-costs
 /// question that raises and lowers the value until confirmed.
-fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, x_symbols: u8, least: u16, cap: u16) -> R<u16> {
+fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, x_symbols: u8, least: u32, cap: u32) -> R<u32> {
     // X itself is a u16 (`StackItem::x`), and `cap` keeps the number within it.
-    announce_x(cx, player, spell, base, None, x_symbols, u32::from(least), u32::from(cap), false, 0, 0, "").map(|n| n as u16)
+    announce_x(cx, player, spell, base, None, x_symbols, least, cap, false, 0, 0, "").map(|n| n)
 }
 
 /// The least value X may be announced as (CR 107.3a, 601.2b): 1 for an X that can't be 0 ("X can't be 0"), else 0.
-pub(crate) const fn least_x(x_cant_be_zero: bool) -> u16 {
-    x_cant_be_zero as u16
+pub(crate) const fn least_x(x_cant_be_zero: bool) -> u32 {
+    x_cant_be_zero as u32
 }
 
 /// Whether a cost paid for something whose X can't be 0 (CR 107.3a) leaves no X that may be announced: the printed cost
@@ -9999,7 +9997,7 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
     loop {
         let mut total = base;
         match kicker {
-            Some(k) => total = kicker_total(total, k, n as u16),
+            Some(k) => total = kicker_total(total, k, n),
             // A reduction past the generic mana there is takes it all, never colored mana (CR 118.7a).
             None if x_symbols > 0 => {
                 total.generic = (total.generic + n * u32::from(x_symbols)).saturating_sub(reduced);
@@ -10033,13 +10031,13 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
 
 /// The most an activation's X may be announced as where it counts targets ("untap X target lands"): no more than the legal
 /// targets there are (CR 601.2c, 602.2b).
-fn x_target_cap(cx: &Cx, asker: &Asker, def: &ActivatedDef) -> u16 {
+fn x_target_cap(cx: &Cx, asker: &Asker, def: &ActivatedDef) -> u32 {
     def.targets
         .iter()
         .filter(|spec| spec.min == TargetSpec::COUNTED)
-        .map(|spec| u16::try_from(target_candidates(cx, asker, spec).len()).unwrap_or(u16::MAX))
+        .map(|spec| cantrip_state::count_u32(target_candidates(cx, asker, spec).len()))
         .min()
-        .unwrap_or(u16::MAX)
+        .unwrap_or(u32::MAX)
 }
 
 /// Activating a non-mana ability (CR 602.2): on the stack, then its costs.
@@ -10105,7 +10103,7 @@ fn activate(
     let mut whole = choose_cost_way(cx, player, source, ability, def, paid, by)?;
     // "Tap X untapped [permanents] you control" (CR 118.3): X can't be announced past the permanents that could pay it.
     let tap_x = match whole.variable {
-        Some(VariableCost::TapX(filter)) => Some((filter, tap_x_candidates(cx, source, player, filter, whole.tap, by).len().min(usize::from(u16::MAX)) as u16)),
+        Some(VariableCost::TapX(filter)) => Some((filter, tap_x_candidates(cx, source, player, filter, whole.tap, by).len() as u32)),
         _ => None,
     };
     if mana.x > 0 {
@@ -10118,15 +10116,15 @@ fn activate(
     }
     // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).
     if whole.loyalty == Some(LOYALTY_MINUS_X) {
-        let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u16;
-        item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), u32::from(cap), true, 0, 0, "")? as u16;
+        let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u32;
+        item.x = announce_x(cx, player, source, mana, None, 0, least_x(def.x_cant_be_zero), cap, true, 0, 0, "")?;
     }
     // CR 118.3, 602.2b: "Remove any number of [kind] counters from this" announces how many, up to the counters there are; the
     // number is the ability's X (CR 107.3), which its effect reads as "that many".
     let removes = match whole.variable {
         Some(VariableCost::RemoveAnyNumberOfCounters(kind)) => {
-            let cap = cx.s().obj(source).counters(kind).clamp(0, i16::MAX) as u32;
-            item.x = announce_x(cx, player, source, mana, None, 0, 0, cap, false, 0, 0, VariableCost::RemoveAnyNumberOfCounters(kind).governs())? as u16;
+            let cap = cx.s().obj(source).counters(kind).clamp(0, i32::MAX) as u32;
+            item.x = announce_x(cx, player, source, mana, None, 0, 0, cap, false, 0, 0, VariableCost::RemoveAnyNumberOfCounters(kind).governs())? ;
             Some((kind, item.x))
         }
         _ => None,
@@ -10136,14 +10134,14 @@ fn activate(
     // chosen as the cost is paid (CR 601.2h).
     if let Some((filter, most)) = tap_x {
         if mana.x == 0 {
-            item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), u32::from(most), false, 0, 0, VariableCost::TapX(filter).governs())? as u16;
+            item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), most, false, 0, 0, VariableCost::TapX(filter).governs())?;
         }
         // One permanents choice can't hold the X to tap beside another cost's permanents (`Cost::and` would make a
         // sacrifice and the tap one choice). No printed card has both; one that did is refused, not paid as another cost.
         if whole.permanents.is_some() {
             return Err(Stop::Cancel);
         }
-        whole = Cost { variable: None, ..whole.and(Cost::tap_untapped(u32::from(item.x), filter)) };
+        whole = Cost { variable: None, ..whole.and(Cost::tap_untapped(item.x, filter)) };
     }
     announce_twobrids(cx, player, source, &mut mana, AnyMana::No)?;
     let life = announce_life(cx, player, source, &mut mana, AnyMana::No, paid)?;
@@ -10301,7 +10299,7 @@ fn activate(
     if let Some((kind, n)) = removes
         && n > 0
     {
-        counters::remove(cx, source, kind, n as i16);
+        counters::remove(cx, source, kind, n as i32);
     }
     pay_exert_and_tappers(cx, source, &whole, &tappers, &mut tapped);
     ops::tap_together_with(cx, &mut tapped, &[]);
@@ -10327,7 +10325,7 @@ fn activate(
     }
     if let Some(loyalty) = whole.loyalty {
         let turn = cx.s().turn.number;
-        let change = if loyalty == LOYALTY_MINUS_X { -(item.x as i16) } else { loyalty as i16 };
+        let change = if loyalty == LOYALTY_MINUS_X { -(item.x as i32) } else { loyalty as i32 };
         cx.st().update_obj(source, |o| o.loyalty_turn = turn);
         if change > 0 {
             // CR 606.4, 118.3: loyalty counters put on as the cost, by the player activating it - what replaces counters being
@@ -11976,20 +11974,20 @@ pub fn may_pay(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId
 
 /// `may_pay` for a cost whose variable part's size the payer sets as they pay it (`VariableCost::DiscardOneOrMore`): how many
 /// it took, or `None` declined.
-pub fn may_pay_counted(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<Option<u16>> {
+pub fn may_pay_counted(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<Option<u32>> {
     pay_during_resolution(cx, payer, source, subject, cost, question, None, None)
 }
 
 /// The most X a payer may raise "you may pay {X}" to while choosing it: past what any game could produce, a bound for a
 /// player who raises without paying.
-const MOST_X_PAID: u16 = 1000;
+const MOST_X_PAID: u32 = 1000;
 
 /// "You may pay {X}" as a spell or ability resolves (CR 118.12, 608.2d), X chosen by the payer as they pay it, since the
 /// text does not define it (CR 107.3f): one question (`RequestKind::UnlessPays` with its `x`) raises and lowers X, makes mana
 /// (CR 605.3a), and pays {X} once the pool covers it, or declines. Any X may be chosen, 0 included (paying {0} is still
 /// paying, CR 118.5). The X paid, or `None` when the payer declined: "when you do" (CR 603.12) asks whether it was paid, and
 /// "X" afterwards is the X paid. `cost` is the cost with its {X} (and any other mana or life beside it).
-pub fn may_pay_x(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<Option<u16>> {
+pub fn may_pay_x(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<Option<u32>> {
     pay_during_resolution(cx, payer, source, subject, cost, question, Some(0), None)
 }
 
@@ -12000,7 +11998,7 @@ pub fn may_pay_x(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: Object
 /// "when you pay this cost one or more times" triggers once for any number above 0, given that number (CR 603.12a,
 /// `Game::reflexive_trigger_counted`). A number whose cost the mana cost's shape can't hold (`ManaCost::times`) is not
 /// offered.
-pub fn may_pay_times(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, mana: ManaCost, most: u16, question: &'static Question) -> R<u16> {
+pub fn may_pay_times(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, mana: ManaCost, most: u32, question: &'static Question) -> R<u32> {
     if most == 0 {
         return Ok(0);
     }
@@ -12025,9 +12023,9 @@ fn pay_during_resolution(
     subject: ObjectId,
     cost: &Cost,
     question: &'static Question,
-    mut x: Option<u16>,
-    times: Option<u16>,
-) -> R<Option<u16>> {
+    mut x: Option<u32>,
+    times: Option<u32>,
+) -> R<Option<u32>> {
     // A part no payment during a resolution can have - a spell's or an activated ability's own - can't be paid, and
     // nothing is asked.
     if !resolution_parts(cost) {
@@ -12043,7 +12041,7 @@ fn pay_during_resolution(
         cost
     };
     // "Pay X life" (CR 119.4) is paid with the X chosen; without an {X} to choose it, X is 0.
-    let life_of = |x: Option<u16>| if cost.pay_x_life { cost.life + u32::from(x.unwrap_or(0)) } else { cost.life };
+    let life_of = |x: Option<u32>| if cost.pay_x_life { cost.life + u32::from(x.unwrap_or(0)) } else { cost.life };
     if !can_pay_life(cx, payer, life_of(x)) {
         return Ok(None);
     }
@@ -12205,7 +12203,7 @@ pub(crate) fn pool_pays(pool: &ManaPool, owed: &ManaCost, life_room: i32, any_co
 /// Pays a resolution's cost with `total` its mana and `life` its life: its Phyrexian symbols are announced first, each
 /// paid with its color or 2 life, immediately before the cost is paid (CR 118.13b, 107.4f), and the life they take is paid
 /// with the rest. A choice of more life than the payer can pay gives the payment up, to be asked again.
-fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mut total: ManaCost, mut life: u32, x: u16) -> R<u16> {
+fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mut total: ManaCost, mut life: u32, x: u32) -> R<u32> {
     if total.phyrexian != [0; 5] {
         life += announce_life(cx, payer, source, &mut total, AnyMana::No, None)?;
         if !rest_payable(cx, payer, 0, life, None) {
@@ -12218,7 +12216,7 @@ fn pay_announced(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, mu
 /// Chooses what the parts of a resolution's cost other than mana and life take, then pays the whole (CR 118.3, 601.2h):
 /// the mana from the pool, the life, and each other part as an activated ability's cost pays it (`activate`). `x` is the
 /// X paid, for a "sacrifice X" part. How many the variable part took ("discard one or more"), 0 for none.
-fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, total: ManaCost, life: u32, x: u16) -> R<u16> {
+fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Cost, total: ManaCost, life: u32, x: u32) -> R<u32> {
     // A cost paid as a spell or ability resolves is paid for no cast or activation (CR 118.12): nothing that forbids paying
     // for those touches it (Yasharn, Implacable Earth's ruling).
     let chosen = choose_permanents(cx, payer, source, cost, None, None)?;
@@ -12242,8 +12240,8 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     let mut taken: Vec<ObjectId> = discards.cards.iter().chain(&exiles).copied().collect();
     let hand_exiles = choose_hand_exiles(cx, payer, source, cost, None, &taken)?;
     taken.extend(&hand_exiles);
-    let (sacrifices, variable_exiles, variable_discards) = choose_variable(cx, payer, source, cost, u32::from(x), None, &taken)?;
-    let taken = u16::try_from(sacrifices.len() + variable_exiles.len() + variable_discards.cards.len()).unwrap_or(u16::MAX);
+    let (sacrifices, variable_exiles, variable_discards) = choose_variable(cx, payer, source, cost, x, None, &taken)?;
+    let taken = cantrip_state::count_u32(sacrifices.len() + variable_exiles.len() + variable_discards.cards.len());
     if life > 0 {
         ops::change_life(cx, payer, -life_paid(life));
     }
@@ -12351,7 +12349,7 @@ fn resolution_parts(cost: &Cost) -> bool {
 ///
 /// `feeds`: whether what the mana abilities could feed the cost counts (`can_pay_other_fed`) - only while the payer may still
 /// activate them for its mana.
-fn resolution_rest_payable(cx: &Cx, payer: PlayerId, source: ObjectId, cost: &Cost, x: u16, feeds: bool) -> bool {
+fn resolution_rest_payable(cx: &Cx, payer: PlayerId, source: ObjectId, cost: &Cost, x: u32, feeds: bool) -> bool {
     let obj = cx.s().obj(source);
     let live = live(cx.s(), source);
     let yours_on_battlefield = live && obj.zone.is(ZoneKind::Battlefield) && obj.controller == payer;
@@ -12375,7 +12373,7 @@ fn resolution_rest_payable(cx: &Cx, payer: PlayerId, source: ObjectId, cost: &Co
     }
     // "Sacrifice X" takes X of them (CR 107.3f).
     if let Some(variable @ (VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. })) = cost.variable
-        && variable_candidates(cx, source, payer, variable, None, None).len() < usize::from(x)
+        && variable_candidates(cx, source, payer, variable, None, None).len() < x as usize
     {
         return false;
     }

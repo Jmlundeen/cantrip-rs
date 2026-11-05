@@ -21,7 +21,7 @@ fn differently_named_lands_in_layers(q: &dyn LayerQuery, player: PlayerId) -> us
 /// 613.4a): characteristic-defining, so it applies in every zone and reads current land names through the layers.
 fn size(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let controller = q.controller(source);
-    let count = differently_named_lands_in_layers(q, controller) as i16;
+    let count = differently_named_lands_in_layers(q, controller) as i32;
     chars.power = Some(count);
     chars.toughness = Some(count);
 }

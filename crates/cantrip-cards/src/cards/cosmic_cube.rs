@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 
 /// The greatest power among the attacking creatures `player` controls, read as the ability resolves (CR 608.2h): none if
 /// none is attacking any more, and then no spell has a mana value "less than or equal to" it.
-fn greatest_attacking_power(g: &dyn Game, player: PlayerId) -> Option<i16> {
+fn greatest_attacking_power(g: &dyn Game, player: PlayerId) -> Option<i32> {
     g.permanents_of(player).into_iter().filter(|&id| g.is_attacking(id)).filter_map(|id| g.chars(id).power).max()
 }
 

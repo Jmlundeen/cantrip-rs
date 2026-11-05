@@ -14,7 +14,7 @@ fn power_is_greatest_mana_value_you_control(q: &dyn LayerQuery, source: ObjectId
         .map(|&id| q.mana_value(id, &q.chars(id)))
         .max()
         .unwrap_or(0);
-    chars.power = Some(greatest as i16);
+    chars.power = Some(greatest as i32);
 }
 
 /// Vigilance is a core keyword.

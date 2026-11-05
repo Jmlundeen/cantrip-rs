@@ -9,16 +9,16 @@ use cantrip_oracle as oracle;
 /// a replacement effect sent elsewhere not being in a graveyard, and it enters under your control.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let x = item.x;
+    let x = item.x as i32;
     let creatures: Vec<ObjectId> = g
         .state()
         .battlefield()
         .iter()
         .copied()
-        .filter(|&id| g.chars(id).is(CardType::Creature) && g.chars(id).toughness.is_some_and(|toughness| i32::from(toughness) <= i32::from(x)))
+        .filter(|&id| g.chars(id).is(CardType::Creature) && g.chars(id).toughness.is_some_and(|toughness| toughness <= x))
         .collect();
     let destroyed = g.destroy_all(&creatures);
-    g.lose_life(you, i32::from(x));
+    g.lose_life(you, x);
     if x < 6 {
         return Ok(());
     }

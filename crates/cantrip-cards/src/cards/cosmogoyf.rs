@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn size(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let state = q.state();
     let zone = state.zone(Zone::exile(state.obj(source).controller));
-    let owned = zone.iter().filter(|&&id| !state.obj(id).token && !state.obj(id).card_copy).count() as i16;
+    let owned = zone.iter().filter(|&&id| !state.obj(id).token && !state.obj(id).card_copy).count() as i32;
     chars.power = Some(owned);
     chars.toughness = Some(owned + 1);
 }

@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(spell) = item.subject {
         let spent = g.obj(spell).spent.total();
-        pump(g, item.object, item.object, spent as i16, 0);
+        pump(g, item.object, item.object, spent as i32, 0);
     }
     Ok(())
 }

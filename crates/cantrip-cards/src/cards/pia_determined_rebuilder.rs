@@ -13,7 +13,7 @@ fn make_thopter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// the ability resolves (CR 608.2h), and the target is pumped if it is still legal (CR 608.2b).
 fn pump_by_artifacts(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        let x = artifacts_you_control(g, item.controller) as i16;
+        let x = artifacts_you_control(g, item.controller) as i32;
         cantrip_mechanics::pump(g, item.object, creature, x, 0);
     }
     Ok(())

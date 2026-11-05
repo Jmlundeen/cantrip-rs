@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// creature, whoever controls it, "your hand" its controller's. The ruling: it is judged only as attackers are declared,
 /// so a creature that has attacked stays attacking whatever its power or the hand become (CR 506.4a).
 fn power_at_most_hand_size(q: &dyn Query, asker: &Asker, attacker: ObjectId, _: Target) -> bool {
-    let hand = q.state().zone(Zone::hand(asker.controller)).len() as i16;
+    let hand = q.state().zone(Zone::hand(asker.controller)).len() as i32;
     q.chars(attacker).power.unwrap_or(0) <= hand
 }
 

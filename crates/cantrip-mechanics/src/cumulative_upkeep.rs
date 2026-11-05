@@ -162,7 +162,7 @@ fn pay(g: &mut dyn Game, item: &StackItem, payment: Payment, age: u32) -> Result
                 let candidates = can(g);
                 let chosen = match candidates.as_slice() {
                     [only] => Some(*only),
-                    _ => choose::player(g, payer, this, candidates, "GainLife", u16::from(life))?,
+                    _ => choose::player(g, payer, this, candidates, "GainLife", u32::from(life))?,
                 };
                 if let Some(opponent) = chosen {
                     g.gain_life(opponent, i32::from(life));

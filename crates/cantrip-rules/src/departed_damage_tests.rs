@@ -195,7 +195,7 @@ fn invalid_redirection_keeps_original_live_damage_and_does_not_use_destination_s
 
 /// A once-only redirection to `destination` in `zone`, the source's 2 damage aimed at OTHER: returns OTHER's life, the
 /// damage marked on the destination and whether the redirection is still waiting.
-fn redirect_once_to(destination: &'static CardDef, zone: Zone) -> (i32, u16, bool) {
+fn redirect_once_to(destination: &'static CardDef, zone: Zone) -> (i32, u32, bool) {
     let (mut game, source) = game();
     let redirector = game.state.push_obj(Obj::new(game.cards.id_of(&ONCE_REDIRECT), YOU, Zone::BATTLEFIELD));
     game.state.zone_push(Zone::BATTLEFIELD, redirector);

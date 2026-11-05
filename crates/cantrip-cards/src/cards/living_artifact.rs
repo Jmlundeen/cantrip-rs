@@ -19,8 +19,8 @@ fn when_youre_dealt_damage(
 }
 
 /// The vitality counters for `damage` dealt, at the counter width (RX-5): never a different, wrapped value.
-fn counters_for_damage(damage: u32) -> i16 {
-    i16::try_from(damage).unwrap_or(i16::MAX)
+fn counters_for_damage(damage: u32) -> i32 {
+    i32::try_from(damage).unwrap_or(i32::MAX)
 }
 
 /// "Whenever you're dealt damage, put that many vitality counters on this Aura." (CR 608.2, 122.1).
@@ -71,7 +71,8 @@ mod tests {
     fn damage_counter_conversion_at_the_counter_width() {
         assert_eq!(super::counters_for_damage(0), 0);
         assert_eq!(super::counters_for_damage(32767), 32767);
-        assert_eq!(super::counters_for_damage(32768), i16::MAX);
-        assert_eq!(super::counters_for_damage(u32::MAX), i16::MAX);
+        assert_eq!(super::counters_for_damage(32768), 32768);
+        assert_eq!(super::counters_for_damage(i32::MAX as u32 + 1), i32::MAX);
+        assert_eq!(super::counters_for_damage(u32::MAX), i32::MAX);
     }
 }

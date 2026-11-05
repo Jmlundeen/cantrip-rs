@@ -445,9 +445,9 @@ pub fn damage_you_deal_to_an_opponent_or_their_permanent(q: &dyn Query, asker: &
 }
 
 /// "... it deals that much damage plus `N` instead" (CR 614.1): the damage about to be dealt is `N` greater.
-pub fn plus<const N: u16>(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+pub fn plus<const N: u32>(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     if let Proposal::Damage(d) = proposal {
-        d.amount = d.amount.saturating_add(N);
+        d.amount = d.amount + N;
     }
 }
 

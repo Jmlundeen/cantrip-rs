@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// affects the creatures there as it resolves (CR 611.2c).
 fn pump_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(spell) = item.subject {
-        let colors = sunburst::colors_spent(g, spell) as i16;
+        let colors = sunburst::colors_spent(g, spell) as i32;
         effects::pump_creatures_you_control(g, item, colors, 0);
     }
     Ok(())

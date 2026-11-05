@@ -13,7 +13,7 @@ fn attacking_or_blocking_an_opponent_controls(q: &dyn Query, asker: &Asker, t: T
 /// types among non-Borg creatures you control." X is determined once as the ability resolves (CR 608.2h); a target that
 /// is no longer legal takes no damage (CR 608.2b).
 fn damage_by_creature_types(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = creature_types_among_non_borg(g, item.object, item.controller) as u16;
+    let x = creature_types_among_non_borg(g, item.object, item.controller) as u32;
     damage_target(g, item, 0, x);
     Ok(())
 }

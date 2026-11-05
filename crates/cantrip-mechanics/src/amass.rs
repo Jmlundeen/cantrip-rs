@@ -15,7 +15,7 @@ pub fn amass(
     source: ObjectId,
     token: &'static CardDef,
     subtype: Subtype,
-    n: i16,
+    n: i32,
 ) -> Result<(), Suspend> {
     amass_army(g, controller, source, token, subtype, n).map(|_| ())
 }
@@ -29,7 +29,7 @@ pub fn amass_army(
     source: ObjectId,
     token: &'static CardDef,
     subtype: Subtype,
-    n: i16,
+    n: i32,
 ) -> Result<Option<ObjectId>, Suspend> {
     let armies = |g: &dyn Game| -> Vec<ObjectId> {
         g.permanents_of(controller)
@@ -68,6 +68,6 @@ pub fn amass_army(
 /// "Amass Goblins N" as a whole ability or spell effect: the Goblin Army token is `tokens::GOBLIN_ARMY` (CR 701.47a).
 /// Down, Down to Goblin-town, Bothersome Noisemaker, Goblin-town Flunkies and Misty Mountains Raider print it with
 /// their own `N`.
-pub fn amass_goblins<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn amass_goblins<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     amass(g, item.controller, item.object, &crate::tokens::GOBLIN_ARMY, Subtype::Goblin, N)
 }

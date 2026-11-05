@@ -13,7 +13,7 @@ static MULTI: CardDef =
 fn to_self(_: &dyn Query, a: &Asker, d: &DamageEvent) -> bool {
     d.target == Target::Object(a.source)
 }
-fn two(_: &dyn Query, _: &Asker, _: &DamageEvent) -> u16 {
+fn two(_: &dyn Query, _: &Asker, _: &DamageEvent) -> u32 {
     2
 }
 static SHIELDED: CardDef =
@@ -129,10 +129,10 @@ fn cx(g: &mut Game) -> Cx<'_> {
         producing: None,
     }
 }
-fn hit(g: &mut Game, source: ObjectId, target: ObjectId, amount: u16) -> Option<DamageResult> {
+fn hit(g: &mut Game, source: ObjectId, target: ObjectId, amount: u32) -> Option<DamageResult> {
     cantrip_api::Game::damage_result(&mut cx(g), source, Target::Object(target), amount)
 }
-fn recorded(g: &Game) -> Vec<(Target, u16, u32)> {
+fn recorded(g: &Game) -> Vec<(Target, u32, u32)> {
     g.log
         .iter()
         .filter_map(|r| match r.event {

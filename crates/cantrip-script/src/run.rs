@@ -66,7 +66,7 @@ struct Casting {
 }
 
 impl Casting {
-    fn new(player: PlayerId, x: Option<u16>, spend: VecDeque<Spend>) -> Casting {
+    fn new(player: PlayerId, x: Option<u32>, spend: VecDeque<Spend>) -> Casting {
         Casting { player, plan: PayPlan::new(x, spend) }
     }
 }
@@ -1244,7 +1244,7 @@ impl<'s> Run<'s> {
             }
             // Counters from among permanents (CR 118.3): as many as there are from each pool in turn, the first offered first.
             RequestKind::RemoveCounters { pools, total, .. } => {
-                let mut left = *total as u16;
+                let mut left = u32::from(*total);
                 let mut taken = Vec::new();
                 for p in pools {
                     let n = p.count.min(left);
@@ -2140,12 +2140,12 @@ impl<'s> Run<'s> {
     /// `Source > Creature: n` per share, or `Source > BotN: n` for the player a trampler attacks; a creature the line
     /// leaves out keeps the engine's own division.
     fn assign_damage(&self, step: &ActionStep, divisions: &[DamageDivision]) -> R<Option<Answer>> {
-        let mut shares: Vec<(ObjectId, Option<ObjectId>, u16)> = Vec::new();
+        let mut shares: Vec<(ObjectId, Option<ObjectId>, u32)> = Vec::new();
         let mut written: Vec<ObjectId> = Vec::new();
         for spec in step.positional() {
             let parts: Vec<&str> = spec.split('>').collect();
             let parsed = (parts.len() == 2)
-                .then(|| parts[1].rfind(':').map(|c| (parts[1][..c].trim(), parts[1][c + 1..].trim().parse::<u16>())))
+                .then(|| parts[1].rfind(':').map(|c| (parts[1][..c].trim(), parts[1][c + 1..].trim().parse::<u32>())))
                 .flatten();
             let Some((to, Ok(amount))) = parsed else {
                 return fail(format!(
@@ -2252,7 +2252,7 @@ impl<'s> Run<'s> {
                 Some((kind, amount)) => (Some(kind.trim()), amount),
                 None => (None, amount.trim()),
             };
-            let Ok(amount) = amount.parse::<u16>() else {
+            let Ok(amount) = amount.parse::<u32>() else {
                 return fail(format!("line {}: {amount} is not a number of counters", step.line));
             };
             let Some(Target::Object(object)) = self.target(step, who.trim(), &objects)? else {
@@ -2719,20 +2719,20 @@ impl<'s> Run<'s> {
 
 /// The X or kicker count a line names (`X: 3`, `Kicked: 2`).
 /// The number of times a line pays a cost it may pay up to a number of times (`PayCost(Times: 2)`, CR 603.12a).
-fn times_of(step: &ActionStep) -> R<Option<u16>> {
+fn times_of(step: &ActionStep) -> R<Option<u32>> {
     match step.named("Times") {
         None => Ok(None),
-        Some(text) => match text.trim().parse::<u16>() {
+        Some(text) => match text.trim().parse::<u32>() {
             Ok(n) => Ok(Some(n)),
             Err(_) => fail(format!("line {}: {text} is not a number", step.line)),
         },
     }
 }
 
-fn x_of(step: &ActionStep) -> R<Option<u16>> {
+fn x_of(step: &ActionStep) -> R<Option<u32>> {
     match step.named("X").or_else(|| step.named("Kicked")) {
         None => Ok(None),
-        Some(text) => match text.trim().parse::<u16>() {
+        Some(text) => match text.trim().parse::<u32>() {
             Ok(n) => Ok(Some(n)),
             Err(_) => fail(format!("line {}: {text} is not a number", step.line)),
         },

@@ -156,7 +156,7 @@ fn play(hands: [&[&str]; 2], steps: Vec<Step>, until: u32, mut watch: impl FnMut
                 Answer::Act(Action::of(confirm.or(mox).expect("a Mox to pay with, or the payment to confirm")))
             }
             RequestKind::ChooseTarget { candidates, .. } => Answer::Targets(vec![candidates[0]]),
-            RequestKind::RemoveCounters { pools, total, .. } => Answer::Counters(vec![(pools[0].object, pools[0].kind, u16::from(*total))]),
+            RequestKind::RemoveCounters { pools, total, .. } => Answer::Counters(vec![(pools[0].object, pools[0].kind, u32::from(*total))]),
             RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand.iter().copied().take(*count as usize).collect()),
             RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
             RequestKind::DeclareBlockers { .. } => Answer::Block(Vec::new()),

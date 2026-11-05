@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Prevent the next X damage to the chosen target this turn (CR 615.7).
 fn shield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    prevention::next_damage_to_target(g, item, 0, 0, item.x);
+    prevention::next_damage_to_target(g, item, 0, 0, u32::from(item.x));
     Ok(())
 }
 

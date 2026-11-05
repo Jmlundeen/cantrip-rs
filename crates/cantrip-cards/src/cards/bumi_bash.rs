@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "Bumi Bash deals damage equal to the number of lands you control to target creature": the lands its controller has as it
 /// resolves (CR 608.2h), through the layers.
 fn damage_by_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let lands = lands_you_control(g, item.controller) as u16;
+    let lands = lands_you_control(g, item.controller) as u32;
     damage_target(g, item, 0, lands);
     Ok(())
 }

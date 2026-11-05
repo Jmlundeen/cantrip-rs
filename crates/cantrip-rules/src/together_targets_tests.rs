@@ -45,7 +45,7 @@ static FIVE: CardDef = creature("Together Test Five", ManaCost { generic: 5, ..M
 /// "Its power is equal to the number of cards in its owner's hand" (a characteristic-defining ability, CR 604.3), toughness 1.
 fn hand_size(q: &dyn LayerQuery, id: ObjectId, chars: &mut Chars) {
     let owner = q.state().obj(id).owner;
-    chars.power = Some(q.state().zone(Zone::hand(owner)).len() as i16);
+    chars.power = Some(q.state().zone(Zone::hand(owner)).len() as i32);
     chars.toughness = Some(1);
 }
 

@@ -4,8 +4,8 @@ use cantrip_oracle as oracle;
 /// "Earthquake deals X damage to each creature without flying and each player." One simultaneous damage event includes both
 /// players and every creature without flying on the battlefield (CR 608.2c, 120.2).
 fn earthquake_deals_x_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = item.x;
-    let mut hits: Vec<(ObjectId, Target, u16)> = g
+    let x = u32::from(item.x);
+    let mut hits: Vec<(ObjectId, Target, u32)> = g
         .state()
         .battlefield()
         .iter()

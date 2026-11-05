@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// them, whoever controls them, attached to the source.
 fn plus_two_power_per_equipment_attached(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let state = view.state();
-    let n = state.battlefield().iter().filter(|&&id| state.obj(id).attached_to == Some(source) && view.chars(id).has_subtype(Subtype::Equipment)).count() as i16;
+    let n = state.battlefield().iter().filter(|&&id| state.obj(id).attached_to == Some(source) && view.chars(id).has_subtype(Subtype::Equipment)).count() as i32;
     chars.power = chars.power.map(|v| v + 2 * n);
 }
 

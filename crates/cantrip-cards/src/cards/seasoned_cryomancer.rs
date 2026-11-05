@@ -15,7 +15,7 @@ fn enter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let nonlands = discarded.iter().filter(|&&card| hand::discarded_nonland_card(&*g, card)).count();
     if nonlands > 0 {
         let this = g.card_id(&CARD);
-        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, u16::try_from(nonlands).unwrap_or(u16::MAX));
+        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, count_u32(nonlands));
     }
     Ok(())
 }
@@ -25,7 +25,7 @@ fn enter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = targets::legal_objects(g, item);
     g.tap_together(&creatures);
-    let puts: Vec<(ObjectId, CounterKind, i16)> = creatures.iter().map(|&creature| (creature, CounterKind::Stun, 1)).collect();
+    let puts: Vec<(ObjectId, CounterKind, i32)> = creatures.iter().map(|&creature| (creature, CounterKind::Stun, 1)).collect();
     g.add_counters_together(&puts);
     Ok(())
 }

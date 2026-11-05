@@ -35,13 +35,13 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let x = discarded.iter().filter(|&&card| hand::discarded_chars(&*g, card).is_some()).map(|&card| g.mana_value(card)).max().unwrap_or(0);
     let this = g.card_id(&CARD);
-    g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, u16::try_from(x).unwrap_or(u16::MAX));
+    g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, x);
     Ok(())
 }
 
 /// "Ill-Timed Explosion deals X damage to each creature": X is the count the reflexive ability carries.
 fn damage_each_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    effects::damage_each_creature(g, item, item.x as u16);
+    effects::damage_each_creature(g, item, item.x as u32);
     Ok(())
 }
 

@@ -138,7 +138,7 @@ pub const CREATURE_WITH_POWER_4_OR_GREATER: TargetSpec = target(creature_with_po
 /// "Target creature with power `N` or less" (CR 115.1, 208.1) as the layers give the power now, so a counter or an effect moves a
 /// creature in and out of range, judged as it is chosen and again as the spell or ability resolves (CR 608.2b). A creature with no
 /// power cannot be one. Escape Tunnel and Silverquill Charm (2), Petty Revenge (3) and The Fire Nation Drill (4) print it.
-pub fn creature_with_power_at_most<const N: i16>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+pub fn creature_with_power_at_most<const N: i32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).power.is_some_and(|v| v <= N))
 }
 /// "Target creature with power 2 or less". Escape Tunnel and Silverquill Charm print it.
@@ -559,7 +559,7 @@ pub fn spell_targets_permanent_controlled_by(q: &dyn Query, item: &StackItem, pl
 /// "[This permanent]'s power" read by an ability of it: the power it has now, or the power it last had on the battlefield
 /// once it has left (CR 608.2h, 113.7a); zero for one with none. Ouroboroid's "where X is Ouroboroid's power" and Loki
 /// Laufeyson's "less than or equal to Loki's power" read it.
-pub fn power_or_last_known(q: &dyn Query, id: ObjectId) -> i16 {
+pub fn power_or_last_known(q: &dyn Query, id: ObjectId) -> i32 {
     if permanent(q, id) {
         q.chars(id).power.unwrap_or(0)
     } else {
@@ -856,7 +856,7 @@ pub fn creature_with_mana_value_at_least<const N: u32>(q: &dyn Query, asker: &As
 /// "Target artifact, enchantment, or creature with power `N` or greater" (CR 115.1): the power condition belongs to the
 /// creature alone, so an artifact or enchantment of any size (an artifact creature too) is a legal target. Exorcise and Make
 /// Your Move print it (4).
-pub fn artifact_enchantment_or_creature_with_power_at_least<const N: i16>(q: &dyn Query, _: &Asker, t: Target) -> bool {
+pub fn artifact_enchantment_or_creature_with_power_at_least<const N: i32>(q: &dyn Query, _: &Asker, t: Target) -> bool {
     let Target::Object(id) = t else { return false };
     if !permanent(q, id) {
         return false;
@@ -915,7 +915,7 @@ pub const CREATURE_AN_OPPONENT_CONTROLS: TargetSpec = target(creature_an_opponen
 
 /// "Target creature an opponent controls with power `N` or less" (CR 115.1, 208.1): its power as the layers make it, as it is
 /// chosen and again as the ability resolves. A creature with no power cannot be a creature.
-pub fn creature_an_opponent_controls_with_power_at_most<const N: i16>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+pub fn creature_an_opponent_controls_with_power_at_most<const N: i32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_an_opponent_controls_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).power.is_some_and(|power| power <= N))
 }
 /// "Target creature an opponent controls with power 3 or less". Elektra, Daughter of the Hand and Oko, Thief of Crowns print it.

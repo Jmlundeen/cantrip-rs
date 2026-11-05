@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// still on the battlefield; the counters go on every creature at once.
 fn counters_for_each_shrine(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let shrine = g.words(item.object).subtype(Subtype::Shrine);
-    let x = permanents_with_subtype_you_control(g, item.controller, shrine) as i16;
+    let x = permanents_with_subtype_you_control(g, item.controller, shrine) as i32;
     effects::counters_on_creatures_you_control(g, item.controller, CounterKind::PlusOne, x);
     Ok(())
 }

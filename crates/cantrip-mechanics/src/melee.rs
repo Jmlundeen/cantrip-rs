@@ -17,7 +17,7 @@ fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired>
 /// creature was declared attacking during `you`'s turn since this combat phase began, however many creatures, whether those
 /// creatures are still attacking or the player still in the game; a planeswalker or battle attacked is not its controller,
 /// and a creature put onto the battlefield attacking was never declared (CR 508.4).
-fn opponents_attacked_this_combat(q: &dyn Query, you: PlayerId) -> i16 {
+fn opponents_attacked_this_combat(q: &dyn Query, you: PlayerId) -> i32 {
     let mut attacked: Vec<PlayerId> = Vec::new();
     for r in crate::history::this_combat(q) {
         if let Event::Attacks { defender: Target::Player(p), .. } = r.event
@@ -28,7 +28,7 @@ fn opponents_attacked_this_combat(q: &dyn Query, you: PlayerId) -> i16 {
             attacked.push(p);
         }
     }
-    attacked.len() as i16
+    attacked.len() as i32
 }
 
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

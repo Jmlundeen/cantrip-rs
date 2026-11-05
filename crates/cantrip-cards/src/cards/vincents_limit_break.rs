@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// owner's control' and has the chosen base power and toughness" (CR 611.2a, 613.4b): both for the rest of the turn, the first the
 /// card's own delayed ability, the second a base-setting effect that replaces earlier ones while counters and other modifiers still
 /// apply. With the target gone nothing happens (CR 608.2b).
-fn becomes(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Result<(), Suspend> {
+fn becomes(g: &mut dyn Game, item: &StackItem, power: i32, toughness: i32) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     g.one_instruction(&mut |g| {
         let this = g.card_id(&CARD);

@@ -20,7 +20,7 @@ pub fn targets_fight(g: &mut dyn Game, item: &StackItem, first: usize, second: u
 /// With the first gone nothing is put on and nothing fights; with only the second gone the counters are still put on and no
 /// fight happens. The counters come first, so the fight is with the power they give (CR 608.2c). Troll Negotiations (two) and
 /// Kapow! (one) print it.
-pub fn plus_one_counters_on_first_target_then_it_fights_second<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn plus_one_counters_on_first_target_then_it_fights_second<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
         g.add_counters(creature, CounterKind::PlusOne, N);
     }
@@ -48,7 +48,7 @@ pub fn attached_creature_fights_first_target(g: &mut dyn Game, item: &StackItem)
 pub fn bite(g: &mut dyn Game, creature: ObjectId, victim: ObjectId) {
     let power = g.chars(creature).power.unwrap_or(0);
     if power > 0 {
-        g.damage(creature, Target::Object(victim), power as u16);
+        g.damage(creature, Target::Object(victim), power as u32);
     }
 }
 
@@ -69,10 +69,10 @@ pub fn targets_bite(g: &mut dyn Game, item: &StackItem, source_slot: usize, vict
 pub fn targets_each_bite_last(g: &mut dyn Game, item: &StackItem) {
     let recipient_slot = item.target_count as usize - 1;
     let Some(recipient) = targets::object(g, item, recipient_slot) else { return };
-    let hits: Vec<(ObjectId, Target, u16)> = (0..recipient_slot)
+    let hits: Vec<(ObjectId, Target, u32)> = (0..recipient_slot)
         .filter_map(|slot| {
             let source = targets::object(g, item, slot)?;
-            let power = g.chars(source).power.unwrap_or(0).max(0) as u16;
+            let power = g.chars(source).power.unwrap_or(0).max(0) as u32;
             Some((source, Target::Object(recipient), power))
         })
         .collect();

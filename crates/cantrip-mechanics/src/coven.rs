@@ -5,7 +5,7 @@ use cantrip_api::*;
 
 /// How many different powers there are among the creatures `player` controls, as the game is now.
 pub fn different_powers(q: &dyn Query, player: PlayerId) -> usize {
-    let mut powers: Vec<i16> = Vec::new();
+    let mut powers: Vec<i32> = Vec::new();
     for id in q.permanents_of(player) {
         let c = q.chars(id);
         if c.is(CardType::Creature)

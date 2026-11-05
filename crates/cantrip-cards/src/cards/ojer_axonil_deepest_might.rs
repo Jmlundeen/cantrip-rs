@@ -14,7 +14,7 @@ fn noncombat_damage_below_power(q: &dyn Query, asker: &Asker, p: &Proposal) -> b
     let power = q.chars(asker.source).power.unwrap_or(0);
     d.amount > 0
         && !d.combat
-        && i32::from(d.amount) < i32::from(power)
+        && i64::from(d.amount) < i64::from(power)
         && q.controller(d.source) == asker.controller
         && q.chars(d.source).colors.has(q.words(asker.source).color(Color::Red))
         && q.state().opponents(asker.controller).any(|opponent| opponent == player)
@@ -23,7 +23,7 @@ fn noncombat_damage_below_power(q: &dyn Query, asker: &Asker, p: &Proposal) -> b
 /// "That source deals damage equal to Ojer Axonil's power instead."
 fn equal_to_power(q: &dyn Query, asker: &Asker, p: &mut Proposal) {
     if let Proposal::Damage(d) = p {
-        d.amount = q.chars(asker.source).power.unwrap_or(0).max(0) as u16;
+        d.amount = q.chars(asker.source).power.unwrap_or(0).max(0) as u32;
     }
 }
 

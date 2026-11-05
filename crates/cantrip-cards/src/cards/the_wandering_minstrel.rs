@@ -28,7 +28,7 @@ fn make_elemental(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Other creatures you control get +X/+X until end of turn, where X is the number of Towns you control": X is
 /// counted once, as the ability resolves (CR 608.2h, the ruling).
 fn pump_by_towns(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = towns(g, item.controller) as i16;
+    let x = towns(g, item.controller) as i32;
     effects::pump_other_creatures_you_control(g, item, x, x);
     Ok(())
 }

@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn slash(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = creatures_you_control(g, item.controller);
     let equipment = permanents_with_subtype_you_control(g, item.controller, Subtype::Equipment);
-    damage_target(g, item, 0, (creatures + equipment) as u16);
+    damage_target(g, item, 0, (creatures + equipment) as u32);
     Ok(())
 }
 

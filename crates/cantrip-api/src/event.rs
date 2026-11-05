@@ -55,7 +55,7 @@ impl DamageKind {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct DamageResult {
     pub target: Target,
-    pub amount: u16,
+    pub amount: u32,
     pub excess: u32,
 }
 
@@ -92,7 +92,7 @@ pub enum Event {
     /// you controlled dealt this turn" counts a source that has since changed controller or color, or left (Temple of
     /// Power's ruling), and a spell's or an ability's source by what it was on the stack or the battlefield then.
     Damage {
-        source: ObjectId, target: Target, amount: u16, kind: DamageKind, controller: PlayerId,
+        source: ObjectId, target: Target, amount: u32, kind: DamageKind, controller: PlayerId,
         /// Total excess damage this recipient was dealt by ALL sources in this simultaneous damage event (CR 120.10).
         /// Repeated on each source's record for that recipient: never sum it across those records or attribute it to
         /// that source alone. A trigger about the recipient uses the batch's other records for its source restrictions.
@@ -107,7 +107,7 @@ pub enum Event {
     /// prevention effect, the protected permanent or the source of a player's protection (CR 702.16e). One event each time
     /// a prevention effect is applied to a damage event and prevents some or all of it, before what is left is dealt;
     /// what "if damage is prevented this way" (CR 615.5) would ask. `combat` says whether it would have been combat damage.
-    DamagePrevented { source: ObjectId, target: Target, amount: u16, combat: bool, by: ObjectId },
+    DamagePrevented { source: ObjectId, target: Target, amount: u32, combat: bool, by: ObjectId },
     LifeChange { player: PlayerId, delta: i32 },
     Drew { player: PlayerId, card: ObjectId },
     /// A card was discarded (CR 701.9a): `card` is the object it became where it went. `undefined` when a replacement put it
@@ -233,7 +233,7 @@ pub enum Event {
     /// put a counter on a creature this turn" asks what it was then, whatever it has become since (Song of the Dryads makes it
     /// a land, CR 613.1d) and wherever it has gone. A card that is not a permanent (a counter put on it in exile, CR 122.6 and
     /// 109.2) has no types here: the set is empty.
-    CountersPut { object: ObjectId, kind: CounterKind, amount: i16, total: i16, by: PlayerId, types: TypeSet },
+    CountersPut { object: ObjectId, kind: CounterKind, amount: i32, total: i32, by: PlayerId, types: TypeSet },
     /// A permanent transformed (CR 701.27a): its other face is up now.
     Transformed { object: ObjectId },
     /// `player` gave a gift (CR 702.174c) to `to`: an instant or sorcery spell they control whose gift cost was paid
@@ -282,7 +282,7 @@ pub enum Event {
     CoinFlipped { player: PlayerId, result: CoinFlip },
     /// A player rolled a die with `sides` sides (CR 706.2): the `natural` result, and the `result` once whatever modifies
     /// the roll has been applied (CR 706.4). Both are what the rolled number is, each for the questions that ask for it.
-    DieRolled { player: PlayerId, sides: u8, natural: u8, result: i16 },
+    DieRolled { player: PlayerId, sides: u8, natural: u8, result: i32 },
     /// One of `count` things was chosen at random: the one at `index`. A scenario fixes it like a die of `count`
     /// sides (face `index + 1`).
     ChosenAtRandom { count: u32, index: u32 },

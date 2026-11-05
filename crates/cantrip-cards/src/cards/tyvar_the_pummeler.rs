@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// worked out once, as the ability resolves (CR 608.2h, the ruling); with no creature it is 0, and a negative greatest power
 /// gives +0/+0 (CR 107.1b).
 fn pump_by_greatest_power(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = greatest_power::among_creatures_you_control(g, item.controller) as i16;
+    let x = greatest_power::among_creatures_you_control(g, item.controller) as i32;
     effects::pump_creatures_you_control(g, item, x, x);
     Ok(())
 }

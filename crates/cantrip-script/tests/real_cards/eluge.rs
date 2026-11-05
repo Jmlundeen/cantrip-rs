@@ -195,7 +195,7 @@ fn play(hands: [&[&str]; 2], steps: Vec<Step>, until: u32, mut watch: impl FnMut
 /// Bot2 it counts Bot2's Islands (CR 109.5: "you" is its controller), a 3/3, and it enters under Bot2 a 3/3.
 #[test]
 fn eluge_as_a_spell_another_player_controls_counts_that_players_islands() {
-    let mut on_stack: Vec<(PlayerId, i16)> = Vec::new();
+    let mut on_stack: Vec<(PlayerId, i32)> = Vec::new();
     let game = play(
         [&["Island", "Mox Sapphire", "Mox Sapphire", "Mox Sapphire", "Eluge, the Shoreless Sea"], &["Island", "Island", "Island", "Probe Commandeer"]],
         vec![

@@ -27,7 +27,7 @@ fn tap_myr(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     g.tap_together(&chosen);
-    let x = chosen.len() as i16;
+    let x = chosen.len() as i32;
     pump(g, item.object, item.object, x, 0);
     let hit = match item.subject {
         Target::Player(p) => Some(Target::Player(p)),
@@ -39,7 +39,7 @@ fn tap_myr(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         _ => None,
     };
     if let Some(target) = hit {
-        g.damage(item.object, target, x as u16);
+        g.damage(item.object, target, x as u32);
     }
     Ok(())
 }

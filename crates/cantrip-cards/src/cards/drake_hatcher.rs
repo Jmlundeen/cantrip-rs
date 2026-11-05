@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// amount. The counters go on it if it is still on the battlefield (CR 400.7).
 fn incubate_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if targets::permanent(g, item.object) {
-        g.add_counters(item.object, CounterKind::Incubation, item.data[0] as i16);
+        g.add_counters(item.object, CounterKind::Incubation, item.data[0] as i32);
     }
     Ok(())
 }

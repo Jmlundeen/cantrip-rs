@@ -435,7 +435,7 @@ pub fn stations_by_toughness(cx: &Cx, creature: ObjectId) -> bool {
 /// (`CardDef::damage_by_toughness`), or an effect about its controller does (`EffectKind::CreaturesAssignDamageByToughness`).
 /// An "as though its power were positive" rule (CR 609.4) uses negative power's magnitude only when assigning by power;
 /// every other procedure still reads its actual negative power (CR 107.1b).
-pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
+pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u32 {
     let c = cx.chars(creature);
     let by_toughness = c.has(Keyword::AssignsDamageByToughness) || sources(cx, |d| !d.damage_by_toughness.is_empty()).any(|(id, controller, def, by)| {
         let asker = Asker { source: id, controller, by, spell: false };
@@ -443,7 +443,7 @@ pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
     }) || (c.toughness.unwrap_or(0) > c.power.unwrap_or(0)
         && cx.s().effects.iter().any(|e| e.kind == EffectKind::CreaturesAssignDamageByToughness && e.controller == cx.s().obj(creature).controller));
     if by_toughness {
-        return c.toughness.unwrap_or(0).max(0) as u16;
+        return c.toughness.unwrap_or(0).max(0) as u32;
     }
     let power = c.power.unwrap_or(0);
     if power < 0 && sources(cx, |d| !d.damage_by_absolute_power.is_empty()).any(|(id, controller, def, by)| {
@@ -452,7 +452,7 @@ pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
     }) {
         return power.unsigned_abs();
     }
-    power.max(0) as u16
+    power.max(0) as u32
 }
 
 /// The card types `player` may cast as though they had flash (CR 307.5, 702.8): from effects that gave them that.

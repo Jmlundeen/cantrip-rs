@@ -102,7 +102,7 @@ fn effect(game: &mut Game, on: ObjectId, kind: EffectKind) {
 }
 
 /// Its power, and its base power.
-fn read(game: &Game, id: ObjectId) -> (Option<i16>, Option<i16>) {
+fn read(game: &Game, id: ObjectId) -> (Option<i32>, Option<i32>) {
     let c = cantrip_api::Query::chars(game, id);
     (c.power, c.base_power)
 }
@@ -276,7 +276,7 @@ static DEFINED_ONE_PLUS: CardDef = CardDef {
 };
 
 fn plus_power_per_other_with_base_one(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let others = q.state().battlefield().iter().filter(|&&id| id != source && q.chars(id).base_power == Some(1)).count() as i16;
+    let others = q.state().battlefield().iter().filter(|&&id| id != source && q.chars(id).base_power == Some(1)).count() as i32;
     chars.power = chars.power.map(|v| v + others);
 }
 

@@ -2277,7 +2277,7 @@ enum Field {
     /// A set of bits: the same change is the same bits flipped.
     Bits(Vec<u64>),
     /// A number: the same change is the same difference.
-    Number(Option<i16>),
+    Number(Option<i32>),
     /// The abilities: the same change is the same ones added and removed, as multisets (CR 113.2c: an ability given twice
     /// is two instances).
     Abilities(Vec<AbilityRef>),
@@ -2304,7 +2304,7 @@ fn fields(c: &Chars) -> [(&'static str, Field); 22] {
         ("protection", bits(c.protection.0.into())),
         ("protection from types", bits(c.protection_types.0.into())),
         ("protection from subtypes", Field::Bits(c.protection_subtypes.0.to_vec())),
-        ("protection from mana value", Field::Number(c.protection_mana_value.map(|v| i16::try_from(v).unwrap_or(i16::MAX)))),
+        ("protection from mana value", Field::Number(c.protection_mana_value.map(|v| i32::try_from(v).unwrap_or(i32::MAX)))),
         ("protection from players", bits(c.protection_players.into())),
         ("hexproof from", bits(c.hexproof_from.0.into())),
         ("abilities", Field::Abilities(c.abilities.iter().flatten().copied().collect())),
@@ -2317,12 +2317,12 @@ fn fields(c: &Chars) -> [(&'static str, Field); 22] {
                     | u64::from(c.protection_everything) << 2,
             ),
         ),
-        // A count: the same change is the same instances added (an audit's field; past i16 it reads as the most).
-        ("must_attack", Field::Number(Some(i16::try_from(c.must_attack).unwrap_or(i16::MAX)))),
+        // A count: the same change is the same instances added (an audit's field; past i32 it reads as the most).
+        ("must_attack", Field::Number(Some(i32::try_from(c.must_attack).unwrap_or(i32::MAX)))),
         // The total toxic value (CR 702.164b), a sum of instances as `must_attack` is.
-        ("toxic", Field::Number(Some(i16::try_from(c.toxic).unwrap_or(i16::MAX)))),
+        ("toxic", Field::Number(Some(i32::try_from(c.toxic).unwrap_or(i32::MAX)))),
         // Its instances of riot (CR 702.136b), a count as `must_attack` is.
-        ("riot", Field::Number(Some(i16::try_from(c.riot).unwrap_or(i16::MAX)))),
+        ("riot", Field::Number(Some(i32::try_from(c.riot).unwrap_or(i32::MAX)))),
         ("losses", bits(u64::from(c.lost_all) | u64::from(c.text_lost) << 1)),
         ("marks", bits(u64::from(c.spell) | u64::from(c.no_cost) << 1 | u64::from(c.name_set) << 2)),
         ("card", plain(&|h| c.card.hash(h))),
@@ -3583,7 +3583,7 @@ mod tests {
     fn creature_too(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
         c.types = c.types.with(CardType::Creature);
     }
-    fn base<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+    fn base<const P: i32, const T: i32>(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
         c.power = Some(P);
         c.toughness = Some(T);
     }
@@ -3635,7 +3635,7 @@ mod tests {
         (state, ids)
     }
 
-    fn pt(cards: &CardTable, state: &GameState, id: ObjectId) -> (Option<i16>, Option<i16>) {
+    fn pt(cards: &CardTable, state: &GameState, id: ObjectId) -> (Option<i32>, Option<i32>) {
         let c = chars(cards, state, &[], id);
         (c.power, c.toughness)
     }
@@ -3780,7 +3780,7 @@ mod tests {
 
     // --- The contract of `apply` (what it does is judged on the object as it stands), and its check.
 
-    fn creature_chars(power: i16, flying: bool) -> Chars {
+    fn creature_chars(power: i32, flying: bool) -> Chars {
         let cards = CardTable::new([&SPROUT]);
         let mut c = *printed(&cards, cards.find("Sprout").unwrap(), false);
         c.power = Some(power);

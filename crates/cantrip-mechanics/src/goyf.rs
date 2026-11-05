@@ -13,7 +13,7 @@ fn apply(q: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
             }
         }
     }
-    let types = seen.iter().count() as i16;
+    let types = seen.iter().count() as i32;
     chars.power = Some(types);
     chars.toughness = Some(types + 1);
 }

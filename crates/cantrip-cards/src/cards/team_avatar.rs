@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// attacked alone, whichever creature of its controller's it is. X is worked out once, as the ability resolves (ruling 2025-10-02).
 fn pump_by_creatures_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(creature) = item.subject else { return Ok(()) };
-    let x = creatures_you_control(g, item.controller) as i16;
+    let x = creatures_you_control(g, item.controller) as i32;
     cantrip_mechanics::pump(g, item.object, creature, x, x);
     Ok(())
 }

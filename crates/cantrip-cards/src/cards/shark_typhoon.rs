@@ -16,7 +16,7 @@ pub static SHARK: CardDef = CardDef {
 /// (CR 111.4, 707.2), never a 0/0 for a moment; an X of 0 makes a 0/0 that state-based actions then put into the graveyard
 /// (CR 704.5f). A size past what power and toughness hold (RX-5) is made at that limit, never wrapped.
 fn shark(g: &mut dyn Game, controller: PlayerId, size: u32) -> Result<(), Suspend> {
-    let size = size.min(i16::MAX as u32) as i16;
+    let size = size.min(i32::MAX as u32) as i32;
     let values = Copiable::of(g.card_id(&SHARK)).sized(size, size);
     g.create_token_copies_of(values, controller, 1)?;
     Ok(())

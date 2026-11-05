@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// 613.4b, 205.1a): his creature types are replaced by Dinosaur and Hero (read through the words of this card's text, CR 612) and
 /// his base power and toughness set, so counters and pumps still count on top; the keywords are gained. Both abilities used in a turn
 /// leave the later one's base power and toughness (CR 613.7b) and both's keywords. The effect ends in the cleanup step (CR 514.2).
-fn becomes(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16, keywords: Keywords) -> Result<(), Suspend> {
+fn becomes(g: &mut dyn Game, item: &StackItem, power: i32, toughness: i32, keywords: Keywords) -> Result<(), Suspend> {
     let words = g.words(item.object);
     let animation = Animation {
         power,

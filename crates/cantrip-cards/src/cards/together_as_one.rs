@@ -11,7 +11,7 @@ fn converge(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     {
         g.draw(player, x);
     }
-    damage_target(g, item, 1, x as u16);
+    damage_target(g, item, 1, x as u32);
     g.gain_life(item.controller, x as i32);
     Ok(())
 }

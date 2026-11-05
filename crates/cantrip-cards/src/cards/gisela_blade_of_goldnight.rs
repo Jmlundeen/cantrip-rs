@@ -17,7 +17,7 @@ fn to_an_opponent(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
 /// or controller of the permanent orders it with other replacement and prevention effects (CR 616.1, the ruling).
 fn double_that_damage(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     if let Proposal::Damage(d) = proposal {
-        d.amount = d.amount.saturating_mul(2);
+        d.amount = d.amount * 2;
     }
 }
 
@@ -29,7 +29,7 @@ fn to_you(q: &dyn Query, asker: &Asker, d: &DamageEvent) -> bool {
 
 /// "... prevent half that damage, rounded up": of the damage as the effects applied before it have left it (CR 616.1f), so
 /// 3 damage has 2 of it prevented and 1 dealt, and 1 damage is all prevented.
-fn half_rounded_up(_: &dyn Query, _: &Asker, d: &DamageEvent) -> u16 {
+fn half_rounded_up(_: &dyn Query, _: &Asker, d: &DamageEvent) -> u32 {
     d.amount.div_ceil(2)
 }
 

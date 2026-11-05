@@ -13,7 +13,7 @@ fn gain_greatest_giant_power(g: &mut dyn Game, item: &StackItem) -> Result<(), S
         .into_iter()
         .filter(|&id| g.chars(id).has_subtype(giant))
         .filter_map(|id| g.chars(id).power)
-        .fold(0, i16::max);
+        .fold(0, i32::max);
     effects::gain_life(g, item, i32::from(greatest))
 }
 

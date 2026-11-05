@@ -108,7 +108,7 @@ pub(crate) fn inherent_triggers(cx: &Cx, event: &Event) -> Vec<(u8, PlayerId, Ta
 /// deals combat damage to the monarch, its controller becomes the monarch"; "whenever one or more creatures a player
 /// controls deal combat damage to the player who has the initiative, the controller of those creatures takes the
 /// initiative", once for each such player however many creatures that was.
-fn combat_damage(cx: &Cx, source: ObjectId, victim: PlayerId, amount: u16, found: &mut Vec<(u8, PlayerId, Target)>) {
+fn combat_damage(cx: &Cx, source: ObjectId, victim: PlayerId, amount: u32, found: &mut Vec<(u8, PlayerId, Target)>) {
     let player = *cx.s().player(victim);
     if amount == 0 || !(player.monarch || player.initiative) {
         return;

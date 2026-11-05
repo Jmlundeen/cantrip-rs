@@ -15,14 +15,14 @@ pub type Spend = (Mana, Option<ManaRestriction>, Option<String>);
 /// exiles from the graveyard, the first offered each time (CR 702.66a).
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct PayPlan {
-    pub x: Option<u16>,
+    pub x: Option<u32>,
     pub spend: VecDeque<Spend>,
     pub convoke: VecDeque<String>,
     pub delve: u32,
 }
 
 impl PayPlan {
-    pub fn new(x: Option<u16>, spend: VecDeque<Spend>) -> PayPlan {
+    pub fn new(x: Option<u32>, spend: VecDeque<Spend>) -> PayPlan {
         PayPlan {
             x,
             spend,

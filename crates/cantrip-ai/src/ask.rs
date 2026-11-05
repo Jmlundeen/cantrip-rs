@@ -199,10 +199,10 @@ pub(crate) fn ask_of(
         let refs: Vec<Ref> = eligible.iter().map(|&e| t(e)).collect();
         match most {
             Some(most) => {
-                let values: Vec<u16> = eligible
+                let values: Vec<u32> = eligible
                     .iter()
                     .map(|e| match *e {
-                        Target::Object(id) => u16::try_from(game.mana_value(id)).unwrap_or(u16::MAX),
+                        Target::Object(id) => game.mana_value(id),
                         _ => 0,
                     })
                     .collect();
@@ -211,7 +211,7 @@ pub(crate) fn ask_of(
                     eligible,
                     Some(TotalObs {
                         values,
-                        most: u16::try_from(most).unwrap_or(u16::MAX),
+                        most,
                     }),
                 )
             }
@@ -250,8 +250,8 @@ pub(crate) fn ask_of(
                 remaining: cost_obs(remaining),
                 options: options(os, refs, &mut perms),
                 announcing: *announcing,
-                x: u16::try_from(*x).unwrap_or(u16::MAX),
-                x_most: u16::try_from(x_most).unwrap_or(u16::MAX),
+                x: *x,
+                x_most,
                 loyalty: *loyalty,
                 attackers: rs(attackers),
                 life: *life,
@@ -272,9 +272,7 @@ pub(crate) fn ask_of(
             source = r(*s);
             let x_most = match x {
                 // `total` is the cost at the X so far, its {X} as generic mana: what is left over pays more X.
-                Some(n) => (mana_available(game, request.player).saturating_sub(total.mana_value())
-                    + u32::from(*n))
-                .min(u32::from(u16::MAX)) as u16,
+                Some(n) => mana_available(game, request.player).saturating_sub(total.mana_value()) + *n,
                 None => 0,
             };
             AskKind::UnlessPays {
@@ -513,7 +511,7 @@ pub(crate) fn ask_of(
             candidates.sort();
             AskKind::ChooseDividedTargets {
                 candidates,
-                total: u16::try_from(*total).unwrap_or(u16::MAX),
+                total: *total,
                 max_targets: u8::try_from(*max_targets).unwrap_or(u8::MAX),
                 optional: *optional,
             }
@@ -560,13 +558,13 @@ pub(crate) fn ask_of(
                 })
                 .collect();
             obeyed.sort();
-            let mut costs: Vec<(Ref, Ref, u16)> = costs
+            let mut costs: Vec<(Ref, Ref, u32)> = costs
                 .iter()
                 .map(|c| {
                     (
                         r(c.attacker),
                         t(c.target),
-                        c.cost.mana_value().min(u32::from(u16::MAX)) as u16,
+                        c.cost.mana_value(),
                     )
                 })
                 .collect();

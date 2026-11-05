@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "Create a token that's a copy of target creature, except it's not legendary and it's a `size`/`size` `kind` in addition to
 /// its other types" (CR 707.2, 707.9b, 111.1): the exceptions are part of the copy's copiable values, so a copy of the token is
 /// a legendary-less `size`/`size` `kind` too. Nothing if the target is no longer legal (CR 608.2b).
-fn copy_as(g: &mut dyn Game, item: &StackItem, kind: Subtype, size: i16) -> Result<(), Suspend> {
+fn copy_as(g: &mut dyn Game, item: &StackItem, kind: Subtype, size: i32) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let values = g.copiable_values(creature).nonlegendary().with_subtype(g.words(item.object).subtype(kind)).sized(size, size);
     g.create_token_copies_of(values, item.controller, 1)?;

@@ -24,7 +24,7 @@ pub enum How {
 }
 
 /// `amount` counters of one kind put on `id` by `by` (CR 122.6). Nothing for an amount of none or fewer.
-pub fn put(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16, by: PlayerId, how: How) {
+pub fn put(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i32, by: PlayerId, how: How) {
     if amount <= 0 {
         return;
     }
@@ -35,7 +35,7 @@ pub fn put(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16, by: Player
 
 /// Counters of several kinds put on `id` together by `by` (CR 122.6): one placement of `put_together`, announced as one
 /// event however many kinds it has.
-pub fn put_all(cx: &mut Cx, id: ObjectId, counts: [i16; CounterKind::COUNT], by: PlayerId, how: How) {
+pub fn put_all(cx: &mut Cx, id: ObjectId, counts: [i32; CounterKind::COUNT], by: PlayerId, how: How) {
     put_together(cx, &[Placement { object: id, counts, by }], how);
 }
 
@@ -44,7 +44,7 @@ pub fn put_all(cx: &mut Cx, id: ObjectId, counts: [i16; CounterKind::COUNT], by:
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Placement {
     pub object: ObjectId,
-    pub counts: [i16; CounterKind::COUNT],
+    pub counts: [i32; CounterKind::COUNT],
     pub by: PlayerId,
 }
 
@@ -122,7 +122,7 @@ pub fn place_together(cx: &mut Cx, placements: &[Placement], how: How) -> Vec<Ev
 /// Takes up to `n` counters of one kind off `id` (CR 122.1): what a cost removes (CR 118.3), what an effect removes, and
 /// the state-based action of CR 704.5q. When the last defense counter comes off a Siege, its defeat ability triggers
 /// (CR 310.12b).
-pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i16) {
+pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i32) {
     if n <= 0 || !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::PhasedOut) {
         return;
     }
@@ -141,7 +141,7 @@ pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i16) {
 /// (CR 122.6a). If either action isn't possible - the same object, none of the kind on `from`, `to` can't have counters of the
 /// kind put on it (CR 101.2: `counters_banned`), or either has left its zone (CR 400.7) or phased out (CR 702.26b) - none is
 /// removed or put. How many came off `from`.
-pub fn mv(cx: &mut Cx, from: ObjectId, to: ObjectId, kind: CounterKind, n: i16) -> i16 {
+pub fn mv(cx: &mut Cx, from: ObjectId, to: ObjectId, kind: CounterKind, n: i32) -> i32 {
     let here = |cx: &Cx, id: ObjectId| live(cx.s(), id) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut);
     if n <= 0 || from == to || !here(cx, from) || !here(cx, to) || cx.s().obj(from).counters(kind) <= 0 {
         return 0;
@@ -171,7 +171,7 @@ pub fn remove_up_to(cx: &mut Cx, player: PlayerId, source: ObjectId, id: ObjectI
         .into_iter()
         .filter_map(|kind| {
             let count = obj.counters(kind);
-            (count > 0).then_some(CounterPool { object: id, kind, count: count as u16 })
+            (count > 0).then_some(CounterPool { object: id, kind, count: count as u32 })
         })
         .collect();
     if pools.is_empty() {
@@ -183,7 +183,7 @@ pub fn remove_up_to(cx: &mut Cx, player: PlayerId, source: ObjectId, id: ObjectI
     let mut removed = 0u16;
     for (object, kind, n) in taken {
         let before = cx.s().obj(object).counters(kind);
-        remove(cx, object, kind, n.min(i16::MAX as u16) as i16);
+        remove(cx, object, kind, n as i32);
         removed += (before - cx.s().obj(object).counters(kind)) as u16;
     }
     Ok(removed)
@@ -201,7 +201,7 @@ pub fn remove_one_from_among(cx: &mut Cx, player: PlayerId, source: ObjectId, pe
         let obj = cx.s().obj(id);
         pools.extend(CounterKind::ALL.into_iter().filter_map(|kind| {
             let count = obj.counters(kind);
-            (count > 0).then_some(CounterPool { object: id, kind, count: count as u16 })
+            (count > 0).then_some(CounterPool { object: id, kind, count: count as u32 })
         }));
     }
     if pools.is_empty() {
@@ -213,7 +213,7 @@ pub fn remove_one_from_among(cx: &mut Cx, player: PlayerId, source: ObjectId, pe
     let mut removed = false;
     for (object, kind, n) in taken {
         let before = cx.s().obj(object).counters(kind);
-        remove(cx, object, kind, n.min(i16::MAX as u16) as i16);
+        remove(cx, object, kind, n as i32);
         removed |= cx.s().obj(object).counters(kind) < before;
     }
     Ok(removed)
@@ -275,7 +275,7 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
 /// (CR 310.4b), a Saga a lore counter (CR 714.3a) - or, with read ahead, the number its controller chose as it entered
 /// (`read_ahead`, CR 702.155b, 714.3b). Added to the counters the replacements give it, before the replacements of counters
 /// being put apply to them all (`entering`).
-pub fn intrinsic(cards: &CardTable, obj: &Obj, read_ahead: Option<u8>, counts: &mut [i16; CounterKind::COUNT]) {
+pub fn intrinsic(cards: &CardTable, obj: &Obj, read_ahead: Option<u8>, counts: &mut [i32; CounterKind::COUNT]) {
     let card = obj.copied_card().unwrap_or_else(|| cards.face(obj.card, obj.transformed));
     let def = cards.get(card);
     // A copy effect's exception may state its loyalty (CR 707.9b: "has starting loyalty X"); a face-down permanent has
@@ -288,7 +288,7 @@ pub fn intrinsic(cards: &CardTable, obj: &Obj, read_ahead: Option<u8>, counts: &
     }
     let saga = def.subtypes.has(Subtype::Saga) && def.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.chapter > 0));
     if let Some(chosen) = read_ahead {
-        counts[CounterKind::Lore as usize] += i16::from(chosen);
+        counts[CounterKind::Lore as usize] += i32::from(chosen);
     } else if saga {
         counts[CounterKind::Lore as usize] += 1;
     }
@@ -298,7 +298,7 @@ pub fn intrinsic(cards: &CardTable, obj: &Obj, read_ahead: Option<u8>, counts: &
 /// applied to them (CR 614.1a), the permanent judged as it would exist on the battlefield (the caller's `judged_entering`):
 /// `by` puts them, its controller unless the effect giving them names another player (CR 122.6a). Placed by
 /// `place_arrived` once it is there.
-pub fn entering(cx: &mut Cx, id: ObjectId, controller: PlayerId, by: PlayerId, counts: [i16; CounterKind::COUNT]) -> [i16; CounterKind::COUNT] {
+pub fn entering(cx: &mut Cx, id: ObjectId, controller: PlayerId, by: PlayerId, counts: [i32; CounterKind::COUNT]) -> [i32; CounterKind::COUNT] {
     replace::counters(cx, id, controller, by, true, true, counts)
 }
 
@@ -308,7 +308,7 @@ pub fn entering(cx: &mut Cx, id: ObjectId, controller: PlayerId, by: PlayerId, c
 /// "when the Nth ... counter is put" sees each it entered with. For a permanent, those `entering` worked out; for a card
 /// arriving elsewhere, those a replacement effect gave it (Dauthi Voidwalker's void counter, CR 614.1a), which no
 /// replacement of counters put on a permanent sees.
-pub fn place_arrived(cx: &mut Cx, id: ObjectId, counts: [i16; CounterKind::COUNT], by: PlayerId, events: &mut Vec<Event>) {
+pub fn place_arrived(cx: &mut Cx, id: ObjectId, counts: [i32; CounterKind::COUNT], by: PlayerId, events: &mut Vec<Event>) {
     if counts.iter().all(|&n| n <= 0) {
         return;
     }
@@ -325,7 +325,7 @@ pub fn place_arrived(cx: &mut Cx, id: ObjectId, counts: [i16; CounterKind::COUNT
 
 /// The permanent as it would exist on the battlefield with the counters it would enter with (CR 614.12): not counters
 /// put, but a moment's hypothesis that `ops::as_it_would_exist` takes back (its journal mark) before anything happens.
-pub(crate) fn hypothetical(o: &mut Obj, counts: &[i16; CounterKind::COUNT]) {
+pub(crate) fn hypothetical(o: &mut Obj, counts: &[i32; CounterKind::COUNT]) {
     o.clear_counters();
     o.put_path_add(counts);
 }

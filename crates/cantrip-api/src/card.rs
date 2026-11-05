@@ -73,7 +73,7 @@ pub struct Entering {
     pub object: ObjectId,
     pub controller: PlayerId,
     pub tapped: bool,
-    pub counters: [i16; CounterKind::COUNT],
+    pub counters: [i32; CounterKind::COUNT],
     pub copy: Option<Copiable>,
     /// It enters prepared (CR 722.2).
     pub prepared: bool,
@@ -103,7 +103,7 @@ pub struct Entering {
     /// It enters enchanting this player (CR 303.4f): an Aura with "enchant player" entering from the stack.
     pub attach_player: Option<PlayerId>,
     /// The X the spell it was cast as announced (CR 107.3m), which "enters with X counters" reads.
-    pub x: u16,
+    pub x: u32,
     /// It enters with its back face up (CR 712.14a): its entering replacements and loyalty are the back face's.
     pub transformed: bool,
     /// The player chosen to protect a battle as it enters (CR 310.9a, 310.12a), by `prepare_entry`.
@@ -160,7 +160,7 @@ pub struct EntersAs {
     /// past that list names no ability and gives none.
     pub abilities: &'static [u8],
     /// "It's a 3/3 ... creature": its power and toughness (CR 613.4b, `EffectKind::SetPt`), set from the moment it enters.
-    pub power_toughness: Option<(i16, i16)>,
+    pub power_toughness: Option<(i32, i32)>,
     /// "It's a ... creature with flying": the keyword abilities it gains (CR 613.1f, `EffectKind::AddKeywords`).
     pub keywords: Keywords,
 }
@@ -342,7 +342,7 @@ pub struct StaticDef {
     pub from: ZoneKind,
     /// For a characteristic-defining ability of power and toughness printed as stars: what the stars are worth once the
     /// ability is lost (CR 208.2a, 208.5, 613.1f), as `*/1+*` is 0/1. The card's printed power and toughness stay unset.
-    pub lost_pt: Option<(i16, i16)>,
+    pub lost_pt: Option<(i32, i32)>,
     /// It makes what it affects lose all abilities (CR 613.1f, layer 6): `loses_all_abilities`. The layers read it to
     /// know which objects have lost their printed abilities to a static ability, so that every rule judged by the
     /// abilities a card prints (static abilities of layer 6 on, cost changes, replacement effects, play rules, trigger
@@ -964,7 +964,7 @@ pub enum VariableCost {
     /// though its mana cost has no {X} (CR 107.3a, 601.2b): casualty X (CR 702.153a), Ob Nixilis, the Adversary's. X is
     /// the spell's X (CR 107.3i: one value for every X of the object, its `x`). The permanent is chosen as the cost is paid
     /// (CR 601.2h), its power read then: the mana abilities activated while paying (CR 601.2g) may have changed it, so X is
-    /// announced up to the most a power can be (`i16::MAX`), and the cost is offered while any such permanent is there,
+    /// announced up to the most a power can be (`i32::MAX`), and the cost is offered while any such permanent is there,
     /// whatever its power now. With none of power X or greater at payment, the cast is taken back.
     SacrificeWithPowerX(ObjectFilter),
     /// Discard one or more cards from your hand that pass the filter, as many as the payer chooses as they pay (CR 701.9):
@@ -1793,7 +1793,7 @@ pub struct TriggeredDef {
     /// "Up to X target ..." where X is read from the game as the ability is put on the stack - Prismabasher's number of colors
     /// among permanents its controller controls (the ruling: it is fixed when the ability triggers, then read again as it
     /// resolves): a `TargetSpec::COUNTED` bound reads it (CR 603.3d, 601.2c). Asked of the ability's source and controller.
-    pub counted_by: Option<fn(&dyn Query, &Asker) -> u16>,
+    pub counted_by: Option<fn(&dyn Query, &Asker) -> u32>,
     /// A Saga's chapter ability (CR 714.2): it triggers when lore counters are put on its source and their number
     /// becomes at least this, having been less. `listens` and `matches` are not used; the core owns the trigger.
     pub chapter: u8,
@@ -1979,15 +1979,15 @@ pub struct Divide {
     /// power divided as you choose": Living Inferno; "where X is the greatest power among creatures you control as you
     /// activate this ability": Lukka, Bound to Ruin). It is locked in there, and what is divided stays as it was announced
     /// whatever later changes what it was read from. A negative value is a total of nothing (CR 107.1b, 120.8).
-    pub reads: Option<fn(&dyn crate::Query, &Asker, u16) -> u32>,
+    pub reads: Option<fn(&dyn crate::Query, &Asker, u32) -> u32>,
 }
 
 impl Divide {
     /// The total to divide with `x` announced, for what `asker` names.
-    pub fn total_for(&self, q: &dyn crate::Query, asker: &Asker, x: u16) -> u32 {
+    pub fn total_for(&self, q: &dyn crate::Query, asker: &Asker, x: u32) -> u32 {
         match self.reads {
             Some(reads) => reads(q, asker, x),
-            None if self.total == TargetSpec::COUNTED => u32::from(x),
+            None if self.total == TargetSpec::COUNTED => x,
             None => self.total,
         }
     }
@@ -2069,7 +2069,7 @@ impl ModalDef {
     /// The most modes it may choose now: `up_to_if`'s maximum while its condition holds, else `max`, with `counted` the count
     /// a `COUNTED` maximum reads. More than it has modes only
     /// matters for a modal that repeats; a count past a byte allows 255, more choices than any mask holds (`COUNT_BITS`).
-    pub fn most(&self, q: &dyn Query, asker: &Asker, counted: u16) -> u8 {
+    pub fn most(&self, q: &dyn Query, asker: &Asker, counted: u32) -> u8 {
         let max = self.up_to_if
             .filter(|(condition, _)| condition(q, asker))
             .map_or(self.max, |(_, max)| max);
@@ -3107,11 +3107,11 @@ pub struct CardDef {
     pub types: TypeSet,
     pub supertypes: Supertypes,
     pub subtypes: SubtypeSet,
-    pub power: Option<i16>,
-    pub toughness: Option<i16>,
-    pub loyalty: Option<i16>,
+    pub power: Option<i32>,
+    pub toughness: Option<i32>,
+    pub loyalty: Option<i32>,
     /// A battle's printed defense (CR 310.4a): it enters with that many defense counters (CR 310.4b).
-    pub defense: Option<i16>,
+    pub defense: Option<i32>,
     pub keywords: Keywords,
     /// Its printed toxic N (CR 702.164a), 0 for none: a keyword ability, part of its copiable values and lost as keywords
     /// are. What the layers grant is added to it (`Chars::toxic`, its total toxic value, CR 702.164b).
@@ -4369,8 +4369,8 @@ impl TurnUp {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Prototype {
     pub cost: ManaCost,
-    pub power: i16,
-    pub toughness: i16,
+    pub power: i32,
+    pub toughness: i32,
     pub text: &'static str,
 }
 

@@ -32,8 +32,7 @@ fn spell_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(spell) = item.subject else { return Ok(()) };
     let amount = g.mana_value(spell);
     if amount > 0 {
-        // A mana value past what damage holds (RX-5) deals that limit, never a wrapped amount.
-        damage_target(g, item, 0, amount.min(u16::MAX as u32) as u16);
+        damage_target(g, item, 0, amount);
     }
     Ok(())
 }

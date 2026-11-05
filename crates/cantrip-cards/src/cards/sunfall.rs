@@ -9,7 +9,7 @@ pub static EXTRA: &[&CardDef] = &[&tokens::INCUBATOR, &tokens::PHYREXIAN];
 /// (CR 608.2c). The Incubator is made even for X of zero (CR 701.53a).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let exiled = effects::exile_all_creatures(g);
-    tokens::incubate(g, item.controller, exiled as i16)
+    tokens::incubate(g, item.controller, exiled as i32)
 }
 
 pub static CARD: CardDef = CardDef {

@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// Roaring Furnace: "When you unlock this door, this Room deals damage equal to the number of cards in your hand to target
 /// creature an opponent controls." The cards are counted as the ability resolves (CR 608.2h).
 fn furnace(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let n = cards_in_hand(g, item.controller) as u16;
+    let n = cards_in_hand(g, item.controller) as u32;
     damage_target(g, item, 0, n);
     Ok(())
 }

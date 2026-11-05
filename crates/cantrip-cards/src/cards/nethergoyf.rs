@@ -14,7 +14,7 @@ fn size(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
             seen = seen.with(t);
         }
     }
-    let types = seen.iter().count() as i16;
+    let types = seen.iter().count() as i32;
     chars.power = Some(types);
     chars.toughness = Some(types + 1);
 }

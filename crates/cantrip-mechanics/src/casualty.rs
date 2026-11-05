@@ -22,7 +22,7 @@ use cantrip_api::*;
 /// A creature with power N or greater (CR 702.153a), read as the cost is paid (CR 601.2h).
 fn creature_with_power_at_least<const N: u8>(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
     let chars = q.chars(id);
-    chars.is(CardType::Creature) && chars.power.is_some_and(|p| p >= i16::from(N))
+    chars.is(CardType::Creature) && chars.power.is_some_and(|p| p >= i32::from(N))
 }
 
 fn creature(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
@@ -74,7 +74,7 @@ pub const fn trigger_with(text: &'static str, copy: Effect) -> AbilityDef {
 
 /// The X announced for the spell whose casualty trigger this is (CR 107.3a): the spell's, on the stack or as it last was
 /// there once it has left (CR 608.2h), as the copy copies it (CR 707.10).
-pub fn x(q: &dyn Query, item: &StackItem) -> u16 {
+pub fn x(q: &dyn Query, item: &StackItem) -> u32 {
     let s = q.state();
     s.stack.iter().find(|i| i.kind == StackKind::Spell && i.object == item.object).or_else(|| s.left_stack(item.object)).map_or(0, |spell| spell.x)
 }

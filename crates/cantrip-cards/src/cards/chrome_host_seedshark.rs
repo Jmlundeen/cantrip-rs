@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// (CR 202.3e); a value past what a counter size holds (RX-5) incubates at that limit.
 fn incubate_x_where_x_spells(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(spell) = item.subject else { return Ok(()) };
-    let amount = g.mana_value(spell).min(i16::MAX as u32) as i16;
+    let amount = g.mana_value(spell).min(i32::MAX as u32) as i32;
     tokens::incubate(g, item.controller, amount)?;
     Ok(())
 }

@@ -165,7 +165,7 @@ pub fn opponent_chooses_one(g: &mut dyn Game, controller: PlayerId, source: Obje
 
 /// A player of `candidates`, chosen without targeting (CR 608.2d, 614.12a), asked even when the choice is forced; none
 /// only when there are no candidates. `verb` and `amount` say what the chosen player will do, as hint text.
-pub fn player(g: &mut dyn Game, chooser: PlayerId, source: ObjectId, candidates: Vec<PlayerId>, verb: &'static str, amount: u16) -> Result<Option<PlayerId>, Suspend> {
+pub fn player(g: &mut dyn Game, chooser: PlayerId, source: ObjectId, candidates: Vec<PlayerId>, verb: &'static str, amount: u32) -> Result<Option<PlayerId>, Suspend> {
     if candidates.is_empty() {
         return Ok(None);
     }

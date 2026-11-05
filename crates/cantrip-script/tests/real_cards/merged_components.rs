@@ -76,7 +76,7 @@ fn mold(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Put a -1/-1 counter on each creature."
 fn shrink(g: &mut dyn Rules, _: &StackItem) -> Result<(), Suspend> {
-    let counters: Vec<(ObjectId, CounterKind, i16)> = creatures(g).into_iter().map(|c| (c, CounterKind::MinusOne, 1)).collect();
+    let counters: Vec<(ObjectId, CounterKind, i32)> = creatures(g).into_iter().map(|c| (c, CounterKind::MinusOne, 1)).collect();
     g.add_counters_together(&counters);
     Ok(())
 }
@@ -311,7 +311,7 @@ fn on_battlefield(game: &Game, name: &str) -> Vec<ObjectId> {
     game.state.battlefield().iter().copied().filter(|&id| game.name(id) == name).collect()
 }
 
-fn counters(game: &Game, id: ObjectId, kind: CounterKind) -> i16 {
+fn counters(game: &Game, id: ObjectId, kind: CounterKind) -> i32 {
     game.state.obj(id).counters(kind)
 }
 

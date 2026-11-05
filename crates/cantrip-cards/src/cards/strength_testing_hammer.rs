@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// greatest power or is tied for greatest power among creatures on the battlefield, draw a card. A creature that has
 /// left the battlefield gets nothing and has no power to compare.
 fn roll_and_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = g.roll_die(item.controller, 6).result as i16;
+    let x = g.roll_die(item.controller, 6).result as i32;
     let Target::Object(creature) = item.subject else { return Ok(()) };
     if !is_live(g, creature) || !g.is_on_battlefield(creature) {
         return Ok(());

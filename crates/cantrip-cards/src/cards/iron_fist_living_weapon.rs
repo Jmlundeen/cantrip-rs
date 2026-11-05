@@ -15,7 +15,7 @@ fn gain_the_ability(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Iron Fist deals damage equal to his power to any other target" (CR 120.3): his power as the ability resolves, or as he last
 /// existed if he has left the battlefield (CR 113.7a); no damage for a power of 0 or less (CR 120.8).
 fn deal_damage_equal_to_power(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u16;
+    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u32;
     g.damage(item.object, item.target(0), power);
     Ok(())
 }

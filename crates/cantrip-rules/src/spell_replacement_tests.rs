@@ -256,7 +256,7 @@ fn resolve_all(g: &mut Game) {
     g.run();
 }
 
-fn finality(g: &Game, permanent: ObjectId) -> i16 {
+fn finality(g: &Game, permanent: ObjectId) -> i32 {
     g.state.obj(permanent).counters(CounterKind::Finality)
 }
 
@@ -410,7 +410,7 @@ fn an_instant_cast_another_way_goes_to_the_graveyard() {
     assert!(g.state.obj(after).zone.is(ZoneKind::Graveyard));
 }
 
-fn plus_ones(g: &Game, permanent: ObjectId) -> i16 {
+fn plus_ones(g: &Game, permanent: ObjectId) -> i32 {
     g.state.obj(permanent).counters(CounterKind::PlusOne)
 }
 

@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let power = history::sacrificed_creatures_power(g, item.object);
     if power > 0 {
-        damage_target(g, item, 0, power.min(u16::MAX as i32) as u16);
+        damage_target(g, item, 0, power as u32);
     }
     Ok(())
 }

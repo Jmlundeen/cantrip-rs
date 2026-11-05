@@ -1331,7 +1331,7 @@ fn rest_of_each(cx: &mut Cx, uses: Vec<PreventionUse>) {
 }
 
 /// Prevents `amount` of the damage (CR 615.1) by the effect of `by`, and records it (CR 615.6, 615.13).
-fn prevent(cx: &mut Cx, d: &mut DamageEvent, amount: u16, by: ObjectId) {
+fn prevent(cx: &mut Cx, d: &mut DamageEvent, amount: u32, by: ObjectId) {
     if amount == 0 {
         return;
     }
@@ -1363,8 +1363,8 @@ pub(crate) fn counters(
     putter: PlayerId,
     entering: bool,
     effect: bool,
-    counts: [i16; CounterKind::COUNT],
-) -> [i16; CounterKind::COUNT] {
+    counts: [i32; CounterKind::COUNT],
+) -> [i32; CounterKind::COUNT] {
     if counts.iter().all(|&n| n <= 0) {
         return counts;
     }
@@ -1384,7 +1384,7 @@ pub(crate) fn counters(
 }
 
 /// `counts` less every kind `object`, controlled by `controller`, can't have put on it (CR 101.2, 122.6).
-fn without_banned(cx: &Cx, object: ObjectId, controller: PlayerId, mut counts: [i16; CounterKind::COUNT]) -> [i16; CounterKind::COUNT] {
+fn without_banned(cx: &Cx, object: ObjectId, controller: PlayerId, mut counts: [i32; CounterKind::COUNT]) -> [i32; CounterKind::COUNT] {
     for (i, n) in counts.iter_mut().enumerate() {
         if *n > 0 && crate::static_rules::counters_banned(cx, cx.cards(), object, controller, CounterKind::ALL[i]) {
             *n = 0;

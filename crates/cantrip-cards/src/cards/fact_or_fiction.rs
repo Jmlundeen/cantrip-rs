@@ -17,7 +17,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     g.reveal(you, &revealed);
     let opponents: Vec<PlayerId> = g.state().opponents(you).collect();
-    let separator = choose::player(g, you, item.object, opponents, "SeparatePiles", revealed.len() as u16)?; // at most five
+    let separator = choose::player(g, you, item.object, opponents, "SeparatePiles", revealed.len() as u32)?; // at most five
     let (first, second) = choose::separate(g, separator, item.object, revealed)?;
     let (keep, rest) = choose::pile(g, you, item.object, first, second)?;
     // Two actions in the order written (CR 608.2c): one pile into the hand, then the other into the graveyard, each pile

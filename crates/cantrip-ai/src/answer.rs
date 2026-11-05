@@ -67,7 +67,7 @@ fn has_color_step(o: &OptionObs) -> bool {
 impl Answering {
     /// The engine's priority option that the factoring's option `n` is (a `Tok::Option` token's number), where `request`
     /// is a priority.
-    pub fn priority_option<'a>(&self, request: &'a Request, n: u16) -> Option<&'a ActionOption> {
+    pub fn priority_option<'a>(&self, request: &'a Request, n: u32) -> Option<&'a ActionOption> {
         match &request.kind {
             RequestKind::Priority { options } => self.perms.options.get(n as usize).and_then(|&i| options.get(i)),
             _ => None,
@@ -370,7 +370,7 @@ impl Answering {
         &self,
         request: &Request,
         answer: &Answer,
-        x: Option<u16>,
+        x: Option<u32>,
     ) -> Option<FactoredAnswer> {
         use FactoredAnswer as F;
         let all = |refs: Vec<Ref>| (!refs.contains(&Ref::None)).then_some(refs);
@@ -396,12 +396,12 @@ impl Answering {
                 let option = self.perms.options.iter().position(|&e| e == engine)?;
                 let o = &canonical[option];
                 let color = has_color_step(o).then(|| match (a.color, a.mana) {
-                    (Some(c), _) => c as u16,
+                    (Some(c), _) => c as u32,
                     (None, Some(Mana::C)) if a.kind == ActionKind::ActivateAbility => COLORLESS,
                     _ => NO_COLOR,
                 });
                 F::Act {
-                    option: option as u16,
+                    option: option as u32,
                     targets: all(a.targets.iter().map(|&t| self.t(t)).collect())?,
                     color,
                 }
@@ -414,7 +414,7 @@ impl Answering {
                 },
                 _,
                 _,
-            ) => F::X(x.unwrap_or(u16::try_from(*now).unwrap_or(u16::MAX))),
+            ) => F::X(x.unwrap_or(*now)),
             (RequestKind::PayCosts { .. }, _, _) => F::AutoPay,
             (RequestKind::UnlessPays { .. }, Answer::Act(a), _)
                 if a.kind == ActionKind::DeclineCost =>
@@ -438,7 +438,7 @@ impl Answering {
             (_, Answer::Yes, _) => F::Yes,
             (_, Answer::No, _) => F::No,
             (_, Answer::Player(p), _) => F::Player(p.0),
-            (_, Answer::Subtype(s), _) => F::Subtype(*s as u16),
+            (_, Answer::Subtype(s), _) => F::Subtype(*s as u32),
             (_, Answer::Attack(attacks), _) => F::Attack(
                 attacks
                     .iter()
@@ -485,7 +485,7 @@ impl Answering {
                 shares
                     .iter()
                     .map(|&(t, n)| {
-                        Some((self.t(t), u16::try_from(n).unwrap_or(u16::MAX)))
+                        Some((self.t(t), n))
                             .filter(|s| s.0 != Ref::None)
                     })
                     .collect::<Option<_>>()?,

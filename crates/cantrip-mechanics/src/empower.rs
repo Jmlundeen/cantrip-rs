@@ -38,7 +38,7 @@ fn jace_tokens(g: &dyn Game, controller: PlayerId) -> Vec<ObjectId> {
 /// "Empower Jace N" for `controller`, `source` being the object whose ability does it. With several Jace planeswalker
 /// tokens (a token copy of a Jace keeps its printed loyalty) the player chooses which gets the counters, a choice that
 /// is not targeting (`Purpose::PutCounters`).
-pub fn jace(g: &mut dyn Game, controller: PlayerId, source: ObjectId, n: i16) -> Result<(), Suspend> {
+pub fn jace(g: &mut dyn Game, controller: PlayerId, source: ObjectId, n: i32) -> Result<(), Suspend> {
     let mut owned = jace_tokens(g, controller);
     if owned.is_empty() {
         tokens::create_by_rule(g, controller, &JACE, 1, false)?;

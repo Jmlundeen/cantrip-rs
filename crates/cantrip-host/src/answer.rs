@@ -182,7 +182,7 @@ pub fn translate(
                     Ok((
                         object(handles, game, s.source)?,
                         if s.creature.is_none() { None } else { Some(object(handles, game, s.creature)?) },
-                        s.amount.clamp(0, i32::from(u16::MAX)) as u16,
+                        u32::try_from(s.amount).map_err(|_| Untranslatable::Illegal(format!("{} is not an amount of damage", s.amount)))?,
                     ))
                 })
                 .collect::<Result<_, Untranslatable>>()?,
@@ -252,7 +252,7 @@ pub fn translate(
                         .into_iter()
                         .find(|k| k.name() == r.counter)
                         .ok_or_else(|| Untranslatable::Illegal(format!("no counter is called \"{}\"", r.counter)))?;
-                    Ok((object(handles, game, r.object)?, kind, r.count.clamp(0, i32::from(u16::MAX)) as u16))
+                    Ok((object(handles, game, r.object)?, kind, u32::try_from(r.count).map_err(|_| Untranslatable::Illegal(format!("{} is not a number of counters", r.count)))?))
                 })
                 .collect::<Result<_, Untranslatable>>()?,
         ),
@@ -356,7 +356,7 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
                 .map(|&(source, creature, amount)| DamageShareMessage {
                     source: handles.handle(source),
                     creature: creature.map_or(ViewHandle::NONE, |c| handles.handle(c)),
-                    amount: i32::from(amount),
+                    amount: amount as i32,
                 })
                 .collect(),
         }),
@@ -370,7 +370,7 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
         Answer::Counters(taken) => AnswerPayload::CountersRemovedAnswer(CountersRemovedAnswer {
             removals: taken
                 .iter()
-                .map(|&(object, kind, n)| CounterPoolMessage { object: handles.handle(object), counter: kind.name().to_string(), count: i32::from(n) })
+                .map(|&(object, kind, n)| CounterPoolMessage { object: handles.handle(object), counter: kind.name().to_string(), count: n as i32 })
                 .collect(),
         }),
     }

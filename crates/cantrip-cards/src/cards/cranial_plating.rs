@@ -12,7 +12,7 @@ fn plus_power_per_artifact(view: &dyn LayerQuery, source: ObjectId, chars: &mut 
         .battlefield()
         .iter()
         .filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Artifact))
-        .count() as i16;
+        .count() as i32;
     chars.power = chars.power.map(|v| v + n);
 }
 

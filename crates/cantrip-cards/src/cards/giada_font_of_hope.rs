@@ -3,9 +3,9 @@ use cantrip_oracle as oracle;
 
 /// How many Angels `controller` already controls on the battlefield (CR 614.12): "Angel" is a word of this card's text (CR 612).
 /// An Angel entering at the same time is not on the battlefield yet, so it is not counted.
-fn angels_already_controlled(q: &dyn Query, asker: &Asker) -> i16 {
+fn angels_already_controlled(q: &dyn Query, asker: &Asker) -> i32 {
     let angel = q.words(asker.source).subtype(Subtype::Angel);
-    q.state().battlefield().iter().filter(|&&id| q.controller(id) == asker.controller && q.chars(id).has_subtype(angel)).count() as i16
+    q.state().battlefield().iter().filter(|&&id| q.controller(id) == asker.controller && q.chars(id).has_subtype(angel)).count() as i32
 }
 
 /// "Each other Angel you control enters with an additional +1/+1 counter on it for each Angel you already control" (CR 614.1c,

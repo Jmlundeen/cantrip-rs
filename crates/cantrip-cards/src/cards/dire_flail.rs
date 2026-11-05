@@ -72,7 +72,7 @@ fn may_sacrifice(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// existed on the battlefield if it has left (the card's rulings, CR 608.2h); the creature is the source, so its lifelink
 /// counts as it last was.
 fn deal_power(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u16;
+    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u32;
     damage_target(g, item, 0, power);
     Ok(())
 }

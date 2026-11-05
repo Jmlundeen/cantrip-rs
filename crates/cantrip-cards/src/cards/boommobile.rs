@@ -15,7 +15,7 @@ fn four_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// longer legal (CR 608.2b: the core doesn't resolve it); the counter only on the Vehicle that is still on the
 /// battlefield (CR 400.7).
 fn x_damage_and_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, item.x);
+    damage_target(g, item, 0, u32::from(item.x));
     g.add_counters(item.object, CounterKind::PlusOne, 1);
     Ok(())
 }

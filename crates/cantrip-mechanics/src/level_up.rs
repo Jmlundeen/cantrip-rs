@@ -11,7 +11,7 @@ fn add_level(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// The number of level counters on `source`, as the layers see it.
-pub fn levels(view: &dyn LayerQuery, source: ObjectId) -> i16 {
+pub fn levels(view: &dyn LayerQuery, source: ObjectId) -> i32 {
     view.state().obj(source).counters(CounterKind::Level)
 }
 

@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "Put that many +1/+1 counters": the size of the batch the trigger saw, counted even for a card that has since left.
 fn that_many_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let many = g.event_objects(item).len() as i16;
+    let many = g.event_objects(item).len() as i32;
     g.add_counters(item.object, CounterKind::PlusOne, many);
     Ok(())
 }

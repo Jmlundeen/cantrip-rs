@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// (CR 608.2b).
 fn elves_pump_and_shrink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let elf = g.words(item.object).subtype(Subtype::Elf);
-    let x = (permanents_with_subtype_you_control(g, item.controller, elf) + subtype_cards_in_graveyard(g, item.controller, elf)) as i16;
+    let x = (permanents_with_subtype_you_control(g, item.controller, elf) + subtype_cards_in_graveyard(g, item.controller, elf)) as i32;
     // One instruction (`Game::one_instruction`): the two "gets" are one sentence, joined by "and".
     g.one_instruction(&mut |g| {
         if let Some(mine) = targets::object(g, item, 0) {

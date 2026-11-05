@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// keep the spell from being countered. Read from the spell it enters from, so a Dyadrine put onto the battlefield without being
 /// cast, or a copy of the spell (CR 707.10) or a token copy of the permanent, had nothing spent and enters with none.
 fn enters_with_counters_for_the_mana_spent(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::PlusOne as usize] += g.obj(entering.object).spent.total() as i16;
+    entering.counters[CounterKind::PlusOne as usize] += g.obj(entering.object).spent.total() as i32;
     Ok(())
 }
 
@@ -42,9 +42,9 @@ fn attack(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// The counters come off, one from each of the two creatures, and the player draws a card and gets the Robot ("if you do").
-fn remove_and_reward(g: &mut dyn Game, you: PlayerId, taken: Vec<(ObjectId, CounterKind, u16)>) -> Result<(), Suspend> {
+fn remove_and_reward(g: &mut dyn Game, you: PlayerId, taken: Vec<(ObjectId, CounterKind, u32)>) -> Result<(), Suspend> {
     for (object, kind, n) in taken {
-        g.remove_counters(object, kind, n as i16);
+        g.remove_counters(object, kind, n as i32);
     }
     g.draw(you, 1);
     tokens::create(g, you, &ROBOT_2_2, 1)?;

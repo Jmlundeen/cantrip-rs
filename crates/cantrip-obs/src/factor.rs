@@ -31,12 +31,12 @@ use crate::{Ask, AskKind, OptionObs, Ref, action};
 
 /// The values of X (or a kicker count) a policy chooses among: every value to ten, then wider steps. Those over what
 /// the seat could pay (`x_most`), or that the request cannot move to, are masked.
-pub const X_BUCKETS: [u16; 15] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 30];
+pub const X_BUCKETS: [u32; 15] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 30];
 
 /// A color token's number: 0 to 4 are white, blue, black, red, green; `COLORLESS` names colorless (CR 106.7); `NO_COLOR`
 /// names nothing.
-pub const COLORLESS: u16 = 5;
-pub const NO_COLOR: u16 = 6;
+pub const COLORLESS: u32 = 5;
+pub const NO_COLOR: u32 = 6;
 
 /// What an option token does.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -103,7 +103,7 @@ pub struct Token {
     pub kind: Tok,
     pub a: Ref,
     pub b: Ref,
-    pub n: u16,
+    pub n: u32,
 }
 
 impl Token {
@@ -116,7 +116,7 @@ impl Token {
         }
     }
 
-    pub const fn of(kind: Tok, a: Ref, b: Ref, n: u16) -> Token {
+    pub const fn of(kind: Tok, a: Ref, b: Ref, n: u32) -> Token {
         Token { kind, a, b, n }
     }
 
@@ -129,7 +129,7 @@ impl Token {
         }
     }
 
-    fn n(kind: Tok, n: u16) -> Token {
+    fn n(kind: Tok, n: u32) -> Token {
         Token {
             kind,
             a: Ref::None,
@@ -176,18 +176,18 @@ pub enum FactoredAnswer {
     Pass,
     /// Priority option `option`, its targets in order, and the color named where it names one (a color token's number).
     Act {
-        option: u16,
+        option: u32,
         targets: Vec<Ref>,
-        color: Option<u16>,
+        color: Option<u32>,
     },
     /// Pay the cost being paid.
     AutoPay,
     /// Announce X (or the kicker count) as this, then pay.
-    X(u16),
+    X(u32),
     /// An "unless pays" cost: pay it (at X, where it has one) or decline.
     Unless {
         pay: bool,
-        x: Option<u16>,
+        x: Option<u32>,
     },
     /// Cards or targets, in the order chosen.
     Refs(Vec<Ref>),
@@ -198,21 +198,21 @@ pub enum FactoredAnswer {
     No,
     Player(u8),
     Name(Option<String>),
-    Subtype(u16),
+    Subtype(u32),
     /// Attacking creatures and what each attacks.
     Attack(Vec<(Ref, Ref)>),
     /// Blocking creatures and the attacker each blocks.
     Block(Vec<(Ref, Ref)>),
     /// Combat damage: (source, the creature dealt it or `None` for the defender, amount).
-    Shares(Vec<(Ref, Option<Ref>, u16)>),
+    Shares(Vec<(Ref, Option<Ref>, u32)>),
     /// Each destination's cards in placing order; or shuffle.
     Placements {
         placements: Vec<Vec<Ref>>,
         shuffle: bool,
     },
-    Divided(Vec<(Ref, u16)>),
+    Divided(Vec<(Ref, u32)>),
     /// Counters removed: (permanent, counter kind, how many).
-    Counters(Vec<(Ref, u16, u16)>),
+    Counters(Vec<(Ref, u16, u32)>),
     /// Triggers by their place in the ask, in the order put on the stack.
     Order(Vec<u8>),
     Index(u8),
@@ -324,8 +324,8 @@ pub fn bound(ask: &Ask) -> usize {
 }
 
 /// The X step: a bucket (and X as it is now), each legal where X can move to it and the seat could pay it.
-fn x_step(p: &mut Picker, now: u16, most: u16, up: bool, down: bool) -> Flow<u16> {
-    let mut values: Vec<u16> = X_BUCKETS.to_vec();
+fn x_step(p: &mut Picker, now: u32, most: u32, up: bool, down: bool) -> Flow<u32> {
+    let mut values: Vec<u32> = X_BUCKETS.to_vec();
     values.push(now);
     values.sort_unstable();
     values.dedup();
@@ -338,7 +338,7 @@ fn x_step(p: &mut Picker, now: u16, most: u16, up: bool, down: bool) -> Flow<u16
 }
 
 /// The bucket `decompose` takes for X `want` from X `now`: the highest legal one at or under it.
-fn x_bucket(now: u16, most: u16, up: bool, down: bool, want: u16) -> u16 {
+fn x_bucket(now: u32, most: u32, up: bool, down: bool, want: u32) -> u32 {
     let mut best = now.min(want);
     for n in X_BUCKETS.into_iter().chain([now]) {
         let legal = n == now || (n > now && up && n <= most.max(now)) || (n < now && down);
@@ -355,7 +355,7 @@ fn color_step(o: &OptionObs) -> Option<Step> {
         return None;
     }
     let mut step = Step::default();
-    for c in 0..5u16 {
+    for c in 0..5u32 {
         step.push(Token::n(Tok::Color, c), o.color_choices & (1 << c) != 0);
     }
     step.push(Token::n(Tok::Color, COLORLESS), colorless);
@@ -385,7 +385,7 @@ fn act(o: &OptionObs, option: usize, p: &mut Picker) -> Flow<FactoredAnswer> {
         None => None,
     };
     Ok(FactoredAnswer::Act {
-        option: option as u16,
+        option: option as u32,
         targets,
         color,
     })
@@ -510,7 +510,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
                 let targetable =
                     o.targets_optional || o.target_candidates.len() >= o.targets_required as usize;
                 step.push(
-                    Token::of(Tok::Option, o.source, Ref::None, i as u16),
+                    Token::of(Tok::Option, o.source, Ref::None, i as u32),
                     targetable,
                 );
             }
@@ -678,7 +678,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
                 let mut step = Step::default();
                 for &m in eligible {
                     step.push(
-                        Token::n(Tok::Mode, u16::from(m)),
+                        Token::n(Tok::Mode, u32::from(m)),
                         *repeat || !modes.contains(&m),
                     );
                 }
@@ -695,7 +695,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             let mut colors = Vec::new();
             for _ in 0..if *choices == 0 { 0 } else { *count } {
                 let mut step = Step::default();
-                for c in 0..5u16 {
+                for c in 0..5u32 {
                     step.push(Token::n(Tok::Color, c), choices & (1 << c) != 0);
                 }
                 colors.push(p.pick(step)?.n as u8);
@@ -706,7 +706,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             let names = names_with(ask, names);
             let mut step = Step::default();
             for i in 0..names.len() {
-                step.push(Token::n(Tok::Name, i as u16), true);
+                step.push(Token::n(Tok::Name, i as u32), true);
             }
             step.push(Token::new(Tok::NoName), true);
             let t = p.pick(step)?;
@@ -717,7 +717,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
         AskKind::ChooseSubtype { choices, .. } => {
             let mut step = Step::default();
             for &c in choices {
-                step.push(Token::n(Tok::Subtype, c), true);
+                step.push(Token::n(Tok::Subtype, u32::from(c)), true);
             }
             Ok(F::Subtype(p.pick(step)?.n))
         }
@@ -726,7 +726,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             let mut step = Step::default();
             for &c in candidates {
                 step.push(
-                    Token::of(Tok::Player, Ref::Player(c), Ref::None, u16::from(c)),
+                    Token::of(Tok::Player, Ref::Player(c), Ref::None, u32::from(c)),
                     true,
                 );
             }
@@ -735,7 +735,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
         AskKind::ChooseReplacement { sources, .. } => {
             let mut step = Step::default();
             for (i, &s) in sources.iter().enumerate() {
-                step.push(Token::of(Tok::Index, s, Ref::None, i as u16), true);
+                step.push(Token::of(Tok::Index, s, Ref::None, i as u32), true);
             }
             Ok(F::Index(p.pick(step)?.n as u8))
         }
@@ -744,13 +744,13 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             total,
             up_to,
         } => {
-            let mut taken = vec![0u16; pools.len()];
+            let mut taken = vec![0u32; pools.len()];
             let mut n = 0;
             while n < *total && pools.iter().zip(&taken).any(|(pool, &t)| t < pool.count) {
                 let mut step = Step::default();
                 for (i, pool) in pools.iter().enumerate() {
                     step.push(
-                        Token::of(Tok::Unit, pool.object, Ref::None, i as u16),
+                        Token::of(Tok::Unit, pool.object, Ref::None, i as u32),
                         taken[i] < pool.count,
                     );
                 }
@@ -780,14 +780,14 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             max_targets,
             optional,
         } => {
-            let mut shares = vec![0u16; candidates.len()];
+            let mut shares = vec![0u32; candidates.len()];
             let mut n = 0;
             while n < *total && !candidates.is_empty() {
                 let named = shares.iter().filter(|&&s| s > 0).count();
                 let mut step = Step::default();
                 for (i, &c) in candidates.iter().enumerate() {
                     step.push(
-                        Token::of(Tok::Unit, c, Ref::None, i as u16),
+                        Token::of(Tok::Unit, c, Ref::None, i as u32),
                         shares[i] > 0 || *max_targets == 0 || named < *max_targets as usize,
                     );
                 }
@@ -902,7 +902,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
                 for (i, &a) in attackers.iter().enumerate() {
                     let room = blocked[i] < max_blockers.get(i).copied().unwrap_or(u8::MAX);
                     step.push(
-                        Token::of(Tok::Block, c, a, i as u16),
+                        Token::of(Tok::Block, c, a, i as u32),
                         room && allowed.contains(&(c, a)),
                     );
                 }
@@ -917,16 +917,16 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
         AskKind::AssignCombatDamage { divisions } => {
             let mut shares = Vec::new();
             for d in divisions {
-                let mut got = vec![0u16; d.creatures.len()];
-                let mut to_defender = 0u16;
+                let mut got = vec![0u32; d.creatures.len()];
+                let mut to_defender = 0u32;
                 for _ in 0..d.damage {
                     let lethal = got.iter().zip(&d.lethal).all(|(g, l)| g >= l);
                     let mut step = Step::default();
                     for (i, &c) in d.creatures.iter().enumerate() {
-                        step.push(Token::of(Tok::Damage, d.source, c, i as u16), true);
+                        step.push(Token::of(Tok::Damage, d.source, c, i as u32), true);
                     }
                     step.push(
-                        Token::of(Tok::Damage, d.source, Ref::None, d.creatures.len() as u16),
+                        Token::of(Tok::Damage, d.source, Ref::None, d.creatures.len() as u32),
                         d.may_assign_to_defender && lethal,
                     );
                     if !step.mask.iter().any(|&m| m) {
@@ -964,7 +964,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
                 let mut step = Step::default();
                 for (i, &s) in sources.iter().enumerate() {
                     step.push(
-                        Token::of(Tok::Next, s, Ref::None, i as u16),
+                        Token::of(Tok::Next, s, Ref::None, i as u32),
                         !order.contains(&(i as u8)),
                     );
                 }
@@ -1000,7 +1000,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
                             && d.eligible.get(k).copied().unwrap_or(false)
                             && room
                             && left > short - usize::from(fills).min(short);
-                        step.push(Token::of(Tok::Place, c, Ref::None, i as u16), legal);
+                        step.push(Token::of(Tok::Place, c, Ref::None, i as u32), legal);
                     }
                 }
                 if !step.mask.iter().any(|&m| m) {
@@ -1239,12 +1239,12 @@ pub fn decompose(
         }
         (AskKind::ChooseModes { .. }, F::Modes(modes)) => {
             for &m in modes {
-                push(Token::n(Tok::Mode, u16::from(m)));
+                push(Token::n(Tok::Mode, u32::from(m)));
             }
         }
         (AskKind::ChooseColors { .. }, F::Colors(colors)) => {
             for &c in colors {
-                push(Token::n(Tok::Color, u16::from(c)));
+                push(Token::n(Tok::Color, u32::from(c)));
             }
         }
         (AskKind::ChooseName { .. }, F::Name(None)) => push(Token::new(Tok::NoName)),
@@ -1253,7 +1253,7 @@ pub fn decompose(
                 .iter()
                 .position(|n| n == name)
                 .ok_or_else(|| format!("{name} is not among the names offered"))?;
-            push(Token::n(Tok::Name, i as u16));
+            push(Token::n(Tok::Name, i as u32));
         }
         (AskKind::ChooseSubtype { .. }, F::Subtype(s)) => push(Token::n(Tok::Subtype, *s)),
         (AskKind::May { .. } | AskKind::Mulligan { .. }, F::Yes) => push(Token::new(Tok::Yes)),
@@ -1263,24 +1263,24 @@ pub fn decompose(
                 Tok::Player,
                 Ref::Player(*p),
                 Ref::None,
-                u16::from(*p),
+                u32::from(*p),
             ))
         }
         (AskKind::ChooseReplacement { sources, .. }, F::Index(i)) => push(Token::of(
             Tok::Index,
             sources.get(*i as usize).copied().ok_or("no such effect")?,
             Ref::None,
-            u16::from(*i),
+            u32::from(*i),
         )),
         (AskKind::RemoveCounters { pools, .. }, F::Counters(taken)) => {
             for (i, pool) in pools.iter().enumerate() {
-                let n: u16 = taken
+                let n: u32 = taken
                     .iter()
                     .filter(|t| t.0 == pool.object && t.1 == pool.kind)
                     .map(|t| t.2)
                     .sum();
                 for _ in 0..n {
-                    push(Token::of(Tok::Unit, pool.object, Ref::None, i as u16));
+                    push(Token::of(Tok::Unit, pool.object, Ref::None, i as u32));
                 }
             }
         }
@@ -1289,9 +1289,9 @@ pub fn decompose(
                 push(Token::new(Tok::Done));
             }
             for (i, &c) in candidates.iter().enumerate() {
-                let n: u16 = shares.iter().filter(|s| s.0 == c).map(|s| s.1).sum();
+                let n: u32 = shares.iter().filter(|s| s.0 == c).map(|s| s.1).sum();
                 for _ in 0..n {
-                    push(Token::of(Tok::Unit, c, Ref::None, i as u16));
+                    push(Token::of(Tok::Unit, c, Ref::None, i as u32));
                 }
             }
         }
@@ -1320,7 +1320,7 @@ pub fn decompose(
                         attackers
                             .iter()
                             .position(|&x| x == a)
-                            .ok_or("no such attacker")? as u16,
+                            .ok_or("no such attacker")? as u32,
                     )),
                     None => push(Token::on(Tok::NoBlock, c)),
                 }
@@ -1329,16 +1329,16 @@ pub fn decompose(
         (AskKind::AssignCombatDamage { divisions }, F::Shares(shares)) => {
             for d in divisions {
                 for (i, &c) in d.creatures.iter().enumerate() {
-                    let n: u16 = shares
+                    let n: u32 = shares
                         .iter()
                         .filter(|s| s.0 == d.source && s.1 == Some(c))
                         .map(|s| s.2)
                         .sum();
                     for _ in 0..n {
-                        push(Token::of(Tok::Damage, d.source, c, i as u16));
+                        push(Token::of(Tok::Damage, d.source, c, i as u32));
                     }
                 }
-                let n: u16 = shares
+                let n: u32 = shares
                     .iter()
                     .filter(|s| s.0 == d.source && s.1.is_none())
                     .map(|s| s.2)
@@ -1348,7 +1348,7 @@ pub fn decompose(
                         Tok::Damage,
                         d.source,
                         Ref::None,
-                        d.creatures.len() as u16,
+                        d.creatures.len() as u32,
                     ));
                 }
             }
@@ -1359,7 +1359,7 @@ pub fn decompose(
                     Tok::Next,
                     sources.get(i as usize).copied().ok_or("no such trigger")?,
                     Ref::None,
-                    u16::from(i),
+                    u32::from(i),
                 ));
             }
         }
@@ -1375,7 +1375,7 @@ pub fn decompose(
         ) => {
             for (i, cards) in placements.iter().enumerate() {
                 for &c in cards {
-                    push(Token::of(Tok::Place, c, Ref::None, i as u16));
+                    push(Token::of(Tok::Place, c, Ref::None, i as u32));
                 }
             }
         }
@@ -1488,7 +1488,7 @@ mod tests {
 
     #[test]
     fn crew_offers_a_negative_power_only_while_the_total_stays_within_reach() {
-        let tap = |powers: Vec<i16>, minimum| {
+        let tap = |powers: Vec<i32>, minimum| {
             ask(AskKind::TapForPower {
                 purpose: "TapToPay".into(),
                 cards: vec![o(1), o(2), o(3)],
@@ -1520,7 +1520,7 @@ mod tests {
             may_cancel: true,
             ..ask(kind)
         };
-        let tap = |cards: Vec<Ref>, powers: Vec<i16>, minimum| {
+        let tap = |cards: Vec<Ref>, powers: Vec<i32>, minimum| {
             cancellable(AskKind::TapForPower {
                 purpose: "TapToPay".into(),
                 cards,
@@ -1837,7 +1837,7 @@ mod tests {
         });
         let mut m = Machine::new(&a, &[]);
         assert_eq!(m.bound(), 5);
-        let to = |c: Ref, i: u16| Token::of(Tok::Damage, o(1), c, i);
+        let to = |c: Ref, i: u32| Token::of(Tok::Damage, o(1), c, i);
         assert!(!legal(&m, to(Ref::None, 2)));
         m.choose_token(to(o(2), 0));
         m.choose_token(to(o(3), 1));
@@ -1964,7 +1964,7 @@ mod tests {
             }
             v
         };
-        let paying = |x: u16, x_most: u16, inc: bool| Ask {
+        let paying = |x: u32, x_most: u32, inc: bool| Ask {
             may_cancel: true,
             source: o(1),
             kind: AskKind::PayCosts {
@@ -1983,7 +1983,7 @@ mod tests {
         let m = Machine::new(&a, &[]);
         let step = m.step().unwrap();
         assert_eq!(step.tokens[0], Token::new(Tok::Cancel));
-        let legal: Vec<u16> = step
+        let legal: Vec<u32> = step
             .legal()
             .filter(|&i| step.tokens[i].kind == Tok::X)
             .map(|i| step.tokens[i].n)

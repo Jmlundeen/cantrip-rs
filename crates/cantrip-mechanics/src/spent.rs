@@ -18,7 +18,7 @@ pub fn two<const M: u8>(q: &dyn Query, asker: &Asker) -> bool {
 /// creature put onto the battlefield without being cast has had no mana spent, so it enters with none. Magmablood Archaic,
 /// Wildgrowth Archaic and Rancorous Archaic print it.
 pub fn enters_with_a_plus_one_counter_for_each_color_spent(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    let colors = crate::sunburst::colors_spent(g, entering.object) as i16;
+    let colors = crate::sunburst::colors_spent(g, entering.object) as i32;
     entering.counters[CounterKind::PlusOne as usize] += colors;
     Ok(())
 }

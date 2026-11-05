@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// (CR 107.3m), which the permanent keeps. The counters go on first (CR 608.2c) and only on him if he is still there;
 /// the draw happens either way.
 fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = g.obj(item.object).x as i16;
+    let x = g.obj(item.object).x as i32;
     if x > 0 && g.is_on_battlefield(item.object) {
         g.add_counters(item.object, CounterKind::PlusOne, x);
     }

@@ -25,7 +25,7 @@ fn make_porthos(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// (CR 611.2a, 514.2).
 fn pump_by_creature_types(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let x = creature_types_among_non_borg(g, item.object, item.controller) as i16;
+    let x = creature_types_among_non_borg(g, item.object, item.controller) as i32;
     cantrip_mechanics::pump(g, item.object, creature, x, x);
     Ok(())
 }

@@ -17,7 +17,7 @@ fn enchanted_creature_deals_damage_equal_to_its_power(g: &mut dyn Game, item: &S
     if let Some(creature) = g.obj(item.object).attached_to
         && g.target_legal(item, 0)
     {
-        let power = targets::power_or_last_known(g, creature).max(0) as u16;
+        let power = targets::power_or_last_known(g, creature).max(0) as u32;
         g.damage(creature, item.target(0), power);
     }
     Ok(())
@@ -28,8 +28,8 @@ fn enchanted_creature_deals_damage_equal_to_its_power(g: &mut dyn Game, item: &S
 /// be gone by now; it deals the damage as it last existed (CR 113.7a), so a lifelinking creature still gains life.
 fn it_deals_that_much_damage_to_each_opponent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(creature) = item.subject else { return Ok(()) };
-    let amount = item.data[0].min(u16::MAX as u32) as u16;
-    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (creature, Target::Player(p), amount)).collect();
+    let amount = item.data[0];
+    let hits: Vec<(ObjectId, Target, u32)> = g.state().opponents(item.controller).map(|p| (creature, Target::Player(p), amount)).collect();
     g.damage_together(&hits);
     Ok(())
 }

@@ -10,7 +10,7 @@ const SIX_PLUS: &str = "6+ | Flying";
 /// information if it has left, CR 113.7a); nothing if the target is no longer legal (CR 608.2b).
 fn blast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let artifacts = artifacts_you_control(g, item.controller);
-    damage_target(g, item, 0, artifacts as u16);
+    damage_target(g, item, 0, artifacts as u32);
     Ok(())
 }
 

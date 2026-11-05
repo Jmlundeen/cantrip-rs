@@ -16,8 +16,8 @@ fn exile_cards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// came back is a new object (CR 400.7) with none.
 fn exiled_with_it(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let n = q.exiled_with(q.linked_to(source)).len();
-    chars.power = Some(n as i16);
-    chars.toughness = Some(n as i16);
+    chars.power = Some(n as i32);
+    chars.toughness = Some(n as i32);
 }
 
 pub static CARD: CardDef = CardDef {

@@ -28,7 +28,7 @@ fn planeswalker_that_player_controls(q: &dyn Query, _: &Asker, t: Target) -> boo
 
 /// "It deals that much damage to target planeswalker that player controls."
 fn damage_the_planeswalker(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    damage_target(g, item, 0, item.data[0] as u16);
+    damage_target(g, item, 0, item.data[0] as u32);
     Ok(())
 }
 

@@ -27,7 +27,7 @@ fn put_and_gain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// the card's ruling), an {X} in its cost counting as 0 there (CR 202.3e); 0 deals no damage (CR 120.8).
 fn damage_equal_to_its_mana_value(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let value = g.state().last_known(item.object).map_or(0, |known| known.mana_value);
-    effects::damage_each_creature(g, item, value as u16);
+    effects::damage_each_creature(g, item, value);
     Ok(())
 }
 

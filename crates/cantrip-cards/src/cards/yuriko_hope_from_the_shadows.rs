@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// a fixed amount from then on (CR 611.2a). With the target illegal the core does not resolve the ability (CR 608.2b).
 fn shrink_power(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        let x = g.state().zone(Zone::graveyard(item.controller)).len() as i16;
+        let x = g.state().zone(Zone::graveyard(item.controller)).len() as i32;
         pump(g, item.object, creature, -x, 0);
     }
     Ok(())

@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 fn plus_power_per_other_creature(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let state = view.state();
     let you = state.obj(source).controller;
-    let n = state.battlefield().iter().filter(|&&id| id != source && state.obj(id).controller == you && view.chars(id).is(CardType::Creature)).count() as i16;
+    let n = state.battlefield().iter().filter(|&&id| id != source && state.obj(id).controller == you && view.chars(id).is(CardType::Creature)).count() as i32;
     chars.power = chars.power.map(|v| v + n);
 }
 

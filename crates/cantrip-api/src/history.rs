@@ -142,7 +142,7 @@ impl Attacked {
 pub struct DamageDealt {
     pub source: ObjectId,
     pub target: Target,
-    pub amount: u16,
+    pub amount: u32,
     pub combat: bool,
     /// Its controller as it dealt the damage (CR 120.3, 609.7).
     pub controller: PlayerId,

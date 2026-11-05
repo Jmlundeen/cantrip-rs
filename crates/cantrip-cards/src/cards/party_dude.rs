@@ -47,7 +47,7 @@ fn opponents_are_attacked(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fi
 /// counted as the ability resolves.
 fn pump_by_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let x = i16::try_from(cards_in_hand(g, item.controller)).unwrap_or(i16::MAX);
+    let x = i32::try_from(cards_in_hand(g, item.controller)).unwrap_or(i32::MAX);
     cantrip_mechanics::pump(g, item.object, creature, x, x);
     Ok(())
 }

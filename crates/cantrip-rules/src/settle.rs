@@ -210,7 +210,7 @@ fn check_once(cx: &mut Cx) -> R<bool> {
     let mut legends: Vec<(ObjectId, &'static str)> = Vec::new();
     let mut bound: Vec<crate::day_night::Bound> = Vec::new();
     let mut battles: Vec<(ObjectId, bool)> = Vec::new();
-    let mut annihilate: Vec<(ObjectId, i16)> = Vec::new();
+    let mut annihilate: Vec<(ObjectId, i32)> = Vec::new();
     let mut roles: Vec<(ObjectId, ObjectId, PlayerId, u32)> = Vec::new();
     for &id in cx.s().battlefield() {
         if !stays(cx, id) {
@@ -282,7 +282,7 @@ fn check_once(cx: &mut Cx) -> R<bool> {
                 to_graveyard.push(id);
                 continue;
             }
-            if i32::from(obj.damage) >= i32::from(toughness) || obj.deathtouched {
+            if i64::from(obj.damage) >= i64::from(toughness) || obj.deathtouched {
                 destroyed.push(id);
                 continue;
             }
@@ -316,7 +316,7 @@ fn check_once(cx: &mut Cx) -> R<bool> {
     let mut sacrificed = Vec::new();
     for (id, chars) in sagas {
         let last = ops::final_chapter(chars.abilities().map(|a| cx.cards().ability(a)));
-        if last == 0 || cx.s().obj(id).counters(CounterKind::Lore) < last as i16 {
+        if last == 0 || cx.s().obj(id).counters(CounterKind::Lore) < last as i32 {
             continue;
         }
         let chapter_ability = |ability: AbilityRef| matches!(cx.cards().ability(ability), AbilityDef::Triggered(t) if t.chapter > 0);
@@ -653,10 +653,10 @@ fn left_the_game(cx: &mut Cx, player: PlayerId) -> bool {
 /// ability (CR 603.12), the amount of the event that triggered it (`TriggeredDef::counted_by_amount`), a number read from the game
 /// as it goes on the stack (`TriggeredDef::counted_by`), or else its source's X, or the
 /// number of times the source was kicked (CR 702.33d, 107.3m).
-fn trigger_counted(cx: &Cx, trigger: &PendingTrigger) -> u16 {
-    // "Up to that many target ...", that many being the event's amount (the life gained): no creature count comes near a u16.
+fn trigger_counted(cx: &Cx, trigger: &PendingTrigger) -> u32 {
+    // "Up to that many target ...", that many being the event's amount (the life gained): a count of 32 bits.
     if triggered(cx, trigger.ability).counted_by_amount {
-        return u16::try_from(trigger.data[0]).unwrap_or(u16::MAX);
+        return trigger.data[0];
     }
     // "Up to X target ...", X read from the game now, as the ability goes on the stack (CR 603.3d, 601.2c).
     if let Some(count) = triggered(cx, trigger.ability).counted_by {
@@ -664,7 +664,7 @@ fn trigger_counted(cx: &Cx, trigger: &PendingTrigger) -> u16 {
         return count(cx, &Asker { source: trigger.source, controller: trigger.controller, by, spell: false });
     }
     let source = cx.s().obj(trigger.source);
-    trigger.count.unwrap_or(if source.x > 0 { source.x } else { u16::from(source.kicked) })
+    trigger.count.unwrap_or(if source.x > 0 { u32::from(source.x) } else { u32::from(source.kicked) })
 }
 
 fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
@@ -1129,7 +1129,7 @@ fn paid_to_cast(cx: &Cx, source: ObjectId, chars: &Chars, nth: usize, event: &Ev
 fn chapter_reached(cx: &Cx, source: ObjectId, chars: &Chars, chapter: u8, event: &Event) -> Option<Fired> {
     match event {
         Event::CountersPut { object, kind: CounterKind::Lore, amount, total, .. } if *object == source => {
-            let chapter = i16::from(chapter);
+            let chapter = i32::from(chapter);
             if total - amount >= chapter || *total < chapter {
                 return None;
             }

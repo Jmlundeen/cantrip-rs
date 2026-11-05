@@ -12,7 +12,7 @@ fn backup(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// the creature is gone when this resolves and deals damage equal to its power as it last existed on the battlefield (CR 113.7a,
 /// 608.2h); it is the source of the damage. A target no longer legal is dealt nothing (CR 608.2b).
 fn blast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u16;
+    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u32;
     damage_target(g, item, 0, power);
     Ok(())
 }

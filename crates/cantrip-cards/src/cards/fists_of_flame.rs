@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let drawn = g.history().drawn(item.controller) as i16;
+    let drawn = g.history().drawn(item.controller) as i32;
     instruction(g, |g| {
         pump(g, item.object, creature, drawn, 0);
         cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);

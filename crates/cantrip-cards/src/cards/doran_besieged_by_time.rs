@@ -35,7 +35,7 @@ fn difference_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(creature) = item.subject else { return Ok(()) };
     let chars = g.chars(creature);
     let (power, toughness) = (chars.power.unwrap_or(0), chars.toughness.unwrap_or(0));
-    let x = (i32::from(power) - i32::from(toughness)).abs() as i16;
+    let x = (i32::from(power) - i32::from(toughness)).abs() as i32;
     pump(g, item.object, creature, x, x);
     Ok(())
 }

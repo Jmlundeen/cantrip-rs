@@ -14,13 +14,13 @@ pub struct Chars {
     pub supertypes: Supertypes,
     pub subtypes: SubtypeSet,
     pub colors: ColorSet,
-    pub power: Option<i16>,
-    pub toughness: Option<i16>,
+    pub power: Option<i32>,
+    pub toughness: Option<i32>,
     /// Its base power: its power as layers 7a and 7b leave it (CR 613.4a, 613.4b; the rulings of the cards that ask), before
     /// what modifies it (7c, counters among them) and what switches it (7d). The layers note it as 7c begins, so it is
     /// settled in the finished characteristics and in a read from 7c on; a static ability's read in an earlier layer finds
     /// the copiable value. `None` where `power` is none for having no power at all (CR 208.3).
-    pub base_power: Option<i16>,
+    pub base_power: Option<i32>,
     pub keywords: Keywords,
     pub protection: ColorSet,
     /// Protection from colorless (CR 702.16a).

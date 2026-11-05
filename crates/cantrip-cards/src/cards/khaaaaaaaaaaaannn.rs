@@ -12,8 +12,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     exile_if_it_would_die(g, item, 0, creature);
-    // Doubled in u32 so a large X cannot overflow; damage is a u16 (RX-5), so the product is held at its largest value.
-    let damage = u16::try_from(u32::from(item.x) * 2).unwrap_or(u16::MAX);
+    let damage = u32::from(item.x) * 2;
     damage_target(g, item, 0, damage);
     Ok(())
 }

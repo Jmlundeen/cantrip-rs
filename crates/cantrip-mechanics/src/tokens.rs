@@ -442,7 +442,7 @@ pub static INCUBATOR: CardDef = CardDef {
 
 /// Incubate N (CR 701.53a): create an Incubator token with N +1/+1 counters on it. Sunfall and Metamorphosis-style
 /// incubators share it.
-pub fn incubate(g: &mut dyn Game, controller: PlayerId, n: i16) -> Result<(), Suspend> {
+pub fn incubate(g: &mut dyn Game, controller: PlayerId, n: i32) -> Result<(), Suspend> {
     let incubator = g.card_id(&INCUBATOR);
     // The Incubator is the rule's (CR 701.53a, 111.10i), as are the words of incubate's reminder text (CR 207.2a).
     g.create_tokens_with_counters(incubator, controller, 1, false, &[(CounterKind::PlusOne, n)], Words::NONE)?;
@@ -546,11 +546,11 @@ pub fn create(g: &mut dyn Game, controller: PlayerId, def: &'static CardDef, cou
 /// `n` of 0 nothing is put, and the 0/0 token goes to the graveyard as a state-based action (CR 704.5f). The card file lists
 /// `tokens::FRACTAL` in its `EXTRA`. The tokens made. Additive Evolution, Berta, Wise Extrapolator, Emil, Vastlands Roamer,
 /// Fractal Anomaly, Fractal Tender and Wild Hypothesis print it.
-pub fn create_fractal_with_counters(g: &mut dyn Game, controller: PlayerId, n: i16) -> Result<Vec<ObjectId>, Suspend> {
+pub fn create_fractal_with_counters(g: &mut dyn Game, controller: PlayerId, n: i32) -> Result<Vec<ObjectId>, Suspend> {
     let made = create(g, controller, &FRACTAL, 1)?;
     g.end_sentence();
     if n > 0 {
-        let puts: Vec<(ObjectId, CounterKind, i16)> = made.iter().map(|&token| (token, CounterKind::PlusOne, n)).collect();
+        let puts: Vec<(ObjectId, CounterKind, i32)> = made.iter().map(|&token| (token, CounterKind::PlusOne, n)).collect();
         g.add_counters_together(&puts);
     }
     Ok(made)

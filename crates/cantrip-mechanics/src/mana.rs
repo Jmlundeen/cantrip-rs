@@ -51,7 +51,7 @@ pub fn enters_tapped(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Su
 
 /// "This creature enters tapped with `N` stun counters on it" (CR 614.1c-d, 122.1d): the counters are on it as it enters, and
 /// keep it tapped through `N` untaps. Baloth Prime (six) and Tonberry (one) print it.
-pub fn enters_tapped_with_stun_counters<const N: i16>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+pub fn enters_tapped_with_stun_counters<const N: i32>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.tapped = true;
     entering.counters[CounterKind::Stun as usize] += N;
     Ok(())

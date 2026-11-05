@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut x = 0;
     if let Some(permanent) = targets::object(g, item, 0) {
-        let value = g.mana_value(permanent) as i16;
+        let value = g.mana_value(permanent) as i32;
         let exiled = g.exile(permanent);
         if g.obj(exiled).zone.is(ZoneKind::Exile) {
             x = value;

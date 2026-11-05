@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// taken whenever characteristics are computed, so it follows the hand as it changes.
 fn minus_one_minus_one_per_card_in_hand(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let state = view.state();
-    let n = state.zone(Zone::hand(state.obj(source).controller)).len() as i16;
+    let n = state.zone(Zone::hand(state.obj(source).controller)).len() as i32;
     chars.power = chars.power.map(|v| v - n);
     chars.toughness = chars.toughness.map(|v| v - n);
 }

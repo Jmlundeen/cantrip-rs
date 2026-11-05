@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// He deals damage equal to his power to each of up to X targets, X being the number of times he was kicked: the
 /// targets are chosen as the trigger goes on the stack, counted by the kicks (`TargetSpec::COUNTED`).
 fn damage_each(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u16;
+    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u32;
     cantrip_mechanics::damage_each_target(g, item, power);
     Ok(())
 }

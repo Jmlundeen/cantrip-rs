@@ -19,7 +19,7 @@ fn played_or_cast_from_outside_your_hand(q: &dyn Query, asker: &Asker) -> bool {
 /// "Spider-Man 2099 deals damage equal to his power to any target" (CR 120.3, 608.2h): his power as he last existed if he has left,
 /// and none at all if it is 0 or less (CR 120.8). A target no longer legal is dealt nothing (CR 608.2b).
 fn damage_equal_to_his_power(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let power = g.chars(item.object).power.and_then(|power| u16::try_from(power).ok()).unwrap_or_default();
+    let power = g.chars(item.object).power.and_then(|power| u32::try_from(power).ok()).unwrap_or_default();
     damage_target(g, item, 0, power);
     Ok(())
 }

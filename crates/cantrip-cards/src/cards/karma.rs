@@ -7,7 +7,7 @@ fn karma_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let amount = g.state().battlefield().iter().copied().filter(|&id| {
         g.chars(id).has_subtype(g.words(item.object).subtype(Subtype::Swamp))
             && item.subject.player() == Some(g.controller(id))
-    }).count() as u16;
+    }).count() as u32;
     effects::damage_that_player(g, item, amount)
 }
 

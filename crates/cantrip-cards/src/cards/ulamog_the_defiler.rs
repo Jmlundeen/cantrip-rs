@@ -17,14 +17,14 @@ fn exile_half(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// every player's exile, as it enters. Entering from exile it is still there and sees itself (the ruling).
 fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let greatest = g.state().seats().flat_map(|p| g.state().zone(Zone::exile(p)).iter().copied()).map(|c| g.mana_value(c)).max().unwrap_or(0);
-    entering.counters[CounterKind::PlusOne as usize] += greatest.min(i16::MAX as u32) as i16;
+    entering.counters[CounterKind::PlusOne as usize] += greatest.min(i32::MAX as u32) as i32;
     Ok(())
 }
 
 /// "Ulamog has annihilator X, where X is the number of +1/+1 counters on it" (CR 702.86a): X is counted as the ability
 /// resolves (the ruling), on Ulamog as it is then or as it last was on the battlefield.
 fn annihilate_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = g.obj(item.object).counters(CounterKind::PlusOne).clamp(0, u8::MAX as i16) as u8;
+    let x = g.obj(item.object).counters(CounterKind::PlusOne).clamp(0, u8::MAX as i32) as u8;
     annihilate_n(g, item, x)
 }
 

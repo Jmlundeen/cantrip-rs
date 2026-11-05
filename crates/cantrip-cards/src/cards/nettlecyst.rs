@@ -19,7 +19,7 @@ fn plus_one_for_each(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
                 c.is(CardType::Artifact) || c.is(CardType::Enchantment)
             }
         })
-        .count() as i16;
+        .count() as i32;
     chars.power = chars.power.map(|v| v + count);
     chars.toughness = chars.toughness.map(|v| v + count);
 }

@@ -18,7 +18,7 @@ fn crafted_colors(s: &GameState, chars_of: impl Fn(ObjectId) -> Chars, effigy: O
 /// "Sunbird Effigy's power and toughness are each equal to the number of colors among the exiled cards used to craft it"
 /// (CR 604.3): none crafted with, or none of them colored, a 0/0.
 fn colors_size(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let n = crafted_colors(q.state(), |c| q.chars(c), source).iter().count() as i16;
+    let n = crafted_colors(q.state(), |c| q.chars(c), source).iter().count() as i32;
     chars.power = Some(n);
     chars.toughness = Some(n);
 }

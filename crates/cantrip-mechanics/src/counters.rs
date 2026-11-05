@@ -7,7 +7,7 @@ use cantrip_api::*;
 /// it resolves, not targeted, from the creatures they control then. A lone creature is taken without a question, and with none
 /// the instruction does nothing. A creature that cannot have counters is still a legal choice; the counters just aren't put
 /// (CR 609.3). Titan of Industry (a shield counter) and Humiliate (a +1/+1 counter) print it.
-pub fn put_on_creature_you_control(g: &mut dyn Game, item: &StackItem, kind: CounterKind, n: i16) -> Result<(), Suspend> {
+pub fn put_on_creature_you_control(g: &mut dyn Game, item: &StackItem, kind: CounterKind, n: i32) -> Result<(), Suspend> {
     let creatures: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     let chosen = match creatures.as_slice() {
@@ -33,7 +33,7 @@ pub fn put_on_creature_you_control(g: &mut dyn Game, item: &StackItem, kind: Cou
 /// controller's opponents control), Feast of the Victorious Dead and Blessing of Frost print it with +1/+1 counters among creatures
 /// their controller controls.
 pub fn distribute(g: &mut dyn Game, controller: PlayerId, source: ObjectId, among: &[ObjectId], kind: CounterKind, n: u8) -> Result<(), Suspend> {
-    let mut puts: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
+    let mut puts: Vec<(ObjectId, CounterKind, i32)> = Vec::new();
     for _ in 0..n {
         let chosen = match among {
             [] => return Ok(()),

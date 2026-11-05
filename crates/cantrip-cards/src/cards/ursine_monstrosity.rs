@@ -13,7 +13,7 @@ fn combat(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         }
     }
     g.end_sentence();
-    let types = g.state().zone(Zone::graveyard(me)).iter().fold(0u16, |all, &card| all | g.chars(card).types.0).count_ones() as i16;
+    let types = g.state().zone(Zone::graveyard(me)).iter().fold(0u16, |all, &card| all | g.chars(card).types.0).count_ones() as i32;
     instruction(g, |g| {
         g.add_effect(item.object, item.object, EffectKind::Pump(types, types), Duration::EndOfTurn);
         cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, item.object);

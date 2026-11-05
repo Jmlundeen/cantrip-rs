@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// (CR 611.2c); X is counted once, as it resolves (CR 608.2h), Craterhoof Behemoth itself included if it is still there.
 /// Haste is the core keyword of its JSON.
 fn pump_and_trample(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = creatures_you_control(g, item.controller) as i16;
+    let x = creatures_you_control(g, item.controller) as i32;
     pump_and_trample_creatures_you_control(g, item, x, x);
     Ok(())
 }

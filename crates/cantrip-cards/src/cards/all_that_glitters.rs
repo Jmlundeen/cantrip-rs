@@ -14,7 +14,7 @@ fn apply(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
             let c = view.chars(id);
             state.obj(id).controller == you && (c.is(CardType::Artifact) || c.is(CardType::Enchantment))
         })
-        .count() as i16;
+        .count() as i32;
     chars.power = chars.power.map(|v| v + n);
     chars.toughness = chars.toughness.map(|v| v + n);
 }

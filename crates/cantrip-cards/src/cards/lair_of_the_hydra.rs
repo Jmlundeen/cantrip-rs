@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// text has now (CR 612).
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let words = g.words(item.object);
-    let x = i16::try_from(item.x).unwrap_or(i16::MAX);
+    let x = i32::try_from(item.x).unwrap_or(i32::MAX);
     let animation = Animation {
         power: x,
         toughness: x,

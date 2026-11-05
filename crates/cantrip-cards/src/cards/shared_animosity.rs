@@ -17,7 +17,7 @@ fn bonus(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         let c = g.chars(id);
         c.is(CardType::Creature) && statics::shares_creature_type(mine, c.subtypes)
     };
-    let count = others.into_iter().filter(|&id| shares(&*g, id)).count() as i16;
+    let count = others.into_iter().filter(|&id| shares(&*g, id)).count() as i32;
     if count > 0 {
         pump(g, item.object, attacker, count, 0);
     }

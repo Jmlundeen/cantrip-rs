@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, haste_until_end_of_turn, tokens};
 use cantrip_oracle as oracle;
 
-fn loyalty(g: &mut dyn Game, comet: ObjectId, delta: i16) {
+fn loyalty(g: &mut dyn Game, comet: ObjectId, delta: i32) {
     if delta >= 0 {
         g.add_counters(comet, CounterKind::Loyalty, delta);
     } else {
@@ -53,7 +53,7 @@ fn roll(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             if let Answer::Targets(chosen) = g.ask(you, ask)?
                 && let Some(&hit) = chosen.first()
             {
-                let amount = g.obj(comet).counters(CounterKind::Loyalty).max(0) as u16;
+                let amount = g.obj(comet).counters(CounterKind::Loyalty).max(0) as u32;
                 g.damage(comet, hit, amount);
             }
             loyalty(g, comet, -2);

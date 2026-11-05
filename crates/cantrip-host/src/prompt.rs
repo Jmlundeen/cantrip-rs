@@ -744,7 +744,7 @@ fn damage_words(game: &Game, asked: PlayerId, d: DamageAbout) -> String {
 }
 
 /// Counters about to be put on a permanent, in words: "2 +1/+1 counters would be put on Walking Ballista".
-fn counter_words(game: &Game, subject: Option<ObjectId>, counters: &[(CounterKind, i16)]) -> String {
+fn counter_words(game: &Game, subject: Option<ObjectId>, counters: &[(CounterKind, i32)]) -> String {
     let kinds: Vec<String> = counters
         .iter()
         .map(|&(kind, n)| format!("{n} {} counter{}", kind.name(), if n == 1 { "" } else { "s" }))
@@ -905,19 +905,19 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             verb: question.verb.into(),
             life: i32::try_from(*life).unwrap_or(i32::MAX),
             life_short: !*life_payable,
-            amount: i32::from(question.amount),
+            amount: question.amount as i32,
             question: question.ask.into(),
             detail: question.detail.into(),
             yes: question.yes.into(),
             no: question.no.into(),
             // "You may pay {X}" (CR 107.3f): X is chosen as it is paid, raised and lowered by the options.
             choosing_x: x.is_some() && times.is_none(),
-            x: x.map_or(0, i32::from),
+            x: x.map_or(0, |x| x as i32),
             // "You may pay [cost] up to N times" (CR 603.12a): the number of times is chosen as it is paid.
             choosing_times: times.is_some(),
             most_times: match times {
                 Some(cantrip_engine::ANY_NUMBER_OF_TIMES) | None => 0,
-                Some(most) => i32::from(*most),
+                Some(most) => *most as i32,
             },
         }),
         // The protocol already shows an unrestricted, non-targeted set choice. Keep that presentation for pile
@@ -1277,7 +1277,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             source: source_handle(game, handles, *source),
             candidates: candidates.iter().map(|&p| seat(p)).collect(),
             verb: (*verb).to_string(),
-            amount: i32::from(*amount),
+            amount: *amount as i32,
             subject: subject.map_or(ViewHandle::NONE, |s| source_handle(game, handles, s)),
         }),
         // Counters removed from among permanents (CR 118.3, 122.1) - as a cost (Dawnhand Dissident's casts) or as an effect
@@ -1290,7 +1290,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             up_to: *up_to,
             pools: pools
                 .iter()
-                .map(|p| CounterPoolMessage { object: handles.handle(p.object), counter: p.kind.name().to_string(), count: i32::from(p.count) })
+                .map(|p| CounterPoolMessage { object: handles.handle(p.object), counter: p.kind.name().to_string(), count: p.count as i32 })
                 .collect(),
         }),
         RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional } => {
@@ -1346,7 +1346,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         generic: wire(c.cost.generic),
                     })
                     .collect(),
-                can_pay: if *can_pay == u16::MAX { -1 } else { i32::from(*can_pay) },
+                can_pay: if *can_pay == u32::MAX { -1 } else { *can_pay as i32 },
                 most_requirements: wire(requirements.most),
                 suggested: attack_messages(handles, &requirements.suggested),
                 verdict: attack_verdict_view(
@@ -1361,13 +1361,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 .iter()
                 .map(|d| DamageDivisionMessage {
                     source: handles.handle(d.source),
-                    damage: i32::from(d.damage),
+                    damage: d.damage as i32,
                     creatures: handles_of(handles, &d.creatures),
-                    lethal: d.lethal.iter().map(|&l| i32::from(l)).collect(),
+                    lethal: d.lethal.iter().map(|&l| l as i32).collect(),
                     may_assign_to_defender: d.may_assign_to_defender,
                     defender: d.defender.player().map_or(0, seat),
-                    suggested: d.suggested.iter().map(|&l| i32::from(l)).collect(),
-                    suggested_to_defender: i32::from(d.suggested_to_defender),
+                    suggested: d.suggested.iter().map(|&l| l as i32).collect(),
+                    suggested_to_defender: d.suggested_to_defender as i32,
                     defender_permanent: d.defender.object().map_or(ViewHandle::NONE, |id| handles.handle(id)),
                     banding: d.banding,
                 })

@@ -15,7 +15,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             chars.is(CardType::Creature) || chars.has_subtype(spacecraft)
         })
         .count();
-    damage_target(g, item, 0, 2 + counted as u16);
+    damage_target(g, item, 0, 2 + counted as u32);
     Ok(())
 }
 

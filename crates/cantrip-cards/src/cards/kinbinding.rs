@@ -12,7 +12,7 @@ pub static EXTRA: &[&CardDef] = &[&tokens::KITHKIN];
 /// one that entered under another player's control or was a noncreature does not.
 fn plus_x_plus_x(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let you = view.state().obj(source).controller;
-    let x = history::creatures_entered_under_control_this_turn(view.history(), you) as i16;
+    let x = history::creatures_entered_under_control_this_turn(view.history(), you) as i32;
     chars.power = chars.power.map(|v| v + x);
     chars.toughness = chars.toughness.map(|v| v + x);
 }

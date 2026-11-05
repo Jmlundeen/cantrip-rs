@@ -117,7 +117,7 @@ pub enum ObjectObs {
     /// (a library); `identity` where the seat knows what it is all the same (a card it saw put there).
     Hidden { place: Place, owner: u8, position: Option<u16>, identity: Option<String>, face_down: bool },
     /// An activated or triggered ability on the stack (`kind` 1 activated, 2 triggered), at `position` from the bottom.
-    Ability { position: u16, source: Ref, name: String, kind: u8, controller: u8, targets: Vec<Ref>, x: u16 },
+    Ability { position: u16, source: Ref, name: String, kind: u8, controller: u8, targets: Vec<Ref>, x: u32 },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -135,9 +135,9 @@ pub struct VisibleObs {
     pub face_down: bool,
     pub token: bool,
     pub tapped: bool,
-    pub damage: u16,
+    pub damage: u32,
     /// Counters by kind, as the engine numbers them, where there are any.
-    pub counters: Vec<(u16, i16)>,
+    pub counters: Vec<(u16, i32)>,
     /// What it attacks, while it does, and whether it was blocked.
     pub attacking: Option<Ref>,
     pub blocked: bool,
@@ -159,8 +159,8 @@ pub struct CharsObs {
     pub supertypes: u8,
     pub colors: u8,
     pub subtypes: Vec<u16>,
-    pub power: Option<i16>,
-    pub toughness: Option<i16>,
+    pub power: Option<i32>,
+    pub toughness: Option<i32>,
     pub keywords: u64,
     pub mana_value: u32,
 }
@@ -169,7 +169,7 @@ pub struct CharsObs {
 pub struct SpellObs {
     pub controller: u8,
     pub targets: Vec<Ref>,
-    pub x: u16,
+    pub x: u32,
 }
 
 /// A public event: its kind (the bit of the engine's `EventMask`), the player and objects it is about, and for a
@@ -268,15 +268,15 @@ pub struct OptionObs {
 /// "Total mana value N or less" over a list: each entry's value, index for index, and N.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TotalObs {
-    pub values: Vec<u16>,
-    pub most: u16,
+    pub values: Vec<u32>,
+    pub most: u32,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CounterPoolObs {
     pub object: Ref,
     pub kind: u16,
-    pub count: u16,
+    pub count: u32,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -284,10 +284,10 @@ pub struct DivisionObs {
     /// The creature whose combat damage it is.
     pub source: Ref,
     pub banding: bool,
-    pub damage: u16,
+    pub damage: u32,
     /// The creatures it may be dealt to, sorted, and what is lethal to each, index for index.
     pub creatures: Vec<Ref>,
-    pub lethal: Vec<u16>,
+    pub lethal: Vec<u32>,
     /// Trample (or as though not blocked): what is left once each creature has its lethal may go to `defender`.
     pub may_assign_to_defender: bool,
     pub defender: Ref,
@@ -310,10 +310,10 @@ pub enum AskKind {
     Priority { options: Vec<OptionObs> },
     /// Paying what is owed, or announcing X (`announcing`): `x` so far, `x_most` the most X the seat could pay as far as
     /// it can tell (the loyalty a "−X" may remove; 1 for a kicker without "any number of times").
-    PayCosts { total: CostObs, remaining: CostObs, options: Vec<OptionObs>, announcing: bool, x: u16, x_most: u16, loyalty: bool, attackers: Vec<Ref>, life: u32 },
+    PayCosts { total: CostObs, remaining: CostObs, options: Vec<OptionObs>, announcing: bool, x: u32, x_most: u32, loyalty: bool, attackers: Vec<Ref>, life: u32 },
     /// "Unless pays" / "may pay" as it resolves: pay the whole cost or decline. `x` the X chosen so far where the payer
     /// chooses it.
-    UnlessPays { subject: Ref, total: CostObs, remaining: CostObs, life: u8, life_payable: bool, verb: String, options: Vec<OptionObs>, x: Option<u16>, x_most: u16 },
+    UnlessPays { subject: Ref, total: CostObs, remaining: CostObs, life: u8, life_payable: bool, verb: String, options: Vec<OptionObs>, x: Option<u32>, x_most: u32 },
     /// `count` (or up to) of `eligible` among `cards`. `purpose` the engine's name for why; `total` index for index with
     /// `eligible`.
     ChooseCards { purpose: String, cards: Vec<Ref>, eligible: Vec<Ref>, count: u8, up_to: bool, total: Option<TotalObs> },
@@ -328,15 +328,15 @@ pub enum AskKind {
     /// One of these subtypes (the engine's numbers), sorted.
     ChooseSubtype { choices: Vec<u16>, purpose: u8 },
     May { purpose: String, verb: String },
-    ChoosePlayer { candidates: Vec<u8>, verb: String, amount: u16 },
+    ChoosePlayer { candidates: Vec<u8>, verb: String, amount: u32 },
     /// Any of `cards` whose powers (index for index) add up to `minimum`.
-    TapForPower { purpose: String, cards: Vec<Ref>, powers: Vec<i16>, minimum: u8 },
+    TapForPower { purpose: String, cards: Vec<Ref>, powers: Vec<i32>, minimum: u8 },
     CollectEvidence { cards: Vec<Ref>, values: Vec<u8>, minimum: u8 },
     Craft { cards: Vec<Ref>, minimum: u8, maximum: u8 },
     /// `total` counters from among the pools (sorted); with `up_to`, any number of them up to `total`, none included.
     RemoveCounters { pools: Vec<CounterPoolObs>, total: u8, up_to: bool },
     /// A total divided among up to `max_targets` (0: any number) of `candidates`, each at least 1.
-    ChooseDividedTargets { candidates: Vec<Ref>, total: u16, max_targets: u8, optional: bool },
+    ChooseDividedTargets { candidates: Vec<Ref>, total: u32, max_targets: u8, optional: bool },
     /// Each of `eligible` attacks one of `defenders` or stays home. `requirements` how many of the requirements (CR 508.1d)
     /// each attack obeys (attacker, defender, how many; sorted, none for an attack that obeys none), of which a declaration
     /// obeys `most`. `costs` what an attack costs (attacker, defender, mana value of the cost); `can_pay` the most the seat
@@ -350,8 +350,8 @@ pub enum AskKind {
         defenders: Vec<Ref>,
         requirements: Vec<(Ref, Ref, u32)>,
         most: u32,
-        costs: Vec<(Ref, Ref, u16)>,
-        can_pay: u16,
+        costs: Vec<(Ref, Ref, u32)>,
+        can_pay: u32,
         max_attackers: Vec<u8>,
         #[serde(default)]
         barred: Vec<(Ref, Ref)>,
@@ -374,5 +374,5 @@ pub enum AskKind {
     /// `library` (sorted), `eligible` (sorted); `destination` the engine's `SearchDestination` number.
     SearchLibrary { library: Vec<Ref>, eligible: Vec<Ref>, count: u8, optional: bool, destination: u8 },
     /// Which replacement effect applies first: `sources` sorted (with their hints), the event's facts.
-    ChooseReplacement { subject: Ref, life: Option<i32>, sources: Vec<Ref>, hints: Vec<String>, damage: Option<(Ref, Ref, u16)>, turn: bool, counters: Vec<(u16, i16)>, draw: bool },
+    ChooseReplacement { subject: Ref, life: Option<i32>, sources: Vec<Ref>, hints: Vec<String>, damage: Option<(Ref, Ref, u32)>, turn: bool, counters: Vec<(u16, i32)>, draw: bool },
 }

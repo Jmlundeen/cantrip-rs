@@ -164,7 +164,7 @@ fn play(path: &Path, tally: &Mutex<Tally>) {
                 announcing: true,
                 x,
                 ..
-            } => Some(u16::try_from(final_x(*x, &later)).unwrap_or(u16::MAX)),
+            } => Some(final_x(*x, &later)),
             RequestKind::UnlessPays { x: Some(x), .. } => Some(*x),
             _ => None,
         };
@@ -193,9 +193,9 @@ fn play(path: &Path, tally: &Mutex<Tally>) {
                         AskKind::PayCosts { x_most, .. } | AskKind::UnlessPays { x_most, .. } => {
                             *x_most
                         }
-                        _ => u16::MAX,
+                        _ => u32::MAX,
                     };
-                    let under = |b: u16, want: u16| {
+                    let under = |b: u32, want: u32| {
                         b <= want && (b == want || !X_BUCKETS.contains(&want) || want > most)
                     };
                     let bucketed = match (m.answer(), f) {

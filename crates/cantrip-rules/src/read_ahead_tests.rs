@@ -247,7 +247,7 @@ fn life(g: &Game) -> i32 {
     i32::from(g.state.player(YOU).life)
 }
 
-fn lore(g: &Game, id: ObjectId) -> i16 {
+fn lore(g: &Game, id: ObjectId) -> i32 {
     g.state.obj(id).counters(CounterKind::Lore)
 }
 

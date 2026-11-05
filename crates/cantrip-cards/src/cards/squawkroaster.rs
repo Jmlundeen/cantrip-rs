@@ -3,10 +3,10 @@ use cantrip_oracle as oracle;
 
 /// The colors among the permanents `player` controls (CR 105.2), each as the layers before this one made it: `vivid::count` for a
 /// characteristic-defining ability, which is asked in the layers (`LayerQuery`) and not of a finished `Query`.
-fn colors_in_layers(q: &dyn LayerQuery, player: PlayerId) -> i16 {
+fn colors_in_layers(q: &dyn LayerQuery, player: PlayerId) -> i32 {
     let state = q.state();
     let colors = state.battlefield().iter().filter(|&&id| state.obj(id).controller == player).fold(0, |set, &id| set | q.chars(id).colors.0);
-    colors.count_ones() as i16
+    colors.count_ones() as i32
 }
 
 /// Vivid (CR 604.3, 105.2): power equal to the number of colors among permanents its controller controls (its owner, when it is

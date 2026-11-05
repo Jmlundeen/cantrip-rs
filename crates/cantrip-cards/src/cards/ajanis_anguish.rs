@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// enchantment even when it has left the battlefield by the time the ability resolves (last-known information, CR 608.2h). Put
 /// onto the battlefield without being cast, X is 0 and no damage is dealt.
 fn deal_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = g.obj(item.object).x;
+    let x = u32::from(g.obj(item.object).x);
     damage_target(g, item, 0, x);
     Ok(())
 }

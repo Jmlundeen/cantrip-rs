@@ -109,7 +109,7 @@ fn cx(g: &mut Game) -> Cx<'_> {
     Cx { g, frame: 0, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
 }
 
-fn one(kind: CounterKind, n: i16) -> [i16; CounterKind::COUNT] {
+fn one(kind: CounterKind, n: i32) -> [i32; CounterKind::COUNT] {
     let mut counts = [0; CounterKind::COUNT];
     counts[kind as usize] = n;
     counts
@@ -121,7 +121,7 @@ fn waiting(g: &Game, watcher: ObjectId) -> Vec<Vec<ObjectId>> {
 }
 
 /// The counters announced, in order: on what, of which kind, how many.
-fn announced(g: &Game) -> Vec<(ObjectId, CounterKind, i16)> {
+fn announced(g: &Game) -> Vec<(ObjectId, CounterKind, i32)> {
     g.log
         .iter()
         .filter_map(|r| match r.event {

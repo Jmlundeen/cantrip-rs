@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// gains [keywords]." The creature type is set, replacing every other creature type and nothing else (CR 205.1a); the base
 /// power and toughness are set in layer 7b (CR 613.4b), so counters and pumps count on top. Read through the words of the
 /// spell, which a text-changing effect may have changed (CR 612).
-fn becomes(g: &mut dyn Game, item: &StackItem, kind: Subtype, power: i16, toughness: i16, keywords: Keywords) {
+fn becomes(g: &mut dyn Game, item: &StackItem, kind: Subtype, power: i32, toughness: i32, keywords: Keywords) {
     let Some(creature) = targets::object(g, item, 0) else { return };
     let words = g.words(item.object);
     instruction(g, |g| {

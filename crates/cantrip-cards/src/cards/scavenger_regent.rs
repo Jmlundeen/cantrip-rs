@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "Each non-Dragon creature gets -X/-X until end of turn." The creatures on the battlefield as it resolves that aren't Dragons
 /// (CR 608.2c, 611.2c); "Dragon" is a word of the spell's text, read through its words (CR 612). One instruction (CR 608.2c).
 fn exude_toxin(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = item.x as i16;
+    let x = item.x as i32;
     let dragon = g.words(item.object).subtype(Subtype::Dragon);
     let creatures: Vec<ObjectId> = g
         .state()

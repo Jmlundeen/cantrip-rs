@@ -12,7 +12,7 @@ fn goblins(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// as this resolves (official ruling); with the target illegal nothing happens (CR 608.2b).
 fn rush(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        let x = creatures_you_control(g, item.controller) as i16;
+        let x = creatures_you_control(g, item.controller) as i32;
         pump(g, item.object, creature, x, x);
     }
     Ok(())

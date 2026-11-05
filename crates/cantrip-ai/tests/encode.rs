@@ -93,7 +93,7 @@ fn positions(path: &Path) -> Vec<(usize, InfoMode, Position)> {
                     announcing: true,
                     x,
                     ..
-                } => Some(u16::try_from(final_x(*x, &later)).unwrap_or(u16::MAX)),
+                } => Some(final_x(*x, &later)),
                 RequestKind::UnlessPays { x: Some(x), .. } => Some(*x),
                 _ => None,
             };
@@ -183,7 +183,7 @@ fn check(
                 _ => false,
             };
             // The objects an option names are pinned: they are only pooled when nothing else fits.
-            if *tok != t.kind || !same(t.a, a) || !same(t.b, b) || (t.n < 2048 && *n != t.n) {
+            if *tok != t.kind || !same(t.a, a) || !same(t.b, b) || (t.n < 2048 && u32::from(*n) != t.n) {
                 return Err(format!(
                     "{at}: option {k} is {t:?}, decoded {:?}",
                     (tok, a, b, n)

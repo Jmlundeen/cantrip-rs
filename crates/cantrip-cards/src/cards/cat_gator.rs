@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// Swamp by its types alike. It is this creature that deals the damage, so its lifelink gains the life (CR 702.15b).
 fn deals_damage_equal_to_your_swamps(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let swamp = g.words(item.object).subtype(Subtype::Swamp);
-    let amount = permanents_with_subtype_you_control(g, item.controller, swamp) as u16;
+    let amount = permanents_with_subtype_you_control(g, item.controller, swamp) as u32;
     damage_target(g, item, 0, amount);
     Ok(())
 }

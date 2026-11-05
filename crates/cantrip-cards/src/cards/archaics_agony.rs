@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// (CR 120.10), and counts only damage dealt to that creature.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let target = item.target(0);
-    let x = sunburst::colors_spent(g, item.object) as u16;
+    let x = sunburst::colors_spent(g, item.object) as u32;
     if let Some(result) = g.damage_result(item.object, target, x)
         && result.target == target
         && result.excess > 0

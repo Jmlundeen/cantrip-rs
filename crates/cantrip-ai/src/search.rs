@@ -1200,7 +1200,7 @@ impl Search<'_> {
         }) else {
             return edges;
         };
-        let costs: Vec<Option<(u16, ManaCost)>> = edges
+        let costs: Vec<Option<(u32, ManaCost)>> = edges
             .iter()
             .map(|e| {
                 (e.token.kind == Tok::Option)

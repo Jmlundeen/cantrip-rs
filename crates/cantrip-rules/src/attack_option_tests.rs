@@ -201,7 +201,7 @@ fn to_blockers(g: &mut Game) {
     panic!("no declare blockers step");
 }
 
-fn power(g: &Game, id: ObjectId) -> i16 {
+fn power(g: &Game, id: ObjectId) -> i32 {
     Query::chars(g, id).power.unwrap_or(0)
 }
 

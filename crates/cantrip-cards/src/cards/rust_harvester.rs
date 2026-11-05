@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// target that is no longer legal (CR 608.2b).
 fn grow_then_deal_its_power(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 1);
-    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u16;
+    let power = g.chars(item.object).power.unwrap_or(0).max(0) as u32;
     damage_target(g, item, 0, power);
     Ok(())
 }

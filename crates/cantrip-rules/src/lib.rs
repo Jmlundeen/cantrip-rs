@@ -1283,7 +1283,7 @@ impl<'a> Cx<'a> {
     }
 
     /// A reflexive triggered ability triggers (CR 603.12): `count` is the number its "that many" counts, if it has one.
-    fn reflexive(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: Option<u16>, objects: &[ObjectId]) {
+    fn reflexive(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: Option<u32>, objects: &[ObjectId]) {
         // A reflexive triggered ability is an ordinary one (CR 603.12): its intervening "if" must hold for it to trigger at all
         // (CR 603.4), not only as it resolves.
         // Asked as the ability it is, acquired as the resolving one that makes it trigger was (CR 607.5).
@@ -1528,7 +1528,7 @@ impl<'a> Cx<'a> {
 
     /// Counters one instruction of an effect puts (`Game::add_counters_together`, `add_counters_together_by`): what it puts on
     /// an object by one player is one placement on it, every kind together (CR 122.6, 608.2), and all of them are one event.
-    fn put_counters_together(&mut self, puts: impl Iterator<Item = (PlayerId, ObjectId, CounterKind, i16)>, len: usize) {
+    fn put_counters_together(&mut self, puts: impl Iterator<Item = (PlayerId, ObjectId, CounterKind, i32)>, len: usize) {
         let mut placements: Vec<counters::Placement> = Vec::with_capacity(len);
         for (by, object, kind, amount) in puts.filter(|&(_, _, _, amount)| amount > 0) {
             match placements.iter_mut().find(|p| p.object == object && p.by == by) {
@@ -1971,15 +1971,15 @@ impl cantrip_api::Game for Cx<'_> {
         ops::mill_together(self, mills)
     }
 
-    fn damage(&mut self, source: ObjectId, target: Target, amount: u16) -> u16 {
+    fn damage(&mut self, source: ObjectId, target: Target, amount: u32) -> u32 {
         ops::damage(self, source, target, amount, false)
     }
 
-    fn damage_result(&mut self, source: ObjectId, target: Target, amount: u16) -> Option<DamageResult> {
+    fn damage_result(&mut self, source: ObjectId, target: Target, amount: u32) -> Option<DamageResult> {
         ops::damage_result(self, source, target, amount, false)
     }
 
-    fn damage_together(&mut self, damage: &[(ObjectId, Target, u16)]) -> Vec<u16> {
+    fn damage_together(&mut self, damage: &[(ObjectId, Target, u32)]) -> Vec<u32> {
         ops::damage_together(self, damage)
     }
 
@@ -2119,7 +2119,7 @@ impl cantrip_api::Game for Cx<'_> {
             .map_err(|_| Suspend)
     }
 
-    fn put_onto_battlefield_attacking(&mut self, object: ObjectId, controller: PlayerId, defender: Target, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend> {
+    fn put_onto_battlefield_attacking(&mut self, object: ObjectId, controller: PlayerId, defender: Target, counters: &[(CounterKind, i32)]) -> Result<ObjectId, Suspend> {
         ops::put_onto_battlefield_attacking(self, object, controller, defender, counters).map_err(|_| Suspend)
     }
 
@@ -2137,7 +2137,7 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield_becoming(self, object, controller, becomes).map_err(|_| Suspend)
     }
 
-    fn put_all_onto_battlefield_becoming(&mut self, objects: &[(ObjectId, PlayerId)], item: &StackItem, what: &'static EntersAs, counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend> {
+    fn put_all_onto_battlefield_becoming(&mut self, objects: &[(ObjectId, PlayerId)], item: &StackItem, what: &'static EntersAs, counters: &[(CounterKind, i32)]) -> Result<Vec<ObjectId>, Suspend> {
         let becomes = Becomes { what, card: item.ability.card, words: self.words(item.object) };
         let all: Vec<(ObjectId, PlayerId, bool)> = objects.iter().map(|&(id, p)| (id, p, false)).collect();
         ops::put_onto_battlefield_becoming_all(self, &all, counters, becomes).map_err(|_| Suspend)
@@ -2155,7 +2155,7 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield(self, objects, ZoneReason::Other).map_err(|_| Suspend)
     }
 
-    fn put_all_onto_battlefield_with_counters(&mut self, objects: &[(ObjectId, PlayerId, bool)], counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend> {
+    fn put_all_onto_battlefield_with_counters(&mut self, objects: &[(ObjectId, PlayerId, bool)], counters: &[(CounterKind, i32)]) -> Result<Vec<ObjectId>, Suspend> {
         ops::put_onto_battlefield_with(self, objects, ZoneReason::Other, counters).map_err(|_| Suspend)
     }
 
@@ -2176,13 +2176,13 @@ impl cantrip_api::Game for Cx<'_> {
         ops::as_it_would_exist(self, entering).chars
     }
 
-    fn put_onto_battlefield_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend> {
+    fn put_onto_battlefield_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i32)]) -> Result<ObjectId, Suspend> {
         ops::put_onto_battlefield_with(self, &[(object, controller, tapped)], ZoneReason::Other, counters)
             .map(|v| v.first().copied().unwrap_or(object))
             .map_err(|_| Suspend)
     }
 
-    fn create_tokens_with_counters(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool, counters: &[(CounterKind, i16)], words: Words) -> Result<Vec<ObjectId>, Suspend> {
+    fn create_tokens_with_counters(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool, counters: &[(CounterKind, i32)], words: Words) -> Result<Vec<ObjectId>, Suspend> {
         let tokens: Vec<(CardId, PlayerId)> = (0..count).map(|_| (def, controller)).collect();
         ops::create_tokens_worded(self, &tokens, tapped, None, counters, words, None, None).map_err(|_| Suspend)
     }
@@ -2216,7 +2216,7 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield_as(self, object, controller, tapped, true, ZoneReason::Other, &[]).map_err(|_| Suspend)
     }
 
-    fn put_onto_battlefield_transformed_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend> {
+    fn put_onto_battlefield_transformed_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i32)]) -> Result<ObjectId, Suspend> {
         ops::put_onto_battlefield_as(self, object, controller, tapped, true, ZoneReason::Other, counters).map_err(|_| Suspend)
     }
 
@@ -2276,7 +2276,7 @@ impl cantrip_api::Game for Cx<'_> {
         self.reflexive(source, controller, ability, subject, None, &[]);
     }
 
-    fn reflexive_trigger_counted(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: u16) {
+    fn reflexive_trigger_counted(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: u32) {
         self.reflexive(source, controller, ability, subject, Some(count), &[]);
     }
 
@@ -2295,7 +2295,7 @@ impl cantrip_api::Game for Cx<'_> {
     fn roll_die_modified(&mut self, player: PlayerId, sides: u32, modifier: i32) -> Roll {
         let natural = self.g.state.roll_die(sides);
         let result = natural as i32 + modifier;
-        self.emit(Event::DieRolled { player, sides: sides as u8, natural: natural as u8, result: result as i16 });
+        self.emit(Event::DieRolled { player, sides: sides as u8, natural: natural as u8, result: result as i32 });
         Roll { natural, result }
     }
 
@@ -2458,7 +2458,7 @@ impl cantrip_api::Game for Cx<'_> {
         ops::exert(self, permanent);
     }
 
-    fn monstrosity(&mut self, permanent: ObjectId, counters: i16) {
+    fn monstrosity(&mut self, permanent: ObjectId, counters: i32) {
         let by = self.doer();
         ops::monstrosity(self, permanent, counters, by);
     }
@@ -2554,7 +2554,7 @@ impl cantrip_api::Game for Cx<'_> {
         self.g.state.add_mana(player, mana, amount, source, Some(restriction), ManaLasts::Step);
     }
 
-    fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) {
+    fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i32) {
         // Taking counters off is `remove_counters`; a negative amount still removes them in a release build.
         debug_assert!(amount >= 0, "use remove_counters");
         if amount < 0 {
@@ -2565,25 +2565,25 @@ impl cantrip_api::Game for Cx<'_> {
         counters::put(self, object, kind, amount, by, counters::How::Effect);
     }
 
-    fn add_counters_together(&mut self, puts: &[(ObjectId, CounterKind, i16)]) {
+    fn add_counters_together(&mut self, puts: &[(ObjectId, CounterKind, i32)]) {
         let by = self.doer();
         self.put_counters_together(puts.iter().map(|&(object, kind, amount)| (by, object, kind, amount)), puts.len());
     }
 
-    fn add_counters_by(&mut self, by: PlayerId, object: ObjectId, kind: CounterKind, amount: i16) {
+    fn add_counters_by(&mut self, by: PlayerId, object: ObjectId, kind: CounterKind, amount: i32) {
         debug_assert!(amount >= 0, "use remove_counters");
         counters::put(self, object, kind, amount, by, counters::How::Effect);
     }
 
-    fn add_counters_together_by(&mut self, puts: &[(PlayerId, ObjectId, CounterKind, i16)]) {
+    fn add_counters_together_by(&mut self, puts: &[(PlayerId, ObjectId, CounterKind, i32)]) {
         self.put_counters_together(puts.iter().copied(), puts.len());
     }
 
-    fn move_counters(&mut self, from: ObjectId, to: ObjectId, kind: CounterKind, amount: i16) -> i16 {
+    fn move_counters(&mut self, from: ObjectId, to: ObjectId, kind: CounterKind, amount: i32) -> i32 {
         counters::mv(self, from, to, kind, amount)
     }
 
-    fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) -> i16 {
+    fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i32) -> i32 {
         let before = self.g.state.obj(object).counters(kind);
         counters::remove(self, object, kind, amount);
         before - self.g.state.obj(object).counters(kind)
@@ -2676,15 +2676,15 @@ impl cantrip_api::Game for Cx<'_> {
         actions::may_pay(self, payer, source, subject, &cost, question).map_err(|_| Suspend)
     }
 
-    fn may_pay_x(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: Cost, question: &'static Question) -> Result<Option<u16>, Suspend> {
+    fn may_pay_x(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: Cost, question: &'static Question) -> Result<Option<u32>, Suspend> {
         actions::may_pay_x(self, payer, source, subject, &cost, question).map_err(|_| Suspend)
     }
 
-    fn may_pay_counted(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: Cost, question: &'static Question) -> Result<Option<u16>, Suspend> {
+    fn may_pay_counted(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: Cost, question: &'static Question) -> Result<Option<u32>, Suspend> {
         actions::may_pay_counted(self, payer, source, subject, &cost, question).map_err(|_| Suspend)
     }
 
-    fn may_pay_times(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, mana: ManaCost, most: u16, question: &'static Question) -> Result<u16, Suspend> {
+    fn may_pay_times(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, mana: ManaCost, most: u32, question: &'static Question) -> Result<u32, Suspend> {
         actions::may_pay_times(self, payer, source, subject, mana, most, question).map_err(|_| Suspend)
     }
 

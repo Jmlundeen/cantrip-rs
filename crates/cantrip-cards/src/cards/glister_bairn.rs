@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// control": X is worked out once, as the ability resolves.
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let x = i16::from(vivid::count(g, item.controller));
+    let x = i32::from(vivid::count(g, item.controller));
     pump(g, item.object, creature, x, x);
     Ok(())
 }

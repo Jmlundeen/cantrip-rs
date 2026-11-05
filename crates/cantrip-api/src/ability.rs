@@ -769,7 +769,7 @@ impl AbilityDef {
     /// "Up to X target ..." where X is read from the game as the ability is put on the stack (CR 603.3d, 601.2c): a
     /// `TargetSpec::COUNTED` bound reads `count`, asked of the ability's source and controller. It is fixed there; the ability's
     /// own text reads the game again as it resolves.
-    pub const fn counted_by(self, count: fn(&dyn crate::Query, &Asker) -> u16) -> AbilityDef {
+    pub const fn counted_by(self, count: fn(&dyn crate::Query, &Asker) -> u32) -> AbilityDef {
         AbilityDef::Triggered(TriggeredDef { counted_by: Some(count), ..triggered_def(self, "only a triggered ability is counted by the game") })
     }
 
@@ -1054,7 +1054,7 @@ impl StaticDef {
     }
 
     /// What the stars of the power and toughness it defines are worth once it is lost (CR 208.2a, 208.5): `*/1+*` is 0/1.
-    pub const fn lost_pt(self, power: i16, toughness: i16) -> StaticDef {
+    pub const fn lost_pt(self, power: i32, toughness: i32) -> StaticDef {
         StaticDef { lost_pt: Some((power, toughness)), ..self }
     }
 

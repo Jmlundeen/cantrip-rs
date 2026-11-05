@@ -12,14 +12,14 @@ use cantrip_api::*;
 
 /// Devour land N: the player chooses any number of the lands they control, none included, and sacrifices them together; the
 /// permanent enters with N +1/+1 counters for each land actually sacrificed.
-pub fn lands<const N: i16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+pub fn lands<const N: i32>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let you = entering.controller;
     let lands: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Land)).collect();
     let chosen = choose::select(g, you, entering.object, Purpose::Sacrifice, lands, select::land_cards(select::ANY_NUMBER))?;
     if chosen.is_empty() {
         return Ok(());
     }
-    let sacrificed = g.sacrifice(you, &chosen).len() as i16;
+    let sacrificed = g.sacrifice(you, &chosen).len() as i32;
     entering.counters[CounterKind::PlusOne as usize] += N * sacrificed;
     Ok(())
 }

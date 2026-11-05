@@ -66,7 +66,7 @@ fn blast(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
 }
 
 fn gain_x(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
-    g.gain_life(item.controller, i32::from(item.x));
+    g.gain_life(item.controller, item.x as i32);
     Ok(())
 }
 

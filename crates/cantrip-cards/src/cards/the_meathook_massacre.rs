@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// "Each creature gets -X/-X until end of turn": every creature on the battlefield as this resolves, fixed then
 /// (CR 611.2c), for the X it was cast with (entering without being cast, X is 0).
 fn shrink_all(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = g.obj(item.object).x as i16;
+    let x = g.obj(item.object).x as i32;
     if x == 0 {
         return Ok(());
     }

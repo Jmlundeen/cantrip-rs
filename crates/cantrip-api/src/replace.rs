@@ -32,7 +32,7 @@ pub struct ZoneChange {
     pub attacking: bool,
     /// The counters an effect gives it as it arrives, whatever the zone (CR 122.6, 614.1c): the void counter a card
     /// exiled in place of a graveyard carries. Not those a permanent enters with of its own (`Entering`).
-    pub counters: [i16; CounterKind::COUNT],
+    pub counters: [i32; CounterKind::COUNT],
     /// The player who puts `counters` on it (CR 122.6a): the player it arrives under, for a permanent entering with them
     /// unless the effect names another; the controller of the replacement effect that gives them to a card arriving in any
     /// other zone (CR 609.1), which the core sets as the effect applies.
@@ -114,7 +114,7 @@ pub struct CounterPlacement {
     /// is judged as it would exist there (CR 614.12).
     pub entering: bool,
     /// How many of each kind would be put.
-    pub counts: [i16; CounterKind::COUNT],
+    pub counts: [i32; CounterKind::COUNT],
     /// The player who puts them (CR 122.6a), always one: the controller of the spell or ability whose effect puts them
     /// (CR 608.2), the player paying a cost or doing the action (CR 118.3, 714.3c), the controller of a source whose damage
     /// puts them (CR 120.3d), or for a permanent entering, its controller unless the effect names another (CR 122.6a).
@@ -178,7 +178,7 @@ pub struct CardDraw {
 pub struct DamageEvent {
     pub source: ObjectId,
     pub target: Target,
-    pub amount: u16,
+    pub amount: u32,
     pub combat: bool,
     /// The damage already marked on the target is healed as this is dealt: Wolverine's "all other damage already dealt
     /// to him is healed". Damage dealt at the same time as this stays.
@@ -375,7 +375,7 @@ pub type PreventionApplies = fn(&dyn Query, &Asker, &DamageEvent) -> bool;
 
 /// How much of the damage a prevention effect prevents (CR 615.1), judged on the damage as the effects applied so far have
 /// left it (CR 616.1f): "prevent half that damage, rounded up". More than the damage is all of it.
-pub type PreventionAmount = fn(&dyn Query, &Asker, &DamageEvent) -> u16;
+pub type PreventionAmount = fn(&dyn Query, &Asker, &DamageEvent) -> u32;
 
 /// A prevention effect of a static ability (CR 615, 604): "Prevent all damage that would be dealt to Black Panther". It
 /// functions while its source is on the battlefield, and prevents all of the damage it applies to, or as much as `amount`
@@ -430,7 +430,7 @@ pub struct GrantedPreventionDef {
 pub struct Prevented {
     pub source: ObjectId,
     pub target: Target,
-    pub amount: u16,
+    pub amount: u32,
     pub combat: bool,
 }
 

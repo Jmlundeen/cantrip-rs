@@ -10,11 +10,11 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     // The target is legal here (an illegal sole target means the spell never resolves, CR 608.2b), so there is one creature.
     for creature in targets::object(g, item, 0).into_iter() {
         let chars = g.chars(creature);
-        // In i32 so doubling cannot wrap; a power of 0 or less deals no damage, so a negative never reaches the u16 conversion.
-        let power = i32::from(chars.power.unwrap_or(0));
+        // A power of 0 or less deals no damage (CR 120.8).
+        let power = chars.power.unwrap_or(0).max(0) as u32;
         let amount = if chars.has(Keyword::Flying) { power * 2 } else { power };
         if amount > 0 {
-            g.damage(creature, Target::Object(creature), u16::try_from(amount).unwrap_or(u16::MAX));
+            g.damage(creature, Target::Object(creature), amount);
         }
     }
     Ok(())

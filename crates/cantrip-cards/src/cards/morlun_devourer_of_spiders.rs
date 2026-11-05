@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// ability (0 if he was put onto the battlefield without being cast). He deals it even if he has left the battlefield by
 /// then, as he last was there (CR 608.2h), so his lifelink still gains life.
 fn deal_x_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = g.obj(item.object).x;
+    let x = u32::from(g.obj(item.object).x);
     damage_target(g, item, 0, x);
     Ok(())
 }

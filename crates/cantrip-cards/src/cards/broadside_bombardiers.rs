@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// (`Query::cost_objects`, CR 602.2b).
 fn boast_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let value = g.cost_objects(item).first().map_or(0, |&id| g.mana_value(id));
-    damage_target(g, item, 0, 2 + value as u16);
+    damage_target(g, item, 0, 2 + value as u32);
     Ok(())
 }
 

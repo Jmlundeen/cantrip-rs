@@ -33,13 +33,13 @@ pub const fn ability(text: &'static str) -> AbilityDef {
 }
 
 /// The number of charge counters on `source`, as the layers see it.
-pub fn charge(view: &dyn LayerQuery, source: ObjectId) -> i16 {
+pub fn charge(view: &dyn LayerQuery, source: ObjectId) -> i32 {
     view.state().obj(source).counters(CounterKind::Charge)
 }
 
 /// A station symbol "{N+}" (CR 721.2a): the static ability of its striation applies to its own permanent while that
 /// permanent has N or more charge counters on it. Use it as a static ability's `affects`.
-pub fn charged<const N: i16>(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+pub fn charged<const N: i32>(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
     affected == source && charge(view, source) >= N
 }
 

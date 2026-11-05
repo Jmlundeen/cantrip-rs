@@ -17,7 +17,7 @@ fn you_removed_two_or_more_loyalty_counters(q: &dyn Query, me: &Asker, event: &E
     let removed = if cost == LOYALTY_MINUS_X {
         q.state().stack.iter().rev().find(|i| i.kind == StackKind::Activated && i.object == source && i.ability == ability)?.x
     } else {
-        (-i16::from(cost)).max(0) as u16
+        (-i32::from(cost)).max(0) as u32
     };
     if removed >= 2 { Fired::PLAIN } else { None }
 }

@@ -10,7 +10,7 @@ fn plus_one_per_creature_and_creature_card(view: &dyn LayerQuery, source: Object
     let you = state.obj(source).controller;
     let on_battlefield = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Creature)).count();
     let in_graveyard = state.zone(Zone::graveyard(you)).iter().filter(|&&id| view.chars(id).is(CardType::Creature)).count();
-    let n = (on_battlefield + in_graveyard) as i16;
+    let n = (on_battlefield + in_graveyard) as i32;
     chars.power = chars.power.map(|v| v + n);
     chars.toughness = chars.toughness.map(|v| v + n);
 }

@@ -40,7 +40,7 @@ fn equipped_creature_deals_combat_damage(q: &dyn Query, source: ObjectId, event:
 
 fn put_loyalty(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if is_live(g, item.object) && g.is_on_battlefield(item.object) && item.data[0] > 0 {
-        g.add_counters(item.object, CounterKind::Loyalty, item.data[0] as i16);
+        g.add_counters(item.object, CounterKind::Loyalty, item.data[0] as i32);
     }
     Ok(())
 }

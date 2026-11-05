@@ -184,7 +184,7 @@ pub const PAY_WATERBEND: u8 = 3;
 
 /// The `most` of a cost a player "may pay any number of times" as an effect resolves (`RequestKind::UnlessPays::times`,
 /// `Game::may_pay_times`): no number but what the cost's shape holds (`ManaCost::times`).
-pub const ANY_NUMBER_OF_TIMES: u16 = u16::MAX;
+pub const ANY_NUMBER_OF_TIMES: u32 = u32::MAX;
 
 /// One thing a player could do: an option of a priority, payment or "unless" question, as a prototype the answer
 /// fills in (targets, a color).
@@ -411,8 +411,8 @@ pub enum RequestKind {
         life_payable: bool,
         question: &'static Question,
         options: Vec<ActionOption>,
-        x: Option<u16>,
-        times: Option<u16>,
+        x: Option<u32>,
+        times: Option<u32>,
     },
     /// Choose cards from among `cards`, every one of which the player sees: which sets of them are an answer is `rule`'s to
     /// say (`Selection`; the core checks every answer with it), and what may be chosen next as the player picks is asked of
@@ -460,7 +460,7 @@ pub enum RequestKind {
     /// Baleful Mastery's "an opponent draws a card". Answered with `Answer::Player`. `verb` and `amount` say what the
     /// chosen player will do, as hint text; `subject` is the object the choice is for, when it is one of several the effect
     /// treats one at a time (Dack Fayden, Helping Hand's "for each of those permanents, choose a different opponent").
-    ChoosePlayer { source: ObjectId, candidates: Vec<PlayerId>, verb: &'static str, amount: u16, subject: Option<ObjectId> },
+    ChoosePlayer { source: ObjectId, candidates: Vec<PlayerId>, verb: &'static str, amount: u32, subject: Option<ObjectId> },
     /// Tap any number of untapped creatures with total power `minimum` or more (CR 702.122a crew, CR 702.171a saddle):
     /// any subset of `cards` whose `powers` (what each counts as towards the total, CR 702.122b) add up to it. A negative
     /// power is added as it is (CR 107.1b), taking from the total.
@@ -468,7 +468,7 @@ pub enum RequestKind {
     /// Harmonize's creature (`Purpose::TapToReduce`, CR 702.180a) is up to one, and `powers` is what tapping each takes off the
     /// generic mana of the total cost: exactly, or, with `up_to`, the most it could take, the total not yet settled as the
     /// creature is chosen (CR 702.180b, 601.2b: X, a kicker and the targets come after it).
-    TapForPower { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, powers: Vec<i16>, minimum: u8, up_to: bool },
+    TapForPower { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, powers: Vec<i32>, minimum: u8, up_to: bool },
     /// Collect evidence N (CR 701.59a): exile any subset of `cards` (the player's graveyard) whose `values` (their mana
     /// values) add up to `minimum` or more. With `symbols`, the `values` are instead the mana symbols of that color among
     /// each card's mana cost (CR 700.5): Baron Helmut Zemo's "exile any number of black cards ... with fifteen or more
@@ -507,7 +507,7 @@ pub enum RequestKind {
         costs: Vec<AttackCost>,
         /// Advice while `costs` has any: the most mana the attacking player could pay now (their pool and what their mana
         /// abilities add, `u16::MAX` when that is not known), counting creatures that may yet be tapped by attacking.
-        can_pay: u16,
+        can_pay: u32,
     },
     /// How creatures divide their combat damage (CR 510.1c-d): one division per creature with a choice.
     AssignCombatDamage { divisions: Vec<DamageDivision> },
@@ -544,7 +544,7 @@ pub enum RequestKind {
         hints: Vec<&'static str>,
         damage: Option<DamageAbout>,
         turn: bool,
-        counters: Vec<(CounterKind, i16)>,
+        counters: Vec<(CounterKind, i32)>,
         draw: bool,
     },
 }
@@ -753,7 +753,7 @@ pub fn stand_in(state: &crate::GameState, kind: &RequestKind, player: PlayerId) 
 pub struct CounterPool {
     pub object: ObjectId,
     pub kind: CounterKind,
-    pub count: u16,
+    pub count: u32,
 }
 
 /// Damage a question about replacement effects is about (CR 616.1): its source, whom it would be dealt to and how much.
@@ -761,7 +761,7 @@ pub struct CounterPool {
 pub struct DamageAbout {
     pub source: ObjectId,
     pub to: Target,
-    pub amount: u16,
+    pub amount: u32,
 }
 
 /// Where the cards a library search finds are going (CR 701.23), as the searcher is told.
@@ -928,19 +928,19 @@ pub struct DamageDivision {
     /// The player asked is not its controller (CR 702.22j-k): banding gives the division of this creature's damage to the
     /// controller of the creatures with banding it is blocked by or is blocking, who divides it among them as they choose.
     pub banding: bool,
-    pub damage: u16,
+    pub damage: u32,
     pub creatures: Vec<ObjectId>,
-    pub lethal: Vec<u16>,
+    pub lethal: Vec<u32>,
     pub may_assign_to_defender: bool,
     pub defender: Target,
-    pub suggested: Vec<u16>,
-    pub suggested_to_defender: u16,
+    pub suggested: Vec<u32>,
+    pub suggested_to_defender: u32,
 }
 
 impl DamageDivision {
     /// The engine's own division of every creature's combat damage, as an answer's shares: lethal to each in turn,
     /// the rest to the defender.
-    pub fn suggested_shares(divisions: &[DamageDivision]) -> Vec<(ObjectId, Option<ObjectId>, u16)> {
+    pub fn suggested_shares(divisions: &[DamageDivision]) -> Vec<(ObjectId, Option<ObjectId>, u32)> {
         let mut shares = Vec::new();
         for d in divisions {
             for (i, &c) in d.creatures.iter().enumerate() {
@@ -1568,7 +1568,7 @@ pub enum Answer {
     /// Indices in order: the order to put triggered abilities on the stack.
     Order(Vec<u32>),
     /// Combat damage shares: (source, the creature it is dealt to, or `None` for the defender, amount).
-    Shares(Vec<(ObjectId, Option<ObjectId>, u16)>),
+    Shares(Vec<(ObjectId, Option<ObjectId>, u32)>),
     /// Where each looked-at card goes: one list per destination, in placing order (for a library top, the first is
     /// the top card); or, where allowed, shuffle instead.
     Placements { placements: Vec<Vec<ObjectId>>, shuffle: bool },
@@ -1580,7 +1580,7 @@ pub enum Answer {
     /// is `announcing`, up to its `most`, in place of raising and lowering it a step at a time.
     Announce(u32),
     /// The counters removed for a `RequestKind::RemoveCounters`: how many of each kind from each permanent.
-    Counters(Vec<(ObjectId, CounterKind, u16)>),
+    Counters(Vec<(ObjectId, CounterKind, u32)>),
     /// The index of the option chosen, for a question of one-of-several (which replacement effect applies first).
     Index(u8),
 }

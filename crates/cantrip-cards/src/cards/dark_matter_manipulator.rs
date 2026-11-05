@@ -14,7 +14,7 @@ fn mill_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn plus_two_per_seven(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let state = view.state();
     let sevens = state.zone(Zone::graveyard(state.obj(source).controller)).len() / 7;
-    chars.power = chars.power.map(|p| p + 2 * sevens as i16);
+    chars.power = chars.power.map(|p| p + 2 * sevens as i32);
 }
 
 pub static CARD: CardDef = CardDef {

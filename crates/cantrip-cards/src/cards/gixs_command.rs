@@ -70,7 +70,7 @@ fn sacrifice_greatest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
         if !cantrip_mechanics::players::reached(g, who) {
             continue;
         }
-        let mine: Vec<(ObjectId, i16)> = g
+        let mine: Vec<(ObjectId, i32)> = g
             .permanents_of(who)
             .into_iter()
             .filter(|&id| g.chars(id).is(CardType::Creature))

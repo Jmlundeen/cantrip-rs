@@ -185,7 +185,7 @@ pub fn itself_with_a_lesson_in_your_graveyard(q: &dyn LayerQuery, source: Object
 /// Artisan and Wight of the Reliquary (creature cards) and Knight of the Reliquary (land cards) print it.
 pub fn plus_one_per_card_type_in_your_graveyard<const TYPE: u8>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let Some(&card_type) = CardType::ALL.iter().find(|&&t| t as u8 == TYPE) else { return };
-    let n = card_type_cards_in_your_graveyard(view, source, card_type) as i16;
+    let n = card_type_cards_in_your_graveyard(view, source, card_type) as i32;
     chars.power = chars.power.map(|v| v + n);
     chars.toughness = chars.toughness.map(|v| v + n);
 }
@@ -448,10 +448,10 @@ pub fn have_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// "Each artifact you control" counted for a static ability (CR 613.4c): the permanents under the controller of `source` that
 /// the earlier layers made artifacts, `source` itself among them if it is one. "+1/+1 for each artifact you control"
 /// (below, Adaptive Omnitool and others) and Improvised Arsenal's "+1/+0 for each artifact you control" both count them.
-pub fn artifacts_you_control(view: &dyn LayerQuery, source: ObjectId) -> i16 {
+pub fn artifacts_you_control(view: &dyn LayerQuery, source: ObjectId) -> i32 {
     let state = view.state();
     let you = state.obj(source).controller;
-    state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Artifact)).count() as i16
+    state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Artifact)).count() as i32
 }
 
 /// "Gets +1/+1 for each artifact you control" (CR 613.4c, layer 7c): "you" is the controller of the source, the object that has
@@ -465,7 +465,7 @@ pub fn plus_one_plus_one_per_artifact_you_control(view: &dyn LayerQuery, source:
 /// "Gets +`P`/+`T` for each artifact you control" (CR 613.4c, layer 7c), counted as `artifacts_you_control` does: the artifacts
 /// under the source's controller as the earlier layers left them, the source among them if it is one. Machinist's Arsenal's
 /// "+2/+2 for each artifact you control" is the same count at a different step.
-pub fn plus_per_artifact_you_control<const P: i16, const T: i16>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+pub fn plus_per_artifact_you_control<const P: i32, const T: i32>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let n = artifacts_you_control(view, source);
     chars.power = chars.power.map(|v| v + n * P);
     chars.toughness = chars.toughness.map(|v| v + n * T);
@@ -477,7 +477,7 @@ pub fn plus_per_artifact_you_control<const P: i16, const T: i16>(view: &dyn Laye
 pub fn plus_one_plus_one_per_enchantment_you_control(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let state = view.state();
     let you = state.obj(source).controller;
-    let n = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Enchantment)).count() as i16;
+    let n = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Enchantment)).count() as i32;
     chars.power = chars.power.map(|v| v + n);
     chars.toughness = chars.toughness.map(|v| v + n);
 }
@@ -493,7 +493,7 @@ pub fn power_is_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, char
 /// Machines print it.
 pub fn plus_power_per_other_artifact_you_control(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let artifacts = crate::lands::count_you_control(view, source, &|c| c.is(CardType::Artifact));
-    let itself = i16::from(view.chars(source).is(CardType::Artifact));
+    let itself = i32::from(view.chars(source).is(CardType::Artifact));
     chars.power = chars.power.map(|v| v + artifacts - itself);
 }
 
@@ -701,7 +701,7 @@ pub fn itself_while_untapped(q: &dyn LayerQuery, source: ObjectId, affected: Obj
 /// "Gets +P/+T" (CR 613.4c): the power and toughness change of an Equipment's, Aura's or permanent's static ability, as the
 /// `apply` of a `Layer::PtModify` static (a negative number is a minus). Cori-Steel Cutter, Embercleave, Grafted Wargear,
 /// Doc Ock's Tentacles and the other plain "+N/+M" statics print it.
-pub fn plus_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+pub fn plus_pt<const P: i32, const T: i32>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = chars.power.map(|v| v + P);
     chars.toughness = chars.toughness.map(|v| v + T);
 }
@@ -734,7 +734,7 @@ pub fn enchantment_too(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// Set power and toughness each to the affected permanent's mana value (CR 613.4b, 202.3).
 /// Animate Artifact, March of the Machines and Opalescence use this operation.
 pub fn base_mana_value(q: &dyn LayerQuery, _: ObjectId, affected: ObjectId, chars: &mut Chars) {
-    let value = q.mana_value(affected, &q.chars(affected)).min(i16::MAX as u32) as i16;
+    let value = q.mana_value(affected, &q.chars(affected)).min(i32::MAX as u32) as i32;
     chars.power = Some(value);
     chars.toughness = Some(value);
 }
@@ -743,7 +743,7 @@ pub fn base_mana_value(q: &dyn LayerQuery, _: ObjectId, affected: ObjectId, char
 /// the counters and effects that modify them (layer 7c) then apply to. Humility and Eaten by Piranhas (1/1), Hexdrinker (4/4
 /// and 6/6), Kaito's Ninja (3/4), Puppet Crafting (5/5), Wrecking Ball Arm (7/7) and a station card's striation (Wurmwall
 /// Sweeper's 2/2, CR 721.2b) print it.
-pub fn base_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+pub fn base_pt<const P: i32, const T: i32>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = Some(P);
     chars.toughness = Some(T);
 }

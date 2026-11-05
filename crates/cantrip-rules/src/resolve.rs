@@ -249,7 +249,7 @@ pub fn as_item<'a>(q: &'a dyn Query, item: &StackItem) -> Given<'a> {
 
 /// The X announced for a spell or an activated ability on the stack (CR 107.3a, 601.2b, 602.2b), its own (CR 107.3k): what
 /// its targets are judged with (`Query::announced_x`). A triggered ability announces none.
-pub fn announced_x(item: &StackItem) -> Option<u16> {
+pub fn announced_x(item: &StackItem) -> Option<u32> {
     (item.kind != StackKind::Triggered).then_some(item.x)
 }
 
@@ -264,7 +264,7 @@ pub struct Given<'a> {
     /// The targets are judged as if the spell's gift were promised (`Query::gift_assumed`).
     pub gift: bool,
     /// The X announced for the spell or ability whose targets these are (`Query::announced_x`, `announced_x`).
-    pub x: Option<u16>,
+    pub x: Option<u32>,
     /// For an ability on the stack, its source and the words of its text as it was put there (`StackItem::words`): what
     /// `Query::words` of that source answers, the source's text since notwithstanding (CR 113.7a). None otherwise.
     pub text: Option<(ObjectId, Words)>,

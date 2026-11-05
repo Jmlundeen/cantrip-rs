@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let x = sunburst::colors_spent(g, item.object) as u32;
     let made = tokens::create(g, item.controller, &tokens::FRACTAL, 2)?;
-    let puts: Vec<(ObjectId, CounterKind, i16)> = made.iter().map(|&token| (token, CounterKind::PlusOne, x as i16)).collect();
+    let puts: Vec<(ObjectId, CounterKind, i32)> = made.iter().map(|&token| (token, CounterKind::PlusOne, x as i32)).collect();
     g.add_counters_together(&puts);
     g.gain_life(item.controller, x as i32);
     Ok(())

@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "Domain — Fblthp's power is equal to the number of basic land types among lands you control."
 fn domain(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    chars.power = Some(cantrip_mechanics::domain::count_in_layers(q, q.state().obj(source).controller) as i16);
+    chars.power = Some(cantrip_mechanics::domain::count_in_layers(q, q.state().obj(source).controller) as i32);
 }
 
 /// "When Fblthp enters, search your library for up to X basic land cards with different names, reveal them, put them into

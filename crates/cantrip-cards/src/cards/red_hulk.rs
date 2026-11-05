@@ -19,7 +19,7 @@ fn counter_then_reflex(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 /// "He deals damage equal to the number of +1/+1 counters on him to any other target": counted as the reflexive ability resolves, or
 /// as he last existed if he has left the battlefield (CR 113.7a, 608.2h).
 fn damage_for_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let counters = g.obj(item.object).counters(CounterKind::PlusOne) as u16;
+    let counters = g.obj(item.object).counters(CounterKind::PlusOne) as u32;
     g.damage(item.object, item.target(0), counters);
     Ok(())
 }

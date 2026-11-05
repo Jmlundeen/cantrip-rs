@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// Each stage replaces the creature's creature types and base power and toughness (CR 205.1a, 613.1d), where a later effect
 /// wins by its timestamp: it loses the creature types it had, an earlier stage's among them, and the new ones follow. Its
 /// card types do not change, so an artifact type Mycosynth Lattice gives it stays.
-fn become_kithkin(g: &mut dyn Game, source: ObjectId, kind: Subtype, power: i16, toughness: i16) {
+fn become_kithkin(g: &mut dyn Game, source: ObjectId, kind: Subtype, power: i32, toughness: i32) {
     let words = g.words(source);
     // "It becomes a Kithkin [...] with base power and toughness [P]/[T]": one instruction (CR 608.2c).
     instruction(g, |g| {

@@ -7,7 +7,7 @@ use cantrip_api::*;
 
 const FADE: usize = CounterKind::Fade as usize;
 
-pub fn enters<const N: i16>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+pub fn enters<const N: i32>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.counters[FADE] += N;
     Ok(())
 }

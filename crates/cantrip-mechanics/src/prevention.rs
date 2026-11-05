@@ -55,7 +55,7 @@ pub fn all_combat_damage_this_turn(g: &mut dyn Game, item: &StackItem, index: u8
 /// "Prevent the next N damage that would be dealt to [the target in `slot`] this turn" (CR 615.7): a shield on it, if it is
 /// still a legal target (CR 608.2b). Healing Salve, Bandage, Mending Hands. The card lists `ANY_DAMAGE` `index`th in its
 /// `granted_preventions`.
-pub fn next_damage_to_target(g: &mut dyn Game, item: &StackItem, slot: usize, index: u8, n: u16) {
+pub fn next_damage_to_target(g: &mut dyn Game, item: &StackItem, slot: usize, index: u8, n: u32) {
     if !g.target_legal(item, slot) {
         return;
     }

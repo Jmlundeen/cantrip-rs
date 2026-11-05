@@ -561,7 +561,7 @@ pub fn connive_n(g: &mut dyn Game, creature: ObjectId, source: ObjectId, count: 
     g.draw(player, count);
     let chosen = choose_from_hand(g, player, source, count)?;
     let discarded = g.discard_together(&chosen);
-    let nonland = discarded.iter().filter(|&&c| hand::discarded_nonland_card(&*g, c)).count() as i16;
+    let nonland = discarded.iter().filter(|&&c| hand::discarded_nonland_card(&*g, c)).count() as i32;
     if nonland > 0 && g.is_on_battlefield(creature) && g.obj(creature).became.is_none() {
         g.add_counters(creature, CounterKind::PlusOne, nonland);
     }
@@ -790,7 +790,7 @@ pub fn lands_you_control(q: &dyn Query, player: PlayerId) -> usize {
 }
 
 /// Deals damage to the target in `slot`, if it is still legal.
-pub fn damage_target(g: &mut dyn Game, item: &StackItem, slot: usize, amount: u16) {
+pub fn damage_target(g: &mut dyn Game, item: &StackItem, slot: usize, amount: u32) {
     if g.target_legal(item, slot) {
         g.damage(item.object, g.state().target(item, slot), amount);
     }
@@ -799,8 +799,8 @@ pub fn damage_target(g: &mut dyn Game, item: &StackItem, slot: usize, amount: u1
 /// "[Source] deals `amount` damage to each of [up to N / one or two] targets" (CR 120.3, 608.2b): every target of the resolving
 /// item that is still legal is dealt `amount` by the item's source, all together as one event. A target that has become
 /// illegal is left out. Prismari Charm, Batroc the Leaper and Way of the Warlord print it.
-pub fn damage_each_target(g: &mut dyn Game, item: &StackItem, amount: u16) {
-    let hits: Vec<(ObjectId, Target, u16)> =
+pub fn damage_each_target(g: &mut dyn Game, item: &StackItem, amount: u32) {
+    let hits: Vec<(ObjectId, Target, u32)> =
         (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).map(|slot| (item.object, g.state().target(item, slot), amount)).collect();
     g.damage_together(&hits);
 }
@@ -810,10 +810,9 @@ pub fn damage_each_target(g: &mut dyn Game, item: &StackItem, amount: u16) {
 /// that has since become illegal is left out with its share (CR 608.2b), and the rest is dealt together as one event.
 /// Pyrokinesis, Fire Covenant, Fury and Shatterskull Smashing print it.
 pub fn damage_divided(g: &mut dyn Game, item: &StackItem) {
-    let hits: Vec<(ObjectId, Target, u16)> = (0..item.target_count as usize)
+    let hits: Vec<(ObjectId, Target, u32)> = (0..item.target_count as usize)
         .filter(|&slot| g.target_legal(item, slot) && g.state().share(item, slot) > 0)
-        // Damage is dealt in a u16 for now: a share past it deals as much as that holds (the damage widening is W2's).
-        .map(|slot| (item.object, g.state().target(item, slot), u16::try_from(g.state().share(item, slot)).unwrap_or(u16::MAX)))
+        .map(|slot| (item.object, g.state().target(item, slot), g.state().share(item, slot)))
         .collect();
     g.damage_together(&hits);
 }
@@ -824,12 +823,12 @@ pub fn damage_divided(g: &mut dyn Game, item: &StackItem) {
 /// one is the announcement's rule (the core's `Divide`), not asked again here. The counters are put on all the targets at
 /// once (CR 608.2, 101.4: one event, CR 603.2c). Court of Garenbrig and Elusive Otter's Grove's Bounty print it.
 pub fn counters_divided(g: &mut dyn Game, item: &StackItem, kind: CounterKind) {
-    let mut puts: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
+    let mut puts: Vec<(ObjectId, CounterKind, i32)> = Vec::new();
     for slot in 0..item.target_count as usize {
         if let Some(object) = targets::object(g, item, slot)
             && g.state().share(item, slot) > 0
         {
-            puts.push((object, kind, i16::try_from(g.state().share(item, slot)).unwrap_or(i16::MAX)));
+            puts.push((object, kind, g.state().share(item, slot) as i32));
         }
     }
     g.add_counters_together(&puts);
@@ -907,7 +906,7 @@ pub fn half_of_library_rounded_up(g: &dyn Query, player: PlayerId) -> u32 {
 }
 
 /// "[It] gets +P/+T until end of turn" (CR 611.2): a continuous effect from the resolving ability's source.
-pub fn pump(g: &mut dyn Game, source: ObjectId, creature: ObjectId, power: i16, toughness: i16) {
+pub fn pump(g: &mut dyn Game, source: ObjectId, creature: ObjectId, power: i32, toughness: i32) {
     if g.is_on_battlefield(creature) && g.obj(creature).became.is_none() {
         g.add_effect(source, creature, EffectKind::Pump(power, toughness), Duration::EndOfTurn);
     }
@@ -1017,8 +1016,8 @@ pub fn surveil_into_graveyard(
 /// creature"), Blinkmoth Nexus and Mishra's Factory print "artifact creature", and so do Firdoch Core and Iron Man Armor,
 /// which are artifacts already.
 pub struct Animation<'a> {
-    pub power: i16,
-    pub toughness: i16,
+    pub power: i32,
+    pub toughness: i32,
     pub colors: Option<ColorSet>,
     /// Card types added beside Creature (layer 4).
     pub types: TypeSet,

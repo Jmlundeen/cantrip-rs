@@ -13,7 +13,7 @@ const ASK: Question = Question::new("PayEnergy", "pay an energy counter?", "Each
 fn discharge(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.change_energy(you, 3);
-    let mut paid = 0u16;
+    let mut paid = 0u32;
     while g.state().player(you).energy() > 0 {
         if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
             break;

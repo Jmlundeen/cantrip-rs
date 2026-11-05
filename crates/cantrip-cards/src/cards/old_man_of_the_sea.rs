@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// A creature's power for "power less than or equal to": one that is no longer a creature has none (CR 208.3), and counts
 /// as 0 (the card's ruling).
-fn power(q: &dyn Query, id: ObjectId) -> i16 {
+fn power(q: &dyn Query, id: ObjectId) -> i32 {
     q.chars(id).power.unwrap_or(0)
 }
 

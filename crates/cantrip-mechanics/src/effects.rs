@@ -51,7 +51,7 @@ pub fn look_at_top_put_any_lands_onto_the_battlefield_tapped_then_shuffle(g: &mu
 /// creatures print it with +1/+1 counters, Chalice of the Void with charge counters and Nissa, Steward of Elements with loyalty
 /// counters.
 pub fn enters_with_x_counters<const KIND: usize>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[KIND] += entering.x as i16;
+    entering.counters[KIND] += entering.x as i32;
     Ok(())
 }
 
@@ -65,14 +65,14 @@ pub fn enters_with_a_counter<const KIND: usize>(_: &mut dyn Game, entering: &mut
 
 /// "This permanent enters with `N` +1/+1 counters on it" (CR 614.1c, 122.1). Botanical Brawler and Costume Closet (two) print
 /// it; one is `enters_with_a_counter`.
-pub fn enters_with_plus_one_counters<const N: i16>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+pub fn enters_with_plus_one_counters<const N: i32>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.counters[CounterKind::PlusOne as usize] += N;
     Ok(())
 }
 
 /// "This creature enters with `N` -1/-1 counters on it" (CR 614.1c). Glen Elendra Guardian, Flitterwing Nuisance (one)
 /// and Moonshadow (six) print it.
-pub fn enters_with_minus_one_counters<const N: i16>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+pub fn enters_with_minus_one_counters<const N: i32>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.counters[CounterKind::MinusOne as usize] += N;
     Ok(())
 }
@@ -91,7 +91,7 @@ pub fn remove_a_minus_one_counter_from_this(g: &mut dyn Game, item: &StackItem) 
 /// if it is no longer a legal target as the spell or ability resolves (CR 608.2b). Bedeck // Bedazzle, Collective
 /// Brutality, Dismember, Fervent Champion, Giant Growth, Grim Bauble, Harvester of Misery, Icy Reception, Last Gasp,
 /// Locust Spray, Proft, Stab, The Mightstone and Weakstone, Theorix Charm, Umezawa's Jitte and Shambling Ghast print it.
-pub fn target_creature_gets<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn target_creature_gets<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = crate::targets::object(g, item, 0) {
         crate::pump(g, item.object, creature, P, T);
     }
@@ -101,7 +101,7 @@ pub fn target_creature_gets<const P: i16, const T: i16>(g: &mut dyn Game, item: 
 /// "Target creature gets +`P`/+`T` and gains first strike until end of turn" (CR 611.2a, 702.7): one instruction, the creature
 /// being the ability's first target; nothing if it is no longer a legal target as the spell resolves (CR 608.2b). Interjection
 /// (+2/+2), Molecular Modifier (+1/+0), Charge the Sanctum's single-target mode (+2/+0) and Riverguard's Reflexes (+2/+2) print it.
-pub fn target_creature_gets_and_gains_first_strike<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn target_creature_gets_and_gains_first_strike<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = crate::targets::object(g, item, 0) {
         instruction(g, |g| {
             crate::pump(g, item.object, creature, P, T);
@@ -114,7 +114,7 @@ pub fn target_creature_gets_and_gains_first_strike<const P: i16, const T: i16>(g
 /// "Target creature gets +`P`/+`T` and gains haste until end of turn" (CR 611.2a, 702.10): one instruction, the creature
 /// being the ability's first target; nothing if it is no longer a legal target as the spell resolves (CR 608.2b). Wild Ride
 /// (+3/+0), Fame (+2/+0) and Kavaron Turbodrone (+1/+1) print it.
-pub fn target_creature_gets_and_gains_haste<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn target_creature_gets_and_gains_haste<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = crate::targets::object(g, item, 0) {
         instruction(g, |g| {
             crate::pump(g, item.object, creature, P, T);
@@ -127,7 +127,7 @@ pub fn target_creature_gets_and_gains_haste<const P: i16, const T: i16>(g: &mut 
 /// "One or two target creatures each get +`P`/+`T` until end of turn" (CR 611.2a): every target still legal as the spell
 /// resolves (CR 608.2b), pumped as one instruction. Appeal to Eirdu (+2/+1), Opera Love Song's mode (+2/+0) and Spiritcall
 /// Enthusiast's Scrollboost (+2/+2) print it.
-pub fn targets_get<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn targets_get<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = crate::targets::legal_objects(g, item);
     instruction(g, |g| {
         for creature in creatures {
@@ -168,7 +168,7 @@ pub fn destroy_artifacts_with_mana_value_at_most(g: &mut dyn Game, limit: u32) -
 /// controls as it resolves, and no creature that enters later. The creatures, for what the rest of the sentence does to them
 /// ("and gain haste", "untap those creatures"). Assault Formation, Eagles of the North, Fatehold Charm, Haze of Rage, Jeskai
 /// Ascendancy, Lorehold Charm, Silk Web Weaver and Warhost's Frenzy print it.
-pub fn pump_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
+pub fn pump_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i32, toughness: i32) -> Vec<ObjectId> {
     let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     instruction(g, |g| {
         for &id in &creatures {
@@ -181,7 +181,7 @@ pub fn pump_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16
 /// "Creatures you control get +`P`/+`T` until end of turn" as a spell's or ability's whole effect: `pump_creatures_you_control`
 /// (CR 611.2, 611.2c). Assault Formation, Castle Embereth, Dwarven Provisioner, Fatehold Charm, Haze of Rage, Master of
 /// Barbs, Prudent Fateseer, Shatterwing Pegasus, Shefet Dunes, Thorin's Last Stand and Winter, Team Player print it.
-pub fn creatures_you_control_get<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn creatures_you_control_get<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     pump_creatures_you_control(g, item, P, T);
     Ok(())
 }
@@ -189,7 +189,7 @@ pub fn creatures_you_control_get<const P: i16, const T: i16>(g: &mut dyn Game, i
 /// "Creatures target player controls get +`P`/+`T` until end of turn" (CR 611.2, 611.2c): the creatures the player at target
 /// slot `TARGET` controls as it resolves, and no creature that enters later; nothing if that player is no longer a legal target
 /// (CR 608.2b). Gnashing of Teeth (-1/-1) and How to Start a Riot (+2/+0) print it.
-pub fn creatures_target_player_controls_get<const TARGET: usize, const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn creatures_target_player_controls_get<const TARGET: usize, const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(player) = crate::targets::player(g, item, TARGET) else { return Ok(()) };
     let creatures: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     instruction(g, |g| {
@@ -203,7 +203,7 @@ pub fn creatures_target_player_controls_get<const TARGET: usize, const P: i16, c
 /// "Creatures you control get +`power`/+`toughness` and gain [a keyword] until end of turn" (CR 611.2, 611.2c): the creatures
 /// `item`'s controller controls as it resolves, and no creature that enters later. Silk, Web Weaver (+2/+2) and The Super Hero
 /// Civil War (+1/+1) print it with vigilance.
-pub fn pump_creatures_you_control_and_gain(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16, keyword: Keyword) {
+pub fn pump_creatures_you_control_and_gain(g: &mut dyn Game, item: &StackItem, power: i32, toughness: i32, keyword: Keyword) {
     instruction(g, |g| {
         for id in pump_creatures_you_control(g, item, power, toughness) {
             gain_until_end_of_turn(g, item.object, id, keyword);
@@ -214,7 +214,7 @@ pub fn pump_creatures_you_control_and_gain(g: &mut dyn Game, item: &StackItem, p
 /// "Other creatures you control get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): the creatures `item`'s
 /// controller controls as it resolves but its source, and no creature that enters later. The creatures, for what the rest
 /// of the sentence does to them ("and gain trample"). Restless Prairie and Summon: Esper Maduin print it.
-pub fn pump_other_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
+pub fn pump_other_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i32, toughness: i32) -> Vec<ObjectId> {
     let others: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&id| id != item.object && g.chars(id).is(CardType::Creature)).collect();
     instruction(g, |g| {
@@ -241,7 +241,7 @@ pub fn creatures_you_control_gain(g: &mut dyn Game, item: &StackItem, keywords: 
 /// "All creatures get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): every creature on the battlefield as
 /// `source`'s spell or ability resolves, whoever controls it, and no creature that enters later. Toxic Deluge (-X/-X) and
 /// Withering Curse (-2/-2) print it.
-pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i16, toughness: i16) {
+pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i32, toughness: i32) {
     pump_creatures_other_than(g, source, &[], power, toughness);
 }
 
@@ -249,7 +249,7 @@ pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i16, toughn
 /// the creatures `other_than` names left out. Harvester of Misery's "other creatures get -2/-2" and D'Ghor Bloodletter's
 /// "all other creatures get -1/-1" leave out their source; Zenos yae Galvus's "creatures other than Zenos yae Galvus and the
 /// chosen creature get -2/-2" its source and the creature it chose.
-pub fn pump_creatures_other_than(g: &mut dyn Game, source: ObjectId, other_than: &[ObjectId], power: i16, toughness: i16) {
+pub fn pump_creatures_other_than(g: &mut dyn Game, source: ObjectId, other_than: &[ObjectId], power: i32, toughness: i32) {
     let creatures: Vec<ObjectId> = creatures_on_the_battlefield(g).into_iter().filter(|id| !other_than.contains(id)).collect();
     instruction(g, |g| {
         for id in creatures {
@@ -262,7 +262,7 @@ pub fn pump_creatures_other_than(g: &mut dyn Game, source: ObjectId, other_than:
 /// each of them, the creatures being those on the battlefield as it resolves. The creatures, for what the rest of the sentence does
 /// to them. Craterclaw Colossus (+X/+0, X the artifacts you control), Craterhoof Behemoth (+X/+X, X the creatures) and Balmor,
 /// Battlemage Captain (+1/+0) print it.
-pub fn pump_and_trample_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
+pub fn pump_and_trample_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i32, toughness: i32) -> Vec<ObjectId> {
     let mut creatures = Vec::new();
     instruction(g, |g| {
         creatures = pump_creatures_you_control(g, item, power, toughness);
@@ -277,7 +277,7 @@ pub fn pump_and_trample_creatures_you_control(g: &mut dyn Game, item: &StackItem
 /// once (CR 608.2, 101.4: one event, CR 603.2c). The creatures, for what the rest of the sentence does to "those
 /// creatures". Abandoned Air Temple, Elspeth, Storm Slayer, Anduril, Narsil Reforged, Gavony Township, Germination
 /// Practicum, Ouroboroid and The Theorist, Jace Beleren print it.
-pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kind: CounterKind, n: i16) -> Vec<ObjectId> {
+pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kind: CounterKind, n: i32) -> Vec<ObjectId> {
     let creatures: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     counters_on_each(g, &creatures, kind, n);
     creatures
@@ -301,8 +301,8 @@ pub fn put_loyalty_counter_on_each_planeswalker_you_control(g: &mut dyn Game, it
 }
 
 /// `n` `kind` counters on each of `objects`, all of them at once (CR 608.2, 101.4).
-pub fn counters_on_each(g: &mut dyn Game, objects: &[ObjectId], kind: CounterKind, n: i16) {
-    let puts: Vec<(ObjectId, CounterKind, i16)> = objects.iter().map(|&id| (id, kind, n)).collect();
+pub fn counters_on_each(g: &mut dyn Game, objects: &[ObjectId], kind: CounterKind, n: i32) {
+    let puts: Vec<(ObjectId, CounterKind, i32)> = objects.iter().map(|&id| (id, kind, n)).collect();
     g.add_counters_together(&puts);
 }
 
@@ -310,7 +310,7 @@ pub fn counters_on_each(g: &mut dyn Game, objects: &[ObjectId], kind: CounterKin
 /// that has the subtype (CR 608.2c, 205.3), the source among them, the subtype read through the words of the source's text
 /// (CR 612.2); all of them at once (CR 608.2, 101.4: one event, CR 603.2c). The permanents. Lyra, Archangel of Dawn
 /// (Angels) and Ajani, Nacatl Avenger (Cats) print it, with one +1/+1 counter: `plus_one_counter_on_each_of_subtype_you_control`.
-pub fn counters_on_each_of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, kind: CounterKind, n: i16) -> Vec<ObjectId> {
+pub fn counters_on_each_of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, kind: CounterKind, n: i32) -> Vec<ObjectId> {
     of_subtype_you_control(g, item, subtype, false, kind, n)
 }
 
@@ -334,11 +334,11 @@ pub fn other_of_subtype_you_control_gain_until_end_of_turn<const SUBTYPE: u16, c
 /// source. Thalia's Lieutenant (Humans), Rescue Retriever (Soldiers), Camellia, the Seedmiser (Squirrels), Agent Phil
 /// Coulson and Doctor Spectrum (Heroes) and Vampire Socialite (Vampires) print it, with one +1/+1 counter:
 /// `plus_one_counter_on_each_other_of_subtype_you_control`.
-pub fn counters_on_each_other_of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, kind: CounterKind, n: i16) -> Vec<ObjectId> {
+pub fn counters_on_each_other_of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, kind: CounterKind, n: i32) -> Vec<ObjectId> {
     of_subtype_you_control(g, item, subtype, true, kind, n)
 }
 
-fn of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, other: bool, kind: CounterKind, n: i16) -> Vec<ObjectId> {
+fn of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, other: bool, kind: CounterKind, n: i32) -> Vec<ObjectId> {
     let word = g.words(item.object).subtype(subtype);
     let objects: Vec<ObjectId> = g
         .permanents_of(item.controller)
@@ -413,7 +413,7 @@ pub fn three_plus_one_counters_on_this(g: &mut dyn Game, item: &StackItem) -> Re
 /// Prowler, Diviner of Victory, Flameblade Adept, Hydro-Man, Fluid Felon, Knight of Dusk's Shadow, Mausoleum Wanderer,
 /// Nighthowl Pursuer, Ravine Raider, Remnant Elemental, Skilled Battlecarver, Slickshot Show-Off, Undulating Witness, Veyran, Voice of Duality
 /// and Woodland Weavemaster.
-pub fn this_gets<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn this_gets<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     crate::pump(g, item.object, item.object, P, T);
     Ok(())
 }
@@ -421,7 +421,7 @@ pub fn this_gets<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem)
 /// "[This creature] gets +`P`/+`T` and gains menace until end of turn" (CR 611.2a, 613.4c, 702.111): one instruction ("gets +1/+0 and
 /// gains menace") of two continuous effects from the ability's source, both of which do nothing once it has left the battlefield
 /// (CR 400.7). Flame-Chain Mauler and Inner Demons Gangsters (+1/+0) print it.
-pub fn this_gets_and_gains_menace<const P: i16, const T: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn this_gets_and_gains_menace<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.one_instruction(&mut |g| {
         crate::pump(g, item.object, item.object, P, T);
         if g.is_on_battlefield(item.object) {
@@ -818,7 +818,7 @@ pub fn target_player_gains<const N: i32>(g: &mut dyn Game, item: &StackItem) -> 
 /// "Target player gains X life": Alabaster Potion and Stream of Life (also prepared by Infirmary Healer).
 pub fn target_player_gains_x_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(player) = crate::targets::player(g, item, 0) {
-        g.gain_life(player, i32::from(item.x));
+        g.gain_life(player, item.x as i32);
     }
     Ok(())
 }
@@ -934,17 +934,17 @@ pub fn target_player_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem)
 /// dealt together (CR 120.2), by the resolving object as it last was if it has left (CR 113.7a). Chandra, Torch of Defiance,
 /// Eye of Jace, Fiery Confluence, Impact Tremors, Warleader's Call, Vivi Ornitier, Gau, Keral Keep Disciples, Voldaren
 /// Epicure and Quintorius Kand print it.
-pub fn damage_each_opponent(g: &mut dyn Game, item: &StackItem, n: u16) {
-    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), n)).collect();
+pub fn damage_each_opponent(g: &mut dyn Game, item: &StackItem, n: u32) {
+    let hits: Vec<(ObjectId, Target, u32)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), n)).collect();
     g.damage_together(&hits);
 }
 
 /// "[This source] deals `n` damage to each opponent and you gain `n` life" (CR 120.3, 119.3): `damage_each_opponent`, then the
 /// controller gains the life whether or not the damage was dealt (CR 608.2c). Extended Absence, Screeching Soulbreaker, Eye of
 /// Jace, Aurelia, the Law Above, Quintorius Kand, Sanctum Lurker, Ark of Hunger and Colossus of the Blood Age print it.
-pub fn damage_each_opponent_and_gain_life(g: &mut dyn Game, item: &StackItem, n: u16) -> Result<(), Suspend> {
+pub fn damage_each_opponent_and_gain_life(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
     damage_each_opponent(g, item, n);
-    g.gain_life(item.controller, i32::from(n));
+    g.gain_life(item.controller, n as i32);
     Ok(())
 }
 
@@ -953,7 +953,7 @@ pub fn damage_each_opponent_and_gain_life(g: &mut dyn Game, item: &StackItem, n:
 /// retest of the trigger condition. The damage is dealt by the ability's source, as it last existed if it has left
 /// (CR 113.7a); none is dealt to a player who has left the game (CR 102.1, 120.1, 800.4a), which the core's damage sees to. Rampaging
 /// Ferocidon, Tetsuko Umezawa, Pursuer, Ankh of Mishra (1), Dingus Egg and Psychic Venom (2) print it.
-pub fn ping_subject_controller<const N: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn ping_subject_controller<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(subject) = item.subject.object() {
         let controller = g.controller(subject);
         g.damage(item.object, Target::Player(controller), N);
@@ -1056,7 +1056,7 @@ pub fn each_opponent_discards_a_card_and_those_who_cant(g: &mut dyn Game, item: 
 /// target, if that is still a legal target as it resolves (CR 608.2b); a source that has left its zone (sacrificed as a cost,
 /// discarded, dead) deals it as it last existed (CR 113.7a, 608.2h). Which targets are allowed is the card's own spell or
 /// ability. Lightning Bolt (any target, 3), Shock (2), Flametongue Kavu (creature, 4) and Hired Claw (opponent, 1) print it.
-pub fn damage_first_target<const N: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn damage_first_target<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     crate::damage_target(g, item, 0, N);
     Ok(())
 }
@@ -1066,7 +1066,7 @@ pub fn damage_first_target<const N: u16>(g: &mut dyn Game, item: &StackItem) -> 
 /// are allowed is the card's own. Stadium Headliner and Team Avatar print it.
 pub fn damage_first_target_by_creatures_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = crate::creatures_you_control(g, item.controller);
-    crate::damage_target(g, item, 0, creatures as u16);
+    crate::damage_target(g, item, 0, creatures as u32);
     Ok(())
 }
 
@@ -1191,7 +1191,7 @@ pub fn exile_what_it_became(g: &mut dyn Game, left: ObjectId) -> Vec<ObjectId> {
 /// graveyard, if it is still there (CR 400.7e) - each card of a merged permanent, together (CR 730.3c, 101.4) - tapped if
 /// `tapped`, each entering with `counters` (CR 122.6). The permanents that entered; a replacement may have kept one out. Hellcat,
 /// Retched Wretch, Pain 101, Unstoppable Slasher, persist and undying print it.
-pub fn return_what_it_became(g: &mut dyn Game, left: ObjectId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend> {
+pub fn return_what_it_became(g: &mut dyn Game, left: ObjectId, tapped: bool, counters: &[(CounterKind, i32)]) -> Result<Vec<ObjectId>, Suspend> {
     let cards: Vec<(ObjectId, PlayerId, bool)> = g.found_all_after_move(left).into_iter().map(|c| (c, g.obj(c).owner, tapped)).collect();
     if cards.is_empty() {
         return Ok(Vec::new());
@@ -1241,7 +1241,7 @@ pub fn untap_all_lands_you_control(g: &mut dyn Game, item: &StackItem) -> Result
 /// legal as it resolves, put on together (CR 101.4), so a "one or more" ability triggers once. Agent Bishop, Man in Black and White
 /// Widow, Free Agent print it.
 pub fn plus_one_counter_on_each_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let puts: Vec<(ObjectId, CounterKind, i16)> =
+    let puts: Vec<(ObjectId, CounterKind, i32)> =
         crate::targets::legal_objects(g, item).into_iter().map(|creature| (creature, CounterKind::PlusOne, 1)).collect();
     g.add_counters_together(&puts);
     Ok(())
@@ -1251,7 +1251,7 @@ pub fn plus_one_counter_on_each_target(g: &mut dyn Game, item: &StackItem) -> Re
 /// permanent was untapped, so a tapped one gets it too; an illegal target does nothing (CR 608.2b). The target filter stays with
 /// each card ("up to one" included). With 1 counter: Loch Mare's second ability, Sygg's Command's fourth mode, Champions of the
 /// Shoal, Consider the Prime Directive's Observe, Deluge Virtuoso, Floodpits Drowner and Utrom Scientists. With 2: Kaito, Bane of Nightmares and Lodestone Needle.
-pub fn tap_and_stun<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn tap_and_stun<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(permanent) = crate::targets::object(g, item, 0) {
         g.tap(permanent);
         g.add_counters(permanent, CounterKind::Stun, N);
@@ -1549,7 +1549,7 @@ pub fn return_first_target_to_battlefield(g: &mut dyn Game, item: &StackItem) ->
 
 /// "This source deals damage to any target and damage to you" (CR 608.2b-c, 120.4b): one instruction, both hits simultaneous.
 /// Psionic Blast and Spicy Oatmeal Pizza use this recipe; the resolving item has one mandatory target.
-pub fn damage_target_and_you<const TARGET: u16, const YOU: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn damage_target_and_you<const TARGET: u32, const YOU: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let target = g.state().target(item, 0);
     g.damage_together(&[(item.object, target, TARGET), (item.object, Target::Player(item.controller), YOU)]);
     Ok(())
@@ -1561,7 +1561,7 @@ pub fn damage_target_and_you<const TARGET: u16, const YOU: u16>(g: &mut dyn Game
 /// once it is illegal, and a mode of a modal spell still resolving for another mode's target gains it anyway (CR 608.2b), as
 /// `target_player_loses_life_you_gain_life` does. Which targets are allowed is the card's own spell or ability. Lightning
 /// Helix, Phlage, Titan of Fire's Fury and Demonic Pact print it with equal amounts; Knockout Blow deals 4 and gains 2.
-pub fn damage_target_and_gain_life(g: &mut dyn Game, item: &StackItem, damage: u16, life: i32) -> Result<(), Suspend> {
+pub fn damage_target_and_gain_life(g: &mut dyn Game, item: &StackItem, damage: u32, life: i32) -> Result<(), Suspend> {
     if g.target_legal(item, 0) {
         g.damage(item.object, item.target(0), damage);
     }
@@ -1582,15 +1582,15 @@ pub fn change_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
 
 /// "This source deals N damage to each creature and each player" (CR 608.2c, 120.4): all recipients
 /// are damaged together, including both players and creatures controlled by either. Pestilence and Encounter the Unknown print it.
-pub fn damage_each_creature_and_player<const N: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn damage_each_creature_and_player<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     damage_each_creature_and_player_n(g, item, N);
     Ok(())
 }
 
 /// `damage_each_creature_and_player` for an amount worked out as the effect resolves, not printed: Volcanic Eruption deals
 /// damage equal to the number of Mountains put into a graveyard this way.
-pub fn damage_each_creature_and_player_n(g: &mut dyn Game, item: &StackItem, n: u16) {
-    let mut hits: Vec<(ObjectId, Target, u16)> =
+pub fn damage_each_creature_and_player_n(g: &mut dyn Game, item: &StackItem, n: u32) {
+    let mut hits: Vec<(ObjectId, Target, u32)> =
         creatures_on_the_battlefield(g).into_iter().map(|id| (item.object, Target::Object(id), n)).collect();
     hits.extend(g.state().apnap().map(|p| (item.object, Target::Player(p), n)));
     g.damage_together(&hits);
@@ -1608,16 +1608,16 @@ pub fn target_becomes_color<const COLOR: u8>(g: &mut dyn Game, item: &StackItem)
 
 /// "[This spell] deals `n` damage to each creature" (Pyroclasm, Fiery Confluence, Avengers Disassembled): one damage event
 /// for every creature on the battlefield as the effect is carried out (CR 608.2c), all dealt together.
-pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
+pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u32) {
     damage_each_creature_dealt(g, item, n);
 }
 
 /// "[This spell] deals `n` damage to each creature your opponents control" (CR 608.2c, 120.2): one damage event for every
 /// creature an opponent of the resolving item's controller controls as the effect is carried out, all dealt together.
 /// Iroh's Demonstration and Easy Pickings (Glóin the Mighty) print it.
-pub fn damage_each_creature_opponents_control(g: &mut dyn Game, item: &StackItem, n: u16) {
+pub fn damage_each_creature_opponents_control(g: &mut dyn Game, item: &StackItem, n: u32) {
     let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
-    let hits: Vec<(ObjectId, Target, u16)> = g
+    let hits: Vec<(ObjectId, Target, u32)> = g
         .state()
         .battlefield()
         .iter()
@@ -1631,7 +1631,7 @@ pub fn damage_each_creature_opponents_control(g: &mut dyn Game, item: &StackItem
 /// "[This spell] deals `n` damage to each opponent and each creature they control" (CR 608.2c, 120.2): one damage event for
 /// each opponent of the resolving item's controller and each creature one controls, all dealt together. Delayed Blast
 /// Fireball, Soul Immolation and Khan, Despot by Design print it.
-pub fn damage_each_opponent_and_each_creature_they_control(g: &mut dyn Game, item: &StackItem, n: u16) {
+pub fn damage_each_opponent_and_each_creature_they_control(g: &mut dyn Game, item: &StackItem, n: u32) {
     let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
     let creatures: Vec<ObjectId> = g
         .state()
@@ -1640,7 +1640,7 @@ pub fn damage_each_opponent_and_each_creature_they_control(g: &mut dyn Game, ite
         .copied()
         .filter(|&id| g.chars(id).is(CardType::Creature) && opponents.contains(&g.controller(id)))
         .collect();
-    let hits: Vec<(ObjectId, Target, u16)> = opponents
+    let hits: Vec<(ObjectId, Target, u32)> = opponents
         .iter()
         .map(|&p| Target::Player(p))
         .chain(creatures.into_iter().map(Target::Object))
@@ -1653,8 +1653,8 @@ pub fn damage_each_opponent_and_each_creature_they_control(g: &mut dyn Game, ite
 /// the battlefield without `subtype` as the effect is carried out, all dealt together. The caller reads the subtype through
 /// the words of the object whose text names it (`g.words(item.object).subtype(..)`, CR 612). Desolation of Smaug (non-Dragon)
 /// and Chandra, Awakened Inferno (non-Elemental) print it.
-pub fn damage_each_creature_not_of_subtype(g: &mut dyn Game, item: &StackItem, subtype: Subtype, n: u16) {
-    let hits: Vec<(ObjectId, Target, u16)> = g
+pub fn damage_each_creature_not_of_subtype(g: &mut dyn Game, item: &StackItem, subtype: Subtype, n: u32) {
+    let hits: Vec<(ObjectId, Target, u32)> = g
         .state()
         .battlefield()
         .iter()
@@ -1672,8 +1672,8 @@ pub fn damage_each_creature_not_of_subtype(g: &mut dyn Game, item: &StackItem, s
 /// House, Temporal Firestorm, Dragonback Assault, Invasion of Karsus, Star of Extinction, Underworld Fires, Calamitous
 /// Cave-In): one damage event for every creature and planeswalker on the battlefield as the effect is carried out (CR 608.2c),
 /// each permanent once even when it is both, all dealt together. Damage to a planeswalker removes loyalty counters (CR 306.8).
-pub fn damage_each_creature_and_planeswalker(g: &mut dyn Game, item: &StackItem, n: u16) {
-    let hits: Vec<(ObjectId, Target, u16)> = g
+pub fn damage_each_creature_and_planeswalker(g: &mut dyn Game, item: &StackItem, n: u32) {
+    let hits: Vec<(ObjectId, Target, u32)> = g
         .state()
         .battlefield()
         .iter()
@@ -1691,8 +1691,8 @@ pub fn damage_each_creature_and_planeswalker(g: &mut dyn Game, item: &StackItem,
 /// damage this way" (Anger of the Gods, Pyroclasm's kin). They are read from the damage events the resolution recorded, so a
 /// creature whose damage was prevented is not among them and one a redirection sent the damage to (CR 614.9, Ancient
 /// Adamantoise) is, once however many times it was dealt damage.
-pub fn damage_each_creature_dealt(g: &mut dyn Game, item: &StackItem, n: u16) -> Vec<ObjectId> {
-    let hits: Vec<(ObjectId, Target, u16)> = g
+pub fn damage_each_creature_dealt(g: &mut dyn Game, item: &StackItem, n: u32) -> Vec<ObjectId> {
+    let hits: Vec<(ObjectId, Target, u32)> = g
         .state()
         .battlefield()
         .iter()
@@ -1710,7 +1710,7 @@ pub fn damage_each_creature_dealt(g: &mut dyn Game, item: &StackItem, n: u16) ->
 /// "[This] deals `n` damage to that player": the player a trigger fired about (`Fired::about(Target::Player(..))`, its
 /// subject), dealt by the ability's source, as it last was if it has left (CR 113.7a, 608.2h). Burning-Tree Shaman, Harsh
 /// Mentor and Immolation Shaman print it.
-pub fn damage_that_player(g: &mut dyn Game, item: &StackItem, n: u16) -> Result<(), Suspend> {
+pub fn damage_that_player(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
     if let Target::Player(p) = item.subject {
         g.damage(item.object, Target::Player(p), n);
     }
@@ -1817,7 +1817,7 @@ pub fn becomes_subtype_until_end_of_turn(g: &mut dyn Game, source: ObjectId, tar
 /// the turn; `KEYWORDS` is a `Keywords` as `u64` (`Keywords::of(&[Keyword::Lifelink]).0`). With no target chosen (an "up to one")
 /// nothing happens. Bard the Bowman (lifelink), Thranduil's Company (two counters, vigilance), Tam's Resistance (vigilance) and
 /// Fateshaper Aspirant's second mode (vigilance and indestructible) print it.
-pub fn plus_one_counters_on_first_target_that_gains_until_end_of_turn<const COUNTERS: i16, const KEYWORDS: u64>(
+pub fn plus_one_counters_on_first_target_that_gains_until_end_of_turn<const COUNTERS: i32, const KEYWORDS: u64>(
     g: &mut dyn Game,
     item: &StackItem,
 ) -> Result<(), Suspend> {
@@ -1997,7 +1997,7 @@ pub fn may_pay_to_transform(g: &mut dyn Game, item: &StackItem, cost: ManaCost) 
 /// under whatever modifies them, counters included (layer 7c). Abilities that already triggered or were activated still
 /// resolve (the rulings). It lasts until the cleanup step (CR 514.2). The color and the creature type are words of the
 /// spell's text (CR 612), read through its words. With the target gone or no longer a creature, nothing happens (CR 608.2b).
-pub fn loses_all_abilities_and_becomes(g: &mut dyn Game, item: &StackItem, slot: usize, color: Color, kind: Subtype, power: i16, toughness: i16) {
+pub fn loses_all_abilities_and_becomes(g: &mut dyn Game, item: &StackItem, slot: usize, color: Color, kind: Subtype, power: i32, toughness: i32) {
     let Some(creature) = crate::targets::object(g, item, slot) else { return };
     let words = g.words(item.object);
     let source = item.object;
@@ -2025,8 +2025,8 @@ pub fn loses_all_abilities_and_becomes_a_creature_for_good(
     slot: usize,
     color: Color,
     kind: Subtype,
-    power: i16,
-    toughness: i16,
+    power: i32,
+    toughness: i32,
 ) {
     let Some(target) = crate::targets::object(g, item, slot) else { return };
     let source = item.object;
@@ -2054,7 +2054,7 @@ pub fn loses_all_abilities_and_becomes_a_creature_for_good(
 pub fn planeswalker_becomes_creature_preventing_damage(
     g: &mut dyn Game,
     item: &StackItem,
-    (power, toughness): (i16, i16),
+    (power, toughness): (i32, i32),
     colors: Option<ColorSet>,
     subtypes: &[Subtype],
     keywords: Keywords,
@@ -2081,7 +2081,7 @@ pub fn planeswalker_becomes_creature_preventing_damage(
 /// "Put `N` -1/-1 counters on target creature" (CR 122.1a, 608.2b), the first target still legal on resolution; nothing when the
 /// slot was left empty ("up to one") or the target is gone. Emptiness (three), Bile-Vial Boggart and Nightmare Sower (one) and
 /// Blight Rot (four) print it.
-pub fn minus_one_counters_on_target<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn minus_one_counters_on_target<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
     g.add_counters(creature, CounterKind::MinusOne, N);
     Ok(())
@@ -2110,7 +2110,7 @@ pub fn put_counters_of_on_target(g: &mut dyn Game, item: &StackItem, from: Objec
 /// Mutant Mechanic's target and Buzzard-Wasp Colony's own permanent are `target`.
 pub fn put_counters_of_on(g: &mut dyn Game, from: ObjectId, target: ObjectId) {
     let counters = g.obj(from).counter_array();
-    let puts: Vec<(ObjectId, CounterKind, i16)> = CounterKind::ALL.into_iter().map(|kind| (target, kind, counters[kind as usize])).collect();
+    let puts: Vec<(ObjectId, CounterKind, i32)> = CounterKind::ALL.into_iter().map(|kind| (target, kind, counters[kind as usize])).collect();
     g.add_counters_together(&puts);
 }
 
@@ -2223,7 +2223,7 @@ pub fn may_pay_to_return_this_to_the_battlefield(
     item: &StackItem,
     price: Cost,
     question: &'static Question,
-    counters: &[(CounterKind, i16)],
+    counters: &[(CounterKind, i32)],
 ) -> Result<(), Suspend> {
     if is_live(g, item.object) && g.may_pay(item.controller, item.object, item.object, price, question)? {
         g.put_onto_battlefield_with_counters(item.object, item.controller, false, counters)?;

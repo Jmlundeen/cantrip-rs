@@ -10,7 +10,7 @@ fn plague_ratss_power_toughness_equal_apply_0(
     let count = q.state().battlefield().iter().copied().filter(|&id| {
         q.chars(id).is(CardType::Creature)
             && cantrip_mechanics::library::object_names_in_layers(q, id).contains(&"Plague Rats")
-    }).count() as i16;
+    }).count() as i32;
     chars.power = Some(count);
     chars.toughness = Some(count);
 }

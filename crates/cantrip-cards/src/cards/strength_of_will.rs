@@ -19,7 +19,7 @@ fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// dealt at once, the trigger's `data[0]`; it counts even when the damage is lethal, indestructible having kept the creature. A
 /// creature that is no longer on the battlefield gets none.
 fn counters_equal_to_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, i16::try_from(item.data[0]).unwrap_or(i16::MAX));
+    g.add_counters(item.object, CounterKind::PlusOne, i32::try_from(item.data[0]).unwrap_or(i32::MAX));
     Ok(())
 }
 

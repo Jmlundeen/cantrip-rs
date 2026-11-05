@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// spell's own object. With the one target illegal the spell is not resolved at all (CR 608.2b), so nothing untaps.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let spent = g.obj(item.object).spent.total();
-    damage_target(g, item, 0, spent as u16);
+    damage_target(g, item, 0, spent as u32);
     for creature in g.permanents_of(item.controller) {
         if g.chars(creature).is(CardType::Creature) {
             g.untap(creature);

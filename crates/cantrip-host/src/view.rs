@@ -1347,7 +1347,7 @@ impl<'a> Projector<'a> {
             power: c.power.map(i32::from),
             toughness: c.toughness.map(i32::from),
             tapped: obj.tapped,
-            damage_marked: i32::from(obj.damage),
+            damage_marked: obj.damage as i32,
             counters,
             summoning_sick: on_battlefield && summoning_sick(game.cards, s, &game.log, id),
             produces_mana: c.abilities().any(|a| matches!(game.cards.ability(a), AbilityDef::Activated(d) if d.is_mana_ability())),

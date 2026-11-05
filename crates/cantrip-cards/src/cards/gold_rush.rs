@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create_a_treasure(g, item)?;
     if let Some(creature) = g.state().spec_targets(item, 0).next().and_then(|slot| targets::object(g, item, slot)) {
-        let bonus = 2 * tokens::treasures_controlled(g, item.controller).len() as i16;
+        let bonus = 2 * tokens::treasures_controlled(g, item.controller).len() as i32;
         pump(g, item.object, creature, bonus, bonus);
     }
     Ok(())

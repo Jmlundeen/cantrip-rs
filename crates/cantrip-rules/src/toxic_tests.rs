@@ -53,7 +53,7 @@ fn to_a_player(_: &dyn Query, _: &Asker, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::Damage(d) if matches!(d.target, Target::Player(_)))
 }
 
-fn keep<const KEEP: u16>(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+fn keep<const KEEP: u32>(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     if let Proposal::Damage(d) = proposal {
         d.amount = d.amount.min(KEEP);
     }
@@ -98,7 +98,7 @@ fn cx(g: &mut Game) -> Cx<'_> {
 }
 
 /// `source` deals `amount` damage to `target`, combat damage or not, as one event of its own.
-fn deal(g: &mut Game, source: ObjectId, target: Target, amount: u16, combat: bool) {
+fn deal(g: &mut Game, source: ObjectId, target: Target, amount: u32, combat: bool) {
     let mut cx = cx(g);
     let mut batch = ops::DamageBatch::default();
     ops::deal_damage_with(&mut cx, source, target, amount, combat, &mut batch);

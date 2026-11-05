@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// "This creature gets +1/+0 as long as you control another artifact" (CR 613.4c): itself, while its controller has an artifact
 /// besides it, as the earlier layers left the permanents (itself being one).
 fn itself_with_another_artifact(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    affected == source && artifacts_you_control(view, source) - i16::from(view.chars(source).is(CardType::Artifact)) >= 1
+    affected == source && artifacts_you_control(view, source) - i32::from(view.chars(source).is(CardType::Artifact)) >= 1
 }
 
 /// "Search your library for a card named Magitek Infantry, put it onto the battlefield tapped, then shuffle" (CR 701.23): the

@@ -59,7 +59,7 @@ static ARC: CardDef = CardDef {
 };
 
 /// Its source's power as the division is announced, none if it is negative.
-fn its_power(q: &dyn Query, asker: &Asker, _: u16) -> u32 {
+fn its_power(q: &dyn Query, asker: &Asker, _: u32) -> u32 {
     u32::try_from(q.chars(asker.source).power.unwrap_or(0)).unwrap_or(0)
 }
 
@@ -171,7 +171,7 @@ fn pay_and_resolve(g: &mut Game, mut r: Request) {
     }
 }
 
-fn plus_ones(g: &Game, id: ObjectId) -> i16 {
+fn plus_ones(g: &Game, id: ObjectId) -> i32 {
     g.state.obj(id).counters(CounterKind::PlusOne)
 }
 

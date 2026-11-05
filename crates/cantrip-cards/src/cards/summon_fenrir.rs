@@ -13,7 +13,7 @@ fn crescent_fang(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// III: "Draw a card if you control the creature with the greatest power or tied for the greatest power": judged as the
 /// chapter resolves, among all creatures on the battlefield, Fenrir itself included while it is still there.
 fn ecliptic_growl(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures: Vec<(ObjectId, i16)> = g
+    let creatures: Vec<(ObjectId, i32)> = g
         .state()
         .battlefield()
         .iter()

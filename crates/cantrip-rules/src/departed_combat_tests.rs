@@ -80,7 +80,7 @@ fn a_tramplers_living_blockers_still_receive_its_entire_damage_without_a_defende
     assert!(!division.may_assign_to_defender);
     assert_eq!(division.defender, Target::None);
     assert_eq!(division.suggested_to_defender, 0);
-    assert_eq!(division.suggested.iter().sum::<u16>(), 3);
+    assert_eq!(division.suggested.iter().sum::<u32>(), 3);
     assert_eq!(division.creatures, blockers);
     let request = Request { id: 0, player: YOU, may_cancel: false, kind: RequestKind::AssignCombatDamage { divisions: vec![division] } };
     assert!(crate::check_answer(cx.g, &request, &Answer::Shares(vec![(attacker, Some(blockers[0]), 1), (attacker, Some(blockers[1]), 1), (attacker, None, 1)])).is_err());

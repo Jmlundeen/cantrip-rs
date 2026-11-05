@@ -304,7 +304,7 @@ pub fn record_distilled(
             ) => {
                 let later: Vec<Answer> =
                     answers[start..].iter().map(|(_, _, a)| a.clone()).collect();
-                Some(u16::try_from(final_x(*x, &later)).unwrap_or(u16::MAX))
+                Some(final_x(*x, &later))
             }
             (
                 RequestKind::UnlessPays { x: Some(_), .. },

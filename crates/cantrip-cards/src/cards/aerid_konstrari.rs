@@ -14,7 +14,7 @@ fn create_heartwood(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// the battlefield, it gets nothing (CR 400.7).
 fn make_and_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create_heartwood(g, item.controller)?;
-    let artifacts = artifacts_you_control(g, item.controller) as i16;
+    let artifacts = artifacts_you_control(g, item.controller) as i32;
     pump(g, item.object, item.object, artifacts, 0);
     Ok(())
 }

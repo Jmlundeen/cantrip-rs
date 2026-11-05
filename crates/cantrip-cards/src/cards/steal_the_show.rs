@@ -17,7 +17,7 @@ fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .zone(Zone::graveyard(item.controller))
         .iter()
         .filter(|&&c| cantrip_mechanics::library::instant_or_sorcery_card(g, c))
-        .count() as u16;
+        .count() as u32;
     damage_target(g, item, 0, n);
     Ok(())
 }

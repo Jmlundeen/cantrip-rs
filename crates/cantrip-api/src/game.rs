@@ -676,15 +676,15 @@ pub trait Game: Query {
     /// Deals damage (CR 120.3) from `source` to `target`: marked on a creature, removed as loyalty from a planeswalker,
     /// lost as life by a player, each after prevention and replacement. How much was dealt, which is none when the damage
     /// was prevented or the target is gone.
-    fn damage(&mut self, source: ObjectId, target: Target, amount: u16) -> u16;
+    fn damage(&mut self, source: ObjectId, target: Target, amount: u32) -> u32;
     /// Deals damage as `damage` does, returning its actual recipient, amount and excess (CR 120.10), or none if no
     /// damage was dealt. Violent Echoes reads the excess after dealing damage; damage triggers such as Toralf's and
     /// Aegar's can read the same rules information from `Event::Damage::recipient_excess`.
-    fn damage_result(&mut self, source: ObjectId, target: Target, amount: u16) -> Option<DamageResult>;
+    fn damage_result(&mut self, source: ObjectId, target: Target, amount: u32) -> Option<DamageResult>;
     /// Deals damage to several recipients at once (CR 120.2, 603.2c): "N damage to each creature and each opponent" is one
     /// event, so "whenever this deals damage" triggers once. Each entry is a source, a recipient and an amount; an effect
     /// that heals the damage already marked does not heal what the event itself dealt. How much each was dealt, in order.
-    fn damage_together(&mut self, damage: &[(ObjectId, Target, u16)]) -> Vec<u16>;
+    fn damage_together(&mut self, damage: &[(ObjectId, Target, u32)]) -> Vec<u32>;
     /// Removes all damage marked on `permanent` (CR 701.69a). A permanent with no marked damage is unchanged.
     fn heal(&mut self, permanent: ObjectId);
     /// Destroys permanents at once (CR 701.8a, 101.4, 603.10a): a leaves-the-battlefield ability sees all of them leave. An
@@ -779,7 +779,7 @@ pub trait Game: Query {
     fn put_onto_battlefield(&mut self, object: ObjectId, controller: PlayerId, tapped: bool) -> Result<ObjectId, Suspend>;
     /// `put_onto_battlefield`, the object entering with these counters as well (CR 122.6, 614.1c): persist's and undying's
     /// "return it with a counter on it". They are part of how it enters, so a replacement of counters applies (CR 614.1).
-    fn put_onto_battlefield_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend>;
+    fn put_onto_battlefield_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i32)]) -> Result<ObjectId, Suspend>;
     /// Whether a counter of `kind` can't be put on `object`, controlled by `controller`, right now (CR 122.6, 101.2): a static
     /// ability on the battlefield says so (Solemnity's "counters can't be put on creatures", Melira's -1/-1 counters). Asked
     /// of a permanent entering as its own replacement is applied, it is judged as it would exist on the battlefield
@@ -805,7 +805,7 @@ pub trait Game: Query {
     /// declared as an attacker, so nothing that watches attackers being declared sees it. Outside combat it is just
     /// tapped. The object enters with `counters` as well (CR 122.6, 614.1c: Grim Reaper's finality counter), none for most.
     /// Returns the new object.
-    fn put_onto_battlefield_attacking(&mut self, object: ObjectId, controller: PlayerId, defender: Target, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend>;
+    fn put_onto_battlefield_attacking(&mut self, object: ObjectId, controller: PlayerId, defender: Target, counters: &[(CounterKind, i32)]) -> Result<ObjectId, Suspend>;
     /// Puts an object onto the battlefield and attaches an Aura already on the battlefield to it, which now
     /// enchants "the creature put onto the battlefield with this Aura" (Animate Dead, Necromancy). Returns the new
     /// object; nothing is attached if the Aura has left or the object did not arrive.
@@ -830,7 +830,7 @@ pub trait Game: Query {
     /// player given and each as `what` says (CR 614.12), so what watches creatures enter does not see Supper for Spiders' Food
     /// artifacts, and what watches artifacts does. Each enters with `counters` as well (CR 122.6, 614.1c): Ghost Vacuum's Spirits, 1/1
     /// with a flying counter. The permanents that entered; one that could not stays where it is.
-    fn put_all_onto_battlefield_becoming(&mut self, objects: &[(ObjectId, PlayerId)], item: &StackItem, what: &'static EntersAs, counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend>;
+    fn put_all_onto_battlefield_becoming(&mut self, objects: &[(ObjectId, PlayerId)], item: &StackItem, what: &'static EntersAs, counters: &[(CounterKind, i32)]) -> Result<Vec<ObjectId>, Suspend>;
     /// Puts several objects onto the battlefield at once (CR 110.2a), each under the player given.
     fn put_all_onto_battlefield(&mut self, objects: &[(ObjectId, PlayerId)]) -> Result<Vec<ObjectId>, Suspend>;
     /// The same, each with whether it enters tapped: Winds of Abandon puts the basic lands it found onto the battlefield
@@ -838,7 +838,7 @@ pub trait Game: Query {
     fn put_all_onto_battlefield_as(&mut self, objects: &[(ObjectId, PlayerId, bool)]) -> Result<Vec<ObjectId>, Suspend>;
     /// `put_all_onto_battlefield_as`, each entering with these counters as well (CR 122.6, 614.1c): Ghost Vacuum puts each
     /// creature card exiled with it onto the battlefield together, each with a flying counter.
-    fn put_all_onto_battlefield_with_counters(&mut self, objects: &[(ObjectId, PlayerId, bool)], counters: &[(CounterKind, i16)]) -> Result<Vec<ObjectId>, Suspend>;
+    fn put_all_onto_battlefield_with_counters(&mut self, objects: &[(ObjectId, PlayerId, bool)], counters: &[(CounterKind, i32)]) -> Result<Vec<ObjectId>, Suspend>;
     /// `player` sacrifices permanents as cards are put onto the battlefield at the same moment (CR 101.4, 701.21a): Goblin
     /// Welder. What `player` can't sacrifice (`can_sacrifice`) stays.
     fn sacrifice_and_return(&mut self, player: PlayerId, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend>;
@@ -850,7 +850,7 @@ pub trait Game: Query {
     /// "put it onto the battlefield transformed ... with a finality counter on it". They are part of how it enters, put by its
     /// controller (CR 122.6a), so a replacement of counters applies to them (CR 614.1). A card with no back face stays where it
     /// is (CR 712.14a).
-    fn put_onto_battlefield_transformed_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend>;
+    fn put_onto_battlefield_transformed_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i32)]) -> Result<ObjectId, Suspend>;
     /// Transforms a permanent (CR 701.27a): the other face is up. It stays the same object (CR 712.18). Nothing if it is not
     /// a double-faced permanent on the battlefield (CR 701.27c). The face it turns over to applies its "as this transforms"
     /// ability as it does (CR 712.20, `CardDef::as_transforms`), which may ask a question.
@@ -900,7 +900,7 @@ pub trait Game: Query {
     /// `create_tokens`, each token entering with these counters (CR 122.6, 111.1): "create a token with two +1/+1
     /// counters on it", its text having `words` as `create_tokens_worded`'s does (`Words::NONE` for a token a rule defines:
     /// incubate's Incubator, CR 701.53a).
-    fn create_tokens_with_counters(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool, counters: &[(CounterKind, i16)], words: Words) -> Result<Vec<ObjectId>, Suspend>;
+    fn create_tokens_with_counters(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool, counters: &[(CounterKind, i32)], words: Words) -> Result<Vec<ObjectId>, Suspend>;
     /// Creates a delayed triggered ability (CR 603.7), controlled by `controller`, about `subject`.
     fn delayed_trigger(&mut self, when: DelayedWhen, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target);
     /// `delayed_trigger`, carrying the objects the ability is about to the moment it triggers (`event_objects` of its
@@ -926,7 +926,7 @@ pub trait Game: Query {
     /// more nonland cards this way, tap up to that many target creatures". `count` is that many: a
     /// `TargetSpec::COUNTED` bound of the ability's target slots reads it as the ability is put on the stack, and its
     /// stack item's `x` is it, for an effect that does "that many" of something (and for a copy of the ability).
-    fn reflexive_trigger_counted(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: u16);
+    fn reflexive_trigger_counted(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: u32);
     /// `reflexive_trigger`, carrying the objects the first part acted on to the ability (`event_objects` of its stack
     /// item), as `delayed_trigger_about` does (CR 603.12, 603.7c): "When you put one or more Equipment onto the battlefield
     /// this way, you may attach one of them to a Samurai you control" chooses among those Equipment.
@@ -1136,7 +1136,7 @@ pub trait Game: Query {
     fn exert(&mut self, permanent: ObjectId);
     /// Monstrosity N (CR 701.37a): if the permanent is not monstrous, it gets N +1/+1 counters and becomes monstrous,
     /// which abilities that watch for it see.
-    fn monstrosity(&mut self, permanent: ObjectId, counters: i16);
+    fn monstrosity(&mut self, permanent: ObjectId, counters: i32);
     /// A creature becomes saddled until end of turn (CR 702.171b).
     fn become_saddled(&mut self, permanent: ObjectId);
     /// A permanent becomes solved (CR 719.3a-b): one on the battlefield that is not solved is given the designation, and
@@ -1263,7 +1263,7 @@ pub trait Game: Query {
     /// player whose effect it is (CR 608.2, 122.6a) - the controller of the spell or ability resolving, of the replacement
     /// effect applying, or the player doing the action - and through the replacement effects of counters being put
     /// (CR 614.1a). A negative `amount` takes that many off instead (`remove_counters`).
-    fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16);
+    fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i32);
     /// Puts counters on several objects, or of several kinds on one, as one instruction of the effect being carried out does
     /// (CR 608.2, 101.4, 122.6): one simultaneous event, which "whenever one or more counters are put on one or more ..." sees
     /// once (CR 603.2c). Each entry is `amount` counters of a kind on an object; entries for one object are one placement on
@@ -1271,26 +1271,26 @@ pub trait Game: Query {
     /// before any is put on; then they are put on and announced together. Put by the player `add_counters` names; an object
     /// that has changed zones (CR 400.7) or an amount of none or fewer gets none. "Put a +1/+1 counter on each creature you
     /// control", proliferate's permanents, "two +1/+1 counters and a flying counter on it".
-    fn add_counters_together(&mut self, counters: &[(ObjectId, CounterKind, i16)]);
+    fn add_counters_together(&mut self, counters: &[(ObjectId, CounterKind, i32)]);
     /// `add_counters` where the effect names the player who puts them (CR 122.6, 608.2c): "target opponent blights 2"
     /// (CR 701.68a), "its controller amasses" (CR 701.47a), "that player puts ... counters". The counters are that player's
     /// in every replacement effect (Innkeeper's Talent's and Vorinclex's "if you would put") and trigger ("whenever you put
     /// one or more counters") that asks who put them; everything else the effect does stays its controller's.
-    fn add_counters_by(&mut self, by: PlayerId, object: ObjectId, kind: CounterKind, amount: i16);
+    fn add_counters_by(&mut self, by: PlayerId, object: ObjectId, kind: CounterKind, amount: i32);
     /// `add_counters_together` where each entry names the player who puts its counters (CR 122.6, 101.4): "each player puts
     /// ...", "each opponent blights 1". One simultaneous event; entries for one object by one player are one placement on it.
-    fn add_counters_together_by(&mut self, counters: &[(PlayerId, ObjectId, CounterKind, i16)]);
+    fn add_counters_together_by(&mut self, counters: &[(PlayerId, ObjectId, CounterKind, i32)]);
     /// "Move" up to `amount` counters of one kind from `from` onto `to` (CR 122.5): each is removed from the first object and
     /// put onto the second, through the replacement effects of counters being put and from `from` the player doing it. If either
     /// action isn't possible - the objects are the same, `from` has none of the kind, `to` can't have counters of that kind put on
     /// it (Solemnity, Melira, Sylvok Outcast), or either is no longer where it was (CR 400.7) or has phased out - no counter is
     /// removed from or put onto anything. Says how many came off `from`: none when nothing could be moved. Tester of the
     /// Tangential, Nesting Grounds, Bioshift, Fate Transfer, Daghatar the Adamant.
-    fn move_counters(&mut self, from: ObjectId, to: ObjectId, kind: CounterKind, amount: i16) -> i16;
+    fn move_counters(&mut self, from: ObjectId, to: ObjectId, kind: CounterKind, amount: i32) -> i32;
     /// Removes up to `amount` counters of one kind from an object (CR 122.1) and says how many came off: none from an
     /// object that has changed zones (CR 400.7). It answers "if you do" and "for each counter removed this way", as Dawn of a
     /// New Age and Coalition Relic ask.
-    fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) -> i16;
+    fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i32) -> i32;
     /// "Remove up to `maximum` counters from target creature" as the effect resolves (CR 608.2d, 122.1): `player` (the
     /// effect's controller) chooses which of the counters on `object`, of any kinds and how many of each, from none to
     /// `maximum` in all, asked as `RequestKind::RemoveCounters` with `up_to`, and they come off. `source` is the spell or
@@ -1412,17 +1412,17 @@ pub trait Game: Query {
     /// (`cost("{X}")`), and `question` what paying does, as for `may_pay`. The X paid, or `None` when the payer declined:
     /// "when you do" asks whether it was paid (CR 603.12), and a reflexive ability that reads X is given it
     /// (`reflexive_trigger_counted`).
-    fn may_pay_x(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: crate::card::Cost, question: &'static Question) -> Result<Option<u16>, Suspend>;
+    fn may_pay_x(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: crate::card::Cost, question: &'static Question) -> Result<Option<u32>, Suspend>;
     /// `may_pay` for a cost with a part whose size the payer sets as they pay it ("you may discard one or more land cards",
     /// `VariableCost::DiscardOneOrMore`): how many that part took, or `None` when the payer declined - the "that many" of a
     /// reflexive "when you do" (CR 603.12, `reflexive_trigger_counted`).
-    fn may_pay_counted(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: crate::card::Cost, question: &'static Question) -> Result<Option<u16>, Suspend>;
+    fn may_pay_counted(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: crate::card::Cost, question: &'static Question) -> Result<Option<u32>, Suspend>;
     /// "You may pay [mana] up to `most` times" (`ANY_NUMBER_OF_TIMES`: "any number of times") as the effect resolves (CR
     /// 118.12, 608.2d): one payment whose number the payer chooses as they pay it, from 1 up to `most`, in one question that
     /// raises and lowers it and makes mana, and pays `mana` that many times over. How many times it was paid, 0 when the
     /// payer declined: "when you pay this cost one or more times" (CR 603.12a) triggers once for any number above 0, and
     /// is given it (`reflexive_trigger_counted`): "that many".
-    fn may_pay_times(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, mana: ManaCost, most: u16, question: &'static Question) -> Result<u16, Suspend>;
+    fn may_pay_times(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, mana: ManaCost, most: u32, question: &'static Question) -> Result<u32, Suspend>;
     /// Whether `card` could be cast now by the ability's controller as an effect resolves (CR 608.2g), from where it
     /// is: it is not a land and has a legal target for every target it needs. The mana is not asked: a player who
     /// finds they cannot pay gives the cast up (CR 733.1).

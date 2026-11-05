@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// duration (CR 611.2a), so a later activation outranks an earlier one by timestamp (CR 613.6): paying {R/W} again after
 /// the Warrior stage makes it a 2/2 Kithkin Spirit again. Each stage replaces its creature types (CR 205.1a: "becomes a Kithkin
 /// Spirit" sets them) and changes no card type, so an artifact type Mycosynth Lattice gives it stays.
-fn become_forms(g: &mut dyn Game, source: ObjectId, kinds: &[Subtype], power: i16, toughness: i16) {
+fn become_forms(g: &mut dyn Game, source: ObjectId, kinds: &[Subtype], power: i32, toughness: i32) {
     let words = g.words(source);
     // "It becomes a [...] with base power and toughness [P]/[T]": one instruction (CR 608.2c).
     instruction(g, |g| {

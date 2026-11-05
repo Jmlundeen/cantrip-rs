@@ -70,7 +70,7 @@ fn zero(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 fn damage_for_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures = cantrip_mechanics::creatures_you_control(g, item.controller);
-    damage_target(g, item, 0, creatures as u16);
+    damage_target(g, item, 0, creatures as u32);
     Ok(())
 }
 

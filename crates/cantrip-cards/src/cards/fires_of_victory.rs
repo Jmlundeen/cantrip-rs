@@ -10,7 +10,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         effects::draw(g, item, 1)?;
         g.end_sentence();
     }
-    let cards = u16::try_from(g.state().zone(Zone::hand(item.controller)).len()).unwrap_or(u16::MAX);
+    let cards = g.state().zone(Zone::hand(item.controller)).len() as u32;
     damage_target(g, item, 0, cards);
     Ok(())
 }

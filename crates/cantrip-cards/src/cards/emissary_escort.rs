@@ -18,7 +18,7 @@ fn plus_greatest_mana_value_among_other_artifacts(view: &dyn LayerQuery, source:
             c.is(CardType::Artifact).then(|| view.mana_value(id, &c))
         })
         .max()
-        .unwrap_or(0) as i16;
+        .unwrap_or(0) as i32;
     chars.power = chars.power.map(|v| v + greatest);
 }
 

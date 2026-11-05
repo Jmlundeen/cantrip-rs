@@ -42,7 +42,7 @@ fn put_an_exiled_card_into_hand(g: &mut dyn Game, item: &StackItem) -> Result<()
 fn grow_for_each_plains(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let plains = g.words(item.object).subtype(Subtype::Plains);
-    let count = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).has_subtype(plains)).count() as i16;
+    let count = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).has_subtype(plains)).count() as i32;
     cantrip_mechanics::pump(g, item.object, creature, count, count);
     Ok(())
 }

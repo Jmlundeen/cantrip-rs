@@ -223,7 +223,7 @@ fn witness(game: &Game, seat: PlayerId) -> Vec<String> {
         let attached = o.attached_to.map(|a| short(game, seat, a));
         let face = knows_face(s, seat, id);
         let chars = if face || o.zone.is(ZoneKind::Battlefield) { format!("{:?}", game.chars(id)) } else { String::new() };
-        let counters: Vec<(usize, i16)> = o.counter_array().iter().enumerate().filter(|&(_, &n)| n != 0).map(|(k, &n)| (k, n)).collect();
+        let counters: Vec<(usize, i32)> = o.counter_array().iter().enumerate().filter(|&(_, &n)| n != 0).map(|(k, &n)| (k, n)).collect();
         lines.insert(format!(
             "obj {} {position:?} own{} ctl{} tap{} dmg{} {counters:?} {attacking:?} {blocking:?} {attached:?} {:?} fd{} tok{} {chars}",
             short(game, seat, id),
@@ -1107,7 +1107,7 @@ Bot2.Life = 17
 fn a_world_deals_anew_a_face_down_creature_whose_attack_kept_it_as_declared() {
     let game = handed_over(CLOAKED_ATTACKER);
     let bot1 = PlayerId(0);
-    let declared = |g: &Game| -> Vec<(Option<i16>, Option<i16>, &'static str)> {
+    let declared = |g: &Game| -> Vec<(Option<i32>, Option<i32>, &'static str)> {
         g.history()
             .attacked_with(bot1)
             .map(|a| {
