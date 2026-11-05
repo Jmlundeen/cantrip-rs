@@ -1,0 +1,55 @@
+# The Mighty Thor, Jane Foster attacks and exiles Bot1's own Cubwarden, mutated over Ornithopter: both cards are exiled, and
+# "return that card to the battlefield tapped under its owner's control" returns each of them (CR 730.3c), together - one event
+# (CR 101.4, 603.6a), two tapped permanents. Satoru, the Infiltrator's "whenever Satoru and/or one or more other nontoken
+# creatures you control enter, if none of them were cast" sees them enter once and draws one card, not one for each card. The
+# hand is empty before the attack: Satoru and Cubwarden were cast with mana (no draw), and the Cats are tokens.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Jet
+Ornithopter
+The Mighty Thor, Jane Foster
+Black Lotus
+Satoru, the Infiltrator
+Cubwarden
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Mighty Thor, Jane Foster.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Satoru, the Infiltrator.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot1.Modes(1)
+Bot1.Pass
+? Bot1.Hand.Count = 0
+? Bot1.Battlefield.Cubwarden.Keywords = Flying; Lifelink; Mutate
+Bot1.Attack(The Mighty Thor, Jane Foster > Bot2)
+Bot1.Target(Cubwarden)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Cubwarden.Tapped = true
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Ornithopter.Tapped = true
+Exile.Count = 0

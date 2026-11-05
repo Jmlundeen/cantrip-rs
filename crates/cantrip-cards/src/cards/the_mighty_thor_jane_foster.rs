@@ -6,13 +6,17 @@ use cantrip_oracle as oracle;
 
 /// "Exile up to one target nontoken artifact or creature, then return that card to the battlefield tapped under its owner's
 /// control": exiled, then returned as a new object (CR 400.7), entering tapped (CR 110.5b). The target is a card, never a token.
+/// A merged permanent is exiled as each of its cards, and each returns (CR 730.3c), all together: one event, so what watches
+/// "one or more" creatures enter sees them once (CR 101.4, 603.6a).
 fn exile_and_return_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(permanent) = targets::object(g, item, 0) else { return Ok(()) };
-    let returning: Vec<(ObjectId, PlayerId)> =
-        g.exile_all(&[permanent]).into_iter().filter(|&card| g.obj(card).zone.is(ZoneKind::Exile)).map(|card| (card, g.obj(card).owner)).collect();
-    for (card, owner) in returning {
-        g.put_onto_battlefield(card, owner, true)?;
-    }
+    let returning: Vec<(ObjectId, PlayerId, bool)> = g
+        .exile_all(&[permanent])
+        .into_iter()
+        .filter(|&card| g.obj(card).zone.is(ZoneKind::Exile))
+        .map(|card| (card, g.obj(card).owner, true))
+        .collect();
+    g.put_all_onto_battlefield_as(&returning)?;
     Ok(())
 }
 
