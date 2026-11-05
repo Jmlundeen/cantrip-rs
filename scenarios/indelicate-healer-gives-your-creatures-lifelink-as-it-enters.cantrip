@@ -1,0 +1,30 @@
+# Indelicate Healer ({2}{W}, a Klingon Warrior Doctor): "Whenever this creature or another Klingon or Warrior you control
+# enters, creatures you control gain lifelink until end of turn." It is itself a Klingon, so its own entering triggers the
+# ability and it has lifelink.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Indelicate Healer
+Plains x20
+Plains x16
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Indelicate Healer.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Indelicate Healer.Keywords = Lifelink

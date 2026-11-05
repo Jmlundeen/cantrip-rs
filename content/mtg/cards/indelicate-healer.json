@@ -1,0 +1,8 @@
+{
+  "name": "Indelicate Healer",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Klingon Warrior Doctor",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever this creature or another Klingon or Warrior you control enters, creatures you control gain lifelink until end of turn."
+}
