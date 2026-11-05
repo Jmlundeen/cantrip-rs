@@ -1,0 +1,8 @@
+{
+  "name": "Picard, Steadfast Captain",
+  "manaCost": "{4}{W}{W}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Whenever Picard enters or attacks, put two +1/+1 counters on another target creature you control."
+}
