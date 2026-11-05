@@ -186,6 +186,8 @@ mod next_turn_delayed_tests;
 #[cfg(test)]
 mod blocking_status_tests;
 #[cfg(test)]
+mod end_combat_phase_tests;
+#[cfg(test)]
 mod own_text_tests;
 #[cfg(test)]
 mod effect_text_tests;
@@ -2651,6 +2653,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn end_the_turn(&mut self) -> Result<(), Suspend> {
         turn::end_the_turn(self).map_err(|_| Suspend)
+    }
+
+    fn end_the_combat_phase(&mut self) -> Result<(), Suspend> {
+        turn::end_the_combat_phase(self).map_err(|_| Suspend)
     }
 
     fn lose_game(&mut self, player: PlayerId) {

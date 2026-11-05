@@ -661,6 +661,35 @@ pub fn attacks_barred(q: &dyn Query, cards: &CardTable, creatures: &[ObjectId], 
     barred
 }
 
+/// What the rules about an open set of objects that resolved spells and abilities made (CR 611.2c, `EffectKind::LastingRule`)
+/// forbid `creatures` to attack among `targets` (CR 508.1c): for each such rule of `LastingRuleKind::CantAttackYou` whose
+/// set takes the creature in as it is now, the attack on the player the effect's words named as its "you" - that player
+/// only, never a planeswalker or battle. A rule of the game, not an ability of the creature or of the source, so it holds
+/// whatever abilities either has lost (CR 613.1f) and outlives the source (CR 611.2a); its set is asked as the attackers are
+/// declared, so a creature that arrives under it later is under it too. Chronomantic Escape's "until your next turn,
+/// creatures can't attack you".
+pub fn lasting_rules_barring_attacks(
+    q: &dyn Query,
+    cards: &'static CardTable,
+    creatures: &[ObjectId],
+    targets: &[Target],
+) -> Vec<(ObjectId, Target)> {
+    let mut barred = Vec::new();
+    if q.state().effects.is_empty() {
+        return barred;
+    }
+    for &creature in creatures {
+        for e in lasting_rules_on(q, cards, creature, LastingRuleKind::CantAttackYou) {
+            let EffectKind::LastingRule { about: Target::Player(you), .. } = e.kind else { continue };
+            let at = Target::Player(you);
+            if targets.contains(&at) && !barred.contains(&(creature, at)) {
+                barred.push((creature, at));
+            }
+        }
+    }
+    barred
+}
+
 /// Whether the static abilities of the permanents on the battlefield let `creature` attack any of `targets` (CR 508.1c),
 /// or `targets` is empty; the targets are worked out only where some permanent restricts attacking.
 pub fn attack_rules_allow_any(q: &dyn Query, cards: &CardTable, creature: ObjectId, targets: impl FnOnce() -> Vec<Target>) -> bool {

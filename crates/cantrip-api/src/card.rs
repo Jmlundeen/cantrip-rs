@@ -2609,6 +2609,12 @@ pub enum LastingRuleKind {
     /// step of the player who controls the permanent, and with `Duration::DuringNextUntapStepOf`, only in that player's.
     /// Exhaustion, Mana Vapors.
     DoesntUntap,
+    /// "Can't attack you" (CR 508.1c): a resolved rule about an open set that forbids the creatures it takes in an attack on
+    /// the player the effect's words named (its "you", the rule's `about`). That player alone: the planeswalkers and battles
+    /// they control or protect may still be attacked. Read beside the static attack rules as attackers are declared
+    /// (`static_rules::lasting_rules_barring_attacks`). Chronomantic Escape's "until your next turn, creatures can't attack
+    /// you".
+    CantAttackYou,
 }
 
 /// A rule a resolving spell or ability gives an open set of objects for a duration (CR 611.2c): "creatures without flying

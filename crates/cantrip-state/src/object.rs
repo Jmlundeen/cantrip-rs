@@ -2997,6 +2997,9 @@ pub struct Turn {
     /// An effect has ended the turn (CR 724.1d): the step under way ends with no player given priority again, and the
     /// game skips straight to the cleanup step.
     pub ending: bool,
+    /// An effect has ended the combat phase (CR 724.2d): the step under way ends with no player given priority again, and
+    /// the game skips straight to the next phase, skipping the end of combat step (724.2e).
+    pub combat_ending: bool,
     /// Players were given priority in this cleanup step (CR 514.3a), so another cleanup step follows it.
     pub cleanup_again: bool,
     /// The extra turn this turn is (CR 500.7), by its `ExtraTurn::id`: what "that turn" names in an ability that created it
