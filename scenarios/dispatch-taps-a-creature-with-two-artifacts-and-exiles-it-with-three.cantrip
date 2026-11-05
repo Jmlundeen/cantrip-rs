@@ -1,0 +1,33 @@
+# Dispatch: "Tap target creature. Metalcraft — If you control three or more artifacts, exile that creature" (CR
+# 701.26a, 608.2c). Bot1 controls two Moxen, one short of metalcraft, and casts it on Bot2's Elite Vanguard on turn 3:
+# the Vanguard is tapped and stays on the battlefield. With three Moxen the same cast exiles it instead
+# (dispatch-with-metalcraft-exiles-the-creature-it-tapped).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Dispatch
+Plains
+Plains x16
+
+[Bot2 Deck]
+Plains
+Elite Vanguard
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Elite Vanguard.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dispatch.Cast(Bot2.Battlefield.Elite Vanguard)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Battlefield.Elite Vanguard.Tapped = true
+Bot2.Graveyard.Count = 0
+Exile.Count = 0
