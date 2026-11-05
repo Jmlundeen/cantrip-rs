@@ -1,0 +1,30 @@
+# Indelicate Healer ({2}{W}): "Whenever this creature or another Klingon or Warrior you control enters, creatures you control
+# gain lifelink until end of turn." Worf, a Klingon Warrior, enters after the Healer, so his entry - not the Healer's own -
+# is what gives both of them lifelink.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Indelicate Healer
+Worf, Chief Tactical Officer
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Indelicate Healer.Cast
+Bot1.Hand.Worf, Chief Tactical Officer.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Worf, Chief Tactical Officer.Keywords = Lifelink; Vigilance
+Bot1.Battlefield.Indelicate Healer.Keywords = Lifelink
