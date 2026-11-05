@@ -1,0 +1,89 @@
+# Gilgamesh, Master-at-Arms: "Whenever Gilgamesh enters or attacks, look at the top six cards of your library. You may put any number of Equipment
+# cards from among them onto the battlefield. Put the rest on the bottom of your library in a random order. When you put one or more Equipment
+# onto the battlefield this way, you may attach one of them to a Samurai you control." Ruling: the reflexive ability can't try to attach an
+# Equipment to a creature it can't legally be attached to.
+# Turn 1: Gilgamesh enters; Bot1 puts no card onto the battlefield, the Loxodon Warhammer included, so the reflexive ability does not trigger.
+# Turn 3: Giver of Runes gives Gilgamesh, Bot1's only Samurai, protection from colorless, and he attacks. Skullclamp and Bark of Doran (white)
+# are put onto the battlefield; Skullclamp can be attached to no Samurai Bot1 controls and is not offered, and Bark of Doran is attached to
+# Gilgamesh, a 6/7 that deals 7 (Bark's "assigns combat damage equal to its toughness"). Bot1 then casts Colleen Wing, Street Samurai.
+# Turn 5: Gilgamesh is protected from colorless again and attacks. Paradise Mantle is put onto the battlefield; Neither Gilgamesh nor Giver of
+# Runes (a creature, not a Samurai) is offered for it, and it goes to Colleen Wing. Turn 7: Lavaspur Boots is put onto the battlefield and Bot1 attaches nothing.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Jet
+Giver of Runes
+Gilgamesh, Master-at-Arms
+Loxodon Warhammer
+Island x5
+Colleen Wing, Street Samurai
+Skullclamp
+Bark of Doran
+Island x5
+Paradise Mantle
+Island x6
+Lavaspur Boots
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Life]
+Bot2: 40
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gilgamesh, Master-at-Arms.Cast
+Bot1.Choose()
+? Stack.Count = 0
+[T3 Bot1.Main1]
+Bot1.Battlefield.Giver of Runes.Activate(Gilgamesh, Master-at-Arms)
+Bot1.Accept
+Bot1.Pass
+Bot1.Attack(Gilgamesh, Master-at-Arms > Bot2)
+Bot1.Choose(Skullclamp; Bark of Doran)
+! Bot1.Choose(Skullclamp)
+Bot1.Choose(Bark of Doran)
+[T3 Bot1.Main2]
+? Bot2.Life = 33
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Colleen Wing, Street Samurai.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Giver of Runes.Activate(Gilgamesh, Master-at-Arms)
+Bot1.Accept
+Bot1.Pass
+Bot1.Attack(Gilgamesh, Master-at-Arms > Bot2)
+Bot1.Choose(Paradise Mantle)
+! Bot1.Choose(Skullclamp)
+Bot1.Choose(Paradise Mantle)
+! Bot1.Choose(Gilgamesh, Master-at-Arms)
+! Bot1.Choose(Giver of Runes)
+Bot1.Choose(Colleen Wing, Street Samurai)
+[T7 Bot1.Main1]
+Bot1.Attack(Gilgamesh, Master-at-Arms > Bot2)
+Bot1.Choose(Lavaspur Boots)
+Bot1.Choose()
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Bark of Doran.AttachedTo = Gilgamesh, Master-at-Arms
+Bot1.Battlefield.Skullclamp.AttachedTo = (absent)
+Bot1.Battlefield.Paradise Mantle.AttachedTo = Colleen Wing, Street Samurai
+Bot1.Battlefield.Lavaspur Boots.AttachedTo = (absent)
+Bot1.Battlefield.Gilgamesh, Master-at-Arms.Toughness = 7
+Bot2.Life = 19

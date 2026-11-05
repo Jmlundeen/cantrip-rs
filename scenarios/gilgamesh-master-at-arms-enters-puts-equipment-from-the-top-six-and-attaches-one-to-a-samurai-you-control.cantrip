@@ -1,0 +1,77 @@
+# Gilgamesh, Master-at-Arms: "Whenever Gilgamesh enters or attacks, look at the top six cards of your library. You may put any number of Equipment
+# cards from among them onto the battlefield. Put the rest on the bottom of your library in a random order. When you put one or more Equipment
+# onto the battlefield this way, you may attach one of them to a Samurai you control."
+# Turn 1: Bot1 casts Leonardo, Sewer Samurai. Turn 2: Bot2 casts Colleen Wing, Street Samurai, a Samurai Bot1 does not control. Turn 3: Bot1
+# draws an Island and casts Gilgamesh off Black Lotus and the Moxen. The top six are Skullclamp, Grizzly Bears, Paradise Mantle, Island, Loxodon Warhammer and Island; the
+# Ornithopter seventh is not looked at, and Bot2's library is not looked at at all. Neither the Bears nor the Ornithopter can be chosen;
+# Skullclamp and Paradise Mantle are put onto the battlefield together and the Warhammer, an Equipment left behind, goes to the bottom. They enter
+# untapped. The reflexive ability offers the two that entered, not the Warhammer, and only one of them; Skullclamp is attached to Leonardo, a Samurai Bot1 controls, chosen over
+# Gilgamesh, while Bot2's Colleen Wing is not offered. Leonardo is 4/2, and Paradise Mantle stays unattached.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Jet
+Leonardo, Sewer Samurai
+Gilgamesh, Master-at-Arms
+Island
+Skullclamp
+Grizzly Bears
+Paradise Mantle
+Island
+Loxodon Warhammer
+Island
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Colleen Wing, Street Samurai
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leonardo, Sewer Samurai.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Colleen Wing, Street Samurai.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gilgamesh, Master-at-Arms.Cast
+! Bot1.Choose(Grizzly Bears)
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Skullclamp; Paradise Mantle)
+! Bot1.Choose(Loxodon Warhammer)
+! Bot1.Choose(Skullclamp; Paradise Mantle)
+Bot1.Choose(Skullclamp)
+! Bot1.Choose(Bot2.Battlefield.Colleen Wing, Street Samurai)
+Bot1.Choose(Leonardo, Sewer Samurai)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Looked = Skullclamp; Grizzly Bears; Paradise Mantle; Island; Loxodon Warhammer; Island
+Bot1.Battlefield.Skullclamp.AttachedTo = Leonardo, Sewer Samurai
+Bot1.Battlefield.Paradise Mantle.AttachedTo = (absent)
+Bot1.Battlefield.Paradise Mantle.Tapped = false
+Bot1.Battlefield.Skullclamp.Tapped = false
+Bot1.Battlefield.Leonardo, Sewer Samurai.Power = 4
+Bot1.Battlefield.Leonardo, Sewer Samurai.Toughness = 2
+Bot1.Hand = Island
+Bot2.Battlefield.Colleen Wing, Street Samurai.Power = 2
