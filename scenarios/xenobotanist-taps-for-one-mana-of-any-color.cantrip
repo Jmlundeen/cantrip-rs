@@ -1,0 +1,28 @@
+# Xenobotanist's "{T}: Add one mana of any color." (CR 106.1a, 605.1a) taps it and adds exactly one mana, of a color no land
+# of this deck makes; the pool is empty before it, so one off would show.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Xenobotanist
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Xenobotanist.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+Bot1.Battlefield.Xenobotanist.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Xenobotanist.Tapped = true
+Bot1.Battlefield.Xenobotanist.Power = 1
+Bot1.Battlefield.Xenobotanist.Toughness = 3
