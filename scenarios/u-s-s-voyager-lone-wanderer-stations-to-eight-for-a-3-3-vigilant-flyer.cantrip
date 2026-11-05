@@ -1,0 +1,69 @@
+# U.S.S. Voyager stations to exactly 8: Craw Wurm's six power and Llanowar Elves's one leave it at seven, still no creature
+# and without flying, and the Elves's one more on a later turn makes eight, when the Spacecraft is a 3/3 artifact creature
+# with flying and vigilance (CR 721.2a-c).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Craw Wurm
+Forest
+Llanowar Elves
+U.S.S. Voyager, Lone Wanderer
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Craw Wurm.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.U.S.S. Voyager, Lone Wanderer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Activate(Ability: Station)
+Bot1.Choose(Craw Wurm)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Counters.Charge = 7
+? Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Types = Artifact
+? Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Keywords = (absent)
+[T7 Bot1.Main1]
+Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Counters.Charge = 8
+Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Types = Artifact; Creature
+Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Power = 3
+Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Toughness = 3
+Bot1.Battlefield.U.S.S. Voyager, Lone Wanderer.Keywords = Flying; Vigilance
