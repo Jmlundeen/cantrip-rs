@@ -658,3 +658,102 @@ fn a_forgotten_reveal_and_move_verb_is_found() {
     cantrip_api::Game::reveal(&mut cx, PlayerId(0), &[in_hand]);
     crate::ops::verify_reveal_carried(&cx, in_hand);
 }
+
+/// "Whenever another creature you control dies while this card is in your graveyard, you gain 2 life" (Furious
+/// Forebear's kind): a leaves-the-battlefield ability that functions in a graveyard (CR 113.6m, 603.10a).
+static MOURNER: CardDef = CardDef {
+    name: "Look-back Mourner",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[triggered(
+        when(EventMask::ZONE_CHANGE, another_dies),
+        gain_two,
+        "Whenever another creature you control dies while this card is in your graveyard, you gain 2 life.",
+    )
+    .functions_in(IN_A_GRAVEYARD)],
+    ..CardDef::BLANK
+};
+
+/// "When this card is put into a graveyard from anywhere": its own move into a graveyard (CR 603.6c, 113.6k).
+fn this_put_into_a_graveyard(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. } if *new == source && to.is(ZoneKind::Graveyard) => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// Emrakul, the Aeons Torn's kind: "When this card is put into a graveyard from anywhere, you gain 2 life."
+static RETURNING: CardDef = CardDef {
+    name: "Look-back Returning",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[triggered(
+        when(EventMask::ZONE_CHANGE, this_put_into_a_graveyard),
+        gain_two,
+        "When this card is put into a graveyard from anywhere, you gain 2 life.",
+    )
+    .functions_in(IN_A_GRAVEYARD)],
+    ..CardDef::BLANK
+};
+
+fn graveyard_game() -> Game {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&MOURNER, &RETURNING, &BEAR])));
+    Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() })
+}
+
+fn put_in(game: &mut Game, def: &'static CardDef, zone: Zone) -> ObjectId {
+    let id = game.state.push_obj(Obj::new(game.cards.id_of(def), PlayerId(0), zone));
+    game.state.zone_push(zone, id);
+    id
+}
+
+/// The sources of the abilities that have triggered.
+fn sources(cx: &Cx) -> Vec<ObjectId> {
+    cx.s().triggers.iter().map(|t| t.source).collect()
+}
+
+/// A Mourner that dies, alone or with a Bear, wasn't in the graveyard just before (CR 603.10a): the card there is a new
+/// object (CR 400.7), so its ability triggers neither for its own death nor for the Bear's.
+#[test]
+fn a_graveyard_look_back_ability_does_not_trigger_from_the_graveyard_its_source_was_just_put_into() {
+    let mut game = graveyard_game();
+    let mourner = put_in(&mut game, &MOURNER, Zone::BATTLEFIELD);
+    let mut alone = cx(&mut game);
+    crate::ops::move_to(&mut alone, mourner, Zone::graveyard(PlayerId(0)));
+    assert_eq!(sources(&alone), Vec::<ObjectId>::new());
+
+    let mut game = graveyard_game();
+    let mourner = put_in(&mut game, &MOURNER, Zone::BATTLEFIELD);
+    let bear = put_in(&mut game, &BEAR, Zone::BATTLEFIELD);
+    let mut together = cx(&mut game);
+    let to = Zone::graveyard(PlayerId(0));
+    crate::ops::move_together(&mut together, &[crate::ops::Moving::to(mourner, to), crate::ops::Moving::to(bear, to)], ZoneReason::Destroy);
+    assert_eq!(sources(&together), Vec::<ObjectId>::new());
+}
+
+/// A Mourner already in the graveyard triggers once for each creature that dies, a second Mourner among them; the second,
+/// put there by the same event, triggers for nothing.
+#[test]
+fn a_graveyard_look_back_ability_triggers_from_a_card_that_was_there_before() {
+    let mut game = graveyard_game();
+    let waiting = put_in(&mut game, &MOURNER, Zone::graveyard(PlayerId(0)));
+    let mourner = put_in(&mut game, &MOURNER, Zone::BATTLEFIELD);
+    let bear = put_in(&mut game, &BEAR, Zone::BATTLEFIELD);
+    let mut cx = cx(&mut game);
+    let to = Zone::graveyard(PlayerId(0));
+    crate::ops::move_together(&mut cx, &[crate::ops::Moving::to(mourner, to), crate::ops::Moving::to(bear, to)], ZoneReason::Destroy);
+    assert_eq!(sources(&cx), vec![waiting, waiting]);
+}
+
+/// "Put into a graveyard from anywhere" is no leaves-the-battlefield ability (CR 603.6c): it triggers from the graveyard
+/// its card was just put into (CR 113.6k), from the battlefield too.
+#[test]
+fn a_from_anywhere_ability_triggers_from_the_graveyard_it_was_just_put_into() {
+    let mut game = graveyard_game();
+    let returning = put_in(&mut game, &RETURNING, Zone::BATTLEFIELD);
+    let mut cx = cx(&mut game);
+    let new = crate::ops::move_to(&mut cx, returning, Zone::graveyard(PlayerId(0)));
+    assert_eq!(sources(&cx), vec![new]);
+}

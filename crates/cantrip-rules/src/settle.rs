@@ -1725,6 +1725,13 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                     if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                         && t.functions.contains(zone)
                         && t.listens.intersects(mask)
+                        // A look-back ability triggers only from an object that was in its zone just before the events
+                        // (CR 603.10a). One these events put there is a new object (CR 400.7) that didn't exist then:
+                        // Furious Forebear dying with another creature, or alone, doesn't trigger from the graveyard it
+                        // goes to. An ability that isn't looked back on (a "put into a graveyard from anywhere"; CR 113.6k)
+                        // still triggers from the zone it was put into.
+                        && !(cx.cards().looks_back(ability, event, seen)
+                            && events.iter().any(|e| matches!(e, Event::ZoneChange { new, .. } if *new == id)))
                         && let Some(fired) = if t.cast_option.is_some() {
                             paid_to_cast(cx, id, &chars, nth, event)
                         } else {
