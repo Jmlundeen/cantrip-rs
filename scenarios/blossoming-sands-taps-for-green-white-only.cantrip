@@ -1,0 +1,26 @@
+# "{T}: Add {G} or {W}." The color is chosen as the ability is activated, one each turn (green, white); the other colors and
+# colorless are refused beside those positive controls.
+
+[Bot1 Deck]
+Blossoming Sands
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Blossoming Sands.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Blossoming Sands.Activate(Color: Blue)
+! Bot1.Battlefield.Blossoming Sands.Activate(Color: Black)
+! Bot1.Battlefield.Blossoming Sands.Activate(Color: Red)
+! Bot1.Battlefield.Blossoming Sands.Activate(Color: Colorless)
+Bot1.Battlefield.Blossoming Sands.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Blossoming Sands.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Blossoming Sands.Tapped = true
