@@ -248,12 +248,15 @@ impl<'s> Run<'s> {
     fn deal_on(script: &'s GameScript, table: &'static CardTable) -> Result<Run<'s>, ScriptFailure> {
         let decks: Vec<Vec<String>> = (0..script.decks.len()).map(|i| script.decklist(i)).collect();
         let sideboards: Vec<Vec<String>> = (0..script.sideboards.len()).map(|i| script.sideboard(i)).collect();
+        let commanders: Vec<Vec<String>> = (0..script.commanders.len()).map(|i| script.commander_list(i)).collect();
         let chooser = if script.opening { Some(PlayerId((script.chooser.max(1) - 1) as u8)) } else { None };
         let outside = Outside {
             sideboards: &sideboards,
             companions: &script.companions,
             basic_lands_outside: &script.basic_lands_outside,
             minimum_deck_size: script.minimum_deck_size.unwrap_or(Outside::default().minimum_deck_size),
+            commander: script.commander,
+            commanders: &commanders,
         };
         let mut game = deal_on(table, &decks, &outside, 1, false, chooser).map_err(|m| ScriptFailure { message: m.clone(), report: m })?;
         // CANTRIP_VERIFY=1: every rollback is checked to restore the state exactly.

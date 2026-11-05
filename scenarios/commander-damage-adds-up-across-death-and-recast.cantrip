@@ -1,0 +1,43 @@
+# CR 903.10a, 903.3: commander damage is counted for the commander card, whatever object it is now. Bot1's commander,
+# Raging Goblin (haste), is cast from the command zone on turn 1 and deals Bot2 1 combat damage; Bot2's Lightning Bolt
+# kills it, and Bot1 moves it back to the command zone (CR 903.9a). On turn 5 it is cast again for {2}{R} (CR 903.8) - a
+# new object (CR 400.7) - and deals 1 more: the two add up to 2 from the one commander.
+# Fixture only: Raging Goblin stands in for a commander; the harness does not check commander eligibility.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Raging Goblin
+
+[Bot1 Deck]
+Mountain x25
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain x24
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Command.Raging Goblin.Cast
+Bot1.Attack(Raging Goblin > Bot2)
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Raging Goblin)
+Bot1.Accept
+? Bot1.Command = Raging Goblin
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Command.Raging Goblin.Cast
+Bot1.Attack(Raging Goblin > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Commander.Raging Goblin.CastCount = 2
+Bot1.Commander.Raging Goblin.DamageTo.Bot2 = 2
+Bot2.Life = 38

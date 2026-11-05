@@ -54,6 +54,9 @@ enum Request {
         /// 100.2a-b): always said, never inferred. A scenario's is its own.
         #[serde(rename = "MinimumDeckSize", default)]
         minimum_deck_size: Option<u32>,
+        /// Explicit format rule switch; a 100-card deck alone does not make Commander.
+        #[serde(rename = "Commander", default)]
+        commander: bool,
         /// A `.cantrip` scenario to play instead of a dealt game: its decks, order and dice are the scenario's, and the
         /// seats named in `Driven` are answered by the table, every other by the script (docs/scenarios-in-the-browser.md).
         #[serde(rename = "Scenario", default)]
@@ -190,6 +193,9 @@ struct SeatSpec {
     /// game if the deck fulfils its condition (CR 103.2b). The server has refused a deck whose companion it doesn't.
     #[serde(rename = "Companion", default)]
     companion: Option<String>,
+    /// Commanders are outside the library.
+    #[serde(rename = "Commanders", default)]
+    commanders: Vec<String>,
     /// The deck's name, where the table has one: the recorder's archetype label.
     #[serde(rename = "DeckName", default)]
     #[cfg_attr(not(feature = "ai-record"), allow(dead_code))]
@@ -215,7 +221,7 @@ fn ok(value: Value) -> Value {
 impl Host {
     fn handle(&mut self, request: Request) -> Value {
         match request {
-            Request::NewGame { seats, seed, shuffle, first_player, chooser, basic_lands_outside, minimum_deck_size, scenario, public } => {
+            Request::NewGame { seats, seed, shuffle, first_player, chooser, basic_lands_outside, minimum_deck_size, commander, scenario, public } => {
                 #[cfg(feature = "ai-record")]
                 let dealt = self.recorder.as_ref().map(|_| Dealt {
                     seed: if scenario.is_some() { 0 } else { seed },
@@ -231,10 +237,13 @@ impl Host {
                     }
                     None => {
                         let companions = seats.iter().map(|s| s.companion.clone()).collect();
+                        let commanders = seats.iter().map(|s| s.commanders.clone()).collect();
                         let deal = Deal {
                             seats: seats.into_iter().map(|s| (s.name, s.deck, s.sideboard)).collect(),
                             basic_lands_outside,
                             companions,
+                            commanders,
+                            commander,
                             minimum_deck_size: minimum_deck_size.unwrap_or_default(),
                             seed,
                             shuffle,

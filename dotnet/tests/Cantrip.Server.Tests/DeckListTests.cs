@@ -81,4 +81,14 @@ public sealed class DeckListTests
         Assert.Throws<FormatException>(() => DeckList.Parse("cut", "60 Swamp\nCompanion\n", "test"));
         Assert.Throws<FormatException>(() => DeckList.Parse("two", "60 Swamp\nCompanion\n2 Lurrus of the Dream-Den\n", "test"));
     }
+
+    [Fact]
+    public void Commander_section_is_separate_from_main_deck_and_can_be_followed_by_explicit_Deck_header()
+    {
+        DeckList deck = DeckList.Parse("commander", "Commander\n1 Balin, Loremaster\nDeck\n99 Forest\n", "commander.txt");
+
+        Assert.Equal([new DeckListEntry("Balin, Loremaster", 1, 2)], deck.Commanders);
+        Assert.Equal([new DeckListEntry("Forest", 99, 4)], deck.Entries);
+        Assert.Equal(99, deck.Count);
+    }
 }

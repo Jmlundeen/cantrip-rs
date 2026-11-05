@@ -1,0 +1,42 @@
+# After Hakoda is returned to the command zone, five Plains cannot pay its {3}{W} plus {2} Commander tax, so the cast is refused.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Hakoda, Selfless Commander
+
+[Bot1 Deck]
+Plains x7
+Plains x18
+
+[Bot2 Deck]
+Unsummon
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Command.Hakoda, Selfless Commander.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Hakoda, Selfless Commander)
+Bot1.Accept
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+! Bot1.Command.Hakoda, Selfless Commander.Cast(Mana: short)
+
+[Expect]
+Bot1.Command = Hakoda, Selfless Commander
+Bot1.Commander.Hakoda, Selfless Commander.CastCount = 1

@@ -77,6 +77,7 @@ public static class DeckValidation
         {
             Name = list.Name,
             Format = format.Key,
+            Commanders = [.. list.Commanders.Select(entry => new DeckEntry(entry.Card, entry.Copies))],
             Main = [.. list.Entries.Select(entry => new DeckEntry(entry.Card, entry.Copies))],
             Side = [.. list.Sideboard.Select(entry => new DeckEntry(entry.Card, entry.Copies))],
             Companion = list.Companion ?? string.Empty,

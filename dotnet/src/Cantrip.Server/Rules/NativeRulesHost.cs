@@ -84,8 +84,8 @@ public sealed class NativeRulesHost : IRulesHost
 
         var host = new NativeRulesHost(transport, seats, history ?? []);
         List<object> named = [.. seats.Select(seat => seat.DeckName is { } deckName
-            ? (object)new { seat.Name, seat.Deck, seat.Sideboard, seat.Companion, DeckName = deckName }
-            : new { seat.Name, seat.Deck, seat.Sideboard, seat.Companion })];
+            ? (object)new { seat.Name, seat.Deck, seat.Sideboard, seat.Companion, seat.Commanders, DeckName = deckName }
+            : new { seat.Name, seat.Deck, seat.Sideboard, seat.Companion, seat.Commanders })];
         object deal = options.Scenario is { } scenario
             ? new
             {
@@ -104,6 +104,7 @@ public sealed class NativeRulesHost : IRulesHost
                 options.Chooser,
                 options.BasicLandsOutside,
                 options.MinimumDeckSize,
+                options.Commander,
             };
         NewGameReply dealt = host.Send<NewGameReply>(publicView ? WithPublic(deal) : deal);
 

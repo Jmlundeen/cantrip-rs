@@ -1,0 +1,40 @@
+# Memory Lapse would put the commander spell on its owner's library; its owner chooses to put it in the command zone instead.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Hakoda, Selfless Commander
+
+[Bot1 Deck]
+Plains x7
+Plains x18
+
+[Bot2 Deck]
+Memory Lapse
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Command.Hakoda, Selfless Commander.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Memory Lapse.Cast(Stack.Hakoda, Selfless Commander)
+Bot1.Accept
+? Bot1.Command = Hakoda, Selfless Commander
+
+[Expect]
+Bot1.Command = Hakoda, Selfless Commander
+Bot1.Commander.Hakoda, Selfless Commander.CastCount = 1

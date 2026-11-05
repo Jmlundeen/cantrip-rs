@@ -1,0 +1,50 @@
+# Fixture only: Hakoda and Griselbrand are separately designated commanders to exercise per-identity totals, not to assert deck legality.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Hakoda, Selfless Commander
+Griselbrand
+
+[Bot1 Deck]
+Plains x7
+Swamp x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Command.Hakoda, Selfless Commander.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Command.Griselbrand.Cast
+Bot1.Attack(Hakoda, Selfless Commander > Bot2; Griselbrand > Bot2)
+[T25 Bot1.Main2]
+
+[Expect]
+Bot1.Commander.Hakoda, Selfless Commander.DamageTo.Bot2 = 3
+Bot1.Commander.Griselbrand.DamageTo.Bot2 = 7
+Bot2.Life = 30

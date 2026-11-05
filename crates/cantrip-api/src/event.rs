@@ -380,6 +380,8 @@ pub enum LossReason {
     EmptyLibrary,
     /// Ten or more poison counters (CR 104.3d, 704.5c).
     Poison,
+    /// At least 21 combat damage from one commander (CR 903.10a).
+    CommanderDamage,
     /// An effect states that the player loses the game (CR 104.3e), or an opponent wins it (CR 104.2b).
     Effect,
     /// The player conceded (CR 104.3a).

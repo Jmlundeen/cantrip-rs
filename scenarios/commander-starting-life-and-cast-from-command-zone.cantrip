@@ -1,0 +1,36 @@
+# Commander starts both players at 40; Bot1 casts Hakoda from the command zone.
+# Browser: play the four Plains and cast Hakoda from the visible Command Zone row.
+# Browser
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Hakoda, Selfless Commander
+
+[Bot1 Deck]
+Plains x7
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Command.Hakoda, Selfless Commander.Cast
+
+[Expect]
+Bot1.Life = 40
+Bot2.Life = 40
+Bot1.Command =
+Bot1.Commander.Hakoda, Selfless Commander.CastCount = 1
+Bot1.Battlefield = Hakoda, Selfless Commander; Plains; Plains; Plains; Plains
+Bot1.Battlefield.Hakoda, Selfless Commander.SummoningSick = true

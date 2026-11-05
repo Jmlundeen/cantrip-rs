@@ -368,6 +368,8 @@ fn a_whole_game_projects_soundly_for_the_public() {
         ],
         basic_lands_outside: Vec::new(),
         companions: Vec::new(),
+        commanders: Vec::new(),
+        commander: false,
         minimum_deck_size: 40,
         seed: 3,
         shuffle: true,

@@ -1,0 +1,40 @@
+# Unsummon would return Hakoda to its owner's hand; its owner chooses the Commander replacement to put it in the command zone.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Hakoda, Selfless Commander
+
+[Bot1 Deck]
+Plains x7
+Plains x18
+
+[Bot2 Deck]
+Unsummon
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Command.Hakoda, Selfless Commander.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Hakoda, Selfless Commander)
+Bot1.Accept
+? Bot1.Command = Hakoda, Selfless Commander
+
+[Expect]
+Bot1.Command = Hakoda, Selfless Commander
+Bot1.Hand.Hakoda, Selfless Commander = (absent)
+Bot1.Commander.Hakoda, Selfless Commander.CastCount = 1

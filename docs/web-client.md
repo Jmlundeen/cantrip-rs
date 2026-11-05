@@ -542,5 +542,6 @@ constructor (`AttachPhone`), and does nothing on any other page: the remote clie
 
 ## Open
 
+- Each player's Command zone: its commanders are shown there and the owner can open the zone to inspect or cast them. The commander card shows how many times it was cast from the command zone, its next tax, and commander damage dealt to each opponent.
 - The emblem pile beside a player's graveyard.
 - Concede, rematch, spectating, sound, and more than one opponent drawn.

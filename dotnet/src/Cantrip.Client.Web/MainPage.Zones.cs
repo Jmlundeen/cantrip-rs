@@ -564,6 +564,20 @@ public sealed partial class MainPage
                 () => { TogglePeek(ZoneKindView.Sideboard, seat); RedrawNow(); }));
         }
 
+        // Commanders remain public while in the command zone, and the owner can open them like other piles to use the
+        // same action surface as cards in hand. Opponents can inspect them too.
+        IReadOnlyList<ObjectView> commanders = client.Zone(ZoneKindView.Command, seat).Where(card => card.Commander).ToArray();
+        if (commanders.Count > 0)
+        {
+            int castable = commanders.Count(card => _actions.For(card.Handle).Any(action => action.Kind == ActionKindView.CastSpell));
+            buttons.Add(new PlayerRail.ZoneButtonSpec(
+                castable > 0 ? $"Command zone  {commanders.Count}  ·  {castable} castable" : $"Command zone  {commanders.Count}",
+                $"{(seat == client.Seat ? "Your" : $"{NameOf(client, seat)}'s")} commanders. Open to inspect or cast.",
+                _peek == (ZoneKindView.Command, seat),
+                () => { TogglePeek(ZoneKindView.Command, seat); RedrawNow(); },
+                Lit: castable > 0));
+        }
+
         return buttons;
     }
 
@@ -807,6 +821,10 @@ public sealed partial class MainPage
         }
 
         IReadOnlyList<ObjectView> contents = client.Zone(peek.Kind, peek.Owner);
+        if (peek.Kind == ZoneKindView.Command)
+        {
+            contents = [.. contents.Where(card => card.Commander)];
+        }
 
         // The top of a library its owner is shown, with its handle, so it can be played from here (Bolas's Citadel).
         if (peek.Kind == ZoneKindView.Library && contents.Count == 0 && client.Shown(peek.Kind, peek.Owner) is { Count: 1 } top)

@@ -1,0 +1,42 @@
+# When Swords to Plowshares exiles Bot1's commander, Bot1 may decline the command-zone replacement and leave it exiled.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Hakoda, Selfless Commander
+
+[Bot1 Deck]
+Plains x7
+Plains x18
+
+[Bot2 Deck]
+Swords to Plowshares
+Plains x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Command.Hakoda, Selfless Commander.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Hakoda, Selfless Commander)
+Bot1.Decline
+
+[Expect]
+Bot1.Command =
+Bot1.Exile.Hakoda, Selfless Commander.Power = 3
+Bot1.Exile.Hakoda, Selfless Commander.Toughness = 5
+Bot1.Commander.Hakoda, Selfless Commander.CastCount = 1

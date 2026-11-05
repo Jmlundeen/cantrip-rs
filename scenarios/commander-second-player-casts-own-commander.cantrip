@@ -1,0 +1,31 @@
+# Bot2 owns a separate commander object and casts it from the shared command zone on Bot2's turn.
+
+[Format]
+Commander
+
+[Bot2 Commander]
+Hakoda, Selfless Commander
+
+[Bot1 Deck]
+Island x30
+
+[Bot2 Deck]
+Plains x7
+Plains x20
+
+[Actions]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Command.Hakoda, Selfless Commander.Cast
+
+[Expect]
+Bot2.Life = 40
+Bot2.Command =
+Bot2.Commander.Hakoda, Selfless Commander.CastCount = 1
+Bot2.Battlefield.Hakoda, Selfless Commander.SummoningSick = true

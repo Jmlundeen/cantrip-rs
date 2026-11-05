@@ -218,6 +218,7 @@ impl Tracker {
                     LossReason::Poison => LossReasonView::Poison,
                     LossReason::Effect => LossReasonView::Effect,
                     LossReason::Conceded => LossReasonView::Conceded,
+                    LossReason::CommanderDamage => LossReasonView::CommanderDamage,
                 };
                 out.push(Proto::Lost { player, reason });
             }
@@ -304,6 +305,10 @@ impl Tracker {
                     LossReasonView::Poison
                 } else if player.drew_from_empty {
                     LossReasonView::EmptyLibrary
+                } else if state.commander
+                    && game.history().players_dealt_21_by_a_commander(state).contains(&p)
+                {
+                    LossReasonView::CommanderDamage
                 } else {
                     LossReasonView::Effect
                 };
@@ -436,9 +441,9 @@ impl Teller<'_> {
                 Some(GameEventView::ObjectMovedEvent(ObjectMovedEvent {
                     object,
                     from: zone_kind_view(from.kind()),
-                    from_owner: zone_owner(*from),
+                    from_owner: if from.is(ZoneKind::Command) { seat(self.game.state.obj(*old).owner) } else { zone_owner(*from) },
                     to: zone_kind_view(to.kind()),
-                    to_owner: zone_owner(*to),
+                    to_owner: if to.is(ZoneKind::Command) { seat(self.game.state.obj(*new).owner) } else { zone_owner(*to) },
                     reason: reason_view(*reason, *from, *to),
                 }))
             }
@@ -595,5 +600,66 @@ mod tests {
                 (4, Step::Upkeep),
             ]
         );
+    }
+
+    #[test]
+    fn commander_return_move_reports_the_second_owners_command_zone() {
+        let cards = cantrip_engine::cards();
+        let commander = cards.find("Balin, Loremaster").expect("commander card");
+        let forest = cards.find("Forest").expect("Forest");
+        let deck = vec![forest; 20];
+        let mut game = Game::new(cards, &Setup {
+            decks: vec![deck.clone(), deck],
+            commanders: vec![vec![], vec![commander]],
+            commander: true,
+            ..Default::default()
+        });
+        let source = *game.state.zone(Zone::COMMAND).iter().find(|&&id| game.state.obj(id).owner == PlayerId(1)).expect("seat two commander");
+        let mut old_object = *game.state.obj(source);
+        old_object.zone = Zone::graveyard(PlayerId(1));
+        let old = game.state.push_obj(old_object);
+        let new = game.state.push_obj(*game.state.obj(source));
+        let mut handles = HandleSpace::new();
+        let mut teller = Teller {
+            game: &game,
+            viewer: PlayerId(0),
+            handles: &mut handles,
+            extra: &HashSet::new(),
+            mentioned: HashSet::new(),
+        };
+
+        let event = teller.tell(&Proto::Moved {
+            old,
+            new,
+            from: Zone::graveyard(PlayerId(1)),
+            to: Zone::COMMAND,
+            reason: ZoneReason::Other,
+        }).expect("movement event");
+        let moved = match event { GameEventView::ObjectMovedEvent(moved) => moved, other => panic!("{other:?}") };
+        assert_eq!((moved.from_owner, moved.to_owner), (2, 2));
+    }
+
+    #[test]
+    fn commander_damage_loss_reason_reaches_the_player_lost_event() {
+        let cards = cantrip_engine::cards();
+        let deck = vec![cards.find("Forest").expect("Forest"); 20];
+        let game = Game::new(cards, &Setup { decks: vec![deck.clone(), deck], ..Default::default() });
+        let player = PlayerId(1);
+        let mut tracker = Tracker::new(&game);
+        let record = Record {
+            serial: 0,
+            turn: 1,
+            step: Step::Upkeep,
+            active: player,
+            cause: Cause::Turn,
+            event: Event::GameLost { player, reason: LossReason::CommanderDamage },
+        };
+        let proto = tracker.collect(&game, &[record], 0).into_iter().find(|proto| matches!(proto, Proto::Lost { .. })).expect("loss proto");
+        assert!(matches!(&proto, Proto::Lost { player: lost, reason: LossReasonView::CommanderDamage } if *lost == player));
+
+        let mut handles = HandleSpace::new();
+        let mut teller = Teller { game: &game, viewer: PlayerId(0), handles: &mut handles, extra: &HashSet::new(), mentioned: HashSet::new() };
+        let event = teller.tell(&proto).expect("player lost event");
+        assert!(matches!(event, GameEventView::PlayerLostEvent(PlayerLostEvent { player: 2, reason: LossReasonView::CommanderDamage })));
     }
 }

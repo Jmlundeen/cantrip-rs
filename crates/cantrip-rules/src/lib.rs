@@ -223,6 +223,8 @@ mod lasting_rules_tests;
 mod untap_bans_tests;
 #[cfg(test)]
 mod untap_others_tests;
+#[cfg(test)]
+mod commander_tests;
 mod validate;
 
 use cantrip_api::*;
@@ -355,6 +357,10 @@ pub struct Setup {
     pub shuffle: bool,
     /// With `shuffle` off: still ask who goes first and offer mulligans (a scenario's `[Opening]`), this seat choosing.
     pub opening_chooser: Option<PlayerId>,
+    /// Whether this is a Commander game (CR 903).
+    pub commander: bool,
+    /// Each seat's designated commander cards, separate from its library deck.
+    pub commanders: Vec<Vec<CardId>>,
 }
 
 /// A deal with nothing in it, for building on: a Freeform game, with no minimum deck size, every other field empty.
@@ -369,6 +375,8 @@ impl Default for Setup {
             seed: 0,
             shuffle: false,
             opening_chooser: None,
+            commander: false,
+            commanders: Vec::new(),
         }
     }
 }
@@ -405,6 +413,15 @@ impl Game {
     pub fn new(cards: &'static CardTable, setup: &Setup) -> Game {
         let players = setup.decks.len();
         let mut state = GameState::new(players, setup.seed);
+        state.commander = setup.commander;
+        if setup.commander {
+            for seat in 0..players {
+                state.update_player(PlayerId(seat as u8), |player| {
+                    player.life = 40;
+                    player.starting_life = 40;
+                });
+            }
+        }
         state.outside_supply = setup.basic_lands_outside.clone();
         state.minimum_deck_size = setup.minimum_deck_size;
         let mut companions: Vec<(PlayerId, ObjectId)> = Vec::new();
@@ -426,6 +443,13 @@ impl Game {
                 let id = state.push_obj(Obj::new(card, p, Zone::sideboard(p)));
                 state.zone_push(Zone::sideboard(p), id);
                 companions.push((p, id));
+            }
+            for &card in setup.commanders.get(seat).into_iter().flatten().filter(|_| setup.commander) {
+                let mut commander = Obj::new(card, p, Zone::COMMAND);
+                commander.commander = true;
+                let id = state.push_obj(commander);
+                state.update_obj(id, |obj| obj.commander_id = Some(id));
+                state.zone_push(Zone::COMMAND, id);
             }
         }
 
@@ -485,6 +509,18 @@ impl Game {
 
     pub fn is_over(&self) -> bool {
         self.state.is_over()
+    }
+
+    /// Successful casts of this commander from the command zone, including spells countered after casting.
+    pub fn commander_cast_count(&self, commander: ObjectId) -> u32 {
+        let Some(identity) = self.state.obj(commander).commander_id.or_else(|| crate::merge::commander_ids(&self.state, commander).into_iter().find(|&id| id != ObjectId::NONE)) else { return 0 };
+        self.history().commander_casts_from_command_zone(&self.state, identity)
+    }
+
+    /// Actual combat damage dealt to `player` by this physical commander, across all zone changes.
+    pub fn commander_damage(&self, commander: ObjectId, player: PlayerId) -> u32 {
+        let Some(identity) = self.state.obj(commander).commander_id.or_else(|| crate::merge::commander_ids(&self.state, commander).into_iter().find(|&id| id != ObjectId::NONE)) else { return 0 };
+        self.history().commander_damage_to(&self.state, identity, player)
     }
 
     /// Runs until the game asks something or ends.
@@ -927,6 +963,7 @@ impl Game {
                 let mana_value = cantrip_api::mana_value_of(&|c| self.cards.get(c), &self.state, id, &c);
                 let row = LastKnown {
                     id,
+                    commander_ids: self.state.obj(id).commander_id.map_or([ObjectId::NONE; 8], |id| [id, ObjectId::NONE, ObjectId::NONE, ObjectId::NONE, ObjectId::NONE, ObjectId::NONE, ObjectId::NONE, ObjectId::NONE]),
                     card: c.card,
                     controller: self.state.obj(id).controller,
                     name: c.name,
@@ -1656,6 +1693,14 @@ impl Drop for OthersText<'_> {
 impl Query for Game {
     fn state(&self) -> &GameState {
         &self.state
+    }
+
+    fn outside_the_game(&self, player: PlayerId) -> Vec<ObjectId> {
+        if self.state.commander || self.state.player_controller(player) != player {
+            Vec::new()
+        } else {
+            self.state.zone(Zone::sideboard(player)).to_vec()
+        }
     }
 
     fn linked_card(&self, card: CardId) -> CardId {

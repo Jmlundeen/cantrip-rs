@@ -1,0 +1,41 @@
+# CR 903.10a, 707.2: a copy of a commander is not a commander, so the combat damage it deals is no commander damage.
+# Bot1's commander, Raging Goblin (haste), deals Bot2 1 combat damage on turn 1. On turn 2 Bot2's Clone enters as a copy
+# of it - a Raging Goblin with haste - and attacks Bot1 for 1: Bot1 loses the life, but no commander dealt it.
+# Fixture only: Raging Goblin stands in for a commander; the harness does not check commander eligibility.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Raging Goblin
+
+[Bot1 Deck]
+Mountain x25
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Clone
+Island x22
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Command.Raging Goblin.Cast
+Bot1.Attack(Raging Goblin > Bot2)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Clone.Cast
+Bot2.Accept
+? Bot2.Battlefield = Mox Sapphire; Raging Goblin
+Bot2.Attack(Raging Goblin > Bot1)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 39
+Bot2.Life = 39
+Bot1.Commander.Raging Goblin.DamageTo.Bot1 = 0
+Bot1.Commander.Raging Goblin.DamageTo.Bot2 = 1

@@ -140,6 +140,10 @@ pub struct Deal {
     pub basic_lands_outside: Vec<String>,
     /// Each seat's companion, chosen as its deck was built (`Setup::companions`), by seat; a seat past the end has none.
     pub companions: Vec<Option<String>>,
+    /// Each seat's Commander cards, outside its library and dealt to its command zone.
+    pub commanders: Vec<Vec<String>>,
+    /// Explicit Commander format switch, never inferred from deck size.
+    pub commander: bool,
     /// The format's minimum deck size, as the server says (`Setup::minimum_deck_size`, CR 100.2a-b).
     pub minimum_deck_size: u32,
     pub seed: u64,
@@ -207,11 +211,21 @@ impl Session {
                 })?),
             });
         }
+        let mut commanders = Vec::new();
+        for (at, names) in deal.commanders.iter().enumerate() {
+            let owner = deal.seats.get(at).map_or("seat", |s| s.0.as_str());
+            commanders.push(names.iter().map(|name| {
+                card(name).map(|id| cards.fronts[id.0 as usize].unwrap_or(id)).ok_or_else(||
+                    Rejection::new("InvalidSetup", format!("{owner}'s commander {name} is not a card the engine has")))
+            }).collect::<Result<Vec<_>, _>>()?);
+        }
         let setup = Setup {
             decks,
             sideboards,
             basic_lands_outside,
             companions,
+            commanders,
+            commander: deal.commander,
             minimum_deck_size: deal.minimum_deck_size,
             seed: deal.seed,
             shuffle: deal.shuffle,
@@ -943,7 +957,7 @@ mod tests {
 
     fn deal(first: &[&str], filler: &str, count: usize) -> Deal {
         let deck = |top: &[&str]| top.iter().map(|c| c.to_string()).chain(std::iter::repeat_n(filler.to_string(), count)).collect::<Vec<_>>();
-        Deal { seats: vec![("North".into(), deck(first), Vec::new()), ("South".into(), deck(&[]), Vec::new())], basic_lands_outside: Vec::new(), companions: Vec::new(), minimum_deck_size: 60, seed: 1, shuffle: false, first_player: Some(1), chooser: None }
+        Deal { seats: vec![("North".into(), deck(first), Vec::new()), ("South".into(), deck(&[]), Vec::new())], basic_lands_outside: Vec::new(), companions: Vec::new(), commanders: Vec::new(), commander: false, minimum_deck_size: 60, seed: 1, shuffle: false, first_player: Some(1), chooser: None }
     }
 
     /// A game whose South is controlled by North during South's next turn (CR 723.1): the effect put in place before the

@@ -381,7 +381,9 @@ pub fn eligible_companions(q: &dyn Query, player: PlayerId) -> Vec<ObjectId> {
     if !outside.iter().any(|&id| q.card(s.obj(id).card).companion.is_some()) {
         return Vec::new();
     }
-    let cards: Vec<ObjectId> = s.zone(Zone::library(player)).iter().chain(s.zone(Zone::hand(player))).copied().collect();
+    let cards: Vec<ObjectId> = s.zone(Zone::library(player)).iter().chain(s.zone(Zone::hand(player)))
+        .chain(s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == player && s.obj(id).commander))
+        .copied().collect();
     let deck = StartingDeck { player, cards: &cards, minimum_size: s.minimum_deck_size };
     outside.iter().copied().filter(|&id| q.card(s.obj(id).card).companion.is_some_and(|condition| condition(q, &deck))).collect()
 }

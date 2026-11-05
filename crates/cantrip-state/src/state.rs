@@ -12,6 +12,8 @@ use crate::vocab::*;
 /// state exactly.
 #[derive(Clone, Debug)]
 pub struct GameState {
+    /// Commander format rules apply to this game (CR 903).
+    pub commander: bool,
     pub players: Vec<Player>,
     /// Restricted mana in the players' pools (CR 106.6), in the order each player's restrictions first came; an entry
     /// whose mana is all spent is gone. Empty in nearly every position.
@@ -509,6 +511,7 @@ impl GameState {
     pub fn new(players: usize, seed: u64) -> GameState {
         debug_assert!(players <= MAX_SEATS, "a game of {players} seats: at most {MAX_SEATS} are dealt");
         GameState {
+            commander: false,
             players: vec![Player::starting(20); players],
             restricted_mana: Vec::new(),
             mana_from: Vec::new(),

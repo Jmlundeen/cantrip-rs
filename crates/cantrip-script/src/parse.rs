@@ -31,6 +31,10 @@ pub struct GameScript {
     /// The format's minimum deck size (a `[Minimum Deck Size]` section: `60` in Constructed, CR 100.2a; `40` in Limited, CR
     /// 100.2b), when not Freeform's none.
     pub minimum_deck_size: Option<u32>,
+    /// Commander rules apply when `[Format] Commander` is present.
+    pub commander: bool,
+    /// Each seat's designated commander cards, separate from the library deck.
+    pub commanders: Vec<Vec<DeckEntry>>,
     pub steps: Vec<ScriptStep>,
     pub expectations: Vec<Expectation>,
     /// Whether the game starts as a real one does (CR 103).
@@ -626,6 +630,8 @@ enum Section {
     Sideboard(usize),
     Companion(usize),
     MinimumDeckSize,
+    Format,
+    Commander(usize),
     BasicLandsOutside,
     Actions,
     Expect,
@@ -684,6 +690,18 @@ impl GameScript {
                         Ok(n) if script.minimum_deck_size.is_none() => script.minimum_deck_size = Some(n),
                         _ => return Err(ParseError("a [Minimum Deck Size] section gives one number, as 40".into())),
                     },
+                    Section::Format => {
+                        if line.eq_ignore_ascii_case("Commander") && !script.commander { script.commander = true; }
+                        else { return Err(ParseError("[Format] currently accepts one value: Commander".into())); }
+                    }
+                    Section::Commander(seat) => {
+                        if script.commanders.len() <= seat { script.commanders.resize_with(seat + 1, Vec::new); }
+                        let entry = parse_deck_entry(line, number)?;
+                        if entry.copies != 1 {
+                            return Err(ParseError("a [Bot1 Commander] section names each commander once".into()));
+                        }
+                        script.commanders[seat].push(entry);
+                    }
                     Section::BasicLandsOutside => {
                         let entry = parse_deck_entry(line, number)?;
                         if entry.copies != 1 {
@@ -737,7 +755,13 @@ impl GameScript {
             .chain((0..self.sideboards.len()).flat_map(|i| self.sideboard(i)))
             .chain(self.basic_lands_outside.iter().cloned())
             .chain(self.companions.iter().flatten().cloned())
+            .chain((0..self.commanders.len()).flat_map(|i| self.commander_list(i)))
             .collect()
+    }
+
+    /// Each designated commander's card name, in order.
+    pub fn commander_list(&self, index: usize) -> Vec<String> {
+        self.commanders.get(index).into_iter().flatten().flat_map(|e| std::iter::repeat_n(e.card.clone(), e.copies)).collect()
     }
 
     /// Each sideboard's card names in order, one entry per copy.
@@ -756,6 +780,7 @@ fn section_header(line: &str) -> Option<Section> {
         "[EVENT LIMIT]" => Some(Section::EventLimit),
         "[BASIC LANDS OUTSIDE]" => Some(Section::BasicLandsOutside),
         "[MINIMUM DECK SIZE]" => Some(Section::MinimumDeckSize),
+        "[FORMAT]" => Some(Section::Format),
         other => {
             let rest = other.strip_prefix("[BOT")?;
             if let Some(seat) = rest.strip_suffix(" SIDEBOARD]") {
@@ -765,6 +790,10 @@ fn section_header(line: &str) -> Option<Section> {
             if let Some(seat) = rest.strip_suffix(" COMPANION]") {
                 let seat = seat.parse::<usize>().ok()?;
                 return (1..=4).contains(&seat).then_some(Section::Companion(seat - 1));
+            }
+            if let Some(seat) = rest.strip_suffix(" COMMANDER]") {
+                let seat = seat.parse::<usize>().ok()?;
+                return (1..=4).contains(&seat).then_some(Section::Commander(seat - 1));
             }
             let seat = rest.strip_suffix(" DECK]")?.parse::<usize>().ok()?;
             (1..=4).contains(&seat).then_some(Section::Deck(seat - 1))
@@ -816,6 +845,16 @@ mod tests {
             other => panic!("{other:?}"),
         }
         assert_eq!(script.expectations[0].key, "Bot1.Graveyard");
+    }
+
+    #[test]
+    fn parses_commander_format_and_commanders_separately_from_decks() {
+        let script = GameScript::parse("[Format]\nCommander\n[Bot1 Commander]\nProbe Commander\n[Bot2 Commander]\nPartner A\nPartner B\n[Bot1 Deck]\nIsland x7\n[Bot2 Deck]\nIsland x7\n", "x").unwrap();
+        assert!(script.commander);
+        assert_eq!(script.commander_list(0), vec!["Probe Commander".to_string()]);
+        assert_eq!(script.commander_list(1), vec!["Partner A".to_string(), "Partner B".to_string()]);
+        assert_eq!(script.decklist(0), vec!["Island".to_string(); 7]);
+        assert!(GameScript::parse("[Format]\nPioneer\n[Bot1 Deck]\nIsland\n", "x").is_err());
     }
 
     #[test]

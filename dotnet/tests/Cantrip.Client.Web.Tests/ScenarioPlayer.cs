@@ -1044,7 +1044,7 @@ public sealed class ScenarioPlayer
         List<(int Seat, bool Graveyard, float X, float Y)> openers = [];
         foreach (PlayerState player in state.Players ?? [])
         {
-            // Exile, and a sideboard (the button reads "Companion" while a companion waits there, CR 702.139a).
+            // Exile, sideboard (the button reads "Companion" while a companion waits there, CR 702.139a), or command zone.
             openers.AddRange((player.Zones ?? []).Where(z => OutsideOrExile(z.Text)).Select(z => (player.Seat, false, z.X, z.Y)));
             if (player.GraveyardX > 0)
             {
@@ -1134,9 +1134,11 @@ public sealed class ScenarioPlayer
         }
     }
 
-    /// <summary>A zone button that opens exile or a sideboard: what a card a player clicks may be in, but for the piles.</summary>
+    /// <summary>A zone button that opens exile, sideboard, or command zone: where a card a player clicks may be.</summary>
     private static bool OutsideOrExile(string text) =>
-        text.StartsWith("Exile", StringComparison.Ordinal) || text.StartsWith("Sideboard", StringComparison.Ordinal);
+        text.StartsWith("Exile", StringComparison.Ordinal)
+        || text.StartsWith("Sideboard", StringComparison.Ordinal)
+        || text.StartsWith("Command zone", StringComparison.Ordinal);
 
     private async Task ClickHandleAsync(int handle)
     {
@@ -1563,7 +1565,7 @@ public sealed class ScenarioPlayer
             string row = card.Groups["row"].Value;
             string name = card.Groups["card"].Value;
             string attribute = card.Groups["attr"].Value;
-            if (row is "Exile" or "OpponentExile" or "Graveyard")
+            if (row is "Exile" or "OpponentExile" or "Graveyard" or "Command" or "OpponentCommand")
             {
                 shown = await ReadInZoneAsync(row, name, attribute);
             }
@@ -1613,7 +1615,7 @@ public sealed class ScenarioPlayer
     }
 
     private static readonly Regex CardKey = new(
-        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation|Note|Counters|Damage|Share|FaceDownName|Halves)$",
+        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard|Command|OpponentCommand)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation|Note|Counters|Damage|Share|FaceDownName|Halves)$",
         RegexOptions.CultureInvariant);
 
     /// <summary>A card named with its number among the cards of that name: <c>Loxodon Warhammer#2</c>.</summary>
@@ -1669,15 +1671,21 @@ public sealed class ScenarioPlayer
         return shown;
     }
 
-    /// <summary>Where a click opens Bot1's exile or graveyard: the Exile button, or the graveyard pile.</summary>
+    /// <summary>Where a click opens Bot1's exile, command zone, or graveyard.</summary>
     private static (float X, float Y)? ZoneOpener(TableState state, string zone)
     {
-        PlayerState? me = zone == "OpponentExile"
+        PlayerState? me = zone is "OpponentExile" or "OpponentCommand"
             ? state.Players?.FirstOrDefault(p => p.Seat != state.Seat)
             : state.Players?.FirstOrDefault(p => p.Seat == state.Seat);
         if (zone is "Exile" or "OpponentExile")
         {
             ZoneButtonState? button = me?.Zones?.FirstOrDefault(z => z.Text.StartsWith("Exile", StringComparison.Ordinal));
+            return button is null ? null : (button.X, button.Y);
+        }
+
+        if (zone is "Command" or "OpponentCommand")
+        {
+            ZoneButtonState? button = me?.Zones?.FirstOrDefault(z => z.Text.StartsWith("Command zone", StringComparison.Ordinal));
             return button is null ? null : (button.X, button.Y);
         }
 

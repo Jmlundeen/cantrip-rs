@@ -536,11 +536,11 @@ impl StateDump {
             }
 
             // CR 114: the emblems a player owns, from the one shared command zone.
-            let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p).map(|&id| game.known_name(id).to_string()).collect();
+            let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p && !s.obj(id).commander).map(|&id| game.known_name(id).to_string()).collect();
             d.list(&format!("{b}.Emblems"), emblems, false);
             // What made each emblem whose text names its maker (`Query::made_by`), in the order of the list above, and the cards
             // in exile linked to it: absent with none. An entry is that object as it was, wherever it is now (CR 400.7).
-            let makers: Vec<Linked> = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p).filter_map(|&id| s.made_by(id)).collect();
+            let makers: Vec<Linked> = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p && !s.obj(id).commander).filter_map(|&id| s.made_by(id)).collect();
             if !makers.is_empty() {
                 d.list(&format!("{b}.Emblems.MadeBy"), makers.iter().map(|by| game.known_name(by.object).to_string()).collect(), false);
                 // Each emblem's cards sorted, the emblems' groups apart by a `|` item, in emblem order.
@@ -556,6 +556,28 @@ impl StateDump {
                 let cards = exiled.iter().filter(|e| *e != "|").count();
                 d.set(format!("{b}.Emblems.ExiledWithMakers.Count"), cards);
                 d.set(format!("{b}.Emblems.ExiledWithMakers"), exiled.join("; "));
+            }
+            // Commanders in the shared command zone, by owner (CR 903.8).
+            let commanders = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p && s.obj(id).commander).map(|&id| game.known_name(id).to_string()).collect();
+            d.list(&format!("{b}.Command"), commanders, false);
+            // Per-identity Commander counters are derived from event history, not a mutable total (`Game::commander_*`).
+            let mut commander_ids: Vec<ObjectId> = s.objects.iter().enumerate().filter_map(|(index, obj)| {
+                (obj.commander && obj.owner == p && obj.commander_id == Some(ObjectId(index as u32))).then_some(ObjectId(index as u32))
+            }).collect();
+            commander_ids.sort_by_key(|&id| game.known_name(id).to_string());
+            for &commander in &commander_ids {
+                let name = game.known_name(commander);
+                let same = commander_ids.iter().filter(|&&id| game.known_name(id) == name).count();
+                let label = if same > 1 {
+                    let rank = commander_ids.iter().take_while(|&&id| id != commander).filter(|&&id| game.known_name(id) == name).count() + 1;
+                    format!("{name}#{rank}")
+                } else { name.to_string() };
+                let cast_count = game.commander_cast_count(commander);
+                d.set(format!("{b}.Commander.{label}.CastCount"), cast_count);
+                for recipient in s.seats() {
+                    let damage = game.commander_damage(commander, recipient);
+                    d.set(format!("{b}.Commander.{label}.DamageTo.{}", bot(recipient)), damage);
+                }
             }
 
             // The battlefield, and its phased-out permanents (CR 702.26b) apart, as `BotN.PhasedOut` under the player who controlled
@@ -941,7 +963,7 @@ const GAME_KEYS: &[&str] = &[
 const PLAYER_KEYS: &[&str] = &[
     "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "MayLookAtLibraryTop", "LostTo", "Mana", "ManaFrom", "LandsPlayed", "CitysBlessing",
     "EnduringStory", "Speed", "Dungeon", "DungeonsCompleted", "TurnsToSkip", "ControlledBy", "NextTurnControlledBy", "Looked", "Surveilled", "Shuffles",
-    "Hand", "Revealed", "Crimes", "Library", "Companion", "Sideboard", "Graveyard", "Emblems", "Emblems.MadeBy", "Emblems.ExiledWithMakers", "Battlefield", "PhasedOut",
+    "Hand", "Revealed", "Crimes", "Library", "Companion", "Sideboard", "Graveyard", "Emblems", "Emblems.MadeBy", "Emblems.ExiledWithMakers", "Command", "Battlefield", "PhasedOut",
 ];
 
 /// The keys the dump writes of a permanent, after `BotN.Battlefield.<name>.` (or `.PhasedOut.`), beside `Counters.<Kind>`.
@@ -996,6 +1018,15 @@ fn writable(key: &str) -> bool {
     };
     if PLAYER_KEYS.contains(&rest) {
         return true;
+    }
+    if let Some(commander) = rest.strip_prefix("Commander.") {
+        if let Some(name) = commander.strip_suffix(".CastCount") {
+            return !name.is_empty();
+        }
+        if let Some((name, player)) = commander.rsplit_once(".DamageTo.Bot") {
+            return !name.is_empty() && player.parse::<u8>().is_ok_and(|n| (1..=4).contains(&n));
+        }
+        return false;
     }
     let property = |zone: &str| rest.strip_prefix(zone).and_then(|r| r.strip_prefix('.')).and_then(|r| r.rsplit_once('.')).map(|(_, p)| p);
     for zone in ["Battlefield", "PhasedOut"].into_iter().chain(CARD_ZONES) {
@@ -1059,7 +1090,7 @@ mod tests {
                 let key = &piece[..piece.find(close).unwrap()];
                 checked += 1;
                 let sample = key.replace("{b}", "Bot1").replace("{key}", "Bot1.Battlefield.Card").replace("{row}", "Battlefield").replace("{label}", "Card");
-                let sample = sample.replace("{}", CounterKind::ALL[0].token());
+                let sample = if key.contains(".DamageTo.") { sample.replace("{}", "Bot2") } else { sample.replace("{}", CounterKind::ALL[0].token()) };
                 if !writable(&sample) && !writable(&key.replace("{b}", "Bot1").replace("{key}", "Bot1.Graveyard.Card")) {
                     missing.push(key.to_string());
                 }
@@ -1076,6 +1107,10 @@ mod tests {
         assert!(writable("Bot2.Graveyard.Sandman, Shifting Scoundrel.Power"));
         assert!(writable("Bot1.Exile.Llanowar Elves.Counters.PlusOnePlusOne"));
         assert!(writable("Bot1.Exile.Llanowar Elves.Colors"));
+        assert!(writable("Bot1.Command"));
+        assert!(writable("Bot1.Command.Count"));
+        assert!(writable("Bot1.Commander.Hakoda, Selfless Commander.CastCount"));
+        assert!(writable("Bot1.Commander.Hakoda, Selfless Commander#2.DamageTo.Bot4"));
         assert!(writable("Bot1.Battlefield.Grizzly Bears.Keywords.Count"));
         assert!(writable("Monarch"));
         assert!(!writable("Bot1.Battlefield.Grizzly Bears.Counters"));
@@ -1083,6 +1118,12 @@ mod tests {
         assert!(!writable("Bot1.Battlefield.Grizzly Bears.Taped"));
         assert!(!writable("Bot1.Hand.Lightning Bolt.Tapped"));
         assert!(!writable("Bot1.Exile.Llanowar Elves.Counters"));
+        assert!(!writable("Bot1.Commanders"));
+        assert!(!writable("Bot1.Commander.CastCount"));
+        assert!(!writable("Bot1.Commander.Hakoda.CastCounts"));
+        assert!(!writable("Bot1.Commander.Hakoda.DamageTo.Bot0"));
+        assert!(!writable("Bot1.Commander.Hakoda.DamageTo.Bot5"));
+        assert!(!writable("Bot1.Commander.Hakoda.DamageBy.Bot2"));
         assert!(!writable("Bot1.Lfie"));
         assert!(!writable("Monarchy"));
     }

@@ -165,6 +165,9 @@ public enum LossReasonView
 
     /// <summary>An effect said so, including an effect that stated somebody else wins.</summary>
     Effect = 4,
+
+    /// Combat damage from one commander reached 21.
+    CommanderDamage = 5,
 }
 
 public enum ObjectKindView

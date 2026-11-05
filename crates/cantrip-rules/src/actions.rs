@@ -520,7 +520,7 @@ fn take_companion_option(cx: &Cx, player: PlayerId, available: &std::cell::OnceC
 /// it stays in the game until it ends (CR 702.139c).
 fn take_companion(cx: &mut Cx, player: PlayerId, card: ObjectId) -> R<()> {
     pay_mana(cx, player, card, COMPANION_COST)?;
-    ops::bring_into_hand(cx, &[card]);
+    ops::bring_companion_into_hand(cx, card);
     Ok(())
 }
 
@@ -3581,7 +3581,18 @@ fn deltas_watched(
     let ability_own = ability.and_then(|(a, by)| activated(cx, a).and_then(|d| d.cost_change).map(|change| (change, by)));
     // The cost changes resolved spells and abilities made (CR 611.2c): of spells only, as every one printed says.
     let lasting = matches!(costed, Costed::Spell(_)) && lasting_changes(cx);
-    if sources.is_empty() && own.is_empty() && ability_own.is_none() && !lasting {
+    let commander_tax = if cx.s().commander {
+        if let Costed::Spell(spell) = costed {
+            let obj = cx.s().obj(spell);
+            if obj.commander_id.is_some() && (obj.zone.is(ZoneKind::Command) || obj.cast_from == Some(ZoneKind::Command)) {
+                // CR 903.8: {2} more for each time it was cast from the command zone before.
+                obj.commander_id.map_or(0, |identity| {
+                    cx.history().commander_casts_from_command_zone(cx.s(), identity) * 2
+                })
+            } else { 0 }
+        } else { 0 }
+    } else { 0 };
+    if sources.is_empty() && own.is_empty() && ability_own.is_none() && !lasting && commander_tax == 0 {
         return (0, ManaCost::ZERO, 0, 0, 0);
     }
     let view;
@@ -3622,7 +3633,7 @@ fn deltas_watched(
         }
         None => announced_q,
     };
-    let mut more = 0u32;
+    let mut more = commander_tax;
     let mut less = ManaCost::ZERO;
     let mut life = 0u32;
     let mut least = 0u8;
@@ -6897,12 +6908,17 @@ impl<'a> Offer<'a> {
         if !cast_only_if_met(cx, def, &self.asker(card)) {
             return;
         }
-        let own = zone.player == player;
+        let own = zone.player == player || (zone.is(ZoneKind::Command) && cx.s().obj(card).owner == player);
         match zone.kind() {
             ZoneKind::Hand if own => {
                 // From the hand, the card and its faces for their costs and the ways that name the hand (CR 601.3).
                 self.by_route(card, def, &Route::RULES, |way| way.from == ZoneKind::Hand, options);
                 self.fused(card, def, options);
+                self.overload(card, def, options);
+                self.bestow(card, def, options);
+            }
+            ZoneKind::Command if own && cx.s().obj(card).commander_id.is_some() => {
+                self.by_route(card, def, &Route::RULES, |way| way.from == ZoneKind::Hand && !way.only_from, options);
                 self.overload(card, def, options);
                 self.bestow(card, def, options);
             }
@@ -7116,6 +7132,9 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
     };
     for zone in cast_zones(cx, player, barred) {
         for &card in cx.s().zone(zone) {
+            if zone.is(ZoneKind::Command) && (cx.s().obj(card).owner != player || !cx.s().obj(card).commander) {
+                continue;
+            }
             offer.card(card, zone, options);
         }
     }
@@ -7156,7 +7175,7 @@ fn cast_zones<'a>(cx: &'a Cx, player: PlayerId, barred: ZoneKinds) -> impl Itera
             })
         }).map(Zone::graveyard)
     }).into_iter().flatten();
-    [Zone::hand(player), Zone::graveyard(player)].into_iter().chain(cx.s().seats().map(Zone::exile)).chain(borrowed)
+    [Zone::hand(player), Zone::graveyard(player), Zone::COMMAND].into_iter().chain(cx.s().seats().map(Zone::exile)).chain(borrowed)
         .filter(move |zone| !barred.contains(zone.kind()))
 }
 

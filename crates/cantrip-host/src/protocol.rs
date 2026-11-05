@@ -181,6 +181,7 @@ pub enum LossReasonView {
     Poison,
     Conceded,
     Effect,
+    CommanderDamage,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -606,6 +607,22 @@ pub struct ObjectView {
     /// for anything else.
     #[serde(default)]
     pub merged_with: Vec<ObjectView>,
+    /// This physical card is a designated commander, wherever it is.
+    #[serde(default)]
+    pub commander: bool,
+    /// Number of times this commander was cast from the command zone (CR 903.8).
+    #[serde(default)]
+    pub commander_cast_count: i32,
+    /// Combat damage this commander has dealt to each player, for the Commander loss rule (CR 903.10a).
+    #[serde(default)]
+    pub commander_damage: Vec<CommanderDamageView>,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct CommanderDamageView {
+    pub player: i32,
+    pub damage: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

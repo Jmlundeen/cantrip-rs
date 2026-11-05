@@ -130,6 +130,8 @@ fn deal(case: &Case, variant: Option<(PlayerId, InfoMode, u64)>) -> Game {
         sideboards: case.sideboards.clone(),
         basic_lands_outside: case.basic_lands_outside.clone(),
         companions: Vec::new(),
+        commander: false,
+        commanders: Vec::new(),
         minimum_deck_size: 60,
         // Another generator for B: a shuffle the seat cannot see comes out otherwise.
         seed: if variant.is_some() { 2 } else { 1 },

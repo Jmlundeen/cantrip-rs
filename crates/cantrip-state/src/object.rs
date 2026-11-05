@@ -16,6 +16,12 @@ pub struct Obj {
     pub controller: PlayerId,
     pub zone: Zone,
     pub token: bool,
+    /// This physical card was designated as a player's commander; follows the card between zones and is never copied.
+    pub commander: bool,
+    /// Stable identity of this designated commander across zone changes; copies never receive it.
+    pub commander_id: Option<ObjectId>,
+    /// In graveyard or exile and eligible for its owner's command-zone choice at the next SBA check.
+    pub commander_return_pending: bool,
     pub tapped: bool,
     /// The turn it came under its controller's control: summoning sick (CR 302.6) while that is not before the
     /// turn its controller's most recent turn began on.
@@ -128,6 +134,8 @@ pub struct Merge {
     /// Whether the object's own component is a token (CR 730.2d): the permanent itself is a token only while its topmost
     /// component is (`Obj::token`), but its own component goes on being one as it leaves (CR 730.3).
     pub own_token: bool,
+    /// The identity of the object's own component when it is a commander.
+    pub own_commander_id: Option<ObjectId>,
     /// The face-down values of the object's own component while it is face down under a face-up component (CR 730.2e): a
     /// face-down permanent a face-up card merged over is a face-up permanent, and its own card stays face down - with no
     /// characteristics to give - until it leaves, when it is revealed (CR 708.9).
@@ -145,6 +153,8 @@ pub struct MergedPart {
     pub face: CardId,
     /// A token, or a copy of a spell that became one as it resolved (CR 707.10f, 111.1).
     pub token: bool,
+    /// The identity of this component when it is a commander.
+    pub commander_id: Option<ObjectId>,
     /// Its own copiable values where they are not its card's (CR 707.2): a copy of a spell's, a prototyped spell's.
     pub copy: Option<Copiable>,
     /// It was put on top of the permanent (CR 702.140c), its characteristics the permanent's from then on (CR 730.2a), or
@@ -571,6 +581,9 @@ impl Obj {
             controller: _,
             zone: _,
             token: _,
+            commander: _,
+            commander_id: _,
+            commander_return_pending: _,
             tapped: _,
             controlled_since: _,
             damage: _,
@@ -641,6 +654,9 @@ impl Obj {
             controller: owner,
             zone,
             token: false,
+            commander: false,
+            commander_id: None,
+            commander_return_pending: false,
             tapped: false,
             controlled_since: 0,
             damage: 0,
@@ -2092,6 +2108,8 @@ pub const MAX_ABILITIES: usize = 32;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct LastKnown {
     pub id: ObjectId,
+    /// Commander identities represented by the source when it dealt damage, captured for Commander damage history.
+    pub commander_ids: [ObjectId; 8],
     pub card: CardId,
     pub controller: PlayerId,
     /// Its name as it last had it (CR 201.2): a copy's, a face-down permanent's none, or one an effect set (CR 612.8).

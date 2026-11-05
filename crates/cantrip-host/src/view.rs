@@ -55,7 +55,7 @@ pub fn zone_kind_view(kind: ZoneKind) -> ZoneKindView {
 /// Seat owning a zone, or zero for a shared one.
 pub fn zone_owner(zone: Zone) -> i32 {
     match zone.kind() {
-        ZoneKind::Library | ZoneKind::Hand | ZoneKind::Graveyard | ZoneKind::Sideboard => seat(zone.player),
+        ZoneKind::Library | ZoneKind::Hand | ZoneKind::Graveyard | ZoneKind::Sideboard | ZoneKind::Command => seat(zone.player),
         _ => 0,
     }
 }
@@ -519,8 +519,11 @@ impl<'a> Projector<'a> {
             view.zones.push(self.zone_view(ZoneKind::Graveyard, p, handles, &visible));
             view.zones.push(self.zone_view(ZoneKind::Sideboard, p, handles, &visible));
         }
-        for kind in [ZoneKind::Battlefield, ZoneKind::Stack, ZoneKind::Exile, ZoneKind::Command] {
+        for kind in [ZoneKind::Battlefield, ZoneKind::Stack, ZoneKind::Exile] {
             view.zones.push(self.zone_view(kind, PlayerId(0), handles, &visible));
+        }
+        for p in s.seats() {
+            view.zones.push(self.zone_view(ZoneKind::Command, p, handles, &visible));
         }
         view.combat = self.combat(handles);
         view
@@ -843,7 +846,7 @@ impl<'a> Projector<'a> {
         // What keeps the player in the game, or out of winning it (CR 104.2b, 104.3), and how damage and counters reach them
         // (CR 702.90b, 122.1), from the static abilities that apply now: Platinum Angel, Phyrexian Unlife, Melira.
         let (they, them) = if p == self.viewer { ("You", "you") } else { ("They", "them") };
-        let reasons = [LossReason::Life, LossReason::EmptyLibrary, LossReason::Poison, LossReason::Effect];
+        let reasons = [LossReason::Life, LossReason::EmptyLibrary, LossReason::Poison, LossReason::CommanderDamage, LossReason::Effect];
         if reasons.iter().all(|&r| game.doesnt_lose(p, r)) {
             summary.pending_effects.push(format!("{they} can't lose the game."));
         } else if game.doesnt_lose(p, LossReason::Life) {
@@ -958,7 +961,7 @@ impl<'a> Projector<'a> {
             ZoneKind::Battlefield => s.battlefield().iter().chain(s.zone(Zone::PHASED_OUT)).copied().collect(),
             ZoneKind::Stack => stack_entries(s).iter().map(StackEntry::key).collect(),
             ZoneKind::Exile => s.seats().flat_map(|p| s.zone(Zone::exile(p)).to_vec()).collect(),
-            ZoneKind::Command => s.zone(Zone::COMMAND).to_vec(),
+            ZoneKind::Command => s.zone(Zone::COMMAND).iter().copied().filter(|&id| s.obj(id).owner == owner).collect(),
             ZoneKind::Sideboard => s.zone(Zone::sideboard(owner)).to_vec(),
             ZoneKind::Gone | ZoneKind::PhasedOut => Vec::new(),
         };
@@ -967,7 +970,7 @@ impl<'a> Projector<'a> {
         let contents_visible = looks_into(s, self.viewer, zone);
         let mut view = ZoneView {
             kind: Some(zone_kind_view(kind)),
-            owner: zone_owner(zone),
+            owner: if kind == ZoneKind::Command { seat(owner) } else { zone_owner(zone) },
             count,
             contents_visible,
             ..Default::default()
@@ -1325,18 +1328,26 @@ impl<'a> Projector<'a> {
             handle,
             // An object that has become another is a former one (CR 400.7), whatever zone it is recorded in.
             zone: Some(if obj.became.is_some() { ZoneKindView::Gone } else { zone_kind_view(zone.kind()) }),
-            zone_owner: zone_owner(zone),
+            zone_owner: if zone.is(ZoneKind::Command) { seat(obj.owner) } else { zone_owner(zone) },
             kind: if obj.card_copy {
                 ObjectKindView::CardCopy
             } else if obj.token {
                 ObjectKindView::Token
-            } else if zone.is(ZoneKind::Command) {
+            } else if zone.is(ZoneKind::Command) && !obj.commander {
                 ObjectKindView::Emblem
             } else {
                 ObjectKindView::Card
             },
             owner: seat(obj.owner),
             controller: seat(obj.controller),
+            commander: obj.commander,
+            commander_cast_count: if obj.commander { game.commander_cast_count(obj.commander_id.unwrap_or(id)) as i32 } else { 0 },
+            commander_damage: if obj.commander {
+                s.seats().map(|p| CommanderDamageView {
+                    player: seat(p),
+                    damage: game.commander_damage(obj.commander_id.unwrap_or(id), p) as i32,
+                }).collect()
+            } else { Vec::new() },
             known: true,
             card_id: def.name.to_string(),
             name: def.name.to_string(),
@@ -1777,6 +1788,36 @@ mod tests {
         for name in ["Tarmogoyf", "Nethergoyf", "Barrowgoyf", "Pyrogoyf"] {
             let view = printed(cards.get(cards.find(name).expect("the card")));
             assert_eq!((view.power, view.toughness), (None, None), "{name}");
+        }
+    }
+
+    #[test]
+    fn commanders_are_card_objects_in_owner_partitioned_command_zones_with_status_metadata() {
+        let cards = cantrip_engine::cards();
+        let first = cards.find("Hakoda, Selfless Commander").expect("commander card");
+        let second = cards.find("Griselbrand").expect("commander card");
+        let lands = vec![cards.find("Forest").expect("Forest"); 20];
+        let game = cantrip_engine::Game::new(cards, &Setup {
+            decks: vec![lands.clone(), lands],
+            commanders: vec![vec![first], vec![second]],
+            commander: true,
+            shuffle: false,
+            ..Default::default()
+        });
+        let mut handles = HandleSpace::new();
+        let view = player_view(&game, PlayerId(0), &mut handles, &["Alice".into(), "Bob".into()], &[false, false], &HashSet::new(), &HashSet::new(), &HashSet::new());
+
+        let alice_command = view.zones.iter().find(|zone| zone.kind == Some(ZoneKindView::Command) && zone.owner == 1).expect("Alice command zone");
+        let bob_command = view.zones.iter().find(|zone| zone.kind == Some(ZoneKindView::Command) && zone.owner == 2).expect("Bob command zone");
+        assert_eq!((alice_command.count, alice_command.contents.len()), (1, 1));
+        assert_eq!((bob_command.count, bob_command.contents.len()), (1, 1));
+        for commander in view.objects.iter().filter(|object| object.zone == Some(ZoneKindView::Command)) {
+            assert_eq!(commander.kind, ObjectKindView::Card);
+            assert!(commander.commander);
+            assert_eq!(commander.commander_cast_count, 0);
+            assert_eq!(commander.commander_damage.len(), 2);
+            assert!(commander.commander_damage.iter().any(|damage| damage.player == commander.owner), "damage to the commander's owner is tracked too");
+            assert_eq!(commander.commander_damage[0].damage, 0);
         }
     }
 

@@ -70,6 +70,7 @@ public sealed class ProtocolJsonTests
     [
         """{"$type":"ObjectMovedEvent","Object":5,"From":"Hand","FromOwner":1,"To":"Battlefield","ToOwner":0,"Reason":"Play"}""",
         """{"$type":"ObjectMovedEvent","Object":0,"From":"Library","FromOwner":2,"To":"Hand","ToOwner":2,"Reason":"Draw"}""",
+        """{"$type":"ObjectMovedEvent","Object":5,"From":"Graveyard","FromOwner":2,"To":"Command","ToOwner":2,"Reason":"Returned"}""",
         """{"$type":"LifeChangedEvent","Player":2,"Delta":-3,"NewTotal":17}""",
         """{"$type":"DamageMarkedEvent","Object":5,"Amount":2}""",
         """{"$type":"TapChangedEvent","Object":3,"Tapped":true}""",
@@ -87,6 +88,7 @@ public sealed class ProtocolJsonTests
         """{"$type":"CountersPutEvent","Object":5,"Name":"+1/+1","Count":1}""",
         """{"$type":"ExtraTurnAddedEvent","Player":1,"Count":1}""",
         """{"$type":"PlayerLostEvent","Player":2,"Reason":"Life"}""",
+        """{"$type":"PlayerLostEvent","Player":2,"Reason":"CommanderDamage"}""",
         """{"$type":"GameEndedEvent","Outcome":"TeamWon","WinningTeam":1}""",
         """{"$type":"TransformedEvent","Object":5,"From":"Delver of Secrets","To":"Insectile Aberration"}""",
         """{"$type":"DieRolledEvent","Player":1,"Sides":20,"Result":17}""",

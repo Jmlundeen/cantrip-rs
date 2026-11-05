@@ -1134,8 +1134,9 @@ public sealed class GameServer : IAsyncDisposable
         }
 
         List<RulesSeat> named = [.. members.Select((member, index) =>
-            new RulesSeat(names[index], Named(_decks[member.Deck].Entries), Named(_decks[member.Deck].Sideboard), _decks[member.Deck].Companion))];
-        return _options.Rules.Create(named, _options.Seed, new RulesGameOptions { MinimumDeckSize = _options.Format.MinimumDeckSize });
+            new RulesSeat(names[index], Named(_decks[member.Deck].Entries), Named(_decks[member.Deck].Sideboard), _decks[member.Deck].Companion)
+            { Commanders = Named(_decks[member.Deck].Commanders) })];
+        return _options.Rules.Create(named, _options.Seed, new RulesGameOptions { MinimumDeckSize = _options.Format.MinimumDeckSize, Commander = _options.Format.IsCommander });
     }
 
     /// <summary>

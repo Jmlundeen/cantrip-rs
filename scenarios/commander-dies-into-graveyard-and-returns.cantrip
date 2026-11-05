@@ -1,0 +1,44 @@
+# Go for the Throat puts Hakoda in its owner's graveyard; its owner accepts the state-based-action move to the command zone.
+# Browser: the owner answers the command-zone question at the table.
+# Browser
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Hakoda, Selfless Commander
+
+[Bot1 Deck]
+Plains x7
+Plains x18
+
+[Bot2 Deck]
+Go for the Throat
+Swamp x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Command.Hakoda, Selfless Commander.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Hakoda, Selfless Commander)
+Bot1.Accept
+? Bot1.Command = Hakoda, Selfless Commander
+
+[Expect]
+Bot1.Command = Hakoda, Selfless Commander
+Bot1.Graveyard.Hakoda, Selfless Commander = (absent)
+Bot1.Commander.Hakoda, Selfless Commander.CastCount = 1

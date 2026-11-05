@@ -38,6 +38,30 @@ A game of three or four players names more decks, `[Bot3 Deck]` and `[Bot4 Deck]
 (`Bot3.Hand.Island.Play`, `Bot1.ChoosePlayer(Bot4)`, `Bot3.Life`) takes them in turn order after Bot2. The first player of a
 game of more than two draws on their first turn (CR 103.8a). A script with no `[Bot3 Deck]` is the duel it always was.
 
+## Commander games
+
+`[Format] Commander` starts a Commander game (CR 903), including the format's 40 starting life and command-zone rules.
+Designated commanders are separate from library decks and named one per line under `[BotN Commander]`; a seat may name
+two commanders for a partner pair. Scenario setup does not validate deck construction or commander eligibility; it only
+passes the chosen commanders and Commander format flag to the game engine. Color identity, singleton construction, and
+partner eligibility remain deck-building checks outside the scenario harness.
+
+```
+[Format]
+Commander
+[Bot1 Commander]
+Probe Commander
+[Bot2 Commander]
+Partner A
+Partner B
+```
+
+`BotN.Command` is the list of that player's designated commanders still in the shared command zone; it is empty after
+they leave it. `BotN.Commander.<Name>.CastCount` counts successful casts of that commander from the command zone, and
+`BotN.Commander.<Name>.DamageTo.BotM` is the combat damage that physical commander dealt to BotM across zone changes.
+For a same-named pair, labels include `#1` and `#2`. These totals come from the event history, so replay and undo restore
+them with the rest of the game.
+
 
 ## In the browser: `# Browser` and `Client.`
 

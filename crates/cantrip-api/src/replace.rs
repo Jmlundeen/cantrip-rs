@@ -68,6 +68,9 @@ pub struct ZoneChange {
     /// its controller exiles it", and may play the card from there. The core's replacement, ordered with the others (CR
     /// 616.1); `on_adventure` says it applied. Set by the move, never by a replacement.
     pub adventure: bool,
+    /// Merged commander components individually replaced into the command zone under CR 903.9c. The permanent's
+    /// `to` remains the destination of its top component; these identities split into the command zone separately.
+    pub commander_components: [ObjectId; 8],
     /// An Omen spell resolving (CR 720.3d): its controller shuffles it into its owner's library instead of putting it into the
     /// graveyard. The core's replacement, ordered with the others (CR 616.1). Set by the move.
     pub omen: bool,

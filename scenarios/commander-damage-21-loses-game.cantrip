@@ -1,0 +1,50 @@
+# Griselbrand deals 7 combat damage to Bot2 on three separate turns; the third hit is the Commander-damage loss threshold.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Griselbrand
+
+[Bot1 Deck]
+Swamp x7
+Swamp x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Command.Griselbrand.Cast
+Bot1.Attack(Griselbrand > Bot2)
+[T17 Bot1.Main2]
+Bot1.Pass
+[T19 Bot1.Attackers]
+Bot1.Attack(Griselbrand > Bot2)
+[T19 Bot1.Main2]
+Bot1.Pass
+[T21 Bot1.Attackers]
+Bot1.Attack(Griselbrand > Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Commander.Griselbrand.CastCount = 1
+Bot1.Commander.Griselbrand.DamageTo.Bot2 = 21
+Bot2.LostTo = CommanderDamage

@@ -119,12 +119,14 @@ fn check_once(cx: &mut Cx) -> R<bool> {
     // with ten or more poison counters loses - unless a static ability says they don't lose that way (CR 104.3: Platinum
     // Angel, Phyrexian Unlife), in which case the game goes on and the draw from an empty library is forgotten with this
     // check.
+    // CR 704.6c: in a Commander game, one dealt 21 or more combat damage by one commander loses too.
+    let commander_beaten = ops::dealt_21_by_a_commander(cx);
     for p in cx.s().seats().collect::<Vec<_>>() {
         let player = *cx.s().player(p);
         if player.lost {
             continue;
         }
-        if let Some(reason) = ops::loses_to_state_based_actions(cx, p) {
+        if let Some(reason) = ops::loses_to_state_based_actions_given(cx, p, &commander_beaten) {
             cx.st().update_player(p, |pl| {
                 pl.lost = true;
                 pl.drew_from_empty = false;
@@ -144,6 +146,23 @@ fn check_once(cx: &mut Cx) -> R<bool> {
     // The game they lost is looked back on (CR 603.10f): as the board was before this check, whose actions all happen at
     // once with the losses (CR 704.3) - a permanent dying in it still sees its controller's opponent lose.
     let lost_before = (!leavers.is_empty()).then(|| (cx.s().battlefield().to_vec(), Then::now(cx)));
+    // CR 903.9a: a commander that entered graveyard or exile since the previous check may move to command zone now.
+    let mut pending = Vec::new();
+    if cx.s().commander {
+        for zone in cx.s().seats().flat_map(|p| [Zone::graveyard(p), Zone::exile(p)]) {
+            pending.extend(cx.s().zone(zone).iter().copied().filter(|&id| cx.s().obj(id).commander_return_pending));
+        }
+    }
+    let mut return_to_command = Vec::new();
+    for id in pending {
+        let owner = cx.s().obj(id).owner;
+        cx.st().update_obj(id, |obj| obj.commander_return_pending = false);
+        if !cx.s().player(owner).lost
+            && matches!(cx.ask_rule(owner, RequestKind::May { source: id, purpose: Purpose::Optional })?, Some(Answer::Yes))
+        {
+            return_to_command.push(ops::Moving::to(id, Zone::COMMAND));
+        }
+    }
     // CR 704.3: the rest of this check is judged on the board as it is now, the losers' objects still on it - an anthem of
     // theirs still counts towards whether another player's creature has lethal damage - and those objects leave with their
     // owners as part of this check (CR 800.4a), below, not by any of the other actions.
@@ -418,9 +437,9 @@ fn check_once(cx: &mut Cx) -> R<bool> {
         }
     }
     destroyed.retain(|id| !to_graveyard.contains(id));
+    let mut sba_moves = return_to_command;
     if !to_graveyard.is_empty() || !destroyed.is_empty() {
         // All at once (CR 704.3): a creature that dies to its toughness and one destroyed by damage leave together.
-        let mut moves: Vec<ops::Moving> = Vec::new();
         for id in to_graveyard.into_iter().chain(destroyed.iter().copied()) {
             // Lethal damage destroys (CR 704.5g-h): a regeneration shield may replace that (CR 701.19a, 614.8), ordered with the
             // other replacement effects (CR 616.1).
@@ -428,9 +447,11 @@ fn check_once(cx: &mut Cx) -> R<bool> {
             if sagas_sacrificed.contains(&id) {
                 moving.reason = Some(ZoneReason::Sacrifice);
             }
-            moves.push(moving);
+            sba_moves.push(moving);
         }
-        ops::move_together(cx, &moves, ZoneReason::StateBased);
+    }
+    if !sba_moves.is_empty() {
+        ops::move_together(cx, &sba_moves, ZoneReason::StateBased);
         acted = true;
     }
     // CR 704.5q, at the same time as the rest (CR 704.3): a permanent leaving in this check leaves with the counters it had.

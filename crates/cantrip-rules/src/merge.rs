@@ -70,6 +70,7 @@ pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
         face: cx.cards().face(card.card, card.transformed),
         // A copy of a permanent spell becomes a token as it resolves (CR 707.10f, 111.1): merging, it is a token component.
         token: card.token || card.card_copy,
+        commander_id: card.commander_id,
         copy: unmutated(cx.cards(), card.card, card.copy),
         on_top,
         timestamp: 0,
@@ -79,6 +80,7 @@ pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
     let mut merge = s.merge_of(target).cloned().unwrap_or_else(|| Merge {
         own_face: cx.cards().face(permanent.card, permanent.transformed),
         own_token: permanent.token,
+        own_commander_id: permanent.commander_id,
         own_face_down: None,
         parts: Vec::new(),
     });
@@ -109,7 +111,13 @@ pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
             o.marks.face_down_as = None;
         });
     }
+    let commander_id = merge.parts.iter().rfind(|p| p.on_top).map_or(merge.own_commander_id, |p| p.commander_id);
+    let has_commander = merge.own_commander_id.is_some() || merge.parts.iter().any(|p| p.commander_id.is_some());
     cx.st().set_merge(target, merge);
+    cx.st().update_obj(target, |obj| {
+        obj.commander_id = commander_id;
+        obj.commander = has_commander;
+    });
     // A card with static abilities is now part of a permanent (CR 702.140e): the layers look for them from here on.
     ops::note_statics(cx, target);
     // What modifies the spell modifies the merged permanent (CR 702.140f): one instruction of the merge, judged once it is done.
@@ -146,8 +154,9 @@ pub(crate) fn meld_with(cx: &mut Cx, permanent: ObjectId, card: ObjectId) -> Eve
         o.last_known = Some(row);
     });
     let timestamp = cx.st().timestamp();
-    let part = MergedPart { card: joining.card, face: joining.card, token: false, copy: None, on_top: false, timestamp, prior: None, melded: true };
-    cx.st().set_merge(permanent, Merge { own_face: into, own_token: false, own_face_down: None, parts: vec![part] });
+    let part = MergedPart { card: joining.card, face: joining.card, token: false, commander_id: joining.commander_id, copy: None, on_top: false, timestamp, prior: None, melded: true };
+    let own_commander_id = cx.s().obj(permanent).commander_id;
+    cx.st().set_merge(permanent, Merge { own_face: into, own_token: false, own_face_down: None, own_commander_id, parts: vec![part] });
     Event::Melded { permanent, card }
 }
 
@@ -156,6 +165,7 @@ pub(crate) fn meld_with(cx: &mut Cx, permanent: ObjectId, card: ObjectId) -> Eve
 #[derive(Clone, Copy)]
 pub(crate) struct Component {
     pub card: CardId,
+    pub commander_id: Option<ObjectId>,
     pub token: bool,
     pub transformed: bool,
     /// Face down as it leaves: revealed as it moves (CR 708.9).
@@ -163,6 +173,24 @@ pub(crate) struct Component {
     /// It is the topmost component: the one whose characteristics the permanent has had (CR 730.2a), which the permanent's
     /// own move to its new zone is the move of.
     pub top: bool,
+}
+
+/// Commander identities physically represented by a merged permanent, for damage events at that moment.
+pub(crate) fn commander_ids(s: &cantrip_state::GameState, id: ObjectId) -> [ObjectId; 8] {
+    let mut ids = [ObjectId::NONE; 8];
+    let mut next = 0;
+    let mut add = |identity: Option<ObjectId>| {
+        if let Some(identity) = identity && !ids.contains(&identity) && next < ids.len() {
+            ids[next] = identity;
+            next += 1;
+        }
+    };
+    add(s.obj(id).commander_id);
+    if let Some(merge) = s.merge_of(id) {
+        add(merge.own_commander_id);
+        for part in &merge.parts { add(part.commander_id); }
+    }
+    ids
 }
 
 /// Every component of the merged permanent `id` (CR 730.2): its own card first, then each that merged with it in the order it
@@ -176,13 +204,14 @@ pub(crate) fn components(cx: &Cx, id: ObjectId) -> Option<Vec<Component>> {
     // that leaves the battlefield.
     all.push(Component {
         card: obj.card,
+        commander_id: merge.own_commander_id,
         token: merge.own_token,
         transformed: obj.transformed,
         face_down: obj.face_down || merge.own_face_down.is_some(),
         top: top == 0,
     });
     for (i, p) in merge.parts.iter().enumerate() {
-        all.push(Component { card: p.card, token: p.token, transformed: p.face != p.card, face_down: obj.face_down, top: top == i + 1 });
+        all.push(Component { card: p.card, commander_id: p.commander_id, token: p.token, transformed: p.face != p.card, face_down: obj.face_down, top: top == i + 1 });
     }
     Some(all)
 }

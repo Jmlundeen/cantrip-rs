@@ -460,6 +460,8 @@ impl AiHost {
                             .map(|s| (s.name, s.deck, s.sideboard))
                             .collect(),
                         basic_lands_outside,
+                        commanders: Vec::new(),
+                        commander: false,
                         minimum_deck_size: minimum_deck_size.unwrap_or_default(),
                         seed,
                         shuffle,

@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 228;
+    public const int ProtocolVersion = 229;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -678,6 +678,18 @@ public sealed class ObjectView
     [Key(62)]
     public List<ObjectView> MergedWith { get; set; } = [];
 
+    /// <summary>This physical card is a designated commander, wherever it is.</summary>
+    [Key(66)]
+    public bool Commander { get; set; }
+
+    /// <summary>Times this commander was cast from the command zone; the next cast's tax is two more per cast.</summary>
+    [Key(67)]
+    public int CommanderCastCount { get; set; }
+
+    /// <summary>Combat damage this commander dealt to each player, for the Commander loss rule.</summary>
+    [Key(68)]
+    public List<CommanderDamageView> CommanderDamage { get; set; } = [];
+
     /// <summary>
     /// Whether the card in exile under <see cref="ExiledWith"/> returns once that permanent leaves the battlefield (an
     /// "until" exile, CR 610.3), as Portable Hole's does; The Darkness Crystal's stays. False for everything else.
@@ -692,6 +704,14 @@ public sealed class ObjectView
     public IEnumerable<ObjectView> AlsoPrinted() => new[] { OtherFace, PrepareSpell, InsetSpell }.OfType<ObjectView>();
 
     public override string ToString() => Known ? $"{Handle} {Name}" : $"{Handle} (unknown)";
+}
+
+/// <summary>Combat damage dealt by one commander to one player.</summary>
+[MessagePackObject]
+public sealed class CommanderDamageView
+{
+    [Key(0)] public int Player { get; set; }
+    [Key(1)] public int Damage { get; set; }
 }
 
 /// <summary>A standing permission to play a card, and whose.</summary>

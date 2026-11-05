@@ -25,6 +25,8 @@ pub(crate) enum Origin {
     Granted(u32),
     /// Madness's static ability (CR 702.35a), the core's own keyword replacement, of the discarded card itself.
     Madness,
+    /// Commander owner's replacement of a move into hand or library (CR 903.9b).
+    Commander,
     /// A spell's own "exile this card instead of putting it anywhere else any time it would leave the stack": flashback's,
     /// harmonize's or aftermath's (CR 702.34a, 702.180a, 702.127a; `ZoneChange::flashback`), of the spell leaving.
     Flashback,
@@ -366,6 +368,9 @@ fn printed_prevention(cx: &Cx, id: ObjectId, index: u8) -> (&'static PreventionD
 /// Whether any effect could apply to an event about `subject`: a permanent with replacements, or the subject's own
 /// card, which has some that function from every zone. The guard that keeps the hot path free of replacement work.
 pub(crate) fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
+    if cx.s().commander && subject.is_some_and(|id| cx.s().obj(id).commander) {
+        return true;
+    }
     // An effect a spell or ability made, which lasts (CR 611.2).
     if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement { .. } | EffectKind::ReplacementRule { .. } | EffectKind::Prevention { .. })) {
         return true;
@@ -396,7 +401,7 @@ pub fn draws_only_repeat_an_attempt_from_an_empty_library(cx: &Cx, player: Playe
     cx.s().zone(Zone::library(player)).is_empty()
         && (cx.s().player(player).drew_from_empty || crate::static_rules::cant_draw(cx, cx.cards(), player, 1))
         && !graveyard_replaces_draws(cx, player)
-        && (!possible(cx, None) || candidates(cx, &Proposal::Draw(CardDraw { player, replaced: false }), &[], None).is_empty())
+        && (!possible(cx, None) || candidates(cx, &Proposal::Draw(CardDraw { player, replaced: false }), &[], None, [None; 8]).is_empty())
 }
 
 fn subject_of(proposal: &Proposal) -> Option<ObjectId> {
@@ -456,7 +461,7 @@ fn affected(cx: &Cx, proposal: &Proposal) -> PlayerId {
 
 /// Every effect that applies to the event and has not been applied to it yet (CR 614.5), in a deterministic order:
 /// by source, then by the order the card lists them.
-fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&Entering>) -> Vec<Candidate> {
+fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&Entering>, commander_declined_to: [Option<Zone>; 8]) -> Vec<Candidate> {
     // Each effect's own text, its source's now (`Cx::own_text`).
     let _others = cx.others_text();
     // Damage that has been prevented in full is no event any more: nothing is left to replace (CR 615.1); nor is a draw that
@@ -625,6 +630,15 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
     // A spell's own replacements of its leaving the stack (CR 702.34a, 614.1a), ordered with the rest (CR 616.1): of the spell
     // itself, which is what the player ordering them is shown. Offered first, as the order its controller almost always wants.
     if let Proposal::ZoneChange(z) = proposal {
+        if cx.s().commander && (z.to.is(ZoneKind::Hand) || z.to.is(ZoneKind::Library)) {
+            for (index, (identity, _)) in commander_components(cx, z.object).into_iter().enumerate().take(8) {
+                if commander_declined_to[index] != Some(z.to)
+                    && !z.commander_components.contains(&identity)
+                {
+                    found.insert(0, Candidate { source: z.object, index: index as u8, origin: Origin::Commander });
+                }
+            }
+        }
         if !applied.contains(&(z.object, 0, Origin::ExileInstead)) && exile_instead_applies(cx, z) {
             found.insert(0, Candidate { source: z.object, index: 0, origin: Origin::ExileInstead });
         }
@@ -689,6 +703,15 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Option<&
     found
 }
 
+/// The physical commander cards among a permanent's components, in component order. Replacement choices index this
+/// filtered list, so any number of ordinary components before them cannot hide a commander from the replacement queue.
+fn commander_components(cx: &Cx, object: ObjectId) -> Vec<(ObjectId, bool)> {
+    match crate::merge::components(cx, object) {
+        Some(parts) => parts.into_iter().filter_map(|part| part.commander_id.map(|id| (id, part.top))).collect(),
+        None => cx.s().obj(object).commander_id.map(|id| vec![(id, true)]).unwrap_or_default(),
+    }
+}
+
 /// The lasting replacement effect a spell or ability made (CR 611.2) that has this timestamp, with its definition: one of
 /// the `granted_replacements` of the card the effect names, whatever its source has become since.
 fn granted<'a>(cx: &'a Cx, timestamp: u32) -> Option<(&'a ContinuousEffect, &'static GrantedReplacementDef)> {
@@ -703,6 +726,7 @@ fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
         Origin::Printed => printed_replacement(cx, c.source, c.index).hint,
         Origin::Granted(timestamp) => granted(cx, timestamp).map_or("", |(_, def)| def.hint),
         Origin::Madness => MADNESS_HINT,
+        Origin::Commander => "put this commander into the command zone instead",
         Origin::Flashback => FLASHBACK_HINT,
         Origin::ExileInstead => match proposal {
             Proposal::ZoneChange(z) if z.exile_instead == ExileInstead::Dream => DREAM_EXILE_HINT,
@@ -844,6 +868,7 @@ fn apply_to(cx: &mut Cx, proposal: &mut Proposal, entry: Option<&mut Entering>, 
 
 fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Entering>, mut uses: Option<&mut Vec<PreventionUse>>) {
     let mut applied: Vec<Applied> = cx.lineage.clone();
+    let mut commander_declined_to: [Option<Zone>; 8] = [None; 8];
     loop {
         // An entering permanent is judged as it would exist with the changes of the replacements applied so far (CR 614.12).
         if let Proposal::ZoneChange(z) = *proposal {
@@ -866,7 +891,7 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
                 return;
             }
         }
-        let found = candidates(cx, proposal, &applied, entry.as_deref());
+        let found = candidates(cx, proposal, &applied, entry.as_deref(), commander_declined_to);
         if found.is_empty() {
             return;
         }
@@ -904,6 +929,19 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
                 if let Proposal::ZoneChange(z) = proposal {
                     z.to = Zone::exile(z.to.player);
                     z.madness = true;
+                }
+            }
+            Origin::Commander => {
+                if matches!(cx.ask_core(cx.s().obj(source).owner, RequestKind::May { source, purpose: Purpose::Optional }, false), Ok(Answer::No)) {
+                    commander_declined_to[index as usize] = match *proposal { Proposal::ZoneChange(z) => Some(z.to), _ => None };
+                } else if let Proposal::ZoneChange(z) = proposal {
+                    if let Some((identity, top)) = commander_components(cx, source).get(index as usize).copied() {
+                        if top {
+                            z.to = Zone::COMMAND;
+                        } else if let Some(slot) = z.commander_components.iter_mut().find(|slot| **slot == ObjectId::NONE) {
+                            *slot = identity;
+                        }
+                    }
                 }
             }
             // Its own (CR 614.1c-d), to the entry as it now is: whether it enters tapped, and under whom, are the event's;
@@ -1056,6 +1094,13 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
             }
         }
         unlink_if_sent_elsewhere(&start, proposal);
+        if let Proposal::ZoneChange(z) = &mut *proposal {
+            for declined in &mut commander_declined_to {
+                if *declined != Some(z.to) {
+                    *declined = None;
+                }
+            }
+        }
     }
 }
 
@@ -1162,7 +1207,7 @@ fn take_plus(parts: &mut Vec<Proposal>) {
 fn apply_to_each_part(cx: &mut Cx, parts: &mut Vec<Proposal>) {
     let mut applied: Vec<Applied> = cx.lineage.clone();
     loop {
-        let mut found: Vec<Vec<Candidate>> = parts.iter().map(|p| candidates(cx, p, &applied, None)).collect();
+        let mut found: Vec<Vec<Candidate>> = parts.iter().map(|p| candidates(cx, p, &applied, None, [None; 8])).collect();
         let mut all: Vec<Candidate> = found.iter().flatten().copied().collect();
         all.sort_by_key(|c| (c.source, c.index, c.origin));
         all.dedup();
@@ -1175,7 +1220,7 @@ fn apply_to_each_part(cx: &mut Cx, parts: &mut Vec<Proposal>) {
             && printed_replacement(cx, chosen.source, chosen.index).optional.is_some()
             && cx.concessions_here()
         {
-            found = parts.iter().map(|p| candidates(cx, p, &applied, None)).collect();
+            found = parts.iter().map(|p| candidates(cx, p, &applied, None, [None; 8])).collect();
             if !found.iter().flatten().any(|c| *c == chosen) {
                 continue;
             }
@@ -1286,7 +1331,7 @@ pub(crate) fn mana_outcomes(cx: &Cx, production: ManaProduction) -> Vec<ManaProd
             return;
         }
         seen.push((key, proposal));
-        let found = candidates(cx, &proposal, applied, None);
+        let found = candidates(cx, &proposal, applied, None, [None; 8]);
         if found.is_empty() {
             if let Proposal::ManaProduction(m) = proposal
                 && !out.contains(&m)
@@ -1830,6 +1875,7 @@ mod tests {
             flashback: false,
             exile_instead: ExileInstead::Never,
             adventure: false,
+            commander_components: [ObjectId::NONE; 8],
             omen: false,
             rebound: false,
             on_adventure: false,

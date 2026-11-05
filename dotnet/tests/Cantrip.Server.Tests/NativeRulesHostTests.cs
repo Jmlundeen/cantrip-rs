@@ -29,7 +29,7 @@ public sealed class NativeRulesHostTests
         NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions { MinimumDeckSize = 60 });
 
         Assert.Equal(
-            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island","Island","Lightning Bolt"],"Sideboard":["Counterspell"],"Companion":null},{"Name":"Bob","Deck":["Swamp"],"Sideboard":[],"Companion":null}],"Seed":123,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[],"MinimumDeckSize":60}""",
+            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island","Island","Lightning Bolt"],"Sideboard":["Counterspell"],"Companion":null,"Commanders":[]},{"Name":"Bob","Deck":["Swamp"],"Sideboard":[],"Companion":null,"Commanders":[]}],"Seed":123,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[],"MinimumDeckSize":60,"Commander":false}""",
             Assert.Single(host.Requests));
         Assert.Equal(1, rules.GameId);
         Assert.Equal([1, 2], rules.Seats);
@@ -49,7 +49,24 @@ public sealed class NativeRulesHostTests
         NativeRulesHost.NewGame(host, seats, 5, new RulesGameOptions { MinimumDeckSize = 60 });
 
         Assert.Equal(
-            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island"],"Sideboard":[],"Companion":null,"DeckName":"ub-reanimator"},{"Name":"Bob","Deck":["Swamp"],"Sideboard":[],"Companion":null}],"Seed":5,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[],"MinimumDeckSize":60}""",
+            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island"],"Sideboard":[],"Companion":null,"Commanders":[],"DeckName":"ub-reanimator"},{"Name":"Bob","Deck":["Swamp"],"Sideboard":[],"Companion":null,"Commanders":[]}],"Seed":5,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[],"MinimumDeckSize":60,"Commander":false}""",
+            Assert.Single(host.Requests));
+    }
+
+    [Fact]
+    public void A_commander_deal_sends_the_explicit_format_flag_and_keeps_commanders_out_of_the_deck()
+    {
+        var host = new ScriptedHost();
+        RulesSeat[] seats =
+        [
+            new("Alice", ["Forest"], []) { Commanders = ["Balin, Loremaster"] },
+            new("Bob", ["Island"], []),
+        ];
+
+        NativeRulesHost.NewGame(host, seats, 7, new RulesGameOptions { MinimumDeckSize = 100, Commander = true });
+
+        Assert.Equal(
+            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Forest"],"Sideboard":[],"Companion":null,"Commanders":["Balin, Loremaster"]},{"Name":"Bob","Deck":["Island"],"Sideboard":[],"Companion":null,"Commanders":[]}],"Seed":7,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[],"MinimumDeckSize":100,"Commander":true}""",
             Assert.Single(host.Requests));
     }
 
@@ -297,7 +314,7 @@ public sealed class NativeRulesHostTests
         new NativeRulesHostFactory(host) { PublicView = true }.Create(Seats, 9, new RulesGameOptions { MinimumDeckSize = 60 });
 
         Assert.Equal(
-            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island","Island","Lightning Bolt"],"Sideboard":["Counterspell"],"Companion":null},{"Name":"Bob","Deck":["Swamp"],"Sideboard":[],"Companion":null}],"Seed":9,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[],"MinimumDeckSize":60,"Public":true}""",
+            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island","Island","Lightning Bolt"],"Sideboard":["Counterspell"],"Companion":null,"Commanders":[]},{"Name":"Bob","Deck":["Swamp"],"Sideboard":[],"Companion":null,"Commanders":[]}],"Seed":9,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[],"MinimumDeckSize":60,"Commander":false,"Public":true}""",
             Assert.Single(host.Requests));
     }
 

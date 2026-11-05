@@ -21,9 +21,11 @@ public sealed class DeckRulesTests
         bool basic = false,
         string[]? subtypes = null,
         ColorView[]? identity = null,
-        Dictionary<string, string>? legalities = null)
+        Dictionary<string, string>? legalities = null,
+        int? power = null,
+        int? toughness = null)
     {
-        var view = new ObjectView { Name = name, CardId = name, CardTypes = [type], OracleText = text, Subtypes = [.. subtypes ?? []] };
+        var view = new ObjectView { Name = name, CardId = name, CardTypes = [type], OracleText = text, Subtypes = [.. subtypes ?? []], Power = power, Toughness = toughness };
         if (legendary) view.Supertypes.Add(SupertypeView.Legendary);
         if (basic) view.Supertypes.Add(SupertypeView.Basic);
         return new CatalogCard
@@ -209,18 +211,22 @@ public sealed class DeckRulesTests
     }
 
     [Fact]
-    public void A_Commander_deck_has_one_commander_that_is_a_legendary_creature_or_says_it_can_be()
+    public void A_Commander_deck_has_a_legal_commander_including_legendary_Vehicles_and_Spacecraft_with_stats()
     {
         CatalogCard planeswalker = Card("Teferi, Temporal Archmage", CardTypeView.Planeswalker, "Teferi, Temporal Archmage can be your commander.", legendary: true);
-        Dictionary<string, CatalogCard> cards = Catalog(Omnath, Bear, planeswalker, Forest);
+        CatalogCard ship = Card("Legendary Ship", CardTypeView.Artifact, legendary: true, subtypes: ["Spacecraft"], power: 4, toughness: 4);
+        CatalogCard noStatsVehicle = Card("Museum Vehicle", CardTypeView.Artifact, legendary: true, subtypes: ["Vehicle"]);
+        Dictionary<string, CatalogCard> cards = Catalog(Omnath, Bear, planeswalker, ship, noStatsVehicle, Forest);
 
         Assert.Contains("A Commander deck needs a commander.", DeckRules.Problems(Deck("commander", [new("Forest", 100)]), cards));
-        Assert.Contains("Grizzly Bears can't be a commander: it is not a legendary creature.",
+        Assert.Contains("Grizzly Bears can't be a commander: it is not a legendary creature or a legendary Vehicle or Spacecraft with a power and toughness box.",
             DeckRules.Problems(Deck("commander", [new("Forest", 99)], commanders: [new("Grizzly Bears", 1)]), cards));
         Assert.Contains("A deck has one commander, or two that may be paired: this one has 3.",
             DeckRules.Problems(Deck("commander", [new("Forest", 97)], commanders: [new("Omnath, Locus of Mana", 1), new("Grizzly Bears", 1), new("Teferi, Temporal Archmage", 1)]), cards));
         Assert.True(DeckRules.CanBeCommander(planeswalker));
         Assert.True(DeckRules.CanJoinCommanders(planeswalker, []));
+        Assert.True(DeckRules.CanJoinCommanders(ship, []));
+        Assert.False(DeckRules.CanJoinCommanders(noStatsVehicle, []));
         Assert.False(DeckRules.CanJoinCommanders(Bear, []));
     }
 

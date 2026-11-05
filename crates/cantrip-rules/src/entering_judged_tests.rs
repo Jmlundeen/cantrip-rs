@@ -243,6 +243,7 @@ fn it_is_judged_again_after_a_replacement_changes_how_it_enters() {
         flashback: false,
         exile_instead: ExileInstead::Never,
         adventure: false,
+        commander_components: [ObjectId::NONE; 8],
         omen: false,
         rebound: false,
         on_adventure: false,

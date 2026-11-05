@@ -33,6 +33,9 @@ public sealed class DeckList
 
     public required IReadOnlyList<DeckListEntry> Entries { get; init; }
 
+    /// <summary>Commander cards, outside the main deck; present only for a Commander table.</summary>
+    public IReadOnlyList<DeckListEntry> Commanders { get; init; } = [];
+
     /// <summary>
     /// The cards after the <c>Sideboard</c> line, which are not part of the starting deck (CR 702.139b). Empty for
     /// almost every decklist.
@@ -94,9 +97,11 @@ public sealed class DeckList
         ArgumentNullException.ThrowIfNull(text);
 
         List<DeckListEntry> entries = [];
+        List<DeckListEntry> commanders = [];
         List<DeckListEntry> sideboard = [];
         string[] lines = text.Split('\n');
         bool afterSideboardLine = false;
+        bool inCommanders = false;
         bool companionNext = false;
         string? companion = null;
 
@@ -112,6 +117,20 @@ public sealed class DeckList
             if (string.Equals(line, "Sideboard", StringComparison.OrdinalIgnoreCase))
             {
                 afterSideboardLine = true;
+                inCommanders = false;
+                continue;
+            }
+            if (string.Equals(line, "Commander", StringComparison.OrdinalIgnoreCase) || string.Equals(line, "Commanders", StringComparison.OrdinalIgnoreCase))
+            {
+                if (commanders.Count > 0 || inCommanders) throw new FormatException($"{source} line {index + 1}: a deck has one Commander section.");
+                afterSideboardLine = false;
+                inCommanders = true;
+                continue;
+            }
+            if (string.Equals(line, "Deck", StringComparison.OrdinalIgnoreCase) || string.Equals(line, "Main", StringComparison.OrdinalIgnoreCase))
+            {
+                inCommanders = false;
+                afterSideboardLine = false;
                 continue;
             }
 
@@ -132,7 +151,7 @@ public sealed class DeckList
                 continue;
             }
 
-            List<DeckListEntry> into = afterSideboardLine ? sideboard : entries;
+            List<DeckListEntry> into = afterSideboardLine ? sideboard : inCommanders ? commanders : entries;
             if (Counted.Match(line) is { Success: true } counted)
             {
                 int copies = int.Parse(counted.Groups[1].Value, CultureInfo.InvariantCulture);
@@ -151,7 +170,7 @@ public sealed class DeckList
             throw new FormatException($"{source}: the Companion line names no card after it.");
         }
 
-        return new DeckList { Name = name, Source = source, Entries = entries, Sideboard = sideboard, Companion = companion };
+        return new DeckList { Name = name, Source = source, Entries = entries, Commanders = commanders, Sideboard = sideboard, Companion = companion };
     }
 
     /// <summary>

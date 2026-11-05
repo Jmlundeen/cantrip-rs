@@ -154,12 +154,16 @@ public static partial class DeckRules
         return format.Copies;
     }
 
-    /// <summary>Whether a card can be a deck's commander on its own merits: a legendary creature, or one that says it can be (CR 903.3).</summary>
+    /// <summary>Whether a card can be a deck's commander on its own merits (CR 903.3).</summary>
     public static bool CanBeCommander(CatalogCard card)
     {
         ArgumentNullException.ThrowIfNull(card);
         ObjectView face = card.Card;
-        return (face.Supertypes.Contains(SupertypeView.Legendary) && face.CardTypes.Contains(CardTypeView.Creature))
+        bool legendary = face.Supertypes.Contains(SupertypeView.Legendary);
+        bool creature = face.CardTypes.Contains(CardTypeView.Creature);
+        bool poweredVehicle = (face.Subtypes.Contains("Vehicle", StringComparer.Ordinal) || face.Subtypes.Contains("Spacecraft", StringComparer.Ordinal))
+            && face.Power is not null && face.Toughness is not null;
+        return (legendary && (creature || poweredVehicle))
             || face.OracleText.Contains("can be your commander", StringComparison.Ordinal);
     }
 
@@ -293,7 +297,7 @@ public static partial class DeckRules
         {
             yield return IsBackground(commanders[0])
                 ? $"{commanders[0].Name} is a Background: it is a commander only beside one that says \"Choose a Background\"."
-                : $"{commanders[0].Name} can't be a commander: it is not a legendary creature.";
+                : $"{commanders[0].Name} can't be a commander: it is not a legendary creature or a legendary Vehicle or Spacecraft with a power and toughness box.";
         }
         else if (commanders.Count == 2 && !CanPair(commanders[0], commanders[1]))
         {

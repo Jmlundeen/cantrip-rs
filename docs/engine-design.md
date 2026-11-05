@@ -2884,8 +2884,16 @@ outright (`Setup::minimum_deck_size`, the host's `MinimumDeckSize`): sixty in Co
 a hundred in Commander (CR 100.2a-b), and none in Freeform - the default format, with no deck size restriction at all (a deck of
 no cards is a Freeform deck), so Yorion's "twenty cards more than the minimum" is twenty there. The server checks every deck against its table's format before dealing it, and each
 game of a match after sideboarding (`DeckRules`, shared with the deck editor, and `DeckValidation`).
+
 The benchmark is unchanged within the noise (2026-10-23, four alternating rounds, engine answering: 9.50, 9.53, 9.37, 9.20 us per decision before and 9.48, 9.32, 9.23, 9.28 us
 after).
+
+### Commander games
+
+`Setup::commander` selects Commander rules for a game and `Setup::commanders` gives each seat's designated commander cards
+separately from its library. They begin in the shared command zone marked as commanders; the library remains an ordinary
+deck. Scenario scripts use `[Format] Commander` and `[BotN Commander]` to exercise this setup. Commander deck construction
+and color identity remain the server/deck-editor's responsibility; in-game Commander rules belong to the engine.
 
 ### Keyword counters
 

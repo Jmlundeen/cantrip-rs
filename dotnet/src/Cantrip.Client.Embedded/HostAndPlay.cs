@@ -82,11 +82,12 @@ public static class HostAndPlay
         List<RulesSeat> seats = [.. playerNames.Select((name, index) =>
             new RulesSeat(name, Named(decks[index % decks.Count].Entries), Named(decks[index % decks.Count].Sideboard), decks[index % decks.Count].Companion)
             {
+                Commanders = Named(decks[index % decks.Count].Commanders),
                 DeckName = decks[index % decks.Count].Name,
             })];
 
         // The engine is told the format's minimum deck size, as a server's table tells it (CR 100.2a-b).
-        IRulesHost game = rules.Create(seats, seed, new RulesGameOptions { MinimumDeckSize = format.MinimumDeckSize });
+        IRulesHost game = rules.Create(seats, seed, new RulesGameOptions { MinimumDeckSize = format.MinimumDeckSize, Commander = format.IsCommander });
 
         var clocks = new HostedClocks(time ?? TimeProvider.System, playerClock ?? MatchClocks.DefaultPlayerClock);
         return Host(new GameSession(game), Listed(decks), clocks);

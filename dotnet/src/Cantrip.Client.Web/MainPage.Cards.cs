@@ -166,6 +166,11 @@ public sealed partial class MainPage
                 look = look with { Annotation = look.Annotation is null ? merged : $"{look.Annotation}\n{merged}" };
             }
 
+            if (card.Commander && CommanderAnnotation(client, card) is { } commander)
+            {
+                look = look with { Annotation = look.Annotation is null ? commander : $"{look.Annotation}\n{commander}" };
+            }
+
             // A card in exile or a graveyard that may be played says until when, and a flashback that it is exiled after.
             if (PermissionAnnotation(card) is { } window)
             {
@@ -176,6 +181,21 @@ public sealed partial class MainPage
         }
 
         return look;
+    }
+
+    /// <summary>Commander cast history and combat damage, as the rules host projected them.</summary>
+    private static string? CommanderAnnotation(GameClient client, ObjectView card)
+    {
+        List<string> notes = [];
+        if (card.CommanderCastCount > 0)
+        {
+            notes.Add($"Cast from command zone {card.CommanderCastCount} time{(card.CommanderCastCount == 1 ? string.Empty : "s")} · next cast tax +{card.CommanderCastCount * 2}");
+        }
+
+        string[] damage = [.. card.CommanderDamage.Where(each => each.Damage > 0).Select(each =>
+            $"{client.View?.Players.FirstOrDefault(player => player.Seat == each.Player)?.Name ?? $"Seat {each.Player}"}: {each.Damage}")];
+        if (damage.Length > 0) notes.Add($"Commander damage · {string.Join(", ", damage)}");
+        return notes.Count == 0 ? "Commander" : string.Join("\n", notes);
     }
 
     /// <summary>

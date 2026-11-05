@@ -58,12 +58,14 @@ pub struct Outside<'a> {
     pub companions: &'a [Option<String>],
     pub basic_lands_outside: &'a [String],
     pub minimum_deck_size: u32,
+    pub commander: bool,
+    pub commanders: &'a [Vec<String>],
 }
 
 /// Nothing outside the game, in a Freeform game: no minimum deck size, as no format names one.
 impl Default for Outside<'_> {
     fn default() -> Self {
-        Outside { sideboards: &[], companions: &[], basic_lands_outside: &[], minimum_deck_size: 0 }
+        Outside { sideboards: &[], companions: &[], basic_lands_outside: &[], minimum_deck_size: 0, commander: false, commanders: &[] }
     }
 }
 
@@ -98,6 +100,8 @@ pub fn deal_on(
         basic_lands_outside: ids(outside.basic_lands_outside)?,
         companions: outside.companions.iter().map(|c| c.as_ref().map(id).transpose()).collect::<Result<_, _>>()?,
         minimum_deck_size: outside.minimum_deck_size,
+        commander: outside.commander,
+        commanders: outside.commanders.iter().map(|d| ids(d)).collect::<Result<_, _>>()?,
         seed,
         shuffle,
         opening_chooser,

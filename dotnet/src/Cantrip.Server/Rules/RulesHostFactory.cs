@@ -13,6 +13,8 @@ namespace Cantrip.Server.Rules;
 /// </param>
 public sealed record RulesSeat(string Name, IReadOnlyList<string> Deck, IReadOnlyList<string> Sideboard, string? Companion = null)
 {
+    /// <summary>The Commander cards in this seat's command zone, outside its library.</summary>
+    public IReadOnlyList<string> Commanders { get; init; } = [];
     public RulesSeat(string name, IReadOnlyList<string> deck) : this(name, deck, [])
     {
     }
@@ -27,6 +29,8 @@ public sealed record RulesSeat(string Name, IReadOnlyList<string> Deck, IReadOnl
 /// <summary>Starting conditions beyond the seed (CR 103).</summary>
 public sealed class RulesGameOptions
 {
+    /// <summary>Whether this game uses Commander rules; supplied from the table format, never inferred from deck size.</summary>
+    public bool Commander { get; init; }
     /// <summary>
     /// The seat to take the first turn, from one; null plays out CR 103.1, where a seat chosen at random decides.
     /// </summary>

@@ -553,6 +553,65 @@ impl<'a> History<'a> {
         })
     }
 
+    /// The times the commander `identity` (`Obj::commander_id`) has been cast from the command zone this game (CR 903.8): a
+    /// spell countered after it was cast was still cast. The commander tax, the client and the scenarios' dump ask it. The
+    /// spell's stack object keeps the identity it was cast with; a copy of a spell was not cast (CR 707.10) and carries none.
+    pub fn commander_casts_from_command_zone(&self, state: &GameState, identity: ObjectId) -> u32 {
+        self.records.iter().filter(|r| matches!(r.event,
+            Event::Cast(c) if c.from == ZoneKind::Command && state.obj(c.spell).commander_id == Some(identity))).count() as u32
+    }
+
+    /// Each record of combat damage dealt to a player by a commander (CR 903.10a), as (the player, the commander's identity,
+    /// the amount): the source is judged as it was when it dealt the damage, by its last-known row, so a commander that has
+    /// changed zones and been cast again is the same commander (CR 903.3), a merged permanent with a commander among its
+    /// components is that commander (CR 730.2), and a copy of a commander is none (CR 707.2). The one reading the Commander
+    /// loss rule, the client and the scenarios' dump share.
+    pub fn commander_combat_damage(&self, state: &'a GameState) -> impl Iterator<Item = (PlayerId, ObjectId, u32)> + 'a {
+        self.records.iter().flat_map(move |r| {
+            let dealt = match r.event {
+                Event::Damage { target: Target::Player(player), amount, kind, known, .. } if kind.is_combat() => {
+                    state.last_known.get(known as usize).map(|row| (player, row.commander_ids, amount))
+                }
+                _ => None,
+            };
+            dealt.into_iter().flat_map(|(player, ids, amount)| {
+                ids.into_iter().filter(|&id| id != ObjectId::NONE).map(move |id| (player, id, amount))
+            })
+        })
+    }
+
+    /// The combat damage the commander `identity` has dealt `player` this game (CR 903.10a).
+    pub fn commander_damage_to(&self, state: &GameState, identity: ObjectId, player: PlayerId) -> u32 {
+        self.records
+            .iter()
+            .filter_map(|r| match r.event {
+                Event::Damage { target: Target::Player(p), amount, kind, known, .. } if p == player && kind.is_combat() => {
+                    state.last_known.get(known as usize).filter(|row| row.commander_ids.contains(&identity)).map(|_| amount)
+                }
+                _ => None,
+            })
+            .sum()
+    }
+
+    /// The players dealt 21 or more combat damage by one commander this game (CR 903.10a, 704.6c), in one reading of the
+    /// history: the state-based check reads it once for every player.
+    pub fn players_dealt_21_by_a_commander(&self, state: &GameState) -> Vec<PlayerId> {
+        let mut totals: Vec<(PlayerId, ObjectId, u32)> = Vec::new();
+        for (player, identity, amount) in self.commander_combat_damage(state) {
+            match totals.iter_mut().find(|(p, id, _)| *p == player && *id == identity) {
+                Some((_, _, total)) => *total += amount,
+                None => totals.push((player, identity, amount)),
+            }
+        }
+        let mut players: Vec<PlayerId> = Vec::new();
+        for (player, _, _) in totals.into_iter().filter(|&(_, _, total)| total >= 21) {
+            if !players.contains(&player) {
+                players.push(player);
+            }
+        }
+        players
+    }
+
     /// Whether `creature` was declared as an attacker this turn (CR 508.1; not one put onto the battlefield attacking).
     pub fn attacked_this_turn(&self, creature: ObjectId) -> bool {
         self.this_turn().iter().any(|r| matches!(r.event, Event::Attacks { attacker, .. } if attacker == creature))

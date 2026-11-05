@@ -100,6 +100,7 @@ struct Plan {
     old: Obj,
     from: Zone,
     to: Zone,
+    requested_to: Zone,
     change: ZoneChange,
     madness: bool,
     entering: bool,
@@ -345,6 +346,7 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
             flashback: m.flashback,
             exile_instead: m.exile_instead,
             adventure: m.adventure,
+            commander_components: [ObjectId::NONE; 8],
             omen: m.omen,
             rebound: m.rebound,
             on_adventure: false,
@@ -354,6 +356,7 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
             shielded: false,
             replaced: false,
         };
+        let requested_to = proposed.to;
         // A permanent entering is judged as it would exist on the battlefield (CR 614.12), and its own replacements are
         // ordered with the others (CR 616.1). One its own replacement sent elsewhere instead does not enter at all.
         let change = match entry {
@@ -411,6 +414,9 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
         }
         new.controller = if entering || to.is(ZoneKind::Stack) { old.controller } else { old.owner };
         new.token = old.token;
+        new.commander = old.commander;
+        new.commander_id = old.commander_id;
+        new.commander_return_pending = old.commander && (to.is(ZoneKind::Graveyard) || to.is(ZoneKind::Exile));
         new.controlled_since = turn;
         // Given as it arrives, below.
         new.timestamp = 0;
@@ -503,8 +509,11 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
             new.card = top.card;
             new.token = top.token;
             new.transformed = top.transformed;
+            new.commander_id = top.commander_id;
+            new.commander = top.commander_id.is_some();
+            new.commander_return_pending = new.commander && (to.is(ZoneKind::Graveyard) || to.is(ZoneKind::Exile));
         }
-        plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, counts, counts_by, last_known, seen_by_all, components });
+        plans.push(Plan { m: *m, reason, old, from, to, requested_to, change, madness, entering, new, counts, counts_by, last_known, seen_by_all, components });
     }
     *cx.s().leaving_together.borrow_mut() = outer_leaving;
     // The permanents regenerated, shielded or otherwise replaced instead of moving stay (CR 701.19a, 614.6): no attachment
@@ -539,7 +548,7 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
     // The components put into one library together, the owner's to order (CR 730.3a).
     let mut into_library: Vec<(PlayerId, Vec<ObjectId>)> = Vec::new();
     let turn = cx.s().turn.number;
-    for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known, components, .. } in plans {
+    for Plan { m, reason, old, from, to, requested_to, change, madness, entering, mut new, counts, counts_by, last_known, components, .. } in plans {
         let m = &m;
         let row = cx.st().last_known_push(last_known);
         cx.st().zone_remove(from, m.id);
@@ -584,10 +593,14 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
         if let Some((all, card_to)) = &components {
             let mut group = vec![new_id];
             for c in all.iter().filter(|c| !c.top) {
-                let (to_c, exiled_with) = match card_to {
+                let (mut to_c, exiled_with) = match card_to {
                     Some((z, by)) if !c.token => (*z, *by),
+                    _ if to.is(ZoneKind::Command) && (requested_to.is(ZoneKind::Hand) || requested_to.is(ZoneKind::Library)) => (requested_to, change.exiled_with),
                     _ => (to, change.exiled_with),
                 };
+                if c.commander_id.is_some_and(|identity| change.commander_components.contains(&identity)) {
+                    to_c = Zone::COMMAND;
+                }
                 let mut part = Obj::new(c.card, old.owner, to_c);
                 // Exiled with the effect's source as the permanent is (CR 607.2b, 730.3d).
                 if to_c.is(ZoneKind::Exile)
@@ -596,6 +609,9 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
                     part.exiled = Some(ExileLink::new(by, from, false));
                 }
                 part.token = c.token;
+                part.commander_id = c.commander_id;
+                part.commander = c.commander_id.is_some();
+                part.commander_return_pending = part.commander && (to_c.is(ZoneKind::Graveyard) || to_c.is(ZoneKind::Exile));
                 part.transformed = c.transformed;
                 part.controlled_since = turn;
                 part.timestamp = cx.st().timestamp();
@@ -2411,6 +2427,7 @@ fn entered_event(cx: &mut Cx, permanent: ObjectId) -> Event {
 pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
     LastKnown {
         id,
+        commander_ids: crate::merge::commander_ids(cx.s(), id),
         card: c.card,
         controller: cx.controller(id),
         name: c.name,
@@ -2670,6 +2687,7 @@ fn create_tokens_onto(
             flashback: false,
             exile_instead: ExileInstead::Never,
             adventure: false,
+            commander_components: [ObjectId::NONE; 8],
             omen: false,
             rebound: false,
             on_adventure: false,
@@ -2877,6 +2895,10 @@ pub fn copy_spell_as(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets
     let timestamp = cx.st().timestamp();
     let mut obj = original;
     (obj.owner, obj.controller, obj.zone, obj.timestamp, obj.controlled_since) = (copier, copier, Zone::STACK, timestamp, turn);
+    // A spell copy is not the designated physical commander card.
+    obj.commander = false;
+    obj.commander_id = None;
+    obj.commander_return_pending = false;
     // A copy was paid for by no one: no mana spent (CR 707.10), so none of what mana does to the spell it pays for
     // (CR 106.6: Cavern of Souls' "can't be countered", Arena of Glory's haste) is the copy's.
     obj.spent = ManaPool::default();
@@ -4373,6 +4395,18 @@ pub fn bring_into_hand(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
 
 /// `bring_into_hand`, the move `revealed` (`Moving::revealed`) when the instruction bringing the cards in reveals them.
 pub fn bring_into_hand_as(cx: &mut Cx, ids: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
+    bring_into_hand_inner(cx, ids, revealed, false)
+}
+
+/// The companion special action (CR 702.139c): unlike ordinary outside-game effects, it is allowed in Commander.
+pub fn bring_companion_into_hand(cx: &mut Cx, id: ObjectId) -> Vec<ObjectId> {
+    bring_into_hand_inner(cx, &[id], false, true)
+}
+
+fn bring_into_hand_inner(cx: &mut Cx, ids: &[ObjectId], revealed: bool, companion: bool) -> Vec<ObjectId> {
+    if cx.s().commander && !companion {
+        return Vec::new();
+    }
     let outside: Vec<Obj> =
         live_ones(cx, ids).into_iter().map(|id| *cx.s().obj(id)).filter(|o| o.zone.is(ZoneKind::Sideboard)).collect();
     let moves: Vec<Moving> = live_ones(cx, ids)
@@ -5165,12 +5199,32 @@ pub fn give_poison(cx: &mut Cx, player: PlayerId, amount: u32, by: PlayerId) {
     counters::put_on_player(cx, player, counters::PlayerCounts { poison: amount.min(u16::MAX as u32) as u16, ..Default::default() }, by);
 }
 
-/// The way `player` loses the game to the next state-based action check (CR 704.5a-c), if they do: 0 or less life, a draw
-/// attempted from an empty library since the last check, ten or more poison counters, in that order, leaving out each
-/// that a static ability says they don't lose for (CR 104.3: Platinum Angel, Phyrexian Unlife).
+/// The way `player` loses the game to the next state-based action check (CR 704.5a-c, 704.6c), if they do: 0 or less life,
+/// a draw attempted from an empty library since the last check, ten or more poison counters, 21 or more combat damage from
+/// one commander, in that order, leaving out each that a static ability says they don't lose for (CR 104.3: Platinum
+/// Angel, Phyrexian Unlife). The check itself reads the commander damage once for every player
+/// (`loses_to_state_based_actions_given`).
+#[cfg(test)]
 pub fn loses_to_state_based_actions(cx: &Cx, player: PlayerId) -> Option<LossReason> {
+    loses_to_state_based_actions_given(cx, player, &dealt_21_by_a_commander(cx))
+}
+
+/// The players dealt 21 or more combat damage by one commander (CR 903.10a), for `loses_to_state_based_actions_given`: none
+/// outside a Commander game, where the history is not read for it.
+pub fn dealt_21_by_a_commander(cx: &Cx) -> Vec<PlayerId> {
+    if cx.s().commander { cx.history().players_dealt_21_by_a_commander(cx.s()) } else { Vec::new() }
+}
+
+/// `loses_to_state_based_actions`, with the players `dealt_21_by_a_commander` read once for a whole check.
+pub fn loses_to_state_based_actions_given(cx: &Cx, player: PlayerId, commander_beaten: &[PlayerId]) -> Option<LossReason> {
     let p = cx.s().player(player);
-    [(p.life <= 0, LossReason::Life), (p.drew_from_empty, LossReason::EmptyLibrary), (p.poison() >= 10, LossReason::Poison)]
+    let commander_damage = commander_beaten.contains(&player);
+    [
+        (p.life <= 0, LossReason::Life),
+        (p.drew_from_empty, LossReason::EmptyLibrary),
+        (p.poison() >= 10, LossReason::Poison),
+        (commander_damage, LossReason::CommanderDamage),
+    ]
         .into_iter()
         .find(|&(applies, reason)| applies && !crate::static_rules::doesnt_lose(cx, cx.cards(), player, reason))
         .map(|(_, reason)| reason)

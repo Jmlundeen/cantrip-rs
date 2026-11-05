@@ -1,0 +1,56 @@
+# Bot1's commander leaves for exile, returns to the command zone by choice, then costs its base {3}{W} plus {2} tax.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Hakoda, Selfless Commander
+
+[Bot1 Deck]
+Plains x7
+Plains x18
+
+[Bot2 Deck]
+Swords to Plowshares
+Plains x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Command.Hakoda, Selfless Commander.Cast
+? Bot1.Commander.Hakoda, Selfless Commander.CastCount = 1
+? Bot1.Mana =
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Hakoda, Selfless Commander)
+Bot1.Accept
+? Bot1.Command = Hakoda, Selfless Commander
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Command.Hakoda, Selfless Commander.Cast
+? Bot1.Commander.Hakoda, Selfless Commander.CastCount = 2
+? Bot1.Mana =
+
+[Expect]
+Bot1.Command =
+Bot1.Commander.Hakoda, Selfless Commander.CastCount = 2
+Bot1.Mana =
+Bot1.Battlefield.Hakoda, Selfless Commander.SummoningSick = true
