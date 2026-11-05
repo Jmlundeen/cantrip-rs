@@ -1,0 +1,38 @@
+# Saurian Explorer gets +2/+2 until end of turn for each land its controller has enter (CR 611.2a, 603.6a): 4/3 becomes 6/5 on
+# turn 3, is 4/3 again on turn 5 before that turn's land, and 6/5 after it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Saurian Explorer
+Forest x5
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Saurian Explorer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Saurian Explorer.Power = 6
+? Bot1.Battlefield.Saurian Explorer.Toughness = 5
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Saurian Explorer.Power = 4
+Bot1.Hand.Forest#2.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Saurian Explorer.Power = 6
+
+[Expect]
+Bot1.Battlefield.Saurian Explorer.Power = 6
+Bot1.Battlefield.Saurian Explorer.Toughness = 5

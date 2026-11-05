@@ -1,0 +1,52 @@
+# Saurian Explorer's "{6}: Create a tapped Planet land token named New Planet ... Activate only as a sorcery." (CR 602.5d):
+# refused on Bot2's turn, paid with exactly six mana in Bot1's main phase, and the token enters tapped and untaps on the next
+# turn to add one mana of any color.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Gleemox
+Saurian Explorer
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Saurian Explorer.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Saurian Explorer.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Saurian Explorer.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.New Planet.Tapped = true
+[T5 Bot1.Main1]
+? Bot1.Battlefield.New Planet.Tapped = false
+Bot1.Battlefield.New Planet.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Battlefield.New Planet.Token = true
+Bot1.Battlefield.New Planet.Types = Land
+Bot1.Battlefield.New Planet.Subtypes = Planet
+Bot1.Battlefield.New Planet#2 = (absent)
