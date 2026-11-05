@@ -1,0 +1,28 @@
+# Tea, Earl Grey, Hot's sacrifice ability, its second mode chosen: its controller gains exactly 3 life and the opponent
+# takes no damage (CR 700.2, 119.3, 701.21a).
+
+[Bot1 Deck]
+Tea, Earl Grey, Hot
+Island x19
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Tea, Earl Grey, Hot.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Tea, Earl Grey, Hot.Activate
+Bot1.Modes(You gain 3 life.)
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 20
+Bot1.Graveyard = Tea, Earl Grey, Hot

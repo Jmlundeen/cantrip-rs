@@ -1,0 +1,29 @@
+# Tea, Earl Grey, Hot draws its controller a card as it enters, then its modal sacrifice ability deals exactly 2 damage to
+# the opponent it targets (CR 603.6a, 700.2, 120.2, 701.21a).
+
+[Bot1 Deck]
+Tea, Earl Grey, Hot
+Island x19
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Tea, Earl Grey, Hot.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Tea, Earl Grey, Hot.Activate
+Bot1.Target(Bot2)
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot1.Graveyard = Tea, Earl Grey, Hot
