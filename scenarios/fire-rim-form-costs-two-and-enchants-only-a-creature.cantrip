@@ -1,0 +1,31 @@
+# Fire-Rim Form {1}{R}: one mana is short (refused); it enchants a creature only, not a player or a land; with two mana it enchants the
+# creature, giving +2/+0 (the toughness stays 2) and first strike for the turn.
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Fire-Rim Form
+Ornithopter
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Hand.Fire-Rim Form.Cast(Bot1.Battlefield.Ornithopter; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Fire-Rim Form.Cast(Bot2)
+! Bot1.Hand.Fire-Rim Form.Cast(Bot1.Battlefield.Mountain)
+Bot1.Hand.Fire-Rim Form.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Fire-Rim Form.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = FirstStrike; Flying
