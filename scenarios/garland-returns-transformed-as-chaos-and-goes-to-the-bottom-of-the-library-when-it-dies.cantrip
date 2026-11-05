@@ -1,0 +1,71 @@
+# Garland, Knight of Cornelia: "{3}{B}{B}{R}{R}: Return this card from your graveyard to the battlefield transformed. Activate only as a sorcery." Bot2 bolts the 3/2 on turn 2. On turn 3
+# Black Lotus (black), Mox Ruby, Mountain, Mox Pearl and Mox Emerald pay the seven exactly ({B}{B}{B}{R}{R} and two generic) and Chaos, the Endless, a 5/5 flyer, is on the battlefield; Bot2's
+# graveyard Garland is not Bot1's and stays. "When Chaos dies, put it on the bottom of its owner's library": on turn 4 two Lightning Bolts kill it and the card is the bottom of Bot1's library.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Garland, Knight of Cornelia
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mountain
+Island x4
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mountain
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Garland, Knight of Cornelia.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Garland, Knight of Cornelia)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Garland, Knight of Cornelia
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana = {W}{B}{B}{B}{R}{R}{G}
+Bot1.Graveyard.Garland, Knight of Cornelia.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Chaos, the Endless.Power = 5
+? Bot1.Battlefield.Chaos, the Endless.Tapped = false
+? Bot1.Battlefield.Chaos, the Endless.Keywords = Flying
+? Bot1.Graveyard = Black Lotus
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Chaos, the Endless)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Chaos, the Endless)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Black Lotus
+Bot1.Library = Island; Island; Island; Garland, Knight of Cornelia
+Bot1.Battlefield.Count = 5

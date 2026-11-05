@@ -1,0 +1,48 @@
+# Garland, Knight of Cornelia (3/2): "Whenever you cast a noncreature spell, surveil 1." Casting Memnite (a creature spell) asks nothing (! Bot1.Arrange); the Mox Sapphire (an artifact, so a
+# noncreature spell) does, and Bot1 keeps the Mountain on top; the Ancestral Recall does too, and now lets the same Mountain go to the graveyard, before drawing three (and the turn 3 draw makes 28). Garland's own cast, with
+# the ability not yet on the battlefield, surveils nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Garland, Knight of Cornelia
+Mox Sapphire
+Ancestral Recall
+Memnite
+Island
+Mountain
+Island x32
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Garland, Knight of Cornelia.Cast
+! Bot1.Arrange
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+! Bot1.Arrange
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Arrange(Mountain |)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 33
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Arrange(| Mountain)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Ancestral Recall; Mountain
+Bot1.Library.Count = 28
