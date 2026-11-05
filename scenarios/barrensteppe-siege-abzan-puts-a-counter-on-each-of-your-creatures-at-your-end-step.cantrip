@@ -1,0 +1,45 @@
+# Barrensteppe Siege, Abzan: "At the beginning of your end step, put a +1/+1 counter on each creature you control." Bot1 casts
+# the Siege and a Llanowar Elves on turn 1: the Elves get a counter at that end step and another at turn 3's, a 3/3 with two
+# counters. Bot2's own Elves (cast turn 2) get none, and Bot2's end step gives Bot1's none (not "your" end step).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Barrensteppe Siege
+Llanowar Elves
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Barrensteppe Siege.Cast
+Bot1.Name(Abzan)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Barrensteppe Siege.ChosenOption = Abzan
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot2.Battlefield.Llanowar Elves.Power = 1

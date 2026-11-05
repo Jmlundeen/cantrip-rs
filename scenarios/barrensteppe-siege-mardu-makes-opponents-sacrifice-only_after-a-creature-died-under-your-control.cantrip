@@ -1,0 +1,59 @@
+# Barrensteppe Siege, Mardu: "At the beginning of your end step, if a creature died under your control this turn, each
+# opponent sacrifices a creature of their choice." Turn 1: nothing died, Bot2 has no creature anyway. Turn 3: Bot1 Lightning
+# Bolts its own Llanowar Elves, so at its end step Bot2, with Llanowar Elves and Mother of Runes, chooses the Elves.
+# Turn 5: nothing died that turn, so Bot2 keeps Mother of Runes.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Barrensteppe Siege
+Llanowar Elves
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Mother of Runes
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Barrensteppe Siege.Cast
+Bot1.Name(Mardu)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Count = 3
+[T6 Bot2.Main1]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield.Mother of Runes.Power = 1
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt
