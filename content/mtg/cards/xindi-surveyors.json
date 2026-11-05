@@ -1,0 +1,8 @@
+{
+  "name": "Xindi Surveyors",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Xindi Scientist",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Landfall — Whenever a land you control enters, put a +1/+1 counter on this creature."
+}
