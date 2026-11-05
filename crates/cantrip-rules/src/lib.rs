@@ -2343,6 +2343,10 @@ impl cantrip_api::Game for Cx<'_> {
         turn::end_the_turn(self).map_err(|_| Suspend)
     }
 
+    fn end_the_combat_phase(&mut self) -> Result<(), Suspend> {
+        turn::end_the_combat_phase(self).map_err(|_| Suspend)
+    }
+
     fn lose_game(&mut self, player: PlayerId) {
         ops::lose_game(self, player);
     }

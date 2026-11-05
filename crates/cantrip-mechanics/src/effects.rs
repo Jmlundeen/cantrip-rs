@@ -1277,6 +1277,17 @@ pub fn untap_all_lands_you_control(g: &mut dyn Game, item: &StackItem) -> Result
     Ok(())
 }
 
+/// "Untap all creatures you control" (CR 701.26b): every creature the ability's controller controls as it resolves, with no
+/// choice. Merciful Mandate prints it.
+pub fn untap_all_creatures_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let creatures: Vec<ObjectId> =
+        g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    for creature in creatures {
+        g.untap(creature);
+    }
+    Ok(())
+}
+
 /// "Put a +1/+1 counter on each of up to N target creatures" (CR 122.1, 601.2c, 608.2b): on every target of the ability that is still
 /// legal as it resolves, put on together (CR 101.4), so a "one or more" ability triggers once. Agent Bishop, Man in Black and White
 /// Widow, Free Agent print it.

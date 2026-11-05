@@ -2465,6 +2465,13 @@ pub enum LastingRuleKind {
     /// step of the player who controls the permanent, and with `Duration::DuringNextUntapStepOf`, only in that player's.
     /// Exhaustion, Mana Vapors.
     DoesntUntap,
+    /// "Can't attack you or planeswalkers you control" (CR 508.1c): a resolved rule about an open set that forbids the
+    /// creatures it takes in an attack on the player the effect's words named (its "you"), and on their planeswalkers. The
+    /// static ability of the same words is `cantrip_mechanics::statics::attacks_you_or_your_planeswalker`, and the two are
+    /// read together (`static_rules::lasting_rules_barring_attacks`). Chronomantic Escape's "until your next turn, creatures
+    /// can't attack you" and Promise of Loyalty's "each of those creatures can't attack you or planeswalkers you control for
+    /// as long as it has a vow counter on it".
+    CantAttackYouOrYourPlaneswalkers,
 }
 
 /// A rule a resolving spell or ability gives an open set of objects for a duration (CR 611.2c): "creatures without flying

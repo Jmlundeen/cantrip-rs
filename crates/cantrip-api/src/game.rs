@@ -968,6 +968,14 @@ pub trait Game: Query {
     /// cleanup step when it is ended during one. Abilities that trigger from here on go on the stack in that cleanup step,
     /// and players then get priority, with another cleanup step after it (724.1f, 514.3a).
     fn end_the_turn(&mut self) -> Result<(), Suspend>;
+    /// "End the combat phase" (CR 724.1, 724.2g), from a resolving spell or ability, if the game is in a combat phase:
+    /// triggered abilities waiting to be put on the stack cease to exist (724.1a); every object on the stack is exiled, the
+    /// resolving one included (724.1b), so the spell or ability that ends the phase does not go to its owner's graveyard;
+    /// state-based actions are checked with no player given priority (724.1c); and once the resolution is over the step
+    /// under way ends with no player given priority again, every attacker and blocker is removed from combat, "this combat"
+    /// effects end, and the game skips to the end of combat step, the combat phase being over (724.1d). Nothing outside a
+    /// combat phase.
+    fn end_the_combat_phase(&mut self) -> Result<(), Suspend>;
 
     /// `player` wins the game (CR 104.2b): their opponents lose and the game ends at once. Nothing if they have lost, or
     /// are losing to a state-based action (CR 104.3f).

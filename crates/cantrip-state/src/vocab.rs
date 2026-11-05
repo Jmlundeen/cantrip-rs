@@ -1249,6 +1249,8 @@ counter_kinds! {
     Conqueror = 63, "conqueror", "Conqueror";
     Film = 64, "film", "Film";
     Peace = 65, "peace", "Peace";
+    // CR 122.1: Promise of Loyalty's "for as long as it has a vow counter on it".
+    Vow = 66, "vow", "Vow";
 }
 
 impl CounterKind {

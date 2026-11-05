@@ -48,7 +48,8 @@ pub fn next_step(game: &mut Game) {
     // The combat phase ends with its end of combat step, or with whatever step of it an effect ended the turn in
     // (CR 724.1d).
     let combat_ends = ending == Step::EndOfCombat
-        || (turn.ending && matches!(ending, Step::BeginCombat | Step::DeclareAttackers | Step::DeclareBlockers | Step::CombatDamage));
+        || ((turn.ending || turn.combat_ending)
+            && matches!(ending, Step::BeginCombat | Step::DeclareAttackers | Step::DeclareBlockers | Step::CombatDamage));
 
     // Mana empties as each step ends (CR 500.5), except the mana that lasts until the end of combat, which is lost as
     // the combat phase ends, and the mana that lasts until end of turn, lost as the cleanup step does (CR 106.4, 500.5a).
@@ -89,6 +90,10 @@ pub fn next_step(game: &mut Game) {
 
     let (number, active, step) = if turn.number == 0 {
         (1, turn.starting, Step::Untap)
+    } else if turn.combat_ending && ending != Step::EndOfCombat {
+        // CR 724.1d, 724.2g: an effect ended the combat phase, so the game skips to its end of combat step and the phase
+        // is over there (CR 511.1); the turn goes on from it.
+        (turn.number, turn.active, Step::EndOfCombat)
     } else if turn.ending || (ending == Step::Cleanup && turn.cleanup_again) {
         // CR 724.1d: the turn ended, so the game skips straight to the cleanup step, a new one if it was ended during
         // one; and a cleanup step in which players had priority is followed by another (CR 514.3a).
@@ -132,6 +137,7 @@ pub fn next_step(game: &mut Game) {
         t.priority = active;
         t.passes = 0;
         t.ending = false;
+        t.combat_ending = false;
         t.cleanup_again = false;
     });
     s.frame_push(Frame::new(FrameKind::BeginStep));
@@ -756,6 +762,14 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     // CR 508.1c: the attacks a static ability forbids ("this creature can't attack unless ...", "creatures with flying
     // can't attack you"). A creature forbidden every attack open to it can't attack at all.
     let mut barred = crate::static_rules::attacks_barred(&*cx, cx.cards(), &eligible, &targets);
+    // CR 508.1c, 611.2c: the attacks a resolved rule about an open set forbids - "until your next turn, creatures can't
+    // attack you" (Chronomantic Escape), and "can't attack you or planeswalkers you control" for as long as the creature
+    // has its vow counter (Promise of Loyalty).
+    for attack in crate::static_rules::lasting_rules_barring_attacks(&*cx, cx.cards(), &eligible, &targets) {
+        if !barred.contains(&attack) {
+            barred.push(attack);
+        }
+    }
     let mut eligible = eligible;
     if !barred.is_empty() {
         eligible.retain(|&id| targets.is_empty() || targets.iter().any(|&at| !barred.contains(&(id, at))));
@@ -1715,6 +1729,46 @@ pub fn end_the_turn(cx: &mut Cx) -> R<()> {
     Ok(())
 }
 
+/// An effect ends the combat phase (CR 724.1, 724.2g), as the spell or ability with that instruction resolves, if the game
+/// is in a combat phase. The instructions are the turn end's (724.1a-c: no trigger on the stack, every object on the stack
+/// exiled, the resolving one included, state-based actions with no priority), and what follows the resolution is
+/// `Turn::combat_ending`'s, read by `priority` and `next_step`: the step ends, and the game skips to the end of combat step.
+/// Outside a combat phase there is nothing to end.
+pub fn end_the_combat_phase(cx: &mut Cx) -> R<()> {
+    if !matches!(
+        cx.s().turn.step(),
+        Step::BeginCombat | Step::DeclareAttackers | Step::DeclareBlockers | Step::CombatDamage | Step::EndOfCombat
+    ) {
+        return Ok(());
+    }
+    // CR 724.1a: abilities that triggered before this began and are not yet on the stack cease to exist.
+    while let Some(last) = cx.s().triggers.len().checked_sub(1) {
+        cx.st().trigger_remove(last);
+    }
+    // CR 724.1b: every object on the stack is exiled, the resolving one among them, all at once.
+    let spells: Vec<ops::Moving> = cx
+        .s()
+        .stack
+        .iter()
+        .rev()
+        .filter(|i| i.kind == StackKind::Spell)
+        .map(|i| ops::Moving::to(i.object, Zone::exile(cx.s().obj(i.object).owner)))
+        .collect();
+    for at in (0..cx.s().stack.len()).rev() {
+        if cx.s().stack[at].kind != StackKind::Spell {
+            cx.st().stack_remove(at);
+        }
+    }
+    if !spells.is_empty() {
+        ops::move_together(cx, &spells, ZoneReason::Exile);
+    }
+    // CR 724.1c: state-based actions, with no player given priority and no triggered ability put on the stack.
+    crate::settle::state_based_actions_alone(cx)?;
+    // CR 724.1d: the step ends once this resolution is over, and the combat phase with it.
+    cx.st().update_turn(|t| t.combat_ending = true);
+    Ok(())
+}
+
 /// The next player in turn order after `p` who has not lost (CR 800.4a).
 fn next_in_game(s: &GameState, p: PlayerId) -> PlayerId {
     let mut next = s.next_player(p);
@@ -1729,7 +1783,7 @@ fn next_in_game(s: &GameState, p: PlayerId) -> PlayerId {
 pub fn priority(cx: &mut Cx) -> R<Flow> {
     // CR 724.1c-d: an effect has ended the turn. No player gets priority again in this step, and the abilities that
     // triggered since wait for the cleanup step (724.1f).
-    if cx.s().turn.ending {
+    if cx.s().turn.ending || cx.s().turn.combat_ending {
         return Ok(Flow::Done);
     }
     if cx.s().unsettled || !cx.s().triggers.is_empty() {
