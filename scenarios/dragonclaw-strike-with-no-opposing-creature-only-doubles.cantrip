@@ -1,0 +1,39 @@
+# Dragonclaw Strike's fight is "up to one": with no creature an opponent controls to choose, Bot1's Grizzly Bears is doubled
+# to 4/4 until end of turn and fights nothing, and is a 2/2 again on turn 4.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Grizzly Bears
+Dragonclaw Strike
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dragonclaw Strike.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Grizzly Bears.Power = 4
+? Bot1.Battlefield.Grizzly Bears.Toughness = 4
+? Bot1.Battlefield.Grizzly Bears.Damage = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot2.Life = 20
