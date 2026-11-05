@@ -37,6 +37,13 @@ pub fn dealt_damage_this_turn(history: History<'_>, source: ObjectId) -> bool {
     history.damage_dealt().any(|d| d.source == source && d.amount > 0)
 }
 
+/// "[It] was dealt damage this turn" (CR 120.2): `object` was the recipient of damage this turn, combat or not. Damage that was
+/// prevented, or whose amount was zero, was not dealt (CR 615.6). The object is the one that was dealt it, so a permanent that
+/// left and came back has been dealt none (CR 400.7). Faller's Faithful and Sold Out print it.
+pub fn was_dealt_damage_this_turn(history: History<'_>, object: ObjectId) -> bool {
+    history.damage_dealt().any(|d| d.target == Target::Object(object) && d.amount > 0)
+}
+
 /// "You've put one or more +1/+1 counters on [it] this turn" (CR 122.6, 611.3a): `player` put at least one +1/+1 counter on
 /// `object` this turn, whether it was on the battlefield or entering with them (the counters' putter is the event's). The object
 /// is the one that received them, so a permanent that left and came back has had none put on it (CR 400.7). Kid Loki and Beast,
