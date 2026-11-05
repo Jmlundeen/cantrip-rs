@@ -1,0 +1,8 @@
+{
+  "name": "The Duras Sisters",
+  "manaCost": "{B/R}{B/R}",
+  "type": "Legendary Creature — Klingon Warrior",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "When The Duras Sisters die, create a 2/1 red Klingon Warrior creature token with haste."
+}

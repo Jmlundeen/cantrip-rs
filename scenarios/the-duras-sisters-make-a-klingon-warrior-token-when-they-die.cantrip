@@ -1,0 +1,39 @@
+# The Duras Sisters: "When The Duras Sisters die, create a 2/1 red Klingon Warrior creature token with haste." (CR 603.6a,
+# 111.1) Bot2's Lightning Bolt deals 3 to the 3/2 Sisters on turn 2, and their controller gets the 2/1 with haste.
+
+[Bot1 Deck]
+The Duras Sisters
+Mox Jet
+Mox Ruby
+Island x18
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Duras Sisters.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.The Duras Sisters)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.The Duras Sisters = (absent)
+Bot1.Battlefield.Klingon Warrior Token.Power = 2
+Bot1.Battlefield.Klingon Warrior Token.Toughness = 1
+Bot1.Battlefield.Klingon Warrior Token.Keywords = Haste
+Bot2.Life = 20
