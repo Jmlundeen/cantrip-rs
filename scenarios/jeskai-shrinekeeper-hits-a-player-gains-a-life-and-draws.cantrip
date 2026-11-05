@@ -1,0 +1,33 @@
+# Jeskai Shrinekeeper ({2}{U}{R}{W}, 3/3 flying haste): cast on turn 1 with three Moxen and a Black Lotus, it attacks at once. Bot2
+# has no creatures, so it deals 3 combat damage to Bot2, and Bot1 gains 1 life and draws a card.
+
+[Bot1 Deck]
+Jeskai Shrinekeeper
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Island x3
+Plains x15
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Jeskai Shrinekeeper.Cast
+Bot1.Attack(Jeskai Shrinekeeper > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot2.Life = 17
+Bot1.Life = 21
+Bot1.Hand = Island; Island; Island

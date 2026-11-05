@@ -1,0 +1,12 @@
+{
+  "name": "Jeskai Shrinekeeper",
+  "manaCost": "{2}{U}{R}{W}",
+  "type": "Creature — Dragon",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying, haste\nWhenever this creature deals combat damage to a player, you gain 1 life and draw a card.",
+  "keywords": [
+    "Flying",
+    "Haste"
+  ]
+}
