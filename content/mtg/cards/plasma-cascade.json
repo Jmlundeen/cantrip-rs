@@ -1,0 +1,6 @@
+{
+  "name": "Plasma Cascade",
+  "manaCost": "{2}{R}",
+  "type": "Instant",
+  "oracleText": "Plasma Cascade deals 3 damage to any target. You may discard a card. If you do, draw a card."
+}
