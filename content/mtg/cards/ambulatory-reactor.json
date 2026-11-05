@@ -1,0 +1,8 @@
+{
+  "name": "Ambulatory Reactor",
+  "manaCost": "{3}{U}",
+  "type": "Artifact Creature — Borg",
+  "power": 2,
+  "toughness": 5,
+  "oracleText": "Artifact creatures you control have \"{T}: Add {C}. Spend this mana only to cast an artifact spell or activate an ability of an artifact source.\""
+}

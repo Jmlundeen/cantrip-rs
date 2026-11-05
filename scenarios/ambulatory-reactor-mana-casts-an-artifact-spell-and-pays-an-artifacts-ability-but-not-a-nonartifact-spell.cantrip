@@ -1,0 +1,65 @@
+# Ambulatory Reactor's granted "{T}: Add {C}. Spend this mana only to cast an artifact spell or activate an ability of an
+# artifact source." (CR 106.6). Turn 3: the Reactor taps for one restricted {C}; with two untapped Islands beside it,
+# Changeling Wayfinder ({3}, a nonartifact creature) would be castable if the {C} could count, so its refusal shows the
+# mana cannot pay for it. That same {C} casts Sol Ring, an artifact spell (`Spend: C`), leaving both Islands untapped.
+# Bot1's Ornithopter - another artifact creature the Reactor's static grants the ability - then taps for the next {C},
+# and Mind Stone is cast with the Islands' {U}{U} (`Spend: U, U`) so that only the {C} is left to pay Mind Stone's
+# "{1}, {T}, Sacrifice this artifact: Draw a card", an ability of an artifact source.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Ambulatory Reactor
+Ornithopter
+Mind Stone
+Sol Ring
+Changeling Wayfinder
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ambulatory Reactor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Ambulatory Reactor.Activate
+? Bot1.Mana = {C} (ArtifactSpellsOrAbilities)
+! Bot1.Hand.Changeling Wayfinder.Cast(Mana: short)
+Bot1.Hand.Sol Ring.Cast(Spend: C)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Island#1.Tapped = false
+? Bot1.Battlefield.Island#2.Tapped = false
+Bot1.Battlefield.Ornithopter.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+? Bot1.Mana = {U}{U} {C} (ArtifactSpellsOrAbilities)
+Bot1.Hand.Mind Stone.Cast(Spend: U, U)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C} (ArtifactSpellsOrAbilities)
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw a card)
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Sol Ring.Types = Artifact
+Bot1.Graveyard = Mind Stone; Black Lotus
+Bot1.Battlefield.Mind Stone = (absent)
+Bot1.Battlefield.Island#1.Tapped = true
+Bot1.Battlefield.Island#2.Tapped = true
+Bot1.Battlefield.Ambulatory Reactor.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
