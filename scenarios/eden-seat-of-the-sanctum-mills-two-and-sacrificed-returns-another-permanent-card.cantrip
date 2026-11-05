@@ -1,0 +1,46 @@
+# Eden, Seat of the Sanctum: "{5}, {T}: Mill two cards. Then you may sacrifice this land. When you do, return another target permanent card
+# from your graveyard to your hand." Bot1 pays {5} with five Moxen; the two milled cards are a Grizzly Bears and a Memnite. Bot1
+# sacrifices Eden, so the reflexive trigger targets a permanent card other than the sacrificed Eden: the sacrificed
+# Eden is refused, and the Memnite is chosen over the Grizzly Bears.
+
+[Bot1 Deck]
+Eden, Seat of the Sanctum
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Forest
+Grizzly Bears
+Memnite
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Eden, Seat of the Sanctum.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Eden, Seat of the Sanctum.Activate(Ability: #2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Graveyard.Count = 3
+! Bot1.Target(Graveyard.Eden, Seat of the Sanctum)
+Bot1.Target(Graveyard.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Forest; Memnite
+Bot1.Graveyard = Eden, Seat of the Sanctum; Grizzly Bears
+Bot1.Library.Count = 20

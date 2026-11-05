@@ -1,0 +1,43 @@
+# Eden, Seat of the Sanctum: the sacrifice is a choice (CR 701.21a). Bot1 mills a Grizzly Bears and a Memnite, declines to sacrifice Eden, and
+# so nothing triggers: both milled cards stay in the graveyard, Eden stays tapped on the battlefield and the hand is unchanged.
+
+
+[Bot1 Deck]
+Eden, Seat of the Sanctum
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Forest
+Grizzly Bears
+Memnite
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Eden, Seat of the Sanctum.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Eden, Seat of the Sanctum.Activate(Ability: #2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Forest
+Bot1.Graveyard = Memnite; Grizzly Bears
+Bot1.Battlefield.Eden, Seat of the Sanctum.Tapped = true
+Bot1.Library.Count = 20

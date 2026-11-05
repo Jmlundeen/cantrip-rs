@@ -1,0 +1,39 @@
+# Eden, Seat of the Sanctum: with one card left in the library Bot1 mills what they can (CR 701.17b) - the Grizzly Bears - and still may sacrifice
+# Eden; the reflexive trigger's only legal target is the milled Grizzly Bears (the sacrificed Eden is not another card), so it returns to hand.
+
+[Bot1 Deck]
+Eden, Seat of the Sanctum
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Forest
+Grizzly Bears
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Eden, Seat of the Sanctum.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Eden, Seat of the Sanctum.Activate(Ability: #2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Forest; Grizzly Bears
+Bot1.Graveyard = Eden, Seat of the Sanctum
+Bot1.Library.Count = 0

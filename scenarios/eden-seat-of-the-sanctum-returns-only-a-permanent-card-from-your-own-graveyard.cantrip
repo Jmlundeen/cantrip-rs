@@ -1,0 +1,65 @@
+# Eden, Seat of the Sanctum: "When you do, return another target permanent card from your graveyard to your hand." On turn 2 Bot2's Lotus Petal
+# pays for a Lightning Bolt at Bot1's Ornithopter, so each graveyard holds a permanent card. On turn 3 Eden mills a Lightning Bolt and a Memnite
+# and is sacrificed: the milled Bolt (an instant, no permanent card), Bot2's Lotus Petal (in Bot2's graveyard, not Bot1's) and Eden itself (not
+# another card) are refused as the target; Bot1's Ornithopter and Memnite are the legal ones, and the Memnite returns.
+
+[Bot1 Deck]
+Eden, Seat of the Sanctum
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Forest
+Lightning Bolt
+Memnite
+Forest x20
+
+[Bot2 Deck]
+Lotus Petal
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Eden, Seat of the Sanctum.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Ornithopter
+? Bot2.Graveyard = Lightning Bolt; Lotus Petal
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Eden, Seat of the Sanctum.Activate(Ability: #2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Graveyard.Count = 4
+! Bot1.Target(Bot1.Graveyard.Eden, Seat of the Sanctum)
+! Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+! Bot1.Target(Bot2.Graveyard.Lotus Petal)
+Bot1.Target(Bot1.Graveyard.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Forest; Memnite
+Bot1.Graveyard = Eden, Seat of the Sanctum; Lightning Bolt; Ornithopter
+Bot2.Graveyard = Lightning Bolt; Lotus Petal
