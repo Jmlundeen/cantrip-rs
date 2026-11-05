@@ -1,0 +1,53 @@
+# Plaza of Heroes: "{T}: Add one mana of any color among legendary permanents you control" counts every legendary permanent,
+# not only creatures and planeswalkers (CR 105.2): Tinybones Joins Up, a black legendary enchantment, gives black. Llanowar
+# Elves is a green permanent that is not legendary, and Bot2's Thalia is a white legendary creature it does not control, so green
+# and white are refused with the other colors and colorless; one {B} is added (the pool is checked). Mox Amber, a colorless
+# legendary artifact that enters after Tinybones, adds no color and takes none away: the colors are those of all of them
+# together (CR 105.2c). Turn 1 its plain "{T}: Add {C}" pays for a Sol Ring, a nonlegendary spell.
+
+[Bot1 Deck]
+Plaza of Heroes
+Sol Ring
+Mox Jet
+Tinybones Joins Up
+Mox Emerald
+Llanowar Elves
+Mox Amber
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Thalia, Guardian of Thraben
+Plains x17
+
+[Actions]
+Bot1.Hand.Plaza of Heroes.Play
+Bot1.Battlefield.Plaza of Heroes.Activate(Ability: {T}: Add {C})
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tinybones Joins Up.Cast
+Bot1.Hand.Mox Amber.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Plaza of Heroes.Activate(Ability: among legendary; Color: Green)
+! Bot1.Battlefield.Plaza of Heroes.Activate(Ability: among legendary; Color: White)
+! Bot1.Battlefield.Plaza of Heroes.Activate(Ability: among legendary; Color: Red)
+! Bot1.Battlefield.Plaza of Heroes.Activate(Ability: among legendary; Color: Blue)
+! Bot1.Battlefield.Plaza of Heroes.Activate(Ability: among legendary; Color: Colorless)
+Bot1.Battlefield.Plaza of Heroes.Activate(Ability: among legendary; Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Battlefield.Plaza of Heroes.Tapped = true
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Mox Amber.Tapped = false

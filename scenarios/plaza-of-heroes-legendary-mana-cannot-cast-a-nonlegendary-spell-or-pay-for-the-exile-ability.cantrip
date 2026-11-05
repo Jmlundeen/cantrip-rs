@@ -1,0 +1,52 @@
+# Plaza of Heroes' any-color mana is for legendary spells only (CR 106.6). Turn 3 Bot1 taps the first Plaza for {R}
+# (restricted) with Mox Pearl and Mox Sapphire untapped and Ragavan, a legendary creature, in play (cast on turn 1 with
+# that Plaza's restricted {R}, so no source of unrestricted red exists). The pool is {R}
+# (LegendarySpells) and two unrestricted mana, three in all, yet:
+#   - Llanowar Elves is not offered: restricted mana can't cast a nonlegendary spell (no Mox or other Plaza makes {G});
+#   - the second Plaza's "{3}, {T}, Exile this land" is not offered: restricted mana can't pay an activation.
+# A Mox Jet then supplies the third unrestricted mana and the same activation is offered (the positive control) and
+# is paid by exactly those three Moxen, the restricted {R} left over, so the activation costs {3} and no more.
+
+[Bot1 Deck]
+Plaza of Heroes
+Plaza of Heroes
+Mox Pearl
+Mox Sapphire
+Ragavan, Nimble Pilferer
+Mox Jet
+Island
+Llanowar Elves
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plaza of Heroes.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plaza of Heroes.Activate(Ability: Spend this mana; Color: Red)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plaza of Heroes.Play
+Bot1.Battlefield.Plaza of Heroes.Activate(Ability: Spend this mana; Color: Red)
+? Bot1.Mana = {R} (LegendarySpells)
+! Bot1.Hand.Llanowar Elves.Cast(Mana: short)
+! Bot1.Battlefield.Plaza of Heroes#2.Activate(Ability: Exile this land; Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plaza of Heroes#2.Activate(Ability: Exile this land; Bot1.Battlefield.Ragavan, Nimble Pilferer)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {R} (LegendarySpells)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Sapphire; Plaza of Heroes; Ragavan, Nimble Pilferer
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Keywords = Hexproof; Indestructible
+Exile.Count = 1
+Bot1.Hand.Llanowar Elves.Colors.Count = 1

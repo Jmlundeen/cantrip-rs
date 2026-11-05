@@ -1,0 +1,37 @@
+# Browser
+# Plaza of Heroes: "{T}: Add one mana of any color. Spend this mana only to cast a legendary spell" (CR 106.6). Unlike
+# Delighted Halfling's, it has no effect on the spell. Turn 3 Bot1 taps it for {R}: the pool is {R} (LegendarySpells) with no
+# "can't be countered", and the page's chip reads just "legendary". It casts Ragavan, a legendary creature, and Bot2's
+# Counterspell (an Island and Mox Sapphire) counters it: the legendary spell stays counterable.
+
+[Bot1 Deck]
+Plaza of Heroes
+Ragavan, Nimble Pilferer
+Island x18
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Plaza of Heroes.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plaza of Heroes.Activate(Ability: Spend this mana; Color: Red)
+? Bot1.Mana = {R} (LegendarySpells)
+? Client.Bot1.Mana = 1 Red (legendary)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot2.Hand.Counterspell.Cast(Stack.Ragavan, Nimble Pilferer)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ragavan, Nimble Pilferer
+Bot2.Graveyard = Counterspell
+Bot1.Battlefield = Plaza of Heroes

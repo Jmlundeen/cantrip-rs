@@ -1,0 +1,60 @@
+# Plaza of Heroes: "{3}, {T}, Exile this land: Target legendary creature gains hexproof and indestructible until end of
+# turn." Turn 3 Bot1's Plaza, with Bot1's Ragavan (cast turn 1 with the Plaza's restricted {R}) and Bot2's Ragavan and
+# Ornithopter in play: the nonlegendary Ornithopter is refused as a target, Bot2's legendary creature accepted, and it
+# has both keywords that turn (CR 702.11b, 702.12b) and neither on turn 4 (CR 611.2a, 514.2). Turn 5 the second Plaza
+# targets Bot1's own Ragavan, also accepted. Each use is paid by three Moxen and leaves the pool empty.
+
+[Bot1 Deck]
+Plaza of Heroes
+Plaza of Heroes
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Ragavan, Nimble Pilferer
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Ragavan, Nimble Pilferer
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Plaza of Heroes.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plaza of Heroes.Activate(Ability: Spend this mana; Color: Red)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Plaza of Heroes.Activate(Ability: Exile this land; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Plaza of Heroes.Activate(Ability: Exile this land; Bot2.Battlefield.Ragavan, Nimble Pilferer)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ragavan, Nimble Pilferer.Keywords = Hexproof; Indestructible
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ragavan, Nimble Pilferer.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Hand.Plaza of Heroes.Play
+Bot1.Battlefield.Plaza of Heroes.Activate(Ability: Exile this land; Bot1.Battlefield.Ragavan, Nimble Pilferer)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Keywords = Hexproof; Indestructible
+Bot2.Battlefield.Ragavan, Nimble Pilferer.Keywords = (absent)
+Bot1.Battlefield.Plaza of Heroes = (absent)
+Exile.Count = 2
