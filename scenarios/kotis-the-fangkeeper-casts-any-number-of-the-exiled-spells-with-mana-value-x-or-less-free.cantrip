@@ -1,0 +1,46 @@
+# Kotis, the Fangkeeper: "Whenever Kotis deals combat damage to a player, exile the top X cards of their library, where X is the amount of
+# damage dealt. You may cast any number of spells with mana value X or less from among them without paying their mana costs." Kotis
+# deals 2, so Grizzly Bears (mana value exactly 2) and Lightning Bolt are exiled from the top and both cast free; Serra Angel, third
+# from the top, is left in the library.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Kotis, the Fangkeeper
+Island x2
+Island x20
+
+[Bot2 Deck]
+Island x7
+Island
+Grizzly Bears
+Lightning Bolt
+Serra Angel
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kotis, the Fangkeeper.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Kotis, the Fangkeeper > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Grizzly Bears)
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+
+[Expect]
+Bot2.Life = 15
+Exile.Count = 0
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot2.Library.Count = 11

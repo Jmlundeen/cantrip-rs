@@ -1,0 +1,11 @@
+{
+  "name": "Kotis, the Fangkeeper",
+  "manaCost": "{1}{B}{G}{U}",
+  "type": "Legendary Creature — Zombie Warrior",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Indestructible\nWhenever Kotis deals combat damage to a player, exile the top X cards of their library, where X is the amount of damage dealt. You may cast any number of spells with mana value X or less from among them without paying their mana costs.",
+  "keywords": [
+    "Indestructible"
+  ]
+}

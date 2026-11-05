@@ -1,0 +1,40 @@
+# Kotis, the Fangkeeper: only "spells with mana value X or less" may be cast. With X = 2 the exiled Serra Angel (mana value 5) is too
+# expensive and the exiled Island is not a spell at all, so Bot1 is offered nothing: both stay in exile.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Kotis, the Fangkeeper
+Island x2
+Island x20
+
+[Bot2 Deck]
+Island x7
+Island
+Serra Angel
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kotis, the Fangkeeper.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Kotis, the Fangkeeper > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Exile = Serra Angel; Island
+Stack.Count = 0
+Bot2.Library.Count = 10
