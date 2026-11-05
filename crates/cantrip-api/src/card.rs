@@ -2912,6 +2912,11 @@ pub type FaceUpBan = fn(&dyn Query, &Asker, ObjectId) -> bool;
 /// doesn't untap during its controller's untap step". A permanent's own, printed or granted, is `Keyword::DoesNotUntap`.
 pub type UntapBan = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// A static ability that says a permanent can't phase in (CR 702.26a, 101.2), asked of the permanent that would phase in:
+/// The City on the Edge of Forever's Human token, "Permanents can't phase in." A rule of the game, not an ability of the
+/// permanent that would phase in, so it holds whatever abilities that one has lost (CR 613.1f).
+pub type PhaseInBan = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// A static ability that says permanents can't become untapped (CR 101.2, 701.26b): true for a permanent on the battlefield
 /// that can't, judged as it is now. Unlike `UntapBan` it holds in the untap step and everywhere else - an effect that untaps
 /// it, a stun counter that would replace its untap (CR 122.1d) - and it is the source's effect, no ability of the permanent,
@@ -3501,6 +3506,9 @@ pub struct CardDef {
     /// Its static abilities that say permanents don't untap during their controllers' untap steps (CR 502.3), while it is on
     /// the battlefield with its abilities. See `UntapBan`.
     pub untap_bans: &'static [UntapBan],
+    /// Its static abilities that say permanents can't phase in (CR 702.26a, 101.2), while it is on the battlefield with
+    /// its abilities: The City on the Edge of Forever's Human token. See `PhaseInBan`.
+    pub phase_in_bans: &'static [PhaseInBan],
     /// Its static abilities that say permanents can't become untapped (CR 101.2, 701.26b), while it is on the battlefield with
     /// its abilities: Frozen in Ice's "enchanted creature ... can't become untapped". See `CantBecomeUntapped`.
     pub cant_become_untapped: &'static [CantBecomeUntapped],
@@ -3724,6 +3732,7 @@ impl CardDef {
         sacrifice_bans: &[],
         face_up_bans: &[],
         untap_bans: &[],
+        phase_in_bans: &[],
         cant_become_untapped: &[],
         damage_by_toughness: &[],
         damage_by_absolute_power: &[],
@@ -3826,6 +3835,7 @@ impl CardDef {
             (!self.sacrifice_bans.is_empty(), "sacrifice bans"),
             (!self.face_up_bans.is_empty(), "face-up bans"),
             (!self.untap_bans.is_empty(), "untap bans"),
+            (!self.phase_in_bans.is_empty(), "phase-in bans"),
             (!self.cant_become_untapped.is_empty(), "rules against becoming untapped"),
             (!self.damage_by_toughness.is_empty(), "damage by toughness"),
             (!self.damage_by_absolute_power.is_empty(), "damage by absolute power"),

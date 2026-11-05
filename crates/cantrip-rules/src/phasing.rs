@@ -112,7 +112,13 @@ fn phase_in(cx: &mut Cx, permanents: &[ObjectId]) {
     let direct: Vec<ObjectId> = permanents
         .iter()
         .copied()
-        .filter(|&id| cx.s().obj(id).marks.phased.is_some_and(|p| !p.indirect) && cx.s().obj(id).zone.is(ZoneKind::PhasedOut))
+        .filter(|&id| {
+            cx.s().obj(id).marks.phased.is_some_and(|p| !p.indirect)
+                && cx.s().obj(id).zone.is(ZoneKind::PhasedOut)
+                // "Permanents can't phase in" (CR 702.26a, 101.2): it stays phased out, and what phased out indirectly with it
+                // stays with it, as it would were it phased in.
+                && !crate::static_rules::phase_in_banned(&*cx, cx.cards(), id)
+        })
         .collect();
     if direct.is_empty() {
         return;

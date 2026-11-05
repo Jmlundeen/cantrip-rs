@@ -809,6 +809,14 @@ pub fn untap_banned(q: &dyn Query, cards: &'static CardTable, id: ObjectId) -> b
     any_static(q, cards, |d| d.untap_bans, |rule, asker| rule(q, asker, id))
 }
 
+/// Whether a static ability of a permanent on the battlefield says the permanent `id` can't phase in (CR 702.26a, 101.2,
+/// `CardDef::phase_in_bans`: The City on the Edge of Forever's "Permanents can't phase in"). No ability of `id`'s, so it
+/// holds whatever abilities `id` has lost (CR 613.1f), and it keeps `id` phased out rather than phasing it in and out
+/// again.
+pub fn phase_in_banned(q: &dyn Query, cards: &'static CardTable, id: ObjectId) -> bool {
+    any_static(q, cards, |d| d.phase_in_bans, |rule, asker| rule(q, asker, id))
+}
+
 /// The rules about an open set of objects that resolved spells and abilities made (CR 611.2c, `EffectKind::LastingRule`) that
 /// say `rule` of the permanent `id` now: one for each such effect whose set takes in `id` as it is now, asked as the effect's
 /// source and controller with what its words named (`OpenSet`). A rule of the game, not an ability of `id` or of the source,
