@@ -198,6 +198,12 @@ pub struct TokenCreation {
     /// Copy values used by token-creation replacements (CR 707.2). An effect that replaces the token with a definition
     /// of its own sets them to that token under its source's words (`Query::token_copy`, CR 612.4).
     pub copy: Option<Copiable>,
+    /// "Those tokens plus a [token] are created instead" (CR 614.1a): one more token of this definition, with these copy
+    /// values, created under the same player in the same event. An effect sets it on the groups it applies to; the event
+    /// gains a single such token however many of its groups the effect applied to, and the effects not yet applied meet
+    /// that token too (CR 616.1f). Its copy values are the token under the effect's source's words (`Query::token_copy`):
+    /// a text change on the source changes the token it adds (CR 612.4, 612.2a).
+    pub plus: Option<(CardId, Option<Copiable>)>,
 }
 
 /// Life a player is about to gain or lose (CR 119.3, 614.1a): by an effect, as a cost (CR 119.4: paying life is losing

@@ -1105,11 +1105,28 @@ fn used_up(cx: &mut Cx, timestamp: u32) {
 /// that apply to any of the groups and have not yet applied to the event; the affected player, the one whose tokens they
 /// are, chooses one where there are several (CR 616.1); its "you may" is asked once; and it applies to every group it
 /// applies to then, after which it has applied to the whole event and applies to none of it again (CR 614.5).
-fn apply_to_parts(cx: &mut Cx, parts: &mut [Proposal]) {
+///
+/// An effect that creates "those tokens plus a [token]" (`TokenCreation::plus`) adds one group of that single token to the
+/// event once it has applied, under the player whose event it is, which the effects still to apply meet as part of it.
+fn apply_to_parts(cx: &mut Cx, parts: &mut Vec<Proposal>) {
     cx.own_text(false, |cx| apply_to_each_part(cx, parts));
 }
 
-fn apply_to_each_part(cx: &mut Cx, parts: &mut [Proposal]) {
+/// The token an effect that just applied added to the event ("those tokens plus a [token]", `TokenCreation::plus`), as a
+/// group of its own: one, however many of the event's groups set it, each mark cleared.
+fn take_plus(parts: &mut Vec<Proposal>) {
+    let mut added: Option<TokenCreation> = None;
+    for part in parts.iter_mut() {
+        if let Proposal::TokenCreation(t) = part
+            && let Some((token, copy)) = t.plus.take()
+        {
+            added.get_or_insert(TokenCreation { controller: t.controller, token, count: 1, copy, plus: None });
+        }
+    }
+    parts.extend(added.map(Proposal::TokenCreation));
+}
+
+fn apply_to_each_part(cx: &mut Cx, parts: &mut Vec<Proposal>) {
     let mut applied: Vec<Applied> = cx.lineage.clone();
     loop {
         let found: Vec<Vec<Candidate>> = parts.iter().map(|p| candidates(cx, p, &applied, None)).collect();
@@ -1130,6 +1147,7 @@ fn apply_to_each_part(cx: &mut Cx, parts: &mut [Proposal]) {
                 for j in (0..parts.len()).filter(|&j| meets(j)) {
                     apply_printed(cx, &mut parts[j], source, index, &applied);
                 }
+                take_plus(parts);
             }
             Origin::Granted(timestamp) => {
                 let Some((&e, def)) = granted(cx, timestamp) else { continue };
@@ -1140,6 +1158,7 @@ fn apply_to_each_part(cx: &mut Cx, parts: &mut [Proposal]) {
                 if took && def.once {
                     used_up(cx, timestamp);
                 }
+                take_plus(parts);
             }
             // Only a printed or a lasting effect replaces anything but a zone change or damage.
             _ => {}
@@ -1472,9 +1491,11 @@ pub fn token_batch(cx: &mut Cx, tokens: &[(CardId, Option<Copiable>, PlayerId)])
             count += 1;
             i += 1;
         }
-        groups.push(TokenCreation { controller, token, copy, count });
+        groups.push(TokenCreation { controller, token, copy, count, plus: None });
     }
     let mut after = groups.clone();
+    // The groups an effect added to the event ("those tokens plus a [token]").
+    let mut added: Vec<TokenCreation> = Vec::new();
     // Each player's, the affected player's (CR 616.1), in the order they first appear.
     let mut done: Vec<PlayerId> = Vec::new();
     for g in &groups {
@@ -1485,16 +1506,23 @@ pub fn token_batch(cx: &mut Cx, tokens: &[(CardId, Option<Copiable>, PlayerId)])
         let theirs: Vec<usize> = (0..groups.len()).filter(|&j| groups[j].controller == g.controller).collect();
         let mut parts: Vec<Proposal> = theirs.iter().map(|&j| Proposal::TokenCreation(groups[j])).collect();
         apply_to_parts(cx, &mut parts);
-        for (&j, part) in theirs.iter().zip(parts) {
-            let Proposal::TokenCreation(t) = part else { unreachable!("an effect cannot change the kind of the event") };
+        let mut parts = parts.into_iter().map(|part| match part {
+            Proposal::TokenCreation(t) => t,
+            _ => unreachable!("an effect cannot change the kind of the event"),
+        });
+        for (&j, t) in theirs.iter().zip(parts.by_ref()) {
             after[j] = t;
         }
+        added.extend(parts);
     }
     // Keep the final replacement’s token definition and copy values (CR 614.1a).
-    let changed = groups.iter().zip(&after).any(|(b, a)| a.count != b.count || a.token != b.token || a.copy != b.copy);
+    let changed = !added.is_empty() || groups.iter().zip(&after).any(|(b, a)| a.count != b.count || a.token != b.token || a.copy != b.copy);
     let mut out: Vec<(CardId, Option<Copiable>, PlayerId)> = Vec::with_capacity(tokens.len());
     for (b, a) in groups.iter().zip(&after) {
         out.extend(std::iter::repeat((a.token, a.copy, b.controller)).take(a.count as usize));
+    }
+    for a in &added {
+        out.extend(std::iter::repeat((a.token, a.copy, a.controller)).take(a.count as usize));
     }
     changed.then_some(out)
 }
