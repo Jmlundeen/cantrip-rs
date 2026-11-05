@@ -1,0 +1,6 @@
+{
+  "name": "Support Mission",
+  "manaCost": "{2}{G}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a creature you control enters, put a quest counter on this enchantment. Put a +1/+1 counter on that creature. If this enchantment has five or more quest counters on it, instead put two +1/+1 counters on that creature."
+}

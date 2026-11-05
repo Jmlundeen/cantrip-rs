@@ -1,0 +1,40 @@
+# Support Mission's trigger puts its quest counter even when the entering creature has left the battlefield by the time it
+# resolves; "that creature" is no longer there, so no +1/+1 counter is put anywhere (CR 608.2c, 400.7). Bot2's Bolt kills the
+# 0/2 Ornithopter in response.
+
+[Bot1 Deck]
+Black Lotus
+Support Mission
+Ornithopter
+Forest x4
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Support Mission.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot1.Battlefield.Support Mission.Counters.Quest = 1
+Bot1.Battlefield.Count = 1

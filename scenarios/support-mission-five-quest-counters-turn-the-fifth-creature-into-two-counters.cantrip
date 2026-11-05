@@ -1,0 +1,71 @@
+# Support Mission: each creature its controller has enter puts a quest counter on the enchantment and a +1/+1 counter on that
+# creature; from the fifth quest counter on, that creature gets two instead (CR 603.6a, 608.2c, 614.1a). Bot2's Ornithopter
+# is no creature of Bot1's, so it adds none.
+
+[Bot1 Deck]
+Black Lotus
+Support Mission
+Ornithopter x4
+Forest
+Llanowar Elves
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Support Mission.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Support Mission.Counters.Quest = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Support Mission.Counters.Quest = 2
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Support Mission.Counters.Quest = 3
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Support Mission.Counters.Quest = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Support Mission.Counters.Quest = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Support Mission.Counters.Quest = 5
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 3
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter#1.Power = 1
+Bot1.Battlefield.Ornithopter#4.Counters.PlusOnePlusOne = 1
