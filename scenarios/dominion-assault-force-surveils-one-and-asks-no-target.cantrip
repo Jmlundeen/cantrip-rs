@@ -1,0 +1,33 @@
+# The second enter mode, "Surveil 1." (CR 701.25a), has no target: the looked-at card goes to the graveyard and nothing is
+# exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Dominion Assault Force
+Forest x4
+Forest
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dominion Assault Force.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Surveil 1)
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Forest)
+
+[Expect]
+Bot1.Graveyard = Forest; Black Lotus
+Bot1.Surveilled = 1 requested, 1 looked
+Bot1.Battlefield.Dominion Assault Force.Power = 4
