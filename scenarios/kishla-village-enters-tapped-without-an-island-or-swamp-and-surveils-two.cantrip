@@ -1,0 +1,35 @@
+# Kishla Village: "This land enters tapped unless you control an Island or a Swamp. {T}: Add {G}. {3}{G}, {T}: Surveil 2."
+# Beside no Island or Swamp (turn 1) it enters tapped; on turn 3, with Black Lotus and Mox Emerald paying {3}{G}, the ability
+# surveils two cards (CR 701.25a): the Mountain goes to the graveyard and the Forest stays on top.
+
+[Bot1 Deck]
+Kishla Village
+Mox Emerald
+Black Lotus
+Island x5
+Mountain
+Forest
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Kishla Village.Play
+? Bot1.Battlefield.Kishla Village.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Kishla Village.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Forest | Mountain)
+
+[Expect]
+Bot1.Battlefield.Kishla Village.Tapped = true
+Bot1.Graveyard = Mountain; Black Lotus
+Bot1.Library.Count = 14

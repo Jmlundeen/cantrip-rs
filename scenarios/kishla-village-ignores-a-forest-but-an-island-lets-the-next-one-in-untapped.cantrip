@@ -1,0 +1,29 @@
+# The Village taps for {G} but a Forest is no help to its own condition (CR 614.12): beside only a Forest it enters tapped
+# (turn 3); once an Island is out the second Village enters untapped (turn 7), the positive control for the first.
+
+[Bot1 Deck]
+Forest
+Kishla Village
+Island
+Kishla Village
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Kishla Village.Play
+? Bot1.Battlefield.Kishla Village.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Kishla Village.Play
+? Bot1.Battlefield.Kishla Village#2.Tapped = false
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Kishla Village#1.Tapped = false
+Bot1.Battlefield.Kishla Village#2.Tapped = false

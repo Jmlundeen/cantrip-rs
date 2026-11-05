@@ -1,0 +1,19 @@
+# "This land enters tapped unless you control an Island or a Swamp" (CR 614.12): Bot1 plays a Swamp on turn 1 and Kishla Village
+# on turn 3, so the Village enters untapped.
+
+[Bot1 Deck]
+Swamp
+Kishla Village
+Island x25
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Kishla Village.Play
+? Bot1.Battlefield.Kishla Village.Tapped = false
+
+[Expect]
+Bot1.Battlefield.Kishla Village.Tapped = false
