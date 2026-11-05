@@ -1,0 +1,44 @@
+# Kheru Goldkeeper: "Whenever one or more cards leave your graveyard during your turn, create a Treasure token."
+# Bot1's graveyard holds Black Lotus (sacrificed on turn 1) and, on turn 3, a Lightning Bolt and Tormod's Crypt (sacrificed
+# as the cost of its own ability). The Crypt exiles all three at once: they trigger Kheru once (CR 603.2c), one Treasure.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Kheru Goldkeeper
+Mox Ruby
+Lightning Bolt
+Tormod's Crypt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kheru Goldkeeper.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Tormod's Crypt.Cast
+Bot1.Battlefield.Tormod's Crypt.Activate(Bot1)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard.Count = 0
+Exile = Black Lotus; Lightning Bolt; Tormod's Crypt
+Bot1.Battlefield.Treasure Token.Token = true
+Bot1.Battlefield.Count = 5

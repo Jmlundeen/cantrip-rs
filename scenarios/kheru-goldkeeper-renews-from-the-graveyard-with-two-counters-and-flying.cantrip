@@ -1,0 +1,66 @@
+# Kheru Goldkeeper: "Renew — {2}{B}{G}{U}, Exile this card from your graveyard: Put two +1/+1 counters and a flying counter
+# on target creature. Activate only as a sorcery." Bot2 Lightning Bolts Kheru on turn 2, with its Llanowar Elves already out.
+# On Bot2's turn the ability is not offered (CR 602.5d). On turn 3 Bot1 pays five Moxen: the Elves become a 3/3 with flying
+# (counters, CR 122.1b). Kheru is exiled as the cost, and a card leaving the graveyard does not trigger Kheru, which is in
+# that graveyard itself and not on the battlefield: no Treasure.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Kheru Goldkeeper
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kheru Goldkeeper.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kheru Goldkeeper)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Graveyard.Kheru Goldkeeper.Activate(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Kheru Goldkeeper.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Power = 3
+Bot2.Battlefield.Llanowar Elves.Toughness = 3
+Bot2.Battlefield.Llanowar Elves.Keywords = Flying
+Bot2.Battlefield.Llanowar Elves.Counters.Flying = 1
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+Exile = Kheru Goldkeeper
+Bot1.Battlefield.Count = 5
