@@ -1,0 +1,41 @@
+# Ballista has the granted ability but its activated damage is not combat damage (CR 120.2a, 603.2).
+# The same Ballista's later combat damage does draw one card, proving the trigger applies to it.
+[Bot1 Deck]
+Island
+Black Lotus
+Sol Ring
+Co-Option Adjutant
+Walking Ballista
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Co-Option Adjutant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Walking Ballista.Activate(Bot2; Ability: Remove)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Library.Count = 12
+? Bot2.Life = 19
+[T5 Bot1.Main1]
+Bot1.Attack(Walking Ballista > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Library.Count = 10
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
