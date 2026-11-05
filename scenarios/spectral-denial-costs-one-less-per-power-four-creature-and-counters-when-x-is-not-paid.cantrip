@@ -1,0 +1,54 @@
+# Bot2 controls an Alpine Grizzly (power 4), so Spectral Denial with X = 2 costs {2}{U} minus {1} = {1}{U} (CR 601.2f, 107.3):
+# the two Moxen Bot2 taps are all it takes, nothing floats. Bot1 has one Mox untapped against the {2} it is asked for
+# (CR 118.12) and cannot pay, so its Mox Jet is countered.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Alpine Grizzly
+Spectral Denial
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Alpine Grizzly.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Spectral Denial.Cast(Stack.Mox Jet; X: 2)
+Bot2.Pass
+? Bot2.Mana =
+Bot1.Pass
+Bot1.Decline
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Mox Jet
+Bot2.Graveyard = Spectral Denial

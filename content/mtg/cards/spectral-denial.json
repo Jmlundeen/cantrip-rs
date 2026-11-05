@@ -1,0 +1,6 @@
+{
+  "name": "Spectral Denial",
+  "manaCost": "{X}{U}",
+  "type": "Instant",
+  "oracleText": "This spell costs {1} less to cast for each creature you control with power 4 or greater.\nCounter target spell unless its controller pays {X}."
+}

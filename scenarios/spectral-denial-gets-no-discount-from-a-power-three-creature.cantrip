@@ -1,0 +1,44 @@
+# The discount needs power 4 or greater. Bot2's Iron-Shield Elf has power 3, so Spectral Denial with X = 1 costs its full
+# {1}{U}: Bot2 taps both Moxen and the cast needs both (a discount would leave one floating).
+
+[Bot1 Deck]
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Iron-Shield Elf
+Spectral Denial
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Iron-Shield Elf.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Spectral Denial.Cast(Stack.Mox Jet; X: 1)
+Bot2.Pass
+? Bot2.Mana =
+Bot1.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Graveyard = Mox Jet
+Bot2.Graveyard = Spectral Denial
