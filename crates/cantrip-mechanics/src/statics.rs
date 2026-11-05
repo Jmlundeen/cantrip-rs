@@ -348,7 +348,8 @@ pub fn have_indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Indestructible);
 }
 
-/// "... has flying and vigilance" (CR 702.9, 702.20, layer 6). Class-F Shuttlecraft and Synthesizer Labship print it.
+/// "... has flying and vigilance" (CR 702.9, 702.20, layer 6). Class-F Shuttlecraft, Synthesizer Labship, Warden of the Inner
+/// Sky and Essence Channeler print it.
 pub fn have_flying_and_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Flying).with(Keyword::Vigilance);
 }

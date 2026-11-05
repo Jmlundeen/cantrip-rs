@@ -14,10 +14,6 @@ fn has_three_or_more_counters(q: &dyn LayerQuery, source: ObjectId, affected: Ob
     source == affected && q.state().obj(source).counter_array().iter().map(|&n| n.max(0) as i32).sum::<i32>() >= 3
 }
 
-fn flying_and_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Flying).with(Keyword::Vigilance);
-}
-
 /// "Put a +1/+1 counter on this creature. Scry 1." The counter goes only on this creature while it is still on the
 /// battlefield (CR 400.7); the scry happens either way.
 fn grow_and_scry(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -35,7 +31,7 @@ pub static CARD: CardDef = CardDef {
     statics: &[static_ability(
         Layer::Ability,
         has_three_or_more_counters,
-        flying_and_vigilance,
+        cantrip_mechanics::statics::have_flying_and_vigilance,
         "As long as this creature has three or more counters on it, it has flying and vigilance.",
     )],
     ..oracle::WARDEN_OF_THE_INNER_SKY

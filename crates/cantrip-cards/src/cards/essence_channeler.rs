@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::{plus_one_counter_on_this, put_its_counters_on_target};
-use cantrip_mechanics::statics::itself;
+use cantrip_mechanics::statics::{have_flying_and_vigilance, itself};
 use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::{THIS_DIES, YOU_GAIN_LIFE};
 use cantrip_oracle as oracle;
@@ -12,11 +12,6 @@ fn you_lost_life_this_turn(view: &dyn LayerQuery, source: ObjectId, affected: Ob
     itself(view, source, affected, so_far) && view.history().life_lost(view.state().obj(source).controller) > 0
 }
 
-/// "... this creature has flying and vigilance" (CR 702.9, 702.20, layer 6).
-fn flying_and_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Flying).with(Keyword::Vigilance);
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(YOU_GAIN_LIFE, plus_one_counter_on_this,"Whenever you gain life, put a +1/+1 counter on this creature."),
@@ -26,7 +21,7 @@ pub static CARD: CardDef = CardDef {
     statics: &[static_ability(
         Layer::Ability,
         you_lost_life_this_turn,
-        flying_and_vigilance,
+        have_flying_and_vigilance,
         "As long as you've lost life this turn, this creature has flying and vigilance.",
     )],
     ..oracle::ESSENCE_CHANNELER
