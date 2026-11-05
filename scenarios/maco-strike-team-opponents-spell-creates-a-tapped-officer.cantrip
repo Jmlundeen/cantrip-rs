@@ -39,4 +39,9 @@ Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
 Bot1.Battlefield = Forest; Forest; MACO Strike Team; Officer Token
 Bot1.Battlefield.Officer Token.Tapped = true
 Bot1.Battlefield.Officer Token.Power = 1
+Bot1.Battlefield.Officer Token.Toughness = 1
+Bot1.Battlefield.Officer Token.Colors = Red
+Bot1.Battlefield.Officer Token.Subtypes = Officer
+Bot1.Battlefield.Officer Token.Types = Creature
+Bot1.Battlefield.Officer Token.Token = true
 Bot1.Graveyard = Llanowar Elves
