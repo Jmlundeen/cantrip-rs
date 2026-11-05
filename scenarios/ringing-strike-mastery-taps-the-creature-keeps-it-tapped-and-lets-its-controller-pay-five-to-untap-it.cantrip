@@ -1,0 +1,57 @@
+# Ringing Strike Mastery: Bot1 enchants Bot2's Grizzly Bears on turn 3. The Aura's enter trigger taps it; on turn 4 Bot2's untap step
+# leaves it tapped (CR 502.3); and the Bears have "{5}: Untap this creature", which Bot2, who controls the creature, pays with a Black
+# Lotus and two Moxen. The Bears untap and the Aura stays on.
+
+[Bot1 Deck]
+Mox Sapphire
+Ringing Strike Mastery
+Island x30
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Grizzly Bears
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ringing Strike Mastery.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Grizzly Bears.Tapped = true
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Grizzly Bears.Tapped = true
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Grizzly Bears.Activate
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Mana =
+Bot2.Battlefield.Grizzly Bears.Tapped = false
+Bot1.Battlefield.Count = 2
