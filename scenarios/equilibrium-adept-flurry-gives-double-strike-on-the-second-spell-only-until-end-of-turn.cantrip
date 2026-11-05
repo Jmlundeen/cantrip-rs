@@ -1,0 +1,58 @@
+# Equilibrium Adept: flurry gives it double strike when its controller casts their second spell in a turn - not the first (Mox
+# Jet) and not the opponent's own second spell on T2 (Mox Pearl, Mox Jet). The double strike lasts until end of turn: it is
+# gone on T4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Equilibrium Adept
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Equilibrium Adept.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Equilibrium Adept.Keywords = (absent)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Equilibrium Adept.Keywords = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Equilibrium Adept.Keywords = (absent)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Equilibrium Adept.Keywords = DoubleStrike
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Equilibrium Adept.Keywords = (absent)
