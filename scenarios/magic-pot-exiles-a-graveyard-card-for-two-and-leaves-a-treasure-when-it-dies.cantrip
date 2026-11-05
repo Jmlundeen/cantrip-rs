@@ -1,0 +1,76 @@
+# Magic Pot {3} (1/4): "{2}, {T}: Exile target card from a graveyard" and "When this creature dies, create a Treasure token". Turn 3: a card on the battlefield is no target;
+# Bot1 Bolts Bot2, then pays the two exactly (the pool is empty) and exiles Bot2's Lightning Bolt from its graveyard. Turn 5: the untapped Pot exiles Bot1's own Bolt from
+# their graveyard. Turn 6 Bot2's Dismember kills the Pot: Bot1, who controlled it, gets the Treasure.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Magic Pot
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Lightning Bolt
+Dismember
+Swamp
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Magic Pot.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Magic Pot.Activate(Ability: Exile target card from a graveyard; Bot2.Battlefield.Mox Ruby)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Magic Pot.Activate(Bot2.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt
+? Bot2.Graveyard =
+? Bot1.Graveyard = Lightning Bolt
+? Bot1.Mana =
+? Bot1.Battlefield.Magic Pot.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Magic Pot.Activate(Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard =
+? Bot1.Mana =
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Dismember.Cast(Bot1.Battlefield.Magic Pot)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Magic Pot
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Treasure Token
+Exile = Lightning Bolt; Lightning Bolt
