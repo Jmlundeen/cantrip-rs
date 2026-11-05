@@ -1,0 +1,45 @@
+# Instant Ramen ({2}, Food, flash): "When this artifact enters, draw a card" and "{2}, {T}, Sacrifice this artifact: You gain 3 life". Bot1 casts it with two Moxen (drawing a card),
+# is then pays {2} from a Black Lotus and gains 3 life as the Ramen is sacrificed.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Instant Ramen
+Island x3
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Instant Ramen.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Stack = Instant Ramen
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 4
+? Stack =
+? Bot1.Battlefield.Instant Ramen.Subtypes = Food
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Instant Ramen.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Instant Ramen = (absent)
+
+[Expect]
+Bot1.Graveyard.Count = 2

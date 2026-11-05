@@ -1,0 +1,9 @@
+{
+  "name": "Instant Ramen",
+  "manaCost": "{2}",
+  "type": "Artifact — Food",
+  "oracleText": "Flash\nWhen this artifact enters, draw a card.\n{2}, {T}, Sacrifice this artifact: You gain 3 life.",
+  "keywords": [
+    "Flash"
+  ]
+}
