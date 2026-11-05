@@ -1,0 +1,39 @@
+# Tribble Cluster ({2}{W}, 1/1): at the beginning of combat on Bot1's turn it gets a +1/+1 counter, so it is 2/2 when Day
+# of Judgment destroys it, and its dies trigger makes X 1/1 white Tribble tokens with "This token can't block" (CR 603.6c,
+# 608.2h). Two Black Lotuses pay for both spells.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Tribble Cluster
+Day of Judgment
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Savannah Lions
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Tribble Cluster.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Tribble Cluster.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Day of Judgment.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Day of Judgment; Tribble Cluster; Black Lotus; Black Lotus
+Bot1.Battlefield.Tribble Token#1.Keywords = CantBlock
+Bot1.Battlefield.Tribble Token#2.Power = 1
