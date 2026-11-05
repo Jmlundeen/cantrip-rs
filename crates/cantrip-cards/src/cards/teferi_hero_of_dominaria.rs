@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, delayed, exile_target, targets, tokens};
+use cantrip_mechanics::{choose, delayed, effects, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// +1: draw a card, then "at the beginning of the next end step, untap up to two lands" (CR 603.7), created as the ability
@@ -35,15 +35,10 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 // --- The emblem ---------------------------------------------------------------------------------------------------
 
-fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    exile_target(g, item, 0);
-    Ok(())
-}
-
 pub static EMBLEM: CardDef = CardDef {
     name: "Teferi, Hero of Dominaria emblem",
     has_cost: false,
-    abilities: &[triggered(cantrip_mechanics::triggers::YOU_DRAW_A_CARD, exile_it, "Whenever you draw a card, exile target permanent an opponent controls.")
+    abilities: &[triggered(cantrip_mechanics::triggers::YOU_DRAW_A_CARD, effects::exile_first_target, "Whenever you draw a card, exile target permanent an opponent controls.")
         .targets(&[targets::PERMANENT_AN_OPPONENT_CONTROLS])],
     text: "Whenever you draw a card, exile target permanent an opponent controls.",
     ..CardDef::BLANK

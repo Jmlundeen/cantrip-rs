@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::replacements::{EXILE_INSTEAD_OF_DYING, exile_if_it_would_die};
-use cantrip_mechanics::{damage_target, exile_target, targets};
+use cantrip_mechanics::{damage_target, effects, targets};
 use cantrip_oracle as oracle;
 
 /// Suplex deals 3 damage to target creature. If that creature would die this turn, exile it instead. The replacement is the
@@ -13,16 +13,10 @@ fn damage_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Exile target artifact.
-fn exile_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    exile_target(g, item, 0);
-    Ok(())
-}
-
 static MODAL: ModalDef = modes(&[
     mode(damage_creature, "Suplex deals 3 damage to target creature. If that creature would die this turn, exile it instead.")
         .targets(&[targets::CREATURE]),
-    mode(exile_artifact, "Exile target artifact.")
+    mode(effects::exile_first_target, "Exile target artifact.")
         .targets(&[targets::ARTIFACT]),
 ]);
 

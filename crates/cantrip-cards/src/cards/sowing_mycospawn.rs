@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{devoid, exile_target, targets};
+use cantrip_mechanics::{devoid, effects, targets};
 use cantrip_mechanics::library::{Find, search_to_battlefield};
 use cantrip_oracle as oracle;
 
@@ -17,12 +17,6 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Exile target land.
-fn exile_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    exile_target(g, item, 0);
-    Ok(())
-}
-
 /// Kicker {1}{C} (CR 702.33, 107.4c).
 const KICKER_COST: ManaCost = ManaCost { generic: 1, symbols: [0, 0, 0, 0, 0, 1], ..ManaCost::ZERO };
 
@@ -31,7 +25,7 @@ pub static CARD: CardDef = CardDef {
     kicker: kicker(KICKER_COST),
     abilities: &[
         triggered(cantrip_mechanics::triggers::CAST_THIS_SPELL, search, "When you cast this spell, search your library for a land card, put it onto the battlefield, then shuffle."),
-        triggered(when_this_spell_is_cast(cast_this_spell_kicked), exile_land, "When you cast this spell, if it was kicked, exile target land.")
+        triggered(when_this_spell_is_cast(cast_this_spell_kicked), effects::exile_first_target, "When you cast this spell, if it was kicked, exile target land.")
             .targets(&[targets::LAND]),
     ],
     ..oracle::SOWING_MYCOSPAWN

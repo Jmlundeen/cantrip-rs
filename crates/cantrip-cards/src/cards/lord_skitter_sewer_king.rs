@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::BEGINNING_OF_YOUR_COMBAT;
-use cantrip_mechanics::{targets, tokens};
+use cantrip_mechanics::{effects, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// "Whenever another Rat you control enters" (CR 603.6a): a permanent other than this one, under your control as it
@@ -20,14 +20,6 @@ fn another_rat_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> O
     }
 }
 
-/// "Exile up to one target card from an opponent's graveyard."
-fn exile_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = targets::object(g, item, 0) {
-        g.exile_all(&[card]);
-    }
-    Ok(())
-}
-
 /// "Create a 1/1 black Rat creature token with 'This token can't block.'" (CR 111.1, 509.1b)
 fn make_rat(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create(g, item.controller, &tokens::RAT_CANT_BLOCK, 1)?;
@@ -38,7 +30,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
             when_asked(EventMask::ZONE_CHANGE, another_rat_you_control_enters),
-            exile_card,
+            effects::exile_first_target,
             "Whenever another Rat you control enters, exile up to one target card from an opponent's graveyard.",
         )
         .targets(&[targets::CARD_IN_AN_OPPONENTS_GRAVEYARD.optional()]),

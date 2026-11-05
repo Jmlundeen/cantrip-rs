@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{devoid, effects, exile_target, targets, triggers};
+use cantrip_mechanics::{devoid, effects, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "When you cast this spell, exile target artifact, enchantment, or land." (CR 115.1).
@@ -15,21 +15,12 @@ fn exile_target_artifact_enchantment_land_target_0(
     )
 }
 
-/// "When you cast this spell, exile target artifact, enchantment, or land." (CR 603.1, 701.13).
-fn exile_target_artifact_enchantment_land(
-    g: &mut dyn Game,
-    item: &StackItem,
-) -> Result<(), Suspend> {
-    exile_target(g, item, 0);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     colors: devoid::COLORS,
     abilities: &[
         triggered(
             triggers::CAST_THIS_SPELL,
-            exile_target_artifact_enchantment_land,
+            effects::exile_first_target,
             "When you cast this spell, exile target artifact, enchantment, or land.",
         )
         .targets(&[target(exile_target_artifact_enchantment_land_target_0)]),

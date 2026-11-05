@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{exile_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "Any number of white cards from your hand": the color word read through this spell's words (CR 612).
@@ -15,15 +15,8 @@ fn artifact_creature_or_enchantment_with_mana_value_x_or_less(q: &dyn Query, ask
         && t.object().is_some_and(|id| q.announced_x().is_none_or(|x| q.mana_value(id) <= x))
 }
 
-/// "Exile target artifact, creature, or enchantment with mana value X or less." Nothing happens if it is no longer a legal
-/// target (CR 608.2b).
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    exile_target(g, item, 0);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(artifact_creature_or_enchantment_with_mana_value_x_or_less)], effect),
+    spell: spell(&[target(artifact_creature_or_enchantment_with_mana_value_x_or_less)], effects::exile_first_target),
     late_targets: true,
     // "As an additional cost to cast this spell, you may exile any number of white cards from your hand. This spell costs {2}
     // less to cast for each card exiled this way." (CR 601.2b, 601.2f, 118.7a)

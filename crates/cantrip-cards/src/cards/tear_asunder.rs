@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::exile_target;
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
 /// "Target artifact or enchantment", or any nonland permanent when the spell was kicked: judged by the kicker count
@@ -17,14 +17,8 @@ fn artifact_or_enchantment(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     }
 }
 
-/// Exile target artifact or enchantment. If this spell was kicked, exile target nonland permanent instead.
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    exile_target(g, item, 0);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(artifact_or_enchantment)], effect),
+    spell: spell(&[target(artifact_or_enchantment)], effects::exile_first_target),
     kicker: kicker(mana("{1}{B}")),
     late_targets: true,
     ..oracle::TEAR_ASUNDER

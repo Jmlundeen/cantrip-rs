@@ -1586,6 +1586,12 @@ pub fn return_first_target_to_hand_then_plus_one_counter_on_this(g: &mut dyn Gam
     Ok(())
 }
 
+/// "Exile [up to one] target [object]" (CR 701.13a, 608.2b): Sela, Tal Shiar Paradox, Exorcise and Soul-Guide Lantern.
+pub fn exile_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    crate::exile_target(g, item, 0);
+    Ok(())
+}
+
 /// "Exile target [permanent]", remembered as exiled with the ability's source (CR 607.2a), so that its linked ability
 /// ("return the exiled card") finds it; nothing if the target is no longer legal (CR 608.2b). The card stays in exile
 /// whatever happens to the source: it is not "until [this] leaves the battlefield" (CR 610.3). Oblivion Ring, Parallax
