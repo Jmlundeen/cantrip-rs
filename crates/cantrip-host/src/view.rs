@@ -1022,7 +1022,8 @@ impl<'a> Projector<'a> {
         let game = self.game;
         let source = game.state.obj(item.object);
         let def = game.cards.get(game.chars(item.object).card);
-        let text = game.cards.ability(item.ability).text();
+        // The words it kept as it was put on the stack, whatever has changed its source's text since (CR 113.7a, 612.1).
+        let text = crate::text::changed_text(game.cards.ability(item.ability).text(), def.name, item.words);
         let mut view = ObjectView {
             handle,
             zone: Some(ZoneKindView::Stack),
@@ -1032,7 +1033,7 @@ impl<'a> Projector<'a> {
             known: true,
             card_id: def.name.to_string(),
             name: def.name.to_string(),
-            oracle_text: text.to_string(),
+            oracle_text: text,
             ..Default::default()
         };
         for t in self.game.state.targets(item) {
