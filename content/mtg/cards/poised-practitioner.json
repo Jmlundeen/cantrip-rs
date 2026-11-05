@@ -1,0 +1,8 @@
+{
+  "name": "Poised Practitioner",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Human Monk",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flurry — Whenever you cast your second spell each turn, put a +1/+1 counter on this creature. Scry 1. (Look at the top card of your library. You may put that card on the bottom.)"
+}

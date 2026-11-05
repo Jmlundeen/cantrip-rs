@@ -1,0 +1,45 @@
+# Poised Practitioner: "Flurry - Whenever you cast your second spell each turn, put a +1/+1 counter on this creature. Scry 1."
+# Turn 3: the first spell (Ornithopter) does nothing; the second (Memnite) puts one counter and scries (the Plains on top goes to
+# the bottom); the third (Mox Sapphire) does not trigger again, so the counter stays one and the library is unchanged.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Poised Practitioner
+Plains
+Ornithopter
+Memnite
+Mox Sapphire
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Poised Practitioner.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Poised Practitioner.Power = 2
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Arrange( | Plains)
+Bot1.Pass
+? Bot1.Battlefield.Poised Practitioner.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+? Bot1.Battlefield.Poised Practitioner.Counters.PlusOnePlusOne = 1
+
+[Expect]
+Bot1.Battlefield.Poised Practitioner.Power = 3
+Bot1.Battlefield.Poised Practitioner.Toughness = 4
+Stack.Count = 0
