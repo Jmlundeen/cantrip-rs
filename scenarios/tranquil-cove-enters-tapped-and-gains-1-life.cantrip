@@ -1,0 +1,22 @@
+# "This land enters tapped. When this land enters, you gain 1 life.": Bot1 plays Tranquil Cove on turn one; it is tapped
+# (CR 614.1d) and its trigger gains 1 life (20 -> 21), so it cannot be tapped for mana that turn.
+
+[Bot1 Deck]
+Tranquil Cove
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Tranquil Cove.Play
+Bot2.Pass
+? Bot1.Life = 21
+! Bot1.Battlefield.Tranquil Cove.Activate(Color: White)
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Battlefield.Tranquil Cove.Tapped = true
+Bot1.Mana = 
+Stack.Count = 0
