@@ -1,0 +1,42 @@
+# Osseous Exhale deals exactly 5 damage (CR 120.3): Bot2's Redwood Treefolk (3/6) attacks on turn 4 and is not killed by it, but five
+# damage is marked on it. Cast without beholding, so no life is gained (the Dragon in Bot1's hand is not revealed).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Osseous Exhale
+Kokusho, the Evening Star
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Redwood Treefolk
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Redwood Treefolk.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Redwood Treefolk > Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Osseous Exhale.Cast
+Bot1.Modes(Cast without beholding)
+Bot1.Target(Bot2.Battlefield.Redwood Treefolk)
+Bot2.Pass
+? Bot2.Battlefield.Redwood Treefolk.Damage = 5
+
+[Expect]
+Bot1.Life = 20
+Bot1.Revealed = (absent)
+Bot2.Battlefield.Redwood Treefolk.Damage = 5

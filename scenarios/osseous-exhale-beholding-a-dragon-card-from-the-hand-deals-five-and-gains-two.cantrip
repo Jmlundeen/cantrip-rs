@@ -1,0 +1,41 @@
+# Osseous Exhale: "As an additional cost to cast this spell, you may behold a Dragon. This spell deals 5 damage to target attacking or
+# blocking creature. If a Dragon was beheld, you gain 2 life." Bot2 attacks with its Memnite on turn 4 (the Ornithopter stays home and
+# is no legal target, CR 506.3). Bot1 reveals Kokusho from its hand to behold a Dragon (CR 701.4a); the Memnite takes 5 and dies, and
+# Bot1 gains 2 life. Kokusho stays in the hand and is revealed.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Osseous Exhale
+Kokusho, the Evening Star
+Plains x20
+
+[Bot2 Deck]
+Memnite
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Osseous Exhale.Cast
+Bot1.Modes(Behold a Dragon)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Choose(Kokusho, the Evening Star)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Revealed = Kokusho, the Evening Star
+Bot1.Graveyard = Osseous Exhale
+Bot2.Graveyard = Memnite
+Bot2.Battlefield = Ornithopter
