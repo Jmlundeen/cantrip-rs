@@ -1,0 +1,26 @@
+# "{T}: Add {R} or {G}." The color is chosen as the ability is activated, one each turn (red, green); the other colors and
+# colorless are refused beside those positive controls.
+
+[Bot1 Deck]
+Rugged Highlands
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Rugged Highlands.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Rugged Highlands.Activate(Color: White)
+! Bot1.Battlefield.Rugged Highlands.Activate(Color: Blue)
+! Bot1.Battlefield.Rugged Highlands.Activate(Color: Black)
+! Bot1.Battlefield.Rugged Highlands.Activate(Color: Colorless)
+Bot1.Battlefield.Rugged Highlands.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Rugged Highlands.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Rugged Highlands.Tapped = true
