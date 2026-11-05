@@ -1,21 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{library, select};
+use cantrip_mechanics::lands::differently_named_lands_in_layers;
 use cantrip_oracle as oracle;
-
-/// The number of differently named lands `player` controls, read during the layer pass: each land's names through the
-/// layers (`library::object_names_in_layers`) and the largest set of them with no name in common (CR 201.2a-b), as
-/// `lands::differently_named_lands` counts outside the layers.
-fn differently_named_lands_in_layers(q: &dyn LayerQuery, player: PlayerId) -> usize {
-    let names: Vec<Vec<&'static str>> = q
-        .state()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| q.controller(id) == player && q.chars(id).is(CardType::Land))
-        .map(|id| library::object_names_in_layers(q, id))
-        .collect();
-    select::largest_name_set(&names).len()
-}
 
 /// "Captain Pike's power and toughness are each equal to the number of differently named lands you control." (CR 604.3,
 /// 613.4a): characteristic-defining, so it applies in every zone and reads current land names through the layers.

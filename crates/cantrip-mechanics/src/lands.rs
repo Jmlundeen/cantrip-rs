@@ -571,6 +571,21 @@ pub fn differently_named_lands(q: &dyn Query, player: PlayerId) -> usize {
     crate::select::largest_name_set(&names).len()
 }
 
+/// `differently_named_lands` read during the layer pass, where a land's names come through the layers themselves
+/// (`library::object_names_in_layers`) rather than the printed ones (CR 201.2a-b, 613.4a): Captain Pike, Fullness of Time
+/// and The Traveler define their power with it.
+pub fn differently_named_lands_in_layers(q: &dyn LayerQuery, player: PlayerId) -> usize {
+    let names: Vec<Vec<&'static str>> = q
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| q.controller(id) == player && q.chars(id).is(CardType::Land))
+        .map(|id| crate::library::object_names_in_layers(q, id))
+        .collect();
+    crate::select::largest_name_set(&names).len()
+}
+
 /// "[This creature]'s power and toughness are each equal to the number of lands you control" as the `StaticDef::apply` of the
 /// ability (CR 613.4a for a characteristic-defining one, CR 604.3; layer 7b for one an effect gave, CR 613.4b), read live
 /// (CR 611.3a). "You" is the controller of `source` (see `count_you_control`). Beorn's Hospitality (given), Lumra, Bellow of the
