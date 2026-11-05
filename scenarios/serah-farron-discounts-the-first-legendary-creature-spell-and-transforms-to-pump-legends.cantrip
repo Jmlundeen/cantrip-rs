@@ -1,0 +1,62 @@
+# Serah Farron (CR 601.2f, 118.7, 603.4, 701.27, 613.4c): on turn 1 Bot1 casts her. On turn 3 the first legendary creature spell Bot1
+# casts costs {2} less - a nonlegendary Ornithopter cast before it does not use the discount up - so Arnyn Deathbloom Botanist
+# ({2}{B}) is paid with the one Mox Jet; Isamaru ({W}) has no generic mana to lose. At the beginning of combat Bot1 controls two
+# other legendary creatures, and transforms Serah: Crystallized Serah is no creature, and legendary creatures Bot1 controls get
+# +2/+2 (Isamaru 4/4, Arnyn 4/4; Bot1's Ornithopter 0/2 stays).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Serah Farron
+Isamaru, Hound of Konda
+Arnyn, Deathbloom Botanist
+Ornithopter
+Mox Jet
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Serah Farron.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Arnyn, Deathbloom Botanist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.DeclareAttackers]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Crystallized Serah.Types = Artifact
+Bot1.Battlefield.Crystallized Serah.Supertypes = Legendary
+Bot1.Battlefield.Isamaru, Hound of Konda.Power = 4
+Bot1.Battlefield.Isamaru, Hound of Konda.Toughness = 4
+Bot1.Battlefield.Arnyn, Deathbloom Botanist.Power = 4
+Bot1.Battlefield.Arnyn, Deathbloom Botanist.Toughness = 4
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2

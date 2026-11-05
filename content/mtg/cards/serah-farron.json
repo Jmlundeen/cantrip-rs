@@ -1,0 +1,17 @@
+{
+  "name": "Serah Farron",
+  "manaCost": "{1}{G}{W}",
+  "type": "Legendary Creature — Human Citizen",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "The first legendary creature spell you cast each turn costs {2} less to cast.\nAt the beginning of combat on your turn, if you control two or more other legendary creatures, you may transform Serah Farron.",
+  "backFace": {
+    "name": "Crystallized Serah",
+    "colorIndicator": [
+      "Green",
+      "White"
+    ],
+    "type": "Legendary Artifact",
+    "oracleText": "The first legendary creature spell you cast each turn costs {2} less to cast.\nLegendary creatures you control get +2/+2."
+  }
+}
