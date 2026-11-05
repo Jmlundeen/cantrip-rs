@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, mayhem, pump};
+use cantrip_mechanics::{effects, mayhem};
 use cantrip_oracle as oracle;
 
 /// "All creatures get -2/-2 until end of turn. If this spell's mayhem cost was paid, creatures your opponents control get
@@ -10,18 +10,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         effects::pump_all_creatures(g, item.object, -2, -2);
         return Ok(());
     }
-    let creatures: Vec<ObjectId> = g
-        .state()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| g.chars(id).is(CardType::Creature) && g.controller(id) != item.controller)
-        .collect();
-    instruction(g, |g| {
-        for id in creatures {
-            pump(g, item.object, id, -2, -2);
-        }
-    });
+    effects::pump_creatures_your_opponents_control(g, item, -2, -2);
     Ok(())
 }
 

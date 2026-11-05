@@ -258,6 +258,23 @@ pub fn pump_creatures_other_than(g: &mut dyn Game, source: ObjectId, other_than:
     });
 }
 
+/// "Creatures your opponents control get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): the creatures each opponent
+/// of `item`'s controller controls as it resolves, and no creature that enters later. Sandman's Quicksand (-2/-2 when its mayhem
+/// cost was paid) and Sephiroth, Planet's Heir (-2/-2) print it.
+pub fn pump_creatures_your_opponents_control(g: &mut dyn Game, item: &StackItem, power: i32, toughness: i32) {
+    let creatures: Vec<ObjectId> = g
+        .state()
+        .opponents(item.controller)
+        .flat_map(|opponent| g.permanents_of(opponent))
+        .filter(|&id| g.chars(id).is(CardType::Creature))
+        .collect();
+    instruction(g, |g| {
+        for id in creatures {
+            crate::pump(g, item.object, id, power, toughness);
+        }
+    });
+}
+
 /// "Creatures you control gain trample and get +P/+T until end of turn" (CR 611.2c): `pump_creatures_you_control` and trample for
 /// each of them, the creatures being those on the battlefield as it resolves. The creatures, for what the rest of the sentence does
 /// to them. Craterclaw Colossus (+X/+0, X the artifacts you control), Craterhoof Behemoth (+X/+X, X the creatures) and Balmor,
