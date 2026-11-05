@@ -1,0 +1,48 @@
+# Artificial Evolution changes Frog to Goblin on Quina (CR 612.1, 612.4, 612.2a): Quina's replacement then adds a
+# 1/1 green Goblin creature token named Goblin, not a Frog.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Quina, Qu Gourmet
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Artificial Evolution
+Frontline Rush
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Quina, Qu Gourmet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Quina, Qu Gourmet)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Frog)
+Bot1.Modes(Goblin)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Frontline Rush.Cast
+Bot1.Modes(Create two 1/1 red Goblin creature tokens.)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Quina, Qu Gourmet; Mox Sapphire; Mox Ruby; Mox Pearl; Goblin Token; Goblin Token; Goblin Token
+Bot1.Battlefield.Frog Token = (absent)

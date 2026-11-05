@@ -1,0 +1,73 @@
+# Quina, Qu Gourmet: "If one or more tokens would be created under your control, those tokens plus a 1/1 green Frog
+# creature token are created instead." On turn 2 Bot2 makes two Goblins with Frontline Rush: they are not Bot1's, so
+# neither player gets a Frog. On turn 3 Quina attacks, and Gut, True Soul Zealot's trigger sacrifices a Mox to create a
+# 4/1 Skeleton that's tapped and attacking: Quina adds one Frog, and it too is created tapped and attacking (ruling
+# 2025-06-06), so Bot2 takes 2 + 4 + 1.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Quina, Qu Gourmet
+Gut, True Soul Zealot
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mountain x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Frontline Rush
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Quina, Qu Gourmet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gut, True Soul Zealot.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Frontline Rush.Cast
+Bot2.Modes(Create two 1/1 red Goblin creature tokens.)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Count = 4
+? Bot1.Battlefield.Count = 6
+[T3 Bot1.Main1]
+Bot1.Attack(Quina, Qu Gourmet > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mox Jet)
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Quina, Qu Gourmet > Bot2; Skeleton Token > Bot2; Frog Token > Bot2
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Battlefield = Forest; Quina, Qu Gourmet; Gut, True Soul Zealot; Mox Ruby; Mox Pearl; Skeleton Token; Frog Token
+Bot1.Battlefield.Frog Token.Tapped = true
+Bot1.Battlefield.Frog Token.Power = 1
+Bot1.Battlefield.Frog Token.Toughness = 1
+Bot1.Battlefield.Frog Token.Colors = Green
+Bot1.Battlefield.Frog Token.Types = Creature
+Bot1.Battlefield.Frog Token.Subtypes = Frog
+Bot2.Battlefield = Mox Ruby; Mox Pearl; Goblin Token; Goblin Token

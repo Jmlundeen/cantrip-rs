@@ -1,0 +1,107 @@
+# Quina, Qu Gourmet and Doubling Season both replace Bot1's token creations; Bot1 chooses which applies first (CR 616.1),
+# and Quina's Frog is part of the event, so Doubling Season doubles it if it applies after (CR 616.1f), and Quina applies
+# once to the event, however many kinds of token it makes (CR 614.5).
+# - Turn 5: Frontline Rush makes two Goblins. Doubling Season first: four Goblins, then one Frog.
+# - Turn 7: Reckoner Bankbuster's last charge counter makes a Treasure and a Pilot together. Quina first: a Treasure, a
+#   Pilot and one Frog, all doubled: two of each.
+# - Then "{2}, Sacrifice a Frog: Put a +1/+1 counter on Quina": a Goblin and Bot2's Halo Hopper (a Frog) are refused, a
+#   Frog token is sacrificed, exactly {2} is paid, and its one counter is doubled to two.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Quina, Qu Gourmet
+Reckoner Bankbuster
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Doubling Season
+Forest
+Frontline Rush
+Forest x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Halo Hopper
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Quina, Qu Gourmet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reckoner Bankbuster.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Reckoner Bankbuster.Activate(Ability: Draw a card)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Halo Hopper.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Reckoner Bankbuster.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Frontline Rush.Cast
+Bot1.Modes(Create two 1/1 red Goblin creature tokens.)
+Bot1.Pass
+Bot2.Pass
+Bot1.Replace(Doubling Season)
+? Bot1.Battlefield = Doubling Season; Forest; Forest; Frog Token; Goblin Token; Goblin Token; Goblin Token; Goblin Token; Mox Emerald; Mox Pearl; Mox Ruby; Quina, Qu Gourmet; Reckoner Bankbuster
+[T7 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Reckoner Bankbuster.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Replace(Quina, Qu Gourmet)
+? Bot1.Battlefield = Doubling Season; Forest; Forest; Frog Token; Frog Token; Frog Token; Goblin Token; Goblin Token; Goblin Token; Goblin Token; Mox Emerald; Mox Pearl; Mox Ruby; Pilot Token; Pilot Token; Quina, Qu Gourmet; Reckoner Bankbuster; Treasure Token; Treasure Token
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Quina, Qu Gourmet.Activate
+! Bot1.Choose(Goblin Token)
+! Bot1.Choose(Halo Hopper)
+Bot1.Choose(Frog Token)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Doubling Season; Forest; Forest; Frog Token; Frog Token; Goblin Token; Goblin Token; Goblin Token; Goblin Token; Mox Emerald; Mox Pearl; Mox Ruby; Pilot Token; Pilot Token; Quina, Qu Gourmet; Reckoner Bankbuster; Treasure Token; Treasure Token
+Bot1.Battlefield.Quina, Qu Gourmet.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Quina, Qu Gourmet.Power = 4
+Bot2.Battlefield.Halo Hopper.Subtypes = Frog
