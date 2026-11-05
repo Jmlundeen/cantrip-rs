@@ -28,6 +28,24 @@ pub fn spells_you_cast(q: &dyn Query, source: ObjectId, player: PlayerId, costed
     if player == q.controller(source) && q.chars(spell).is(card_type) { CostDelta::less(amount) } else { CostDelta::NONE }
 }
 
+/// Whether `spell` is the first spell `player` casts this turn that `kind` accepts (CR 601.2f, 118.7): `kind` reads a spell's
+/// characteristics as it was cast, and no other such spell was cast by them this turn - before the source came to the battlefield
+/// included, a spell that `kind` rejects not counting. Asked of this turn's casts, which hold a spell once it has been cast,
+/// itself included. Radagast of Rhosgobel and Serah Farron ask it.
+pub fn first_spell_you_cast_this_turn(q: &dyn Query, spell: ObjectId, player: PlayerId, kind: fn(&Chars) -> bool) -> bool {
+    kind(&q.chars(spell)) && !q.history().casts_by(player).any(|c| c.spell != spell && kind(&c.chars(q)))
+}
+
+/// "The first [kind] spell you cast each turn costs {`amount`} less to cast" (CR 601.2f, 118.7): up to that much generic mana of its
+/// total cost, after any increases; never a colored symbol, and not the mana cost or mana value of the spell. For the source's
+/// controller's spells only. Radagast of Rhosgobel (creature, {2}) and Serah Farron (legendary creature, {2}) print it.
+pub fn first_spell_you_cast_each_turn(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, amount: u32, kind: fn(&Chars) -> bool) -> CostDelta {
+    match costed {
+        Costed::Spell(spell) if player == q.controller(source) && first_spell_you_cast_this_turn(q, spell, player, kind) => CostDelta::less(amount),
+        _ => CostDelta::NONE,
+    }
+}
+
 /// "[Subtype] spells you cast cost {`N`} less to cast" (CR 601.2f, 118.7a): a spell of the source's controller that is that subtype as it is cast,
 /// the subtype read through the words of the source's text (CR 612); generic mana only. `TYPE` is `lands::sub(Subtype::Villain)` and so on.
 /// Baron Strucker, Hydra Overlord and Tombstone, Career Criminal (Villain, {1}) print it.
