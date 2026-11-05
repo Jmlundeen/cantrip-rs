@@ -1,0 +1,40 @@
+# The Slug blocks, and in response to its trigger it is returned to hand. Its controller declines to pay {1}{G}, so "each creature
+# blocking or blocked by this creature" is read as the Slug last existed on the battlefield (CR 608.2h): the Grizzly Bears it
+# blocked still gain first strike, though the Slug is no longer in combat.
+[Bot1 Deck]
+Spitting Slug
+Black Lotus
+Island
+Unsummon
+Island x20
+[Bot2 Deck]
+Grizzly Bears
+Black Lotus
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Spitting Slug.Cast
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+[T4 Bot2.Attackers]
+Bot2.Attack(Grizzly Bears > Bot1)
+Bot1.Block(Spitting Slug > Grizzly Bears)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Unsummon.Cast(Bot1.Battlefield.Spitting Slug)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Bot2.Battlefield.Grizzly Bears.Keywords = FirstStrike
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Unsummon; Black Lotus
+Bot1.Life = 20
