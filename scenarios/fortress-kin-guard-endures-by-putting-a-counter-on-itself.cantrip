@@ -1,0 +1,28 @@
+# Fortress Kin-Guard: "When this creature enters, it endures 1." (CR 701.63a) Bot1 chooses the counter: the Kin-Guard is a 2/3
+# with one +1/+1 counter and no Spirit token is made.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Fortress Kin-Guard
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fortress Kin-Guard.Cast
+Bot1.Pass
+Bot1.Accept
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Fortress Kin-Guard.Power = 2
+Bot1.Battlefield.Fortress Kin-Guard.Toughness = 3
+Bot1.Battlefield.Fortress Kin-Guard.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Count = 3
+Stack.Count = 0

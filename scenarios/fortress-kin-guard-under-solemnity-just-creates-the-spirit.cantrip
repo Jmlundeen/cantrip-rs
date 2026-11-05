@@ -1,0 +1,35 @@
+# Fortress Kin-Guard: "When this creature enters, it endures 1." (CR 701.63a) With Solemnity out, +1/+1 counters can't be put
+# on the Kin-Guard (CR 101.2), so the controller is not asked: a 1/1 Spirit is created and the Kin-Guard stays a 1/2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Solemnity
+Fortress Kin-Guard
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Solemnity.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fortress Kin-Guard.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Fortress Kin-Guard.Power = 1
+Bot1.Battlefield.Fortress Kin-Guard.Toughness = 2
+Bot1.Battlefield.Fortress Kin-Guard.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spirit Token.Power = 1
+Stack.Count = 0

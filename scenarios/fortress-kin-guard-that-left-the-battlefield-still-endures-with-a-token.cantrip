@@ -1,0 +1,35 @@
+# Fortress Kin-Guard's ruling: "If you can't put +1/+1 counters on the creature for any reason as an endure ability resolves
+# (for example, if the creature is no longer on the battlefield), you'll just create a Spirit token." (CR 701.63a) With the
+# trigger on the stack Bot1 Bolts its own Kin-Guard: no question is asked (the refused Accept shows it) and a Spirit is made.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Fortress Kin-Guard
+Lightning Bolt
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fortress Kin-Guard.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Fortress Kin-Guard)
+! Bot1.Accept
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Fortress Kin-Guard; Lightning Bolt
+Bot1.Battlefield.Spirit Token.Power = 1
+Bot1.Battlefield.Count = 4
+Stack.Count = 0

@@ -1,0 +1,31 @@
+# Fortress Kin-Guard: "When this creature enters, it endures 1." (CR 701.63a) Bot1 declines the counter, so a 1/1 white Spirit
+# creature token is created and the Kin-Guard stays a 1/2.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Fortress Kin-Guard
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fortress Kin-Guard.Cast
+Bot1.Pass
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Fortress Kin-Guard.Power = 1
+Bot1.Battlefield.Fortress Kin-Guard.Toughness = 2
+Bot1.Battlefield.Fortress Kin-Guard.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spirit Token.Power = 1
+Bot1.Battlefield.Spirit Token.Toughness = 1
+Bot1.Battlefield.Spirit Token.Colors = White
+Bot1.Battlefield.Count = 4
+Stack.Count = 0
