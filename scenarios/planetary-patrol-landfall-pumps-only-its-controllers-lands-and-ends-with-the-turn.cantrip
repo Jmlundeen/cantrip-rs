@@ -1,0 +1,45 @@
+# Planetary Patrol, a 2/2: "Landfall - Whenever a land you control enters, this creature gets +1/+1 until end of turn."
+# Bot1 plays it and a Forest: 3/3. Bot2's own land entering gives it nothing ("you control"), and on turn 2 the turn-1
+# pump has ended (a 2/2 again, "until end of turn", CR 514.2). A Forest on turn 3 pumps it again.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Planetary Patrol
+Forest
+Forest
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Planetary Patrol.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Planetary Patrol.Power = 3
+? Bot1.Battlefield.Planetary Patrol.Toughness = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Planetary Patrol.Power = 2
+? Bot1.Battlefield.Planetary Patrol.Toughness = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Planetary Patrol.Power = 3
+Bot1.Battlefield.Planetary Patrol.Toughness = 3
