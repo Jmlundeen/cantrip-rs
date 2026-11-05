@@ -1,0 +1,60 @@
+# Host of the Hereafter: "Whenever this creature or another creature you control dies, if it had counters on it, put its counters
+# on up to one target creature you control." With two Hosts, one 4/4 killed by two Lightning Bolts triggers both: its own and the
+# other Host's, each about the dead Host's two counters (the counters are put on, not moved), so the survivor has its own two and
+# two from each trigger: six.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Host of the Hereafter
+Host of the Hereafter
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Host of the Hereafter.Cast
+[T2 Bot2.Main1]
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Host of the Hereafter.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Host of the Hereafter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Host of the Hereafter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Host of the Hereafter)
+Bot1.Target(Bot1.Battlefield.Host of the Hereafter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Host of the Hereafter
+Bot1.Battlefield.Host of the Hereafter.Counters.PlusOnePlusOne = 6
+Bot1.Battlefield.Host of the Hereafter.Power = 8

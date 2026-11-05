@@ -1,0 +1,40 @@
+# Host of the Hereafter: "dies" (CR 700.4) is put into a graveyard from the battlefield. Bot1's Host, with its two counters, is
+# exiled by Swords to Plowshares instead, so nothing triggers: Bot1 is offered no target for the Ornithopter and the Ornithopter
+# has no counters.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Host of the Hereafter
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Host of the Hereafter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Host of the Hereafter)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Target
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Stack.Count = 0

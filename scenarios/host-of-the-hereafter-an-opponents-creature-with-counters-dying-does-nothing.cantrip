@@ -1,0 +1,58 @@
+# Host of the Hereafter: "another creature you control dies" (CR 603.2). Bot2's own Host, with its counters, is killed by two
+# Lightning Bolts: it is not a creature Bot1 controls, so Bot1's Host does not trigger and Bot1 is offered no target for its
+# Ornithopter.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Host of the Hereafter
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Host of the Hereafter
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Host of the Hereafter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Host of the Hereafter.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Host of the Hereafter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Host of the Hereafter)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Target
+
+[Expect]
+Bot2.Graveyard = Host of the Hereafter; Lightning Bolt; Lightning Bolt; Black Lotus
+Bot1.Battlefield.Ornithopter.Power = 0

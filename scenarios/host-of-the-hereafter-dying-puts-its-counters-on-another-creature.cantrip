@@ -1,0 +1,52 @@
+# Host of the Hereafter: "This creature enters with two +1/+1 counters on it. Whenever this creature or another creature you
+# control dies, if it had counters on it, put its counters on up to one target creature you control." Bot1's Host (a 4/4 with
+# its counters) is killed by two Lightning Bolts on Bot2's turn: its two counters are put on Bot1's Ornithopter (a 2/4).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Host of the Hereafter
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Host of the Hereafter.Cast
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Battlefield.Host of the Hereafter.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Host of the Hereafter.Power = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Host of the Hereafter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Host of the Hereafter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Host of the Hereafter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
