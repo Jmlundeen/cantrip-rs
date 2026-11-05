@@ -1,0 +1,8 @@
+{
+  "name": "Narset, Jeskai Waymaster",
+  "manaCost": "{U}{R}{W}",
+  "type": "Legendary Creature — Human Monk",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "At the beginning of your end step, you may discard your hand. If you do, draw cards equal to the number of spells you've cast this turn."
+}
