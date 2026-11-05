@@ -1,0 +1,6 @@
+{
+  "name": "Death Begets Life",
+  "manaCost": "{5}{B}{G}{U}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all creatures and enchantments. Draw a card for each permanent destroyed this way."
+}
