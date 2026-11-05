@@ -20,9 +20,10 @@ checked for sufficiency, not exhaustiveness:
   older code can name a rule that was renumbered (CR 712.4 is meld cards, not modal double-faced cards);
 - the "never" list, line by line - `card-lint.py "Card Name"` finds its mechanical items (each NEVER blocks; each LOOK
   is read, and the author's answer to it checked), the rest is read;
-- number widths are decided: `docs/rules-exceptions.md` RX-5 keeps today's widths (mana costs, X, multikicker, counters,
-  power, toughness, damage, player counters) and their existing clamps, so a u8/u16 limit on those is not a finding; a
-  card's own arithmetic that wraps (an i16 doubled) still is;
+- number widths are decided: `docs/rules-exceptions.md` RX-5 keeps today's widths for multikicker, `ManaTally` and player
+  counters (poison, energy, experience, toxic) and their existing clamps, so a u8/u16 limit on those is not a finding;
+  power, toughness, counters, damage, X and mana costs are 32-bit with plain arithmetic, so a card that narrows one of
+  them (`as u16`, `as i16`, a clamp or saturating arithmetic on it) or wraps it is a finding;
 - no rules property set by hand (`SKILL.md`, "A card never tells the engine what the rules already decide"): a flag the
   card sets so the engine applies a rule correctly is a core gap, reported, not a card finding to patch;
 - no parallel system (`CLAUDE.md`, "Use the systems that exist"): every new store, cache, flag, record, lookup or helper
