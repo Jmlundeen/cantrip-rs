@@ -1,0 +1,8 @@
+{
+  "name": "Tal Shiar Analyst",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Romulan Scientist",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "{T}: This creature deals 1 damage to each opponent.\nWhenever you cast a noncreature spell, untap this creature."
+}
