@@ -787,6 +787,15 @@ pub static SOLDIER_2_2: CardDef = CardDef {
     ..token!(Soldier)
 };
 
+/// The 5/5 green Elephant creature token. Mammoth Bellow and Roar of Endless Song make it.
+pub static ELEPHANT_5_5: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Green)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(5),
+    toughness: Some(5),
+    ..token!(Elephant)
+};
+
 /// The 2/2 red Mutant creature token. Jennika, Bad Apple Big Sister, Mighty Mutanimals, Sally Pride, Slash, Turtle Blimp, Wooden
 /// Cane, Old Hob and Splinter & Leo make it.
 pub static MUTANT: CardDef = CardDef {
