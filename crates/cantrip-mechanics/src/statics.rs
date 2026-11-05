@@ -585,6 +585,13 @@ pub fn players_cant_cast_from_graveyards_or_libraries(_: &dyn Query, _: &Asker, 
     !matches!(from, ZoneKind::Graveyard | ZoneKind::Library)
 }
 
+/// "Your opponents can't cast spells during your turn" (CR 101.2) as a `CardDef::cast_rules` entry: the opponents of the
+/// permanent's controller may not cast while it is that controller's turn. Voice of Victory, Jennifer Walters, Dragonlord
+/// Dromoka and Kutzil, Malamet Exemplar print it.
+pub fn opponents_cant_cast_spells_during_your_turn(q: &dyn Query, asker: &Asker, caster: PlayerId, _from: ZoneKind) -> bool {
+    !(q.state().turn.active == asker.controller && caster != asker.controller)
+}
+
 /// "Players can't gain life" (CR 119.7) as a `CardDef::cant_gain_life` entry: every player, its controller included, while
 /// the permanent is on the battlefield. Sunspine Lynx, Giant Cindermaw, Rampaging Ferocidon, Leyline of Punishment, Everlasting
 /// Torment and Havoc Festival print it.

@@ -1,14 +1,9 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
+use cantrip_mechanics::statics;
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("DealDamage", "deal that much damage to the target?", "Only once each turn", "Deal the damage", "Don't");
-
-/// "Your opponents can't cast spells during your turn" (CR 101.2): a cast rule, true for who may cast. The opponents of
-/// the permanent's controller may not, while it is that controller's turn.
-fn opponents_cant_cast_on_your_turn(q: &dyn Query, asker: &Asker, caster: PlayerId, _from: ZoneKind) -> bool {
-    !(q.state().turn.active == asker.controller && caster != asker.controller)
-}
 
 // --- The Sensational She-Hulk -----------------------------------------------------------------------------------
 
@@ -57,14 +52,14 @@ pub static BACK: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::DAMAGE, creature_you_control_is_dealt_damage), retaliate, "Whenever a creature you control is dealt damage, you may have The Sensational She-Hulk deal that much damage to any target. Do this only once each turn.")
         .targets(&[targets::ANY])
         .sums_per_subject()],
-    cast_rules: &[opponents_cant_cast_on_your_turn],
+    cast_rules: &[statics::opponents_cant_cast_spells_during_your_turn],
     ..oracle::THE_SENSATIONAL_SHE_HULK
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(cost("{3}{W}{W}{G}"), cantrip_mechanics::effects::transform_self, "{3}{G}{W}{W}: Transform Jennifer Walters. Activate only as a sorcery.")
         .sorcery_speed()],
-    cast_rules: &[opponents_cant_cast_on_your_turn],
+    cast_rules: &[statics::opponents_cant_cast_spells_during_your_turn],
     back: Some(&BACK),
     ..oracle::JENNIFER_WALTERS
 };
