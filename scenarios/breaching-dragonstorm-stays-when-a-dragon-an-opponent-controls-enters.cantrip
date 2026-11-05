@@ -1,0 +1,43 @@
+# Breaching Dragonstorm: only a Dragon "you control" returns it. Bot2 casts Clarion Conqueror (a Dragon) on turn 2 and Bot1's
+# Breaching Dragonstorm stays on the battlefield.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Breaching Dragonstorm
+Island
+Island
+Island
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Black Lotus
+Clarion Conqueror
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Breaching Dragonstorm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Clarion Conqueror.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Jet; Breaching Dragonstorm
+Bot2.Battlefield = Clarion Conqueror

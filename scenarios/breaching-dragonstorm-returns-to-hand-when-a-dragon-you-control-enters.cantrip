@@ -1,0 +1,44 @@
+# Breaching Dragonstorm: "When a Dragon you control enters, return this enchantment to its owner's hand." Bot1 casts it off Mox
+# Ruby, Mox Jet and Black Lotus (the Grizzly Bears found is declined into hand), then on turn 3 casts Clarion Conqueror (a Dragon)
+# with Mox Pearl, Mox Ruby and Mox Jet: the Enchantment is back in hand.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Breaching Dragonstorm
+Mox Pearl
+Clarion Conqueror
+Island
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Breaching Dragonstorm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Breaching Dragonstorm.Types = Enchantment
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Clarion Conqueror
+Bot1.Hand = Breaching Dragonstorm; Grizzly Bears; Island; Island

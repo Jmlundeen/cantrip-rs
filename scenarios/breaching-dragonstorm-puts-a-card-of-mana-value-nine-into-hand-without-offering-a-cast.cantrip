@@ -1,0 +1,38 @@
+# Breaching Dragonstorm: a nonland card with mana value more than 8 is put into hand, not cast: Darksteel Angel (mana value 9) is
+# exiled after the Mountain, no cast is offered (`! Bot1.Accept`), and it is in hand beside the Islands; the Mountain stays in exile.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Breaching Dragonstorm
+Island
+Island
+Island
+Mountain
+Darksteel Angel
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Breaching Dragonstorm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+! Bot1.Accept
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Jet; Breaching Dragonstorm
+Exile = Mountain
+Bot1.Hand = Darksteel Angel; Island; Island; Island
