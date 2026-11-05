@@ -1,0 +1,11 @@
+{
+  "name": "Operations Officer",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Human Officer",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Lifelink (Damage dealt by this creature also causes you to gain that much life.)\nWhen this creature enters, draw a card.\nWhenever this creature attacks, put a +1/+1 counter on it.",
+  "keywords": [
+    "Lifelink"
+  ]
+}
