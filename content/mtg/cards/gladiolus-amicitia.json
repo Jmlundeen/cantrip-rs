@@ -1,0 +1,8 @@
+{
+  "name": "Gladiolus Amicitia",
+  "manaCost": "{4}{R}{G}",
+  "type": "Legendary Creature — Human Warrior",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "When Gladiolus Amicitia enters, search your library for a land card, put it onto the battlefield tapped, then shuffle.\nLandfall — Whenever a land you control enters, another target creature you control gets +2/+2 and gains trample until end of turn."
+}

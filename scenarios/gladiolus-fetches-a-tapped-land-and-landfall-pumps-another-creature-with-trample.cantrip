@@ -1,0 +1,65 @@
+# Gladiolus Amicitia (6/6): "When Gladiolus Amicitia enters, search your library for a land card, put it onto the battlefield tapped, then shuffle." and "Landfall - Whenever a land you control enters,
+# another target creature you control gets +2/+2 and gains trample until end of turn." Turn 1 Bot1 casts a Memnite, then Gladiolus. The search takes a Mountain from its own library (not any land of
+# Bot2's) tapped, and the Mountain entering is itself a landfall: the only other creature, Memnite, becomes 3/3 with trample (Gladiolus is not a legal target of "another"). Turn 3 an Island played
+# gives it +2/+2 again, from a second trigger, and an Island Bot2 plays on turn 4 does nothing: "a land you control".
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Black Lotus
+Gladiolus Amicitia
+Memnite
+Island
+Island x3
+Mountain
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Gladiolus Amicitia.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Mountain)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Mountain.Tapped = true
+? Bot1.Battlefield.Memnite.Power = 3
+? Bot1.Battlefield.Memnite.Toughness = 3
+? Bot1.Battlefield.Memnite.Keywords = Trample
+? Bot1.Battlefield.Gladiolus Amicitia.Power = 6
+? Bot1.Battlefield.Gladiolus Amicitia.Keywords = (absent)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Memnite.Power = 1
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Memnite.Power = 3
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 1
+
+[Expect]
+Bot1.Battlefield.Memnite.Toughness = 1
