@@ -766,3 +766,23 @@ bit: only a change adding a 65th keyword can. A compile-time assert, or a wider 
 
 **Notes.** The encoder's keyword features stop at bit 47, so the model sees nothing of bits 48 and up. It changes what the AI
 sees, never the rules.
+
+### KI-156: A divided trigger's shares are drawn as damage, with no text, in the client
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host and client (`crates/cantrip-host/src/prompt.rs`, `RequestKind::ChooseDividedTargets`) | 2026-11-05, reviewing divided activated abilities |
+
+**Notes.** The divided-targets request for a triggered ability carries only its source, and the host sends `text: ""`, since the
+trigger is not on the stack yet. The client then takes the shares for damage: Court of Garenbrig's, Jade Seedstones',
+Omnivorous Flytrap's and Fury's counters are drawn in the damage tone and the dock line is empty. Spells and activated
+abilities send their text. The fix carries `PendingTrigger::ability` in the request and prints that ability's text.
+
+### KI-157: A granted activated ability's divide prompt shows the ability's own text, not the granted words
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host (`crates/cantrip-host/src/prompt.rs`) | 2026-11-05, reviewing divided activated abilities |
+
+**Notes.** The prompt reads `game.cards.ability(item.ability).text()`; the item's announced words (`item.words`) are what the
+player sees for a granted or text-changed ability. Display only.
