@@ -1,0 +1,39 @@
+# Kishla Trawlers: Bot1 declines the exile. Nothing is exiled, so "when you do" does not happen (CR 603.12): the Ornithopter and the
+# Lightning Bolt stay in the graveyard (the Lotus too, three cards) and no target is asked for.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Ornithopter
+Lightning Bolt
+Kishla Trawlers
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Kishla Trawlers.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+! Bot1.Target
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard.Count = 3

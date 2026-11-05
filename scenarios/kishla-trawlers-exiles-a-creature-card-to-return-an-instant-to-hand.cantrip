@@ -1,0 +1,43 @@
+# Kishla Trawlers: "When this creature enters, you may exile a creature card from your graveyard. When you do, return target instant or
+# sorcery card from your graveyard to your hand." Bot1's Lightning Bolt kills its own Ornithopter, so both are in the graveyard. It
+# casts Kishla Trawlers, exiles the Ornithopter (the only creature card) and the reflexive trigger (CR 603.12) returns the Bolt.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Ornithopter
+Lightning Bolt
+Kishla Trawlers
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Kishla Trawlers.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Hand.Lightning Bolt.Colors = Red
+Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Kishla Trawlers.Power = 3

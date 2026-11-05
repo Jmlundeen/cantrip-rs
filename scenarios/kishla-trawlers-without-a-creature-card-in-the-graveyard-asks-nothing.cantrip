@@ -1,0 +1,35 @@
+# Kishla Trawlers: Bot1's graveyard holds a Lightning Bolt (and the Lotus) but no creature card, so there is nothing to exile and it is
+# not asked (an Accept is refused); the Bolt stays in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Lightning Bolt
+Kishla Trawlers
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Kishla Trawlers.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard.Count = 2
+Bot2.Life = 17

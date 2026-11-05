@@ -1,0 +1,47 @@
+# Kishla Trawlers: Bot2's Lightning Bolt kills Bot1's Ornithopter on turn 2 (the Bolt goes to Bot2's graveyard, not Bot1's). On turn 3
+# Bot1 casts Kishla Trawlers and exiles the Ornithopter, but "your graveyard" has no instant or sorcery card to target, so the
+# reflexive trigger (CR 603.12) is removed from the stack for want of a target (CR 603.3d) and nothing returns.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Ornithopter
+Kishla Trawlers
+Island x18
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Kishla Trawlers.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+! Bot1.Target
+
+[Expect]
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Lightning Bolt
