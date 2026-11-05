@@ -1,0 +1,8 @@
+{
+  "name": "Rescue Leopard",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Cat",
+  "power": 4,
+  "toughness": 2,
+  "oracleText": "Whenever this creature becomes tapped, you may discard a card. If you do, draw a card."
+}

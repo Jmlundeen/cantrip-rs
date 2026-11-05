@@ -1,0 +1,41 @@
+# Rescue Leopard {2}{R}, 4/2: "Whenever this creature becomes tapped, you may discard a card. If you do, draw a card." Bot1 casts it on
+# turn 1 with three Moxen. On turn 3 it attacks and becomes tapped (CR 508.1f): Bot1 discards the Island and draws the card under it,
+# the Plains (Forest was drawn for the turn). Bot2 takes 4.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Rescue Leopard
+Island
+Mountain
+Swamp
+Forest
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rescue Leopard.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Rescue Leopard > Bot2)
+Bot1.Pass
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Forest; Mountain; Plains; Swamp
+Bot1.Graveyard = Island
+Bot2.Life = 16

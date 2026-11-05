@@ -1,0 +1,39 @@
+# Rescue Leopard's "you may discard a card. If you do, draw a card": on turn 3 it attacks and becomes tapped, and Bot1 chooses no
+# card to discard. Nothing is discarded and, not having discarded, nothing is drawn: the hand keeps its cards and the library its
+# Plains.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Rescue Leopard
+Island
+Mountain
+Swamp
+Forest
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rescue Leopard.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Rescue Leopard > Bot2)
+Bot1.Pass
+Bot1.Choose()
+
+[Expect]
+Bot1.Hand = Forest; Island; Mountain; Swamp
+Bot1.Graveyard =
