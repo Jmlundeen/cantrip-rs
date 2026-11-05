@@ -1,0 +1,51 @@
+# Whirlwing Stormbrood: "You may cast sorcery spells and Dragon spells as though they had flash." On Bot2's turn 4, in response to
+# its Ornithopter, Bot1 casts Clarion Conqueror (a Dragon creature, which has no flash of its own) with the three sources it
+# kept untapped (CR 307.5, 702.8).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Whirlwing Stormbrood
+Island
+Clarion Conqueror
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Whirlwing Stormbrood.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Island; Mox Sapphire; Mox Pearl; Mox Jet; Mox Ruby; Whirlwing Stormbrood; Clarion Conqueror

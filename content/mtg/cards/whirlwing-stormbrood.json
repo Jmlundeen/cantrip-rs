@@ -1,0 +1,18 @@
+{
+  "name": "Whirlwing Stormbrood",
+  "manaCost": "{4}{U}",
+  "type": "Creature — Dragon",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Flash\nFlying\nYou may cast sorcery spells and Dragon spells as though they had flash.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ],
+  "omen": {
+    "name": "Dynamic Soar",
+    "manaCost": "{2}{G}",
+    "type": "Sorcery — Omen",
+    "oracleText": "Put three +1/+1 counters on target creature you control. (Then shuffle this card into its owner's library.)"
+  }
+}

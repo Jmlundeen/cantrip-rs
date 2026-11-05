@@ -1,0 +1,39 @@
+# Whirlwing Stormbrood cast as its Omen, Dynamic Soar (CR 720.3): {2}{G}, a sorcery, "Put three +1/+1 counters on target creature
+# you control." Bot1's Ornithopter (0/2) becomes 3/5, and the card is shuffled into Bot1's library (20 cards, now 21), not put
+# into the graveyard.
+
+[Bot1 Deck]
+Ornithopter
+Whirlwing Stormbrood
+Mox Emerald
+Mox Ruby
+Mox Jet
+Island x2
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Whirlwing Stormbrood.Cast(Bot1.Battlefield.Ornithopter; Ability: Omen)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 5
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 21
