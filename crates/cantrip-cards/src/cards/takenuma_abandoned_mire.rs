@@ -1,25 +1,22 @@
+use cantrip_api::select::{part, Choice, SelectFn, Verdict};
 use cantrip_api::*;
-use cantrip_mechanics::{channel, choose};
+use cantrip_mechanics::{channel, library, select};
 use cantrip_oracle as oracle;
 
-/// "Mill three cards, then return a creature or planeswalker card from your graveyard to your hand": chosen from the
-/// whole graveyard as it stands after the mill, and not optional - one is returned whenever there is one.
+/// "A creature or planeswalker card": a card in a graveyard with the creature or planeswalker type.
+fn creature_or_planeswalker_card(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    Verdict::each(choice, |card| q.chars(card).is(CardType::Creature) || q.chars(card).is(CardType::Planeswalker))
+}
+
+const CREATURE_OR_PLANESWALKER_CARD: select::Selection = select::Selection::of(
+    select::as_many_as_can(1),
+    &[part(&(creature_or_planeswalker_card as SelectFn), 0, "")],
+)
+.called("creature or planeswalker");
+
+/// "Mill three cards, then return a creature or planeswalker card from your graveyard to your hand."
 fn mill_then_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    g.mill(you, 3);
-    let graveyard = g.state().zone(Zone::graveyard(you)).to_vec();
-    let eligible: Vec<ObjectId> = graveyard
-        .iter()
-        .copied()
-        .filter(|&c| {
-            let chars = g.chars(c);
-            chars.is(CardType::Creature) || chars.is(CardType::Planeswalker)
-        })
-        .collect();
-    if let Some(chosen) = choose::cards_from(g, you, item.object, Purpose::PutIntoHand, graveyard, eligible, 1, false)?.first() {
-        g.return_to_hand(&[*chosen]);
-    }
-    Ok(())
+    library::mill_then_return_a_card(g, item, 3, CREATURE_OR_PLANESWALKER_CARD)
 }
 
 pub static CARD: CardDef = CardDef {
