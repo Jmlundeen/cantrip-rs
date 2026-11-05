@@ -1,0 +1,52 @@
+# Type-03 Borg Vessel ({3}{W}): Station puts charge counters equal to the stationing creature's power on it, and "7+ | Flying"
+# makes it a 5/5 artifact creature with flying. A Quakestrider Ceratops (12 power) stations it, and nothing else about the
+# Spacecraft moves: it is an artifact creature at 12 counters, flying, 5/5.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Quakestrider Ceratops
+Type-03 Borg Vessel
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Quakestrider Ceratops.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Type-03 Borg Vessel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Type-03 Borg Vessel.Activate(Ability: Station)
+Bot1.Choose(Quakestrider Ceratops)
+
+[Expect]
+Bot1.Battlefield.Type-03 Borg Vessel.Counters.Charge = 12
+Bot1.Battlefield.Type-03 Borg Vessel.Types = Artifact; Creature
+Bot1.Battlefield.Type-03 Borg Vessel.Keywords = Flying
+Bot1.Battlefield.Type-03 Borg Vessel.Power = 5
+Bot1.Battlefield.Type-03 Borg Vessel.Toughness = 5
+Bot1.Battlefield.Quakestrider Ceratops.Tapped = true

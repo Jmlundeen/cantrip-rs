@@ -1,0 +1,44 @@
+# Type-03 Borg Vessel ({3}{W}): "Whenever you cast a spell, create a 1/1 colorless Borg artifact creature token" and
+# "Artifact spells you cast cost {1} less to cast" (CR 601.2f). Cast on turn 7, it watches turn 9: Mind Stone's {2} is
+# paid with a single Plains thanks to the reduction, and casting it makes the Borg token.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Type-03 Borg Vessel
+Mind Stone
+Plains x20
+Mind Stone x11
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Hand.Type-03 Borg Vessel.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Borg Token.Power = 1
