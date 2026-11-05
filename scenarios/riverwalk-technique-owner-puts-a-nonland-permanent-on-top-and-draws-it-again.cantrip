@@ -1,0 +1,45 @@
+# Riverwalk Technique, the first mode: "The owner of target nonland permanent puts it on their choice of the top or bottom of their
+# library." Bot2 has an Island and an Ornithopter: the Island is not a legal target (the refusal). Bot1 targets the Ornithopter and its
+# owner Bot2 puts it on top (Accept), so it draws it again in turn 4.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Riverwalk Technique
+Island x20
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Riverwalk Technique.Cast
+Bot1.Modes(The owner of target nonland permanent)
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot2.Accept
+? Bot2.Battlefield.Ornithopter = (absent)
+[T4 Bot2.Main1]
+? Bot2.Hand.Count = 7
+? Bot2.Hand.Ornithopter.Colors.Count = 0
+
+[Expect]
+Bot1.Graveyard = Riverwalk Technique; Black Lotus

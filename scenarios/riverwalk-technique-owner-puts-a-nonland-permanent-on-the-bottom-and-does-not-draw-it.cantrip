@@ -1,0 +1,40 @@
+# Riverwalk Technique, the first mode: Bot2's Ornithopter is targeted and its owner Bot2 chooses the bottom of the library (Decline), so
+# the library is a card longer, the Ornithopter is not in its hand on turn 4, and it is not on the battlefield.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Riverwalk Technique
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x21
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Riverwalk Technique.Cast
+Bot1.Modes(The owner of target nonland permanent)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot2.Decline
+? Bot2.Battlefield.Ornithopter = (absent)
+? Bot2.Library.Count = 15
+[T4 Bot2.Main1]
+? Bot2.Hand.Count = 8
+
+[Expect]
+Bot1.Graveyard = Riverwalk Technique; Black Lotus

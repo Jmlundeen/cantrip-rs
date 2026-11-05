@@ -1,0 +1,6 @@
+{
+  "name": "Riverwalk Technique",
+  "manaCost": "{3}{U}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• The owner of target nonland permanent puts it on their choice of the top or bottom of their library.\n• Counter target noncreature spell."
+}
