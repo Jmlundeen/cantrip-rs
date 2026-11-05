@@ -1,0 +1,37 @@
+# Highspire Bell-Ringer: only the second spell of the turn is cheaper. With the Bell-Ringer and a Mox Sapphire on the battlefield, Bot1 on
+# turn 3 has an Island and the Mox (two mana) and tries Dauntless Scrapbot ({3}) as its first spell: it pays full price, so the cast is
+# not offered (CR 601.2f).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Highspire Bell-Ringer
+Mox Sapphire
+Dauntless Scrapbot
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Highspire Bell-Ringer.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Dauntless Scrapbot.Cast(Mana: short)
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 3

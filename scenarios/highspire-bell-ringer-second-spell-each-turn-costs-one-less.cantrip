@@ -1,0 +1,41 @@
+# Highspire Bell-Ringer: "The second spell you cast each turn costs {1} less to cast." With it on the battlefield (Bot1 pays its {2}{U} with
+# Black Lotus on turn 1), Bot1 casts Mox Sapphire on turn 3 (the first spell of the turn), then Dauntless Scrapbot ({3}) as the second,
+# paying only {2} (the Island and the Mox, CR 601.2f, 118.7c): the pool is empty after it and the Scrapbot resolves.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Highspire Bell-Ringer
+Mox Sapphire
+Dauntless Scrapbot
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Highspire Bell-Ringer.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dauntless Scrapbot.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Highspire Bell-Ringer.Keywords = Flying

@@ -1,0 +1,11 @@
+{
+  "name": "Highspire Bell-Ringer",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Djinn Monk",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "Flying\nThe second spell you cast each turn costs {1} less to cast.",
+  "keywords": [
+    "Flying"
+  ]
+}
