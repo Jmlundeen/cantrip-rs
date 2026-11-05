@@ -1,0 +1,62 @@
+# Undergrowth Leopard ({1}{G}, 2/2 vigilance): "{1}, Sacrifice this creature: Destroy target artifact or enchantment." Bot1 casts
+# one on turn 1 (Forest and Mox Emerald) and a second on turn 3. Bot2's Propaganda (an enchantment) is destroyed by the first,
+# its Island is refused beside it and so is Bot1's own Forest. On turn 5 the second Leopard destroys Bot1's own Mox Emerald
+# (an artifact of its own is a legal target). With Bot1's mana all spent (turn 2) the {1} cannot be paid and the ability is refused.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Undergrowth Leopard
+Undergrowth Leopard
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Propaganda
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Undergrowth Leopard.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Propaganda.Cast
+Bot2.Pass
+! Bot1.Battlefield.Undergrowth Leopard.Activate(Bot2.Battlefield.Mox Sapphire; Mana: short)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Undergrowth Leopard.Cast
+Bot1.Pass
+! Bot1.Battlefield.Undergrowth Leopard.Activate(Bot2.Battlefield.Island)
+! Bot1.Battlefield.Undergrowth Leopard.Activate(Bot1.Battlefield.Forest)
+Bot1.Battlefield.Undergrowth Leopard.Activate(Bot2.Battlefield.Propaganda)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Propaganda
+? Bot1.Graveyard.Count = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Undergrowth Leopard.Activate(Bot1.Battlefield.Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Mox Emerald; Undergrowth Leopard; Undergrowth Leopard
+Bot2.Graveyard = Propaganda
+Bot1.Battlefield = Forest; Forest; Forest
