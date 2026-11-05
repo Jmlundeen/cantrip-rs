@@ -2026,36 +2026,10 @@ pub fn put_all_onto_battlefield_attached(cx: &mut Cx, objects: &[(ObjectId, Play
     let mut prepared: Vec<(usize, Entering)> = Vec::with_capacity(objects.len());
     for (i, &(id, controller, host)) in objects.iter().enumerate() {
         // An object moves once however many times it is named (CR 400.7), with the first host named.
-        if !live(cx.s(), id)
-            || prepared.iter().any(|(_, e)| e.object == id)
-            || (!bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id))
-            || instant_or_sorcery_entering(cx, id, false)
-        {
+        if prepared.iter().any(|(_, e)| e.object == id) {
             continue;
         }
-        let mut entering = Entering {
-            object: id,
-            controller,
-            tapped: false,
-            counters: [0; CounterKind::COUNT],
-            copy: None,
-            prepared: false,
-            chosen_color: None,
-            chosen_subtype: None,
-            chosen_player: None,
-            chosen_card: None,
-            chosen_option: None,
-            chosen_number: None,
-            chosen_object: None, emblem: None,
-            attach: Some(host),
-            attach_player: None,
-            x: 0,
-            transformed: false,
-            protector: None, read_ahead: None, riot_haste: false,
-            instead: None,
-            becomes: None,
-            own: None,
-        };
+        let Some(mut entering) = entering_attached(cx, &bans, id, controller, host) else { continue };
         prepare_entry(cx, &mut entering)?;
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
             continue;
@@ -2066,16 +2040,12 @@ pub fn put_all_onto_battlefield_attached(cx: &mut Cx, objects: &[(ObjectId, Play
     let mut moves: Vec<Moving> = Vec::with_capacity(prepared.len());
     let mut moved: Vec<usize> = Vec::with_capacity(prepared.len());
     for (i, mut entering) in prepared {
-        let (id, controller, host) = objects[i];
-        let it = as_it_would_exist(cx, &entering).chars;
-        if it.has_subtype(Subtype::Aura) {
-            if !crate::attach::aura_hosts(cx, id, &it, controller, &entering_ids).contains(&Target::Object(host)) {
-                continue;
-            }
-        } else if !(it.has_subtype(Subtype::Equipment) && crate::attach::host_allows(&*cx, id, host, true)) {
-            entering.attach = None;
+        match attached_entry(cx, &entering, &entering_ids) {
+            AttachedEntry::Stays => continue,
+            AttachedEntry::Unattached => entering.attach = None,
+            AttachedEntry::Attached => {}
         }
-        moves.push(Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) });
+        moves.push(Moving { entering: Some(entering), ..Moving::to(entering.object, Zone::BATTLEFIELD) });
         moved.push(i);
     }
     let mut out = vec![None; objects.len()];
@@ -2089,6 +2059,82 @@ pub fn put_all_onto_battlefield_attached(cx: &mut Cx, objects: &[(ObjectId, Play
         }
     }
     Ok(out)
+}
+
+/// How an object put onto the battlefield attached to a host the effect names enters (CR 303.4i, 301.5e, 303.4h).
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub(crate) enum AttachedEntry {
+    /// Attached to its host.
+    Attached,
+    /// Unattached: an Equipment that could not equip its host, or anything that is neither Aura nor Equipment.
+    Unattached,
+    /// Not at all: an Aura its host is not a legal object for stays where it is.
+    Stays,
+}
+
+/// `id` about to be put onto the battlefield under `controller` attached to `host`, before its own entering replacements
+/// are applied (`prepare_entry`): None if it can't be put there at all - it is no longer the object it was (CR 400.7), one of
+/// `bans` (`static_rules::enter_bans`) keeps it where it is (CR 101.2, 101.3), or it is an instant or sorcery card (CR 304.4,
+/// 307.4). Shared by the move (`put_all_onto_battlefield_attached`) and the question asked before it (`could_enter_attached`).
+fn entering_attached(cx: &Cx, bans: &[(ObjectId, PlayerId, &'static CardDef, Option<Linked>)], id: ObjectId, controller: PlayerId, host: ObjectId) -> Option<Entering> {
+    if !live(cx.s(), id) || (!bans.is_empty() && crate::static_rules::enter_banned(cx, bans, id)) || instant_or_sorcery_entering(cx, id, false) {
+        return None;
+    }
+    Some(Entering {
+        object: id,
+        controller,
+        tapped: false,
+        counters: [0; CounterKind::COUNT],
+        copy: None,
+        prepared: false,
+        chosen_color: None,
+        chosen_subtype: None,
+        chosen_player: None,
+        chosen_card: None,
+        chosen_option: None,
+        chosen_number: None,
+        chosen_object: None,
+        emblem: None,
+        attach: Some(host),
+        attach_player: None,
+        x: 0,
+        transformed: false,
+        protector: None,
+        read_ahead: None,
+        riot_haste: false,
+        instead: None,
+        becomes: None,
+        own: None,
+    })
+}
+
+/// How `entering` (attached to its host, `Entering::attach`) would enter, judged on it as it would exist on the battlefield
+/// (CR 614.12) - seeing it attached to its host - against the game as it is before it moves, `entering_ids` the objects
+/// entering with it (`attach::enters_attachable`). The one judgement of the move (`put_all_onto_battlefield_attached`) and of
+/// the question asked before it (`could_enter_attached`).
+pub(crate) fn attached_entry(cx: &mut Cx, entering: &Entering, entering_ids: &[ObjectId]) -> AttachedEntry {
+    let Some(host) = entering.attach else { return AttachedEntry::Unattached };
+    let it = as_it_would_exist(cx, entering).chars;
+    let attachable = crate::attach::enters_attachable(cx, entering.object, &it, entering.controller, host, entering_ids);
+    match (attachable, it.has_subtype(Subtype::Aura)) {
+        (true, _) => AttachedEntry::Attached,
+        (false, true) => AttachedEntry::Stays,
+        (false, false) => AttachedEntry::Unattached,
+    }
+}
+
+/// Whether `object`, from wherever it is, could be put onto the battlefield under `controller` attached to `host` now
+/// (`Game::could_enter_attached`): what `put_onto_battlefield_attached` would do with it, asked before it is chosen. It can
+/// be put there (`entering_attached`), and as it would exist there it could be attached to `host` (`attached_entry`): an
+/// Aura one its enchant abilities allow (CR 303.4f, 702.5a), that has no protection from it (CR 702.16c), that is not the
+/// Aura itself, and while the Aura would be no creature (CR 303.4d); hexproof does not matter, as it is not targeted. Judged
+/// as the move judges it, with nothing entering beside it. The one step of the move it leaves out is the object's own
+/// entering replacements (`prepare_entry`), whose choices (CR 614.12a: a Clone's copy, read ahead, a battle's protector) are
+/// made as it moves and can't be asked before it is chosen.
+pub fn could_enter_attached(cx: &mut Cx, object: ObjectId, controller: PlayerId, host: ObjectId) -> bool {
+    let bans = crate::static_rules::enter_bans(cx);
+    entering_attached(cx, &bans, object, controller, host)
+        .is_some_and(|entering| attached_entry(cx, &entering, &[object]) == AttachedEntry::Attached)
 }
 
 /// Transforms a permanent (CR 701.27a): its other face is up. The same object, so nothing about it is new (CR 712.18).

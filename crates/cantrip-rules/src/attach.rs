@@ -12,12 +12,18 @@ use crate::{Cx, R, ops};
 /// enchant abilities, or Equipment's creature on the battlefield (CR 301.5c), allow. An Aura that is also a creature can
 /// enchant nothing (CR 303.4d). Judged without targeting, so hexproof does not matter.
 pub fn host_allows(q: &dyn Query, attachment: ObjectId, host: ObjectId, attaching: bool) -> bool {
+    let ac = q.chars(attachment);
+    host_allows_as(q, attachment, &ac, || q.mana_value(attachment), q.controller(attachment), host, attaching)
+}
+
+/// `host_allows` for `attachment` with the characteristics `ac` (and the mana value `mana_value` gives) under `controller`:
+/// as it is (`host_allows`), or as it would exist on the battlefield when it is about to enter (`enters_attachable`).
+fn host_allows_as(q: &dyn Query, attachment: ObjectId, ac: &Chars, mana_value: impl FnOnce() -> u32, controller: PlayerId, host: ObjectId, attaching: bool) -> bool {
     if attachment == host || !live(q.state(), host) {
         return false;
     }
-    let ac = q.chars(attachment);
     let hc = q.chars(host);
-    if hc.protected_from_by(&ac, || q.mana_value(attachment), q.controller(attachment)) {
+    if hc.protected_from_by(ac, mana_value, controller) {
         return false;
     }
     if ac.has_subtype(Subtype::Equipment) {
@@ -26,10 +32,41 @@ pub fn host_allows(q: &dyn Query, attachment: ObjectId, host: ObjectId, attachin
         return (!ac.is(CardType::Creature) || creature_ok) && q.is_on_battlefield(host) && hc.is(CardType::Creature);
     }
     if ac.has_subtype(Subtype::Aura) {
-        let asker = Asker { source: attachment, controller: q.controller(attachment), by: None, spell: false };
-        return !ac.is(CardType::Creature) && enchants_allow(q, &ac, &asker, Target::Object(host));
+        let asker = Asker { source: attachment, controller, by: None, spell: false };
+        return !ac.is(CardType::Creature) && enchants_allow(q, ac, &asker, Target::Object(host));
     }
     false
+}
+
+/// Whether an object about to enter the battlefield attached to `host` - put there by an effect that names the host, so
+/// nothing is chosen (CR 303.4f) - would enter attached to it: judged on it as it would exist there (`it`, CR 614.12) under
+/// `controller`, against the game as it is before it moves. An Aura must be able to enchant `host` as `aura_hosts` would offer
+/// it (CR 303.4i: otherwise it stays where it is), so not itself nor anything in `entering`, the objects entering with it; an
+/// Equipment must be able to equip it (CR 301.5e: otherwise it enters unattached). What the move
+/// (`ops::put_all_onto_battlefield_attached`) and the question before it (`ops::could_enter_attached`) both judge by.
+pub(crate) fn enters_attachable(cx: &Cx, id: ObjectId, it: &Chars, controller: PlayerId, host: ObjectId, entering: &[ObjectId]) -> bool {
+    if it.has_subtype(Subtype::Aura) {
+        if it.is(CardType::Creature) {
+            return false;
+        }
+        let asker = Asker { source: id, controller, by: None, spell: false };
+        let o = cx.s().obj(host);
+        return live(cx.s(), host)
+            && (o.zone.is(ZoneKind::Battlefield) || o.zone.is(ZoneKind::Graveyard))
+            && aura_object_allowed(cx, id, it, &asker, host, entering);
+    }
+    it.has_subtype(Subtype::Equipment)
+        && host_allows_as(cx, id, it, || cantrip_api::mana_value_of(&|c| cx.card(c), cx.s(), id, it), controller, host, true)
+}
+
+/// Whether an Aura entering as `aura_chars` (CR 614.12) for `asker` could enchant the object `host` of the battlefield or a
+/// graveyard (CR 303.4f): it is not the Aura itself nor one of `entering` (CR 303.4d, 101.4), each of the Aura's enchant
+/// abilities allows it, and it has no protection from the Aura (CR 702.16c). Not a target, so hexproof does not matter.
+fn aura_object_allowed(cx: &Cx, aura: ObjectId, aura_chars: &Chars, asker: &Asker, host: ObjectId, entering: &[ObjectId]) -> bool {
+    host != aura
+        && !entering.contains(&host)
+        && enchants_allow(cx, aura_chars, asker, Target::Object(host))
+        && !cx.chars(host).protected_from_by(aura_chars, || cantrip_api::mana_value_of(&|c| cx.card(c), cx.s(), aura, aura_chars), asker.controller)
 }
 
 /// The enchant abilities an Aura has (CR 702.5a): among its abilities as the layers leave them (`AbilityRef::enchant`), its
@@ -69,7 +106,7 @@ pub fn player_allows(cx: &Cx, aura: ObjectId, player: PlayerId) -> bool {
 /// graveyards, as the C# engine lists them, leaving out itself and everything entering with it; then the players, in turn
 /// order, still in the game and without protection from its controller (CR 702.16k). Judged on the Aura as it would exist there
 /// (`aura_chars`, CR 614.12) under `controller`: each of its enchant abilities allows it, and it has no protection from the
-/// Aura. An Aura that would be a creature can enchant nothing (CR 303.4d).
+/// Aura (`aura_object_allowed`). An Aura that would be a creature can enchant nothing (CR 303.4d).
 pub(crate) fn aura_hosts(cx: &Cx, aura: ObjectId, aura_chars: &Chars, controller: PlayerId, entering: &[ObjectId]) -> Vec<Target> {
     if aura_chars.is(CardType::Creature) {
         return Vec::new();
@@ -81,14 +118,9 @@ pub(crate) fn aura_hosts(cx: &Cx, aura: ObjectId, aura_chars: &Chars, controller
     let mut hosts = Vec::new();
     for zone in zones {
         for &id in state.zone(zone) {
-            let target = Target::Object(id);
-            if id == aura || entering.contains(&id) || !enchants_allow(cx, aura_chars, &asker, target) {
-                continue;
+            if aura_object_allowed(cx, aura, aura_chars, &asker, id, entering) {
+                hosts.push(Target::Object(id));
             }
-            if cx.chars(id).protected_from_by(aura_chars, || cantrip_api::mana_value_of(&|c| cx.card(c), cx.s(), aura, aura_chars), controller) {
-                continue;
-            }
-            hosts.push(target);
         }
     }
     for p in state.apnap() {

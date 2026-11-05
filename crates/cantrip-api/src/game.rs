@@ -834,6 +834,17 @@ pub trait Game: Query {
     /// Herald's "return any number of Aura cards from your graveyard to the battlefield attached to creatures you control";
     /// Mantle of the Ancients, Cass, Hand of Vengeance, Unfinished Business and Bruna, Light of Alabaster return several so.
     fn put_all_onto_battlefield_attached(&mut self, objects: &[(ObjectId, PlayerId, ObjectId)]) -> Result<Vec<Option<ObjectId>>, Suspend>;
+    /// Whether `object`, from wherever it is - an Aura card in a graveyard, a hand or a library - could be put onto the
+    /// battlefield under `controller` attached to `host` now (`put_onto_battlefield_attached`, `put_all_onto_battlefield_attached`),
+    /// by the one judgement those moves make: it can be put there at all, and as it would exist there (CR 614.12) it could be
+    /// attached to `host` - an Aura an object its enchant abilities allow (CR 303.4f, 702.5a), without protection from it
+    /// (CR 702.16c), not the Aura itself, and the Aura no creature (CR 303.4d); an Equipment a creature it could equip
+    /// (CR 301.5e). Not targeting, so hexproof does not matter. Unlike `can_attach`, for an object not yet on the battlefield.
+    /// An effect that has its player choose the Auras and their hosts offers only these (CR 303.4f; Storm Herald's ruling: an
+    /// Aura that can't legally enchant a creature you control can't be returned): Storm Herald, Mantle of the Ancients,
+    /// Nomad Mythmaker, Bruna, Light of Alabaster, Evershrike, Liberated Livestock, Auratouched Mage and Sovereigns of Lost
+    /// Alara's "an Aura card that could enchant it".
+    fn could_enter_attached(&mut self, object: ObjectId, controller: PlayerId, host: ObjectId) -> bool;
     /// Puts an object onto the battlefield under `controller` as the effect of `item` says it is (`EntersAs`, CR 614.12):
     /// it enters as that - an Enduring creature's card "is an enchantment" and never enters as a creature, so nothing that
     /// watches creatures enter sees it - and stays so for as long as it is that object (CR 611.2a, 400.7). As an Aura

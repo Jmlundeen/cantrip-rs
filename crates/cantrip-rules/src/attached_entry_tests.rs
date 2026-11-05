@@ -11,6 +11,7 @@ use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind};
 
 const YOU: PlayerId = PlayerId(0);
+const OPPONENT: PlayerId = PlayerId(1);
 
 static LAND: CardDef = CardDef { name: "Attached Entry Land", has_cost: false, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
 
@@ -94,11 +95,62 @@ static WATCHER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_on_the_battlefield(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
+}
+
+/// An Aura with "enchant creature you control": who "you" is, is the player it enters under.
+static YOUR_AURA: CardDef = CardDef {
+    name: "Attached Entry Your Aura",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura]),
+    enchant: Some(target(creature_you_control)),
+    ..CardDef::BLANK
+};
+
+fn aura(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
+    c.has_subtype(Subtype::Aura)
+}
+
+fn add_creature(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+    c.types = c.types.with(CardType::Creature);
+}
+
+/// "Auras are creatures": on the battlefield only, so an Aura card in a graveyard is none, and would be one there (CR 303.4d).
+static ANIMATOR: CardDef = CardDef {
+    name: "Attached Entry Animator",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    statics: &[static_ability(Layer::Type, aura, add_creature, "Auras are creatures.")],
+    ..CardDef::BLANK
+};
+
+fn equipment(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
+    c.has_subtype(Subtype::Equipment)
+}
+
+/// "Equipment are creatures", on the battlefield only: an Equipment that's a creature can't equip (CR 301.5c).
+static EQUIPMENT_ANIMATOR: CardDef = CardDef {
+    name: "Attached Entry Equipment Animator",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    statics: &[static_ability(Layer::Type, equipment, add_creature, "Equipment are creatures.")],
+    ..CardDef::BLANK
+};
+
+/// A creature with hexproof, which an Aura that does not target may enchant.
+static HEXPROOF_BEAR: CardDef = CardDef {
+    name: "Attached Entry Hexproof Bear",
+    types: TypeSet::of(&[CardType::Creature]),
+    keywords: Keywords::of(&[Keyword::Hexproof]),
+    power: Some(2),
+    toughness: Some(2),
+    ..CardDef::BLANK
+};
+
 /// A Treasure-like artifact that is no creature: an Equipment cannot equip it.
 static ARTIFACT: CardDef = CardDef { name: "Attached Entry Artifact", types: TypeSet::of(&[CardType::Artifact]), ..CardDef::BLANK };
 
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&LAND, &BEAR, &AURA, &EQUIPMENT, &ARTIFACT, &WARDING_AURA, &COSTLY_AURA, &WATCHER])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&LAND, &BEAR, &AURA, &EQUIPMENT, &ARTIFACT, &WARDING_AURA, &COSTLY_AURA, &WATCHER, &YOUR_AURA, &ANIMATOR, &HEXPROOF_BEAR, &EQUIPMENT_ANIMATOR])));
     let deck = || vec![table.id_of(&LAND); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -293,4 +345,113 @@ fn an_aura_cannot_enchant_an_object_entering_with_it() {
     assert!(g.state.obj(card).zone.is(ZoneKind::Graveyard));
     let equipment = new[2].expect("an Equipment enters unattached");
     assert_eq!(g.state.obj(equipment).attached_to, None);
+}
+
+/// Whether `card` could be put onto the battlefield under `controller` attached to `host` (`Game::could_enter_attached`), the
+/// question a card asks before its player chooses - checked against the move itself, made on a copy of the game: the move
+/// puts it there attached to `host` exactly when the question said it could. Asking moves nothing and records nothing.
+fn offered(g: &mut Game, card: ObjectId, controller: PlayerId, host: ObjectId) -> bool {
+    let (zone, events) = (g.state.obj(card).zone, g.log.len());
+    let offered = cantrip_api::Game::could_enter_attached(&mut cx(g), card, controller, host);
+    assert_eq!((g.state.obj(card).zone, g.log.len()), (zone, events), "asking changed nothing");
+    let mut moved = g.clone();
+    let new = cantrip_api::Game::put_onto_battlefield_attached(&mut cx(&mut moved), card, controller, host).expect("nothing is asked: the host is named");
+    let attached = new.is_some_and(|n| moved.state.obj(n).attached_to == Some(host));
+    assert_eq!(offered, attached, "the question and the move agree");
+    offered
+}
+
+/// An Aura card in a graveyard can be put onto the battlefield attached to a creature its enchant ability allows and to no
+/// land (CR 303.4f, 303.4i, 702.5a). `can_attach`, which asks of an attachment on the battlefield, says no to both.
+#[test]
+fn an_aura_card_in_a_graveyard_could_enter_attached_to_what_it_could_enchant() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let land = put(&mut g, &LAND, YOU, Zone::BATTLEFIELD);
+    let card = put(&mut g, &AURA, YOU, Zone::graveyard(YOU));
+    assert!(offered(&mut g, card, YOU, bear));
+    assert!(!offered(&mut g, card, YOU, land));
+    assert!(!cantrip_api::Game::can_attach(&cx(&mut g), card, bear), "can_attach is for an attachment on the battlefield");
+}
+
+/// "Enchant creature you control" is read on the Aura as it would exist on the battlefield, under the player it enters under
+/// (CR 614.12, 303.4f): an opponent's card returned under your control can enchant your creature - though in its owner's
+/// graveyard it is theirs - and the same card entering under its owner could not.
+#[test]
+fn the_enchant_ability_is_read_on_the_aura_as_it_would_exist_on_the_battlefield() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let card = put(&mut g, &YOUR_AURA, OPPONENT, Zone::graveyard(OPPONENT));
+    assert_eq!(cantrip_api::Query::controller(&cx(&mut g), card), OPPONENT);
+    assert!(offered(&mut g, card, YOU, bear));
+    assert!(!offered(&mut g, card, OPPONENT, bear));
+}
+
+/// "Auras are creatures" applies on the battlefield: the Aura card in the graveyard is no creature, but it would be one there, and
+/// an Aura that's also a creature can enchant nothing (CR 303.4d, 614.12) - so it could enter attached to nothing.
+#[test]
+fn an_aura_that_would_be_a_creature_could_enter_attached_to_nothing() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let card = put(&mut g, &AURA, YOU, Zone::graveyard(YOU));
+    put(&mut g, &ANIMATOR, YOU, Zone::BATTLEFIELD);
+    assert!(!cx(&mut g).chars(card).is(CardType::Creature), "no creature in the graveyard");
+    assert!(!offered(&mut g, card, YOU, bear));
+}
+
+/// A creature with protection from the Aura can't be enchanted by it (CR 702.16c): the Costly Aura could not enter attached to a
+/// creature the Warding Aura gives protection from mana value 3 or greater, and the Aura with mana value 0 could. Hexproof
+/// does not matter, as the Aura does not target (CR 303.4f).
+#[test]
+fn protection_keeps_an_aura_from_entering_attached_and_hexproof_does_not() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let warding = put(&mut g, &WARDING_AURA, YOU, Zone::graveyard(YOU));
+    put_attached(&mut g, warding, bear).expect("it entered");
+    let (costly, cheap) = (put(&mut g, &COSTLY_AURA, YOU, Zone::graveyard(YOU)), put(&mut g, &AURA, YOU, Zone::graveyard(YOU)));
+    assert!(!offered(&mut g, costly, YOU, bear));
+    assert!(offered(&mut g, cheap, YOU, bear));
+    let hexproof = put(&mut g, &HEXPROOF_BEAR, OPPONENT, Zone::BATTLEFIELD);
+    assert!(offered(&mut g, costly, YOU, hexproof));
+}
+
+/// An Aura can't enchant itself (CR 303.4d): the card named as its own host could not enter, nor could one named a creature
+/// that has since left the battlefield, a new object (CR 400.7).
+#[test]
+fn an_aura_could_not_enter_attached_to_itself_or_to_an_object_gone() {
+    let mut g = game();
+    let card = put(&mut g, &AURA, YOU, Zone::graveyard(YOU));
+    assert!(!offered(&mut g, card, YOU, card));
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let gone = crate::ops::move_to(&mut cx(&mut g), bear, Zone::graveyard(YOU));
+    assert_ne!(gone, bear);
+    assert!(!offered(&mut g, card, YOU, bear));
+}
+
+/// An Equipment card could enter attached to a creature and not to an artifact that is no creature, where it enters unattached
+/// (CR 301.5e).
+#[test]
+fn an_equipment_could_enter_attached_to_a_creature_only() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let artifact = put(&mut g, &ARTIFACT, YOU, Zone::BATTLEFIELD);
+    let card = put(&mut g, &EQUIPMENT, YOU, Zone::graveyard(YOU));
+    assert!(offered(&mut g, card, YOU, bear));
+    assert!(!offered(&mut g, card, YOU, artifact));
+}
+
+/// "Equipment are creatures" applies on the battlefield: the Equipment card in the graveyard is no creature, but it would be one
+/// there, and an Equipment that's a creature can't equip (CR 301.5c, 614.12) - it enters unattached (CR 301.5e), never attached
+/// for the state-based actions to take it off.
+#[test]
+fn an_equipment_that_would_be_a_creature_enters_unattached() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    put(&mut g, &EQUIPMENT_ANIMATOR, YOU, Zone::BATTLEFIELD);
+    let card = put(&mut g, &EQUIPMENT, YOU, Zone::graveyard(YOU));
+    assert!(!cx(&mut g).chars(card).is(CardType::Creature), "no creature in the graveyard");
+    assert!(!offered(&mut g, card, YOU, bear));
+    let equipment = put_attached(&mut g, card, bear).expect("it entered");
+    assert_eq!(g.state.obj(equipment).attached_to, None);
+    assert!(!g.log.iter().any(|r| matches!(r.event, Event::Attached { .. })), "it never became attached");
 }

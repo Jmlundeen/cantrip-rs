@@ -2151,6 +2151,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_all_onto_battlefield_attached(self, objects).map_err(|_| Suspend)
     }
 
+    fn could_enter_attached(&mut self, object: ObjectId, controller: PlayerId, host: ObjectId) -> bool {
+        ops::could_enter_attached(self, object, controller, host)
+    }
+
     fn sacrifice_and_return(&mut self, player: PlayerId, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend> {
         ops::sacrifice_and_return(self, player, sacrificed, returned).map_err(|_| Suspend)
     }
