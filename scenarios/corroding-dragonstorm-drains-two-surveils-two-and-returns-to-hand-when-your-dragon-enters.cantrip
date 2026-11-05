@@ -1,0 +1,47 @@
+# Corroding Dragonstorm: "When this enchantment enters, each opponent loses 2 life and you gain 2 life. Surveil 2." and "When a
+# Dragon you control enters, return this enchantment to its owner's hand." Bot1 casts it with Mox Jet and Mox Pearl: Bot2 is
+# at 18, Bot1 at 22, and the surveil sees the Forest and the Island, keeping the Forest on top and binning the Island.
+# An Ornithopter (not a Dragon) enters and the Enchantment stays (`?` check); Clarion Conqueror (a Dragon), cast with Black
+# Lotus's {W}{W}{W}, returns it to the hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Black Lotus
+Corroding Dragonstorm
+Clarion Conqueror
+Ornithopter
+Swamp
+Forest
+Island
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Corroding Dragonstorm.Cast
+Bot1.Pass
+Bot1.Arrange(Forest | Island)
+? Bot1.Life = 22
+? Bot2.Life = 18
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Corroding Dragonstorm.Types = Enchantment
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Pearl; Ornithopter; Clarion Conqueror
+Bot1.Hand = Swamp; Corroding Dragonstorm
+Bot1.Graveyard = Black Lotus; Island
+Bot1.Life = 22
+Bot2.Life = 18
