@@ -1,0 +1,40 @@
+# Inspirited Vanguard ({4}{G}, 3/2): "Whenever this creature enters or attacks, it endures 2." (CR 701.63a) Bot1 casts it with a
+# Black Lotus and two Moxen, then attacks on turn 3 into an empty board. Both times Bot1 declines the counters: two 2/2 white Spirit tokens, the Vanguard stays 3/2 and Bot2 takes 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Inspirited Vanguard
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Inspirited Vanguard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Bot1.Battlefield.Inspirited Vanguard.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Attackers]
+Bot1.Attack(Inspirited Vanguard > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Inspirited Vanguard.Power = 3
+Bot1.Battlefield.Inspirited Vanguard.Toughness = 2
+Bot1.Battlefield.Inspirited Vanguard.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spirit Token#1.Power = 2
+Bot1.Battlefield.Spirit Token#2.Toughness = 2
+Bot1.Battlefield.Spirit Token#2.Colors = White
