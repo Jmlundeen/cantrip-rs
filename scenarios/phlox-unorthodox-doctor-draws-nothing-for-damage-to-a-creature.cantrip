@@ -1,0 +1,64 @@
+# Phlox, Unorthodox Doctor: "combat damage to a player" (CR 510.2) - the countered 2/2 Memnite is blocked by Bot2's Grizzly
+# Bears and deals its damage to the creature, so nothing triggers even though Phlox hits Bot2 for 3 that same combat.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Phlox, Unorthodox Doctor
+Memnite
+Dig Site Inventory
+Forest
+Forest
+Forest x14
+
+[Bot2 Deck]
+Grizzly Bears
+Grizzly Bears
+Forest x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phlox, Unorthodox Doctor.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Dig Site Inventory.Cast(Memnite)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Phlox, Unorthodox Doctor; Memnite > Bot2)
+Bot2.Block(Grizzly Bears > Memnite)
+[T5 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot1.Graveyard.Grizzly Bears = (absent)
+Bot1.Battlefield.Memnite = (absent)
+Bot1.Hand.Count = 2

@@ -1,0 +1,58 @@
+# Phlox, Unorthodox Doctor: the trigger needs a counter on the creature. Phlox (3/4, no counter) attacks and Bot2's Grizzly
+# Bears blocks it; trample puts 2 on the blocker and 1 through to Bot2, and nothing is drawn.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Phlox, Unorthodox Doctor
+Memnite
+Forest
+Forest
+Forest
+Forest x14
+
+[Bot2 Deck]
+Grizzly Bears
+Grizzly Bears
+Forest x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phlox, Unorthodox Doctor.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Phlox, Unorthodox Doctor; Memnite > Bot2)
+Bot2.Block(Grizzly Bears > Phlox, Unorthodox Doctor)
+[T5 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot2.Life = 18
+Bot1.Graveyard.Grizzly Bears = (absent)
+Bot1.Battlefield.Grizzly Bears = (absent)
+Bot1.Hand.Count = 3
