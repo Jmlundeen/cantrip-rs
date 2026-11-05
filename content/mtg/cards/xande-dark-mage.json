@@ -1,0 +1,11 @@
+{
+  "name": "Xande, Dark Mage",
+  "manaCost": "{2}{U}{B}",
+  "type": "Legendary Creature — Human Wizard",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Menace (This creature can't be blocked except by two or more creatures.)\nXande gets +1/+1 for each noncreature, nonland card in your graveyard.",
+  "keywords": [
+    "Menace"
+  ]
+}

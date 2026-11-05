@@ -1,0 +1,42 @@
+# Xande, Dark Mage (CR 613.4c, 111.7, 404.1): "gets +1/+1 for each noncreature, nonland card in your graveyard" - a 3/3 with menace. The
+# Black Lotus sacrificed to cast him makes him 4/4; Faithless Looting, which discards an Island (a land) and an Ornithopter (a creature
+# card, neither counted) and then goes to the graveyard itself, makes him 5/5. Bot2's discard to hand size on turn 2, a Lightning Bolt in
+# ITS graveyard, adds nothing. (The pool empties as the cast is paid: Jet's {B} and the Lotus's three {U} are exactly {2}{U}{B}.)
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Xande, Dark Mage
+Mox Ruby
+Faithless Looting
+Ornithopter
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Lightning Bolt x40
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Xande, Dark Mage.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Xande, Dark Mage.Power = 4
+? Bot1.Battlefield.Xande, Dark Mage.Toughness = 4
+? Bot1.Battlefield.Xande, Dark Mage.Keywords = Menace
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Ornithopter)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Faithless Looting; Ornithopter; Island; Black Lotus
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Xande, Dark Mage.Power = 5
+Bot1.Battlefield.Xande, Dark Mage.Toughness = 5
