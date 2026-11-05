@@ -1,0 +1,51 @@
+# Stratagem Emulator: "When this creature dies, create X 1/1 colorless Borg artifact creature tokens, where X is its
+# power" (CR 603.6c, 608.2h). Giant Growth makes it 5/4, then Infernal Grasp destroys it: X is the power it last had on
+# the battlefield, 5, not the 2 it has in the graveyard.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Stratagem Emulator
+Forest
+Giant Growth
+Plains x14
+
+[Bot2 Deck]
+Swamp
+Swamp
+Infernal Grasp
+Swamp x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Stratagem Emulator.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Stratagem Emulator)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Stratagem Emulator)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Borg Token#5.Power = 1
+Bot1.Battlefield.Count = 9
