@@ -1,0 +1,17 @@
+{
+  "name": "Runescale Stormbrood",
+  "manaCost": "{3}{R}",
+  "type": "Creature — Dragon",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Flying\nWhenever you cast a noncreature spell or a Dragon spell, this creature gets +2/+0 until end of turn.",
+  "keywords": [
+    "Flying"
+  ],
+  "omen": {
+    "name": "Chilling Screech",
+    "manaCost": "{1}{U}",
+    "type": "Instant — Omen",
+    "oracleText": "Counter target spell with mana value 2 or less. (Then shuffle this card into its owner's library.)"
+  }
+}

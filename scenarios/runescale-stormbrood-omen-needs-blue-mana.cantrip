@@ -1,0 +1,39 @@
+# Runescale Stormbrood's Omen, Chilling Screech, costs {1}{U} (CR 720.3a): with only Mox Ruby and Mox Jet, tapped, it cannot be cast
+# on Bot2's Mox Emerald (mana value 0, a legal target); once Mox Sapphire is in play it is cast and the Mox is countered.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Runescale Stormbrood
+Island x16
+
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Runescale Stormbrood.Cast(Stack.Mox Emerald; Ability: Omen; Mana: short)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Runescale Stormbrood.Cast(Stack.Mox Emerald; Ability: Omen)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Mox Emerald
+Bot2.Graveyard = Mox Emerald

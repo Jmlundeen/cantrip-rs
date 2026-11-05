@@ -1,0 +1,53 @@
+# Runescale Stormbrood: "Whenever you cast a noncreature spell or a Dragon spell, this creature gets +2/+0 until end of turn." Cast
+# off Mox Ruby and Black Lotus, it is a 2/4 flier. An Ornithopter (a creature spell that is no Dragon) leaves it at 2; Mox Jet
+# (noncreature) makes it 4, Mox Pearl 6. On turn 3 the pump has ended (2), and Clarion Conqueror (a Dragon creature spell) makes it 4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Runescale Stormbrood
+Ornithopter
+Mox Jet
+Mox Pearl
+Clarion Conqueror
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Runescale Stormbrood.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Runescale Stormbrood.Keywords = Flying
+? Bot1.Battlefield.Runescale Stormbrood.Power = 2
+? Bot1.Battlefield.Runescale Stormbrood.Toughness = 4
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Runescale Stormbrood.Power = 2
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Runescale Stormbrood.Power = 4
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Runescale Stormbrood.Power = 6
+? Bot1.Battlefield.Runescale Stormbrood.Toughness = 4
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Runescale Stormbrood.Power = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Runescale Stormbrood.Power = 4
+Bot1.Battlefield.Clarion Conqueror.Power = 3

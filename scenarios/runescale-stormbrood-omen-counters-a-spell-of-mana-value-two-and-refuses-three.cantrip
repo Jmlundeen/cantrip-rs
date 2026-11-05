@@ -1,0 +1,66 @@
+# Runescale Stormbrood cast as its Omen, Chilling Screech (CR 720.3): an instant ({1}{U}, paid by Mox Sapphire and Mox Jet) cast on
+# Bot2's turn. "Counter target spell with mana value 2 or less": Coalition Relic (mana value 3) is refused as a target, Grizzly Bears
+# (exactly 2) is countered. The Omen is a noncreature spell, so the first Runescale Stormbrood on Bot1's battlefield gets +2/+0
+# (CR 720.3b). Resolving, the Omen is shuffled into Bot1's library (CR 720.3d), not into the graveyard (only the used Black Lotus is there).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Runescale Stormbrood
+Runescale Stormbrood
+Mox Sapphire
+Mox Jet
+Island
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Coalition Relic
+Grizzly Bears
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Runescale Stormbrood.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Coalition Relic.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Runescale Stormbrood.Cast(Stack.Coalition Relic; Ability: Omen)
+Bot1.Pass
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Hand.Runescale Stormbrood.Cast(Stack.Grizzly Bears; Ability: Omen)
+? Stack = Runescale Stormbrood; Chilling Screech; Grizzly Bears
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Runescale Stormbrood.Power = 4
+? Stack = Chilling Screech; Grizzly Bears
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Grizzly Bears; Black Lotus
+? Bot1.Graveyard = Black Lotus
+? Bot1.Library.Count = 13
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Black Lotus
+Bot1.Library.Count = 13
+Bot2.Graveyard = Grizzly Bears; Black Lotus
+Bot2.Battlefield = Mox Emerald; Mox Ruby; Coalition Relic
