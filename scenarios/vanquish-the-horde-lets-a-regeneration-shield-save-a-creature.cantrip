@@ -1,0 +1,52 @@
+# Vanquish the Horde says only "Destroy all creatures": it does not say they can't be regenerated, so a regeneration
+# shield made in response saves Bot2's Llanowar Elves (it is tapped and stays) while Bot1's Memnite is destroyed
+# (CR 701.8a, 701.19). Two creatures make the {6}{W}{W} spell cost {4}{W}{W}, paid with five Moxen and a Plains.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Memnite
+Vanquish the Horde
+Plains x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Yavimaya Hollow
+Forest x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Vanquish the Horde.Cast
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+Bot2.Battlefield.Forest.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Vanquish the Horde; Memnite
+Bot2.Battlefield = Forest; Llanowar Elves; Yavimaya Hollow
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Stack.Count = 0

@@ -1,0 +1,77 @@
+# Vanquish the Horde: "This spell costs {1} less to cast for each creature on the battlefield" (CR 601.2f, 118.7a).
+# Four creatures make the {6}{W}{W} spell cost {4}, paid with exactly four Plains, and it destroys every creature
+# including its caster's (CR 701.8a, 120.2).
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Elite Vanguard
+Elite Vanguard
+Vanquish the Horde
+Plains x13
+
+[Bot2 Deck]
+Plains
+Plains
+Plains
+Elite Vanguard
+Elite Vanguard
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Elite Vanguard.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Elite Vanguard.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Plains#3.Activate
+Bot2.Hand.Elite Vanguard.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Hand.Vanquish the Horde.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Vanquish the Horde; Elite Vanguard; Elite Vanguard
+Bot2.Graveyard = Elite Vanguard; Elite Vanguard

@@ -1,0 +1,6 @@
+{
+  "name": "Vanquish the Horde",
+  "manaCost": "{6}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "This spell costs {1} less to cast for each creature on the battlefield.\nDestroy all creatures."
+}
