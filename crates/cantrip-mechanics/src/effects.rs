@@ -1588,6 +1588,20 @@ pub fn return_first_target_to_battlefield(g: &mut dyn Game, item: &StackItem) ->
     Ok(())
 }
 
+/// "Return [up to N] target [creature cards] from your graveyard to the battlefield. Put a +1/+1 counter on each of them" (CR 400.3,
+/// 122.1): the targets still legal enter under your control (CR 608.2b, 110.2a), all at once; then, as the next sentence (CR 608.2c),
+/// one +1/+1 counter goes on each that did enter - a new object each (CR 400.7), one instruction (CR 122.6). A card a replacement
+/// effect sent elsewhere (Containment Priest's exile) never became one of them. Scout for Survivors and Smile at Death print it.
+pub fn return_targets_to_battlefield_with_plus_one_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let you = item.controller;
+    let cards: Vec<(ObjectId, PlayerId)> = crate::targets::legal_objects(g, item).into_iter().map(|c| (c, you)).collect();
+    let entered = g.put_all_onto_battlefield(&cards)?;
+    g.end_sentence();
+    let counters: Vec<(ObjectId, CounterKind, i32)> = entered.into_iter().filter(|&id| g.is_on_battlefield(id)).map(|id| (id, CounterKind::PlusOne, 1)).collect();
+    g.add_counters_together(&counters);
+    Ok(())
+}
+
 /// "This source deals damage to any target and damage to you" (CR 608.2b-c, 120.4b): one instruction, both hits simultaneous.
 /// Psionic Blast and Spicy Oatmeal Pizza use this recipe; the resolving item has one mandatory target.
 pub fn damage_target_and_you<const TARGET: u32, const YOU: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

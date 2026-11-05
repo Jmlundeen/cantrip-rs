@@ -1,0 +1,58 @@
+# Smile at Death: "up to two" (CR 115.1d). Bot2 Bolts Bot1's Memnite on turn 2. Smile comes down on turn 5. At the turn 7 upkeep Bot1
+# chooses no target (the Memnite is a legal one, but it need not be): it stays in the graveyard. At the turn 9 upkeep it chooses just
+# the Memnite, which returns with a +1/+1 counter as a 2/2 - fewer than the most is enough.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Memnite
+Smile at Death
+Plains
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Plains.Play
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Smile at Death.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Upkeep]
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Memnite
+[T9 Bot1.Upkeep]
+Bot1.Target(Bot1.Graveyard.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Battlefield.Memnite.Toughness = 2

@@ -1,0 +1,84 @@
+# Smile at Death: "At the beginning of your upkeep, return up to two target creature cards with power 2 or less from your graveyard
+# to the battlefield. Put a +1/+1 counter on each of those creatures." Bot2 Bolts Bot1's Memnite (power 1), Ornithopter (0), Grizzly
+# Bears (2, exactly at the limit) and Devilthorn Fox (3, just past it). On turn 9 Bot1's upkeep trigger cannot target the Fox (CR 115.1)
+# nor three cards (CR 115.1d); it returns the Memnite and the Bears, each with a +1/+1 counter, as 2/2 and 3/3. The Ornithopter stays.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Memnite
+Ornithopter
+Grizzly Bears
+Devilthorn Fox
+Smile at Death
+Plains
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Devilthorn Fox.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Devilthorn Fox)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Smile at Death.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Upkeep]
+! Bot1.Target(Bot1.Graveyard.Devilthorn Fox)
+! Bot1.Target(Bot1.Graveyard.Memnite; Bot1.Graveyard.Ornithopter; Bot1.Graveyard.Grizzly Bears)
+Bot1.Target(Bot1.Graveyard.Memnite; Bot1.Graveyard.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Devilthorn Fox; Ornithopter
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Battlefield.Memnite.Toughness = 2
+Bot1.Battlefield.Grizzly Bears.Power = 3
+Bot1.Battlefield.Grizzly Bears.Toughness = 3
