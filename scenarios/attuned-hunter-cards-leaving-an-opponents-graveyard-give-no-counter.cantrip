@@ -1,0 +1,32 @@
+# Attuned Hunter counts only cards leaving YOUR graveyard: on Bot1's turn 3 Bot2 exiles its own graveyard (a spent Black Lotus) with Tormod's Crypt, and the 3/3 stays a 3/3.
+
+[Bot1 Deck]
+Black Lotus
+Attuned Hunter
+Island x18
+
+[Bot2 Deck]
+Black Lotus
+Tormod's Crypt
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Attuned Hunter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Tormod's Crypt.Cast
+[T3 Bot1.Main1]
+Bot2.Battlefield.Tormod's Crypt.Activate(Bot2)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Attuned Hunter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Attuned Hunter.Power = 3

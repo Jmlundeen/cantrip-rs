@@ -1,0 +1,11 @@
+{
+  "name": "Attuned Hunter",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Human Ranger",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Trample\nWhenever one or more cards leave your graveyard during your turn, put a +1/+1 counter on this creature.",
+  "keywords": [
+    "Trample"
+  ]
+}
