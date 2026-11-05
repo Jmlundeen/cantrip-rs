@@ -1,0 +1,46 @@
+# Kutzil, Malamet Exemplar in a three-player game: "one or more ... deals combat damage to a player" is one trigger for each
+# player the batch damaged (CR 603.2c). Glorious Anthem puts every creature of Bot1's above its base power (CR 613.4c). Kutzil and
+# a Memnite hit Bot2 and an Ornithopter hits Bot3 in the same damage step: two qualifying creatures on one player draw one card
+# between them, and the other player draws another. Hand: the turn-4 draw and two cards = 3 (the first player's turn-1 draw,
+# CR 103.8a, was played with the rest of the hand).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Black Lotus
+Kutzil, Malamet Exemplar
+Memnite
+Ornithopter
+Glorious Anthem
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kutzil, Malamet Exemplar.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Glorious Anthem.Cast
+Bot1.Pass
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Kutzil, Malamet Exemplar > Bot2; Memnite > Bot2; Ornithopter > Bot3)
+[T4 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot3.Life = 19
+Bot1.Hand.Count = 3

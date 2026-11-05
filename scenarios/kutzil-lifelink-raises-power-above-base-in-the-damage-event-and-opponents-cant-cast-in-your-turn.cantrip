@@ -1,0 +1,55 @@
+# Kutzil, Malamet Exemplar: Elenda, Saint of Dusk (printed 4/4, lifelink; +1/+1 while her controller's life total is greater
+# than starting life) attacks at exactly 20 life. When she deals her damage the lifelink gain is part of the same event
+# (CR 510.2, 120.3f), and the trigger is checked right after it, before state-based actions (CR 603.10): her power is then 5,
+# above her base 4, so Kutzil's controller draws. Her power was 4 as she dealt the damage, so only reading it after the
+# event draws (Bot1 hand: 1 draw for turn 3 + 1 for the trigger). "Your opponents can't cast spells during your turn"
+# (CR 101.2): Bot2 casts a Lightning Bolt in its own turn 2 but is refused one in Bot1's turn 3.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Gleemox
+Black Lotus
+Kutzil, Malamet Exemplar
+Elenda, Saint of Dusk
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kutzil, Malamet Exemplar.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Elenda, Saint of Dusk.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Elenda, Saint of Dusk > Bot2)
+Bot1.Pass
+! Bot2.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Life = 24
+Bot1.Hand.Count = 2
+Bot2.Graveyard = Lightning Bolt

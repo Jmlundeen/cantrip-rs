@@ -1,0 +1,74 @@
+# Kutzil, Malamet Exemplar: "you control" and "one or more". On turn 4 Bot2's Scuzzback Scrapper (1/1) is pumped by Giant Growth
+# to 4/4, above its base power, and hits Bot1: it is not Bot1's creature, so Bot1 draws nothing (hand still empty). On turn 5
+# Bot1's Pest Mascot (3/4 with a +1/+1 counter from Dissection Practice's life gain, above its base 2) and a Memnite (power 1,
+# its base) both hit Bot2 unblocked in the same damage step: one trigger (CR 603.2c), because the Mascot qualifies, one draw
+# (the turn-5 draw and that card: two Islands in hand).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Gleemox
+Kutzil, Malamet Exemplar
+Pest Mascot
+Dissection Practice
+Memnite
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Scuzzback Scrapper
+Giant Growth
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kutzil, Malamet Exemplar.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Scuzzback Scrapper.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pest Mascot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Dissection Practice.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Scuzzback Scrapper > Bot1)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Scuzzback Scrapper)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+? Bot1.Life = 17
+? Bot1.Hand.Count = 0
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Pest Mascot > Bot2; Memnite > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Hand.Count = 2

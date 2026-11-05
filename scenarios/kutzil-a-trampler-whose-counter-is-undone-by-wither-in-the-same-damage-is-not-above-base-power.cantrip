@@ -1,0 +1,64 @@
+# Kutzil, Malamet Exemplar: Pest Mascot (2/3 trample) grows a +1/+1 counter (3/4: power above its base 2) when Dissection
+# Practice gains Bot1 a life. It attacks with a Memnite (power 1, its base: never qualifies) and is blocked by Scuzzback
+# Scrapper (1/1 wither). The Mascot assigns 1 to the Scrapper and tramples 2 over (CR 702.19b); the Scrapper's wither damage
+# puts a -1/-1 counter on it as part of the same event (CR 702.80a), so right after the damage - when the trigger is checked,
+# before state-based actions cancel the counters (CR 603.10, 704.5q) - its power is 2, equal to its base. Neither creature
+# that dealt damage to Bot2 has power above base, so Bot1 draws nothing: the hand is the turn-5 draw alone (Island).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Gleemox
+Kutzil, Malamet Exemplar
+Pest Mascot
+Dissection Practice
+Memnite
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Scuzzback Scrapper
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kutzil, Malamet Exemplar.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Scuzzback Scrapper.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pest Mascot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Dissection Practice.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Pest Mascot.Power = 3
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Pest Mascot > Bot2; Memnite > Bot2)
+Bot2.Block(Scuzzback Scrapper > Pest Mascot)
+Bot1.AssignDamage(Pest Mascot > Scuzzback Scrapper: 1; Pest Mascot > Bot2: 2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Hand = Island

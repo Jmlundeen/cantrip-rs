@@ -1,0 +1,8 @@
+{
+  "name": "Kutzil, Malamet Exemplar",
+  "manaCost": "{1}{G}{W}",
+  "type": "Legendary Creature — Cat Warrior",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Your opponents can't cast spells during your turn.\nWhenever one or more creatures you control each with power greater than its base power deals combat damage to a player, draw a card."
+}

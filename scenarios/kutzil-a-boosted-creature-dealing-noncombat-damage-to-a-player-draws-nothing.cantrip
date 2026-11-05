@@ -1,0 +1,44 @@
+# Kutzil, Malamet Exemplar: "combat damage". Prodigal Sorcerer is 2/2 under Glorious Anthem, above its base power, and its ability
+# deals 1 damage to Bot2 (CR 120.1): that is not combat damage (CR 510.2), so nothing is drawn. The hand is the turn-3 draw alone.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Gleemox
+Black Lotus
+Kutzil, Malamet Exemplar
+Prodigal Sorcerer
+Glorious Anthem
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Hand.Kutzil, Malamet Exemplar.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Prodigal Sorcerer.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glorious Anthem.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Prodigal Sorcerer.Power = 2
+Bot1.Battlefield.Prodigal Sorcerer.Activate(Bot2)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Hand.Count = 1
