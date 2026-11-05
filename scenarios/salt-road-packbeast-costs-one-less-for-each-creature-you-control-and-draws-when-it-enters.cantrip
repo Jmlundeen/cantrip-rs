@@ -1,0 +1,41 @@
+# Salt Road Packbeast: "Affinity for creatures" (CR 702.41: {1} less for each creature you control) and "When this creature
+# enters, draw a card". Bot1 has four Moxes ({5}{W} needs six mana). With Memnite alone it costs {4}{W}, five mana: refused
+# (the refusal). With the Ornithopter too it costs {3}{W}, four mana, so the Moxes pay for it; its enter trigger draws a card
+# (hand: 7 cards, minus 4 Moxes, Memnite, Ornithopter and the Packbeast is 0, plus 1).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Emerald
+Memnite
+Ornithopter
+Salt Road Packbeast
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+! Bot1.Hand.Salt Road Packbeast.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Salt Road Packbeast.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 0
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Memnite; Ornithopter; Salt Road Packbeast
+Bot1.Hand.Count = 1
