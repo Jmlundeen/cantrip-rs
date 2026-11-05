@@ -1247,6 +1247,12 @@ fn artifact_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> b
 
 pub const ARTIFACT_CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(artifact_card_in_your_graveyard);
 
+/// "Noncreature, nonland card from your graveyard" (CR 115.1, 404.1): a card there is the types it has in a graveyard. Used as
+/// `target(..)` or `up_to_one(..)`; Monastery Messenger and Practiced Scrollsmith print it.
+pub fn noncreature_nonland_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard(q, asker, t, &[]) && matches!(t, Target::Object(id) if !q.chars(id).is(CardType::Creature) && !q.chars(id).is(CardType::Land))
+}
+
 fn creature_card_in_your_graveyard_with_mana_value_x_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     card_in_your_graveyard(q, asker, t, &[CardType::Creature]) && matches!(t, Target::Object(id) if mana_value_is_x(q, id))
 }

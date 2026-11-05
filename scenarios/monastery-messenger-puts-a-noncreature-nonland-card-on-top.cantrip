@@ -1,0 +1,43 @@
+# {2/U}{2/R}{2/W}, flying, vigilance; "When this creature enters, put up to one target noncreature, nonland card from your graveyard
+# on top of your library." The graveyard holds a dead Ornithopter (a creature: refused) and a Lightning Bolt, which goes on top: Bot1 draws it in the next turn (T5).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Monastery Messenger
+Ornithopter
+Lightning Bolt
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Monastery Messenger.Cast
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Ornithopter)
+Bot1.Target(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Hand.Lightning Bolt.Colors.Count = 1
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Monastery Messenger.Power = 2
