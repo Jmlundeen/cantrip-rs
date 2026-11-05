@@ -1,0 +1,35 @@
+# Neelix makes a Food on entering (CR 111.10b) and grows by one +1/+1 counter each time its controller gains life (CR 119.3,
+# 603.2): sacrificing the Food for {2} gains 3 life as one event, so the 1/1 becomes 2/2.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Neelix, Moral Support
+Forest x4
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Neelix, Moral Support.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Neelix, Moral Support.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Forest#2.Play
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Food Token.Activate
+
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield.Neelix, Moral Support.Power = 2
+Bot1.Battlefield.Neelix, Moral Support.Toughness = 2
+Bot1.Battlefield.Neelix, Moral Support.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Food Token = (absent)
