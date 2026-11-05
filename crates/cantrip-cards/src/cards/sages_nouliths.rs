@@ -1,6 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::job_select::{HERO, JOB_SELECT};
+use cantrip_mechanics::job_select::JOB_SELECT;
+use cantrip_mechanics::tokens::HERO_1_1_COLORLESS;
 use cantrip_mechanics::{effects, targets, triggers};
 use cantrip_oracle as oracle;
 
@@ -17,4 +18,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::SAGES_NOULITHS
 };
 
-pub static EXTRA: &[&CardDef] = &[&HERO];
+pub static EXTRA: &[&CardDef] = &[&HERO_1_1_COLORLESS];

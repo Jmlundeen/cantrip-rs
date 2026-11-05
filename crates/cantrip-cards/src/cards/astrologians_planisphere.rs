@@ -1,6 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::job_select::{HERO, JOB_SELECT};
+use cantrip_mechanics::job_select::JOB_SELECT;
+use cantrip_mechanics::tokens::HERO_1_1_COLORLESS;
 use cantrip_oracle as oracle;
 
 /// "Whenever you cast a noncreature spell and whenever you draw your third card each turn" (CR 603.2, 121.2): the
@@ -33,4 +34,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::ASTROLOGIANS_PLANISPHERE
 };
 
-pub static EXTRA: &[&CardDef] = &[&HERO];
+pub static EXTRA: &[&CardDef] = &[&HERO_1_1_COLORLESS];
