@@ -1,0 +1,40 @@
+# Guinan, Ancient Advisor: "If you put two or more +1/+1 counters on creatures this way, draw a card." (CR 608.2c). On
+# turn 7 only Elite Vanguard enters, so the activation puts one counter on it, one short of two: no card is drawn, and
+# its hand ends at four cards, Savannah Lions among them.
+
+[Bot1 Deck]
+Guinan, Ancient Advisor
+Elite Vanguard
+Savannah Lions
+Plains x7
+Plains x30
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Guinan, Ancient Advisor.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Guinan, Ancient Advisor.Activate
+
+[Expect]
+Bot1.Battlefield.Elite Vanguard.Power = 3
+Bot1.Battlefield.Guinan, Ancient Advisor.Power = 1
+Bot1.Hand.Count = 4

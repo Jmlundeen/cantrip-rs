@@ -1,0 +1,8 @@
+{
+  "name": "Guinan, Ancient Advisor",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — El-Aurian Advisor",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "{1}, {T}: Put a +1/+1 counter on each creature you control that entered this turn. If you put two or more +1/+1 counters on creatures this way, draw a card."
+}

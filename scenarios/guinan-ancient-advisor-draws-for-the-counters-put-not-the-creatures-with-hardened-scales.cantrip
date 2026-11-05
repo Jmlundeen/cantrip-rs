@@ -1,0 +1,47 @@
+# Guinan, Ancient Advisor: "If you put two or more +1/+1 counters on creatures this way, draw a card." With Hardened Scales
+# one creature (Memnite, entered this turn) gets two counters, so the card is drawn although only one creature got them
+# (CR 122.6, 614.1; ruling: the number of counters actually put). Guinan herself entered on turn 1 and gets nothing.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Guinan, Ancient Advisor
+Hardened Scales
+Memnite
+Swamp
+Plains x30
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hardened Scales.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Guinan, Ancient Advisor.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Guinan, Ancient Advisor.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 3
+Bot1.Battlefield.Guinan, Ancient Advisor.Power = 1
+Bot1.Hand = Swamp
