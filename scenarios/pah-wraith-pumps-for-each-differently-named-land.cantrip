@@ -1,0 +1,52 @@
+# Pah-Wraith {5}{R}{R} 4/4 with first strike and haste: "Strange new worlds - Whenever this creature attacks, creatures you
+# control get +X/+0 until end of turn, where X is the number of differently named lands you control." Mountain, Mox Ruby,
+# Mox Emerald, Mox Pearl, Mox Sapphire and Mox Jet pay the seven mana. With one Mountain out it attacks as a 5/4 (20 to 15);
+# a second Mountain on turn 3 is the same name, so X is still one and it attacks again as a 5/4 (15 to 10).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mountain
+Pah-Wraith
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pah-Wraith.Cast
+Bot1.Attack(Pah-Wraith > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Pah-Wraith.Power = 5
+? Bot2.Life = 15
+
+[Expect]
+Bot1.Battlefield.Pah-Wraith.Power = 5
+Bot2.Life = 15

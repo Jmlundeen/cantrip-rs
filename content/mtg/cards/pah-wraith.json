@@ -1,0 +1,12 @@
+{
+  "name": "Pah-Wraith",
+  "manaCost": "{5}{R}{R}",
+  "type": "Creature — Wraith",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "First strike, haste\nStrange new worlds — Whenever this creature attacks, creatures you control get +X/+0 until end of turn, where X is the number of differently named lands you control.",
+  "keywords": [
+    "FirstStrike",
+    "Haste"
+  ]
+}
