@@ -1,0 +1,46 @@
+# Duelist's Heritage: "you may have target attacking creature gain double strike" - the target is chosen as the trigger
+# goes on the stack and the "may" is asked as it resolves (CR 608.2b); declined, Grizzly Bears deals only its normal 2
+# damage and has no double strike.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Forest
+Forest
+Duelist's Heritage
+Grizzly Bears
+Plains x20
+Forest x13
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Duelist's Heritage.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot1.Decline
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Grizzly Bears.Keywords = (absent)
