@@ -1,0 +1,25 @@
+# Focus the Mind: only a spell cast this turn counts. Bot1 cast Black Lotus on turn 1; on turn 3 casts nothing first, and the Lotus plus an
+# Island make four mana, which cannot pay the full {4}{U}, so Focus the Mind cannot be cast.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Focus the Mind
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Focus the Mind.Cast(Mana: short)
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 1

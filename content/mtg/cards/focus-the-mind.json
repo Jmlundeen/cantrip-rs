@@ -1,0 +1,6 @@
+{
+  "name": "Focus the Mind",
+  "manaCost": "{4}{U}",
+  "type": "Instant",
+  "oracleText": "This spell costs {2} less to cast if you've cast another spell this turn.\nDraw three cards, then discard a card."
+}

@@ -1,0 +1,32 @@
+# Focus the Mind (CR 601.2f): "This spell costs {2} less to cast if you've cast another spell this turn. Draw three cards, then discard a card."
+# Bot1 casts Mox Sapphire and Black Lotus, then pays {2}{U} (the Lotus's three blue mana, nothing over) for Focus the Mind instead of {4}{U}.
+# It draws three cards and discards an Island (a hand of 4 + 3 - 1 = 6).
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Focus the Mind
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Focus the Mind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 10
+Bot1.Graveyard = Focus the Mind; Island; Black Lotus
