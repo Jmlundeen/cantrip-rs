@@ -1,0 +1,8 @@
+{
+  "name": "Troi, Winging It",
+  "manaCost": "{3}{W}",
+  "type": "Legendary Creature — Betazoid Human Advisor",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Whenever an opponent draws a card during your turn, create a 1/1 blue Faerie creature token with flying."
+}

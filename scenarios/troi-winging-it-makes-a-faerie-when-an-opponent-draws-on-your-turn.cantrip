@@ -1,0 +1,48 @@
+# Troi, Winging It ({3}{W}): "Whenever an opponent draws a card during your turn, create a 1/1 blue Faerie creature token
+# with flying." Bot2 casts Brainstorm on Bot1's turn 7; each of its three draws triggers Troi, making three Faeries.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Troi, Winging It
+Plains x20
+Plains x15
+
+[Bot2 Deck]
+Island
+Island
+Brainstorm
+Island x37
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Hand.Troi, Winging It.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Faerie Token#1.Power = 1
+Bot1.Battlefield.Faerie Token#1.Keywords = Flying
