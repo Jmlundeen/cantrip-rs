@@ -1,0 +1,11 @@
+{
+  "name": "Saru, Unthreatened",
+  "manaCost": "{2}{G}",
+  "type": "Legendary Creature — Kelpien Officer",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Flash\nWhen Saru enters, another target creature you control gains hexproof until end of turn. (It can't be the target of spells or abilities your opponents control.)",
+  "keywords": [
+    "Flash"
+  ]
+}

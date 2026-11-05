@@ -1,0 +1,51 @@
+# Saru, Unthreatened is cast with flash on Bot2's turn (CR 702.8a) and gives another target creature its controller controls
+# hexproof until end of turn (CR 702.11b, 611.2a): Saru itself is no legal target, Bot2's Lightning Bolt cannot target the
+# Grizzly Bears that turn, and can on Bot2's next turn, after the grant has ended.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Grizzly Bears
+Saru, Unthreatened
+Forest x2
+Forest x14
+
+[Bot2 Deck]
+Island
+Mountain
+Lightning Bolt
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Saru, Unthreatened.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Saru, Unthreatened.Keywords = Flash
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grizzly Bears)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Grizzly Bears; Black Lotus
+Bot1.Battlefield.Saru, Unthreatened.Power = 3
+Bot1.Battlefield.Saru, Unthreatened.Toughness = 2
+Bot1.Life = 20
