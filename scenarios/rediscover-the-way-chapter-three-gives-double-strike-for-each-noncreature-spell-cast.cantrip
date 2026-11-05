@@ -1,0 +1,66 @@
+# Rediscover the Way, chapter III (turn 5): "Whenever you cast a noncreature spell this turn, target creature you control gains
+# double strike until end of turn." A delayed triggered ability (CR 603.7b) for that turn only. Bot1 casts an Ornithopter first
+# (a creature spell: nothing), then Mox Jet (a noncreature spell: the Llanowar Elves gain double strike); on turn 6 the
+# Elves have lost it. Moxen cast on turn 1 and 3, before the chapter, gave nothing either.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Rediscover the Way
+Llanowar Elves
+Mox Emerald
+Mox Jet
+Plains
+Plains
+Plains
+Ornithopter
+Plains
+Plains
+Plains
+Plains
+Island x8
+
+[Bot2 Deck]
+Forest x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rediscover the Way.Cast
+Bot1.Pass
+Bot1.Arrange(Plains | Plains; Plains)
+[T3 Bot1.Main1]
+Bot1.Arrange(Plains | Plains; Plains)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Pass
+? Bot1.Battlefield.Rediscover the Way.Counters.Lore = 3
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = DoubleStrike
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+
+[Expect]
+Bot1.Graveyard = Rediscover the Way

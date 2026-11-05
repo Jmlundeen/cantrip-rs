@@ -1,0 +1,56 @@
+# Rediscover the Way, chapters I and II: "Look at the top three cards of your library. Put one of them into your hand and the
+# rest on the bottom of your library in any order." Cast on turn 1 (a cast short of mana is refused), chapter I takes the Swamp
+# from Island, Swamp, Forest and bottoms the other two; chapter II on turn 3, after the draw of the Mountain, takes the Mox Emerald
+# from Mox Jet, Mox Emerald, Plains and bottoms the other two. Exactly one card of each three reaches the hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Rediscover the Way
+Plains
+Plains
+Plains
+Island
+Swamp
+Forest
+Mountain
+Mox Jet
+Mox Emerald
+Plains
+Island x8
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+! Bot1.Hand.Rediscover the Way.Cast(Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rediscover the Way.Cast
+Bot1.Pass
+Bot1.Arrange(Swamp | Island; Forest)
+? Bot1.Hand = Plains; Plains; Plains; Swamp
+? Bot1.Battlefield.Rediscover the Way.Counters.Lore = 1
+? Bot1.Library.Count = 14
+? Bot1.Revealed = (absent)
+? Bot2.Revealed = (absent)
+[T3 Bot1.Main1]
+! Bot1.Arrange(Mox Emerald; Mox Jet | Plains)
+! Bot1.Arrange( | Mox Jet; Mox Emerald; Plains)
+Bot1.Arrange(Mox Emerald | Mox Jet; Plains)
+? Bot1.Hand = Plains; Plains; Plains; Swamp; Mountain; Mox Emerald
+? Bot1.Battlefield.Rediscover the Way.Counters.Lore = 2
+? Bot1.Library.Count = 12
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Swamp; Mountain; Mox Emerald
+Bot1.Library.Count = 12

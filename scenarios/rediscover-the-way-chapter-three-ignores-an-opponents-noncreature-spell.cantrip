@@ -1,0 +1,70 @@
+# Rediscover the Way, chapter III (turn 5): the trigger is for noncreature spells YOU cast. Bot2's Lightning Bolt, cast at Bot1
+# on turn 5 with the Llanowar Elves out, gives them no double strike (checked); Bot1's own Mox Jet right after does (the control).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Rediscover the Way
+Llanowar Elves
+Mox Emerald
+Mox Jet
+Plains
+Plains
+Plains
+Ornithopter
+Plains
+Plains
+Plains
+Plains
+Island x8
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rediscover the Way.Cast
+Bot1.Pass
+Bot1.Arrange(Plains | Plains; Plains)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Arrange(Plains | Plains; Plains)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Pass
+? Bot1.Battlefield.Rediscover the Way.Counters.Lore = 3
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+? Bot1.Life = 17
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = DoubleStrike
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+
+[Expect]
+Bot1.Graveyard = Rediscover the Way
