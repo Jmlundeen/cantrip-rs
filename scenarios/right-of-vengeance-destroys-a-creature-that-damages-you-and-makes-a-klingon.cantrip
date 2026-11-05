@@ -1,0 +1,44 @@
+# Right of Vengeance ({3}{W}): "Until end of turn, whenever a creature deals combat damage to you, destroy that creature
+# and create a 2/1 red Klingon Warrior creature token with haste" (CR 603.7b, 603.7d). Bot2's Savannah Lions attacks on
+# turn three; Bot1 casts the instant in that combat, so the delayed trigger is set up before the damage, and the Lions are
+# destroyed as they damage Bot1 for 2.
+
+[Bot1 Deck]
+Black Lotus
+Right of Vengeance
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Savannah Lions
+Plains x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Right of Vengeance.Cast
+Bot2.Attack(Savannah Lions > Bot1)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Klingon Warrior Token.Power = 2
+Bot1.Battlefield.Klingon Warrior Token.Keywords = Haste
+Bot2.Graveyard = Savannah Lions
