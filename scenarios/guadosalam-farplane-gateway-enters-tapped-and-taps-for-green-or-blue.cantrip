@@ -1,0 +1,25 @@
+# Guadosalam, Farplane Gateway, a Town: "This land enters tapped. {T}: Add {G} or {U}" (CR 614.1d, 305.6). It enters tapped and cannot be tapped for mana that turn (refused). On turn 3 it
+# taps for {G}; on turn 5, the other of its colors, {U}, and never red.
+
+[Bot1 Deck]
+Guadosalam, Farplane Gateway
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Guadosalam, Farplane Gateway.Play
+? Bot1.Battlefield.Guadosalam, Farplane Gateway.Tapped = true
+? Bot1.Battlefield.Guadosalam, Farplane Gateway.Subtypes = Town
+! Bot1.Battlefield.Guadosalam, Farplane Gateway.Activate(Color: Green)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Guadosalam, Farplane Gateway.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Guadosalam, Farplane Gateway.Activate(Color: Blue)
+? Bot1.Mana = {U}
+! Bot1.Battlefield.Guadosalam, Farplane Gateway.Activate(Color: Red)
+
+[Expect]
+Bot1.Battlefield.Guadosalam, Farplane Gateway.Tapped = true
