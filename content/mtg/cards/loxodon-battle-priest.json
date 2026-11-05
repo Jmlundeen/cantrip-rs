@@ -1,0 +1,8 @@
+{
+  "name": "Loxodon Battle Priest",
+  "manaCost": "{4}{W}",
+  "type": "Creature — Elephant Cleric",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "At the beginning of combat on your turn, put a +1/+1 counter on another target creature you control."
+}
