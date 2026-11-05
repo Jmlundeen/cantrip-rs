@@ -685,6 +685,12 @@ impl AbilityDef {
         AbilityDef::Activated(ActivatedDef { cycling: true, ..activated(self, "only an activated ability cycles") })
     }
 
+    /// A ninjutsu ability (CR 702.49a, 702.49d): one of the class "ninjutsu abilities" (`ActivatedDef::ninjutsu`). For the
+    /// keyword's shared mechanics alone.
+    pub const fn ninjutsu(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { ninjutsu: true, ..activated(self, "only an activated ability is a ninjutsu ability") })
+    }
+
     /// "X can't be 0" (CR 107.3a, 602.2b): the X of its activation cost is announced as 1 or more.
     pub const fn x_cant_be_zero(self) -> AbilityDef {
         AbilityDef::Activated(ActivatedDef { x_cant_be_zero: true, ..activated(self, "only an activated ability announces an X") })

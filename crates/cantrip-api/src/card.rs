@@ -1535,6 +1535,11 @@ pub struct ActivatedDef {
     /// keyword's shared mechanics (`triggers::cycling`, `typecycling`), never by a card, and held to the words by
     /// `cantrip-cards/tests/cycling_matches_oracle.rs`.
     pub cycling: bool,
+    /// A ninjutsu ability (CR 702.49a), commander ninjutsu's included, which is a variant of it (CR 702.49d): "ninjutsu
+    /// abilities" are named as a class by a card that changes their cost (Silver-Fur Master), and `from` tells them from no
+    /// other ability of a card in hand. Set by the keyword's shared mechanics (`ninjutsu::ninjutsu`), never by a card, and
+    /// held to the words by `cantrip-cards/tests/ninjutsu_matches_oracle.rs`.
+    pub ninjutsu: bool,
     /// "Sacrifice an artifact or discard a nonland card" (CR 601.2b, 602.2b, 118.3): the part of the cost that names a choice
     /// between ways of paying, one of which the player chooses as the ability is announced, before X and its targets; it is
     /// paid with `cost`, the two together. A way that can't be paid is not offered, and a lone one is taken without asking. None
@@ -1607,6 +1612,7 @@ impl ActivatedDef {
         late_targets: false,
         plot: false,
         cycling: false,
+        ninjutsu: false,
         x_cant_be_zero: false,
         cant_be_copied: false,
         special_action: false,

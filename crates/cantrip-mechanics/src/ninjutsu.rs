@@ -21,8 +21,10 @@ fn put_onto_battlefield_attacking(g: &mut dyn Game, item: &StackItem) -> Result<
 
 /// Ninjutsu `cost` (CR 702.49a): "{cost}, Return an unblocked attacker you control to its owner's hand: Put this card
 /// onto the battlefield from your hand tapped and attacking." Kaito, Bane of Nightmares and Fallen Shinobi print it;
-/// `text` is the ability's full text, which a scenario's `Ability:` matches.
+/// `text` is the ability's full text, which a scenario's `Ability:` matches. It is one of the class "ninjutsu abilities"
+/// (`ActivatedDef::ninjutsu`), which a builder for commander ninjutsu, a variant of it (CR 702.49d), is to mark too.
 pub const fn ninjutsu(cost: ManaCost, text: &'static str) -> AbilityDef {
     ability(Cost::mana(cost).and(return_to_hand(1, unblocked_attacker_you_control)), put_onto_battlefield_attacking, text)
         .from(ZoneKind::Hand)
+        .ninjutsu()
 }
