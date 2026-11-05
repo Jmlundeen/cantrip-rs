@@ -1,0 +1,25 @@
+# Treno, Dark City, a Town: "This land enters tapped. {T}: Add {U} or {B}" (CR 614.1d, 305.6). It enters tapped and cannot be tapped for mana that turn (refused). On turn 3 it
+# taps for {U}; on turn 5, the other of its colors, {B}, and never red.
+
+[Bot1 Deck]
+Treno, Dark City
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Treno, Dark City.Play
+? Bot1.Battlefield.Treno, Dark City.Tapped = true
+? Bot1.Battlefield.Treno, Dark City.Subtypes = Town
+! Bot1.Battlefield.Treno, Dark City.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Treno, Dark City.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Treno, Dark City.Activate(Color: Black)
+? Bot1.Mana = {B}
+! Bot1.Battlefield.Treno, Dark City.Activate(Color: Red)
+
+[Expect]
+Bot1.Battlefield.Treno, Dark City.Tapped = true
