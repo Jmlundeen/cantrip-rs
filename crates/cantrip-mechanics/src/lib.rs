@@ -46,6 +46,7 @@ pub mod goad;
 pub mod goyf;
 pub mod graveyards;
 pub mod greatest_power;
+pub mod greatest_toughness;
 pub mod harness;
 pub mod hexproof_from;
 pub mod job_select;

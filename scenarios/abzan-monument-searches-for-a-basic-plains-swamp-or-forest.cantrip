@@ -1,0 +1,36 @@
+# Abzan Monument {2} Artifact: "When this artifact enters, search your library for a basic Plains, Swamp, or Forest card,
+# reveal it, put it into your hand, then shuffle" (CR 701.23). Two Moxen cast it on turn 1. The search refuses an Island (the
+# wrong type) and a Tundra (a Plains, but not basic), then refuses two cards at once (the search finds at most one) and finds the Forest: it reaches the hand, revealed.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Abzan Monument
+Mountain x4
+Island
+Forest x2
+Tundra
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Abzan Monument.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Island)
+! Bot1.Search(Tundra)
+! Bot1.Search(Forest; Forest)
+Bot1.Search(Forest)
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Forest; Mountain; Mountain; Mountain; Mountain
+Bot1.Revealed = Forest

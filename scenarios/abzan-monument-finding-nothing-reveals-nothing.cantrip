@@ -1,0 +1,32 @@
+# The search may find nothing (CR 701.23b): Bot1 leaves the Plains, Swamp and Forest in the library and nothing is
+# revealed or put into the hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Abzan Monument
+Mountain x4
+Plains
+Swamp
+Forest
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Abzan Monument.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search()
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Mountain; Mountain; Mountain; Mountain
+Bot1.Revealed = (absent)

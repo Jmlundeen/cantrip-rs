@@ -1,0 +1,57 @@
+# "{1}{W}{B}{G}, {T}, Sacrifice this artifact: Create an X/X white Spirit creature token, where X is the greatest toughness
+# among creatures you control. Activate only as a sorcery." Bot1 casts the Monument on turn 1 beside a Memnite (1/1) and an
+# Ornithopter (0/2); on turn 3 four Moxen pay, and the Spirit is 2/2 - the greatest toughness (not the greatest power, not
+# the sum), the Monument sacrificed as a cost. It is refused on the opponent's turn 2, when Bot2 casts a Phyrexian Walker
+# (0/3): a creature Bot1 does not control, so its toughness 3 is not counted.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Abzan Monument
+Memnite
+Ornithopter
+Mountain x4
+Mountain x20
+
+[Bot2 Deck]
+Mox Ruby
+Phyrexian Walker
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Abzan Monument.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search()
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Phyrexian Walker.Cast
+! Bot1.Battlefield.Abzan Monument.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Abzan Monument.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Abzan Monument
+Bot2.Battlefield.Phyrexian Walker.Toughness = 3
+Bot1.Battlefield.Spirit Token.Power = 2
+Bot1.Battlefield.Spirit Token.Toughness = 2
+Bot1.Battlefield.Spirit Token.Colors = White
