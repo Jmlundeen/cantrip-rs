@@ -1,0 +1,41 @@
+# Conversion makes every Mountain, whoever controls it, a Plains (CR 305.7, 613.1d): it taps for white, and a Taiga (a
+# Mountain Forest) loses its Forest type too and taps for {W} alone, not {R} or {G}; each keeps its card type and the basic
+# Mountain its supertype (the ruling: no supertype is added or removed); a Forest, which is no Mountain, is left alone.
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Conversion
+Mountain
+Island x20
+[Bot2 Deck]
+Taiga
+Forest
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Conversion.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Taiga.Play
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.PayCost
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+! Bot2.Battlefield.Taiga.Activate(Ability: Add {G})
+! Bot2.Battlefield.Taiga.Activate(Ability: Add {R})
+Bot2.Battlefield.Taiga.Activate(Ability: Add {W})
+? Bot2.Mana = {W}
+[Expect]
+Bot1.Battlefield.Mountain.Subtypes = Plains
+Bot1.Battlefield.Mountain.Supertypes = Basic
+Bot1.Battlefield.Mountain.Types = Land
+Bot2.Battlefield.Taiga.Subtypes = Plains
+Bot2.Battlefield.Taiga.Types = Land
+Bot2.Battlefield.Forest.Subtypes = Forest

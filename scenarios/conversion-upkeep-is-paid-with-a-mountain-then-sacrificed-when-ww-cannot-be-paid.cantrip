@@ -1,0 +1,47 @@
+# Conversion's upkeep cost {W}{W} is paid exactly (a Mountain taps for white under it, with a Mox Pearl), and Conversion stays; two
+# turns later the Mox Pearl is destroyed so only {W} is available, WW cannot be paid, and Conversion is sacrificed and the
+# Mountains are Mountains again (CR 118.12, 701.21a).
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Conversion
+Mountain
+Island x20
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Disenchant
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Conversion.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.PayCost
+? Bot1.Mana =
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Conversion.Types = Enchantment
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Pearl)
+Bot2.Pass
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+! Bot1.PayCost
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Conversion = (absent)
+Bot1.Graveyard = Conversion; Mox Pearl; Black Lotus
+Bot1.Battlefield.Mountain.Subtypes = Mountain
+Bot2.Battlefield.Mountain.Subtypes = Mountain

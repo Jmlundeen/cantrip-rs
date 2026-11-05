@@ -1,0 +1,34 @@
+# Conversion sets a Mountain's subtype to Plains, so it loses all abilities of its rules text (CR 305.7), and a land
+# entering is judged as it will exist on the battlefield (CR 614.12): Bot2's Dwarven Mine, entering with no other Mountain,
+# would enter tapped, but under Conversion it has no such ability and enters untapped - and its "when this land enters
+# untapped" trigger is gone too, so no Dwarf is made. It taps for {W}, not {R}.
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Pearl
+Conversion
+Plains x15
+[Bot2 Deck]
+Dwarven Mine
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Conversion.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Dwarven Mine.Play
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Dwarven Mine.Tapped = false
+! Bot2.Battlefield.Dwarven Mine.Activate(Ability: Add {R})
+Bot2.Battlefield.Dwarven Mine.Activate(Ability: Add {W})
+? Bot2.Mana = {W}
+[Expect]
+Turn = 2
+Bot2.Battlefield.Dwarf = (absent)
+Bot2.Battlefield.Dwarven Mine.Subtypes = Plains

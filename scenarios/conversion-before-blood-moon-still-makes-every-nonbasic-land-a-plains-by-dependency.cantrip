@@ -1,0 +1,55 @@
+# Blood Moon enters after Conversion, but Conversion's effect depends on Blood Moon's: applying "Nonbasic lands are
+# Mountains" changes what "All Mountains are Plains" applies to (CR 613.8a), so Blood Moon's applies first whatever the
+# timestamps (CR 613.8b), and then Conversion's makes those Mountains Plains (CR 305.7). The Taiga, already a Plains, stays
+# one; Mutavault, which becomes a Mountain only through Blood Moon after Conversion is out, is a Plains too and taps for
+# {W}, not {R}.
+[Bot1 Deck]
+Taiga
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Conversion
+Blood Moon
+Mutavault
+Plains x15
+[Bot2 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Taiga.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Conversion.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Taiga.Activate
+Bot1.PayCost
+[T3 Bot1.Main1]
+Bot1.Hand.Mutavault.Play
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Taiga.Subtypes = Plains
+? Bot1.Battlefield.Mutavault.Subtypes = Plains
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Taiga.Activate
+Bot1.PayCost
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {R})
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {W})
+? Bot1.Mana = {W}
+[Expect]
+Turn = 5
+Bot1.Battlefield.Taiga.Subtypes = Plains
+Bot1.Battlefield.Mutavault.Subtypes = Plains
+Bot1.Battlefield.Conversion.Types = Enchantment
