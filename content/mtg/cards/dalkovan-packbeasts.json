@@ -1,0 +1,11 @@
+{
+  "name": "Dalkovan Packbeasts",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Ox",
+  "power": 0,
+  "toughness": 4,
+  "oracleText": "Vigilance\nMobilize 3 (Whenever this creature attacks, create three tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)",
+  "keywords": [
+    "Vigilance"
+  ]
+}
