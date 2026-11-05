@@ -1,0 +1,46 @@
+# Tribble Cluster: "When this creature dies, create X 1/1 white Tribble creature tokens with 'This token can't block,'
+# where X is this creature's power" (CR 603.6c, 608.2h, 107.1b). It is a 2/2 after its first combat counter on turn 5;
+# Last Gasp gives it -3/-3 on turn 6, so it dies a -1/-1: its power as it last existed is negative, and no Tribbles are
+# created.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Tribble Cluster
+Plains x16
+
+[Bot2 Deck]
+Swamp
+Swamp
+Last Gasp
+Swamp x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Tribble Cluster.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Last Gasp.Cast(Bot1.Battlefield.Tribble Cluster)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard.Tribble Cluster.Power = 1
+Bot1.Battlefield.Count = 3
