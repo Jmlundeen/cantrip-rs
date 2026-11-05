@@ -1777,6 +1777,34 @@ pub fn of_subtype_you_control_dies<const SUBTYPE: u16>(q: &dyn Query, me: &Asker
     }
 }
 
+/// "Whenever you attack with one or more [subtype]s" (CR 508.1m, 603.2c): a creature its controller declares as an attacker that
+/// has the subtype, `SUBTYPE` a `Subtype` as `u16` (`lands::sub`), read through the words of the source's text (CR 612). The
+/// attackers declared together are one batch, so with `once_per_batch` the ability triggers once however many attack; each is
+/// the subject. Hired Claw (Lizards) and Choco, Seeker of Paradise (Birds) print it.
+pub fn you_attack_with_a_creature_of_subtype<const SUBTYPE: u16>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Attacks { attacker, .. }
+            if q.controller(*attacker) == me.controller && q.chars(*attacker).has_subtype(crate::lands::word(q, me.source, SUBTYPE)) =>
+        {
+            Fired::about(Target::Object(*attacker))
+        }
+        _ => None,
+    }
+}
+
+/// "Whenever an opponent loses life" (CR 119.3, 603.2): one event for each time life is lost, damage and paying life included,
+/// and none when none is (a loss of 0, or damage that was prevented). "An opponent" is read against the ability's controller
+/// (CR 603.7d-e), and a player who has left the game is no one's opponent (CR 800.4a). The player is the subject and the
+/// trigger carries how much was lost. Bloodthirsty Conqueror and Kefka, Ruler of Ruin (on its controller's turn) print it.
+pub fn opponent_loses_life(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::LifeChange { player, delta } if *delta < 0 && q.state().opponents(me.controller).any(|p| p == *player) => {
+            Some(Fired { subject: Target::Player(*player), data: [delta.unsigned_abs(), 0] })
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever another creature you control dies" (CR 700.4, 603.10a): a creature other than the source, looked back on as it last
 /// was on the battlefield, under the controller it last had. Heirloom Auntie and Pitiless Plunderer print it.
 pub fn another_creature_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
