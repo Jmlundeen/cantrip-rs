@@ -2415,13 +2415,7 @@ fn token_copy(cards: &CardTable, card: CardId, copy: Option<Copiable>, words: Wo
     if words.is_printed() {
         return copy;
     }
-    // A double-faced token's own definition (an Incubator, CR 111.10i) keeps both faces, each under the changed words.
-    let faces = cards.backs[card.0 as usize].map(|_| card);
-    let values = Copiable { words, name: cards.get(card).token_name_under(words), ..Copiable::of(card) };
-    Some(match faces {
-        Some(front) => values.own_faces_of(front),
-        None => values,
-    })
+    cantrip_api::token_values(cards.get(card), card, words)
 }
 
 /// Whether an instruction names a defender or leaves its choice to the entering creature's controller (CR 508.4).

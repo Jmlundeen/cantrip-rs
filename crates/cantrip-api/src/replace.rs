@@ -195,8 +195,8 @@ pub struct TokenCreation {
     pub controller: PlayerId,
     pub token: CardId,
     pub count: u32,
-    /// Copy values used by token-creation replacements (CR 707.2). Clear when replacing the token with another
-    /// definition.
+    /// Copy values used by token-creation replacements (CR 707.2). An effect that replaces the token with a definition
+    /// of its own sets them to that token under its source's words (`Query::token_copy`, CR 612.4).
     pub copy: Option<Copiable>,
 }
 

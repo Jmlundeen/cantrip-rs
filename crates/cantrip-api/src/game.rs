@@ -208,6 +208,14 @@ pub trait Query {
     /// replacements.
     fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars;
 
+    /// The copy values of a token of `card` that `source`'s text makes (CR 612.4, 612.2a, `token_values`): what a
+    /// replacement effect that has a token of a definition of its own created instead sets as `TokenCreation::copy`, so
+    /// a text change on its source (Artificial Evolution, Sleight of Mind) changes the token it makes. `None` for
+    /// printed words.
+    fn token_copy(&self, card: CardId, source: ObjectId) -> Option<Copiable> {
+        crate::token_values(self.card(card), card, self.words(source))
+    }
+
     /// Whether `id` has lost all its abilities (CR 613.1f), to a resolved effect or a static ability, so that the
     /// abilities its card prints are gone: the one answer every rule read off a card is judged by - static abilities
     /// from layer 6 on, play rules, cost changes, replacement effects, trigger and block rules - so that they agree with

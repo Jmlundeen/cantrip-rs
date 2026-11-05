@@ -14,11 +14,11 @@ fn tokens_under_your_control(_: &dyn Query, me: &Asker, p: &Proposal) -> bool {
 }
 
 /// "... that many 3/3 colorless Illusion artifact creature tokens are created instead": the same count, of a token that
-/// is no copy of anything.
-fn illusions_instead(q: &dyn Query, _: &Asker, p: &mut Proposal) {
+/// is no copy of anything, but what Holo-Engineer's text says now (CR 612.4, 612.2a: Artificial Evolution's Goblin).
+fn illusions_instead(q: &dyn Query, me: &Asker, p: &mut Proposal) {
     if let Proposal::TokenCreation(t) = p {
         t.token = q.card_id(&tokens::ILLUSION_3_3_ARTIFACT);
-        t.copy = None;
+        t.copy = q.token_copy(t.token, me.source);
     }
 }
 

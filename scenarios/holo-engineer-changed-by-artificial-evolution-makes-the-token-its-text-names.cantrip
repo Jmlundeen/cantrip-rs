@@ -1,0 +1,54 @@
+# A token a replacement effect makes is what the replacement's text says now (CR 612.1, 612.4, 612.2a): Artificial
+# Evolution changes Illusion to Goblin on Holo-Engineer, and Voldaren Epicure's Blood token is replaced by a 3/3 colorless
+# Goblin artifact creature token, named Goblin, not an Illusion.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Holo-Engineer
+Mox Sapphire
+Artificial Evolution
+Mox Ruby
+Voldaren Epicure
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Holo-Engineer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Holo-Engineer)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Illusion)
+Bot1.Modes(Goblin)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Voldaren Epicure.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Holo-Engineer; Illusion Token; Mox Emerald; Mox Sapphire; Mox Ruby; Voldaren Epicure; Goblin Token
+Bot1.Battlefield.Goblin Token.Subtypes = Goblin
+Bot1.Battlefield.Goblin Token.Types = Artifact; Creature
+Bot1.Battlefield.Goblin Token.Power = 3
+Bot1.Battlefield.Goblin Token.Toughness = 3
+Bot2.Life = 19

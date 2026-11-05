@@ -1,6 +1,7 @@
 //! Computed characteristics (CR 613): what an object is once every continuous effect has been applied.
 
 use cantrip_state::*;
+use crate::CardDef;
 
 
 /// One object's characteristics as the layer system computed them.
@@ -92,6 +93,19 @@ pub fn current_words(state: &GameState, id: ObjectId) -> Words {
         }
     }
     words
+}
+
+/// The copy values of a token of `card` (`def`) that a text with `words` makes (CR 612.4, 707.2): the colors and subtypes
+/// the changed text names, and the name of a token named for its subtypes (CR 111.4, 612.2a). `None` for printed words: the
+/// token is its definition. A double-faced token's own definition (an Incubator, CR 111.10i) keeps both faces, each under
+/// the changed words. What a token creation is made with (`ops::create_tokens`), and what a replacement effect that makes
+/// a token instead, or as well, sets with it (`Query::token_copy`, `TokenCreation::copy`).
+pub fn token_values(def: &CardDef, card: CardId, words: Words) -> Option<Copiable> {
+    if words.is_printed() {
+        return None;
+    }
+    let values = Copiable { words, name: def.token_name_under(words), ..Copiable::of(card) };
+    Some(if def.back.is_some() { values.own_faces_of(card) } else { values })
 }
 
 impl Chars {

@@ -9,11 +9,12 @@ fn artifact_tokens_under_your_control(q: &dyn Query, me: &Asker, p: &Proposal) -
 }
 
 /// "... that many 5/5 red Dragon creature tokens with flying are created instead": the same count, of a token that is
-/// no copy of anything.
-fn dragons_instead(q: &dyn Query, _: &Asker, p: &mut Proposal) {
+/// no copy of anything, but what Draconic Visitor's text says now (CR 612.4, 612.2a: Sleight of Mind's blue, Artificial
+/// Evolution's Goblin).
+fn dragons_instead(q: &dyn Query, me: &Asker, p: &mut Proposal) {
     if let Proposal::TokenCreation(t) = p {
         t.token = q.card_id(&DRAGON_5_5);
-        t.copy = None;
+        t.copy = q.token_copy(t.token, me.source);
     }
 }
 
