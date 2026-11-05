@@ -1,0 +1,25 @@
+# Baron, Airship Kingdom, a Town: "This land enters tapped. {T}: Add {U} or {R}" (CR 614.1d, 305.6). It enters tapped and cannot be tapped for mana that turn (refused). On turn 3 it
+# taps for {U}; on turn 5, the other of its colors, {R}.
+
+[Bot1 Deck]
+Baron, Airship Kingdom
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Baron, Airship Kingdom.Play
+? Bot1.Battlefield.Baron, Airship Kingdom.Tapped = true
+? Bot1.Battlefield.Baron, Airship Kingdom.Subtypes = Town
+! Bot1.Battlefield.Baron, Airship Kingdom.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Baron, Airship Kingdom.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Baron, Airship Kingdom.Activate(Color: Red)
+? Bot1.Mana = {R}
+! Bot1.Battlefield.Baron, Airship Kingdom.Activate(Color: Green)
+
+[Expect]
+Bot1.Battlefield.Baron, Airship Kingdom.Tapped = true
