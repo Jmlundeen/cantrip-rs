@@ -1,0 +1,89 @@
+# Golbez, Crystal Collector: "Whenever an artifact you control enters, surveil 1." and "At the beginning of your end step, if you control four or more artifacts, return target creature card from
+# your graveyard to your hand. Then if you control eight or more artifacts, each opponent loses life equal to that card's power." Turn 1 Bot1 casts Golbez, then five more artifacts (the Moxen and a Black
+# Lotus; the first three entered before it and surveil nothing, the other three do): the first surveil puts a Savannah Lions in the graveyard, the rest keep the Memnite on top. Six artifacts at the end step:
+# the Lions come back to hand and Bot2 loses nothing. Turn 3 the Memnite is drawn and cast (seven artifacts; its surveil puts Hill Giant in the graveyard, which returns at the end step, still no loss).
+# Turn 5 the Ornithopter is the eighth artifact; its surveil puts a second Hill Giant in the graveyard, and at the end step it returns and Bot2 loses 3, the card's power.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Golbez, Crystal Collector
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Black Lotus
+Savannah Lions
+Memnite
+Hill Giant
+Ornithopter
+Hill Giant
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Golbez, Crystal Collector.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Savannah Lions)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Memnite |)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Memnite |)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Memnite |)
+[T1 Bot1.End]
+? Bot1.Graveyard = Savannah Lions
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Upkeep]
+? Bot1.Hand = Savannah Lions
+? Bot1.Graveyard.Count = 0
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Hill Giant)
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+? Bot1.Hand = Hill Giant; Savannah Lions
+? Bot2.Life = 20
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Hill Giant)
+[T5 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Upkeep]
+? Bot1.Hand = Hill Giant; Hill Giant; Savannah Lions
+? Bot2.Life = 17
+
+[Expect]
+Bot1.Battlefield.Count = 9

@@ -1,0 +1,54 @@
+# Golbez, Crystal Collector: "At the beginning of your end step, if you control four or more artifacts, return target creature card from your graveyard to your hand." Turn 1 Bot1 has three
+# artifacts (two Moxen, then a Mox Ruby entering after Golbez, whose surveil puts a Savannah Lions in the graveyard) and the ability does not trigger: the Lions stay. Turn 3 the Mox Pearl is the
+# fourth artifact, exactly enough; its trigger at the end step returns the Lions.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Golbez, Crystal Collector
+Mox Ruby
+Mox Pearl
+Island
+Island
+Savannah Lions
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Golbez, Crystal Collector.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Savannah Lions)
+[T1 Bot1.End]
+Bot1.Pass
+[T2 Bot2.Upkeep]
+? Bot1.Graveyard = Savannah Lions
+? Bot1.Battlefield.Count = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island |)
+[T3 Bot1.End]
+? Bot1.Graveyard = Savannah Lions
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+? Bot1.Hand = Island; Island; Island; Savannah Lions
+? Bot1.Graveyard.Count = 0
+
+[Expect]
+Bot2.Life = 20
