@@ -1,0 +1,48 @@
+# Venerated Stormsinger: Bot2's Lightning Bolt kills Bot1's Memnite ("another creature you control"): Bot2 19, Bot1 21. A second
+# Bolt kills the Stormsinger itself ("this creature"), which sees its own death (CR 603.10a): Bot2 18, Bot1 22.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Memnite
+Venerated Stormsinger
+Swamp x20
+
+[Bot2 Deck]
+Mox Ruby
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Venerated Stormsinger.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Life = 21
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Venerated Stormsinger)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 22
+Bot1.Graveyard = Venerated Stormsinger; Memnite; Black Lotus
