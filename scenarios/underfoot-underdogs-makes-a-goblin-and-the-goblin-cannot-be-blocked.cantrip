@@ -1,0 +1,60 @@
+# Underfoot Underdogs {2}{R}, 1/2: entering makes a 1/1 red Goblin token. On turn 3 {1},{T}: the Goblin (power 1) is aimed at and
+# can't be blocked this turn, so Bot2's Ornithopter may not block it (it is refused) and Bot2 takes 1. Hill Giant (power 3) is
+# too strong to be the target and Bot2's Ornithopter is not Bot1's: both refused. The Underdogs is summoning sick on turn 1 and
+# can't pay {T} then, though the mana was there.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Underfoot Underdogs
+Hill Giant
+Mountain x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Underfoot Underdogs.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire; Mox Emerald; Underfoot Underdogs; Goblin Token
+! Bot1.Battlefield.Underfoot Underdogs.Activate(Ability: can't be blocked; Bot1.Battlefield.Goblin Token)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Underfoot Underdogs.Activate(Ability: can't be blocked; Bot1.Battlefield.Hill Giant)
+! Bot1.Battlefield.Underfoot Underdogs.Activate(Ability: can't be blocked; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Underfoot Underdogs.Activate(Ability: can't be blocked; Bot1.Battlefield.Goblin Token)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Goblin Token > Bot2)
+! Bot2.Block(Ornithopter > Goblin Token)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Underfoot Underdogs.Tapped = true

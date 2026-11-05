@@ -1,0 +1,8 @@
+{
+  "name": "Underfoot Underdogs",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Goblin Warrior",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "When this creature enters, create a 1/1 red Goblin creature token.\n{1}, {T}: Target creature you control with power 2 or less can't be blocked this turn."
+}

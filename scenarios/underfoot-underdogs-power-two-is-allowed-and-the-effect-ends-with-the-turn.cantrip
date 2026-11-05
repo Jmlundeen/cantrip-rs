@@ -1,0 +1,63 @@
+# Underfoot Underdogs: "power 2 or less" includes 2 (CR 115.1): Grizzly Bears (2/2) are accepted as the target on turn 3 and can't
+# be blocked, so the Ornithopter may not block them and Bot2 takes 2. The effect lasts only this turn (CR 611.2): on turn 5 the
+# Ornithopter blocks the Bears and Bot2 loses no more life. The Underdogs may also target itself (power 1) on turn 5.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Underfoot Underdogs
+Grizzly Bears
+Mountain x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Underfoot Underdogs.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Underfoot Underdogs.Activate(Ability: can't be blocked; Bot1.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Grizzly Bears > Bot2)
+! Bot2.Block(Ornithopter > Grizzly Bears)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Underfoot Underdogs.Activate(Ability: can't be blocked; Bot1.Battlefield.Underfoot Underdogs)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot2.Block(Ornithopter > Grizzly Bears)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Underfoot Underdogs.Tapped = true
