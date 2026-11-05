@@ -1,0 +1,67 @@
+# Dragon's Prey ({2}{B}, instant): "This spell costs {2} more to cast if it targets a Dragon. Destroy target creature." Bot1 has
+# four Moxen out and a fifth, Mox Emerald, in hand for turn 3. With the four tapped ({4}): Prey on Bot2's Dragon Engine (a Dragon Construct) costs {2}{B}+{2} = five
+# and is refused for want of mana; with the Emerald cast and tapped too it is cast, paid exactly, and the Engine dies. Turn 5, with three Moxen
+# tapped: Prey on Bot2's Grizzly Bears (no Dragon) costs only {2}{B} and destroys the Bears.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Dragon's Prey
+Dragon's Prey
+Forest x13
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Dragon Engine
+Grizzly Bears
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Dragon Engine.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+!Bot1.Hand.Dragon's Prey.Cast(Bot2.Battlefield.Dragon Engine; Mana: short)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dragon's Prey.Cast(Bot2.Battlefield.Dragon Engine)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Dragon Engine; Black Lotus
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dragon's Prey.Cast(Bot2.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Grizzly Bears; Dragon Engine; Black Lotus
+Bot2.Battlefield.Count = 2
+Bot1.Graveyard = Dragon's Prey; Dragon's Prey
