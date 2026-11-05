@@ -1,0 +1,55 @@
+# Spot, Felis catus ({2}{W}): "Whenever Spot or another nontoken legendary permanent you control enters, create a Food token.
+# {4}, Sacrifice a Food: Destroy target artifact." Spot's own entering makes a Food; on turn 3 that Food pays for the
+# activated ability's sacrifice and an Ornithopter is destroyed, and on turn 5 a second legendary permanent entering makes
+# another Food.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Spot, Felis catus
+Ambassador K'Ehleyr
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spot, Felis catus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Spot, Felis catus.Activate(Ability: {4}, Sacrifice a Food: Destroy target artifact; Sacrifice: Food Token; Target: Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ambassador K'Ehleyr.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard.Ornithopter.Power = 0
+Bot1.Battlefield.Ambassador K'Ehleyr.Power = 2
+Bot1.Battlefield.Spot, Felis catus.Power = 1
+Bot1.Battlefield.Food Token.Keywords = (absent)
