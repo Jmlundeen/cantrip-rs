@@ -1,0 +1,30 @@
+# Overwhelming Surge, first mode only: 3 damage to a creature of your own (Bot1's Ornithopter 0/2 dies), the artifacts in play untouched.
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Overwhelming Surge
+Ornithopter
+Island x20
+[Bot2 Deck]
+Mox Emerald
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Overwhelming Surge.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Ornithopter; Overwhelming Surge
+Bot2.Battlefield = Mox Emerald

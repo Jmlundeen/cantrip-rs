@@ -1,0 +1,43 @@
+# Overwhelming Surge {2}{R}, "Choose one or both" (CR 700.2): both modes. Mode 1 deals exactly 3 to Bot2's Wall of Stone (0/8), a player
+# is no target; mode 2 destroys Bot2's Mox Emerald, but not an artifact creature (Ornithopter) of Bot1's. Two mana is short.
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Overwhelming Surge
+Ornithopter
+Island x20
+[Bot2 Deck]
+Black Lotus
+Wall of Stone
+Mox Emerald
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Overwhelming Surge.Cast(Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Overwhelming Surge.Cast
+! Bot1.Modes(Count: 0)
+Bot1.Modes(1; 2)
+! Bot1.Target(Bot2)
+Bot1.Target(Bot2.Battlefield.Wall of Stone)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Mox Emerald)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Wall of Stone.Damage = 3
+[Expect]
+Bot2.Graveyard = Mox Emerald; Black Lotus
+Bot1.Graveyard = Overwhelming Surge

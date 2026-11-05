@@ -1,0 +1,6 @@
+{
+  "name": "Overwhelming Surge",
+  "manaCost": "{2}{R}",
+  "type": "Instant",
+  "oracleText": "Choose one or both —\n• Overwhelming Surge deals 3 damage to target creature.\n• Destroy target noncreature artifact."
+}
