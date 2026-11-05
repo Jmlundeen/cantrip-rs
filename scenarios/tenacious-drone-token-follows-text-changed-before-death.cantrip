@@ -1,0 +1,45 @@
+# Artificial Evolution changes "Borg" to "Goblin" in the Drone's ability before it dies; its token follows that word and is colorless, artifact, 1/1 and untapped (CR 612, 111.1).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Tenacious Drone
+Artificial Evolution
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tenacious Drone.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Tenacious Drone)
+Bot1.Modes(Borg)
+Bot1.Modes(Goblin)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Tenacious Drone > Bot2)
+Bot2.Block(Llanowar Elves > Tenacious Drone)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Goblin Token; Mox Jet; Mox Sapphire; Swamp
+Bot1.Battlefield.Goblin Token.Power = 1
+Bot1.Battlefield.Goblin Token.Toughness = 1
+Bot1.Battlefield.Goblin Token.Types = Artifact; Creature
+Bot1.Battlefield.Goblin Token.Colors = (absent)
+Bot1.Battlefield.Goblin Token.Subtypes = Goblin
+Bot1.Battlefield.Goblin Token.Tapped = false
+Bot1.Graveyard = Tenacious Drone; Artificial Evolution
+Bot2.Graveyard = Llanowar Elves
