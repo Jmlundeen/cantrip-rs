@@ -1,0 +1,8 @@
+{
+  "name": "Watcher of the Wayside",
+  "manaCost": "{3}",
+  "type": "Artifact Creature — Golem",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "When this creature enters, target player mills two cards. You gain 2 life. (To mill two cards, a player puts the top two cards of their library into their graveyard.)"
+}

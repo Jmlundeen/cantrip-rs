@@ -1,0 +1,37 @@
+# Watcher of the Wayside's target is any player: Bot1 targets itself, mills its own top two cards (Mountain, Plains) into its own
+# graveyard and still gains 2 life (22). Bot2's library is untouched.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Watcher of the Wayside
+Island x3
+Mountain
+Plains
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Watcher of the Wayside.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot1.Graveyard.Count = 2
+Bot1.Library.Count = 15
+Bot2.Library.Count = 13
+Bot2.Graveyard.Count = 0
