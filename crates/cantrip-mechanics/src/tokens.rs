@@ -1094,6 +1094,18 @@ pub static WHITE_FLYING_SPIRIT: CardDef = CardDef {
     ..token!(Spirit)
 };
 
+/// The 1/1 white Bird creature token with flying. Wingblade Disciple, Seller of Songbirds, Emeria Angel and Aether Channeler
+/// make it.
+pub static BIRD: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Flying]),
+    text: "Flying",
+    ..token!(Bird)
+};
+
 /// The 1/1 white and black Inkling creature token with flying. Emeritus of Truce, Eager Glyphmage, Informed Inkwright and
 /// Harsh Annotation make it.
 pub static INKLING: CardDef = CardDef {
