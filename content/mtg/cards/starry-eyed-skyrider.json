@@ -1,0 +1,11 @@
+{
+  "name": "Starry-Eyed Skyrider",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Human Scout",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Flying\nWhenever this creature attacks, another target creature you control gains flying until end of turn.\nAttacking tokens you control have flying.",
+  "keywords": [
+    "Flying"
+  ]
+}
