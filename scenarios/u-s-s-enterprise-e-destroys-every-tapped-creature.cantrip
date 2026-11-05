@@ -1,0 +1,38 @@
+# U.S.S. Enterprise-E ({3}{W}{W}): "When U.S.S. Enterprise-E enters, destroy all tapped creatures" (CR 701.8). Llanowar
+# Elves is tapped for mana on turn 1 and is still tapped, so when the Enterprise is cast that turn it is destroyed as
+# the Enterprise enters.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Black Lotus
+Mox Pearl
+Mox Pearl
+Mox Pearl
+U.S.S. Enterprise-E, Sovereign
+Plains x18
+Forest x15
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.U.S.S. Enterprise-E, Sovereign.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Black Lotus
+Bot1.Battlefield.U.S.S. Enterprise-E, Sovereign.Tapped = false
