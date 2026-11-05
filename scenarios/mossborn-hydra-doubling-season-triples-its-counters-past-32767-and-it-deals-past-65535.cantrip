@@ -1,0 +1,108 @@
+# Counts past what 16 bits hold, end to end (#2336, CR 122.1, 120.3, 107.1: nothing caps a counter, a creature's size or damage).
+# Doubling Season (CR 614.1a: twice that many counters are put instead) is in play when Mossborn Hydra enters, so it enters with 2
+# +1/+1 counters, and each landfall "double the number of +1/+1 counters" (CR 701.10e) puts N more, which Doubling Season doubles
+# to 2N: the counters triple. Five Wooded Foothills played over five turns and then all fetching a Forest make ten
+# landfalls: 2 x 3^10 = 118,098 counters, past 32,767 after the ninth (39,366). The 118,098/118,098 trampler then attacks Bot2
+# unblocked and deals 118,098, past 65,535: Bot2 is at 20 - 118,098 = -118,078 and has lost.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Black Lotus
+Doubling Season
+Mossborn Hydra
+Wooded Foothills
+Wooded Foothills
+Wooded Foothills
+Wooded Foothills
+Wooded Foothills
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Mossborn Hydra.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 2
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 6
+[T5 Bot1.Main1]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 18
+[T7 Bot1.Main1]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 54
+[T9 Bot1.Main1]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 162
+[T11 Bot1.Main1]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 486
+Bot1.Battlefield.Wooded Foothills#1.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 1458
+Bot1.Battlefield.Wooded Foothills#1.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 4374
+Bot1.Battlefield.Wooded Foothills#1.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 13122
+Bot1.Battlefield.Wooded Foothills#1.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 39366
+Bot1.Battlefield.Wooded Foothills#1.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 118098
+Bot1.Attack(Mossborn Hydra > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 118098
+Bot1.Battlefield.Mossborn Hydra.Power = 118098
+Bot1.Battlefield.Mossborn Hydra.Toughness = 118098
+Bot2.Life = -118078
+Bot2.Status = Lost
