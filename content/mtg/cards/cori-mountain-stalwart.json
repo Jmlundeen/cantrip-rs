@@ -1,0 +1,8 @@
+{
+  "name": "Cori Mountain Stalwart",
+  "manaCost": "{1}{R}{W}",
+  "type": "Creature — Human Monk",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flurry — Whenever you cast your second spell each turn, this creature deals 2 damage to each opponent and you gain 2 life."
+}

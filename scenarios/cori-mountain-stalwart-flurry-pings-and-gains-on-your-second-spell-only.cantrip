@@ -1,0 +1,54 @@
+# Cori Mountain Stalwart: "Flurry — Whenever you cast your second spell each turn, this creature deals 2 damage to each
+# opponent and you gain 2 life." Bot1 casts three Moxen and the Stalwart on turn 1 (the Stalwart is the fourth spell, so
+# nothing triggers: it was not on the battlefield). On Bot2's turn 2 Bot2's own second spell does not trigger it ("you
+# cast"). On turn 3 Bot1's first spell does nothing, the second pings Bot2 for 2 and gains 2, and the third does nothing.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Cori Mountain Stalwart
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cori Mountain Stalwart.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Life = 20
+? Bot1.Life = 20
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot1.Life = 22
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 22
+Stack.Count = 0
