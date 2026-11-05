@@ -1,0 +1,8 @@
+{
+  "name": "Sunset Strikemaster",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Human Monk",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "{T}: Add {R}.\n{2}{R}, {T}, Sacrifice this creature: It deals 6 damage to target creature with flying."
+}

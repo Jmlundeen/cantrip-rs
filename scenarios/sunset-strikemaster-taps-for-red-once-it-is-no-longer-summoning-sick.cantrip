@@ -1,0 +1,32 @@
+# Sunset Strikemaster: "{T}: Add {R}." is a mana ability that needs the creature to have been under its controller's control since
+# the turn began (CR 302.6, 602.5a): on turn 1 it is refused. On turn 3 tapping it adds exactly {R} to the pool, which pays
+# for a Shock on Bot2's face with nothing left over.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Sunset Strikemaster
+Shock
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunset Strikemaster.Cast
+! Bot1.Battlefield.Sunset Strikemaster.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sunset Strikemaster.Activate
+? Bot1.Mana = {R}
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Sunset Strikemaster.Tapped = true

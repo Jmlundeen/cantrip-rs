@@ -1,0 +1,46 @@
+# Sunset Strikemaster {1}{R}, 3/1: "{2}{R}, {T}, Sacrifice this creature: It deals 6 damage to target creature with flying." On turn
+# 3 three Moxen pay {2}{R} and the Strikemaster's tap and sacrifice pay the rest. Bot2's Memnite (no flying) is refused; its Wall of
+# Shards (1/8, flying) is the target and survives with exactly 6 damage marked (not 5 or 7). The Strikemaster is in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Sunset Strikemaster
+Mountain x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Wall of Shards
+Memnite
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunset Strikemaster.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wall of Shards.Cast
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Sunset Strikemaster.Activate(Ability: 6 damage; Bot2.Battlefield.Memnite)
+Bot1.Battlefield.Sunset Strikemaster.Activate(Ability: 6 damage; Bot2.Battlefield.Wall of Shards)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Wall of Shards.Damage = 6
+Bot1.Graveyard = Sunset Strikemaster
