@@ -1,0 +1,25 @@
+# Rabanastre, Royal City, a Town: "This land enters tapped. {T}: Add {R} or {W}" (CR 614.1d, 305.6). It enters tapped and cannot be tapped for mana that turn (refused). On turn 3 it
+# taps for {R}; on turn 5, the other of its colors, {W}, and never blue.
+
+[Bot1 Deck]
+Rabanastre, Royal City
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Rabanastre, Royal City.Play
+? Bot1.Battlefield.Rabanastre, Royal City.Tapped = true
+? Bot1.Battlefield.Rabanastre, Royal City.Subtypes = Town
+! Bot1.Battlefield.Rabanastre, Royal City.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Rabanastre, Royal City.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Rabanastre, Royal City.Activate(Color: White)
+? Bot1.Mana = {W}
+! Bot1.Battlefield.Rabanastre, Royal City.Activate(Color: Blue)
+
+[Expect]
+Bot1.Battlefield.Rabanastre, Royal City.Tapped = true
