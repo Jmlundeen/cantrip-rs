@@ -1,0 +1,42 @@
+# Riling Dawnbreaker: "At the beginning of combat on your turn, another target creature you control gets +1/+0 until end of
+# turn." Bot1 casts Memnite and the 3/4 Dragon on turn 1 (five Moxen pay {4}{W}). At the beginning of combat Memnite, the
+# only creature that is "another", is the target: 2/1 for the turn and the Dragon stays 3/4 (the refusal: it can't target
+# itself). The pump ends with the turn: Memnite is 1/1 again on turn 2.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Memnite
+Riling Dawnbreaker
+Plains x8
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Riling Dawnbreaker.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.Memnite.Toughness = 1
+? Bot1.Battlefield.Riling Dawnbreaker.Power = 3
+? Bot1.Battlefield.Riling Dawnbreaker.Toughness = 4
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Riling Dawnbreaker.Power = 3
+Bot1.Battlefield.Riling Dawnbreaker.Keywords = Flying; Vigilance

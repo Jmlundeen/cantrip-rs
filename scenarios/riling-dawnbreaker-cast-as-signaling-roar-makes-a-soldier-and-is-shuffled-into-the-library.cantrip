@@ -1,0 +1,33 @@
+# Riling Dawnbreaker cast from the hand as its Omen, Signaling Roar (CR 720.3): "Create a 2/2 white Soldier creature token.
+# (Then shuffle this card into its owner's library.)" {1}{W} from Mox Pearl and Mox Ruby. The Dragon is never cast, so no
+# combat trigger; the Soldier token is a 2/2 white Soldier and, as it resolves, the card is shuffled into Bot1's library
+# (CR 720.3d): the graveyard stays empty and the library holds it again: 8 cards after the opening hand, 9 now.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Riling Dawnbreaker
+Plains x12
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Riling Dawnbreaker.Cast(Ability: Omen)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Stack = Signaling Roar
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Soldier Token
+Bot1.Battlefield.Soldier Token.Power = 2
+Bot1.Battlefield.Soldier Token.Toughness = 2
+Bot1.Battlefield.Soldier Token.Subtypes = Soldier
+Bot1.Battlefield.Soldier Token.Colors = White
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 9
+Exile.Count = 0

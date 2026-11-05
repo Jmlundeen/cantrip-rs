@@ -1,0 +1,18 @@
+{
+  "name": "Riling Dawnbreaker",
+  "manaCost": "{4}{W}",
+  "type": "Creature — Dragon",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Flying, vigilance\nAt the beginning of combat on your turn, another target creature you control gets +1/+0 until end of turn.",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ],
+  "omen": {
+    "name": "Signaling Roar",
+    "manaCost": "{1}{W}",
+    "type": "Sorcery — Omen",
+    "oracleText": "Create a 2/2 white Soldier creature token. (Then shuffle this card into its owner's library.)"
+  }
+}
