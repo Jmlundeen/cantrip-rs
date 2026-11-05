@@ -1,0 +1,42 @@
+# Maturation Chamber: "{4}, {T}: Create a 1/1 colorless Borg artifact creature token for each charge counter on this
+# artifact. Activate only as a sorcery." (CR 602.2, 122.1). Bot1 casts it off a Black Lotus on turn 1 and casts no other
+# artifact spell; on turn 7 it activates it off four Plains: with no charge counter on it, the ability creates no token.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Maturation Chamber
+Plains
+Plains
+Plains
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Maturation Chamber.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Battlefield.Maturation Chamber.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Maturation Chamber.Tapped = true
+Bot1.Battlefield.Count = 5

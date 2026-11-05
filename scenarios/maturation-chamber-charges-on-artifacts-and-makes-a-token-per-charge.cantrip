@@ -1,0 +1,42 @@
+# Maturation Chamber: "Whenever you cast an artifact spell, put a charge counter on this artifact" (CR 603.2) and
+# "{4}, {T}: Create a 1/1 colorless Borg artifact creature token for each charge counter on this artifact" (CR 122.1,
+# 602.2). Memnite is the one artifact spell, so the activation on turn 7 (four Plains) makes one token.
+
+[Bot1 Deck]
+Plains
+Maturation Chamber
+Memnite
+Plains x4
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Maturation Chamber.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Battlefield.Maturation Chamber.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Borg Token.Power = 1
