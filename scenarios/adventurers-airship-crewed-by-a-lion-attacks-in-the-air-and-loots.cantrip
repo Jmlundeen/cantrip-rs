@@ -1,0 +1,54 @@
+# Adventurer's Airship (3/2 flying Vehicle, Crew 2): a lone Savannah Lions (power 2, summoning sick, which does not matter for a
+# crew cost) crews it on turn 3 and the Airship attacks, flying, for 3. "Whenever this Vehicle attacks, draw a card, then discard
+# a card": Bot1 draws the Mountain and then chooses the Island from a hand of Island, Forest and Mountain. Bot2 had no flying blocker.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Adventurer's Airship
+Savannah Lions
+Island
+Forest
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Adventurer's Airship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Adventurer's Airship.Types = Artifact
+Bot1.Battlefield.Adventurer's Airship.Activate(Ability: Crew)
+Bot1.Choose(Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Adventurer's Airship.Types = Artifact; Creature
+Bot1.Attack(Adventurer's Airship > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Adventurer's Airship.Keywords = Flying
+Bot1.Battlefield.Adventurer's Airship.Power = 3
+Bot1.Battlefield.Savannah Lions.Tapped = true
+Bot1.Hand = Forest; Mountain
+Bot1.Graveyard = Island

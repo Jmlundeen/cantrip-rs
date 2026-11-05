@@ -1,0 +1,46 @@
+# Adventurer's Airship, "Crew 2": a lone Zephyr Sprite (power 1) cannot crew it, so it stays a plain artifact; with a second Sprite
+# the two together (total power 2, exactly) can.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Mox Jet
+Adventurer's Airship
+Zephyr Sprite
+Zephyr Sprite
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Adventurer's Airship.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Zephyr Sprite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Adventurer's Airship.Activate(Ability: Crew)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Zephyr Sprite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Adventurer's Airship.Activate(Ability: Crew)
+Bot1.Choose(Zephyr Sprite#1; Zephyr Sprite#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Adventurer's Airship.Types.Count = 2
+
+[Expect]
+Bot1.Battlefield.Zephyr Sprite#1.Tapped = true
+Bot1.Battlefield.Zephyr Sprite#2.Tapped = true
