@@ -1,0 +1,29 @@
+# Starfleet Crew ({1}{W}) has no rules text, so it is a card of characteristics alone: cast with a Plains and a Mox Pearl it
+# is a white 2/3 Officer Creature with no keywords, and its mana value is 2 (CR 202.3, 208.1).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Starfleet Crew
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Starfleet Crew.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Starfleet Crew.Power = 2
+Bot1.Battlefield.Starfleet Crew.Toughness = 3
+Bot1.Battlefield.Starfleet Crew.Types = Creature
+Bot1.Battlefield.Starfleet Crew.Subtypes = Officer
+Bot1.Battlefield.Starfleet Crew.Colors = White
+Bot1.Battlefield.Starfleet Crew.Keywords = (absent)
+Bot1.Battlefield.Starfleet Crew.ManaValue = 2

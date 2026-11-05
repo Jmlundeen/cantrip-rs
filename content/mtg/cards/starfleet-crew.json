@@ -1,0 +1,8 @@
+{
+  "name": "Starfleet Crew",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Officer",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": ""
+}
