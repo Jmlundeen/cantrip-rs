@@ -1,0 +1,68 @@
+# Harmonize {5}{U} (CR 702.180a). Turn 3: Bot1 casts Ureni's Rebuff for {1}{U} at Bot2's Llanowar Elves, and it goes to the
+# graveyard; Bot2 casts the Elves again. Turn 5: Bot1 casts it from the graveyard tapping its Grizzly Bears (power 2) to take {2}
+# off the generic part, so the four mana ({3}{U}) of a Black Lotus and a Mox Emerald pay for it, returns the Elves again, and the
+# card is exiled rather than left in the graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Grizzly Bears
+Ureni's Rebuff
+Island x22
+
+[Bot2 Deck]
+Mox Emerald
+Grizzly Bears
+Llanowar Elves
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ureni's Rebuff.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Graveyard = Ureni's Rebuff
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Ureni's Rebuff.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Harmonize)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Ureni's Rebuff
+Bot1.Battlefield.Grizzly Bears.Tapped = true
+Bot2.Battlefield = Mox Emerald
+Bot1.Mana =

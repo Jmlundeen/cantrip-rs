@@ -1,0 +1,45 @@
+# Ureni's Rebuff: "Return target creature to its owner's hand." Bot2's Mox Ruby is not a creature, so it is no legal target (the
+# refusal); Bot1 returns Bot2's Grizzly Bears, which goes back to Bot2's hand, and the sorcery goes to the graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Ureni's Rebuff
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Ureni's Rebuff.Cast(Bot2.Battlefield.Mox Ruby)
+Bot1.Hand.Ureni's Rebuff.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Mox Emerald; Mox Ruby
+Bot2.Hand.Count = 6
+Bot1.Graveyard = Ureni's Rebuff
