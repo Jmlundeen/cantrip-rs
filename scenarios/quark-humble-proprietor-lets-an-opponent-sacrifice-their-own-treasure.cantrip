@@ -1,0 +1,53 @@
+# Quark, Humble Proprietor {2}{R}: "You can't sacrifice Treasure tokens." That is its controller's Treasures (CR 101.2),
+# not an opponent's: Bot2's Deadly Dispute makes a Treasure, and Bot2 activates it for red mana without Quark stopping it.
+# Quark's own upkeep trigger still gives Bot1 a Treasure.
+
+[Bot1 Deck]
+Quark, Humble Proprietor
+Mox Ruby
+Mox Ruby
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Deadly Dispute
+Swamp x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Quark, Humble Proprietor.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Deadly Dispute.Cast
+Bot2.Choose(Mox Sapphire)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Treasure Token.Activate(Color: Red)
+? Bot2.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Treasure Token.Token = true
+Bot2.Battlefield.Treasure Token = (absent)
+Bot2.Graveyard = Deadly Dispute; Mox Sapphire
+Bot2.Mana = {R}

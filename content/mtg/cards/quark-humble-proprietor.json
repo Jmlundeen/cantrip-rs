@@ -1,0 +1,8 @@
+{
+  "name": "Quark, Humble Proprietor",
+  "manaCost": "{2}{R}",
+  "type": "Legendary Creature — Ferengi Rogue",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "You can't sacrifice Treasure tokens.\nAt the beginning of each upkeep, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+}

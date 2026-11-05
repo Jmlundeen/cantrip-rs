@@ -1,0 +1,46 @@
+# Quark, Humble Proprietor {2}{R} 1/2: "You can't sacrifice Treasure tokens." and "At the beginning of each upkeep, create a
+# Treasure token." Bot1's Treasure arrives on Bot2's upkeep and its mana ability, which sacrifices it, is refused. Once Bot2's
+# Lightning Bolt kills Quark the same activation is offered and the Treasure is sacrificed for one red mana.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Quark, Humble Proprietor
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Quark, Humble Proprietor.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Treasure Token.Token = true
+! Bot1.Battlefield.Treasure Token.Activate(Color: Red)
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Quark, Humble Proprietor)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Quark, Humble Proprietor
+Bot1.Battlefield.Treasure Token.Activate(Color: Red)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot1.Graveyard = Quark, Humble Proprietor
+Bot2.Graveyard = Lightning Bolt
