@@ -1,0 +1,38 @@
+# Shuttlecraft Galileo ({3}{W}): "Landfall — Whenever a land you control enters, create a 1/1 red Officer creature token."
+# The Plains played before it entered make nothing; the Forest that enters afterwards, on turn five, makes one token.
+
+[Bot1 Deck]
+Black Lotus
+Plains
+Plains
+Forest
+Shuttlecraft Galileo
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Shuttlecraft Galileo.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Officer Token.Power = 1
+Bot1.Battlefield.Officer Token.Toughness = 1
+Bot1.Battlefield.Officer Token.Colors = Red
+Bot1.Battlefield.Officer Token.Types = Creature
+Bot1.Battlefield.Count = 5
