@@ -1,0 +1,38 @@
+# Sagu Wildling cast from the hand as its Omen, Roost Seek ({G}, CR 720.3): "Search your library for a basic land card, reveal
+# it, put it into your hand, then shuffle." The nonbasic Tropical Island is refused; Bot1 finds the basic Mountain, which
+# goes into the hand. As Roost Seek resolves it is shuffled into Bot1's library (CR 720.3d): ten cards, one taken and one
+# added, and nothing in the graveyard. The creature was never cast, so no enters trigger gained Bot1 3 life.
+
+[Bot1 Deck]
+Forest
+Sagu Wildling
+Island
+Island
+Island
+Island
+Island
+Mountain
+Tropical Island
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Sagu Wildling.Cast(Ability: Omen)
+Bot1.Battlefield.Forest.Activate
+? Stack = Roost Seek
+Bot1.Pass
+! Bot1.Search(Tropical Island)
+Bot1.Search(Mountain)
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Hand = Island; Island; Island; Island; Island; Mountain
+Bot1.Library.Count = 10
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Forest
+Exile.Count = 0

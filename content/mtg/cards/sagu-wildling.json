@@ -1,0 +1,17 @@
+{
+  "name": "Sagu Wildling",
+  "manaCost": "{4}{G}",
+  "type": "Creature — Dragon",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nWhen this creature enters, you gain 3 life.",
+  "keywords": [
+    "Flying"
+  ],
+  "omen": {
+    "name": "Roost Seek",
+    "manaCost": "{G}",
+    "type": "Sorcery — Omen",
+    "oracleText": "Search your library for a basic land card, reveal it, put it into your hand, then shuffle. (Also shuffle this card.)"
+  }
+}

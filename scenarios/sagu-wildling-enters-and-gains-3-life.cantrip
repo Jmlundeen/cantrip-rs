@@ -1,0 +1,35 @@
+# Sagu Wildling ({4}{G}, 3/3 flying Dragon): "When this creature enters, you gain 3 life." Bot1 casts it with Black Lotus
+# ({G}{G}{G}) and a Mox Emerald plus a Mox Jet, and gains 3 life (23). Bot2 had no creature to block a flyer; on turn 3
+# the Wildling attacks for 3 in the air.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Sagu Wildling
+Forest x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sagu Wildling.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+[T3 Bot1.Attackers]
+Bot1.Attack(Sagu Wildling > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Battlefield.Sagu Wildling.Keywords = Flying
