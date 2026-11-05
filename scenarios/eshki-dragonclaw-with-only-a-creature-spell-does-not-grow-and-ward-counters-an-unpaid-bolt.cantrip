@@ -1,0 +1,47 @@
+# Eshki Dragonclaw cast from four lands on turn 7 (a creature spell, and no noncreature spell that turn): no card, no
+# counters, a 4/4. Ward {1}: Bot2's Lightning Bolt at it on turn 8 is countered when Bot2 declines to pay, and Eshki is
+# undamaged.
+
+[Bot1 Deck]
+Forest
+Island
+Mountain
+Island
+Eshki Dragonclaw
+Island x2
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Eshki Dragonclaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Eshki Dragonclaw.Power = 4
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Eshki Dragonclaw)
+Bot2.Decline
+
+[Expect]
+Bot1.Battlefield.Eshki Dragonclaw.Power = 4
+Bot1.Battlefield.Eshki Dragonclaw.Toughness = 4
+Bot1.Battlefield.Eshki Dragonclaw.Damage = 0
+Bot2.Graveyard = Lightning Bolt; Island; Island
