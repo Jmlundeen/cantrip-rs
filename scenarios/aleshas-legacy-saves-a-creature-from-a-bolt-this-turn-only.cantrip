@@ -1,0 +1,47 @@
+# Alesha's Legacy: "Target creature you control gains indestructible until end of turn" (and deathtouch). Bot2's first Bolt at
+# Bot1's Memnite on turn 2 is answered by the Legacy: the Memnite survives with 3 damage. It cannot target Bot2's Ornithopter.
+# On turn 4 the effect is long over: Bot2's second Bolt kills the Memnite.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Memnite
+Alesha's Legacy
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+! Bot1.Hand.Alesha's Legacy.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Alesha's Legacy.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Damage = 3
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Memnite; Alesha's Legacy
