@@ -1,0 +1,40 @@
+# Stratagem Emulator: "When this creature dies, create X 1/1 colorless Borg artifact creature tokens, where X is its
+# power" (CR 603.6c, 608.2h). Power 2 as it last existed, so two tokens; Shock's two damage is lethal to a 2/1.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Stratagem Emulator
+Plains x16
+
+[Bot2 Deck]
+Mountain
+Shock
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Stratagem Emulator.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Stratagem Emulator)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Borg Token#1.Power = 1
+Bot1.Battlefield.Borg Token#2.Power = 1
