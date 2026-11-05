@@ -1,0 +1,44 @@
+# Zero, Incorporeal Sensate: "When Zero enters, look at target opponent's hand. You may exile a nonland card from it. For
+# as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to cast." (CR 406.2,
+# 601.2f) Bot1 exiles Lightning Bolt; on turn two Bot2 may cast it from exile for {2}{R}, its Mountain and two Moxen paying.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Zero, Incorporeal Sensate
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mox Ruby
+Mox Emerald
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zero, Incorporeal Sensate.Cast
+Bot1.Choose(Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Exile.Lightning Bolt.Cast(Bot1)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 17
+Exile.Count = 0
+Bot2.Graveyard = Lightning Bolt
+Bot2.Mana =
+Bot1.Battlefield.Zero, Incorporeal Sensate.Keywords = Lifelink
