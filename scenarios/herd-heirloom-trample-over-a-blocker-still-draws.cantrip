@@ -1,0 +1,38 @@
+# Herd Heirloom: the granted trample lets a blocked Viashino Warrior (4/2) assign 2 to the blocking Ornithopter (0/2) and 2 to Bot2, and that combat damage to a player draws a card (CR 702.19b, 510.1c): Bot2 is at 18 and Bot1's hand holds the drawn card.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Viashino Warrior
+Herd Heirloom
+Island x2
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Herd Heirloom.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Herd Heirloom.Activate(Color: Red)
+Bot1.Hand.Viashino Warrior.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Herd Heirloom.Activate(Ability: Until end of turn; Bot1.Battlefield.Viashino Warrior)
+Bot1.Attack(Viashino Warrior)
+Bot2.Block(Ornithopter > Viashino Warrior)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand.Count = 4
+Bot2.Graveyard = Ornithopter

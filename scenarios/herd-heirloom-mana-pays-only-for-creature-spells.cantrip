@@ -1,0 +1,28 @@
+# Herd Heirloom ({1}{G}): "{T}: Add one mana of any color. Spend this mana only to cast a creature spell." Bot1 casts it on turn 1 and taps it for {R}: Lightning Bolt is refused (no other mana), then Mons's Goblin Raiders ({R}, a creature) is cast with it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Herd Heirloom
+Lightning Bolt
+Mons's Goblin Raiders
+Island x2
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Herd Heirloom.Cast
+Bot1.Battlefield.Herd Heirloom.Activate(Color: Red)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
+Bot1.Hand.Mons's Goblin Raiders.Cast
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Herd Heirloom; Mons's Goblin Raiders
+Bot1.Hand = Island; Island; Lightning Bolt
+Bot1.Mana = 

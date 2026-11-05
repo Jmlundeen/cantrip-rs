@@ -1,0 +1,58 @@
+# Herd Heirloom: "{T}: Until end of turn, target creature you control with power 4 or greater gains trample and 'Whenever this creature deals combat damage to a player, draw a card.'" Bot1 has a Viashino Warrior (4/2), a Hill Giant (3/3) and Bot2 has an Obsidian Giant (4/4). The Heirloom is refused on the Hill Giant (power 3) and on Bot2's Giant (not yours), then on the Warrior: it attacks unblocked and Bot1 draws a card (hand empty before) while Bot2 takes 4.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Viashino Warrior
+Herd Heirloom
+Hill Giant
+Mox Jet
+Mox Pearl
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Obsidian Giant
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Herd Heirloom.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Herd Heirloom.Activate(Color: Red)
+Bot1.Hand.Viashino Warrior.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Obsidian Giant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Herd Heirloom.Activate(Ability: Until end of turn; Bot1.Battlefield.Hill Giant)
+! Bot1.Battlefield.Herd Heirloom.Activate(Ability: Until end of turn; Bot2.Battlefield.Obsidian Giant)
+Bot1.Battlefield.Herd Heirloom.Activate(Ability: Until end of turn; Bot1.Battlefield.Viashino Warrior)
+Bot1.Attack(Viashino Warrior)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Hand.Count = 1
