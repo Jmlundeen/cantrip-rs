@@ -1,0 +1,42 @@
+# Glacierwood Siege, Sultai: "You may play lands from your graveyard." Bot1 pays {1}{G}{U} with Black Lotus (blue) and Mox
+# Emerald, names Sultai, then casts Faithless Looting with Mox Ruby: it draws a Forest and an Island and discards the Forest and
+# the Island, so a Forest and an Island sit in the graveyard. Bot1 plays the graveyard Forest as its land for the turn, and the
+# Forest left in hand is then refused (CR 305.2: one land play). Sultai does not mill on an instant or sorcery: casting the
+# Looting milled nobody.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Glacierwood Siege
+Faithless Looting
+Forest
+Forest
+Forest
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glacierwood Siege.Cast
+Bot1.Name(Sultai)
+? Bot1.Battlefield.Glacierwood Siege.ChosenOption = Sultai
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Forest; Island)
+? Bot2.Library.Count = 13
+? Bot1.Graveyard = Faithless Looting; Island; Forest; Black Lotus
+Bot1.Graveyard.Forest.Play
+! Bot1.Hand.Forest.Play
+
+[Expect]
+Bot1.LandsPlayed = 1
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard = Faithless Looting; Island; Black Lotus

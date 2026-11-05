@@ -1,0 +1,47 @@
+# Glacierwood Siege, Temur: "Whenever you cast an instant or sorcery spell, target player mills four cards." Bot1 pays {1}{G}{U}
+# with Black Lotus (blue) and Mox Emerald, names Temur, then Lightning Bolts Bot2: the trigger targets Bot2, who mills exactly
+# four (13 in the library, then 9). Casting Mox Pearl, an artifact, mills nothing more. Temur gives no leave to play lands from
+# the graveyard: the Island Bot1 would replay is refused.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Glacierwood Siege
+Lightning Bolt
+Mox Pearl
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Glacierwood Siege.Cast
+Bot1.Name(Temur)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Glacierwood Siege.ChosenOption = Temur
+? Bot2.Library.Count = 13
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Library.Count = 9
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Graveyard.Black Lotus.Play
+
+[Expect]
+Bot2.Library.Count = 9
+Bot2.Graveyard.Count = 4
+Bot1.Library.Count = 13
