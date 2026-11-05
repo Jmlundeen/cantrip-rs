@@ -186,13 +186,23 @@ pub fn next_time_chosen_source_would_damage_you(g: &mut dyn Game, item: &StackIt
 
 /// `next_time_chosen_source_would_damage_you` for a source `rule` allows ("a black or red source of your choice": `SOURCE`
 /// with `source_of_colors` as a part), judged as it is chosen (CR 609.7a) and again, by the card's `applies`
-/// (`from_chosen_source_of_colors`), as it would deal damage (CR 609.7b). Circle of Protection: Black and Greater Realm of
-/// Preservation print it.
+/// (`from_chosen_source_of_colors`), as it would deal damage (CR 609.7b). Circle of Protection: Artifacts; the colored
+/// ones go through `next_time_source_of_colors_would_damage_you`.
 pub fn next_time_source_would_damage_you(g: &mut dyn Game, item: &StackItem, index: u8, rule: Selection) -> Result<Option<ObjectId>, Suspend> {
     let Some(source) = choose_source(g, item, rule)? else { return Ok(None) };
     let to = Target::Player(item.controller);
     g.add_effect(item.object, source, EffectKind::Prevention { card: item.ability.card, index, to, shield: Shield::NextTime }, Duration::EndOfTurn);
     Ok(Some(source))
+}
+
+/// "The next time a [color] source of your choice would deal damage to you this turn, prevent that damage" for the colors
+/// `COLORS`, worded `words` ("black or red") in the question: `next_time_source_would_damage_you` over `SOURCE` limited by
+/// `source_of_colors`, choosing none, and making no shield, when no source has those colors. The card
+/// lists `from_chosen_source_of_colors::<COLORS>` first (index 0) in its `granted_preventions`. Circle of Protection: Black
+/// and Blue and Greater Realm of Preservation print it.
+pub fn next_time_source_of_colors_would_damage_you<const COLORS: u8>(g: &mut dyn Game, item: &StackItem, words: &'static str) -> Result<Option<ObjectId>, Suspend> {
+    let rule = SOURCE.taking(crate::select::as_many_as_can(1)).with(crate::select::part(&(source_of_colors::<COLORS> as SelectFn), 0, words));
+    next_time_source_would_damage_you(g, item, 0, rule)
 }
 
 /// Whether `id` is one of the colors `COLORS` (a `ColorSet`'s bits) as the text of `source` words them (CR 612).
