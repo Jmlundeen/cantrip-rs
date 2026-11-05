@@ -1,0 +1,74 @@
+# The Seriema is stationed to eight charge counters, so the tapped Agent Maria Hill has indestructible; then Dress Down enters.
+# In layer 6 the 7+ striation's part (its effect began in layer 4, CR 613.6) gives The Seriema flying and the static ability
+# "Other tapped legendary creatures you control have indestructible"; the later Dress Down takes both (CR 613.1f, 613.7), and
+# the granted ability, which Dress Down would take, applies after it (CR 613.8a-b), so not at all: a 5/5 artifact creature with
+# no abilities, and Maria Hill is no longer indestructible.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Black Lotus
+Colossal Dreadmaw
+Dress Down
+Black Lotus
+The Seriema
+Agent Maria Hill
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Seriema.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Agent Maria Hill)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Agent Maria Hill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Agent Maria Hill)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Agent Maria Hill.Keywords = Indestructible
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Dress Down.Types = Enchantment
+Bot1.Battlefield.The Seriema.Counters.Charge = 8
+Bot1.Battlefield.The Seriema.Types = Artifact; Creature
+Bot1.Battlefield.The Seriema.Power = 5
+Bot1.Battlefield.The Seriema.Toughness = 5
+Bot1.Battlefield.The Seriema.Keywords = (absent)
+Bot1.Battlefield.Agent Maria Hill.Tapped = true
+Bot1.Battlefield.Agent Maria Hill.Keywords = (absent)

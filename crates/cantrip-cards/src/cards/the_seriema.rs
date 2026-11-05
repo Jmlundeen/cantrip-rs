@@ -11,13 +11,18 @@ fn fetch_a_legendary_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), 
     Ok(())
 }
 
-/// "Other tapped legendary creatures you control", printed in the 7+ striation (CR 721.2a): only while this Spacecraft has seven
-/// or more charge counters, a legendary creature you control other than this one, tapped now (CR 613.1f).
+/// "Other tapped legendary creatures you control": a legendary creature its holder's controller controls other than the
+/// holder, tapped now (CR 613.1f).
 fn other_tapped_legendary_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    station::charged::<7>(q, source, source, so_far)
-        && statics::other_creatures_you_control(q, source, affected, so_far)
-        && so_far.supertypes.legendary
-        && q.state().obj(affected).tapped
+    statics::other_creatures_you_control(q, source, affected, so_far) && so_far.supertypes.legendary && q.state().obj(affected).tapped
+}
+
+/// The 7+ striation's layer 6 part: flying and the static ability "Other tapped legendary creatures you control have
+/// indestructible", together, so that both continue the one effect that began in layer 4 (CR 613.6, 721.2a-b) and The Seriema
+/// has them under an earlier "loses all abilities"; a later one takes them both (CR 613.7).
+fn flying_and_the_indestructible_grant(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    statics::have_flying(q, source, chars);
+    station::has::<0>(q, source, chars);
 }
 
 pub static CARD: CardDef = CardDef {
@@ -31,14 +36,15 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::Type, station::charged::<7>, station::is_a_creature, SEVEN_PLUS),
-        static_ability(Layer::Ability, station::charged::<7>, statics::have_flying, SEVEN_PLUS).continues(),
+        static_ability(Layer::Ability, station::charged::<7>, flying_and_the_indestructible_grant, SEVEN_PLUS).continues(),
         static_ability(Layer::PtSet, station::charged::<7>, statics::base_pt::<5, 5>, SEVEN_PLUS).continues(),
-        static_ability(
-            Layer::Ability,
-            other_tapped_legendary_creatures_you_control,
-            statics::have_indestructible,
-            "7+ | Other tapped legendary creatures you control have indestructible.",
-        ),
     ],
+    // The 7+ striation's static ability (CR 721.2a), which The Seriema has while it has seven or more charge counters.
+    delayed: &[granted_static_ability(
+        Layer::Ability,
+        other_tapped_legendary_creatures_you_control,
+        statics::have_indestructible,
+        "Other tapped legendary creatures you control have indestructible.",
+    )],
     ..oracle::THE_SERIEMA
 };

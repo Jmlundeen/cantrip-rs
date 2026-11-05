@@ -1,0 +1,74 @@
+# Dress Down is on the battlefield before The Seriema enters. Eight charge counters turn on its 7+ striation: one static ability
+# whose effect began in layer 4 (CR 721.2a-b), so its layer 6 part keeps applying although Dress Down, earlier in layer 6, took
+# The Seriema's abilities (CR 613.6) - and that part gives it, after Dress Down, the static ability "Other tapped legendary
+# creatures you control have indestructible" (CR 613.1f, 613.7a). The tapped Agent Maria Hill, whose own abilities Dress Down
+# took, has indestructible.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Black Lotus
+Colossal Dreadmaw
+Elvish Mystic
+Black Lotus
+Dress Down
+The Seriema
+Agent Maria Hill
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossal Dreadmaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Seriema.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Agent Maria Hill)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Agent Maria Hill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Colossal Dreadmaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Seriema.Activate(Ability: Station)
+Bot1.Choose(Agent Maria Hill)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Dress Down.Types = Enchantment
+Bot1.Battlefield.The Seriema.Counters.Charge = 8
+Bot1.Battlefield.The Seriema.Types = Artifact; Creature
+Bot1.Battlefield.The Seriema.Power = 5
+Bot1.Battlefield.The Seriema.Toughness = 5
+Bot1.Battlefield.The Seriema.Keywords = Flying
+Bot1.Battlefield.Agent Maria Hill.Tapped = true
+Bot1.Battlefield.Agent Maria Hill.Keywords = Indestructible
