@@ -1,0 +1,64 @@
+# Kuja, Genome Sorcerer: at the beginning of your end step it creates a tapped 0/1 black Wizard whose cast trigger deals 1 damage to
+# each opponent, and transforms once you control four or more Wizards. Turn 1: Kuja, then the first Wizard (Kuja and it are two).
+# Turn 3: Bot1 casts Lightning Bolt: the Wizard pings for 1, then the Bolt deals 3 (Bot2 20 -> 16); the end step makes the second
+# Wizard: three Wizards are not enough. Turn 5 the third Wizard makes four, and Kuja transforms into Trance Kuja, Fate Defied.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Kuja, Genome Sorcerer
+Lightning Bolt
+Mountain
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kuja, Genome Sorcerer.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Wizard Token.Tapped = true
+? Bot1.Battlefield.Wizard Token.Power = 0
+? Bot1.Battlefield.Wizard Token.Toughness = 1
+? Bot1.Battlefield.Kuja, Genome Sorcerer.Power = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Kuja, Genome Sorcerer.Power = 3
+[T5 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Trance Kuja, Fate Defied.Power = 4
+Bot1.Battlefield.Trance Kuja, Fate Defied.Toughness = 6
+Bot1.Battlefield.Wizard Token#3.Tapped = true
