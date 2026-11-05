@@ -463,6 +463,41 @@ pub fn search_two_one_onto_battlefield_tapped_other_into_hand(g: &mut dyn Game, 
     Ok(())
 }
 
+const BIN: Question = Question::new(
+    "PutTopIntoGraveyard",
+    "put it into your graveyard?",
+    "The card you looked at stays on top of your library if you don't",
+    "Put it into your graveyard",
+    "Leave it on top",
+);
+
+/// "Look at the top card of your library. If it [passes `qualifies`], you may reveal it and put it into your hand. If you don't
+/// put the card into your hand, you may put it into your graveyard." (CR 701.20a.) The card is looked at whatever it is, and may
+/// be left unrevealed even if it qualifies (`reveal` is the question asked then); not put into the hand, it may go to the
+/// graveyard - no discard, no mill. An empty library has nothing to look at. `qualifies` is judged on the card looked at, with
+/// the ability's stack item. Traveling Botanist (a land card) and Gathering Stone (a card of the chosen type) print it.
+pub fn look_at_top_may_take_else_bin(
+    g: &mut dyn Game,
+    item: &StackItem,
+    reveal: &'static Question,
+    qualifies: impl FnOnce(&mut dyn Game, ObjectId) -> bool,
+) -> Result<(), Suspend> {
+    let you = item.controller;
+    let Some(&top) = top_of_library(g, you, 1).first() else {
+        return Ok(());
+    };
+    g.look_at(you, &[top]);
+    if qualifies(g, top) && crate::effects::ask_may(g, you, item.object, Purpose::Ask(reveal))? {
+        g.reveal(you, &[top]);
+        g.return_to_hand_revealed(&[top]);
+        return Ok(());
+    }
+    if crate::effects::ask_may(g, you, item.object, Purpose::Ask(&BIN))? {
+        g.put_into_graveyard(&[top]);
+    }
+    Ok(())
+}
+
 /// "Look at the top `count` cards of your library. Put between `min` and `max` of them that pass `wanted` into your hand
 /// and the rest on the bottom of your library" (CR 401.2, 701.20-ish "look"): `reveal` makes it "you may reveal". A
 /// library with fewer cards shows what it has (CR 609.3), and `min` and `max` shrink to the cards that qualify. With

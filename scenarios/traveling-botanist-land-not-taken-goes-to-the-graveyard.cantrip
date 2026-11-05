@@ -1,0 +1,28 @@
+# A land the controller does not reveal (Decline) may be put into the graveyard instead (Accept) - no discard, no mill.
+
+[Bot1 Deck]
+Black Lotus
+Traveling Botanist
+Island x5
+Swamp
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Traveling Botanist.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Traveling Botanist > Bot2)
+Bot1.Decline
+Bot1.Accept
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Forest; Black Lotus
+Bot1.Library.Count = 12

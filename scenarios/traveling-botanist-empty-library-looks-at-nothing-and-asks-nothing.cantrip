@@ -1,0 +1,27 @@
+# With an empty library there is no top card: the Botanist's trigger looks at nothing and asks nothing (CR 701.20a). The deck is eight cards, so the turn 3 draw empties the library.
+
+[Bot1 Deck]
+Black Lotus
+Traveling Botanist
+Island x5
+Swamp
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Traveling Botanist.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Traveling Botanist > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Library.Count = 0
+Bot1.Graveyard = Black Lotus
+Bot2.Life = 18

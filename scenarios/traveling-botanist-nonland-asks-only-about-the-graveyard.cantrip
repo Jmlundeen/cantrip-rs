@@ -1,0 +1,26 @@
+# A nonland card (Mox Jet) is looked at but cannot be revealed into the hand: only the graveyard question is asked.
+
+[Bot1 Deck]
+Black Lotus
+Traveling Botanist
+Island x5
+Swamp
+Mox Jet
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Traveling Botanist.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Traveling Botanist > Bot2)
+Bot1.Accept
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Mox Jet; Black Lotus
