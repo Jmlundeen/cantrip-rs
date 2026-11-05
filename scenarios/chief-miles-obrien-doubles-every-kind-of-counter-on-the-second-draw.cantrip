@@ -1,0 +1,57 @@
+# O'Brien doubles every kind of counter on his one target (CR 701.10e, 608.2h). Scientists stuns itself on turn 3,
+# so there is no intervening untap to remove the stun (CR 122.1d). The draw step was the first draw; Combat Tutorial
+# draws the second and third, then adds a +1/+1 counter before O'Brien's trigger goes on the stack (CR 121.2, 603.3).
+# Both kinds double from one to two, including the +1/+1 counter added after the triggering draw.
+
+[Bot1 Deck]
+Utrom Scientists
+Mox Pearl
+Mox Emerald
+Chief Miles O'Brien
+Combat Tutorial
+Island
+Black Lotus
+Island x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chief Miles O'Brien.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Utrom Scientists.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Utrom Scientists)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Utrom Scientists.Counters.Stun = 1
+? Bot1.Battlefield.Utrom Scientists.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Combat Tutorial.Cast
+Bot1.Target(Bot1)
+Bot1.Target(Bot1.Battlefield.Utrom Scientists)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Utrom Scientists)
+? Bot1.Battlefield.Utrom Scientists.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Utrom Scientists.Counters.Stun = 1
+
+[Expect]
+Bot1.Battlefield.Utrom Scientists.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Utrom Scientists.Counters.Stun = 2
+Bot1.Battlefield.Utrom Scientists.Power = 4
+Bot1.Battlefield.Chief Miles O'Brien.Counters.PlusOnePlusOne = (absent)

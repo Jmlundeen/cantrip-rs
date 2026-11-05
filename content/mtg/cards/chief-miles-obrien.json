@@ -1,0 +1,8 @@
+{
+  "name": "Chief Miles O'Brien",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Human Artificer",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Seek out — Whenever you draw your second card each turn, double the number of each kind of counter on target artifact or creature you control."
+}
