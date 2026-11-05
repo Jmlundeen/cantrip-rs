@@ -19,7 +19,12 @@ use cantrip_api::*;
 fn put_charge_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(&tapped) = g.cost_objects(item).first() else { return Ok(()) };
     let chars = g.chars(tapped);
-    let amount = if g.stations_using_toughness(tapped) { chars.toughness } else { chars.power }.unwrap_or(0);
+    let amount = if g.stations_using_toughness(tapped) {
+        chars.toughness.unwrap_or(0)
+    } else {
+        // "... stations Spacecraft as though his power were tripled" (Sulu, Heroic Helmsman): what it counts as, not its power.
+        g.tapped_power(tapped, item.object)
+    };
     if amount > 0 {
         g.add_counters(item.object, CounterKind::Charge, amount);
     }

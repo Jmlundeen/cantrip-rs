@@ -2874,6 +2874,11 @@ pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
 /// Whether a static ability makes this creature assign combat damage as though negative power were positive
 /// (CR 510.1a, 609.4): given the rule's own asker. This changes combat assignment alone, never the creature's power.
+/// "This creature stations Spacecraft and crews Vehicles as though its power were tripled" (CR 702.122b): the
+/// power it counts with when tapped for a crew or station cost, from the power it has and the permanent being crewed
+/// or stationed. Sulu, Heroic Helmsman.
+pub type TapPowerRule = fn(&dyn Query, &Asker, i16, ObjectId) -> i16;
+
 pub type DamageByAbsolutePowerRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
 /// Whether a static ability makes this creature station permanents using its toughness rather than its power (CR 702.184c):
@@ -3453,6 +3458,10 @@ pub struct CardDef {
     /// (CR 510.1a, 609.4), while the source has its abilities: Loot, the Anomaly. The rule selects the creatures;
     /// the core computes the positive magnitude only where combat assignment uses their power.
     pub damage_by_absolute_power: &'static [DamageByAbsolutePowerRule],
+    /// "This creature stations Spacecraft and crews Vehicles as though its power were tripled" (CR 702.122b, 702.184a):
+    /// what the creature counts as towards a crew or station cost, given the power it has and the permanent being crewed or
+    /// stationed, while it is on the battlefield with its abilities. Sulu, Heroic Helmsman. See `TapPowerRule`.
+    pub tap_power: &'static [TapPowerRule],
     /// "Each creature you control with toughness greater than its power stations permanents using its toughness rather than
     /// its power" (CR 702.184c), while the source is on the battlefield with its abilities as the station ability resolves:
     /// Tapestry Warden. See `StationByToughnessRule`.
@@ -3666,6 +3675,7 @@ impl CardDef {
         cant_become_untapped: &[],
         damage_by_toughness: &[],
         damage_by_absolute_power: &[],
+        tap_power: &[],
         stations_by_toughness: &[],
         damage_stays: &[],
         mana_told_apart: &[],
@@ -3767,6 +3777,7 @@ impl CardDef {
             (!self.cant_become_untapped.is_empty(), "rules against becoming untapped"),
             (!self.damage_by_toughness.is_empty(), "damage by toughness"),
             (!self.damage_by_absolute_power.is_empty(), "damage by absolute power"),
+            (!self.tap_power.is_empty(), "tap power"),
             (!self.stations_by_toughness.is_empty(), "stations by toughness"),
             (!self.damage_stays.is_empty(), "a damage-stays rule"),
             (!self.mana_told_apart.is_empty(), "a mana source rule"),

@@ -1219,6 +1219,10 @@ pub trait Game: Query {
     /// Whether `creature` stations permanents using its toughness rather than its power (CR 702.184c), by a static ability
     /// on the battlefield now (`CardDef::stations_by_toughness`); asked of the creature as it last existed if it has left.
     fn stations_using_toughness(&self, creature: ObjectId) -> bool;
+    /// What `creature` counts as when it is tapped to station `permanent` (CR 702.184a-b): its power, or what a static
+    /// ability of the battlefield's makes it count as (Sulu, Heroic Helmsman's "stations Spacecraft ... as though his power
+    /// were tripled"). A creature that has left the battlefield counts as the power it last had.
+    fn tapped_power(&self, creature: ObjectId, permanent: ObjectId) -> i16;
     fn lose_life(&mut self, player: PlayerId, amount: i32);
     /// "`player`'s life total becomes `total`" (CR 119.5): they gain or lose the difference, so a player who can't gain life
     /// keeps a total lower than `total` (CR 119.7).

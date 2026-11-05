@@ -1077,7 +1077,8 @@ fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatu
         // it does so"), so tapping it takes from the total.
         let bonus = if t.greater_with.is_some_and(|k| c.has(k)) { 2 } else { 0 };
         cards.push(id);
-        powers.push(c.power.unwrap_or(0).saturating_add(bonus));
+        // "... as though its power were tripled": what the creature counts as for this cost (CR 702.122b).
+        powers.push(crate::static_rules::tapped_power(cx, c.power.unwrap_or(0).saturating_add(bonus), source));
     }
     (cards, powers)
 }

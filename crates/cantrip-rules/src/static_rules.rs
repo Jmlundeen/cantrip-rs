@@ -453,6 +453,16 @@ pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
     power.max(0) as u16
 }
 
+/// What `creature` counts as towards a crew or station cost (CR 702.122b): its power, or what a static ability of the
+/// battlefield's makes it count as for the permanent being crewed or stationed - "stations Spacecraft and crews Vehicles
+/// as though his power were tripled" (Sulu, Heroic Helmsman). Asked of each creature tapped for such a cost.
+pub fn tapped_power(cx: &Cx, power: i16, permanent: ObjectId) -> i16 {
+    sources(cx, |d| !d.tap_power.is_empty()).fold(power, |power, (id, controller, def, by)| {
+        let asker = Asker { source: id, controller, by, spell: false };
+        def.tap_power.iter().fold(power, |power, rule| rule(cx, &asker, power, permanent))
+    })
+}
+
 /// The card types `player` may cast as though they had flash (CR 307.5, 702.8): from effects that gave them that.
 pub fn flash_types(cx: &Cx, player: PlayerId) -> TypeSet {
     flash_type_grants(cx, player).fold(TypeSet::NONE, |types, (_, t)| TypeSet(types.0 | t.0))
