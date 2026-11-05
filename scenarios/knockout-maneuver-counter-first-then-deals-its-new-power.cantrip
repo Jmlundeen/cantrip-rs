@@ -1,0 +1,51 @@
+# Knockout Maneuver: "Put a +1/+1 counter on target creature you control. Then it deals damage equal to its power to target creature an opponent controls."
+# Bot1's Alpine Grizzly (4/2) gets the counter (5/3) and then deals 5 (not 4) to Bot2's Wall of Stone (0/8), which deals none back. The first target must be
+# Bot1's own and the second an opponent's creature (the refusals).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Alpine Grizzly
+Knockout Maneuver
+Island
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Wall of Stone
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Alpine Grizzly.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Knockout Maneuver.Cast
+! Bot1.Target(Bot2.Battlefield.Wall of Stone)
+Bot1.Target(Bot1.Battlefield.Alpine Grizzly)
+! Bot1.Target(Bot1.Battlefield.Alpine Grizzly)
+Bot1.Target(Bot2.Battlefield.Wall of Stone)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Alpine Grizzly.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Alpine Grizzly.Power = 5
+Bot1.Battlefield.Alpine Grizzly.Damage = 0
+Bot2.Battlefield.Wall of Stone.Damage = 5

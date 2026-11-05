@@ -1,0 +1,6 @@
+{
+  "name": "Knockout Maneuver",
+  "manaCost": "{2}{G}",
+  "type": "Sorcery",
+  "oracleText": "Put a +1/+1 counter on target creature you control, then it deals damage equal to its power to target creature an opponent controls."
+}
