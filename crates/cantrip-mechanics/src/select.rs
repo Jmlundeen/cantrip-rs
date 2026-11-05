@@ -167,6 +167,24 @@ pub const fn basic_land_of_type(subtype: Subtype) -> Part {
     part(&(basic_land_of_type_rule as SelectFn), crate::lands::sub(subtype) as u32, "")
 }
 
+fn basic_land_of_types_rule<const A: u16, const B2: u16, const C: u16>(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
+    let (a, b, c) = (
+        crate::lands::word(q, choice.source, A),
+        crate::lands::word(q, choice.source, B2),
+        crate::lands::word(q, choice.source, C),
+    );
+    Verdict::each(choice, |card| is_basic_of_type(q, card, a) || is_basic_of_type(q, card, b) || is_basic_of_type(q, card, c))
+}
+
+/// "A basic [type A], [type B], or [type C] card" (CR 205.4a, 205.3i, 305.6): a card with the basic supertype and one of the
+/// three land types, each read through the words of the text of the card that asks (CR 612.2) and a card as it is where it is.
+/// The Monument cycle searches for it: Abzan, Jeskai, Mardu, Sultai and Temur Monument. The Landscapes (Bountiful Landscape and
+/// the rest) print the same "basic [type A], [type B], or [type C] card"; they still search with the legacy `Find` and would move
+/// onto this in a follow-up.
+pub const fn basic_land_of_types<const A: u16, const B2: u16, const C: u16>() -> Part {
+    part(&(basic_land_of_types_rule::<A, B2, C> as SelectFn), 0, "")
+}
+
 /// "A basic land card or Planet card": Final Frontier and Genesis Device search for it.
 pub const BASIC_LAND_OR_PLANET: Part = basic_land_or_subtype(Subtype::Planet);
 
