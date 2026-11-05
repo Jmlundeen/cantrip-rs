@@ -1,0 +1,29 @@
+# CR 117.4, 104.3a (the owner's ruling, 2026-11-05): a concession with nothing on the stack restarts the pass sequence too, so
+# the step does not end until every player still in has passed again. In a game of three Bot1 plays an Island in their first
+# main phase; Bot1 and Bot2 pass, and Bot3, holding priority, concedes. Bot1 gets priority and passes, and the game is still in
+# Bot1's first main phase with Bot2 holding priority: it ends only when Bot2 passes again too.
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+Bot3.Concede
+? Step = Main1
+? PriorityPlayer = Bot1
+Bot1.Pass
+? Step = Main1
+? PriorityPlayer = Bot2
+Bot2.Pass
+
+[Expect]
+Result = InProgress
+Bot3.Status = Lost

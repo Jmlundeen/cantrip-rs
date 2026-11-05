@@ -1,0 +1,33 @@
+# CR 117.4, 104.3a (the owner's ruling, 2026-11-05): a concession restarts the pass sequence even when the player who concedes
+# is not the one holding priority. In a game of three Bot1 casts Ornithopter; Bot1 and Bot2 pass, and as Bot3 holds priority
+# Bot2 concedes. Bot3 keeps priority, and when Bot3 passes Ornithopter is still on the stack: Bot1's pass from before the
+# concession no longer counts, so Bot1 is given priority and must pass again before it resolves.
+
+[Bot1 Deck]
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Concede
+? PriorityPlayer = Bot3
+? Stack = Ornithopter
+Bot3.Pass
+? Stack = Ornithopter
+? PriorityPlayer = Bot1
+Bot1.Pass
+? Stack.Count = 0
+? Step = Main1
+
+[Expect]
+Result = InProgress
+Bot2.Status = Lost
+Bot1.Battlefield.Ornithopter.Power = 0

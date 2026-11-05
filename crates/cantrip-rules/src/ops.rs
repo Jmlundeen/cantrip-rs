@@ -4841,10 +4841,13 @@ pub fn lose_game(cx: &mut Cx, player: PlayerId) {
 
 /// A player concedes (CR 104.3a): they lose and leave the game at once, which nothing prevents ("can't lose the game" does not
 /// stop it); the monarch and the initiative pass on (CR 725.4, 726.4) and their objects leave (CR 800.4a).
+/// Conceding is a player's action (CR 104.3a), so it breaks the run of passes: every player still in passes again, with what
+/// the concession caused, before the top of the stack resolves or the step ends (CR 117.4; the owner's ruling, 2026-11-05).
 pub fn concede(cx: &mut Cx, player: PlayerId) {
     if cx.s().player(player).lost || cx.s().is_over() {
         return;
     }
+    cx.st().update_turn(|t| t.passes = 0);
     leaves_having_lost(cx, player, LossReason::Conceded);
 }
 
