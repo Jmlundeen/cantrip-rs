@@ -2183,6 +2183,27 @@ pub const CREATURE_YOU_CONTROL_ATTACKS: Trigger = when_asked(EventMask::ATTACKS,
 pub const DRAGON_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, of_subtype_you_control_enters::<{ crate::lands::sub(Subtype::Dragon) }>);
 pub const OPPONENTS_CREATURE_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, opponents_creature_enters);
 pub const LEGENDARY_CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, legendary_creature_you_control_enters);
+
+/// "Whenever a nontoken legendary permanent you control enters" (CR 603.6a): any legendary permanent under your control that
+/// is a card rather than a token, this one included, entering the battlefield from anywhere. Spot, Felis catus prints it as
+/// "Whenever Spot or another nontoken legendary permanent you control enters".
+pub fn nontoken_legendary_permanent_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. } if to.is(ZoneKind::Battlefield) => {
+            let c = q.chars(*new);
+            (!q.obj(*new).token
+                && q.controller(*new) == me.controller
+                && c.supertypes.legendary
+                && crate::targets::is_permanent_card(&c))
+            .then(|| Fired::PLAIN)
+            .flatten()
+        }
+        _ => None,
+    }
+}
+
+pub const NONTOKEN_LEGENDARY_PERMANENT_YOU_CONTROL_ENTERS: Trigger =
+    when_asked(EventMask::ZONE_CHANGE, nontoken_legendary_permanent_you_control_enters);
 pub const ARTIFACT_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, artifact_you_control_enters);
 pub const NONTOKEN_ARTIFACT_YOU_CONTROL_ENTERS: Trigger =
     when_asked(EventMask::ZONE_CHANGE, nontoken_you_control_enters::<ARTIFACT_TYPE>);
