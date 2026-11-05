@@ -1,0 +1,54 @@
+# Meticulous Artisan: "When this creature enters, create a Treasure token" gives Bot1 one Treasure and Bot2 none. Prowess
+# (CR 702.108a) pumps it +1/+1 for Bot1's noncreature spell (Mox Jet) but not for a creature spell (Ornithopter, still 4/4
+# after it) nor for the opponent's Mox Pearl, and the pump has ended on T2 (3/3 again).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Meticulous Artisan
+Mox Jet
+Ornithopter
+Mountain x15
+
+[Bot2 Deck]
+Mox Pearl
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Meticulous Artisan.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Meticulous Artisan; Mox Ruby; Treasure Token
+? Bot2.Battlefield.Count = 0
+? Bot1.Battlefield.Meticulous Artisan.Power = 3
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Meticulous Artisan.Power = 4
+? Bot1.Battlefield.Meticulous Artisan.Toughness = 4
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Meticulous Artisan.Power = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Meticulous Artisan.Power = 3
+Bot1.Battlefield.Meticulous Artisan.Toughness = 3

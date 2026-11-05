@@ -1,0 +1,8 @@
+{
+  "name": "Meticulous Artisan",
+  "manaCost": "{3}{R}",
+  "type": "Creature — Djinn Artificer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nWhen this creature enters, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+}
