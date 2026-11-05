@@ -1,0 +1,36 @@
+# Mox Jasper counts only Dragons its controller controls: Bot2's Phyrexian Dragon Engine does not let Bot1 activate it
+# (the refusal).
+
+[Bot1 Deck]
+Mox Jasper
+Mountain x19
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Phyrexian Dragon Engine
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jasper.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Phyrexian Dragon Engine.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Phyrexian Dragon Engine.Keywords = DoubleStrike
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Mox Jasper.Activate
+
+[Expect]
+Bot1.Mana = 

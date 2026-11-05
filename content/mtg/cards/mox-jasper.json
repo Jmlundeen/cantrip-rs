@@ -1,0 +1,6 @@
+{
+  "name": "Mox Jasper",
+  "manaCost": "{0}",
+  "type": "Legendary Artifact",
+  "oracleText": "{T}: Add one mana of any color. Activate only if you control a Dragon."
+}
