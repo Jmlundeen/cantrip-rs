@@ -1,0 +1,6 @@
+{
+  "name": "Riverwheel Sweep",
+  "manaCost": "{2/U}{2/R}{2/W}",
+  "type": "Sorcery",
+  "oracleText": "Tap target creature. Put three stun counters on it. (If a permanent with a stun counter would become untapped, remove one from it instead.)\nExile the top two cards of your library. Choose one of them. Until the end of your next turn, you may play that card."
+}

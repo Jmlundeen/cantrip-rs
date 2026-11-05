@@ -1,0 +1,53 @@
+# {2/U}{2/R}{2/W}, "Tap target creature. Put three stun counters on it. Exile the top two cards of your library. Choose one of them. Until the end of your next
+# turn, you may play that card." On turn 3 three Moxen (U, R, W) pay one coloured mana per symbol. Bot2's Ornithopter is tapped and stunned (a Mox is no creature
+# and is refused), so on turn 4 it stays tapped and one counter comes off instead (CR 122.1d). Bot1 exiles a Mountain and a Lightning Bolt and chooses the Bolt:
+# the Mountain is refused on turn 5 although Bot1 has its land drop, and the Bolt is cast from exile with the Ruby.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Riverwheel Sweep
+Island
+Island
+Island
+Island
+Mountain
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Riverwheel Sweep.Cast(Mox Sapphire)
+Bot1.Hand.Riverwheel Sweep.Cast(Ornithopter)
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+? Bot2.Battlefield.Ornithopter.Tapped = true
+? Bot2.Battlefield.Ornithopter.Counters.Stun = 3
+? Exile = Lightning Bolt; Mountain
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Tapped = true
+? Bot2.Battlefield.Ornithopter.Counters.Stun = 2
+[T5 Bot1.Main1]
+! Bot1.Exile.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 17
+Exile = Mountain
+Bot1.Graveyard = Lightning Bolt; Riverwheel Sweep
