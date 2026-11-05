@@ -1,0 +1,22 @@
+{
+  "name": "Exdeath, Void Warlock",
+  "manaCost": "{1}{B}{G}",
+  "type": "Legendary Creature — Spirit Warlock",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When Exdeath enters, you gain 3 life.\nAt the beginning of your end step, if there are six or more permanent cards in your graveyard, transform Exdeath.",
+  "backFace": {
+    "name": "Neo Exdeath, Dimension's End",
+    "colorIndicator": [
+      "Black",
+      "Green"
+    ],
+    "type": "Legendary Creature — Spirit Avatar",
+    "power": "*",
+    "toughness": 3,
+    "oracleText": "Trample\nNeo Exdeath's power is equal to the number of permanent cards in your graveyard.",
+    "keywords": [
+      "Trample"
+    ]
+  }
+}

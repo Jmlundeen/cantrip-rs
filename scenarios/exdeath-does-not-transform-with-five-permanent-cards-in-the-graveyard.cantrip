@@ -1,0 +1,52 @@
+# Exdeath, Void Warlock: "At the beginning of your end step, if there are six or more permanent cards in your graveyard, transform Exdeath" - five is not enough. Breaking mills Bot1's top
+# eight cards on turn 3: five Islands and three Lightning Bolts (instants are not permanent cards, CR 110.4a), with Breaking beside them nine cards in all but only five permanent cards. The
+# ability does not trigger at the end step (CR 603.4), and Exdeath is still the 3/3 on turn 5.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Exdeath, Void Warlock
+Mox Sapphire
+Breaking // Entering
+Memnite
+Island
+Island x5
+Lightning Bolt x3
+Island x24
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Exdeath, Void Warlock.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Breaking // Entering.Cast(Bot1; Ability: Breaking)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 9
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Exdeath, Void Warlock.Power = 3
+
+[Expect]
+Bot1.Graveyard.Count = 9

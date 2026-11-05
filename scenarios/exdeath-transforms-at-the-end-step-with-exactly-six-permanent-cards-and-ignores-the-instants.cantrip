@@ -1,0 +1,79 @@
+# Exdeath, Void Warlock (3/3): "When Exdeath enters, you gain 3 life" (Bot1 on 23) and "At the beginning of your end step, if there are six or more permanent cards in your graveyard, transform
+# Exdeath." Breaking mills Bot1's top eight cards: six Islands (permanent cards, CR 110.4a) and two Lightning Bolts (instants, not permanent cards), and Breaking itself rests there as a sorcery
+# card: six permanent cards, exactly enough. At the end step Exdeath becomes Neo Exdeath, Dimension's End (trample, 3 toughness) whose power is the number of permanent cards in the graveyard: 6.
+# Bot2's The Wondrous Wasp takes its abilities on turn 4, and the star is worth 0 (CR 208.2a, 208.5): a 0/3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Exdeath, Void Warlock
+Mox Sapphire
+Breaking // Entering
+Memnite
+Island
+Island x6
+Lightning Bolt x2
+Island x24
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+The Wondrous Wasp
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Exdeath, Void Warlock.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Breaking // Entering.Cast(Bot1; Ability: Breaking)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 9
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Neo Exdeath, Dimension's End.Power = 6
+? Bot1.Battlefield.Neo Exdeath, Dimension's End.Toughness = 3
+? Bot1.Battlefield.Neo Exdeath, Dimension's End.Keywords = Trample
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Neo Exdeath, Dimension's End)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Neo Exdeath, Dimension's End.Power = 0
+Bot1.Battlefield.Neo Exdeath, Dimension's End.Toughness = 3
