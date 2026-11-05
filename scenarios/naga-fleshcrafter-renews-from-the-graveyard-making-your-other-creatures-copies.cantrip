@@ -1,0 +1,66 @@
+# Naga Fleshcrafter: "Renew — {2}{U}, Exile this card from your graveyard: Put a +1/+1 counter on target nonlegendary creature
+# you control. Each other creature you control becomes a copy of that creature until end of turn. Activate only as a sorcery."
+# On turn 1 Bot1 casts Memnite, Ragavan, Nimble Pilferer and a Naga Fleshcrafter it declines to have copy, so it dies. On
+# Bot2's turn 2 a Phyrexian Walker comes down. On turn 3 the ability refuses the legendary Ragavan as its target
+# (CR 205.4a) and Bot2's nonlegendary Walker, a creature Bot1 doesn't control; aimed at Memnite it exiles the Naga, puts a
+# +1/+1 counter on Memnite (2/2) and makes Ragavan, the one other creature Bot1 controls, a Memnite (a 1/1 artifact
+# Construct, never legendary) until end of turn - while Bot2's Phyrexian Walker is still a Walker (CR 611.2c, 707.2). As the turn passes to Bot2's turn 4 Ragavan is the 2/1 Monkey Pirate again
+# (CR 514.2) and Memnite keeps its counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Naga Fleshcrafter
+Ragavan, Nimble Pilferer
+Memnite
+Mox Jet
+Island x16
+
+[Bot2 Deck]
+Phyrexian Walker
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Naga Fleshcrafter.Cast
+Bot1.Decline
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Phyrexian Walker.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Graveyard.Naga Fleshcrafter.Activate(Ragavan, Nimble Pilferer)
+! Bot1.Graveyard.Naga Fleshcrafter.Activate(Phyrexian Walker)
+Bot1.Graveyard.Naga Fleshcrafter.Activate(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite#1.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Memnite#1.Power = 2
+? Bot1.Battlefield.Memnite#2.Types = Artifact; Creature
+? Bot1.Battlefield.Memnite#2.Power = 1
+? Bot2.Battlefield.Phyrexian Walker.Toughness = 3
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Exile = Naga Fleshcrafter
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Battlefield.Memnite.Toughness = 2
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Types = Creature
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Power = 2
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Toughness = 1
+Bot2.Battlefield.Phyrexian Walker.Toughness = 3

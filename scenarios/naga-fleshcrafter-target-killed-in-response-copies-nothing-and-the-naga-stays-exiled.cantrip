@@ -1,0 +1,60 @@
+# Naga Fleshcrafter: the renew ability targets Memnite; in response Bot2 Lightning Bolts it, so the target is illegal as the
+# ability resolves and none of it happens (CR 608.2b): no counter, and Ragavan, Nimble Pilferer, the other creature Bot1
+# controls, does not become a copy of anything. The Naga stays exiled: exiling it was the cost. Set up as in the
+# neighbouring scenario, with Bot2 holding a Mox Ruby and a Lightning Bolt.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Naga Fleshcrafter
+Ragavan, Nimble Pilferer
+Memnite
+Mox Jet
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Naga Fleshcrafter.Cast
+Bot1.Decline
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Naga Fleshcrafter.Activate(Memnite)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Memnite)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Memnite = (absent)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Naga Fleshcrafter
+Bot1.Graveyard = Memnite; Black Lotus
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Power = 2
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Toughness = 1
