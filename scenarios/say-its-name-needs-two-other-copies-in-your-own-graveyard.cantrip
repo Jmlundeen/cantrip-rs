@@ -1,0 +1,32 @@
+# Say Its Name: "Exile this card and two other cards named Say Its Name from your graveyard". Bot1's graveyard holds only two copies (the cast one and one milled), and
+# Bot2's holds a third (discarded to hand size on turn 2): it is not Bot1's graveyard, so the ability is refused on turn 3 (CR 602.2b, 118.3).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Say Its Name
+Island x4
+Say Its Name
+Forest
+Island
+Altanak, the Thrice-Called
+Island x10
+
+[Bot2 Deck]
+Say Its Name x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Say Its Name.Cast
+Bot1.Pass
+Bot1.Choose()
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Say Its Name.Activate
+
+[Expect]
+Bot2.Graveyard = Say Its Name
+Bot1.Graveyard.Count = 4

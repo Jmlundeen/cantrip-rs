@@ -1,0 +1,38 @@
+# Say Its Name: the only Altanak, the Thrice-Called is in Bot1's library. Bot1 chooses to search the library, is refused any other card of it ("a card named", CR 701.23a)
+# and finds Altanak there (the zone no other scenario takes it from): it leaves the library, enters untapped, and the library is shuffled (CR 701.24).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Say Its Name
+Island x4
+Say Its Name
+Say Its Name
+Forest
+Altanak, the Thrice-Called
+Island x8
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Say Its Name.Cast
+Bot1.Pass
+Bot1.Choose()
+Bot1.Graveyard.Say Its Name.Activate
+Bot1.Pass
+Bot1.Accept
+! Bot1.Search(Island)
+Bot1.Search(Altanak, the Thrice-Called)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Altanak, the Thrice-Called.Power = 9
+Bot1.Library.Count = 8
+Bot1.Hand.Count = 4
+Bot1.Shuffles = 1

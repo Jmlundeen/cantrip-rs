@@ -1,0 +1,42 @@
+# Say Its Name: the cost is this card and exactly two other copies. Bot1's first copy mills three more, so four copies are in the graveyard; activating
+# exiles the activator's choice of three (CR 701.13) and leaves the fourth. The Altanak, the Thrice-Called is in Bot1's hand (the opening one), and Bot1 does not search
+# the library: no shuffle (CR 701.23), the library keeps the order it had.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Say Its Name
+Altanak, the Thrice-Called
+Island x3
+Say Its Name
+Say Its Name
+Say Its Name
+Island
+Forest
+Island x8
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Say Its Name.Cast
+Bot1.Pass
+Bot1.Choose()
+Bot1.Graveyard.Say Its Name.Activate
+Bot1.Pass
+Bot1.Decline
+Bot1.Choose(Altanak, the Thrice-Called)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Altanak, the Thrice-Called.Power = 9
+Bot1.Graveyard = Say Its Name
+Exile.Count = 3
+Bot1.Hand.Count = 3
+Bot1.Library = Island; Forest; Island; Island; Island; Island; Island; Island; Island; Island
+Bot1.Shuffles = 0

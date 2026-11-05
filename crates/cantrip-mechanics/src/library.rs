@@ -1204,8 +1204,8 @@ pub fn owner_puts_first_target_on_top_or_bottom(g: &mut dyn Game, item: &StackIt
 
 /// "Mill `count` cards, then return [`rule`] from your graveyard to your hand" (CR 701.17, 608.2c): the choice is made from the
 /// whole graveyard as the mill left it, a card just milled included, and is not a target. One is returned whenever the rule
-/// finds one. Takenuma, Abandoned Mire (a creature or planeswalker card) and Fell Gravship (a creature or Spacecraft card)
-/// print it.
+/// finds one, unless `rule` lets none be chosen (an "up to one" for a "you may": Say Its Name). Takenuma, Abandoned Mire (a
+/// creature or planeswalker card) and Fell Gravship (a creature or Spacecraft card) print it.
 pub fn mill_then_return_a_card(g: &mut dyn Game, item: &StackItem, count: u32, rule: Selection) -> Result<(), Suspend> {
     let you = item.controller;
     g.mill(you, count);

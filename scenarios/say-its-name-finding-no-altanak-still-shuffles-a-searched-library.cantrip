@@ -1,0 +1,35 @@
+# Say Its Name: no Altanak, the Thrice-Called is anywhere in Bot1's graveyard, hand or library. Bot1 searches the library anyway (CR 701.23b: it may be searched
+# whatever it holds) and finds nothing, and "if you search your library this way, shuffle" still shuffles it (CR 701.24); the cost is paid and nothing enters.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Say Its Name
+Island x4
+Say Its Name
+Say Its Name
+Forest
+Island x9
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Say Its Name.Cast
+Bot1.Pass
+Bot1.Choose()
+Bot1.Graveyard.Say Its Name.Activate
+Bot1.Pass
+Bot1.Accept
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Exile.Count = 3
+Bot1.Library.Count = 9
+Bot1.Shuffles = 1

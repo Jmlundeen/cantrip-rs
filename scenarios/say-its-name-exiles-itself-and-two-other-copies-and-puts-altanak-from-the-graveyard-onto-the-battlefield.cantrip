@@ -1,0 +1,45 @@
+# Say Its Name: Bot1's first copy mills the two others and an Altanak, the Thrice-Called (declining to return it), so the graveyard holds three copies and Altanak.
+# On Bot2's turn the ability is refused ("activate only as a sorcery", CR 602.5d). On turn 3 Bot1 activates it - no mana - exiling the copy and two others (CR 701.13) and, not searching
+# the library, puts Altanak from the graveyard onto the battlefield. Bot2 holds Altanaks in its hand, library and (discarded on turn 2) graveyard: none is touched.
+# Altanak costs nothing to take and nothing is shuffled.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Say Its Name
+Island x4
+Say Its Name
+Say Its Name
+Altanak, the Thrice-Called
+Island x10
+
+[Bot2 Deck]
+Altanak, the Thrice-Called x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Say Its Name.Cast
+Bot1.Pass
+Bot1.Choose()
+[T2 Bot2.Main1]
+! Bot1.Graveyard.Say Its Name.Activate
+[T3 Bot1.Main1]
+Bot1.Graveyard.Say Its Name.Activate
+Bot1.Pass
+Bot1.Decline
+Bot1.Choose(Altanak, the Thrice-Called)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Altanak, the Thrice-Called.Power = 9
+Bot1.Graveyard.Count = 0
+Exile.Count = 3
+Bot1.Library.Count = 9
+Bot1.Shuffles = 0
+Bot2.Graveyard = Altanak, the Thrice-Called
+Bot2.Hand.Count = 7
+Bot2.Battlefield.Count = 0

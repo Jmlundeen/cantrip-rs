@@ -1,0 +1,30 @@
+# Say Its Name: a land card is as good as a creature card for "return a creature or land card". Bot1 mills Lightning Bolt, Forest and Counterspell and takes the Forest
+# (the only card that qualifies); the other two stay in the graveyard (CR 701.17a, 608.2c).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Say Its Name
+Island x4
+Lightning Bolt
+Forest
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Say Its Name.Cast
+Bot1.Pass
+! Bot1.Choose(Counterspell)
+Bot1.Choose(Forest)
+
+[Expect]
+Bot1.Hand = Forest; Island; Island; Island; Island
+Bot1.Graveyard = Say Its Name; Counterspell; Lightning Bolt
