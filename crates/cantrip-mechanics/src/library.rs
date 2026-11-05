@@ -84,34 +84,35 @@ pub fn find_to_top(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: S
     Ok(found)
 }
 
-/// "Search your [`zone`] and/or library for [`rule`]" (CR 701.23, 701.23a-b): the cards found, and whether the library was
+/// "Search your [`zones`] and/or library for [`rule`]" (CR 701.23, 701.23a-b): the cards found, and whether the library was
 /// searched, for the "if you search your library this way, shuffle" that follows. The player chooses first whether to search
-/// the library (`ask`, by `ask_may_search`, a search the effect can't cause being declined). If they do, `zone` and the
-/// library are searched together: one selection over the cards of both that `rule` allows, so the one card of "a [quality]
-/// card" may be taken from either, having seen both (the library is searched whatever is found, and the caller shuffles it). If
-/// they don't, only `zone` is searched, and nothing is asked when no card there fits. A card may be left unfound only in a
-/// hidden zone (CR 701.23b): searched alone, a public zone such as the graveyard must give up a card that fits, so an
+/// the library (`ask`, by `ask_may_search`, a search the effect can't cause being declined). If they do, `zones` and the
+/// library are searched together: one selection over the cards of all of them that `rule` allows, so the one card of "a [quality]
+/// card" may be taken from any, having seen all (the library is searched whatever is found, and the caller shuffles it). If
+/// they don't, only `zones` are searched, and nothing is asked when no card there fits. A card may be left unfound only in a
+/// hidden zone (CR 701.23b): searched alone, public zones such as the graveyard must give up a card that fits, so an
 /// "up to" count there is "as many as there are". The cards are left where they were found for the caller to move.
-/// Last Light of Durin's Day (a Dragon card from the hand, onto the battlefield) and Vision Quest (an artifact creature card
-/// from the graveyard, onto the battlefield) print it; Aether Searcher (a card with a noted name, cast) searches the hand.
+/// Last Light of Durin's Day (a Dragon card from the hand, onto the battlefield), Vision Quest (an artifact creature card
+/// from the graveyard, onto the battlefield) and Say Its Name (a card named Altanak, the Thrice-Called, from the graveyard,
+/// hand and/or library, onto the battlefield) print it; Aether Searcher (a card with a noted name, cast) searches the hand.
 pub fn search_zone_and_or_library(
     g: &mut dyn Game,
     player: PlayerId,
     source: ObjectId,
-    zone: Zone,
+    zones: &[Zone],
     destination: SearchDestination,
     purpose: Purpose,
     ask: &'static Question,
     rule: Selection,
 ) -> Result<(Vec<ObjectId>, bool), Suspend> {
-    let cards = g.state().zone(zone).to_vec();
+    let cards: Vec<ObjectId> = zones.iter().flat_map(|&zone| g.state().zone(zone).iter().copied()).collect();
     if ask_may_search(g, player, source, ask)? {
         let found = search_with(g, player, player, source, destination, rule, cards)?;
         return Ok((found, true));
     }
     let any = cantrip_api::select::first_answer(&*g, &rule, player, source, &cards, true).is_some_and(|taken| !taken.is_empty());
     let rule = match rule.count {
-        crate::select::Count::UpTo(n) if !zone.kind().is_hidden() => rule.taking(crate::select::as_many_as_can(n)),
+        crate::select::Count::UpTo(n) if zones.iter().all(|zone| !zone.kind().is_hidden()) => rule.taking(crate::select::as_many_as_can(n)),
         _ => rule,
     };
     let found = if any { crate::choose::select(g, player, source, purpose, cards, rule)? } else { Vec::new() };
