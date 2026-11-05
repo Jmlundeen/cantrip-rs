@@ -1,0 +1,39 @@
+# Supplementation Node: "Artifact creatures you control have 'Whenever this creature deals combat damage to a
+# player, put a +1/+1 counter on it.'" (CR 613.1f, 603.2). It is cast on turn 5 with three Plains; Memnite, an
+# artifact creature, attacks unblocked on turn 7 and the granted trigger puts a +1/+1 counter on it.
+
+[Bot1 Deck]
+Memnite
+Plains
+Plains
+Plains
+Plains
+Plains
+Supplementation Node
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Supplementation Node.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Attack(Memnite > Bot2)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 2
