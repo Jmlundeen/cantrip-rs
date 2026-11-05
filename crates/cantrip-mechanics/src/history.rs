@@ -490,6 +490,13 @@ pub fn this_combat(q: &dyn Query) -> &[Record] {
     }
 }
 
+/// "If it's the first combat phase of the turn" (CR 603.4, 500.8) as an intervening "if" (`AbilityDef::condition`): the turn's
+/// beginning of combat steps are in its history, and the first combat phase is the only one of them so far. It is asked as the
+/// ability triggers and again as it resolves. Raph & Leo, Sibling Rivals and Genji Glove print it.
+pub fn first_combat_phase_of_the_turn(q: &dyn Query, _: &Asker) -> bool {
+    q.history().this_turn().iter().filter(|r| matches!(r.event, Event::StepBegan { step: Step::BeginCombat })).count() == 1
+}
+
 /// `cards_left_graveyard_this_turn` as a condition of the ability's controller: a triggered ability's intervening "if a card
 /// left your graveyard this turn" (CR 603.4). Gau, Feral Youth and Primary Research print it.
 pub fn a_card_left_your_graveyard_this_turn(q: &dyn Query, asker: &Asker) -> bool {
