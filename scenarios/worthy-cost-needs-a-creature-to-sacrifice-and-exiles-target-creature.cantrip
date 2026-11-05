@@ -1,0 +1,46 @@
+# Worthy Cost: "As an additional cost to cast this spell, sacrifice a creature. Exile target creature or planeswalker." With
+# Bot2's Hired Blade to target but no creature of its own Bot1 can't cast it though the {B} is there (the refusal); with an
+# Ornithopter out it can: the Blade is exiled (not put in the graveyard), the sacrificed Ornithopter is in Bot1's graveyard.
+
+[Bot1 Deck]
+Swamp
+Ornithopter
+Worthy Cost
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Hired Blade
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Hired Blade.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+! Bot1.Hand.Worthy Cost.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Worthy Cost.Cast(Bot2.Battlefield.Hired Blade)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Hired Blade
+Bot2.Graveyard =
+Bot1.Graveyard = Worthy Cost; Ornithopter
