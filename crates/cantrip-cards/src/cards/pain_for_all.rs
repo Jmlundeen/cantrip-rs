@@ -23,20 +23,6 @@ fn enchanted_creature_deals_damage_equal_to_its_power(g: &mut dyn Game, item: &S
     Ok(())
 }
 
-/// "Whenever enchanted creature is dealt damage" (CR 120.2, 603.2): the creature this Aura is attached to as the damage is dealt,
-/// the trigger's subject for "it", and the amount dealt, which is not zero (CR 120.8). Damage that is lethal triggers it too (the
-/// creature is still on the battlefield as the event is seen, before state-based actions).
-fn enchanted_creature_dealt_damage(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Damage { target: Target::Object(hurt), amount, .. } if q.obj(source).attached_to == Some(*hurt) => {
-            Some(Fired { subject: Target::Object(*hurt), data: [*amount as u32, 0] })
-        }
-        _ => None,
-    }
-}
-
-const ENCHANTED_CREATURE_DEALT_DAMAGE: Trigger = when(EventMask::DAMAGE, enchanted_creature_dealt_damage);
-
 /// "It deals that much damage to each opponent" (CR 120.3, 608.2h): the enchanted creature, as the trigger saw it, deals the
 /// amount - all damage dealt to it at once, however many sources - to every opponent still in the game together. The creature may
 /// be gone by now; it deals the damage as it last existed (CR 113.7a), so a lifelinking creature still gains life.
@@ -57,7 +43,7 @@ pub static CARD: CardDef = CardDef {
         )
         .targets(&[TargetSpec { filter: any_target_but_the_enchanted_creature, ..targets::ANY }]),
         triggered(
-            ENCHANTED_CREATURE_DEALT_DAMAGE,
+            triggers::ENCHANTED_CREATURE_DEALT_DAMAGE,
             it_deals_that_much_damage_to_each_opponent,
             "Whenever enchanted creature is dealt damage, it deals that much damage to each opponent.",
         )

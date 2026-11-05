@@ -2287,3 +2287,18 @@ pub fn deals_combat_damage_to_player_or_planeswalker(q: &dyn Query, source: Obje
 
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_OR_PLANESWALKER: Trigger =
     when(EventMask::DAMAGE, deals_combat_damage_to_player_or_planeswalker);
+
+/// "Whenever enchanted creature is dealt damage" (CR 120.2, 603.2): the creature this Aura is attached to as the damage is dealt
+/// (the trigger's subject, for "it"), and the amount dealt, which is not zero (CR 120.8), as data. Damage that is lethal triggers it
+/// too (the creature is still on the battlefield as the event is seen, before state-based actions). Pain for All and Sleep Magic
+/// print it, both `.sums_per_subject()`.
+pub fn enchanted_creature_dealt_damage(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { target: Target::Object(hurt), amount, .. } if q.obj(source).attached_to == Some(*hurt) => {
+            Some(Fired { subject: Target::Object(*hurt), data: [*amount as u32, 0] })
+        }
+        _ => None,
+    }
+}
+
+pub const ENCHANTED_CREATURE_DEALT_DAMAGE: Trigger = when(EventMask::DAMAGE, enchanted_creature_dealt_damage);
