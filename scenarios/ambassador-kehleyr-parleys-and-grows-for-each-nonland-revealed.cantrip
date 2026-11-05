@@ -1,0 +1,33 @@
+# Ambassador K'Ehleyr ({2}{W}), vigilance: "Parley — At the beginning of combat on your turn, each player reveals the top
+# card of their library, then draws a card. For each nonland card revealed this way, put a +1/+1 counter on Ambassador
+# K'Ehleyr." Cast on turn 1 off three Moxen, its first combat reveals a Savannah Lions from Bot1's all-nonland library (one
+# counter) and an Island from Bot2's (a land: none), and each player draws the card they revealed.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Ambassador K'Ehleyr
+Savannah Lions x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ambassador K'Ehleyr.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ambassador K'Ehleyr.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ambassador K'Ehleyr.Power = 3
+Bot1.Battlefield.Ambassador K'Ehleyr.Toughness = 3
+Bot1.Battlefield.Ambassador K'Ehleyr.Keywords = Vigilance
+Bot2.Life = 20
