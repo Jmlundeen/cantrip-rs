@@ -69,7 +69,7 @@ expectation or scenario, a wrong citation, a stale comment, a missing `Closes #N
 into one commit per card. It has already written and broken the probe; handing that to another agent only reloads the
 card. Each expectation it adds is break-tested (it fails under the break and passes as written), and its fixes are folded
 into the commit they belong to, the author kept (`git commit --fixup` and `GIT_SEQUENCE_EDITOR=true git rebase
---autosquash origin/main`); it logs `fixes-committed` and then `review-passed`. **A finding that changes code** - the
+--autosquash origin/main`); it logs `fixes-committed --commit <sha>` (refused without the sha) and then `review-passed`. **A finding that changes code** - the
 card's logic, shared code, the core - goes back to an author, so that what the fix decides is reviewed by someone who
 did not write it: the reviewer reports it, logs `review-blocked`, and confirms the fix when it comes back. The
 reviewer's verdict is final: the coordinator lands on it and does not review the card again. Nothing is changed
