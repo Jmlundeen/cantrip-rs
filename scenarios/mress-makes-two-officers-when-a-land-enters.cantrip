@@ -1,0 +1,42 @@
+# M'Ress: "Landfall — Whenever a land you control enters, create two 1/1 red Officer creature tokens" (CR 207.2c,
+# 603.6a, 111.4). She is cast on turn 9 off five Plains; the next land Bot1 plays, on turn 11, is the landfall that
+# creates the two tokens together. Nothing is created by the land played before she entered.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+M'Ress, Crew Coordinator
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Battlefield.Plains#5.Activate
+Bot1.Hand.M'Ress, Crew Coordinator.Cast
+Bot1.Pass
+Bot2.Pass
+[T11 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[Expect]
+Bot1.Battlefield.Officer Token#1.Power = 1
+Bot1.Battlefield.Officer Token#2.Power = 1
+Bot1.Battlefield.Officer Token#1.Colors = Red
