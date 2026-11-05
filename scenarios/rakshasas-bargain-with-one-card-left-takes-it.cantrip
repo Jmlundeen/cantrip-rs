@@ -1,0 +1,30 @@
+# Rakshasa's Bargain with a one-card library: the player sees it and the one card is taken (a short library gives what it has, CR 609.3); the graveyard gets none of the rest.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Rakshasa's Bargain
+Island
+Island
+Island
+Ponder
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Rakshasa's Bargain.Cast
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Ponder | )
+[Expect]
+Bot1.Hand = Island; Island; Island; Ponder
+Bot1.Library.Count = 0

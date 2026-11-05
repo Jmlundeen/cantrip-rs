@@ -774,7 +774,7 @@ pub fn reveal_top_take_one_rest_to_graveyard(
     count: usize,
     wanted: fn(&Chars) -> bool,
 ) -> Result<(), Suspend> {
-    top_take_one_rest_to_graveyard(g, player, source, count, true, 0, wanted)
+    top_take_one_rest_to_graveyard(g, player, source, count, true, (0, 1), wanted)
 }
 
 /// "Look at the top two cards of your library. Put one of them into your hand and the other on the bottom of your library"
@@ -786,11 +786,20 @@ pub fn look_at_top_two_take_one_other_on_bottom(g: &mut dyn Game, player: Player
 }
 
 /// "Look at the top `count` cards of your library. Put one of those cards into your hand and the rest into your graveyard"
-/// (CR 701.20a, 400.3): the card is not revealed and taking it is not optional, so a library with any card shows the player
+/// (CR 701.20e, 400.3): the card is not revealed and taking it is not optional, so a library with any card shows the player
 /// what it has and one is taken (CR 609.3 for a short library); the rest go together, in the order their owner arranges them
 /// (CR 404.3). Stirring Honormancer prints it, as do Forbidden Alchemy, Glimpse the Future and Professor Onyx.
 pub fn look_at_top_take_one_rest_to_graveyard(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) -> Result<(), Suspend> {
-    top_take_one_rest_to_graveyard(g, player, source, count, false, 1, |_| true)
+    top_take_one_rest_to_graveyard(g, player, source, count, false, (1, 1), |_| true)
+}
+
+/// "Look at the top `count` cards of your library. Put `take` of them into your hand and the rest into your graveyard"
+/// (CR 701.20e, 400.3): `look_at_top_take_one_rest_to_graveyard` for several cards, none optional, so a library holding
+/// `take` cards or more shows the player what it has and exactly `take` are taken (a shorter one gives all it has, CR 609.3);
+/// the rest go together, in the order their owner arranges them (CR 404.3). Rakshasa's Bargain (two of four) and Underrealm
+/// Lich (one of three, in place of a draw) print it.
+pub fn look_at_top_take_some_rest_to_graveyard(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize, take: u8) -> Result<(), Suspend> {
+    top_take_one_rest_to_graveyard(g, player, source, count, false, (take, take), |_| true)
 }
 
 fn top_take_one_rest_to_graveyard(
@@ -799,7 +808,7 @@ fn top_take_one_rest_to_graveyard(
     source: ObjectId,
     count: usize,
     reveal: bool,
-    min: u8,
+    (min, max): (u8, u8),
     wanted: fn(&Chars) -> bool,
 ) -> Result<(), Suspend> {
     let revealed = top_of_library(g, player, count);
@@ -812,13 +821,15 @@ fn top_take_one_rest_to_graveyard(
         g.look_at(player, &revealed);
     }
     let takeable: Vec<ObjectId> = revealed.iter().copied().filter(|&c| wanted(&g.chars(c))).collect();
+    // A short library gives all it has (CR 609.3).
+    let (min, max) = (min.min(takeable.len() as u8), max.min(takeable.len() as u8));
     let mut taken = Vec::new();
     if !takeable.is_empty() {
         let ask = RequestKind::DistributeCards {
             source,
             cards: revealed.clone(),
             destinations: vec![
-                Destination { kind: DestinationKind::Hand, min, max: 1, eligible: takeable },
+                Destination { kind: DestinationKind::Hand, min, max, eligible: takeable },
                 Destination { kind: DestinationKind::Graveyard, min: 0, max: u8::MAX, eligible: revealed.clone() },
             ],
             may_shuffle: false,

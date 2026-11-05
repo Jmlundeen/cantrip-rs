@@ -1,0 +1,41 @@
+# {2/B}{2/G}{2/U}, "Look at the top four cards of your library. Put two of them into your hand and the rest into your graveyard."
+# Three Moxen pay one coloured mana per symbol. The top four are Ponder, Lightning Bolt, Brainstorm and Island, and the player looks at them: taking three or one, or shuffling
+# instead, is refused; Ponder and Brainstorm go to the hand and the Bolt and the Island to the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Rakshasa's Bargain
+Island
+Island
+Island
+Ponder
+Lightning Bolt
+Brainstorm
+Island
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Rakshasa's Bargain.Cast
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+! Bot1.Arrange(Ponder; Lightning Bolt; Brainstorm | Island)
+! Bot1.Arrange(Ponder | Lightning Bolt; Brainstorm; Island)
+! Bot1.Arrange(Shuffle)
+Bot1.Arrange(Ponder; Brainstorm | Lightning Bolt; Island)
+? Bot1.Looked = Ponder; Lightning Bolt; Brainstorm; Island
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Ponder; Brainstorm
+Bot1.Graveyard = Rakshasa's Bargain; Island; Lightning Bolt
