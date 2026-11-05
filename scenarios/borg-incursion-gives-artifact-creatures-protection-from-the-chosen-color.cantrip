@@ -1,0 +1,41 @@
+# Borg Incursion ({2}{W}): "Create two 1/1 colorless Borg artifact creature tokens, then artifact creatures you control gain
+# protection from the color of your choice until end of turn" (CR 701.7, 702.16). Blue is chosen, so every artifact creature
+# it controls - the two new tokens and the Ornithopter - has protection from blue, and a nonartifact creature gets nothing.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Ornithopter
+Savannah Lions
+Borg Incursion
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 2
+Bot1.Hand.Borg Incursion.Cast
+Bot1.Colors(Blue)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Borg Token#1.ProtectionFrom = Blue
+Bot1.Battlefield.Borg Token#2.ProtectionFrom = Blue
+Bot1.Battlefield.Ornithopter.ProtectionFrom = Blue
+Bot1.Battlefield.Savannah Lions.ProtectionFrom = (absent)
+Bot1.Battlefield.Count = 4
