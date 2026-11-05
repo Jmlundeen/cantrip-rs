@@ -1,0 +1,29 @@
+# Sandskitter Outrider: Bot1 declines the counters, so the Outrider stays a 2/1 and a 2/2 white Spirit creature token is created
+# (CR 701.63a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Sandskitter Outrider
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sandskitter Outrider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield.Sandskitter Outrider.Power = 2
+Bot1.Battlefield.Sandskitter Outrider.Toughness = 1
+Bot1.Battlefield.Sandskitter Outrider.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spirit Token.Power = 2
+Bot1.Battlefield.Spirit Token.Toughness = 2
+Bot1.Battlefield.Spirit Token.Colors = White

@@ -1,0 +1,37 @@
+# Sandskitter Outrider ({3}{B}, 2/1 menace): "When this creature enters, it endures 2." (CR 701.63a) Bot1 casts it with a Black Lotus
+# and a Mox Jet and takes the counters: a 4/3 with two +1/+1 counters and no Spirit token. On turn 3 it attacks and Bot2's lone
+# Ornithopter cannot block it (menace, CR 702.110b), so Bot2 takes 4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Sandskitter Outrider
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sandskitter Outrider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Battlefield.Count = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Attackers]
+Bot1.Attack(Sandskitter Outrider > Bot2)
+[T3 Bot1.Blockers]
+! Bot2.Block(Ornithopter > Sandskitter Outrider)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sandskitter Outrider.Power = 4
+Bot1.Battlefield.Sandskitter Outrider.Toughness = 3
+Bot1.Battlefield.Sandskitter Outrider.Counters.PlusOnePlusOne = 2
+Bot2.Life = 16
