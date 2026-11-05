@@ -1907,6 +1907,16 @@ pub fn gain_hexproof_and_indestructible_until_end_of_turn(g: &mut dyn Game, sour
     g.add_effect(source, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof, Keyword::Indestructible])), Duration::EndOfTurn);
 }
 
+/// "Target permanent gains hexproof and indestructible until end of turn" (CR 702.11b, 702.12b, 611.2a), the permanent being the
+/// spell or ability's first target; nothing if it is no longer a legal target as it resolves (CR 608.2b). Concerted Care, Defend the
+/// Rider, Restoration Magic, Vigorbloom Charm and Plaza of Heroes print it.
+pub fn target_gains_hexproof_and_indestructible_until_end_of_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(permanent) = crate::targets::object(g, item, 0) {
+        gain_hexproof_and_indestructible_until_end_of_turn(g, item.object, permanent);
+    }
+    Ok(())
+}
+
 /// "A creature or planeswalker with the greatest mana value among creatures and planeswalkers they control": the
 /// permanents `player` controls now that tie for the greatest mana value (`Query::mana_value`: tokens, copies and face-down
 /// permanents read as the rules say) in the one group of their creatures and planeswalkers, so a planeswalker of 5 outranks a

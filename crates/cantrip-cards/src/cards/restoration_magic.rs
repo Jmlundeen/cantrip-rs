@@ -1,16 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::{gain_hexproof_and_indestructible_until_end_of_turn as protect, gain_life};
+use cantrip_mechanics::effects::{gain_hexproof_and_indestructible_until_end_of_turn as protect, gain_life, target_gains_hexproof_and_indestructible_until_end_of_turn as cure};
 use cantrip_mechanics::{targets, tiered};
 use cantrip_oracle as oracle;
-
-/// "Target permanent gains hexproof and indestructible until end of turn." Nothing happens if the target is no longer
-/// legal (CR 608.2b).
-fn cure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(permanent) = targets::object(g, item, 0) {
-        protect(g, item.object, permanent);
-    }
-    Ok(())
-}
 
 /// Cure, "You gain 3 life." The spell does not resolve at all with its one target illegal (CR 608.2b), so the life is
 /// never gained then.

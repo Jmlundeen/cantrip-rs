@@ -1,16 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::{draw, gain_hexproof_and_indestructible_until_end_of_turn as protect, gain_life};
+use cantrip_mechanics::effects::{draw, gain_life, target_gains_hexproof_and_indestructible_until_end_of_turn as protect_permanent};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
-
-/// "Target permanent you control gains hexproof and indestructible until end of turn." Nothing happens if the target is no
-/// longer legal (CR 608.2b).
-fn protect_permanent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(permanent) = targets::object(g, item, 0) {
-        protect(g, item.object, permanent);
-    }
-    Ok(())
-}
 
 /// "You draw a card and gain 3 life."
 fn draw_and_gain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
