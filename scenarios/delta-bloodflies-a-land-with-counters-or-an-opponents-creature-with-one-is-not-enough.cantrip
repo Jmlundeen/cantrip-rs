@@ -1,0 +1,42 @@
+# Delta Bloodflies: "if you control a creature with a counter on it" (CR 603.4) - a creature, and one Bot1 controls. Bot1 has
+# a Gemstone Mine with three mining counters (a land, not a creature), and Bot2 a Kin-Tree Nurturer that endured 1 with a +1/+1
+# counter (a creature, but not Bot1's). On turn 3 the Bloodflies attack: the ability does not trigger, so Bot2 takes only the
+# flyer's 1 combat damage (19); its Nurturer has no flying or reach.
+
+[Bot1 Deck]
+Gemstone Mine
+Mox Jet
+Mox Pearl
+Delta Bloodflies
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Kin-Tree Nurturer
+Island x20
+
+[Actions]
+Bot1.Hand.Gemstone Mine.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Delta Bloodflies.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Kin-Tree Nurturer.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+? Bot1.Battlefield.Gemstone Mine.Counters.Mining = 3
+? Bot2.Battlefield.Kin-Tree Nurturer.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Attackers]
+Bot1.Attack(Delta Bloodflies > Bot2)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 19

@@ -1,0 +1,42 @@
+# Delta Bloodflies ({1}{B}, 1/2 flying): "Whenever this creature attacks, if you control a creature with a counter on it, each
+# opponent loses 1 life." (CR 603.4) Bot1's Kin-Tree Nurturer endures 1 and has a counter; it stays home. The Bloodflies attack on
+# turn 3: the trigger drains 1 and the unblocked flyer deals 1 more (Bot2 18). Bot2's Memnite has no flying or reach.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Kin-Tree Nurturer
+Delta Bloodflies
+Swamp x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Kin-Tree Nurturer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Delta Bloodflies.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Attackers]
+Bot1.Attack(Delta Bloodflies > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Blockers]
+! Bot2.Block(Memnite > Delta Bloodflies)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18

@@ -1,0 +1,11 @@
+{
+  "name": "Delta Bloodflies",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Insect",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Flying\nWhenever this creature attacks, if you control a creature with a counter on it, each opponent loses 1 life.",
+  "keywords": [
+    "Flying"
+  ]
+}
