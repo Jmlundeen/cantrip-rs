@@ -1,0 +1,50 @@
+# The Doctor, EMH: "put a +1/+1 counter on target creature. Then put a +1/+1 counter on each creature you control with a
+# counter on it." (CR 115.1, 122.1, 608.2h) The target may be an opponent's creature: Bot2's Grizzly Bears gets the first
+# counter, and having a counter does not make it a creature Bot1 controls, so the second sentence gives it none. Bot1's
+# Memnite has no counter and gets none either.
+
+[Bot1 Deck]
+The Doctor, EMH
+Memnite
+Mox Emerald
+Mox Jet
+Black Lotus
+Island x18
+
+[Bot2 Deck]
+Grizzly Bears
+Forest
+Forest
+Island x17
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Doctor, EMH.Cast
+Bot1.Target(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.The Doctor, EMH.Counters.PlusOnePlusOne = (absent)

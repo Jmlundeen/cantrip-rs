@@ -1,0 +1,8 @@
+{
+  "name": "The Doctor, EMH",
+  "manaCost": "{3}{G/W}{G/W}",
+  "type": "Legendary Artifact Creature — Illusion Doctor",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When The Doctor enters, put a +1/+1 counter on target creature. Then put a +1/+1 counter on each creature you control with a counter on it."
+}
