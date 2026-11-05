@@ -1,0 +1,43 @@
+# The Inner Light: "I -- Return target green or white creature card from your graveyard to the battlefield. II -- Choose
+# target creature. Whenever it deals combat damage to a player this turn, you draw that many cards. III -- You gain life
+# equal to the greatest power among creatures you control. Create a Treasure token." (CR 603.7b, 121.1, 119.3) Bot2's Shock
+# kills a Llanowar Elves on turn 2; chapter I returns it on turn 3, chapter II watches the same Elves on turn 5 and its one
+# combat damage draws a card, and chapter III gains 1 life and makes a Treasure on turn 7.
+
+[Bot1 Deck]
+Black Lotus x4
+Llanowar Elves
+The Inner Light
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Shock
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Inner Light.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Count = 2
+Bot1.Battlefield.Treasure Token.Subtypes = Treasure
+Bot1.Life = 21
+Bot2.Life = 19
