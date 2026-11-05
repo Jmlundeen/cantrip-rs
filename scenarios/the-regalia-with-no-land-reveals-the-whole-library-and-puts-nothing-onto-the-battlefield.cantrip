@@ -1,0 +1,46 @@
+# The Regalia with no land in the library: the attack trigger reveals every card (CR 701.20, 609.3), nothing enters, and all
+# of them go back on the bottom, so the library still holds its two cards and no land enters:
+# the Regalia attacks for 4.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+The Regalia
+Memnite
+Forest
+Ornithopter
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Regalia.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Regalia.Activate(Ability: Crew 1)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(The Regalia > Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Library.Count = 2
+Bot1.Hand = Forest

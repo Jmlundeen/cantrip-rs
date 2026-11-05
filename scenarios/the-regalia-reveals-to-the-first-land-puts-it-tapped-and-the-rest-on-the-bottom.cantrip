@@ -1,0 +1,57 @@
+# The Regalia (4/4 Vehicle, Haste, Crew 1): cast on turn 1 with four Moxen, a Memnite crews it and, with haste, it attacks at once.
+# "Whenever The Regalia attacks, reveal cards from the top of your library until you reveal a land card": Ornithopter and
+# Lightning Bolt are revealed, then the Island, which enters tapped (CR 701.20); the Ornithopter and the Bolt go on the bottom,
+# so the five cards below stay in order on top with the Ornithopter under them and the Island is not among them. A Rograkh
+# (power 0) cannot crew it alone (CR 702.122a). Bot2 takes 4.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+The Regalia
+Memnite
+Rograkh, Son of Rohgahh
+Ornithopter
+Island
+Lightning Bolt
+Counterspell
+Dark Ritual
+Giant Growth
+Shock
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Regalia.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Rograkh, Son of Rohgahh.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.The Regalia.Activate(Ability: Crew 1)
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Regalia.Activate(Ability: Crew 1)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(The Regalia > Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Library = Lightning Bolt; Counterspell; Dark Ritual; Giant Growth; Shock; Ornithopter

@@ -1,0 +1,11 @@
+{
+  "name": "The Regalia",
+  "manaCost": "{4}",
+  "type": "Legendary Artifact — Vehicle",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Haste\nWhenever The Regalia attacks, reveal cards from the top of your library until you reveal a land card. Put that card onto the battlefield tapped and the rest on the bottom of your library in a random order.\nCrew 1",
+  "keywords": [
+    "Haste"
+  ]
+}
