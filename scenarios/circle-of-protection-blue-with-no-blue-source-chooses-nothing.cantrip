@@ -1,6 +1,7 @@
+# Browser
 # Red and black mana cannot pay Circle of Protection: Blue's {W} (CR 601.2h); with white it is cast. With no
 # blue source anywhere - Ornithopter is colorless, the Circle white - its ability can still be activated and resolves
-# with nothing chosen (the ruling: "Can be used even when there is no damage to prevent"; CR 609.7a).
+# with nothing chosen and no question asked (the ruling: "Can be used even when there is no damage to prevent"; CR 609.7a): the page is back at priority with no choose-a-source question.
 
 [Bot1 Deck]
 Mox Ruby
@@ -33,8 +34,8 @@ Bot1.Battlefield.Circle of Protection: Blue.Activate
 ? Stack.Count = 1
 Bot1.Pass
 Bot2.Pass
-Bot1.Choose()
 ? Stack.Count = 0
+? Client.Bot1.Prompt.Title = Your first main phase
 
 [Expect]
 Bot1.Life = 20
