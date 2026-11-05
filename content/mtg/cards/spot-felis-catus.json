@@ -1,0 +1,8 @@
+{
+  "name": "Spot, Felis catus",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Cat",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Whenever Spot or another nontoken legendary permanent you control enters, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\n{4}, Sacrifice a Food: Destroy target artifact."
+}

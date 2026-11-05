@@ -1,0 +1,36 @@
+# Spot, Felis catus: "Whenever Spot or another nontoken legendary permanent you control enters, create a Food token." A token
+# copy of Spot made by Replicate is Spot itself entering, so it triggers although it is a token (CR 603.6a); the original Spot
+# does not trigger for it, being another permanent that is a token. Two Foods are made in all: one for each Spot entering.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Sapphire
+Spot, Felis catus
+Repudiate // Replicate
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Spot, Felis catus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Repudiate // Replicate.Cast(Bot1.Battlefield.Spot, Felis catus; Ability: Replicate)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Food Token#1.Types = Artifact
+Bot1.Battlefield.Food Token#2.Types = Artifact
+Bot1.Battlefield.Food Token#3 = (absent)
