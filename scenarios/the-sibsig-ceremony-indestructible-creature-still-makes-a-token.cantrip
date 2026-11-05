@@ -1,0 +1,45 @@
+# The Sibsig Ceremony: "destroy that creature, then create a 2/2 black Zombie Druid creature token" - the token is created
+# whether or not the creature was destroyed (CR 608.2c). Darksteel Myr ({3}, indestructible) is cast for {1} and survives
+# beside a Zombie Druid token. Bot2's creature is not "a creature you control": its Memnite is cast, enters, and stays, and
+# Bot2's Hill Giant costs the full {3}{R} (the Ceremony reduces only its controller's spells).
+
+[Bot1 Deck]
+Black Lotus
+The Sibsig Ceremony
+Darksteel Myr
+Swamp x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Memnite
+Hill Giant
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Sibsig Ceremony.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Darksteel Myr.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+! Bot2.Hand.Hill Giant.Cast(Mana: short)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Darksteel Myr.Power = 0
+Bot1.Battlefield.Zombie Druid Token.Power = 2
+Bot2.Battlefield.Memnite.Power = 1

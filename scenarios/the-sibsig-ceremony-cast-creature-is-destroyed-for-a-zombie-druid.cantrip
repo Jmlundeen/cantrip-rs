@@ -1,0 +1,39 @@
+# The Sibsig Ceremony ({B}{B}{B}): "Creature spells you cast cost {2} less to cast." and "Whenever a creature you control
+# enters, if you cast it, destroy that creature, then create a 2/2 black Zombie Druid creature token." Turn 1: Black Lotus
+# pays for the Ceremony. Mox Ruby's lone {R} cannot cast Hill Giant ({3}{R}, which costs {1}{R} now); with Mox Pearl too it
+# is cast, enters, and is destroyed for a Zombie Druid token (CR 603.4, 701.8). The token was not cast, so it is not destroyed
+# in turn (it was created, CR 111.1, not cast).
+
+[Bot1 Deck]
+Black Lotus
+The Sibsig Ceremony
+Mox Ruby
+Mox Pearl
+Hill Giant
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Sibsig Ceremony.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Hill Giant.Cast(Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Hill Giant; Black Lotus
+Bot1.Battlefield.Zombie Druid Token.Power = 2
+Bot1.Battlefield.Zombie Druid Token.Toughness = 2
+Bot1.Battlefield.Count = 4
