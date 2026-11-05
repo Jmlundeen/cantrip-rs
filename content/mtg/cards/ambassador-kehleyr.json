@@ -1,0 +1,11 @@
+{
+  "name": "Ambassador K'Ehleyr",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Klingon Human Advisor",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Vigilance\nParley — At the beginning of combat on your turn, each player reveals the top card of their library, then draws a card. For each nonland card revealed this way, put a +1/+1 counter on Ambassador K'Ehleyr.",
+  "keywords": [
+    "Vigilance"
+  ]
+}
