@@ -1,0 +1,11 @@
+{
+  "name": "Alchemist's Assistant",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Monkey",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Lifelink\nRenew — {1}{B}, Exile this card from your graveyard: Put a lifelink counter on target creature. Activate only as a sorcery.",
+  "keywords": [
+    "Lifelink"
+  ]
+}

@@ -1,0 +1,46 @@
+# Alchemist's Assistant (2/1 lifelink): "Renew - {1}{B}, Exile this card from your graveyard: Put a lifelink counter on target
+# creature. Activate only as a sorcery." Turn 1: the Assistant is cast with two Moxen and Bolted by Bot2 on turn 2. On turn 3,
+# with the mana for it floating, the renew is refused with the Memnite spell on the stack and with a land as the target; then
+# it gives the Memnite a lifelink counter, which makes it a lifelinker (CR 122.1b).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Alchemist's Assistant
+Memnite
+Swamp x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Alchemist's Assistant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Alchemist's Assistant)
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Graveyard.Alchemist's Assistant.Activate(Memnite)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Graveyard.Alchemist's Assistant.Activate(Bot1.Battlefield.Mox Jet)
+Bot1.Graveyard.Alchemist's Assistant.Activate(Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Memnite.Counters.Lifelink = 1
+Bot1.Battlefield.Memnite.Keywords = Lifelink
+Exile = Alchemist's Assistant
