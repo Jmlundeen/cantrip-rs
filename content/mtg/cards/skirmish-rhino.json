@@ -1,0 +1,11 @@
+{
+  "name": "Skirmish Rhino",
+  "manaCost": "{W}{B}{G}",
+  "type": "Creature — Rhino",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Trample\nWhen this creature enters, each opponent loses 2 life and you gain 2 life.",
+  "keywords": [
+    "Trample"
+  ]
+}
