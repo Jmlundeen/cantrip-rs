@@ -1,0 +1,39 @@
+# Worf, Chief Tactical Officer ({2}{W}, 2/3): "Vigilance (Attacking doesn't cause this creature to tap.)" (CR 702.20a).
+# On turn five Worf attacks for 2 and is still untapped afterwards, so he stays able to block.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Worf, Chief Tactical Officer
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Worf, Chief Tactical Officer.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Worf, Chief Tactical Officer > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Worf, Chief Tactical Officer.Tapped = false
+Bot2.Life = 18
