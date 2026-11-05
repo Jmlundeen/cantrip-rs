@@ -1,0 +1,83 @@
+# Ragnarok, Divine Deliverance dies: both its cards go to the graveyard (CR 712.21), and its trigger destroys target permanent and returns target nonlegendary permanent card from your graveyard; Fang (legendary) and a card in the opponent's graveyard are refused (CR 115.1, 603.10a).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Fang, Fearless l'Cie
+Vanille, Cheerful l'Cie
+Grizzly Bears
+Lightning Bolt
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Go for the Throat
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fang, Fearless l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Vanille, Cheerful l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.PayCost
+? Stack.Count = 0
+? Bot1.Battlefield = Mox Jet; Mox Emerald; Mox Pearl; Mox Sapphire; Forest; Ragnarok, Divine Deliverance
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Ragnarok, Divine Deliverance)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Fang, Fearless l'Cie; Vanille, Cheerful l'Cie; Lightning Bolt; Black Lotus
+? Bot1.Battlefield.Ragnarok, Divine Deliverance = (absent)
+? Exile.Count = 0
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+! Bot1.Target(Fang, Fearless l'Cie)
+! Bot1.Target(Bot2.Graveyard.Island)
+Bot1.Target(Black Lotus)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Forest; Mox Emerald; Mox Jet; Mox Pearl; Mox Sapphire
+Bot1.Battlefield.Black Lotus.Tapped = false
+Bot1.Graveyard = Fang, Fearless l'Cie; Vanille, Cheerful l'Cie; Lightning Bolt
+Bot2.Battlefield = Mox Pearl
+Bot2.Graveyard = Mox Jet; Go for the Throat; Island
+Bot1.Life = 19

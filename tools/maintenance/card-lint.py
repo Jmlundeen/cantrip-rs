@@ -130,6 +130,7 @@ def oracle_of(name):
         return ""
     card = found[3]
     faces = [card] + [card[k] for k in ("backFace", "adventure", "omen", "aftermath") if isinstance(card.get(k), dict)]
+    faces += [m["into"] for m in [card.get("meld")] if isinstance(m, dict) and isinstance(m.get("into"), dict)]
     faces += card.get("halves") or []
     # Reminder text is no rules text (CR 207.2): the words of "Equip worthy {1} (... red and/or white.)" are the CR's.
     return re.sub(r"\([^)]*\)", "", "\n".join(f.get("oracleText", "") for f in faces if isinstance(f, dict)))

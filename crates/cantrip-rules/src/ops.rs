@@ -552,6 +552,8 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
         }
         new.timestamp = cx.st().timestamp();
         let new_id = cx.st().push_obj(new);
+        // Its meld counterpart arrives with it, the one permanent (CR 712.14c): part of it from here on.
+        let melded = m.entering.and_then(|e| e.melded).filter(|_| entering).map(|card| crate::merge::meld_with(cx, new_id, card));
         // What the effect putting it there says it is, it is as it arrives (CR 614.12), before anything sees it arrive.
         if entering && let Some(b) = m.entering.and_then(|e| e.becomes) {
             enter_as(cx, new_id, b);
@@ -658,6 +660,7 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
             remove_from_combat(cx, &[m.id]);
         }
         events.push(Event::ZoneChange { old: m.id, new: new_id, from, to, reason, part: false });
+        events.extend(melded);
         events.append(&mut part_events);
         // CR 708.9: a face-down permanent or spell that moves to any other zone is revealed to all players by its owner as
         // it moves - where it arrives face up, as a card going anywhere but exile face down does.
@@ -1841,7 +1844,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes, own: None };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes, own: None, melded: None };
         prepare_entry(cx, &mut entering)?;
         // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1910,6 +1913,7 @@ pub fn put_onto_battlefield_as(
         instead: None,
         becomes: None,
         own: None,
+        melded: None,
     };
     prepare_entry(cx, &mut entering)?;
     // Turned over by its own daybound as it would enter (CR 702.145b), it is judged as that face (CR 304.4, 307.4).
@@ -1917,6 +1921,53 @@ pub fn put_onto_battlefield_as(
         return Ok(id);
     }
     Ok(move_together(cx, &[Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }], reason).first().copied().unwrap_or(id))
+}
+
+/// Meld (CR 701.42a, 712.14c): puts `first` and `second`, the two cards of a meld pair, onto the battlefield under
+/// `controller`'s control with their back faces up and combined - one permanent, `first`'s card its own, entering as the
+/// pair's combined back face, whose characteristics alone it has (CR 712.8g): its own "enters" replacements are that face's,
+/// as a permanent entering as a copy has the copy's (CR 614.12). Only the two cards of one meld pair are melded: a token, a
+/// copy of a card, or two cards that are no pair stay where they are (CR 701.42b-c), as do the two where a static ability
+/// keeps the permanent from entering (CR 101.2). The melded permanent, if they melded.
+pub fn meld(cx: &mut Cx, first: ObjectId, second: ObjectId, controller: PlayerId) -> R<Option<ObjectId>> {
+    if first == second || !live(cx.s(), first) || !live(cx.s(), second) {
+        return Ok(None);
+    }
+    let (a, b) = (*cx.s().obj(first), *cx.s().obj(second));
+    let pair = |x: &Obj, y: &Obj| !x.token && !x.card_copy && cx.card(x.card).meld.is_some_and(|m| m.with == cx.card(y.card).name);
+    let Some(into) = cx.card(a.card).meld.filter(|_| pair(&a, &b) && pair(&b, &a)).map(|m| cx.cards().id_of(m.into)) else {
+        return Ok(None);
+    };
+    if crate::static_rules::cant_enter(cx, first) {
+        return Ok(None);
+    }
+    let mut entering = Entering {
+        object: first,
+        controller,
+        tapped: false,
+        counters: [0; CounterKind::COUNT],
+        copy: Some(Copiable::of(into)),
+        prepared: false,
+        chosen_color: None,
+        chosen_subtype: None,
+        chosen_player: None,
+        chosen_card: None,
+        chosen_option: None,
+        chosen_number: None,
+        chosen_object: None,
+        emblem: None,
+        attach: None, attach_player: None,
+        x: 0,
+        transformed: false,
+        protector: None, read_ahead: None, riot_haste: false,
+        instead: None,
+        becomes: None,
+        own: None,
+        melded: Some(second),
+    };
+    prepare_entry(cx, &mut entering)?;
+    let entered = move_together(cx, &[Moving { entering: Some(entering), ..Moving::to(first, Zone::BATTLEFIELD) }], ZoneReason::Other);
+    Ok(entered.first().copied().filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Battlefield) && cx.s().merge_of(id).is_some()))
 }
 
 /// The continuous effects an effect putting `id` onto the battlefield gives it as it enters (`EntersAs`, CR 614.12, 613.1d,
@@ -2105,6 +2156,7 @@ fn entering_attached(cx: &Cx, bans: &[(ObjectId, PlayerId, &'static CardDef, Opt
         instead: None,
         becomes: None,
         own: None,
+        melded: None,
     })
 }
 
@@ -2568,7 +2620,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes: None, own: None };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes: None, own: None, melded: None };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
@@ -5246,6 +5298,7 @@ mod tests {
             instead: None,
             becomes: None,
             own: None,
+            melded: None,
         }
     }
 

@@ -1397,16 +1397,26 @@ impl<'a> Projector<'a> {
         };
 
         // A merged permanent's other components (CR 730.2), topmost first: its own card, unless it is the topmost, and each
-        // card that merged with it, the last placed over first. A face-down one shows nothing of itself (CR 708.5, 730.2e).
+        // card that merged or melded with it, the last placed over first. A face-down one shows nothing of itself (CR 708.5, 730.2e).
         if let Some(merge) = s.merge_of(id) {
             let cards = self.game.cards;
-            let mut stack: Vec<(CardId, bool)> = vec![(merge.own_face, merge.own_face_down.is_some() || obj.face_down)];
+            // A melded permanent's own component is its own card, not the meld card it is (CR 712.8g, 712.14c), and while
+            // nothing is placed over it the permanent shown is the meld card, none of its components.
+            let melded = merge.parts.iter().any(|p| p.melded);
+            let own = if melded { obj.card } else { merge.own_face };
+            let mut stack: Vec<(CardId, bool)> = vec![(own, merge.own_face_down.is_some() || obj.face_down)];
+            let mut shown = usize::from(!melded);
             for p in &merge.parts {
-                if p.on_top { stack.insert(0, (p.face, false)) } else { stack.push((p.face, false)) }
+                if p.on_top {
+                    stack.insert(0, (p.face, false));
+                    shown = 1;
+                } else {
+                    stack.push((p.face, false))
+                }
             }
             view.merged_with = stack
                 .into_iter()
-                .skip(1)
+                .skip(shown)
                 // The permanent's controller may look at a face-down component of it (CR 708.5).
                 .map(|(card, hidden)| if hidden && self.viewer != obj.controller { ObjectView { known: false, ..Default::default() } } else { printed(cards.get(card)) })
                 .collect();

@@ -122,7 +122,7 @@ pub fn determinize_owned(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: I
     };
     let visible = observable(game, seat, &extra);
     let sees = |id: ObjectId| visible.contains(&id) && knows_face(s, seat, id);
-    // Merged permanents (CR 730.2): the mutating spells each merged with, in the order they merged, and the place among its
+    // Merged permanents (CR 730.2): the mutating spells (or melded card, CR 712.14c) each merged with, in the order they merged, and the place among its
     // components of its topmost one (0 for its own card, CR 730.2a); and the objects the components other than the
     // topmost became as it left (CR 730.3), in the order of its components.
     let mut merged: HashMap<ObjectId, (Vec<ObjectId>, usize)> = HashMap::new();
@@ -136,6 +136,8 @@ pub fn determinize_owned(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: I
                     *top = spells.len();
                 }
             }
+            // A melded permanent's other card (CR 712.14c) is a component under its own, never its topmost.
+            Event::Melded { permanent, card } => merged.entry(permanent).or_default().0.push(card),
             Event::ZoneChange { old, new, part: true, .. } => parted.entry(old).or_default().push(new),
             _ => {}
         }
@@ -198,7 +200,8 @@ pub fn determinize_owned(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: I
                 continue;
             }
             // The other components of a merged permanent (CR 730.2): each card that merged with it was a spell on the
-            // stack, face up (CR 702.140c), so the seat knows it, as it knows the card wherever it goes.
+            // stack, face up (CR 702.140c), or a card melded with it face up (CR 712.14c), so the seat knows it, as it
+            // knows the card wherever it goes.
             let merge = s.merge_of(id);
             if merge.is_some()
                 && let Some((merged_spells, _)) = merged.get(&id)

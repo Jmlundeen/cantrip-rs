@@ -1,0 +1,69 @@
+# Vanille, Cheerful l'Cie's intervening if is checked again as the trigger resolves: Fang destroyed in response leaves nothing to pay, and on the next turn, with no Fang, it does not trigger (CR 603.4).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Fang, Fearless l'Cie
+Vanille, Cheerful l'Cie
+Grizzly Bears
+Lightning Bolt
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Go for the Throat
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fang, Fearless l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Vanille, Cheerful l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Fang, Fearless l'Cie)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Fang, Fearless l'Cie; Lightning Bolt; Black Lotus
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T5 Bot1.Main1]
+? Stack.Count = 0
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Forest; Mox Emerald; Mox Jet; Mox Pearl; Mox Sapphire; Vanille, Cheerful l'Cie
+Exile.Count = 0

@@ -143,6 +143,16 @@ pub fn mana_value_of(card: &dyn Fn(CardId) -> &'static CardDef, state: &GameStat
         }
         _ => mana_cost_of(card, obj, c),
     };
+    // CR 712.8g, 202.3c: a melded permanent with its combined back face's characteristics has the sum of its cards' front
+    // faces' mana values; a copy of it has its values' alone, 0 - another permanent, or the melded permanent itself once a
+    // copy effect applied after it melded (`EffectKind::RestoreCopy`, later in timestamp order) makes its copiable values,
+    // even a copy of a melded permanent (CR 707.2, 613.2a).
+    if let Some(merge) = state.merge_of(id).filter(|m| m.own_face == c.card)
+        && let Some(part) = merge.parts.iter().find(|p| p.melded)
+        && !state.effects.iter().any(|e| e.affected == id && e.timestamp > part.timestamp && matches!(e.kind, EffectKind::RestoreCopy(_)))
+    {
+        return front.cost.mana_value() + card(part.card).cost.mana_value();
+    }
     let x = if obj.zone.is(ZoneKind::Stack) { obj.x } else { state.left_stack(id).map_or(0, |item| item.x) };
     cost.mana_value() + cost.x as u32 * x as u32
 }
@@ -879,6 +889,11 @@ pub trait Game: Query {
     /// controller (CR 122.6a), so a replacement of counters applies to them (CR 614.1). A card with no back face stays where it
     /// is (CR 712.14a).
     fn put_onto_battlefield_transformed_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i32)]) -> Result<ObjectId, Suspend>;
+    /// Meld (CR 701.42a): "meld them into [name]" - `first` and `second`, the two cards of a meld pair, put onto the battlefield
+    /// under `controller`'s control as one permanent, the pair's combined back face (CR 712.4a, 712.8g). Two objects that
+    /// can't be melded - a token, a copy of a card, two cards that are no pair - stay where they are (CR 701.42b-c). The
+    /// melded permanent, if they melded.
+    fn meld(&mut self, first: ObjectId, second: ObjectId, controller: PlayerId) -> Result<Option<ObjectId>, Suspend>;
     /// Transforms a permanent (CR 701.27a): the other face is up. It stays the same object (CR 712.18). Nothing if it is not
     /// a double-faced permanent on the battlefield (CR 701.27c). The face it turns over to applies its "as this transforms"
     /// ability as it does (CR 712.20, `CardDef::as_transforms`), which may ask a question.

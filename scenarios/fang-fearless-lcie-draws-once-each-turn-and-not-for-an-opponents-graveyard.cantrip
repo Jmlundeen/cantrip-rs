@@ -1,0 +1,59 @@
+# Fang, Fearless l'Cie: a card leaving the opponent's graveyard does not trigger it; the first card leaving your graveyard draws a card and loses 1 life, and a second the same turn does nothing (CR 603.2).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Jet
+Mox Emerald
+Fang, Fearless l'Cie
+Scavenging Ooze
+Forest
+Forest
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Fang, Fearless l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Scavenging Ooze.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Scavenging Ooze.Activate(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Scavenging Ooze.Activate(Black Lotus)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Lightning Bolt
+? Bot1.Life = 19
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Scavenging Ooze.Activate(Black Lotus)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Hand = Lightning Bolt
+Bot1.Life = 19

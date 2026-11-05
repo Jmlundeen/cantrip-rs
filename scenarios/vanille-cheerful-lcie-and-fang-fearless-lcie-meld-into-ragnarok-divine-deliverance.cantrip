@@ -1,0 +1,71 @@
+# Vanille, Cheerful l'Cie and Fang, Fearless l'Cie meld into Ragnarok, Divine Deliverance.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Fang, Fearless l'Cie
+Vanille, Cheerful l'Cie
+Grizzly Bears
+Lightning Bolt
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fang, Fearless l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Vanille, Cheerful l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.PayCost
+? Stack.Count = 0
+? Bot1.Battlefield = Mox Jet; Mox Emerald; Mox Pearl; Mox Sapphire; Forest; Ragnarok, Divine Deliverance
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ragnarok, Divine Deliverance > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Exile.Count = 0
+Bot1.Battlefield.Ragnarok, Divine Deliverance.ManaValue = 7
+Bot1.Battlefield.Ragnarok, Divine Deliverance.Power = 7
+Bot1.Battlefield.Ragnarok, Divine Deliverance.Toughness = 6
+Bot1.Battlefield.Ragnarok, Divine Deliverance.Colors = Black; Green
+Bot1.Battlefield.Ragnarok, Divine Deliverance.Keywords = Haste; Menace; Reach; Trample; Vigilance
+Bot1.Battlefield.Ragnarok, Divine Deliverance.Tapped = false
+Bot1.Hand = Forest; Grizzly Bears
+Bot1.Graveyard = Lightning Bolt; Black Lotus

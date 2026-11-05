@@ -160,6 +160,7 @@ fn entering(id: ObjectId, controller: PlayerId, tapped: bool) -> Entering {
         instead: None,
         becomes: None,
         own: None,
+        melded: None,
     }
 }
 

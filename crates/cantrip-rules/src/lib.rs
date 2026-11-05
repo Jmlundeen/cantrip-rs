@@ -2230,6 +2230,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield_as(self, object, controller, tapped, true, ZoneReason::Other, counters).map_err(|_| Suspend)
     }
 
+    fn meld(&mut self, first: ObjectId, second: ObjectId, controller: PlayerId) -> Result<Option<ObjectId>, Suspend> {
+        ops::meld(self, first, second, controller).map_err(|_| Suspend)
+    }
+
     fn transform(&mut self, permanent: ObjectId) -> Result<(), Suspend> {
         ops::transform(self, permanent, None).map_err(|_| Suspend)
     }

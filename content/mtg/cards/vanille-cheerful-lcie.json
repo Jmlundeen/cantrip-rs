@@ -1,0 +1,29 @@
+{
+  "name": "Vanille, Cheerful l'Cie",
+  "manaCost": "{3}{G}",
+  "type": "Legendary Creature — Human Cleric",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "When Vanille enters, mill two cards, then return a permanent card from your graveyard to your hand.\nAt the beginning of your first main phase, if you both own and control Vanille and a creature named Fang, Fearless l'Cie, you may pay {3}{B}{G}. If you do, exile them, then meld them into Ragnarok, Divine Deliverance.",
+  "meld": {
+    "with": "Fang, Fearless l'Cie",
+    "into": {
+      "name": "Ragnarok, Divine Deliverance",
+      "colorIndicator": [
+        "Black",
+        "Green"
+      ],
+      "type": "Legendary Creature — Beast Avatar",
+      "power": 7,
+      "toughness": 6,
+      "oracleText": "Reach, vigilance, menace, trample, haste\nWhen Ragnarok dies, destroy target permanent and return target nonlegendary permanent card from your graveyard to the battlefield.",
+      "keywords": [
+        "Reach",
+        "Vigilance",
+        "Menace",
+        "Trample",
+        "Haste"
+      ]
+    }
+  }
+}

@@ -584,6 +584,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     instead: None,
                     becomes: None,
                     own: None,
+                    melded: None,
                 };
                 ops::prepare_entry(cx, &mut entering)?;
                 if let Some(at) = on_stack(cx) {

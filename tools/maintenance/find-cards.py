@@ -47,6 +47,7 @@ def colors_of(card):
 def rules_text(card):
     """Oracle text without reminder text, every face's (an adventure's spell is part of what the card does)."""
     faces = [card] + [card[k] for k in ("backFace", "adventure", "omen") if isinstance(card.get(k), dict)]
+    faces += [m["into"] for m in [card.get("meld")] if isinstance(m, dict) and isinstance(m.get("into"), dict)]
     faces += [h for h in card.get("halves", []) if isinstance(h, dict)]
     text = "\n".join(f.get("oracleText", "") for f in faces if f.get("oracleText"))
     return re.sub(r"\([^)]*\)", "", text).strip()

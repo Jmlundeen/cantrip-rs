@@ -123,6 +123,10 @@ def faces(card, alone):
         face = card.get(key)
         if isinstance(face, dict) and face.get("name") and (key == "backFace" or face["name"] in alone):
             names.append(face["name"])
+    # A meld card (CR 712.4) is drawn with its own art, the halves of it printed on the backs of its pair.
+    meld = (card.get("meld") or {}).get("into")
+    if isinstance(meld, dict) and meld.get("name"):
+        names.append(meld["name"])
     return names
 
 

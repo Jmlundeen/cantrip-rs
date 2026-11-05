@@ -74,6 +74,7 @@ pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
         on_top,
         timestamp: 0,
         prior: permanent.copy,
+        melded: false,
     };
     let mut merge = s.merge_of(target).cloned().unwrap_or_else(|| Merge {
         own_face: cx.cards().face(permanent.card, permanent.transformed),
@@ -127,6 +128,27 @@ pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
     );
     cx.emit(Event::Mutated { permanent: target, spell, on_top });
     Ok(())
+}
+
+/// The meld card `card` joining `permanent`, its counterpart as it enters (CR 701.42a, 712.14c): it leaves its zone - no object
+/// any more, but part of the permanent, which an effect that refers to it finds (CR 400.7) - and the permanent has only the
+/// pair's combined back face's characteristics (CR 712.8g), its own face here, over the card it is. As it leaves, the two
+/// cards go to the new zone (CR 712.21), as any merged permanent's components do (`components`). The event that records it.
+pub(crate) fn meld_with(cx: &mut Cx, permanent: ObjectId, card: ObjectId) -> Event {
+    let own = cx.s().obj(permanent).card;
+    let into = cx.cards().id_of(cx.card(own).meld.expect("a melding card is a meld card").into);
+    let joining = *cx.s().obj(card);
+    let known = ops::last_known_of(cx, card);
+    let row = cx.st().last_known_push(known);
+    cx.st().zone_remove(joining.zone, card);
+    cx.st().update_obj(card, |o| {
+        o.became = Some(permanent);
+        o.last_known = Some(row);
+    });
+    let timestamp = cx.st().timestamp();
+    let part = MergedPart { card: joining.card, face: joining.card, token: false, copy: None, on_top: false, timestamp, prior: None, melded: true };
+    cx.st().set_merge(permanent, Merge { own_face: into, own_token: false, own_face_down: None, parts: vec![part] });
+    Event::Melded { permanent, card }
 }
 
 /// One component of a merged permanent (CR 730.2), as it leaves the battlefield (CR 730.3): the card, token or copy it is, and

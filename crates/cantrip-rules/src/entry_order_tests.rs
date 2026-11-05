@@ -232,6 +232,7 @@ fn an_own_enters_out_of_its_tier_stops_a_verifying_run() {
             instead: None,
             becomes: None,
             own: Some(table.id_of(def)),
+            melded: None,
         };
         let mut after = before;
         let mut c = crate::Cx { g: &mut g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };

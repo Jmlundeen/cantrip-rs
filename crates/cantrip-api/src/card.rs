@@ -125,6 +125,9 @@ pub struct Entering {
     /// as it prepares the entry and applied by it among the other replacement effects that modify how it enters, in the
     /// order its controller chooses (CR 614.12, 616.1). Emptied as it applies; a card never reads or sets it.
     pub own: Option<CardId>,
+    /// It is melding with this card, its counterpart (CR 701.42a, 712.14c): the two enter as one permanent, with only the
+    /// characteristics of their combined back face (CR 712.8g), which it enters as (`copy`). Set by the meld verb alone.
+    pub melded: Option<ObjectId>,
 }
 
 /// What an effect that puts a card onto the battlefield says it is (CR 614.12: it enters as that, never as what it was;
@@ -3243,6 +3246,11 @@ pub struct CardDef {
     /// on the stack and on the battlefield when cast prototyped (CR 718.2-718.3), and in no other case (CR 718.4). From the
     /// content key `prototype`; the core makes the prototyped face (`prototyped_face`) and casts it by `WAY_PROTOTYPE`.
     pub prototype: Option<Prototype>,
+    /// Meld (CR 701.42, 712.4): a meld card's pair - the card it melds with, and the combined back face the two make, half
+    /// printed on each (CR 712.4a). From the content key `meld`. Not a back face (`back`): a meld card can't transform or
+    /// convert (CR 712.4c), and its back face has no characteristics outside the melded permanent (CR 712.4b). The combined
+    /// face is registered in the card table by itself, so it can be named (CR 201.4e).
+    pub meld: Option<Meld>,
     /// It is a prototype card's prototyped face (`prototyped_face`, CR 718.3b): what a prototyped spell and the permanent it
     /// becomes are, and a copy of either (CR 718.3c-d). Its `prototype` is its card's: the existence of the alternative
     /// characteristics is part of the copiable values (CR 718.2a).
@@ -3628,6 +3636,7 @@ impl CardDef {
         bestow: None,
         bestow_cost: ManaCost::ZERO,
         prototype: None,
+        meld: None,
         prototyped: false,
         mutating: false,
         rebound: false,
@@ -4370,6 +4379,16 @@ impl TurnUp {
     }
 }
 
+/// A meld card's pair (CR 701.42b, 712.4): the card it melds with, by name, and the melded permanent's combined back face.
+/// Both cards of a pair name the same combined face, and each other.
+#[derive(Clone, Copy)]
+pub struct Meld {
+    /// The name of its counterpart (CR 712.4a).
+    pub with: &'static str,
+    /// The combined back face (CR 712.8g): the only characteristics the melded permanent has.
+    pub into: &'static CardDef,
+}
+
 /// A prototype card's alternative characteristics (CR 718.1-718.2): the mana cost, power and toughness in its inset frame,
 /// and the keyword line as printed ("Prototype {2}{R} \u{2014} 3/2"), which names the cast.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -4449,6 +4468,9 @@ impl CardTable {
         // A back face is registered with its front (the first of a name wins, as for every card).
         let backs: Vec<&'static CardDef> = cards.iter().filter_map(|c| c.back).collect();
         cards.extend(backs);
+        // A meld pair's combined back face (CR 712.4a), which each card of the pair names: once, as the same definition.
+        let melded: Vec<&'static CardDef> = cards.iter().filter_map(|c| c.meld.map(|m| m.into)).collect();
+        cards.extend(melded);
         // A prototype card's prototyped face (CR 718.3b), after its card so that a lookup by name finds the card.
         let prototyped: Vec<&'static CardDef> = cards.iter().filter_map(|&c| prototyped_face(c)).collect();
         cards.extend(prototyped);
@@ -4495,6 +4517,17 @@ impl CardTable {
             // battlefield.
             for s in card.statics.iter().filter(|s| s.layer == Layer::Control) {
                 assert!(!s.everywhere && !s.own && !s.continues, "{}: a control-changing static ability affects other permanents", card.name);
+            }
+            // A meld pair (CR 712.4a): each card names the other, and both the one combined face, so the melded permanent is
+            // the same whichever card's ability melds them.
+            if let Some(m) = card.meld
+                && let Some(partner) = cards.iter().find(|c| c.name == m.with)
+            {
+                assert!(
+                    partner.meld.is_some_and(|p| p.with == card.name && std::ptr::eq(p.into, m.into)),
+                    "{}: a meld card and its counterpart name each other and one combined back face (CR 712.4a)",
+                    card.name
+                );
             }
             // A fused split spell is made by the core from its halves' targets and instructions alone (CR 702.102b-d): a half
             // with a choice or cost of its own as it is cast (CR 601.2b-f), or text the core would have to run another way,

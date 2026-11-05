@@ -401,6 +401,7 @@ fn an_aura_with_no_enchant_ability_may_enchant_anything() {
         instead: None,
         becomes: Some(Becomes { what: &AS_BARE_AURA, card: g.cards.id_of(&BEAR), words: Words::NONE }),
         own: None,
+        melded: None,
     };
     let mut c = cx(&mut g);
     let chars = crate::ops::as_it_would_exist(&mut c, &entering).chars;

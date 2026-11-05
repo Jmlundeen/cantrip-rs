@@ -1353,7 +1353,10 @@ impl GameState {
             let part = parts[i];
             let values = part.copy.unwrap_or(Copiable::of(part.face));
             let mut sources: Vec<Copiable> = self.merged_sources(&base).to_vec();
-            let top = if part.on_top {
+            // A melded permanent is its combined face alone (CR 712.8g): its counterpart gives it nothing.
+            let top = if part.melded {
+                base.unmerged()
+            } else if part.on_top {
                 if base_gives {
                     sources.insert(0, base.unmerged());
                 }

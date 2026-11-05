@@ -1,0 +1,29 @@
+{
+  "name": "Fang, Fearless l'Cie",
+  "manaCost": "{2}{B}",
+  "type": "Legendary Creature — Human Warrior",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Whenever one or more cards leave your graveyard, you draw a card and you lose 1 life. This ability triggers only once each turn.",
+  "meld": {
+    "with": "Vanille, Cheerful l'Cie",
+    "into": {
+      "name": "Ragnarok, Divine Deliverance",
+      "colorIndicator": [
+        "Black",
+        "Green"
+      ],
+      "type": "Legendary Creature — Beast Avatar",
+      "power": 7,
+      "toughness": 6,
+      "oracleText": "Reach, vigilance, menace, trample, haste\nWhen Ragnarok dies, destroy target permanent and return target nonlegendary permanent card from your graveyard to the battlefield.",
+      "keywords": [
+        "Reach",
+        "Vigilance",
+        "Menace",
+        "Trample",
+        "Haste"
+      ]
+    }
+  }
+}

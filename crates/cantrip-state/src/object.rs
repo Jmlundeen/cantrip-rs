@@ -156,6 +156,9 @@ pub struct MergedPart {
     /// The permanent's copiable values just before this merge - what the copy effects and merges earlier in timestamp order
     /// make them, `None` for its own face's - which this merge applies over (CR 613.2a, 613.7).
     pub prior: Option<Copiable>,
+    /// It is the counterpart a meld card melded with (CR 701.42a): the permanent has only the characteristics of the pair's
+    /// combined back face, its own face (`Merge::own_face`), and none of this card's (CR 712.8g). Its `face` is its card's.
+    pub melded: bool,
 }
 
 /// What a permanent is marked with: exerted (CR 701.43), monstrous (CR 701.37), solved (CR 719.3b), saddled (CR 702.171), a player chosen

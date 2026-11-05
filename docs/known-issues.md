@@ -56,6 +56,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-148](#ki-148-a-waiting-when-event-delayed-trigger-is-shown-beside-its-controllers-life-not-on-the-object-it-watches) | A waiting "when [event]" delayed trigger is shown beside its controller's life, not on the object it watches | Pri-2 | Open |
 | [KI-149](#ki-149-no-test-reads-a-noncreature-permanents-printed-power-and-toughness-off-the-wire) | No test reads a noncreature permanent's printed power and toughness off the wire | Pri-2 | Open |
 | [KI-151](#ki-151-an-ability-on-the-stack-is-shown-with-its-printed-text-not-the-words-it-kept) | An ability on the stack is shown with its printed text, not the words it kept | Pri-2 | Open |
+| [KI-158](#ki-158-the-client-shows-no-melded-faces-text-for-a-meld-card-outside-the-battlefield) | The client shows no melded face's text for a meld card outside the battlefield | Pri-2 | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Pri-3 | Fix queued |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Pri-3 | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Pri-3 | Open |
@@ -805,3 +806,14 @@ abilities send their text. The fix carries `PendingTrigger::ability` in the requ
 
 **Notes.** The prompt reads `game.cards.ability(item.ability).text()`; the item's announced words (`item.words`) are what the
 player sees for a granted or text-changed ability. Display only.
+
+### KI-158: The client shows no melded face's text for a meld card outside the battlefield
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client (`dotnet/src/Cantrip.Cards/CardFileReader.cs`) | 2026-11-05, reviewing Vanille, Cheerful l'Cie and Fang, Fearless l'Cie (#2341) |
+
+**Notes.** A meld card's content carries the combined back face it melds into (`"meld": {"with": .., "into": {..}}`), and
+the rulings let players see that face at any time (CR 712.4b). The C# card reader ignores `meld`, so looking at Vanille or
+Fang in a hand, library view, graveyard or exile shows no Ragnarok, Divine Deliverance. The melded permanent itself is drawn
+from the host's view of it. The fix reads `meld.into` as a face the card view can turn to, as a back face is. Display only.

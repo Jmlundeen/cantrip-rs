@@ -356,6 +356,10 @@ pub enum Event {
     /// on top. What "whenever this creature mutates" triggers on (CR 702.140d), and "the number of times it has mutated"
     /// counts.
     Mutated { permanent: ObjectId, spell: ObjectId, on_top: bool },
+    /// A meld card's counterpart melded with it (CR 701.42a, 712.14c): `card` left its zone as the two entered as the one
+    /// permanent `permanent`, recorded after the permanent's zone change, which is the pair's one entering (CR 712.21's
+    /// "one permanent"). `card` is no object any more, but part of the permanent (CR 400.7), as a mutating spell is.
+    Melded { permanent: ObjectId, card: ObjectId },
 }
 
 /// Why a player loses the game (CR 104.3): what a "can't lose the game" or "don't lose the game for ..." effect is asked
@@ -486,6 +490,7 @@ impl Event {
             | Event::ControlChanged { permanent, .. }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Mutated { permanent, spell, .. } => permanent == object || spell == object,
+            Event::Melded { permanent, card } => permanent == object || card == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::Attached { attachment, to } => attachment == object || to == Target::Object(object),
             Event::ManaSpent { source, on, .. } => source == object || on == object,
@@ -588,6 +593,8 @@ impl EventMask {
     /// A spell merged with a permanent (CR 702.140d): it shares transforming's bit, every one of the 64 being taken, so an
     /// ability listening for either is asked of both kinds, and tells them apart by the event.
     pub const MUTATED: EventMask = EventMask::TRANSFORMED;
+    /// A meld card's counterpart melded with it (CR 701.42a): recorded only, sharing transforming's bit as mutating does.
+    pub const MELDED: EventMask = EventMask::TRANSFORMED;
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -655,6 +662,7 @@ impl EventMask {
             Event::CountersPut { .. } => EventMask::COUNTERS,
             Event::Transformed { .. } => EventMask::TRANSFORMED,
             Event::Mutated { .. } => EventMask::MUTATED,
+            Event::Melded { .. } => EventMask::MELDED,
             Event::Unattached { .. } => EventMask::UNATTACHED,
             Event::Attached { .. } => EventMask::ATTACHED,
             Event::Tapped { .. } => EventMask::TAPPED,

@@ -160,6 +160,14 @@ fn main() {
                 emit(&mut out, &back_const, &back_fields);
             }
         }
+        // The meld card of a meld pair (CR 712.4) is a constant of its own, which both cards of the pair refer to.
+        if let Some(into) = card.get("meld").and_then(|m| m.get("into")).and_then(Value::as_object) {
+            let into_const = ident(&str_of(into, "name"));
+            if names.insert(into_const.clone()) {
+                let into_fields = face_fields(into, true, source, &known).unwrap_or_else(|e| panic!("{source}: meld card: {e}"));
+                emit(&mut out, &into_const, &into_fields);
+            }
+        }
         emit(&mut out, &konst, &fields);
     }
     out.push_str("/// The cards that are their characteristics and nothing more: keywords the core plays, a basic land type's mana\n");
@@ -328,7 +336,7 @@ fn is_plain(card: &Card) -> bool {
     if card.get("part") == Some(&Value::Bool(true)) {
         return true;
     }
-    if ["backFace", "adventure", "omen", "prepare", "halves", "split", "prototype"].iter().any(|k| card.contains_key(*k)) {
+    if ["backFace", "meld", "adventure", "omen", "prepare", "halves", "split", "prototype"].iter().any(|k| card.contains_key(*k)) {
         return false;
     }
     without_reminder(&str_of(card, "oracleText")).split('\n').filter(|l| !l.trim().is_empty()).all(|line| {
@@ -504,6 +512,11 @@ fn face_fields(card: &Card, is_back: bool, source: &str, known: &HashSet<String>
                 fields.push("    back_land: true,".into());
             }
         }
+    }
+    if !is_back && let Some(meld) = card.get("meld").and_then(Value::as_object) {
+        let with = meld.get("with").and_then(Value::as_str).unwrap_or_else(|| panic!("{source}: meld names the card it melds with"));
+        let into = meld.get("into").and_then(Value::as_object).unwrap_or_else(|| panic!("{source}: meld gives the meld card it melds into"));
+        fields.push(format!("    meld: Some(Meld {{ with: {}, into: &{} }}),", rust_str(with), ident(&str_of(into, "name"))));
     }
     let basics: Vec<String> = subs.iter().filter_map(|s| BASIC_LAND.iter().find(|(n, _)| n == s)).map(|(_, m)| format!("Mana::{m}")).collect();
     if !basics.is_empty() {

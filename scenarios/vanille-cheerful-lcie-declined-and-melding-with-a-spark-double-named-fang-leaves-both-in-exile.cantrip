@@ -1,0 +1,77 @@
+# Vanille, Cheerful l'Cie: declining the payment keeps both on the battlefield; with two creatures named Fang the one exiled is chosen, and a Spark Double copying Fang is no meld pair, so it and Vanille stay in exile (CR 701.42c, 712.4a, and the rulings).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Fang, Fearless l'Cie
+Vanille, Cheerful l'Cie
+Forest
+Forest
+Spark Double
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Fang, Fearless l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Vanille, Cheerful l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Forest)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Sapphire; Fang, Fearless l'Cie; Vanille, Cheerful l'Cie
+? Bot1.Mana =
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spark Double.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Fang, Fearless l'Cie)
+? Bot1.Battlefield.Fang, Fearless l'Cie#2.Counters.PlusOnePlusOne = 1
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Choose(Fang, Fearless l'Cie#2)
+
+[Expect]
+Exile = Spark Double; Vanille, Cheerful l'Cie
+Bot1.Battlefield = Fang, Fearless l'Cie; Forest; Forest; Mox Emerald; Mox Jet; Mox Sapphire
+Bot1.Battlefield.Fang, Fearless l'Cie.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ragnarok, Divine Deliverance = (absent)

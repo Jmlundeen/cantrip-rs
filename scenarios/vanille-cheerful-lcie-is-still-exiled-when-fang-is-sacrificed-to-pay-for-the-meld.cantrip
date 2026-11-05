@@ -1,0 +1,59 @@
+# Fang sacrificed to Phyrexian Tower while paying Vanille's {3}{B}{G}: "if you do, exile them" still exiles Vanille, and with no Fang beside it nothing melds (CR 608.2c, 609.3, 701.42c).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Fang, Fearless l'Cie
+Vanille, Cheerful l'Cie
+Grizzly Bears
+Lightning Bolt
+Phyrexian Tower
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fang, Fearless l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Vanille, Cheerful l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Phyrexian Tower.Play
+[T3 Bot1.Main1]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Phyrexian Tower.Activate(Ability: Sacrifice; Sacrifice: Fang, Fearless l'Cie)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Fang, Fearless l'Cie; Lightning Bolt; Black Lotus
+Exile = Vanille, Cheerful l'Cie
+Exile.Count = 1
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Sapphire; Phyrexian Tower
+Bot1.Battlefield.Phyrexian Tower.Tapped = true

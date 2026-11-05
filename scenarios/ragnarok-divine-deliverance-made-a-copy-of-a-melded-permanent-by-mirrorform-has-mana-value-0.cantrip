@@ -1,0 +1,70 @@
+# A melded Ragnarok that Mirrorform makes a copy of a melded permanent (itself) has mana value 0, as any copy of a melded permanent does, though two meld cards represent it (CR 712.8g, 202.3c, 707.2).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Fang, Fearless l'Cie
+Vanille, Cheerful l'Cie
+Forest
+Black Lotus
+Grizzly Bears
+Forest
+Island
+Island
+Mirrorform
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Fang, Fearless l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Vanille, Cheerful l'Cie.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Black Lotus)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.PayCost
+? Stack.Count = 0
+? Bot1.Battlefield.Ragnarok, Divine Deliverance.ManaValue = 7
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Mirrorform.Cast(Ragnarok, Divine Deliverance)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Island; Island; Ragnarok, Divine Deliverance
+Bot1.Battlefield.Ragnarok, Divine Deliverance.ManaValue = 0

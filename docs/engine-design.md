@@ -2847,6 +2847,8 @@ find them all from the permanent (CR 730.3c), read from the history. Not built, 
 a permanent face down (CR 730.2f, 730.2j: no card does), flip cards (CR 730.2h), and the relative timestamp order of exiled
 components (CR 730.3b), which nothing in exile reads.
 
+Meld (CR 701.42, 712.4) is built on the same merge. A meld card's `CardDef::meld` names its counterpart and the pair's combined back face, a `CardDef` registered in the card table by itself so it can be named (CR 201.4e), and never a back face (`back`): a meld card can't transform or convert (CR 712.4c). `Game::meld` (`ops::meld`) checks that the two objects are the two cards of one pair - no token, no copy of a card (CR 701.42b-c) - and puts the first onto the battlefield entering as the combined face (`Entering::copy`, so its own "enters" replacements are that face's, CR 614.12) with `Entering::melded` naming the second. As the first arrives (CR 712.14c) `merge::meld_with` makes the second a `MergedPart` with `melded` set - no object any more, followed to the permanent by `became` (CR 400.7) - and gives the permanent a `Merge` whose own face is the combined face, recorded as `Event::Melded` after the one zone change. The permanent has only that face's characteristics (CR 712.8g), and its mana value is the sum of its two cards' front faces' (`mana_value_of`), while it has them. Leaving, it is a merged permanent leaving: one permanent, two cards (CR 712.21). The host shows the meld card, not either card, while nothing is placed over it.
+
 ### Legal moves as a first-class output
 
 Every pending request comes with its legal answers enumerated, cheaply and in a stable order. The client's prompt
