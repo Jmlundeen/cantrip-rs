@@ -1,0 +1,34 @@
+# Yathan Tombguard: "a creature you control". Bot2's Kin-Tree Nurturer (a 3/2 lifelink with a counter) hits Bot1 on turn 4: Bot1
+# draws no card and loses no life from the Tombguard, taking only the 3 damage.
+
+[Bot1 Deck]
+Black Lotus
+Yathan Tombguard
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Kin-Tree Nurturer
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Yathan Tombguard.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Kin-Tree Nurturer.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+[T4 Bot2.Attackers]
+Bot2.Attack(Kin-Tree Nurturer > Bot1)
+[T4 Bot2.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 17
+Bot1.Hand.Count = 6
