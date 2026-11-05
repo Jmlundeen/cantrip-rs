@@ -1,0 +1,58 @@
+# Lightfoot Technique: "Put a +1/+1 counter on target creature. It gains flying and indestructible until end of turn." Cast on turn 3
+# at Bot1's Memnite (1/1, no keywords) it becomes a 2/2 for good, a flyer and indestructible for the turn only: a Lightning Bolt after
+# it attacks (Bot2 loses exactly 2) does not destroy it, and on turn 4, with neither keyword left, a second Bolt kills it. A Mox Pearl, not a creature, is refused.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Memnite
+Lightfoot Technique
+Plains
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Lightfoot Technique.Cast(Mox Pearl)
+Bot1.Hand.Lightfoot Technique.Cast(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Memnite.Keywords = Flying; Indestructible
+Bot1.Attack(Memnite > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Memnite.Damage = 3
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Memnite.Damage = 0
+? Bot1.Battlefield.Memnite.Toughness = 2
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Memnite; Lightfoot Technique
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

@@ -1,0 +1,38 @@
+# Lightfoot Technique: "target creature" is any creature. Bot1 puts the counter on Bot2's Memnite (1/1 becomes 2/2) and gives it
+# flying and indestructible: Bot2's Memnite then survives a Lightning Bolt from Bot1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lightfoot Technique
+Lightning Bolt
+Plains x20
+
+[Bot2 Deck]
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lightfoot Technique.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+? Bot2.Battlefield.Memnite.Keywords = Flying; Indestructible
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Memnite.Damage = 3
+Bot2.Graveyard.Count = 0
