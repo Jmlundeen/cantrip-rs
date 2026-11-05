@@ -1,0 +1,9 @@
+{
+  "name": "Static Snare",
+  "manaCost": "{4}{W}",
+  "type": "Enchantment",
+  "oracleText": "Flash\nThis spell costs {1} less to cast for each attacking creature.\nWhen this enchantment enters, exile target artifact or creature an opponent controls until this enchantment leaves the battlefield.",
+  "keywords": [
+    "Flash"
+  ]
+}

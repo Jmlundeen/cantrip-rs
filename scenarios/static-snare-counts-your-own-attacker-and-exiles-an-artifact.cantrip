@@ -1,0 +1,40 @@
+# Static Snare: "for each attacking creature" counts the caster's own attackers too. Bot1 attacks with its Ornithopter on turn 3, so
+# the Snare flashed in at the declare attackers step costs {3}{W}: four Mox Pearls pay it exactly. Its trigger takes an artifact
+# that is not a creature, Bot2's Mox Pearl; the exile lasts until Bot1's Snare leaves.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Static Snare
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Static Snare.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mox Pearl
+Bot2.Battlefield.Count = 0

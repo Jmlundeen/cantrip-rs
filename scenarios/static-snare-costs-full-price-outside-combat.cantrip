@@ -1,0 +1,37 @@
+# Static Snare: with no attacking creature it costs the full {4}{W}. Bot1 has four Mox Pearls out on turn 3, four white mana, and
+# cannot cast it (the refusal, with mana to pay a cheaper one); with a fifth Mox Pearl it can (the positive control), the trigger
+# having no opposing artifact or creature to take.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Static Snare
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+! Bot1.Hand.Static Snare.Cast(Mana: short)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#5.Activate
+Bot1.Hand.Static Snare.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 6
