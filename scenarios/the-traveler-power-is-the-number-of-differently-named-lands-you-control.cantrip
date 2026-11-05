@@ -1,0 +1,46 @@
+# The Traveler: "The Traveler's power is equal to the number of differently named lands you control" (CR 604.3, 201.2a-b):
+# a second Forest adds no name, so three names are three power, and Bot2's two Islands are not its controller's lands. The
+# card also prints reach and vigilance (CR 702.17, 702.20).
+
+[Bot1 Deck]
+The Traveler
+Mox Sapphire
+Mox Emerald
+Forest
+Island
+Plains
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The Traveler.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.The Traveler.Power = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main2]
+? Bot1.Battlefield.The Traveler.Power = 3
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+
+[Expect]
+Turn = 9
+Bot1.Battlefield.The Traveler.Power = 3
+Bot1.Battlefield.The Traveler.Toughness = 3
+Bot1.Battlefield.The Traveler.Keywords = Reach; Vigilance
