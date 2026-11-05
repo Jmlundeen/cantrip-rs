@@ -35,6 +35,7 @@ pub static CARD: CardDef = CardDef {
         allows: may_cast_from_exile,
         additional: Cost::NONE,
         any_type: false,
+        any_color: false,
         lands: false,
         life_for_mana_value: false,
         instead: None,

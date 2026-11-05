@@ -2307,6 +2307,10 @@ pub struct ExileCast {
     /// "And mana of any type can be spent to cast that spell" (CR 609.4b): any mana pays any symbol of what a cast by it
     /// costs (`ManaCost::paid_with_any_type`), as a play permission's `PlayGrant::any_type` pays. Null Summoner's threshold ability.
     pub any_type: bool,
+    /// "And you may spend mana as though it were mana of any color to cast those spells" (CR 609.4b): any mana pays a colored
+    /// symbol of what a cast by it costs, and a {C} symbol still takes colorless mana (`ManaCost::paid_with_any_color`), as a
+    /// play permission's `PlayGrant::any_color` pays. Tibalt, Cosmic Impostor's emblem.
+    pub any_color: bool,
     /// "You may play" rather than "cast" (CR 305.1): a land card it allows may be played from exile, as one of the player's
     /// land plays, at the time the rules let them play a land. The Temporal Anchor, Nightveil Specter, Valgavoth, Terror Eater.
     pub lands: bool,

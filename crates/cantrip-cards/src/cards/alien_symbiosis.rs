@@ -23,6 +23,7 @@ pub static CARD: CardDef = CardDef {
         allows: this_card_by_its_owner,
         additional: Cost { discard: Discards::one(1, None), ..Cost::NONE },
         any_type: false,
+        any_color: false,
         lands: false,
         life_for_mana_value: false,
         instead: None,

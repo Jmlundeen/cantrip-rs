@@ -37,6 +37,7 @@ pub static CARD: CardDef = CardDef {
         allows,
         additional: Cost::NONE,
         any_type: false,
+        any_color: false,
         lands: true,
         life_for_mana_value: true,
         instead: None,

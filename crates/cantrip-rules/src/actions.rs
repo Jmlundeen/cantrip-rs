@@ -6598,12 +6598,13 @@ impl Route {
     }
 
     /// A permanent's permission to cast cards in exile, or a card's own to be cast from where it is (CR 601.3, 604.1, 113.6e),
-    /// judged on each face: what it adds is owed with every cast by it (CR 118.8), it may let mana of any type pay (CR
-    /// 609.4b), and it may name life equal to the mana value as the cost paid rather than the mana cost (CR 118.9, 119.4).
+    /// judged on each face: what it adds is owed with every cast by it (CR 118.8), it may let mana of any type or as though of
+    /// any color pay (CR 609.4b), and it may name life equal to the mana value as the cost paid rather than the mana cost (CR
+    /// 118.9, 119.4).
     fn exile_cast(c: &Given<ExileCast>) -> Route {
         Route {
             by: Some(c.grant),
-            terms: PlayGrant { any_type: c.what.any_type, life_for_mana_value: c.what.life_for_mana_value, instead: c.what.instead, ..PlayGrant::CAST },
+            terms: PlayGrant { any_type: c.what.any_type, any_color: c.what.any_color, life_for_mana_value: c.what.life_for_mana_value, instead: c.what.instead, ..PlayGrant::CAST },
             additional: c.what.additional,
             allows: Allows::Exile(c.asker(), c.what),
             ..Route::RULES
@@ -12389,7 +12390,7 @@ mod tests {
     static EXILER: CardDef = CardDef {
         name: "Alternative Test Exiler",
         types: TypeSet::of(&[CardType::Enchantment]),
-        exile_casts: &[ExileCast { text: "Cast from exile", from: ZoneKind::Exile, allows: any_card, additional: Cost::NONE, any_type: false, lands: false, life_for_mana_value: false, instead: None }],
+        exile_casts: &[ExileCast { text: "Cast from exile", from: ZoneKind::Exile, allows: any_card, additional: Cost::NONE, any_type: false, any_color: false, lands: false, life_for_mana_value: false, instead: None }],
         ..CardDef::BLANK
     };
     /// "You may cast spells from the top of your library" (CR 601.3).

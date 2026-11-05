@@ -51,6 +51,7 @@ static EMBLEM: CardDef = CardDef {
         allows: exiled_with_its_maker,
         additional: Cost::NONE,
         any_type: false,
+        any_color: true,
         lands: true,
         life_for_mana_value: false,
         instead: None,
@@ -470,6 +471,47 @@ fn a_maker_that_left_still_has_its_emblem_and_a_returned_one_is_another_object()
     let option = options(&mut g).into_iter().find(|o| o.source == Some(spell) && o.kind == ActionKind::CastSpell).expect("castable");
     take(&mut g, &option);
     assert_eq!(Query::exiled_with(&g, own(&g, maker, &MAKER)), vec![land]);
+}
+
+/// {U}{C}, to pay for from exile.
+static COSTLY: CardDef = CardDef {
+    name: "Emblem Maker Test Costly",
+    types: TypeSet::of(&[CardType::Sorcery]),
+    cost: ManaCost { symbols: [0, 1, 0, 0, 0, 1], ..ManaCost::ZERO },
+    has_cost: true,
+    spell: Some(SpellDef { targets: &[], effect: nothing }),
+    ..CardDef::BLANK
+};
+
+/// Whether the card exiled with an emblem's maker may be cast with this pool: "you may spend mana as though it were mana of any
+/// color to cast those spells" (CR 609.4b, 105.2a), from the command zone (CR 114.4). Red pays {U} and not {C}.
+fn costly_castable(pool: [u32; 6], exiled_with_the_maker: bool) -> bool {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&COSTLY, &EMBLEM, &MAKER])));
+    let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+    let maker = game.state.push_obj(Obj::new(table.id_of(&MAKER), YOU, Zone::GONE));
+    let card = game.state.push_obj(Obj::new(table.id_of(&COSTLY), YOU, Zone::exile(YOU)));
+    game.state.zone_push(Zone::exile(YOU), card);
+    let by = Linked { object: maker, text: table.id_of(&MAKER), acquired: Acquired::OWN };
+    if exiled_with_the_maker {
+        game.state.update_obj(card, |o| o.exiled = Some(ExileLink::new(by, Zone::library(YOU), false)));
+    }
+    cantrip_api::Game::create_emblem_made_by(&mut cx(&mut game), table.id_of(&EMBLEM), YOU, by);
+    game.state.update_player(YOU, |p| p.pool = ManaPool(pool));
+    game.state.update_turn(|t| {
+        t.active = YOU;
+        t.priority = YOU;
+        t.set_step(Step::PrecombatMain);
+    });
+    priority_options(&mut cx(&mut game), YOU).iter().any(|o| o.kind == ActionKind::CastSpell && o.source == Some(card))
+}
+
+#[test]
+fn an_emblems_permission_spends_mana_as_any_color_and_no_more() {
+    const RED_RED: [u32; 6] = [0, 0, 0, 2, 0, 0];
+    const RED_COLORLESS: [u32; 6] = [0, 0, 0, 1, 0, 1];
+    assert!(costly_castable(RED_COLORLESS, true), "red pays {{U}} beside colorless for {{C}}");
+    assert!(!costly_castable(RED_RED, true), "no color stands for {{C}}");
+    assert!(!costly_castable(RED_COLORLESS, false), "the permission is for the maker's cards alone");
 }
 
 /// Replacement effects are of the permanent it would be (CR 614.12): one that would have lost its abilities makes none, and

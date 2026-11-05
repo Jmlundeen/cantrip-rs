@@ -42,6 +42,7 @@ pub static CARD: CardDef = CardDef {
         allows,
         additional: remove_counters_among(3, targets::filters::creature),
         any_type: false,
+        any_color: false,
         lands: false,
         life_for_mana_value: false,
         instead: None,

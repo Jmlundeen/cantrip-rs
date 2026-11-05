@@ -65,6 +65,7 @@ pub static CARD: CardDef = CardDef {
         allows: once_each_turn,
         additional: Cost::NONE,
         any_type: false,
+        any_color: false,
         lands: false,
         life_for_mana_value: false,
         instead: Some(ManaCost::ZERO),
