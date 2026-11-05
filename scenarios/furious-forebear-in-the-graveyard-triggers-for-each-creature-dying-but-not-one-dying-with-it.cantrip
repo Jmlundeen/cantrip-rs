@@ -1,0 +1,75 @@
+# Furious Forebear, CR 603.10a: a Forebear already in the graveyard triggers once for each creature you control that dies, and one
+# dying with them triggers for nothing (ruling: "If Furious Forebear dies at the same time as one or more creatures you control,
+# its ability won't trigger"). Bot2 Bolts the first Forebear on turn 2. On turn 4 Bot2's Devilthorn Fox (3/1) attacks, and Bot1
+# blocks with the second Forebear and a Memnite: both die at once. Only the first Forebear's ability triggers, twice (`? Stack.Count = 2`):
+# Bot1 pays {1}{W} for the first (the Plains and the Mox Jet) and that Forebear returns to its hand; the second still asks
+# (it has left the graveyard, so it "won't be returned ... even if you pay") and Bot1 declines. A trigger from the second Forebear
+# would be asked here too, and fail the refusal after.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Furious Forebear
+Memnite
+Plains
+Plains
+Furious Forebear
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Mox Pearl
+Mox Jet
+Devilthorn Fox
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Furious Forebear.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Furious Forebear)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Furious Forebear
+? Stack.Count = 0
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Devilthorn Fox.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Furious Forebear.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Devilthorn Fox > Bot1)
+[T4 Bot2.DeclareBlockers]
+Bot1.Block(Furious Forebear > Devilthorn Fox; Memnite > Devilthorn Fox)
+[T4 Bot2.CombatDamage]
+Bot2.Pass
+? Stack.Count = 2
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.PayCost
+Bot2.Pass
+Bot1.Pass
+Bot1.Decline
+! Bot1.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Furious Forebear; Plains
+Bot1.Graveyard = Furious Forebear; Memnite
+Bot2.Graveyard = Devilthorn Fox; Lightning Bolt; Black Lotus

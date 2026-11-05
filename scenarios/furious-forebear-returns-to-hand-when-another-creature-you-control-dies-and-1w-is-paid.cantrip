@@ -1,0 +1,46 @@
+# Furious Forebear: "Whenever a creature you control dies while this card is in your graveyard, you may pay {1}{W}. If you do, return this card from your graveyard to your hand." Bot2's Bolt kills the Forebear itself on turn 2: it was not in the graveyard when it died, so nothing triggers (CR 603.10a; `? Stack.Count = 1` as the second Bolt is cast). A second Bolt kills Bot1's Memnite: the ability triggers from the graveyard, Bot1 pays {1}{W} (the Plains and the Mox Jet) and the Forebear returns to its hand - not to the battlefield.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Furious Forebear
+Memnite
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Furious Forebear.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Furious Forebear)
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost
+
+[Expect]
+Bot1.Hand = Furious Forebear; Plains
+Bot1.Graveyard = Memnite
+Bot1.Battlefield.Count = 4

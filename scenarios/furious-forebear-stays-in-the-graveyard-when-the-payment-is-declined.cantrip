@@ -1,0 +1,45 @@
+# Furious Forebear: the payment is optional ("you may pay {1}{W}"). Same game as the paying scenario: the Forebear dies to a Bolt, then Bot1's Memnite does; Bot1 declines to pay and the Forebear stays in the graveyard (and Bot1 could have paid: the Plains and the Mox Jet are untapped).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Furious Forebear
+Memnite
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Furious Forebear.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Furious Forebear)
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Hand = Plains
+Bot1.Graveyard = Memnite; Furious Forebear

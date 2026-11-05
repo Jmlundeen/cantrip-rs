@@ -1,0 +1,53 @@
+# Furious Forebear: "Whenever a creature you control dies while this card is in your graveyard" - ruling: if the Forebear dies at the
+# same time as one or more creatures you control, its ability won't trigger, for it was not in the graveyard when they died. Bot2's
+# Devilthorn Fox (3/1) attacks on turn 4 and Bot1 blocks it with the Forebear (3/1) and a Memnite: the Fox deals 1 to each and all
+# three die at once. Bot1 has {1}{W} available (the Plains and Mox Jet), but nothing triggers (`? Stack.Count = 0` at Bot1's
+# priority in the combat damage step) and the payment is never asked (`! Bot1.Decline`) and the Forebear stays in the graveyard.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Furious Forebear
+Memnite
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Devilthorn Fox
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Furious Forebear.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Devilthorn Fox.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Devilthorn Fox > Bot1)
+[T4 Bot2.DeclareBlockers]
+Bot1.Block(Furious Forebear > Devilthorn Fox; Memnite > Devilthorn Fox)
+[T4 Bot2.CombatDamage]
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Pass
+! Bot1.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Memnite; Furious Forebear
+Bot1.Hand = Plains; Plains
+Bot2.Graveyard = Devilthorn Fox
