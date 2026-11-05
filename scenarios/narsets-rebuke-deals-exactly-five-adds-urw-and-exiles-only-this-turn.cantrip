@@ -1,0 +1,45 @@
+# Narset's Rebuke {4}{R}: 5 damage to target creature, then {U}{R}{W}. Bot2's Wall of Stone (0/8) survives with exactly 5 damage and the
+# three mana is in Bot1's pool. On a later turn Go for the Throat destroys it and it goes to the graveyard: the exile lasted only the turn
+# it was cast.
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Narset's Rebuke
+Mox Jet
+Go for the Throat
+Island
+Island x14
+[Bot2 Deck]
+Black Lotus
+Wall of Stone
+Mountain x18
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wall of Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Narset's Rebuke.Cast(Bot2.Battlefield.Wall of Stone)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Wall of Stone.Damage = 5
+? Exile.Count = 0
+? Bot1.Mana = {W}{U}{R}
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Go for the Throat.Cast(Bot2.Battlefield.Wall of Stone)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Graveyard = Wall of Stone; Black Lotus
+Exile.Count = 0
+Bot1.Graveyard = Go for the Throat; Narset's Rebuke; Black Lotus

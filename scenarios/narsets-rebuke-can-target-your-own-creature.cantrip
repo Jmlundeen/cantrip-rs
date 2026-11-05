@@ -1,0 +1,25 @@
+# Narset's Rebuke may target a creature you control: Bot1's Ornithopter takes 5, is exiled instead of dying, and the mana still comes.
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Narset's Rebuke
+Ornithopter
+Island x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Narset's Rebuke.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {W}{U}{R}
+[Expect]
+Exile = Ornithopter
+Bot1.Graveyard = Narset's Rebuke; Black Lotus
