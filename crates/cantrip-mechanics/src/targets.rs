@@ -784,6 +784,14 @@ pub fn nontoken_artifact_or_creature_filter(q: &dyn Query, asker: &Asker, t: Tar
 }
 /// "Target artifact or enchantment". Disenchant and Cathar Commando print it.
 pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = target(artifact_or_enchantment_filter);
+
+fn other_artifact_or_enchantment_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    t != Target::Object(asker.source) && artifact_or_enchantment_filter(q, asker, t)
+}
+
+/// "Up to one other target artifact or enchantment" (CR 115.1, 601.2c): the slot may be left unchosen, and the source
+/// itself is not one of them. Balance of Terror's first chapter and Return to Dust's second slot print it.
+pub const UP_TO_ONE_OTHER_ARTIFACT_OR_ENCHANTMENT: TargetSpec = up_to_one(other_artifact_or_enchantment_filter);
 /// "Target artifact, creature, or enchantment": a permanent that is any of them (CR 115.1). March of Otherworldly Light (with
 /// a mana value limit of its own) and Teferi, Time Raveler (up to one) print it.
 pub fn artifact_creature_or_enchantment_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
@@ -812,6 +820,10 @@ fn another_permanent_you_control_filter(q: &dyn Query, asker: &Asker, t: Target)
 /// "Another target permanent you control" (CR 115.1, 109.5): a permanent its controller controls, other than the source itself.
 /// Rescue Girl, First Responder and North Pole Patrol print it.
 pub const ANOTHER_PERMANENT_YOU_CONTROL: TargetSpec = target(another_permanent_you_control_filter);
+
+/// "Up to one other target permanent you control" (CR 115.1, 601.2c): the slot may be left unchosen. Balance of Terror's
+/// second and third chapters print it.
+pub const UP_TO_ONE_ANOTHER_PERMANENT_YOU_CONTROL: TargetSpec = up_to_one(another_permanent_you_control_filter);
 
 /// "Target nonland permanent". Banishing Knack and Boomerang Basics print it.
 pub const NONLAND_PERMANENT: TargetSpec = target(nonland_permanent_filter);

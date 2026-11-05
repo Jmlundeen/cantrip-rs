@@ -51,6 +51,18 @@ pub static BORG: CardDef = CardDef {
     ..token!(Borg)
 };
 
+/// A 1/1 white Tribble creature token with "This token can't block" (CR 111.1, 111.10). Tribble Cluster and Koloth,
+/// Tribble Hunter create this exact token.
+pub static TRIBBLE: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::CantBlock]),
+    text: "This token can't block.",
+    ..token!(Tribble)
+};
+
 /// A Royal Role token (CR 111.10m, 303.7): "a colorless Aura Role enchantment token named Royal with enchant creature and
 /// 'Enchanted creature gets +1/+1 and has ward {1}.'" Royal Treatment, Charmed Clothier, Gylwain, Casting Director,
 /// Besotted Knight and Redtooth Genealogist make it, attached to a creature (`create_role`).

@@ -2231,6 +2231,23 @@ pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, a
 pub const CREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, creature_spell_you_cast);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player_subject);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player);
+
+/// "Whenever a creature deals combat damage to you" (CR 510.2, 603.2): one trigger for each creature that deals combat
+/// damage above zero to the ability's controller, with that creature as the trigger's subject. Right of Vengeance prints
+/// it on a delayed ability that lasts the turn, so "you" is that ability's controller (CR 603.7d).
+pub fn creature_deals_combat_damage_to_you(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: from, target: Target::Player(p), amount, kind, .. }
+            if kind.is_combat() && *amount > 0 && *p == me.controller && q.chars(*from).is(CardType::Creature) =>
+        {
+            Fired::about(Target::Object(*from))
+        }
+        _ => None,
+    }
+}
+
+/// "Whenever a creature deals combat damage to you" as a trigger condition: `triggered(CREATURE_DEALS_COMBAT_DAMAGE_TO_YOU, ..)`.
+pub const CREATURE_DEALS_COMBAT_DAMAGE_TO_YOU: Trigger = when_asked(EventMask::DAMAGE, creature_deals_combat_damage_to_you);
 pub const OPPONENT_ACTIVATES_ABILITY_OF_ARTIFACT_CREATURE_OR_LAND: Trigger =
     when_asked(EventMask::ABILITY_ACTIVATED, opponent_activates_ability_of_artifact_creature_or_land);
 pub const YOU_ACTIVATE_A_LOYALTY_ABILITY: Trigger = when_asked(EventMask::ABILITY_ACTIVATED, you_activate_a_loyalty_ability);
