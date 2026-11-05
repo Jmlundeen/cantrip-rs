@@ -1,0 +1,38 @@
+# {2/G}{2/U}{2/R}, "When this creature enters, draw a card, then discard a card." Three Moxen (G, U, R) pay one coloured mana per
+# symbol (CR 107.4e), so no {2} is paid. With only two Moxen the creature is refused (each remaining symbol would cost {2});
+# with the third it resolves, loots (draws an Island, discards one) and is a 4/3.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Temur Tawnyback
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Temur Tawnyback.Cast(Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Temur Tawnyback.Cast
+Bot1.Modes()
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Temur Tawnyback.Power = 4
+Bot1.Battlefield.Temur Tawnyback.Toughness = 3

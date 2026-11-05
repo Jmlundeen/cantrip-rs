@@ -1,0 +1,8 @@
+{
+  "name": "Temur Tawnyback",
+  "manaCost": "{2/G}{2/U}{2/R}",
+  "type": "Creature — Beast",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "When this creature enters, draw a card, then discard a card."
+}
