@@ -1,0 +1,65 @@
+# Ultima Weapon ({7}, equip {7}): Black Lotus, Sol Ring (paid with Mox Pearl), Mox Ruby and Mox Jet pay for it on turn 1 and a free
+# Ornithopter comes down. Turn 3 has only six mana, one short of Equip {7}, so it is refused (CR 702.6a). Turn 5 has seven: the
+# Ornithopter becomes 7/7 and, attacking, triggers "destroy target creature an opponent controls": Bot1's own Ornithopter is no
+# legal target (CR 115.1), so Bot2's Ornithopter is chosen and Bot2's Memnite stays. Bot2 takes 7.
+
+[Bot1 Deck]
+Black Lotus
+Sol Ring
+Mox Pearl
+Mox Ruby
+Mox Jet
+Ultima Weapon
+Ornithopter
+Plains x16
+
+[Bot2 Deck]
+Ornithopter
+Memnite
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ultima Weapon.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Ultima Weapon.Activate(Ornithopter; Mana: short)
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Ultima Weapon.Activate(Ornithopter)
+Bot1.Attack(Ornithopter > Bot2)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+? Bot1.Battlefield.Ornithopter.Power = 7
+? Bot1.Battlefield.Ornithopter.Toughness = 9
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Count = 1
+Bot1.Battlefield.Ultima Weapon.AttachedTo = Ornithopter
