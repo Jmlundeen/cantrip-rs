@@ -1,0 +1,31 @@
+# Starfleet Security {R} 1/1 with haste: "When this creature dies during your turn, investigate." It enters and a
+# Lightning Bolt from Bot1 kills it on Bot1's own first turn, so the trigger investigates: one Clue token.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Starfleet Security
+Lightning Bolt
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Starfleet Security.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Starfleet Security)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Clue Token.Token = true
+Bot1.Graveyard = Starfleet Security; Lightning Bolt
+Bot2.Life = 20

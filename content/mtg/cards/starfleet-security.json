@@ -1,0 +1,11 @@
+{
+  "name": "Starfleet Security",
+  "manaCost": "{R}",
+  "type": "Creature — Human Officer",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Haste\nWhen this creature dies during your turn, investigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")",
+  "keywords": [
+    "Haste"
+  ]
+}
