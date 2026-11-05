@@ -1,0 +1,30 @@
+# Bot1 declines the counters on the entering Ornithopter: a 1/1 white Spirit token (X=1) is created instead; the token entering does not trigger the Warden again (it is a token).
+
+[Bot1 Deck]
+Black Lotus
+Warden of the Grove
+Ornithopter
+Island x18
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Warden of the Grove.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spirit Token.Power = 1
+Bot1.Battlefield.Spirit Token.Colors = White

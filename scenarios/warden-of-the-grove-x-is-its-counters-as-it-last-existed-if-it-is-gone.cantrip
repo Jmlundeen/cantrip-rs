@@ -1,0 +1,38 @@
+# "It endures X, where X is the number of counters on this creature" (CR 608.2h): read as the ability resolves, as the Warden last existed if it has left the battlefield. With its end-step counter the Warden is a 3/3; Bot2 Bolts it in response to the trigger from Bot1's Ornithopter, and the Ornithopter still endures 1.
+
+[Bot1 Deck]
+Black Lotus
+Warden of the Grove
+Ornithopter
+Island x18
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Warden of the Grove.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Warden of the Grove)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Graveyard = Warden of the Grove; Black Lotus
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spirit Token = (absent)

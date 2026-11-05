@@ -1,0 +1,28 @@
+# Warden of the Grove (2/2): "At the beginning of your end step, put a +1/+1 counter on this creature." Bot1 casts an Ornithopter the same turn BEFORE the end step: the Warden has no counters, so the Ornithopter endures 0 (nothing, no question). The end step then gives the Warden its counter (3/3).
+
+[Bot1 Deck]
+Black Lotus
+Warden of the Grove
+Ornithopter
+Island x18
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Warden of the Grove.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Warden of the Grove.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Warden of the Grove.Power = 3
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spirit Token = (absent)

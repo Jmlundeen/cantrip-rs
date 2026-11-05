@@ -1,0 +1,27 @@
+# Only creatures YOU control: Bot2 casts its Ornithopter on turn 2 while the Warden has a counter, and nothing happens to it.
+
+[Bot1 Deck]
+Black Lotus
+Warden of the Grove
+Ornithopter
+Island x18
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Warden of the Grove.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Spirit Token = (absent)
+Bot2.Battlefield.Spirit Token = (absent)
