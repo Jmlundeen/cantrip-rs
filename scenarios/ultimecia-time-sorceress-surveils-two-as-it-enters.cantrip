@@ -1,0 +1,39 @@
+# Ultimecia, Time Sorceress: "Whenever Ultimecia enters or attacks, surveil 2" (CR 701.25a, 603.2): on entering, the top TWO cards
+# are looked at; the second (Counterspell) goes to the graveyard while the first (Lightning Bolt) stays on top.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ultimecia, Time Sorceress
+Island
+Lightning Bolt
+Counterspell
+Island x30
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ultimecia, Time Sorceress.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Lightning Bolt | Counterspell)
+
+[Expect]
+Bot1.Graveyard = Counterspell
+Bot1.Library.Count = 31
+Bot1.Battlefield.Ultimecia, Time Sorceress.Power = 4
+Bot1.Battlefield.Ultimecia, Time Sorceress.Toughness = 5

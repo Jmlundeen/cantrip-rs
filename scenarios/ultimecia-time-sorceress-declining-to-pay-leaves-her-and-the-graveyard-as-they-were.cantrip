@@ -1,0 +1,65 @@
+# Ultimecia, Time Sorceress (CR 118.12, 701.27): with eight cards in the graveyard and the mana to pay, Bot1 may still decline at the
+# beginning of the end step on turn 7: nothing is paid or exiled, she does not transform, and no extra turn follows (turn 8 is Bot2's).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ultimecia, Time Sorceress
+Black Lotus
+Island
+Island
+Gleemox
+Island x30
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ultimecia, Time Sorceress.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Island; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Gleemox.Cast
+Bot1.Attack(Ultimecia, Time Sorceress > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Island; Island)
+[T5 Bot1.Main1]
+Bot1.Attack(Ultimecia, Time Sorceress > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Island; Island)
+[T7 Bot1.Main1]
+Bot1.Attack(Ultimecia, Time Sorceress > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Island; Island)
+[T7 Bot1.End]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T8 Bot2.Main1]
+
+[Expect]
+Turn = 8
+ActivePlayer = Bot2
+Exile.Count = 0
+Bot1.Graveyard.Count = 8
+Bot1.Battlefield.Ultimecia, Time Sorceress.Power = 4
+Bot1.Battlefield.Black Lotus.Tapped = false
