@@ -1,0 +1,41 @@
+# An unused shield expires at end of turn (CR 611.2a).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Circle of Protection: Red
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Raging Goblin
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Circle of Protection: Red.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Raging Goblin.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Circle of Protection: Red.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Raging Goblin)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Raging Goblin > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
