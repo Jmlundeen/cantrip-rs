@@ -1,0 +1,36 @@
+# Test of Courage, "Alter the Past — Exile target card from a graveyard. You gain 2 life." (CR 700.2, 701.13, 119.3): the
+# Lightning Bolt Bot2 cast is exiled from its graveyard and Bot1 gains exactly two life.
+
+[Bot1 Deck]
+Forest
+Test of Courage
+Forest x5
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 17
+[T3 Bot1.Main1]
+Bot1.Hand.Forest#2.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Test of Courage.Cast
+Bot1.Modes(Alter the Past)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot2.Exile.Lightning Bolt.Colors = Red
+Exile.Count = 1

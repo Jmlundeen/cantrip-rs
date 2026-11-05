@@ -1,0 +1,51 @@
+# Test of Courage, "Obliterate the Transwarp Network — Destroy target artifact or enchantment with mana value 3 or less."
+# (CR 700.2, 701.8a, 202.3): Bot2's Icy Manipulator, mana value 4, is refused, and its Chromatic Lantern, mana value exactly
+# 3, is destroyed.
+
+[Bot1 Deck]
+Forest
+Test of Courage
+Forest x5
+Forest x12
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Jet
+Chromatic Lantern
+Icy Manipulator
+Island
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Chromatic Lantern.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate(Ability: {U})
+Bot2.Battlefield.Island#2.Activate(Ability: {U})
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Chromatic Lantern.Activate(Color: Blue)
+Bot2.Hand.Icy Manipulator.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest#2.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Test of Courage.Cast
+Bot1.Modes(Obliterate the Transwarp Network)
+! Bot1.Target(Bot2.Battlefield.Icy Manipulator)
+Bot1.Target(Bot2.Battlefield.Chromatic Lantern)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Chromatic Lantern; Black Lotus
+Bot2.Battlefield.Icy Manipulator.Types = Artifact
+Bot2.Battlefield.Chromatic Lantern = (absent)
