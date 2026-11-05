@@ -1,0 +1,42 @@
+# Dragonologist: "You may reveal an instant, sorcery, or Dragon card from among them": with a Demonic Tutor among the top six
+# Bot1 takes nothing; the hand is unchanged, nothing is revealed, and all six go to the bottom (CR 701.20a).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Dragonologist
+Plains
+Plains
+Plains
+Ornithopter
+Forest
+Demonic Tutor
+Plains
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dragonologist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Arrange( | Ornithopter; Forest; Demonic Tutor; Plains; Plains; Plains)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains
+Bot1.Library.Count = 14

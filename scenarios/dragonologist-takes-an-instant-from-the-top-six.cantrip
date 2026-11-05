@@ -1,0 +1,42 @@
+# Dragonologist: "You may reveal an instant, sorcery, or Dragon card from among them": the top six are an Ornithopter, a Forest,
+# four Plains with an Ancestral Recall (an instant) among them; Bot1 takes the instant, revealing it.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Dragonologist
+Plains
+Plains
+Plains
+Ornithopter
+Forest
+Ancestral Recall
+Plains
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dragonologist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Arrange(Ancestral Recall | Ornithopter; Forest; Plains; Plains; Plains)
+? Bot1.Revealed = Ancestral Recall
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Ancestral Recall
+Bot1.Library.Count = 13

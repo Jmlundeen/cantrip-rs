@@ -1,0 +1,68 @@
+# Dragonologist: "Untapped Dragons you control have hexproof." Bot1 has a Dragon Whelp and the Dragonologist (which takes a
+# Lightning Bolt off the top six). On turn 2 Bot2 holds four red mana and a Bolt in hand: the Bolt may not target Bot1's untapped
+# Whelp (CR 702.11b) though the mana is there, so Bot2 casts its own Dragon Whelp with it instead. On turn 3 Bot1's Bolt kills
+# Bot2's untapped Dragon Whelp, which is not a Dragon Bot1 controls and so has no hexproof.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Dragon Whelp
+Dragonologist
+Lightning Bolt
+Plains x5
+Plains x8
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Dragon Whelp
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dragon Whelp.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dragonologist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt | Plains; Plains; Plains; Plains; Plains)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Dragon Whelp)
+Bot2.Hand.Dragon Whelp.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Dragon Whelp)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Dragon Whelp = (absent)
+Bot2.Graveyard = Dragon Whelp; Black Lotus
+Bot1.Battlefield.Dragon Whelp.Keywords = Flying; Hexproof
