@@ -1,0 +1,37 @@
+# Auroral Procession: "Return target card from your graveyard to your hand." Bot2's drawn Lightning Bolt is discarded at the
+# end of turn 2, so on turn 3 Bot1's own graveyard holds only the Black Lotus it sacrifices for mana. A cast naming Bot2's
+# Bolt is refused (the card is in the wrong graveyard), so is one naming the Mox Emerald on the battlefield (not in a
+# graveyard at all), and the cast at the Lotus is the positive control: the Lotus is back in Bot1's hand and the Bolt stays.
+
+[Bot1 Deck]
+Auroral Procession
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Island x3
+Island x14
+
+[Bot2 Deck]
+Island x7
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Auroral Procession.Cast(Bot2.Graveyard.Lightning Bolt)
+! Bot1.Hand.Auroral Procession.Cast(Bot1.Battlefield.Mox Emerald)
+Bot1.Hand.Auroral Procession.Cast(Bot1.Graveyard.Black Lotus)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Auroral Procession
+Bot1.Hand = Black Lotus; Island; Island; Island; Island

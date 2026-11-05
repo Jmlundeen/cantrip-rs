@@ -1,0 +1,6 @@
+{
+  "name": "Auroral Procession",
+  "manaCost": "{G}{U}",
+  "type": "Instant",
+  "oracleText": "Return target card from your graveyard to your hand."
+}
