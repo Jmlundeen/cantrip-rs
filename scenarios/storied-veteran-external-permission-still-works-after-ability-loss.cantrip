@@ -1,0 +1,44 @@
+# Probe Graveyard Silence (Yixlid Jailer's "Cards in graveyards lose all abilities") removes the Veteran's own permission,
+# while Lurrus of the Dream-Den's permission remains and casts it, without the own permission's finality counter. The test
+# table in crates/cantrip-script/tests/storied_veteran_permissions.rs adds the probe.
+
+[Bot1 Deck]
+Probe Graveyard Silence
+Storied Veteran
+Innocent Blood
+Lurrus of the Dream-Den
+Black Lotus x2
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Probe Graveyard Silence.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Storied Veteran.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Innocent Blood.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Graveyard.Storied Veteran.Cast(Ability: Cast from your graveyard)
+Bot1.Graveyard.Storied Veteran.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Storied Veteran.Counters.Finality = (absent)
+Bot1.Graveyard = Innocent Blood; Black Lotus; Black Lotus
+Exile.Count = 0

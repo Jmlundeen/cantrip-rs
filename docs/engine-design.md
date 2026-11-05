@@ -1723,6 +1723,9 @@ there is a face to judge. The records keep a grant in eight bytes (`Grant::NONE`
 The benchmark measured 8.15 us per decision against 8.21 us on main, six runs each alternating the two builds (2026-10-20);
 before the faces were judged lazily it was 9.2 us, nearly all of it `CardTable::id_of`'s search for each face's id.
 
+The card's own graveyard permission is offered only while the card has that ability in its current characteristics
+(`layers::chars`, CR 613.1f), not merely because its printed keyword remains in the card definition.
+
 **The executor makes exactly the action offered.** The answer is checked against the options (`validate::fits`: the
 grants are part of the option), and `act` reads back what the `Grant` names - the route's terms (`through`) - and hands them
 to `cast` (`CastBy`: the grant, a way's cost and riders, what the permission adds, life for mana value, the alternative's

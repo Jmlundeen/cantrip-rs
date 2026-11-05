@@ -1,0 +1,40 @@
+# The first spell is cast from hand without a finality counter; after Innocent Blood puts it in the graveyard, its own permission carries the entry replacement. A second sacrifice shows the finality counter exile it.
+
+[Bot1 Deck]
+Storied Veteran
+Black Lotus
+Innocent Blood x2
+Swamp
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Storied Veteran.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Storied Veteran.Counters.Finality = (absent)
+Bot1.Hand.Innocent Blood.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Graveyard.Storied Veteran.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Storied Veteran.Counters.Finality = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Innocent Blood.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Storied Veteran = (absent)
+Bot1.Graveyard = Innocent Blood; Innocent Blood; Black Lotus
+Exile = Storied Veteran

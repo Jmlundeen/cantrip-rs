@@ -48,7 +48,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 
 | ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
-| [KI-152](#ki-152-self-graveyard-casting-needs-ability-loss-and-permission-riders) | Self-graveyard casting needs ability loss and permission riders | Pri-1 | Blocked on core owner |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 | [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
@@ -91,31 +90,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-159](#ki-159-a-scenarios-spend-that-no-payment-asks-about-is-ignored) | A scenario's `Spend:` that no payment asks about is ignored | Pri-3 | Open |
 
 ## Issues
-
-### KI-152: Self-graveyard casting needs ability loss and permission riders
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Blocked on core owner | engine (`cantrip-api`, `cantrip-rules`) | 2026-11-04, Storied Veteran implementation |
-
-**Notes.** Storied Veteran remains unimplemented; no partial card is registered. Yixlid Jailer's official ruling says a
-card's own graveyard-casting ability is lost with its other abilities (CR 613.1f, 604.2, 601.3). `CardTable::new` rejects
-`loses_all_abilities(...).everywhere()`, so the rules-correct graveyard ability-loss fixture cannot start. The intrinsic
-`CastFromYourGraveyard` route also reads the printed keyword in `actions.rs`, rather than the card's current abilities.
-The core must support ability loss outside the battlefield and have this route respect it.
-
-Storied Veteran's "If you do, it enters with a finality counter" also needs its own casting permission to carry an
-entry replacement (CR 400.7h, 614.1c), as the existing granted-way pipeline does. The intrinsic route records no `Grant`
-and has no rider field; `GrantedWay::spell_replacement` is read only for battlefield/emblem grants, not a card's own
-graveyard permission. Extend the existing permission/replacement system, rather than using an alternative cost as a
-permission or putting a counter on every spell cast from a graveyard. Hundred-Battle Veteran prints the same recipe.
-
-**Scenarios.**
-- [`storied-veteran-graveyard-permission-stops-when-abilities-are-lost.cantrip`](../scenarios/storied-veteran-graveyard-permission-stops-when-abilities-are-lost.cantrip)
-  asserts refusal with {B} available after a hand-cast Veteran is sacrificed. The test-only table in
-  `crates/cantrip-script/tests/storied_veteran_permissions.rs` preserves the exact API rejection (and the refusal failure
-  if the table becomes admissible), plus a positive control without ability loss. The regular corpus skips this scene
-  until a complete Storied Veteran and the ability-loss fixture are available.
 
 ### KI-159: A scenario's `Spend:` that no payment asks about is ignored
 

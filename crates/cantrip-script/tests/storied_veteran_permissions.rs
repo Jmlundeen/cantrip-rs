@@ -8,12 +8,6 @@ const SCENE: &str = include_str!(
 );
 const REFUSAL: &str = "! Bot1.Graveyard.Storied Veteran.Cast\n";
 
-// The probe tests only casting permission; it is not registered as a functional Storied Veteran.
-static VETERAN: CardDef = CardDef {
-    keywords: Keywords::of(&[Keyword::CantBlock, Keyword::CastFromYourGraveyard]),
-    ..cantrip_oracle::STORIED_VETERAN
-};
-
 /// "Cards in graveyards lose all abilities" (CR 613.1f, 604.2): Yixlid Jailer's effect.
 fn in_a_graveyard(view: &dyn LayerQuery, _: ObjectId, affected: ObjectId, _: &Chars) -> bool {
     view.state().obj(affected).zone.is(ZoneKind::Graveyard)
@@ -32,76 +26,63 @@ static SILENCE: CardDef = CardDef {
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| {
-        CardTable::new(cantrip_cards::all().into_iter().chain([&VETERAN, &SILENCE]))
-    })
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&SILENCE])))
 }
 
 #[test]
-fn the_intrinsic_permission_loss_regression_is_still_failing() {
-    let outcome = std::panic::catch_unwind(|| {
-        let script = GameScript::parse(SCENE, "storied-veteran-permission-loss").unwrap();
-        run_on(&script, table())
-    });
-    match outcome {
-        Err(payload) => {
-            let message = payload
-                .downcast_ref::<String>()
-                .map(String::as_str)
-                .or_else(|| payload.downcast_ref::<&str>().copied())
-                .unwrap_or_default();
-            assert_eq!(
-                message,
-                "Probe Graveyard Silence: a static ability that makes objects lose all abilities affects permanents"
-            );
-            println!("known bug: {message}");
-        }
-        Ok(Err(failure)) => {
-            assert!(
-                failure.message.contains("must not be offered, but it is"),
-                "{}",
-                failure.report
-            );
-            assert!(
-                failure
-                    .message
-                    .contains("Bot1.Graveyard.Storied Veteran.Cast"),
-                "{}",
-                failure.report
-            );
-            println!("known bug: {}", failure.message);
-        }
-        Ok(Ok(_)) => panic!("the known bug is fixed; remove its marker and this guard"),
-    }
-}
-
-#[test]
-fn the_same_graveyard_position_offers_the_intrinsic_permission_without_ability_loss() {
-    static TABLE: OnceLock<CardTable> = OnceLock::new();
-    let table =
-        TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&VETERAN])));
-    let text = SCENE
-        .replace("Probe Graveyard Silence\n", "")
-        .replace("Bot1.Hand.Probe Graveyard Silence.Cast\n", "")
-        .replace(REFUSAL, "");
-    let script = GameScript::parse(&text, "storied-veteran-permission-positive-control").unwrap();
-    let result = run_on(&script, table).unwrap_or_else(|failure| panic!("{}", failure.report));
+fn the_own_graveyard_permission_ends_when_the_card_loses_its_abilities() {
+    let script = GameScript::parse(SCENE, "storied-veteran-permission-loss").unwrap();
+    let result = run_on(&script, table()).unwrap_or_else(|failure| panic!("{}", failure.report));
     let game = &result.game;
     let veteran = game
         .state
         .zone(Zone::graveyard(PlayerId(0)))
         .iter()
         .copied()
-        .find(|&id| game.name(id) == VETERAN.name)
-        .unwrap();
-    assert!(!game.lost_all_abilities(veteran));
-    assert!(game.chars(veteran).has(Keyword::CastFromYourGraveyard));
-    let RequestKind::Priority { options } = &game.pending().unwrap().kind else {
-        panic!("priority")
-    };
-    assert!(
-        options
-            .iter()
-            .any(|option| option.kind == ActionKind::CastSpell && option.source == Some(veteran))
-    );
+        .find(|&id| game.name(id) == "Storied Veteran")
+        .expect("Veteran remains in its owner's graveyard");
+    assert!(game.lost_all_abilities(veteran));
+}
+
+#[test]
+fn another_permission_still_casts_the_card_after_its_own_ability_is_lost() {
+    let script_text = include_str!("../../../scenarios/storied-veteran-external-permission-still-works-after-ability-loss.cantrip");
+    let script = GameScript::parse(script_text, "storied-veteran-external-permission-after-ability-loss").unwrap();
+    let result = run_on(&script, table()).unwrap_or_else(|failure| panic!("{}", failure.report));
+    let game = &result.game;
+    let veteran = game
+        .state
+        .zone(Zone::new(ZoneKind::Battlefield, PlayerId(0)))
+        .iter()
+        .copied()
+        .find(|&id| game.name(id) == "Storied Veteran")
+        .expect("the separate graveyard permission cast the Veteran");
+    assert_eq!(game.state.obj(veteran).counters(CounterKind::Finality), 0);
+}
+
+#[test]
+fn the_intrinsic_permission_is_offered_without_ability_loss_and_its_spell_enters_with_finality() {
+    let text = SCENE
+        .replace("\r\n", "\n")
+        .replace("Probe Graveyard Silence\n", "")
+        .replace("Bot1.Hand.Probe Graveyard Silence.Cast\n", "")
+        .replace(
+            REFUSAL,
+            "Bot1.Graveyard.Storied Veteran.Cast\nBot1.Pass\nBot2.Pass\n",
+        )
+        .replace(
+            "[Expect]\nBot1.Graveyard = Innocent Blood; Storied Veteran; Black Lotus\nBot1.Battlefield.Storied Veteran = (absent)\nBot1.Mana = {B}\nExile.Count = 0",
+            "[Expect]\nBot1.Graveyard = Innocent Blood; Black Lotus\nBot1.Battlefield.Storied Veteran.Counters.Finality = 1\nExile.Count = 0",
+        );
+    let script = GameScript::parse(&text, "storied-veteran-permission-positive-control").unwrap();
+    let result = run_on(&script, table()).unwrap_or_else(|failure| panic!("{}", failure.report));
+    let game = &result.game;
+    let veteran = game
+        .state
+        .zone(Zone::new(ZoneKind::Battlefield, PlayerId(0)))
+        .iter()
+        .copied()
+        .find(|&id| game.name(id) == "Storied Veteran")
+        .expect("the graveyard permission cast the Veteran");
+    assert_eq!(game.state.obj(veteran).counters(CounterKind::Finality), 1);
 }

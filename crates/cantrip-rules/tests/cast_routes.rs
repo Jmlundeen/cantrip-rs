@@ -54,6 +54,19 @@ static WAY_SPELL: CardDef = CardDef { name: "Route Way Probe", ways: &[HAND_WAY,
 static INTRINSIC_GRAVEYARD_SPELL: CardDef =
     CardDef { name: "Route Intrinsic Graveyard Probe", keywords: Keywords::of(&[Keyword::CastFromYourGraveyard]), ..PROBE_SPELL };
 
+/// "Cards in graveyards lose all abilities" (CR 613.1f, 604.2): Yixlid Jailer's effect.
+fn in_a_graveyard(view: &dyn LayerQuery, _: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    view.state().obj(affected).zone.is(ZoneKind::Graveyard)
+}
+
+static GRAVEYARD_SILENCE: CardDef = CardDef {
+    name: "Route Graveyard Silence",
+    oracle: true,
+    types: TypeSet::of(&[CardType::Enchantment]),
+    statics: &[loses_all_abilities(in_a_graveyard, "Cards in graveyards lose all abilities.").everywhere()],
+    ..CardDef::BLANK
+};
+
 static ADVENTURE_FACE: CardDef = CardDef {
     name: "Route Adventure Probe Adventure",
     cost: ManaCost { generic: 1, ..ManaCost::ZERO },
@@ -405,6 +418,7 @@ fn table() -> &'static CardTable {
             &PROBE_SPELL,
             &WAY_SPELL,
             &INTRINSIC_GRAVEYARD_SPELL,
+            &GRAVEYARD_SILENCE,
             &ADVENTURE_PROBE,
             &ADVENTURE_FACE,
             &RESOLUTION_PROBE,
@@ -685,6 +699,21 @@ fn a_rule_or_the_cards_own_permission_stays_beside_a_permission_that_names_a_cos
         assert!(in_zone(&game, Zone::graveyard(ME), card) && !in_zone(&game, Zone::exile(ME), card), "case {case}");
         assert!(game.log.iter().any(|r| matches!(r.event, Event::Cast(c) if c.granted_by() == ordinary.granted_by && c.way == 0)), "case {case}");
     }
+}
+
+/// CR 613.1f, 604.2: the card's own "you may cast this card from your graveyard" (Hogaak, Arisen Necropolis) is an ability of
+/// the card in the graveyard, read from its characteristics there: a card that lost all its abilities there (Yixlid Jailer)
+/// has no permission of its own to be cast from it.
+#[test]
+fn the_cards_own_graveyard_permission_is_gone_when_it_lost_its_abilities_there() {
+    let (mut game, spell) = game_with("Route Intrinsic Graveyard Probe", Zone::graveyard, 2);
+    game.run();
+    assert_eq!(casts_of(&game, spell).len(), 1, "the card's own permission");
+    let (mut game, spell) = game_with("Route Intrinsic Graveyard Probe", Zone::graveyard, 2);
+    put(&mut game, "Route Graveyard Silence", ME);
+    game.state.see_statics();
+    game.run();
+    assert!(casts_of(&game, spell).is_empty(), "no abilities, no permission");
 }
 
 /// An action naming a permission the question did not offer it by is refused, and the question stays.

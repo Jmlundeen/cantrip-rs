@@ -1,5 +1,5 @@
-# Known bug: Graveyard ability-loss statics are rejected; a lost self-casting permission must not allow a cast (CR 613.1f, 604.2, 601.3).
-# A test-only table isolates Storied Veteran's permission; Probe Graveyard Silence supplies Yixlid Jailer's static effect.
+# A test-only table (crates/cantrip-script/tests/storied_veteran_permissions.rs) adds Probe Graveyard Silence, which supplies
+# Yixlid Jailer's static effect: Storied Veteran loses its own graveyard permission there.
 # Casting from the hand still works. After sacrifice the remaining {B} cannot cast the ability-less graveyard card.
 
 [Bot1 Deck]

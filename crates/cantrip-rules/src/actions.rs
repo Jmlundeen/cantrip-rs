@@ -6938,7 +6938,7 @@ impl<'a> Offer<'a> {
                 // The card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard"; or a
                 // rule that lets its owner cast spells from their graveyard (Yawgmoth's Will), which says nothing more.
                 // Each is a permission of its own (two Yawgmoth's Wills are two).
-                if def.keywords.has(Keyword::CastFromYourGraveyard) {
+                if cx.chars(card).has(Keyword::CastFromYourGraveyard) {
                     routes.push(Route::RULES);
                 }
                 routes.extend(self.graveyard.iter().map(|&by| Route::permission(Some(by), PlayGrant::CAST)));

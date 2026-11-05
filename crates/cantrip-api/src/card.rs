@@ -4498,10 +4498,12 @@ impl CardTable {
                 "{}: a given play rule is one rule",
                 card.name
             );
-            // The layers find what a "loses all abilities" static took from among the permanents
-            // (`layers::lost_to_statics`), and a characteristic-defining ability is no such ability (CR 604.3).
+            // A "loses all abilities" static may function outside the battlefield (Yixlid Jailer, CR 613.1f, 604.2),
+            // including cards in graveyards. `everywhere` describes the objects it can affect, not where its source
+            // ability functions; `layers::lost_to_statics` applies its layer-6 effect to each affected object. A
+            // characteristic-defining ability cannot define or remove abilities (CR 604.3).
             for s in card.statics.iter().filter(|s| s.loses_all) {
-                assert!(!s.everywhere && !s.own, "{}: a static ability that makes objects lose all abilities affects permanents", card.name);
+                assert!(!s.own, "{}: a characteristic-defining ability cannot make objects lose all abilities (CR 604.3)", card.name);
             }
             // A later part of an effect (CR 613.6) follows the part before it, in a later layer, from the same zone: the
             // layers apply it to the objects that part applied to, which they know only once that part's layer is done.
