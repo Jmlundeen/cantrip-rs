@@ -1,0 +1,40 @@
+# Satoru, the Infiltrator (menace) draws for nothing here: Satoru and then Invasion Reinforcements are each cast with
+# mana spent on them (CR 601.2h), so "no mana was spent to cast them" is false for them, and the Ally token Reinforcements
+# makes is a token, not a nontoken creature, so it does not count (CR 111.1). Bot1 keeps one Island in hand throughout: a
+# draw would make it two cards.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Satoru, the Infiltrator
+Invasion Reinforcements
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Satoru, the Infiltrator.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Hand.Invasion Reinforcements.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Count = 7
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Satoru, the Infiltrator.Keywords = Menace
+Bot1.Battlefield.Invasion Reinforcements.Power = 1
+Bot1.Battlefield.Ally Token.Power = 1

@@ -1,0 +1,33 @@
+# With Satoru out, Mox Pearl is cast with no mana spent and an Island is played, neither a creature: nothing is drawn, and
+# Bot1's hand is the Ornithopter and an Island. Then Ornithopter, cast for its mana cost of {0}, is a creature that was cast
+# with no mana spent (CR 601.2h, 118.5): it is no spell cast "without paying its mana cost", and Satoru draws all the same.
+# The Island drawn replaces the Ornithopter: the hand is 2 again.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Satoru, the Infiltrator
+Mox Pearl
+Island
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Satoru, the Infiltrator.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Pass
+? Bot1.Hand.Count = 2
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Ornithopter.Power = 0

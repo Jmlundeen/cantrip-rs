@@ -1,0 +1,43 @@
+# Satoru is on the battlefield (cast with mana: no draw). Bot1 casts Bloodbraid Elf with mana (no draw), and its cascade
+# casts Llanowar Elves from the library without paying its mana cost: no mana is spent to cast it (CR 601.2h), so Satoru
+# draws exactly one card as the Elves enter (CR 603.2c). Bot1's hand is empty before: the Island on the library's top is
+# drawn and the hand is 1. Bloodbraid Elf resolves after, cast with mana, and draws nothing more.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Black Lotus
+Satoru, the Infiltrator
+Bloodbraid Elf
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Satoru, the Infiltrator.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+? Bot1.Hand.Count = 1
+Bot1.Hand.Bloodbraid Elf.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: B)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Accept
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Bloodbraid Elf.Power = 3

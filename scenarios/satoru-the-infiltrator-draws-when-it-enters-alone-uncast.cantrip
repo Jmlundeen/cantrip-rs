@@ -1,0 +1,26 @@
+# Show and Tell puts Satoru alone onto the battlefield: it was not cast, and "Satoru and/or" counts it with no other
+# creature entering (CR 603.4, 603.6a), so it draws for itself. Bot1's hand is 3 Islands after Show and Tell, 4 with the draw.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Satoru, the Infiltrator
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Show and Tell.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Choose(Satoru, the Infiltrator)
+Bot2.Choose()
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Satoru, the Infiltrator.Power = 2

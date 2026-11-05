@@ -1,0 +1,38 @@
+# Llanowar Elves is cast with mana: no draw, the hand is Ephemerate alone. Ephemerate then exiles it and returns it in the
+# same turn: the Elves that come back are a new object (CR 400.7) that was never cast, whatever was spent on the spell it
+# once was, so Satoru draws (CR 603.4). Ephemerate is gone: the hand is the one Island drawn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Pearl
+Satoru, the Infiltrator
+Llanowar Elves
+Ephemerate
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Satoru, the Infiltrator.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Llanowar Elves)
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Llanowar Elves.Power = 1

@@ -1,0 +1,35 @@
+# Satoru is on the battlefield, cast with mana (no draw). Bot1 casts Show and Tell, putting nothing onto the battlefield;
+# Bot2 puts Llanowar Elves onto the battlefield without casting it. It is an uncast creature, but Bot2 controls it, not
+# Satoru's controller: nothing triggers and Bot1's hand stays the two Islands. (scenario
+# satoru-the-infiltrator-draws-for-a-creature-cast-without-paying-its-mana-cost is the same with Bot1's own creature.)
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Black Lotus
+Satoru, the Infiltrator
+Show and Tell
+Island x12
+
+[Bot2 Deck]
+Llanowar Elves
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Satoru, the Infiltrator.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Hand.Show and Tell.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Choose()
+Bot2.Choose(Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot2.Battlefield.Llanowar Elves.Power = 1

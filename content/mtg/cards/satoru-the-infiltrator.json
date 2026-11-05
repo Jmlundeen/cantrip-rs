@@ -1,0 +1,11 @@
+{
+  "name": "Satoru, the Infiltrator",
+  "manaCost": "{U}{B}",
+  "type": "Legendary Creature — Human Ninja Rogue",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Menace\nWhenever Satoru and/or one or more other nontoken creatures you control enter, if none of them were cast or no mana was spent to cast them, draw a card.",
+  "keywords": [
+    "Menace"
+  ]
+}
