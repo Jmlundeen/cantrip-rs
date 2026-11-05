@@ -1,0 +1,37 @@
+# The Unicomplex enters untapped with three other lands. Both modes are eligible - Bot2's Lightning Bolt put a creature
+# card in the graveyard - so the choice is asked; the second mode surveils exactly 1, sending the known top card to the
+# graveyard (CR 603.6a, 700.2b, 701.25a).
+
+[Bot1 Deck]
+The Unicomplex
+Llanowar Elves
+Forest
+Island x18
+
+[Bot2 Deck]
+Mountain x2
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.The Unicomplex.Play
+Bot1.Modes(Surveil 1)
+Bot1.Arrange( | Island)
+
+[Expect]
+Bot1.Battlefield.The Unicomplex.Tapped = false
+Bot1.Graveyard.Count = 2
+Bot1.Surveilled = 1 requested, 1 looked
+Bot1.Life = 20

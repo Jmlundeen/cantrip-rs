@@ -1,0 +1,38 @@
+# The Unicomplex enters untapped with three other lands and its first mode puts the targeted creature card from the
+# graveyard on top of its owner's library, where it is now the only card (CR 614.1d, 603.6a, 700.2b, 401.4, 608.2b).
+# Bot2's Lightning Bolt kills Llanowar Elves so the card is in the graveyard.
+
+[Bot1 Deck]
+The Unicomplex
+Forest
+Llanowar Elves
+Island x7
+
+[Bot2 Deck]
+Mountain x2
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.The Unicomplex.Play
+Bot1.Modes(Put target creature card from your graveyard on top of your library.)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Library = Llanowar Elves
+Bot1.Graveyard =
+Bot1.Battlefield.The Unicomplex.Tapped = false
+Bot1.Life = 20
