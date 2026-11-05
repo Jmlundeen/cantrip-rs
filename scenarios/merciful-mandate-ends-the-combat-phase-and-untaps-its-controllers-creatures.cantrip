@@ -1,0 +1,53 @@
+# Merciful Mandate ({1}{W}): "Untap all creatures you control. If it's a combat phase, you may end the combat phase. (Remove
+# all attackers and blockers from combat. Exile all spells and abilities from the stack, including this spell.)" Bot1's
+# Savannah Lions attacked on turn three and is still tapped on turn four, when Bot2's Lions attack. Bot1 casts the spell in
+# that declare attackers step and says yes: its own creature untaps, Bot2's attacker leaves combat, and no damage is dealt.
+# The spell exiles itself from the stack (CR 724.1b), so it is not in the graveyard.
+
+[Bot1 Deck]
+Plains
+Plains
+Savannah Lions
+Merciful Mandate
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Savannah Lions
+Plains x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Savannah Lions > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Savannah Lions > Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Merciful Mandate.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Savannah Lions.Tapped = false
+Bot1.Exile.Merciful Mandate.Colors.Count = 1
+Bot2.Graveyard.Count = 0

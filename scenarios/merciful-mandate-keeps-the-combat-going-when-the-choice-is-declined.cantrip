@@ -1,0 +1,50 @@
+# Merciful Mandate ({1}{W}): the "may" declined. Bot1 casts it in Bot2's declare attackers step and lets the combat go on:
+# its own creature still untaps (that sentence is unconditional), but Bot2's Savannah Lions stay in combat and deal their
+# damage, and the spell goes to the graveyard as any instant does.
+
+[Bot1 Deck]
+Plains
+Plains
+Savannah Lions
+Merciful Mandate
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Savannah Lions
+Plains x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Savannah Lions > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Savannah Lions > Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Merciful Mandate.Cast
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Savannah Lions.Tapped = false
+Bot1.Graveyard.Count = 1
