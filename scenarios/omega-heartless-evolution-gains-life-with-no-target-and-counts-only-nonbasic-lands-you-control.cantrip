@@ -1,0 +1,54 @@
+# Omega, Heartless Evolution: "up to one" target, so Bot1 may choose none of Bot2's nonland permanents (an Ornithopter) and the
+# trigger still resolves and Bot1 gains X life (CR 115.1d, 601.2c). X counts nonbasic lands Bot1 controls only (CR 205.4a): one
+# Tropical Island, played on turn 1, counts and the Forest played on turn 3 does not, and Bot2's own nonbasic Underground Sea
+# does not count either. Bot1 gains 1 (21); the Ornithopter is left untapped.
+
+[Bot1 Deck]
+Tropical Island
+Forest
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Omega, Heartless Evolution
+Forest x13
+
+[Bot2 Deck]
+Underground Sea
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Tropical Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Underground Sea.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Omega, Heartless Evolution.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot2.Battlefield.Ornithopter.Tapped = false
+Bot2.Battlefield.Underground Sea.Tapped = false

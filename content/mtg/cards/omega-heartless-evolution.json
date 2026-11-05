@@ -1,0 +1,8 @@
+{
+  "name": "Omega, Heartless Evolution",
+  "manaCost": "{5}{G}{U}",
+  "type": "Legendary Artifact Creature — Robot",
+  "power": 8,
+  "toughness": 8,
+  "oracleText": "Wave Cannon — When Omega enters, for each opponent, tap up to one target nonland permanent that opponent controls. Put X stun counters on each of those permanents and you gain X life, where X is the number of nonbasic lands you control. (If a permanent with a stun counter would become untapped, remove one from it instead.)"
+}

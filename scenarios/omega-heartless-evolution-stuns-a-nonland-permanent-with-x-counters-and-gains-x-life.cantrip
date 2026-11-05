@@ -1,0 +1,64 @@
+# Omega, Heartless Evolution (CR 603.6a, 601.2c, 122.1d, 119.3): when it enters, for each opponent, tap up to one target nonland
+# permanent that opponent controls, put X stun counters on it and gain X life, X the number of nonbasic lands Bot1 controls.
+# Bot1 has played a Forest (basic, not counted), a Tropical Island and an Underground Sea by turn 5, so X is 2: Bot2's Mox Ruby
+# is tapped with two stun counters and Bot1 gains 2 (22). Bot2's Island is refused as a target (a land) and its Ornithopter,
+# not chosen, is left alone.
+
+[Bot1 Deck]
+Forest
+Tropical Island
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Omega, Heartless Evolution
+Underground Sea
+Forest x12
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Tropical Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Underground Sea.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Omega, Heartless Evolution.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot2.Battlefield.Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot2.Battlefield.Mox Ruby.Tapped = true
+Bot2.Battlefield.Mox Ruby.Counters.Stun = 2
+Bot2.Battlefield.Ornithopter.Tapped = false
