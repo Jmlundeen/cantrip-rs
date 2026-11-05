@@ -1,0 +1,75 @@
+# Borg Scout Sphere's enters ability draws a card (CR 603.6a), and its 6+ station symbol (CR 721.2a-b) is inactive at five
+# charge counters and turns it into a flying 5/5 artifact creature at exactly six (CR 702.184, 721.2).
+# Cobblebrute's five power stations it to five; the opponent's Memnite is an artifact creature that must not gain flying,
+# and the controller's own Memnite stations the last counter and then flies. Neither a nonartifact creature nor a
+# noncreature artifact gains flying. The mana pool after casting pins down the {2}{U} cost.
+
+[Bot1 Deck]
+Borg Scout Sphere
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Cobblebrute
+Memnite
+Island x20
+
+[Bot2 Deck]
+Memnite
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Borg Scout Sphere.Cast
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Cobblebrute.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Borg Scout Sphere.Activate(Ability: Station)
+Bot1.Choose(Cobblebrute)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Borg Scout Sphere.Counters.Charge = 5
+? Bot1.Battlefield.Borg Scout Sphere.Types = Artifact
+? Bot1.Battlefield.Borg Scout Sphere.Keywords = (absent)
+? Bot1.Battlefield.Memnite.Keywords = (absent)
+? Bot1.Battlefield.Cobblebrute.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Borg Scout Sphere.Activate(Ability: Station)
+Bot1.Choose(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Borg Scout Sphere.Counters.Charge = 6
+Bot1.Battlefield.Borg Scout Sphere.Types = Artifact; Creature
+Bot1.Battlefield.Borg Scout Sphere.Keywords = Flying
+Bot1.Battlefield.Borg Scout Sphere.Power = 5
+Bot1.Battlefield.Borg Scout Sphere.Toughness = 5
+Bot1.Battlefield.Memnite.Keywords = Flying
+Bot1.Battlefield.Memnite.Tapped = true
+Bot1.Battlefield.Cobblebrute.Tapped = false
+Bot1.Battlefield.Cobblebrute.Keywords = (absent)
+Bot1.Battlefield.Mox Sapphire.Keywords = (absent)
+Bot2.Battlefield.Memnite.Keywords = (absent)

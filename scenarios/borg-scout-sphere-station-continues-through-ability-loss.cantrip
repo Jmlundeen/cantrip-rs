@@ -1,0 +1,66 @@
+# The 6+ striation is one effect across layers (CR 721.2b, 613.6): an older Dress Down cannot stop its ability and
+# base-P/T parts after its type part applies. The granted static's timestamp is the Sphere's (CR 613.7a), so it gives
+# both the Sphere and Memnite flying after the older Dress Down. A later Dress Down removes that ability instead,
+# but the Sphere still has base power and toughness 5/5. Seven counters also checks that 6+ means at least six.
+
+[Bot1 Deck]
+Black Lotus x2
+Kalakscion, Hunger Tyrant
+Mox Sapphire
+Memnite
+Dress Down
+Borg Scout Sphere
+Mox Jet
+Island
+Dress Down
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Kalakscion, Hunger Tyrant.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Borg Scout Sphere.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Borg Scout Sphere.Activate(Ability: Station)
+Bot1.Choose(Kalakscion, Hunger Tyrant)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Borg Scout Sphere.Counters.Charge = 7
+? Bot1.Battlefield.Borg Scout Sphere.Types = Artifact; Creature
+? Bot1.Battlefield.Borg Scout Sphere.Power = 5
+? Bot1.Battlefield.Borg Scout Sphere.Toughness = 5
+? Bot1.Battlefield.Borg Scout Sphere.Keywords = Flying
+? Bot1.Battlefield.Memnite.Keywords = Flying
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Borg Scout Sphere.Counters.Charge = 7
+Bot1.Battlefield.Borg Scout Sphere.Types = Artifact; Creature
+Bot1.Battlefield.Borg Scout Sphere.Power = 5
+Bot1.Battlefield.Borg Scout Sphere.Toughness = 5
+Bot1.Battlefield.Borg Scout Sphere.Keywords = (absent)
+Bot1.Battlefield.Memnite.Keywords = (absent)
+Bot1.Battlefield.Dress Down.Types = Enchantment
