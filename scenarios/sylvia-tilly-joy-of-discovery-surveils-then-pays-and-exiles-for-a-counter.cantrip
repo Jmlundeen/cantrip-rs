@@ -1,0 +1,42 @@
+# Sylvia Tilly surveils two on entering and, at the beginning of combat on her controller's turn, may pay {1} and exile a
+# card from the graveyard: when it does, a reflexive ability puts a +1/+1 counter on target creature (CR 603.12, 118.12).
+# With both surveilled cards in the graveyard and one of them exiled, the 2/2 is a 3/3; declined on turn 5, with the mana
+# open, the payment exiles nothing and puts no second counter.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Sylvia Tilly, Joy of Discovery
+Forest x4
+Grizzly Bears
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sylvia Tilly, Joy of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Grizzly Bears; Forest)
+? Bot1.Graveyard.Count = 3
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Forest.Activate
+Bot1.PayCost
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.BeginCombat]
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Sylvia Tilly, Joy of Discovery.Power = 3
+Bot1.Battlefield.Sylvia Tilly, Joy of Discovery.Toughness = 3
+Bot1.Battlefield.Sylvia Tilly, Joy of Discovery.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard.Count = 2
+Bot1.Surveilled = 2 requested, 2 looked
