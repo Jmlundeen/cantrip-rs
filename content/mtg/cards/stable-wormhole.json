@@ -1,0 +1,6 @@
+{
+  "name": "Stable Wormhole",
+  "manaCost": "{2}{G}",
+  "type": "Enchantment",
+  "oracleText": "Whenever you attack, create a tapped Planet land token named New Planet with \"{T}: Add one mana of any color.\""
+}

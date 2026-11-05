@@ -1,0 +1,37 @@
+# Stable Wormhole: "Whenever you attack, create a tapped Planet land token named New Planet ..." (CR 508.1m, 111.1, 111.4).
+# Two attackers in one declaration are one attack, so exactly one token is made, tapped: it untaps on turn 5 and taps for a
+# color no land of this deck makes.
+
+[Bot1 Deck]
+Black Lotus
+Stable Wormhole
+Ornithopter x2
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Stable Wormhole.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2; Ornithopter#2 > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.New Planet.Tapped = true
+[T5 Bot1.Main1]
+? Bot1.Battlefield.New Planet.Tapped = false
+Bot1.Battlefield.New Planet.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.New Planet.Token = true
+Bot1.Battlefield.New Planet.Types = Land
+Bot1.Battlefield.New Planet.Subtypes = Planet
+Bot1.Battlefield.New Planet#2 = (absent)
