@@ -1,0 +1,31 @@
+# Dragonback Lancer: Flying; Mobilize 1 (CR 702.181a). Attacking on turn 3 it creates one tapped and attacking 1/1 red Warrior
+# (CR 508.4), so Bot2 takes 3 + 1 = 4; the Lancer has flying and the Warrior is sacrificed at the beginning of the next end step.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Dragonback Lancer
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Dragonback Lancer.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Dragonback Lancer)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Count = 3
+? Bot1.Battlefield.Dragonback Lancer.Keywords = Flying
+? Bot2.Life = 16
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 16
+Bot1.Battlefield = Plains; Dragonback Lancer
