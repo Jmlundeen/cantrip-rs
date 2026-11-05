@@ -1,0 +1,30 @@
+# "{T}: Add {U}, {R}, or {W}." The color is chosen as the ability is activated, one each turn (blue, red, white); the other colors and
+# colorless are refused beside those positive controls.
+
+[Bot1 Deck]
+Mystic Monastery
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mystic Monastery.Play
+? Bot1.Battlefield.Mystic Monastery.Tapped = true
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Mystic Monastery.Activate(Color: Black)
+! Bot1.Battlefield.Mystic Monastery.Activate(Color: Green)
+! Bot1.Battlefield.Mystic Monastery.Activate(Color: Colorless)
+Bot1.Battlefield.Mystic Monastery.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mystic Monastery.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mystic Monastery.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Mystic Monastery.Tapped = true

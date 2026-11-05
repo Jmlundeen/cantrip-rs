@@ -1,0 +1,5 @@
+{
+  "name": "Mystic Monastery",
+  "type": "Land",
+  "oracleText": "This land enters tapped.\n{T}: Add {U}, {R}, or {W}."
+}
