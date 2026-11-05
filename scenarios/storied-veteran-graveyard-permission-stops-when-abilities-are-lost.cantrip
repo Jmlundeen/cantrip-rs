@@ -1,0 +1,40 @@
+# Known bug: Graveyard ability-loss statics are rejected; a lost self-casting permission must not allow a cast (CR 613.1f, 604.2, 601.3).
+# A test-only table isolates Storied Veteran's permission; Probe Graveyard Silence supplies Yixlid Jailer's static effect.
+# Casting from the hand still works. After sacrifice the remaining {B} cannot cast the ability-less graveyard card.
+
+[Bot1 Deck]
+Storied Veteran
+Black Lotus
+Innocent Blood
+Probe Graveyard Silence
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Probe Graveyard Silence.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Storied Veteran.Cast
+Bot1.Pass
+? Bot1.Mana = {B}{B}
+Bot2.Pass
+? Bot1.Battlefield.Storied Veteran.Counters.Finality = (absent)
+Bot1.Hand.Innocent Blood.Cast
+Bot1.Pass
+? Bot1.Mana = {B}
+Bot2.Pass
+? Bot1.Graveyard = Innocent Blood; Storied Veteran; Black Lotus
+! Bot1.Graveyard.Storied Veteran.Cast
+
+[Expect]
+Bot1.Graveyard = Innocent Blood; Storied Veteran; Black Lotus
+Bot1.Battlefield.Storied Veteran = (absent)
+Bot1.Mana = {B}
+Exile.Count = 0

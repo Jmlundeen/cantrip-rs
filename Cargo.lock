@@ -209,6 +209,7 @@ dependencies = [
  "cantrip-cards",
  "cantrip-engine",
  "cantrip-mechanics",
+ "cantrip-oracle",
  "cantrip-state",
 ]
 
