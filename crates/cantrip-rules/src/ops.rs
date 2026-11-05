@@ -2001,57 +2001,94 @@ pub fn put_onto_battlefield_becoming_all(cx: &mut Cx, objects: &[(ObjectId, Play
     Ok(moved.into_iter().filter(|&n| live(cx.s(), n) && cx.s().obj(n).zone.is(ZoneKind::Battlefield)).collect())
 }
 
-/// Puts one object onto the battlefield attached to `host` (`Game::put_onto_battlefield_attached`, CR 303.4f, 303.4i, 301.5e): the
-/// effect names what an Aura enchants, so nothing is chosen (the choice of `choose_aura_hosts` is for an effect that does not).
-/// Judged on the Aura as it would exist on the battlefield (CR 614.12), under `controller`: an Aura `host` is not a legal object
-/// for - by its enchant abilities, or because it has protection from the Aura - stays where it is (CR 303.4i). An Equipment
-/// enters attached only if it could equip `host`, unattached otherwise (CR 301.5e), and anything else enters unattached
-/// (CR 303.4h). The permanent, or None if it did not enter.
+/// Puts one object onto the battlefield attached to `host` (`Game::put_onto_battlefield_attached`): the batch of one
+/// (`put_all_onto_battlefield_attached`). The permanent, or None if it did not enter.
 pub fn put_onto_battlefield_attached(cx: &mut Cx, id: ObjectId, controller: PlayerId, host: ObjectId) -> R<Option<ObjectId>> {
-    // A card a static ability keeps from entering stays where it is (CR 101.2, 101.3); nor does an instant or sorcery card (CR
-    // 304.4, 307.4).
-    if !live(cx.s(), id) || crate::static_rules::cant_enter(cx, id) || instant_or_sorcery_entering(cx, id, false) {
-        return Ok(None);
-    }
-    let mut entering = Entering {
-        object: id,
-        controller,
-        tapped: false,
-        counters: [0; CounterKind::COUNT],
-        copy: None,
-        prepared: false,
-        chosen_color: None,
-        chosen_subtype: None,
-        chosen_player: None,
-        chosen_card: None,
-        chosen_option: None,
-        chosen_number: None,
-        chosen_object: None, emblem: None,
-        attach: None,
-        attach_player: None,
-        x: 0,
-        transformed: false,
-        protector: None, read_ahead: None, riot_haste: false,
-        instead: None,
-        becomes: None,
-        own: None,
-    };
-    prepare_entry(cx, &mut entering)?;
-    if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
-        return Ok(None);
-    }
-    let it = as_it_would_exist(cx, &entering).chars;
-    if it.has_subtype(Subtype::Aura) {
-        if !crate::attach::aura_hosts(cx, id, &it, controller, &[id]).contains(&Target::Object(host)) {
-            return Ok(None);
+    Ok(put_all_onto_battlefield_attached(cx, &[(id, controller, host)])?.first().copied().flatten())
+}
+
+/// Puts objects onto the battlefield together, each under the player given and attached to the host given
+/// (`Game::put_all_onto_battlefield_attached`, CR 303.4f, 303.4i, 301.5e, 101.4): the effect names what each Aura enchants, so
+/// nothing is chosen (the choice of `choose_aura_hosts` is for an effect that does not), and they all arrive in one move, one
+/// event (CR 603.6a: a "one or more" ability sees them once).
+///
+/// Each one's entering replacements see it attached to its host, as it would exist on the battlefield (CR 614.12), and each is
+/// judged so under its controller against the game as it is before any of them moves: an Aura its host is not a legal object
+/// for - by its enchant abilities, because it has protection from the Aura, because it is gone (CR 400.7), or because it is
+/// itself one of the objects entering - stays where it is (CR 303.4i), while the others enter. What the ones entering together
+/// do to one another's hosts once there (an Aura that gives its creature protection from another) is the state-based actions'
+/// to judge (CR 704.5m). An Equipment enters attached only if it could equip its host, unattached otherwise (CR 301.5e), and
+/// anything else enters unattached (CR 303.4h). A card a static ability keeps from entering stays where it is (CR 101.2,
+/// 101.3), as does an instant or sorcery card (CR 304.4, 307.4). For each object in order, the permanent, or None if it did not
+/// enter.
+pub fn put_all_onto_battlefield_attached(cx: &mut Cx, objects: &[(ObjectId, PlayerId, ObjectId)]) -> R<Vec<Option<ObjectId>>> {
+    let bans = crate::static_rules::enter_bans(cx);
+    let mut prepared: Vec<(usize, Entering)> = Vec::with_capacity(objects.len());
+    for (i, &(id, controller, host)) in objects.iter().enumerate() {
+        // An object moves once however many times it is named (CR 400.7), with the first host named.
+        if !live(cx.s(), id)
+            || prepared.iter().any(|(_, e)| e.object == id)
+            || (!bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id))
+            || instant_or_sorcery_entering(cx, id, false)
+        {
+            continue;
         }
-        entering.attach = Some(host);
-    } else if it.has_subtype(Subtype::Equipment) && crate::attach::host_allows(&*cx, id, host, true) {
-        entering.attach = Some(host);
+        let mut entering = Entering {
+            object: id,
+            controller,
+            tapped: false,
+            counters: [0; CounterKind::COUNT],
+            copy: None,
+            prepared: false,
+            chosen_color: None,
+            chosen_subtype: None,
+            chosen_player: None,
+            chosen_card: None,
+            chosen_option: None,
+            chosen_number: None,
+            chosen_object: None, emblem: None,
+            attach: Some(host),
+            attach_player: None,
+            x: 0,
+            transformed: false,
+            protector: None, read_ahead: None, riot_haste: false,
+            instead: None,
+            becomes: None,
+            own: None,
+        };
+        prepare_entry(cx, &mut entering)?;
+        if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
+            continue;
+        }
+        prepared.push((i, entering));
     }
-    let moves = vec![Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) }];
-    let new = move_together(cx, &moves, ZoneReason::Other).first().copied();
-    Ok(new.filter(|&n| cx.s().obj(n).zone.is(ZoneKind::Battlefield)))
+    let entering_ids: Vec<ObjectId> = prepared.iter().map(|(_, e)| e.object).collect();
+    let mut moves: Vec<Moving> = Vec::with_capacity(prepared.len());
+    let mut moved: Vec<usize> = Vec::with_capacity(prepared.len());
+    for (i, mut entering) in prepared {
+        let (id, controller, host) = objects[i];
+        let it = as_it_would_exist(cx, &entering).chars;
+        if it.has_subtype(Subtype::Aura) {
+            if !crate::attach::aura_hosts(cx, id, &it, controller, &entering_ids).contains(&Target::Object(host)) {
+                continue;
+            }
+        } else if !(it.has_subtype(Subtype::Equipment) && crate::attach::host_allows(&*cx, id, host, true)) {
+            entering.attach = None;
+        }
+        moves.push(Moving { entering: Some(entering), ..Moving::to(id, Zone::BATTLEFIELD) });
+        moved.push(i);
+    }
+    let mut out = vec![None; objects.len()];
+    if moves.is_empty() {
+        return Ok(out);
+    }
+    let new = move_together(cx, &moves, ZoneReason::Other);
+    for (&i, &n) in moved.iter().zip(&new) {
+        if live(cx.s(), n) && cx.s().obj(n).zone.is(ZoneKind::Battlefield) {
+            out[i] = Some(n);
+        }
+    }
+    Ok(out)
 }
 
 /// Transforms a permanent (CR 701.27a): its other face is up. The same object, so nothing about it is new (CR 712.18).

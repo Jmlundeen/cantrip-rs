@@ -2147,6 +2147,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield_attached(self, object, controller, host).map_err(|_| Suspend)
     }
 
+    fn put_all_onto_battlefield_attached(&mut self, objects: &[(ObjectId, PlayerId, ObjectId)]) -> Result<Vec<Option<ObjectId>>, Suspend> {
+        ops::put_all_onto_battlefield_attached(self, objects).map_err(|_| Suspend)
+    }
+
     fn sacrifice_and_return(&mut self, player: PlayerId, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend> {
         ops::sacrifice_and_return(self, player, sacrificed, returned).map_err(|_| Suspend)
     }

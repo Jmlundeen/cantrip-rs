@@ -817,6 +817,15 @@ pub trait Game: Query {
     /// (CR 303.4h). The permanent, or None if it did not enter. Eagle's Rescue and Gryff's Boon return themselves so; Dragon Breath,
     /// Dragon Fangs, Dragon Scales, Dragon Shadow and Dragon Wings return to the creature that entered.
     fn put_onto_battlefield_attached(&mut self, object: ObjectId, controller: PlayerId, host: ObjectId) -> Result<Option<ObjectId>, Suspend>;
+    /// `put_onto_battlefield_attached` for several objects at once, each `(object, controller, host)`: they all enter together,
+    /// one event (CR 101.4, 603.6a: a "one or more" ability sees them once), never one at a time. Each one's host is judged
+    /// against the game as it is before any of them moves, so an Aura can't enchant another object entering with it, and what
+    /// one does to another's host once they are there is for the state-based actions (CR 704.5m); an Aura whose host is not
+    /// a legal object for it then stays where it is (CR 303.4i) while the others enter. Each one's entering replacements see
+    /// it attached to its host (CR 614.12). For each object in order, the permanent, or None if it did not enter. Storm
+    /// Herald's "return any number of Aura cards from your graveyard to the battlefield attached to creatures you control";
+    /// Mantle of the Ancients, Cass, Hand of Vengeance, Unfinished Business and Bruna, Light of Alabaster return several so.
+    fn put_all_onto_battlefield_attached(&mut self, objects: &[(ObjectId, PlayerId, ObjectId)]) -> Result<Vec<Option<ObjectId>>, Suspend>;
     /// Puts an object onto the battlefield under `controller` as the effect of `item` says it is (`EntersAs`, CR 614.12):
     /// it enters as that - an Enduring creature's card "is an enchantment" and never enters as a creature, so nothing that
     /// watches creatures enter sees it - and stays so for as long as it is that object (CR 611.2a, 400.7). As an Aura
@@ -939,7 +948,10 @@ pub trait Game: Query {
     /// Records that `player`, the ability's controller, did what this ability of this object lets them do only once each
     /// turn (CR 603.2h), for `History::done`.
     fn note_done(&mut self, source: ObjectId, ability: AbilityRef, player: PlayerId);
-    /// Marks a permanent to be exiled instead if it would leave the battlefield (CR 702.84a).
+    /// Marks a permanent to be exiled instead if it would leave the battlefield, for as long as it is that object (CR 400.7):
+    /// the replacement effect "if it would leave the battlefield, exile it instead of putting it anywhere else" (CR 614.1a),
+    /// unearth's (CR 702.84a) and any effect's worded so - From the Catacombs' creature, Storm Herald's Auras. Applied among
+    /// the other replacements of the move as its controller orders them (CR 616.1).
     fn exile_on_leave(&mut self, permanent: ObjectId);
     fn shuffle(&mut self, player: PlayerId);
     /// A number below `bound`, from the game's own random source ("at random"): journalled, so the same

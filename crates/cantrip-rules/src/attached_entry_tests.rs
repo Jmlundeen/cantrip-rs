@@ -2,7 +2,9 @@
 //! the effect names what an Aura enchants, so nothing is chosen (CR 303.4f), and an Aura the named object is not a legal one for stays
 //! where it is (CR 303.4i); an Equipment enters attached to a creature it could equip and unattached to anything else (CR 301.5e).
 //! Over test cards shaped like Eagle's Rescue's "return this card from your graveyard to the battlefield attached to target
-//! creature".
+//! creature". Several enter together (`Game::put_all_onto_battlefield_attached`), each on the host named for it, as Storm Herald's
+//! "return any number of Aura cards from your graveyard to the battlefield attached to creatures you control" puts them: one
+//! event (CR 101.4, 603.6a), each host judged before any of them moves.
 
 use crate::{Cx, Game, Setup};
 use cantrip_api::*;
@@ -41,11 +43,62 @@ static EQUIPMENT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "Enchanted creature has protection from mana value 3 or greater": a mana value 0 Aura.
+const WARDING_STATICS: &[StaticDef] = &[static_ability(
+    Layer::Ability,
+    cantrip_mechanics::attach::attached_object,
+    from_mana_value_three_or_more,
+    "Enchanted creature has protection from mana value 3 or greater",
+)];
+
+fn from_mana_value_three_or_more(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.protection_mana_value = Some(3);
+}
+
+static WARDING_AURA: CardDef = CardDef {
+    name: "Attached Entry Warding Aura",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura]),
+    enchant: Some(target(creature_on_the_battlefield)),
+    statics: WARDING_STATICS,
+    ..CardDef::BLANK
+};
+
+/// An Aura with "enchant creature" and mana value 3, which the Warding Aura's creature has protection from.
+static COSTLY_AURA: CardDef = CardDef {
+    name: "Attached Entry Costly Aura",
+    cost: ManaCost { generic: 3, ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura]),
+    enchant: Some(target(creature_on_the_battlefield)),
+    ..CardDef::BLANK
+};
+
+fn an_aura_enters(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. } if to.is(ZoneKind::Battlefield) && q.chars(*new).has_subtype(Subtype::Aura) => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+fn nothing(_: &mut dyn cantrip_api::Game, _: &StackItem) -> Result<(), Suspend> {
+    Ok(())
+}
+
+/// "Whenever one or more Auras enter, do nothing" (CR 603.2c).
+static WATCHER: CardDef = CardDef {
+    name: "Attached Entry Watcher",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    abilities: &[triggered(cantrip_api::when(EventMask::ZONE_CHANGE, an_aura_enters), nothing, "Whenever one or more Auras enter, do nothing.")
+        .once_per_batch()],
+    ..CardDef::BLANK
+};
+
 /// A Treasure-like artifact that is no creature: an Equipment cannot equip it.
 static ARTIFACT: CardDef = CardDef { name: "Attached Entry Artifact", types: TypeSet::of(&[CardType::Artifact]), ..CardDef::BLANK };
 
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&LAND, &BEAR, &AURA, &EQUIPMENT, &ARTIFACT])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&LAND, &BEAR, &AURA, &EQUIPMENT, &ARTIFACT, &WARDING_AURA, &COSTLY_AURA, &WATCHER])));
     let deck = || vec![table.id_of(&LAND); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -76,6 +129,30 @@ fn cx(game: &mut Game) -> Cx<'_> {
 
 fn put_attached(g: &mut Game, card: ObjectId, host: ObjectId) -> Option<ObjectId> {
     cantrip_api::Game::put_onto_battlefield_attached(&mut cx(g), card, YOU, host).expect("nothing is asked: the host is named")
+}
+
+fn put_all_attached(g: &mut Game, entries: &[(ObjectId, ObjectId)]) -> Vec<Option<ObjectId>> {
+    let entries: Vec<(ObjectId, PlayerId, ObjectId)> = entries.iter().map(|&(card, host)| (card, YOU, host)).collect();
+    cantrip_api::Game::put_all_onto_battlefield_attached(&mut cx(g), &entries).expect("nothing is asked: the hosts are named")
+}
+
+/// The state-based actions performed in a settling frame of the game's own, as the rules perform them.
+fn state_based_actions(g: &mut Game) {
+    g.state.frame_push(Frame::new(FrameKind::Settle));
+    let frame = g.state.agenda.len() - 1;
+    let mut cx = Cx { g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    crate::settle::state_based_actions_alone(&mut cx).expect("nothing is asked");
+}
+
+/// The permanents that entered the battlefield, in the order the history records them.
+fn entered(g: &Game) -> Vec<ObjectId> {
+    g.log
+        .iter()
+        .filter_map(|r| match r.event {
+            Event::ZoneChange { new, to, .. } if to.is(ZoneKind::Battlefield) => Some(new),
+            _ => None,
+        })
+        .collect()
 }
 
 /// With two creatures it could enchant, the Aura enters attached to the one the effect names: nobody is asked, and it is attached as
@@ -122,4 +199,98 @@ fn an_equipment_enters_attached_to_a_creature_and_unattached_to_anything_else() 
     let loose = put_attached(&mut g, other, artifact).expect("it entered");
     assert!(g.state.obj(loose).zone.is(ZoneKind::Battlefield));
     assert_eq!(g.state.obj(loose).attached_to, None);
+}
+
+/// Two Auras returned together, each to the creature named for it: both enter in one move, each attached to its own host, and a
+/// "whenever one or more Auras enter" ability triggers once (CR 101.4, 603.2c, 603.6a) - never once for each, as entering one at a
+/// time would.
+#[test]
+fn two_auras_enter_together_each_attached_to_its_own_host() {
+    let mut g = game();
+    let watcher = put(&mut g, &WATCHER, YOU, Zone::BATTLEFIELD);
+    let (first, second) = (put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD), put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD));
+    let (a, b) = (put(&mut g, &AURA, YOU, Zone::graveyard(YOU)), put(&mut g, &AURA, YOU, Zone::graveyard(YOU)));
+    let new = put_all_attached(&mut g, &[(a, first), (b, second)]);
+    let (Some(on_first), Some(on_second)) = (new[0], new[1]) else { panic!("both entered: {new:?}") };
+    assert_eq!(g.state.obj(on_first).attached_to, Some(first));
+    assert_eq!(g.state.obj(on_second).attached_to, Some(second));
+    assert_eq!(entered(&g), vec![on_first, on_second]);
+    assert_eq!(g.state.triggers.iter().filter(|t| t.source == watcher).count(), 1, "one batch, one trigger");
+}
+
+/// The same two Auras returned one at a time are two batches: the watcher triggers twice. What the test above tells apart.
+#[test]
+fn two_auras_returned_one_at_a_time_are_two_batches() {
+    let mut g = game();
+    let watcher = put(&mut g, &WATCHER, YOU, Zone::BATTLEFIELD);
+    let (first, second) = (put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD), put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD));
+    let (a, b) = (put(&mut g, &AURA, YOU, Zone::graveyard(YOU)), put(&mut g, &AURA, YOU, Zone::graveyard(YOU)));
+    put_attached(&mut g, a, first).expect("it entered");
+    put_attached(&mut g, b, second).expect("it entered");
+    assert_eq!(g.state.triggers.iter().filter(|t| t.source == watcher).count(), 2);
+}
+
+/// One Aura is named a land, which "enchant creature" does not allow: it stays in the graveyard, a card that did not move
+/// (CR 303.4i), and the other enters attached all the same.
+#[test]
+fn an_aura_with_no_legal_host_stays_while_the_other_enters() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let land = put(&mut g, &LAND, YOU, Zone::BATTLEFIELD);
+    let (stays, enters) = (put(&mut g, &AURA, YOU, Zone::graveyard(YOU)), put(&mut g, &AURA, YOU, Zone::graveyard(YOU)));
+    let new = put_all_attached(&mut g, &[(stays, land), (enters, bear)]);
+    assert_eq!(new[0], None);
+    assert!(g.state.obj(stays).zone.is(ZoneKind::Graveyard) && g.state.obj(stays).became.is_none(), "the card did not move");
+    let aura = new[1].expect("it entered");
+    assert_eq!(g.state.obj(aura).attached_to, Some(bear));
+}
+
+/// The Warding Aura and the Costly Aura are returned together onto one creature. Each host is judged as the game is before
+/// either moves (CR 303.4i, 101.4), when the creature has no protection, so both enter attached; once there, the Warding Aura's
+/// protection from mana value 3 or greater makes the creature an illegal object for the Costly Aura, which the state-based
+/// actions put into its owner's graveyard (CR 704.5m, 702.16c). The Warding Aura, judged by the same check, stays.
+#[test]
+fn an_aura_entering_with_one_that_gives_its_host_protection_from_it_enters_then_falls_off() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let (warding, costly) = (put(&mut g, &WARDING_AURA, YOU, Zone::graveyard(YOU)), put(&mut g, &COSTLY_AURA, YOU, Zone::graveyard(YOU)));
+    let new = put_all_attached(&mut g, &[(warding, bear), (costly, bear)]);
+    let (Some(warding), Some(costly)) = (new[0], new[1]) else { panic!("both entered: {new:?}") };
+    assert_eq!(g.state.obj(costly).attached_to, Some(bear), "it entered attached");
+    assert_eq!(cx(&mut g).chars(bear).protection_mana_value, Some(3));
+    state_based_actions(&mut g);
+    assert!(g.state.obj(costly).became.is_some_and(|c| g.state.obj(c).zone.is(ZoneKind::Graveyard)), "it fell off");
+    assert_eq!(g.state.obj(warding).attached_to, Some(bear));
+    assert!(g.state.obj(warding).zone.is(ZoneKind::Battlefield));
+}
+
+/// The creature already has that protection: the Costly Aura, judged before the move, has no legal host and stays in the
+/// graveyard (CR 303.4i, 702.16c) - it never enters to fall off.
+#[test]
+fn an_aura_its_host_already_has_protection_from_stays() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, YOU, Zone::BATTLEFIELD);
+    let warding = put(&mut g, &WARDING_AURA, YOU, Zone::graveyard(YOU));
+    put_attached(&mut g, warding, bear).expect("it entered");
+    let costly = put(&mut g, &COSTLY_AURA, YOU, Zone::graveyard(YOU));
+    assert_eq!(put_all_attached(&mut g, &[(costly, bear)]), vec![None]);
+    assert!(g.state.obj(costly).zone.is(ZoneKind::Graveyard) && g.state.obj(costly).became.is_none());
+}
+
+/// An Aura named onto a creature card entering in the same move is not attached to it: a host is one there before the move
+/// (CR 303.4i), so the Aura stays where it is while the creature card enters, and an Equipment named onto it enters unattached
+/// (CR 301.5e).
+#[test]
+fn an_aura_cannot_enchant_an_object_entering_with_it() {
+    let mut g = game();
+    let creature = put(&mut g, &BEAR, YOU, Zone::graveyard(YOU));
+    let card = put(&mut g, &AURA, YOU, Zone::graveyard(YOU));
+    let equipment = put(&mut g, &EQUIPMENT, YOU, Zone::graveyard(YOU));
+    let new = put_all_attached(&mut g, &[(creature, creature), (card, creature), (equipment, creature)]);
+    let bear = new[0].expect("the creature card entered, attached to nothing");
+    assert_eq!(g.state.obj(bear).attached_to, None);
+    assert_eq!(new[1], None);
+    assert!(g.state.obj(card).zone.is(ZoneKind::Graveyard));
+    let equipment = new[2].expect("an Equipment enters unattached");
+    assert_eq!(g.state.obj(equipment).attached_to, None);
 }
