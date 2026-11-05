@@ -2236,9 +2236,13 @@ pub enum ManaRestriction {
     /// "If that mana is spent on a creature spell, it gains haste until end of turn" (CR 106.6; Arena of Glory): it may
     /// be spent on anything, and does that to a creature spell it pays for.
     GainsHaste,
-    /// "Spend this mana only to cast a legendary spell, and that spell can't be countered" (CR 106.6, 701.5; Delighted
+    /// "Spend this mana only to cast a legendary spell, and that spell can't be countered" (CR 106.6, 701.6; Delighted
     /// Halfling): a limit and an effect, each independent of the other, carried by the mana itself.
     LegendaryUncounterable,
+    /// "Spend this mana only to cast a legendary spell" (CR 106.6, 205.4a; Plaza of Heroes): only on casting a spell that is
+    /// legendary as it is on the stack, never on an ability, nor on a cost paid for a spell that is not casting it ("unless its
+    /// controller pays", CR 118.12). It does nothing to the spell it pays for.
+    LegendarySpells,
     /// "Spend this mana only to cast [type] spells" (CR 106.6): only on casting a spell (CR 601.2g) that has one of these
     /// card types - not on an ability, nor on any other spell, nor on a cost paid for a spell that is not casting it
     /// ("unless its controller pays", CR 118.12). A spell with flashback or kicker is still the spell it is.
@@ -2498,10 +2502,11 @@ impl ManaRestriction {
     /// of `Subtypes` are named for their subtypes and those of `ManaValue` for their number (`name`). A card naming a
     /// restriction of card types not here fails the build (`Adds::only_for` is checked at compile time), since the host
     /// has no word for it on the wire.
-    pub const NAMED: [(ManaRestriction, &'static str); 19] = [
+    pub const NAMED: [(ManaRestriction, &'static str); 20] = [
         (ManaRestriction::NotNonartifactSpells, "NotNonartifactSpells"),
         (ManaRestriction::GainsHaste, "GainsHaste"),
         (ManaRestriction::LegendaryUncounterable, "LegendarySpells, CantBeCountered"),
+        (ManaRestriction::LegendarySpells, "LegendarySpells"),
         (ManaRestriction::ARTIFACT_SPELLS, "ArtifactSpells"),
         (ManaRestriction::INSTANT_OR_SORCERY_SPELLS, "InstantOrSorcerySpells"),
         (ManaRestriction::PLANESWALKER_SPELLS, "PlaneswalkerSpells"),
@@ -2524,7 +2529,8 @@ impl ManaRestriction {
         match (self, other) {
             (ManaRestriction::NotNonartifactSpells, ManaRestriction::NotNonartifactSpells)
             | (ManaRestriction::GainsHaste, ManaRestriction::GainsHaste)
-            | (ManaRestriction::LegendaryUncounterable, ManaRestriction::LegendaryUncounterable) => true,
+            | (ManaRestriction::LegendaryUncounterable, ManaRestriction::LegendaryUncounterable)
+            | (ManaRestriction::LegendarySpells, ManaRestriction::LegendarySpells) => true,
             (ManaRestriction::Spells(a), ManaRestriction::Spells(b)) | (ManaRestriction::NonSpells(a), ManaRestriction::NonSpells(b)) => {
                 a.0 == b.0
             }
@@ -2614,7 +2620,7 @@ impl ManaRestriction {
             (ManaRestriction::NotSpellsFrom(zone), ManaPayment::Spell { from, .. }) => from != zone,
             (ManaRestriction::NotSpellsFrom(_), _) => true,
             (ManaRestriction::GainsHaste, _) => true,
-            (ManaRestriction::LegendaryUncounterable, ManaPayment::Spell { legendary, .. }) => legendary,
+            (ManaRestriction::LegendaryUncounterable | ManaRestriction::LegendarySpells, ManaPayment::Spell { legendary, .. }) => legendary,
             (ManaRestriction::Spells(allowed) | ManaRestriction::SpellsOrAbilities(allowed, _), ManaPayment::Spell { types, .. }) => {
                 allowed.0 & types.0 != 0
             }
@@ -3090,6 +3096,40 @@ mod tests {
             let name = r.name();
             assert_eq!(ManaRestriction::parse(name.split_whitespace()), Some(r), "{name}");
         }
+    }
+
+    /// "Spend this mana only to cast a legendary spell" (CR 106.6; Plaza of Heroes): a legendary spell, of any card type,
+    /// and nothing else; and unlike Delighted Halfling's, which has the same limit and is mana of its own kind, it does
+    /// nothing to the spell.
+    #[test]
+    fn mana_for_a_legendary_spell_pays_for_only_that_and_does_nothing_to_it() {
+        let spell = |types, legendary| ManaPayment::Spell {
+            types,
+            subtypes: SubtypeSet::NONE,
+            legendary,
+            mana_value: 2,
+            x: false,
+            from: ZoneKind::Hand,
+        };
+        let creature = TypeSet::of(&[CardType::Creature]);
+        let plaza = ManaRestriction::LegendarySpells;
+        let halfling = ManaRestriction::LegendaryUncounterable;
+        for r in [plaza, halfling] {
+            assert!(r.may_pay(&spell(creature, true)) && r.may_pay(&spell(TypeSet::of(&[CardType::Sorcery]), true)));
+            assert!(!r.may_pay(&spell(creature, false)));
+            assert!(!r.may_pay(&ManaPayment::Ability {
+                source: creature,
+                subtypes: SubtypeSet::NONE,
+                on_battlefield: true,
+                equip: false,
+            }));
+            assert!(!r.may_pay(&ManaPayment::Other));
+        }
+        assert_eq!(plaza.effects(), 0);
+        assert_eq!(halfling.effects(), MANA_MAKES_UNCOUNTERABLE);
+        assert!(plaza.is_known() && plaza != halfling);
+        assert_eq!(ManaRestriction::parse("LegendarySpells".split_whitespace()), Some(plaza));
+        assert_eq!(ManaRestriction::parse("LegendarySpells, CantBeCountered".split_whitespace()), Some(halfling));
     }
 
     /// A restriction by subtype names any number of them, each exactly: the third of three pays for a spell with it, which a

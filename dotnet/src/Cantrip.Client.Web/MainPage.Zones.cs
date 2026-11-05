@@ -694,6 +694,7 @@ public sealed partial class MainPage
         (ManaSpendFilterView.CreatureSpells, _) => "creatures",
         (ManaSpendFilterView.InstantOrSorcerySpells, _) => "instants & sorceries",
         (ManaSpendFilterView.ActivatedAbilities, _) => "abilities",
+        (ManaSpendFilterView.LegendarySpells, ManaSpendEffectView.CantBeCountered) => "legendary · uncounterable",
         (ManaSpendFilterView.LegendarySpells, _) => "legendary",
         (ManaSpendFilterView.NotNonartifactSpells, _) => "no nonartifact spells",
         (ManaSpendFilterView.SpellsFromExile, _) => "spells from exile",

@@ -1,0 +1,33 @@
+# Browser
+# What the page shows of Delighted Halfling's mana (CR 106.6): the pool's chip says both what it is for and what it does to
+# the spell, since mana limited to legendary spells alone is other mana with a caption of its own; its card menu words each
+# color the same way. Lightning Bolt can't be cast with it, and Ragavan, a legendary creature, can.
+
+[Bot1 Deck]
+Forest
+Delighted Halfling
+Lightning Bolt
+Ragavan, Nimble Pilferer
+Forest x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Delighted Halfling.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Delighted Halfling.Activate(Ability: any color; Color: Red)
+? Client.Bot1.Menu = {T}: Add {C}; {T}: Add {W} (only for legendary spells, and that spell can't be countered); {T}: Add {U} (only for legendary spells, and that spell can't be countered); {T}: Add {B} (only for legendary spells, and that spell can't be countered); {T}: Add {R} (only for legendary spells, and that spell can't be countered); {T}: Add {G} (only for legendary spells, and that spell can't be countered)
+? Client.Bot1.Mana = 1 Red (legendary · uncounterable)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Mana: short)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Mana =
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Bot1.Battlefield = Forest; Delighted Halfling; Ragavan, Nimble Pilferer

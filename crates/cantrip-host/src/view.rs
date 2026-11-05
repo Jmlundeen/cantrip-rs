@@ -127,7 +127,8 @@ pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, M
         }
         ManaRestriction::NotNonartifactSpells => ManaSpendFilterView::NotNonartifactSpells,
         ManaRestriction::GainsHaste => ManaSpendFilterView::None,
-        ManaRestriction::LegendaryUncounterable => ManaSpendFilterView::LegendarySpells,
+        // Told apart on the wire by their effects.
+        ManaRestriction::LegendaryUncounterable | ManaRestriction::LegendarySpells => ManaSpendFilterView::LegendarySpells,
         r if r == ManaRestriction::ARTIFACT_SPELLS => ManaSpendFilterView::ArtifactSpells,
         r if r == ManaRestriction::INSTANT_OR_SORCERY_SPELLS => ManaSpendFilterView::InstantOrSorcerySpells,
         r if r == ManaRestriction::PLANESWALKER_SPELLS => ManaSpendFilterView::PlaneswalkerSpells,
@@ -1725,6 +1726,11 @@ mod tests {
             let (filter, effect, subtypes, mana_value) = restriction_view(restriction);
             assert_eq!(restriction_of(filter, effect, &subtypes, mana_value), Some(restriction), "{}", restriction.name());
         }
+        // The same filter, and only the effect says whether the mana also makes the spell uncounterable.
+        let (filter, effect, ..) = restriction_view(ManaRestriction::LegendarySpells);
+        assert_eq!((filter, effect), (ManaSpendFilterView::LegendarySpells, ManaSpendEffectView::None));
+        let (filter, effect, ..) = restriction_view(ManaRestriction::LegendaryUncounterable);
+        assert_eq!((filter, effect), (ManaSpendFilterView::LegendarySpells, ManaSpendEffectView::CantBeCountered));
         let (filter, ..) = restriction_view(ManaRestriction::ARTIFACT_SPELLS_OR_ANY_ABILITY);
         assert_eq!(filter, ManaSpendFilterView::ArtifactSpellsOrAnyAbility);
         // Ronin, Shadow Stalker's: Equipment spells or equip abilities, the subtype beside the filter.

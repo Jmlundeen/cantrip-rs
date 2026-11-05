@@ -466,7 +466,7 @@ shapes have an example:
   `SubtypeSpells::CHOSEN_TYPE_SPELLS_OR_ABILITIES` for Eclipsed Realms, `CHOSEN_TYPE_CREATURE_SPELLS_OR_ABILITIES` for Secluded
   Courtyard), `ManaRestriction::NONCREATURE_SPELLS` "spend this mana only to cast a noncreature
   spell", `ManaRestriction::mana_value_at_least(4)` "spells with mana value 4 or greater" (and `mana_value_at_least_or_x(5)`
-  "... or spells with {X} in their mana costs"), and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` the
+  "... or spells with {X} in their mana costs"), `LegendarySpells` "spend this mana only to cast a legendary spell", and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` the
   rest. A mana ability's subtype is read through its source's words and its chosen type as it is activated; an effect
   that adds the mana reads `g.words(item.object).subtype(..)` itself. A new restriction of card types is added to
   `ManaRestriction::NAMED` (the build fails on a card naming one that is not there), and the host gives it a word on the

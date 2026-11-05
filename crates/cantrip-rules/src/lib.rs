@@ -11,6 +11,8 @@ mod base_power_tests;
 #[cfg(test)]
 mod takeback_tests;
 #[cfg(test)]
+mod legendary_mana_tests;
+#[cfg(test)]
 mod as_transforms_tests;
 #[cfg(test)]
 mod daybound_copy_tests;
