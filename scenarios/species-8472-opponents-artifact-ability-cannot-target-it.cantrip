@@ -1,0 +1,58 @@
+# Species 8472 "can't be the target of abilities from artifact sources your opponents control" (CR 115.1, 113.3a): Bot2's Icy
+# Manipulator, an artifact, may not tap it, and may tap Bot1's Forest instead.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Species 8472
+Forest x12
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Icy Manipulator
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Species 8472.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Icy Manipulator.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+! Bot2.Battlefield.Icy Manipulator.Activate(Bot1.Battlefield.Species 8472)
+Bot2.Battlefield.Icy Manipulator.Activate(Bot1.Battlefield.Forest)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Species 8472.Tapped = false
