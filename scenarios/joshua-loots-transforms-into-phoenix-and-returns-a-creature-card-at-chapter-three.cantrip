@@ -1,0 +1,72 @@
+# Joshua, Phoenix's Dominant and its back face Phoenix, Warden of Fire (a Saga creature). Turn 1: Joshua enters and Bot1 discards Craw Wurm and Savannah
+# Lions, drawing two Mountains. Turn 3, as a sorcery, {3}{R}{W}, {T} exiles Joshua and returns it transformed under its owner's control: Phoenix with a lore
+# counter, so chapter I deals 2 damage to Bot2 (18). Turn 5 chapter II deals 2 more (16). Turn 7 chapter III returns creature cards with total mana value 6 or less:
+# Craw Wurm and Savannah Lions together (7) are refused, Craw Wurm alone (exactly 6) is chosen and comes back, Savannah Lions stays in the graveyard, and Phoenix is exiled and
+# returns front face up as Joshua.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Joshua, Phoenix's Dominant
+Craw Wurm
+Savannah Lions
+Memnite
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Joshua, Phoenix's Dominant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Craw Wurm; Savannah Lions; Memnite)
+Bot1.Choose(Craw Wurm; Savannah Lions)
+? Bot1.Graveyard = Savannah Lions; Craw Wurm
+? Bot1.Hand = Memnite; Mountain; Mountain
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Joshua, Phoenix's Dominant.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Phoenix, Warden of Fire.Power = 4
+? Bot1.Battlefield.Phoenix, Warden of Fire.Keywords = Flying; Lifelink
+? Bot2.Life = 18
+? Stack.Count = 0
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+? Stack.Count = 0
+[T7 Bot1.Main1]
+! Bot1.Target(Bot1.Graveyard.Craw Wurm; Bot1.Graveyard.Savannah Lions)
+Bot1.Target(Bot1.Graveyard.Craw Wurm)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Savannah Lions
+? Bot1.Battlefield.Craw Wurm.Power = 6
+? Bot1.Battlefield.Joshua, Phoenix's Dominant.Power = 3
+
+[Expect]
+Turn = 7
+Bot2.Life = 16

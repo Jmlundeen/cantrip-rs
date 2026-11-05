@@ -1,0 +1,23 @@
+{
+  "name": "Joshua, Phoenix's Dominant",
+  "manaCost": "{1}{R}{W}",
+  "type": "Legendary Creature — Human Noble Wizard",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "When Joshua enters, discard up to two cards, then draw that many cards.\n{3}{R}{W}, {T}: Exile Joshua, then return it to the battlefield transformed under its owner's control. Activate only as a sorcery.",
+  "backFace": {
+    "name": "Phoenix, Warden of Fire",
+    "colorIndicator": [
+      "Red",
+      "White"
+    ],
+    "type": "Legendary Enchantment Creature — Saga Phoenix",
+    "power": 4,
+    "toughness": 4,
+    "oracleText": "(As this Saga enters and after your draw step, add a lore counter.)\nI, II — Rising Flames — Phoenix deals 2 damage to each opponent.\nIII — Flames of Rebirth — Return any number of target creature cards with total mana value 6 or less from your graveyard to the battlefield. Exile Phoenix, then return it to the battlefield (front face up).\nFlying, lifelink",
+    "keywords": [
+      "Flying",
+      "Lifelink"
+    ]
+  }
+}

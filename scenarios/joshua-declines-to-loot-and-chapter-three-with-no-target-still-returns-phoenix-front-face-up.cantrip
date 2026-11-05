@@ -1,0 +1,59 @@
+# Joshua, Phoenix's Dominant: "discard up to two cards" can be none, and then nothing is drawn. Turn 1: Bot1 declines, so its hand (Craw Wurm, Memnite and
+# the cards it started with) is unchanged and its graveyard empty. Turn 3 Joshua transforms into Phoenix (chapter I, Bot2 at 18); turn 7 chapter III "any number of
+# target creature cards" has no creature card in the graveyard to target, yet still triggers: nothing returns and Phoenix is exiled and returns front face up as Joshua.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Joshua, Phoenix's Dominant
+Craw Wurm
+Memnite
+Mox Emerald
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Joshua, Phoenix's Dominant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+? Bot1.Hand = Craw Wurm; Memnite
+? Bot1.Library.Count = 13
+? Bot1.Graveyard.Count = 0
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Joshua, Phoenix's Dominant.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Joshua, Phoenix's Dominant.Power = 3
+
+[Expect]
+Turn = 7
+Bot2.Life = 16
