@@ -1,0 +1,8 @@
+{
+  "name": "Sela, Tal Shiar Paradox",
+  "manaCost": "{3}{B}",
+  "type": "Legendary Creature — Romulan Human Rogue",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever Sela attacks, exile up to one target card from a graveyard.\nWhenever one or more cards leave your graveyard, create a tapped 2/2 black Romulan creature token."
+}

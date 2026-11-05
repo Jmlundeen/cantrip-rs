@@ -1,0 +1,63 @@
+# Artificial Evolution changes Romulan to Elf; Trait Doctoring changes black to green for turn 3 (CR 612.2a, 612.4).
+# The first token keeps those words after the color change expires; the next is a black Elf, both tapped when made.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Sela, Tal Shiar Paradox
+Mox Sapphire
+Trait Doctoring
+Artificial Evolution
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sela, Tal Shiar Paradox.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Sela, Tal Shiar Paradox)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Romulan)
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trait Doctoring.Cast(Sela, Tal Shiar Paradox)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Black)
+Bot1.Colors(Green)
+Bot1.Choose()
+Bot1.Attack(Sela, Tal Shiar Paradox)
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Elf Token.Colors = Green
+? Bot1.Battlefield.Elf Token.Subtypes = Elf
+? Bot1.Battlefield.Elf Token.Tapped = true
+? Bot1.Battlefield.Sela, Tal Shiar Paradox.Colors = Black
+[T5 Bot1.Main1]
+Bot1.Attack(Sela, Tal Shiar Paradox)
+Bot1.Target(Bot1.Graveyard.Artificial Evolution)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Elf Token#1.Colors = Green
+Bot1.Battlefield.Elf Token#1.Subtypes = Elf
+Bot1.Battlefield.Elf Token#1.Power = 2
+Bot1.Battlefield.Elf Token#1.Toughness = 2
+Bot1.Battlefield.Elf Token#2.Colors = Black
+Bot1.Battlefield.Elf Token#2.Subtypes = Elf
+Bot1.Battlefield.Elf Token#2.Tapped = true
+Bot1.Battlefield.Romulan Token = (absent)
+Bot2.Life = 14

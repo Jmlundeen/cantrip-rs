@@ -1,0 +1,55 @@
+# Graveyard-departure triggers look back before the move: Sela is not on the battlefield as it leaves its graveyard
+# (CR 603.10a). Reanimating another creature later does make a Romulan; merely dying does not (CR 603.2g).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Entomb
+Reanimate
+Black Lotus
+Grizzly Bears
+Reanimate
+Sela, Tal Shiar Paradox
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Sela, Tal Shiar Paradox)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Sela, Tal Shiar Paradox)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 16
+? Bot1.Battlefield.Romulan Token = (absent)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+? Bot1.Mana = {G}
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Grizzly Bears)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Romulan Token = (absent)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Grizzly Bears)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 14
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Sela, Tal Shiar Paradox.Power = 3
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.Romulan Token.Tapped = true
+Bot1.Battlefield.Romulan Token.Power = 2
+Bot1.Battlefield.Romulan Token.Toughness = 2

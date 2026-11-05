@@ -1,0 +1,45 @@
+# Sela exiles its controller's Lotus, then dies while the token trigger is on the stack. The trigger still creates
+# a tapped Romulan for its original controller (CR 603.3a, 113.7a); Sela dying itself is not a graveyard departure.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Sela, Tal Shiar Paradox
+Swamp x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sela, Tal Shiar Paradox.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Sela, Tal Shiar Paradox)
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+Bot1.Pass
+Bot2.Pass
+? Exile = Black Lotus
+? Stack.Count = 1
+? Bot1.Battlefield.Romulan Token = (absent)
+Bot2.Hand.Lightning Bolt.Cast(Sela, Tal Shiar Paradox)
+Bot2.Battlefield.Mountain.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Sela, Tal Shiar Paradox
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Romulan Token.Tapped = true
+Bot1.Battlefield.Romulan Token.Power = 2
+Bot1.Battlefield.Romulan Token.Toughness = 2
+Bot2.Life = 20
+Bot2.Battlefield.Romulan Token = (absent)

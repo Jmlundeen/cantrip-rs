@@ -1,0 +1,50 @@
+# Four cards leave Bot1's graveyard together on Bot2's turn: one tapped Romulan, not four (CR 603.2c, 111.2).
+# Entomb and the Crypt's sacrifice put cards into the graveyard, which is not the trigger event (CR 603.2g).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Sela, Tal Shiar Paradox
+Tormod's Crypt
+Entomb
+Island
+Grizzly Bears
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Tormod's Crypt.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sela, Tal Shiar Paradox.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Grizzly Bears)
+? Bot1.Battlefield.Romulan Token = (absent)
+? Bot1.Graveyard.Count = 3
+[T2 Bot2.Main1]
+Bot1.Battlefield.Tormod's Crypt.Activate(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Graveyard.Count = 0
+? Bot1.Battlefield.Romulan Token = (absent)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 2
+Exile = Black Lotus; Entomb; Grizzly Bears; Tormod's Crypt
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Romulan Token.Tapped = true
+Bot1.Battlefield.Romulan Token.Power = 2
+Bot1.Battlefield.Romulan Token.Toughness = 2
+Bot2.Battlefield.Romulan Token = (absent)

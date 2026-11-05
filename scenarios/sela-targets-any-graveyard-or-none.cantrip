@@ -1,0 +1,83 @@
+# Sela's attack targets zero or one card in any graveyard, of any card type (CR 508.3a, 601.2c, 701.13a).
+# Only Sela attacking asks a target; only Bot1's departures make a Romulan (CR 603.2c, 109.5).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Sela, Tal Shiar Paradox
+Ornithopter
+Memnite
+Forest
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sela, Tal Shiar Paradox.Cast
+? Bot1.Mana = {B}
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Romulan Token = (absent)
+Bot1.Attack(Sela, Tal Shiar Paradox)
+! Bot1.Target(Bot1.Battlefield.Sela, Tal Shiar Paradox)
+! Bot1.Target(Bot1.Hand.Forest)
+! Bot1.Target(Bot1.Graveyard.Black Lotus; Bot1.Graveyard.Ornithopter)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt)
+[T3 Bot1.Main2]
+? Exile = Lightning Bolt
+? Bot1.Graveyard = Ornithopter; Black Lotus
+? Bot1.Battlefield.Romulan Token = (absent)
+[T5 Bot1.Main1]
+Bot1.Attack(Memnite)
+! Bot1.Target
+[T5 Bot1.Main2]
+? Exile = Lightning Bolt
+[T7 Bot1.Main1]
+Bot1.Attack(Sela, Tal Shiar Paradox)
+Bot1.Target()
+[T7 Bot1.Main2]
+? Bot1.Graveyard = Ornithopter; Black Lotus
+? Bot1.Battlefield.Romulan Token = (absent)
+[T9 Bot1.Main1]
+Bot1.Attack(Sela, Tal Shiar Paradox)
+Bot1.Target(Bot1.Graveyard.Black Lotus)
+[T9 Bot1.Main2]
+? Bot1.Battlefield.Romulan Token.Tapped = true
+? Bot1.Graveyard = Ornithopter
+[T11 Bot1.Main1]
+Bot1.Attack(Sela, Tal Shiar Paradox)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+[T11 Bot1.Main2]
+
+[Expect]
+Exile = Black Lotus; Lightning Bolt; Ornithopter
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Romulan Token#1.Token = true
+Bot1.Battlefield.Romulan Token#1.Types = Creature
+Bot1.Battlefield.Romulan Token#1.Subtypes = Romulan
+Bot1.Battlefield.Romulan Token#1.Colors = Black
+Bot1.Battlefield.Romulan Token#1.Power = 2
+Bot1.Battlefield.Romulan Token#1.Toughness = 2
+Bot1.Battlefield.Romulan Token#1.Tapped = false
+Bot1.Battlefield.Romulan Token#2.Tapped = true
+Bot2.Battlefield.Romulan Token = (absent)
+Bot2.Life = 7
