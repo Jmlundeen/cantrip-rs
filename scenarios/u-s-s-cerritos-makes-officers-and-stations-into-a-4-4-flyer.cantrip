@@ -1,0 +1,38 @@
+# U.S.S. Cerritos makes two 1/1 red Officer tokens as it enters, then Stationing a 6-power creature puts six charge
+# counters on it, turning it into a 4/4 artifact creature with flying (CR 111.1, 721.2a-b, 122.6).
+
+[Bot1 Deck]
+U.S.S. Cerritos, Following Up
+Craw Wurm
+Black Lotus x4
+Mox Emerald
+Forest x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest#1.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest#2.Play
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.U.S.S. Cerritos, Following Up.Cast
+Bot1.Hand.Craw Wurm.Cast
+Bot1.Battlefield.U.S.S. Cerritos, Following Up.Activate(Ability: Station)
+Bot1.Choose(Craw Wurm)
+
+[Expect]
+Bot1.Battlefield.Craw Wurm.Tapped = true
+Bot1.Battlefield.U.S.S. Cerritos, Following Up.Power = 4
+Bot1.Battlefield.U.S.S. Cerritos, Following Up.Toughness = 4
+Bot1.Battlefield.U.S.S. Cerritos, Following Up.Types = Artifact; Creature
+Bot1.Battlefield.Officer Token#1.Power = 1
+Bot1.Battlefield.Officer Token#2.Power = 1
