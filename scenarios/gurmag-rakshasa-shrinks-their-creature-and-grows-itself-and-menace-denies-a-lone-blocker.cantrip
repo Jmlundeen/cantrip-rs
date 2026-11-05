@@ -1,0 +1,53 @@
+# Gurmag Rakshasa ({4}{B}{B}, 5/5 menace): "When this creature enters, target creature an opponent controls gets -2/-2 until end
+# of turn and target creature you control gets +2/+2 until end of turn." Bot1 kills Bot2's Memnite (1/1 becomes -1/-1) and grows
+# the Rakshasa itself to 7/7 (it is a legal "creature you control" as the ability is put on the stack, CR 603.3d). The bonus ends
+# at cleanup (CR 514.2). On turn 5 Bot2's lone Ornithopter cannot block it (menace, CR 702.110b), so Bot2 takes 5.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Ruby
+Gurmag Rakshasa
+Swamp x20
+
+[Bot2 Deck]
+Memnite
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gurmag Rakshasa.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Target(Bot1.Battlefield.Gurmag Rakshasa)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Gurmag Rakshasa.Power = 7
+? Bot1.Battlefield.Gurmag Rakshasa.Toughness = 7
+? Bot2.Graveyard = Memnite
+[T5 Bot1.Attackers]
+Bot1.Attack(Gurmag Rakshasa > Bot2)
+[T5 Bot1.Blockers]
+! Bot2.Block(Ornithopter > Gurmag Rakshasa)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Gurmag Rakshasa.Power = 5
+Bot1.Battlefield.Gurmag Rakshasa.Toughness = 5
+Bot2.Life = 15

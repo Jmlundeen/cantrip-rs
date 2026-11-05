@@ -1,0 +1,11 @@
+{
+  "name": "Gurmag Rakshasa",
+  "manaCost": "{4}{B}{B}",
+  "type": "Creature — Demon",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Menace (This creature can't be blocked except by two or more creatures.)\nWhen this creature enters, target creature an opponent controls gets -2/-2 until end of turn and target creature you control gets +2/+2 until end of turn.",
+  "keywords": [
+    "Menace"
+  ]
+}
