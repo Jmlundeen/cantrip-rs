@@ -1,0 +1,12 @@
+{
+  "name": "Ravenous Cosmozoan",
+  "manaCost": "{5}{R}",
+  "type": "Creature — Fish",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "This spell costs {1} less to cast for each noncreature, nonland card in your graveyard.\nFlying, haste",
+  "keywords": [
+    "Flying",
+    "Haste"
+  ]
+}

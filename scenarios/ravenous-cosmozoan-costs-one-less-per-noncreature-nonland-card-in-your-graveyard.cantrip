@@ -1,0 +1,44 @@
+# Ravenous Cosmozoan {5}{R}: "This spell costs {1} less to cast for each noncreature, nonland card in your graveyard."
+# Bot1's graveyard holds one Lightning Bolt, so it costs {4}{R}: exactly five taps (Mox Ruby, Jet, Sapphire, Pearl and a
+# Mountain) cast it and leave the pool empty. On turn 5 a second Cosmozoan, with the same one card there, is refused off
+# four taps.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Lightning Bolt
+Ravenous Cosmozoan
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Lightning Bolt
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ravenous Cosmozoan.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ravenous Cosmozoan.Power = 3
+Bot1.Battlefield.Ravenous Cosmozoan.Keywords = Flying; Haste
+Bot2.Life = 17

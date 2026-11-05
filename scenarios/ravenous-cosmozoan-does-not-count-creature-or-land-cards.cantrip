@@ -1,0 +1,50 @@
+# Ravenous Cosmozoan {5}{R}: "This spell costs {1} less to cast for each noncreature, nonland card in your graveyard"
+# (CR 601.2f, 118.7a): Faithless Looting discards Crimson Kobolds (a creature card) and a Forest (a land card) and is
+# itself a sorcery; a Lightning Bolt follows it, so the graveyard holds two noncreature, nonland cards - the Looting and
+# the Bolt - and the Cosmozoan costs {3}{R}, exactly the four mana tapped. Were the creature and land counted it would
+# cost {2}{R} and leave mana in the pool.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Faithless Looting
+Crimson Kobolds
+Forest
+Ravenous Cosmozoan
+Lightning Bolt
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Crimson Kobolds; Forest)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ravenous Cosmozoan.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ravenous Cosmozoan.Power = 3
+Bot1.Battlefield.Ravenous Cosmozoan.Keywords = Flying; Haste
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Faithless Looting; Forest; Crimson Kobolds
