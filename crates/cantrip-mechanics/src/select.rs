@@ -457,7 +457,7 @@ pub const BASIC_LAND_OR_PLANET_CARD: Selection = Selection::of(up_to(1), &[BASIC
 /// "A basic Plains card", which may be left unfound (CR 701.23b): Clay-Fired Bricks and Oberth-Class Starship.
 pub const BASIC_PLAINS_CARD: Selection = Selection::of(up_to(1), &[basic_land_of_type(Subtype::Plains)]).called("basic Plains");
 
-/// "A basic Mountain card", which may be left unfound (CR 701.23b): Molten Man, Inferno Incarnate.
+/// "A basic Mountain card", which may be left unfound (CR 701.23b): Molten Man, Inferno Incarnate and The Naked Time.
 pub const BASIC_MOUNTAIN_CARD: Selection = Selection::of(up_to(1), &[basic_land_of_type(Subtype::Mountain)]).called("basic Mountain");
 
 /// `count` Forest cards: Wood Elves's one (`FOREST_CARD`), which may be left unfound (CR 701.23b).

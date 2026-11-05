@@ -1,0 +1,50 @@
+# The Naked Time {1}{R} Saga, every chapter. I - "Search your library for a basic Mountain card, put it onto the battlefield
+# tapped, then shuffle": a Mountain is found and enters tapped. II - "Whenever a creature you control enters this turn, put a
+# +1/+1 counter on it and it gains haste until end of turn": Crimson Kobolds (0/1) is cast on turn 3, after the chapter has
+# resolved, and enters as a 1/2 with haste. III - "Sacrifice a land": one of Bot1's Mountains goes on turn 5.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+The Naked Time
+Crimson Kobolds
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Naked Time.Cast
+Bot1.Search(Mountain)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mountain#2.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Crimson Kobolds.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Crimson Kobolds.Power = 1
+? Bot1.Battlefield.Crimson Kobolds.Toughness = 2
+? Bot1.Battlefield.Crimson Kobolds.Keywords = Haste
+[T5 Bot1.Main1]
+Bot1.Choose(Mountain)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Crimson Kobolds.Power = 1
+Bot1.Battlefield.Crimson Kobolds.Toughness = 2
+Bot1.Battlefield.Crimson Kobolds.Keywords = (absent)

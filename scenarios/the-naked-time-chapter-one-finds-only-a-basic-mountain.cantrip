@@ -1,0 +1,36 @@
+# The Naked Time {1}{R} Saga, chapter I: "Search your library for a basic Mountain card, put it onto the battlefield tapped,
+# then shuffle." Bot1's library holds Badlands (a Mountain, but not basic) and a Forest (basic, but not a Mountain): neither
+# may be found (CR 205.4a, 205.3i), and a basic Mountain is.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+The Naked Time
+Crimson Kobolds
+Mountain
+Mountain
+Badlands
+Forest
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Naked Time.Cast
+! Bot1.Search(Badlands)
+! Bot1.Search(Forest)
+Bot1.Search(Mountain)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Ruby; The Naked Time
+Bot1.Battlefield.Mountain#2.Tapped = true
+Bot1.Shuffles = 1

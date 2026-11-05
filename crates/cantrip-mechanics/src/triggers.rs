@@ -1572,7 +1572,8 @@ pub fn creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> 
         Event::ZoneChange { new, to, .. }
             if to.is(ZoneKind::Battlefield) && q.controller(*new) == me.controller && q.chars(*new).is(CardType::Creature) =>
         {
-            Fired::PLAIN
+            // The trigger is about the creature that entered (CR 603.6a): "that creature" is its subject, as `another_`'s is.
+            Fired::about(Target::Object(*new))
         }
         _ => None,
     }
