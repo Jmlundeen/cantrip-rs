@@ -1,0 +1,26 @@
+# Lasyd Prowler ({2}{G}{G}, 5/5): "When this creature enters, you may mill cards equal to the number of lands you control." Bot1 has one land (Black Lotus is not one) and accepts: exactly one card, the top Memnite, goes to the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Forest
+Lasyd Prowler
+Ornithopter x4
+Memnite
+Forest x2
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Lasyd Prowler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Graveyard = Memnite; Black Lotus
+Bot1.Library.Count = 2

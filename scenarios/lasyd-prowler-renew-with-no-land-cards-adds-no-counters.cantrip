@@ -1,0 +1,43 @@
+# Lasyd Prowler: Renew with no land card in the graveyard puts X = 0 counters: Bot1 declines the mill, Go for the Throat kills the Prowler, and renew on Bot1's Memnite is still paid for (the Prowler is exiled) but adds nothing.
+
+[Bot1 Deck]
+Black Lotus
+Forest
+Lasyd Prowler
+Go for the Throat
+Mox Jet
+Mox Ruby
+Forest
+Memnite
+Memnite
+Forest x2
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Lasyd Prowler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Go for the Throat.Cast(Bot1.Battlefield.Lasyd Prowler)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Graveyard.Lasyd Prowler.Activate(Bot1.Battlefield.Memnite)
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 1
+Exile = Lasyd Prowler

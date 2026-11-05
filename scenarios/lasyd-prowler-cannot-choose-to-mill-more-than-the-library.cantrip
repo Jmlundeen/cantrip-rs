@@ -1,0 +1,24 @@
+# Lasyd Prowler: Bot1's library is empty and it has one land, so it can't choose to mill one card (CR 701.17b) and is not asked (! Accept).
+
+[Bot1 Deck]
+Black Lotus
+Forest
+Lasyd Prowler
+Ornithopter x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Lasyd Prowler.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Bot1.Library.Count = 0
+Bot1.Graveyard = Black Lotus

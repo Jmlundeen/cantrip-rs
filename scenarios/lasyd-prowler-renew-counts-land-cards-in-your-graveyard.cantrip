@@ -1,0 +1,65 @@
+# Lasyd Prowler: "Renew -- {1}{G}, Exile this card from your graveyard: Put X +1/+1 counters on target creature, where X is the number of land cards in your graveyard. Activate only as a sorcery." Bot2 casts its own Prowler on turn 2 and mills a Forest (Bot2's graveyard, not counted). Bot1 casts one on turn 3 with two lands, milling two Forests, and Go for the Throat kills it on turn 5. With Memnite on the stack renew is refused (sorcery timing); then it is refused on Mox Jet (not a creature) and puts two counters (not three: the Prowler itself, Go for the Throat and Bot2's Forest are no X) on Bot2's Prowler, making it 7/7; Bot1's Prowler is exiled as the cost.
+
+[Bot1 Deck]
+Forest x2
+Mox Jet
+Mox Ruby
+Lasyd Prowler
+Go for the Throat
+Memnite
+Memnite
+Forest x2
+Memnite
+Memnite
+
+[Bot2 Deck]
+Black Lotus
+Forest
+Lasyd Prowler
+Ornithopter x4
+Island
+Forest
+Island x2
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Lasyd Prowler.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lasyd Prowler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Go for the Throat.Cast(Bot1.Battlefield.Lasyd Prowler)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Memnite.Cast
+! Bot1.Graveyard.Lasyd Prowler.Activate(Bot2.Battlefield.Lasyd Prowler)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Graveyard.Lasyd Prowler.Activate(Bot1.Battlefield.Mox Jet)
+Bot1.Graveyard.Lasyd Prowler.Activate(Bot2.Battlefield.Lasyd Prowler)
+
+[Expect]
+Bot2.Battlefield.Lasyd Prowler.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Lasyd Prowler.Power = 7
+Exile = Lasyd Prowler

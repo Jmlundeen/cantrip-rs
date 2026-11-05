@@ -1,0 +1,36 @@
+# Lasyd Prowler: "you may mill cards equal to the number of lands you control." Bot1 plays a Forest on turn 1 and a second on turn 3, so two cards (the two Forests on top, after the turn's draw) are milled, not one; the Moxen are not lands.
+
+[Bot1 Deck]
+Forest x2
+Mox Jet
+Mox Ruby
+Lasyd Prowler
+Ornithopter x2
+Ornithopter
+Forest
+Forest
+Memnite
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lasyd Prowler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Graveyard = Forest; Forest
+Bot1.Library.Count = 1

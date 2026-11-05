@@ -1,0 +1,26 @@
+# Lasyd Prowler: "you may mill cards equal to the number of lands you control." Bot1 declines: the library and graveyard are as they were.
+
+[Bot1 Deck]
+Black Lotus
+Forest
+Lasyd Prowler
+Ornithopter x4
+Memnite
+Forest x2
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Lasyd Prowler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Graveyard = Black Lotus
+Bot1.Library.Count = 3
