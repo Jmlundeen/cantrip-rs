@@ -1,0 +1,11 @@
+{
+  "name": "Summit Intimidator",
+  "manaCost": "{3}{R}",
+  "type": "Creature — Yeti",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Reach\nWhen this creature enters, target creature can't block this turn.",
+  "keywords": [
+    "Reach"
+  ]
+}
