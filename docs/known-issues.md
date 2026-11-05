@@ -747,3 +747,22 @@ ignores additional combat phases the same way. Only the label is wrong: stops ar
 end steps. A fix reads the pending additional steps and phases from the turn the table sends.
 
 **Scenarios.** `yshtola-rhul-*` (the engine side); the label has no browser test.
+
+### KI-154: Nothing stops a 65th `Keyword` from being added
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | engine types (`Keyword`, `Keywords::of`) | 2026-11-05, reviewing `Keyword::AssignsDamageByToughness` |
+
+**Notes.** `Keyword` uses 57 of the 64 bits of its set. `Keywords::of` fails at compile time only in a const context; at runtime
+`1u64 << k` panics with overflow checks on and, without them, aliases Flying. No game can reach it, since each keyword has its own
+bit: only a change adding a 65th keyword can. A compile-time assert, or a wider set, closes it before the bits run out.
+
+### KI-155: The observation encoder sees only the first 48 keyword bits
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | AI (`crates/cantrip-obs/src/encode.rs`) | 2026-11-05, reviewing `Keyword::AssignsDamageByToughness` |
+
+**Notes.** The encoder's keyword features stop at bit 47, so the model sees nothing of bits 48 and up. It changes what the AI
+sees, never the rules.
