@@ -754,6 +754,11 @@ pub fn artifact_or_creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool 
         c.is(CardType::Artifact) || c.is(CardType::Creature)
     })
 }
+/// "Target nontoken artifact or creature" as a filter (CR 115.1, 111.1): a permanent that is an artifact or a creature and is a
+/// card, not a token, for a slot that is "up to one" of them. The Mighty Thor, Jane Foster and The Measure of a Man print it.
+pub fn nontoken_artifact_or_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    artifact_or_creature_filter(q, asker, t) && matches!(t, Target::Object(id) if !q.obj(id).token)
+}
 /// "Target artifact or enchantment". Disenchant and Cathar Commando print it.
 pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = target(artifact_or_enchantment_filter);
 /// "Target artifact, creature, or enchantment": a permanent that is any of them (CR 115.1). March of Otherworldly Light (with
