@@ -1,0 +1,51 @@
+# Rufus Shinra (CR 603.4, 111.1): "Whenever Rufus Shinra attacks, if you don't control a creature named Darkstar, create Darkstar".
+# Cast on turn 1 with three Moxen. On turn 3 he attacks and makes Darkstar, a legendary 2/2 white and black Dog (Bot2 takes 2: 18);
+# on turn 5 he attacks again while Bot1 controls Darkstar and makes nothing (Bot2 16), so the board is the three Moxen, Rufus and the
+# one Darkstar.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Rufus Shinra
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rufus Shinra.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Rufus Shinra > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Battlefield.Darkstar.Token = true
+? Bot1.Battlefield.Darkstar.Supertypes = Legendary
+? Bot1.Battlefield.Darkstar.Colors = Black; White
+? Bot1.Battlefield.Darkstar.Subtypes = Dog
+? Bot1.Battlefield.Darkstar.Power = 2
+? Bot1.Battlefield.Darkstar.Toughness = 2
+? Bot1.Battlefield.Count = 5
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Rufus Shinra > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 16
+Bot1.Battlefield.Count = 5
