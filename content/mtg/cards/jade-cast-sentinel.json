@@ -1,0 +1,11 @@
+{
+  "name": "Jade-Cast Sentinel",
+  "manaCost": "{4}",
+  "type": "Artifact Creature — Ape Snake",
+  "power": 1,
+  "toughness": 5,
+  "oracleText": "Reach\n{2}, {T}: Put target card from a graveyard on the bottom of its owner's library.",
+  "keywords": [
+    "Reach"
+  ]
+}

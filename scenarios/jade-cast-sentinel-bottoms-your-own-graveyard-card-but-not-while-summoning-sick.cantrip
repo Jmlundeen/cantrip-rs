@@ -1,0 +1,48 @@
+# Jade-Cast Sentinel: Bot1's own Lightning Bolt (turn 1, Mox Ruby) is in Bot1's graveyard; the Sentinel, cast with four more
+# Moxen, is summoning sick on turn 1 and cannot pay {T} (the refusal). On turn 3 it puts the Bolt on the bottom of Bot1's own
+# library and is left tapped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Jade-Cast Sentinel
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jade-Cast Sentinel.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Jade-Cast Sentinel.Activate(Ability: {2}; Bot1.Graveyard.Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Jade-Cast Sentinel.Activate(Ability: {2}; Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Jade-Cast Sentinel.Tapped = true
+Stack.Count = 0
+Bot1.Graveyard.Count = 0
+Bot1.Mana =
+Bot2.Life = 17
