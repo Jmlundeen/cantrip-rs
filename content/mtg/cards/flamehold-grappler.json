@@ -1,0 +1,11 @@
+{
+  "name": "Flamehold Grappler",
+  "manaCost": "{U}{R}{W}",
+  "type": "Creature — Human Monk",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "First strike\nWhen this creature enters, copy the next spell you cast this turn when you cast it. You may choose new targets for the copy. (A copy of a permanent spell becomes a token.)",
+  "keywords": [
+    "FirstStrike"
+  ]
+}

@@ -1,0 +1,55 @@
+# Flamehold Grappler: "When this creature enters, copy the next spell you cast this turn when you cast it. You may choose new
+# targets for the copy." The next spell, Lightning Bolt at Bot2, is copied (CR 707.10) and Bot1 aims the copy at Bot2's
+# Ornithopter: Bot2 takes 3 once and the Ornithopter dies. A second Bolt the same turn is not copied (the delayed ability is
+# used up): it deals 3 once, so Bot2 ends on 14.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Flamehold Grappler
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Flamehold Grappler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 1
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 0
+? Bot2.Life = 17
+? Bot2.Graveyard = Ornithopter
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 14
+Bot2.Graveyard = Ornithopter
+Delayed.Count = 0

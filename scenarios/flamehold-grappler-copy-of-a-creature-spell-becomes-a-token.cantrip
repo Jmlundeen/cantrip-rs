@@ -1,0 +1,37 @@
+# Flamehold Grappler: "(A copy of a permanent spell becomes a token.)" (CR 707.10f) The next spell, an Ornithopter, is copied as
+# it is cast: its copy resolves into a token Ornithopter beside the card, so Bot1 has two, and a creature spell has no new
+# targets to choose.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Flamehold Grappler
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Flamehold Grappler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Flamehold Grappler; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter; Ornithopter
+Delayed.Count = 0
