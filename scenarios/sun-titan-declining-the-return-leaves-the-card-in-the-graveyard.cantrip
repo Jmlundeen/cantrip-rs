@@ -1,0 +1,48 @@
+# Sun Titan: "you may return target permanent card ..." - the target is chosen as the trigger goes on the stack, and the
+# "may" is asked as it resolves (CR 608.2b); declining leaves Memnite in the graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Memnite
+Sun Titan
+Plains x12
+
+[Bot2 Deck]
+Savannah Lions
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Memnite > Bot2)
+Bot2.Block(Savannah Lions > Memnite)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sun Titan.Cast
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Sun Titan.Power = 6
+Bot1.Graveyard = Memnite

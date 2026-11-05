@@ -1,0 +1,11 @@
+{
+  "name": "Sun Titan",
+  "manaCost": "{4}{W}{W}",
+  "type": "Creature — Giant",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Vigilance\nWhenever this creature enters or attacks, you may return target permanent card with mana value 3 or less from your graveyard to the battlefield.",
+  "keywords": [
+    "Vigilance"
+  ]
+}
