@@ -1,0 +1,60 @@
+# Synchronized Charge ({1}{G}): "Distribute two +1/+1 counters among one or two target creatures you control. Creatures you control with counters on them gain vigilance and trample until end of turn." Bot1 splits one counter each between Memnite and Llanowar Elves (CR 601.2d: no target at all, a share of 0 and Bot2's Walking Ballista are refused, with the mana there), so both become 2/2 and 2/2 with vigilance and trample; its Ornithopter, with no counter, gains nothing and keeps only its flying; Bot2's Walking Ballista, which entered with two +1/+1 counters, gains nothing: only creatures you control count.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Forest
+Llanowar Elves
+Memnite
+Ornithopter
+Synchronized Charge
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Walking Ballista
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Synchronized Charge.Cast(Bot2.Battlefield.Walking Ballista)
+Bot1.Hand.Synchronized Charge.Cast
+! Bot1.Divide()
+! Bot1.Divide(Memnite: 0; Llanowar Elves: 2)
+Bot1.Divide(Memnite: 1; Llanowar Elves: 1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 2
+Bot1.Battlefield.Memnite.Keywords = Trample; Vigilance
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Keywords = Trample; Vigilance
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Walking Ballista.Keywords = (absent)
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard = Synchronized Charge
+Bot1.Mana =

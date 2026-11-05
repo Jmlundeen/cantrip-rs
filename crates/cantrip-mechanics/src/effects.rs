@@ -230,7 +230,14 @@ pub fn pump_other_creatures_you_control(g: &mut dyn Game, item: &StackItem, powe
 /// Clarion with lifelink, Spectacular Spider-Man and Invasion of Gobakhan with hexproof and indestructible, and The Wind
 /// Crystal with flying and lifelink.
 pub fn creatures_you_control_gain(g: &mut dyn Game, item: &StackItem, keywords: &[Keyword]) {
-    let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    creatures_you_control_where_gain(g, item, keywords, |_, _| true);
+}
+
+/// "Creatures you control [that `wanted`] gain [keywords] until end of turn" (CR 611.2, 611.2c, 702): `creatures_you_control_gain`
+/// for the creatures `wanted` accepts as `item` resolves, no creature that enters later (or comes to qualify) gaining anything.
+/// Synchronized Charge's "creatures you control with counters on them gain vigilance and trample" prints it.
+pub fn creatures_you_control_where_gain(g: &mut dyn Game, item: &StackItem, keywords: &[Keyword], wanted: impl Fn(&dyn Game, ObjectId) -> bool) {
+    let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature) && wanted(&*g, id)).collect();
     instruction(g, |g| {
         for id in creatures {
             g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(keywords)), Duration::EndOfTurn);

@@ -1,0 +1,48 @@
+# Synchronized Charge: a creature you control "with counters on them" gains vigilance and trample whether or not the spell targeted it, whatever it carries them from (CR 122.1). Turn 3: Bot1 hard-casts it, both counters on Memnite (one target takes the whole share), which becomes 3/3 with the keywords. Turn 5: it casts it from the graveyard for harmonize {4}{G} (CR 702.180a), tapping Memnite (power 3) to take {3} off, so two Moxen pay {1}{G}; both counters go on Llanowar Elves (3/3), and Memnite, untargeted, gains the keywords again as Ornithopter, with no counter, does not. Harmonize on Bot2's turn is refused (it is a sorcery).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Memnite
+Ornithopter
+Llanowar Elves
+Synchronized Charge
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Synchronized Charge.Cast
+Bot1.Divide(Memnite: 2)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+! Bot1.Graveyard.Synchronized Charge.Cast(Ability: Harmonize)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Synchronized Charge.Cast(Ability: Harmonize)
+Bot1.Choose(Memnite)
+Bot1.Divide(Llanowar Elves: 2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Synchronized Charge
+Bot1.Battlefield.Memnite.Power = 3
+Bot1.Battlefield.Memnite.Tapped = true
+Bot1.Battlefield.Memnite.Keywords = Trample; Vigilance
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Keywords = Trample; Vigilance
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Mana =
