@@ -1,0 +1,6 @@
+{
+  "name": "Perennation",
+  "manaCost": "{3}{W}{B}{G}",
+  "type": "Sorcery",
+  "oracleText": "Return target permanent card from your graveyard to the battlefield with a hexproof counter and an indestructible counter on it."
+}

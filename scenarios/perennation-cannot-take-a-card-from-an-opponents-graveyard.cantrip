@@ -1,0 +1,44 @@
+# Perennation: "Return target permanent card from your graveyard ..." Bot1 Bolts Bot2's Ornithopter on turn 3, so the only permanent card in any
+# graveyard is in Bot2's. On turn 5, with all six mana available, Perennation cannot target it, and cannot target the Bolt in Bot1's own graveyard
+# (an instant is no permanent card) either, so it is not cast.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Ruby
+Lightning Bolt
+Island
+Perennation
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Island.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot2.Graveyard = Island; Ornithopter
+! Bot1.Hand.Perennation.Cast(Ornithopter)
+! Bot1.Hand.Perennation.Cast(Lightning Bolt)
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Island; Ornithopter

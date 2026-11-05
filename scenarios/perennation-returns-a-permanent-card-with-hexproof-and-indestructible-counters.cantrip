@@ -1,0 +1,55 @@
+# Perennation: "Return target permanent card from your graveyard to the battlefield with a hexproof counter and an indestructible counter on it." Bot2's
+# Lightning Bolt kills Bot1's Ornithopter on turn 2; on turn 3 Perennation (six mana: five Moxen and an Island) returns it with both counters, and it
+# comes back as the same 0/2 it was. The Bolt is an instant and the only other card in either graveyard, so the Ornithopter is the one legal target.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Emerald
+Ornithopter
+Island
+Perennation
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Island.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Perennation.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.Hexproof = 1
+Bot1.Battlefield.Ornithopter.Counters.Indestructible = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Graveyard = Perennation
+Bot2.Graveyard = Lightning Bolt
