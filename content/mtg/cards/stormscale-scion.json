@@ -1,0 +1,11 @@
+{
+  "name": "Stormscale Scion",
+  "manaCost": "{4}{R}{R}",
+  "type": "Creature — Dragon",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Flying\nOther Dragons you control get +1/+1.\nStorm (When you cast this spell, copy it for each spell cast before it this turn. Copies become tokens.)",
+  "keywords": [
+    "Flying"
+  ]
+}

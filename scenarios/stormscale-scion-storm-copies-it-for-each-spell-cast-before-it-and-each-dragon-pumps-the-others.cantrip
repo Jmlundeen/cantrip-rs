@@ -1,0 +1,69 @@
+# Stormscale Scion: {4}{R}{R}, 4/4 flying, "Other Dragons you control get +1/+1" and storm. Five Moxes are cast first (five spells) and
+# Mountain played (a land is no spell), so six mana pay for it and the storm trigger makes five copies, which become tokens (CR 707.10f):
+# six Scions, each pumped by the five others to 9/9. Bot2's Clarion Conqueror (a Dragon it controls) is not pumped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Mountain
+Stormscale Scion
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Clarion Conqueror
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Stormscale Scion.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 6
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Stormscale Scion#1.Power = 9
+? Bot1.Battlefield.Stormscale Scion#1.Toughness = 9
+? Bot1.Battlefield.Stormscale Scion#6.Power = 9
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Clarion Conqueror.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 12
+Bot2.Battlefield.Clarion Conqueror.Power = 3
