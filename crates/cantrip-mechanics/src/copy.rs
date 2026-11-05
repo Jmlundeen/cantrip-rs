@@ -227,6 +227,15 @@ pub fn create_hasty_token_copy_sacrificed_at_end_step(g: &mut dyn Game, item: &S
 /// resolving ability's card, `SACRIFICE_IT_AT_END_STEP`, about every token made (CR 603.7c). Chrome Dome and Blastoneuron
 /// print it.
 pub fn create_token_copy_with_haste_sacrificed_at_end_step(g: &mut dyn Game, item: &StackItem, of: ObjectId, ability: u8) -> Result<(), Suspend> {
+    let tokens = create_token_copy_with_haste(g, item, of)?;
+    crate::delayed::at_next_end_step_about(g, item, ability, &tokens);
+    Ok(())
+}
+
+/// "Create a token that's a copy of [it]. It gains haste." (CR 707.2, 613.1f, 611.2a): the token copies `of` as it is now, and its
+/// haste is a separate effect on the token, not a copiable value. Each sentence ends where the text's does (CR 608.2c). The tokens
+/// made (a replacement may make more), for what the rest of the text does to them. Chrome Dome, Blastoneuron and Esper Terra print it.
+pub fn create_token_copy_with_haste(g: &mut dyn Game, item: &StackItem, of: ObjectId) -> Result<Vec<ObjectId>, Suspend> {
     let tokens = g.create_token_copies(of, item.controller, 1)?;
     g.end_sentence();
     // "That token gains haste" is one instruction, applying to every token made (CR 608.2c).
@@ -237,8 +246,7 @@ pub fn create_token_copy_with_haste_sacrificed_at_end_step(g: &mut dyn Game, ite
         Ok(())
     })?;
     g.end_sentence();
-    crate::delayed::at_next_end_step_about(g, item, ability, &tokens);
-    Ok(())
+    Ok(tokens)
 }
 
 /// The delayed ability of `create_hasty_token_copy_sacrificed_at_end_step`, for the card's `delayed` list: "Sacrifice it",
