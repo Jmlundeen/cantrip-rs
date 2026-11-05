@@ -1,0 +1,36 @@
+# Krotiq Nestguard ({2}{G}, 4/4 defender): "{2}{G}: This creature can attack this turn as though it didn't have defender."
+# Cast on turn 1 with Black Lotus's {G}{G}{G}. On turn 5 three Moxen pay {2}{G} and it attacks for 4 (Bot2 20 to 16); without the ability a defender has no
+# attack to declare on turns 1 and 3 (the combat step is skipped).
+
+[Bot1 Deck]
+Black Lotus
+Krotiq Nestguard
+Mox Emerald
+Mox Ruby
+Mox Jet
+Forest x2
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Krotiq Nestguard.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Krotiq Nestguard.Activate
+Bot1.Pass
+Bot1.Attack(Krotiq Nestguard > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
