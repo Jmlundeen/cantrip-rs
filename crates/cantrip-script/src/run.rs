@@ -1891,6 +1891,18 @@ impl<'s> Run<'s> {
                 }
             }
             RequestKind::ChooseDividedTargets { candidates, .. } => {
+                // `! Bot1.Divide(Grizzly Bears: 1; Bot2.Battlefield.Elvish Mystic: 1)`: a target named that the question
+                // does not offer, though it is in the game, makes the division refused (CR 601.2c).
+                let everything: Vec<ObjectId> = (0..self.game.state.objects.len() as u32).map(ObjectId).collect();
+                for piece in action.positional() {
+                    let who = piece.rsplit_once(':').map_or(piece, |(who, _)| who).trim();
+                    if self.target(action, who, candidates)?.is_none() {
+                        if bot_id(who).is_none() && self.objects(action, who, &everything)?.is_empty() {
+                            return fail(format!("line {line}: {text} proves nothing: no such card is in the game"));
+                        }
+                        return Ok(());
+                    }
+                }
                 let answer = self.divide(action, candidates)?;
                 if check_answer(&self.game, request, &answer).is_ok() {
                     return fail(format!("line {line} says {text} must not be a division the question accepts, but it is"));
