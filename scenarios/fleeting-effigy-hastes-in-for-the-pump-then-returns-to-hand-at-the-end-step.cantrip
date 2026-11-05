@@ -1,0 +1,57 @@
+# Fleeting Effigy: haste lets it attack the turn it is cast; "{2}{R}: +2/+0" is paid exactly out of three Moxen (the pool is
+# empty afterwards, and a second activation is refused for want of mana) and raises only the power, so it hits for 4 as a
+# 4/2; at the beginning of Bot1's end step it returns to hand, and on T3 it is back as a plain 2/2 (the pump has ended).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Fleeting Effigy
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fleeting Effigy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{B}{R}
+Bot1.Battlefield.Fleeting Effigy.Activate
+? Bot1.Mana =
+! Bot1.Battlefield.Fleeting Effigy.Activate(Mana: short)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fleeting Effigy.Power = 4
+? Bot1.Battlefield.Fleeting Effigy.Toughness = 2
+[T1 Bot1.BeginCombat]
+Bot1.Attack(Fleeting Effigy > Bot2)
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Pearl
+? Bot1.Hand.Fleeting Effigy.Power = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fleeting Effigy.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fleeting Effigy.Power = 2
+
+[Expect]
+Bot2.Life = 16
