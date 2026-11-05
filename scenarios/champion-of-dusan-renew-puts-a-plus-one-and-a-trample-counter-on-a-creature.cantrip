@@ -1,0 +1,69 @@
+# Champion of Dusan ({2}{G}, 4/2 trample): "Renew -- {1}{G}, Exile this card from your graveyard: Put a +1/+1 counter and a
+# trample counter on target creature. Activate only as a sorcery." Bot2 Bolts two Champions (the second cast on turn 3 with
+# Forest, Mox Emerald and Mox Ruby). On turn 5, with Ornithopter on the stack, renew is refused (sorcery timing) with the mana to
+# pay; after it resolves renew is refused on Mox Emerald (not a creature), then puts the counters on Bot1's own Ornithopter
+# and on Bot2's, both exiling a Champion as the cost.
+
+[Bot1 Deck]
+Black Lotus
+Champion of Dusan
+Champion of Dusan
+Mox Emerald
+Mox Ruby
+Ornithopter
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Ornithopter
+Island x2
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Champion of Dusan.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Champion of Dusan)
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Champion of Dusan.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Champion of Dusan)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Graveyard.Champion of Dusan#1.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+! Bot1.Graveyard.Champion of Dusan#1.Activate(Bot1.Battlefield.Mox Emerald)
+Bot1.Graveyard.Champion of Dusan#1.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Graveyard.Champion of Dusan.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter.Counters.Trample = 1
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Counters.Trample = 1
+Exile = Champion of Dusan; Champion of Dusan
+Bot1.Graveyard = Black Lotus
