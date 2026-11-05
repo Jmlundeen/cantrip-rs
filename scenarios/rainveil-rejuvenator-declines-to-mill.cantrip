@@ -1,0 +1,25 @@
+# Rainveil Rejuvenator ({3}{G}, 2/4): "When this creature enters, you may mill three cards." Bot1 declines: the library and graveyard are as they were.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Rainveil Rejuvenator
+Ornithopter x4
+Memnite x3
+Forest x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rainveil Rejuvenator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Library.Count = 7

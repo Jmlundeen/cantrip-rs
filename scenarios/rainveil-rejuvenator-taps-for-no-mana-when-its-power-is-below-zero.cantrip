@@ -1,0 +1,39 @@
+# Rainveil Rejuvenator: "{T}: Add an amount of {G} equal to this creature's power." After Depower (-4/-0) its power is -2, and
+# a negative amount adds nothing: Bot1's mana pool stays empty.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Rainveil Rejuvenator
+Depower
+Memnite
+Memnite x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rainveil Rejuvenator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Depower.Cast(Bot1.Battlefield.Rainveil Rejuvenator)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Rainveil Rejuvenator.Power = -2
+Bot1.Battlefield.Rainveil Rejuvenator.Activate
+
+[Expect]
+Bot1.Mana =

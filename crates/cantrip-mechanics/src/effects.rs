@@ -1422,15 +1422,34 @@ pub fn may_draw_then_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), S
     Ok(())
 }
 
-const MAY_MILL: Question = Question::new("Mill", "mill a card?", "The top card of your library goes into your graveyard", "Mill", "Don't mill");
+const MAY_MILL_A_CARD: Question = Question::new("Mill", "mill a card?", "The top card of your library goes into your graveyard", "Mill", "Don't mill");
+const MAY_MILL_TWO: Question = Question::new("Mill", "mill two cards?", "The top two cards of your library go into your graveyard", "Mill two", "Don't mill");
+const MAY_MILL_THREE: Question = Question::new("Mill", "mill three cards?", "The top three cards of your library go into your graveyard", "Mill three", "Don't mill");
+const MAY_MILL_CARDS: Question = Question::new("Mill", "mill cards?", "That many cards from the top of your library go into your graveyard", "Mill", "Don't mill");
 
-/// "You may mill a card" (CR 701.17a): asked of the ability's controller, then the mill. Mole Man's Moloid tokens and
-/// Patchwork Beastie print it.
-pub fn may_mill_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if ask_may(g, item.controller, item.object, Purpose::Ask(&MAY_MILL))? {
-        g.mill(item.controller, 1);
+/// "You may mill `n` cards" (CR 701.17a, 701.17b): asked of the ability's controller, then the mill. A player can't choose to mill
+/// more cards than their library holds, so with fewer than `n` cards in it nothing is asked and nothing is milled. Mole Man's
+/// Moloid tokens and Patchwork Beastie (one card), Visage of Dread (two), Rainveil Rejuvenator (three) and Lasyd Prowler (the
+/// lands they control) print it.
+pub fn may_mill(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspend> {
+    if g.state().zone(Zone::library(item.controller)).len() < n {
+        return Ok(());
+    }
+    let question = match n {
+        1 => &MAY_MILL_A_CARD,
+        2 => &MAY_MILL_TWO,
+        3 => &MAY_MILL_THREE,
+        _ => &MAY_MILL_CARDS,
+    };
+    if ask_may(g, item.controller, item.object, Purpose::Ask(question))? {
+        g.mill(item.controller, n as u32);
     }
     Ok(())
+}
+
+/// "You may mill a card" (CR 701.17a): `may_mill` of one card, for an ability's whole effect.
+pub fn may_mill_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    may_mill(g, item, 1)
 }
 
 /// "You may [do something with] this card" (CR 113.6k): `ask_may` for a card that triggered from a zone it

@@ -1,0 +1,40 @@
+# Rainveil Rejuvenator: "{T}: Add an amount of {G} equal to this creature's power." On turn 3 it adds GG as a 2/4. On turn 5,
+# after Sarkhan's Resolve makes it a 5/7 (the power it has as the ability resolves), it adds GGGGG.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Rainveil Rejuvenator
+Sarkhan's Resolve
+Ornithopter x2
+Memnite x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rainveil Rejuvenator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T3 Bot1.Main1]
+Bot1.Battlefield.Rainveil Rejuvenator.Activate
+? Bot1.Mana = {G}{G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sarkhan's Resolve.Cast
+Bot1.Modes(Target creature gets +3/+3 until end of turn)
+Bot1.Target(Bot1.Battlefield.Rainveil Rejuvenator)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Rainveil Rejuvenator.Activate
+
+[Expect]
+Bot1.Mana = {G}{G}{G}{G}{G}

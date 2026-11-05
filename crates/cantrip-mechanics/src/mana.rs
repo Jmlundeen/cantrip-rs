@@ -3,6 +3,14 @@
 
 use cantrip_api::*;
 
+/// "{T}: Add an amount of {G} equal to this creature's power" (CR 106.1, 107.1b): its power as the ability resolves, which adds
+/// nothing if it is 0 or less. A mana ability's `add_by`: Rainveil Rejuvenator and Topiary Lecturer.
+pub fn add_green_equal_to_its_power(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    let power = g.chars(asker.source).power.unwrap_or(0).max(0) as u32;
+    g.add_mana(asker.controller, Mana::G, power);
+    Ok(())
+}
+
 /// "Add {U} for each artifact you control" (CR 106.5): counted as the ability resolves, possibly none. A mana ability's
 /// `add_by`: Tolarian Academy, and Uthros, Titanic Godcore's 12+ ability.
 pub fn add_blue_for_each_artifact(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
