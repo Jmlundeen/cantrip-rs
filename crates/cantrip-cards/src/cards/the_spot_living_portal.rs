@@ -26,7 +26,6 @@ fn exile_the_targets(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 /// return only if he arrived in the library.
 fn bottom_of_library_then_return_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(card) = item.subject else { return Ok(()) };
-    if !is_live(g, card) { return Ok(()) }
     if g.put_into_library(&[card], LibraryPlace::Bottom).is_empty() { return Ok(()) }
     effects::return_exiled_to_hand(g, item)
 }
