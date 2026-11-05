@@ -1,0 +1,73 @@
+# Ignis Scientia: "When Ignis Scientia enters, look at the top six cards of your library. You may put a land card from among them onto the battlefield tapped. Put the rest on the bottom of your library
+# in a random order." and "{1}{G}{U}, {T}: Exile target card from a graveyard. If a creature card was exiled this way, create a Food token." Turn 1 Bot1 sacrifices a Black Lotus (into its graveyard) and
+# casts Ignis: the six cards looked at hold two lands (a Memnite is refused); the Mountain arrives tapped and the Savannah Lions, seventh, is not looked at and is the next draw. Turn 2 Bot2 discards a Savannah
+# Lions. Turn 3 Ignis exiles it from Bot2's graveyard: a creature card, so a Food token. Turn 5 it exiles the Lotus from Bot1's own graveyard: not a creature card, so no second Food.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Ignis Scientia
+Black Lotus
+Island
+Island
+Memnite
+Memnite
+Mountain
+Memnite
+Island
+Memnite
+Savannah Lions
+Island x6
+
+[Bot2 Deck]
+Savannah Lions
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ignis Scientia.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Memnite)
+! Bot1.Choose(Mountain; Island)
+Bot1.Choose(Mountain)
+? Bot1.Battlefield.Mountain.Tapped = true
+? Bot1.Library.Count = 12
+? Bot1.Graveyard = Black Lotus
+Bot2.Discard(Savannah Lions)
+[T3 Bot1.Main1]
+? Bot1.Hand = Island; Island; Savannah Lions
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Ignis Scientia.Activate(Bot2.Graveyard.Savannah Lions)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard.Count = 0
+? Bot1.Battlefield.Count = 6
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Ignis Scientia.Activate(Bot1.Graveyard.Black Lotus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 0
+? Bot1.Battlefield.Count = 6
+
+[Expect]
+Bot1.Exile.Black Lotus.Colors.Count = 0

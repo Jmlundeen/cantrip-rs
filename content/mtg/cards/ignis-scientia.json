@@ -1,0 +1,8 @@
+{
+  "name": "Ignis Scientia",
+  "manaCost": "{1}{G}{U}",
+  "type": "Legendary Creature — Human Advisor",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When Ignis Scientia enters, look at the top six cards of your library. You may put a land card from among them onto the battlefield tapped. Put the rest on the bottom of your library in a random order.\nI've Come Up with a New Recipe! — {1}{G}{U}, {T}: Exile target card from a graveyard. If a creature card was exiled this way, create a Food token."
+}

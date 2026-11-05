@@ -1,0 +1,42 @@
+# Ignis Scientia: "You may put a land card from among them onto the battlefield tapped." Bot1 declines: the Mountain among the six looked at stays in the library, with the other five on the bottom.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Ignis Scientia
+Island
+Island
+Island
+Memnite
+Mountain
+Memnite
+Memnite
+Memnite
+Memnite
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ignis Scientia.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Ignis Scientia; Mox Emerald; Mox Jet; Mox Sapphire
+Bot1.Library.Count = 14
