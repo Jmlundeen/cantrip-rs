@@ -1,0 +1,57 @@
+# Tellah, Great Sage (CR 601.2h, 608.2c, 111.1): on turn 1 Bot1 casts him with five Moxen. On turn 3 Fireball with X of 3 costs
+# 4 mana: exactly the "four or more" that draws two cards, below the eight that sacrifices him. Every noncreature spell makes a
+# 1/1 colorless Hero creature token: one here. Bot1 holds Island x1 (the turn's draw) + 2 drawn = 3 Islands; Tellah stays.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Tellah, Great Sage
+Fireball
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tellah, Great Sage.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fireball.Cast(X: 3)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Tellah, Great Sage.Power = 3
+Bot1.Battlefield.Hero Token.Power = 1
+Bot1.Battlefield.Hero Token.Toughness = 1
+Bot1.Battlefield.Hero Token.Subtypes = Hero
+Bot1.Graveyard = Fireball

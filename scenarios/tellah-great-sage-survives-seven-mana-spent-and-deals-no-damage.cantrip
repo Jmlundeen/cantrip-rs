@@ -1,0 +1,62 @@
+# Tellah, Great Sage (CR 601.2h, 608.2c): Fireball with X of 6 costs 7 mana (Black Lotus's three and four Moxen): one short of the
+# eight that sacrifices him. Casting Black Lotus (nothing spent) made a Hero too. He makes a Hero and draws two, stays on the battlefield and deals no damage: Bot2 loses only
+# Fireball's 6.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Tellah, Great Sage
+Fireball
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tellah, Great Sage.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fireball.Cast(X: 6)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 14
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Tellah, Great Sage.Power = 3
+Bot1.Battlefield.Hero Token#1.Power = 1
+Bot1.Battlefield.Hero Token#1.Toughness = 1
+Bot1.Battlefield.Hero Token#1.Subtypes = Hero
+Bot1.Graveyard = Fireball; Black Lotus
+Bot1.Battlefield.Count = 8
