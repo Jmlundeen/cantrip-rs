@@ -511,6 +511,8 @@ fn an_emblems_permission_spends_mana_as_any_color_and_no_more() {
     const RED_COLORLESS: [u32; 6] = [0, 0, 0, 1, 0, 1];
     assert!(costly_castable(RED_COLORLESS, true), "red pays {{U}} beside colorless for {{C}}");
     assert!(!costly_castable(RED_RED, true), "no color stands for {{C}}");
+    // Colorless mana, too, is spent as though it were any color (Mycosynth Lattice's ruling): it pays {U}.
+    assert!(costly_castable([0, 0, 0, 0, 0, 2], true), "colorless pays {{U}} as though it were blue");
     assert!(!costly_castable(RED_COLORLESS, false), "the permission is for the maker's cards alone");
 }
 
@@ -529,6 +531,13 @@ fn no_emblem_comes_of_an_entry_that_is_not_one_or_of_abilities_lost() {
     let card = put(&mut g, &MAKER, Zone::graveyard(YOU));
     cantrip_api::Game::put_onto_battlefield(&mut cx(&mut g), card, YOU, false).expect("no question");
     assert!(emblems(&g).is_empty(), "it would have had no such ability");
+
+    // A face-down permanent has no abilities (CR 708.2a, 708.3): manifested, it gets no emblem.
+    let mut g = game();
+    let card = put(&mut g, &MAKER, Zone::graveyard(YOU));
+    let manifested = cantrip_api::Game::put_onto_battlefield_face_down(&mut cx(&mut g), card, YOU, FaceDown::Manifested, false).expect("no question");
+    assert!(manifested.is_some_and(|id| g.state.obj(id).face_down), "it entered face down");
+    assert!(emblems(&g).is_empty(), "a face-down permanent has no \"as this enters\"");
 }
 
 /// As an ability resolves, the emblem takes that ability's link, covering what was exiled before it was made.
