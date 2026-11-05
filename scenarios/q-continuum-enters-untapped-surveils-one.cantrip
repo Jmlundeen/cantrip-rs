@@ -1,0 +1,30 @@
+# Q Continuum enters untapped with two other lands. Both modes are eligible (Ornithopter is a creature), so the choice
+# is asked; choosing the second one surveils exactly 1, sending the known top card to the graveyard (CR 603.6a, 700.2b,
+# 701.25a).
+
+[Bot1 Deck]
+Q Continuum
+Ornithopter
+Island x8
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot1.Hand.Q Continuum.Play
+Bot1.Modes(Surveil 1)
+Bot1.Arrange( | Lightning Bolt)
+
+[Expect]
+Bot1.Battlefield.Q Continuum.Tapped = false
+Bot1.Graveyard = Lightning Bolt
+Bot1.Surveilled = 1 requested, 1 looked
+Bot1.Life = 20

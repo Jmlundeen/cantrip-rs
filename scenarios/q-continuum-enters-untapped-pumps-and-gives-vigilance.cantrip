@@ -1,0 +1,39 @@
+# Q Continuum enters untapped with three other lands and its first mode pumps Llanowar Elves (+1/+1) and gives it
+# vigilance, shown by the Elves attacking without tapping and dealing 2 (a 1/1 would deal 1) (CR 614.1d, 603.6a,
+# 700.2b, 611.2a, 702.20, 508.1f).
+# The Elves are the only creature, so they are the mode's only target; the checks run at the end so the attack
+# declaration is not spent on a "?" line.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island x2
+Q Continuum
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Q Continuum.Play
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+[Bot1.BeginCombat]
+Bot1.Attack(Llanowar Elves > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 2
+Bot2.Life = 18
+Bot1.Battlefield.Q Continuum.Tapped = false
