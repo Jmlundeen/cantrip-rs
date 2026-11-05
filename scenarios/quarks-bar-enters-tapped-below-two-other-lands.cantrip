@@ -1,0 +1,24 @@
+# One Island is the only other land Bot1 controls when Quark's Bar enters, so it enters tapped, nothing triggers (no
+# opponent is damaged), and once untapped it taps for exactly one red mana (CR 614.1d, 603.6a, 605.1a, 605.3b).
+
+[Bot1 Deck]
+Quark's Bar
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Quark's Bar.Play
+! Bot1.Modes
+[T3 Bot1.Main1]
+Bot1.Battlefield.Quark's Bar.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Quark's Bar.Tapped = true
+Bot1.Mana = {R}
+Bot1.Life = 20
+Bot2.Life = 20

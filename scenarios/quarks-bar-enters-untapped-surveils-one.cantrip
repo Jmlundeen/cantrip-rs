@@ -1,0 +1,27 @@
+# Quark's Bar entering untapped with two other lands, choosing its second mode: Surveil 1 sends the known top card
+# (after Bot1's draws) to the graveyard, and nobody is damaged (CR 603.6a, 700.2b, 701.25a).
+
+[Bot1 Deck]
+Quark's Bar
+Island x8
+Lightning Bolt
+Counterspell
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Quark's Bar.Play
+Bot1.Modes(Surveil 1)
+Bot1.Arrange( | Lightning Bolt)
+
+[Expect]
+Bot1.Battlefield.Quark's Bar.Tapped = false
+Bot1.Graveyard = Lightning Bolt
+Bot1.Surveilled = 1 requested, 1 looked
+Bot2.Life = 20

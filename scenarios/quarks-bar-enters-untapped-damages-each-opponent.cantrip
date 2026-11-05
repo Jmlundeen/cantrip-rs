@@ -1,0 +1,23 @@
+# Quark's Bar enters untapped with two other lands and its first mode deals exactly 1 damage to each opponent, its
+# controller untouched (CR 614.1d, 603.6a, 700.2b, 120.3, 102.2).
+
+[Bot1 Deck]
+Quark's Bar
+Island x2
+Mountain x18
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Quark's Bar.Play
+Bot1.Modes(This land deals 1 damage to each opponent.)
+
+[Expect]
+Bot1.Battlefield.Quark's Bar.Tapped = false
+Bot2.Life = 19
+Bot1.Life = 20
