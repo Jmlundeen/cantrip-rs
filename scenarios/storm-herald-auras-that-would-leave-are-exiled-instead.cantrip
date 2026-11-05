@@ -1,0 +1,51 @@
+# "If those Auras would leave the battlefield, exile them instead of putting them anywhere else" (CR 614.1a): Storm Herald returns
+# two Auras together (any number: both chosen), each attached to the creature chosen for it (Herald is the only one). Bot2 then
+# bolts Herald; the state-based action would put Herald into the graveyard and both Auras with it, but they are exiled instead, so
+# Rancor's "put into a graveyard from the battlefield, return it to its owner's hand" never happens (hand stays empty).
+# Turn 1 Lion's Eye Diamond discards the Auras into the graveyard; Herald is drawn on turn 3 and paid with Mountain and Sol Ring.
+
+[Bot1 Deck]
+Lion's Eye Diamond
+Mountain
+Sol Ring
+Rancor
+Eternal Warrior
+Island
+Island
+Storm Herald
+Mountain x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Red)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Storm Herald.Cast
+Bot1.Pass
+Bot1.Choose(Rancor; Eternal Warrior)
+Bot1.Choose(Storm Herald)
+Bot1.Choose(Storm Herald)
+? Bot1.Battlefield.Rancor.AttachedTo = Storm Herald
+? Bot1.Battlefield.Eternal Warrior.AttachedTo = Storm Herald
+? Bot1.Battlefield.Storm Herald.Power = 5
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Storm Herald)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Graveyard.Storm Herald.Power = 3
+Exile = Rancor; Eternal Warrior
+Bot1.Hand.Count = 0

@@ -1,0 +1,59 @@
+# Storm Herald's enters trigger returns any number of Aura cards from YOUR graveyard attached to creatures YOU control (CR 303.4f,
+# 303.4i): of Bot1's graveyard (Holy Strength, Eternal Warrior, Evil Presence) only the Auras that could enchant a creature Bot1
+# controls are offered (Evil Presence enchants a land: not offered; the ruling), Bot2's Fear in Bot2's graveyard is not Bot1's, and
+# Bot2's Dwarven Trader is not a host. Only the chosen Holy Strength returns (Herald 4/4); Eternal Warrior stays in the graveyard.
+# Holy Strength is exiled at the beginning of Bot1's next end step, this turn's (CR 603.7).
+# Bot1's Lion's Eye Diamond discards the hand on turn 1 (the Auras and a spare Mountain); Herald is drawn on turn 3 and paid with
+# Mountain and Sol Ring. Bot2's turn 2 casts Dwarven Trader with a Mountain, then discards Fear with its own diamond.
+
+[Bot1 Deck]
+Lion's Eye Diamond
+Mountain
+Sol Ring
+Holy Strength
+Eternal Warrior
+Evil Presence
+Mountain
+Storm Herald
+Mountain x13
+
+[Bot2 Deck]
+Lion's Eye Diamond
+Mountain
+Dwarven Trader
+Fear
+Island x3
+Island x13
+
+[Actions]
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Red)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Dwarven Trader.Cast
+Bot2.Pass
+Bot2.Hand.Lion's Eye Diamond.Cast
+Bot2.Battlefield.Lion's Eye Diamond.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Storm Herald.Cast
+Bot1.Pass
+! Bot1.Choose(Evil Presence)
+! Bot1.Choose(Bot2.Graveyard.Fear)
+Bot1.Choose(Holy Strength)
+! Bot1.Choose(Bot2.Battlefield.Dwarven Trader)
+Bot1.Choose(Storm Herald)
+? Bot1.Battlefield.Storm Herald.Power = 4
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Holy Strength = (absent)
+Exile = Holy Strength
+Bot1.Graveyard = Lion's Eye Diamond; Mountain; Evil Presence; Eternal Warrior
+Bot2.Graveyard = Lion's Eye Diamond; Island; Island; Island; Island; Fear
+Bot1.Battlefield.Storm Herald.Power = 3

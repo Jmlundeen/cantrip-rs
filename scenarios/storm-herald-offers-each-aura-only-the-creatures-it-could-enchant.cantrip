@@ -1,0 +1,43 @@
+# Storm Herald's returned Auras go "attached to creatures you control" (CR 303.4f): each chosen Aura is offered only the creatures
+# it could enchant (the ruling: an Aura that can't be attached to a creature you control can't be returned; CR 303.4i). Animate
+# Wall ("Enchant Wall") is offered Bot1's Steel Wall and not Storm Herald, a creature Bot1 controls that it can't enchant. Herald
+# has haste: it attacks the turn it is cast (CR 702.10b).
+# Turn 1: Lion's Eye Diamond, Mountain, Sol Ring (off the Mountain), Steel Wall (off Sol Ring), then the diamond discards Animate
+# Wall and the spare Mountains. Herald is drawn on turn 3 and paid with Mountain and Sol Ring.
+
+[Bot1 Deck]
+Lion's Eye Diamond
+Mountain
+Sol Ring
+Steel Wall
+Animate Wall
+Mountain
+Mountain
+Storm Herald
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Steel Wall.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Storm Herald.Cast
+Bot1.Pass
+Bot1.Choose(Animate Wall)
+! Bot1.Choose(Storm Herald)
+Bot1.Choose(Steel Wall)
+? Bot1.Battlefield.Animate Wall.AttachedTo = Steel Wall
+Bot1.Attack(Storm Herald > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
