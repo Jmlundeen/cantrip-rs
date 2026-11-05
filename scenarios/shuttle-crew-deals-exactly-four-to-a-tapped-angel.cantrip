@@ -1,0 +1,67 @@
+# Shuttle Crew: "When this creature enters, it deals 4 damage to target tapped creature an opponent controls" (CR
+# 603.6a, 120.3). Bot2's Baneslayer Angel (5/5) attacked on turn 12 and is still tapped on turn 13, when Bot1 casts
+# Shuttle Crew: the Angel is its only legal target and has exactly 4 damage marked on it, one short of lethal, so it
+# survives the trigger.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Shuttle Crew
+Plains x16
+
+[Bot2 Deck]
+Plains
+Plains
+Plains
+Plains
+Plains
+Baneslayer Angel
+Plains x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T10 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Plains#3.Activate
+Bot2.Battlefield.Plains#4.Activate
+Bot2.Battlefield.Plains#5.Activate
+Bot2.Hand.Baneslayer Angel.Cast
+Bot2.Pass
+Bot1.Pass
+[T11 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T12 Bot2.Main1]
+Bot2.Attack(Baneslayer Angel > Bot1)
+Bot1.Pass
+[T13 Bot1.Main1]
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Shuttle Crew.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Baneslayer Angel.Damage = 4
+
+[Expect]
+Bot2.Battlefield.Baneslayer Angel.Tapped = true
