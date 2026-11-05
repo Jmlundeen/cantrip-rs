@@ -134,12 +134,13 @@ def when(text):
 
 
 # Open issues with their claim comments; closed ones (a card done, or dropped) need no comments, which are most of
-# what a page of issues costs.
+# what a page of issues costs. Every issue, not only those labelled `card`: a contributor who cannot label opens a
+# card's issue with no label, and it is known by its title. Missing one here would open a duplicate and miss its claim.
 ISSUES = """query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){
-issues(first:100,after:$endCursor,labels:["card"],states:OPEN){pageInfo{hasNextPage endCursor}nodes{number title state
+issues(first:100,after:$endCursor,states:OPEN){pageInfo{hasNextPage endCursor}nodes{number title state
 labels(first:20){nodes{name}}comments(last:20){nodes{author{login}body createdAt}}}}}}"""
 CLOSED = """query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){
-issues(first:100,after:$endCursor,labels:["card"],states:CLOSED){pageInfo{hasNextPage endCursor}nodes{number title
+issues(first:100,after:$endCursor,states:CLOSED){pageInfo{hasNextPage endCursor}nodes{number title
 state labels(first:20){nodes{name}}}}}}"""
 ONE_ISSUE = """query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){
 issue(number:$number){number title state labels(first:20){nodes{name}}comments(last:50){nodes{author{login}body
