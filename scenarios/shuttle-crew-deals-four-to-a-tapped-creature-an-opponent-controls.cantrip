@@ -1,0 +1,43 @@
+# Shuttle Crew: "When this creature enters, it deals 4 damage to target tapped creature an opponent controls" (CR
+# 603.6a, 120.3). Bot2's Elite Vanguard attacks on turn 4 and is still tapped on turn 5, when Bot1 has three Plains and
+# casts Shuttle Crew: the only legal target takes 4, which is lethal to a 2/1 (CR 704.5g).
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Shuttle Crew
+Plains x16
+
+[Bot2 Deck]
+Plains
+Elite Vanguard
+Plains x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Elite Vanguard.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Attack(Elite Vanguard > Bot1)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Shuttle Crew.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Graveyard = Elite Vanguard
+Bot1.Battlefield.Shuttle Crew.Power = 1
+Bot1.Battlefield.Shuttle Crew.Keywords = Flying
