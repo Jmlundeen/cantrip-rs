@@ -1,0 +1,54 @@
+# "{1}{U}{R}{W}, {T}, Sacrifice this artifact: Create two 1/1 white Bird creature tokens with flying. Activate only as a sorcery." (CR 602.5d, 111.2)
+# Bot1 casts the Monument on turn 1; on the opponent's turn 2 the activation is refused (sorcery speed); on turn 3 the
+# Moxen pay and the Monument is sacrificed as a cost, leaving only the tokens.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Jet
+Jeskai Monument
+Ornithopter x4
+Ornithopter x20
+
+[Bot2 Deck]
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Jeskai Monument.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search()
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+! Bot1.Battlefield.Jeskai Monument.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Jeskai Monument.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Jeskai Monument
+Bot1.Battlefield.Bird Token#1.Power = 1
+Bot1.Battlefield.Bird Token#1.Toughness = 1
+Bot1.Battlefield.Bird Token#1.Colors = White
+Bot1.Battlefield.Bird Token#1.Keywords = Flying
+Bot1.Battlefield.Bird Token#2.Power = 1
+Bot1.Battlefield.Bird Token#2.Toughness = 1
+Bot1.Battlefield.Bird Token#2.Colors = White
+Bot1.Battlefield.Bird Token#2.Keywords = Flying
+Bot1.Battlefield.Bird Token#3 = (absent)
