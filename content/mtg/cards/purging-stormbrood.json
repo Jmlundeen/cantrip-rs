@@ -1,0 +1,17 @@
+{
+  "name": "Purging Stormbrood",
+  "manaCost": "{4}{B}",
+  "type": "Creature — Dragon",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Flying\nWard—Pay 2 life.\nWhen this creature enters, remove all counters from up to one target creature.",
+  "keywords": [
+    "Flying"
+  ],
+  "omen": {
+    "name": "Absorb Essence",
+    "manaCost": "{1}{W}",
+    "type": "Instant — Omen",
+    "oracleText": "Target creature gets +2/+2 and gains lifelink and hexproof until end of turn. (Then shuffle this card into its owner's library.)"
+  }
+}

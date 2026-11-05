@@ -1,0 +1,41 @@
+# Purging Stormbrood's Omen, Absorb Essence, is an instant (CR 720.3a): Bot2 Bolts Bot1's Memnite and Bot1 answers with it. The Memnite
+# gains hexproof until end of turn, so the Bolt's target is illegal as it tries to resolve (CR 608.2b) and does nothing; the Memnite is
+# a 3/3 with 0 damage and lives, Bot2's Bolt is in its graveyard, and the Omen is shuffled into Bot1's library (CR 720.3d): 13 after the opening hand, 14 after.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Memnite
+Purging Stormbrood
+Swamp x16
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Purging Stormbrood.Cast(Bot1.Battlefield.Memnite; Ability: Omen)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Memnite.Power = 3
+Bot1.Battlefield.Memnite.Toughness = 3
+Bot2.Graveyard = Lightning Bolt
+Bot1.Library.Count = 14
+Bot1.Graveyard.Count = 0
