@@ -1,0 +1,37 @@
+# Grindstone under Rest in Peace: the two Lightning Bolts Bot2 mills are exiled instead of reaching the graveyard, but they
+# are still the cards milled (CR 701.17c) and they share red, so it repeats; the second pass mills a blue card and a land,
+# which share nothing, and stops. Four cards are in exile (plus the spent Black Lotus) and none in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Grindstone
+Rest in Peace
+Swamp x10
+
+[Bot2 Deck]
+Island x7
+Lightning Bolt x2
+Counterspell
+Island x3
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Hand.Grindstone.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Grindstone.Activate(Bot2)
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Exile.Count = 5
+Bot2.Library.Count = 2
