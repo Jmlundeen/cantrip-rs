@@ -1,0 +1,41 @@
+# Dragonstorm Forecaster {U} Creature 0/3: "{2}, {T}: Search your library for a card named Dragonstorm Globe or Boulderborn
+# Dragon, reveal it, put it into your hand, then shuffle." Cast turn 1, it is untapped and no longer summoning sick on turn 3,
+# where Bot1 pays {2} with two Moxen. The other name works too: Bot1 takes the Boulderborn Dragon, revealed, into the hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Dragonstorm Forecaster
+Plains x4
+Dragonstorm Globe
+Boulderborn Dragon
+Phyrexian Dragon Engine
+Lightning Bolt
+Plains x8
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dragonstorm Forecaster.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Dragonstorm Forecaster.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Phyrexian Dragon Engine)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Boulderborn Dragon)
+? Bot1.Revealed = Boulderborn Dragon
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Dragonstorm Forecaster.Tapped = true
+Bot1.Hand = Boulderborn Dragon; Plains; Plains; Plains; Plains

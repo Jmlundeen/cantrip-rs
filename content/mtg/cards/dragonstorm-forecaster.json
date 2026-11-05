@@ -1,0 +1,8 @@
+{
+  "name": "Dragonstorm Forecaster",
+  "manaCost": "{U}",
+  "type": "Creature — Human Scout",
+  "power": 0,
+  "toughness": 3,
+  "oracleText": "{2}, {T}: Search your library for a card named Dragonstorm Globe or Boulderborn Dragon, reveal it, put it into your hand, then shuffle."
+}
