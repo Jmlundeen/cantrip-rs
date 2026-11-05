@@ -51,7 +51,7 @@ runs the layer contract check (`cargo test --profile checked -p cantrip-script -
 changes no characteristic by design, such as a granted attack cap, is listed in its `INERT` table with the reason). It **breaks the card** to see which expectation catches each
 decision its code makes (a number, a filter, whose objects, a condition): `card-mutate.py "Name"` makes the mechanical
 breaks and lists the survivors (it restores the file itself), and the breaks of meaning it cannot make are one
-temporary edit at a time in the card's own worktree, run, then restored at once with `git checkout -- <file>`; a scenario it proposes is written to its scratchpad
+temporary edit at a time in the card's own worktree, run, then restored at once with `git checkout -- <file>` (every run goes through `cargo run`, never a prebuilt `target/.../corpus` binary: after a restore that binary still holds the break, and a review once reported an engine bug that was only a stale build); a scenario it proposes is written to its scratchpad
 and tried there the same way (`corpus -- --file <path>`). It commits only the fixes the next paragraph but one gives it, cleans nothing, never
 clones the repository elsewhere, and leaves `git status` clean. It reaches that worktree only by the token in its prompt (`tools\worktree.cmd join`, its first
 command, and `leave` its last), never by a path it was given. Every command runs in the foreground with a long timeout
