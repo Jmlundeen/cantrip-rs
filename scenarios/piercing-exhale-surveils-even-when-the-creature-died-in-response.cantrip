@@ -1,0 +1,51 @@
+# Piercing Exhale: the surveil is not part of the damage. Bot1 beholds a Dragon card from its hand (Kokusho, revealed) and targets its Hill Giant and Bot2's Ornithopter; Bot2 kills the Hill Giant with Lightning Bolt in response, so no damage is dealt (CR 608.2b), but the Exhale still resolves for the Ornithopter and Bot1 surveils 2 (Counterspell goes to the graveyard).
+
+[Bot1 Deck]
+Black Lotus
+Hill Giant
+Mox Emerald
+Mox Sapphire
+Piercing Exhale
+Kokusho, the Evening Star
+Island
+Island
+Lightning Bolt
+Counterspell
+Island x8
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Piercing Exhale.Cast
+Bot1.Modes(Behold a Dragon)
+Bot1.Target(Bot1.Battlefield.Hill Giant)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Kokusho, the Evening Star)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hill Giant)
+Bot1.Arrange(Lightning Bolt | Counterspell)
+
+[Expect]
+Bot1.Revealed = Kokusho, the Evening Star
+Bot1.Graveyard = Piercing Exhale; Counterspell; Hill Giant; Black Lotus
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot1.Surveilled = 2 requested, 2 looked

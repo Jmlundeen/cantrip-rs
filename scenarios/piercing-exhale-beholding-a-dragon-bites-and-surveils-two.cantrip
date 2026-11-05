@@ -1,0 +1,51 @@
+# Piercing Exhale ({1}{G}): "As an additional cost to cast this spell, you may behold a Dragon. Target creature you control deals damage equal to its power to target creature or planeswalker. If a Dragon was beheld, surveil 2." Bot1 beholds its Phyrexian Dragon Engine (a Dragon permanent; nothing moves) and the Engine, 2 power, kills Bot2's Ornithopter (0/2). The surveil looks at two cards: Lightning Bolt stays on top, Counterspell goes to the graveyard. The Exhale is refused on an opponent's creature as the first target and on an artifact that is no creature as the second, with the mana there.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Phyrexian Dragon Engine
+Piercing Exhale
+Island x2
+Island
+Lightning Bolt
+Counterspell
+Island x8
+
+[Bot2 Deck]
+Mox Jet
+Ornithopter
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Piercing Exhale.Cast(Bot2.Battlefield.Ornithopter; Bot2.Battlefield.Ornithopter)
+! Bot1.Hand.Piercing Exhale.Cast(Bot1.Battlefield.Phyrexian Dragon Engine; Bot2.Battlefield.Mox Jet)
+Bot1.Hand.Piercing Exhale.Cast
+Bot1.Modes(Behold a Dragon)
+Bot1.Target(Bot1.Battlefield.Phyrexian Dragon Engine)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Phyrexian Dragon Engine)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Lightning Bolt | Counterspell)
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Piercing Exhale; Counterspell
+Bot1.Library.Count = 9
+Bot1.Surveilled = 2 requested, 2 looked
+Bot1.Battlefield.Phyrexian Dragon Engine.Tapped = false

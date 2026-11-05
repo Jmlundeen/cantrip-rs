@@ -1,0 +1,54 @@
+# Piercing Exhale: "Target creature you control deals damage equal to its power to target creature or planeswalker. If a Dragon was beheld, surveil 2." Cast without beholding (Bot1 has a Dragon to behold, and declines), Bot1's Phyrexian Dragon Engine deals its 2 damage to Bot2's Professor Dellian Fel (5 loyalty, 3 left) and nothing is surveilled.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Phyrexian Dragon Engine
+Piercing Exhale
+Island x2
+Island
+Lightning Bolt
+Island x8
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Professor Dellian Fel
+Island x2
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Professor Dellian Fel.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Piercing Exhale.Cast
+Bot1.Modes(Cast without beholding)
+Bot1.Target(Bot1.Battlefield.Phyrexian Dragon Engine)
+Bot1.Target(Bot2.Battlefield.Professor Dellian Fel)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Professor Dellian Fel.Counters.Loyalty = 3
+Bot1.Graveyard = Piercing Exhale
+Bot1.Library.Count = 9
