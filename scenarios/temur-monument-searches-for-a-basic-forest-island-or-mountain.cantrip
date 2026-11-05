@@ -1,0 +1,36 @@
+# Temur Monument {2} Artifact: "When this artifact enters, search your library for a basic Forest, Island, or Mountain card, reveal it, put it into
+# your hand, then shuffle" (CR 701.23). Two Moxen cast it on turn 1. The search refuses a Swamp (the wrong type) and a
+# Volcanic Island (it has a listed type, but is not basic), then refuses two cards at once (the search finds at most one) and finds the Island: it reaches the hand, revealed.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Temur Monument
+Ornithopter x4
+Swamp
+Volcanic Island
+Island x2
+Ornithopter x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Temur Monument.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Swamp)
+! Bot1.Search(Volcanic Island)
+! Bot1.Search(Island; Island)
+Bot1.Search(Island)
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Island; Ornithopter; Ornithopter; Ornithopter; Ornithopter
+Bot1.Revealed = Island

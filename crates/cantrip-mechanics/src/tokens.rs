@@ -787,7 +787,7 @@ pub static SOLDIER_2_2: CardDef = CardDef {
     ..token!(Soldier)
 };
 
-/// The 5/5 green Elephant creature token. Mammoth Bellow and Roar of Endless Song make it.
+/// The 5/5 green Elephant creature token. Mammoth Bellow, Roar of Endless Song and Temur Monument make it.
 pub static ELEPHANT_5_5: CardDef = CardDef {
     colors: Some(ColorSet::of(Color::Green)),
     types: TypeSet::of(&[CardType::Creature]),
