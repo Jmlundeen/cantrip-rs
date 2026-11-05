@@ -1,0 +1,12 @@
+{
+  "name": "Black Waltz No. 3",
+  "manaCost": "{2}{B}{R}",
+  "type": "Legendary Creature — Wizard",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying, deathtouch\nWhenever you cast a noncreature spell, Black Waltz No. 3 deals 2 damage to each opponent.",
+  "keywords": [
+    "Flying",
+    "Deathtouch"
+  ]
+}
