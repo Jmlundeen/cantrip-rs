@@ -1,0 +1,11 @@
+{
+  "name": "Targ Wrangler",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Klingon Warrior",
+  "power": 5,
+  "toughness": 3,
+  "oracleText": "Menace (This creature can't be blocked except by two or more creatures.)\nAt the beginning of your end step, if this creature attacked this turn, sacrifice a nonland permanent.",
+  "keywords": [
+    "Menace"
+  ]
+}

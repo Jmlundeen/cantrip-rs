@@ -1,0 +1,32 @@
+# Targ Wrangler {2}{R} 5/3: "At the beginning of your end step, if this creature attacked this turn, sacrifice a nonland
+# permanent." It never attacks, so the intervening "if" is false (CR 603.4) and nothing is sacrificed at the end step.
+
+[Bot1 Deck]
+Targ Wrangler
+Mox Ruby
+Mox Ruby
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Targ Wrangler.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+
+[Expect]
+Bot1.Battlefield = Targ Wrangler; Mountain; Mox Ruby; Mox Ruby
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 3

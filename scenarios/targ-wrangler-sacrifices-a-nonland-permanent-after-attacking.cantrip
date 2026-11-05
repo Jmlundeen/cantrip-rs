@@ -1,0 +1,39 @@
+# Targ Wrangler {2}{R} 5/3 with menace: "At the beginning of your end step, if this creature attacked this turn, sacrifice
+# a nonland permanent." It attacks unblocked on turn 3 (20 to 15) and at that turn's end step Bot1 sacrifices a Mox Ruby,
+# the Wrangler itself staying.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Targ Wrangler
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Targ Wrangler.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Targ Wrangler > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 15
+? Bot1.Battlefield.Targ Wrangler.Power = 5
+[T3 Bot1.End]
+Bot1.Choose(Mox Ruby)
+
+[Expect]
+Bot1.Graveyard = Mox Ruby
+Bot1.Battlefield.Targ Wrangler.Power = 5
+Bot1.Battlefield.Targ Wrangler.Toughness = 3
