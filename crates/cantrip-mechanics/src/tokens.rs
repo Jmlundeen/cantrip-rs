@@ -695,6 +695,16 @@ pub static ZOMBIE: CardDef = CardDef {
     ..token!(Zombie)
 };
 
+/// The 2/2 black Zombie Druid creature token (CR 111.1, 111.4). Essence Anchor, Adorned Crocodile, Sultai Monument, Teval's
+/// Judgment, Teval, the Balanced Scale, The Sibsig Ceremony and Welcome the Dead make it.
+pub static ZOMBIE_DRUID: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Black)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    ..token!(Zombie Druid)
+};
+
 /// The 1/1 green and white Citizen creature token (CR 111.4). Grand Crescendo and Rakish Revelers make it.
 pub static CITIZEN: CardDef = CardDef {
     // White (bit 0) and green (bit 4).
