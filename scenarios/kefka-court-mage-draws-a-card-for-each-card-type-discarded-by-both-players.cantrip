@@ -1,0 +1,46 @@
+# Kefka, Court Mage: when it enters each player discards a card and Bot1 draws a card for each card type among them.
+# Bot1 discards an Island (land) and Bot2 a Lightning Bolt (instant): two types, two cards.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sol Ring
+Kefka, Court Mage
+Island
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Kefka, Court Mage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+Bot2.Choose(Lightning Bolt)
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Graveyard.Count = 1
+Bot2.Graveyard.Count = 1
+Bot2.Hand.Count = 6

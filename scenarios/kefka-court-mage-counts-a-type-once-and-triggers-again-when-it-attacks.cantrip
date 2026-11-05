@@ -1,0 +1,54 @@
+# Kefka, Court Mage: a card type is counted once however many discarded cards have it, and the trigger happens on each attack too.
+# Turn 1 it enters: both discard a land, one type, so Bot1 draws one card. Turn 3 it attacks: Bot1 discards a Swamp and Bot2 an
+# Ornithopter (an artifact creature), three types among them, one of them a land: land, artifact and creature, so Bot1 draws three.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sol Ring
+Kefka, Court Mage
+Island
+Swamp x13
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Kefka, Court Mage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+Bot2.Choose(Mountain)
+? Stack.Count = 0
+? Bot1.Hand.Count = 1
+[T3 Bot1.Main1]
+Bot1.Attack(Kefka, Court Mage > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Swamp)
+Bot2.Choose(Ornithopter)
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 2
+Bot2.Graveyard.Count = 2
