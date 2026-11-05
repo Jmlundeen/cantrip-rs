@@ -1,0 +1,39 @@
+# Shock Brigade: menace lets two blockers block it together (CR 702.111b): Bot2's two Ornithopters both block it, so
+# only the unblocked Warrior token (mobilize 1) deals damage: Bot2 goes to 19, not 18.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Shock Brigade
+Mountain x15
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock Brigade.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Shock Brigade > Bot2)
+Bot2.Block(Ornithopter#1 > Shock Brigade; Ornithopter#2 > Shock Brigade)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Shock Brigade.Damage = 0

@@ -1,0 +1,11 @@
+{
+  "name": "Shock Brigade",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Goblin Soldier",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Menace (This creature can't be blocked except by two or more creatures.)\nMobilize 1 (Whenever this creature attacks, create a tapped and attacking 1/1 red Warrior creature token. Sacrifice it at the beginning of the next end step.)",
+  "keywords": [
+    "Menace"
+  ]
+}

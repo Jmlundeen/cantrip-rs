@@ -1,0 +1,42 @@
+# Shock Brigade: menace (CR 702.111b) - Bot2's lone Ornithopter cannot block it (refused), but can block the tapped and
+# attacking Warrior token mobilize 1 (CR 702.181a) created, which has no menace; the Brigade connects for 1 (Bot2 at 19).
+# The Warrior is sacrificed at the beginning of the next end step.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Shock Brigade
+Mountain x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock Brigade.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Shock Brigade > Bot2)
+! Bot2.Block(Ornithopter > Shock Brigade)
+Bot2.Block(Ornithopter > Warrior Token)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Warrior Token.Tapped = true
+? Bot2.Life = 19
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield = Mountain; Mox Ruby; Shock Brigade
