@@ -62,8 +62,8 @@ pub fn plus_one_of_each_kind_apply(proposal: &mut Proposal) {
 }
 
 /// "If one or more tokens would be created under your control" (CR 111.1, 614.1a): whose they would be, not who makes
-/// them.
-fn tokens_under_your_control(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+/// them. The condition of `DOUBLE_TOKENS`, Holo-Engineer and Quina, Qu Gourmet.
+pub fn tokens_under_your_control(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::TokenCreation(t) if t.controller == asker.controller && t.count > 0)
 }
 

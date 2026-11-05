@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::replacements::tokens_under_your_control;
 use cantrip_mechanics::{tokens, triggers};
 use cantrip_oracle as oracle;
 
@@ -6,11 +7,6 @@ use cantrip_oracle as oracle;
 fn illusion(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create(g, item.controller, &tokens::ILLUSION_3_3_ARTIFACT, 1)?;
     Ok(())
-}
-
-/// "If one or more tokens would be created under your control" (CR 111.1, 614.1a): whose they would be.
-fn tokens_under_your_control(_: &dyn Query, me: &Asker, p: &Proposal) -> bool {
-    matches!(p, Proposal::TokenCreation(t) if t.controller == me.controller)
 }
 
 /// "... that many 3/3 colorless Illusion artifact creature tokens are created instead": the same count, of a token that
