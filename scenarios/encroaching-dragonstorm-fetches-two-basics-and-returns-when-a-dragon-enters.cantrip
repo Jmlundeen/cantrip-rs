@@ -1,0 +1,55 @@
+# Encroaching Dragonstorm ({3}{G}): "When this enchantment enters, search your library for up to two basic land cards, put them
+# onto the battlefield tapped, then shuffle." Cast with Black Lotus's {G}{G}{G} and Mox Emerald; only basic lands may be found
+# (not a Tropical Island, not Llanowar Elves) and no more than two, and the Forests enter tapped. "When a Dragon you control
+# enters, return this enchantment to its owner's hand": an Ornithopter (not a Dragon) leaves it in play on turn 3; Sagu Wildling
+# (a Dragon, cast with a Forest and four Moxen's mana) returns it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Encroaching Dragonstorm
+Sagu Wildling
+Mox Ruby
+Mox Jet
+Ornithopter
+Forest x2
+Tropical Island
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Encroaching Dragonstorm.Cast
+Bot1.Pass
+! Bot1.Search(Tropical Island)
+! Bot1.Search(Llanowar Elves)
+! Bot1.Search(Forest#1; Forest#2; Forest#3)
+Bot1.Search(Forest#1; Forest#2)
+? Bot1.Battlefield.Forest#1.Tapped = true
+? Bot1.Battlefield.Forest#2.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Encroaching Dragonstorm.Types = Enchantment
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sagu Wildling.Cast
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Encroaching Dragonstorm; Forest
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Ruby; Mox Jet; Ornithopter; Sagu Wildling
+Bot1.Life = 23
