@@ -715,6 +715,11 @@ pub trait Game: Query {
     /// Sylvok Outcast's "you can't get poison counters"). A cost of getting counters (ward) is paid only when this holds
     /// (CR 118.3).
     fn can_get_counters(&self, player: PlayerId, kind: PlayerCounter) -> bool;
+    /// Whether `attach` would attach `attachment` to `host` now (CR 701.3a-b): both on the battlefield, it not already
+    /// attached there, and the host one it could legally be attached to - an Equipment a creature without protection from
+    /// it (CR 301.5c, 702.16c-d), an Aura what its enchant ability allows (CR 702.5a). Judged without targeting. A choice of
+    /// what to attach to offers only these: "it can't try to attach to a creature it can't legally be attached to".
+    fn can_attach(&self, attachment: ObjectId, host: ObjectId) -> bool;
     /// Returns objects to their owners' hands at once (CR 400.3, 101.4): from the battlefield, a graveyard, exile or
     /// anywhere else, whoever controls them. A token that leaves the battlefield ceases to exist (CR 111.7, 704.5d). Something
     /// that is no longer the object it was is not returned (CR 400.7). The new objects, in order.
@@ -908,6 +913,10 @@ pub trait Game: Query {
     /// `TargetSpec::COUNTED` bound of the ability's target slots reads it as the ability is put on the stack, and its
     /// stack item's `x` is it, for an effect that does "that many" of something (and for a copy of the ability).
     fn reflexive_trigger_counted(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: u16);
+    /// `reflexive_trigger`, carrying the objects the first part acted on to the ability (`event_objects` of its stack
+    /// item), as `delayed_trigger_about` does (CR 603.12, 603.7c): "When you put one or more Equipment onto the battlefield
+    /// this way, you may attach one of them to a Samurai you control" chooses among those Equipment.
+    fn reflexive_trigger_about(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, objects: &[ObjectId]);
     /// It becomes day (CR 731.1): every daybound or nightbound permanent whose face disagrees is turned over. Nothing if
     /// it already is day; a game that has had a designation always has one. A permanent turned over applies its face's "as
     /// this transforms" ability (CR 712.20), which may ask a question.

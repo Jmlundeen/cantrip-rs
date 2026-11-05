@@ -797,16 +797,21 @@ fn graveyard_order_read(cx: &Cx) -> bool {
     cx.s().objects.iter().any(|o| cards.get(o.card).reads_graveyard_order || o.copy.is_some_and(|c| cards.get(c.card).reads_graveyard_order))
 }
 
+/// Whether `attach` would attach `attachment` to `host` now (CR 701.3a-b): both are the permanents they were on the
+/// battlefield, it is not already attached there, and the host is one it could legally be attached to (`host_allows`).
+pub fn attachable(cx: &Cx, attachment: ObjectId, host: ObjectId) -> bool {
+    live(cx.s(), attachment)
+        && cx.s().obj(attachment).zone.is(ZoneKind::Battlefield)
+        && cx.s().obj(attachment).attached_to != Some(host)
+        && crate::attach::host_allows(cx, attachment, host, true)
+        && cx.s().obj(host).zone.is(ZoneKind::Battlefield)
+}
+
 /// Attaches an Aura or Equipment to a permanent (CR 701.3a). Nothing happens when it could not be attached there
-/// (CR 701.3b) or already is. Attaching reassigns its timestamp (CR 701.3c, 613.7e), and it has become attached
-/// (`Event::Attached`), what this returns.
+/// (CR 701.3b) or already is (`attachable`). Attaching reassigns its timestamp (CR 701.3c, 613.7e), and it has become
+/// attached (`Event::Attached`), what this returns.
 pub fn attach(cx: &mut Cx, attachment: ObjectId, host: ObjectId) -> bool {
-    if !live(cx.s(), attachment)
-        || !cx.s().obj(attachment).zone.is(ZoneKind::Battlefield)
-        || cx.s().obj(attachment).attached_to == Some(host)
-        || !crate::attach::host_allows(cx, attachment, host, true)
-        || !cx.s().obj(host).zone.is(ZoneKind::Battlefield)
-    {
+    if !attachable(cx, attachment, host) {
         return false;
     }
     // Moving it off what it was on unattaches it from that first (CR 701.3d).

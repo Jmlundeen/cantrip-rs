@@ -1279,7 +1279,7 @@ impl<'a> Cx<'a> {
     }
 
     /// A reflexive triggered ability triggers (CR 603.12): `count` is the number its "that many" counts, if it has one.
-    fn reflexive(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: Option<u16>) {
+    fn reflexive(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: Option<u16>, objects: &[ObjectId]) {
         // A reflexive triggered ability is an ordinary one (CR 603.12): its intervening "if" must hold for it to trigger at all
         // (CR 603.4), not only as it resolves.
         // Asked as the ability it is, acquired as the resolving one that makes it trigger was (CR 607.5).
@@ -1289,13 +1289,14 @@ impl<'a> Cx<'a> {
         {
             return;
         }
+        let members = self.g.state.members_push(objects);
         self.g.state.trigger_push(cantrip_state::PendingTrigger {
             source,
             ability,
             controller,
             subject,
             data: [0; 2],
-            members: cantrip_state::Span::default(),
+            members,
             count,
             since: None,
             acquired: self.resolving_acquired(source),
@@ -1840,6 +1841,10 @@ impl cantrip_api::Game for Cx<'_> {
         !static_rules::player_counters_banned(self, self.cards(), player, kind)
     }
 
+    fn can_attach(&self, attachment: ObjectId, host: ObjectId) -> bool {
+        ops::attachable(self, attachment, host)
+    }
+
     fn stage(&self) -> u16 {
         self.g.state.agenda[self.frame].stage
     }
@@ -2260,11 +2265,15 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn reflexive_trigger(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target) {
-        self.reflexive(source, controller, ability, subject, None);
+        self.reflexive(source, controller, ability, subject, None, &[]);
     }
 
     fn reflexive_trigger_counted(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: u16) {
-        self.reflexive(source, controller, ability, subject, Some(count));
+        self.reflexive(source, controller, ability, subject, Some(count), &[]);
+    }
+
+    fn reflexive_trigger_about(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, objects: &[ObjectId]) {
+        self.reflexive(source, controller, ability, Target::None, None, objects);
     }
 
     fn exile_on_leave(&mut self, permanent: ObjectId) {
