@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::{artifacts_you_control, pump};
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::{THIS_DIES, THIS_ENTERS};
+use cantrip_mechanics::triggers::THIS_ENTERS_OR_DIES;
 use cantrip_oracle as oracle;
 
 /// "Create a Heartwood token."
@@ -21,10 +21,7 @@ fn make_and_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        // "Enters or dies" is one event or the other, never both at once, so it is written as the two triggers it is:
-        // a leaves-the-battlefield trigger is looked back on (CR 603.10a), an enters trigger is not (CR 603.6a).
-        triggered(THIS_ENTERS, create_heartwood, "When Aerid Konstrari enters, create a Heartwood token."),
-        triggered(THIS_DIES, create_heartwood, "When Aerid Konstrari dies, create a Heartwood token."),
+        triggered(THIS_ENTERS_OR_DIES, create_heartwood, "When Aerid Konstrari enters or dies, create a Heartwood token."),
         ability(cost("{6}"), make_and_grow, "{6}: Create a Heartwood token. Then Aerid Konstrari gets +X/+0 until end of turn, where X is the number of artifacts you control."),
     ],
     ..oracle::AERID_KONSTRARI

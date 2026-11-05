@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, triggers::THIS_ENTERS};
+use cantrip_mechanics::{choose, triggers::THIS_ENTERS_OR_DIES};
 use cantrip_oracle as oracle;
 
 /// Battle Cannon: for each opponent, its controller chooses a nonland permanent that player controls (nobody is asked
@@ -25,8 +25,7 @@ fn battle_cannon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, battle_cannon, "Battle Cannon - When Chaos Defiler enters, for each opponent, choose a nonland permanent that player controls. Destroy one of them chosen at random."),
-        triggered(cantrip_mechanics::triggers::THIS_DIES, battle_cannon, "Battle Cannon - When Chaos Defiler dies, for each opponent, choose a nonland permanent that player controls. Destroy one of them chosen at random."),
+        triggered(THIS_ENTERS_OR_DIES, battle_cannon, "Battle Cannon - When this creature enters or dies, for each opponent, choose a nonland permanent that player controls. Destroy one of them chosen at random."),
     ],
     ..oracle::CHAOS_DEFILER
 };
