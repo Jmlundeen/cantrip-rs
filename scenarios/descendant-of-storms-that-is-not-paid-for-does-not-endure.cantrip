@@ -1,0 +1,29 @@
+# Descendant of Storms: Bot1 declines to pay {1}{W} ("if you do", CR 608.2d), so it does not endure: no counter and no Spirit token.
+# Both Plains stay untapped.
+
+[Bot1 Deck]
+Plains
+Plains
+Descendant of Storms
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Descendant of Storms.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Descendant of Storms)
+Bot1.Pass
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Descendant of Storms.Power = 2
+Bot1.Battlefield.Descendant of Storms.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Plains#1.Tapped = false
+Bot2.Life = 18

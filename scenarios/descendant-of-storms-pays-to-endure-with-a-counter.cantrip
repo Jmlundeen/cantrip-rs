@@ -1,0 +1,32 @@
+# Descendant of Storms: "Whenever this creature attacks, you may pay {1}{W}. If you do, it endures 1." (CR 701.63a) Bot1 pays with two Plains
+# and chooses the counter: a 3/2 attacker (2/1 plus one counter) that deals 3, with no Spirit token.
+
+[Bot1 Deck]
+Plains
+Plains
+Descendant of Storms
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Descendant of Storms.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Descendant of Storms)
+Bot1.Pass
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.PayCost
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Descendant of Storms.Power = 3
+Bot1.Battlefield.Descendant of Storms.Toughness = 2
+Bot1.Battlefield.Descendant of Storms.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Count = 3
+Bot2.Life = 17
