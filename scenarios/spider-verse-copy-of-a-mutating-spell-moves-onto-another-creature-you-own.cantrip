@@ -64,5 +64,5 @@ Bot2.Pass
 Bot1.Battlefield = Cat Token; Cat Token; Cat Token; Cat Token; Cubwarden; Cubwarden; Gleemox; Mox Jet; Mox Pearl; Mox Ruby; Spider-Verse
 Bot2.Battlefield = Ornithopter
 Bot1.Graveyard = Wrenn's Resolve; Black Lotus
-Bot1.Battlefield.Cubwarden#1.Keywords = ?; Flying; Lifelink
-Bot1.Battlefield.Cubwarden#2.Keywords = ?; Flying; Haste; Lifelink
+Bot1.Battlefield.Cubwarden#1.Keywords = Flying; Lifelink; Mutate
+Bot1.Battlefield.Cubwarden#2.Keywords = Flying; Haste; Lifelink; Mutate

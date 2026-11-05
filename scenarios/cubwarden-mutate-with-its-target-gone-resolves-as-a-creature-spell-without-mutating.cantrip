@@ -35,6 +35,6 @@ Bot1.Pass
 
 [Expect]
 Bot1.Battlefield = Cubwarden; Plains; Plains
-Bot1.Battlefield.Cubwarden.Keywords = ?; Lifelink
+Bot1.Battlefield.Cubwarden.Keywords = Lifelink; Mutate
 Bot1.Battlefield.Cubwarden.Power = 3
 Bot1.Graveyard.Count = 2

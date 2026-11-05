@@ -106,6 +106,8 @@ fn keyword_name(k: u8) -> &'static str {
         51 => "Wither",
         56 => "Phasing",
         57 => "CantBeCopied",
+        58 => "Mutate",
+        59 => "ReadAhead",
         60 => "AssignsDamageByToughness",
         _ => "?",
     }

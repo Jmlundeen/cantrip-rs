@@ -30,7 +30,7 @@ Bot1.Modes(2)
 Bot1.Pass
 ? Bot1.Battlefield.Ornithopter.Power = 0
 ? Bot1.Battlefield.Ornithopter.Toughness = 2
-? Bot1.Battlefield.Ornithopter.Keywords = ?; Flying; Lifelink
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Lifelink; Mutate
 [T4 Bot2.Main1]
 Bot2.Hand.Mountain.Play
 Bot2.Battlefield.Mountain.Activate
