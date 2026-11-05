@@ -1,0 +1,49 @@
+# Join the Collective ({5}{W}{W}): X is "the number of nonartifact creatures destroyed this way", judged as each last existed
+# on the battlefield (CR 608.2h). Under Mycosynth Lattice every permanent is an artifact, so Bot1's Savannah Lions is an
+# artifact creature when it is destroyed and X is 0: no Borg token is made.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Black Lotus
+Black Lotus
+Savannah Lions
+Join the Collective
+Plains
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Mycosynth Lattice
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Mycosynth Lattice.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Join the Collective.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Plains
+Bot1.Graveyard = Join the Collective; Savannah Lions; Black Lotus; Black Lotus; Black Lotus
+Bot2.Battlefield = Mycosynth Lattice
