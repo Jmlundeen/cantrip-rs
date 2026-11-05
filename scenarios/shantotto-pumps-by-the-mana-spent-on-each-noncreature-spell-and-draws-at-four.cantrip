@@ -1,0 +1,68 @@
+# Shantotto, Tactician Magician (CR 601.2h, 611.2c, 603.4): whenever Bot1 casts a noncreature spell she gets +X/+0 until end of turn,
+# X the mana spent on it. A Mox Emerald (nothing spent) adds +0 and draws nothing; Exhaustion ({2}{U}) makes her 3/4 and, X being 3,
+# draws no card; on the next turn she is 0/4 again, and Flashfires ({3}{R}) makes her 4/4 and, X being exactly 4, draws a card.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Shantotto, Tactician Magician
+Exhaustion
+Flashfires
+Mox Emerald
+Mox Pearl
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shantotto, Tactician Magician.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shantotto, Tactician Magician.Power = 0
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Exhaustion.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shantotto, Tactician Magician.Power = 3
+? Bot1.Battlefield.Shantotto, Tactician Magician.Toughness = 4
+? Bot1.Hand.Count = 2
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Shantotto, Tactician Magician.Power = 0
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Flashfires.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Shantotto, Tactician Magician.Power = 4
+Bot1.Battlefield.Shantotto, Tactician Magician.Toughness = 4
+Bot1.Hand.Count = 3
