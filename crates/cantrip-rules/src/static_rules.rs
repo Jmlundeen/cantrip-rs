@@ -724,6 +724,31 @@ pub fn doesnt_lose(q: &dyn Query, cards: &'static CardTable, player: PlayerId, r
     any_static(q, cards, |d| d.loss_rules, |rule, asker| rule(q, asker, player, reason))
 }
 
+/// Every miracle ability a card in its owner's hand has (CR 702.94a): its own first, then those the permanents on the
+/// battlefield give it (`CardDef::granted_miracles`: Lorehold, the Historian), in the battlefield's order, each rules text of
+/// a merged permanent's included (CR 702.140e), each named by the card it is printed on.
+pub fn miracles(q: &dyn Query, cards: &'static CardTable, card: ObjectId) -> Vec<Miracle> {
+    let mut all: Vec<Miracle> = q.card(q.obj(card).card).miracle.map(|cost| Miracle { granter: None, cost: Some(cost) }).into_iter().collect();
+    let s = q.state();
+    for &id in s.battlefield() {
+        let o = s.obj(id);
+        for (granter, by) in cards.texts_linked(s, id) {
+            let def = cards.get(granter);
+            // A permanent that has lost all its abilities gives nothing (CR 613.1f).
+            if def.granted_miracles.is_empty() || q.lost_all_abilities(id) {
+                continue;
+            }
+            let asker = Asker { source: id, controller: o.controller, by, spell: false };
+            for (i, grant) in def.granted_miracles.iter().enumerate() {
+                if (grant.has)(q, &asker, card) {
+                    all.push(Miracle { granter: Some((granter, i as u8)), cost: (grant.cost)(q, q.obj(card).card).map(|c| reduced_by(c, u32::from(grant.less)).0) });
+                }
+            }
+        }
+    }
+    all
+}
+
 /// Whether `player` can't draw `n` more cards right now (CR 121.2b, 121.3, 614.17, `Game::cant_draw`): "each player can't
 /// draw more than one card each turn" (`CardDef::cant_draw`: Spirit of the Labyrinth).
 pub fn cant_draw(q: &dyn Query, cards: &'static CardTable, player: PlayerId, n: u32) -> bool {

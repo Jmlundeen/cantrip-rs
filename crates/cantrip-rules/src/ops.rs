@@ -3163,7 +3163,7 @@ pub fn draw(cx: &mut Cx, player: PlayerId) {
     // cards in its controller's hand (Lorehold, the Historian); with more than one, the player says which it is revealed
     // with, and only that one's linked ability triggers (CR 607.5).
     if cx.s().turn.number > 0 && cx.s().obj(card).zone == Zone::hand(player) {
-        let miracles = cantrip_api::miracles(&*cx, card);
+        let miracles = crate::static_rules::miracles(&*cx, cx.cards(), card);
         if let Some(&first) = miracles.first()
             && crate::loops::settled_read(cx, |h| h.drawn(player) == 0, |&first| !first)
             && matches!(cx.ask_core(player, RequestKind::May { source: card, purpose: Purpose::RevealForMiracle(only_miracle(cx, card, &miracles)) }, false), Ok(Answer::Yes))

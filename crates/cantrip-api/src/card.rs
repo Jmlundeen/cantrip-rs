@@ -2398,28 +2398,6 @@ pub fn miracle_cost(q: &dyn Query, miracle: MiracleOf, face: CardId) -> Option<M
     miracle_cost_and_x_less(q, miracle, face).map(|(cost, _)| cost)
 }
 
-/// Every miracle ability a card in its owner's hand has (CR 702.94a): its own first, then those the permanents on the
-/// battlefield give it, in the battlefield's order.
-pub fn miracles(q: &dyn Query, card: ObjectId) -> Vec<Miracle> {
-    let mut all: Vec<Miracle> = q.card(q.obj(card).card).miracle.map(|cost| Miracle { granter: None, cost: Some(cost) }).into_iter().collect();
-    for &id in q.state().battlefield() {
-        let o = q.obj(id);
-        let granter = o.copied_card().unwrap_or(o.card);
-        let def = q.card(granter);
-        // A permanent that has lost all its abilities gives nothing (CR 613.1f).
-        if def.granted_miracles.is_empty() || q.lost_all_abilities(id) {
-            continue;
-        }
-        let asker = Asker { source: id, controller: o.controller, by: None, spell: false };
-        for (i, grant) in def.granted_miracles.iter().enumerate() {
-            if (grant.has)(q, &asker, card) {
-                all.push(Miracle { granter: Some((granter, i as u8)), cost: (grant.cost)(q, q.obj(card).card).map(|c| reduced_by(c, u32::from(grant.less)).0) });
-            }
-        }
-    }
-    all
-}
-
 /// A static ability that says whether a player may cast spells right now from a kind of zone (CR 101.2, 601.3): false
 /// forbids it, for every spell cast from that zone, a cast an effect offers during resolution too. "Your opponents can't
 /// cast spells during your turn" (Voice of Victory) ignores the zone; "your opponents can't cast spells from anywhere other

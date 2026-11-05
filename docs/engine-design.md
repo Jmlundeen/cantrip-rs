@@ -1190,9 +1190,9 @@ of state-based actions (CR 704.5h).
 ### Miracle, printed and given
 
 Miracle (CR 702.94a) is the core's: as a card is drawn, if it is its player's first draw of the turn, `ops::draw` asks
-`cantrip_api::miracles` what miracle abilities it has - its own `CardDef::miracle`, then each one a permanent on the
-battlefield gives it (`CardDef::granted_miracles`, asked of the permanent with its controller as "you", and not while the
-permanent has lost its abilities). With one, the player is asked whether to reveal it; with several, whether and then which
+`static_rules::miracles` what miracle abilities it has - its own `CardDef::miracle`, then each one a permanent on the
+battlefield gives it (`CardDef::granted_miracles` of each rules text the permanent has, a merged permanent's components'
+too, asked of the permanent with its controller as "you", and not while the permanent has lost its abilities). With one, the player is asked whether to reveal it; with several, whether and then which
 (`Label::Miracle`), since each miracle ability is linked only to its own triggered ability (CR 607.5). The linked ability
 (`MIRACLE_ABILITY`) carries which one it was in its data, so the cost it offers is that one's even once the permanent that gave
 it has left (CR 113.7a), and a granted cost is read for the face being cast (a Room's door, CR 709.3a). A grant's

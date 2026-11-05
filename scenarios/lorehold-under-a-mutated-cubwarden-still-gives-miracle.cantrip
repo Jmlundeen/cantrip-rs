@@ -1,0 +1,57 @@
+# Cubwarden mutates over Lorehold, the Historian, on top (CR 702.140c): the merged creature is Cubwarden, with all the
+# abilities of both its cards (CR 702.140e), so Lorehold's "each instant and sorcery card in your hand has miracle {2}"
+# still applies. Hop to It, Bot1's first card of turn 7, is revealed and cast for {2} from Sol Ring (CR 702.94a). Bot1
+# declines Lorehold's discard on turn 4 and has no card to discard on turn 6.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Plains
+Cubwarden
+Hop to It
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Cubwarden.Cast(Lorehold, the Historian; Ability: Mutate)
+Bot1.Pass
+Bot1.Modes(1)
+Bot1.Pass
+? Bot1.Battlefield.Cubwarden.Power = 3
+[T7 Bot1.Draw]
+Bot1.Accept
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Accept
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Hop to It
+Bot1.Battlefield.Rabbit Token#3.Token = true
+Bot1.Battlefield.Cat Token#2.Token = true
