@@ -1,0 +1,69 @@
+# The Akroan War's III: each tapped creature deals damage to itself equal to its power, as its own source (CR 120.3).
+# Bot2's Vampire Nighthawk (2/3, deathtouch, lifelink), tapped from the attack II forced on T4, deals 2 to itself: its own
+# deathtouch destroys it (CR 702.2b) and its own lifelink gains Bot2 2 (CR 120.3f) - 2, its power, not 3, its toughness.
+# Bot1's Llanowar Elves, tapped for mana with III on the stack and given -4/-0 by Depower, has power -3 and deals no
+# damage (CR 107.1b, 120.8), so it survives. Chapter I had no creature to target when the Saga entered on T1.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+The Akroan War
+Llanowar Elves
+Depower
+Island x14
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Vampire Nighthawk
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Akroan War.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Vampire Nighthawk.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Vampire Nighthawk > Bot1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Depower.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = -3
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Vampire Nighthawk = (absent)
+Bot2.Life = 24
+Bot1.Life = 18
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.The Akroan War = (absent)
