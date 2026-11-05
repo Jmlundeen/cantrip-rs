@@ -1,0 +1,43 @@
+# The attack trigger's targeted mode can target the attacking Operative itself; deathtouch lasts through the turn.
+[Bot1 Deck]
+Swamp
+Memnite
+Swamp
+Tal Shiar Operative
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Plains
+Angelic Wall
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Memnite.Cast
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Tal Shiar Operative.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Angelic Wall.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Tal Shiar Operative > Bot2)
+Bot1.Modes(Target creature you control gains deathtouch until end of turn.)
+! Bot1.Target(Bot2.Battlefield.Angelic Wall)
+Bot1.Target(Bot1.Battlefield.Tal Shiar Operative)
+Bot2.Block(Angelic Wall > Tal Shiar Operative)
+[T7 Bot1.Upkeep]
+
+[Expect]
+Turn = 7
+Bot2.Graveyard = Angelic Wall
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Tal Shiar Operative.Keywords = (absent)

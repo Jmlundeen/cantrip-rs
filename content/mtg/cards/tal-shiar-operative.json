@@ -1,0 +1,8 @@
+{
+  "name": "Tal Shiar Operative",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Romulan Officer Spy",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Whenever this creature attacks, choose one —\n• Target creature you control gains deathtouch until end of turn.\n• Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)"
+}

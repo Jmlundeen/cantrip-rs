@@ -1,0 +1,51 @@
+# The trigger targets Memnite, then Bolt removes that target while the trigger is on the stack; no other creature gains deathtouch.
+[Bot1 Deck]
+Swamp
+Memnite
+Swamp
+Tal Shiar Operative
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Plains
+Black Lotus
+Angelic Wall
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Memnite.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Tal Shiar Operative.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Angelic Wall.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Plains.Activate
+[T5 Bot1.Main1]
+Bot1.Attack(Tal Shiar Operative > Bot2; Memnite > Bot2)
+Bot1.Modes(Target creature you control gains deathtouch until end of turn.)
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot2.Hand.Lightning Bolt.Cast(Memnite)
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot2.Block(Angelic Wall > Tal Shiar Operative)
+[T5 Bot1.End]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard.Memnite.Power = 1
+Bot1.Battlefield.Tal Shiar Operative.Power = 2
+Bot2.Battlefield.Angelic Wall.Damage = 2
