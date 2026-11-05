@@ -1,0 +1,73 @@
+# Dress Down is on the battlefield before Borg Cube enters, and Quakestrider Ceratops stations the Cube to twelve charge counters.
+# Its 12+ striation is one static ability whose effect began in layer 4 (CR 721.2a-b), so its layer 6 part keeps applying although
+# Dress Down, earlier in layer 6, took the Cube's abilities (CR 613.6) - and that part gives the Cube, after Dress Down, the static
+# ability "Artifact creatures you control have flying" (CR 613.1f, 613.7a): the Cube and Memnite fly; the Ceratops, no artifact,
+# does not.
+
+[Bot1 Deck]
+Black Lotus x2
+Quakestrider Ceratops
+Black Lotus x2
+Memnite
+Mox Jet
+Mox Sapphire
+Dress Down
+Borg Cube
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#2.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Quakestrider Ceratops.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Borg Cube.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Borg Cube.Activate(Ability: Station)
+Bot1.Choose(Quakestrider Ceratops)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Dress Down.Types = Enchantment
+Bot1.Battlefield.Borg Cube.Counters.Charge = 12
+Bot1.Battlefield.Borg Cube.Types = Artifact; Creature
+Bot1.Battlefield.Borg Cube.Power = 6
+Bot1.Battlefield.Borg Cube.Toughness = 6
+Bot1.Battlefield.Borg Cube.Keywords = Flying
+Bot1.Battlefield.Memnite.Keywords = Flying
+Bot1.Battlefield.Quakestrider Ceratops.Keywords = (absent)

@@ -35,11 +35,6 @@ fn assimilate_or_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     Ok(())
 }
 
-/// The striation's flying grant applies to artifact creatures its controller controls while this has twelve charge counters.
-fn twelve_plus_artifact_creatures(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    station::charge(q, source) >= 12 && statics::your_artifact_creatures(q, source, affected, so_far)
-}
-
 pub static CARD: CardDef = CardDef {
     own_cost_changes: &[affinity::for_artifact_creatures],
     abilities: &[
@@ -48,10 +43,13 @@ pub static CARD: CardDef = CardDef {
         station::ability(STATION_TEXT),
     ],
     statics: &[
-        static_ability(Layer::Type, station::charged::<12>, station::is_a_creature, "As long as this Spacecraft has twelve or more charge counters on it, it's an artifact creature."),
-        // The base-P/T part continues the self-only Type-layer part; keep them adjacent so the flying grant's wider set is separate (CR 613.6, 721.2b).
-        static_ability(Layer::PtSet, statics::itself, statics::base_pt::<6, 6>, "12+ | 6/6").continues(),
-        static_ability(Layer::Ability, twelve_plus_artifact_creatures, statics::have_flying, TWELVE_PLUS),
+        static_ability(Layer::Type, station::charged::<12>, station::is_a_creature, TWELVE_PLUS),
+        // Its layer 6 part gives the Cube the striation's static ability, continuing the one effect that began in layer 4 (CR
+        // 613.6, 721.2a-b): the Cube has it under an earlier "loses all abilities", and a later one takes it (CR 613.7).
+        static_ability(Layer::Ability, station::charged::<12>, station::has::<0>, TWELVE_PLUS).continues(),
+        static_ability(Layer::PtSet, station::charged::<12>, statics::base_pt::<6, 6>, TWELVE_PLUS).continues(),
     ],
+    // The 12+ striation's static ability (CR 721.2a), which the Cube has while it has twelve or more charge counters.
+    delayed: &[granted_static_ability(Layer::Ability, statics::your_artifact_creatures, statics::have_flying, "Artifact creatures you control have flying.")],
     ..oracle::BORG_CUBE
 };
