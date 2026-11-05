@@ -1,0 +1,6 @@
+{
+  "name": "The Holodeck",
+  "manaCost": "{7}",
+  "type": "Legendary Artifact",
+  "oracleText": "Once during each of your turns, you may play a permanent card you own from outside the game or from your graveyard."
+}

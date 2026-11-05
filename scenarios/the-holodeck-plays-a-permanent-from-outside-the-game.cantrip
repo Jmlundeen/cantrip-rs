@@ -1,0 +1,37 @@
+# The Holodeck lets its controller play a permanent card they own from outside the game: a creature for its mana cost on one
+# turn, and a land as the turn's land play on the next (CR 400.11b, 601.3, 305.1); a card left in the sideboard is never
+# played by itself.
+
+[Bot1 Deck]
+The Holodeck
+Black Lotus x4
+Forest x15
+
+[Bot1 Sideboard]
+Grizzly Bears
+Forest
+Llanowar Elves
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest#1.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest#1.Play
+Bot1.Hand.The Holodeck.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Sideboard.Grizzly Bears.Cast(Ability: outside the game)
+[T5 Bot1.Main1]
+Bot1.Sideboard.Forest.Play
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Types = Creature
+Bot1.Battlefield.Count = 6
+Bot1.Sideboard = Llanowar Elves

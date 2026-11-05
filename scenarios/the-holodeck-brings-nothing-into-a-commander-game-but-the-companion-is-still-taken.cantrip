@@ -1,0 +1,48 @@
+# In a Commander game no card is brought in from outside the game except by rules, special actions and effects that
+# specifically bring cards into Commander games (CR 903.11): The Holodeck's "play a permanent card you own from outside
+# the game" reaches neither Bot1's companion Kaheera nor its Forest, though both are outside the game and the mana is
+# there. The companion's special action (CR 702.139c) still puts Kaheera into Bot1's hand for {3}.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Rampaging Ferocidon
+
+[Bot1 Deck]
+The Holodeck
+Black Lotus x3
+Forest x16
+
+[Bot1 Sideboard]
+Forest
+
+[Bot1 Companion]
+Kaheera, the Orphanguard
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+? Bot1.Companion = Kaheera, the Orphanguard
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.The Holodeck.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Sideboard.Kaheera, the Orphanguard.Cast
+! Bot1.Sideboard.Forest.Play
+Bot1.Sideboard.Kaheera, the Orphanguard.TakeCompanion
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.The Holodeck.Types = Artifact
+Bot1.Hand = Forest; Forest; Forest; Kaheera, the Orphanguard
+Bot1.Sideboard = Forest

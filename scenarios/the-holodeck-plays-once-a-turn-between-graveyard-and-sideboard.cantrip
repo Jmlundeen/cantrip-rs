@@ -1,0 +1,59 @@
+# The Holodeck's one permission covers both zones: once Llanowar Elves is cast from the graveyard, Grizzly Bears in the
+# sideboard can't be cast the same turn, though the mana to pay for it is there; a sideboard instant is no permanent card
+# (CR 110.4a); on the opponent's turn the flash Ambush Viper can't be cast from outside the game ("each of your turns");
+# on its controller's next turn the permission is back and Grizzly Bears is cast (CR 400.11b, 601.3, 604.1).
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Black Lotus x3
+The Holodeck
+Forest x15
+
+[Bot1 Sideboard]
+Grizzly Bears
+Fog
+Ambush Viper
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.The Holodeck.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Sideboard.Fog.Cast(Ability: outside the game)
+Bot1.Graveyard.Llanowar Elves.Cast(Ability: outside the game)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Types = Creature
+! Bot1.Sideboard.Grizzly Bears.Cast(Ability: outside the game)
+[T4 Bot2.Main1]
+! Bot1.Sideboard.Ambush Viper.Cast(Ability: outside the game)
+[T5 Bot1.Main1]
+Bot1.Sideboard.Grizzly Bears.Cast(Ability: outside the game)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Types = Creature
+Bot1.Battlefield.Llanowar Elves.Types = Creature
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus
+Bot1.Sideboard = Fog; Ambush Viper

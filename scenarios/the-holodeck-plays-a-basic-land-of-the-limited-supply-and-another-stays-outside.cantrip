@@ -1,0 +1,33 @@
+# In a Limited game a sideboard holds any number of basic lands (Magic Tournament Rules): one The Holodeck plays from
+# outside the game leaves another outside, as one a wish brings in does (CR 400.11b). Bot1 plays a Forest from outside
+# the game as its land play, and its sideboard is still Forest; Bot2's is untouched.
+
+[Bot1 Deck]
+The Holodeck
+Black Lotus x3
+Island x16
+
+[Basic Lands Outside]
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+? Bot1.Sideboard = Forest
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.The Holodeck.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Sideboard.Forest.Play
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = The Holodeck; Forest
+Bot1.Sideboard = Forest
+Bot2.Sideboard = Forest

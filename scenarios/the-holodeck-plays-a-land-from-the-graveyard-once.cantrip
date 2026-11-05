@@ -1,0 +1,40 @@
+# The Holodeck's way for the graveyard plays a land card there (CR 305.1, 604.1): Bot1 sacrifices Unexplored Territory
+# for a Forest and plays the Territory again from its graveyard on its next turn as that turn's land play. That spends the
+# once (one permission between both zones), so the Forest outside the game can't be played that turn.
+
+[Bot1 Deck]
+The Holodeck
+Black Lotus x3
+Unexplored Territory
+Island
+Island
+Forest x14
+
+[Bot1 Sideboard]
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Unexplored Territory.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.The Holodeck.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Unexplored Territory.Activate(Ability: Search)
+Bot1.Search(Forest)
+[T3 Bot1.Main1]
+Bot1.Graveyard.Unexplored Territory.Play
+! Bot1.Sideboard.Forest.Play
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = The Holodeck; Forest; Unexplored Territory
+Bot1.Sideboard = Forest
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus

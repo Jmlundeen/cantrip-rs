@@ -1,0 +1,37 @@
+# A companion is a card its owner has outside the game (CR 702.139a, 400.11a), so outside a Commander game The Holodeck's
+# "you may play a permanent card you own from outside the game" casts it for its mana cost (CR 400.11b, 601.3), the
+# companion's special action not needed: Kaheera, the Orphanguard, revealed as Bot1's companion, is cast from the sideboard.
+
+[Bot1 Deck]
+The Holodeck
+Black Lotus x3
+Forest x16
+
+[Bot1 Companion]
+Kaheera, the Orphanguard
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+? Bot1.Companion = Kaheera, the Orphanguard
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.The Holodeck.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Sideboard.Kaheera, the Orphanguard.Cast(Ability: outside the game)
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Kaheera, the Orphanguard.Types = Creature
+Bot1.Sideboard =
