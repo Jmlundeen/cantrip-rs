@@ -1,0 +1,40 @@
+# Boulderborn Dragon {5} Artifact Creature 3/3: "Flying, vigilance. Whenever this creature attacks, surveil 1." Cast turn 1 with
+# Black Lotus and two Moxen, it attacks turn 3: it has flying and vigilance (still untapped), the attack trigger surveils one
+# card (CR 701.25a) and Bot1 puts the Mountain into the graveyard; Bot2 takes 3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Black Lotus
+Boulderborn Dragon
+Island x4
+Mountain
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Boulderborn Dragon.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Boulderborn Dragon.Keywords = Flying; Vigilance
+Bot1.Attack(Boulderborn Dragon > Bot2)
+Bot1.Arrange( | Mountain)
+? Bot1.Battlefield.Boulderborn Dragon.Tapped = false
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Mountain; Black Lotus
+Bot1.Library.Count = 14

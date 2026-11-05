@@ -1,0 +1,12 @@
+{
+  "name": "Boulderborn Dragon",
+  "manaCost": "{5}",
+  "type": "Artifact Creature — Dragon",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying, vigilance\nWhenever this creature attacks, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ]
+}
