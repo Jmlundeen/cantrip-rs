@@ -1,0 +1,38 @@
+# Sultai Devotee ({1}{G}, 2/1 deathtouch): "{1}: Add {B}, {G}, or {U}. Activate only once each turn." It is cast on turn 1 with
+# Mox Emerald and Mox Ruby. On turn 3 red is refused beside the {B} it makes (paid with Mox Emerald) and a second activation the same
+# turn is refused with Mox Ruby still able to pay; turn 5 makes {G} and turn 7 {U}.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Sultai Devotee
+Forest x3
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sultai Devotee.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Sultai Devotee.Activate(Color: Red)
+Bot1.Battlefield.Sultai Devotee.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana = {B}
+! Bot1.Battlefield.Sultai Devotee.Activate(Color: Green)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sultai Devotee.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana = {G}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Sultai Devotee.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 7

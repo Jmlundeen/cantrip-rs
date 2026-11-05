@@ -1,0 +1,11 @@
+{
+  "name": "Sultai Devotee",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Zombie Snake Druid",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Deathtouch\n{1}: Add {B}, {G}, or {U}. Activate only once each turn.",
+  "keywords": [
+    "Deathtouch"
+  ]
+}
