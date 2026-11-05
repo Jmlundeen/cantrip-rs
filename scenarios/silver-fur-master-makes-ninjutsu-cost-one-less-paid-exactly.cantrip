@@ -1,0 +1,50 @@
+# Silver-Fur Master: "Ninjutsu abilities you activate cost {1} less to activate" (CR 601.2f, 602.2b). Turn 1: the Master comes
+# in off Mox Sapphire and Mox Jet and a Fanatical Firebrand off Mox Ruby. Turn 3 the Firebrand attacks and is unblocked, and
+# Dokuchi Shadow-Walker's Ninjutsu {3}{B} is paid with exactly the three Moxen, {2}{B}: it is offered with only three
+# sources (so the reduction is at least one) and the pool ends empty (so it is not more than one). The Dokuchi is a Ninja
+# the Master pumps, so it deals 6. The Firebrand's damage is not dealt (it was returned before damage).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Silver-Fur Master
+Fanatical Firebrand
+Dokuchi Shadow-Walker
+Island x15
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Silver-Fur Master.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Fanatical Firebrand > Bot2)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dokuchi Shadow-Walker.Activate(Ability: Ninjutsu)
+Bot1.Choose(Fanatical Firebrand)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Mana = 
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Hand = Fanatical Firebrand; Island; Island
+Bot1.Battlefield.Dokuchi Shadow-Walker.Tapped = true
+Bot1.Battlefield.Dokuchi Shadow-Walker.Power = 6

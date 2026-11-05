@@ -1,0 +1,71 @@
+# "You" in Silver-Fur Master's abilities is its controller, not its owner (CR 109.5). Bot2 takes Bot1's Master with Claim the
+# Firstborn. Bot1's own Ninja, Fang of Shigeki, is 1/1 again. Bot2's Ornithopter attacks, unblocked, and its Dokuchi Shadow-Walker's
+# Ninjutsu {3}{B} is paid with exactly three Moxen, {2}{B}, so the reduction is Bot2's; the Dokuchi, Bot2's own Ninja, is pumped
+# to 6/6 and deals 6.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Silver-Fur Master
+Fang of Shigeki
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Claim the Firstborn
+Dokuchi Shadow-Walker
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Silver-Fur Master.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fang of Shigeki.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Fang of Shigeki.Power = 2
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Claim the Firstborn.Cast(Bot1.Battlefield.Silver-Fur Master)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Fang of Shigeki.Power = 1
+? Bot1.Battlefield.Fang of Shigeki.Toughness = 1
+Bot2.Attack(Ornithopter > Bot1)
+[T4 Bot2.Blockers]
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Dokuchi Shadow-Walker.Activate(Ability: Ninjutsu)
+Bot2.Choose(Ornithopter)
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Dokuchi Shadow-Walker.Power = 6
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 14

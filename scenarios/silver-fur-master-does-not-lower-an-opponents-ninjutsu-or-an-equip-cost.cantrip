@@ -1,0 +1,67 @@
+# Silver-Fur Master reduces only "ninjutsu abilities you activate". (1) Bot2 attacks on turn 2 with a hasty Fanatical Firebrand,
+# unblocked, and holds Dokuchi Shadow-Walker with Ninjutsu {3}{B}: with only three sources left (Mox Jet, Mox Emerald, Mox
+# Sapphire) the ability is not offered, since Bot1's Master does not lower Bot2's activation. (The runner offers it again with
+# mana to spare, so the refusal is for the cost.) (2) On turn 3 Bot1's own Shadowspear Equip {2}, not a ninjutsu ability, is
+# paid in full: the two Moxen tapped for it leave the pool empty.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Silver-Fur Master
+Shadowspear
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Fanatical Firebrand
+Dokuchi Shadow-Walker
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Silver-Fur Master.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Fanatical Firebrand.Cast
+Bot2.Pass
+Bot2.Attack(Fanatical Firebrand > Bot1)
+[T2 Bot2.Blockers]
+! Bot2.Hand.Dokuchi Shadow-Walker.Activate(Ability: Ninjutsu; Mana: short)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shadowspear.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Shadowspear.Activate(Ability: Equip; Silver-Fur Master)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Shadowspear.AttachedTo = Silver-Fur Master

@@ -1,0 +1,63 @@
+# "Ninja" and "Rogue" are creature type words of Silver-Fur Master's third ability (CR 612.2), so Artificial Evolution changes which
+# creatures it pumps. Fang of Shigeki is a Snake Ninja, Robber of the Rich a Human Archer Rogue. Ninja to Goblin: Fang is 1/1 again,
+# Robber still 3/3. Then Rogue to Snake: the text says "Other Goblin and Snake creatures", so Fang is 2/2 again and Robber 2/2.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Black Lotus
+Silver-Fur Master
+Fang of Shigeki
+Robber of the Rich
+Artificial Evolution
+Artificial Evolution
+Island x14
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Silver-Fur Master.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fang of Shigeki.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Robber of the Rich.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fang of Shigeki.Power = 2
+? Bot1.Battlefield.Robber of the Rich.Power = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Silver-Fur Master)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Ninja)
+Bot1.Modes(Goblin)
+? Bot1.Battlefield.Fang of Shigeki.Power = 1
+? Bot1.Battlefield.Robber of the Rich.Power = 3
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Silver-Fur Master)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Rogue)
+Bot1.Modes(Snake)
+
+[Expect]
+Bot1.Battlefield.Fang of Shigeki.Power = 2
+Bot1.Battlefield.Fang of Shigeki.Toughness = 2
+Bot1.Battlefield.Robber of the Rich.Power = 2
+Bot1.Battlefield.Robber of the Rich.Toughness = 2

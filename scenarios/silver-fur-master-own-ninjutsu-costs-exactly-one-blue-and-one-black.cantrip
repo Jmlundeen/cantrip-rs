@@ -1,0 +1,51 @@
+# Silver-Fur Master's own Ninjutsu {U}{B} (CR 702.49a). Turn 3 its two sources, Island and Mox Sapphire, make no black, and turn 5
+# the two left untapped, Swamp and Mox Jet, make no blue: refused both times for the cost. Turn 7 Mox Sapphire and Mox Jet pay it
+# exactly, the pool empty after, the attacking Ornithopter goes back to hand and the Master comes in tapped and attacking.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Silver-Fur Master
+Mox Jet
+Swamp
+Island x15
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Blockers]
+! Bot1.Hand.Silver-Fur Master.Activate(Ability: Ninjutsu; Mana: short)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Blockers]
+! Bot1.Hand.Silver-Fur Master.Activate(Ability: Ninjutsu; Mana: short)
+[T7 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T7 Bot1.Blockers]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Silver-Fur Master.Activate(Ability: Ninjutsu)
+Bot1.Choose(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Silver-Fur Master.Tapped = true
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand.Ornithopter.Power = 0

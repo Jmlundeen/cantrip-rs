@@ -1,0 +1,53 @@
+# Silver-Fur Master: "Other Ninja and Rogue creatures you control get +1/+1" (CR 613.4c), judged on what the earlier layers made
+# the object. Firdoch Core, a Kindred Artifact with Changeling (CR 702.73a), is a Ninja and a Rogue without being a creature, and
+# has no power or toughness (CR 208.3). Once "{4}: This artifact becomes a 4/4 artifact creature until end of turn" makes it one
+# (layer 4), its base 4/4 (layer 7b) gets the +1/+1 (layer 7c): it is 5/5.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Silver-Fur Master
+Firdoch Core
+Island x14
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Silver-Fur Master.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firdoch Core.Power = (absent)
+? Bot1.Battlefield.Firdoch Core.Toughness = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Firdoch Core.Activate(Ability: {4})
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Firdoch Core.Power = 5
+Bot1.Battlefield.Firdoch Core.Toughness = 5
