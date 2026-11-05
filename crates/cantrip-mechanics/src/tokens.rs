@@ -768,6 +768,15 @@ pub static SOLDIER: CardDef = CardDef {
     ..token!(Soldier)
 };
 
+/// The 2/2 white Soldier creature token. Teeming Dragonstorm and Riling Dawnbreaker's omen, Signaling Roar, make it.
+pub static SOLDIER_2_2: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    ..token!(Soldier)
+};
+
 /// The 2/2 red Mutant creature token. Jennika, Bad Apple Big Sister, Mighty Mutanimals, Sally Pride, Slash, Turtle Blimp, Wooden
 /// Cane, Old Hob and Splinter & Leo make it.
 pub static MUTANT: CardDef = CardDef {
