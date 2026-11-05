@@ -348,6 +348,8 @@ fn scenarios_that_once_failed_factor() {
             "smugglers-copter-crew-taxed-by-anointed-peacekeeper-cannot-tap-the-elf-that-paid-the-mana",
             "we-say-thee-nay-teamwork-made-unpayable-by-tapping-an-elf-for-mana-is-taken-back",
             "we-say-thee-nay-teamwork-taps-a-summoning-sick-creature-and-another-for-total-power-two",
+            // Creatures that can't attack alone (CR 508.1c): a walk declaring one alone is the validator's refusal.
+            "pet-sehlat-two-attack-together",
         ]
         .iter()
         .map(|n| {
