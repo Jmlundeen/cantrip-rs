@@ -1,0 +1,46 @@
+# Tempest Hawk: "Whenever this creature deals combat damage to a player, you may search your library for a card named
+# Tempest Hawk, reveal it, put it into your hand, then shuffle." Bot1 casts it on turn 1 ({2}{W} from three Moxes) and on turn 3
+# attacks past Bot2's empty board: 2 damage (Bot2 to 18), then the search finds only a card with that name - the Plains
+# cannot be taken (the refusal beside the allowed Hawk) - and one Hawk goes to hand, revealed: "a card", so the third Hawk
+# stays in the library (11 cards left).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Tempest Hawk
+Plains x3
+Plains
+Plains
+Tempest Hawk
+Tempest Hawk
+Plains x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Tempest Hawk.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Attack(Tempest Hawk > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot1.Accept
+! Bot1.Search(Plains)
+! Bot1.Search(Tempest Hawk; Tempest Hawk)
+Bot1.Search(Tempest Hawk)
+? Bot1.Revealed = Tempest Hawk
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand.Count = 5
+Bot1.Hand = Plains; Plains; Plains; Plains; Tempest Hawk
+Bot1.Library.Count = 11

@@ -1,0 +1,11 @@
+{
+  "name": "Tempest Hawk",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Bird",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying\nWhenever this creature deals combat damage to a player, you may search your library for a card named Tempest Hawk, reveal it, put it into your hand, then shuffle.\nA deck can have any number of cards named Tempest Hawk.",
+  "keywords": [
+    "Flying"
+  ]
+}
