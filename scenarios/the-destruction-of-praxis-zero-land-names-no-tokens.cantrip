@@ -1,0 +1,16 @@
+# With no lands, Praxis resolves for X=0 and creates no Klingons.
+[Bot1 Deck]
+Black Lotus x2
+The Destruction of Praxis
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Destruction of Praxis.Cast
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Klingon Warrior Token = (absent)

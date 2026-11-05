@@ -1,0 +1,51 @@
+# Two Doubling Seasons apply one at a time to the two Klingons; Bot1 chooses each replacement, producing eight tokens.
+[Bot1 Deck]
+Forest
+Black Lotus x3
+Doubling Season
+Doubling Season
+Plains
+Island
+Swamp
+Mountain
+Gemstone Mine
+The Destruction of Praxis
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Hand.Doubling Season.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Gemstone Mine.Play
+Bot1.Replace(Doubling Season#1)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Gemstone Mine.Activate(Color: Black)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.The Destruction of Praxis.Cast
+Bot1.Replace(Doubling Season#1)
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Klingon Warrior Token#1.Power = 2
+Bot1.Battlefield.Klingon Warrior Token#8.Power = 2
+Bot1.Battlefield.Klingon Warrior Token#9 = (absent)
+Bot1.Battlefield.Doubling Season#1.Types = Enchantment
+Bot1.Battlefield.Doubling Season#2.Types = Enchantment

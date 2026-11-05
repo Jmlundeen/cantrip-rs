@@ -1,0 +1,58 @@
+# Artificial Evolution changes the Praxis spell's "Klingon" word to Elf before it resolves; its two hasty tokens are red 2/1 Elf Warriors and enter after the -6/-6 instruction (CR 608.2c, 612.2).
+[Bot1 Deck]
+Forest
+Plains
+Island
+Swamp
+Mountain
+Dwarven Mine
+The Destruction of Praxis
+Black Lotus x3
+Artificial Evolution
+Island x20
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Island x20
+[Actions]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Dwarven Mine.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Destruction of Praxis.Cast
+Bot1.Hand.Artificial Evolution.Cast(Stack.The Destruction of Praxis)
+Bot1.Battlefield.Island.Activate
+Bot1.Modes(Klingon)
+Bot1.Modes(Elf)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Elf Warrior Token#1.Power = 2
+Bot1.Battlefield.Elf Warrior Token#1.Toughness = 1
+Bot1.Battlefield.Elf Warrior Token#1.Colors = Red
+Bot1.Battlefield.Elf Warrior Token#1.Subtypes = Elf; Warrior
+Bot1.Battlefield.Elf Warrior Token#1.Keywords = Haste
+Bot1.Battlefield.Elf Warrior Token#2.Power = 2
+Bot1.Battlefield.Elf Warrior Token#2.Toughness = 1
+Bot1.Battlefield.Elf Warrior Token#2.Colors = Red
+Bot1.Battlefield.Elf Warrior Token#2.Subtypes = Elf; Warrior
+Bot1.Battlefield.Elf Warrior Token#2.Keywords = Haste
+Bot1.Graveyard = The Destruction of Praxis; Artificial Evolution; Black Lotus
+Bot2.Battlefield.Grizzly Bears = (absent)

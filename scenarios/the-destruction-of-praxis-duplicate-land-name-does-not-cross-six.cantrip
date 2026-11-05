@@ -1,0 +1,45 @@
+# Five unique land names give X=5; the repeated Forest adds no sixth, so Gigantosaurus is exactly 5/5 and Praxis makes no tokens.
+[Bot1 Deck]
+Forest
+Plains
+Island
+Swamp
+Mountain
+Forest
+The Destruction of Praxis
+Black Lotus x3
+Island x20
+[Bot2 Deck]
+Black Lotus x2
+Gigantosaurus
+Island x20
+[Actions]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Gigantosaurus.Cast
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Destruction of Praxis.Cast
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Klingon Warrior Token = (absent)
+Bot2.Battlefield.Gigantosaurus.Power = 5
+Bot2.Battlefield.Gigantosaurus.Toughness = 5
