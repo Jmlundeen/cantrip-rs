@@ -1,0 +1,11 @@
+{
+  "name": "Hope Estheim",
+  "manaCost": "{W}{U}",
+  "type": "Legendary Creature — Human Wizard",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Lifelink\nAt the beginning of your end step, each opponent mills X cards, where X is the amount of life you gained this turn.",
+  "keywords": [
+    "Lifelink"
+  ]
+}

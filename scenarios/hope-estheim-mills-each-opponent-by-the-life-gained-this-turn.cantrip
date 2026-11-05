@@ -1,0 +1,46 @@
+# Hope Estheim (2/2 lifelink): "At the beginning of your end step, each opponent mills X cards, where X is the amount of life you gained this turn." Turn 1 Bot1 casts it and gained nothing, so
+# Bot2 mills none (13 cards stay in its library). Turn 3 Hope attacks and its lifelink gains 2: at the end step Bot2 mills exactly 2 (down to 10 after its turn 2 draw). Turn 5 Bot1 gains no
+# life, so the end step mills nothing again: "this turn" does not carry over.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Hope Estheim
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hope Estheim.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Upkeep]
+? Bot2.Library.Count = 13
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Hope Estheim)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+? Bot1.Life = 22
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+? Bot2.Library.Count = 10
+[T5 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Upkeep]
+? Bot2.Library.Count = 9
+
+[Expect]
+Bot2.Life = 18
