@@ -2328,11 +2328,11 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_combat_phase(&mut self) {
-        self.g.state.update_turn(|t| t.extra_combats = t.extra_combats.saturating_add(1));
+        self.g.state.update_turn(|t| t.extra_combats = t.extra_combats + 1);
     }
 
     fn add_end_step(&mut self) {
-        self.g.state.update_turn(|t| t.extra_end_steps = t.extra_end_steps.saturating_add(1));
+        self.g.state.update_turn(|t| t.extra_end_steps = t.extra_end_steps + 1);
     }
 
     fn end_the_turn(&mut self) -> Result<(), Suspend> {

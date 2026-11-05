@@ -733,3 +733,16 @@ intermittent, not certain: on 2026-11-01 the shared-board test passed in one run
 before the splash would go; the splash, when it stays, is marked `uno-keep-loader` and Uno's `removeLoading` never runs.
 
 **Scenarios.** None: browser tests.
+
+### KI-153: The pass button says "End Turn" in an end step that another end step follows
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client (`dotnet/src/Cantrip.Client.Web/MainPage.xaml.cs`) | 2026-11-05, reviewing #2195 (Y'shtola Rhul) |
+
+**Notes.** The pass button's label predicts the next step from the current one and takes End to be followed by Cleanup, so in
+Y'shtola Rhul's first end step it reads "End Turn" though an additional end step comes next (`Turn::extra_end_steps`); it
+ignores additional combat phases the same way. Only the label is wrong: stops are per step, and the client stops in both
+end steps. A fix reads the pending additional steps and phases from the turn the table sends.
+
+**Scenarios.** `yshtola-rhul-*` (the engine side); the label has no browser test.
