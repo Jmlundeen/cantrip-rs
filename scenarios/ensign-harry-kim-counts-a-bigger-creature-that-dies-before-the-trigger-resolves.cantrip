@@ -1,0 +1,47 @@
+# Ensign Harry Kim: the intervening "if" is checked again as the ability resolves (CR 603.4), reading the entering
+# creature as it last existed if it has left by then (CR 608.2h). Elite Vanguard enters on turn 5 and its trigger goes
+# on the stack; Bot2's Shock kills it before that ability resolves, and its last-known power of 2 is still greater than
+# Kim's 1, so Kim gets the +1/+1 counter and is a 2/3.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Ensign Harry Kim, Operations
+Elite Vanguard
+Plains x15
+
+[Bot2 Deck]
+Mountain
+Shock
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Ensign Harry Kim, Operations.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Elite Vanguard)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ensign Harry Kim, Operations.Power = 2
+Bot1.Graveyard = Elite Vanguard
