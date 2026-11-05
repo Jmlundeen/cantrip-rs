@@ -1,0 +1,47 @@
+# "If you don't draw a card this way": Bot1 controls a creature with a counter (Sage of the Fang), but the Envoy's draw is replaced by dredging Golgari Grave-Troll back (CR 702.52a),
+# so no card is drawn and the Envoy gets its +1/+1 counter. (Bot1 entombed the Troll on turn 1 and declined to dredge the turn 3 draw step.)
+
+[Bot1 Deck]
+Black Lotus
+Sage of the Fang
+Trade Route Envoy
+Entomb
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Golgari Grave-Troll
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Golgari Grave-Troll)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sage of the Fang.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Decline
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Trade Route Envoy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Trade Route Envoy.Counters.PlusOnePlusOne = 1
+Bot1.Hand = Golgari Grave-Troll; Island
+Bot1.Graveyard.Golgari Grave-Troll = (absent)

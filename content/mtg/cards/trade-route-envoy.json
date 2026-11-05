@@ -1,0 +1,8 @@
+{
+  "name": "Trade Route Envoy",
+  "manaCost": "{3}{G}",
+  "type": "Creature — Dog Soldier",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "When this creature enters, draw a card if you control a creature with a counter on it. If you don't draw a card this way, put a +1/+1 counter on this creature."
+}

@@ -1,0 +1,26 @@
+# Trade Route Envoy with no creature carrying a counter: "If you don't draw a card this way, put a +1/+1 counter on this creature." Bot1 pays with Black Lotus and a Mox
+# (nothing else on the battlefield has a counter), draws nothing, and the Envoy is 5/4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Trade Route Envoy
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Trade Route Envoy.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Trade Route Envoy.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Trade Route Envoy.Power = 5
+Bot1.Battlefield.Trade Route Envoy.Toughness = 4
+Bot1.Hand.Count = 4
