@@ -1,0 +1,55 @@
+# Clive's Hideaway needs four legendary creatures you control. Bot1 controls three (Cecil, General Chang and Tinybones), a Ornithopter
+# (not legendary) and, since Bot2 controls Rograkh (legendary, but not Bot1's), nothing else: the ability resolves and plays nothing, so
+# the Bolt stays exiled, face down, and Bot2 stays at 20. (Four creatures, or four legendary creatures counting Bot2's, would play it.)
+
+[Bot1 Deck]
+Clive's Hideaway
+Black Lotus
+Ornithopter
+Cecil, Dark Knight
+General Chang, Cold Warrior
+Tinybones, the Pickpocket
+Mox Pearl
+Lightning Bolt
+Island x3
+Mox Sapphire
+Island x20
+
+[Bot2 Deck]
+Rograkh, Son of Rohgahh
+Island x20
+
+[Actions]
+Bot1.Hand.Clive's Hideaway.Play
+Bot1.Arrange(Lightning Bolt | Island; Island; Island)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.General Chang, Cold Warrior.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Tinybones, the Pickpocket.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Rograkh, Son of Rohgahh.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Clive's Hideaway.Activate(Ability: You may play)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Exile.Count = 1
+Bot2.Life = 20

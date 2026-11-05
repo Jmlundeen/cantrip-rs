@@ -1,0 +1,49 @@
+# Clive's Hideaway hides Lightning Bolt (hideaway 4, CR 702.75a). Bot1 controls four legendary creatures - Rograkh, Cecil, General Chang and
+# Tinybones - so {2}, {T} lets them cast the exiled Bolt for free (CR 118.9, 608.2g) at Bot2, who goes to 17.
+
+[Bot1 Deck]
+Clive's Hideaway
+Black Lotus
+Rograkh, Son of Rohgahh
+Cecil, Dark Knight
+General Chang, Cold Warrior
+Tinybones, the Pickpocket
+Mox Pearl
+Lightning Bolt
+Island x3
+Mox Sapphire
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Clive's Hideaway.Play
+Bot1.Arrange(Lightning Bolt | Island; Island; Island)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Rograkh, Son of Rohgahh.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.General Chang, Cold Warrior.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Tinybones, the Pickpocket.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Clive's Hideaway.Activate(Ability: You may play)
+Bot1.Accept
+Bot1.Target(Bot2)
+
+[Expect]
+Exile.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Black Lotus
