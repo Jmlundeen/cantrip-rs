@@ -1,0 +1,44 @@
+# Ambling Stormshell: "Whenever you cast a Turtle spell, untap this creature." After it attacks with three stun counters,
+# Bot1 casts an Aegis Turtle in its second main phase: the untap would happen, so one stun counter is removed instead (CR
+# 122.1d) and the Stormshell stays tapped with two. A Mox Ruby cast first is no Turtle: it changes nothing.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Ambling Stormshell
+Aegis Turtle
+Mox Ruby
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ambling Stormshell.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ambling Stormshell > Bot2)
+[T3 Bot1.Main2]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+? Bot1.Battlefield.Ambling Stormshell.Counters.Stun = 3
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Aegis Turtle.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ambling Stormshell.Counters.Stun = 2
+Bot1.Battlefield.Ambling Stormshell.Tapped = true

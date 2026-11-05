@@ -1,0 +1,37 @@
+# Ambling Stormshell: "Whenever this creature attacks, put three stun counters on it and draw three cards." Bot1 casts it on
+# turn 1 (two Mox Sapphires and a Black Lotus) and attacks on turn 3: it deals 5, gets three stun counters (it stays tapped
+# at untap steps, CR 122.1d) and Bot1 draws three cards on top of its turn-3 draw.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Ambling Stormshell
+Aegis Turtle
+Mox Ruby
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ambling Stormshell.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ambling Stormshell > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Ambling Stormshell.Counters.Stun = 3
+Bot1.Battlefield.Ambling Stormshell.Tapped = true
+Bot1.Hand.Count = 7
