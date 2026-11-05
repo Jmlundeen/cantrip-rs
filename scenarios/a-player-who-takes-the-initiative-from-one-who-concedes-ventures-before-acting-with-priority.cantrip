@@ -1,0 +1,67 @@
+# CR 117.5, 800.4a, 726.4: a concession is dealt with before priority is given again. In a game of three Bot1 takes the
+# initiative with Feywild Caretaker on turn one. On turn two Bot2, the active player, holds priority in their main phase when
+# Bot1 concedes: the initiative passes to Bot2, who takes it, and "Whenever a player takes the initiative, they venture into
+# Undercity" goes on the stack at once, before Bot2 can act or pass with it waiting. It resolves as Bot2 and Bot3 pass, still
+# in the main phase: Bot2 is in the Undercity's Secret Entrance.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sol Ring
+Feywild Caretaker
+Island
+Forest
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Feywild Caretaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Search(Island)
+? Initiative = Bot1
+[T2 Bot2.Main1]
+Bot1.Concede
+? Initiative = Bot2
+? Stack = (rules)
+? PriorityPlayer = Bot2
+Bot2.Pass
+Bot3.Pass
+Bot2.Search(Island)
+? Step = Main1
+
+[Expect]
+Bot2.Dungeon = Undercity: Secret Entrance

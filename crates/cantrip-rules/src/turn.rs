@@ -1727,6 +1727,11 @@ fn next_in_game(s: &GameState, p: PlayerId) -> PlayerId {
 /// A priority round: state-based actions and triggers first, then the player with priority acts or passes; when
 /// everyone has passed in succession the top of the stack resolves, or with an empty stack the step ends (CR 117).
 pub fn priority(cx: &mut Cx) -> R<Flow> {
+    // A player who conceded as priority was waiting leaves the game here, on every replay (`Game::concede`), before anything
+    // else: priority is given again once they have, so the state-based actions their leaving calls for are performed and what
+    // it triggered - another player taking the initiative, a "when that player loses the game" - goes on the stack first
+    // (CR 117.5, 800.4a), not after the player holding priority acts or passes.
+    cx.concessions_here();
     // CR 724.1c-d: an effect has ended the turn. No player gets priority again in this step, and the abilities that
     // triggered since wait for the cleanup step (724.1f).
     if cx.s().turn.ending {
