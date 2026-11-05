@@ -1,0 +1,41 @@
+# Two Adjutants grant two separate instances to each artifact creature (CR 113.2c, 603.2c).
+# Memnite draws twice from a single hit; on a later turn it draws twice again, not only once per turn/game.
+[Bot1 Deck]
+Island
+Black Lotus
+Sol Ring
+Co-Option Adjutant x2
+Memnite
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Co-Option Adjutant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Co-Option Adjutant.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Attack(Memnite > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+? Stack.Count = 2
+[T3 Bot1.Main2]
+? Bot1.Library.Count = 10
+[T5 Bot1.Main1]
+Bot1.Attack(Memnite > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Library.Count = 7

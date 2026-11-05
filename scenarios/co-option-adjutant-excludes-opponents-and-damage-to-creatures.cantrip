@@ -1,0 +1,40 @@
+# Only your artifact creatures gain the ability; an opponent's artifact hitting you draws nothing (CR 109.5, 611.3a).
+# The Adjutant deals combat damage to a blocker, not a player, and draws nothing (CR 603.2, 120.2a).
+[Bot1 Deck]
+Island
+Black Lotus
+Co-Option Adjutant
+Island x17
+
+[Bot2 Deck]
+Mountain
+Clockwork Percussionist
+Ornithopter
+Mountain x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Co-Option Adjutant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Clockwork Percussionist.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Attack(Clockwork Percussionist > Bot1)
+[T2 Bot2.Main2]
+? Bot2.Library.Count = 12
+? Bot1.Library.Count = 13
+[T3 Bot1.Main1]
+Bot1.Attack(Co-Option Adjutant > Bot2)
+Bot2.Block(Ornithopter > Co-Option Adjutant)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter
+Bot1.Library.Count = 12
+Bot2.Library.Count = 12

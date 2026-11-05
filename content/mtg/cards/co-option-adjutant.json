@@ -1,0 +1,8 @@
+{
+  "name": "Co-Option Adjutant",
+  "manaCost": "{3}{U}",
+  "type": "Artifact Creature — Borg",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Artifact creatures you control have \"Whenever this creature deals combat damage to a player, draw a card.\""
+}
