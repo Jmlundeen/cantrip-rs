@@ -1,0 +1,46 @@
+# Test of Identity {1}{R}, "I Am Klingon - Target Klingon gets +1/+1 and gains double strike until end of turn": the
+# target is a Klingon only while it is legal. Targ Wrangler is a Klingon when targeted and is exiled by Swords to Plowshares
+# in response, so the mode finds no target as it resolves (CR 608.2b) and does nothing. The refusal shows the mode cannot
+# target an artifact.
+
+[Bot1 Deck]
+Targ Wrangler
+Test of Identity
+Swords to Plowshares
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Targ Wrangler.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Test of Identity.Cast
+Bot1.Modes(I Am Klingon)
+! Bot1.Target(Bot1.Battlefield.Mox Emerald)
+Bot1.Target(Bot1.Battlefield.Targ Wrangler)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Targ Wrangler)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Targ Wrangler
+Bot1.Graveyard = Test of Identity; Swords to Plowshares
+Bot1.Life = 25
+Bot1.Battlefield.Count = 4

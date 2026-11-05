@@ -1,0 +1,41 @@
+# Test of Identity {1}{R}, "I Am Klingon - Target Klingon gets +1/+1 and gains double strike until end of turn": Targ
+# Wrangler, a Klingon Warrior 5/3, is a 6/4 double striker with menace until the turn ends.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Targ Wrangler
+Test of Identity
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Targ Wrangler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Test of Identity.Cast
+Bot1.Modes(I Am Klingon)
+Bot1.Target(Bot1.Battlefield.Targ Wrangler)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Targ Wrangler.Power = 6
+Bot1.Battlefield.Targ Wrangler.Toughness = 4
+Bot1.Battlefield.Targ Wrangler.Keywords = DoubleStrike; Menace
+Bot1.Graveyard = Test of Identity

@@ -1,0 +1,32 @@
+# Test of Identity {1}{R}, "I Am Starfleet - Discard a card. If you do, draw two cards": a Lightning Bolt is discarded and
+# two Islands are drawn, so Bot1 holds three Forests and two Islands.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Test of Identity
+Lightning Bolt
+Forest
+Forest
+Forest
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Test of Identity.Cast
+Bot1.Modes(I Am Starfleet)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Forest; Forest; Forest; Island; Island
+Bot1.Graveyard = Test of Identity; Lightning Bolt

@@ -1,0 +1,6 @@
+{
+  "name": "Test of Identity",
+  "manaCost": "{1}{R}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• I Am Klingon — Target Klingon gets +1/+1 and gains double strike until end of turn.\n• I Am Starfleet — Discard a card. If you do, draw two cards."
+}
