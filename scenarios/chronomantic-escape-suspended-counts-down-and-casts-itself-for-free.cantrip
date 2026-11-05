@@ -1,0 +1,41 @@
+# Chronomantic Escape ({4}{W}{W}) has Suspend 3—{2}{W} (CR 702.62a): rather than cast it, Bot1 pays {2}{W} on turn three and
+# exiles it with three time counters. One comes off at each of Bot1's upkeeps - three, then two at turn five, one at turn
+# seven - and when the last is removed at turn nine it is cast for free, resolves, and exiles itself again with three.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Chronomantic Escape
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Chronomantic Escape.Suspend
+? Bot1.Exile.Chronomantic Escape.Counters.Time = 3
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Exile.Chronomantic Escape.Counters.Time = 2
+[T7 Bot1.Main1]
+? Bot1.Exile.Chronomantic Escape.Counters.Time = 1
+[T9 Bot1.Upkeep]
+Bot1.Accept
+[T9 Bot1.Main1]
+? Bot1.Exile.Chronomantic Escape.Counters.Time = 3
+
+[Expect]
+Bot1.Life = 20
+Bot1.Exile.Chronomantic Escape.Counters.Time = 3
+Bot1.Battlefield.Count = 3

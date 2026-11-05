@@ -1,0 +1,53 @@
+# Chronomantic Escape ({4}{W}{W}): "Until your next turn, creatures can't attack you. Exile Chronomantic Escape with three time
+# counters on it." Bot2's Savannah Lions attack on turn four, before the spell; Bot1 casts it on turn five, so the rule (CR
+# 611.2c) takes in the Lions and bars their attack on turn six. It lasts until Bot1's next turn begins (CR 611.2b), so on
+# turn eight the Lions attack again. The card exiles itself as it resolves, with the three time counters (CR 702.62a).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Plains
+Plains
+Chronomantic Escape
+Plains x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Savannah Lions
+Plains x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Attack(Savannah Lions > Bot1)
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Chronomantic Escape.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Exile.Chronomantic Escape.Counters.Time = 3
+[T6 Bot2.Main1]
+Bot2.Pass
+[T6 Bot2.Main2]
+? Bot1.Life = 18
+[T8 Bot2.Main1]
+Bot2.Attack(Savannah Lions > Bot1)
+[T8 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot1.Exile.Chronomantic Escape.Counters.Time = 2
