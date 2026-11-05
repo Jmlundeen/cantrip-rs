@@ -76,6 +76,14 @@ pub fn ability_cheaper_per_subtype_you_control<const TYPE: u16>(q: &dyn Query, a
     CostDelta::less(crate::permanents_with_subtype_you_control(q, asker.controller, wanted) as u32)
 }
 
+/// "This spell costs {N} less to cast if you've cast another spell this turn" (CR 601.2f, 118.7a): asked of the event history, so a
+/// countered spell or one still on the stack counts and the reduction applies once however many were cast; this spell is not yet
+/// cast while its cost is worked out (CR 601.2i), so it is never among them. A generic reduction takes only the generic part
+/// (CR 118.7a). Focus the Mind ({2}) and Gigastorm Titan ({3}) print it.
+pub fn less_if_you_cast_another_spell_this_turn<const N: u8>(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+    if q.history().casts_by(player).next().is_some() { CostDelta::less(N as u32) } else { CostDelta::NONE }
+}
+
 /// "The second spell you cast each turn costs {N} less to cast" (CR 601.2f, 118.7a, 601.2i): the controller's own spells only,
 /// the one being cast being their second when exactly one spell of theirs was cast earlier this turn, whoever's it was and
 /// however it was cast. A generic reduction takes only the generic part (CR 118.7c). Uthros Psionicist ({2}), Highspire
