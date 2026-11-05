@@ -1,0 +1,50 @@
+# Iroh, Tea Master: Bot2, the targeted opponent, concedes as Bot1 is asked whether to give the Food away. Bot1 accepts, but
+# no one gains control (CR 800.4b), so "when you do" (CR 603.12) does not trigger and no Ally is made.
+
+[Bot1 Deck]
+Plains
+Mountain
+Plains
+Iroh, Tea Master
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Bot3 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T4 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Iroh, Tea Master.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Stack.Count = 0
+Bot1.Pass
+Bot1.Target(Food Token)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot2.Concede
+Bot1.Accept
+Bot1.Pass
+Bot3.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Battlefield = Plains; Plains; Mountain; Iroh, Tea Master; Food Token

@@ -25,9 +25,11 @@ fn give_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
-    g.gain_control(item.object, permanent, opponent, Duration::Indefinite);
-    let this = g.card_id(&CARD);
-    g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    // "When you do": only if the opponent now controls it - not if they have left the game (CR 800.4b).
+    if g.gain_control(item.object, permanent, opponent, Duration::Indefinite) {
+        let this = g.card_id(&CARD);
+        g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    }
     Ok(())
 }
 
