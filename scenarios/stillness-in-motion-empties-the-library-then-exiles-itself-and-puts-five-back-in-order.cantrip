@@ -1,0 +1,51 @@
+# Stillness in Motion mills three each upkeep (CR 701.17a). On Bot1's turn 3 the library goes from seven to four, nothing else
+# happens (it is not empty), and Bot1 draws Consider. On turn 5 the three cards left are milled, so the library is empty:
+# the Enchantment is exiled and Bot1 picks five of the six cards in its graveyard (leaving Misshapen Fiend), putting them on
+# top in the order it chooses (CR 401.4); the draw step then takes Mesa Pegasus, the top one.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Stillness in Motion
+Island x4
+Lightning Bolt
+Shock
+Giant Growth
+Consider
+Brainstorm
+Mesa Pegasus
+Misshapen Fiend
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stillness in Motion.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+? Bot1.Library.Count = 7
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 3
+? Bot1.Graveyard.Count = 3
+? Bot1.Battlefield = Mox Sapphire; Mox Ruby; Stillness in Motion
+[T5 Bot1.Upkeep]
+! Bot1.Choose()
+! Bot1.Choose(Lightning Bolt; Shock; Giant Growth; Brainstorm)
+! Bot1.Choose(Lightning Bolt; Shock; Giant Growth; Brainstorm; Mesa Pegasus; Misshapen Fiend)
+Bot1.Choose(Lightning Bolt; Shock; Giant Growth; Brainstorm; Mesa Pegasus)
+Bot1.Arrange(Mesa Pegasus; Brainstorm; Giant Growth; Shock; Lightning Bolt)
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Exile = Stillness in Motion
+Bot1.Graveyard = Misshapen Fiend
+Bot1.Hand.Count = 6
+Bot1.Hand.Mesa Pegasus.Power = 1
+Bot1.Library = Brainstorm; Giant Growth; Shock; Lightning Bolt

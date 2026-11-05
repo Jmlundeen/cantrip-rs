@@ -1,0 +1,38 @@
+# A library of exactly three cards is emptied by the first mill (CR 701.17a). Stillness in Motion exiles itself and puts five
+# cards from the graveyard on top; the graveyard holds only the three just milled, so all three go back (CR 609.3), in the
+# order Bot1 gives, and the draw step takes the top one.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Stillness in Motion
+Island x4
+Lightning Bolt
+Shock
+Giant Growth
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stillness in Motion.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+! Bot1.Choose()
+Bot1.Choose(Lightning Bolt; Shock; Giant Growth)
+Bot1.Arrange(Shock; Giant Growth; Lightning Bolt)
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Exile = Stillness in Motion
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Shock.Colors = Red
+Bot1.Hand.Count = 5
+Bot1.Library = Giant Growth; Lightning Bolt

@@ -1,0 +1,6 @@
+{
+  "name": "Stillness in Motion",
+  "manaCost": "{1}{U}",
+  "type": "Enchantment",
+  "oracleText": "At the beginning of your upkeep, mill three cards. Then if your library has no cards in it, exile this enchantment and put five cards from your graveyard on top of your library in any order."
+}
