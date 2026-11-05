@@ -1,0 +1,11 @@
+{
+  "name": "Snowmelt Stag",
+  "manaCost": "{3}{U}",
+  "type": "Creature — Elemental Elk",
+  "power": 2,
+  "toughness": 5,
+  "oracleText": "Vigilance\nDuring your turn, this creature has base power and toughness 5/2.\n{5}{U}{U}: This creature can't be blocked this turn.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

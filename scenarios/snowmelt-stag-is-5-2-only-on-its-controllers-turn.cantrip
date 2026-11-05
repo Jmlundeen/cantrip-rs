@@ -1,0 +1,33 @@
+# Snowmelt Stag is a 2/5, but during its controller's turn its base power and toughness are 5/2 (CR 613.4b): 5/2 on turn 1
+# while Bot1 is the active player, 2/5 on Bot2's turn 2, 5/2 again on turn 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Snowmelt Stag
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Snowmelt Stag.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Snowmelt Stag.Power = 5
+? Bot1.Battlefield.Snowmelt Stag.Toughness = 2
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Snowmelt Stag.Power = 2
+? Bot1.Battlefield.Snowmelt Stag.Toughness = 5
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Snowmelt Stag.Power = 5
+Bot1.Battlefield.Snowmelt Stag.Toughness = 2
