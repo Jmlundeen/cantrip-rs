@@ -1,0 +1,54 @@
+# Flow of Maggots names the creature type that may block it with a word of its text (CR 612.2): Artificial Evolution,
+# changing "Wall" to "Bear" in it, lets Grizzly Bears block it and refuses Wall of Wood (CR 509.1b).
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Flow of Maggots
+Artificial Evolution
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Grizzly Bears
+Wall of Wood
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Flow of Maggots.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Flow of Maggots)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wall)
+Bot1.Modes(Bear)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Wall of Wood.Cast
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.PayCost
+Bot1.Pass
+? Bot1.Battlefield.Flow of Maggots.Counters.Age = 1
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Flow of Maggots > Bot2)
+! Bot2.Block(Wall of Wood > Flow of Maggots)
+Bot2.Block(Grizzly Bears > Flow of Maggots)
+? Combat.Blocks.Count = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = Flow of Maggots; Artificial Evolution; Black Lotus
+Bot2.Graveyard = Grizzly Bears; Black Lotus
