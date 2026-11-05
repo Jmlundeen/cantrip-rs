@@ -1,0 +1,8 @@
+{
+  "name": "Hundred-Battle Veteran",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Zombie Warrior",
+  "power": 4,
+  "toughness": 2,
+  "oracleText": "As long as there are three or more different kinds of counters among creatures you control, this creature gets +2/+4.\nYou may cast this card from your graveyard. If you do, it enters with a finality counter on it. (If a creature with a finality counter on it would die, exile it instead.)"
+}

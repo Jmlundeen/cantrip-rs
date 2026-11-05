@@ -1,0 +1,62 @@
+# Hundred-Battle Veteran ({3}{B}, 4/2): "As long as there are three or more different kinds of counters among creatures you
+# control, this creature gets +2/+4." (CR 613.4c, 122.1) Turn 1: Faithless Looting discards the Veteran and Alchemist's
+# Assistant, and Kin-Tree Nurturer endures with a +1/+1 counter. Turn 3 the Veteran is cast from the graveyard and enters
+# with a finality counter: two kinds of counters (finality, +1/+1) make it no bigger than 4/2. Alchemist's Assistant's renew then
+# puts a lifelink counter on the Nurturer, a third kind, and the Veteran is a 6/6.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Hundred-Battle Veteran
+Faithless Looting
+Alchemist's Assistant
+Kin-Tree Nurturer
+Mox Sapphire
+Swamp
+Mox Emerald
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Hundred-Battle Veteran; Alchemist's Assistant)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kin-Tree Nurturer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Hundred-Battle Veteran.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hundred-Battle Veteran.Counters.Finality = 1
+? Bot1.Battlefield.Hundred-Battle Veteran.Power = 4
+? Bot1.Battlefield.Hundred-Battle Veteran.Toughness = 2
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Alchemist's Assistant.Activate(Kin-Tree Nurturer)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Kin-Tree Nurturer.Counters.Lifelink = 1
+Bot1.Battlefield.Hundred-Battle Veteran.Power = 6
+Bot1.Battlefield.Hundred-Battle Veteran.Toughness = 6

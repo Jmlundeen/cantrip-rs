@@ -1,0 +1,64 @@
+# Hundred-Battle Veteran: "You may cast this card from your graveyard. If you do, it enters with a finality counter on it."
+# The counter comes with its own permission only (CR 601.3): cast from the graveyard under Yawgmoth's Will's ("Until end of
+# turn, you may play lands and cast spells from your graveyard"), it enters with none. Bot2 Bolts it on turn 2; on turn 3
+# Bot1 casts Yawgmoth's Will off a Black Lotus and then the Veteran from its graveyard by the Will, with four Moxen. Bot2's
+# second Bolt kills it on turn 4, after the Will's exile replacement has ended: with no finality counter it goes to the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Hundred-Battle Veteran
+Black Lotus
+Yawgmoth's Will
+Swamp x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hundred-Battle Veteran.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hundred-Battle Veteran)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Hundred-Battle Veteran
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Hundred-Battle Veteran.Cast(Ability: Yawgmoth's Will)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hundred-Battle Veteran.Power = 4
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hundred-Battle Veteran)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Hundred-Battle Veteran.Power = 4

@@ -1,0 +1,42 @@
+# Hundred-Battle Veteran: "You may cast this card from your graveyard." Cast that way it still costs {3}{B}, paid in the mana its
+# cost asks for (CR 601.2f-h; "You still pay all costs"): Bot1's four non-black Moxen don't cast it. Bot1 casts it on turn 1 off
+# a Black Lotus, so it has no black source after, and Bot2 Bolts it on turn 2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Hundred-Battle Veteran
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hundred-Battle Veteran.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hundred-Battle Veteran)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Hundred-Battle Veteran.Cast(Mana: short)
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Hundred-Battle Veteran; Black Lotus
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Ruby; Mox Sapphire

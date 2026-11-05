@@ -1,0 +1,60 @@
+# Hundred-Battle Veteran: "You may cast this card from your graveyard. If you do, it enters with a finality counter on it."
+# (CR 601.2, 122.1) Turn 1 it is cast from the hand with four Moxen and has no counter; Bot2 Bolts it on turn 2 and it goes to
+# the graveyard, from which it cannot be cast on Bot2's turn (a creature spell, CR 307.1). On turn 3 it is cast from the
+# graveyard and enters with a finality counter; Bot2's second Bolt on turn 4 kills it and it is exiled instead of dying
+# (CR 122.1g), leaving the graveyard empty.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Hundred-Battle Veteran
+Swamp x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hundred-Battle Veteran.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hundred-Battle Veteran)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Hundred-Battle Veteran
+! Bot1.Graveyard.Hundred-Battle Veteran.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Hundred-Battle Veteran.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hundred-Battle Veteran.Counters.Finality = 1
+? Bot1.Life = 20
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hundred-Battle Veteran)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard = 
+Bot1.Exile.Hundred-Battle Veteran.Power = 4
