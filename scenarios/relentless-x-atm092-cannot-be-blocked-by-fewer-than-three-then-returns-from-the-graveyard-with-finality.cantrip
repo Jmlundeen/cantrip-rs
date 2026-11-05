@@ -1,0 +1,87 @@
+# Relentless X-ATM092 (6/5) can't be blocked except by three or more creatures (CR 509.1b): Bot2's two Ornithopters may not block it on turn 3 and it deals 6. Dismember then kills it
+# (-5/-5), and on turn 7 "{8}: Return this card from your graveyard to the battlefield tapped with a finality counter on it" is paid exactly (a Sol Ring cast with the Emerald, then
+# the Jet, the Ruby, a Swamp, a Mana Vault and the Sol Ring: eight mana, the Pearl left untapped): it returns tapped with the finality counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Relentless X-ATM092
+Dismember
+Mana Vault
+Swamp
+Mox Emerald
+Sol Ring
+Island x14
+
+[Bot2 Deck]
+Ornithopter x2
+Island x7
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Relentless X-ATM092.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Attack(Relentless X-ATM092 > Bot2)
+! Bot2.Block(Ornithopter#1 > Relentless X-ATM092)
+! Bot2.Block(Ornithopter#2 > Relentless X-ATM092)
+[T3 Bot1.Main2]
+? Bot2.Life = 14
+Bot1.Hand.Mana Vault.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dismember.Cast(Bot1.Battlefield.Relentless X-ATM092)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Relentless X-ATM092; Dismember; Black Lotus
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Graveyard.Relentless X-ATM092.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mana Vault.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Relentless X-ATM092.Tapped = true
+Bot1.Battlefield.Relentless X-ATM092.Counters.Finality = 1
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Graveyard = Dismember; Black Lotus
