@@ -1,0 +1,66 @@
+# Promise of Loyalty ({4}{W}): "Each player puts a vow counter on a creature they control and sacrifices the rest. Each of
+# those creatures can't attack you or planeswalkers you control for as long as it has a vow counter on it." Each player
+# controls a Savannah Lions and an Ornithopter when Bot1 casts it on turn three; in turn order (CR 101.4) Bot1 keeps the
+# Lions and sacrifices the Ornithopter, then Bot2 does the same. The vow counter is on each kept creature (CR 122.1), the
+# rest are sacrificed, and on turn four Bot2's Lions can't attack Bot1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Savannah Lions
+Ornithopter
+Plains
+Promise of Loyalty
+Plains x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Savannah Lions
+Ornithopter
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Promise of Loyalty.Cast
+Bot1.Choose(Savannah Lions)
+Bot2.Choose(Savannah Lions)
+? Bot1.Battlefield.Savannah Lions.Counters.Vow = 1
+? Bot2.Battlefield.Savannah Lions.Counters.Vow = 1
+? Bot1.Battlefield.Count = 4
+? Bot2.Battlefield.Count = 4
+[T4 Bot2.Main1]
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot2.Battlefield.Savannah Lions.Tapped = false
+Bot2.Battlefield.Savannah Lions.Damage = 0
+Bot1.Battlefield.Savannah Lions.Counters.Vow = 1
+Bot2.Battlefield.Savannah Lions.Counters.Vow = 1
+Bot1.Graveyard.Count = 3
+Bot2.Graveyard.Count = 1
