@@ -1,0 +1,47 @@
+# Ferocidon prohibits Gul Dukat's life gain (CR 101.2). Gul's controller loses 2, the opponent pays 1, and only the opponent loses 1 again.
+# Including Gul's controller would lose an extra 2; the blocked gain cannot cancel that mistake (CR 119.3).
+
+[Bot1 Deck]
+Gul Dukat, Colonial Prefect
+Black Lotus x2
+Mox Jet
+Night's Whisper
+Swamp
+Island x20
+
+[Bot2 Deck]
+Rampaging Ferocidon
+Black Lotus
+Mana Confluence
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gul Dukat, Colonial Prefect.Cast
+Bot1.Pass
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mana Confluence.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Rampaging Ferocidon.Cast
+[T3 Bot1.Main1]
+Bot2.Battlefield.Mana Confluence.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Night's Whisper.Cast
+[T3 Bot1.End]
+? Bot1.Life = 18
+? Bot2.Life = 19
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Stack.Count = 0

@@ -109,3 +109,8 @@ Bot1.Battlefield.Life Loss Witness.Counters.Charge = 2
 fn archfiend_loses_life_in_one_batch_with_two_occurrences() {
     play("Archfiend of Despair", 20);
 }
+
+#[test]
+fn gul_dukat_loses_life_in_one_batch_with_two_occurrences() {
+    play("Gul Dukat, Colonial Prefect", 22);
+}

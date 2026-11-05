@@ -1,0 +1,52 @@
+# Gul Dukat reads each opponent's losses as its end-step trigger resolves, including damage dealt in response (CR 608.2h).
+# Bot2 loses 2 and Bot3 loses 3; Bot1's own payment of 1 life is not an opponent's loss (CR 119.4).
+
+[Bot1 Deck]
+Gul Dukat, Colonial Prefect
+Black Lotus x2
+Mox Jet
+Mox Ruby
+Shock
+Lightning Bolt
+Mana Confluence
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mana Confluence.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gul Dukat, Colonial Prefect.Cast
+Bot1.Pass
+? Bot1.Mana =
+[T4 Bot1.Main1]
+Bot1.Battlefield.Mana Confluence.Activate(Color: Red)
+Bot1.Hand.Shock.Cast(Bot2)
+[T4 Bot1.End]
+? Stack.Count = 1
+? Bot2.Life = 18
+? Bot3.Life = 20
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot3.Life = 17
+[T5 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 16
+Bot3.Life = 14
+Bot1.Battlefield.Gul Dukat, Colonial Prefect.Keywords = Menace
+Stack.Count = 0

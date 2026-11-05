@@ -1,0 +1,53 @@
+# Both opponents pay 1 life this turn (CR 119.4). Teferi's Reproach then freezes Bot2's life total.
+# Gul Dukat's nontargeted loss reaches Bot3 only, and gains only that 1 life, not both requested losses (CR 101.2, 608.2c).
+
+[Bot1 Deck]
+Gul Dukat, Colonial Prefect
+Black Lotus x2
+Mox Jet
+Teferi's Reproach
+Mox Pearl
+Swamp
+Island x20
+
+[Bot2 Deck]
+Mana Confluence
+Island x20
+
+[Bot3 Deck]
+Mana Confluence
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gul Dukat, Colonial Prefect.Cast
+Bot1.Pass
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mana Confluence.Play
+[T3 Bot3.Main1]
+Bot3.Hand.Mana Confluence.Play
+[T4 Bot1.Main1]
+Bot2.Battlefield.Mana Confluence.Activate(Color: Blue)
+Bot3.Battlefield.Mana Confluence.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Teferi's Reproach.Cast(Bot2)
+[T4 Bot1.End]
+? Bot2.Life = 19
+? Bot3.Life = 19
+[T5 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
+Bot3.Life = 18
+Stack.Count = 0

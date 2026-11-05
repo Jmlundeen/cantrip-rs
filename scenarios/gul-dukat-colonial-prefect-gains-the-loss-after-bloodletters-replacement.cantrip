@@ -1,0 +1,42 @@
+# Bloodletter doubles Mana Confluence's 1 life payment to 2, then Gul Dukat's loss of 2 to 4 (CR 119.4, 614.1a).
+# Gul Dukat gains the 4 actually lost, not the 2 requested (CR 119.3, 608.2c).
+
+[Bot1 Deck]
+Gul Dukat, Colonial Prefect
+Bloodletter of Aclazotz
+Black Lotus x3
+Mox Jet
+Swamp
+Island x20
+
+[Bot2 Deck]
+Mana Confluence
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+Bot1.Hand.Gul Dukat, Colonial Prefect.Cast
+Bot1.Pass
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mana Confluence.Play
+[T3 Bot1.Main1]
+Bot2.Battlefield.Mana Confluence.Activate(Color: Blue)
+[T3 Bot1.End]
+? Bot2.Life = 18
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 14
+Stack.Count = 0

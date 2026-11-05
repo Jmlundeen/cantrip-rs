@@ -1,0 +1,11 @@
+{
+  "name": "Gul Dukat, Colonial Prefect",
+  "manaCost": "{4}{B}{B}{B}",
+  "type": "Legendary Creature — Cardassian Rogue",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Menace\nAt the beginning of each end step, each opponent loses life equal to the life that player lost this turn. You gain life equal to the life lost this way. (Damage causes loss of life.)",
+  "keywords": [
+    "Menace"
+  ]
+}

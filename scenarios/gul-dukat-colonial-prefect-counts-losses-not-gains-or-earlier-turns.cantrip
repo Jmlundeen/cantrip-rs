@@ -1,0 +1,52 @@
+# Gul Dukat counts both Night's Whisper losses, not their net with Healing Salve (CR 119.3).
+# The opponent's end step doubles the 4 lost this turn; the next turn's end step does not count that earlier loss (CR 603.2b).
+
+[Bot1 Deck]
+Gul Dukat, Colonial Prefect
+Black Lotus x2
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Night's Whisper x2
+Black Lotus
+Mox Jet
+Mox Pearl
+Healing Salve
+Swamp
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gul Dukat, Colonial Prefect.Cast
+Bot1.Pass
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Night's Whisper.Cast
+Bot2.Hand.Night's Whisper.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Target player gains 3 life)
+Bot2.Target(Bot2)
+[T2 Bot2.End]
+? Bot2.Life = 19
+[T3 Bot1.Main1]
+? Bot1.Life = 24
+? Bot2.Life = 15
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 15
+Stack.Count = 0

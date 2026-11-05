@@ -1,0 +1,49 @@
+# Bot2 loses 2 life before casting Platinum Emperion; Gul Dukat still requests that loss at the end step.
+# Emperion prohibits it, so no life was lost this way and Gul Dukat gains nothing (CR 101.2, 608.2c).
+
+[Bot1 Deck]
+Gul Dukat, Colonial Prefect
+Black Lotus x2
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Platinum Emperion
+Black Lotus x3
+Mox Jet
+Night's Whisper
+Swamp
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gul Dukat, Colonial Prefect.Cast
+Bot1.Pass
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Night's Whisper.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Platinum Emperion.Cast
+[T2 Bot2.End]
+? Bot2.Life = 18
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Stack.Count = 0
