@@ -8,6 +8,14 @@ pub fn power_three_or_greater_cant_block(q: &dyn Query, source: ObjectId, blocke
     source != attacker || q.chars(blocker).power.unwrap_or(0) < 3
 }
 
+/// "Creatures with power less than this creature's power can't block it" (CR 509.1b): of a possible block with the source as
+/// the attacker, the blocker's power must be at least its own, both as they are as blockers are declared. A block that has been
+/// made stands if powers change afterwards, since this is only asked when blocks are declared. Formation Breaker and Elusive
+/// Otter print it.
+pub fn power_less_than_its_cant_block_it(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
+    source != attacker || q.chars(blocker).power.unwrap_or(0) >= q.chars(source).power.unwrap_or(0)
+}
+
 /// "[This creature] can't be blocked this turn except by creatures with haste" (CR 509.1b): the restriction on the creature `on`,
 /// as an attacker, that only a creature with haste as blockers are declared may block it. It says nothing of its blocking, nor of
 /// a block already made. A card lists `EXCEPT_BY_HASTE` in its `lasting_block_rules` and the resolved ability adds

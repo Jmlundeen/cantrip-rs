@@ -1,0 +1,8 @@
+{
+  "name": "Formation Breaker",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Beast",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Creatures with power less than this creature's power can't block it.\nAs long as you control a creature with a counter on it, this creature gets +1/+2."
+}
