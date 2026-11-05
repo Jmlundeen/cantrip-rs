@@ -1,0 +1,33 @@
+# Entomb puts a creature in the caster's graveyard; the first mode targets and returns it.
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Dark Ritual
+Entomb
+Stray from History
+Island
+Island
+Island
+Island
+Serra Angel
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Serra Angel)
+Bot1.Hand.Stray from History.Cast
+Bot1.Modes(Rewrite the Past)
+Bot1.Target(Graveyard.Serra Angel)
+
+[Expect]
+Turn = 1
+Bot1.Hand.Count = 3
+Bot1.Hand.Serra Angel.Power = 4
+Bot1.Graveyard.Count = 4

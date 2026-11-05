@@ -1,0 +1,36 @@
+# Both target slots accept the printed union, including a Spacecraft that is not a creature.
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Dark Ritual
+Entomb
+Entomb
+Stray from History
+Island
+Serra Angel
+Enterprise NX-01
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Enterprise NX-01)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Serra Angel)
+Bot1.Hand.Stray from History.Cast
+Bot1.Modes(Rewrite the Past)
+! Bot1.Target(Graveyard.Dark Ritual)
+Bot1.Target(Graveyard.Serra Angel; Graveyard.Enterprise NX-01)
+
+[Expect]
+Turn = 1
+Bot1.Hand.Count = 3
+Bot1.Hand.Serra Angel.Power = 4
+Bot1.Hand.Enterprise NX-01.Colors.Count = 1
+Bot1.Graveyard.Count = 5

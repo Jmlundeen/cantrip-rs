@@ -1,0 +1,29 @@
+# With only lands in the targeted hand, the mode reveals it but offers no card to exile. Rewrite the Past is refused first:
+# with no creature or Spacecraft card in Bot1's graveyard it has no legal target, and it needs at least one (CR 700.2a,
+# 601.2c).
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Stray from History
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Stray from History.Cast
+! Bot1.Modes(Rewrite the Past)
+Bot1.Modes(Repair the Timeline)
+
+[Expect]
+Turn = 1
+Bot2.Hand.Count = 7
+Exile.Count = 0
+Bot1.Graveyard = Stray from History; Dark Ritual

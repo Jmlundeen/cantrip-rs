@@ -1,0 +1,48 @@
+# Rewrite the Past permits at most two targets. Three legal creature and Spacecraft cards are available; the three-target answer is refused, then two are returned.
+[Bot1 Deck]
+Swamp
+Entomb
+Entomb
+Entomb
+Dark Ritual
+Black Lotus
+Stray from History
+Serra Angel
+Enterprise NX-01
+Hill Giant
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Serra Angel)
+[T3 Bot1.Main1]
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Enterprise NX-01)
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Hill Giant)
+Bot1.Hand.Stray from History.Cast
+Bot1.Modes(Rewrite the Past)
+! Bot1.Target(Graveyard.Serra Angel; Graveyard.Enterprise NX-01; Graveyard.Hill Giant)
+Bot1.Target(Graveyard.Serra Angel; Graveyard.Enterprise NX-01)
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 3
+Bot1.Hand.Serra Angel.Power = 4
+Bot1.Hand.Enterprise NX-01.Colors.Count = 1
+Bot1.Graveyard.Hill Giant.Power = 3

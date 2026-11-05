@@ -1,0 +1,48 @@
+# Entomb places a creature and a noncreature Spacecraft in the caster's graveyard. Cling to Dust exiles the Spacecraft in response; Stray still returns its legal creature target.
+[Bot1 Deck]
+Swamp
+Entomb
+Dark Ritual
+Entomb
+Dark Ritual
+Stray from History
+Swamp
+Island
+Serra Angel
+Enterprise NX-01
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Cling to Dust
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Enterprise NX-01)
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Search(Serra Angel)
+Bot1.Hand.Stray from History.Cast
+Bot1.Modes(Rewrite the Past)
+Bot1.Target(Graveyard.Serra Angel; Graveyard.Enterprise NX-01)
+Bot2.Hand.Cling to Dust.Cast(Graveyard.Enterprise NX-01)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Hand.Serra Angel.Power = 4
+Bot1.Hand.Enterprise NX-01 = (absent)
+Exile = Enterprise NX-01
+Stack.Count = 0
