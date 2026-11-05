@@ -1,0 +1,54 @@
+# Choco and Storm Crow attack: two cards looked at, a Forest and an Island, neither taken into the hand. "Any number of land cards" - both enter tapped together, and each is
+# landfall: Choco gets +1/+0 twice, 5/5, and with Storm Crow's 1 Bot2 takes 6: 14. Nothing is left for the graveyard (only the spent Black Lotus is there).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Choco, Seeker of Paradise
+Storm Crow
+Island
+Forest
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Choco, Seeker of Paradise.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Hand.Storm Crow.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Choco, Seeker of Paradise; Storm Crow)
+Bot1.Choose()
+Bot1.Choose(Forest; Island)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Choco, Seeker of Paradise.Power = 5
+? Bot1.Battlefield.Choco, Seeker of Paradise.Toughness = 5
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 14
+Bot1.Graveyard.Count = 1
+Bot1.Library.Count = 10
+Bot1.Battlefield.Forest.Tapped = true

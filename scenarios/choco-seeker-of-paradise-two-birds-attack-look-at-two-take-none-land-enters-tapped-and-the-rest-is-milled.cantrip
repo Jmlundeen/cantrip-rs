@@ -1,0 +1,56 @@
+# Choco, Seeker of Paradise (3/5) and Storm Crow (a Bird) attack together: the Birds declared in one attack are one batch (CR 603.2c), so Choco triggers once and
+# looks at two cards - a Forest and a Serra Angel (the Island below them is unlooked). At most one may go to the hand (two are refused); Bot1 takes none. Of the cards
+# left only the land may enter (the Angel is refused), tapped; the Angel goes to the graveyard. The Forest entering is landfall: Choco 4/5 + Storm Crow 1 = 5, Bot2 on 15.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Choco, Seeker of Paradise
+Storm Crow
+Island
+Forest
+Serra Angel
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Choco, Seeker of Paradise.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Hand.Storm Crow.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Choco, Seeker of Paradise; Storm Crow)
+! Bot1.Choose(Forest; Serra Angel)
+Bot1.Choose()
+! Bot1.Choose(Serra Angel)
+Bot1.Choose(Forest)
+? Bot1.Looked = Forest; Serra Angel
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Graveyard = Serra Angel; Black Lotus
+Bot1.Library.Count = 10

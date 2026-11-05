@@ -1,0 +1,8 @@
+{
+  "name": "Choco, Seeker of Paradise",
+  "manaCost": "{1}{G}{W}{U}",
+  "type": "Legendary Creature — Bird",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "Whenever one or more Birds you control attack, look at that many cards from the top of your library. You may put one of them into your hand. Then put any number of land cards from among them onto the battlefield tapped and the rest into your graveyard.\nLandfall — Whenever a land you control enters, Choco gets +1/+0 until end of turn."
+}

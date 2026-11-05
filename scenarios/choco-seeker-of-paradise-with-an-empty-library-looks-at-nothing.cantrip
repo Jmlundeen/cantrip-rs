@@ -1,0 +1,43 @@
+# Choco attacks with the library empty (an eight-card deck: seven in hand and the turn-3 draw): "look at that many cards" shows what is there (CR 609.3), which is none, so nobody
+# is asked and nothing enters or is put anywhere. Choco hits for 3: Bot2 on 17.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Choco, Seeker of Paradise
+Storm Crow
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Choco, Seeker of Paradise.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Choco, Seeker of Paradise)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 17
+Bot1.Library.Count = 0
+Bot1.Graveyard.Count = 0

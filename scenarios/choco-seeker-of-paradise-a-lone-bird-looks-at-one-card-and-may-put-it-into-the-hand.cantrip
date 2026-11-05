@@ -1,0 +1,48 @@
+# Choco alone attacks (a Bird, the only one): "that many" is one card, the Forest on top (the Serra Angel below it is unlooked). Bot1 puts it into its hand; no land enters,
+# so there is no landfall and Choco hits for 3: Bot2 on 17. The library holds the 11 cards that were not looked at.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Choco, Seeker of Paradise
+Storm Crow
+Island
+Forest
+Serra Angel
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Choco, Seeker of Paradise.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Choco, Seeker of Paradise)
+Bot1.Choose(Forest)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 17
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 11
+Bot1.Graveyard.Count = 0

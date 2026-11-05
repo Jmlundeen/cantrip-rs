@@ -1,0 +1,53 @@
+# Choco, Seeker of Paradise (a Bird) and Savannah Lions (a Cat, no Bird) attack together: one Bird attacked, so "that many" is one card (CR 603.2c, 608.2h),
+# the Forest on top - the Lions in the same attack are not counted, and the Serra Angel below the Forest is never looked at. Bot1 puts the Forest into its
+# hand; nothing else was looked at, so nothing enters and nothing is milled (the graveyard holds only the Black Lotus sacrificed for the Lions). Choco and the Lions
+# hit for 3 + 2: Bot2 on 15. The library holds the 11 cards below the Forest.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Choco, Seeker of Paradise
+Savannah Lions
+Island
+Forest
+Serra Angel
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Choco, Seeker of Paradise.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Choco, Seeker of Paradise; Savannah Lions)
+Bot1.Choose(Forest)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 15
+Bot1.Hand.Count = 2
+Bot1.Library.Count = 11
+Bot1.Graveyard.Count = 1
