@@ -1,0 +1,78 @@
+# Squall, SeeD Mercenary (CR 506.5, 702.4, 510.2, 202.3, 115.1): attacking alone on turn 3 Squall gains double strike and deals 3 + 3
+# to Bot2 (20 -> 14). Each combat damage step returns a target permanent card with mana value 3 or less from Bot1's graveyard: Shantotto
+# (mana value exactly 3) comes back while Hill Giant (mana value 4), Bot2's Black Lotus and its later discarded Island are not legal targets, so the second damage
+# step has none. On turn 5 Squall attacks with Shantotto: not alone, so no double strike, and 3 damage only (14 -> 11).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Squall, SeeD Mercenary
+Faithless Looting
+Shantotto, Tactician Magician
+Hill Giant
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Squall, SeeD Mercenary.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Shantotto, Tactician Magician; Hill Giant)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Squall, SeeD Mercenary)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Squall, SeeD Mercenary.Keywords = DoubleStrike
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Damage]
+? Bot2.Life = 17
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shantotto, Tactician Magician.Power = 0
+? Bot1.Battlefield.Shantotto, Tactician Magician.Tapped = false
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 14
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Squall, SeeD Mercenary; Shantotto, Tactician Magician)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Damage]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 11
+Stack.Count = 0
+Bot1.Graveyard = Faithless Looting; Hill Giant
+Bot2.Graveyard = Island; Black Lotus

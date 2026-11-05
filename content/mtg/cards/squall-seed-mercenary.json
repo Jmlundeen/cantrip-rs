@@ -1,0 +1,8 @@
+{
+  "name": "Squall, SeeD Mercenary",
+  "manaCost": "{2}{W}{B}",
+  "type": "Legendary Creature — Human Knight Mercenary",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Rough Divide — Whenever a creature you control attacks alone, it gains double strike until end of turn.\nWhenever Squall deals combat damage to a player, return target permanent card with mana value 3 or less from your graveyard to the battlefield."
+}
