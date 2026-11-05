@@ -1,0 +1,52 @@
+# Aspect of Wolf's "Forests you control" are its controller's, not the enchanted creature's controller's (CR 109.5),
+# and a Forest is any permanent with the Forest subtype as it is now (CR 305.6, 305.7, 611.3a). Bot1 enchants Bot2's
+# Grizzly Bears (2/2) on turn 5 with Savannah, Tropical Island (nonbasic Forests) and a basic Forest - three Forests:
+# +1/+2 makes it 3/4 (Bot2's two Forests would make it 3/3, all five 4/5, the basic Forest alone 2/3). On turn 7
+# Spreading Seas makes Bot1's basic Forest an Island, no longer a Forest (CR 305.7): two Forests, +1/+1, 3/3.
+
+[Bot1 Deck]
+Savannah
+Tropical Island
+Forest
+Island
+Aspect of Wolf
+Spreading Seas
+Island x10
+
+[Bot2 Deck]
+Forest
+Forest
+Grizzly Bears
+Forest x10
+
+[Actions]
+Bot1.Hand.Savannah.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Tropical Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Savannah.Activate(Ability: {G})
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Aspect of Wolf.Cast(Bot2.Battlefield.Grizzly Bears)
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Grizzly Bears.Power = 3
+? Bot2.Battlefield.Grizzly Bears.Toughness = 4
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Tropical Island.Activate(Ability: {U})
+Bot1.Hand.Spreading Seas.Cast(Bot1.Battlefield.Forest)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Grizzly Bears.Power = 3
+Bot2.Battlefield.Grizzly Bears.Toughness = 3
+Bot1.Battlefield.Aspect of Wolf.AttachedTo = Grizzly Bears
+Bot1.Battlefield.Spreading Seas.AttachedTo = Forest

@@ -451,6 +451,10 @@ const INERT: &[(&str, &str)] = &[
         "Kinbinding",
         "its effect counts the creatures the event history says entered under its controller's control this turn, and a synthetic state has no history; a scenario of the card shows the +X/+X",
     ),
+    (
+        "Aspect of Wolf",
+        "its effect counts the Forests its controller controls, and the synthetic boards hold none; its scenarios show +X/+Y for odd and even counts, nonbasic Forests, a Forest that stops being one, and an opponent's creature",
+    ),
 ];
 
 /// The contract of every static ability's effect (`StaticApply`), across the whole card table: applied to synthetic objects

@@ -1,0 +1,6 @@
+{
+  "name": "Aspect of Wolf",
+  "manaCost": "{1}{G}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nEnchanted creature gets +X/+Y, where X is half the number of Forests you control, rounded down, and Y is half the number of Forests you control, rounded up."
+}
