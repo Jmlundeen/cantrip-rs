@@ -1,0 +1,47 @@
+# Karakyk Guardian: "This creature has hexproof as long as it hasn't dealt damage yet." The opponent's Lightning Bolt can't target
+# it at first, though damage dealt by something else (the Bolt's own, to Bot1) is in the history. Once it has dealt combat damage
+# (to Bot2, in the air) it loses hexproof for good, and a Lightning Bolt then targets it and marks three damage.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Karakyk Guardian
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Karakyk Guardian.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 17
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Karakyk Guardian)
+[T3 Bot1.Main1]
+Bot1.Attack(Karakyk Guardian > Bot2)
+[T4 Bot2.Main1]
+? Bot2.Life = 14
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Karakyk Guardian)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Karakyk Guardian.Damage = 3

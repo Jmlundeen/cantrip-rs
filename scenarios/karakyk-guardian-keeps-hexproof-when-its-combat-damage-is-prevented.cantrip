@@ -1,0 +1,45 @@
+# Karakyk Guardian: damage that is prevented is not dealt (CR 615.6), so a Fog on its attack leaves it as it was: Bot2 takes none,
+# and on its own turn still can't target it with a Lightning Bolt.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Karakyk Guardian
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Fog
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Karakyk Guardian.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Karakyk Guardian > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fog.Cast
+[T4 Bot2.Main1]
+? Bot2.Life = 20
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Karakyk Guardian)
+
+[Expect]
+Bot2.Life = 20
