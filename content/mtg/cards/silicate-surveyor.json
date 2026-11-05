@@ -1,0 +1,11 @@
+{
+  "name": "Silicate Surveyor",
+  "manaCost": "{4}{R}",
+  "type": "Creature — Tholian Scout",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Reach\nWhen this creature enters, exile the top card of your library. Until the end of your next turn, you may play that card.",
+  "keywords": [
+    "Reach"
+  ]
+}

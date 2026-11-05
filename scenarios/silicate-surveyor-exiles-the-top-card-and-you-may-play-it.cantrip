@@ -1,0 +1,46 @@
+# Silicate Surveyor {4}{R}: "When this creature enters, exile the top card of your library. Until the end of your next
+# turn, you may play that card." Four Mox Rubies and a Mountain pay the five mana; the Forest on top of the library is
+# exiled, then played as Bot1's land for turn 3, so it is on the battlefield and exile is empty.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Silicate Surveyor
+Mountain
+Forest
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Silicate Surveyor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Mountain
+Bot1.Exile.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Exile.Count = 0
+Bot1.Battlefield.Silicate Surveyor.Power = 4
