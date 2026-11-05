@@ -1,0 +1,8 @@
+{
+  "name": "Embermouth Sentinel",
+  "manaCost": "{2}",
+  "type": "Artifact Creature — Chimera",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "When this creature enters, you may search your library for a basic land card, reveal it, then shuffle and put that card on top. If you control a Dragon, put that card onto the battlefield tapped instead."
+}

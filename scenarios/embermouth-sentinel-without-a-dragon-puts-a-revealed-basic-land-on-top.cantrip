@@ -1,0 +1,39 @@
+# Embermouth Sentinel {2} Artifact Creature 2/1: "When this creature enters, you may search your library for a basic land card,
+# reveal it, then shuffle and put that card on top. If you control a Dragon, put that card onto the battlefield tapped instead."
+# Bot1 controls no Dragon, accepts and may find only a basic land card (the Tropical Island and Lightning Bolt are refused): the
+# Island is revealed and ends on top, so Bot1 draws it in turn 3's draw step and it never reaches the battlefield.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Embermouth Sentinel
+Plains x4
+Plains
+Lightning Bolt
+Island
+Tropical Island
+Plains x6
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Embermouth Sentinel.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Accept
+! Bot1.Search(Tropical Island)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Island)
+? Bot1.Revealed = Island
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Island; Plains; Plains; Plains; Plains
+Bot1.Battlefield = Embermouth Sentinel; Mox Pearl; Mox Sapphire

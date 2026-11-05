@@ -1,0 +1,51 @@
+# Embermouth Sentinel: only a Dragon its controller controls counts. Bot2's Phyrexian Dragon Engine (turn 2) does not send Bot1's
+# basic land to the battlefield: the Island goes on top and Bot1 draws it in turn 5's draw step.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Embermouth Sentinel
+Plains x4
+Plains
+Island
+Plains x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Phyrexian Dragon Engine
+Swamp x16
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Phyrexian Dragon Engine.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Embermouth Sentinel.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Search(Island)
+? Bot1.Battlefield = Embermouth Sentinel; Mox Pearl; Mox Sapphire
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Island; Plains; Plains; Plains; Plains; Plains
