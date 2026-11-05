@@ -1,0 +1,57 @@
+# Cloud of Darkness (3/3 flying): "When Cloud of Darkness enters, target creature an opponent controls gets -X/-X until end of turn, where X is the number of permanent cards
+# in your graveyard." Turn 1 Bot1 casts Ancestral Recall (an instant: in its graveyard, but not a permanent card). Turn 2 Bot2 casts Black Lotus and sacrifices it (a permanent card
+# in Bot2's graveyard, not Bot1's) and an Ornithopter (0/2). Turn 3 Bot1 sacrifices its own Black Lotus for mana (the one permanent card in its graveyard) and casts Cloud:
+# X = 1, so the Ornithopter is -1/1 (X = 2, counting Ancestral Recall or Bot2's Lotus, would kill it); Bot1's own Memnite and Cloud are no targets, so the Ornithopter is the one legal target and is chosen without asking.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ancestral Recall
+Cloud of Darkness
+Memnite
+Island
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cloud of Darkness.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Power = -1
+? Bot2.Battlefield.Ornithopter.Toughness = 1
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+
+[Expect]
+Bot1.Graveyard = Black Lotus; Ancestral Recall
+Bot2.Graveyard = Black Lotus
