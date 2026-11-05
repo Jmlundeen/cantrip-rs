@@ -92,6 +92,11 @@ pub struct Entering {
     /// The object chosen as it enters (CR 614.12a, 607.2d): Dauntless Bodyguard's "another creature you control"
     /// (`cantrip_mechanics::choose::object_as_enters`).
     pub chosen_object: Option<ObjectId>,
+    /// "As this permanent enters, you get an emblem with ..." (CR 614.12, 114.2): the emblem its controller gets as it arrives
+    /// (`cantrip_mechanics::tokens::emblem_as_enters`), under the player it enters under, naming the permanent as the new
+    /// object it is by then (CR 400.7; `Query::made_by`). Made by the engine as it arrives, so an entry sent elsewhere makes
+    /// none (`instead`, CR 614.1a), and `object`, what it is still leaving from, is never the name kept. Tibalt, Cosmic Impostor.
+    pub emblem: Option<CardId>,
     /// It enters attached to this permanent (CR 303.4f): an Aura entering from the stack, or choosing its host as it
     /// is put onto the battlefield (CR 303.4g).
     pub attach: Option<ObjectId>,
@@ -263,6 +268,10 @@ pub trait LayerQuery {
     /// component's card. What "the card's delayed ability" a static ability gives is named by.
     fn text_of(&self, source: ObjectId) -> CardId {
         self.cards().current(self.state().obj(source))
+    }
+    /// The ability that made the emblem `emblem` (`Query::made_by`).
+    fn made_by(&self, emblem: ObjectId) -> Option<Linked> {
+        self.state().made_by(emblem)
     }
     /// The cards in exile exiled by `by` (CR 607.2a; `Query::exiled_with`), in exile order.
     fn exiled_with(&self, by: Linked) -> Vec<ObjectId> {

@@ -214,12 +214,17 @@ pub struct Marks {
 pub const CHOSEN_KEPT: usize = 2;
 
 /// A choice an object keeps with the ability that made it (`Chosen`), told apart from that ability's other choices by its
-/// kind: a card name (CR 201.3), an object, or a player.
+/// kind: a card name (CR 201.3), an object, or a player. An emblem may keep the ability that made it the same way
+/// (`Choices::maker`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Kept {
     Name(CardId),
     Object(ObjectId),
     Player(PlayerId),
+    /// On an emblem, no choice but what its text names: the object whose ability made it, as the object it was then (CR
+    /// 114.2, 400.7), that ability being the `Chosen`'s text and way of acquiring it. Read with `Choices::maker`, by any
+    /// ability of the emblem, whatever has become of that object.
+    Maker(ObjectId),
 }
 
 impl Kept {
@@ -285,7 +290,8 @@ pub trait ChoiceRecord {
     fn keep(&mut self, by: Linked, value: Kept) -> bool;
     /// What was chosen, with no ability asking: the scenario dump's and the loop watch's.
     fn entered_raw(&self) -> (Option<CardId>, Entered);
-    /// Every object chosen: as it entered, then as its abilities resolved (the loop watch's).
+    /// Every object it names: chosen as it entered, then chosen as its abilities resolved or (an emblem) what made it (the
+    /// loop watch's).
     fn objects_raw(&self) -> [Option<ObjectId>; 1 + CHOSEN_KEPT];
     /// The same choices with no object chosen (the loop watch's, which hashes the objects by their canonical names).
     fn without_objects(&self) -> Choices;
@@ -333,7 +339,7 @@ impl ChoiceRecord for Choices {
         let mut all = [self.object; 1 + CHOSEN_KEPT];
         for (at, kept) in self.kept.iter().enumerate() {
             all[1 + at] = match kept {
-                Some(Chosen { value: Kept::Object(id), .. }) => Some(*id),
+                Some(Chosen { value: Kept::Object(id) | Kept::Maker(id), .. }) => Some(*id),
                 _ => None,
             };
         }
@@ -343,7 +349,7 @@ impl ChoiceRecord for Choices {
     fn without_objects(&self) -> Choices {
         let mut kept = self.kept;
         for k in &mut kept {
-            if let Some(Chosen { value: Kept::Object(id), .. }) = k {
+            if let Some(Chosen { value: Kept::Object(id) | Kept::Maker(id), .. }) = k {
                 *id = ObjectId::NONE;
             }
         }
@@ -402,6 +408,14 @@ impl Choices {
     pub fn card(&self, by: Linked) -> Option<CardId> {
         self.kept_to(by, |k| match k {
             Kept::Name(card) => Some(card),
+            _ => None,
+        })
+    }
+
+    /// On an emblem, the ability that made it (`Kept::Maker`): the object as it was then, wherever it is now.
+    pub fn maker(&self) -> Option<Linked> {
+        self.kept.iter().flatten().find_map(|c| match c.value {
+            Kept::Maker(object) => Some(Linked { object, text: c.text, acquired: c.acquired }),
             _ => None,
         })
     }
@@ -612,6 +626,7 @@ impl Obj {
             || exiled.is_some()
             || phased.is_some_and(|p| p.until_leaves.is_some())
             || choices.entered_raw().1.object.is_some()
+            || choices.maker().is_some()
     }
 
     /// A fresh object in `zone`, with nothing about it set: the rules' own source for an ability no card has (the
@@ -3025,6 +3040,26 @@ mod tests {
         let mut both = entered;
         assert!(both.keep(own, Kept::Object(ObjectId(9))));
         assert_eq!((both.object(own), both.player(own)), (Some(ObjectId(7)), Some(PlayerId(0))));
+    }
+
+    #[test]
+    fn an_emblem_keeps_the_ability_that_made_it_beside_what_was_chosen() {
+        let maker = Linked { object: ObjectId(9), text: CardId(4), acquired: Acquired::OWN };
+        let own = Linked { object: ObjectId(2), text: CardId(6), acquired: Acquired::OWN };
+        let mut choices = <Choices as ChoiceRecord>::entered(CardId(6), Entered { subtype: Some(Subtype::Elf), ..Default::default() });
+        assert_eq!(choices.maker(), None);
+        assert!(choices.keep(maker, Kept::Maker(maker.object)));
+        assert_eq!(choices.maker(), Some(maker), "every part of the ability, read by no link");
+        assert_eq!(choices.subtype(own), Some(Subtype::Elf));
+        // It is no object chosen, to the text that made it or to the emblem's own.
+        assert_eq!((choices.object(maker), choices.object(own)), (None, None));
+        // The loop watch's: it names an object as a chosen one does.
+        assert_eq!(choices.objects_raw(), [None, Some(ObjectId(9)), None]);
+        assert_eq!(choices.without_objects().objects_raw(), [None, Some(ObjectId::NONE), None]);
+        let mut emblem = Obj::new(CardId(6), PlayerId(0), Zone::COMMAND);
+        assert!(!emblem.links_an_object());
+        emblem.marks.choices = choices;
+        assert!(emblem.links_an_object());
     }
 
     /// A subtype restriction's name reads back as the same restriction, whatever its subtypes hold: "or" inside a name

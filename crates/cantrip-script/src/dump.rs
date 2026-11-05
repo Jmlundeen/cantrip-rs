@@ -538,6 +538,14 @@ impl StateDump {
             // CR 114: the emblems a player owns, from the one shared command zone.
             let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p).map(|&id| game.known_name(id).to_string()).collect();
             d.list(&format!("{b}.Emblems"), emblems, false);
+            // What made each emblem whose text names its maker (`Query::made_by`), in the order of the list above, and the cards
+            // in exile linked to it: absent with none. An entry is that object as it was, wherever it is now (CR 400.7).
+            let makers: Vec<Linked> = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p).filter_map(|&id| s.made_by(id)).collect();
+            if !makers.is_empty() {
+                d.list(&format!("{b}.Emblems.MadeBy"), makers.iter().map(|by| game.known_name(by.object).to_string()).collect(), false);
+                let exiled: Vec<String> = makers.iter().flat_map(|&by| Query::exiled_with(game, by)).map(|id| game.known_name(id).to_string()).collect();
+                d.list(&format!("{b}.Emblems.ExiledWithMakers"), exiled, false);
+            }
 
             // The battlefield, and its phased-out permanents (CR 702.26b) apart, as `BotN.PhasedOut` under the player who controlled
             // them as they phased out, with the same keys for each.
@@ -921,7 +929,7 @@ const GAME_KEYS: &[&str] = &[
 const PLAYER_KEYS: &[&str] = &[
     "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "MayLookAtLibraryTop", "LostTo", "Mana", "ManaFrom", "LandsPlayed", "CitysBlessing",
     "EnduringStory", "Speed", "Dungeon", "DungeonsCompleted", "TurnsToSkip", "ControlledBy", "NextTurnControlledBy", "Looked", "Surveilled", "Shuffles",
-    "Hand", "Revealed", "Crimes", "Library", "Companion", "Sideboard", "Graveyard", "Emblems", "Battlefield", "PhasedOut",
+    "Hand", "Revealed", "Crimes", "Library", "Companion", "Sideboard", "Graveyard", "Emblems", "Emblems.MadeBy", "Emblems.ExiledWithMakers", "Battlefield", "PhasedOut",
 ];
 
 /// The keys the dump writes of a permanent, after `BotN.Battlefield.<name>.` (or `.PhasedOut.`), beside `Counters.<Kind>`.

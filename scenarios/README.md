@@ -570,6 +570,9 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Surveilled`, each completed surveil in order as `<count> requested, <looked> looked` (CR 701.25a, 701.25d),
   absent until the player surveils
 - `BotN.Hand`, `.Library`, `.Graveyard`, `.Battlefield`, `.Emblems` (CR 114, from the command zone), each with `.Count`
+- `BotN.Emblems.MadeBy`: the object that made each of BotN's emblems whose text names its maker (`Query::made_by`), in
+  emblem order, wherever it is now; `BotN.Emblems.ExiledWithMakers`: the cards in exile linked to those makers, emblem by
+  emblem. Both absent with no such emblem.
 - `BotN.Companion`: the card the player revealed as their companion before the game (CR 103.2b), wherever it has gone since;
   empty for a player who revealed none.
 - `BotN.Sideboard` (with `.Count`): the cards the player owns outside the game (CR 400.11a), in the order the sideboard lists

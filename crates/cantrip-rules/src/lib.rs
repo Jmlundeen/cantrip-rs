@@ -130,6 +130,8 @@ mod given_play_rule_tests;
 #[cfg(test)]
 mod exiled_with_permission_tests;
 #[cfg(test)]
+mod emblem_maker_tests;
+#[cfg(test)]
 mod instant_sorcery_entering_tests;
 #[cfg(test)]
 mod attached_entry_tests;
@@ -2225,11 +2227,15 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn create_emblem(&mut self, def: CardId, player: PlayerId) -> ObjectId {
-        ops::create_emblem(self, def, player, None)
+        ops::create_emblem(self, def, player, None, None)
     }
 
     fn create_emblem_choosing_subtype(&mut self, def: CardId, player: PlayerId, subtype: Subtype) -> ObjectId {
-        ops::create_emblem(self, def, player, Some(subtype))
+        ops::create_emblem(self, def, player, Some(subtype), None)
+    }
+
+    fn create_emblem_made_by(&mut self, def: CardId, player: PlayerId, by: Linked) -> ObjectId {
+        ops::create_emblem(self, def, player, None, Some(by))
     }
 
     fn create_tokens(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {

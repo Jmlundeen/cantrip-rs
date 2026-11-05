@@ -418,6 +418,15 @@ pub trait Query {
         s.seats().flat_map(|p| s.zone(Zone::exile(p)).iter().copied()).filter(|&id| self.obj(id).exiled.is_some_and(|l| l.is_by_in(s, by))).collect()
     }
 
+    /// The ability that made the emblem `emblem` (CR 114.2), where it was made with one (`tokens::emblem_as_enters`,
+    /// `tokens::create_emblem_made_by`): the object as it was then (CR 400.7), wherever it is now, and that ability as linked
+    /// abilities know it. "Cards exiled with [that object]", on an emblem that names it, is
+    /// `exiled_with(made_by(asker.source)?)`: the emblem's own abilities are not linked to anything (CR 607.2a), so nothing
+    /// else finds them, and another object of the same name is another object (Tibalt, Cosmic Impostor's ruling).
+    fn made_by(&self, emblem: ObjectId) -> Option<Linked> {
+        self.state().made_by(emblem)
+    }
+
     /// The card a face's abilities are printed on, as linked abilities know it (CR 607.1, 607.1b): `CardTable::linked_card`.
     fn linked_card(&self, card: CardId) -> CardId;
 
@@ -878,6 +887,11 @@ pub trait Game: Query {
     /// abilities read it with `GameState::chosen_subtype` (`Query::linked_to` of the emblem). Oko, Shadowmoor
     /// Scion's -6 makes one.
     fn create_emblem_choosing_subtype(&mut self, def: CardId, player: PlayerId, subtype: Subtype) -> ObjectId;
+    /// `create_emblem` for an emblem whose text names the object that made it (CR 114.2, 400.7): `by`, the ability making it
+    /// as it resolves (`Query::linked` of the resolving ability), is kept on the emblem for its abilities to read
+    /// (`Query::made_by`), whatever becomes of that object. One made as a permanent enters is `Entering::emblem`, since the
+    /// permanent is not yet the object it will be.
+    fn create_emblem_made_by(&mut self, def: CardId, player: PlayerId, by: Linked) -> ObjectId;
     /// Creates `count` tokens of a definition (CR 111.2), under `controller`.
     /// Creates tokens of several definitions as one instruction (CR 111.1, 101.4): they enter together, so a "one or
     /// more" ability sees one event. Each is a definition and who controls it.

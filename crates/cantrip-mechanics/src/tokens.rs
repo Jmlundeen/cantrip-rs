@@ -617,6 +617,21 @@ pub fn create_emblem_choosing_subtype(g: &mut dyn Game, player: PlayerId, def: &
     g.create_emblem_choosing_subtype(def, player, subtype)
 }
 
+/// `create_emblem` for an emblem whose text names the object that made it (CR 114.2, 400.7): `by`, the ability making it as it
+/// resolves (`Query::linked` of the item), is kept on it for its abilities to read (`Query::made_by`).
+pub fn create_emblem_made_by(g: &mut dyn Game, player: PlayerId, def: &'static CardDef, by: Linked) -> ObjectId {
+    let def = g.card_id(def);
+    g.create_emblem_made_by(def, player, by)
+}
+
+/// "As this permanent enters, you get an emblem with ..." (CR 614.12, 114.2), from its `CardDef::enters`: the player it enters
+/// under gets `def` as it arrives, kept on the emblem as the permanent it arrives as (`Entering::emblem`, `Query::made_by`). A
+/// replacement effect, so a permanent that would have lost its abilities gets none, and none comes of an entry sent
+/// elsewhere. The permanent lists `def` in its `EXTRA`. Tibalt, Cosmic Impostor makes his so.
+pub fn emblem_as_enters(g: &mut dyn Game, entering: &mut Entering, def: &'static CardDef) {
+    entering.emblem = Some(g.card_id(def));
+}
+
 /// The 4/4 green Rhino Warrior creature token. Titan of Industry, Vivien on the Hunt, Workshop Warchief, Crash the Party and
 /// Killer Service make it.
 pub static RHINO_WARRIOR: CardDef = CardDef {

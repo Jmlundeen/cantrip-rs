@@ -1142,6 +1142,11 @@ impl GameState {
         self.obj(by.object).marks.choices.object(by)
     }
 
+    /// The ability that made the emblem `id` (`Choices::maker`), for one whose text names that object (`Query::made_by`).
+    pub fn made_by(&self, id: ObjectId) -> Option<Linked> {
+        self.obj(id).marks.choices.maker()
+    }
+
     /// How `id` has the abilities of the text it has now (CR 607.5, 707.2): by the latest copy effect still on it, which
     /// made its copiable values what they are (`EffectKind::RestoreCopy`), or as its own. What an ability of that text is
     /// linked by (`Linked::acquired`); an ability an effect granted it is not of that text.

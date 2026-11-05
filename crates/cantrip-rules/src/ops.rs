@@ -571,6 +571,9 @@ fn move_together_entering(cx: &mut Cx, moves: &[Moving], reason: ZoneReason, att
         if to.is(ZoneKind::Graveyard) && !new.token && !old.card_copy {
             binned.push((to.player, new_id));
         }
+        if entering && let Some(e) = &m.entering {
+            emblem_as_it_arrives(cx, e, new_id);
+        }
         // Each other component of a merged permanent goes there too, a new object of its own (CR 730.3), arriving from no zone
         // as a component, not as a permanent that left: what triggers on a card put into a zone sees it, and what triggers on
         // a permanent leaving sees the one permanent (CR 730.3, the release notes' "one creature died, three cards were put
@@ -1838,7 +1841,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes, own: None };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes, own: None };
         prepare_entry(cx, &mut entering)?;
         // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1899,7 +1902,7 @@ pub fn put_onto_battlefield_as(
         chosen_card: None,
         chosen_option: None,
         chosen_number: None,
-        chosen_object: None,
+        chosen_object: None, emblem: None,
         attach: None, attach_player: None,
         x: 0,
         transformed,
@@ -2023,7 +2026,7 @@ pub fn put_onto_battlefield_attached(cx: &mut Cx, id: ObjectId, controller: Play
         chosen_card: None,
         chosen_option: None,
         chosen_number: None,
-        chosen_object: None,
+        chosen_object: None, emblem: None,
         attach: None,
         attach_player: None,
         x: 0,
@@ -2140,14 +2143,30 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<bool> {
 }
 
 /// Creates an emblem (CR 114.2): an object in the command zone, owned by the player, that nothing moves. `subtype` is the
-/// creature type its text says "chosen" (CR 607.2d), kept as a permanent keeps what it chose as it entered (`Choices`).
-pub fn create_emblem(cx: &mut Cx, def: CardId, player: PlayerId, subtype: Option<Subtype>) -> ObjectId {
+/// creature type its text says "chosen" (CR 607.2d), kept as a permanent keeps what it chose as it entered (`Choices`). `maker`
+/// is the ability that makes it, where its text names that object (`Kept::Maker`).
+pub fn create_emblem(cx: &mut Cx, def: CardId, player: PlayerId, subtype: Option<Subtype>, maker: Option<Linked>) -> ObjectId {
     // The emblem's abilities are the creating text's (CR 114.2, 612.4): words that text changed are changed in them. An
     // ability's text is as it was put on the stack (`Cx::own_text`, CR 113.7a).
     let words = match cx.cause() {
         Cause::Spell(source) | Cause::Ability { source, .. } => Query::words(&*cx, source),
         _ => Words::NONE,
     };
+    emblem_with_words(cx, def, player, words, subtype, maker)
+}
+
+/// The emblem `entering` gets its controller as it arrives as `permanent` (`Entering::emblem`, CR 614.12, 114.2): the creating
+/// text is the permanent's own - the text it entered with, acquired as its own (CR 607.5, 707.9a), and its words - and
+/// `permanent`, the new object it is by now, is the object it names (CR 400.7).
+fn emblem_as_it_arrives(cx: &mut Cx, entering: &Entering, permanent: ObjectId) {
+    let Some(def) = entering.emblem else { return };
+    let maker = Linked { object: permanent, text: cx.cards().linked_card(entering_card(cx, entering)), acquired: Acquired::OWN };
+    let words = Query::words(&*cx, permanent);
+    let player = cx.s().obj(permanent).controller;
+    emblem_with_words(cx, def, player, words, None, Some(maker));
+}
+
+fn emblem_with_words(cx: &mut Cx, def: CardId, player: PlayerId, words: Words, subtype: Option<Subtype>, maker: Option<Linked>) -> ObjectId {
     let copy = (!words.is_printed()).then(|| Copiable { words, ..Copiable::of(def) });
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
@@ -2157,6 +2176,10 @@ pub fn create_emblem(cx: &mut Cx, def: CardId, player: PlayerId, subtype: Option
     obj.copy = copy;
     if subtype.is_some() {
         obj.marks.choices = Choices::entered(cx.cards().linked_card(def), Entered { subtype, ..Entered::default() });
+    }
+    if let Some(by) = maker {
+        // An emblem's first keeping: there is always room (`CHOSEN_KEPT`).
+        obj.marks.choices.keep(by, Kept::Maker(by.object));
     }
     let id = cx.st().push_obj(obj);
     cx.st().zone_push(Zone::COMMAND, id);
@@ -2468,7 +2491,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes: None, own: None };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes: None, own: None };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
@@ -2575,6 +2598,7 @@ fn create_tokens_onto(
         // Once every counter it enters with is on it, a hone counter among them (CR 122.1j).
         note_statics(cx, id);
         cx.st().zone_push(Zone::BATTLEFIELD, id);
+        emblem_as_it_arrives(cx, &entering, id);
         events.push(match spell {
             Some(spell) => Event::ZoneChange { old: spell.object, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, part: false, reason: ZoneReason::Resolve },
             None => Event::ZoneChange { old: id, new: id, from: Zone::GONE, to: Zone::BATTLEFIELD, part: false, reason: ZoneReason::Created },
@@ -5136,7 +5160,7 @@ mod tests {
             chosen_card: None,
             chosen_option: None,
             chosen_number: None,
-            chosen_object: None,
+            chosen_object: None, emblem: None,
             attach: None,
             attach_player: None,
             x: 0,

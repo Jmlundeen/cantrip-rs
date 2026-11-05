@@ -151,7 +151,7 @@ fn entering(id: ObjectId, controller: PlayerId, tapped: bool) -> Entering {
         chosen_card: None,
         chosen_option: None,
         chosen_number: None,
-        chosen_object: None,
+        chosen_object: None, emblem: None,
         attach: None,
         attach_player: None,
         x: 0,

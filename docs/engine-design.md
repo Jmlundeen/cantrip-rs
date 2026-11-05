@@ -2120,6 +2120,19 @@ returns is a new object whose cards it never covers (CR 400.7). `one` is "a card
 uses it up (`actions::use_up_permission`, before the card moves); two triggers' permissions are two cards. It is offered
 as any permission is (`permissions_for`, `land_plays`), with every timing rule and land play the card's type needs.
 
+An emblem whose text names the object that made it ("you may play cards exiled with Tibalt, Cosmic Impostor") keeps that
+ability on the emblem (`Kept::Maker`, in the emblem's `Choices`, so it is journaled, hashed and canonicalized for the loop
+watch as a chosen object is): the object as it was then, its text and how it acquired it, a whole `Linked`, read by any
+ability of the emblem with `Query::made_by` and handed to `exiled_with`. An exile link stays on the card when the
+exiling object leaves (only `return_exiled`'s "until" path acts on that, CR 610.3), so the emblem reads the cards after the
+maker has gone, and a maker that comes back is a new object (CR 400.7) with its own emblem and its own cards. A resolving
+ability passes its own link (`Game::create_emblem_made_by`). "As this enters, you get an emblem" (CR 614.12) can't: the
+permanent is not yet the object it will be, so its `CardDef::enters` only says which emblem (`Entering::emblem`), and the
+engine makes it as the permanent arrives (`ops::emblem_as_it_arrives`, in `move_together` and for a token), naming the
+new object, under the player it entered under, with the text it entered with acquired as its own. An entry that a
+replacement sends elsewhere arrives nowhere and makes none, and one judged again before it arrives (`as_it_would_exist`)
+makes none either.
+
 ### Restricted mana
 
 An ability's explicit "Activate only as an instant" is `ActivatedDef::priority_only`, written with
