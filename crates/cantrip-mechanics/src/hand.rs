@@ -265,6 +265,21 @@ pub fn look_at_an_opponents_hand_then_choose_a_name(g: &mut dyn Game, entering: 
     Ok(())
 }
 
+/// "Discard up to `most` cards, then draw that many cards" (CR 701.9, 121.1): the player chooses up to `most` cards of their hand
+/// (none included; no question for an empty hand), they are discarded together, then they draw as many cards as they chose -
+/// the number chosen, not the number a replacement let go to the graveyard. Tersa Lightshatter and Joshua, Phoenix's Dominant
+/// print it.
+pub fn discard_up_to_then_draw(g: &mut dyn Game, player: PlayerId, source: ObjectId, most: u32) -> Result<(), Suspend> {
+    let hand = g.state().zone(Zone::hand(player)).to_vec();
+    let chosen = choose::select(g, player, source, Purpose::Discard, hand, crate::select::cards(crate::select::up_to(most)))?;
+    if chosen.is_empty() {
+        return Ok(());
+    }
+    g.discard_together(&chosen);
+    g.draw(player, chosen.len() as u32);
+    Ok(())
+}
+
 /// The card a discard event names and what it is - "an opponent discards a land card" (Aclazotz, Deepest Betrayal), "for
 /// each nonland card discarded this way" (Seasoned Pyromancer) - read where it went (CR 701.9a): none when the event is no
 /// discard, and no characteristics when a replacement put it into a hidden zone unrevealed, where every value of them is

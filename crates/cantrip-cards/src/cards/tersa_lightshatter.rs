@@ -1,20 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::hand;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// When this enters, discard up to two cards, then draw that many cards. The discards happen together (CR 701.9),
 /// before the draw.
 fn discard_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let player = item.controller;
-    let hand = g.state().zone(Zone::hand(player)).to_vec();
-    let chosen = choose::cards(g, player, item.object, Purpose::Discard, hand, 2, true)?;
-    if chosen.is_empty() {
-        return Ok(());
-    }
-    g.discard_together(&chosen);
-    g.draw(player, chosen.len() as u32);
-    Ok(())
+    hand::discard_up_to_then_draw(g, item.controller, item.object, 2)
 }
 
 /// "If there are seven or more cards in your graveyard" (CR 603.4): asked as it triggers and again as it resolves.
