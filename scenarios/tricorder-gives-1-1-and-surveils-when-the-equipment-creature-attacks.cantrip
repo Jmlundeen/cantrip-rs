@@ -1,0 +1,35 @@
+# Tricorder's equipped creature is 3/3 while the Equipment gives +1/+1, and attacking surveils 1: the looked-at card goes to
+# the graveyard, so the library loses one and the graveyard gains one (CR 613.4c, 701.42a, 702.6a).
+
+[Bot1 Deck]
+Tricorder
+Grizzly Bears
+Forest x18
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Tricorder.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Tricorder.Activate(Bot1.Battlefield.Grizzly Bears; Ability: Equip)
+[Bot1.BeginCombat]
+Bot1.Attack(Grizzly Bears)
+Bot1.Arrange( | Forest)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 3
+Bot1.Battlefield.Grizzly Bears.Toughness = 3
+Bot1.Graveyard.Count = 1
+Bot2.Life = 17
