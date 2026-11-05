@@ -1,0 +1,16 @@
+# Twin Bolt with a single target puts both points of damage on it (CR 601.2d).
+[Bot1 Deck]
+Black Lotus
+Twin Bolt
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Twin Bolt.Cast
+Bot1.Divide(Bot2: 2)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Life = 18

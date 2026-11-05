@@ -1,0 +1,25 @@
+# Twin Bolt with two targets deals 1 to each; no other split of its 2 damage is allowed (CR 601.2d: each target gets at least 1),
+# and it needs at least one target: choosing none is refused (CR 601.2c).
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Twin Bolt
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Twin Bolt.Cast
+! Bot1.Divide()
+! Bot1.Divide(Bot1: 0; Bot2: 2)
+! Bot1.Divide(Bot1: 1; Bot2: 2)
+Bot1.Divide(Bot1: 1; Bot2: 1)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
