@@ -1,0 +1,27 @@
+# Temporal Anomaly's sacrifice ability mills exactly four cards (four Forests, declined rather than taken), and a tapped
+# New Planet is made (CR 605.1a, 701.17a, 701.17c, 701.21a, 111.4).
+
+[Bot1 Deck]
+Temporal Anomaly
+Forest
+Black Lotus
+Island x2
+Forest x15
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Temporal Anomaly.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Temporal Anomaly.Activate(Ability: Sacrifice this land)
+
+[Expect]
+Bot1.Library.Count = 8
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield.New Planet.Tapped = true
+Bot1.Mana =
