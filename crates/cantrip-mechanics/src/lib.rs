@@ -61,6 +61,7 @@ pub mod dredge;
 pub mod earthbend;
 pub mod echo;
 pub mod empower;
+pub mod endure;
 pub mod enduring;
 pub mod enlist;
 pub mod escalate;
