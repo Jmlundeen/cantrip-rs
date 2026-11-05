@@ -1,0 +1,6 @@
+{
+  "name": "Genji Glove",
+  "manaCost": "{5}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Equipped creature has double strike.\nWhenever equipped creature attacks, if it's the first combat phase of the turn, untap it. After this phase, there is an additional combat phase.\nEquip {3}"
+}
