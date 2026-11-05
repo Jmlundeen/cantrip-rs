@@ -1,0 +1,27 @@
+# Vash, Freelance Archaeologist: "Whenever a card leaves your graveyard, draw a card. This ability triggers only once each
+# turn." (CR 603.6c, 603.8) Two Black Lotuses and Tormod's Crypt itself leave the graveyard together, so Vash draws one
+# card, not three. The next upkeep's surveil 1 is answered by the default and leaves the top card in the library.
+
+[Bot1 Deck]
+Vash, Freelance Archaeologist
+Black Lotus x2
+Tormod's Crypt
+Forest x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Vash, Freelance Archaeologist.Cast
+Bot1.Hand.Tormod's Crypt.Cast
+Bot1.Battlefield.Tormod's Crypt.Activate(Bot1)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Exile.Count = 3
+Bot1.Hand.Count = 5

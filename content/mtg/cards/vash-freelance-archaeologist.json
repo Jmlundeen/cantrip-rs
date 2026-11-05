@@ -1,0 +1,8 @@
+{
+  "name": "Vash, Freelance Archaeologist",
+  "manaCost": "{1}{B}{G}",
+  "type": "Legendary Creature — Human Rogue Scientist",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "At the beginning of your upkeep, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\nWhenever a card leaves your graveyard, draw a card. This ability triggers only once each turn."
+}
