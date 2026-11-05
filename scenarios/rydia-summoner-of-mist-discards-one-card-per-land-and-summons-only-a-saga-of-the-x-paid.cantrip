@@ -1,0 +1,62 @@
+# Rydia, Summoner of Mist (CR 701.9, 107.3a, 115.1, 202.3): the landfall trigger discards one card, never two ("you may discard a
+# card"), so choosing two is refused. On turn 1 Bot1 discards Kumano Faces Kakkazan to an Island, on turn 3 Fable of the Mirror-Breaker
+# (a Saga of mana value 3) to another, and casts Lightning Bolt (mana value 1, not a Saga) at Bot2 (17). With X=1 only Kumano may be
+# the target: Fable, mana value 3, and the Bolt are refused. Kumano returns untapped with a finality counter and chapter I makes Bot2
+# 16.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Rydia, Summoner of Mist
+Lightning Bolt
+Island
+Fable of the Mirror-Breaker
+Kumano Faces Kakkazan
+Island x2
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rydia, Summoner of Mist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Kumano Faces Kakkazan; Fable of the Mirror-Breaker)
+Bot1.Choose(Kumano Faces Kakkazan)
+? Bot1.Graveyard.Count = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Fable of the Mirror-Breaker)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Rydia, Summoner of Mist.Activate(Ability: Summon; X: 1)
+! Bot1.Target(Bot1.Graveyard.Fable of the Mirror-Breaker)
+! Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Target(Bot1.Graveyard.Kumano Faces Kakkazan)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 16
+Bot1.Graveyard.Count = 2
+Bot1.Battlefield.Kumano Faces Kakkazan.Tapped = false
+Bot1.Battlefield.Kumano Faces Kakkazan.Counters.Finality = 1

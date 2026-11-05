@@ -1,0 +1,50 @@
+# Rydia, Summoner of Mist (CR 701.9, 121.1, 107.3a, 122.6, 714.3a): on turn 1 Bot1 casts Rydia, then plays an Island and her landfall
+# trigger lets them discard Kumano Faces Kakkazan and draw a card. On turn 3 they pay X=1 and tap Rydia to return that Saga, mana
+# value 1, to the battlefield: it enters with a finality counter and a lore counter, so chapter I deals 1 damage to Bot2 (19). Rydia
+# is tapped, the hand is the same size (a discard and a draw).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Rydia, Summoner of Mist
+Kumano Faces Kakkazan
+Island
+Mox Pearl
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rydia, Summoner of Mist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Kumano Faces Kakkazan)
+? Bot1.Graveyard = Kumano Faces Kakkazan
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Rydia, Summoner of Mist.Activate(Ability: Summon; X: 1)
+Bot1.Target(Kumano Faces Kakkazan)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 19
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Kumano Faces Kakkazan.Counters.Finality = 1
+Bot1.Battlefield.Rydia, Summoner of Mist.Tapped = true
