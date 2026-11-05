@@ -1,0 +1,28 @@
+# Wail of War, second mode: "up to two" allows none (CR 115.1b). With no creature card in Bot1's graveyard the mode is still
+# chosen and cast with no target, and resolves doing nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Wail of War
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wail of War.Cast
+Bot1.Modes(2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Wail of War
+Bot1.Hand.Count = 3

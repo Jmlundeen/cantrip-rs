@@ -1,0 +1,57 @@
+# Wail of War, second mode: "Return up to two target creature cards from your graveyard to your hand." Bot2's Black Lotus pays
+# for three Lightning Bolts that kill Bot1's three Memnites. Three targets are refused (CR 115.1, "up to two"); two are returned
+# together, leaving the third Memnite in the graveyard.
+
+[Bot1 Deck]
+Memnite
+Memnite
+Memnite
+Mox Jet
+Mox Pearl
+Mox Ruby
+Wail of War
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite#1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite#2)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite#3)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard.Count = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wail of War.Cast
+Bot1.Modes(2)
+! Bot1.Target(Bot1.Graveyard.Memnite#1; Bot1.Graveyard.Memnite#2; Bot1.Graveyard.Memnite#3)
+Bot1.Target(Bot1.Graveyard.Memnite#1; Bot1.Graveyard.Memnite#2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Memnite; Memnite; Swamp
+Bot1.Graveyard = Wail of War; Memnite
