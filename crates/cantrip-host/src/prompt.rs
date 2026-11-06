@@ -428,6 +428,11 @@ fn remaining_colored(cost: &ManaCost) -> Vec<ColorView> {
     out
 }
 
+/// The types of mana that may pay X (`XMana::types`), as the client names them.
+fn x_mana_view(x_mana: XMana) -> Vec<ManaTypeView> {
+    Mana::ALL.into_iter().zip(ManaTypeView::ALL).filter(|&(m, _)| x_mana.may_pay(m)).map(|(_, v)| v).collect()
+}
+
 fn remaining_hybrid(cost: &ManaCost) -> Vec<HybridSymbolView> {
     let mut out = Vec::new();
     for (a, b) in cost.hybrid.iter().flatten() {
@@ -841,7 +846,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         RequestKind::Priority { options } => {
             PromptPayload::PriorityPromptMessage(PriorityPrompt { player, options: options_messages(game, handles, options) })
         }
-        RequestKind::PayCosts { source, total, remaining, options, announcing, x, most, least, loyalty, attackers, life, governs, assist, x_cost: _ } => {
+        RequestKind::PayCosts { source, total, remaining, options, announcing, x, most, least, loyalty, attackers, life, governs, assist, x_cost } => {
             let def = game.cards.get(game.state.obj(*source).card);
             let kicker = def.kicker;
             let spends_no_mana = game.chars(*source).has(Keyword::CantSpendManaToCast);
@@ -875,9 +880,17 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     i32::from(game.state.obj(*source).counters(CounterKind::Loyalty).max(0))
                 } else if let Some((_, could)) = sacrifices {
                     could.min(i32::MAX as usize) as i32
+                } else if let Some(paid) = x_cost.as_deref().filter(|_| *announcing && governs.is_empty()) {
+                    // An X paid in mana: the most the mana at hand could pay for, with the total the cast or activation
+                    // would lock in at each X - the cost changes applied (CR 601.2f) - and split between X and the rest as
+                    // the payment splits it where only some mana may pay X (`most_affordable_x`).
+                    most_affordable_x(game, request.player, *source, paid, *least, *most).map_or(-1, wire)
                 } else {
                     -1
                 },
+                x_mana: if remaining.x_mana.is_any() { Vec::new() } else { x_mana_view(remaining.x_mana) },
+                x_mana_one_each: remaining.x_mana.one_each,
+                remaining_x: wire(remaining.x_part()),
                 sacrifice_reduces: sacrifices.map_or(0, |(each, _)| i32::from(each)),
                 most_announced: wire(*most),
                 least_announced: wire(*least),

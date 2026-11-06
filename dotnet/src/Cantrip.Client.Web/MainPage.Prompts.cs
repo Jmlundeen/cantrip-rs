@@ -432,11 +432,15 @@ public sealed partial class MainPage
                     : prompt.Assisted > 0
                         ? $"  ·  {prompt.Assisted} paid by the player helping"
                         : "  ·  the player helping paid none";
+                // X's part that only some mana may pay (CR 107.3, 601.2h: "Spend only black mana on X"), while some is owed.
+                string xPart = prompt.RemainingX > 0 && Announcement.XManaNote(prompt) is { Length: > 0 } note
+                    ? $"  ·  {prompt.RemainingX} of it for {note}"
+                    : string.Empty;
                 Prompt(
                     _actions.Assignable.Count > 0 ? $"Choose mana for {name}" : $"Pay for {name}",
                     covered
                         ? $"your pool covers {prompt.Total}{life}{helped}  ·  {how}"
-                        : $"{prompt.Remaining} of {prompt.Total} still to pay{life}{helped}  ·  {how}{colorless}{(prompt.SpendsNoMana ? string.Empty : AutoManaNote())}");
+                        : $"{prompt.Remaining} of {prompt.Total} still to pay{xPart}{life}{helped}  ·  {how}{colorless}{(prompt.SpendsNoMana ? string.Empty : AutoManaNote())}");
             }
 
             if (covered && _actions.Confirm is { } pay)
@@ -704,11 +708,13 @@ public sealed partial class MainPage
                 ? $"  ·  {ManaForX(client)} mana for it, tapped as it is paid"
                 : "  ·  tap lands to raise X";
 
+        // "Spend only black mana on X" (CR 107.3, 601.2h): said before X is chosen, and the reach is that mana's.
+        string xMana = Announcement.XManaNote(prompt) is { Length: > 0 } note ? $"  ·  {note}" : string.Empty;
         Prompt(
             Announcement.Title(prompt, name),
             prompt.XPaidInLife
                 ? $"{total} and {x} life  ·  {reach}  ·  targets and paying come next"
-                : $"{total} in all  ·  {reach}{planning}  ·  targets and paying come next");
+                : $"{total} in all{xMana}  ·  {reach}{planning}  ·  targets and paying come next");
 
         if (announce is not null)
         {

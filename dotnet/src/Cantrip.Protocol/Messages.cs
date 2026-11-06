@@ -2669,6 +2669,25 @@ public sealed class PayCostsPromptMessage : PromptPayload
     public bool Squad { get; set; }
 
     /// <summary>
+    /// What mana may be spent on X ("Spend only black mana on X", CR 107.3, 601.2h: Drain Life, Crypt Rats; "Spend only
+    /// colored mana on X", Emblazoned Golem): the types that may, or empty where any mana may. Set for the announcement and
+    /// for the payment alike, so a client says it before X is chosen.
+    /// </summary>
+    [Key(31)]
+    public List<ManaTypeView> XMana { get; set; } = [];
+
+    /// <summary>"No more than one mana of each color may be spent this way" (Emblazoned Golem): one of each of <see cref="XMana"/> at most.</summary>
+    [Key(32)]
+    public bool XManaOneEach { get; set; }
+
+    /// <summary>
+    /// How much of <see cref="RemainingGeneric"/> is X's, which only <see cref="XMana"/> pays; the rest any mana pays. A
+    /// generic reduction takes X's first and a cost increase is not X's, so this may be less than X (CR 601.2f).
+    /// </summary>
+    [Key(33)]
+    public int RemainingX { get; set; }
+
+    /// <summary>
     /// Giving up on the spell (CR 733.1). A question that offers no giving up - the steps of a player assisting with another's
     /// spell (CR 702.132a) - closes their window or announces nothing more, or pays with the first pool mana offered: what they
     /// announced they must pay. The host's own default answer, the same way.

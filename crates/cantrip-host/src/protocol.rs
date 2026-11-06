@@ -1249,6 +1249,16 @@ pub struct PayCostsPrompt {
     /// The mana other players have paid towards this spell's cost as it is cast: the assisting player's (CR 702.132a).
     #[serde(default)]
     pub assisted: i32,
+    /// What mana may be spent on X ("Spend only black mana on X", CR 107.3, 601.2h): the types that may, or empty where any
+    /// may. Set for the announcement and for the payment alike.
+    #[serde(default)]
+    pub x_mana: Vec<ManaTypeView>,
+    /// "No more than one mana of each color may be spent this way" (Emblazoned Golem): one of each of `x_mana` at most.
+    #[serde(default)]
+    pub x_mana_one_each: bool,
+    /// How much of `remaining_generic` is X's, which only `x_mana` pays (`ManaCost::x_part`); the rest any mana pays.
+    #[serde(default)]
+    pub remaining_x: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

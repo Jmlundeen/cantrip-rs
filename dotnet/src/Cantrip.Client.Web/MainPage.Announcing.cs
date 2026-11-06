@@ -50,6 +50,48 @@ public sealed partial class MainPage
         client.View?.Players.FirstOrDefault(player => player.Seat == client.ActingSeat)?.Mana.Sum() ?? 0;
 
     /// <summary>
+    /// Of the mana there is for X, what may be spent on it where only some may ("Spend only black mana on X",
+    /// <see cref="PayCostsPromptMessage.XMana"/>): the pool's of those types and what each planned source could add of one,
+    /// or, where X takes one of each color at most, how many of those colors there are among them.
+    /// </summary>
+    private int ManaForXOnly(GameClient client, PayCostsPromptMessage prompt)
+    {
+        if (prompt.XMana.Count == 0)
+        {
+            return int.MaxValue;
+        }
+
+        int[] pool = client.View?.Players.FirstOrDefault(player => player.Seat == client.ActingSeat)?.Mana ?? [];
+        bool May(ManaTypeView type) => prompt.XMana.Contains(type);
+        IEnumerable<ManaTypeView> Makes(ViewHandle source) => _castMana
+            .Where(option => option.Source == source)
+            .SelectMany(option => option.Produces.Concat(option.ColorChoices.Select(color => (ManaTypeView)(int)color)));
+        if (prompt.XManaOneEach)
+        {
+            HashSet<ManaTypeView> types = [.. ManaTypes.Where(type => (int)type < pool.Length && pool[(int)type] > 0 && May(type))];
+            // Each planned source one color more, where it could make one not yet counted.
+            foreach (ViewHandle source in _planned)
+            {
+                foreach (ManaTypeView type in Makes(source).Where(May))
+                {
+                    if (types.Add(type))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return types.Count;
+        }
+
+        return ManaTypes.Where(type => (int)type < pool.Length && May(type)).Sum(type => pool[(int)type])
+            + _planned.Where(source => Makes(source).Any(May)).Sum(ManaFrom);
+    }
+
+    private static readonly ManaTypeView[] ManaTypes =
+        [ManaTypeView.White, ManaTypeView.Blue, ManaTypeView.Black, ManaTypeView.Red, ManaTypeView.Green, ManaTypeView.Colorless];
+
+    /// <summary>
     /// Plans a source for X, or takes it back off the plan, and sets X to what the mana now reaches: the stepper changes it
     /// from there.
     /// </summary>
@@ -61,7 +103,7 @@ public sealed partial class MainPage
         }
 
         _plannedFor = prompt.Spell;
-        _selection.Announced = Announcement.XPaidBy(prompt, ManaForX(client));
+        _selection.Announced = Announcement.XPaidBy(prompt, ManaForX(client), ManaForXOnly(client, prompt));
         _needsRedraw = true;
     }
 

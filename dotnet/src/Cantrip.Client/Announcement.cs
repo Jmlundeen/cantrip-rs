@@ -161,12 +161,61 @@ public static class Announcement
     /// The X that <paramref name="mana"/> mana would pay for: what is left of it once the rest of the cost is paid, an X's
     /// worth for each one. Zero when it does not reach past the rest; colours are the payment's to judge.
     /// </summary>
-    public static int XPaidBy(PayCostsPromptMessage prompt, int mana)
+    public static int XPaidBy(PayCostsPromptMessage prompt, int mana) => XPaidBy(prompt, mana, int.MaxValue);
+
+    /// <summary>
+    /// <see cref="XPaidBy(PayCostsPromptMessage, int)"/> where only some mana may be spent on X ("Spend only black mana on X",
+    /// <see cref="PayCostsPromptMessage.XMana"/>): <paramref name="forX"/> is how much of the mana may - of one of those types,
+    /// or, where X takes one of each color at most, how many of those colors there are - and the rest of the cost's own
+    /// symbols of those types take theirs first.
+    /// </summary>
+    public static int XPaidBy(PayCostsPromptMessage prompt, int mana, int forX)
     {
         ArgumentNullException.ThrowIfNull(prompt);
         int xs = XSymbols(prompt.Total);
-        return xs == 0 ? 0 : Clamp(prompt, Math.Max(0, mana - ManaValueButX(prompt)) / xs);
+        if (xs == 0)
+        {
+            return 0;
+        }
+
+        int x = Math.Max(0, mana - ManaValueButX(prompt)) / xs;
+        if (prompt.XMana.Count > 0)
+        {
+            int theirs = prompt.XManaOneEach ? 0 : Symbols(prompt.Total).Count(symbol => prompt.XMana.Exists(type => symbol == Letter(type)));
+            x = Math.Min(x, Math.Max(0, forX - theirs) / xs);
+        }
+
+        return Clamp(prompt, x);
     }
+
+    /// <summary>
+    /// What may be spent on X, in words, or empty where any mana may: "X: black mana only", "X: black or red mana only", "X:
+    /// colored mana only, one of each color at most".
+    /// </summary>
+    public static string XManaNote(PayCostsPromptMessage prompt)
+    {
+        ArgumentNullException.ThrowIfNull(prompt);
+        if (prompt.XMana.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        bool colored = prompt.XMana.Count == 5 && !prompt.XMana.Contains(ManaTypeView.Colorless);
+        string kinds = colored && prompt.XManaOneEach ? "colored"
+            : string.Join(" or ", prompt.XMana.Select(type => type.ToString().ToLowerInvariant()));
+        return prompt.XManaOneEach ? $"X: {kinds} mana only, one of each color at most" : $"X: {kinds} mana only";
+    }
+
+    /// <summary>The letter a mana type's symbol is written with: W U B R G C.</summary>
+    private static string Letter(ManaTypeView type) => type switch
+    {
+        ManaTypeView.White => "W",
+        ManaTypeView.Blue => "U",
+        ManaTypeView.Black => "B",
+        ManaTypeView.Red => "R",
+        ManaTypeView.Green => "G",
+        _ => "C",
+    };
 
     /// <summary>The symbols of a cost in the server's notation, braces off: "X", "3", "R", "W/U", "2/G", "B/P".</summary>
     private static IEnumerable<string> Symbols(string cost)

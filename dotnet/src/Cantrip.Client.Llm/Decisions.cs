@@ -422,6 +422,10 @@ public sealed class Decisions
     private int X(GameClient client, PayCostsPromptMessage prompt)
     {
         int reach = prompt.XGoverns.Length > 0 ? prompt.MostAnnounced : Math.Max(0, prompt.MostAffordable);
+        if (XCosts.Most(client) is { } ceiling)
+        {
+            reach = Math.Max(prompt.LeastAnnounced, Math.Min(reach, ceiling));
+        }
         int most = Math.Min(reach, MostChoices - 1);
         string spell = GameText.Named(client, prompt.Spell);
 
@@ -479,6 +483,8 @@ public sealed class Decisions
         if (answer is TakeActionAnswer taken)
         {
             AttackCosts.Answered(client, prompt, taken);
+            // A payment for an X given up: no X as large is offered again this turn (XCosts).
+            XCosts.Answered(client, prompt, taken);
         }
 
         return answer;
@@ -534,9 +540,8 @@ public sealed class Decisions
 
         if (owing)
         {
-            if (AutoPlay.Produce(
-                    prompt.Options, prompt.RemainingColored, prompt.RemainingGeneric, prompt.RemainingHybrid, prompt.RemainingColorless)
-                is { } produce)
+            OwedMana owed = OwedMana.Of(prompt);
+            if (AutoPlay.Produce(prompt.Options, owed.Colored, owed.Generic, owed.Hybrid, owed.Colorless) is { } produce)
             {
                 return produce;
             }

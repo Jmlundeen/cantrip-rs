@@ -42,8 +42,9 @@ public static class AutoPlay
                 return true;
 
             case PayCostsPromptMessage pay:
-                TakeActionAnswer paying = Pay(pay);
+                TakeActionAnswer paying = Pay(pay, client);
                 AttackCosts.Answered(client, pay, paying);
+                XCosts.Answered(client, pay, paying);
                 client.Answer(paying);
                 return true;
 
@@ -352,6 +353,13 @@ public static class AutoPlay
                     continue;
                 }
 
+                // Payments for X given up this turn have left no X above 0 to announce (XCosts): announcing one again would
+                // only be given up again.
+                if (option.HasX && XCosts.Most(client) < 1)
+                {
+                    continue;
+                }
+
                 // Black Lotus and its like are saved rather than tapped for mana nobody has asked for yet.
                 if (option.Kind == ActionKindView.ActivateAbility && ChoosesColors(option))
                 {
@@ -403,7 +411,7 @@ public static class AutoPlay
 
         if (prompt.AnnouncesXOrKicks)
         {
-            return Announce(prompt, AnnouncedValue(prompt));
+            return Announce(prompt, AnnouncedValue(prompt, client));
         }
 
         if (!prompt.HasX)
@@ -440,9 +448,12 @@ public static class AutoPlay
                     || option.Kind == ActionKindView.ExileToPay)
                 .GroupBy(option => option.Alternative)
                 .Sum(way => Math.Min(way.Count(), way.First().PaysUpTo));
-            int genericForMana = Math.Max(0, prompt.RemainingGeneric - instead);
-            if ((genericForMana > 0 || prompt.RemainingColored.Count > 0 || prompt.RemainingHybrid.Count > 0 || prompt.RemainingColorless > 0)
-                && (Produce(prompt.Options, prompt.RemainingColored, genericForMana, prompt.RemainingHybrid, prompt.RemainingColorless)
+            // X's part that only some mana may pay asks for that mana (`OwedMana`); what is tapped or exiled instead pays it
+            // first, as the server has it pay generic mana.
+            OwedMana owedMana = OwedMana.Of(prompt, instead);
+            int genericForMana = owedMana.Generic;
+            if ((genericForMana > 0 || owedMana.Colored.Count > 0 || owedMana.Hybrid.Count > 0 || owedMana.Colorless > 0)
+                && (Produce(prompt.Options, owedMana.Colored, genericForMana, owedMana.Hybrid, owedMana.Colorless)
                     ?? (genericForMana > 0 ? Produce(prompt.Options, [], genericForMana) : null)) is { } first)
             {
                 return first;
@@ -461,7 +472,8 @@ public static class AutoPlay
                 return Answer(exiled);
             }
 
-            if (Produce(prompt.Options, prompt.RemainingColored, prompt.RemainingGeneric, prompt.RemainingHybrid, prompt.RemainingColorless) is { } produce)
+            OwedMana owedAll = OwedMana.Of(prompt);
+            if (Produce(prompt.Options, owedAll.Colored, owedAll.Generic, owedAll.Hybrid, owedAll.Colorless) is { } produce)
             {
                 return produce;
             }
@@ -488,12 +500,21 @@ public static class AutoPlay
     /// The value this seat announces (CR 601.2b): as much as its mana reaches for an {X} or a kicker, and for an X paid
     /// in life — Toxic Deluge's, Fire Covenant's — half of what it could pay and live, since the server's
     /// <see cref="PayCostsPromptMessage.MostAffordable"/> is the most that leaves one life and a bot spending all of it
-    /// on every such spell would hand the next attack the game.
+    /// on every such spell would hand the next attack the game. Once the seat behind <paramref name="client"/> has given up
+    /// paying for an X this turn, never as much as that X (<see cref="XCosts"/>): the advice was wrong, and the same X would
+    /// be given up again for ever.
     /// </summary>
-    public static int AnnouncedValue(PayCostsPromptMessage prompt)
+    public static int AnnouncedValue(PayCostsPromptMessage prompt, GameClient? client = null)
     {
         ArgumentNullException.ThrowIfNull(prompt);
 
+        int wanted = Wanted(prompt);
+        return XCosts.Most(client) is { } ceiling ? Math.Max(prompt.LeastAnnounced, Math.Min(wanted, ceiling)) : wanted;
+    }
+
+    /// <summary>The value <see cref="AnnouncedValue"/> wants before anything given up this turn lowers it.</summary>
+    private static int Wanted(PayCostsPromptMessage prompt)
+    {
         int most = Math.Max(0, prompt.MostAffordable);
 
         // Permanents sacrificed for a reduction each (CR 601.2b): none, a seat with no plan for its board keeping it.
@@ -585,7 +606,9 @@ public static class AutoPlay
 
         if (owing)
         {
-            if (Produce(prompt.Options, prompt.RemainingColored, prompt.RemainingGeneric, prompt.RemainingHybrid, prompt.RemainingColorless) is { } produce)
+            // X's part that only some mana may pay asks for that mana (`OwedMana`).
+            OwedMana owed = OwedMana.Of(prompt);
+            if (Produce(prompt.Options, owed.Colored, owed.Generic, owed.Hybrid, owed.Colorless) is { } produce)
             {
                 return produce;
             }
@@ -694,10 +717,12 @@ public static class AutoPlay
         ArgumentNullException.ThrowIfNull(prompt);
         ArgumentNullException.ThrowIfNull(option);
 
-        return (prompt.RemainingGeneric > 0 && prompt.RemainingColored.Count == 0 && prompt.RemainingHybrid.Count == 0)
-            || option.Produces.Any(type => prompt.RemainingColored.Contains((ColorView)(int)type))
-            || option.Produces.Any(type => prompt.RemainingHybrid.Exists(symbol => symbol.Accepts((ColorView)(int)type)))
-            || (prompt.RemainingColorless > 0 && option.Produces.Contains(ManaTypeView.Colorless));
+        // X's part that only some mana may pay is owed as that mana (`OwedMana`).
+        OwedMana owed = OwedMana.Of(prompt);
+        return (owed.Generic > 0 && owed.Colored.Count == 0 && owed.Hybrid.Count == 0)
+            || option.Produces.Any(type => owed.Colored.Contains((ColorView)(int)type))
+            || option.Produces.Any(type => owed.Hybrid.Exists(symbol => symbol.Accepts((ColorView)(int)type)))
+            || (owed.Colorless > 0 && option.Produces.Contains(ManaTypeView.Colorless));
     }
 
     private static bool Hurts(ActionOptionMessage option) => option.LifeCost > 0 || option.DamageToController > 0;

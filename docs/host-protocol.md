@@ -91,7 +91,13 @@ value itself and sends nothing until it is chosen. A value past `MostAnnounced` 
 can't be 0 (CR 107.3a: "X can't be 0"), where the announcement starts at 1, `DecreaseX` stops there, and 0 is refused; else 0.
 Version 204. `XGoverns` is, for an X that is not paid in mana, what the cost says X governs - casualty X's "the least power of the
 creature you sacrifice" (CR 702.153a) - and empty for any other; a page captions the announcement with it in place of the mana
-wording ("not enough mana for it" would be false of a creature's power). Version 206.
+wording ("not enough mana for it" would be false of a creature's power). Version 206. `MostAffordable`, for an X paid in
+mana, is the most X the mana at hand could pay for (the engine's `most_affordable_x`, advice: the announcement still takes any
+X up to `MostAnnounced`), with the cost increases and reductions applied as the total is locked in (CR 601.2f) at some legal
+choice of the targets still to come - never more than could be paid - and -1 where the engine can't say. `XMana` is what mana may be spent on X ("Spend only black mana on
+X", CR 107.3, 601.2h), empty where any may; `XManaOneEach` is Emblazoned Golem's "no more than one mana of each color", and
+`RemainingX` how much of `RemainingGeneric` is X's, which only `XMana` pays. Set for the announcement and the payment alike.
+Version 230.
 
 **Checking a selection.** A choice of cards (`ChooseCardsPromptMessage`) and a library search (`SearchLibraryPromptMessage`)
 are judged by the question's selection rule (docs/engine-design.md, "Selection rules"), which the client cannot run: the

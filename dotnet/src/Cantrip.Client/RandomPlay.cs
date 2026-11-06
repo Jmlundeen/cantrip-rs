@@ -107,6 +107,12 @@ public sealed class RandomPlay : IAutoPlayer
     /// <summary>The X this seat is paying for, chosen as the spell was announced. <see cref="Unchosen"/> until then.</summary>
     private int _targetX = Unchosen;
 
+    /// <summary>
+    /// The most X this seat draws this turn, once it has given up paying for one (<see cref="XCosts"/>); null otherwise. Read
+    /// from the client before each answer, so <see cref="Decide"/> stays free of it.
+    /// </summary>
+    private int? _xMost;
+
     /// <summary>The spell whose optional cost was last decided, so one decision covers the whole payment.</summary>
     private ViewHandle _unless;
 
@@ -141,14 +147,17 @@ public sealed class RandomPlay : IAutoPlayer
             _draws = 0;
         }
 
+        _xMost = XCosts.Most(client);
         AnswerPayload answer = _draws >= Draws ? asked.Prompt.Default() : Decide(asked.Prompt);
 
         // Costs to attack (CR 508.1h-j): a payment given up is remembered, and the declarations of the rest of that turn
-        // cost nothing, so a seat that cannot pay does not declare the same attack for ever.
+        // cost nothing, so a seat that cannot pay does not declare the same attack for ever. So is a payment for an X given
+        // up, and no X as large is drawn again that turn (XCosts).
         switch (asked.Prompt, answer)
         {
             case (PayCostsPromptMessage pay, TakeActionAnswer taken):
                 AttackCosts.Answered(client, pay, taken);
+                XCosts.Answered(client, pay, taken);
                 break;
             case (DeclareAttackersPromptMessage attackers, AttackersDeclaredAnswer declared):
                 declared.Attacks = AttackCosts.Within(attackers, declared.Attacks, AttackCosts.Mana(client, attackers));
@@ -334,6 +343,11 @@ public sealed class RandomPlay : IAutoPlayer
                 // Drawn here, and drawn once, within what the server says could be paid: for an X paid in life, what
                 // could be paid and survived (CR 704.5a), so a random seat never pays itself out of the game.
                 int most = Math.Max(0, prompt.MostAffordable);
+                if (_xMost is { } ceiling)
+                {
+                    most = Math.Max(prompt.LeastAnnounced, Math.Min(most, ceiling));
+                }
+
                 _targetX = prompt.VariableKicker
                     ? (Coin() ? _random.Next(most + 1) : 0)
                     : prompt.Kicker.Length > 0
@@ -366,9 +380,8 @@ public sealed class RandomPlay : IAutoPlayer
 
         if (owing)
         {
-            if (AutoPlay.Produce(
-                    prompt.Options, prompt.RemainingColored, prompt.RemainingGeneric, prompt.RemainingHybrid, prompt.RemainingColorless)
-                is { } produce)
+            OwedMana owed = OwedMana.Of(prompt);
+            if (AutoPlay.Produce(prompt.Options, owed.Colored, owed.Generic, owed.Hybrid, owed.Colorless) is { } produce)
             {
                 return produce;
             }

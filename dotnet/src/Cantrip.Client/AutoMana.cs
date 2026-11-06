@@ -51,15 +51,7 @@ public sealed class ManaOwed
     public static ManaOwed? Of(PromptPayload? prompt) => prompt switch
     {
         // The announcement of X (CR 601.2b) is not a payment: nothing is paid until the targets are chosen.
-        PayCostsPromptMessage { AnnouncesXOrKicks: false } pay => new ManaOwed(
-            pay.RemainingGeneric + (pay.HasX
-                && pay.RemainingGeneric == 0
-                && pay.RemainingColored.Count == 0
-                && pay.RemainingHybrid.Count == 0
-                && pay.RemainingColorless == 0 ? 1 : 0),
-            pay.RemainingColored,
-            pay.RemainingHybrid,
-            pay.RemainingColorless),
+        PayCostsPromptMessage { AnnouncesXOrKicks: false } pay => OfPayment(pay),
         UnlessPaysPromptMessage unless => new ManaOwed(
             unless.RemainingGeneric,
             unless.RemainingColored,
@@ -68,9 +60,71 @@ public sealed class ManaOwed
         _ => null,
     };
 
+    private static ManaOwed OfPayment(PayCostsPromptMessage pay)
+    {
+        OwedMana owed = OwedMana.Of(pay);
+        return new ManaOwed(
+            owed.Generic + (pay.HasX
+                && owed.Generic == 0
+                && owed.Colored.Count == 0
+                && owed.Hybrid.Count == 0
+                && owed.Colorless == 0 ? 1 : 0),
+            owed.Colored,
+            owed.Hybrid,
+            owed.Colorless);
+    }
+
     /// <summary>How many remaining symbols a colour could pay, including either half of a hybrid symbol.</summary>
     public int CountOf(ColorView color) =>
         Colored.Count(owed => owed == color) + Hybrid.Count(owed => owed.Accepts(color));
+}
+
+/// <summary>
+/// What a payment still owes, as requirements a source of mana is matched to: the coloured, hybrid and colorless symbols,
+/// and the generic mana any mana pays. X's part that only some mana may pay ("Spend only black mana on X", CR 107.3,
+/// 601.2h: <see cref="PayCostsPromptMessage.RemainingX"/>) is no generic mana here: each of it is a symbol of the one type
+/// that may pay it, or one the types that may could each pay - so whatever taps a source for this payment, a bot's or the
+/// page's, taps one whose mana X can spend. Where X takes one mana of each color at most (Emblazoned Golem), the server
+/// drops a color from <see cref="PayCostsPromptMessage.XMana"/> once it has paid X, so what is left asks for the others.
+/// </summary>
+public sealed record OwedMana(List<ColorView> Colored, int Generic, List<HybridSymbolView> Hybrid, int Colorless)
+{
+    /// <summary>
+    /// What <paramref name="pay"/> owes, less <paramref name="instead"/> of its generic mana that something besides mana pays
+    /// (a creature or artifact tapped, a card exiled): X's part first, as the server has it.
+    /// </summary>
+    public static OwedMana Of(PayCostsPromptMessage pay, int instead = 0)
+    {
+        ArgumentNullException.ThrowIfNull(pay);
+        int generic = Math.Max(0, pay.RemainingGeneric - Math.Max(0, instead));
+        int x = Math.Min(Math.Max(0, Math.Min(pay.RemainingX, pay.RemainingGeneric) - Math.Max(0, instead)), generic);
+        if (x <= 0 || pay.XMana.Count == 0)
+        {
+            return new OwedMana(pay.RemainingColored, generic, pay.RemainingHybrid, pay.RemainingColorless);
+        }
+
+        List<ColorView> colored = [.. pay.RemainingColored];
+        List<HybridSymbolView> hybrid = [.. pay.RemainingHybrid];
+        int colorless = pay.RemainingColorless;
+        List<ColorView> colors = [.. pay.XMana.Where(type => type != ManaTypeView.Colorless).Select(type => (ColorView)(int)type)];
+        for (int i = 0; i < x; i++)
+        {
+            if (pay.XMana.Count == 1 && colors.Count == 1)
+            {
+                colored.Add(colors[0]);
+            }
+            else if (pay.XMana.Count == 1)
+            {
+                colorless++;
+            }
+            else
+            {
+                hybrid.Add(new HybridSymbolView { Colors = colors });
+            }
+        }
+
+        return new OwedMana(colored, generic - x, hybrid, colorless);
+    }
 }
 
 /// <summary>
