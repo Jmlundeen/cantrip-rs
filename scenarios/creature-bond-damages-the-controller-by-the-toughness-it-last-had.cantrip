@@ -1,0 +1,62 @@
+# Creature Bond on Bot2's Elvish Mystic (toughness 1). Bot2 pumps it with Giant Growth (toughness 4), then Bot1 destroys it
+# with Infernal Grasp: the Aura deals damage equal to the toughness the creature last had on the battlefield (4, CR 608.2h,
+# 603.10a), not its printed 1, to the creature's controller, Bot2 - not to the Aura's controller, who only pays Grasp's 2 life.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Pearl
+Creature Bond
+Infernal Grasp
+Island
+Island x17
+
+[Bot2 Deck]
+Forest
+Forest
+Elvish Mystic
+Giant Growth
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Creature Bond.Cast(Bot2.Battlefield.Elvish Mystic)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Elvish Mystic.Toughness = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Giant Growth.Cast(Elvish Mystic)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Elvish Mystic.Toughness = 4
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 18
+Bot2.Battlefield.Elvish Mystic = (absent)
+Bot1.Graveyard = Creature Bond; Infernal Grasp

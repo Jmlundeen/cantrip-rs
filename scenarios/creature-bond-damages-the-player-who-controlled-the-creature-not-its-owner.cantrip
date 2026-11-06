@@ -1,0 +1,62 @@
+# Bot1 takes Bot2's Elvish Mystic with Control Magic, then puts its own Creature Bond on it and destroys it with Infernal
+# Grasp. The Aura deals 1 damage (the Mystic's toughness) to the creature's controller as it last existed on the
+# battlefield (CR 608.2h), Bot1 - not to its owner, Bot2, into whose graveyard it goes: Bot1 loses 2 to Grasp and 1 to the
+# Aura, Bot2 stays at 20.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Control Magic
+Creature Bond
+Infernal Grasp
+Island x13
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Control Magic.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Control Magic.AttachedTo = Elvish Mystic
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Creature Bond.Cast(Bot1.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 20
+Bot2.Graveyard = Elvish Mystic
+Bot1.Graveyard = Creature Bond; Control Magic; Infernal Grasp
