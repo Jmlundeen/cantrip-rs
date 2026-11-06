@@ -1,0 +1,65 @@
+# Cyclopean Tomb's land is stripped of its mire counter by Vampire Hexmage (a removal "with" Hexmage, not with the Tomb) before the
+# Tomb dies. The text asks only that no mire counter "has been removed from [the land] with this artifact", so in the first upkeep
+# after the Tomb is gone the Forest is still the one land to choose, and choosing it removes no counter: it is the plain Forest it
+# became when the counter left (CR 122.1, 305.7, 611.2b). Removing no counter records no removal, so the Forest is still a land
+# the Tomb mired and took no counter from, and is offered again the upkeep after.
+[Bot1 Deck]
+Sol Ring
+Gleemox
+Gleemox
+Gleemox
+Cyclopean Tomb
+Forest
+Vampire Hexmage
+Disenchant
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#1.Activate(Color: W)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#2.Activate(Color: W)
+Bot1.Battlefield.Gleemox#3.Activate(Color: W)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Cyclopean Tomb.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Cyclopean Tomb.Activate(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Gleemox#1.Activate(Color: B)
+Bot1.Hand.Vampire Hexmage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gleemox#2.Activate(Color: W)
+Bot1.Battlefield.Gleemox#3.Activate(Color: W)
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Cyclopean Tomb)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Forest.Counters.Mire = (absent)
+? Bot1.Battlefield.Forest.Subtypes = Forest
+[T5 Bot1.Upkeep]
+Bot1.Choose(Bot1.Battlefield.Forest)
+? Bot1.Battlefield.Forest.Subtypes = Forest
+[T7 Bot1.Upkeep]
+Bot1.Choose(Bot1.Battlefield.Forest)
+[T7 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Forest.Subtypes = Forest
+Bot1.Battlefield.Forest.Counters.Mire = (absent)

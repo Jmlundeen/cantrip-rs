@@ -1,0 +1,6 @@
+{
+  "name": "Cyclopean Tomb",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "{2}, {T}: Put a mire counter on target non-Swamp land. That land is a Swamp for as long as it has a mire counter on it. Activate only during your upkeep.\nWhen this artifact is put into a graveyard from the battlefield, at the beginning of each of your upkeeps for the rest of the game, remove all mire counters from a land that a mire counter was put onto with this artifact but that a mire counter has not been removed from with this artifact."
+}

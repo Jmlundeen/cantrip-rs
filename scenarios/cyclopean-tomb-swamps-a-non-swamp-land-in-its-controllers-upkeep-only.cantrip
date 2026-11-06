@@ -1,0 +1,53 @@
+# Cyclopean Tomb: "{2}, {T}: Put a mire counter on target non-Swamp land. That land is a Swamp for as long as it has a mire counter
+# on it. Activate only during your upkeep." Not offered in Bot1's main phase (the same position, with mana to spare, as the
+# upkeep); in the upkeep Bot2's Swamp is refused and Bot1's Forest takes the counter, paid for with exactly {2} (CC from the
+# Sol Ring), and becomes a Swamp: its Forest type and {G} gone, tapping for {B} (CR 305.7, 611.2b, 605.1a).
+[Bot1 Deck]
+Sol Ring
+Gleemox
+Gleemox
+Gleemox
+Cyclopean Tomb
+Forest
+Mountain
+Island x30
+
+[Bot2 Deck]
+Swamp
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#1.Activate(Color: W)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#2.Activate(Color: W)
+Bot1.Battlefield.Gleemox#3.Activate(Color: W)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Cyclopean Tomb.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T1 Bot1.Main1]
+! Bot1.Battlefield.Cyclopean Tomb.Activate(Bot1.Battlefield.Forest)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Upkeep]
+! Bot1.Battlefield.Cyclopean Tomb.Activate(Bot2.Battlefield.Swamp)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Cyclopean Tomb.Activate(Bot1.Battlefield.Forest)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {B}
+[Expect]
+Bot1.Battlefield.Forest.Counters.Mire = 1
+Bot1.Battlefield.Forest.Subtypes = Swamp
+Bot1.Battlefield.Cyclopean Tomb.Tapped = true
+Bot2.Battlefield.Swamp.Counters.Mire = (absent)

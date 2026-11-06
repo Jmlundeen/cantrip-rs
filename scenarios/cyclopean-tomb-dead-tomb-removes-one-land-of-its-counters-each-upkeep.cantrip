@@ -1,0 +1,120 @@
+# Cyclopean Tomb dies (Disenchant) after putting a mire counter on Bot1's Forest and on Bot2's Island; Bot2's own Tomb put one on
+# Bot1's Mountain and Tezzeret's Gambit's proliferate one more on the Forest. Then in each of Bot1's upkeeps (never Bot2's) its
+# controller chooses a land this Tomb mired and no counter of it has come off: the Forest first, losing both its counters
+# whoever put them there, then the Island; the Mountain was never this Tomb's, so with nothing left nothing is asked. A land is a
+# Swamp only while a mire counter is on it (CR 122.1, 305.7, 603.7, 611.2b).
+[Bot1 Deck]
+Sol Ring
+Gleemox
+Gleemox
+Gleemox
+Cyclopean Tomb
+Forest
+Mountain
+Tezzeret's Gambit
+Island
+Island
+Disenchant
+Island x30
+
+[Bot2 Deck]
+Sol Ring
+Gleemox
+Gleemox
+Gleemox
+Cyclopean Tomb
+Island
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#1.Activate(Color: W)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox#2.Activate(Color: W)
+Bot1.Battlefield.Gleemox#3.Activate(Color: W)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Cyclopean Tomb.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Gleemox.Cast
+Bot2.Pass
+Bot2.Hand.Gleemox.Cast
+Bot2.Pass
+Bot2.Hand.Gleemox.Cast
+Bot2.Pass
+Bot2.Battlefield.Gleemox#1.Activate(Color: W)
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Gleemox#2.Activate(Color: W)
+Bot2.Battlefield.Gleemox#3.Activate(Color: W)
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Cyclopean Tomb.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Cyclopean Tomb.Activate(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Gleemox#1.Activate(Color: U)
+Bot1.Battlefield.Gleemox#2.Activate(Color: U)
+Bot1.Battlefield.Gleemox#3.Activate(Color: U)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Forest.Counters.Mire = 2
+[T4 Bot2.Upkeep]
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Cyclopean Tomb.Activate(Bot1.Battlefield.Mountain)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Mountain.Counters.Mire = 1
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Cyclopean Tomb.Activate(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Island.Counters.Mire = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gleemox#1.Activate(Color: W)
+Bot1.Battlefield.Gleemox#2.Activate(Color: W)
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Cyclopean Tomb)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Disenchant; Cyclopean Tomb; Tezzeret's Gambit
+[T6 Bot2.Upkeep]
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Forest.Counters.Mire = 2
+? Bot2.Battlefield.Island.Counters.Mire = 1
+[T7 Bot1.Upkeep]
+Bot1.Choose(Bot1.Battlefield.Forest)
+? Bot1.Battlefield.Forest.Counters.Mire = (absent)
+? Bot1.Battlefield.Forest.Subtypes = Forest
+? Bot2.Battlefield.Island.Counters.Mire = 1
+? Bot1.Battlefield.Mountain.Counters.Mire = 1
+[T9 Bot1.Upkeep]
+Bot1.Choose(Bot2.Battlefield.Island)
+? Bot2.Battlefield.Island.Counters.Mire = (absent)
+[T11 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Choose
+[T11 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Mountain.Counters.Mire = 1
+Bot1.Battlefield.Mountain.Subtypes = Swamp
+Bot2.Battlefield.Island.Subtypes = Island
