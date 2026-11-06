@@ -1,0 +1,6 @@
+{
+  "name": "Anguished Unmaking",
+  "manaCost": "{1}{W}{B}",
+  "type": "Instant",
+  "oracleText": "Exile target nonland permanent. You lose 3 life."
+}

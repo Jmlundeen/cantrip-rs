@@ -1,0 +1,80 @@
+# "Exile target nonland permanent. You lose 3 life." (CR 701.13a, 119.3, 115.1). On turn 3 Bot1 casts it at Bot2's
+# Ornithopter and Bot2 answers with Lightning Bolt on its own Ornithopter: the target is illegal as the spell tries to
+# resolve, so it does not resolve and Bot1 stays at 20 (Scryfall's ruling). On turn 5 it exiles Bot1's own Mox Ruby and
+# on turn 7 Bot2's Mox Sapphire, each losing exactly 3 life - 17 and then 14. A land is no legal target (the refusal).
+
+[Bot1 Deck]
+Anguished Unmaking
+Anguished Unmaking
+Anguished Unmaking
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Mox Sapphire
+Lightning Bolt
+Mountain
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Anguished Unmaking.Cast(Bot2.Battlefield.Mountain)
+Bot1.Hand.Anguished Unmaking.Cast(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+? Bot1.Graveyard = Anguished Unmaking
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Anguished Unmaking.Cast(Bot1.Battlefield.Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 17
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Anguished Unmaking.Cast(Bot2.Battlefield.Mox Sapphire)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 14
+
+[Expect]
+Turn = 7
+Bot1.Life = 14
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Sapphire
+Bot2.Battlefield = Mountain
+Exile = Mox Ruby; Mox Sapphire
+Bot2.Graveyard = Ornithopter; Lightning Bolt
