@@ -1468,6 +1468,12 @@ pub fn tap_and_stun<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<
     Ok(())
 }
 
+/// "Tap [up to one] target creature and put a stun counter on it. Draw a card." (CR 701.26a, 122.1d, 121.1): Cryogenic Stasis and Consider the Prime Directive.
+pub fn tap_and_stun_then_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    tap_and_stun::<1>(g, item)?;
+    draw(g, item, 1)
+}
+
 /// "Tap [N] target [permanents]" (CR 701.26a, 608.2b): each target that is still legal as the ability resolves. Divining
 /// Duelist (as a mode), Quake, Agent of S.H.I.E.L.D. and Raft Security Officer print it.
 pub fn tap_targets(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
