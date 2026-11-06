@@ -1,0 +1,69 @@
+# Two Cryogenic Stasis spells on the opponent's turn target the same opposing Memnite.
+# The first taps it; the second still adds a counter although tapping it is impossible
+# (CR 701.26a, 609.3). Each draws exactly one card for Bot1 (CR 121.1). Other creatures
+# on both sides stay untouched. Each stun counter replaces one untap, not both at once
+# (CR 122.1d), and after two missed untaps Memnite untaps normally.
+
+[Bot1 Deck]
+Cryogenic Stasis x2
+Black Lotus
+Mox Sapphire
+Memnite
+Island
+Plains
+Forest
+Swamp
+Mountain
+Island x20
+
+[Bot2 Deck]
+Memnite
+Ornithopter
+Island x25
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}{U}{U}{U}
+? Bot1.Hand.Count = 4
+? Bot2.Hand.Count = 6
+Bot1.Hand.Cryogenic Stasis.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+? Bot1.Mana = {U}{U}
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Tapped = true
+? Bot2.Battlefield.Memnite.Counters.Stun = 1
+? Bot1.Hand.Count = 4
+? Bot2.Hand.Count = 6
+Bot1.Hand.Cryogenic Stasis.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Tapped = true
+? Bot2.Battlefield.Memnite.Counters.Stun = 2
+? Bot1.Hand = Forest; Island; Plains; Swamp
+? Bot1.Hand.Count = 4
+? Bot2.Hand.Count = 6
+? Bot1.Battlefield.Memnite.Tapped = false
+? Bot1.Battlefield.Memnite.Counters.Stun = (absent)
+? Bot2.Battlefield.Ornithopter.Tapped = false
+? Bot2.Battlefield.Ornithopter.Counters.Stun = (absent)
+[T4 Bot2.Upkeep]
+? Bot2.Battlefield.Memnite.Tapped = true
+? Bot2.Battlefield.Memnite.Counters.Stun = 1
+[T6 Bot2.Upkeep]
+? Bot2.Battlefield.Memnite.Tapped = true
+? Bot2.Battlefield.Memnite.Counters.Stun = (absent)
+[T8 Bot2.Upkeep]
+
+[Expect]
+Bot2.Battlefield.Memnite.Tapped = false
+Bot2.Battlefield.Memnite.Counters.Stun = (absent)

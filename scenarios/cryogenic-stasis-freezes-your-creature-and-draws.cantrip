@@ -1,0 +1,45 @@
+# Cryogenic Stasis can target your own creature, but not a noncreature artifact (CR 115.1a).
+# Exactly {1}{U} taps Memnite and puts one stun counter on it (CR 701.26a, 122.1d), leaving
+# Ornithopter alone. The controller draws exactly the Forest on top, not the opponent (CR 121.1).
+
+[Bot1 Deck]
+Cryogenic Stasis
+Mox Sapphire
+Mox Pearl
+Memnite
+Ornithopter
+Island
+Grizzly Bears
+Forest
+Swamp
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{U}
+? Bot1.Hand.Count = 3
+! Bot1.Hand.Cryogenic Stasis.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Hand.Cryogenic Stasis.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Tapped = true
+Bot1.Battlefield.Memnite.Counters.Stun = 1
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Ornithopter.Counters.Stun = (absent)
+Bot1.Hand = Forest; Grizzly Bears; Island
+Bot1.Hand.Count = 3
+Bot2.Hand.Count = 7
+Bot1.Graveyard = Cryogenic Stasis
