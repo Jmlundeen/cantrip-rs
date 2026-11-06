@@ -1474,6 +1474,22 @@ pub fn tap_and_stun_then_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), 
     draw(g, item, 1)
 }
 
+/// "Tap all creatures your opponents control" (CR 701.26a, 101.4): every creature each opponent of the resolving item's
+/// controller controls as the effect is carried out, tapped together; an already-tapped one stays tapped. Cryptic Command,
+/// Ultimecia, Temporal Threat and Summon: Alexander (Crystal Fragments' back face) print it.
+pub fn tap_each_creature_opponents_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
+    let creatures: Vec<ObjectId> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| g.chars(id).is(CardType::Creature) && opponents.contains(&g.controller(id)))
+        .collect();
+    g.tap_together(&creatures);
+    Ok(())
+}
+
 /// "Tap [N] target [permanents]" (CR 701.26a, 608.2b): each target that is still legal as the ability resolves. Divining
 /// Duelist (as a mode), Quake, Agent of S.H.I.E.L.D. and Raft Security Officer print it.
 pub fn tap_targets(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
