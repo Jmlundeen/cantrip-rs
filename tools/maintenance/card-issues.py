@@ -145,9 +145,10 @@ state labels(first:20){nodes{name}}}}}}"""
 ONE_ISSUE = """query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){
 issue(number:$number){number title state labels(first:20){nodes{name}}comments(last:50){nodes{author{login}body
 createdAt}}}}}"""
+# A grouped card PR may close twenty issues; retain activity for every card in the group.
 PULLS = """query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){
 pullRequests(first:50,after:$endCursor,states:OPEN){pageInfo{hasNextPage endCursor}nodes{number createdAt
-headRefName author{login}closingIssuesReferences(first:5){nodes{number}}commits(last:30){nodes{commit{committedDate}}}}}}}"""
+headRefName author{login}closingIssuesReferences(first:100){nodes{number}}commits(last:30){nodes{commit{committedDate}}}}}}}"""
 BRANCHES = """query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){
 refs(refPrefix:"refs/heads/card/",first:100,after:$endCursor){pageInfo{hasNextPage endCursor}nodes{name target{
 ...on Commit{committedDate author{user{login}}}}}}}}"""
