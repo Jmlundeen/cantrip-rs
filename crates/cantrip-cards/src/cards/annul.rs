@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::counter_target;
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
 /// An artifact or enchantment spell on the stack.
@@ -9,12 +9,7 @@ fn artifact_or_enchantment_spell(q: &dyn Query, _: &Asker, t: Target) -> bool {
             && (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Enchantment)))
 }
 
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    counter_target(g, item, 0);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(artifact_or_enchantment_spell)], effect),
+    spell: spell(&[target(artifact_or_enchantment_spell)], effects::counter_first_target),
     ..oracle::ANNUL
 };

@@ -12,6 +12,14 @@ pub fn counter_subject_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), S
     Ok(())
 }
 
+/// "Counter target spell" as a spell's or ability's whole effect (CR 701.6, 608.2b): the spell in the first target slot,
+/// countered only while it is still a legal target as this resolves. Cryptic Command, Counterspell, Negate and the
+/// Elemental Blasts print it.
+pub fn counter_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    crate::counter_target(g, item, 0);
+    Ok(())
+}
+
 fn you_control_source(q: &dyn Query, e: &ContinuousEffect) -> bool {
     q.is_on_battlefield(e.source) && q.controller(e.source) == e.controller
 }

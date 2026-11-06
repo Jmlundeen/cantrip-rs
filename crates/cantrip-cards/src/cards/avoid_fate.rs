@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{counter_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// An instant or Aura spell currently targeting a permanent you control (CR 115.1, 608.2b).
@@ -11,13 +11,7 @@ fn eligible_spell(q: &dyn Query, asker: &Asker, target: Target) -> bool {
         && targets::spell_targets_permanent_controlled_by(q, item, asker.controller)
 }
 
-/// Counter the target spell if it remains legal (CR 701.6a, 608.2b).
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    counter_target(g, item, 0);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(eligible_spell)], effect),
+    spell: spell(&[target(eligible_spell)], effects::counter_first_target),
     ..oracle::AVOID_FATE
 };

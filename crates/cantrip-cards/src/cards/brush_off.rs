@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{counter_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "This spell costs {1}{U} less to cast if it targets an instant or sorcery spell" (CR 601.2f): the target as the total cost
@@ -13,14 +13,8 @@ fn less_if_it_targets_an_instant_or_sorcery(q: &dyn Query, _: ObjectId, _: Playe
     if one { CostDelta::less_mana(mana("{1}{U}")) } else { CostDelta::NONE }
 }
 
-/// "Counter target spell."
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    counter_target(g, item, 0);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[targets::SPELL], effect),
+    spell: spell(&[targets::SPELL], effects::counter_first_target),
     own_cost_changes: &[less_if_it_targets_an_instant_or_sorcery],
     ..oracle::BRUSH_OFF
 };

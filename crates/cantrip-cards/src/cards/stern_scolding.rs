@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{counter_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "Target creature spell with power or toughness 2 or less" (CR 115.1): a spell on the stack, read as it is there.
@@ -11,12 +11,7 @@ fn small_creature_spell(q: &dyn Query, asker: &Asker, t: Target) -> bool {
         })
 }
 
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    counter_target(g, item, 0);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(small_creature_spell)], effect),
+    spell: spell(&[target(small_creature_spell)], effects::counter_first_target),
     ..oracle::STERN_SCOLDING
 };
