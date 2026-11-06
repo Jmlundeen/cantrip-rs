@@ -87,11 +87,11 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-150](#ki-150-text-changes-are-interned-for-at-most-4294967295-distinct-lists-in-a-process) | Text changes are interned for at most 4,294,967,295 distinct lists in a process | Pri-3 | Won't fix: beyond practical scale |
 | [KI-146](#ki-146-the-booster-drafts-dragged-pick-test-once-saw-the-pick-fly-from-the-pack) | The booster draft's dragged-pick test once saw the pick fly from the pack | Pri-3 | Suspected |
 | [KI-147](#ki-147-two-tablet-browser-tests-wait-forever-for-unos-splash-to-go) | Two tablet browser tests wait forever for Uno's splash to go | Pri-3 | Open |
-| [KI-158](#ki-158-a-scenarios-spend-that-no-payment-asks-about-is-ignored) | A scenario's `Spend:` that no payment asks about is ignored | Pri-3 | Open |
+| [KI-159](#ki-159-a-scenarios-spend-that-no-payment-asks-about-is-ignored) | A scenario's `Spend:` that no payment asks about is ignored | Pri-3 | Open |
 
 ## Issues
 
-### KI-158: A scenario's `Spend:` that no payment asks about is ignored
+### KI-159: A scenario's `Spend:` that no payment asks about is ignored
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
