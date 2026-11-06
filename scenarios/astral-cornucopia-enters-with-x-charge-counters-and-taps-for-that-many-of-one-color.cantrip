@@ -1,0 +1,38 @@
+# Astral Cornucopia {X}{X}{X} enters with X charge counters (CR 614.1c): cast with X of 2 it costs {6}, which Bot1 pays
+# exactly with Black Lotus and three Moxen, and it enters with two charge counters, whose {T} ability is a mana ability
+# (CR 605.1a) that adds one mana of the chosen color for each of them - two white here (CR 106.3).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Astral Cornucopia
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Astral Cornucopia.Cast(X: 2)
+Bot1.Pass
+? Bot1.Mana =
+[Bot1.Main2]
+? Bot1.Battlefield.Astral Cornucopia.Counters.Charge = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Astral Cornucopia.Activate(Color: White)
+? Bot1.Mana = {W}{W}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Astral Cornucopia.Counters.Charge = 2
+Bot1.Battlefield.Astral Cornucopia.Tapped = true
+Bot1.Graveyard = Black Lotus

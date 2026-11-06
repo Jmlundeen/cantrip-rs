@@ -1,0 +1,23 @@
+# Cast with X of 0, Astral Cornucopia enters with no charge counter (CR 614.1c) and its mana ability (CR 605.1a) adds
+# one mana of the chosen color for each charge counter it has - none, so nothing - while still paying its tap.
+
+[Bot1 Deck]
+Astral Cornucopia
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Astral Cornucopia.Cast(X: 0)
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Astral Cornucopia.Counters.Charge = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Astral Cornucopia.Activate(Color: Red)
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Astral Cornucopia.Tapped = true
+Bot1.Battlefield.Astral Cornucopia.Counters.Charge = (absent)
