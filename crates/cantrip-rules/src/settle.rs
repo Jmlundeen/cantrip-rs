@@ -1025,6 +1025,27 @@ fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event
     found.push((PendingTrigger { source, ability, controller, subject, data: [0; 2], members: Span::default(), count: None, since: None, acquired: Acquired::OWN, words: None }, t, again));
 }
 
+/// One of the rules' own triggered abilities that `source` has for a keyword or a subtype (`counters::last_counter_trigger`)
+/// that `event` triggered, controlled by `controller`: unless something stops it triggering, and once more for each static
+/// ability that makes it trigger again (CR 603.2d), as any other ability of an object is.
+#[allow(clippy::too_many_arguments)]
+fn rules_ability(cx: &mut Cx, source: ObjectId, index: u8, controller: PlayerId, event: &Event, seen: bool, statics: &mut TriggerStatics, found: &mut Found) {
+    let ability = AbilityRef { card: cx.cards().intrinsic, index };
+    let AbilityDef::Triggered(t) = cx.cards().ability(ability) else { return };
+    let permanent = cx.s().obj(source).zone.is(ZoneKind::Battlefield);
+    let triggering = Triggering { source, controller, def: t, permanent, looks_back: cx.cards().looks_back(ability, event, seen) };
+    if statics.stop(cx, event, &triggering) {
+        return;
+    }
+    let mut again = Again::new();
+    statics.additional(cx, event, &triggering, &mut again);
+    found.push((
+        PendingTrigger { source, ability, controller, subject: Target::None, data: [0; 2], members: Span::default(), count: None, since: None, acquired: Acquired::OWN, words: None },
+        t,
+        again,
+    ));
+}
+
 /// The slot of `chars`'s abilities that the `nth` of `Chars::abilities()` is in.
 fn slot_of(chars: &Chars, nth: usize) -> usize {
     chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(nth).map_or(0, |(slot, _)| slot)
@@ -1597,6 +1618,11 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             // The players' inherent triggered abilities (CR 725.2, 726.2, 702.179d), which no object has.
             for (index, controller, subject) in crate::designations::inherent_triggers(cx, event) {
                 inherent(cx, index, controller, subject, event, seen, &mut statics, &mut found);
+            }
+            // The rules' abilities an object has for a keyword or a subtype that trigger on its last counter of a kind coming
+            // off (suspend's, CR 702.62a; a Siege's, CR 310.12b).
+            if let Some((source, index, controller)) = crate::counters::last_counter_trigger(cx, event) {
+                rules_ability(cx, source, index, controller, event, seen, &mut statics, &mut found);
             }
             let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
             if let Some(before) = before {

@@ -166,8 +166,10 @@ neither a later change of control or color nor the source leaving can alter.
   (`Cause::Ability`), gone or not, so Cyclopean Tomb's "a land that a mire counter was put onto with this artifact but
   that a mire counter has not been removed from with this artifact" reads the `CountersPut` and `CountersRemoved`
   records whose cause is an ability of that Tomb - its activated one, and its delayed one after it has died. Every
-  counter that comes off an object is a `CountersRemoved` record, filed with those put on (`EventMask::COUNTERS`);
-  no ability triggers on it yet.
+  counter that comes off an object is a `CountersRemoved` event, filed with those put on (`EventMask::COUNTERS`), with
+  how many of the kind are left (`total`). Triggers are looked for as it is emitted (`counters::remove`), which is how
+  the rules' "when the last [kind] counter is removed" abilities trigger however the counter came off: suspend's cast
+  (CR 702.62a) and a Siege's defeat (CR 310.12b), from `counters::last_counter_trigger`.
 - **Visibility is derived, not stored.** Who knows what follows from the state and the log, provided every action
   that gives a player knowledge is an event: a reveal, a look at cards (`seen_by` on a face-down card), a search.
 - **Narration, replay and training data are views of it.** "State before a decision, the options, the choice, the

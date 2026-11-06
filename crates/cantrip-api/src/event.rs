@@ -239,9 +239,12 @@ pub enum Event {
     /// `amount` counters of `kind` came off an object (CR 122.1), as many as it had of them at most: removed by a cost (CR
     /// 118.3) or an effect, moved off it (CR 122.5), or cancelled by the state-based action of CR 704.5q. What removed them
     /// is the record's `Cause`, as `CountersPut`'s is: the source of the ability resolving, gone or not (`Cause::Ability`) -
-    /// "a land that a mire counter has not been removed from with this artifact" (Cyclopean Tomb) asks it. Filed with the
-    /// counters put (`EventMask::COUNTERS`) in the history; no ability triggers on it yet.
-    CountersRemoved { object: ObjectId, kind: CounterKind, amount: i32 },
+    /// "a land that a mire counter has not been removed from with this artifact" (Cyclopean Tomb) asks it. `total` is how
+    /// many of that kind it has once they are off, so "when the last time counter is removed from this card" (suspend, CR
+    /// 702.62a) and "when the last defense counter is removed from this permanent" (a Siege, CR 310.12b) read the event as
+    /// the counters come off (CR 603.2): `total` 0, however many came off at once. Filed with the counters put
+    /// (`EventMask::COUNTERS`), which is what an ability listening for either is asked of.
+    CountersRemoved { object: ObjectId, kind: CounterKind, amount: i32, total: i32 },
     /// A permanent transformed (CR 701.27a): its other face is up now.
     Transformed { object: ObjectId },
     /// `player` gave a gift (CR 702.174c) to `to`: an instant or sorcery spell they control whose gift cost was paid
@@ -616,8 +619,6 @@ impl EventMask {
             Event::Looked { .. } => EventMask::LOOKED,
             Event::Countered { .. } => EventMask::COUNTERED,
             Event::AbilityActivated { .. } => EventMask::ABILITY_ACTIVATED,
-            // Counters taken off are filed with those put on; triggers listen only for the latter (`of`).
-            Event::CountersPut { .. } | Event::CountersRemoved { .. } => EventMask::COUNTERS,
             // The alternative cost a cast was paid with is part of the cast's record.
             Event::Cast(_) | Event::PaidAlternative { .. } => EventMask::CAST,
             Event::LandPlayed { .. } => EventMask::LAND_PLAYED,
@@ -671,7 +672,8 @@ impl EventMask {
             Event::Suspected { .. } => EventMask::SUSPECTED,
             Event::EnteredFaceDown { .. } => EventMask::ENTERED_FACE_DOWN,
             Event::TurnedFaceUp { .. } => EventMask::TURNED_FACE_UP,
-            Event::CountersPut { .. } => EventMask::COUNTERS,
+            // Counters put on and taken off share a kind: an ability listening for either tells them apart by the event.
+            Event::CountersPut { .. } | Event::CountersRemoved { .. } => EventMask::COUNTERS,
             Event::Transformed { .. } => EventMask::TRANSFORMED,
             Event::Mutated { .. } => EventMask::MUTATED,
             Event::Melded { .. } => EventMask::MELDED,

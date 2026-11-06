@@ -146,17 +146,15 @@ fn suspend_upkeep(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !crate::game::is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Exile) || g.obj(card).counters(CounterKind::Time) <= 0 {
         return Ok(());
     }
+    // "When the last is removed" is a triggered ability of its own, which triggers on the counter coming off however it
+    // does - this ability or any effect (`Event::CountersRemoved`, the rules' `counters::last_counter_trigger`).
     g.remove_counters(card, CounterKind::Time, 1);
-    // "When the last is removed" is a triggered ability of its own, put on the stack the next time a player gets priority.
-    if g.obj(card).counters(CounterKind::Time) == 0 {
-        let ability = AbilityRef { card: g.card_id(&INTRINSIC), index: SUSPEND_CAST };
-        g.reflexive_trigger(card, item.controller, ability, Target::None);
-    }
     Ok(())
 }
 
 /// "When the last is removed and the card is exiled, you may cast it without paying its mana cost. If you don't, it
-/// remains exiled." (CR 702.62a)
+/// remains exiled." (CR 702.62a) Triggered by the last time counter coming off a card with suspend in exile, by whatever
+/// removed it (`Event::CountersRemoved`); "if it's exiled" is asked again here as it resolves (CR 603.4).
 fn suspend_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let card = item.object;
     if !crate::game::is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Exile) || !g.could_cast_during_resolution(card) {

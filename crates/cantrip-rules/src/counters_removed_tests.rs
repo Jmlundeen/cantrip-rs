@@ -35,7 +35,7 @@ fn removed(cx: &Cx, from: usize) -> Vec<(ObjectId, CounterKind, i32)> {
     cx.g.log[from..]
         .iter()
         .filter_map(|r| match r.event {
-            Event::CountersRemoved { object, kind, amount } => Some((object, kind, amount)),
+            Event::CountersRemoved { object, kind, amount, .. } => Some((object, kind, amount)),
             _ => None,
         })
         .collect()

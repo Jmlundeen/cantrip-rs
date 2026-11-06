@@ -8,7 +8,7 @@
 //! called from this module alone (`only_the_put_path_puts_counters`). Taking counters off (`remove`) is not putting them.
 
 use cantrip_api::*;
-use cantrip_state::{Obj, PendingTrigger};
+use cantrip_state::Obj;
 
 use crate::layers::{self, live};
 use crate::{Cx, ops, replace};
@@ -196,8 +196,9 @@ pub(crate) fn place_prepared(cx: &mut Cx, placements: &[Placement]) -> Vec<Event
 }
 
 /// Takes up to `n` counters of one kind off `id` (CR 122.1): what a cost removes (CR 118.3), what an effect removes, and
-/// the state-based action of CR 704.5q, recorded as `Event::CountersRemoved`. When the last defense counter comes off a
-/// Siege, its defeat ability triggers (CR 310.12b).
+/// the state-based action of CR 704.5q, emitted as `Event::CountersRemoved`: the abilities that trigger on counters coming
+/// off are looked for as they come off (CR 603.2), "when the last [kind] counter is removed" among them
+/// (`last_counter_trigger`).
 pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i32) {
     if n <= 0 || !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::PhasedOut) {
         return;
@@ -207,13 +208,37 @@ pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i32) {
         return;
     }
     cx.st().update_obj(id, |o| o.remove_counters(kind, n));
+    let total = cx.s().obj(id).counters(kind);
+    ops::end_lapsed_durations(cx, id);
     // What came off is recorded, with what removed it as the record's cause: "a mire counter has not been removed from with
     // this artifact" (Cyclopean Tomb) asks the history.
-    let amount = before - cx.s().obj(id).counters(kind);
-    cx.record(Event::CountersRemoved { object: id, kind, amount });
-    ops::end_lapsed_durations(cx, id);
-    if kind == CounterKind::Defense && cx.s().obj(id).counters(CounterKind::Defense) == 0 {
-        siege_defeat_triggers(cx, id);
+    cx.emit(Event::CountersRemoved { object: id, kind, amount: before - total, total });
+}
+
+/// The rules' own ability that `event` triggers on the object whose last counter of a kind it took off, if any (CR 603.2):
+/// its index in `intrinsic`, its source and who controls it. The event says how many are left (`total`), so taking off
+/// several at once, down to none, is one "last counter removed", and one that took off some but left any is none.
+/// - Suspend's "when the last time counter is removed from this card, if it's exiled, you may play it" (CR 702.62a): a card
+///   with suspend, its ability functioning in exile, where "if it's exiled" holds as it triggers (CR 603.4; asked again as it
+///   resolves, `intrinsic::suspend_cast`) - controlled by its owner (CR 108.4a, 113.8). However the counter came off: its
+///   upkeep ability, or any effect.
+/// - A Siege's "when the last defense counter is removed from this permanent, exile it" (CR 310.12b), on the battlefield.
+pub(crate) fn last_counter_trigger(cx: &Cx, event: &Event) -> Option<(ObjectId, u8, PlayerId)> {
+    let Event::CountersRemoved { object, kind, amount, total: 0 } = *event else { return None };
+    if amount <= 0 || !live(cx.s(), object) {
+        return None;
+    }
+    let obj = cx.s().obj(object);
+    match kind {
+        CounterKind::Time if obj.zone.is(ZoneKind::Exile) && cx.card(obj.card).suspend.is_some() => {
+            Some((object, cantrip_api::intrinsic::SUSPEND_CAST, obj.owner))
+        }
+        CounterKind::Defense
+            if obj.zone.is(ZoneKind::Battlefield) && layers::chars(cx.cards(), cx.s(), &cx.g.log, object).has_subtype(Subtype::Siege) =>
+        {
+            Some((object, cantrip_api::intrinsic::SIEGE_DEFEAT, obj.controller))
+        }
+        _ => None,
     }
 }
 
@@ -323,31 +348,6 @@ pub fn choose_kind(cx: &mut Cx, player: PlayerId, source: ObjectId, object: Obje
         _ if cost => Err(crate::Stop::Cancel),
         _ => Ok(None),
     }
-}
-
-/// A Siege that has lost its last defense counter triggers its defeat ability (CR 310.12b).
-fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
-    if !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-        return;
-    }
-    let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
-    if !chars.has_subtype(Subtype::Siege) {
-        return;
-    }
-    let ability = AbilityRef { card: cx.cards().intrinsic, index: cantrip_api::intrinsic::SIEGE_DEFEAT };
-    let controller = cx.s().obj(id).controller;
-    cx.st().trigger_push(PendingTrigger {
-        source: id,
-        ability,
-        controller,
-        subject: Target::None,
-        data: [0; 2],
-        members: cantrip_state::Span::default(),
-        count: None,
-        since: None,
-        acquired: Acquired::OWN,
-        words: None,
-    });
 }
 
 /// What a permanent enters with because of what it is (CR 614.1c), counters it enters with like any other (CR 122.6),

@@ -130,6 +130,8 @@ mod stale_move_tests;
 #[cfg(test)]
 mod suspend_haste_tests;
 #[cfg(test)]
+mod suspend_last_counter_tests;
+#[cfg(test)]
 mod entering_judged_tests;
 #[cfg(test)]
 mod entered_known_tests;

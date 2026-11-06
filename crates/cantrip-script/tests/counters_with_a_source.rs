@@ -299,7 +299,7 @@ fn a_dead_tombs_upkeep_ability_takes_the_mire_counters_it_put_off_one_land_each_
         .log
         .iter()
         .filter_map(|r| match (r.cause, r.event) {
-            (Cause::Ability { source, .. }, Event::CountersRemoved { object, kind: CounterKind::Mire, amount }) if source == tomb => Some((object, amount)),
+            (Cause::Ability { source, .. }, Event::CountersRemoved { object, kind: CounterKind::Mire, amount, .. }) if source == tomb => Some((object, amount)),
             _ => None,
         })
         .collect();
