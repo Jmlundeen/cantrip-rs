@@ -299,7 +299,7 @@ fn cost(text: &str) -> Result<String, String> {
     let mut slots: Vec<String> = hybrid.iter().map(|(a, b)| format!("Some((Mana::{a}, Mana::{b}))")).collect();
     slots.resize(6, "None".into());
     Ok(format!(
-        "ManaCost {{ generic: {generic}, symbols: {symbols:?}, hybrid: [{}], twobrid: {twobrid:?}, phyrexian: {phyrexian:?}, x: {x} }}",
+        "ManaCost {{ generic: {generic}, symbols: {symbols:?}, hybrid: [{}], twobrid: {twobrid:?}, phyrexian: {phyrexian:?}, x: {x}, ..ManaCost::ZERO }}",
         slots.join(", ")
     ))
 }

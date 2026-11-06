@@ -1561,6 +1561,10 @@ pub struct ActivatedDef {
     /// "X can't be 0" (CR 107.3a, 601.2b by way of 602.2b): the X of its activation cost is announced as 1 or more, and it is
     /// offered only where it could be paid with X as 1 (Lair of the Hydra, Helm of Obedience, Aladdin's Lamp).
     pub x_cant_be_zero: bool,
+    /// "Spend only [type] mana on X" (CR 107.3, 601.2h by way of 602.2b): what mana may pay the X of its activation cost
+    /// (Crypt Rats, Crimson Hellkite, Atalya, Samite Master's modes), `XMana::ANY` for most. Written `.x_mana(..)`; held to
+    /// the Oracle text by `cantrip-cards/tests/x_mana_matches_oracle.rs`.
+    pub x_mana: XMana,
     /// "This ability can't be copied" (CR 101.2, 707.10): no effect copies it while it is on the stack, and an effect that
     /// would does nothing (Gogo, Master of Mimicry).
     pub cant_be_copied: bool,
@@ -1629,6 +1633,7 @@ impl ActivatedDef {
         cycling: false,
         ninjutsu: false,
         x_cant_be_zero: false,
+        x_mana: XMana::ANY,
         cant_be_copied: false,
         divide: None,
         special_action: false,
@@ -3196,6 +3201,10 @@ pub struct CardDef {
     /// have to be 0, without paying its mana cost or for an alternative cost with no {X} (CR 107.3b; Mind Grind's ruling).
     /// For a kicker with {X} (Thieving Skydiver's), the kicker is paid with X as 1 or more: announcing 0 is not kicking it.
     pub x_cant_be_zero: bool,
+    /// "Spend only [type] mana on X" (CR 107.3, 601.2h): what mana may pay the X of its mana cost or of its kicker (Drain
+    /// Life, Consume Spirit: `XMana::only(Mana::B)`; Emblazoned Golem: `XMana::COLORED_ONE_EACH`), `XMana::ANY` for most.
+    /// Held to the Oracle text by `cantrip-cards/tests/x_mana_matches_oracle.rs`.
+    pub x_mana: XMana,
     /// Delayed abilities created as it is cast for a way, with no stack item of their own (CR 608.3g, 603.7a): a pair
     /// of the way (as `ways[n - 1]`) and the index in `delayed`. The ability triggers at the beginning of the next end
     /// step, aimed at the permanent the spell becomes: dash's "return it to its owner's hand" (CR 702.109a), blitz's.
@@ -3644,6 +3653,7 @@ impl CardDef {
         end_step_riders: &[],
         late_targets: false,
         x_cant_be_zero: false,
+        x_mana: XMana::ANY,
         additional_cost: None,
         additional_choice: &[],
         enters: None,

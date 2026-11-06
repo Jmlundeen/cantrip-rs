@@ -841,7 +841,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         RequestKind::Priority { options } => {
             PromptPayload::PriorityPromptMessage(PriorityPrompt { player, options: options_messages(game, handles, options) })
         }
-        RequestKind::PayCosts { source, total, remaining, options, announcing, x, most, least, loyalty, attackers, life, governs, assist } => {
+        RequestKind::PayCosts { source, total, remaining, options, announcing, x, most, least, loyalty, attackers, life, governs, assist, x_cost: _ } => {
             let def = game.cards.get(game.state.obj(*source).card);
             let kicker = def.kicker;
             let spends_no_mana = game.chars(*source).has(Keyword::CantSpendManaToCast);

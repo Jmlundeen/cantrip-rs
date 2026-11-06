@@ -2303,6 +2303,49 @@ then sacrificed. An ability that taps an untapped permanent instead (Urza, Lord 
 you control: Add {U}") joins the alternatives of each permanent it could tap: that permanent's own {T} mana abilities or
 it, never both (where it falls short, KI-108).
 
+### Mana spent on X
+
+"Spend only black mana on X" (Drain Life, Consume Spirit, Crypt Rats; red for Crimson Hellkite, white for Atalya, Samite
+Master's modes, "black and/or red mana" for Soul Burn) restricts what pays the X of a cost, not what mana does
+(CR 107.3, 601.2h): it is `CardDef::x_mana` for the X of a spell's mana cost or kicker and `ActivatedDef::x_mana`
+(`.x_mana(..)`) for an activation cost's, an `XMana` - the types that may pay X, and whether one of each at most
+(Emblazoned Golem's "Spend only colored mana on X. No more than one mana of each color may be spent this way",
+`XMana::COLORED_ONE_EACH`). `cantrip-cards/tests/x_mana_matches_oracle.rs` holds both to the Oracle text.
+
+The cost carries it once X is announced (`ManaCost::with_x_mana`, then `plus_x`): `generic` is still all the generic mana,
+`not_x` how much of it is not X's, and `x_part` the rest. A cost increase is not X's (Atalya's ruling; `add_generic`, which
+`add_cost`, `ManaCost::plus`, the cost changes and Trinisphere's least use), while a reduction of generic mana takes X's part
+first (Drain Life's ruling: a reducer may reduce the X part), and so does what pays generic mana without spending mana -
+convoke, delve, improvise, CR 702.51a, 702.66a, 702.126a: the restriction is on mana spent. Either could pay either part,
+and X's is the part fewer kinds of mana may pay, so taking it first is never worse for the payer. A unit of mana spent on the
+generic mana pays X's part where it may (`ManaCost::spend_generic`; one of each takes its type away), the rest otherwise, for
+the same reason; so a pool or a payer paying unit by unit never strands mana X needed. Mana spent as though it were of any
+color pays X's part (CR 609.4b; Celestial Dawn's ruling: white spent as though another color pays what only that color may),
+so the payment's view of the cost (`paid_with_any_color`, `paid_with_any_type`) drops the restriction, unless one of each
+asks more than there are types.
+
+Every judgment of a cost with an X part splits the mana between X and the rest by trying the shapes X's part could be paid
+in (`ManaCost::x_shapes`): that many symbols of its one type, each split of it among two types, or each set of as many
+colors as it is for one of each (at most ten). The pool's way of paying (`ways`), the advice (`Available::covers_left`, and
+`Search::staged`'s flow, after what is tapped for the cost has paid its share), and the AI's payment (`owed_shapes`) each
+take a cost as paid if one shape is. Costs with no X part never make one, so nothing else pays for it. The most X an
+announcement could be paid for (`most_affordable_x`, the host's `MostAffordable`) is found by doubling and halving X over
+that advice, so it is the split's too. Each X is judged by the total the cast or activation would lock in: the announcement
+carries what the total is made of (`RequestKind::PayCosts::x_cost`, an `XCost`: the cost before X, what each X adds, a
+kicker's rest, a reduction announced before X, what is costed, the modes and targets announced), and `x_total` is the one
+function the cast, the activation, the special action and the advice all take the total at an X from; the advice then
+applies what the cast applies before locking it in (CR 601.2f) - the cost a spell's targets define, the cost changes
+(`change_any`), the life they add, the reduction announced before X, and the least the total may come to - at some legal
+announcement of the targets still to be chosen (`some_announcement`, as the menu's advice finds one), so a tax (Thalia, a
+Sphere) lowers it, a reducer raises it, and a change its targets bring is counted. The mana it judges with is what the
+payment has (`x_available`): never the creature harmonize taps, chosen before X (`XCost::reducer`, CR 702.180b), whose
+power comes off the total instead; for an activation, what the priority menu offers it by, through the same function
+(`activation_available`: not the source of a {T} cost, CR 602.2b, 605.3b; what a waterbend cost may tap at that X). Only
+an X judged payable is answered,
+and a search past its budget answers no, so it never says more than can be paid. The benchmark (`cantrip-bench --games 128`, "engine answering", 2026-11-05, main
+62a9b085 against the branch, alternating on a shared, loaded machine): 17.85/18.59, 17.82/18.63, 17.96/17.85, 18.12/17.63
+us - within the noise.
+
 ### Mana spent as though it were of any color
 
 "Spend mana as though it were mana of any color" (CR 609.4b) is a `CardDef::spend_any_color` rule, asked of a payment

@@ -351,6 +351,49 @@ pub enum StandIn {
     Chosen { controller: PlayerId, source: ObjectId, candidates: Vec<PlayerId> },
 }
 
+/// What the total cost of a spell or an activated ability comes to at each X announced for it, where X is paid in mana
+/// (CR 601.2b, 107.3a): the cost before X and what X adds, as the cast or the activation takes it once X is announced
+/// (`cantrip_rules::x_total`), and what it then announces and applies before the total is locked in (CR 601.2c, 601.2f):
+/// the targets, the cost changes, and a reduction announced before X. Carried by the announcement for the advice of how much
+/// X could be paid (`cantrip_rules::most_affordable_x`), which works the total out by the same steps.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct XCost {
+    /// The total before X is announced, with what may pay X (`ManaCost::x_mana`).
+    pub base: ManaCost,
+    /// The generic mana each X adds: the cost's {X} symbols, or a kicker's ({X} kicker).
+    pub per: u32,
+    /// The rest of a kicker with {X} (CR 702.33a), added once when X is not 0; `None` for an X of the cost itself.
+    pub kicker: Option<ManaCost>,
+    /// What a cost paid instead was reduced by that its own generic mana could not take, which comes off X's (CR 118.7a).
+    pub less: u32,
+    /// The generic mana a reduction announced before X takes off once the total is determined (CR 601.2f, 118.7a): the
+    /// cards exiled from the hand for "{2} less for each".
+    pub reduced: u32,
+    /// The creature harmonize taps, chosen before X (CR 702.180b, 601.2b): its power comes off the total once it is
+    /// determined (CR 702.180a), and it is tapped for the cost, so it makes no mana for it (CR 601.2h).
+    pub reducer: Option<ObjectId>,
+    /// What the X is announced for, as the cost changes know it.
+    pub costed: XCosted,
+    /// The modes chosen before X (CR 601.2b, 700.2), as `StackItem::modes` holds them; `None` where the modes are chosen
+    /// after it, and 0 for no modes.
+    pub modes: Option<u32>,
+    /// The targets announced with the action (CR 601.2c).
+    pub targets: Vec<Target>,
+    /// Whether targets are chosen once X is announced (CR 601.2c): the ones the action did not announce.
+    pub targets_later: bool,
+}
+
+/// What an X paid in mana is announced for (`XCost`), the request's source being the spell or the source of the ability.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum XCosted {
+    /// A spell being cast.
+    Spell,
+    /// An activated ability of the source, a mana ability among them, as linked abilities know it (CR 607.5).
+    Ability(AbilityRef, Option<Linked>),
+    /// A special action taken for the source (CR 116.2: a morph cost with {X} paid to turn it face up).
+    SpecialAction(AbilityRef),
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RequestKind {
     /// Act or pass (CR 117). Passing is always legal.
@@ -386,6 +429,9 @@ pub enum RequestKind {
         governs: &'static str,
         /// Where this question stands in paying for a spell with assist (CR 702.132a), `AssistStep::None` for any other.
         assist: AssistStep,
+        /// While announcing an X paid in mana: what the total comes to at each X (`XCost`), for the advice of how much X
+        /// the mana at hand could pay. `None` for any other question.
+        x_cost: Option<Box<XCost>>,
     },
     /// A cost paid as a spell or ability resolves (CR 118.12, 608.2d): "[a player] may pay [cost]. If they do, ...", and
     /// "... unless [a player] pays [cost]" (CR 118.12a). One payment of the whole cost, `total` mana and `life` life:

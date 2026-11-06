@@ -696,6 +696,11 @@ impl AbilityDef {
         AbilityDef::Activated(ActivatedDef { x_cant_be_zero: true, ..activated(self, "only an activated ability announces an X") })
     }
 
+    /// "Spend only [type] mana on X" (CR 107.3, 601.2h by way of 602.2b): only that mana may pay the X of its activation cost.
+    pub const fn x_mana(self, x_mana: XMana) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { x_mana, ..activated(self, "only an activated ability announces an X") })
+    }
+
     /// "This ability can't be copied" (CR 101.2, 707.10): an effect that would copy it while it is on the stack does nothing.
     pub const fn cant_be_copied(self) -> AbilityDef {
         AbilityDef::Activated(ActivatedDef { cant_be_copied: true, ..activated(self, "only an activated ability is marked so here") })

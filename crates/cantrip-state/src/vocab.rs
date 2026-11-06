@@ -283,6 +283,62 @@ impl ManaTally {
     }
 }
 
+/// What mana may be spent on a cost's X (CR 107.3, 601.2h): "Spend only black mana on X" (Drain Life, Consume Spirit,
+/// Crypt Rats), "Spend only red mana on X" (Crimson Hellkite), "Spend only white mana on X" (Atalya, Samite Master),
+/// "Spend only black and/or red mana on X" (Soul Burn), and "Spend only colored mana on X. No more than one mana of
+/// each color may be spent this way." (Emblazoned Golem). X itself is generic mana (CR 107.3a): a generic reduction may
+/// reduce it (Drain Life's ruling), and what pays generic mana without spending mana (convoke, delve, improvise) may pay
+/// it. A cost increase is not X (Atalya's ruling), so it is not restricted.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct XMana {
+    /// The types of mana that may be spent on X: a bit for each `Mana`, W U B R G C.
+    pub types: u8,
+    /// No more than one mana of each type may be spent on X: once a type has paid for X, `types` loses it.
+    pub one_each: bool,
+}
+
+impl XMana {
+    /// Any mana: no restriction.
+    pub const ANY: XMana = XMana { types: 0b11_1111, one_each: false };
+    /// "Spend only colored mana on X. No more than one mana of each color may be spent this way." (Emblazoned Golem)
+    pub const COLORED_ONE_EACH: XMana = XMana { types: 0b1_1111, one_each: true };
+
+    /// "Spend only [type] mana on X."
+    pub const fn only(mana: Mana) -> XMana {
+        XMana { types: 1 << mana as u8, one_each: false }
+    }
+
+    /// "Spend only [type] and/or [type] mana on X."
+    pub const fn either(a: Mana, b: Mana) -> XMana {
+        XMana { types: 1 << a as u8 | 1 << b as u8, one_each: false }
+    }
+
+    pub const fn is_any(self) -> bool {
+        self.types == XMana::ANY.types && !self.one_each
+    }
+
+    /// Whether a unit of `mana` may be spent on X now.
+    pub const fn may_pay(self, mana: Mana) -> bool {
+        self.types & (1 << mana as u8) != 0
+    }
+
+    /// After a unit of `mana` was spent on X: one of each type takes that type away.
+    pub const fn spent(self, mana: Mana) -> XMana {
+        if self.one_each { XMana { types: self.types & !(1 << mana as u8), one_each: true } } else { self }
+    }
+
+    /// How many units of X it could still pay at most: one for each type where it takes one of each, unbounded otherwise.
+    pub const fn most(self) -> u32 {
+        if self.one_each { self.types.count_ones() } else { u32::MAX }
+    }
+}
+
+impl Default for XMana {
+    fn default() -> XMana {
+        XMana::ANY
+    }
+}
+
 /// A mana cost (CR 202): generic, and a count of each colored symbol; hybrid, monocolored hybrid, Phyrexian and {X}
 /// symbols. Snow ({S}) is not built.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
@@ -301,10 +357,142 @@ pub struct ManaCost {
     pub phyrexian: [u32; 5],
     /// How many {X} symbols it has (CR 107.3): {X}{X} is 2.
     pub x: u8,
+    /// What mana may be spent on its X (`XMana`); `XMana::ANY` for most costs, where `not_x` means nothing and is 0.
+    pub x_mana: XMana,
+    /// Where `x_mana` restricts X: how much of `generic` is not X's, which any mana pays; the rest of `generic` is X's
+    /// (`x_part`). X is added with `plus_x`, other generic mana with `add_generic` (a cost increase, CR 601.2f, is not X:
+    /// Atalya's ruling). A reduction of generic mana (CR 118.7a) takes X's first, and so does what pays generic mana
+    /// instead of mana (convoke, delve, improvise): each could pay either, and X's is the part fewer kinds of mana may pay,
+    /// so that is never worse for the payer (Drain Life's ruling: "Cost reducers can be used to reduce the X part").
+    pub not_x: u32,
 }
 
 impl ManaCost {
-    pub const ZERO: ManaCost = ManaCost { generic: 0, symbols: [0; 6], hybrid: [None; 6], twobrid: [0; 5], phyrexian: [0; 5], x: 0 };
+    pub const ZERO: ManaCost = ManaCost { generic: 0, symbols: [0; 6], hybrid: [None; 6], twobrid: [0; 5], phyrexian: [0; 5], x: 0, x_mana: XMana::ANY, not_x: 0 };
+
+    /// The cost with `x_mana` restricting what pays its X, once announced (`plus_x`): what generic mana it has now is not X's.
+    pub fn with_x_mana(mut self, x_mana: XMana) -> ManaCost {
+        if !x_mana.is_any() && self.x_mana.is_any() {
+            self.not_x = self.generic;
+            self.x_mana = x_mana;
+        }
+        self
+    }
+
+    /// The generic mana only `x_mana` may pay: X's (CR 107.3).
+    pub fn x_part(&self) -> u32 {
+        if self.x_mana.is_any() { 0 } else { self.generic - self.not_x.min(self.generic) }
+    }
+
+    /// `amount` generic mana of X added (CR 107.3a: each {X} announced is that much generic mana), restricted to what
+    /// `x_mana` allows.
+    pub fn plus_x(self, amount: u32, x_mana: XMana) -> ManaCost {
+        let mut out = if amount > 0 { self.with_x_mana(x_mana) } else { self };
+        out.generic += amount;
+        out
+    }
+
+    /// `n` generic mana added that is not X's (a cost increase, CR 601.2f; another cost's generic mana).
+    pub fn add_generic(&mut self, n: u32) {
+        self.generic += n;
+        if !self.x_mana.is_any() {
+            self.not_x += n;
+        }
+    }
+
+    /// The generic mana any mana may pay: all of it but X's.
+    pub fn plain_generic(&self) -> u32 {
+        self.generic - self.x_part()
+    }
+
+    /// One unit of `mana` spent on the generic mana (CR 601.2h): on X's where it may pay that and some is owed - the part
+    /// fewer kinds of mana may pay, so never worse for the payer - and otherwise on the rest. Whether it paid any.
+    pub fn spend_generic(&mut self, mana: Mana) -> bool {
+        if self.x_part() > 0 && self.x_mana.may_pay(mana) {
+            self.generic -= 1;
+            self.x_mana = self.x_mana.spent(mana);
+            true
+        } else if self.plain_generic() > 0 {
+            self.generic -= 1;
+            if !self.x_mana.is_any() {
+                self.not_x = self.not_x.min(self.generic + 1) - 1;
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Up to `n` of the generic mana that is not X's paid (what any mana pays).
+    pub fn spend_plain(&mut self, n: u32) {
+        let plain = self.plain_generic();
+        let pay = n.min(plain);
+        self.generic -= pay;
+        if !self.x_mana.is_any() {
+            self.not_x = plain - pay;
+        }
+    }
+
+    /// One unit of mana spent as though it were any type that may pay X's part (CR 609.4b): `mana`'s own where it may, else
+    /// the first that may. Whether X's part had any left to pay.
+    pub fn spend_x_as_any(&mut self, mana: Mana) -> bool {
+        if self.x_part() == 0 || self.x_mana.types == 0 {
+            return false;
+        }
+        let as_type = if self.x_mana.may_pay(mana) { mana } else { Mana::ALL[self.x_mana.types.trailing_zeros() as usize] };
+        self.spend_generic(as_type)
+    }
+
+    /// The shapes its X's part could be paid in (CR 601.2h), each the cost with that part made symbols of the types that pay
+    /// it: one of each of a set of colors where it takes one of each (Emblazoned Golem: every set of as many colors as
+    /// X's part), or each split of it among the types it allows (one type: that many symbols of it). The cost itself where
+    /// it has no such part; none where it can't be paid at all (more of one each than there are types).
+    pub fn x_shapes(&self) -> Vec<ManaCost> {
+        let part = self.x_part();
+        if part == 0 {
+            return vec![*self];
+        }
+        let mut base = *self;
+        base.generic -= part;
+        base.x_mana = XMana::ANY;
+        base.not_x = 0;
+        let types: Vec<usize> = (0..6).filter(|&m| self.x_mana.types & (1 << m) != 0).collect();
+        let mut out = Vec::new();
+        if self.x_mana.one_each {
+            if part as usize > types.len() {
+                return out;
+            }
+            for mask in 0u32..1 << types.len() {
+                if mask.count_ones() == part {
+                    let mut shape = base;
+                    for (i, &m) in types.iter().enumerate() {
+                        if mask & (1 << i) != 0 {
+                            shape.symbols[m] += 1;
+                        }
+                    }
+                    out.push(shape);
+                }
+            }
+            return out;
+        }
+        // Each split of `part` among `types`: how many of each.
+        fn split(base: ManaCost, types: &[usize], left: u32, out: &mut Vec<ManaCost>) {
+            let Some((&m, rest)) = types.split_first() else { return };
+            if rest.is_empty() {
+                let mut shape = base;
+                shape.symbols[m] += left;
+                out.push(shape);
+                return;
+            }
+            for here in 0..=left {
+                let mut shape = base;
+                shape.symbols[m] += here;
+                split(shape, rest, left - here, out);
+            }
+        }
+        split(base, &types, part, &mut out);
+        out
+    }
 
     pub fn mana_value(&self) -> u32 {
         self.generic
@@ -331,7 +519,7 @@ impl ManaCost {
         for (i, &n) in self.twobrid.iter().enumerate() {
             for _ in 0..n {
                 if generic.get(at).copied().unwrap_or(false) {
-                    out.generic += 2;
+                    out.add_generic(2);
                 } else {
                     out.symbols[Color::ALL[i].mana() as usize] += 1;
                 }
@@ -360,7 +548,25 @@ impl ManaCost {
         paid.hybrid = [None; 6];
         paid.twobrid = [0; 5];
         paid.generic = generic;
+        // Mana spent on X as though it were black is black mana spent on X (Celestial Dawn's ruling: white mana spent as
+        // though it were another color pays what only that color may).
+        if self.x_mana.types & 0b1_1111 != 0 {
+            paid.lift_x(self);
+        } else {
+            paid.not_x = self.not_x + (generic - self.generic);
+        }
         paid
+    }
+
+    /// The payment's view of X's part where any mana may stand for the types that may pay it (CR 609.4b): no restriction,
+    /// unless it takes one of each and is more than there are types, which no mana can pay.
+    fn lift_x(&mut self, of: &ManaCost) {
+        if of.x_mana.is_any() || of.x_mana.one_each && of.x_part() > of.x_mana.most() {
+            self.not_x = if of.x_mana.is_any() { 0 } else { of.not_x + (self.generic - of.generic) };
+            return;
+        }
+        self.x_mana = XMana::ANY;
+        self.not_x = 0;
     }
 
     /// The cost as it is paid when "mana of any type can be spent" for it (CR 609.4b: Cruelclaw's Heist, Null Summoner):
@@ -378,6 +584,7 @@ impl ManaCost {
         paid.hybrid = [None; 6];
         paid.twobrid = [0; 5];
         paid.generic = self.generic + symbols + hybrid;
+        paid.lift_x(self);
         paid
     }
 
@@ -386,6 +593,13 @@ impl ManaCost {
     pub fn plus(&self, other: &ManaCost) -> ManaCost {
         let mut sum = *self;
         sum.generic += other.generic;
+        // X's part stays X's, whichever side has it; the rest of the generic mana is not X's.
+        if !other.x_mana.is_any() && self.x_mana.is_any() {
+            sum.x_mana = other.x_mana;
+            sum.not_x = self.generic + other.plain_generic();
+        } else if !self.x_mana.is_any() {
+            sum.not_x = self.plain_generic() + other.plain_generic();
+        }
         sum.x += other.x;
         for i in 0..6 {
             sum.symbols[i] += other.symbols[i];
@@ -406,7 +620,7 @@ impl ManaCost {
     /// twice). `None` when the result does not fit the cost's shape: more {X} symbols than a byte counts, or more hybrid
     /// symbols than its slots hold. Never a smaller cost than `n` payments.
     pub fn times(&self, n: u32) -> Option<ManaCost> {
-        let mut out = ManaCost { generic: self.generic * n, x: u8::try_from(u32::from(self.x) * n).ok()?, hybrid: [None; 6], ..*self };
+        let mut out = ManaCost { generic: self.generic * n, not_x: self.not_x * n, x: u8::try_from(u32::from(self.x) * n).ok()?, hybrid: [None; 6], ..*self };
         for i in 0..6 {
             out.symbols[i] = self.symbols[i] * n;
         }

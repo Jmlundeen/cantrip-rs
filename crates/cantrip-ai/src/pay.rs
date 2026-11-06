@@ -287,6 +287,23 @@ fn owed_symbols(owed: &ManaCost) -> (Vec<Vec<Mana>>, u32) {
     (symbols, owed.generic)
 }
 
+/// `owed_symbols` for each shape X's part could be paid in, where only some mana may pay it ("Spend only black mana on X",
+/// `ManaCost::x_part`): a symbol of the types that may pay it for each mana of it, or, where it takes one mana of each
+/// type at most (Emblazoned Golem), each set of types it could take (`ManaCost::x_shapes`). One for any other cost.
+fn owed_shapes(owed: &ManaCost) -> Vec<(Vec<Vec<Mana>>, u32)> {
+    let part = owed.x_part();
+    if part == 0 {
+        return vec![owed_symbols(owed)];
+    }
+    if owed.x_mana.one_each {
+        return owed.x_shapes().iter().map(owed_symbols).collect();
+    }
+    let (mut symbols, generic) = owed_symbols(owed);
+    let types: Vec<Mana> = Mana::ALL.into_iter().filter(|&m| owed.x_mana.may_pay(m)).collect();
+    symbols.extend(std::iter::repeat_n(types, part as usize));
+    vec![(symbols, generic - part)]
+}
+
 /// Whether the sources `used` (indices into `sources`) pay the symbols and the generic part, and the mana their taps add
 /// that it does not use: each symbol matched to a source of its kind (a source of `amount` mana is that many), and what is
 /// left of them paying the generic part. `None` if they do not pay it.
@@ -301,8 +318,7 @@ fn pays_with(symbols: &[Vec<Mana>], generic: u32, sources: &[Source], used: &[us
 
 /// Whether the sources `left` could pay `cost`.
 fn could_pay(cost: &ManaCost, sources: &[Source], left: &[usize]) -> bool {
-    let (symbols, generic) = owed_symbols(cost);
-    pays_with(&symbols, generic, sources, left).is_some()
+    owed_shapes(cost).iter().any(|(symbols, generic)| pays_with(symbols, *generic, sources, left).is_some())
 }
 
 /// The ways to pay from `sources` with none to spare: every set of them that pays and has no smaller such set inside it,
@@ -411,11 +427,20 @@ fn ways(game: &Game, options: &[ActionOption], owed: &ManaCost, follow: &[(ManaC
             }
         }
     }
-    let (symbols, generic) = owed_symbols(owed);
     if sources.len() > 16 {
         return (sources, Vec::new());
     }
-    let ways = payments(&symbols, generic, &sources)
+    // Each shape's payments, a set of sources once (with the least it wastes).
+    let mut found: Vec<(Vec<usize>, u32)> = Vec::new();
+    for (symbols, generic) in owed_shapes(owed) {
+        for (used, waste) in payments(&symbols, generic, &sources) {
+            match found.iter_mut().find(|(u, _)| *u == used) {
+                Some((_, w)) => *w = (*w).min(waste),
+                None => found.push((used, waste)),
+            }
+        }
+    }
+    let ways = found
         .into_iter()
         .map(|(used, waste)| {
             let left: Vec<usize> = (0..sources.len()).filter(|i| !used.contains(i)).collect();
@@ -507,8 +532,10 @@ fn tap(game: &Game, options: &[ActionOption], owed: &ManaCost) -> Option<Action>
     let keeps = |w: &Way| keep.iter().all(|id| w.left.contains(id));
     let chosen = ways.iter().max_by(|a, b| keeps(a).cmp(&keeps(b)).then_with(|| better(a, b)));
     if let Some(way) = chosen {
-        let (symbols, _) = owed_symbols(owed);
         let used = &way.used;
+        // The shape the way pays (`owed_shapes`).
+        let shapes = owed_shapes(owed);
+        let symbols = shapes.iter().find(|(s, g)| pays_with(s, *g, &sources, used).is_some()).map_or_else(Vec::new, |(s, _)| s.clone());
         let slots: Vec<Vec<Mana>> = used.iter().map(|&i| sources[i].kinds.clone()).collect();
         let (src, m) = match first_paid(&symbols, &slots) {
             Some((j, m)) => (used[j], Some(m)),

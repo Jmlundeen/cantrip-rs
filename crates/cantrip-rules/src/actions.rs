@@ -7,6 +7,7 @@
 
 use cantrip_api::*;
 use cantrip_state::Span;
+use cantrip_state::{XCost, XCosted};
 
 use crate::layers::{self, live, summoning_sick};
 use crate::{Cx, Flow, R, Stop, counters, ops, static_rules};
@@ -2908,7 +2909,8 @@ fn some_activation(
     for x in xs {
         let mut owed = cost;
         if cost.x > 0 {
-            owed.generic += u32::from(x) * u32::from(cost.x);
+            // "Spend only black mana on X" (CR 107.3, 601.2h): X's generic mana only that mana may pay.
+            owed = cost.with_x_mana(def.x_mana).plus_x(u32::from(x) * u32::from(cost.x), def.x_mana);
             owed.x = 0;
         }
         for &mask in &masks {
@@ -3008,7 +3010,7 @@ fn apply_cost_changes_before_least(cx: &Cx, player: PlayerId, costed: Costed, co
 fn at_least(mut cost: ManaCost, least: u8) -> ManaCost {
     let value = cost.mana_value();
     if value < least as u32 {
-        cost.generic += least as u32 - value;
+        cost.add_generic(least as u32 - value);
     }
     cost
 }
@@ -3276,6 +3278,186 @@ pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: Pla
     Some((less_each, variable_candidates(&cx, spell, player, variable, Some(CostFor::Spell), None).len()))
 }
 
+/// For an announcement of an X paid in mana (CR 601.2b) - an {X} in a spell's mana cost or an activation cost, or a kicker
+/// with {X} - that carries what the total is at each X (`paid`, `RequestKind::PayCosts::x_cost`) and lets X be at most
+/// `most`: the most X the mana `player` has and could make could pay for (advice, CR 601.2g), or `None` when not even `least`
+/// could be. Each X is judged by the total the cast or activation would then lock in (`x_payable`): the cost changes
+/// applied as they are once the targets are announced (CR 601.2c, 601.2f), at some legal announcement of them. The total
+/// keeps what restricts the mana that pays X ("Spend only black mana on X", `ManaCost::x_mana`), so the mana that could
+/// pay either X or the rest is split between them as the payment would split it. Every X it answers was judged payable, so
+/// it never says more could be paid than can.
+pub fn most_affordable_x(game: &crate::Game, player: PlayerId, source: ObjectId, paid: &XCost, least: u32, most: u32) -> Option<u32> {
+    if paid.per == 0 {
+        return None;
+    }
+    let mut copy = advice_game(game);
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    // What pays for it is the same at every X, unless a waterbend cost's {X} lets more be tapped for it.
+    let bends = match paid.costed {
+        XCosted::Ability(ability, _) | XCosted::SpecialAction(ability) => activated(&cx, ability).is_some_and(|d| d.waterbend),
+        XCosted::Spell => false,
+    };
+    let once = (!bends).then(|| x_available(&cx, player, source, paid, least));
+    let pays = |n: u32| match &once {
+        Some(a) => x_payable(&cx, a, player, source, paid, n),
+        None => x_payable(&cx, &x_available(&cx, player, source, paid, n), player, source, paid, n),
+    };
+    if least > most || !pays(least) {
+        return None;
+    }
+    // Paying for more X rarely makes the total cheaper: the most is found by doubling past it, then halving back, and only an
+    // X judged payable is ever kept.
+    let (mut good, mut step) = (least, 1u32);
+    let mut bad = loop {
+        let next = good.saturating_add(step).min(most);
+        if next == good {
+            return Some(good);
+        }
+        if !pays(next) {
+            break next;
+        }
+        good = next;
+        step = step.saturating_mul(2);
+    };
+    while bad - good > 1 {
+        let mid = good + (bad - good) / 2;
+        if pays(mid) { good = mid } else { bad = mid }
+    }
+    Some(good)
+}
+
+/// What `player` has to pay for the announcement `paid` with, X announced as `n`, as the cast or activation pays it: never
+/// the creature harmonize taps (CR 702.180b, 601.2h), tapped for the cost before any mana is; for an activation, what the
+/// priority menu offers it by (`activation_available`: the source of a {T} cost, CR 602.2b, 605.3b; a waterbend cost).
+fn x_available(cx: &Cx, player: PlayerId, source: ObjectId, paid: &XCost, n: u32) -> Available {
+    let def = match paid.costed {
+        XCosted::Spell => return available_without(cx, player, paid.reducer, ManaWindow::Payment),
+        XCosted::Ability(ability, _) | XCosted::SpecialAction(ability) => activated(cx, ability),
+    };
+    let plain = std::cell::OnceCell::new();
+    let own = def.and_then(|def| {
+        let bend = def.cost.mana.generic + n * u32::from(def.cost.mana.x);
+        activation_available(cx, player, source, def, bend, || plain.get_or_init(|| available(cx, player)))
+    });
+    own.or_else(|| plain.into_inner()).unwrap_or_else(|| available(cx, player))
+}
+
+/// Whether `player` could pay for the announcement `paid` with X announced as `n` (advice, CR 601.2g), by the steps the cast
+/// or activation takes once X is announced: the total `x_total` gives, the modes where they come after X, the targets - some
+/// legal announcement of them (CR 601.2c), as `some_announcement` finds it - and the cost they add
+/// (`CardDef::cost_of_targets`), the cost changes applied as they are then (CR 601.2f, `change_any`: each way the payer
+/// could announce a reduction's hybrid symbols), the life they add payable (CR 118.8, 119.4), the reduction announced
+/// before X, and the least the total may come to. Past `ANNOUNCEMENT_BUDGET` it answers no: never more X than can be paid.
+fn x_payable(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, paid: &XCost, n: u32) -> bool {
+    let (costed, by, spell, ability) = match paid.costed {
+        XCosted::Spell => (Costed::Spell(source), None, true, None),
+        XCosted::Ability(ability, by) => (Costed::Ability(source, ability, by), by, false, activated(cx, ability)),
+        XCosted::SpecialAction(ability) => (Costed::SpecialAction(source, ability), None, false, None),
+    };
+    let asker = Asker { source, controller: player, by, spell };
+    let obj = *cx.s().obj(source);
+    let card = spell.then(|| cx.card(obj.copied_card().unwrap_or(obj.card)));
+    // The spell as it is once X is announced (`cast`), for the changes and the targets to read.
+    let mut announced = obj;
+    if spell {
+        announced.x = n;
+        if paid.kicker.is_some() {
+            announced.kicked = u8::from(n > 0);
+        }
+    }
+    let earlier = spell.then_some(&announced);
+    let view = Announcing { q: cx, spell: source, obj: announced };
+    let pays_for = match costed {
+        Costed::Spell(_) => Some(CostFor::Spell),
+        _ => ability.and_then(activating),
+    };
+    let own_life = card.and_then(|d| d.additional_cost).map_or(0, |c| c.life) + ability.map_or(0, |d| d.cost.life);
+    let of_targets = card.and_then(|d| d.cost_of_targets);
+    let changes = !a.changers.is_empty()
+        || spell && lasting_changes(cx)
+        || card.is_some_and(|d| !d.own_cost_changes.is_empty())
+        || ability.is_some_and(|d| d.cost_change.is_some());
+    let covered = |cost: ManaCost, targets: &[Target]| -> bool {
+        let mut cost = cost;
+        if let Some(of) = of_targets {
+            let added = of(&view, &asker, targets);
+            if !can_pay_other(cx, source, player, &added) {
+                return false;
+            }
+            cost = add_cost(cost, added.mana);
+        }
+        if changes {
+            let (_, _, added, _, _) = deltas_as(cx, &a.changers, player, costed, None, targets, earlier);
+            if added > 0 && i64::from(payable_life_for(cx, player, pays_for)) < i64::from(added) + i64::from(own_life) {
+                return false;
+            }
+        }
+        change_any(cx, &a.changers, player, costed, cost, None, targets, earlier, &mut |total, least| {
+            let mut total = total;
+            // A reduction announced before X comes off once the total is determined (CR 601.2f, 118.7a), as the cast takes it:
+            // the cards exiled for it, and the power of the creature harmonize taps (CR 702.180a).
+            total.generic = total.generic.saturating_sub(paid.reduced).saturating_sub(paid.reducer.map_or(0, |c| reduction_of(cx, c)));
+            affordable_with(cx, a, player, source, &ManaCost { x: 0, ..at_least(total, least) })
+        })
+    };
+    let pre = x_total(paid, n);
+    let modal = card.and_then(|d| d.modal).or(ability.and_then(|d| d.modal));
+    // Modes chosen after X (CR 601.2b, 700.2: "choose both instead" if kicked) are some choice of them, with their costs.
+    let masks: Vec<Option<u32>> = match (paid.modes, modal) {
+        (None, Some(modal)) => {
+            let range = match modal.when_paid {
+                Some(range) if announced.paid > 0 || announced.kicked > 0 => range,
+                _ => (modal.min, modal.max),
+            };
+            mode_masks(cx, &asker, modal, range).into_iter().map(Some).collect()
+        }
+        _ => vec![None],
+    };
+    let named = named_by_changes(cx, a, source);
+    // What the changes make of an announcement; a cost its targets define reads them as the changes don't, so it tells every
+    // candidate apart (`Watching`).
+    let key = |targets: &[Target], watching: &Watching| {
+        if of_targets.is_some() {
+            watching.told.set(true);
+        }
+        (deltas_watched(cx, &a.changers, player, costed, None, targets, earlier, Some(watching)), of_targets.map(|_| targets.to_vec()))
+    };
+    let counted = if n > 0 { n } else { u32::from(announced.kicked) };
+    let mut budget = ANNOUNCEMENT_BUDGET;
+    for mask in masks {
+        let cost = match (mask, modal) {
+            (Some(mask), Some(modal)) => modal_cost(modal, mask, pre),
+            _ => pre,
+        };
+        // Targets the action announced, or none to choose: the total is judged once.
+        if !paid.targets_later || !changes && of_targets.is_none() {
+            if covered(cost, &paid.targets) {
+                return true;
+            }
+            continue;
+        }
+        let chosen = mask.or(paid.modes).unwrap_or(0);
+        let (own, divide) = match (card, ability) {
+            (Some(def), _) => (cx.cards().spell_targets_of(def), def.divide),
+            (None, Some(def)) => (def.targets, def.divide),
+            (None, None) => (&[][..], None),
+        };
+        let specs = match (modal, divide) {
+            (Some(modal), _) => mode_specs(modal, chosen),
+            (None, Some(divide)) => match divided_slots(own, divide.total_for(&view, &asker, n)) {
+                Some(slots) => slots,
+                None => continue,
+            },
+            (None, None) => own.to_vec(),
+        };
+        let found = some_announcement(&view, cx, &asker, &[], &[specs], (counted, announced.kicked, false), &mut budget, &named, &key, &mut |t| covered(cost, t));
+        if found == Found::Yes {
+            return true;
+        }
+    }
+    false
+}
+
 /// What casting a card from a hand by the cast option `option` costs `player` before any target is announced, with the cost
 /// changes in play applied (CR 601.2f): its mana cost, an alternative cost of its own (a way, overload), or a face's mana
 /// cost (an Adventure, an Omen, a half, a back face, a bestowed Aura), with the mana of its additional cost (CR 118.8), what
@@ -3425,7 +3607,8 @@ fn change_parts_split(
     let (more, less, life, least, discount) = deltas(cx, sources, player, costed, face, targets);
     let less = split_reduction(&less, split);
     let mut cost = cost;
-    cost.generic += more;
+    // An increase is not X's (Atalya's ruling): `add_generic`.
+    cost.add_generic(more);
     let mut first = cost;
     any_announcement(&cost, &less, &mut |c| {
         first = c;
@@ -3450,7 +3633,7 @@ fn change_any(
 ) -> bool {
     let (more, whole, _, least, discount) = deltas_as(cx, sources, player, costed, face, targets, announced);
     let mut cost = cost;
-    cost.generic += more;
+    cost.add_generic(more);
     // Each way the payer could split a reduction by hybrid mana (CR 118.7e).
     let n = reduction_choices(&whole).min(8);
     (0u32..1 << n).any(|mask| {
@@ -3807,10 +3990,12 @@ fn least_cost_parts(
     if x_only_zero(def.x_cant_be_zero, def.cost.x, base.x) {
         return false;
     }
-    let mut cost = at_least_x(base, def.x_cant_be_zero);
+    // "Spend only black mana on X" (CR 107.3, 601.2h): X's generic mana only that mana may pay (`ManaCost::plus_x`).
+    let mut cost = at_least_x(base.with_x_mana(def.x_mana), def.x_cant_be_zero);
     // The X announced, where it is more than the least (CR 107.3a, 601.2b).
     let more_x = u32::from(earlier.x.saturating_sub(least_x(def.x_cant_be_zero)));
-    cost.generic += more_x * (u32::from(base.x) + u32::from(def.additional_cost.map_or(0, |c| c.waterbend.x)));
+    cost = cost.plus_x(more_x * u32::from(base.x), cost.x_mana);
+    cost.add_generic(more_x * u32::from(def.additional_cost.map_or(0, |c| c.waterbend.x)));
     // The kicker, the optional additional cost and the cards spliced onto it, where they are announced (CR 601.2b, 601.2f).
     if let Some(k) = def.kicker.filter(|_| earlier.kicks > 0) {
         cost = kicker_total(cost, k, earlier.kicks);
@@ -3822,7 +4007,7 @@ fn least_cost_parts(
     if let Some(extra) = def.additional_cost {
         cost = add_cost(cost, extra.mana);
         // A waterbend cost (CR 701.67a-b) is mana too, its X at the least X announced (CR 107.3a).
-        cost.generic += extra.waterbend.generic + u32::from(extra.waterbend.x) * u32::from(least_x(def.x_cant_be_zero));
+        cost.add_generic(extra.waterbend.generic + u32::from(extra.waterbend.x) * least_x(def.x_cant_be_zero));
     }
     // CR 601.2b: an additional cost that is one of several ("behold a Jace or pay {1}") costs at least the mana of the
     // cheapest of them that can be paid otherwise.
@@ -3921,10 +4106,14 @@ fn phyrexian_with_life(cx: &Cx, player: PlayerId, mut cost: ManaCost, other_life
 /// else with the restricted mana an ability may spend (CR 106.6); and the spell with mana spent as though it were mana of
 /// any color where a static ability lets `player` do so to cast it (CR 609.4b).
 pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) -> bool {
+    cost.mana_value() == 0 || affordable_with(cx, &available(cx, player), player, source, cost)
+}
+
+/// `can_afford`, with `a` what `player` has to pay with.
+fn affordable_with(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, cost: &ManaCost) -> bool {
     if cost.mana_value() == 0 {
         return true;
     }
-    let a = available(cx, player);
     let chars = cx.chars(source);
     if cx.s().obj(source).zone.is(ZoneKind::Stack) {
         let any_color = !a.any_color
@@ -4740,8 +4929,8 @@ impl Available {
         }
         let per = cost.x as u32;
         (1..=(most as u32 - mana_value).div_ceil(per)).any(|n| {
-            let mut more = *cost;
-            more.generic += n * per;
+            // X's generic mana, which only what may pay X pays ("Spend only black mana on X", CR 107.3, 601.2h).
+            let more = cost.plus_x(n * per, cost.x_mana);
             self.covers_as(&more, &ManaPayment::Spell { types, subtypes, legendary, mana_value: mana_value + n * per, x, from })
         })
     }
@@ -4840,6 +5029,10 @@ impl Available {
             }
         }
         named |= (0..6).filter(|&m| cost.symbols[m] > 0).fold(0u8, |t, m| t | 1 << m);
+        // The types X's part asks for, where only some may pay it (CR 107.3, 601.2h).
+        if cost.x_part() > 0 {
+            named |= cost.x_mana.types;
+        }
         // Each source's choices: the ability, and the type of its chosen mana; `None` for leaving it unactivated.
         let choices: Vec<Vec<Option<(Alternative, Option<usize>)>>> = self
             .complex
@@ -4948,6 +5141,11 @@ impl Available {
     fn covers_left(&self, cost: &ManaCost) -> bool {
         if self.unknown || cost.mana_value() == 0 {
             return true;
+        }
+        // X's part that only some mana may pay (CR 107.3, 601.2h): covered if one of the shapes it could be paid in is
+        // (`ManaCost::x_shapes`), what is tapped for the cost having paid what it could of it first (`less_taps`).
+        if cost.x_part() > 0 {
+            return cost.x_shapes().iter().any(|shape| self.covers_left(shape));
         }
         if self.linked.is_empty() {
             return self.covers_with(cost, self.fixed);
@@ -5316,10 +5514,18 @@ impl Search<'_> {
             }
             supply.push(Supply { stage, types: a.produces(chosen), restriction: None, n: a.produced });
         }
-        Demand::of(&leaf.with.less_taps(self.cost), u32::MAX, self.payment.copied(), &mut demand);
         supply.retain(|s| s.n > 0 && s.types != 0);
-        demand.retain(|d| d.n > 0);
-        transports(&supply, &demand)
+        // X's part that only some mana may pay (CR 107.3, 601.2h): paid in one of the shapes it could be (`x_shapes`).
+        let owed = leaf.with.less_taps(self.cost);
+        let pays = |shape: &ManaCost, mut demand: Vec<Demand>| {
+            Demand::of(shape, u32::MAX, self.payment.copied(), &mut demand);
+            demand.retain(|d| d.n > 0);
+            transports(&supply, &demand)
+        };
+        if owed.x_part() == 0 {
+            return pays(&owed, demand);
+        }
+        owed.x_shapes().iter().any(|shape| pays(shape, demand.clone()))
     }
 }
 
@@ -5335,6 +5541,7 @@ struct Supply {
 
 /// Symbols to pay, for `Search::staged`: paid at a `stage` with mana made before it, by mana of one of `types`, for
 /// `payment` (none: unrestricted mana only), how many.
+#[derive(Clone)]
 struct Demand {
     stage: u32,
     types: u8,
@@ -5564,22 +5771,14 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             let owed = if def.special_action { special_action_cost(cx, player, id, ability, def) } else { def.cost.mana };
             // An {X} is judged at the least it may be announced as (CR 107.3a, 601.2b): 0, or 1 where X can't be 0.
             let judged = at_least_x(owed, def.x_cant_be_zero).mana_value() > 0 && !def.tap_creatures_for_mana;
-            // Waterbend (CR 701.67a-b): each untapped artifact or creature may be tapped to pay {1} of the waterbend cost's
-            // generic mana - at the least X may be announced as, for "Waterbend {X}" - and together no more than that,
-            // whatever the total has besides (Anointed Peacekeeper's tax); one that could make mana is either (`TapFor`). The
-            // source of a {T} cost is tapped for that already, and its mana can't pay (CR 602.2b, 605.3b).
-            let bent = (judged && def.waterbend).then(|| {
-                let tap = TapFor { artifacts: true, creatures: true, convoke: false, cap: at_least_x(def.cost.mana, def.x_cant_be_zero).generic };
-                available_as(cx, player, def.cost.tap.then_some(id), ManaWindow::Payment, false, Some(tap))
-            });
-            // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
-            // Nor may it be spent for mana by another's ability (sacrificed to an altar, tapped by Urza) while paying it.
-            let own = (judged
-                && bent.is_none()
-                && def.cost.tap
-                && (has_mana_source(cx, id, player) || available.get_or_init(|| self::available(cx, player)).spent.contains(&id)))
-            .then(|| available_without(cx, player, Some(id), ManaWindow::Payment));
-            let a = judged.then(|| bent.as_ref().or(own.as_ref()).unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
+            // What pays for it (`activation_available`), its waterbend judged at the least X may be announced as.
+            let own = judged
+                .then(|| {
+                    let bend = at_least_x(def.cost.mana, def.x_cant_be_zero).generic;
+                    activation_available(cx, player, id, def, bend, || available.get_or_init(|| self::available(cx, player)))
+                })
+                .flatten();
+            let a = judged.then(|| own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
             // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
             let payment = if def.special_action { ManaPayment::Other } else { ability_payment(cx, id, chars.types, chars.subtypes, def.equip) };
             let covered = |a: &Available, owed: ManaCost, targets: &[Target]| {
@@ -5729,6 +5928,21 @@ pub const EXTRA_LOYALTY_ALLOWED: u8 = AbilityRef::EXTRA_LOYALTY_ALLOWED;
 
 /// Whether a loyalty ability of `id` may be activated now (CR 606.3): none has been this turn, or effects have allowed
 /// more than have been. Counted in the history, where the activations and the allowances are both recorded.
+/// What `player` has to pay for an activation of `def`, an ability of `id`, with, where that is not all they have to pay
+/// anything with (`plain`, `available`): `None` where it is. Waterbend (CR 701.67a-b): each untapped artifact or creature
+/// may be tapped to pay {1} of the waterbend cost's generic mana - `bend`, its {X} as announced - and together no more than
+/// that, whatever the total has besides (Anointed Peacekeeper's tax); one that could make mana is either (`TapFor`). The
+/// source of a {T} cost is tapped for it, so its own mana abilities cannot pay (CR 602.2b, 605.3b), nor may it be spent for
+/// mana by another's ability (sacrificed to an altar, tapped by Urza) while paying it. The priority menu offers the
+/// activation by it, and the advice of how much X could be paid judges X by it (`x_available`), so they never part.
+fn activation_available<'a>(cx: &Cx, player: PlayerId, id: ObjectId, def: &ActivatedDef, bend: u32, plain: impl FnOnce() -> &'a Available) -> Option<Available> {
+    if def.waterbend {
+        let tap = TapFor { artifacts: true, creatures: true, convoke: false, cap: bend };
+        return Some(available_as(cx, player, def.cost.tap.then_some(id), ManaWindow::Payment, false, Some(tap)));
+    }
+    (def.cost.tap && (has_mana_source(cx, id, player) || plain().spent.contains(&id))).then(|| available_without(cx, player, Some(id), ManaWindow::Payment))
+}
+
 fn loyalty_available(cx: &Cx, id: ObjectId) -> bool {
     if cx.s().obj(id).loyalty_turn != cx.s().turn.number {
         return true;
@@ -8286,6 +8500,9 @@ fn cast(
         return Err(Stop::Cancel);
     }
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x {
+        // "Spend only black mana on X" (CR 107.3, 601.2h): the X announced, its mana cost's or its kicker's, is generic mana
+        // only that mana may pay (`ManaCost::plus_x`).
+        cost.mana = cost.mana.with_x_mana(def.x_mana);
         let base = cost.mana;
         // X paid in life is announced up to the life there is (CR 119.4), and X creatures sacrificed up to the creatures
         // there are (CR 601.2b).
@@ -8315,12 +8532,32 @@ fn cast(
         // An X that can't be 0 starts at 1 (CR 107.3a). A kicker with {X} announces 0 as not kicking it, so a kicked one
         // has X 1 or more as it is.
         let least = if def.kicker.is_none() && less_each == 0 { u32::from(least_x(def.x_cant_be_zero)) } else { 0 };
-        let announced = announce_x(cx, player, spell, base, def.kicker, x_symbols, least, cap, false, less_each, hand_reduction, extra.variable.map_or("", |v| v.governs()))?;
+        // An X paid in mana - the {X} of the cost, or a kicker's - and what the total comes to at each X (`x_total`): what
+        // the cost is once it is announced, and what the advice of how much X could be paid judges it by, with the
+        // targets still to be chosen and the cost changes they may meet (CR 601.2c, 601.2f).
+        let paid = match def.kicker {
+            Some(k) if k.cost.x > 0 => Some((Some(ManaCost { x: 0, ..k.cost }), u32::from(k.cost.x))),
+            None if x_symbols > 0 && less_each == 0 => Some((None, u32::from(x_symbols))),
+            _ => None,
+        }
+        .map(|(kicker, per)| XCost {
+            base,
+            per,
+            kicker,
+            less,
+            reduced: hand_reduction,
+            reducer,
+            costed: XCosted::Spell,
+            modes: (!modes_after_costs).then_some(mask),
+            targets: targets.to_vec(),
+            targets_later: def.modal.is_some() || (!specs.is_empty() && (def.divide.is_some() || resolving || !targets_with_cast(cx.cards(), def))),
+        });
+        let announced = announce_x(cx, player, spell, base, def.kicker, paid.as_ref(), least, cap, false, less_each, extra.variable.map_or("", |v| v.governs()))?;
         let n = announced;
         if let Some(k) = def.kicker {
             if k.cost.x > 0 {
                 // Kicker {X} (CR 702.33a, 107.3): X is the number announced, and kicked when it is not 0.
-                cost.mana = kicker_total(cost.mana, k, n);
+                cost.mana = paid.as_ref().map_or_else(|| kicker_total(cost.mana, k, n), |c| x_total(c, n));
                 item.kicked = (n > 0) as u8;
                 item.x = n;
                 cx.st().update_obj(spell, |o| {
@@ -8342,9 +8579,11 @@ fn cast(
             // cost has no {X} and nothing reads it as the value of X (CR 107.3, 601.2b).
             sacrificed_any_number = announced;
         } else {
-            // What a cost paid instead was reduced by that its own generic mana could not take, off X's (CR 118.7a).
-            let xs = n as u32 * x_symbols as u32;
-            cost.mana.generic += xs - xs.min(less);
+            // What a cost paid instead was reduced by that its own generic mana could not take comes off X's (CR 118.7a,
+            // `x_total`).
+            if let Some(c) = &paid {
+                cost.mana = x_total(c, n);
+            }
             item.x = n;
             cx.st().update_obj(spell, |o| o.x = n);
         }
@@ -8849,6 +9088,7 @@ fn assist(cx: &mut Cx, caster: PlayerId, spell: ObjectId, total: ManaCost) -> R<
                 life: 0,
                 governs: "",
                 assist: AssistStep::HelperAnnounces,
+                x_cost: None,
             };
             match cx.ask_core(helper, ask, false)? {
                 Answer::Announce(value) if value <= most => {
@@ -8903,6 +9143,7 @@ fn assist_window(cx: &mut Cx, player: PlayerId, spell: ObjectId, owed: ManaCost,
             life: 0,
             governs: "",
             assist: step,
+            x_cost: None,
         };
         match cx.ask_core(player, ask, caster)? {
             Answer::Act(action) => match action.kind {
@@ -9488,7 +9729,8 @@ fn set_item_shares(cx: &mut Cx, shares: &[u32]) {
 
 fn add_cost(a: ManaCost, b: ManaCost) -> ManaCost {
     let mut c = a;
-    c.generic += b.generic;
+    // `b`'s generic mana is not X's (`ManaCost::add_generic`): its {X}, if any, is announced apart.
+    c.add_generic(b.generic);
     for i in 0..6 {
         c.symbols[i] += b.symbols[i];
     }
@@ -9699,7 +9941,7 @@ fn announce_reduction(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: C
             .find(|&mask| {
                 let split: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
                 let mut total = *cost;
-                total.generic += more;
+                total.add_generic(more);
                 can_afford(cx, player, source, &any.view(&reduce(total, &split_reduction(&whole, &split))))
             })
             .map(|mask| (0..n as u8).filter(|&i| mask & (1 << i) != 0).collect())
@@ -9774,7 +10016,7 @@ fn announce_hybrids(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Cos
             .find(|&mask| {
                 let chosen: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
                 let mut total = announced(&chosen);
-                total.generic += more;
+                total.add_generic(more);
                 let total = reduce(total, &less);
                 can_afford(cx, player, source, &any.view(&total))
             })
@@ -9872,16 +10114,37 @@ fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut Man
     Ok(life)
 }
 
+/// A cost with a kicker with {X} paid for the X announced, `n` (CR 702.33a, 107.3): the rest of the kicker (`rest`) once
+/// and `per` generic mana for each X, when `n` is not 0.
+fn kicker_x_total(base: ManaCost, rest: ManaCost, per: u32, n: u32) -> ManaCost {
+    if n == 0 {
+        return base;
+    }
+    let total = add_cost(base, rest);
+    // The kicker's X, which what restricts the spell's X restricts (`ManaCost::x_mana`: Emblazoned Golem's).
+    total.plus_x(n * per, total.x_mana)
+}
+
+/// The total cost once X is announced as `n` (CR 601.2b, 107.3a), before the targets and the cost changes (CR 601.2c,
+/// 601.2f): what the cast, the activation and the special action take as their cost, and what the advice of how much X
+/// could be paid starts from (`most_affordable_x`).
+pub fn x_total(c: &XCost, n: u32) -> ManaCost {
+    match c.kicker {
+        Some(rest) => kicker_x_total(c.base, rest, c.per, n),
+        None => {
+            // What a cost paid instead was reduced by that its own generic mana could not take, off X's (CR 118.7a).
+            let xs = n * c.per;
+            c.base.plus_x(xs - xs.min(c.less), c.base.x_mana)
+        }
+    }
+}
+
 /// A cost with its kicker paid `n` times (CR 702.33); a kicker with {X} in it is paid once for the X announced, which
 /// is `n`, so it adds that much generic mana (and its other symbols once, when n is not 0).
 fn kicker_total(base: ManaCost, k: Kicker, n: u32) -> ManaCost {
     let mut total = base;
     if k.cost.x > 0 {
-        if n > 0 {
-            total = add_cost(total, ManaCost { x: 0, ..k.cost });
-            total.generic += n as u32 * k.cost.x as u32;
-        }
-        return total;
+        return kicker_x_total(base, ManaCost { x: 0, ..k.cost }, u32::from(k.cost.x), n);
     }
     for _ in 0..n {
         total = add_cost(total, k.cost);
@@ -10036,9 +10299,14 @@ fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 
 /// Announcing X or the number of times a spell is kicked (CR 601.2b), as the C# engine asks it: a pay-costs
 /// question that raises and lowers the value until confirmed.
-fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, x_symbols: u8, least: u32, cap: u32) -> R<u32> {
-    // X itself is a u16 (`StackItem::x`), and `cap` keeps the number within it.
-    announce_x(cx, player, spell, base, None, x_symbols, least, cap, false, 0, 0, "").map(|n| n)
+fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, paid: &XCost, least: u32, cap: u32) -> R<u32> {
+    announce_x(cx, player, spell, paid.base, None, Some(paid), least, cap, false, 0, "")
+}
+
+/// What an X paid in mana of an ability or a special action with no targets announced costs at each X (`XCost`): `base`
+/// and `base.x` generic mana for each X.
+fn untargeted_x(base: ManaCost, costed: XCosted) -> XCost {
+    XCost { base, per: u32::from(base.x), kicker: None, less: 0, reduced: 0, reducer: None, costed, modes: Some(0), targets: Vec::new(), targets_later: false }
 }
 
 /// The least value X may be announced as (CR 107.3a, 601.2b): 1 for an X that can't be 0 ("X can't be 0"), else 0.
@@ -10057,19 +10325,19 @@ pub(crate) const fn x_only_zero(x_cant_be_zero: bool, printed_x: u8, paid_x: u8)
 /// `cost` as the least it could be announced to come to: each {X} as the least X may be (`least_x`), in generic mana.
 /// The `x` symbols are kept, for mana that pays for spells of a mana value at an X that brings it there
 /// (`Available::covers_for`).
-fn at_least_x(mut cost: ManaCost, x_cant_be_zero: bool) -> ManaCost {
-    cost.generic += u32::from(cost.x) * u32::from(least_x(x_cant_be_zero));
-    cost
+fn at_least_x(cost: ManaCost, x_cant_be_zero: bool) -> ManaCost {
+    cost.plus_x(u32::from(cost.x) * least_x(x_cant_be_zero), cost.x_mana)
 }
 
-/// `announce`, saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`), how much generic mana
-/// each one announced takes off the total shown (`VariableCost::SacrificeAnyNumber`'s `less_each`), and how much a
-/// reduction already announced takes off it (`reduced`: the cards chosen for `ExileFromHandForLess`, CR 601.2b, 601.2f,
-/// 118.7a). The value starts at `least` (1 for an X that can't be 0, CR 107.3a), or at the X the reduction pays for where
-/// that is more, and never goes below `least`; with no value from `least` to `cap` there is nothing that may be announced,
-/// and the spell or ability is taken back (CR 601.2b, 733.1).
+/// `announce`, for an X paid in mana (`paid`: what the total is at each X, a reduction already announced taken off what is
+/// shown, the cards chosen for `ExileFromHandForLess`, CR 601.2b, 601.2f, 118.7a) or not (`None`, the total shown from
+/// `base`), saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`) and how much generic mana
+/// each one announced takes off the total shown (`VariableCost::SacrificeAnyNumber`'s `less_each`). The value starts at
+/// `least` (1 for an X that can't be 0, CR 107.3a), or at the X the reduction pays for where that is more, and never goes
+/// below `least`; with no value from `least` to `cap` there is nothing that may be announced, and the spell or ability is
+/// taken back (CR 601.2b, 733.1).
 #[allow(clippy::too_many_arguments)]
-fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, least: u32, cap: u32, loyalty: bool, less_each: u8, reduced: u32, governs: &'static str) -> R<u32> {
+fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, paid: Option<&XCost>, least: u32, cap: u32, loyalty: bool, less_each: u8, governs: &'static str) -> R<u32> {
     let most: u32 = match kicker {
         Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1,
         _ => cap,
@@ -10078,18 +10346,22 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         return Err(Stop::Cancel);
     }
     // The X the reduction pays for: the most X whose generic mana it takes off whole.
-    let paid_for = if kicker.is_none() && x_symbols > 0 { reduced / u32::from(x_symbols) } else { 0 };
+    let paid_for = match paid {
+        Some(c) if c.kicker.is_none() && c.per > 0 => c.reduced / c.per,
+        _ => 0,
+    };
     let mut n: u32 = paid_for.clamp(least, most);
     loop {
         let mut total = base;
-        match kicker {
-            Some(k) => total = kicker_total(total, k, n),
+        match (paid, kicker) {
             // A reduction past the generic mana there is takes it all, never colored mana (CR 118.7a).
-            None if x_symbols > 0 => {
-                total.generic = (total.generic + n * u32::from(x_symbols)).saturating_sub(reduced);
+            (Some(c), _) => {
+                total = x_total(c, n);
+                total.generic = total.generic.saturating_sub(c.reduced);
             }
+            (None, Some(k)) => total = kicker_total(total, k, n),
             // A reduction past the generic mana there is takes it all, so the most it is matters, never the rest (CR 118.7a).
-            None => total.generic = total.generic.saturating_sub(n * u32::from(less_each)),
+            (None, None) => total.generic = total.generic.saturating_sub(n * u32::from(less_each)),
         }
         let mut options = Vec::new();
         if n < most {
@@ -10100,7 +10372,8 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         }
         options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         options.push(ActionOption::simple(ActionKind::CancelCasting));
-        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, most, least, loyalty, attackers: Vec::new(), life: 0, governs, assist: AssistStep::None };
+        let x_cost = paid.map(|c| Box::new(c.clone()));
+        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, most, least, loyalty, attackers: Vec::new(), life: 0, governs, assist: AssistStep::None, x_cost };
         match cx.ask_core(player, ask, true)? {
             // The whole value at once, which the request's `least` and `most` bound (`validate::check`).
             Answer::Announce(value) if (least..=most).contains(&value) => return Ok(value),
@@ -10196,21 +10469,31 @@ fn activate(
         // "X target lands" cannot be announced past the legal targets there are (CR 601.2c, 602.2b).
         let cap = x_target_cap(cx, &Asker { source, controller: player, by, spell: false }, def);
         let cap = tap_x.map_or(cap, |(_, most)| cap.min(most));
-        let n = announce(cx, player, source, mana, mana.x, least_x(def.x_cant_be_zero), cap)?;
-        mana.generic += u32::from(n) * u32::from(mana.x);
+        // "Spend only black mana on X" (CR 107.3, 601.2h by way of 602.2b): X's generic mana only that mana may pay.
+        mana = mana.with_x_mana(def.x_mana);
+        // What the total comes to at each X (`x_total`), with the targets still to be chosen and the cost changes they may
+        // meet (CR 601.2c, 601.2f by way of 602.2b), for the advice of how much X could be paid.
+        let paid = XCost {
+            modes: Some(mask),
+            targets: targets.to_vec(),
+            targets_later: def.modal.is_some() || (!def.targets.is_empty() && (def.divide.is_some() || !targets_with_activation(def))),
+            ..untargeted_x(mana, XCosted::Ability(ability, by))
+        };
+        let n = announce(cx, player, source, &paid, least_x(def.x_cant_be_zero), cap)?;
+        mana = x_total(&paid, n);
         item.x = n;
     }
     // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).
     if whole.loyalty == Some(LOYALTY_MINUS_X) {
         let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u32;
-        item.x = announce_x(cx, player, source, mana, None, 0, least_x(def.x_cant_be_zero), cap, true, 0, 0, "")?;
+        item.x = announce_x(cx, player, source, mana, None, None, least_x(def.x_cant_be_zero), cap, true, 0, "")?;
     }
     // CR 118.3, 602.2b: "Remove any number of [kind] counters from this" announces how many, up to the counters there are; the
     // number is the ability's X (CR 107.3), which its effect reads as "that many".
     let removes = match whole.variable {
         Some(VariableCost::RemoveAnyNumberOfCounters(kind)) => {
             let cap = cx.s().obj(source).counters(kind).max(0) as u32;
-            item.x = announce_x(cx, player, source, mana, None, 0, 0, cap, false, 0, 0, VariableCost::RemoveAnyNumberOfCounters(kind).governs())? ;
+            item.x = announce_x(cx, player, source, mana, None, None, 0, cap, false, 0, VariableCost::RemoveAnyNumberOfCounters(kind).governs())? ;
             Some((kind, item.x))
         }
         _ => None,
@@ -10220,7 +10503,7 @@ fn activate(
     // chosen as the cost is paid (CR 601.2h).
     if let Some((filter, most)) = tap_x {
         if mana.x == 0 {
-            item.x = announce_x(cx, player, source, mana, None, 0, u32::from(least_x(def.x_cant_be_zero)), most, false, 0, 0, VariableCost::TapX(filter).governs())?;
+            item.x = announce_x(cx, player, source, mana, None, None, u32::from(least_x(def.x_cant_be_zero)), most, false, 0, VariableCost::TapX(filter).governs())?;
         }
         // One permanents choice can't hold the X to tap beside another cost's permanents (`Cost::and` would make a
         // sacrifice and the tap one choice). No printed card has both; one that did is refused, not paid as another cost.
@@ -10555,9 +10838,9 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     // first, and kept on the permanent for its other abilities to read.
     let mut x = None;
     if printed.x > 0 {
-        let n = announce(cx, player, source, printed, printed.x, 0, 1000)?;
-        printed.generic += u32::from(n) * u32::from(printed.x);
-        printed.x = 0;
+        let paid = untargeted_x(printed, XCosted::SpecialAction(ability));
+        let n = announce(cx, player, source, &paid, 0, 1000)?;
+        printed = ManaCost { x: 0, ..x_total(&paid, n) };
         x = Some(n);
     }
     // How each {2/C} and each Phyrexian symbol is paid is announced first, as for a cast or an activation (CR 601.2b, 107.4f,
@@ -10687,9 +10970,9 @@ fn activate_mana_as(
     // An {X} in the cost is announced first (CR 107.3a, 601.2b, 605.3a) and kept on the source for the effect to read.
     let mut mana = def.cost.mana;
     if mana.x > 0 {
-        let n = announce(cx, player, source, mana, mana.x, least_x(def.x_cant_be_zero), 1000)?;
-        mana.generic += n as u32 * mana.x as u32;
-        mana.x = 0;
+        let paid = untargeted_x(mana.with_x_mana(def.x_mana), XCosted::Ability(ability, by));
+        let n = announce(cx, player, source, &paid, least_x(def.x_cant_be_zero), 1000)?;
+        mana = ManaCost { x: 0, ..x_total(&paid, n) };
         cx.st().update_obj(source, |o| o.x = n);
     }
     // CR 601.2f by way of 602.2b and 605.3: the total cost, with what increases or reduces the cost to activate abilities
@@ -11191,8 +11474,9 @@ fn spend(owed: &mut ManaCost, mana: Mana) {
         owed.symbols[mana as usize] -= 1;
     } else if let Some(slot) = owed.hybrid.iter().position(|h| matches!(h, Some((a, b)) if *a == mana || *b == mana)) {
         owed.hybrid[slot] = None;
-    } else if owed.generic > 0 {
-        owed.generic -= 1;
+    } else {
+        // X's part where the mana may pay it, else the rest (CR 107.3, 601.2h: "Spend only black mana on X").
+        owed.spend_generic(mana);
     }
 }
 
@@ -11237,15 +11521,17 @@ impl AnyMana {
             owed.symbols[i] -= 1;
         } else if let Some(slot) = owed.hybrid.iter().position(Option::is_some) {
             owed.hybrid[slot] = None;
-        } else if owed.generic > 0 {
-            owed.generic -= 1;
+        } else if !owed.spend_x_as_any(mana) {
+            // X's part as though it were mana that may pay it (CR 609.4b), else the rest.
+            owed.spend_generic(mana);
         }
     }
 }
 
 /// Whether a unit of `mana` pays anything still owed.
 fn pays(owed: &ManaCost, mana: Mana) -> bool {
-    owed.generic > 0
+    owed.plain_generic() > 0
+        || owed.x_part() > 0 && owed.x_mana.may_pay(mana)
         || owed.symbols[mana as usize] > 0
         || owed.hybrid.iter().flatten().any(|(a, b)| *a == mana || *b == mana)
 }
@@ -11282,12 +11568,33 @@ fn uncovered(pool: &ManaPool, owed: &ManaCost) -> ManaCost {
         left[i] -= take;
         *n -= take;
     }
+    // X's part, by the mana that may pay it (CR 107.3, 601.2h); then the rest of the generic mana by what is left over.
+    for mana in Mana::ALL {
+        while out.x_part() > 0 && out.x_mana.may_pay(mana) && left[mana as usize] > 0 {
+            left[mana as usize] -= 1;
+            out.spend_generic(mana);
+        }
+    }
     let spare: u32 = left.iter().sum();
-    out.generic = out.generic.saturating_sub(spare);
+    out.spend_plain(spare);
     out
 }
 
 pub(crate) fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
+    // X's part that only some mana may pay ("Spend only black mana on X", CR 107.3, 601.2h): each shape it could be paid in
+    // (`ManaCost::x_shapes`) is a way, and shapes that spend the same mana are the same way.
+    if owed.x_part() > 0 {
+        let mut one: Option<[u32; 6]> = None;
+        for shape in owed.x_shapes() {
+            match ways(pool, &shape) {
+                Ways::None => {}
+                Ways::Many => return Ways::Many,
+                Ways::One(spent) if one.is_some_and(|o| o != spent) => return Ways::Many,
+                Ways::One(spent) => one = Some(spent),
+            }
+        }
+        return one.map_or(Ways::None, Ways::One);
+    }
     // How a Phyrexian or a monocolored hybrid symbol is paid is announced before the pool pays it (`announce_life`,
     // `announce_twobrids`, `pool_pays`). One not announced is never free: mana pays a Phyrexian symbol only with its color
     // (CR 107.4f), and a {2/C} symbol is paid with its color or {2} (CR 107.4e), a choice of the payer's.
@@ -11878,7 +12185,7 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
         } else {
             total
         };
-        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, least: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life + u32::from(life), governs: "", assist: helpers.assist };
+        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, most: 0, least: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life + u32::from(life), governs: "", assist: helpers.assist, x_cost: None };
         // The player assisting pays for a spell that is not theirs to take back (CR 702.132a).
         let answer = cx.ask_core(player, ask, helpers.assist != AssistStep::HelperPays)?;
         if record {
@@ -12270,7 +12577,7 @@ pub(crate) fn pool_pays(pool: &ManaPool, owed: &ManaCost, life_room: i32, any_co
                 life_room - 2 * other as i32
             } else {
                 next.twobrid[color] = 0;
-                next.generic += 2 * other;
+                next.add_generic(2 * other);
                 life_room
             };
             room >= 0 && go(pool, next, room, any_color, at + 1)

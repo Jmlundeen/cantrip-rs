@@ -123,7 +123,7 @@ fn fill(random: &mut Random, option: &ActionOption) -> Action {
 }
 
 fn pays(owed: &ManaCost, mana: Mana) -> bool {
-    owed.generic > 0 || owed.symbols[mana as usize] > 0 || owed.hybrid.iter().flatten().any(|(a, b)| *a == mana || *b == mana)
+    owed.plain_generic() > 0 || owed.x_part() > 0 && owed.x_mana.may_pay(mana) || owed.symbols[mana as usize] > 0 || owed.hybrid.iter().flatten().any(|(a, b)| *a == mana || *b == mana)
 }
 
 /// Pays as the C# AutoPlay does: pool mana that pays something, then a mana ability that makes something owed,

@@ -34,7 +34,8 @@ impl PayPlan {
 
 /// Whether `mana` pays any of what is `owed`.
 pub fn pays(owed: &ManaCost, mana: Mana) -> bool {
-    owed.generic > 0
+    owed.plain_generic() > 0
+        || owed.x_part() > 0 && owed.x_mana.may_pay(mana)
         || owed.symbols[mana as usize] > 0
         || owed
             .hybrid
