@@ -350,3 +350,45 @@ fn protection_from_enchantments_spares_its_aura_alone() {
     assert!(stays(&g, ward, bear));
     assert!(went_to_the_graveyard(&g, blue));
 }
+
+/// "Loses all abilities" (CR 613.1f) in layer 6 after White Ward's grant, by timestamp (CR 613.7): the creature has no
+/// protection, and a white Aura stays. A Ward attached after the loss gives it again (CR 613.7), sparing itself as before.
+#[test]
+fn losing_all_abilities_takes_the_protection_and_a_later_grant_gives_it_back() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
+    let ward = attached(&mut g, &WHITE_WARD, bear);
+    let white = attached(&mut g, &WHITE_AURA, bear);
+    effect(&mut g, bear, EffectKind::LoseAllAbilities);
+    assert!(!cx(&mut g).chars(bear).has_protection(), "the granted protection is lost with the rest (CR 613.1f)");
+    state_based_actions(&mut g);
+    assert!(stays(&g, ward, bear) && stays(&g, white, bear), "no protection removes either");
+
+    let later = attached(&mut g, &WHITE_WARD, bear);
+    assert_eq!(cx(&mut g).chars(bear).protection_colors(), ColorSet::of(Color::White), "granted after the loss, it is kept");
+    state_based_actions(&mut g);
+    assert!(stays(&g, later, bear), "it spares itself");
+    assert!(went_to_the_graveyard(&g, ward) && went_to_the_graveyard(&g, white), "and removes the other white Auras");
+}
+
+/// The masks are exact for any ids: an instance sparing only `a` spares `a` alone, and two sparing different Auras spare
+/// neither, even where one id's bits are a subset of the other's (1 and 3), or one is 0 or every bit.
+#[test]
+fn what_an_instance_spares_is_exact_for_any_two_ids() {
+    let white = ColorSet::of(Color::White);
+    let removes = |p: &SparedProtection, aura: u32| p.removing(ObjectId(aura)).0.has(Color::White);
+    for (a, b) in [(1, 3), (3, 1), (0, 1), (0, u32::MAX), (u32::MAX, 7), (6, 5)] {
+        let mut one = SparedProtection::NONE;
+        one.add(white, TypeSet::NONE, Spares::Aura(ObjectId(a)));
+        assert!(!removes(&one, a) && removes(&one, b), "{a} alone is spared, {b} is not");
+        let mut two = one;
+        two.add(white, TypeSet::NONE, Spares::Aura(ObjectId(b)));
+        assert!(removes(&two, a) && removes(&two, b), "{a} and {b} remove each other");
+        let mut every = one;
+        every.add(white, TypeSet::NONE, Spares::Auras);
+        assert!(!removes(&every, a) && removes(&every, b), "sparing every Aura does not stop {a}'s removing {b}");
+    }
+    let mut auras = SparedProtection::NONE;
+    auras.add(white, TypeSet::NONE, Spares::Auras);
+    assert!(!removes(&auras, 0) && !removes(&auras, u32::MAX));
+}
