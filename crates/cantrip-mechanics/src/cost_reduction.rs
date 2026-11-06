@@ -11,6 +11,14 @@ pub fn for_each_instant_and_sorcery_in_your_graveyard(q: &dyn Query, _: ObjectId
     CostDelta::less(cards as u32)
 }
 
+/// "This spell costs {1} less to cast for each noncreature, nonland card in your graveyard" (CR 601.2f, 118.7a): counted as
+/// the cost is determined, the cards as they are in the caster's graveyard; a Kindred noncreature card counts. The reduction
+/// never takes off a colored symbol (CR 118.7a), which the core leaves in place. Serpent of the Pass prints it.
+pub fn for_each_noncreature_nonland_card_in_your_graveyard(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
+    let cards = q.state().zone(Zone::graveyard(player)).iter().filter(|&&id| !q.chars(id).is(CardType::Creature) && !q.chars(id).is(CardType::Land)).count();
+    CostDelta::less(cards as u32)
+}
+
 /// "This spell costs {N} less to cast if you control a [subtype]" (CR 601.2f, 118.7a): judged once, as the total cost is
 /// determined, for the cost of casting it only (the core asks a card's own change only as it is cast), and counting only the
 /// caster's permanents. `TYPE` is `lands::sub(Subtype::Kithkin)` and so on; the type is a word of the spell's rules text, read
