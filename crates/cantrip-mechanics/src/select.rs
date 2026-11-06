@@ -160,8 +160,9 @@ pub const fn basic_land_or_subtype(subtype: Subtype) -> Part {
 
 /// "A basic [subtype] card" (CR 205.4a, 205.3i, 305.6): a card with the basic supertype and `subtype`, the type read through the
 /// words of the text of the card that asks (CR 612.2) and a card as it is where it is; a nonbasic land of the type is not one.
-/// Clay-Fired Bricks and Oberth-Class Starship search for a basic Plains card (`BASIC_PLAINS_CARD`); Starfield Shepherd and
-/// Yasharn test it by hand with `is_basic_of_type`.
+/// Clay-Fired Bricks and Oberth-Class Starship search for a basic Plains card (`BASIC_PLAINS_CARD`), Molten Man, Inferno
+/// Incarnate for a basic Mountain card (`BASIC_MOUNTAIN_CARD`); Starfield Shepherd and Yasharn test it by hand with
+/// `is_basic_of_type`.
 pub const fn basic_land_of_type(subtype: Subtype) -> Part {
     part(&(basic_land_of_type_rule as SelectFn), crate::lands::sub(subtype) as u32, "")
 }
@@ -455,6 +456,9 @@ pub const BASIC_LAND_OR_PLANET_CARD: Selection = Selection::of(up_to(1), &[BASIC
 
 /// "A basic Plains card", which may be left unfound (CR 701.23b): Clay-Fired Bricks and Oberth-Class Starship.
 pub const BASIC_PLAINS_CARD: Selection = Selection::of(up_to(1), &[basic_land_of_type(Subtype::Plains)]).called("basic Plains");
+
+/// "A basic Mountain card", which may be left unfound (CR 701.23b): Molten Man, Inferno Incarnate.
+pub const BASIC_MOUNTAIN_CARD: Selection = Selection::of(up_to(1), &[basic_land_of_type(Subtype::Mountain)]).called("basic Mountain");
 
 /// `count` Forest cards: Wood Elves's one (`FOREST_CARD`), which may be left unfound (CR 701.23b).
 pub const fn forest_cards(count: Count) -> Selection {

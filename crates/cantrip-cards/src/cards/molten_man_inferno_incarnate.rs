@@ -4,13 +4,11 @@ use cantrip_mechanics::select;
 use cantrip_mechanics::{lands, library, sacrifice_chosen, triggers};
 use cantrip_oracle as oracle;
 
-const BASIC_MOUNTAIN_CARD: select::Selection = select::Selection::of(select::up_to(1), &[select::basic_land_of_type(Subtype::Mountain)]).called("basic Mountain");
-
 /// "Search your library for a basic Mountain card, put it onto the battlefield tapped, then shuffle" (CR 701.23): the player
 /// finds one basic land card with the Mountain subtype or none, and the library is shuffled either way. "Mountain" is a word
 /// of Molten Man's text (CR 612), which the selection rule reads.
 fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    library::find_to_battlefield(g, item.controller, item.object, BASIC_MOUNTAIN_CARD, true)?;
+    library::find_to_battlefield(g, item.controller, item.object, select::BASIC_MOUNTAIN_CARD, true)?;
     Ok(())
 }
 
