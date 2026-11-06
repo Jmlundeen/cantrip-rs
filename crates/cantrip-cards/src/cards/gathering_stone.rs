@@ -1,7 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::chosen_type::enters_choosing_a_creature_type;
-use cantrip_mechanics::effects::ask_may;
-use cantrip_mechanics::top_of_library;
+use cantrip_mechanics::library;
 use cantrip_mechanics::triggers::THIS_ENTERS_OR_YOUR_UPKEEP;
 use cantrip_oracle as oracle;
 
@@ -11,14 +10,6 @@ const REVEAL: Question = Question::new(
     "It is a card of the chosen type. If you don't, you may put it into your graveyard instead",
     "Reveal it",
     "Don't",
-);
-
-const BIN: Question = Question::new(
-    "PutTopIntoGraveyard",
-    "put it into your graveyard?",
-    "The card you looked at stays on top of your library if you don't",
-    "Put it into your graveyard",
-    "Leave it on top",
 );
 
 /// "Spells you cast of the chosen type cost {1} less to cast" (CR 601.2f, 205.3): only its controller's spells, judged on the
@@ -36,26 +27,13 @@ fn chosen_type_spells_cost_less(q: &dyn Query, source: ObjectId, player: PlayerI
 }
 
 /// "Look at the top card of your library. If it's a card of the chosen type, you may reveal it and put it into your hand. If
-/// you don't put the card into your hand, you may put it into your graveyard." (CR 701.20a.) The card is looked at whatever it
-/// is, and may be left unrevealed even if it is of the chosen type (the 2025-11-17 ruling); not put into the hand, it may go to
-/// the graveyard - no discard, no mill. An empty library has nothing to look at.
+/// you don't put the card into your hand, you may put it into your graveyard." (CR 701.20a.) It may be left unrevealed even if it
+/// is of the chosen type (the 2025-11-17 ruling).
 fn look_at_the_top_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    let Some(&top) = top_of_library(g, you, 1).first() else {
-        return Ok(());
-    };
-    g.look_at(you, &[top]);
-    let asker = g.item_asker(item, you);
-    let of_the_chosen_type = g.state().chosen_subtype(g.linked_to(&asker)).is_some_and(|chosen| g.chars(top).has_subtype(chosen));
-    if of_the_chosen_type && ask_may(g, you, item.object, Purpose::Ask(&REVEAL))? {
-        g.reveal(you, &[top]);
-        g.return_to_hand_revealed(&[top]);
-        return Ok(());
-    }
-    if ask_may(g, you, item.object, Purpose::Ask(&BIN))? {
-        g.put_into_graveyard(&[top]);
-    }
-    Ok(())
+    let asker = g.item_asker(item, item.controller);
+    library::look_at_top_may_take_else_bin(g, item, &REVEAL, |g, top| {
+        g.state().chosen_subtype(g.linked_to(&asker)).is_some_and(|chosen| g.chars(top).has_subtype(chosen))
+    })
 }
 
 pub static CARD: CardDef = CardDef {
