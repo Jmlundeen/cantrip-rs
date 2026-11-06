@@ -1,0 +1,48 @@
+# Each Black Ward spares only itself (CR 702.16n: "this Aura"), so two on one creature that are both black remove each
+# other (CR 702.16c, 704.5m). Bot1's Devoted Hero wears two Black Wards, both white, and keeps them; Painter's Servant
+# naming black makes them black (CR 105.3), and state-based actions put both into the graveyard at once.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Devoted Hero
+Black Ward
+Black Ward
+Painter's Servant
+Plains x10
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Devoted Hero.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Ward.Cast(Bot1.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: W)
+Bot1.Hand.Black Ward.Cast(Bot1.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Black Ward#1.AttachedTo = Devoted Hero
+? Bot1.Battlefield.Black Ward#2.AttachedTo = Devoted Hero
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Black)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Black Ward; Black Ward; Black Lotus

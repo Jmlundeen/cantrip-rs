@@ -1,0 +1,56 @@
+# Black Ward gives Bot2's Devoted Hero protection from black (CR 702.16). On turn 3 Bot1 cannot target the Hero with
+# Fear, a black Aura spell (CR 702.16b; the refusal, and the runner offers it again with mana to spare), and Cabal Evangel
+# attacking into it is blocked by the Hero: the Evangel's damage is black and prevented (CR 702.16e), so
+# the 1/2 Hero survives with no damage marked (without Black Ward it would die).
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Cabal Evangel
+Fear
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Devoted Hero
+Black Ward
+Plains x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: B)
+Bot1.Hand.Cabal Evangel.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Devoted Hero.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Black Ward.Cast(Bot2.Battlefield.Devoted Hero)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+! Bot1.Hand.Fear.Cast(Bot2.Battlefield.Devoted Hero)
+Bot1.Attack(Cabal Evangel > Bot2)
+Bot2.Block(Devoted Hero > Cabal Evangel)
+[T3 Bot1.CombatDamage]
+? Bot2.Battlefield.Devoted Hero.Damage = 0
+[Expect]
+Bot2.Battlefield.Devoted Hero.ProtectionFrom = Black
+Bot2.Battlefield.Devoted Hero.Damage = 0
+Bot2.Battlefield.Black Ward.AttachedTo = Devoted Hero
+Bot2.Graveyard.Count = 0

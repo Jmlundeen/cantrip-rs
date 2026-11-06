@@ -1,0 +1,48 @@
+# Black Ward's "black" is a color word of its text (CR 612.1, 702.16): Bot1's Sleight of Mind changes it to red, so the
+# Devoted Hero it enchants has protection from red and no longer from black (CR 612.2), and the Aura, white, stays. Bot2
+# then cannot target the Hero with Lightning Bolt (the refusal; the bolt aimed at Bot1 is the positive control).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Devoted Hero
+Black Ward
+Sleight of Mind
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Devoted Hero.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Ward.Cast(Bot1.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.Black Ward)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+Bot1.Colors(Red)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Devoted Hero)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[Expect]
+Bot1.Battlefield.Devoted Hero.ProtectionFrom = Red
+Bot1.Battlefield.Black Ward.AttachedTo = Devoted Hero
+Bot1.Life = 17

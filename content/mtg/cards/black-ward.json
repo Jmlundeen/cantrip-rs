@@ -1,0 +1,6 @@
+{
+  "name": "Black Ward",
+  "manaCost": "{W}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nEnchanted creature has protection from black. This effect doesn't remove this Aura."
+}

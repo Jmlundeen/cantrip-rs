@@ -1,0 +1,52 @@
+# Black Ward's "This effect doesn't remove this Aura" spares it from its own protection only: another instance of
+# protection from black still removes it once it is black (CR 702.16n, 704.5m). Black Ward enchants a creature, any
+# player's (CR 303.4a): Bot1 cannot cast it on its Mox Jet (the refusal) but enchants Bot2's White Knight, which has
+# protection from black of its own. While the Ward is white it stays; Painter's Servant naming black makes it black
+# (CR 105.3), and the Knight's protection puts it into Bot1's graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Black Ward
+Painter's Servant
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+White Knight
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.White Knight.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Black Ward.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Hand.Black Ward.Cast(Bot2.Battlefield.White Knight)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Black Ward.AttachedTo = White Knight
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Black)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Black Ward
+Bot2.Battlefield.White Knight.ProtectionFrom = Black
