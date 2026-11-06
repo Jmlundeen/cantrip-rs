@@ -1,0 +1,60 @@
+# Ancient Greenwarden's third ability doubles only what a land entering triggers (CR 603.2d; its 2020-09-25 rulings): the
+# trigger need not name lands, so Impact Tremors' "whenever a creature you control enters" triggers twice for Dryad Arbor,
+# a land creature, but only once for Memnite, a creature that is not a land. Bot2 loses 1 and then 2: 19, then 17.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mountain
+Ancient Greenwarden
+Impact Tremors
+Memnite
+Dryad Arbor
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ancient Greenwarden.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Impact Tremors.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+[T5 Bot1.Main1]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot1.Life = 20
+Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
+Stack.Count = 0

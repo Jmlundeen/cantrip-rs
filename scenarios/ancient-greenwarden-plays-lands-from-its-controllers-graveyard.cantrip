@@ -1,0 +1,71 @@
+# "You may play lands from your graveyard" (CR 305.1): Bot1 sacrifices Marsh Flats on turn 1 and casts Ancient
+# Greenwarden. On turn 3 it plays a Forest from its hand instead of the Marsh Flats (declining) and casts Sazh's
+# Chocobo; on turn 5 it plays the Marsh Flats from its own graveyard (accepting) and the Chocobo's landfall triggers
+# twice for the land entering. Bot2's Marsh Flats in Bot2's graveyard stays there - the permission is its controller's
+# alone - and it does not let a land card's own ability be activated from a graveyard (CR 602.2a).
+
+[Bot1 Deck]
+Ancient Greenwarden
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Marsh Flats
+Sazh's Chocobo
+Forest x2
+Plains
+Forest x10
+
+[Bot2 Deck]
+Marsh Flats
+Swamp x19
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Plains)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ancient Greenwarden.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Marsh Flats.Play
+Bot2.Battlefield.Marsh Flats.Activate
+Bot2.Search(Swamp)
+[T3 Bot1.Main1]
+! Bot2.Graveyard.Marsh Flats.Play
+! Bot1.Graveyard.Marsh Flats.Activate
+? Bot1.Graveyard = Black Lotus; Marsh Flats
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sazh's Chocobo.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Graveyard.Marsh Flats.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Marsh Flats.Types = Land
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sazh's Chocobo.Counters.PlusOnePlusOne = 2
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Black Lotus
+Bot1.Graveyard.Count = 1
+Bot2.Graveyard = Marsh Flats
+Bot1.Battlefield.Marsh Flats.Types = Land
+Bot1.Battlefield.Sazh's Chocobo.Counters.PlusOnePlusOne = 2
