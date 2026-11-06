@@ -5134,19 +5134,35 @@ impl CardTable {
     /// Equipment's equip abilities cost {2} less to activate." A face-down permanent has none of them either.
     ///
     /// The hottest walk of the engine (every static, cost change, replacement and trigger reads it, for each permanent): an
-    /// object with no exception text walks only its own and its components' texts, with no step for the texts it lacks.
+    /// object with no exception text anywhere - nearly every one - walks a plain list of its own and its components' cards,
+    /// a small iterator; any other walks `texts_with_exclusions`, without the exclusions (which only the layers read), boxed
+    /// so that the plain walk does not carry its size.
     pub fn texts<'a>(&self, s: &'a GameState, obj: &'a Obj) -> impl Iterator<Item = CardId> + use<'a> {
-        let (sources, extra): (&'a [Copiable], Option<ExceptionTexts<'a>>) = match obj.copy {
-            Some(ref c) if obj.marks.face_down_as.is_none() => (
-                if c.merged != 0 { s.merged_sources(c) } else { &[] },
-                (c.extra_abilities[0].instances > 0).then(|| c.extra_texts()),
-            ),
-            _ => (&[], None),
-        };
-        let own = std::iter::once(self.current(obj)).chain(sources.iter().map(|v| v.card));
-        match extra {
+        let copy = obj.copy.as_ref().filter(|_| obj.marks.face_down_as.is_none());
+        let sources = copy.filter(|c| c.merged != 0).map_or(&[][..], |c| s.merged_sources(c));
+        let card = self.current(obj);
+        if no_exception_texts(copy, sources) {
+            Texts::Own(std::iter::once(card).chain(sources.iter().map(|v| v.card)))
+        } else {
+            let all: Box<dyn Iterator<Item = CardId> + 'a> = Box::new(self.texts_with_exclusions(s, card, copy).map(|(card, _, _)| card));
+            Texts::Excepted(all)
+        }
+    }
+
+    /// The same text walk with its component of origin and CR 707.9d exclusions. An exception text belongs to the
+    /// component whose values acquired it, not the card defining the quoted ability. No state beyond copiable values.
+    fn texts_with_exclusions<'a>(&self, s: &'a GameState, card: CardId, copy: Option<&'a Copiable>) -> impl Iterator<Item = (CardId, Option<CardId>, CdaExclusions)> + use<'a> {
+        let sources = copy.filter(|c| c.merged != 0).map_or(&[][..], |c| s.merged_sources(c));
+        let excluded = copy.map_or(CdaExclusions::NONE, Copiable::excluded_cdas);
+        let merged_excluded = copy.map_or(CdaExclusions::NONE, Copiable::merged_excluded_cdas);
+        let components = sources.iter().flat_map(move |v| {
+            std::iter::once((v.card, Some(v.card), v.excluded_cdas().union(merged_excluded)))
+                .chain(v.extra_texts_with_exclusions().map(move |(card, excluded)| (card, Some(v.card), excluded.union(merged_excluded))))
+        });
+        let own = std::iter::once((card, None, excluded)).chain(components);
+        match copy.filter(|c| c.extra_abilities[0].instances > 0) {
             None => Texts::Own(own),
-            Some(extra) => Texts::Excepted(own.chain(extra)),
+            Some(c) => Texts::Excepted(own.chain(c.extra_texts_with_exclusions().map(|(card, excluded)| (card, None, excluded)))),
         }
     }
 
@@ -5154,14 +5170,36 @@ impl CardTable {
     /// object has (`current`), whose abilities are asked as its own text's (`linked_to`), and for a text an exception adds,
     /// which is the copy's own; for each other component of a merged permanent, that component's card (`component_link`), so
     /// a static ability, a replacement effect or a hook of a card under another reads the choices and exiles its own card
-    /// made, and names what it gives by its own card.
+    /// made, and names what it gives by its own card. A component's exception texts use that component's link too.
+    /// An object with no exception text anywhere walks a plain list, and any other the full walk boxed, as `texts` does.
     pub fn texts_linked<'a>(&'a self, s: &'a GameState, id: ObjectId) -> impl Iterator<Item = (CardId, Option<Linked>)> + use<'a> {
         let obj = s.obj(id);
-        let components = match obj.copy {
-            Some(ref c) if c.merged != 0 && obj.marks.face_down_as.is_none() => s.merged_sources(c).len(),
-            _ => 0,
-        };
-        self.texts(s, obj).enumerate().map(move |(i, card)| (card, (i > 0 && i <= components).then(|| self.component_link(s, id, card))))
+        let copy = obj.copy.as_ref().filter(|_| obj.marks.face_down_as.is_none());
+        let sources = copy.filter(|c| c.merged != 0).map_or(&[][..], |c| s.merged_sources(c));
+        let card = self.current(obj);
+        if no_exception_texts(copy, sources) {
+            Texts::Own(std::iter::once((card, None)).chain(sources.iter().map(move |v| (v.card, Some(self.component_link(s, id, v.card))))))
+        } else {
+            let all: Box<dyn Iterator<Item = (CardId, Option<Linked>)> + 'a> =
+                Box::new(self.texts_linked_with_exclusions_of(s, id, card, copy).map(|(card, link, _)| (card, link)));
+            Texts::Excepted(all)
+        }
+    }
+
+    /// `texts_linked`, preserving which defining abilities were not copied from each text (CR 707.9d). The layers use
+    /// these exclusions instead of treating a final stated characteristic as excluding every subsequently acquired CDA.
+    pub fn texts_linked_with_exclusions<'a>(&'a self, s: &'a GameState, id: ObjectId) -> impl Iterator<Item = (CardId, Option<Linked>, CdaExclusions)> + use<'a> {
+        let obj = s.obj(id);
+        let copy = obj.copy.as_ref().filter(|_| obj.marks.face_down_as.is_none());
+        self.texts_linked_with_exclusions_of(s, id, self.current(obj), copy)
+    }
+
+    /// The same walk for the values the layers are judging, including a face-down permanent as it would be face up
+    /// (CR 708.8). This changes no row: the layers supply the effective primary card and copy values they already use.
+    pub fn texts_linked_with_exclusions_of<'a>(&'a self, s: &'a GameState, id: ObjectId, card: CardId, copy: Option<&'a Copiable>) -> impl Iterator<Item = (CardId, Option<Linked>, CdaExclusions)> + use<'a> {
+        self.texts_with_exclusions(s, card, copy).map(move |(card, component, excluded)| {
+            (card, component.map(|c| self.component_link(s, id, c)), excluded)
+        })
     }
 
     /// How an ability printed on `card`, one of the merged permanent `id`'s components other than its topmost, is linked (CR
@@ -5174,10 +5212,13 @@ impl CardTable {
 
     /// The link an ability printed on `card`, one of `id`'s texts (`texts`), is asked with: `None` for the text the object has,
     /// a component's for any other (`texts_linked`).
+    /// Only a merged permanent, or a copy of one, has texts with a link: any other object's are all `None`, and are not
+    /// walked (every ability an effect grants asks this).
     pub fn link_of_text(&self, s: &GameState, id: ObjectId, card: CardId) -> Option<Linked> {
-        let obj = s.obj(id);
-        let exception = obj.copy.is_some_and(|c| c.adds_text(card));
-        (s.merge_of(id).is_some() && card != self.current(obj) && !exception).then(|| self.component_link(s, id, card))
+        if s.obj(id).copy.is_none_or(|c| c.merged == 0) {
+            return None;
+        }
+        self.texts_linked(s, id).find(|&(text, _)| text == card).and_then(|(_, link)| link)
     }
 
     /// The card a face's abilities are printed on, as linked abilities know it (CR 607.1, 607.1b): a transforming
@@ -5466,6 +5507,13 @@ mod tests {
     }
 }
 
+/// Whether neither an object's copiable values (`copy`) nor any of its merged components' (`sources`) has an exception
+/// that adds an ability or a text (CR 707.9b): its texts are its own card and its components' cards, nothing more.
+#[inline]
+fn no_exception_texts(copy: Option<&Copiable>, sources: &[Copiable]) -> bool {
+    copy.is_none_or(|c| c.extra_abilities[0].instances == 0) && sources.iter().all(|v| v.extra_abilities[0].instances == 0)
+}
+
 /// `CardTable::texts`: an object's own and components' texts (`Own`), or those followed by the texts its copiable values'
 /// exceptions add (`Excepted`), so an object with none walks no more than its own.
 enum Texts<A, B> {
@@ -5473,11 +5521,11 @@ enum Texts<A, B> {
     Excepted(B),
 }
 
-impl<A: Iterator<Item = CardId>, B: Iterator<Item = CardId>> Iterator for Texts<A, B> {
-    type Item = CardId;
+impl<T, A: Iterator<Item = T>, B: Iterator<Item = T>> Iterator for Texts<A, B> {
+    type Item = T;
 
     #[inline]
-    fn next(&mut self) -> Option<CardId> {
+    fn next(&mut self) -> Option<T> {
         match self {
             Texts::Own(a) => a.next(),
             Texts::Excepted(b) => b.next(),
@@ -5493,10 +5541,52 @@ impl<A: Iterator<Item = CardId>, B: Iterator<Item = CardId>> Iterator for Texts<
     }
 
     #[inline]
-    fn fold<Acc, F: FnMut(Acc, CardId) -> Acc>(self, init: Acc, f: F) -> Acc {
+    fn fold<Acc, F: FnMut(Acc, T) -> Acc>(self, init: Acc, f: F) -> Acc {
         match self {
             Texts::Own(a) => a.fold(init, f),
             Texts::Excepted(b) => b.fold(init, f),
         }
+    }
+}
+
+#[cfg(test)]
+mod text_walk_tests {
+    use super::*;
+
+    static TOP: CardDef = CardDef { name: "Walk Test Top", ..CardDef::BLANK };
+    static LOWER: CardDef = CardDef { name: "Walk Test Lower", ..CardDef::BLANK };
+    static LOWER_TEXT: CardDef = CardDef { name: "Walk Test Lower Text", ..CardDef::BLANK };
+    static TOP_TEXT: CardDef = CardDef { name: "Walk Test Top Text", ..CardDef::BLANK };
+
+    /// The plain walks (`texts`, `texts_linked`, `link_of_text`), which skip the exclusion bookkeeping for an object with no
+    /// exception text anywhere, are exactly the full walk without its exclusions (CR 707.2, 707.9b, 702.140e) for each shape
+    /// of copiable values: none, a merged permanent, a component with an exception text of its own, and exception texts on
+    /// the top as well.
+    #[test]
+    fn the_plain_text_walks_are_the_full_walk_without_its_exclusions() {
+        let cards: &'static CardTable = Box::leak(Box::new(CardTable::new([&TOP, &LOWER, &LOWER_TEXT, &TOP_TEXT])));
+        let [top, lower, lower_text, top_text] = [&TOP, &LOWER, &LOWER_TEXT, &TOP_TEXT].map(|d| cards.id_of(d));
+        let mut s = GameState::new(2, 1);
+        let id = s.push_obj(Obj::new(top, PlayerId(0), Zone::BATTLEFIELD));
+        let check = |s: &GameState, want: &[CardId]| {
+            let full: Vec<(CardId, Option<Linked>)> = cards.texts_linked_with_exclusions(s, id).map(|(c, l, _)| (c, l)).collect();
+            assert_eq!(full.iter().map(|&(c, _)| c).collect::<Vec<_>>(), want);
+            assert_eq!(cards.texts(s, s.obj(id)).collect::<Vec<_>>(), want);
+            assert_eq!(cards.texts_linked(s, id).collect::<Vec<_>>(), full);
+            for &(card, link) in &full {
+                assert_eq!(cards.link_of_text(s, id, card), link, "{card:?}");
+            }
+        };
+        check(&s, &[top]);
+        s.update_obj(id, |o| o.copy = Some(Copiable::of(top).with_text(top_text)));
+        check(&s, &[top, top_text]);
+        let merged = s.merged_sources_push(&[Copiable::of(lower)]);
+        s.update_obj(id, |o| o.copy = Some(Copiable { merged, ..Copiable::of(top) }));
+        check(&s, &[top, lower]);
+        let merged = s.merged_sources_push(&[Copiable::of(lower).with_text(lower_text)]);
+        s.update_obj(id, |o| o.copy = Some(Copiable { merged, ..Copiable::of(top) }));
+        check(&s, &[top, lower, lower_text]);
+        s.update_obj(id, |o| o.copy = Some(Copiable { merged, ..Copiable::of(top).with_text(top_text) }));
+        check(&s, &[top, lower, lower_text, top_text]);
     }
 }

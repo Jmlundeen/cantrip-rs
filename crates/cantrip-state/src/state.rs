@@ -1416,7 +1416,7 @@ impl GameState {
             let base_gives = !(own_below && merge.own_face_down.is_some());
             let part = parts[i];
             let values = part.copy.unwrap_or(Copiable::of(part.face));
-            let mut sources: Vec<Copiable> = self.merged_sources(&base).to_vec();
+            let mut sources: Vec<Copiable> = self.merged_sources(&base).iter().map(|s| s.exclude_cdas(base.merged_excluded_cdas())).collect();
             // A melded permanent is its combined face alone (CR 712.8g): its counterpart gives it nothing.
             let top = if part.melded {
                 base.unmerged()
@@ -2442,6 +2442,34 @@ mod tests {
         assert!(!s.spill_targets.is_empty());
         s.rollback(before);
         assert!(s.spill_targets.is_empty() && s.spill_specs.is_empty() && s.share_arena.is_empty(), "the arena outlived its journal");
+    }
+
+    /// Copy counts and per-acquisition exclusions belong to the journalled row, not a parallel store. Repeated Stage
+    /// self-copies beyond 255 (CR 707.9a, 113.2c), followed by a replacing exception and a fresh CDA, undo and redo whole.
+    #[test]
+    fn copy_instances_and_cda_exclusions_undo_and_redo_whole() {
+        let mut s = GameState::new(2, 1);
+        let ability = AbilityRef { card: CardId(7), index: 0 };
+        let text = CardId(9);
+        let id = s.push_obj(Obj::new(CardId(1), PlayerId(0), Zone::BATTLEFIELD));
+        let before = s.clone_with_journal();
+        let mark = s.mark();
+        for _ in 0..512 {
+            s.update_obj(id, |o| o.copy = Some(o.copy.unwrap_or(Copiable::of(o.card)).with_ability(ability).with_text(text)));
+        }
+        s.update_obj(id, |o| o.copy = Some(o.copy.unwrap().sized(7, 7).with_text(text)));
+        let values = s.obj(id).copy.unwrap();
+        assert_eq!(values.extra_instances().collect::<Vec<_>>(), vec![ability; 512]);
+        assert_eq!(values.extra_texts_with_exclusions().filter(|&(_, e)| e == CdaExclusions::PT).count(), 512);
+        assert_eq!(values.extra_texts_with_exclusions().last(), Some((text, CdaExclusions::NONE)));
+        let after = s.clone_with_journal();
+        let (undos, redos) = s.step_back(mark);
+        assert!(s == before && s.obj(id).copy.is_none());
+        s.step_forward(undos, redos);
+        assert!(s == after);
+        assert_eq!(s.obj(id).copy, Some(values));
+        s.rollback(mark);
+        assert!(s == before);
     }
 
     /// Lists longer than 2^16 - a zone of 70,000 tokens, a batch of 70,000 objects - are reachable under the event cap
