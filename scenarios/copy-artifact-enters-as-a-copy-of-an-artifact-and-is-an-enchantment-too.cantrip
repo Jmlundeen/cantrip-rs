@@ -1,0 +1,35 @@
+# Bot1 casts Copy Artifact (Mox Sapphire pays {U}, an Island {1}) and has it enter as a copy of Bot2's Ornithopter,
+# one of two artifacts on offer (Bot1's own Mox is the other; Copy Artifact itself is not: the choice is made before
+# it enters, CR 614.12a). It is not blue any more (the card's ruling) and is an enchantment in addition to the artifact
+# creature types (CR 707.9b). Ornithopter is untouched; the unchosen Mox stays.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Copy Artifact
+Island x17
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Copy Artifact.Cast
+Bot1.Accept
+Bot1.Target(Ornithopter)
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire; Ornithopter
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature; Enchantment
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Ornithopter.Colors = (absent)
+Bot2.Battlefield = Island; Ornithopter
+Bot2.Battlefield.Ornithopter.Types = Artifact; Creature

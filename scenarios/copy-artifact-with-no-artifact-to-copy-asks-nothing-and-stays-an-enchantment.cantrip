@@ -1,0 +1,27 @@
+# No artifact is on the battlefield (only Islands, which the filter must not offer), so nothing is asked (the card's
+# ruling; `! Bot1.Accept`): Copy Artifact enters as an enchantment that has no effect, a blue Enchantment, and stays.
+
+[Bot1 Deck]
+Island
+Copy Artifact
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Copy Artifact.Cast
+Bot1.Pass
+! Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Copy Artifact.Types = Enchantment
+Bot1.Battlefield.Copy Artifact.Colors = Blue

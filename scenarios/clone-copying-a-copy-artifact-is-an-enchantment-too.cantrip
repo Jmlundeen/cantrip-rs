@@ -1,0 +1,48 @@
+# Copy Artifact's exception is part of its copy's copiable values (CR 707.9b). On turn 3 Bot1's Copy Artifact enters
+# as a copy of Bot1's own Ornithopter (one of three artifacts Bot1 controls), so it is an Ornithopter that is an
+# enchantment too; then Bot1's Clone copies that Copy Artifact and is an enchantment too (Clone has no exception of its
+# own), while the printed Ornithopter stays an artifact creature only.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Island
+Copy Artifact
+Black Lotus
+Clone
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Copy Artifact.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+? Bot1.Battlefield.Ornithopter#2.Types = Artifact; Creature; Enchantment
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Ornithopter#2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Island; Island; Mox Sapphire; Ornithopter; Ornithopter; Ornithopter
+Bot1.Battlefield.Ornithopter#1.Types = Artifact; Creature
+Bot1.Battlefield.Ornithopter#2.Types = Artifact; Creature; Enchantment
+Bot1.Battlefield.Ornithopter#3.Types = Artifact; Creature; Enchantment
+Bot1.Battlefield.Ornithopter#2.Colors = (absent)
+Bot1.Battlefield.Ornithopter#3.Colors = (absent)
+Bot1.Battlefield.Ornithopter#3.Keywords = Flying
+Bot1.Graveyard = Black Lotus

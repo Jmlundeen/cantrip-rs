@@ -1,0 +1,26 @@
+# "You may have this enchantment enter as a copy": Bot1 declines with an artifact available, so Copy Artifact enters as
+# itself, a blue Enchantment with no abilities, and stays. Mox Sapphire pays {U}, Black Lotus the {1}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Copy Artifact
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Copy Artifact.Cast
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Copy Artifact
+Bot1.Battlefield.Copy Artifact.Types = Enchantment
+Bot1.Battlefield.Copy Artifact.Colors = Blue
+Bot1.Graveyard = Black Lotus
