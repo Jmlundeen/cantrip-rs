@@ -1,0 +1,67 @@
+# Academy Ruins prints "{T}: Add {C}." and "{1}{U}, {T}: Put target artifact card from your graveyard on top of
+# your library." (CR 605.1a, 115.1, 401.4, 608.2b). Bot1 taps it for exactly one colorless mana on turn 1 - the
+# ability takes no color - then sacrifices an Ornithopter to Village Rites and puts it back on top of its own
+# library with exactly a Swamp and an Island, the pool empty afterwards. With two Swamps' {B}{B} that ability is
+# not offered; Village Rites, a nonartifact card in that graveyard, and the Lotus Petal Bot2 sacrificed into
+# Bot2's graveyard are no targets, and Bot2's graveyard and library are left alone.
+
+[Bot1 Deck]
+Academy Ruins
+Swamp
+Island
+Island
+Ornithopter
+Village Rites
+Swamp
+Island x13
+
+[Bot2 Deck]
+Lotus Petal
+Island x19
+
+[Actions]
+Bot1.Hand.Academy Ruins.Play
+! Bot1.Battlefield.Academy Ruins.Activate(Color: White)
+Bot1.Battlefield.Academy Ruins.Activate
+? Bot1.Mana = {C}
+? Bot1.Battlefield.Academy Ruins.Tapped = true
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot2.Battlefield.Lotus Petal.Activate(Color: Blue)
+? Bot2.Graveyard = Lotus Petal
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Village Rites.Cast
+Bot1.Choose(Ornithopter)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+? Bot1.Graveyard = Village Rites; Ornithopter
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+! Bot1.Battlefield.Academy Ruins.Activate(Ability: Put target; Bot1.Graveyard.Ornithopter; Mana: short)
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+! Bot1.Battlefield.Academy Ruins.Activate(Ability: Put target; Bot1.Graveyard.Village Rites)
+! Bot1.Battlefield.Academy Ruins.Activate(Ability: Put target; Bot2.Graveyard.Lotus Petal)
+Bot1.Battlefield.Academy Ruins.Activate(Ability: Put target; Bot1.Graveyard.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Academy Ruins.Tapped = true
+Bot1.Graveyard = Village Rites
+Bot2.Graveyard = Lotus Petal
+Bot1.Library = Ornithopter; Island; Island; Island; Island; Island; Island; Island; Island
+Bot2.Library.Count = 10
