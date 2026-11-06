@@ -4,6 +4,7 @@
 mod combat_counts;
 mod concession;
 mod counter_duration_ends;
+mod demonic_hordes_unsacrificeable;
 mod demonic_pact;
 mod eluge;
 mod fantasticar_cant_be_sacrificed;

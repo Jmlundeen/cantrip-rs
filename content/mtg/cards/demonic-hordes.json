@@ -1,0 +1,8 @@
+{
+  "name": "Demonic Hordes",
+  "manaCost": "{3}{B}{B}{B}",
+  "type": "Creature — Demon",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "{T}: Destroy target land.\nAt the beginning of your upkeep, unless you pay {B}{B}{B}, tap this creature and sacrifice a land of an opponent's choice."
+}

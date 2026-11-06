@@ -1,0 +1,61 @@
+# Demonic Hordes: when {B}{B}{B} cannot be paid at upkeep (only two black sources are tapped, so the cost is refused,
+# CR 118.12) it is tapped and the opponent, not its controller, chooses which land is sacrificed (CR 701.21a): Bot2 picks the
+# Forest, though the Swamp is the older land, and may not pick a nonland permanent (Mox Jet). Turn 1 as for the paid scenario; turn 3 pays and plays the Forest.
+
+[Bot1 Deck]
+Demonic Hordes
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Gleemox
+Swamp
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Demonic Hordes.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.PayCost
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+! Bot1.PayCost
+Bot1.Decline
+! Bot2.Choose(Mox Jet)
+Bot2.Choose(Forest)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Demonic Hordes.Tapped = true
+Bot1.Graveyard = Forest; Black Lotus
+Bot1.Battlefield.Count = 6
