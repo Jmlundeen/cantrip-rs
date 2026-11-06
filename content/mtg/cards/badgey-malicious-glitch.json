@@ -1,0 +1,8 @@
+{
+  "name": "Badgey, Malicious Glitch",
+  "manaCost": "{3}{B}",
+  "type": "Legendary Artifact Creature — Illusion Horror",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Whenever Badgey becomes tapped, each opponent loses 1 life and you gain 1 life."
+}
