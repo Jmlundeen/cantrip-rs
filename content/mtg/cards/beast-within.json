@@ -1,0 +1,6 @@
+{
+  "name": "Beast Within",
+  "manaCost": "{2}{G}",
+  "type": "Instant",
+  "oracleText": "Destroy target permanent. Its controller creates a 3/3 green Beast creature token."
+}
