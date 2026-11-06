@@ -1356,6 +1356,42 @@ pub fn this_dies_about_the_card(_: &dyn Query, source: ObjectId, event: &Event) 
     }
 }
 
+/// The creature `source` was attached to when it died: "When enchanted creature dies" / "Whenever equipped creature dies"
+/// (CR 700.4, 603.6c, 603.10a), judged on the board as it was before the event (CR 704.5n has unattached it from the
+/// corpse by the time anything downstream asks), a creature as it last was there. Returns the old object and the card it
+/// became (CR 400.7).
+fn attached_creature_that_died(q: &dyn Query, source: ObjectId, event: &Event) -> Option<(ObjectId, ObjectId)> {
+    match event {
+        Event::ZoneChange { old, new, from, to, .. }
+            if from.is(ZoneKind::Battlefield)
+                && to.is(ZoneKind::Graveyard)
+                && q.obj(source).attached_to == Some(*old)
+                && q.chars(*old).is(CardType::Creature) =>
+        {
+            Some((*old, *new))
+        }
+        _ => None,
+    }
+}
+
+/// "When enchanted creature dies" / "Whenever equipped creature dies", the ability about nothing. Skullclamp and
+/// Transmogrant's Crown print it.
+pub fn attached_creature_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    attached_creature_that_died(q, source, event).and(Fired::PLAIN)
+}
+
+/// `attached_creature_dies` for an ability about the creature as it last existed on the battlefield (`StackItem::subject`,
+/// CR 608.2h): its toughness, its types, its controller. Heirloom Blade and Creature Bond print it.
+pub fn attached_creature_dies_about_it(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    attached_creature_that_died(q, source, event).and_then(|(old, _)| Fired::about(Target::Object(old)))
+}
+
+/// `attached_creature_dies` for an ability about the card now in the graveyard, a new object (CR 400.7): "return that card
+/// to the battlefield". Ferocity of the Hunt prints it.
+pub fn attached_creature_dies_about_the_card(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    attached_creature_that_died(q, source, event).and_then(|(_, new)| Fired::about(Target::Object(new)))
+}
+
 /// "When this leaves the battlefield" (CR 603.6c, 603.10a), looked back on whichever zone it goes to. Animate Dead and
 /// Cryogen Relic print it.
 pub fn this_leaves(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -2242,6 +2278,9 @@ pub const NONCREATURE_SPELL_YOU_CAST_ABOUT_IT: Trigger = when_asked(EventMask::S
 pub const YOU_CAST_A_SPELL_FROM_EXILE: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell_from_exile);
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
 pub const THIS_ENTERS_OR_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_enters_or_dies);
+pub const ATTACHED_CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, attached_creature_dies);
+pub const ATTACHED_CREATURE_DIES_ABOUT_IT: Trigger = when(EventMask::ZONE_CHANGE, attached_creature_dies_about_it);
+pub const ATTACHED_CREATURE_DIES_ABOUT_THE_CARD: Trigger = when(EventMask::ZONE_CHANGE, attached_creature_dies_about_the_card);
 pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
 pub const YOU_LOSE_CONTROL_OF_THIS: Trigger =
     when_asked(EventMask(EventMask::CONTROL_CHANGED.0 | EventMask::ZONE_CHANGE.0), you_lose_control_of_this);

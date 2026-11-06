@@ -4,23 +4,6 @@ use cantrip_mechanics::statics::{have_deathtouch, plus_pt};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// "When enchanted creature dies" (CR 603.6c, 603.10a): a leaves-the-battlefield ability of the Aura, looked back on the
-/// board before the event, so it still sees what it was attached to. Fires on the card as it is in the graveyard (the new
-/// object, CR 400.7).
-fn enchanted_creature_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { old, new, from, to, .. }
-            if from.is(ZoneKind::Battlefield)
-                && to.is(ZoneKind::Graveyard)
-                && q.obj(source).attached_to == Some(*old)
-                && q.chars(*old).is(CardType::Creature) =>
-        {
-            Fired::about(Target::Object(*new))
-        }
-        _ => None,
-    }
-}
-
 /// "Return that card to the battlefield tapped under its owner's control" (CR 110.2a): the card as it is in the graveyard.
 fn return_host(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(card) = item.subject else { return Ok(()) };
@@ -31,7 +14,7 @@ fn return_host(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE),
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, enchanted_creature_dies), return_host, "When enchanted creature dies, return that card to the battlefield tapped under its owner's control.")],
+    abilities: &[triggered(cantrip_mechanics::triggers::ATTACHED_CREATURE_DIES_ABOUT_THE_CARD, return_host, "When enchanted creature dies, return that card to the battlefield tapped under its owner's control.")],
     statics: &[
         static_ability(Layer::PtModify, attached_object, plus_pt::<1, 0>, "Enchanted creature gets +1/+0."),
         static_ability(Layer::Ability, attached_object, have_deathtouch, "Enchanted creature has deathtouch."),
