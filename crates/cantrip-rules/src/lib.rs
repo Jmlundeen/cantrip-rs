@@ -1695,14 +1695,6 @@ impl Query for Game {
         &self.state
     }
 
-    fn outside_the_game(&self, player: PlayerId) -> Vec<ObjectId> {
-        if self.state.commander || self.state.player_controller(player) != player {
-            Vec::new()
-        } else {
-            self.state.zone(Zone::sideboard(player)).to_vec()
-        }
-    }
-
     fn linked_card(&self, card: CardId) -> CardId {
         self.cards.linked_card(card)
     }

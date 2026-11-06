@@ -378,9 +378,11 @@ pub trait Query {
     /// game sees them (CR 400.11c).
     ///
     /// While another player controls `player` (CR 723), there is nothing: the controller can't see those cards (723.4), so
-    /// they can't have the player choose any of them (Emrakul, the Promised End's ruling).
+    /// they can't have the player choose any of them (Emrakul, the Promised End's ruling). In a Commander game there is nothing
+    /// either: no card from outside the game is brought into one (CR 903.11) but by the companion's special action, which
+    /// looks at the companion itself.
     fn outside_the_game(&self, player: PlayerId) -> Vec<ObjectId> {
-        if self.state().player_controller(player) != player {
+        if self.state().commander || self.state().player_controller(player) != player {
             return Vec::new();
         }
         self.state().zone(Zone::sideboard(player)).to_vec()
