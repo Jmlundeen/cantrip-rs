@@ -1,0 +1,62 @@
+# Blaze of Glory is an instant cast "during combat before blockers are declared": the beginning of combat step counts, with
+# no attackers yet declared (a defending player is then any opponent of the attacking player, CR 506.2). It lasts "this turn":
+# on turn 3 Ironroot Treefolk blocks both Border Guard and Ageless Guardian (it must, CR 509.1c); a second Blaze cast in the declare blockers
+# step is refused (CR 601.3), with a second Mox Pearl untapped to pay for it. On turn 5 the same attackers come again and the Treefolk may block only one of them, or none.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Border Guard
+Ageless Guardian
+Island x14
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Mox Ruby
+Ironroot Treefolk
+Mox Pearl
+Blaze of Glory
+Blaze of Glory
+Mox Pearl
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Border Guard.Cast
+Bot1.Hand.Ageless Guardian.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Ironroot Treefolk.Cast
+[T3 Bot1.BeginCombat]
+! Bot2.Hand.Blaze of Glory.Cast(Bot1.Battlefield.Border Guard)
+Bot2.Hand.Blaze of Glory.Cast(Bot2.Battlefield.Ironroot Treefolk)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Attack(Border Guard > Bot2; Ageless Guardian > Bot2)
+Bot2.Block(Ironroot Treefolk > Border Guard; Ironroot Treefolk > Ageless Guardian)
+[T3 Bot1.Blockers]
+! Bot2.Hand.Blaze of Glory.Cast(Bot2.Battlefield.Ironroot Treefolk)
+[T5 Bot1.Main1]
+Bot1.Attack(Border Guard > Bot2; Ageless Guardian > Bot2)
+! Bot2.Block(Ironroot Treefolk > Border Guard; Ironroot Treefolk > Ageless Guardian)
+Bot2.Block(Ironroot Treefolk > Ageless Guardian)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 19

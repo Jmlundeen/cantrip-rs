@@ -1,0 +1,68 @@
+# Blaze of Glory: "Cast this spell only during combat before blockers are declared" (CR 601.3) and "Target creature defending
+# player controls can block any number of creatures this turn. It blocks each attacking creature this turn if able." Bot1
+# attacks with three 2/2s; before combat the spell is refused (the positive control is the cast in the declare attackers
+# step). Bot2's Ironroot Treefolk (3/5) then blocks all three: a declaration leaving one out is refused (CR 509.1c, the
+# requirement is obeyed as far as it can be), as is blocking just one. Its 3 damage is divided among the three it blocks
+# (CR 510.1d): 2 kills the Bears, 1 goes to Bear Cub, none to the Apes. The Treefolk takes 6 and dies.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Black Lotus
+Balduvian Bears
+Bear Cub
+Barbary Apes
+Island x14
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Mox Ruby
+Ironroot Treefolk
+Mox Pearl
+Blaze of Glory
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Balduvian Bears.Cast
+Bot1.Hand.Bear Cub.Cast
+Bot1.Hand.Barbary Apes.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Ironroot Treefolk.Cast
+[T3 Bot1.Main1]
+! Bot2.Hand.Blaze of Glory.Cast
+Bot1.Attack(Balduvian Bears > Bot2; Bear Cub > Bot2; Barbary Apes > Bot2)
+Bot2.Hand.Blaze of Glory.Cast(Bot2.Battlefield.Ironroot Treefolk)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Blaze of Glory; Black Lotus
+! Bot2.Block(Ironroot Treefolk > Balduvian Bears)
+! Bot2.Block(Ironroot Treefolk > Balduvian Bears; Ironroot Treefolk > Bear Cub)
+Bot2.Block(Ironroot Treefolk > Balduvian Bears; Ironroot Treefolk > Bear Cub; Ironroot Treefolk > Barbary Apes)
+Bot2.AssignDamage(Ironroot Treefolk > Balduvian Bears: 2; Ironroot Treefolk > Bear Cub: 1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Graveyard = Balduvian Bears; Black Lotus
+Bot1.Battlefield.Bear Cub.Damage = 1
+Bot1.Battlefield.Barbary Apes.Damage = 0
+Bot2.Graveyard = Ironroot Treefolk; Blaze of Glory; Black Lotus

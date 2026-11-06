@@ -1,0 +1,58 @@
+# Blaze of Glory lifts only the limit on how many it may block ("Does not allow ... a creature to block any creatures it would
+# not normally be able to block", 2004 ruling). Bot1 attacks with Balduvian Bears and Aven Skirmisher (flying); Bot2's
+# Ironroot Treefolk has no reach. Cast on it, the requirement (CR 509.1c) covers only the Bears: blocking the Bears alone is
+# the one legal declaration, no block at all is refused, and blocking the flyer is refused. The spell cannot target an
+# attacker's creature (it is not one a defending player controls); the cast on the Treefolk is the positive control.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Balduvian Bears
+Aven Skirmisher
+Island x14
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Mox Ruby
+Ironroot Treefolk
+Mox Pearl
+Blaze of Glory
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Balduvian Bears.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Skirmisher.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Ironroot Treefolk.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Balduvian Bears > Bot2; Aven Skirmisher > Bot2)
+! Bot2.Hand.Blaze of Glory.Cast(Bot1.Battlefield.Balduvian Bears)
+Bot2.Hand.Blaze of Glory.Cast(Bot2.Battlefield.Ironroot Treefolk)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+! Bot2.Block(Count: 0)
+! Bot2.Block(Ironroot Treefolk > Aven Skirmisher)
+Bot2.Block(Ironroot Treefolk > Balduvian Bears)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Graveyard = Balduvian Bears
+Bot2.Battlefield.Ironroot Treefolk.Damage = 2
