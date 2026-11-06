@@ -1,0 +1,49 @@
+# Cryogenic Stasis taps and stuns before its draw instruction (CR 608.2c).
+# Words of Wind replaces that draw with returning a permanent (CR 614.1a, 121.6).
+# At the return choice the targeted Memnite is already tapped with a stun counter;
+# returning it records that tapped state, and no card is drawn from the library.
+
+[Bot1 Deck]
+Cryogenic Stasis
+Words of Wind
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Memnite
+Island
+Forest
+Swamp
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Words of Wind.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Words of Wind.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Cryogenic Stasis.Cast(Bot1.Battlefield.Memnite)
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Tapped = true
+? Bot1.Battlefield.Memnite.Counters.Stun = 1
+Bot1.Choose(Memnite)
+
+[Expect]
+Bot1.Hand = Memnite
+Bot1.Library.Count = 14
+Bot1.Battlefield.Memnite = (absent)
+LeftBattlefield = Black Lotus (tapped); Memnite (tapped)
