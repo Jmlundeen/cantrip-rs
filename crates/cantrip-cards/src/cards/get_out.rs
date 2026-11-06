@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{counter_target, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "Target creature or enchantment spell" (CR 115.1): a spell on the stack with the card type creature or enchantment, an
@@ -9,13 +9,6 @@ fn creature_or_enchantment_spell(q: &dyn Query, asker: &Asker, t: Target) -> boo
         let chars = q.chars(id);
         chars.is(CardType::Creature) || chars.is(CardType::Enchantment)
     })
-}
-
-/// "Counter target creature or enchantment spell" (CR 701.6). Nothing happens if it is no longer a legal target
-/// (CR 608.2b).
-fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    counter_target(g, item, 0);
-    Ok(())
 }
 
 /// "Target creatures and/or enchantments you own" (CR 108.3, 115.1): on the battlefield and owned by the caster, whoever
@@ -33,7 +26,7 @@ fn return_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 static MODAL: ModalDef = modes(&[
-    mode(counter, "Counter target creature or enchantment spell.").targets(&[target(creature_or_enchantment_spell)]),
+    mode(effects::counter_first_target, "Counter target creature or enchantment spell.").targets(&[target(creature_or_enchantment_spell)]),
     mode(return_to_hand, "Return one or two target creatures and/or enchantments you own to your hand.")
         .targets(&[target(creature_or_enchantment_you_own).between(1, 2)]),
 ]);

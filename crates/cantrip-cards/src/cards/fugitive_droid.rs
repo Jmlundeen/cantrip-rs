@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{counter_target, history, targets};
+use cantrip_mechanics::{effects, history, targets};
 use cantrip_oracle as oracle;
 
 /// "Can't be blocked if an artifact entered the battlefield under your control this turn" (CR 509.1b): asked of the history,
@@ -26,15 +26,10 @@ fn spell_that_targets_an_artifact_or_creature_you_control(q: &dyn Query, asker: 
     })
 }
 
-fn counter_that_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    counter_target(g, item, 0);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(
         cost("{U}").and(SACRIFICE_THIS),
-        counter_that_spell,
+        effects::counter_first_target,
         "{U}, Sacrifice this creature: Counter target spell that targets an artifact or creature you control.",
     )
     .targets(&[target(spell_that_targets_an_artifact_or_creature_you_control)])],

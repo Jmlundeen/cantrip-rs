@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{counter_target, effects, targets};
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// Whether `id`'s mana value is less than or equal to the number of cards in its controller's graveyard (CR 202.3, 404.1).
@@ -18,14 +18,8 @@ fn creature_with_mana_value_at_most_graveyard(q: &dyn Query, _: &Asker, t: Targe
     matches!(t, Target::Object(id) if targets::permanent(q, id) && q.chars(id).is(CardType::Creature) && mana_value_at_most_cards_in_its_controllers_graveyard(q, id))
 }
 
-/// "Counter target spell ..." (CR 701.6a, 608.2b).
-fn counter_the_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    counter_target(g, item, 0);
-    Ok(())
-}
-
 static MODES: ModalDef = modes(&[
-    mode(counter_the_spell, "Counter target spell with mana value less than or equal to the number of cards in its controller's graveyard.")
+    mode(effects::counter_first_target, "Counter target spell with mana value less than or equal to the number of cards in its controller's graveyard.")
         .targets(&[target(spell_with_mana_value_at_most_graveyard)]),
     mode(effects::destroy_first_target, "Destroy target creature with mana value less than or equal to the number of cards in its controller's graveyard.")
         .targets(&[target(creature_with_mana_value_at_most_graveyard)]),
