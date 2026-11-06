@@ -192,6 +192,17 @@ pub fn enchanted_creature_cant_block(q: &dyn Query, source: ObjectId, blocker: O
     q.obj(source).attached_to != Some(blocker)
 }
 
+/// The permanent the rule's source is attached to: what a `TargetingRule` of "enchanted [permanent]" names.
+fn attached_to_source(view: &dyn LayerQuery, source: ObjectId, subject: ObjectId) -> bool {
+    view.state().obj(source).attached_to == Some(subject)
+}
+
+/// "Enchanted [permanent] can't be enchanted by other Auras" (CR 303.4) as a `CardDef::targeting_rules` entry
+/// (`TargetingRuleKind::NoOtherAuras`): no "has", so a rule of the Aura's, not an ability the permanent gains (CR 113.1a) - a
+/// permanent that loses all its abilities is still under it (CR 613.1f), and it ends as the Aura leaves or moves. Consecrate
+/// Land and Anti-Magic Aura print it.
+pub const ENCHANTED_NO_OTHER_AURAS: TargetingRule = TargetingRule { kind: TargetingRuleKind::NoOtherAuras, applies: attached_to_source };
+
 /// "Enchanted creature can't attack" (CR 508.1c, 303.4) as a `CardDef::attack_rules` entry, asked of each creature that could be
 /// declared an attacker: false for the one the Aura is attached to. It is a rule of the Aura's, no ability of the creature
 /// (CR 113.1a), so a creature that loses all its abilities is still under it (CR 613.1f). Path to Redemption, Retro-Mutation,

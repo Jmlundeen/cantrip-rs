@@ -3259,6 +3259,32 @@ fn targeting_forbidden(cards: &CardTable, state: &GameState, log: &[Record], for
     })
 }
 
+/// Whether a static ability of a permanent on the battlefield says `host` can't be enchanted by the Aura `aura`
+/// (`TargetingRuleKind::NoOtherAuras`, CR 303.4): "Enchanted land can't be enchanted by other Auras" names `host` and its
+/// source is not `aura`. What an Aura entering (CR 303.4f, 303.4i: an Aura spell resolving included), moving (CR 303.4j) or
+/// attached (CR 303.4c, 704.5m) is judged by. Not what an Aura spell may target: that is its enchant ability's alone
+/// (CR 303.4a, 115.1b, 702.5a), so another Aura spell may target the permanent, and is put into its owner's graveyard as it
+/// resolves (CR 303.4i). Nothing when no permanent has a targeting rule.
+pub fn enchanting_forbidden(cards: &CardTable, state: &GameState, log: &[Record], host: ObjectId, aura: ObjectId) -> bool {
+    let sources: Vec<ObjectId> = {
+        let found = static_sources(cards, state);
+        if found.targeting.is_empty() {
+            return false;
+        }
+        found.targeting.clone()
+    };
+    let view = View::new(cards, state, log, Layer::Ability);
+    sources.into_iter().any(|source| {
+        source != aura
+            && cards
+                .texts(state, state.obj(source))
+                .flat_map(|c| cards.get(c).targeting_rules)
+                .any(|r| matches!(r.kind, TargetingRuleKind::NoOtherAuras) && (r.applies)(&view, source, host))
+            // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
+            && !lost_all_abilities(cards, state, log, source)
+    })
+}
+
 /// Whether `id` has lost all its abilities (CR 613.1f): to a resolved effect, or to a static ability (`StaticDef::loses_all`)
 /// where the layers' order applied it (`Chars::lost_all`). `Query::lost_all_abilities` is this.
 ///

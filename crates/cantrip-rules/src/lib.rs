@@ -106,6 +106,8 @@ mod protection_qualities_tests;
 #[cfg(test)]
 mod aura_sparing_protection_tests;
 #[cfg(test)]
+mod no_other_auras_tests;
+#[cfg(test)]
 mod mode_counts_tests;
 #[cfg(test)]
 mod special_action_cost_tests;

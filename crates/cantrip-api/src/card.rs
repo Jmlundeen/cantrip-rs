@@ -2629,6 +2629,16 @@ pub enum TargetingRuleKind {
     /// targets of blue spells or abilities from blue sources" (Spellbane Centaur). No hexproof ability (CR 702.11d is the
     /// keyword): what lets a player target as though there were no hexproof (CR 702.11e) does not lift it.
     Forbid(TargetingForbid),
+    /// "[It] can't be enchanted by other Auras" (CR 303.4: "Other effects can limit what a permanent can be enchanted by"):
+    /// the objects it names can't be enchanted by an Aura other than the rule's source. It is no targeting restriction: an
+    /// Aura spell's legal targets are its enchant ability's alone (CR 303.4a, 115.1b, 702.5a), so another Aura spell may
+    /// target them, and as it resolves it is put into its owner's graveyard instead of entering (CR 303.4i). An Aura can't
+    /// enter attached to them (CR 303.4f, 303.4i) nor move onto them (CR 303.4j), and an
+    /// Aura already attached to one is put into its owner's graveyard (CR 303.4c, 704.5m) - Consecrate Land's ruling: "those
+    /// Auras are put into their owners' graveyards". Each such rule names its own source the one exception, so two of them on
+    /// one object leave no Aura it may have, and the two remove each other. Consecrate Land and Anti-Magic Aura print it
+    /// (`cantrip_mechanics::attach::ENCHANTED_NO_OTHER_AURAS`).
+    NoOtherAuras,
 }
 
 /// The rule of a `TargetingRuleKind::Forbid`: asked of the static ability's source, the spell or ability that would
@@ -2638,9 +2648,9 @@ pub enum TargetingRuleKind {
 /// ability's source (CR 612.1, `LayerQuery::words`).
 pub type TargetingForbid = fn(&dyn LayerQuery, ObjectId, &Asker, &Chars) -> bool;
 
-/// A static ability that changes targeting rules for the objects it names (CR 604, 609.4), while its source is on the
-/// battlefield: `applies` is asked of the source and of an object that is or would be a target, and sees the layers as they
-/// are before the abilities layer. "Creatures your opponents control can be the targets of spells and abilities as though they
+/// A static ability that changes targeting rules - or, for an Aura, what may enchant (`TargetingRuleKind::NoOtherAuras`) - for
+/// the objects it names (CR 604, 609.4), while its source is on the battlefield: `applies` is asked of the source and of an
+/// object that is or would be a target or a host, and sees the layers as they are before the abilities layer. "Creatures your opponents control can be the targets of spells and abilities as though they
 /// didn't have hexproof. Ward abilities of those creatures don't trigger" (Nowhere to Run).
 #[derive(Clone, Copy)]
 pub struct TargetingRule {

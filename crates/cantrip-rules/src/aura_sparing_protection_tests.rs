@@ -205,8 +205,8 @@ fn an_aura_giving_protection_from_its_own_color_stays_and_another_aura_of_that_c
         let c = q.chars(bear);
         assert_eq!(c.protection_colors(), ColorSet::of(Color::White));
         assert!(c.protected_from_by(&q.chars(ward), || q.mana_value(ward), YOU), "the Ward's damage and targeting are covered (CR 702.16b, 702.16e)");
-        assert!(crate::attach::host_allows(q, ward, bear, false), "where it is, it is legal (CR 702.16n)");
-        assert!(!crate::attach::host_allows(q, ward, bear, true), "judged as being attached, it could not be (CR 702.16c)");
+        assert!(crate::attach::host_allows(&cx, ward, bear, false), "where it is, it is legal (CR 702.16n)");
+        assert!(!crate::attach::host_allows(&cx, ward, bear, true), "judged as being attached, it could not be (CR 702.16c)");
     }
     state_based_actions(&mut g);
     assert!(stays(&g, ward, bear), "this effect doesn't remove this Aura (CR 702.16n)");

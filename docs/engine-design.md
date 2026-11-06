@@ -1880,6 +1880,17 @@ nothing; one that lost all its abilities applies none (CR 613.1f). Not built, as
 effect that says it (Vines of Vastwood, Autumn's Veil, Veilstone Amulet) and Wall of Shadows' "spells that can target
 only Walls", which reads the targeting spell's requirement rather than its characteristics.
 
+"Enchanted land can't be enchanted by other Auras" (Consecrate Land, Anti-Magic Aura; CR 303.4: "Other effects can limit
+what a permanent can be enchanted by") is kept with the targeting rules, `TargetingRuleKind::NoOtherAuras`
+(`cantrip_mechanics::attach::ENCHANTED_NO_OTHER_AURAS`): a rule of the Aura's, no ability of the permanent, found from the
+same `StaticSources::targeting`. It limits what may enchant, not what may be targeted: an Aura spell's legal targets are
+its enchant ability's alone (CR 303.4a, 115.1b, 702.5a), so another Aura spell may target the permanent, and is put into
+its owner's graveyard as it resolves (CR 303.4i). Attach legality - `attach::host_allows` (attaching, CR 303.4j; attached,
+the state-based action of 303.4c and 704.5m) and `aura_object_allowed` (entering, CR 303.4f, 303.4i, `could_enter_attached`)
+- asks `layers::enchanting_forbidden`.
+Each such rule excepts its own source alone, so a second copy is another Aura: it is refused, and two attached to one
+permanent at once remove each other.
+
 ### Craft
 
 Craft with [materials] [cost] (CR 702.167a) is an activated ability whose cost exiles its source and its materials
