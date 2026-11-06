@@ -1,0 +1,41 @@
+# A land is a permanent (CR 110.1), so Bot2's Forest is destroyed by Beast Within and Bot2, its controller, makes the
+# 3/3 green Beast; a card in hand is not a permanent, so the cast naming one is refused beside it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Beast Within
+Forest x13
+
+[Bot2 Deck]
+Forest
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Beast Within.Cast(Bot1.Hand.Forest)
+Bot1.Hand.Beast Within.Cast(Bot2.Battlefield.Forest)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield.Beast Token.Power = 3
+Bot2.Battlefield.Beast Token.Colors = Green
+Bot2.Graveyard = Forest
+Bot1.Battlefield.Count = 3
+Bot2.Battlefield.Beast Token.Tapped = false
