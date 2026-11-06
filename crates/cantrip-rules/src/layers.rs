@@ -12,7 +12,7 @@
 //! history: which permanents have static abilities is a question of the state alone.
 
 use cantrip_api::*;
-use cantrip_state::ContinuousEffect;
+use cantrip_state::{CdaExclusions, ContinuousEffect};
 
 pub fn chars(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> Chars {
     chars_before(cards, state, log, id, Layer::End)
@@ -641,7 +641,7 @@ impl ObjCtx<'_> {
             doors(cards, self.card, self.obj.marks.doors, self.copy, &mut chars);
         }
         if !self.sources.is_empty() {
-            merged_abilities(cards, self.sources, &mut chars);
+            merged_abilities(cards, self.sources, self.copy.map_or(CdaExclusions::NONE, Copiable::merged_excluded_cdas), &mut chars);
         }
         chars
     }
@@ -652,10 +652,13 @@ impl ObjCtx<'_> {
 /// holds (`MAX_ABILITIES`): the abilities its text lists, its keywords (toxic adding up, CR 702.164c), its protections and
 /// hexproofs from qualities. A characteristic-defining ability among them defines what it defines (CR 604.3, 613.3: the
 /// release notes' Boneyard Mycodrax), as a static ability of the permanent's (`texts`); changeling is applied again.
-fn merged_abilities(cards: &CardTable, sources: &[Copiable], chars: &mut Chars) {
+fn merged_abilities(cards: &CardTable, sources: &[Copiable], excluded: CdaExclusions, chars: &mut Chars) {
     let mut n = chars.abilities.iter().take_while(|a| a.is_some()).count();
     for values in sources {
-        let other = initial(cards, values.card, Some(values));
+        let mut other = initial(cards, values.card, Some(values));
+        if excluded.contains(CdaExclusions::TYPES) {
+            other.keywords.0 &= !Keywords::of(&[Keyword::Changeling]).0;
+        }
         chars.keywords = Keywords(chars.keywords.0 | other.keywords.0);
         chars.toxic += other.toxic;
         chars.riot += other.riot;
@@ -1085,26 +1088,27 @@ thread_local! {
 /// The object's own characteristic-defining abilities of `layer` (CR 604.3, 613.3): they apply first, and depend only on
 /// one another (CR 613.8a(c)).
 fn own_statics(cx: &Ctx, o: &ObjCtx, layer: Layer, chars: &mut Chars) {
-    // A merged permanent's other components' characteristic-defining abilities are its own too (CR 702.140e; the release
-    // notes: they "overwrite the characteristics from the topmost object"), each asked as its own card's.
-    let others: Vec<(CardId, Linked)> =
-        if o.sources.is_empty() { Vec::new() } else { cx.cards.texts_linked(cx.state, o.id).filter_map(|(c, l)| l.map(|l| (c, l))).collect() };
-    let mut own = o
-        .def
-        .statics
-        .iter()
-        .map(|st| (st, None))
-        .chain(others.iter().flat_map(|&(card, link)| cx.cards.get(card).statics.iter().map(move |st| (st, Some((link, card))))))
-        .filter(|(s, _)| s.own && s.layer == layer)
+    // Exception text is the object's own too (CR 604.3a, 707.9a); a merged component's text, including its exceptions,
+    // keeps its component link (CR 702.140e). Only state with extra texts needs the additional walk.
+    let others: Vec<_> = if o.sources.is_empty() && o.copy.is_none_or(|c| c.extra_abilities[0].instances == 0) {
+        Vec::new()
+    } else {
+        cx.cards.texts_linked_with_exclusions_of(cx.state, o.id, o.card, o.copy).skip(1).collect()
+    };
+    let excluded = match layer {
+        Layer::Type => CdaExclusions::TYPES,
+        Layer::Color => CdaExclusions::COLOR,
+        Layer::PtDefine => CdaExclusions::PT,
+        _ => CdaExclusions::NONE,
+    };
+    let primary_excluded = o.copy.is_some_and(|c| c.excluded_cdas().contains(excluded));
+    let mut own = o.def.statics.iter().filter(|_| !primary_excluded).map(|st| (st, None, true))
+        .chain(others.iter().filter(|(_, _, e)| !e.contains(excluded)).flat_map(|&(card, link, _)| {
+            cx.cards.get(card).statics.iter().map(move |st| (st, link.map(|l| (l, card)), false))
+        }))
+        .filter(|(s, _, _)| s.own && s.layer == layer)
         .peekable();
     if own.peek().is_none() {
-        return;
-    }
-    // CR 707.9d: a copy that states its colors or its power and toughness does not copy a characteristic-defining
-    // ability that would define them.
-    let colors = o.copy.and_then(|c| c.colors).is_some();
-    let pt = o.copy.and_then(|c| c.pt()).is_some();
-    if (layer == Layer::Color && colors) || (layer == Layer::PtDefine && pt) {
         return;
     }
     let view = View { pass: Some(cx.pass), ..View::new(cx.cards, cx.state, cx.log, layer) };
@@ -1117,9 +1121,11 @@ fn own_statics(cx: &Ctx, o: &ObjCtx, layer: Layer, chars: &mut Chars) {
     if defining {
         DEFINING.with(|d| d.borrow_mut().push(o.id));
     }
-    for (st, by) in own {
+    for (st, by, primary) in own {
         if lost {
-            if let Some((power, toughness)) = st.lost_pt {
+            // A lost CDA does not redefine the copied box. Only the primary card's star-valued box needs its
+            // CR 208.2a fallback; an exception or a component never supplies the merged permanent's box.
+            if primary && let Some((power, toughness)) = st.lost_pt {
                 chars.power = Some(power);
                 chars.toughness = Some(toughness);
             }
@@ -1348,16 +1354,22 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
     // card's; an instant or sorcery stays one, with its spell types. Changeling, which defines the subtypes it replaced,
     // is not copied (CR 707.9d), though an exception may give it again.
     let stated = copy.is_some_and(|c| c.types_stated());
-    let (types, subtypes, printed_keywords) = if stated {
+    let (types, subtypes) = if stated {
         let spell = TypeSet(def.types.0 & TypeSet::of(&[CardType::Instant, CardType::Sorcery]).0);
         let spell_types = if spell.0 != 0 {
             def.subtypes.iter().filter(|s| !s.is_creature_type()).fold(SubtypeSet::NONE, SubtypeSet::with)
         } else {
             SubtypeSet::NONE
         };
-        (TypeSet(spell.0 | extra_types.0), spell_types.union(extra_subtypes), Keywords(def.printed_keywords().0 & !Keywords::of(&[Keyword::Changeling]).0))
+        (TypeSet(spell.0 | extra_types.0), spell_types.union(extra_subtypes))
     } else {
-        (TypeSet(def.types.0 | extra_types.0), words.subtypes(def.subtypes).union(extra_subtypes), def.printed_keywords())
+        (TypeSet(def.types.0 | extra_types.0), words.subtypes(def.subtypes).union(extra_subtypes))
+    };
+    let printed_keywords = def.printed_keywords();
+    let printed_keywords = if copy.is_some_and(|c| c.excluded_cdas().contains(CdaExclusions::TYPES)) {
+        Keywords(printed_keywords.0 & !Keywords::of(&[Keyword::Changeling]).0)
+    } else {
+        printed_keywords
     };
     let mut abilities = [None; MAX_ABILITIES];
     let mut n = 0;
@@ -1427,8 +1439,8 @@ fn worded_hexproof(printed: HexproofFrom, words: Words) -> HexproofFrom {
 
 /// Changeling (CR 702.73a): "This object is every creature type", a characteristic-defining ability that works in every
 /// zone (CR 604.3) and applies first in layer 4 (CR 613.3). It gives only what the object can have: creature types
-/// belong to creatures and kindreds (CR 205.3d, 205.3m). Only the printed ability is a characteristic-defining one
-/// (CR 604.3a), so one granted in layer 6 gives nothing. A non-creature, non-Kindred object with Changeling that later
+/// belong to creatures and kindreds (CR 205.3d, 205.3m). Printed changeling or one acquired as part of a copy effect is
+/// characteristic-defining (CR 604.3a); one granted in layer 6 gives nothing. A non-creature, non-Kindred object with Changeling that later
 /// becomes a creature is not given the types: no printed card can reach that case (Firdoch Core is a Kindred).
 fn changeling(chars: &mut Chars) {
     if chars.keywords.has(Keyword::Changeling) && (chars.is(CardType::Creature) || chars.is(CardType::Kindred)) {
@@ -4182,6 +4194,73 @@ mod tests {
         let changeling = chars(&cards, &state, &[], ids[3]);
         assert!(changeling.has_subtype(Subtype::Demon) && changeling.has(Keyword::Changeling) && !changeling.has_subtype(Subtype::Equipment));
         assert!(values.has_exceptions() && Copiable::of(idol).typed(TypeSet::NONE, SubtypeSet::NONE).has_exceptions());
+    }
+
+    fn all_colors(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+        c.colors = ColorSet(0x1f);
+    }
+
+    /// Sphinx of the Guildpact's color CDA, for the normal color exclusion of CR 707.9d.
+    static COLOR_CDA: CardDef = CardDef {
+        name: "Color CDA Copy Fixture",
+        types: TypeSet::of(&[CardType::Creature]),
+        power: Some(5),
+        toughness: Some(5),
+        statics: &[characteristic_defining(Layer::Color, all_colors, "This creature is all colors.")],
+        ..CardDef::BLANK
+    };
+
+    /// The Scarab God copying Sphinx of the Guildpact excludes the color CDA; copying a merged creature with changeling
+    /// excludes the lower component's CDA too. Clone copies those exclusions rather than resurrecting either ability.
+    #[test]
+    fn stated_copy_characteristics_exclude_primary_and_merged_cdas() {
+        let cards = CardTable::new([&IDOL, &COLOR_CDA]);
+        let (mut state, ids) = battlefield(&cards, &["Color CDA Copy Fixture", "Idol", "Idol"]);
+        assert_eq!(chars(&cards, &state, &[], ids[0]).colors, ColorSet(0x1f));
+        let sphinx = cards.id_of(&COLOR_CDA);
+        state.update_obj(ids[0], |o| o.copy = Some(Copiable::of(sphinx).colored(ColorSet::of(Color::Black))));
+        assert_eq!(chars(&cards, &state, &[], ids[0]).colors, ColorSet::of(Color::Black));
+        let idol = cards.id_of(&IDOL);
+        let merged = state.merged_sources_push(&[Copiable::of(idol)]);
+        let values = ardyn(sphinx);
+        let values = Copiable { merged, ..Copiable::of(sphinx) }.typed(values.extra_types, values.extra_subtypes).colored(ColorSet::of(Color::Black)).sized(5, 5);
+        state.update_obj(ids[1], |o| o.copy = Some(values));
+        state.update_obj(ids[2], |o| o.copy = Some(values));
+        for id in [ids[1], ids[2]] {
+            let c = chars(&cards, &state, &[], id);
+            assert_eq!(c.colors, ColorSet::of(Color::Black));
+            assert_eq!(c.subtypes, SubtypeSet::of(&[Subtype::Demon]));
+            assert!(!c.has(Keyword::Changeling) && c.has(Keyword::Flying));
+        }
+    }
+
+    /// CR 604.3a, 707.9a, 707.9d: a fresh color CDA or changeling acquired by a copy effect is not excluded by an
+    /// inherited stated color or type. Copying those values keeps both; replacing those characteristics excludes them.
+    #[test]
+    fn later_copy_acquisitions_override_stated_colors_and_types() {
+        let cards = CardTable::new([&IDOL, &COLOR_CDA]);
+        let (mut state, ids) = battlefield(&cards, &["Idol", "Idol", "Idol"]);
+        let values = ardyn(cards.id_of(&IDOL)).with_text(cards.id_of(&COLOR_CDA)).with_keyword(Keyword::Changeling);
+        state.update_obj(ids[0], |o| o.copy = Some(values));
+        let copied = state.obj(ids[0]).copy.unwrap();
+        state.update_obj(ids[1], |o| o.copy = Some(copied));
+        for id in [ids[0], ids[1]] {
+            let c = chars(&cards, &state, &[], id);
+            assert_eq!(c.colors, ColorSet(0x1f));
+            assert_eq!(c.types, TypeSet::of(&[CardType::Creature]));
+            assert!(c.has(Keyword::Flying) && c.has(Keyword::Changeling));
+            assert!(c.has_subtype(Subtype::Elf) && c.has_subtype(Subtype::Demon));
+            assert!(!c.has_subtype(Subtype::Equipment));
+        }
+        let replaced = values.typed(TypeSet::of(&[CardType::Creature]), SubtypeSet::of(&[Subtype::Zombie])).colored(ColorSet::of(Color::Black));
+        state.update_obj(ids[2], |o| o.copy = Some(replaced));
+        let c = chars(&cards, &state, &[], ids[2]);
+        assert_eq!(c.colors, ColorSet::of(Color::Black));
+        assert_eq!(c.subtypes, SubtypeSet::of(&[Subtype::Zombie]));
+        assert!(c.has(Keyword::Flying) && !c.has(Keyword::Changeling));
+        // An in-addition exception keeps the original changeling instead of excluding it.
+        state.update_obj(ids[2], |o| o.copy = Some(Copiable::of(cards.id_of(&IDOL)).with_subtype(Subtype::Rogue)));
+        assert!(chars(&cards, &state, &[], ids[2]).has(Keyword::Changeling));
     }
 
     /// CR 205.1a: "an object with either the instant or sorcery card type retains that type", and its spell type with it.

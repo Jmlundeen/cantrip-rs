@@ -315,6 +315,329 @@ fn a_copy_has_the_base_power_its_copiable_values_give() {
     assert_eq!(read(&g, wall), (Some(4), Some(3)));
 }
 
+/// Ornithopter's printed box, without any card implementation: a copy-exception CDA must replace this 0/2 in 7a.
+static COPY_BODY: CardDef = CardDef {
+    name: "CDA Copy Body",
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    power: Some(0),
+    toughness: Some(2),
+    ..CardDef::BLANK
+};
+
+/// Urabrask's Forge creates a token with stated 2/1 on its second trigger. Its stated box is inherited by a later copy.
+static TOKEN_BODY: CardDef = CardDef {
+    name: "CDA Copy Token Body",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(0),
+    toughness: Some(0),
+    ..CardDef::BLANK
+};
+
+static ISLAND: CardDef = CardDef { name: "CDA Test Island", types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
+static FOREST: CardDef = CardDef { name: "CDA Test Forest", types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
+
+fn differently_named_lands(q: &dyn LayerQuery, source: ObjectId, c: &mut Chars) {
+    let mut names = std::collections::BTreeSet::new();
+    for &id in q.state().battlefield() {
+        if q.controller(id) == q.controller(source) {
+            let land = q.chars(id);
+            if land.is(CardType::Land) {
+                names.insert(land.name);
+            }
+        }
+    }
+    c.power = Some(names.len() as i32);
+    c.toughness = c.power;
+}
+
+/// Only the quoted ability of Colossal Clone Master's exception: a core fixture, not the printed card or its mechanic.
+static COPY_CDA: CardDef = CardDef {
+    name: "CDA Copy Exception",
+    statics: &[characteristic_defining(Layer::PtDefine, differently_named_lands,
+        "This creature's power and toughness are each equal to the number of differently named lands you control.")],
+    ..CardDef::BLANK
+};
+
+fn copy_values(g: &mut Game, id: ObjectId, values: Copiable) {
+    cantrip_api::Game::set_copy(&mut cx(g), id, values);
+}
+
+fn pt_and_base(g: &Game, id: ObjectId) -> (Option<i32>, Option<i32>, Option<i32>) {
+    let c = cantrip_api::Query::chars(g, id);
+    (c.power, c.toughness, c.base_power)
+}
+
+/// CR 604.3a, 707.9a: the ability acquired in the copying process is the copy's own CDA, over the copied printed box.
+#[test]
+fn a_copy_exception_cda_defines_pt_over_the_copied_printed_box() {
+    let mut g = game_with(&[&COPY_BODY, &COPY_CDA, &ISLAND]);
+    enter(&mut g, &ISLAND);
+    let original = enter(&mut g, &COPY_BODY);
+    let copy = enter(&mut g, &COPY_BODY);
+    let values = cantrip_api::Query::copiable_values(&g, original).with_text(g.cards.id_of(&COPY_CDA));
+    copy_values(&mut g, copy, values);
+    assert_eq!(pt_and_base(&g, copy), (Some(1), Some(1), Some(1)));
+    assert_eq!(pt_and_base(&g, original), (Some(0), Some(2), Some(0)));
+    effect(&mut g, copy, EffectKind::Pump(2, 3));
+    assert_eq!(pt_and_base(&g, copy), (Some(3), Some(4), Some(1)));
+    // Ovinize's ability-loss part leaves the copied box, not the exception's undefined/zero box.
+    effect(&mut g, copy, EffectKind::LoseAllAbilities);
+    assert_eq!(pt_and_base(&g, copy), (Some(2), Some(5), Some(0)));
+}
+
+/// CR 707.9a, 707.9d: an inherited stated box excludes earlier CDAs only. Clone subsequently copies the newly acquired
+/// CDA as well as that box; it evaluates for the new object's controller and current lands, not a saved source value.
+#[test]
+fn a_later_copy_cda_overrides_inherited_stated_pt_and_is_copiable() {
+    let mut g = game_with(&[&TOKEN_BODY, &COPY_BODY, &COPY_CDA, &ISLAND, &FOREST]);
+    enter(&mut g, &ISLAND);
+    let token = enter(&mut g, &TOKEN_BODY);
+    g.state.update_obj(token, |o| o.token = true);
+    let values = Copiable::of(g.cards.id_of(&TOKEN_BODY)).sized(2, 1);
+    copy_values(&mut g, token, values);
+    let copy = enter(&mut g, &COPY_BODY);
+    let values = cantrip_api::Query::copiable_values(&g, token).nonlegendary().with_text(g.cards.id_of(&COPY_CDA));
+    copy_values(&mut g, copy, values);
+    assert_eq!(pt_and_base(&g, copy), (Some(1), Some(1), Some(1)));
+    let clone = enter(&mut g, &COPY_BODY);
+    let values = cantrip_api::Query::copiable_values(&g, copy);
+    assert_eq!(values.pt(), Some((2, 1)), "the CDA does not erase the underlying copiable box");
+    copy_values(&mut g, clone, values);
+    g.state.update_obj(clone, |o| o.controller = THEM);
+    assert_eq!(pt_and_base(&g, clone), (Some(0), Some(0), Some(0)));
+    let forest = enter(&mut g, &FOREST);
+    g.state.update_obj(forest, |o| o.controller = THEM);
+    assert_eq!(pt_and_base(&g, clone), (Some(1), Some(1), Some(1)));
+    enter(&mut g, &ISLAND);
+    assert_eq!(pt_and_base(&g, copy), (Some(1), Some(1), Some(1)), "same-named lands count once");
+    enter(&mut g, &FOREST);
+    assert_eq!(pt_and_base(&g, copy), (Some(2), Some(2), Some(2)));
+    cantrip_api::Game::exile(&mut cx(&mut g), copy);
+    assert_eq!(pt_and_base(&g, clone), (Some(1), Some(1), Some(1)), "the original copy is not the CDA's source");
+    effect(&mut g, clone, EffectKind::LoseAllAbilities);
+    assert_eq!(pt_and_base(&g, clone), (Some(2), Some(1), Some(2)));
+}
+
+/// Quicksilver Gargantuan copying a copy with an acquired CDA must exclude it, and Clone copying the Gargantuan must
+/// not bring it back. A subsequent Colossal-style copy acquisition can add a fresh instance of the same text.
+#[test]
+fn a_stated_pt_copy_excludes_acquired_cdas_but_a_later_acquisition_is_distinct() {
+    let mut g = game_with(&[&COPY_BODY, &COPY_CDA, &ISLAND, &FOREST]);
+    enter(&mut g, &ISLAND);
+    let copy = enter(&mut g, &COPY_BODY);
+    let text = g.cards.id_of(&COPY_CDA);
+    let values = Copiable::of(g.cards.id_of(&COPY_BODY)).with_text(text).sized(7, 7);
+    copy_values(&mut g, copy, values);
+    assert_eq!(pt_and_base(&g, copy), (Some(7), Some(7), Some(7)));
+    let clone = enter(&mut g, &COPY_BODY);
+    let values = cantrip_api::Query::copiable_values(&g, copy);
+    copy_values(&mut g, clone, values);
+    assert_eq!(pt_and_base(&g, clone), (Some(7), Some(7), Some(7)));
+    copy_values(&mut g, clone, values.with_text(text));
+    assert_eq!(pt_and_base(&g, clone), (Some(1), Some(1), Some(1)));
+    enter(&mut g, &FOREST);
+    assert_eq!(pt_and_base(&g, clone), (Some(2), Some(2), Some(2)));
+    effect(&mut g, clone, EffectKind::LoseAllAbilities);
+    assert_eq!(pt_and_base(&g, clone), (Some(7), Some(7), Some(7)));
+}
+
+/// CR 707.9a, 400.7: an acquired CDA and its box undo and redo with the row; leaving keeps their last-known result,
+/// while the new object has its printed card again, without the copy's text or exclusions.
+#[test]
+fn acquired_cdas_undo_redo_and_leave_as_new_objects() {
+    let mut g = game_with(&[&COPY_BODY, &COPY_CDA, &ISLAND]);
+    enter(&mut g, &ISLAND);
+    let copy = enter(&mut g, &COPY_BODY);
+    let mark = g.state.mark();
+    let values = Copiable::of(g.cards.id_of(&COPY_BODY)).sized(2, 1).with_text(g.cards.id_of(&COPY_CDA));
+    copy_values(&mut g, copy, values);
+    assert_eq!(pt_and_base(&g, copy), (Some(1), Some(1), Some(1)));
+    let (undos, redos) = g.state.step_back(mark);
+    assert!(g.state.obj(copy).copy.is_none());
+    assert_eq!(pt_and_base(&g, copy), (Some(0), Some(2), Some(0)));
+    g.state.step_forward(undos, redos);
+    assert_eq!(cantrip_api::Query::copiable_values(&g, copy), values);
+    assert_eq!(pt_and_base(&g, copy), (Some(1), Some(1), Some(1)));
+    cantrip_api::Game::exile(&mut cx(&mut g), copy);
+    assert_eq!(pt_and_base(&g, copy), (Some(1), Some(1), Some(1)));
+    let new = g.state.obj(copy).became.expect("a new object in exile");
+    assert!(g.state.obj(new).copy.is_none());
+    assert_eq!(pt_and_base(&g, new), (Some(0), Some(2), Some(0)));
+    assert_eq!(g.cards.texts(&g.state, g.state.obj(new)).collect::<Vec<_>>(), [g.cards.id_of(&COPY_BODY)]);
+}
+
+/// CR 708.8: a copied creature turned face down (Ixidron) keeps its copy effect beneath the face-down values. Asking
+/// what it would be face up must see the acquired CDA again, without leaking it into the actual face-down creature.
+#[test]
+fn a_face_up_query_recovers_the_copy_exceptions_cda() {
+    let mut g = game_with(&[&COPY_BODY, &COPY_CDA, &BEAR, &ISLAND]);
+    enter(&mut g, &ISLAND);
+    let copy = enter(&mut g, &COPY_BODY);
+    let values = Copiable::of(g.cards.id_of(&COPY_BODY)).sized(2, 1).with_text(g.cards.id_of(&COPY_CDA));
+    copy_values(&mut g, copy, values);
+    let down = g.cards.id_of(&BEAR);
+    g.state.update_obj(copy, |o| {
+        o.face_down = true;
+        o.marks.face_down_as = Some(down);
+    });
+    assert_eq!(pt_and_base(&g, copy), (Some(2), Some(2), Some(2)));
+    let up = cantrip_api::Query::chars_if_face_up(&g, copy);
+    assert_eq!((up.power, up.toughness, up.base_power), (Some(1), Some(1), Some(1)));
+    assert_eq!(pt_and_base(&g, copy), (Some(2), Some(2), Some(2)));
+}
+
+/// Installs the existing core merge representation, as a resolved mutate spell would: the new component on top or under.
+fn merge_component(g: &mut Game, id: ObjectId, def: &'static CardDef, on_top: bool) {
+    let card = g.cards.id_of(def);
+    let prior = g.state.obj(id).copy;
+    let part = cantrip_state::MergedPart {
+        card, face: card, token: false, commander_id: None, copy: None, on_top, timestamp: g.state.timestamp(), prior, melded: false,
+    };
+    let mut merged = g.state.merge_of(id).cloned().unwrap_or(cantrip_state::Merge {
+        own_face: g.cards.current(g.state.obj(id)), own_token: g.state.obj(id).token, own_commander_id: None,
+        own_face_down: None, parts: Vec::new(),
+    });
+    merged.parts.push(part);
+    g.state.set_merge(id, merged);
+}
+
+/// A mutate creature placed above a Colossal-style copy keeps the acquired CDA below, with its component link. Clone
+/// copies the merged CDA too. Quicksilver Gargantuan excludes it, and later mutation must not resurrect that excluded CDA.
+#[test]
+fn a_merged_components_exception_cda_and_its_exclusions_survive_copying_and_mutation() {
+    let mut g = game_with(&[&COPY_BODY, &COPY_CDA, &BEAR, &ISLAND]);
+    enter(&mut g, &ISLAND);
+    let copy = enter(&mut g, &COPY_BODY);
+    let text = g.cards.id_of(&COPY_CDA);
+    let body = g.cards.id_of(&COPY_BODY);
+    copy_values(&mut g, copy, Copiable::of(body).with_text(text));
+    merge_component(&mut g, copy, &BEAR, true);
+    assert_eq!(pt_and_base(&g, copy), (Some(1), Some(1), Some(1)));
+    let texts: Vec<_> = g.cards.texts_linked(&g.state, copy).collect();
+    assert_eq!(texts, [
+        (g.cards.id_of(&BEAR), None),
+        (body, Some(g.cards.component_link(&g.state, copy, body))),
+        (text, Some(g.cards.component_link(&g.state, copy, body))),
+    ]);
+    let clone = enter(&mut g, &COPY_BODY);
+    let values = cantrip_api::Query::copiable_values(&g, copy);
+    copy_values(&mut g, clone, values);
+    assert_eq!(pt_and_base(&g, clone), (Some(1), Some(1), Some(1)));
+    assert_eq!(g.cards.link_of_text(&g.state, clone, text), Some(g.cards.component_link(&g.state, clone, body)),
+        "a copy of a merge keeps the exception's component link without being physically merged");
+    // The loss is not copiable; a fresh Clone still has the merged CDA.
+    effect(&mut g, copy, EffectKind::LoseAllAbilities);
+    assert_eq!(pt_and_base(&g, copy), (Some(2), Some(2), Some(2)));
+    assert_eq!(pt_and_base(&g, clone), (Some(1), Some(1), Some(1)));
+    copy_values(&mut g, clone, values.sized(7, 7));
+    assert_eq!(pt_and_base(&g, clone), (Some(7), Some(7), Some(7)));
+    merge_component(&mut g, clone, &BEAR, false);
+    assert_eq!(pt_and_base(&g, clone), (Some(7), Some(7), Some(7)), "rebuilding the merged sources keeps prior exclusions");
+    let values = cantrip_api::Query::copiable_values(&g, clone).with_text(text);
+    copy_values(&mut g, clone, values);
+    assert_eq!(pt_and_base(&g, clone), (Some(1), Some(1), Some(1)), "a later acquired CDA is not excluded");
+}
+
+fn unused_copy_ability(_: &mut dyn cantrip_api::Game, _: &StackItem) -> Result<(), Suspend> {
+    Ok(())
+}
+
+/// Only an activated ability's definition: the self-copy value updates below use the core API, not a printed card.
+static COPY_ABILITY: CardDef = CardDef {
+    name: "Repeated Copy Ability Fixture",
+    abilities: &[ability(TAP, unused_copy_ability, "{T}: Copy ability fixture.")],
+    ..CardDef::BLANK
+};
+
+/// CR 113.2c, 707.9a: Stage's repeated self-copying can pass 255 instances. Reading actual copiable values, not the
+/// bounded displayed ability list, preserves every instance for the next self-copy and for another object copying it.
+#[test]
+fn repeated_self_copy_preserves_activated_ability_values_past_255() {
+    let mut g = game_with(&[&ISLAND, &COPY_ABILITY]);
+    let stage = enter(&mut g, &ISLAND);
+    let ability = AbilityRef { card: g.cards.id_of(&COPY_ABILITY), index: 0 };
+    assert!(matches!(g.cards.ability(ability), AbilityDef::Activated(_)));
+    for n in 1..=512 {
+        let values = cantrip_api::Query::copiable_values(&g, stage).with_ability(ability);
+        copy_values(&mut g, stage, values);
+        let read = cantrip_api::Query::copiable_values(&g, stage);
+        assert_eq!(read.extra_instances().collect::<Vec<_>>(), vec![ability; n]);
+    }
+    let values = cantrip_api::Query::copiable_values(&g, stage);
+    let clone = enter(&mut g, &ISLAND);
+    copy_values(&mut g, clone, values);
+    assert_eq!(cantrip_api::Query::copiable_values(&g, clone), values);
+    assert_eq!(cantrip_api::Query::chars(&g, clone).abilities().filter(|&a| a == ability).count(), MAX_ABILITIES);
+    effect(&mut g, clone, EffectKind::LoseAllAbilities);
+    assert!(!cantrip_api::Query::chars(&g, clone).abilities().any(|a| a == ability));
+    assert_eq!(cantrip_api::Query::copiable_values(&g, clone).extra_instances().collect::<Vec<_>>(), vec![ability; 512]);
+}
+
+/// CR 113.2c, 707.9a: both the linked and unlinked text walks retain every instance past 255. A subsequent copy and
+/// merge keep the counts and the component link, and a replacing copy excludes every existing instance.
+#[test]
+fn copy_and_merged_text_walks_keep_more_than_255_instances() {
+    let mut g = game_with(&[&COPY_BODY, &COPY_CDA, &BEAR, &ISLAND]);
+    enter(&mut g, &ISLAND);
+    let copy = enter(&mut g, &COPY_BODY);
+    let text = g.cards.id_of(&COPY_CDA);
+    let mut values = Copiable::of(g.cards.id_of(&COPY_BODY));
+    for _ in 0..512 {
+        values = values.with_text(text);
+    }
+    copy_values(&mut g, copy, values);
+    assert_eq!(g.cards.texts(&g.state, g.state.obj(copy)).filter(|&c| c == text).count(), 512);
+    assert_eq!(pt_and_base(&g, copy), (Some(1), Some(1), Some(1)));
+    let clone = enter(&mut g, &COPY_BODY);
+    let values = cantrip_api::Query::copiable_values(&g, copy);
+    copy_values(&mut g, clone, values);
+    merge_component(&mut g, clone, &BEAR, true);
+    let link = g.cards.component_link(&g.state, clone, g.cards.id_of(&COPY_BODY));
+    assert_eq!(g.cards.texts_linked(&g.state, clone).filter(|&(c, l)| c == text && l == Some(link)).count(), 512);
+    assert_eq!(pt_and_base(&g, clone), (Some(1), Some(1), Some(1)));
+    let replaced = cantrip_api::Query::copiable_values(&g, clone).sized(7, 7);
+    copy_values(&mut g, clone, replaced);
+    assert_eq!(pt_and_base(&g, clone), (Some(7), Some(7), Some(7)));
+    assert_eq!(g.cards.texts_linked_with_exclusions(&g.state, clone)
+        .filter(|&(c, _, e)| c == text && e.contains(cantrip_state::CdaExclusions::PT)).count(), 512);
+}
+
+fn graveyard_creatures(q: &dyn LayerQuery, source: ObjectId, c: &mut Chars) {
+    let count = q.state().zone(Zone::graveyard(q.controller(source))).iter().filter(|&&id| q.chars(id).is(CardType::Creature)).count() as i32;
+    c.power = Some(count);
+    c.toughness = Some(count);
+}
+
+/// Boneyard Mycodrax's */* CDA and star-valued box, to distinguish a lower component's fallback from the topmost box.
+static STAR_BODY: CardDef = CardDef {
+    name: "CDA Star Box Fixture",
+    types: TypeSet::of(&[CardType::Creature]),
+    statics: &[characteristic_defining(Layer::PtDefine, graveyard_creatures,
+        "This creature's power and toughness are each equal to the number of creature cards in your graveyard.").lost_pt(0, 0)],
+    ..CardDef::BLANK
+};
+
+/// Mutating above a Boneyard Mycodrax retains its CDA, but losing that CDA leaves the top component's box. Clone
+/// copying the merged creature uses that same box on ability loss, not the lower component's star-valued box.
+#[test]
+fn losing_a_merged_star_cda_leaves_the_topmost_copied_box() {
+    let mut g = game_with(&[&STAR_BODY, &BEAR]);
+    let star = enter(&mut g, &STAR_BODY);
+    let dead = Obj::new(g.cards.id_of(&BEAR), YOU, Zone::graveyard(YOU));
+    let dead = g.state.push_obj(dead);
+    g.state.zone_push(Zone::graveyard(YOU), dead);
+    merge_component(&mut g, star, &BEAR, true);
+    assert_eq!(pt_and_base(&g, star), (Some(1), Some(1), Some(1)));
+    let clone = enter(&mut g, &BEAR);
+    let values = cantrip_api::Query::copiable_values(&g, star);
+    copy_values(&mut g, clone, values);
+    assert_eq!(pt_and_base(&g, clone), (Some(1), Some(1), Some(1)));
+    effect(&mut g, star, EffectKind::LoseAllAbilities);
+    effect(&mut g, clone, EffectKind::LoseAllAbilities);
+    assert_eq!(pt_and_base(&g, star), (Some(2), Some(2), Some(2)));
+    assert_eq!(pt_and_base(&g, clone), (Some(2), Some(2), Some(2)));
+}
+
 /// CR 708.2a, 613.2b: a face-down creature is a 2/2 by its copiable values, whatever its card is, under what modifies it; face
 /// up its card's own values are its base power.
 #[test]

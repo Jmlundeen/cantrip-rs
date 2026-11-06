@@ -838,43 +838,65 @@ impl Obj {
 pub struct ExtraAbility {
     pub card: CardId,
     pub index: u8,
-    pub instances: u8,
+    pub instances: u32,
+}
+
+/// The characteristics whose defining abilities a copy effect did not copy (CR 707.9d). Kept per text, not inferred
+/// from the final characteristic: an ability acquired by a later copy effect is not excluded by an earlier exception.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct CdaExclusions(u8);
+
+impl CdaExclusions {
+    pub const NONE: Self = Self(0);
+    pub const TYPES: Self = Self(1);
+    pub const COLOR: Self = Self(2);
+    pub const PT: Self = Self(4);
+
+    pub fn contains(self, characteristic: Self) -> bool {
+        self.0 & characteristic.0 != 0
+    }
+
+    pub fn union(self, other: Self) -> Self {
+        Self(self.0 | other.0)
+    }
 }
 
 /// The texts the exceptions of a copy's values add, each instance once (`Copiable::extra_texts`). A walk of a few slots kept
 /// small and plain, since every object's texts are walked (`CardTable::texts`) and nearly every object has none.
 #[derive(Clone, Debug)]
 pub struct ExceptionTexts<'a> {
-    slots: std::slice::Iter<'a, ExtraAbility>,
-    card: CardId,
-    left: u8,
+    slots: std::iter::Enumerate<std::slice::Iter<'a, ExtraAbility>>,
+    exclusions: u32,
+    text: (CardId, CdaExclusions),
+    left: u32,
 }
 
 impl<'a> ExceptionTexts<'a> {
-    /// The texts among `slots`, a copy's `extra_abilities` or none of them.
+    /// The texts among `slots`, with the defining abilities earlier copy effects excluded from each.
     #[inline]
-    pub fn of(slots: &'a [ExtraAbility]) -> ExceptionTexts<'a> {
-        ExceptionTexts { slots: slots.iter(), card: CardId(0), left: 0 }
+    fn of(slots: &'a [ExtraAbility], exclusions: u32) -> ExceptionTexts<'a> {
+        ExceptionTexts { slots: slots.iter().enumerate(), exclusions, text: (CardId(0), CdaExclusions::NONE), left: 0 }
     }
 }
 
 impl Iterator for ExceptionTexts<'_> {
-    type Item = CardId;
+    type Item = (CardId, CdaExclusions);
 
     #[inline]
-    fn next(&mut self) -> Option<CardId> {
+    fn next(&mut self) -> Option<Self::Item> {
         if self.left > 0 {
             self.left -= 1;
-            return Some(self.card);
+            return Some(self.text);
         }
-        for slot in self.slots.by_ref() {
+        for (i, slot) in self.slots.by_ref() {
             // An empty slot has no instances, and the slots after it are empty too.
             if slot.instances == 0 {
                 break;
             }
             if slot.is_text() {
-                (self.card, self.left) = (slot.card, slot.instances - 1);
-                return Some(slot.card);
+                self.text = (slot.card, CdaExclusions(((self.exclusions >> Copiable::extra_cda_shift(i)) & 7) as u8));
+                self.left = slot.instances - 1;
+                return Some(self.text);
             }
         }
         None
@@ -940,6 +962,10 @@ pub struct Copiable {
     /// Copiable (the Ikoria release notes: "the characteristics of the combined merged creature are copiable"), so a copy
     /// of a merged permanent has the abilities too, though it is one object of one card. Empty for any other values.
     pub merged: u32,
+    /// CR 707.9d exclusions, three bits each: the primary text, the merged sources as a group, then each exception slot.
+    /// Set by the characteristic-replacing builders, only for texts already present. A later `with_text` starts with none.
+    #[doc(hidden)]
+    pub cda_exclusions: [u8; 3],
 }
 
 impl Copiable {
@@ -959,7 +985,53 @@ impl Copiable {
             words: Words::NONE,
             front: CardId(0),
             merged: 0,
+            cda_exclusions: [0; 3],
         }
+    }
+
+    // Three bits for each exception text plus the primary and merged-source groups must fit losslessly.
+    const CDA_BITS_FIT: () = assert!(6 + Self::EXTRA_ABILITIES * 3 <= 24);
+
+    fn cda_bits(&self) -> u32 {
+        let () = Self::CDA_BITS_FIT;
+        u32::from_le_bytes([self.cda_exclusions[0], self.cda_exclusions[1], self.cda_exclusions[2], 0])
+    }
+
+    fn set_cda_bits(&mut self, bits: u32) {
+        let [a, b, c, _] = bits.to_le_bytes();
+        self.cda_exclusions = [a, b, c];
+    }
+
+    fn extra_cda_shift(slot: usize) -> usize {
+        6 + slot * 3
+    }
+
+    /// Defining abilities excluded from the primary card's text by copy effects (CR 707.9d).
+    pub fn excluded_cdas(&self) -> CdaExclusions {
+        CdaExclusions((self.cda_bits() & 7) as u8)
+    }
+
+    /// Defining abilities excluded from all the already-merged components by a later copy effect (CR 707.9d).
+    pub fn merged_excluded_cdas(&self) -> CdaExclusions {
+        CdaExclusions(((self.cda_bits() >> 3) & 7) as u8)
+    }
+
+    /// A characteristic-replacing exception excludes the existing texts' defining abilities, not later acquisitions.
+    pub(crate) fn exclude_cdas(mut self, excluded: CdaExclusions) -> Self {
+        let mut bits = self.cda_bits() | u32::from(excluded.0);
+        if self.merged != 0 {
+            bits |= u32::from(excluded.0) << 3;
+        }
+        for (i, extra) in self.extra_abilities.iter().enumerate().take_while(|(_, e)| e.instances > 0) {
+            if extra.is_text() {
+                bits |= u32::from(excluded.0) << Self::extra_cda_shift(i);
+            }
+        }
+        self.set_cda_bits(bits);
+        if excluded.contains(CdaExclusions::TYPES) {
+            self.extra_keywords.0 &= !Keywords::of(&[Keyword::Changeling]).0;
+        }
+        self
     }
 
     /// "Except it's a 5/5 black Demon" (CR 707.9b, 205.1a): the exception states what it is (`typed`).
@@ -1065,11 +1137,13 @@ impl Copiable {
             || self.name.is_some()
             || !self.words.is_printed()
             || self.merged != 0
+            || self.cda_exclusions != [0; 3]
     }
 
     /// These values without the abilities of a merged permanent's other components (`merged`): its topmost component's.
     pub fn unmerged(mut self) -> Copiable {
         self.merged = 0;
+        self.set_cda_bits(self.cda_bits() & !(7 << 3));
         self
     }
 
@@ -1093,7 +1167,7 @@ impl Copiable {
         self.extra_types = types;
         self.extra_subtypes = subtypes;
         self.stated |= Copiable::STATED_TYPES;
-        self
+        self.exclude_cdas(CdaExclusions::TYPES)
     }
 
     /// "Except it's a [subtype] in addition to its other types."
@@ -1108,17 +1182,18 @@ impl Copiable {
     pub const EXTRA_ABILITIES: usize = 6;
 
     /// "Except it has [this ability]." Another instance of an ability the exceptions already add is counted in its slot
-    /// (CR 113.2c), up to 255 of them, which is past what any object holds (`MAX_ABILITIES`). A new one with every slot
-    /// taken (`EXTRA_ABILITIES`) is not added: the values are left as they were.
+    /// (CR 113.2c). The count is 32-bit: repeated self-copying by Thespian's Stage can pass 255 in a timed game.
+    /// A new one with every slot taken (`EXTRA_ABILITIES`) is not added: the values are left as they were.
     pub fn with_ability(mut self, ability: AbilityRef) -> Copiable {
         let slot = self
             .extra_abilities
             .iter()
-            .position(|e| e.instances > 0 && e.ability() == ability)
+            .enumerate()
+            .position(|(i, e)| e.instances > 0 && e.ability() == ability && (!e.is_text() || self.cda_bits() >> Self::extra_cda_shift(i) & 7 == 0))
             .or_else(|| self.extra_abilities.iter().position(|e| e.instances == 0));
         let Some(slot) = slot else { return self };
         let e = &mut self.extra_abilities[slot];
-        *e = ExtraAbility { card: ability.card, index: ability.index, instances: e.instances.saturating_add(1) };
+        *e = ExtraAbility { card: ability.card, index: ability.index, instances: e.instances + 1 };
         self
     }
 
@@ -1137,13 +1212,19 @@ impl Copiable {
             .iter()
             .take_while(|e| e.instances > 0)
             .filter(|e| !e.is_text())
-            .flat_map(|e| std::iter::repeat_n(e.ability(), usize::from(e.instances)))
+            .flat_map(|e| (0..e.instances).map(move |_| e.ability()))
     }
 
     /// Every instance of the texts the exceptions add (`with_text`), in order (CR 707.9b, 113.2c).
     #[inline]
-    pub fn extra_texts(&self) -> ExceptionTexts<'_> {
-        ExceptionTexts::of(if self.extra_abilities[0].instances > 0 { &self.extra_abilities } else { &[] })
+    pub fn extra_texts(&self) -> impl Iterator<Item = CardId> + '_ {
+        self.extra_texts_with_exclusions().map(|(card, _)| card)
+    }
+
+    /// Each exception text with the defining abilities copy effects excluded from that acquisition (CR 707.9a, 707.9d).
+    #[inline]
+    pub fn extra_texts_with_exclusions(&self) -> ExceptionTexts<'_> {
+        ExceptionTexts::of(if self.extra_abilities[0].instances > 0 { &self.extra_abilities } else { &[] }, self.cda_bits())
     }
 
     /// Whether an exception adds `ability`.
@@ -1165,14 +1246,14 @@ impl Copiable {
     /// "Except it's [color]."
     pub fn colored(mut self, colors: ColorSet) -> Copiable {
         self.colors = Some(colors);
-        self
+        self.exclude_cdas(CdaExclusions::COLOR)
     }
 
     /// "Except it's [power]/[toughness]."
     pub fn sized(mut self, power: i32, toughness: i32) -> Copiable {
         self.stated |= Copiable::STATED_PT;
         self.stated_pt = (power, toughness);
-        self
+        self.exclude_cdas(CdaExclusions::PT)
     }
 
     /// "Except it's [power]/[toughness]" (`sized`), if it says so.
@@ -3391,12 +3472,14 @@ mod copiable_tests {
     use super::*;
 
     /// Every `Obj` holds an `Option<Copiable>`, so a copy's exceptions are packed: the yes-or-no ones and a stated loyalty
-    /// take no separate allocation. Each reads back as it was set, a later one over an earlier. On x86-64 the published
-    /// i32-stat layout is 176 bytes; the additional keyword bits require a u128 set, whose 16-byte alignment makes the
-    /// combined `Option<Copiable>` 192 bytes. The guard records that layout without narrowing any copy exception.
+    /// take three bytes, and an object pays nothing for them. Each reads back as it was set, a later one over an earlier.
+    /// On x86-64 the published i32-stat layout is 176 bytes; the additional keyword bits require a u128 set, whose 16-byte
+    /// alignment makes the combined `Option<Copiable>` 192 bytes. A merged permanent's run of other components (`merged`,
+    /// CR 702.140e) took the last word. Per-text CDA exclusions use three more bytes (24 bits); 32-bit instance counts cost
+    /// four bytes per slot.
     #[test]
-    fn the_rare_exceptions_cost_an_object_nothing_and_read_back() {
-        assert!(std::mem::size_of::<Option<Copiable>>() <= 192, "Option<Copiable> is {} bytes", std::mem::size_of::<Option<Copiable>>());
+    fn copy_exceptions_stay_compact_and_read_back() {
+        assert!(std::mem::size_of::<Option<Copiable>>() <= 224, "Option<Copiable> is {} bytes", std::mem::size_of::<Option<Copiable>>());
         let plain = Copiable::of(CardId(1));
         let high_keyword = plain.with_keyword(Keyword::Desertwalk);
         assert!(high_keyword.extra_keywords.has(Keyword::Desertwalk));
@@ -3444,5 +3527,62 @@ mod copiable_tests {
         assert_eq!(values.extra_texts().collect::<Vec<_>>(), [CardId(9), CardId(9)]);
         assert_eq!(values.extra_instances().collect::<Vec<_>>(), [first]);
         assert!(Copiable::of(CardId(1)).with_text(CardId(9)).has_exceptions());
+    }
+
+    /// Stage copying itself as Lotus Field, untapped each time by Kiora's Follower with Illusionist's Bracers, can gain
+    /// more than 255 instances (CR 113.2c, 707.9a). Counts, and both walks, must preserve them without spending new slots.
+    #[test]
+    fn repeated_copy_abilities_and_exception_texts_keep_more_than_255_instances() {
+        let ability = AbilityRef { card: CardId(7), index: 0 };
+        let text = CardId(9);
+        let mut values = Copiable::of(CardId(1));
+        for n in 1..=512u32 {
+            values = values.with_ability(ability).with_text(text);
+            assert_eq!(values.extra_abilities[0].instances, n);
+            assert_eq!(values.extra_abilities[1].instances, n);
+        }
+        assert_eq!(values.extra_abilities[2], ExtraAbility::NONE, "repeated instances share a slot");
+        assert_eq!(values.extra_instances().collect::<Vec<_>>(), vec![ability; 512]);
+        assert_eq!(values.extra_texts().collect::<Vec<_>>(), vec![text; 512]);
+        let replaced = values.sized(7, 7).with_text(text);
+        assert_eq!(replaced.extra_texts_with_exclusions().collect::<Vec<_>>(),
+            std::iter::repeat_n((text, CdaExclusions::PT), 512).chain([(text, CdaExclusions::NONE)]).collect::<Vec<_>>());
+        assert_eq!(replaced.extra_instances().count(), 512, "a replacement does not exclude activated abilities");
+    }
+
+    /// CR 707.9a, 707.9d: later acquisitions of the same quoted text are not instances of the earlier, excluded CDA.
+    #[test]
+    fn cda_exclusions_belong_to_each_text_acquisition() {
+        let values = Copiable::of(CardId(1)).sized(7, 7).with_text(CardId(9)).colored(ColorSet::of(Color::Black)).with_text(CardId(9));
+        assert_eq!(values.excluded_cdas(), CdaExclusions::PT.union(CdaExclusions::COLOR));
+        assert_eq!(values.extra_texts_with_exclusions().collect::<Vec<_>>(), [
+            (CardId(9), CdaExclusions::COLOR), (CardId(9), CdaExclusions::NONE),
+        ]);
+        assert_eq!(values.with_text(CardId(9)).extra_texts_with_exclusions().collect::<Vec<_>>(), [
+            (CardId(9), CdaExclusions::COLOR), (CardId(9), CdaExclusions::NONE), (CardId(9), CdaExclusions::NONE),
+        ]);
+        let replaced = values.sized(4, 4);
+        assert_eq!(replaced.extra_texts_with_exclusions().collect::<Vec<_>>(), [
+            (CardId(9), CdaExclusions::COLOR.union(CdaExclusions::PT)), (CardId(9), CdaExclusions::PT),
+        ]);
+    }
+
+    /// All six exception slots, including the highest packed bits, keep every exclusion; a new merge clears only the
+    /// old merged group's mask after it has been distributed into its components (`rechain_merged`).
+    #[test]
+    fn every_exception_slot_preserves_all_cda_exclusions() {
+        let mut values = Copiable { merged: 1, ..Copiable::of(CardId(1)) };
+        for i in 0..Copiable::EXTRA_ABILITIES {
+            values = values.with_text(CardId(i as u16 + 10));
+        }
+        values = values.typed(TypeSet::of(&[CardType::Creature]), SubtypeSet::NONE).colored(ColorSet::of(Color::Black)).sized(4, 4);
+        let all = CdaExclusions::TYPES.union(CdaExclusions::COLOR).union(CdaExclusions::PT);
+        assert_eq!(values.excluded_cdas(), all);
+        assert_eq!(values.merged_excluded_cdas(), all);
+        assert_eq!(values.extra_texts_with_exclusions().collect::<Vec<_>>(), (0..Copiable::EXTRA_ABILITIES).map(|i| (CardId(i as u16 + 10), all)).collect::<Vec<_>>());
+        let top = values.unmerged();
+        assert_eq!(top.merged_excluded_cdas(), CdaExclusions::NONE);
+        assert_eq!(top.excluded_cdas(), all);
+        assert_eq!(top.extra_texts_with_exclusions().collect::<Vec<_>>(), values.extra_texts_with_exclusions().collect::<Vec<_>>());
     }
 }

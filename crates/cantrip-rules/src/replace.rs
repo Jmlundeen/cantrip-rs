@@ -315,7 +315,10 @@ fn source_text_ids<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = CardId>
 /// object has, a merged permanent's other component's own (`CardTable::component_link`), so that component's effect reads
 /// what its own card exiled or chose.
 fn source_texts_linked<'a>(cx: &'a Cx, id: ObjectId) -> impl Iterator<Item = (&'static CardDef, Option<Linked>)> + 'a {
-    source_text_ids(cx, id).enumerate().map(move |(i, c)| (cx.cards().get(c), (i > 0).then(|| cx.cards().component_link(cx.s(), id, c))))
+    let entering = matches!(cx.entering, Some(w) if w.object == id);
+    let first = (cx.cards().get(source_card(cx, id)), None);
+    let rest = if entering { None } else { Some(cx.cards().texts_linked(cx.s(), id).skip(1)) };
+    std::iter::once(first).chain(rest.into_iter().flatten().map(|(card, link)| (cx.cards().get(card), link)))
 }
 
 /// `id`'s printed replacement effects (`source_texts`), numbered as `Candidate::index` names them, each with its link.
@@ -2511,6 +2514,23 @@ mod tests {
         assert!(cx.s().agenda[frame].pending.is_none(), "every question was answered");
         let s = cx.s();
         (s.zone(Zone::hand(ME)).len(), s.zone(Zone::library(ME)).len(), s.player(ME).life)
+    }
+
+    /// A copy of a merged permanent carries exception texts on both its topmost and lower components. Replacement
+    /// and prevention lookup must use the same component of origin as the static-ability walk, not the text's index.
+    #[test]
+    fn replacement_texts_keep_the_copy_exceptions_component_of_origin() {
+        let mut g = game(&[(&FILLER, Zone::BATTLEFIELD)], Vec::new());
+        let id = g.state.battlefield()[0];
+        let (top, lower, below, own) = (g.cards.id_of(&FILLER), g.cards.id_of(&DOUBLER), g.cards.id_of(&GAINER), g.cards.id_of(&PEACE));
+        let merged = g.state.merged_sources_push(&[Copiable::of(lower).with_text(below)]);
+        let values = Copiable { merged, ..Copiable::of(top).with_text(own) };
+        g.state.update_obj(id, |o| o.copy = Some(values));
+        let link = Some(g.cards.component_link(&g.state, id, lower));
+        let frame = g.state.agenda.len() - 1;
+        let cx = Cx { g: &mut g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let texts: Vec<_> = source_texts_linked(&cx, id).map(|(d, l)| (d.name, l)).collect();
+        assert_eq!(texts, [(FILLER.name, None), (DOUBLER.name, link), (GAINER.name, link), (PEACE.name, None)]);
     }
 
     /// CR 614.5: each of two "draw two cards instead" effects has one opportunity at a draw and at the draws it is replaced

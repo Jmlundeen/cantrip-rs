@@ -823,6 +823,17 @@ and Arcane Adaptation on turn 5.
 **Layers 1 and 2.**
 - **Layer 1:** copy effects and face-down values stay the copiable values the per-object pipeline starts from. A copy
   effect's values are fixed when it begins (707.2b, 707.2c), so layer 1 has no cross-object dependency left to judge.
+  `Copiable` keeps CR 707.9d CDA exclusions per text acquisition: three packed bytes for the primary text, the existing
+  merged components and each exception-text slot. Its characteristic-replacing builders exclude only texts already
+  present; later `with_text` acquisitions are not excluded by an inherited stated characteristic (604.3a, 707.9a).
+  `CardTable::texts` / `texts_linked` walk component exception texts too, using their component's link; the layers read
+  the same walk with its exclusions, using their effective values for a face-up query (708.8) rather than the actual
+  face-down text. Component-link lookups and replacement/prevention walks use the same origin metadata, including for
+  a single object copying a merge. Rebuilding a merge distributes its prior group exclusions into the existing
+  components before adding new ones. Losing a CDA leaves the primary card's box, not an exception or lower component's.
+  Exception ability and text instance counts are `u32`, with plain arithmetic: Thespian's Stage copying itself as Lotus
+  Field, untapped by Kiora's Follower with Illusionist's Bracers, can pass 255 repetitions. Instances share their existing
+  distinct-ability slot; the six-slot capacity and its full-list behavior are unchanged.
   305.7's removal of what a copy effect gave a land is recorded by the layer-4 pass: per land, the point in the order at
   which its text abilities, including copied ones, went. Layer 6 reads that record.
 - **Layer 2 (control):** ordered by the same rules (`layers::control_order`): its effects - control-changing static
