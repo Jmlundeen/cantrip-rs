@@ -1,0 +1,29 @@
+# Arcane Sanctum enters tapped (CR 614.1d) and "{T}: Add {W}, {U}, or {B}." is a mana ability (CR 605.1a) that takes no
+# other color: Bot1 plays it on turn 1 and it is tapped; on turn 3 it untaps and adds {W}, on turn 5 {U} and on turn 7
+# {B}, each the single mana the {T} cost buys, and green is not offered.
+
+[Bot1 Deck]
+Arcane Sanctum
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Arcane Sanctum.Play
+? Bot1.Battlefield.Arcane Sanctum.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Arcane Sanctum.Activate(Color: Green)
+Bot1.Battlefield.Arcane Sanctum.Activate(Color: White)
+? Bot1.Mana = {W}
+? Bot1.Battlefield.Arcane Sanctum.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Arcane Sanctum.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Arcane Sanctum.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Arcane Sanctum.Tapped = true
