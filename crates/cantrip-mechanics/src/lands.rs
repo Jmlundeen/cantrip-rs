@@ -615,6 +615,15 @@ pub fn differently_named_lands_in_layers(q: &dyn LayerQuery, player: PlayerId) -
     crate::select::largest_name_set(&names).len()
 }
 
+/// "This creature's power and toughness are each equal to the number of differently named lands you control" (CR 604.3,
+/// 613.4a), as the `StaticDef::apply` of the ability: characteristic-defining, so it applies in every zone and reads
+/// current land names through the layers. Captain Pike, Fullness of Time and Colossal Clone Master's copy exception print it.
+pub fn power_and_toughness_are_differently_named_lands_you_control(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let count = differently_named_lands_in_layers(q, q.controller(source)) as i32;
+    chars.power = Some(count);
+    chars.toughness = Some(count);
+}
+
 /// "[This creature]'s power and toughness are each equal to the number of lands you control" as the `StaticDef::apply` of the
 /// ability (CR 613.4a for a characteristic-defining one, CR 604.3; layer 7b for one an effect gave, CR 613.4b), read live
 /// (CR 611.3a). "You" is the controller of `source` (see `count_you_control`). Beorn's Hospitality (given), Lumra, Bellow of the
