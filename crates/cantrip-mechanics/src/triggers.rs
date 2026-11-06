@@ -1112,6 +1112,16 @@ pub fn you_cast_a_spell(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fire
     }
 }
 
+/// "Whenever you cast a spell" (CR 601.2i, 603.2) for an ability that does something with the spell cast: it is the trigger's
+/// subject (`Fired::about`), so the copy of "copy it" is of that spell. Flamehold Grappler's delayed ability and Jace Reawakened's
+/// print it.
+pub fn you_cast_a_spell_about_it(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. } if *player == me.controller => Fired::about(Target::Object(*spell)),
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a spell with mana value N or greater" (CR 603.2, 601.2i, 202.3): a spell cast, not copied (CR 707.10), by this
 /// permanent's controller, with the mana value it has on the stack - the X chosen for it counts (CR 202.3e). Spider Manifestation,
 /// Kulrath Mystic and Tanufel Rimespeaker print it with 4 (`YOU_CAST_A_SPELL_WITH_MANA_VALUE_4_OR_GREATER`), Up the Beanstalk with 5.

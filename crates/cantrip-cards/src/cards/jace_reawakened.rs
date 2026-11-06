@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::history::from_the_future;
-use cantrip_mechanics::{choose, copy, delayed, effects, plot};
+use cantrip_mechanics::{choose, copy, delayed, effects, plot, triggers};
 use cantrip_oracle as oracle;
 
 /// "+1: You may exile a nonland card with mana value 3 or less from your hand. If you do, it becomes plotted." (CR 702.170a) It
@@ -25,14 +25,6 @@ fn copy_spells_this_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
     Ok(())
 }
 
-/// "Whenever you cast a spell" (CR 601.2i, 603.2): the spell is the trigger's subject, so the copy is of that spell.
-fn you_cast_a_spell(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { spell, player, .. } if *player == me.controller => Fired::about(Target::Object(*spell)),
-        _ => None,
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     cast_only_if: Some(from_the_future),
     abilities: &[
@@ -41,7 +33,7 @@ pub static CARD: CardDef = CardDef {
         ability(loyalty(-6), copy_spells_this_turn, "\u{2212}6: Until end of turn, whenever you cast a spell, copy it. You may choose new targets for the copy."),
     ],
     delayed: &[triggered(
-        when_asked(EventMask::SPELL_CAST, you_cast_a_spell),
+        when_asked(EventMask::SPELL_CAST, triggers::you_cast_a_spell_about_it),
         copy::copy_the_cast_spell,
         "Whenever you cast a spell, copy it. You may choose new targets for the copy.",
     )],
