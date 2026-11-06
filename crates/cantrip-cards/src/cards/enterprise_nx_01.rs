@@ -2,12 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{effects, statics, station, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
-/// "6+ | Flying, vigilance" (CR 721.2a): both abilities are granted together while the striation is active.
-fn flying_and_vigilance(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    statics::have_flying(q, source, chars);
-    statics::have_vigilance(q, source, chars);
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
@@ -20,7 +14,7 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::Type, station::charged::<6>, station::is_a_creature, "6+ | Flying, vigilance (4/3)"),
-        static_ability(Layer::Ability, station::charged::<6>, flying_and_vigilance, "6+ | Flying, vigilance (4/3)").continues(),
+        static_ability(Layer::Ability, station::charged::<6>, statics::have_flying_and_vigilance, "6+ | Flying, vigilance (4/3)").continues(),
         static_ability(Layer::PtSet, station::charged::<6>, statics::base_pt::<4, 3>, "6+ | Flying, vigilance (4/3)").continues(),
     ],
     ..oracle::ENTERPRISE_NX_01
