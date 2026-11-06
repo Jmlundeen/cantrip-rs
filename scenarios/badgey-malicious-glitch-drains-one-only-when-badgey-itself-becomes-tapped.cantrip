@@ -1,0 +1,51 @@
+# "Whenever Badgey becomes tapped" is Badgey itself, not any permanent its controller taps (CR 603.2): tapping Mox Ruby on
+# turn 3 drains nothing, and attacking taps Badgey, so each opponent loses 1 life and Bot1 gains 1 (CR 119.3) before the
+# 4 combat damage lands - Bot2 at 20 - 1 - 4 = 15 and Bot1 at 21.
+
+[Bot1 Deck]
+Badgey, Malicious Glitch
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Badgey, Malicious Glitch.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+? Bot2.Life = 20
+Bot1.Attack(Badgey, Malicious Glitch > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+? Bot2.Life = 19
+[T3 Bot1.Main2]
+? Bot2.Life = 15
+
+[Expect]
+Turn = 3
+Bot1.Life = 21
+Bot2.Life = 15
+Bot1.Battlefield.Badgey, Malicious Glitch.Tapped = true
