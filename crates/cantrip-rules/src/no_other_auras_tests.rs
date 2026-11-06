@@ -133,14 +133,14 @@ fn attached(g: &mut Game, def: &'static CardDef, host: ObjectId) -> ObjectId {
 }
 
 fn cx(game: &mut Game) -> Cx<'_> {
-    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
+    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None }
 }
 
 /// The state-based actions performed in a settling frame of the game's own, as the rules perform them.
 fn state_based_actions(g: &mut Game) {
     g.state.frame_push(Frame::new(FrameKind::Settle));
     let frame = g.state.agenda.len() - 1;
-    let mut cx = Cx { g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    let mut cx = Cx { g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
     crate::settle::state_based_actions_alone(&mut cx).expect("nothing is asked");
 }
 
@@ -154,7 +154,7 @@ fn went_to_the_graveyard(g: &Game, id: ObjectId) -> bool {
 
 /// Whether the spell `spell` on the stack could target `what` (CR 601.2c, 608.2b).
 fn spell_can_target(g: &Game, spell: ObjectId, what: ObjectId) -> bool {
-    let asker = Asker { source: spell, controller: YOU, by: None, spell: true };
+    let asker = Asker { instance: None, source: spell, controller: YOU, by: None, spell: true };
     crate::layers::can_target(g.cards, &g.state, &g.log, &asker, Target::Object(what))
 }
 
@@ -258,7 +258,7 @@ fn resolve_spell(g: &mut Game, def: &'static CardDef, spell: ObjectId, targets: 
     let serial = g.state.stack.last().expect("the spell").serial;
     g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
     let frame = g.state.agenda.len() - 1;
-    let mut cx = Cx { g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    let mut cx = Cx { g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
     crate::resolve::resolve(&mut cx).expect("nothing is asked");
 }
 
@@ -298,7 +298,7 @@ fn resolve_bestowed(g: &mut Game, host: ObjectId) -> ObjectId {
     let serial = g.state.stack.last().expect("the spell").serial;
     g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
     let frame = g.state.agenda.len() - 1;
-    let mut cx = Cx { g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    let mut cx = Cx { g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
     crate::resolve::resolve(&mut cx).expect("nothing is asked");
     spell
 }
@@ -365,7 +365,7 @@ fn another_aura_can_not_enter_attached_to_the_permanent() {
     assert!(g.state.obj(card).zone.is(ZoneKind::Graveyard), "it stays where it is");
     let cx = cx(&mut g);
     let chars = cx.chars(card);
-    let hosts = crate::attach::aura_hosts(&cx, card, &chars, YOU, &[]);
+    let hosts = crate::attach::aura_hosts(&cx, card, &chars, YOU, cx.mana_value(card), &[]);
     assert!(!hosts.contains(&Target::Object(bear)) && hosts.contains(&Target::Object(free)), "it can't be chosen (CR 303.4f)");
 }
 

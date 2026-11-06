@@ -76,7 +76,7 @@ fn game() -> (Game, ObjectId, ObjectId) {
     let creature = put(&mut game, &OUTSIDE_CREATURE, Zone::sideboard(YOU));
     let land = put(&mut game, &OUTSIDE_LAND, Zone::sideboard(YOU));
     let source = game.state.zone(Zone::library(YOU))[0];
-    game.state.add_mana(YOU, Mana::C, 1, source, None, ManaLasts::Step);
+    game.state.add_mana(YOU, Mana::C, 1, source, None, ManaLasts::Step, false);
     game.state.update_turn(|t| {
         t.active = YOU;
         t.priority = YOU;
@@ -86,7 +86,7 @@ fn game() -> (Game, ObjectId, ObjectId) {
 }
 
 fn cx(game: &mut Game) -> Cx<'_> {
-    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
+    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None }
 }
 
 /// The casts and land plays `player` is offered of `card`.

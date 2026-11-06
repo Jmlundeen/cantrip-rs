@@ -301,6 +301,18 @@ pub(crate) struct AsText<'a> {
 }
 
 impl Query for AsText<'_> {
+    fn can_attach_to(&self, attachment: ObjectId, host: ObjectId) -> bool {
+        crate::attach::host_allows(self, attachment, host, true)
+    }
+
+    fn enchanting_forbidden(&self, host: ObjectId, aura: ObjectId) -> bool {
+        self.q.enchanting_forbidden(host, aura)
+    }
+
+    fn can_untap(&self, permanent: ObjectId) -> bool {
+        self.q.can_untap(permanent)
+    }
+
     fn linked_card(&self, card: CardId) -> CardId {
         self.q.linked_card(card)
     }
