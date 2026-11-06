@@ -84,6 +84,7 @@ mod tests {
                 base_power: None,
                 keywords: Keywords::NONE,
                 protection: ColorSet::NONE,
+                protection_spared: SparedProtection::NONE,
                 protection_colorless: false,
                 protection_players: 0,
                 protection_types: TypeSet::NONE,

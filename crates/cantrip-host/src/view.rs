@@ -1107,6 +1107,7 @@ impl<'a> Projector<'a> {
             // on its own line, read from the effects. (A static ability of another permanent giving more is not told apart.)
             let mut given = *c;
             given.protection = ColorSet::NONE;
+            given.protection_spared = SparedProtection::NONE;
             given.protection_colorless = false;
             given.protection_players = 0;
             given.protection_types = TypeSet::NONE;
@@ -1692,7 +1693,7 @@ fn protection_words(c: &Chars, names: &[String]) -> Option<String> {
     if c.protection_everything {
         return Some("Protection from everything".to_string());
     }
-    let mut words: Vec<String> = c.protection.iter().map(|color| color.name().to_lowercase()).collect();
+    let mut words: Vec<String> = c.protection_colors().iter().map(|color| color.name().to_lowercase()).collect();
     if c.protection_colorless {
         words.push("colorless".to_string());
     }
@@ -1700,7 +1701,7 @@ fn protection_words(c: &Chars, names: &[String]) -> Option<String> {
         words.push("colored spells".to_string());
     }
     // Plural, as cards print it: "from instants", "from sorceries".
-    words.extend(c.protection_types.iter().map(|t| {
+    words.extend(c.protection_card_types().iter().map(|t| {
         let name = t.name().to_lowercase();
         match name.strip_suffix('y') {
             Some(stem) => format!("{stem}ies"),

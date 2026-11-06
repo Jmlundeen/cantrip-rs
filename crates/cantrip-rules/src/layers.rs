@@ -1339,6 +1339,7 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         keywords: Keywords(printed_keywords.0 | extra_keywords.0),
         // CR 612.4: a color word of a token's text is the text's that made it.
         protection: words.colors(def.protection),
+        protection_spared: SparedProtection::NONE,
         protection_colorless: false,
         protection_players: 0,
         protection_types: TypeSet::NONE,
@@ -2293,7 +2294,7 @@ enum Field {
     Plain(u64),
 }
 
-fn fields(c: &Chars) -> [(&'static str, Field); 22] {
+fn fields(c: &Chars) -> [(&'static str, Field); 23] {
     use std::hash::{Hash, Hasher};
     let plain = |v: &dyn Fn(&mut std::collections::hash_map::DefaultHasher)| {
         let mut h = std::collections::hash_map::DefaultHasher::new();
@@ -2310,6 +2311,8 @@ fn fields(c: &Chars) -> [(&'static str, Field); 22] {
         ("toughness", Field::Number(c.toughness)),
         ("keywords", bits(c.keywords.0)),
         ("protection", bits(c.protection.0.into())),
+        // Each instance adds bits only (`SparedProtection`).
+        ("protection sparing Auras", Field::Bits(c.protection_spared.bits())),
         ("protection from types", bits(c.protection_types.0.into())),
         ("protection from subtypes", Field::Bits(c.protection_subtypes.0.to_vec())),
         ("protection from mana value", Field::Number(c.protection_mana_value.map(|v| v as i32))),
@@ -2454,6 +2457,8 @@ fn contract_pairs(base: Chars, ability: AbilityRef) -> Vec<(Chars, Chars)> {
     vary(&|c| c.keywords = Keywords(u64::MAX));
     // protection
     vary(&|c| c.protection = ColorSet::of(Color::Red));
+    vary(&|c| c.protect_sparing(ColorSet::of(Color::White), TypeSet::NONE, Spares::Aura(ObjectId(7))));
+    vary(&|c| c.protect_sparing(ColorSet::NONE, TypeSet::of(&[CardType::Enchantment]), Spares::Auras));
     vary(&|c| c.protection_types = TypeSet::of(&[CardType::Creature]));
     vary(&|c| c.protection_subtypes = SubtypeSet::of(&[Subtype::Demon]));
     vary(&|c| c.protection_mana_value = Some(3));
@@ -3428,6 +3433,7 @@ mod tests {
             base_power: Some(1),
             keywords: Keywords::NONE,
             protection: ColorSet::NONE,
+            protection_spared: SparedProtection::NONE,
             protection_colorless: false,
             protection_players: 0,
             protection_types: TypeSet::NONE,

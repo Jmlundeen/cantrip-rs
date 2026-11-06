@@ -796,8 +796,9 @@ impl StateDump {
                         d.list(&format!("{key}.HexproofFrom"), qualities, true);
                     }
                     // Its protection from colors (CR 702.16a), printed or granted, as the colors' words: `Black; Red`.
-                    if !c.protection.is_empty() {
-                        let mut colors: Vec<String> = c.protection.iter().map(|c| c.name().to_string()).collect();
+                    // Every instance's, whichever Auras it spares (CR 702.16n).
+                    if !c.protection_colors().is_empty() {
+                        let mut colors: Vec<String> = c.protection_colors().iter().map(|c| c.name().to_string()).collect();
                         colors.sort();
                         d.list(&format!("{key}.ProtectionFrom"), colors, true);
                     }

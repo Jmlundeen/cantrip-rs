@@ -10,7 +10,9 @@ use crate::{Cx, R, ops};
 /// Whether `attachment` could be attached to `host` right now (CR 701.3a-b): the host is still the object it was,
 /// is not the attachment itself and does not have protection from it (CR 702.16c-d), and is one the attachment's
 /// enchant abilities, or Equipment's creature on the battlefield (CR 301.5c), allow. An Aura that is also a creature can
-/// enchant nothing (CR 303.4d). Judged without targeting, so hexproof does not matter.
+/// enchant nothing (CR 303.4d). Judged without targeting, so hexproof does not matter. Not `attaching` - an attachment the
+/// state-based actions judge where it is (CR 704.5m-n) - an Aura is judged only against the protection that doesn't spare
+/// it (CR 702.16n, `Chars::protection_removes_aura`).
 pub fn host_allows(q: &dyn Query, attachment: ObjectId, host: ObjectId, attaching: bool) -> bool {
     let ac = q.chars(attachment);
     host_allows_as(q, attachment, &ac, || q.mana_value(attachment), q.controller(attachment), host, attaching)
@@ -23,7 +25,14 @@ fn host_allows_as(q: &dyn Query, attachment: ObjectId, ac: &Chars, mana_value: i
         return false;
     }
     let hc = q.chars(host);
-    if hc.protected_from_by(ac, mana_value, controller) {
+    // An Aura already attached is put into the graveyard only by protection that doesn't spare it (CR 702.16n); one being
+    // attached can't be by any (CR 702.16c: "can't be enchanted"; Spectra Ward's ruling).
+    let protected = if !attaching && ac.has_subtype(Subtype::Aura) {
+        hc.protection_removes_aura(attachment, ac, mana_value, controller)
+    } else {
+        hc.protected_from_by(ac, mana_value, controller)
+    };
+    if protected {
         return false;
     }
     if ac.has_subtype(Subtype::Equipment) {

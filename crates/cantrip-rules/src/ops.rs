@@ -2425,10 +2425,11 @@ pub fn last_known_from(cx: &Cx, id: ObjectId, c: &Chars) -> LastKnown {
         base_power: c.base_power,
         keywords: c.keywords,
         toxic: c.toxic,
-        protection: c.protection,
+        // Every quality, whichever Auras an instance spares (`Chars::as_known`).
+        protection: c.protection_colors(),
         protection_colorless: c.protection_colorless,
         protection_players: c.protection_players,
-        protection_types: c.protection_types,
+        protection_types: c.protection_card_types(),
         protection_subtypes: c.protection_subtypes,
         protection_mana_value: c.protection_mana_value,
         spell: c.spell,

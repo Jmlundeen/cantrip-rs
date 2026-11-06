@@ -100,6 +100,8 @@ mod pay_times_tests;
 #[cfg(test)]
 mod protection_qualities_tests;
 #[cfg(test)]
+mod aura_sparing_protection_tests;
+#[cfg(test)]
 mod mode_counts_tests;
 #[cfg(test)]
 mod special_action_cost_tests;
@@ -933,10 +935,10 @@ impl Game {
                     base_power: c.base_power,
                     keywords: c.keywords,
                     toxic: c.toxic,
-                    protection: c.protection,
+                    protection: c.protection_colors(),
                     protection_colorless: c.protection_colorless,
                     protection_players: c.protection_players,
-                    protection_types: c.protection_types,
+                    protection_types: c.protection_card_types(),
                     protection_subtypes: c.protection_subtypes,
                     protection_mana_value: c.protection_mana_value,
                     spell: c.spell,

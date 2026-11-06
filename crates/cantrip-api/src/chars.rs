@@ -23,7 +23,13 @@ pub struct Chars {
     /// the copiable value. `None` where `power` is none for having no power at all (CR 208.3).
     pub base_power: Option<i32>,
     pub keywords: Keywords,
+    /// Protection from these colors (CR 702.16a), from instances that remove every Aura with the color (CR 702.16c). The
+    /// colors of the instances that spare some Auras are `protection_spared`'s; `protection_colors` is every color.
     pub protection: ColorSet,
+    /// Protection whose instances don't remove some Auras (CR 702.16n): Black Ward's "This effect doesn't remove this Aura",
+    /// Spectra Ward's "doesn't remove Auras". Protection in every other respect (`protected_from`); only the Aura state-based
+    /// action reads what it spares (`protection_removes_aura`).
+    pub protection_spared: SparedProtection,
     /// Protection from colorless (CR 702.16a).
     pub protection_colorless: bool,
     /// Protection from players (CR 702.16a): a bit per seat, every seat a game deals (`MAX_SEATS`).
@@ -125,7 +131,10 @@ impl Chars {
         self.base_power = last.base_power;
         self.keywords = last.keywords;
         self.toxic = last.toxic;
+        // What an instance spares matters to an Aura attached to it alone (CR 702.16n), never to what was: its last-known
+        // protection is every quality it had (`ops::last_known_from`).
         self.protection = last.protection;
+        self.protection_spared = SparedProtection::NONE;
         self.protection_colorless = last.protection_colorless;
         self.protection_players = last.protection_players;
         self.protection_types = last.protection_types;
@@ -158,6 +167,7 @@ impl Chars {
     /// colorless, a player, a card type, colored spells or everything.
     pub fn has_protection(&self) -> bool {
         !self.protection.is_empty()
+            || !self.protection_spared.is_empty()
             || self.protection_colorless
             || self.protection_players != 0
             || self.protection_types != TypeSet::NONE
@@ -171,10 +181,15 @@ impl Chars {
     /// from, colorless, a card type, a subtype, or a mana value. `mana_value` is the source's, worked out only when
     /// the protection reads it.
     pub fn protected_from(&self, source: &Chars, mana_value: impl FnOnce() -> u32) -> bool {
+        self.covers(self.protection_colors(), self.protection_card_types(), source, mana_value)
+    }
+
+    /// Whether protection from `colors` and `types` and its other qualities covers `source` (CR 702.16a).
+    fn covers(&self, colors: ColorSet, types: TypeSet, source: &Chars, mana_value: impl FnOnce() -> u32) -> bool {
         self.protection_everything
-            || self.protection.intersects(source.colors)
+            || colors.intersects(source.colors)
             || (self.protection_colorless && source.colors.is_empty())
-            || self.protection_types.0 & source.types.0 != 0
+            || types.0 & source.types.0 != 0
             || self.protection_subtypes.intersects(source.subtypes)
             || self.protection_mana_value.is_some_and(|least| mana_value() >= least)
             || (self.protection_colored_spells && source.spell && !source.colors.is_empty())
@@ -184,6 +199,31 @@ impl Chars {
     /// its colors, colorless, or the player controlling it.
     pub fn protected_from_by(&self, source: &Chars, mana_value: impl FnOnce() -> u32, controller: PlayerId) -> bool {
         self.protected_from(source, mana_value) || self.protection_players & (1 << controller.0) != 0
+    }
+
+    /// Whether its protection puts the Aura `aura`, with these characteristics and controlled by `controller`, into its
+    /// owner's graveyard as a state-based action (CR 702.16c, 704.5m): `protected_from_by`, less the instances that don't
+    /// remove it (CR 702.16n) - another instance from the same quality still does.
+    pub fn protection_removes_aura(&self, aura: ObjectId, source: &Chars, mana_value: impl FnOnce() -> u32, controller: PlayerId) -> bool {
+        let (colors, types) = self.protection_spared.removing(aura);
+        self.covers(ColorSet(self.protection.0 | colors.0), TypeSet(self.protection_types.0 | types.0), source, mana_value)
+            || self.protection_players & (1 << controller.0) != 0
+    }
+
+    /// Every color it has protection from (CR 702.16a), whichever Auras the instances remove.
+    pub fn protection_colors(&self) -> ColorSet {
+        ColorSet(self.protection.0 | self.protection_spared.colors().0)
+    }
+
+    /// Every card type it has protection from (CR 702.16a), whichever Auras the instances remove.
+    pub fn protection_card_types(&self) -> TypeSet {
+        TypeSet(self.protection_types.0 | self.protection_spared.types().0)
+    }
+
+    /// Protection from `colors` and `types` that doesn't remove `spares` (CR 702.16n, layer 6): "Enchanted creature has
+    /// protection from black. This effect doesn't remove this Aura."
+    pub fn protect_sparing(&mut self, colors: ColorSet, types: TypeSet, spares: Spares) {
+        self.protection_spared.add(colors, types, spares);
     }
 
     /// "Loses all abilities" (CR 613.1f): every ability it has now goes, keywords, protections and "hexproof from"
@@ -196,6 +236,7 @@ impl Chars {
     fn clear_abilities(&mut self) {
         self.keywords = Keywords::NONE;
         self.protection = ColorSet::NONE;
+        self.protection_spared = SparedProtection::NONE;
         self.protection_colorless = false;
         self.protection_players = 0;
         self.protection_types = TypeSet::NONE;

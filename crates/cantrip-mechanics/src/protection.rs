@@ -72,3 +72,33 @@ pub fn from_mana_value_at_least_apply<const LEAST: u32>(_: &dyn LayerQuery, _: O
 pub const fn from_mana_value_at_least<const LEAST: u32>(text: &'static str) -> StaticDef {
     static_ability(Layer::Ability, itself, from_mana_value_at_least_apply::<LEAST>, text)
 }
+
+/// "Enchanted creature has protection from [color]. This effect doesn't remove this Aura." (CR 702.16n, layer 6) as a static
+/// ability's `StaticDef::apply`, `COLOR` a `Color` as `u8`: protection in every way (CR 702.16b-e), but the Aura giving it is
+/// not put into its owner's graveyard by it (`Chars::protect_sparing`). The color is a word of the Aura's text (CR 612.2).
+pub fn from_color_not_removing_this_aura_apply<const COLOR: u8>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let color = view.words(source).color(Color::ALL[COLOR as usize]);
+    chars.protect_sparing(ColorSet::of(color), TypeSet::NONE, Spares::Aura(source));
+}
+
+/// An Aura's "Enchanted creature has protection from [color]. This effect doesn't remove this Aura." (CR 702.16n): Black Ward,
+/// Blue Ward, Green Ward, Red Ward and White Ward print it.
+pub const fn enchanted_from_color_not_removing_this_aura<const COLOR: u8>(text: &'static str) -> StaticDef {
+    static_ability(Layer::Ability, crate::attach::attached_object, from_color_not_removing_this_aura_apply::<COLOR>, text)
+}
+
+/// "Enchanted creature has protection from the chosen color. This effect doesn't remove this Aura." (CR 702.16n, layer 6) as a
+/// static ability's `StaticDef::apply`: the color chosen as the Aura entered (CR 607.2d), no color word, so a text-changing effect
+/// leaves it (CR 612.2). An Aura with none chosen gives nothing.
+pub fn from_chosen_color_not_removing_this_aura_apply(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    if let Some(color) = view.state().chosen_color(view.linked_to(source)) {
+        chars.protect_sparing(ColorSet::of(color), TypeSet::NONE, Spares::Aura(source));
+    }
+}
+
+/// An Aura's "Enchanted creature has protection from the chosen color. This effect doesn't remove this Aura." (CR 702.16n), its
+/// color chosen as it enters (`mana::aura_enters_choosing_a_color`): Cho-Manno's Blessing, Flickering Ward, Floating Shield,
+/// Pentarch Ward and Ward of Lights print it.
+pub const fn enchanted_from_chosen_color_not_removing_this_aura(text: &'static str) -> StaticDef {
+    static_ability(Layer::Ability, crate::attach::attached_object, from_chosen_color_not_removing_this_aura_apply, text)
+}

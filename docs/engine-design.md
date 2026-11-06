@@ -356,7 +356,13 @@ only the candidates the host's verdict on those picked says may be added.
   colorless, card types, creature types (`protection_subtypes`: Baneslayer Angel's Demons and Dragons), a least mana value
   (`protection_mana_value`: Mistmeadow Skulk), players, colored spells and everything; `Chars::protected_from_by` judges a
   source against them for targeting, damage, blocking and attaching, reading the source's mana value (a closure, worked out only
-  when the protection reads it) at each of those sites. A text change is no copiable value (707.2), so a copy of a
+  when the protection reads it) at each of those sites. Protection whose effect "doesn't remove this Aura" or "doesn't
+  remove Auras" (702.16n: Black Ward, Cho-Manno's Blessing, Tattoo Ward, Spectra Ward) is `Chars::protection_spared`
+  (`Chars::protect_sparing`, `Spares`), from colors and card types, kept apart from `protection`: it is protection everywhere
+  (`protection_colors`, `protection_card_types`), and only the Aura state-based action (704.5m, `attach::host_allows` not
+  attaching) asks `protection_removes_aura`, which leaves out the instances that spare that Aura. Another instance from the
+  same quality still removes it, two Auras each sparing only itself remove each other, and attaching an Aura (701.3b, 303.4i)
+  or casting one at the creature is judged against every instance, as Spectra Ward's ruling has it. A text change is no copiable value (707.2), so a copy of a
   changed permanent has the printed text, and a permanent that leaves and returns is a new object with it too. An
   effect that sets a name (612.8, "named Everflame, Heroes' Legacy") is `EffectKind::SetName`, in layer 3: the object
   has that name alone (`Chars::name_set`), for the legend rule and every "same name" or chosen-name question

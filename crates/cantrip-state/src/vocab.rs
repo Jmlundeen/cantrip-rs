@@ -556,6 +556,84 @@ impl fmt::Debug for TypeSet {
     }
 }
 
+/// Which Auras an instance of protection doesn't remove (CR 702.16n): "This effect doesn't remove this Aura" (Black Ward,
+/// Cho-Manno's Blessing, Tattoo Ward: the Aura whose effect it is) or "This effect doesn't remove Auras" (Spectra Ward).
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+pub enum Spares {
+    /// This Aura, the source of the effect.
+    Aura(ObjectId),
+    /// Every Aura.
+    Auras,
+}
+
+/// Protection from colors and card types whose instances don't remove some Auras (CR 702.16n): it does everything protection
+/// does (CR 702.16b-e, `Chars::protected_from`), but an Aura it spares is not put into its owner's graveyard by it as a
+/// state-based action (CR 704.5m); another instance of protection from the same quality, one that doesn't spare that Aura,
+/// still removes it. It does not let an Aura be attached that the protection forbids (CR 702.16c; Spectra Ward's ruling: the
+/// creature can't be the target of further Aura spells), nor spare Equipment (CR 702.16d), which is no Aura.
+///
+/// Per quality - the five colors (`Color` as the index), then the card types (5 + `CardType` as the index) - every instance
+/// adds only bits, so what one adds never depends on what is there (the contract of a static ability's apply): `ids` ORs the
+/// ids of the Auras whose instances spare only themselves, `not_ids` ORs their complements. One such Aura alone leaves
+/// `ids == !not_ids`, its id; two different ones leave them apart, and each removes the other. A quality given with no Aura of
+/// its own is spared to every Aura (Spectra Ward's) unless one such instance also gives it.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Default, Debug)]
+pub struct SparedProtection {
+    colors: ColorSet,
+    types: TypeSet,
+    ids: [u32; Self::QUALITIES],
+    not_ids: [u32; Self::QUALITIES],
+}
+
+impl SparedProtection {
+    const QUALITIES: usize = 5 + CardType::ALL.len();
+    pub const NONE: SparedProtection =
+        SparedProtection { colors: ColorSet::NONE, types: TypeSet::NONE, ids: [0; Self::QUALITIES], not_ids: [0; Self::QUALITIES] };
+
+    /// Protection from these colors and card types that doesn't remove `spares` (CR 702.16n).
+    pub fn add(&mut self, colors: ColorSet, types: TypeSet, spares: Spares) {
+        self.colors = ColorSet(self.colors.0 | colors.0);
+        self.types = TypeSet(self.types.0 | types.0);
+        if let Spares::Aura(aura) = spares {
+            let at = colors.iter().map(|c| c as usize).chain(types.iter().map(|t| 5 + t as usize));
+            for i in at {
+                self.ids[i] |= aura.0;
+                self.not_ids[i] |= !aura.0;
+            }
+        }
+    }
+
+    /// Every color it is protection from.
+    pub fn colors(&self) -> ColorSet {
+        self.colors
+    }
+
+    /// Every card type it is protection from.
+    pub fn types(&self) -> TypeSet {
+        self.types
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.colors.is_empty() && self.types == TypeSet::NONE
+    }
+
+    /// The colors and card types from which an instance that doesn't spare `aura` gives protection: one of an Aura of its
+    /// own that is another Aura, or two such Auras' (CR 702.16n).
+    pub fn removing(&self, aura: ObjectId) -> (ColorSet, TypeSet) {
+        let removes = |i: usize| (self.ids[i] | self.not_ids[i]) != 0 && !(self.ids[i] == aura.0 && self.not_ids[i] == !aura.0);
+        let colors = self.colors.iter().filter(|&c| removes(c as usize)).fold(ColorSet::NONE, ColorSet::with);
+        let types = self.types.iter().filter(|&t| removes(5 + t as usize)).fold(TypeSet::NONE, TypeSet::with);
+        (colors, types)
+    }
+
+    /// Its bits, for a check that compares characteristics field by field.
+    pub fn bits(&self) -> Vec<u64> {
+        let mut bits = vec![u64::from(self.colors.0) | u64::from(self.types.0) << 8];
+        bits.extend(self.ids.iter().zip(self.not_ids).map(|(&id, not)| u64::from(id) | u64::from(not) << 32));
+        bits
+    }
+}
+
 /// The qualities of "hexproof from [quality]" abilities (CR 702.11d): a permanent with one can't be the target of
 /// [quality] spells its controller's opponents control, nor of abilities they control from [quality] sources. A bit
 /// for each quality: the five colors (`ColorSet`'s bits), monocolored and multicolored (CR 105.2a-b), and card types
