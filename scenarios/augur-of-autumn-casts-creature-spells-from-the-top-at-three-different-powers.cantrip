@@ -1,0 +1,48 @@
+# Coven (an ability word, CR 207.2c, whose condition is a static ability, CR 604.1): with three creatures of different
+# powers Bot1 may cast creature spells from the top of its library (CR 601.2). With Augur of Autumn and Ornithopter out
+# (powers 2 and 0) the Elvish Mystic on top is refused even though its {G} is in the pool; Llanowar Elves (power 1) makes
+# the third power and it is cast; the Grizzly Bears that follows is left where it is.
+
+[Bot1 Deck]
+Black Lotus
+Augur of Autumn
+Mox Emerald
+Ornithopter
+Llanowar Elves
+Forest
+Forest
+Elvish Mystic
+Grizzly Bears
+Island x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Augur of Autumn.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Library.Elvish Mystic.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Library.Elvish Mystic.Cast
+? Bot1.Mana =
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Augur of Autumn.Power = 2
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Library.Grizzly Bears.Power = 2
+Bot1.Library.Count = 7

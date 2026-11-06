@@ -1,0 +1,8 @@
+{
+  "name": "Augur of Autumn",
+  "manaCost": "{1}{G}{G}",
+  "type": "Creature — Human Druid",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "You may look at the top card of your library any time.\nYou may play lands from the top of your library.\nCoven — As long as you control three or more creatures with different powers, you may cast creature spells from the top of your library."
+}
