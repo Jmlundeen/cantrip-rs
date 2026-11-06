@@ -104,6 +104,18 @@ pub fn creature_defending_player_controls(q: &dyn Query, asker: &Asker, t: Targe
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == defending)
 }
 
+/// "Target creature defending player controls" on a spell, which refers to no attacking creature: a creature an opponent of
+/// the active player controls, during combat. CR 506.2 has a defending player only during the combat phase, and the
+/// nonactive player is it in a two-player game whether or not they are attacked; CR 802.2 makes every opponent one in a
+/// multiplayer game. Blaze of Glory, Yare and False Orders print it. (For a trigger about an attacking creature, which
+/// has its own defending player, see `creature_defending_player_controls`.)
+pub fn spell_creature_defending_player_controls(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    let state = q.state();
+    crate::combat::during_combat(q)
+        && creature_filter(q, asker, t)
+        && matches!(t, Target::Object(id) if state.opponents(state.turn.active).any(|p| p == q.controller(id)))
+}
+
 /// "Target creature defending player controls": see `creature_defending_player_controls`. Captain America's Shield prints it
 /// (Greatsword of Tyr's is "up to one").
 pub const CREATURE_DEFENDING_PLAYER_CONTROLS: TargetSpec = target(creature_defending_player_controls);

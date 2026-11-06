@@ -150,6 +150,13 @@ pub fn during_combat(q: &dyn Query) -> bool {
     )
 }
 
+/// "Cast this spell only during combat before blockers are declared" (CR 601.3): from the beginning of combat step through
+/// the declare attackers step, of any combat phase (the 2013 ruling). Blaze of Glory, Disharmony, Gorilla War Cry, Panic and
+/// Winter's Chill print it.
+pub fn cast_only_before_blockers(q: &dyn Query, _: &Asker) -> bool {
+    matches!(q.state().turn.step(), Step::BeginCombat | Step::DeclareAttackers)
+}
+
 /// "Activate only during combat" (CR 602.5b, 506.1): the activation condition form of `during_combat`. Jade Statue prints it.
 pub fn activate_only_during_combat(q: &dyn Query, _: &Asker) -> bool {
     during_combat(q)
