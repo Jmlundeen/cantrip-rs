@@ -1369,6 +1369,13 @@ pub enum EffectKind {
     MustAttackAt(Target),
     /// It becomes this subtype in addition to its other subtypes (CR 613.1d), layer 4.
     AddSubtype(Subtype),
+    /// "That land is a Swamp" (CR 305.7, 613.1d), layer 4: a land's land type is set to this basic land type, which a
+    /// resolved spell or ability's effect does as a static ability's does (`Chars::set_land_subtypes`): its other land types
+    /// go, and so does every ability its rules text gives it, while the basic land type's mana ability comes with the type
+    /// (CR 305.6) and what other effects grant it stays. Its card types and supertypes are unchanged (snow is kept: Cyclopean
+    /// Tomb's ruling). Nothing for an object that is not a land at its timestamp. Cyclopean Tomb ("for as long as it has a mire
+    /// counter on it"), Tide Shaper, Shimmering Mirage and Elsewhere Flask.
+    SetLandType(Subtype),
     /// Its creature type becomes this one (CR 205.1a, 613.1d), layer 4: every creature type it had is replaced, its card types
     /// and its other subtypes (artifact types, land types) stay: "becomes a green Wurm" (Scale Up).
     SetCreatureType(Subtype),

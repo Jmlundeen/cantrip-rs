@@ -1804,7 +1804,7 @@ fn exists(view: &View, source: ObjectId, id: ObjectId, snap: &Snap) -> bool {
 }
 
 /// Whether anything in the game could take an object's abilities: a "loses all abilities" static ability or one that sets
-/// land subtypes among the static-ability sources, or a resolved "loses all abilities".
+/// land subtypes among the static-ability sources, or a resolved "loses all abilities" or "is a [basic land type]".
 fn strips(view: &View) -> bool {
     match view.pass {
         Some(pass) => {
@@ -1820,7 +1820,8 @@ fn strips(view: &View) -> bool {
 }
 
 fn strippers_present(cards: &CardTable, state: &GameState) -> bool {
-    state.effects.iter().any(|e| e.kind == EffectKind::LoseAllAbilities) || (state.statics_seen && abilities_may_be_lost(cards, state))
+    state.effects.iter().any(|e| matches!(e.kind, EffectKind::LoseAllAbilities | EffectKind::SetLandType(_)))
+        || (state.statics_seen && abilities_may_be_lost(cards, state))
 }
 
 /// What `entry` does to the object, which it applies to.
@@ -2842,6 +2843,7 @@ pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
         EffectKind::ChangeText { .. } | EffectKind::SetName(_) => Layer::Text,
         EffectKind::AddTypes(_)
         | EffectKind::AddSubtype(_)
+        | EffectKind::SetLandType(_)
         | EffectKind::LoseAllCreatureTypes
         | EffectKind::AddAllCreatureTypes
         | EffectKind::SetCreatureType(_)
@@ -2936,6 +2938,8 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
             // CR 205.1b: added types are added; a land that becomes a creature is still a land.
             (Layer::Type, EffectKind::AddTypes(types)) => chars.types = TypeSet(chars.types.0 | types.0),
             (Layer::Type, EffectKind::AddSubtype(s)) => chars.subtypes = chars.subtypes.with(s),
+            // CR 305.7: the land's land types are set, and the abilities its rules text gives it are gone with them.
+            (Layer::Type, EffectKind::SetLandType(s)) => chars.set_land_subtypes(SubtypeSet::NONE.with(s)),
             (Layer::Type, EffectKind::LoseAllCreatureTypes) => {
                 chars.subtypes = chars.subtypes.iter().filter(|t| !t.is_creature_type()).fold(SubtypeSet::NONE, SubtypeSet::with);
             }
@@ -3264,8 +3268,10 @@ pub fn lost_all_abilities(cards: &CardTable, state: &GameState, log: &[Record], 
     if state.lost_all_abilities_to_an_effect(id) {
         return true;
     }
-    // Most positions have neither kind of ability in play: one look at the sources says so.
-    if !abilities_may_be_lost(cards, state) {
+    // Most positions have neither kind of ability in play, nor a resolved effect setting this land's type: one look at the
+    // sources and the effects says so.
+    let land_type_set = !state.effects.is_empty() && state.effects.iter().any(|e| e.affected == id && matches!(e.kind, EffectKind::SetLandType(_)));
+    if !land_type_set && !abilities_may_be_lost(cards, state) {
         return false;
     }
     let c = chars(cards, state, log, id);

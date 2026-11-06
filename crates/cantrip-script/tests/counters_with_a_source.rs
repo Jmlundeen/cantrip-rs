@@ -5,7 +5,8 @@
 //! its controller's and never in another player's, with its source long gone. On a table of test-only cards, until
 //! Cyclopean Tomb is added:
 //!
-//! - Probe Tomb and Other Tomb are artifacts with "{0}: Put a mire counter on target land", "Sacrifice this artifact: nothing"
+//! - Probe Tomb and Other Tomb are artifacts with "{0}: Put a mire counter on target land. That land is a Swamp for as long
+//!   as it has a mire counter on it" (`EffectKind::SetLandType`, `Duration::WhileCounter`), "Sacrifice this artifact: nothing"
 //!   and Cyclopean Tomb's "when this is put into a graveyard from the battlefield, at the beginning of each of your upkeeps
 //!   for the rest of the game, remove all mire counters from a land that a mire counter was put onto with this artifact but
 //!   that a mire counter has not been removed from with this artifact" (the first such land: the card asks its player);
@@ -34,6 +35,13 @@ fn the_land(item: &StackItem) -> ObjectId {
 
 fn mire(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(the_land(item), CounterKind::Mire, 1);
+    Ok(())
+}
+
+/// "Put a mire counter on target land. That land is a Swamp for as long as it has a mire counter on it." (CR 305.7, 611.2b)
+fn mire_and_swamp(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    mire(g, item)?;
+    g.add_effect(item.object, the_land(item), EffectKind::SetLandType(Subtype::Swamp), Duration::WhileCounter(CounterKind::Mire));
     Ok(())
 }
 
@@ -91,7 +99,8 @@ fn each_upkeep(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
 }
 
 static TOMB_ABILITIES: [AbilityDef; 3] = [
-    ability(Cost::NONE, mire, "{0}: Put a mire counter on target land.").targets(&LAND),
+    ability(Cost::NONE, mire_and_swamp, "{0}: Put a mire counter on target land. That land is a Swamp for as long as it has a mire counter on it.")
+        .targets(&LAND),
     ability(SACRIFICE_THIS, nothing, "Sacrifice this artifact: Nothing."),
     triggered(
         cantrip_mechanics::triggers::THIS_DIES,
@@ -205,6 +214,11 @@ fn mire_on(game: &Game, name: &str) -> i32 {
     game.state.obj(on_battlefield(game, name)).counters(CounterKind::Mire)
 }
 
+/// Whether Land A, Land B and Land C are Swamps.
+fn swamps(game: &Game) -> [bool; 3] {
+    ["Land A", "Land B", "Land C"].map(|n| game.chars(on_battlefield(game, n)).subtypes == SubtypeSet::NONE.with(Subtype::Swamp))
+}
+
 /// Settled in turn `n`'s draw step, past its upkeep and what triggered there.
 fn in_draw_step_of(n: u32) -> impl Fn(&Game) -> bool {
     move |g: &Game| g.state.turn.number == n && g.state.turn.step() == Step::Draw && g.state.stack.is_empty()
@@ -223,7 +237,8 @@ fn triggered_in(game: &Game, tomb: ObjectId) -> Vec<u32> {
 /// one on Land C. With Probe Tomb sacrificed, its delayed ability triggers in each of its controller's upkeeps and never in
 /// the opponent's: it takes both mire counters off Land A (CR 122.1: all of them, whatever put them there, the ruling), then
 /// Land B's, then finds no such land, and Land C's counter - Other Tomb's - stays. What Probe Tomb did is asked of the history
-/// after it has gone, by its object, which Other Tomb's actions don't answer for.
+/// after it has gone, by its object, which Other Tomb's actions don't answer for. Each land a Tomb mired is a Swamp until its
+/// last mire counter comes off (CR 305.7, 611.2b), whatever has become of the Tomb.
 #[test]
 fn a_dead_tombs_upkeep_ability_takes_the_mire_counters_it_put_off_one_land_each_upkeep() {
     use Do::*;
@@ -248,12 +263,14 @@ fn a_dead_tombs_upkeep_ability_takes_the_mire_counters_it_put_off_one_land_each_
     let (tomb, other) = (on_battlefield(&game, "Probe Tomb"), on_battlefield(&game, "Other Tomb"));
     let [a, b, c] = ["Land A", "Land B", "Land C"].map(|n| on_battlefield(&game, n));
     assert_eq!((mire_on(&game, "Land A"), mire_on(&game, "Land B"), mire_on(&game, "Land C")), (2, 1, 1));
+    assert_eq!(swamps(&game), [true, true, true]);
     assert_eq!(mired_with(&game, tomb), vec![a, b], "Probe Mire's counter is no Tomb's");
     assert_eq!(mired_with(&game, other), vec![c]);
 
     play(&mut game, [&[Activate("Probe Tomb", 1, "")], &[]], |g| g.state.stack.is_empty() && !g.state.battlefield().iter().any(|&id| g.name(id) == "Probe Tomb"));
     assert_eq!(game.state.turn.number, 3);
     assert_eq!(mired_with(&game, tomb), vec![a, b], "the history answers for the Tomb that has gone");
+    assert_eq!(swamps(&game), [true, true, true], "the Swamps are not tied to the Tomb (the ruling)");
     assert!(triggered_in(&game, tomb).is_empty());
 
     play(&mut game, [&[], &[]], in_draw_step_of(4));
@@ -263,16 +280,19 @@ fn a_dead_tombs_upkeep_ability_takes_the_mire_counters_it_put_off_one_land_each_
     play(&mut game, [&[], &[]], in_draw_step_of(5));
     assert_eq!(triggered_in(&game, tomb), vec![5]);
     assert_eq!((mire_on(&game, "Land A"), mire_on(&game, "Land B"), mire_on(&game, "Land C")), (0, 1, 1));
+    assert_eq!(swamps(&game), [false, true, true], "Land A has no mire counter, and is itself again");
     assert_eq!(mired_with(&game, tomb), vec![b]);
 
     play(&mut game, [&[], &[]], in_draw_step_of(7));
     assert_eq!(triggered_in(&game, tomb), vec![5, 7]);
     assert_eq!((mire_on(&game, "Land A"), mire_on(&game, "Land B"), mire_on(&game, "Land C")), (0, 0, 1));
+    assert_eq!(swamps(&game), [false, false, true]);
     assert!(mired_with(&game, tomb).is_empty());
 
     play(&mut game, [&[], &[]], in_draw_step_of(9));
     assert_eq!(triggered_in(&game, tomb), vec![5, 7, 9], "for the rest of the game, with nothing left to do");
     assert_eq!(mire_on(&game, "Land C"), 1, "Other Tomb's counter stays");
+    assert_eq!(swamps(&game), [false, false, true]);
     assert_eq!(mired_with(&game, other), vec![c]);
     // Each counter that came off is recorded, with the Tomb's delayed ability as its cause.
     let removed: Vec<(ObjectId, i32)> = game

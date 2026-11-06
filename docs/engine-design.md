@@ -442,7 +442,11 @@ only the candidates the host's verdict on those picked says may be added.
   setting ability itself applies whatever its source loses in layer 6 (613.6: Magus under Eaten by Piranhas), and a land's own
   ability that sets its own subtype (Multiversal Passage) goes on applying and does not count it as having lost its text. A land
   about to enter is judged as it would be on the battlefield (614.12, below): under such an effect its own `enters`
-  replacements - "enters tapped", "as this enters" - do not apply.
+  replacements - "enters tapped", "as this enters" - do not apply. A resolved spell or ability's effect sets a land's subtype
+  the same way (`EffectKind::SetLandType`, applied in layer 4 at its timestamp): Cyclopean Tomb's "that land is a Swamp for
+  as long as it has a mire counter on it" (`Duration::WhileCounter`), Shimmering Mirage's and Elsewhere Flask's "until end
+  of turn", Tide Shaper's. A land's static ability it takes depends on it whatever the timestamps (613.8a), and
+  `lost_all_abilities` answers for the land while such an effect names it.
 - **A permanent about to enter is judged as it would exist on the battlefield (614.12)**: `ops::as_it_would_exist` puts it
   there for the moment of the question - under the player it enters under, tapped or not, with the face, copy effect,
   choices, counters, cast door and protector the replacements applied so far gave it, at a new (the latest) timestamp, and
@@ -460,10 +464,9 @@ only the candidates the host's verdict on those picked says may be added.
   (`replace::possible`) or a counter ban could limit its counters. A card's own replacement that must judge it so while it
   applies - a copy replacement's exception, decided on the copy it has just chosen (CR 616.1c, 707.9b: Spark Double's "an
   additional +1/+1 counter on it if it's a creature", a copy of Sol Ring under March of the Machines getting it) - asks
-  `Game::entering_chars(&Entering)`, the same `as_it_would_exist` over the entry as it stands. A resolved effect that sets a land's
-  subtype ("target land becomes an Island until end of turn") has no `EffectKind` yet; the copiable values a copy effect gave
-  such a land other than abilities stay: CR 305.7 lists copiable effects among the sources of the abilities it loses,
-  against the abilities other effects granted, which it keeps.
+  `Game::entering_chars(&Entering)`, the same `as_it_would_exist` over the entry as it stands. The copiable values a copy
+  effect gave a land whose subtype is set, other than abilities, stay: CR 305.7 lists copiable effects among the sources of
+  the abilities it loses, against the abilities other effects granted, which it keeps.
 - **The order of a permanent's entering replacements (CR 616.1c-e)**: a replacement that has it enter as a copy applies
   first, then one that has it enter back face up (daybound at night, judged on the copy, `ops::enters_by_daybound`), then
   the rest. A card's own copy replacement is its typed `CardDef::enters_as_copy` (built with

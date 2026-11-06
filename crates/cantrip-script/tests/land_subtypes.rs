@@ -5,7 +5,10 @@
 //! - a land's printed rules that live on its card rather than among its abilities - a replacement effect - and a printed
 //!   keyword, which it loses, beside a keyword another effect granted it, which it keeps;
 //! - a land whose own static ability sets other lands' subtypes, which another such ability takes away whatever their
-//!   timestamps (CR 613.8a): no printed land the engine has sets other lands' subtypes.
+//!   timestamps (CR 613.8a): no printed land the engine has sets other lands' subtypes;
+//! - the same done by a resolved spell's effect (`EffectKind::SetLandType`, "target land becomes a Swamp"): the printed rules
+//!   lost, the granted keyword kept, the supertypes unchanged, and a land's ability that sets other lands' subtypes taken away
+//!   though the effect is newer (CR 613.8a).
 
 use std::collections::VecDeque;
 use std::sync::OnceLock;
@@ -100,9 +103,20 @@ fn wings(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
 /// A zero-cost instant: "Target land gains flying until end of turn."
 static WINGS: CardDef = CardDef { name: "Probe Wings", types: TypeSet::of(&[CardType::Instant]), spell: spell(&[target(a_land)], wings), ..CardDef::BLANK };
 
+fn swamp(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(id) = item.target(0) {
+        g.add_effect(item.object, id, EffectKind::SetLandType(Subtype::Swamp), Duration::EndOfTurn);
+    }
+    Ok(())
+}
+
+/// A zero-cost instant: "Target land becomes a Swamp until end of turn." A resolved effect that sets a land's subtype
+/// (`EffectKind::SetLandType`; Cyclopean Tomb's, Shimmering Mirage's).
+static SWAMP: CardDef = CardDef { name: "Probe Swamp", types: TypeSet::of(&[CardType::Instant]), spell: spell(&[target(a_land)], swamp), ..CardDef::BLANK };
+
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&FILLER, &BASIC, &MOON, &LAND, &SEA, &GAIN, &WINGS]))
+    TABLE.get_or_init(|| CardTable::new([&FILLER, &BASIC, &MOON, &LAND, &SEA, &GAIN, &WINGS, &SWAMP]))
 }
 
 /// A two-player game: each seat's hand is the named cards, then basic lands.
@@ -217,4 +231,52 @@ fn a_land_that_sets_other_lands_subtypes_loses_that_ability_to_another_such_effe
         assert!(game.lost_all_abilities(sea));
         assert!(!game.lost_all_abilities(basic));
     }
+}
+
+/// CR 305.7 by a resolved effect: Probe Land, made a Swamp by Probe Swamp, has the Swamp's "{T}: Add {B}" alone (CR 305.6), no
+/// hexproof and no replacement effect - a gain of 1 life is 1 - while the flying Probe Wings granted it stays. Its card type
+/// and its (lack of) supertypes are unchanged, and the effect ends with the turn: the land is itself again.
+#[test]
+fn a_land_a_resolved_effect_makes_a_swamp_loses_its_printed_rules_until_the_effect_ends() {
+    let mut game = deal(&["Probe Land", "Probe Wings", "Probe Swamp", "Probe Gain"], &[]);
+    play(&mut game, [&[("Probe Land", ""), ("Probe Wings", "Probe Land"), ("Probe Swamp", "Probe Land")], &[]], |g| {
+        g.state.stack.is_empty() && g.state.effects.iter().any(|e| matches!(e.kind, EffectKind::SetLandType(_)))
+    });
+    let land = on_battlefield(&game, "Probe Land").unwrap();
+    let chars = game.chars(land);
+    assert_eq!(chars.subtypes, SubtypeSet::NONE.with(Subtype::Swamp));
+    assert_eq!((chars.types, chars.supertypes), (TypeSet::of(&[CardType::Land]), Supertypes::default()));
+    assert!(chars.has(Keyword::Flying), "a keyword another effect granted stays");
+    assert!(!chars.has(Keyword::Hexproof), "a printed keyword is gone");
+    let abilities: Vec<AbilityRef> = chars.abilities.iter().flatten().copied().collect();
+    assert_eq!(abilities, vec![AbilityRef { card: table().intrinsic, index: Mana::B as u8 }], "only the Swamp's {{T}}: Add {{B}}");
+    assert!(game.lost_all_abilities(land), "every rule its card prints is gone with its rules text");
+
+    play(&mut game, [&[("Probe Gain", "")], &[]], |g| g.state.player(PlayerId(0)).life == 21 && g.state.stack.is_empty());
+    assert_eq!(game.state.player(PlayerId(0)).life, 21, "its replacement no longer doubles the gain");
+
+    play(&mut game, [&[], &[]], |g| g.state.turn.number == 2);
+    assert_eq!(game.chars(land).subtypes, SubtypeSet::NONE);
+    assert!(game.chars(land).has(Keyword::Hexproof));
+    assert!(!game.lost_all_abilities(land));
+}
+
+/// Each other land is an Island (Probe Sea); then Probe Swamp makes Probe Sea a Swamp. The effect is newer than Probe Sea's
+/// ability, but takes it away (CR 305.7), so Probe Sea's effect depends on it and applies after it (CR 613.8a), and no longer
+/// exists: the basic land is no Island. Making the basic land a Swamp keeps its basic supertype.
+#[test]
+fn a_resolved_effect_that_makes_a_land_a_swamp_takes_its_ability_to_set_other_lands_subtypes() {
+    let mut game = deal(&["Probe Sea", "Probe Swamp", "Probe Swamp"], &["Probe Basic"]);
+    play(&mut game, [&[("Probe Sea", "")], &[("Probe Basic", "")]], |g| settled(g, "Probe Basic"));
+    let (sea, basic) = (on_battlefield(&game, "Probe Sea").unwrap(), on_battlefield(&game, "Probe Basic").unwrap());
+    assert_eq!(game.chars(basic).subtypes, SubtypeSet::NONE.with(Subtype::Island), "the control");
+
+    play(&mut game, [&[("Probe Swamp", "Probe Sea")], &[]], |g| g.state.stack.is_empty() && g.chars(sea).has_subtype(Subtype::Swamp));
+    assert_eq!(game.chars(sea).subtypes, SubtypeSet::NONE.with(Subtype::Swamp));
+    assert_eq!(game.chars(basic).subtypes, SubtypeSet::NONE, "Probe Sea's ability is gone");
+    assert!(game.lost_all_abilities(sea));
+
+    play(&mut game, [&[("Probe Swamp", "Probe Basic")], &[]], |g| g.state.stack.is_empty() && g.chars(basic).has_subtype(Subtype::Swamp));
+    assert_eq!(game.chars(basic).subtypes, SubtypeSet::NONE.with(Subtype::Swamp));
+    assert!(game.chars(basic).supertypes.basic, "its supertypes are unchanged");
 }
