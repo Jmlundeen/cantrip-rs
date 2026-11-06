@@ -25,7 +25,7 @@ pub fn endure(g: &mut dyn Game, permanent: ObjectId, source: ObjectId, n: i32) -
         return Ok(());
     }
     let controller = g.controller(permanent);
-    let can_take_counters = is_live(g, permanent) && g.is_on_battlefield(permanent) && !g.counters_banned(permanent, controller, CounterKind::PlusOne);
+    let can_take_counters = g.is_on_battlefield(permanent) && !g.counters_banned(permanent, controller, CounterKind::PlusOne);
     if can_take_counters && crate::effects::ask_may(g, controller, source, Purpose::Ask(&ENDURE))? {
         g.add_counters_by(controller, permanent, CounterKind::PlusOne, n);
     } else {
