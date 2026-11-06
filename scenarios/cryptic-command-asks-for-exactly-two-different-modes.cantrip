@@ -1,0 +1,36 @@
+# Cryptic Command asks for exactly two different modes (CR 700.2, 700.2d), as its 2017-11-17 ruling says: one mode, the same
+# mode twice, or three modes are refused while the question is open, and only two different ones are taken. Its {1}{U}{U}{U} is
+# paid exactly by Black Lotus's {U}{U}{U} and Mox Pearl's {W}, so the pool is empty right after the cast. The modes taken are
+# the return (its own Mox Pearl, a permanent) and the draw.
+
+[Bot1 Deck]
+Cryptic Command
+Black Lotus
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cryptic Command.Cast
+! Bot1.Modes(Count: 0)
+! Bot1.Modes(1)
+! Bot1.Modes(1; 1)
+! Bot1.Modes(1; 2; 3)
+Bot1.Modes(2; 4)
+Bot1.Target(Bot1.Battlefield.Mox Pearl)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Cryptic Command; Black Lotus
+Bot1.Hand.Count = 6
+Bot1.Battlefield.Count = 0
+Stack.Count = 0

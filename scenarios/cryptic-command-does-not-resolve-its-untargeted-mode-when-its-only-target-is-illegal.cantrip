@@ -1,0 +1,49 @@
+# With every target illegal the spell doesn't resolve, so its untargeted mode does nothing (CR 608.2b, 700.2c; the
+# card's 2017-11-17 ruling): Bot2's Lightning Bolt kills the only target of Cryptic Command's return mode before it
+# resolves, so Bot1 doesn't draw a card from its draw mode and the Command goes to the graveyard without resolving.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Cryptic Command
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Forest
+Llanowar Elves
+Lightning Bolt
+Island x3
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Command.Cast
+Bot1.Modes(2; 4)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Cryptic Command; Black Lotus
+Bot1.Hand.Count = 4
+Bot2.Battlefield.Count = 2
+Bot2.Battlefield.Llanowar Elves = (absent)
+Bot2.Graveyard.Count = 2
+Stack.Count = 0

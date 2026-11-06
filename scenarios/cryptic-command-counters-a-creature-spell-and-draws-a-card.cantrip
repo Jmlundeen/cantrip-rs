@@ -1,0 +1,41 @@
+# Cryptic Command's counter mode takes a creature spell and its draw mode draws a card (CR 700.2, 701.6a, 121.1):
+# Bot2's Ornithopter is countered into its graveyard and Bot1 draws. The choice is exactly two different modes: one,
+# three, or the same mode twice is refused (CR 700.2, 700.2d). The pool is checked right after the cast: five blue
+# mana made, four spent.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Cryptic Command
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Command.Cast
+! Bot1.Modes(1)
+! Bot1.Modes(1; 3; 4)
+! Bot1.Modes(1; 1)
+Bot1.Modes(1; 4)
+Bot1.Target(Stack.Ornithopter)
+? Bot1.Mana = {U}
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Cryptic Command; Black Lotus
+Bot1.Hand.Count = 4
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter
+Stack.Count = 0
