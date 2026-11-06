@@ -519,10 +519,11 @@ pub enum Subtype {
     Brikar,
     JemHadar,
     Talaxian,
+    Communicator,
 }
 
 impl Subtype {
-    pub const ALL: [Subtype; 506] = [
+    pub const ALL: [Subtype; 507] = [
         Subtype::Adventure,
         Subtype::Advisor,
         Subtype::Aetherborn,
@@ -1029,6 +1030,7 @@ impl Subtype {
         Subtype::Brikar,
         Subtype::JemHadar,
         Subtype::Talaxian,
+        Subtype::Communicator,
     ];
 
     pub const fn name(self) -> &'static str {
@@ -1111,6 +1113,7 @@ impl Subtype {
             Subtype::Cockatrice => "Cockatrice",
             Subtype::Comet => "Comet",
             Subtype::Construct => "Construct",
+            Subtype::Communicator => "Communicator",
             Subtype::Contraption => "Contraption",
             Subtype::Coward => "Coward",
             Subtype::Coyote => "Coyote",
@@ -1560,7 +1563,7 @@ impl Subtype {
     /// (CR 205.1a): those of a card type it still has.
     pub fn card_types(self) -> TypeSet {
         match self {
-            Subtype::Attraction | Subtype::Blood | Subtype::Bobblehead | Subtype::Book | Subtype::Clue | Subtype::Contraption | Subtype::Equipment | Subtype::Food | Subtype::Fortification | Subtype::Gold | Subtype::Heartwood | Subtype::Incubator | Subtype::Infinity | Subtype::Junk | Subtype::Lander | Subtype::Map | Subtype::Mutagen | Subtype::Powerstone | Subtype::Spacecraft | Subtype::Stone | Subtype::Treasure | Subtype::Vehicle | Subtype::Vibranium => TypeSet::of(&[CardType::Artifact]),
+            Subtype::Attraction | Subtype::Blood | Subtype::Bobblehead | Subtype::Book | Subtype::Clue | Subtype::Communicator | Subtype::Contraption | Subtype::Equipment | Subtype::Food | Subtype::Fortification | Subtype::Gold | Subtype::Heartwood | Subtype::Incubator | Subtype::Infinity | Subtype::Junk | Subtype::Lander | Subtype::Map | Subtype::Mutagen | Subtype::Powerstone | Subtype::Spacecraft | Subtype::Stone | Subtype::Treasure | Subtype::Vehicle | Subtype::Vibranium => TypeSet::of(&[CardType::Artifact]),
             Subtype::Aura | Subtype::Background | Subtype::Cartouche | Subtype::Case | Subtype::Class | Subtype::Curse | Subtype::Plan | Subtype::Role | Subtype::Room | Subtype::Rune | Subtype::Saga | Subtype::Shard | Subtype::Shrine => TypeSet::of(&[CardType::Enchantment]),
             Subtype::Cave | Subtype::Desert | Subtype::Forest | Subtype::Gate | Subtype::Island | Subtype::Lair | Subtype::Locus | Subtype::Mine | Subtype::Mountain | Subtype::Plains | Subtype::Planet | Subtype::PowerPlant | Subtype::Sphere | Subtype::Swamp | Subtype::Tower | Subtype::Town | Subtype::Urzas => TypeSet::of(&[CardType::Land]),
             Subtype::Ajani | Subtype::Aminatou | Subtype::Angrath | Subtype::Arlinn | Subtype::Ashiok | Subtype::Bahamut | Subtype::Basri | Subtype::Bolas | Subtype::Calix | Subtype::Chandra | Subtype::Comet | Subtype::Dack | Subtype::Dakkon | Subtype::Daretti | Subtype::Davriel | Subtype::Dellian | Subtype::Dihada | Subtype::Domri | Subtype::Dovin | Subtype::Ellywick | Subtype::Elminster | Subtype::Elspeth | Subtype::Estrid | Subtype::Freyalise | Subtype::Garruk | Subtype::Gideon | Subtype::Grist | Subtype::Guff | Subtype::Huatli | Subtype::Jace | Subtype::Jared | Subtype::Jaya | Subtype::Jeska | Subtype::Kaito | Subtype::Karn | Subtype::Kasmina | Subtype::Kaya | Subtype::Kiora | Subtype::Koth | Subtype::Liliana | Subtype::Lolth | Subtype::Lukka | Subtype::Minsc | Subtype::Mordenkainen | Subtype::Nahiri | Subtype::Narset | Subtype::Niko | Subtype::Nissa | Subtype::Nixilis | Subtype::Oko | Subtype::Quintorius | Subtype::Ral | Subtype::Rowan | Subtype::Saheeli | Subtype::Samut | Subtype::Sarkhan | Subtype::Serra | Subtype::Sivitri | Subtype::Sorin | Subtype::Szat | Subtype::Tamiyo | Subtype::Tasha | Subtype::Teferi | Subtype::Teyo | Subtype::Tezzeret | Subtype::Tibalt | Subtype::Tyvar | Subtype::Ugin | Subtype::Urza | Subtype::Venser | Subtype::Vivien | Subtype::Vraska | Subtype::Vronos | Subtype::Will | Subtype::Windgrace | Subtype::Wrenn | Subtype::Xenagos | Subtype::Yanggu | Subtype::Yanling | Subtype::Zariel => TypeSet::of(&[CardType::Planeswalker]),
@@ -2060,8 +2063,13 @@ mod card_type_tests {
             (Subtype::JemHadar, "Jem'Hadar"),
             (Subtype::Talaxian, "Talaxian"),
         ];
-        assert_eq!(Subtype::ALL.len(), 470 + appended.len());
+        assert_eq!(Subtype::ALL.len(), 470 + appended.len() + 1);
         assert_eq!(Subtype::CREATURE_TYPES.len(), 330 + appended.len());
+        // Communicator is the artifact type added after those creature types, so it holds the last number and no
+        // creature-type place.
+        assert_eq!(Subtype::Communicator as u16, Subtype::ALL.len() as u16 - 1);
+        assert_eq!(Subtype::named("Communicator"), Some(Subtype::Communicator));
+        assert!(!Subtype::Communicator.is_creature_type());
         for (i, (n, name)) in appended.into_iter().enumerate() {
             assert_eq!(Subtype::named(name), Some(n));
             assert_eq!(n.name(), name);

@@ -218,9 +218,9 @@ public sealed class SubtypeSet
     /// <summary>Artifact types (CR 205.3g).</summary>
     public static readonly SubtypeSet Artifact = new("artifact types", [CardType.Artifact],
     [
-        "Attraction", "Blood", "Bobblehead", "Book", "Clue", "Contraption", "Equipment", "Food", "Fortification", "Gold",
-        "Heartwood", "Incubator", "Infinity", "Junk", "Lander", "Map", "Mutagen", "Powerstone", "Spacecraft", "Stone", "Treasure",
-        "Vehicle", "Vibranium",
+        "Attraction", "Blood", "Bobblehead", "Book", "Clue", "Communicator", "Contraption", "Equipment", "Food", "Fortification",
+        "Gold", "Heartwood", "Incubator", "Infinity", "Junk", "Lander", "Map", "Mutagen", "Powerstone", "Spacecraft", "Stone",
+        "Treasure", "Vehicle", "Vibranium",
     ]);
 
     /// <summary>Enchantment types (CR 205.3h).</summary>
