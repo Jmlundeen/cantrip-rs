@@ -6096,16 +6096,35 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     }
     // The land cards in the graveyard that a way a permanent gives lets the player play (CR 305.1, 604): once during each of
     // their turns, say. Looked for only when the graveyard holds a land card.
+    // A modal double-faced card whose back face is a land is played as that face (CR 712.12) by such a way as well, the way
+    // judging the card as that face (CR 712.8a: "play a land" asks of the face that is played).
     let mut granted: Option<Vec<Given<GrantedWay>>> = None;
-    for &id in cx.s().zone(Zone::graveyard(player)) {
-        if !cx.chars(id).is(CardType::Land) || (!bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id)) || forbidden(id, cx.s().obj(id).card) {
-            continue;
+    let mut by_way = |id: ObjectId, from: ZoneKind, options: &mut Vec<ActionOption>| {
+        if !bans.is_empty() && crate::static_rules::enter_banned(cx, &bans, id) {
+            return;
+        }
+        let card = cx.s().obj(id).card;
+        let front = cx.chars(id).is(CardType::Land) && !forbidden(id, card);
+        let back = cx.card(card).back.filter(|_| cx.card(card).back_land).map(|back| cx.card_id(back)).filter(|&back| !forbidden(id, back));
+        if !front && back.is_none() {
+            return;
         }
         for way in granted.get_or_insert_with(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)).iter() {
-            if way.what.lands && (way.what.cost)(cx, &way.asker(), id, player).is_some() {
+            if !way.what.lands || way.what.from != from {
+                continue;
+            }
+            if front && (way.what.cost)(cx, &way.asker(), id, player).is_some() {
                 options.push(ActionOption { granted_by: Some(way.grant), ..ActionOption::on(ActionKind::PlayLand, id, 0) });
             }
+            if let Some(face) = back
+                && (way.what.cost)(&QueryAsFace { q: cx, cards: cx.cards(), spell: id, face }, &way.asker(), id, player).is_some()
+            {
+                options.push(ActionOption { granted_by: Some(way.grant), ..ActionOption::on(ActionKind::PlayLand, id, WAY_BACK_FACE) });
+            }
         }
+    };
+    for &id in cx.s().zone(Zone::graveyard(player)) {
+        by_way(id, ZoneKind::Graveyard, options);
     }
     // A land a card lets this player play from where it is (CR 305.1): "you may play that card". Each permission is its own.
     for p in &cx.s().permissions {

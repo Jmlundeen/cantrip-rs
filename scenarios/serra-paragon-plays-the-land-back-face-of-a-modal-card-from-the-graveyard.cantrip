@@ -1,0 +1,41 @@
+# Serra Paragon: "Once during each of your turns, you may play a land from your graveyard ..." A modal double-faced card
+# whose back face is a land is played as that face (CR 712.12), from the graveyard as from a hand: Faithless Looting
+# discards Bala Ged Recovery (a sorcery, its back face the land Bala Ged Sanctuary), and Bot1 plays it from the graveyard
+# as Bala Ged Sanctuary, which enters tapped. It was the turn's land play (CR 305.1): no Plains can be played after it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Faithless Looting
+Serra Paragon
+Plains
+Plains
+Bala Ged Recovery
+Plains x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Bala Ged Recovery; Plains)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+Bot1.Graveyard.Bala Ged Recovery.Play(Ability: Once during each of your turns)
+! Bot1.Hand.Plains.Play
+
+[Expect]
+Bot1.Battlefield.Bala Ged Sanctuary.Tapped = true
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Serra Paragon; Bala Ged Sanctuary
+Bot1.Graveyard = Black Lotus; Faithless Looting; Plains
