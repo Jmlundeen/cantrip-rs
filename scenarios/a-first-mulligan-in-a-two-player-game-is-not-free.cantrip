@@ -1,0 +1,28 @@
+# CR 103.5c makes the first mulligan free only in a multiplayer game. In a duel each mulligan counts: Bot1 mulligans
+# twice and, keeping, puts two cards on the bottom of its library. Each deck is a single card over and over, so the
+# shuffles cannot change what is expected.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.PlayFirst
+Bot1.Mulligan
+Bot2.Keep
+Bot1.Mulligan
+Bot1.Keep
+Bot1.Choose(Island; Island)
+[T1 Bot1.Main1]
+
+[Expect]
+Turn = 1
+ActivePlayer = Bot1
+# Five kept; the starting player of a duel does not draw on turn one (CR 103.8a).
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 15

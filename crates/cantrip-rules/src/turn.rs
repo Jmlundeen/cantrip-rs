@@ -236,6 +236,12 @@ fn turn_would_have_begun(s: &mut GameState, p: PlayerId) {
 }
 
 /// The start of the game (CR 103): who goes first, the opening hands, mulligans.
+/// The mulligans of `taken` that count (CR 103.5c): in a multiplayer game the first is free, putting no card on the
+/// bottom and not counting toward the number a player may take. That is the number of cards put on the bottom on keeping.
+pub fn counted_mulligans(s: &GameState, taken: u8) -> u8 {
+    if s.players.len() >= 3 { taken.saturating_sub(1) } else { taken }
+}
+
 pub fn opening(cx: &mut Cx) -> R<Flow> {
     // A scenario's fixed deal has dealt and kept the hands already, and goes straight to the opening-hand actions.
     let dealt = cx.s().seats().all(|p| cx.s().player(p).kept);
@@ -273,7 +279,8 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
         let mut redraw = Vec::new();
         for p in undecided {
             let mulligans = cx.s().player(p).mulligans;
-            if mulligans >= 7 {
+            // Seven counted mulligans and the player keeps (`docs/rules-exceptions.md` RX-6).
+            if counted_mulligans(cx.s(), mulligans) >= 7 {
                 cx.st().update_player(p, |pl| pl.kept = true);
                 continue;
             }
@@ -282,11 +289,12 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
                 Some(Answer::Yes) => redraw.push(p),
                 Some(_) => {
                     cx.st().update_player(p, |pl| pl.kept = true);
-                    if mulligans > 0 {
+                    let bottom = counted_mulligans(cx.s(), mulligans);
+                    if bottom > 0 {
                         let hand = cx.s().zone(Zone::hand(p)).to_vec();
                         let answer = cx.ask_rule(
                             p,
-                            RequestKind::choose_cards(hand[0], Purpose::Discard, hand.clone(), hand, u32::from(mulligans), false, ""),
+                            RequestKind::choose_cards(hand[0], Purpose::Discard, hand.clone(), hand, u32::from(bottom), false, ""),
                         )?;
                         if let Some(Answer::Cards(bottom)) = answer {
                             for card in bottom {

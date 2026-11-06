@@ -706,7 +706,7 @@ impl Session {
                 self.told.push(Proto::Mulligan { player: request.player, count: i32::from(*mulligans) + 1 });
             }
             (RequestKind::Mulligan { mulligans }, _) => {
-                self.told.push(Proto::Kept { player: request.player, cards: 7 - i32::from(*mulligans) });
+                self.told.push(Proto::Kept { player: request.player, cards: 7 - i32::from(counted_mulligans(&self.game.state, *mulligans)) });
             }
             _ => {}
         }

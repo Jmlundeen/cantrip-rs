@@ -1,0 +1,33 @@
+# CR 103.5c: in a multiplayer game the first mulligan a player takes doesn't count toward the number of cards that player
+# puts on the bottom of their library. In a game of three, Bot1 plays first and mulligans once: its seven go back, it
+# draws seven more and keeps all seven, putting none on the bottom (no card is asked for). Each deck is a single card over
+# and over, so the shuffle cannot change what is expected.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Bot3 Deck]
+Mountain x20
+
+[Actions]
+Bot1.PlayFirst
+Bot1.Mulligan
+Bot2.Keep
+Bot3.Keep
+Bot1.Keep
+[T1 Bot1.Main1]
+
+[Expect]
+Turn = 1
+ActivePlayer = Bot1
+# Seven in hand and none under the library: the first player of a game of three draws on turn one (CR 103.8a), so eight.
+Bot1.Hand.Count = 8
+Bot1.Library.Count = 12
+Bot2.Hand.Count = 7
+Bot3.Hand.Count = 7

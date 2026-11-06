@@ -138,8 +138,10 @@ RX-5 now covers only what it still lists.
 
 **What the rules say.** A player may mulligan as many times as they like.
 
-**What the engine does instead, and why.** After seven mulligans the player keeps (`turn.rs`). A player who mulligans
-seven times has an empty opening hand to put cards back from, so an eighth mulligan makes no practical difference.
+**What the engine does instead, and why.** After seven counted mulligans the player keeps (`turn.rs`); in a multiplayer
+game the first mulligan is free and does not count (CR 103.5c), so that is after eight there. A player who has taken
+seven counted mulligans has an empty opening hand to put cards back from, so another mulligan makes no practical
+difference.
 
 ### RX-7: A card an ability is activated from in a hidden zone is revealed once, not kept revealed while the ability is on the stack
 

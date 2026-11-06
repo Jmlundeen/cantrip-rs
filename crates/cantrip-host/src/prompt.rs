@@ -1429,7 +1429,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         RequestKind::Mulligan { mulligans } => PromptPayload::MulliganPromptMessage(MulliganPrompt {
             player,
             mulligans: i32::from(*mulligans),
-            keeps: 7 - i32::from(*mulligans),
+            keeps: 7 - i32::from(counted_mulligans(&game.state, *mulligans)),
         }),
         RequestKind::ChooseStartingPlayer { candidates } => {
             PromptPayload::ChooseStartingPlayerPromptMessage(ChooseStartingPlayerPrompt {
