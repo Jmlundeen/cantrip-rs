@@ -1,0 +1,54 @@
+# Ancient Greenwarden's third ability (CR 603.2, 603.6a): a land entering causes a triggered ability of a permanent its
+# controller controls to trigger an additional time. Bot1 casts it on turn 1 off four mana sources; its own land,
+# Adventurer's Inn, enters the same turn, so the Inn's "you gain 2 life" triggers twice and Bot1 is at 24, not 22.
+# Its Reach (CR 702.17) is why it may block Bot2's flying Ornithopter on turn 4, which its 5 power kills.
+
+[Bot1 Deck]
+Ancient Greenwarden
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Adventurer's Inn
+Forest x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ancient Greenwarden.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Adventurer's Inn.Play
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+? Bot1.Life = 24
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Block(Ancient Greenwarden > Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 24
+
+[Expect]
+Turn = 4
+Bot1.Life = 24
+Bot1.Battlefield.Ancient Greenwarden.Power = 5
+Bot1.Battlefield.Ancient Greenwarden.Toughness = 7
+Bot2.Graveyard = Ornithopter

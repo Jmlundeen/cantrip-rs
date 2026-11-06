@@ -1,0 +1,11 @@
+{
+  "name": "Ancient Greenwarden",
+  "manaCost": "{4}{G}{G}",
+  "type": "Creature — Elemental",
+  "power": 5,
+  "toughness": 7,
+  "oracleText": "Reach (This creature can block creatures with flying.)\nYou may play lands from your graveyard.\nIf a land entering causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time.",
+  "keywords": [
+    "Reach"
+  ]
+}

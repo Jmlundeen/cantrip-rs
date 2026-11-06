@@ -1,0 +1,50 @@
+# Ancient Greenwarden's third ability doubles only "a triggered ability of a permanent you control" (CR 603.2): Bot1 casts
+# it on turn 1, and Bot2's own Sazh's Chocobo, whose landfall puts a +1/+1 counter on it, triggers once when Bot2's Forest
+# enters on turn 4 - one counter, not two.
+
+[Bot1 Deck]
+Ancient Greenwarden
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Sazh's Chocobo
+Black Lotus
+Forest x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ancient Greenwarden.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Sazh's Chocobo.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Sazh's Chocobo.Counters.PlusOnePlusOne = 1
+
+[Expect]
+Turn = 4
+Bot2.Battlefield.Sazh's Chocobo.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Sazh's Chocobo.Power = 1
+Bot1.Battlefield.Ancient Greenwarden.Power = 5
