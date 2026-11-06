@@ -1335,6 +1335,7 @@ counter_kinds! {
     Conqueror = 63, "conqueror", "Conqueror";
     Film = 64, "film", "Film";
     Peace = 65, "peace", "Peace";
+    Mire = 66, "mire", "Mire";
 }
 
 impl CounterKind {
@@ -1920,6 +1921,20 @@ mod tests {
         let colorless_white = ManaCost { hybrid: [Some((Mana::C, Mana::W)), None, None, None, None, None], ..ManaCost::ZERO };
         assert_eq!((colorless_white.mana_value(), colorless_white.colors()), (1, ColorSet::NONE.with(Color::White)));
         assert_eq!(colorless_white.to_string(), "{C/W}");
+    }
+
+    /// CR 122.1: every kind of counter is named once, as Oracle text writes it, and the scenario dump's token for it is its
+    /// own: a kind added at the end (Cyclopean Tomb's mire counter) takes the next index and clashes with none before it.
+    #[test]
+    fn every_counter_kind_has_its_own_name_and_token() {
+        for (i, kind) in CounterKind::ALL.into_iter().enumerate() {
+            assert_eq!(kind as usize, i, "{kind:?} sits at its index");
+            for other in &CounterKind::ALL[..i] {
+                assert_ne!(kind.name(), other.name());
+                assert_ne!(kind.token(), other.token());
+            }
+        }
+        assert_eq!((CounterKind::Mire.name(), CounterKind::Mire.token()), ("mire", "Mire"));
     }
 }
 
