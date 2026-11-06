@@ -3124,6 +3124,21 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
     [Key(10)]
     public BlockVerdictView Verdict { get; set; } = new() { Complete = true };
 
+    /// <summary>
+    /// How many attackers each of <see cref="Eligible"/> can block, index for index (CR 509.1a): 1 for most creatures, more
+    /// for one that "can block an additional creature", 0 for one that "can block any number of creatures". A creature
+    /// blocking several attackers is declared with one block of each.
+    /// </summary>
+    [Key(11)]
+    public List<int> BlockCapacities { get; set; } = [];
+
+    /// <summary>How many attackers <paramref name="blocker"/> can block; <see cref="int.MaxValue"/> for any number, 1 for one not listed.</summary>
+    public int CapacityOf(ViewHandle blocker)
+    {
+        int at = Eligible.IndexOf(blocker);
+        return at < 0 || at >= BlockCapacities.Count ? 1 : BlockCapacities[at] == 0 ? int.MaxValue : BlockCapacities[at];
+    }
+
     /// <summary>Whether a creature blocking <paramref name="declared"/> blocks <paramref name="attacker"/>: the same creature, or a member of its band.</summary>
     public bool BlocksThrough(ViewHandle declared, ViewHandle attacker)
     {

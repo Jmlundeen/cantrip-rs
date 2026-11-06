@@ -1518,6 +1518,22 @@ impl<'a> Projector<'a> {
                         view.granted_abilities.push(AbilityTextView { text: format!("Blocks {}{until} if able.", game.name(attacker)), spent: false });
                         continue;
                     }
+                    // A requirement to block every attacker (CR 509.1c): "Blocks each attacking creature this turn if able."
+                    EffectKind::MustBlockEach => {
+                        let until = self.until_text(e.duration);
+                        view.granted_abilities.push(AbilityTextView { text: format!("Blocks each attacking creature{until} if able."), spent: false });
+                        continue;
+                    }
+                    // How many it can block (CR 509.1a): "Can block any number of creatures this turn."
+                    EffectKind::BlockCapacity(capacity) => {
+                        let what = match capacity {
+                            BlockCapacity::AnyNumber => "any number of creatures".to_string(),
+                            BlockCapacity::Additional(1) => "an additional creature".to_string(),
+                            BlockCapacity::Additional(n) => format!("an additional {n} creatures"),
+                        };
+                        view.granted_abilities.push(AbilityTextView { text: format!("Can block {what}{}.", self.until_text(e.duration)), spent: false });
+                        continue;
+                    }
                     // A requirement to attack (CR 508.1d), and what: "Attacks Gideon, Battle-Forged during its controller's next
                     // turn if able."
                     EffectKind::MustAttackAt(at) => {

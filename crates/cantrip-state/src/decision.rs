@@ -859,6 +859,36 @@ pub struct BlockRequirements {
     /// What each block that costs something costs (CR 509.1d); a block with no entry is free. A requirement is never obeyed
     /// by paying (CR 509.1c): `most` counts free blocks only. Empty until an effect makes blocking cost something.
     pub costs: Vec<BlockCost>,
+    /// Each creature offered that can block more than one attacker (CR 509.1a, `BlockCapacity`), with how many it can block
+    /// (`u32::MAX` for any number); one not listed blocks one at most. Empty where no creature can block more than one.
+    pub capacities: Vec<(ObjectId, u32)>,
+}
+
+/// How many creatures a creature can block, past the one every creature can (CR 509.1a): "can block any number of
+/// creatures" (Wall of Glare, Valor Made Real), or "can block an additional creature" - or "an additional N creatures"
+/// (Watcher in the Web's seven, Hundred-Handed One's ninety-nine). They add up: two "an additional creature" make three,
+/// and "any number" is any number whatever else applies. From a static ability (`CardDef::block_capacities`), or from a
+/// resolved spell or ability (`EffectKind::BlockCapacity`), which is an effect on the creature and no ability of it (CR
+/// 113.1a, 611.2c).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum BlockCapacity {
+    AnyNumber,
+    Additional(u32),
+}
+
+impl BlockCapacity {
+    /// How many creatures a creature under `capacities` can block (CR 509.1a): one, and each additional one; `u32::MAX` for
+    /// any number. The additional ones are what cards print (seven, ninety-nine), a handful at once, so their sum is plain.
+    pub fn total(capacities: impl IntoIterator<Item = BlockCapacity>) -> u32 {
+        let mut total = 1;
+        for c in capacities {
+            match c {
+                BlockCapacity::AnyNumber => return u32::MAX,
+                BlockCapacity::Additional(n) => total += n,
+            }
+        }
+        total
+    }
 }
 
 /// One requirement on a declaration of blockers (CR 509.1c), obeyed by a block that matches it: `blocker` blocks `attacker`
@@ -904,6 +934,11 @@ impl BlockRequirements {
     /// The fewest and most creatures that may block `attacker` (1 and any number for one not listed).
     pub fn limits_of(&self, attacker: ObjectId) -> (u32, u32) {
         self.limits.iter().find(|l| l.0 == attacker).map_or((1, u32::MAX), |l| (l.1, l.2))
+    }
+
+    /// How many attackers `blocker` can block (CR 509.1a): one for a creature not listed, `u32::MAX` for any number.
+    pub fn capacity_of(&self, blocker: ObjectId) -> u32 {
+        self.capacities.iter().find(|c| c.0 == blocker).map_or(1, |c| c.1)
     }
 
     /// Whether `blocker` blocking `attacker` costs nothing to declare (CR 509.1d).

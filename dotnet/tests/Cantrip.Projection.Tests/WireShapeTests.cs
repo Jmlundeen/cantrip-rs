@@ -29,7 +29,7 @@ public sealed class WireShapeTests
     /// The wire as it stands. Written as version and digest together so the two are updated in one edit rather than
     /// one of them being remembered — and so this line never names a version it has drifted away from.
     /// </summary>
-    private const string Recorded = "227:64AD789DE62BA325";
+    private const string Recorded = "228:D6BB32EB9AF46DAF";
 
     /// <summary>
     /// In-person play's own wire (<c>Cantrip.Protocol.InPerson</c>, docs/in-person.md), guarded the same way against its

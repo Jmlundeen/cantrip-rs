@@ -360,9 +360,20 @@ pub enum AskKind {
     },
     /// One division per creature with a choice, sorted by source.
     AssignCombatDamage { divisions: Vec<DivisionObs> },
-    /// Each of `eligible` blocks one attacker of `allowed` or none. `required` the blocks effects require if able, of
-    /// which a declaration obeys `most`; `min_blockers`/`max_blockers` each attacker's, index for index with `attackers`.
-    DeclareBlockers { eligible: Vec<Ref>, attackers: Vec<Ref>, allowed: Vec<(Ref, Ref)>, required: Vec<(Ref, Ref)>, most: u8, min_blockers: Vec<u8>, max_blockers: Vec<u8> },
+    /// Each of `eligible` blocks one attacker of `allowed` or none - or, one listed in `capacities`, up to that many
+    /// (`u32::MAX` for any number, CR 509.1a). `required` the blocks effects require if able, of which a declaration obeys
+    /// `most`; `min_blockers`/`max_blockers` each attacker's, index for index with `attackers`.
+    DeclareBlockers {
+        eligible: Vec<Ref>,
+        attackers: Vec<Ref>,
+        allowed: Vec<(Ref, Ref)>,
+        required: Vec<(Ref, Ref)>,
+        most: u8,
+        min_blockers: Vec<u8>,
+        max_blockers: Vec<u8>,
+        #[serde(default)]
+        capacities: Vec<(Ref, u32)>,
+    },
     DiscardToHandSize { count: u8, hand: Vec<Ref> },
     Mulligan { mulligans: u8 },
     ChooseStartingPlayer { candidates: Vec<u8> },

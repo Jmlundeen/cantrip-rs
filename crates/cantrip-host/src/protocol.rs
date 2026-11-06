@@ -1087,6 +1087,11 @@ pub struct DeclareBlockersPrompt {
     /// of a band blocks every member, so it obeys a requirement to block any of them.
     #[serde(default)]
     pub bands: Vec<i32>,
+    /// How many attackers each of `eligible` can block, index for index (CR 509.1a): 1 for most creatures, more for one that
+    /// "can block an additional creature", 0 for one that can block any number. A creature declared to block several
+    /// attackers is one block of each.
+    #[serde(default)]
+    pub block_capacities: Vec<i32>,
     /// The rules' verdict on declaring no blockers: whether that may be declared, why not, and the blocks that may be declared
     /// first. Every other declaration is asked of the host (`CheckBlocks`).
     #[serde(default)]

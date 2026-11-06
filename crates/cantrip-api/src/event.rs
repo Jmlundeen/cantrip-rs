@@ -185,10 +185,12 @@ pub enum Event {
     /// the battlefield attacking (CR 508.4).
     AttackersDeclared { player: PlayerId, count: u32 },
     /// A creature blocks an attacker (CR 509.1, 509.1g): one event for each blocker and each attacker it blocks, so an
-    /// attacker blocked by two sees both. `declared` is the attacker it was declared to block; the other members of that
-    /// attacker's band, which it blocks too (CR 702.22h), come as `declared: false`. "Whenever this creature blocks" (CR 509.3a)
-    /// reads the declared one alone, triggering once; "whenever it blocks a creature" (CR 509.3b) and "becomes blocked by a
-    /// creature" (CR 509.3d) read each.
+    /// attacker blocked by two sees both, and a creature blocking several attackers (CR 509.1a) has one for each. `declared`
+    /// marks one event of each blocker: the first attacker it was declared to block. The other members of that attacker's
+    /// band, which it blocks too (CR 702.22h), and the other attackers a creature that can block several was declared to
+    /// block come as `declared: false`. "Whenever this creature blocks" (CR 509.3a) reads the declared one alone, triggering
+    /// once however many it blocks; "whenever it blocks a creature" (CR 509.3b) and "becomes blocked by a creature" (CR 509.3d)
+    /// read each.
     Blocks { blocker: ObjectId, attacker: ObjectId, declared: bool },
     /// An attacking creature was not blocked (CR 509.1h): decided as the declare blockers step's blocks are made.
     Unblocked { attacker: ObjectId, defender: Target },

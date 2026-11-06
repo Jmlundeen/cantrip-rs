@@ -2541,6 +2541,16 @@ pub struct LastingRule {
 /// controls.
 pub type BlockerLimit = fn(&dyn Query, ObjectId, ObjectId) -> Option<usize>;
 
+/// A static ability that lets a creature block more than one attacker (CR 509.1a): asked, while the object that has it is on
+/// the battlefield with its abilities, of each creature that could block - the object as `source`, then the creature - and
+/// `Some` names how many more it can block. A creature's own "this creature can block any number of creatures" (Wall of
+/// Glare) or "an additional creature each combat" (Two-Headed Giant of Foriys) asks `blocker == source`; another permanent's
+/// "enchanted creature can block any number of creatures" (Entangler), "equipped creature ..." (Echo Circlet) or "each
+/// creature you control ..." (High Ground) gives the creature no ability (CR 113.1a), so a creature that loses its abilities
+/// still can. What several give adds up (`BlockCapacity::total`). A resolved spell or ability's "can block any number of
+/// creatures this turn" (Valor Made Real) is `EffectKind::BlockCapacity` instead.
+pub type BlockCapacityRule = fn(&dyn Query, ObjectId, ObjectId) -> Option<BlockCapacity>;
+
 /// A static ability that requires a creature to block a particular attacker if able (CR 509.1c): asked, while the object that
 /// has it is on the battlefield with its abilities, of each block the restrictions allow - the object as `source`, then the
 /// blocker and the attacker; true makes that block a requirement. "All creatures able to block enchanted creature do so"
@@ -3401,6 +3411,8 @@ pub struct CardDef {
     pub block_rules: &'static [BlockRule],
     /// Its static abilities that limit how many creatures may block an attacker (CR 509.1b), while it is on the battlefield.
     pub blocker_limits: &'static [BlockerLimit],
+    /// Its static abilities that let a creature block more than one attacker (CR 509.1a), while it is on the battlefield.
+    pub block_capacities: &'static [BlockCapacityRule],
     /// Its static abilities that require creatures to block (CR 509.1c), while it is on the battlefield.
     pub block_requirements: &'static [BlockRequirement],
     /// Its static abilities that require an attacker to be blocked (CR 509.1c), while it is on the battlefield.
@@ -3683,6 +3695,7 @@ impl CardDef {
         spell_rules: &[],
         block_rules: &[],
         blocker_limits: &[],
+        block_capacities: &[],
         block_requirements: &[],
         must_be_blocked: &[],
         attack_rules: &[],
@@ -3784,6 +3797,7 @@ impl CardDef {
             (!self.spell_rules.is_empty(), "spell rules"),
             (!self.block_rules.is_empty(), "block rules"),
             (!self.blocker_limits.is_empty(), "blocker limits"),
+            (!self.block_capacities.is_empty(), "block capacities"),
             (!self.block_requirements.is_empty(), "block requirements"),
             (!self.must_be_blocked.is_empty(), "must be blocked"),
             (!self.attack_rules.is_empty(), "attack rules"),
@@ -4026,7 +4040,8 @@ pub struct CardTable {
     pub mana_replaces: Vec<bool>,
     /// Whether any card limits the spells cast each turn.
     pub any_cast_limit: bool,
-    /// Which cards have block rules or blocker limits (CR 509.1b): the permanents whose static abilities limit blocking.
+    /// Which cards have block rules, blocker limits (CR 509.1b) or block capacities (CR 509.1a): the permanents whose static
+    /// abilities limit blocking, or let a creature block more.
     pub block_rules: Vec<bool>,
     /// Which cards have attack rules (CR 508.1c).
     pub attack_rules: Vec<bool>,
@@ -4622,7 +4637,8 @@ impl CardTable {
         let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty() || !c.additional_triggers.is_empty()).collect();
         let designators: Vec<bool> = cards.iter().map(|c| c.ascend || c.storied).collect();
         let engines: Vec<bool> = cards.iter().map(|c| c.start_your_engines).collect();
-        let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty() || !c.blocker_limits.is_empty()).collect();
+        let block_rules: Vec<bool> =
+            cards.iter().map(|c| !c.block_rules.is_empty() || !c.blocker_limits.is_empty() || !c.block_capacities.is_empty()).collect();
         let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
         let attack_alone_rules: Vec<bool> = cards.iter().map(|c| !c.attack_alone_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();

@@ -10,6 +10,10 @@
 //! (CR 509.1c) is completed only by adding the block it requires. A block that no legal declaration has alongside the blocks
 //! declared is not addable; taking a block back out is always allowed.
 //!
+//! A declaration is a list of blocks, each one creature blocking one attacker. A creature appears in as many as it can block
+//! (`BlockRequirements::capacity_of`: one, or more for "can block an additional creature" and "can block any number of
+//! creatures", CR 509.1a), each attacker once.
+//!
 //! `solve` is the one search: the most requirements a declaration can obey without paying a cost (asked once as the question
 //! is made), and whether a declaration that obeys that many extends given blocks (each addable block).
 
@@ -63,7 +67,8 @@ impl BlockRequirements {
                 .iter()
                 .copied()
                 .filter(|&(b, a)| {
-                    !blocks.iter().any(|x| x.0 == b)
+                    count_u32(blocks.iter().filter(|x| x.0 == b).count()) < self.capacity_of(b)
+                        && !blocks.iter().any(|x| x.0 == b && self.blocks_through(x.1, a))
                         && count_u32(blocks.iter().filter(|x| x.1 == a).count()) < self.limits_of(a).1
                         && {
                             let mut more = blocks.to_vec();
@@ -79,12 +84,21 @@ impl BlockRequirements {
     }
 
     /// The first thing that keeps `blocks` from being declared as it is, if anything does, and whether blocks added to it could
-    /// mend it: not past a block that is not allowed, a creature blocking twice or an attacker over its most.
+    /// mend it: not past a block that is not allowed, a creature blocking more creatures than it can or one creature twice,
+    /// or an attacker over its most.
     fn issue(&self, allowed: &[(ObjectId, ObjectId)], blocks: &[(ObjectId, ObjectId)]) -> Option<(BlockIssue, bool)> {
         let issue = |creature, words: String, other, rule, mendable| Some((BlockIssue { creature, words, other, rule }, mendable));
         for (i, &(b, a)) in blocks.iter().enumerate() {
-            if blocks[..i].iter().any(|x| x.0 == b) {
-                return issue(b, "can block only one creature".into(), None, "509.1a", false);
+            // CR 509.1a: one creature for each blocker to block, or as many as it can block (`BlockCapacity`).
+            let capacity = self.capacity_of(b);
+            if capacity != u32::MAX && count_u32(blocks[..=i].iter().filter(|x| x.0 == b).count()) > capacity {
+                let words = if capacity == 1 { "can block only one creature".into() } else { format!("can block only {}", creatures(capacity)) };
+                return issue(b, words, None, "509.1a", false);
+            }
+            // Each attacker it blocks is chosen once, and a creature blocking one member of a band already blocks the others
+            // (CR 702.22h).
+            if blocks[..i].iter().any(|x| x.0 == b && self.blocks_through(x.1, a)) {
+                return issue(b, "already blocks".into(), Some(a), "509.1a", false);
             }
             if !allowed.contains(&(b, a)) {
                 return issue(b, "can't block".into(), Some(a), "509.1b", false);
@@ -123,16 +137,18 @@ impl BlockRequirements {
         None
     }
 
-    /// The declaration extending `fixed` with blocks among `allowed`, by creatures `fixed` does not have block, that keeps
-    /// every attacker it blocks within its limits and obeys the most requirements (CR 509.1c), with how many; with `enough`,
-    /// the first found that obeys at least that many. `None` when there is none. With `free_only`, blocks that cost something
-    /// (CR 509.1d) are left out: no requirement is obeyed by paying a cost (CR 509.1c).
+    /// The declaration extending `fixed` with blocks among `allowed`, each creature blocking no more attackers than it can (one,
+    /// or its `capacity_of`, `fixed`'s blocks counted), that keeps every attacker it blocks within its limits and obeys the most
+    /// requirements (CR 509.1c), with how many; with `enough`, the first found that obeys at least that many. `None` when there
+    /// is none. With `free_only`, blocks that cost something (CR 509.1d) are left out: no requirement is obeyed by paying a cost
+    /// (CR 509.1c).
     ///
     /// Only blocks of an attacker a requirement can be obeyed through, or one `fixed` blocks, can obey a requirement or make up
     /// an attacker's fewest blockers, so only those are searched: the blockers with the most to obey first, their best blocks
-    /// first. A branch is cut when it cannot beat the best found (or reach `enough`) - bounded by what the creatures still to
-    /// come could obey, and by what the attackers' room for more blockers lets them obey, whichever is less - or when it leaves
-    /// an attacker short of blockers no remaining creature can make up; the search ends once a declaration reaches the bound.
+    /// first, each choosing which of them to block (a creature that can block several, any set of them up to its capacity). A
+    /// branch is cut when it cannot beat the best found (or reach `enough`) - bounded by what the creatures still to come could
+    /// obey, and by what the attackers' room for more blockers lets them obey, whichever is less - or when it leaves an attacker
+    /// short of blockers no remaining creature can make up; the search ends once a declaration reaches the bound.
     pub fn solve(
         &self,
         allowed: &[(ObjectId, ObjectId)],
@@ -141,6 +157,10 @@ impl BlockRequirements {
         free_only: bool,
     ) -> Option<(u32, Vec<(ObjectId, ObjectId)>)> {
         let usable = |b: ObjectId, a: ObjectId| !free_only || self.free(b, a);
+        // How many more attackers a creature can block past those `fixed` has it block (none past its capacity), and whether
+        // it may block `a` as well: not an attacker it blocks already, as declared or through a band (CR 702.22h).
+        let room = |b: ObjectId| self.capacity_of(b).saturating_sub(count_u32(fixed.iter().filter(|f| f.0 == b).count()));
+        let open = |b: ObjectId, a: ObjectId| room(b) > 0 && !fixed.iter().any(|f| f.0 == b && self.blocks_through(f.1, a));
         let mut targets: Vec<ObjectId> = Vec::new();
         let add = |x: ObjectId, targets: &mut Vec<ObjectId>| {
             if !targets.contains(&x) {
@@ -152,15 +172,20 @@ impl BlockRequirements {
         }
         for r in &self.required {
             for &(b, a) in allowed {
-                if self.obeys(r, b, a) && usable(b, a) && !fixed.iter().any(|f| f.0 == b) {
+                if self.obeys(r, b, a) && usable(b, a) && open(b, a) {
                     add(a, &mut targets);
                 }
             }
         }
         let limits: Vec<(u32, u32)> = targets.iter().map(|&a| self.limits_of(a)).collect();
-        // The requirements on a blocker (Lure, "blocks this turn if able") count block by block; one on an attacker ("must be
-        // blocked if able") once, however many creatures block it, so the search keeps how many blocks obey each.
-        let own = |b: ObjectId, a: ObjectId| count_u32(self.required.iter().filter(|r| r.blocker.is_some() && self.obeys(r, b, a)).count());
+        // A requirement to block a given attacker (Lure, "blocks each attacking creature if able") counts block by block; one
+        // on a blocker to block whichever attacker ("blocks this turn if able") once for the creature, however many it blocks;
+        // and one on an attacker ("must be blocked if able") once, however many creatures block it, so the search keeps how
+        // many blocks obey each.
+        let own = |b: ObjectId, a: ObjectId| {
+            count_u32(self.required.iter().filter(|r| r.blocker == Some(b) && r.attacker.is_some() && self.obeys(r, b, a)).count())
+        };
+        let own_any = |b: ObjectId| count_u32(self.required.iter().filter(|r| r.blocker == Some(b) && r.attacker.is_none()).count());
         let on_attacker: Vec<ObjectId> = self.required.iter().filter(|r| r.blocker.is_none()).filter_map(|r| r.attacker).collect();
         let through: Vec<Vec<usize>> =
             targets.iter().map(|&t| (0..on_attacker.len()).filter(|&k| self.blocks_through(t, on_attacker[k])).collect()).collect();
@@ -168,8 +193,11 @@ impl BlockRequirements {
         let mut counts = vec![0u32; targets.len()];
         let mut met = vec![0u32; on_attacker.len()];
         let mut fixed_gain = 0;
-        for &(b, a) in fixed {
+        for (i, &(b, a)) in fixed.iter().enumerate() {
             fixed_gain += own(b, a);
+            if !fixed[..i].iter().any(|f| f.0 == b) {
+                fixed_gain += own_any(b);
+            }
             if let Some(t) = targets.iter().position(|&x| x == a) {
                 counts[t] += 1;
                 for &k in &through[t] {
@@ -183,39 +211,47 @@ impl BlockRequirements {
         if counts.iter().zip(&limits).any(|(&n, &(_, most))| n > most) {
             return None;
         }
-        // Each other creature that could block one of `targets`, with the attackers it may block and how many requirements on
-        // it each block obeys, the most first.
-        let mut blockers: Vec<(ObjectId, Vec<(usize, u32)>)> = Vec::new();
+        // Each creature that could block one more of `targets`, with the attackers it may block and how many requirements to
+        // block that attacker each block obeys, the most first; how many more it can block; and how many requirements to block
+        // whichever attacker its first block obeys (none for one `fixed` has blocking already).
+        let mut blockers: Vec<Blocker> = Vec::new();
         for &(b, a) in allowed {
-            if fixed.iter().any(|f| f.0 == b) || !usable(b, a) {
+            if !usable(b, a) || !open(b, a) {
                 continue;
             }
             let Some(t) = targets.iter().position(|&x| x == a) else { continue };
             let g = own(b, a);
-            match blockers.iter_mut().find(|e| e.0 == b) {
-                Some(e) => e.1.push((t, g)),
-                None => blockers.push((b, vec![(t, g)])),
+            match blockers.iter_mut().find(|e| e.id == b) {
+                Some(e) => e.options.push((t, g)),
+                None => blockers.push(Blocker {
+                    id: b,
+                    options: vec![(t, g)],
+                    room: room(b),
+                    any: if fixed.iter().any(|f| f.0 == b) { 0 } else { own_any(b) },
+                }),
             }
         }
-        for (_, options) in &mut blockers {
-            options.sort_by_key(|&(t, g)| (std::cmp::Reverse(g), std::cmp::Reverse(through[t].len())));
+        for e in &mut blockers {
+            e.options.sort_by_key(|&(t, g)| (std::cmp::Reverse(g), std::cmp::Reverse(through[t].len())));
         }
-        blockers.sort_by_key(|(_, options)| std::cmp::Reverse(options.first().map_or(0, |o| o.1)));
-        // What the blockers from each point on could obey, each its best block; how many of them could block each target; and,
+        blockers.sort_by_key(|e| std::cmp::Reverse(e.any + e.options.first().map_or(0, |o| o.1)));
+        // What the blockers from each point on could obey, each its best blocks; how many of them could block each target; and,
         // for each target, the blockers that could block it by what that block obeys, the most first.
         let mut best_after = vec![0u32; blockers.len() + 1];
         let mut able_after = vec![vec![0u32; targets.len()]; blockers.len() + 1];
         for i in (0..blockers.len()).rev() {
-            best_after[i] = best_after[i + 1] + blockers[i].1.first().map_or(0, |o| o.1);
+            let e = &blockers[i];
+            best_after[i] = best_after[i + 1] + e.any + e.options.iter().take(e.room as usize).map(|o| o.1).sum::<u32>();
             able_after[i] = able_after[i + 1].clone();
-            for &(t, _) in &blockers[i].1 {
+            for &(t, _) in &e.options {
                 able_after[i][t] += 1;
             }
         }
+        let bands: Vec<u32> = targets.iter().map(|&t| self.bands.iter().find(|b| b.0 == t).map_or(0, |b| b.1)).collect();
         let mut by_target: Vec<Vec<(usize, u32)>> = vec![Vec::new(); targets.len()];
-        for (i, (_, options)) in blockers.iter().enumerate() {
-            for &(t, g) in options {
-                by_target[t].push((i, g));
+        for (i, e) in blockers.iter().enumerate() {
+            for &(t, g) in &e.options {
+                by_target[t].push((i, e.any + g));
             }
         }
         for list in &mut by_target {
@@ -223,18 +259,21 @@ impl BlockRequirements {
         }
 
         struct Search<'a> {
-            blockers: &'a [(ObjectId, Vec<(usize, u32)>)],
+            blockers: &'a [Blocker],
             limits: &'a [(u32, u32)],
             best_after: &'a [u32],
             able_after: &'a [Vec<u32>],
             by_target: &'a [Vec<(usize, u32)>],
             through: &'a [Vec<usize>],
             meets: &'a [Vec<usize>],
+            /// The band of each target, 0 for none.
+            bands: &'a [u32],
             enough: Option<u32>,
             counts: Vec<u32>,
             met: Vec<u32>,
-            chosen: Vec<Option<usize>>,
-            best: Option<(u32, Vec<Option<usize>>)>,
+            /// The blocks chosen so far, each a blocker's index and a target's.
+            chosen: Vec<(usize, usize)>,
+            best: Option<(u32, Vec<(usize, usize)>)>,
             ceiling: u32,
         }
         impl Search<'_> {
@@ -294,12 +333,24 @@ impl BlockRequirements {
                     None if self.best.as_ref().is_some_and(|(n, _)| reach <= *n) => return,
                     _ => {}
                 }
-                for k in 0..self.blockers[i].1.len() {
-                    let (t, gain) = self.blockers[i].1[k];
+                self.pick(i, 0, self.blockers[i].room, true, obeyed);
+            }
+
+            /// Blocker `i`'s blocks: each of its options from `from` on, with up to `left` more after it, then no more (with
+            /// `first`, no block at all) - each set of attackers it can block once, in the order of its options.
+            fn pick(&mut self, i: usize, from: usize, left: u32, first: bool, obeyed: u32) {
+                let blockers = self.blockers;
+                let blocker = &blockers[i];
+                for k in from..blocker.options.len() {
+                    let (t, gain) = blocker.options[k];
                     if self.counts[t] >= self.limits[t].1 {
                         continue;
                     }
-                    let mut more = gain;
+                    // Not a second member of a band it blocks already (CR 702.22h).
+                    if self.bands[t] != 0 && self.chosen.iter().rev().take_while(|c| c.0 == i).any(|c| self.bands[c.1] == self.bands[t]) {
+                        continue;
+                    }
+                    let mut more = gain + if first { blocker.any } else { 0 };
                     for &r in &self.through[t] {
                         if self.met[r] == 0 {
                             more += 1;
@@ -307,8 +358,13 @@ impl BlockRequirements {
                         self.met[r] += 1;
                     }
                     self.counts[t] += 1;
-                    self.chosen[i] = Some(t);
-                    self.go(i + 1, obeyed + more);
+                    self.chosen.push((i, t));
+                    if left > 1 {
+                        self.pick(i, k + 1, left - 1, false, obeyed + more);
+                    } else {
+                        self.go(i + 1, obeyed + more);
+                    }
+                    self.chosen.pop();
                     self.counts[t] -= 1;
                     for &r in &self.through[t] {
                         self.met[r] -= 1;
@@ -317,7 +373,6 @@ impl BlockRequirements {
                         return;
                     }
                 }
-                self.chosen[i] = None;
                 self.go(i + 1, obeyed);
             }
         }
@@ -329,10 +384,11 @@ impl BlockRequirements {
             by_target: &by_target,
             through: &through,
             meets: &meets,
+            bands: &bands,
             enough: enough.map(|n| n.saturating_sub(fixed_gain)),
             counts,
             met,
-            chosen: vec![None; blockers.len()],
+            chosen: Vec::new(),
             best: None,
             ceiling: 0,
         };
@@ -340,9 +396,20 @@ impl BlockRequirements {
         search.go(0, 0);
         let (obeyed, chosen) = search.best?;
         let mut declaration = fixed.to_vec();
-        declaration.extend(blockers.iter().zip(chosen).filter_map(|((b, _), t)| t.map(|t| (*b, targets[t]))));
+        declaration.extend(chosen.into_iter().map(|(i, t)| (blockers[i].id, targets[t])));
         Some((obeyed + fixed_gain, declaration))
     }
+}
+
+/// A creature `solve` may have block, with what its blocks could obey.
+struct Blocker {
+    id: ObjectId,
+    /// The targets it may block, each with how many requirements to block that attacker the block obeys, the most first.
+    options: Vec<(usize, u32)>,
+    /// How many more attackers it can block.
+    room: u32,
+    /// How many requirements to block whichever attacker its first block obeys.
+    any: u32,
 }
 
 #[cfg(test)]
@@ -492,8 +559,58 @@ mod tests {
         assert!(r.judge(&allowed, &[(X, A)], false).complete && r.judge(&allowed, &[(X, B)], false).complete);
     }
 
-    /// Every way of blocking, over small random boards (allowed blocks, fewest and most blockers, bands, costs, and
-    /// requirements of every kind, some on the same creature twice): `solve`'s most is the most any free legal declaration
+    const C: ObjectId = ObjectId(3);
+
+    /// A creature that can block any number of creatures and blocks each attacking creature if able (Blaze of Glory: one
+    /// requirement for each attacker, CR 509.1c) must block every attacker it may; one short obeys one fewer and is refused.
+    #[test]
+    fn a_creature_that_blocks_each_attacker_blocks_them_all() {
+        let allowed = [(X, A), (X, B), (X, C)];
+        let mut r = BlockRequirements { required: vec![lure(X, A), lure(X, B), lure(X, C)], capacities: vec![(X, u32::MAX)], ..Default::default() };
+        (r.most, r.suggested) = r.solve(&allowed, &[], None, true).expect("a declaration");
+        assert_eq!(r.most, 3);
+        assert_eq!(r.suggested.len(), 3);
+        assert!(r.judge(&allowed, &[(X, A), (X, B), (X, C)], false).complete);
+        let two = r.judge(&allowed, &[(X, A), (X, C)], true);
+        assert!(!two.complete && two.issue.is_some_and(|i| i.rule == "509.1c"));
+        assert_eq!(two.addable, vec![(X, B)]);
+        // The same attacker twice is no second block.
+        let twice = r.judge(&allowed, &[(X, A), (X, A)], false);
+        assert_eq!(twice.issue.map(|i| (i.creature, i.words, i.other)), Some((X, "already blocks".to_string(), Some(A))));
+    }
+
+    /// One additional creature makes two: a third block is refused, and of three attackers it must block, two are the most
+    /// it can obey.
+    #[test]
+    fn an_additional_creature_makes_two() {
+        let allowed = [(X, A), (X, B), (X, C)];
+        let mut r = BlockRequirements { required: vec![lure(X, A), lure(X, B), lure(X, C)], capacities: vec![(X, 2)], ..Default::default() };
+        r.most = r.solve(&allowed, &[], None, true).map_or(0, |s| s.0);
+        assert_eq!(r.most, 2);
+        assert!(r.judge(&allowed, &[(X, B), (X, C)], false).complete);
+        let three = r.judge(&allowed, &[(X, A), (X, B), (X, C)], true);
+        assert_eq!(three.issue.map(|i| (i.creature, i.words, i.rule)), Some((X, "can block only two creatures".to_string(), "509.1a")));
+        assert!(r.judge(&allowed, &[(X, A)], true).addable == vec![(X, B), (X, C)]);
+        // A creature that can block one is refused a second, as ever.
+        let plain = BlockRequirements::default();
+        let issue = plain.judge(&allowed, &[(X, A), (X, B)], false).issue;
+        assert_eq!(issue.map(|i| i.words), Some("can block only one creature".to_string()));
+    }
+
+    /// "Blocks this turn if able" on a creature that can block any number is one requirement, obeyed by its first block:
+    /// blocking one attacker or both obeys it alike.
+    #[test]
+    fn blocking_if_able_counts_once_however_many_it_blocks() {
+        let allowed = [(X, A), (X, B)];
+        let mut r = BlockRequirements { required: vec![blocks(X)], capacities: vec![(X, u32::MAX)], ..Default::default() };
+        r.most = r.solve(&allowed, &[], None, true).map_or(0, |s| s.0);
+        assert_eq!(r.most, 1);
+        assert!(r.judge(&allowed, &[(X, A)], false).complete && r.judge(&allowed, &[(X, A), (X, B)], false).complete);
+        assert!(!r.judge(&allowed, &[], false).complete);
+    }
+
+    /// Every way of blocking, over small random boards (allowed blocks, fewest and most blockers, bands, costs, creatures that
+    /// can block two or any number, and requirements of every kind, some on the same creature twice): `solve`'s most is the most any free legal declaration
     /// obeys, a declaration is complete exactly when it is legal, and `addable` offers exactly the blocks some legal
     /// declaration extending it has - never one that none does.
     #[test]
@@ -505,7 +622,7 @@ mod tests {
             seed ^= seed << 17;
             seed % n
         };
-        for _ in 0..400 {
+        for _ in 0..1000 {
             let blockers: Vec<ObjectId> = (0..1 + next(4)).map(|i| ObjectId(10 + i as u32)).collect();
             let attackers: Vec<ObjectId> = (0..1 + next(3)).map(|i| ObjectId(1 + i as u32)).collect();
             let allowed: Vec<(ObjectId, ObjectId)> =
@@ -539,43 +656,55 @@ mod tests {
                 .filter(|_| next(6) == 0)
                 .map(|&(b, a)| BlockCost { blocker: b, attacker: a, cost: ManaCost { generic: 1, ..ManaCost::ZERO }, source: ObjectId(99) })
                 .collect();
-            let mut r = BlockRequirements { required, bands, limits, costs, ..Default::default() };
-            // Every declaration: each blocker blocks one allowed attacker or none.
+            // Most creatures block one attacker; some two (one additional), some any number.
+            let capacities: Vec<(ObjectId, u32)> = blockers
+                .iter()
+                .filter_map(|&b| match next(5) {
+                    0 => Some((b, 2)),
+                    1 => Some((b, u32::MAX)),
+                    _ => None,
+                })
+                .collect();
+            let mut r = BlockRequirements { required, bands, limits, costs, capacities, ..Default::default() };
+            // Every declaration: each blocker blocks a set of the attackers it is allowed to, as many as it can at most.
             let mut all: Vec<Vec<(ObjectId, ObjectId)>> = vec![Vec::new()];
             for &b in &blockers {
+                let options: Vec<(ObjectId, ObjectId)> = allowed.iter().copied().filter(|p| p.0 == b).collect();
                 let mut more = Vec::new();
                 for d in &all {
-                    more.push(d.clone());
-                    for &(bb, a) in allowed.iter().filter(|p| p.0 == b) {
+                    for set in 0u32..(1 << options.len()) {
+                        if set.count_ones() > r.capacity_of(b) {
+                            continue;
+                        }
                         let mut e = d.clone();
-                        e.push((bb, a));
+                        e.extend((0..options.len()).filter(|&k| set & (1 << k) != 0).map(|k| options[k]));
                         more.push(e);
                     }
                 }
                 all = more;
             }
             let plain = r.clone();
+            // Each attacker within its limits, and no creature blocking two members of one band (it blocks both through
+            // either, CR 702.22h).
             let fits = |d: &[(ObjectId, ObjectId)]| {
                 attackers.iter().all(|&a| {
                     let n = count_u32(d.iter().filter(|x| x.1 == a).count());
                     let (least, most) = plain.limits_of(a);
                     n == 0 || (least <= n && n <= most)
-                })
+                }) && d.iter().enumerate().all(|(i, x)| !d[..i].iter().any(|y| y.0 == x.0 && plain.blocks_through(y.1, x.1)))
             };
             let most = all.iter().filter(|d| fits(d) && d.iter().all(|&(b, a)| plain.free(b, a))).map(|d| plain.obeyed(d)).max().unwrap_or(0);
             r.most = r.solve(&allowed, &[], None, true).map_or(0, |s| s.0);
             assert_eq!(r.most, most, "{r:?} over {allowed:?}");
             let legal = |d: &[(ObjectId, ObjectId)]| fits(d) && plain.obeyed(d) >= most;
+            let legal_ones: Vec<&Vec<(ObjectId, ObjectId)>> = all.iter().filter(|l| legal(l)).collect();
             for d in all.iter().filter(|d| d.len() <= 2) {
                 let verdict = r.judge(&allowed, d, true);
                 assert_eq!(verdict.complete, legal(d), "{d:?} under {r:?}");
                 let wanted: Vec<(ObjectId, ObjectId)> = allowed
                     .iter()
                     .copied()
-                    .filter(|&(b, a)| {
-                        !d.iter().any(|x| x.0 == b)
-                            && all.iter().any(|l| l.contains(&(b, a)) && d.iter().all(|x| l.contains(x)) && legal(l))
-                    })
+                    .filter(|&(b, a)| !d.contains(&(b, a)) && legal_ones.iter().any(|l| l.contains(&(b, a)) && d.iter().all(|x| l.contains(x))))
                     .collect();
                 assert_eq!(verdict.addable, wanted, "addable to {d:?} under {r:?} over {allowed:?}");
             }

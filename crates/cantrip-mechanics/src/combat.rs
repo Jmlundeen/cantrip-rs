@@ -129,6 +129,18 @@ pub fn one_blocker_at_most(q: &dyn Query, source: ObjectId, attacker: ObjectId) 
     (q.obj(source).attached_to == Some(attacker)).then_some(1)
 }
 
+/// "This creature can block any number of creatures" (CR 509.1a): a `block_capacities` rule of the creature's own. Wall of
+/// Glare, Noble Ox, Palace Guard and Avatar of Hope print it.
+pub fn can_block_any_number(_: &dyn Query, source: ObjectId, blocker: ObjectId) -> Option<BlockCapacity> {
+    (source == blocker).then_some(BlockCapacity::AnyNumber)
+}
+
+/// "This creature can block an additional creature each combat" (CR 509.1a): a `block_capacities` rule of the creature's
+/// own. Two-Headed Giant of Foriys, Foriysian Interceptor and Lairwatch Giant print it.
+pub fn can_block_an_additional_creature(_: &dyn Query, source: ObjectId, blocker: ObjectId) -> Option<BlockCapacity> {
+    (source == blocker).then_some(BlockCapacity::Additional(1))
+}
+
 /// "During combat" (CR 506.1): any step of the combat phase, beginning of combat through end of combat. Yuriko, Blade of the
 /// Mighty ("During combat, players can't cast spells") and Jade Statue print it.
 pub fn during_combat(q: &dyn Query) -> bool {

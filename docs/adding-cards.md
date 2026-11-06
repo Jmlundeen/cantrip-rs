@@ -518,6 +518,10 @@ shapes have an example:
 - **Combat**: planeswalkers are attackable (`DeclareAttackers.planeswalkers`); `Keyword::CantBeAttacked` (CR 508.1c), `EffectKind::CantAttack` and `CantBlock` for a resolved "can't attack or block" (CR 508.1c, 509.1b; the host writes each on the creature with its duration),
   `CantBeBlockedByPowerTwoOrLess`, `CantBeBlockedExceptByThreeOrMore` (`Chars::minimum_blockers`, menace's two too),
   `CantBeBlockedByMoreThanOne` (`Chars::maximum_blockers`; a JSON `keywords` entry when printed, a layer-6 grant otherwise).
+  "Can block any number of creatures" / "an additional creature" (CR 509.1a): a static ability is `CardDef::block_capacities`
+  (`mechanics::combat::can_block_any_number`, `can_block_an_additional_creature` for the creature's own); a resolved one
+  `EffectKind::BlockCapacity`; "blocks each attacking creature this turn if able" `EffectKind::MustBlockEach`
+  (`docs/engine-design.md`, "Blocking more than one creature"). A scenario declares each block: `Bot2.Block(Wall > A, Wall > B)`.
   Landwalk (CR 702.14): a keyword per basic land type (`Keyword::Islandwalk`, `Swampwalk`, ...), read by the blocking
   rule with its land type (`Keyword::LANDWALKS`); a card that grants one names it through its words,
   `Keyword::landwalk(q.words(source).subtype(Subtype::Island))` (Lord of Atlantis).

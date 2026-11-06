@@ -2540,6 +2540,33 @@ the restrictions are cumulative) is offered no block at all (`turn::declare_bloc
 at the attacker clicked and says why the rest are still held; the tactical, random, automatic and language-model seats never
 declare more. A multi-pair refusal in a scenario is judged by the engine's check of that declaration.
 
+### Blocking more than one creature
+
+Every creature blocks one attacker (CR 509.1a) unless something says it can block more: "can block any number of
+creatures" or "can block an additional creature" ("an additional N creatures"), each a `BlockCapacity` (`AnyNumber`,
+`Additional(n)`), which add up (`BlockCapacity::total`; "any number" is any number). The split is the one above: a static
+ability - the creature's own (Wall of Glare, `cantrip_mechanics::combat::can_block_any_number`; Two-Headed Giant of Foriys,
+`can_block_an_additional_creature`) or another permanent's (Entangler, Echo Circlet, High Ground) - is that permanent's
+`CardDef::block_capacities`, read with the block rules' sources (`turn::block_capacity`), so losing abilities takes the
+creature's own and not another's; a resolved "can block any number of creatures this turn" (Valor Made Real, Blaze of Glory,
+Act of Heroism's "an additional creature") is `EffectKind::BlockCapacity`, an effect on the creature that outlasts its losing
+abilities (CR 611.2c). `BlockRequirements::capacities` carries each creature offered that can block more than one, and
+everything that judges a declaration reads it (`capacity_of`): `judge`'s issue ("can block only two creatures", and "already
+blocks" for an attacker named twice or a second member of a band it blocks, CR 702.22h), `addable`, and `solve`, which lets
+each blocker choose any set of the attackers it may block up to its capacity. A declaration is still a list of
+(blocker, attacker) pairs, one creature appearing in several, and the combat state keeps one `Block` for each pair, so
+`blocks`, "blocked by" and removal from combat (CR 506.4: each pair goes with its creature) need nothing new.
+
+"Blocks each attacking creature this turn if able" (Blaze of Glory) is `EffectKind::MustBlockEach`: a requirement for each
+attacker the creature may block (`RequiredBlock { blocker, attacker }`, as Lure's are), so the maximum-requirements rule (CR
+509.1c) counts each block that obeys one, and a creature that can block them all must. "Blocks this turn if able"
+(`MustBlock`) on such a creature is one requirement, obeyed by its first block however many it makes (`solve` counts it once
+per creature). A blocker blocking two or more divides its combat damage among them as its controller chooses (CR 510.1d,
+`turn::blocker_division`, the same `DamageDivision` a band's blocker had). Its blocks are announced together (CR 509.1g) as
+one `Event::Blocks` for each pair, `declared` on its first alone, so "whenever this creature blocks" triggers once (CR 509.3a)
+and "whenever this creature blocks a creature" once for each attacker (CR 509.3b); "becomes blocked by a creature" (CR 509.3d)
+reads each pair from the attacker's side.
+
 A resolved rule about a set that can still gain members (CR 611.2c: an effect that changes no characteristics is a rule of
 the game, and reaches objects that weren't there as it began) is `EffectKind::LastingRule { card, index, about }`, naming the
 `index`th of the `CardDef::lasting_rules` of the card that made it, made by `Game::add_lasting_rule`: a `LastingRule { text,

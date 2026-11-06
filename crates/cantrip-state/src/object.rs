@@ -1439,6 +1439,16 @@ pub enum EffectKind {
     /// nothing, and may block another or none. An attacker named is the object it is: one that left combat and came back is a
     /// new object it never names (CR 400.7). An effect, not an ability, as `MustBlock` is.
     MustBlockAttacker(ObjectId),
+    /// "Blocks each attacking creature this turn if able" (CR 509.1c, Blaze of Glory): a requirement for each attacker it may
+    /// block, in each declaration of blockers while the effect lasts - a creature that can block more than one obeys more of
+    /// them the more it blocks, and must obey as many as it can. An effect, not an ability, as `MustBlock` is.
+    MustBlockEach,
+    /// "Can block any number of creatures this turn" (Valor Made Real, Blaze of Glory) or "can block an additional creature
+    /// this turn" (Act of Heroism, Mounted Archers) for as long as the effect lasts (CR 509.1a): what it adds to the attackers
+    /// the creature can block (`BlockCapacity::total`), each such effect its own. A resolved spell or ability that says so
+    /// without "has" or "gains" makes an effect on the creature, not an ability it gains (CR 113.1a, 611.2c), so a creature
+    /// that loses its abilities afterwards (CR 613.1f) still can. A static ability's is `CardDef::block_capacities`.
+    BlockCapacity(crate::decision::BlockCapacity),
     /// "Its activated abilities can't be activated" (CR 602.5) for as long as the effect lasts: every activated ability of
     /// the object, mana abilities (CR 605.1a) and abilities whose cost untaps it included, whoever would activate them. A
     /// resolved effect, so it outlasts its source (Braided Net).

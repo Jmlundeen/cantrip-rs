@@ -2130,9 +2130,13 @@ impl<'s> Run<'s> {
             if parts.len() != 2 {
                 return fail(format!("line {}: write a block as \"Blocker > Attacker\", not \"{spec}\"", step.line));
             }
-            let blockers: Vec<ObjectId> =
-                self.objects(step, parts[0].trim(), eligible)?.into_iter().filter(|b| !blocks.iter().any(|x| x.0 == *b)).collect();
             let Some(attacker) = self.objects(step, parts[1].trim(), attackers)?.into_iter().next() else { return Ok(None) };
+            // A creature not yet blocking as many attackers as it can (CR 509.1a), nor this one.
+            let blockers: Vec<ObjectId> = self
+                .objects(step, parts[0].trim(), eligible)?
+                .into_iter()
+                .filter(|&b| count_u32(blocks.iter().filter(|x| x.0 == b).count()) < rules.capacity_of(b) && !blocks.contains(&(b, attacker)))
+                .collect();
             if blockers.is_empty() {
                 return Ok(None);
             }

@@ -1410,6 +1410,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     .iter()
                     .map(|a| requirements.bands.iter().find(|b| b.0 == *a).map_or(0, |b| b.1 as i32))
                     .collect(),
+                block_capacities: eligible
+                    .iter()
+                    .map(|&b| match requirements.capacity_of(b) {
+                        u32::MAX => 0,
+                        most => wire(most),
+                    })
+                    .collect(),
             })
         }
         RequestKind::DiscardToHandSize { count, hand } => PromptPayload::DiscardPromptMessage(DiscardPrompt {

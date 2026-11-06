@@ -159,7 +159,10 @@ the blocks meant first and the engine's own declaration (`Suggested`) next; a ch
 question is asked again unless it is no longer outstanding - and answered with the engine's own declaration if it is
 answered so again, so an automatic seat never goes round forever. So no client works out a requirement, restriction or cost itself,
 and a new one changes the engine alone. `MinimumBlockers`, `MaximumBlockers`, `Requirements` and `MostRequirements` are for
-showing the player. The answer is still checked when it is given. Version 205.
+showing the player. The answer is still checked when it is given. Version 205. `BlockCapacities`, index for index with
+`Eligible`, is how many attackers each creature can block (CR 509.1a): 1 for most, more for "can block an additional
+creature", 0 for "can block any number of creatures"; a creature blocking several is declared with one block of each, and
+"blocks each attacking creature if able" (Blaze of Glory) is a requirement for each attacker. Version 228.
 
 An unrestricted `SeparatePiles` selection (`AnyNumber`, no parts or candidate restriction) uses the existing non-targeted
 `ChooseTargetPromptMessage` presentation; its `TargetsChosenAnswer` is translated to the engine's card selection and

@@ -304,9 +304,15 @@ pub fn bound(ask: &Ask) -> usize {
         AskKind::Craft { maximum, .. } => *maximum as usize + 1,
         AskKind::RemoveCounters { total, .. } => *total as usize,
         AskKind::ChooseDividedTargets { total, .. } => *total as usize + 1,
-        AskKind::DeclareAttackers { eligible, .. } | AskKind::DeclareBlockers { eligible, .. } => {
-            eligible.len()
-        }
+        AskKind::DeclareAttackers { eligible, .. } => eligible.len(),
+        // A creature that can block several attackers takes a step for each it blocks and one to stop.
+        AskKind::DeclareBlockers { eligible, attackers, capacities, .. } => eligible
+            .iter()
+            .map(|c| match capacities.iter().find(|x| x.0 == *c) {
+                Some(&(_, n)) => (n as usize).min(attackers.len()) + 1,
+                None => 1,
+            })
+            .sum(),
         AskKind::AssignCombatDamage { divisions } => {
             divisions.iter().map(|d| d.damage as usize).sum()
         }
@@ -892,24 +898,33 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
             attackers,
             allowed,
             max_blockers,
+            capacities,
             ..
         } => {
             let mut blocked = vec![0u8; attackers.len()];
             let mut blocks = Vec::new();
             for &c in eligible {
-                let mut step = Step::default();
-                step.push(Token::on(Tok::NoBlock, c), true);
-                for (i, &a) in attackers.iter().enumerate() {
-                    let room = blocked[i] < max_blockers.get(i).copied().unwrap_or(u8::MAX);
-                    step.push(
-                        Token::of(Tok::Block, c, a, i as u32),
-                        room && allowed.contains(&(c, a)),
-                    );
-                }
-                let t = p.pick(step)?;
-                if t.kind == Tok::Block {
+                // One block, or none; a creature that can block several (CR 509.1a) is asked again after each, until it
+                // stops (`NoBlock`) or blocks as many as it can.
+                let capacity = capacities.iter().find(|x| x.0 == c).map_or(1, |x| x.1);
+                let mut made = 0u32;
+                while made < capacity {
+                    let mut step = Step::default();
+                    step.push(Token::on(Tok::NoBlock, c), true);
+                    for (i, &a) in attackers.iter().enumerate() {
+                        let room = blocked[i] < max_blockers.get(i).copied().unwrap_or(u8::MAX);
+                        step.push(
+                            Token::of(Tok::Block, c, a, i as u32),
+                            room && allowed.contains(&(c, a)) && !blocks.contains(&(c, a)),
+                        );
+                    }
+                    let t = p.pick(step)?;
+                    if t.kind != Tok::Block {
+                        break;
+                    }
                     blocked[t.n as usize] += 1;
                     blocks.push((c, t.b));
+                    made += 1;
                 }
             }
             Ok(F::Block(blocks))
@@ -1307,13 +1322,17 @@ pub fn decompose(
             AskKind::DeclareBlockers {
                 eligible,
                 attackers,
+                capacities,
                 ..
             },
             F::Block(blocks),
         ) => {
             for &c in eligible {
-                match blocks.iter().find(|b| b.0 == c) {
-                    Some(&(_, a)) => push(Token::of(
+                // Each block it makes, then a stop where it could have blocked more (CR 509.1a).
+                let capacity = capacities.iter().find(|x| x.0 == c).map_or(1, |x| x.1);
+                let mut made = 0u32;
+                for &(_, a) in blocks.iter().filter(|b| b.0 == c) {
+                    push(Token::of(
                         Tok::Block,
                         c,
                         a,
@@ -1321,8 +1340,11 @@ pub fn decompose(
                             .iter()
                             .position(|&x| x == a)
                             .ok_or("no such attacker")? as u32,
-                    )),
-                    None => push(Token::on(Tok::NoBlock, c)),
+                    ));
+                    made += 1;
+                }
+                if made < capacity {
+                    push(Token::on(Tok::NoBlock, c));
                 }
             }
         }
@@ -1462,6 +1484,7 @@ mod tests {
             most: 1,
             min_blockers: vec![2, 1],
             max_blockers: vec![255, 1],
+            capacities: vec![],
         });
         let mut m = Machine::new(&a, &[]);
         assert_eq!(m.bound(), 2);
@@ -1484,6 +1507,33 @@ mod tests {
         )
         .unwrap();
         assert_eq!(tokens[0], Token::of(Tok::Block, o(1), o(3), 0));
+    }
+
+    /// A creature that can block any number of creatures (CR 509.1a) is asked again after each block, never the same attacker
+    /// twice, until it stops; one that can block two is asked no third time.
+    #[test]
+    fn a_creature_that_can_block_several_is_asked_after_each_block() {
+        let a = ask(AskKind::DeclareBlockers {
+            eligible: vec![o(1), o(2)],
+            attackers: vec![o(3), o(4), o(5)],
+            allowed: vec![(o(1), o(3)), (o(1), o(4)), (o(1), o(5)), (o(2), o(3)), (o(2), o(4)), (o(2), o(5))],
+            required: vec![],
+            most: 0,
+            min_blockers: vec![1, 1, 1],
+            max_blockers: vec![255, 255, 255],
+            capacities: vec![(o(1), u32::MAX), (o(2), 2)],
+        });
+        let mut m = Machine::new(&a, &[]);
+        m.choose_token(Token::of(Tok::Block, o(1), o(4), 1));
+        assert!(!legal(&m, Token::of(Tok::Block, o(1), o(4), 1)));
+        m.choose_token(Token::of(Tok::Block, o(1), o(3), 0));
+        m.choose_token(Token::on(Tok::NoBlock, o(1)));
+        m.choose_token(Token::of(Tok::Block, o(2), o(3), 0));
+        m.choose_token(Token::of(Tok::Block, o(2), o(5), 2));
+        assert_eq!(m.answer(), Some(&FactoredAnswer::Block(vec![(o(1), o(4)), (o(1), o(3)), (o(2), o(3)), (o(2), o(5))])));
+        round_trip(&a, &FactoredAnswer::Block(vec![(o(1), o(3)), (o(1), o(4)), (o(1), o(5)), (o(2), o(4))]));
+        round_trip(&a, &FactoredAnswer::Block(vec![(o(2), o(3)), (o(2), o(4))]));
+        round_trip(&a, &FactoredAnswer::Block(vec![]));
     }
 
     #[test]

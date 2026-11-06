@@ -176,6 +176,8 @@ mod excess_damage_tests;
 #[cfg(test)]
 mod must_block_tests;
 #[cfg(test)]
+mod multi_block_tests;
+#[cfg(test)]
 mod room_door_tests;
 #[cfg(test)]
 mod play_permission_tests;

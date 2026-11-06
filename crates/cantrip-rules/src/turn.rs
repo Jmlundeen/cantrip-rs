@@ -1084,6 +1084,22 @@ fn maximum_blockers(cx: &Cx, attacker: ObjectId, rule_sources: &[ObjectId]) -> u
     most
 }
 
+/// How many attackers `blocker` can block (CR 509.1a): one, and what each resolved "can block any number of creatures this
+/// turn" or "an additional creature" on it (`EffectKind::BlockCapacity`) and each static ability of a permanent among
+/// `rule_sources` (`CardDef::block_capacities`, its own among them) adds (`BlockCapacity::total`); `u32::MAX` for any number.
+fn block_capacity(cx: &Cx, blocker: ObjectId, rule_sources: &[ObjectId]) -> u32 {
+    let resolved = cx.s().effects.iter().filter(|e| e.affected == blocker).filter_map(|e| match e.kind {
+        EffectKind::BlockCapacity(c) => Some(c),
+        _ => None,
+    });
+    let statics = rule_sources.iter().flat_map(|&id| {
+        cx.cards()
+            .texts(cx.s(), cx.s().obj(id))
+            .flat_map(move |card| cx.card(card).block_capacities.iter().filter_map(move |rule| rule(cx, id, blocker)))
+    });
+    BlockCapacity::total(resolved.chain(statics))
+}
+
 /// The requirements on a declaration of attackers by `eligible` among `targets` (CR 508.1d), one for each source: each
 /// instance of "attacks each combat if able" it has (printed or gained, `Chars::must_attack`); one for each "attacks if able"
 /// rule about a set that takes it in, and two for each that also says "attacks a player other than you if able"
@@ -1238,10 +1254,12 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         // A defending player who has left blocks with nothing (CR 800.4a): no one else declares their blocks.
         let answer = cx.ask_rule(defender, RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements })?;
         if let Some(Answer::Block(blocks)) = answer {
-            // CR 509.1g: the blockers are declared together, a "blocks" event for each attacker each blocks, those of a band it
-            // blocks through banding marked as not declared, so "whenever this creature blocks" triggers once (CR 509.3a).
+            // CR 509.1g: the blockers are declared together, a "blocks" event for each attacker each blocks; only its first
+            // declared block is marked as declared - not the others of a band it blocks through banding, nor the other attackers
+            // a creature that can block several was declared to block - so "whenever this creature blocks" triggers once
+            // (CR 509.3a) and "whenever it blocks a creature" once for each (CR 509.3b).
             let mut events: Vec<Event> = Vec::with_capacity(blocks.len());
-            let mut list = Vec::new();
+            let mut list: Vec<Block> = Vec::new();
             let mut attackers = cx.s().attackers.clone();
             for (blocker, attacker) in blocks {
                 // CR 702.22h: a creature blocking a member of an attacking band blocks each other member of it too, a block of
@@ -1249,7 +1267,8 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
                 let band = attackers.iter().find(|a| a.id == attacker).map_or(0, |a| a.band);
                 let mut blocked = vec![attacker];
                 blocked.extend(attackers.iter().filter(|a| band != 0 && a.band == band && a.id != attacker).map(|a| a.id));
-                events.extend(blocked.iter().map(|&a| Event::Blocks { blocker, attacker: a, declared: a == attacker }));
+                let first = !list.iter().any(|b| b.blocker == blocker);
+                events.extend(blocked.iter().map(|&a| Event::Blocks { blocker, attacker: a, declared: first && a == attacker }));
                 for attacker in blocked {
                     list.push(Block { blocker, attacker, first_strike: false });
                     if let Some(a) = attackers.iter_mut().find(|a| a.id == attacker) {
@@ -1315,12 +1334,27 @@ fn block_rules(cx: &Cx, attackers: &[ObjectId], allowed: &[(ObjectId, ObjectId)]
         {
             required.push(RequiredBlock { blocker: Some(e.affected), attacker: Some(attacker) });
         }
+        // "Blocks each attacking creature if able": one requirement for each attacker it may block (CR 509.1c).
+        if e.kind == EffectKind::MustBlockEach {
+            required.extend(allowed.iter().filter(|p| p.0 == e.affected).map(|&(b, a)| RequiredBlock { blocker: Some(b), attacker: Some(a) }));
+        }
+    }
+    // The creatures that can block more than one attacker (CR 509.1a): none without a static ability that limits or widens
+    // blocking or a resolved effect that widens it.
+    let mut capacities: Vec<(ObjectId, u32)> = Vec::new();
+    if !rule_sources.is_empty() || cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::BlockCapacity(_))) {
+        for &(b, _) in allowed {
+            if !capacities.iter().any(|c| c.0 == b) {
+                capacities.push((b, block_capacity(cx, b, rule_sources)));
+            }
+        }
+        capacities.retain(|c| c.1 != 1);
     }
     // A creature blocking one member of an attacking band blocks every member (CR 702.22h), so blocking any member obeys a
     // requirement to block another, and one block may obey two.
     let bands = cx.s().attackers.iter().filter(|a| a.band != 0).map(|a| (a.id, a.band)).collect();
     // No block costs anything to declare yet (CR 509.1d): no effect that makes one is built.
-    let mut rules = BlockRequirements { required, most: 0, suggested: Vec::new(), bands, limits, costs: Vec::new() };
+    let mut rules = BlockRequirements { required, most: 0, suggested: Vec::new(), bands, limits, costs: Vec::new(), capacities };
     if !rules.required.is_empty()
         && let Some((most, suggested)) = rules.solve(allowed, &[], None, true)
     {
@@ -1562,8 +1596,8 @@ fn attacker_division(cx: &Cx, attacker: &Attacker) -> Option<DamageDivision> {
 }
 
 /// The damage division a blocker blocking two or more creatures has (CR 510.1d): among them as its controller chooses, or,
-/// when one of them has banding, as the attacking player chooses (CR 702.22k). A blocker blocks two or more only by blocking
-/// a band (CR 702.22h).
+/// when one of them has banding, as the attacking player chooses (CR 702.22k). A blocker blocks two or more by blocking a band
+/// (CR 702.22h), or as a creature that can block more than one (CR 509.1a).
 fn blocker_division(cx: &Cx, blocker: ObjectId) -> Option<DamageDivision> {
     let power = crate::static_rules::combat_damage_of(cx, blocker);
     let blocked = blocked_by(cx, blocker);

@@ -638,6 +638,9 @@ pub(crate) fn ask_of(
                 .iter()
                 .flat_map(|q| allowed.iter().copied().filter(move |&(b, a)| q.blocker.is_none_or(|x| x == b) && q.attacker.is_none_or(|x| x == a)))
                 .collect();
+            // The creatures that can block more than one attacker (CR 509.1a).
+            let mut capacities: Vec<(Ref, u32)> = requirements.capacities.iter().map(|&(b, n)| (r(b), n)).collect();
+            capacities.sort();
             AskKind::DeclareBlockers {
                 eligible: rs(eligible),
                 attackers,
@@ -646,6 +649,7 @@ pub(crate) fn ask_of(
                 most: u8::try_from(requirements.most).unwrap_or(u8::MAX),
                 min_blockers,
                 max_blockers,
+                capacities,
             }
         }
         RequestKind::DiscardToHandSize { count, hand } => AskKind::DiscardToHandSize {
