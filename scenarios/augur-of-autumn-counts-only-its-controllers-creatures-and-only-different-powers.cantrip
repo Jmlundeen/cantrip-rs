@@ -1,0 +1,66 @@
+# "You control" is Bot1 alone, and three creatures of two powers are not three creatures with different powers (CR
+# 604.1): Bot1's Augur of Autumn, Llanowar Elves and Elvish Mystic (powers 2, 1 and 1) leave the free Ornithopter on
+# top refused, while Bot2's own Augur, Llanowar Elves and Ornithopter (powers 2, 1 and 0) would allow it if anyone's
+# creatures counted.
+
+[Bot1 Deck]
+Black Lotus
+Augur of Autumn
+Mox Emerald
+Llanowar Elves
+Elvish Mystic
+Forest
+Forest
+Island
+Ornithopter
+Island x7
+
+[Bot2 Deck]
+Black Lotus
+Augur of Autumn
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Forest
+Forest
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Augur of Autumn.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Elvish Mystic.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Augur of Autumn.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Augur of Autumn.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+? Bot1.Battlefield.Elvish Mystic.Power = 1
+? Bot2.Battlefield.Augur of Autumn.Power = 2
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot1.Library.Count = 8
+! Bot1.Library.Ornithopter.Cast
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Library.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Power = 0

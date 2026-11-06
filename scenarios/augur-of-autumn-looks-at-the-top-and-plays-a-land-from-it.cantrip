@@ -1,0 +1,41 @@
+# Augur of Autumn lets its controller look at the top card of its library any time (CR 401.2) and play lands from there
+# (CR 305.1, 601.2): Bot1's top card is a Forest, played this turn, while the Ornithopter that follows it stays put - a
+# creature cannot be cast from the top with only one creature out, whatever sits in the other player's library.
+
+[Bot1 Deck]
+Black Lotus
+Augur of Autumn
+Island
+Island
+Island
+Island
+Island
+Forest
+Ornithopter
+Island x8
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Augur of Autumn.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.MayLookAtLibraryTop = true
+? Bot2.MayLookAtLibraryTop = (absent)
+Bot1.Library.Forest.Play
+? Bot1.Battlefield.Forest.Tapped = false
+! Bot1.Library.Ornithopter.Cast
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Augur of Autumn.Power = 2
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Library.Ornithopter.Power = 0
+Bot2.Library.Ornithopter.Power = 0
