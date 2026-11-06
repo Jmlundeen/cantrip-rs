@@ -2527,7 +2527,7 @@ public sealed partial class MainPage
             "Declare blockers",
             held
                 ?? (_pending.Count > 0
-                ? $"Choose an attacker to block ({_pending.Count} selected)"
+                ? $"Choose an attacker to block ({_pending.Count} selected){CapacityHint(prompt)}"
                 : issue ?? $"{prompt.Attackers.Count} attacking  ·  {blockers} blocking"));
 
         AddButton(
@@ -2573,6 +2573,20 @@ public sealed partial class MainPage
         return _blocking.Count(pair => pair.Attacker == attacker.Value) >= most
             ? $"{name} can't be blocked by more than {Blockers(most)}"
             : $"{name} can't be blocked by {(_pending.Count == 1 ? "that creature" : "those creatures")} as well";
+    }
+
+    /// <summary>
+    /// For one creature picked up that can block more than one attacker (CR 509.1a), how many: "  ·  it can block any number of
+    /// creatures", "  ·  it can block 2 creatures" - each a click on another attacker after it is sent at one. Empty otherwise.
+    /// </summary>
+    private string CapacityHint(DeclareBlockersPromptMessage prompt)
+    {
+        if (_pending.Count != 1 || prompt.CapacityOf(new ViewHandle(_pending[0])) is not (> 1 and var capacity))
+        {
+            return string.Empty;
+        }
+
+        return capacity == int.MaxValue ? "  ·  it can block any number of creatures" : $"  ·  it can block {capacity} creatures";
     }
 
     /// <summary>"one creature", "two creatures": how many blockers an attacker may have at most.</summary>

@@ -281,6 +281,14 @@ with N" counts them; a creature already declared comes back with a click. Blocke
 Pairs the server would refuse (a flier against a creature without reach) are left out of what is sent and the attacker is
 dimmed when none of the creatures picked up may block it.
 
+A creature that can block more than one attacker (CR 509.1a, `DeclareBlockersPrompt.BlockCapacities`) is picked up again
+with a click while the host's verdict offers it another block, and sent at the next attacker; the dock says how many it can
+block ("it can block 2 creatures"), and a click on an attacker it already blocks takes that block back. On the board
+(`MainPage.Combat.cs`) the attackers a creature blocks together - this, or a band it blocks (CR 702.22h) - stand side by side
+in one column across from all their blockers, so each creature is drawn once, and the creature blocking several writes over
+its art which it blocks ("Blocking Benalish Hero and Guerrilla Gorilla"). While combat damage is divided, each creature a
+division reaches wears its share, the attackers a blocker's damage goes among included (CR 510.1d).
+
 A press on an empty part of a battlefield row and a drag draws a rectangle (`SelectionOverlayElement`), and letting go
 picks up every creature that may be declared whose card it touches - sent at once where there is only one thing to
 attack. A press that lands on anything else on the battlefield or in the hand puts everything down, as the dock's

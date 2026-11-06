@@ -858,6 +858,28 @@ public sealed class Decisions
                 continue;
             }
 
+            // A creature that can block more than one attacker (CR 509.1a) is asked which of them, as many as it can block.
+            int capacity = prompt.CapacityOf(blocker);
+            if (capacity > 1)
+            {
+                IReadOnlyList<int> picks = Many(new Question
+                {
+                    Heading = $"Declare blockers. {GameText.Creature(client, blocker)} can block "
+                        + (capacity == int.MaxValue ? "any number of creatures" : $"up to {capacity} creatures") + ". Which does it block?",
+                    Note = Minimums(client, prompt) + Blocking(client, answer.Blocks),
+                    Choices = [.. attackers.Select(attacker => GameText.Creature(client, attacker))],
+                    Picks = Math.Min(attackers.Count, capacity),
+                    UpTo = true,
+                });
+
+                foreach (int chosen in picks)
+                {
+                    answer.Blocks.Add(new BlockMessage { Blocker = blocker, Attacker = attackers[chosen] });
+                }
+
+                continue;
+            }
+
             List<string> choices = [.. attackers.Select(attacker => $"Block {GameText.Creature(client, attacker)}.")];
             choices.Add("Do not block with it.");
 

@@ -128,12 +128,18 @@ public sealed class CombatSelectionTests(WebClient web)
         await table.ClickCardAsync("Savannah Lions");
         await table.SettledAsync(state => state.Selected == 0 && state.Controls.Any(control => control.Label == "Block with 1"));
 
-        // Blocking the Lions, the Nighthawk may still block the Serra Angel: a click picks it up again, not off the Lions.
+        // Blocking the Lions, the Nighthawk may still block the Serra Angel: a click picks it up again, not off the Lions, and
+        // the dock says how many it can block.
         await table.ClickCardAsync("Vampire Nighthawk");
-        await table.SettledAsync(state => state.Selected == 1);
+        TableState again = await table.SettledAsync(state => state.Selected == 1);
+        Assert.Equal("Choose an attacker to block (1 selected)  ·  it can block 2 creatures", again.Detail);
         await table.ClickCardAsync("Serra Angel");
         TableState both = await table.SettledAsync(state => state.Selected == 0 && state.Controls.Any(control => control.Label == "Block with 1"));
         Assert.Equal("2 attacking  ·  1 blocking", both.Detail);
+
+        // It stands once, across from both attackers, and says which it blocks.
+        CardState nighthawk = await table.CardAsync("Vampire Nighthawk");
+        Assert.Equal("Blocking Savannah Lions and Serra Angel", nighthawk.Annotation);
         await table.PictureAsync("one-creature-blocking-two");
 
         await table.ClickAsync("Block with 1", "button");

@@ -2713,6 +2713,7 @@ public static class PromptFixtures
                         Block(MyLurker, TheirRecruit), Block(MyLurker, TheirSentinel),
                         Block(MyBrute, TheirRecruit), Block(MyBrute, TheirSentinel),
                     ],
+                    BlockCapacities = [2, 2],
                 }, BlocksPerBlocker("blockers-two-each"));
 
             case "assign-damage":

@@ -128,8 +128,11 @@ public sealed partial class MainPage
             // Every attacker in a group has the same controller, which decides which half the blockers go in.
             bool mineAttacking = attackers.Any(a => client.Object(a.Attacker)?.Controller == client.Seat);
 
-            // Unblocked attackers stand in a pile with their twins; a blocked one always stands alone, because the
-            // blockers across from it belong to it and not to the pile.
+            // Unblocked attackers stand in a pile with their twins; a blocked one stands alone, because the blockers across
+            // from it belong to it and not to the pile - unless a blocker of it blocks another attacker too (a creature that
+            // can block more than one, CR 509.1a, or one blocking a band, CR 702.22h): the attackers it blocks then stand side
+            // by side in one column across from all their blockers, so each creature is drawn once, and the creature blocking
+            // several says which (BlockingAnnotation).
             List<(List<ObjectView> Attackers, List<ObjectView> Blockers)> columns = [];
             Dictionary<string, int> unblocked = [];
 
@@ -154,9 +157,38 @@ public sealed partial class MainPage
                     }
 
                     unblocked[look] = columns.Count;
+                    columns.Add(([creature], blockers));
+                    continue;
                 }
 
-                columns.Add(([creature], blockers));
+                // Every column a blocker of this attacker already stands in becomes one, with this attacker in it.
+                List<int> sharing = [.. Enumerable.Range(0, columns.Count)
+                    .Where(i => columns[i].Blockers.Exists(standing => blockers.Exists(blocker => blocker.Handle == standing.Handle)))];
+                if (sharing.Count == 0)
+                {
+                    columns.Add(([creature], blockers));
+                    continue;
+                }
+
+                (List<ObjectView> Attackers, List<ObjectView> Blockers) joined = columns[sharing[0]];
+                foreach (int i in sharing.Skip(1))
+                {
+                    joined.Attackers.AddRange(columns[i].Attackers);
+                    joined.Blockers.AddRange(columns[i].Blockers.Where(blocker => !joined.Blockers.Exists(standing => standing.Handle == blocker.Handle)));
+                }
+
+                joined.Attackers.Add(creature);
+                joined.Blockers.AddRange(blockers.Where(blocker => !joined.Blockers.Exists(standing => standing.Handle == blocker.Handle)));
+                for (int i = sharing.Count - 1; i > 0; i--)
+                {
+                    columns.RemoveAt(sharing[i]);
+                }
+
+                // The piles behind a column taken out have moved up one.
+                foreach (string look in unblocked.Keys.ToList())
+                {
+                    unblocked[look] -= sharing.Skip(1).Count(i => i < unblocked[look]);
+                }
             }
 
             // Both columns are given the wider of the two, so an attacker and its blockers share a centre line across
@@ -166,30 +198,41 @@ public sealed partial class MainPage
 
             var dividing = client.Prompt?.Prompt as AssignCombatDamagePromptMessage;
 
+            // Each step is offered only where the dock's own would be: down while there is something to take back, up while
+            // the creature dividing still has damage left to divide. A creature two divisions reach wears the first's.
+            void Wear(DamageDivisionMessage division, ObjectView creature)
+            {
+                (int Source, int Creature) key = (division.Source.Value, creature.Handle.Value);
+                int share = _shares.GetValueOrDefault(key);
+                _wornShares.TryAdd(creature.Handle, new WornShare(
+                    share,
+                    share > 0,
+                    Assigned(division) < division.Damage,
+                    Counters: false,
+                    delta => _shares[key] = Math.Max(0, _shares.GetValueOrDefault(key) + delta)));
+            }
+
             foreach ((List<ObjectView> fighters, List<ObjectView> blockers) in columns)
             {
-                // Each step is offered only where the dock's own would be: down while there is something to take back,
-                // up while the attacker still has damage left to divide.
-                if (dividing?.Divisions.FirstOrDefault(candidate => candidate.Source == fighters[0].Handle) is { } division)
+                // An attacker's damage is worn by its blockers (CR 510.1c), a blocker's by the attackers it blocks (CR 510.1d).
+                foreach (ObjectView dealer in fighters.Concat(blockers))
                 {
-                    foreach (ObjectView blocker in blockers)
+                    if (dividing?.Divisions.FirstOrDefault(candidate => candidate.Source == dealer.Handle) is { } division)
                     {
-                        (int Source, int Creature) key = (division.Source.Value, blocker.Handle.Value);
-                        int share = _shares.GetValueOrDefault(key);
-                        _wornShares[blocker.Handle] = new WornShare(
-                            share,
-                            share > 0,
-                            Assigned(division) < division.Damage,
-                            Counters: false,
-                            delta => _shares[key] = Math.Max(0, _shares.GetValueOrDefault(key) + delta));
+                        foreach (ObjectView taker in fighters.Concat(blockers).Where(taker => division.Creatures.Contains(taker.Handle)))
+                        {
+                            Wear(division, taker);
+                        }
                     }
                 }
 
-                float blockersWidth = blockers.Sum(blocker => BoardRows.PileWidthOf([blocker], cardWidth))
-                    + (BoardRows.BlockerGap * Math.Max(0, blockers.Count - 1));
-                float width = MathF.Max(BoardRows.PileWidthOf(fighters, cardWidth), blockersWidth);
+                float LineWidth(List<ObjectView> line) =>
+                    line.Sum(card => BoardRows.PileWidthOf([card], cardWidth)) + (BoardRows.BlockerGap * Math.Max(0, line.Count - 1));
 
-                offence.Add(new BoardRows.CombatColumn(width, fighters, Pile: true));
+                bool pile = blockers.Count == 0;
+                float width = MathF.Max(pile ? BoardRows.PileWidthOf(fighters, cardWidth) : LineWidth(fighters), LineWidth(blockers));
+
+                offence.Add(new BoardRows.CombatColumn(width, fighters, Pile: pile));
                 defence.Add(new BoardRows.CombatColumn(width, blockers, Pile: false));
             }
 

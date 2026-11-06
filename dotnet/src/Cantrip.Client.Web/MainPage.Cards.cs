@@ -156,6 +156,11 @@ public sealed partial class MainPage
                 look = look with { Annotation = above is null ? owned : $"{above}\n{owned}" };
             }
 
+            if (BlockingAnnotation(client, card) is { } blocking)
+            {
+                look = look with { Annotation = look.Annotation is null ? blocking : $"{look.Annotation}\n{blocking}" };
+            }
+
             if (MergedAnnotation(card) is { } merged)
             {
                 look = look with { Annotation = look.Annotation is null ? merged : $"{look.Annotation}\n{merged}" };
@@ -171,6 +176,39 @@ public sealed partial class MainPage
         }
 
         return look;
+    }
+
+    /// <summary>
+    /// What a creature blocking two or more attackers says it blocks, declared or being declared: "Blocking Goblin Guide and
+    /// Raging Goblin". It stands once across from all of them (FillCombat), and this says which they are - a creature that
+    /// can block more than one (CR 509.1a), or one blocking a band (CR 702.22h). Null for one blocking one or none.
+    /// </summary>
+    private string? BlockingAnnotation(GameClient client, ObjectView card)
+    {
+        if (card.Zone != ZoneKindView.Battlefield || client.View is not { } view)
+        {
+            return null;
+        }
+
+        List<ViewHandle> blocked = [.. view.Combat.Blocks.Where(block => block.Blockers.Contains(card.Handle)).Select(block => block.Attacker)];
+        if (client.Prompt?.Prompt is DeclareBlockersPromptMessage)
+        {
+            foreach ((int blocker, int attacker) in _blocking)
+            {
+                if (blocker == card.Handle.Value && !blocked.Contains(new ViewHandle(attacker)))
+                {
+                    blocked.Add(new ViewHandle(attacker));
+                }
+            }
+        }
+
+        if (blocked.Count < 2)
+        {
+            return null;
+        }
+
+        List<string> names = [.. blocked.Select(attacker => client.Object(attacker)?.Name ?? "a creature")];
+        return $"Blocking {string.Join(", ", names.Take(names.Count - 1))} and {names[^1]}";
     }
 
     /// <summary>

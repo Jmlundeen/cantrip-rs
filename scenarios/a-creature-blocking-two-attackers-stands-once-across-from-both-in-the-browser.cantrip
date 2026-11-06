@@ -1,0 +1,57 @@
+# Browser
+# What a player sees of a creature blocking more than one attacker (CR 509.1g, 510.1d): Bot2's Ulvenwald Oddity blocks
+# Benalish Hero, banded with Guerrilla Gorilla, and so blocks both (CR 702.22h) - the one way a printed card in the engine
+# blocks two attackers until a card that "can block any number of creatures" is added. Bot1's page draws the Oddity once,
+# across from both attackers standing side by side, and writes over its art which it blocks. In the damage step the Oddity's
+# 4 is divided among the attackers it blocks (by Bot1, through banding, CR 702.22k), each attacker wearing its share: all 4
+# on the Hero, which dies, and the Gorilla lives.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Benalish Hero
+Guerrilla Gorilla
+Island x14
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Benalish Hero > Bot2; Guerrilla Gorilla > Bot2)
+Bot1.Choose(Guerrilla Gorilla)
+Bot2.Block(Ulvenwald Oddity > Benalish Hero)
+[T3 Bot1.Blockers]
+? Client.Bot1.OpponentBattlefield.Ulvenwald Oddity.Annotation = Blocking Benalish Hero and Guerrilla Gorilla
+? Client.Bot1.Combat = Attacking Bot2: Benalish Hero, Guerrilla Gorilla
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Banding: divide their creature's combat damage
+? Client.Bot1.Battlefield.Benalish Hero.Share = 4 damage
+? Client.Bot1.Battlefield.Guerrilla Gorilla.Share = 0 damage
+Bot1.AssignDamage(Ulvenwald Oddity > Benalish Hero: 4)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Graveyard = Benalish Hero
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 3

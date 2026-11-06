@@ -321,6 +321,42 @@ public sealed class DecisionTests
     }
 
     [Fact]
+    public void A_creature_that_can_block_several_attackers_is_asked_which()
+    {
+        // "Can block any number of creatures" (CR 509.1a): one question for the creature, any of the attackers it may block,
+        // each chosen a block of its own.
+        var chooser = new ScriptedChooser([0, 2]);
+
+        AnswerPayload answer = new Decisions(chooser).Answer(
+            Seated(
+                Creature(1, "Wall of Glare", 0, 5),
+                Creature(7, "Grizzly Bears", 2, 2, Them),
+                Creature(8, "Raging Goblin", 1, 1, Them),
+                Creature(9, "Savannah Lions", 2, 1, Them)),
+            new DeclareBlockersPromptMessage
+            {
+                Player = Me,
+                Eligible = [Handle(1)],
+                Attackers = [Handle(7), Handle(8), Handle(9)],
+                Allowed =
+                [
+                    new() { Blocker = Handle(1), Attacker = Handle(7) },
+                    new() { Blocker = Handle(1), Attacker = Handle(8) },
+                    new() { Blocker = Handle(1), Attacker = Handle(9) },
+                ],
+                MinimumBlockers = [1, 1, 1],
+                BlockCapacities = [0],
+            });
+
+        List<BlockMessage> blocks = Assert.IsType<BlockersDeclaredAnswer>(answer).Blocks;
+        Assert.Equal([Handle(7), Handle(9)], blocks.Select(block => block.Attacker));
+        Assert.All(blocks, block => Assert.Equal(Handle(1), block.Blocker));
+        Question asked = Assert.Single(chooser.Asked);
+        Assert.Contains("any number of creatures", asked.Heading, StringComparison.Ordinal);
+        Assert.Equal(3, asked.Picks);
+    }
+
+    [Fact]
     public void Takes_back_a_block_that_is_one_short_of_the_minimum()
     {
         // Menace is stated per attacker and a declaration one blocker short of it is refused whole (CR 509.1b), which

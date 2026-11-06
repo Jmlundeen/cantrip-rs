@@ -474,11 +474,11 @@ public sealed class RandomPlay : IAutoPlayer
 
     /// <summary>
     /// Declares blockers by giving every creature that could block its own draw: stand by, or block any one of the
-    /// attackers the prompt allows it to (CR 509.1a-b).
+    /// attackers the prompt allows it to (CR 509.1a-b) - or, for a creature that can block more than one
+    /// (<see cref="DeclareBlockersPromptMessage.CapacityOf"/>), a coin for each attacker, up to as many as it can block.
     /// <para>
-    /// One attacker per blocker, because blocking two takes an ability and the prompt offers pairs rather than a
-    /// count. Several blockers landing on one attacker is how a gang block happens, and with it the attacker's
-    /// damage-assignment order (CR 509.2) — which a seat that only ever blocked to trade could not reach.
+    /// Several blockers landing on one attacker is how a gang block happens, and with it the attacker's division of
+    /// damage among them (CR 510.1c) — which a seat that only ever blocked to trade could not reach.
     /// </para>
     /// <para>
     /// Blocks short of a minimum are taken back rather than sent: menace and "except by three or more" are stated
@@ -494,6 +494,18 @@ public sealed class RandomPlay : IAutoPlayer
         {
             List<ViewHandle> attackers =
                 [.. prompt.Allowed.Where(pair => pair.Blocker == blocker).Select(pair => pair.Attacker)];
+
+            // A creature that can block more than one attacker (CR 509.1a) blocks each it may by a coin, as many as it can.
+            int capacity = prompt.CapacityOf(blocker);
+            if (capacity > 1)
+            {
+                foreach (ViewHandle attacker in attackers.Where(_ => _random.Next(2) == 0).Take(capacity))
+                {
+                    answer.Blocks.Add(new BlockMessage { Blocker = blocker, Attacker = attacker });
+                }
+
+                continue;
+            }
 
             int draw = _random.Next(attackers.Count + 1);
             if (draw < attackers.Count)
