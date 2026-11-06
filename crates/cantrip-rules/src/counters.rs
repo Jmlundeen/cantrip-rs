@@ -196,8 +196,8 @@ pub(crate) fn place_prepared(cx: &mut Cx, placements: &[Placement]) -> Vec<Event
 }
 
 /// Takes up to `n` counters of one kind off `id` (CR 122.1): what a cost removes (CR 118.3), what an effect removes, and
-/// the state-based action of CR 704.5q. When the last defense counter comes off a Siege, its defeat ability triggers
-/// (CR 310.12b).
+/// the state-based action of CR 704.5q, recorded as `Event::CountersRemoved`. When the last defense counter comes off a
+/// Siege, its defeat ability triggers (CR 310.12b).
 pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i32) {
     if n <= 0 || !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::PhasedOut) {
         return;
@@ -207,6 +207,10 @@ pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i32) {
         return;
     }
     cx.st().update_obj(id, |o| o.remove_counters(kind, n));
+    // What came off is recorded, with what removed it as the record's cause: "a mire counter has not been removed from with
+    // this artifact" (Cyclopean Tomb) asks the history.
+    let amount = before - cx.s().obj(id).counters(kind);
+    cx.record(Event::CountersRemoved { object: id, kind, amount });
     ops::end_lapsed_durations(cx, id);
     if kind == CounterKind::Defense && cx.s().obj(id).counters(CounterKind::Defense) == 0 {
         siege_defeat_triggers(cx, id);

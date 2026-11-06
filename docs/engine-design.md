@@ -162,7 +162,12 @@ once it is turned up; a `Damage` record carries its source's controller and colo
 neither a later change of control or color nor the source leaving can alter.
 
 - **Causes are recorded.** Each event names what produced it, which serves explanations, debugging and the AI's
-  features.
+  features. It is also what "with this [object]" asks: a resolving ability's records name its source
+  (`Cause::Ability`), gone or not, so Cyclopean Tomb's "a land that a mire counter was put onto with this artifact but
+  that a mire counter has not been removed from with this artifact" reads the `CountersPut` and `CountersRemoved`
+  records whose cause is an ability of that Tomb - its activated one, and its delayed one after it has died. Every
+  counter that comes off an object is a `CountersRemoved` record, filed with those put on (`EventMask::COUNTERS`);
+  no ability triggers on it yet.
 - **Visibility is derived, not stored.** Who knows what follows from the state and the log, provided every action
   that gives a player knowledge is an event: a reveal, a look at cards (`seen_by` on a face-down card), a search.
 - **Narration, replay and training data are views of it.** "State before a decision, the options, the choice, the
@@ -948,7 +953,8 @@ holds; an object that changed zones is a new one with a new ability (CR 400.7).
 
 A delayed triggered ability waits as a `Delayed` record in the state, on no object (CR 603.7): once at the next such step
 (`DelayedWhen::Step`), at each such step for the rest of the game (`EachStep`: paradigm, CR 702.192a, which goes on whatever
-happens to the card it came from), or on events: each one this turn (`ThisTurn`), until an event (`UntilEvent`), until a
+happens to the card it came from; Cyclopean Tomb's "at the beginning of each of your upkeeps for the rest of the game",
+made as it dies, its source the Tomb as it last existed; epic's upkeep copies, CR 702.50a), or on events: each one this turn (`ThisTurn`), until an event (`UntilEvent`), until a
 player's next turn (`UntilNextTurnOf`), or the next one this turn (`NextThisTurn`: "when you next cast ... this turn", CR
 603.7b, used up by the event it triggers on and ended with the turn if none comes; two made in one turn both trigger on
 that event, Doublecast's ruling), or the next one of an object it watches, whenever that comes (`WhenEvent`: "when that

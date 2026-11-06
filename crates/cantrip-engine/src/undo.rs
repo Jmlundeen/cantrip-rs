@@ -128,12 +128,13 @@ fn mana_activation(game: &Game, answer: &Answer) -> Option<ObjectId> {
     }
 }
 
-/// Whether these entries are only what a mana ability does: taps, sacrifices from the battlefield, mana made and spent, and life paid
-/// or lost for it.
+/// Whether these entries are only what a mana ability does: taps, sacrifices from the battlefield, counters removed (Pentad
+/// Prism's charge counter), mana made and spent, and life paid or lost for it.
 fn only_mana(records: &[Record]) -> bool {
     records.iter().all(|r| match r.event {
         Event::ZoneChange { from, reason, .. } => reason == ZoneReason::Sacrifice && from.kind() == ZoneKind::Battlefield,
         Event::Tapped { .. }
+        | Event::CountersRemoved { .. }
         | Event::TappedForMana { .. }
         | Event::ManaSpent { .. }
         | Event::LifeChange { .. }
