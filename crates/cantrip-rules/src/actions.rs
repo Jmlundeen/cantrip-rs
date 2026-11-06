@@ -10217,6 +10217,10 @@ fn activate(
     let chosen = choose_permanents(cx, player, source, &whole, paid, by)?;
     let discards = choose_discards(cx, player, source, &whole, by)?;
     let exiles = choose_exiles(cx, player, source, &whole, &[])?;
+    // The cards it exiles from the hand, as a spell's are (`cast`): none another part of the cost already took (CR 601.2h,
+    // 118.3), and from what is there once the mana is paid.
+    let taken: Vec<ObjectId> = discards.cards.iter().chain(&exiles).copied().collect();
+    let hand_exiles = choose_hand_exiles(cx, player, source, &whole, by, &taken)?;
     // The creatures a crew or saddle cost taps, once the mana is paid (CR 601.2g-h by way of 602.2b), as a spell's are
     // (`cast`): a mana ability activated while paying a cost increase (Anointed Peacekeeper's) may have tapped one, and a
     // tapped creature can't pay the cost.
@@ -10289,6 +10293,7 @@ fn activate(
     add_revealed_to_item(cx, at, &revealed);
     pay_discards(cx, &discards);
     let exiled = pay_exiles(cx, &exiles);
+    pay_exiles(cx, &hand_exiles);
     // The cards a cost counting symbols exiled stay with the ability, as they are in exile (CR 400.7), for its effect to
     // name ("those exiled cards", `Query::cost_objects`, CR 602.2b, 601.2h).
     if whole.exile_symbols.is_some() {
