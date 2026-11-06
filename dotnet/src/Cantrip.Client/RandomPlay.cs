@@ -190,6 +190,10 @@ public sealed class RandomPlay : IAutoPlayer
             ChooseDividedTargetsPromptMessage divided => Divided(divided),
             RemoveCountersPromptMessage remove => RemoveCounters(remove),
             ChooseModesPromptMessage modes => Modes(modes),
+            ChooseNumberPromptMessage number => new NumberChosenAnswer
+            {
+                Value = checked((uint)_random.NextInt64(number.Least, (long)number.Most + 1)),
+            },
             ChooseCardsPromptMessage cards => Cards(cards),
             SearchLibraryPromptMessage search => Search(search),
             DiscardPromptMessage discard => new CardsChosenAnswer { Cards = Some(discard.Hand, discard.Count) },
@@ -288,7 +292,7 @@ public sealed class RandomPlay : IAutoPlayer
 
     /// <summary>Whether an ability adds mana, either of stated types or of colors its answer would name (CR 106.1b).</summary>
     private static bool MakesMana(ActionOptionMessage option) =>
-        option.Produces.Count > 0 || option.ProducesOfAnyOneColor > 0 || option.ProducesOfAnyColorEach > 0;
+        option.Produces.Count > 0 || option.ProducesOfAnyOneColor > 0 || option.ProducesOfAnyColorEach > 0 || option.ColorChoices.Count > 0;
 
     /// <summary>
     /// What to aim an action at: a draw from the targets the server offered, and for "up to one target" the choice
@@ -358,6 +362,11 @@ public sealed class RandomPlay : IAutoPlayer
             return AutoPlay.Announce(prompt, _targetX);
         }
 
+        if (prompt.ManaAbilities)
+        {
+            return AutoPlay.Pay(prompt);
+        }
+
         if (!prompt.HasX)
         {
             return AutoPlay.Pay(prompt);
@@ -381,7 +390,7 @@ public sealed class RandomPlay : IAutoPlayer
         if (owing)
         {
             OwedMana owed = OwedMana.Of(prompt);
-            if (AutoPlay.Produce(prompt.Options, owed.Colored, owed.Generic, owed.Hybrid, owed.Colorless) is { } produce)
+            if (AutoPlay.Produce(prompt.Options, owed.Colored, owed.Generic, owed.Hybrid, owed.Colorless, owed.Snow) is { } produce)
             {
                 return produce;
             }
