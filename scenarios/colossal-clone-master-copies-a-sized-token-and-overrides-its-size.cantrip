@@ -1,0 +1,47 @@
+# Colossal Clone Master copies a 2/1 Phyrexian Horror token (CR 707.2): the copy acquires the token's copiable values and
+# the exception's characteristic-defining ability (CR 707.9a), so with its one differently named land its P/T is 1/1 while
+# the copied token is 2/1. It keeps the copied haste and trample, and being a token is not copied, so the copy is not one.
+
+[Bot1 Deck]
+Island
+Urabrask's Forge
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Sapphire
+Colossal Clone Master
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Urabrask's Forge.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Phyrexian Horror Token.Power = 2
+? Bot1.Battlefield.Phyrexian Horror Token.Toughness = 1
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Colossal Clone Master.Cast
+Bot1.Accept
+Bot1.Pass
+? Bot1.Battlefield.Phyrexian Horror Token#2.Power = 1
+? Bot1.Battlefield.Phyrexian Horror Token#2.Toughness = 1
+
+[Expect]
+Bot1.Battlefield.Phyrexian Horror Token#1.Power = 2
+Bot1.Battlefield.Phyrexian Horror Token#1.Toughness = 1
+Bot1.Battlefield.Phyrexian Horror Token#1.Token = true
+Bot1.Battlefield.Phyrexian Horror Token#1.Keywords = Haste; Trample
+Bot1.Battlefield.Phyrexian Horror Token#2.Power = 1
+Bot1.Battlefield.Phyrexian Horror Token#2.Toughness = 1
+Bot1.Battlefield.Phyrexian Horror Token#2.Token = (absent)
+Bot1.Battlefield.Phyrexian Horror Token#2.Keywords = Haste; Trample

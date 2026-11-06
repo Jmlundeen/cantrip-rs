@@ -1,0 +1,46 @@
+# "You may" has both answers (CR 608.2d): declining the copy leaves Colossal Clone Master as its printed 0/0 with no
+# exception ability, so state-based actions put it into the graveyard (CR 704.5f, 707.2). The creature it could have copied
+# is still on the battlefield, so the result is the decline and not a missing candidate.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Memnite
+Black Lotus
+Black Lotus
+Colossal Clone Master
+Island
+Island x20
+
+[Bot2 Deck]
+Plains
+Isamaru, Hound of Konda
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Isamaru, Hound of Konda.Cast
+Bot2.Battlefield.Plains.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Colossal Clone Master.Cast
+Bot1.Decline
+Bot1.Pass
+? Bot1.Battlefield.Colossal Clone Master = (absent)
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 1
+Bot1.Battlefield.Memnite.Toughness = 1
+Bot1.Battlefield.Colossal Clone Master = (absent)
+Bot1.Graveyard.Colossal Clone Master.Power = 0
+Bot1.Graveyard.Colossal Clone Master.Toughness = 0
+Bot2.Battlefield.Isamaru, Hound of Konda.Power = 2
+Bot2.Battlefield.Isamaru, Hound of Konda.Toughness = 2
