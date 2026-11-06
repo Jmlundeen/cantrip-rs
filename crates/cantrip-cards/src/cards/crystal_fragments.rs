@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::statics::plus_pt;
-use cantrip_mechanics::{exile_and_return_transformed, prevention};
+use cantrip_mechanics::{effects, exile_and_return_transformed, prevention};
 use cantrip_oracle as oracle;
 
 /// "{5}{W}{W}: Exile this Equipment, then return it to the battlefield transformed under its owner's control" (CR 712.14a):
@@ -32,21 +32,12 @@ fn prevent_damage_to_your_creatures(g: &mut dyn Game, item: &StackItem) -> Resul
     Ok(())
 }
 
-/// III: "Tap all creatures your opponents control." (CR 701.26a).
-fn tap_opponents_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
-    let creatures: Vec<ObjectId> =
-        g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature) && opponents.contains(&g.controller(id))).collect();
-    g.tap_together(&creatures);
-    Ok(())
-}
-
 /// Summon: Alexander, the back face: a white 4/3 Saga Construct creature with flying (CR 714).
 pub static BACK: CardDef = CardDef {
     abilities: &[
         chapter(1, prevent_damage_to_your_creatures, "I, II \u{2014} Prevent all damage that would be dealt to creatures you control this turn."),
         chapter(2, prevent_damage_to_your_creatures, "I, II \u{2014} Prevent all damage that would be dealt to creatures you control this turn."),
-        chapter(3, tap_opponents_creatures, "III \u{2014} Tap all creatures your opponents control."),
+        chapter(3, effects::tap_each_creature_opponents_control, "III \u{2014} Tap all creatures your opponents control."),
     ],
     granted_preventions: &[DAMAGE_TO_CREATURES_YOU_CONTROL],
     ..oracle::SUMMON_ALEXANDER
