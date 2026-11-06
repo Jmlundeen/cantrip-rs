@@ -29,6 +29,7 @@ pub mod channel;
 pub mod class;
 pub mod choose;
 pub mod casualty;
+pub mod cast_from_your_graveyard;
 pub mod cipher;
 pub mod chosen_type;
 pub mod hand;
