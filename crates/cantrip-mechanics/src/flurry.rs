@@ -1,4 +1,4 @@
-//! Flurry (CR 702.170a): "Whenever you cast your second spell each turn, [effect]." Cori-Steel Cutter and Cosmogrand Zenith print it.
+//! Flurry (an ability word, CR 207.2c): "Whenever you cast your second spell each turn, [effect]." Cori-Steel Cutter and Cosmogrand Zenith print it.
 //!
 //! A card with flurry lists `trigger(text, effect)` among its `abilities`, or `modal_trigger(text, modes)` when the
 //! effect is a choice of modes (CR 700.2b).
