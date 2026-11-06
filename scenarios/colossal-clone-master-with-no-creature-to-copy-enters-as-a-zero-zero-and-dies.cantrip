@@ -1,0 +1,35 @@
+# With no creature on the battlefield there is nothing to copy, so nothing is asked (CR 608.2d, 707.2) and Colossal Clone
+# Master enters as its printed 0/0, which state-based actions put into the graveyard (CR 704.5f). The only other permanents
+# are a land and an artifact, so a copy that offered a noncreature would be the wrong card.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Black Lotus
+Colossal Clone Master
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Colossal Clone Master.Cast
+Bot1.Pass
+? Bot1.Battlefield.Colossal Clone Master = (absent)
+
+[Expect]
+Bot1.Battlefield.Colossal Clone Master = (absent)
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Graveyard.Colossal Clone Master.Power = 0
+Bot1.Graveyard.Colossal Clone Master.Toughness = 0
