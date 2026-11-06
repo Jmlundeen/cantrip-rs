@@ -1,0 +1,32 @@
+# CR 103.5 and RX-6 (docs/rules-exceptions.md): after seven mulligans the player keeps without being asked again, and
+# keeping puts seven cards - the whole hand - on the bottom of the library, as every keep puts one per mulligan. Bot1
+# mulligans seven times in a duel and begins with no cards in hand. Each deck is a single card over and over, so the
+# shuffles cannot change what is expected.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.PlayFirst
+Bot1.Mulligan
+Bot2.Keep
+Bot1.Mulligan
+Bot1.Mulligan
+Bot1.Mulligan
+Bot1.Mulligan
+Bot1.Mulligan
+Bot1.Mulligan
+[T1 Bot1.Main1]
+
+[Expect]
+Turn = 1
+ActivePlayer = Bot1
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 20
+Bot2.Hand.Count = 7

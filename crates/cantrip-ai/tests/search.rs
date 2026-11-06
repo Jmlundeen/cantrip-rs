@@ -860,14 +860,15 @@ fn every_world_dealt_shows_the_seat_the_game_it_is_in() {
 /// it and must be the same - the request, the seat's knowledge and guard, no payment run, every other seat's knowledge
 /// and guard, the observation, the network's input, the options, their priors and the value - and no cut at the root
 /// may outlive its trim. And every world dealt fresh shows the seat the game it is in: its root observation is the real
-/// one, mulligans included (the tiny network mulligans often: hands shuffled back, cards bottomed).
+/// one, mulligans included (the tiny network mulligans often: hands shuffled back, cards bottomed - to an empty hand at
+/// the cap, RX-6, which ends a game early, so three games are played to reach enough searches).
 #[test]
 fn a_kept_tree_is_the_tree_a_fresh_search_would_grow() {
     let evaluator = TractEvaluator::load(&tiny(), table()).unwrap();
     let decks = [deck("dimir-midrange.txt"), deck("boros-dragons.txt")];
     let (mut rerooted, mut checked, mut fresh, mut fresh_mismatched) = (0usize, 0usize, 0usize, 0usize);
     let mut mismatches = std::collections::BTreeMap::<String, usize>::new();
-    for seed in 0..2u64 {
+    for seed in 0..3u64 {
         let mut game = deal(&[decks[0].clone(), decks[1].clone()], 77_000 + seed, true, None).unwrap();
         let mut ks: Vec<Knowledge> = game.state.seats().map(Knowledge::new).collect();
         let mut payments = vec![cantrip_ai::net::Payment::default(); 2];

@@ -279,12 +279,14 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
         let mut redraw = Vec::new();
         for p in undecided {
             let mulligans = cx.s().player(p).mulligans;
-            // Seven counted mulligans and the player keeps (`docs/rules-exceptions.md` RX-6).
-            if counted_mulligans(cx.s(), mulligans) >= 7 {
-                cx.st().update_player(p, |pl| pl.kept = true);
-                continue;
-            }
-            match cx.ask_rule(p, RequestKind::Mulligan { mulligans })? {
+            // Seven counted mulligans and the player keeps (`docs/rules-exceptions.md` RX-6), putting all seven on the
+            // bottom as any keep does.
+            let answer = if counted_mulligans(cx.s(), mulligans) >= 7 {
+                Some(Answer::No)
+            } else {
+                cx.ask_rule(p, RequestKind::Mulligan { mulligans })?
+            };
+            match answer {
                 None => continue,
                 Some(Answer::Yes) => redraw.push(p),
                 Some(_) => {

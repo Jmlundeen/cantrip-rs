@@ -1,0 +1,37 @@
+# CR 103.5c and RX-6 (docs/rules-exceptions.md): the cap is seven counted mulligans, and the first mulligan of a
+# multiplayer game is free, so in a game of three Bot1 is asked an eighth time, mulligans, and then keeps without being
+# asked again, putting all seven on the bottom. Each deck is a single card over and over, so the shuffles cannot change
+# what is expected.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Bot3 Deck]
+Mountain x20
+
+[Actions]
+Bot1.PlayFirst
+Bot1.Mulligan
+Bot2.Keep
+Bot3.Keep
+Bot1.Mulligan
+Bot1.Mulligan
+Bot1.Mulligan
+Bot1.Mulligan
+Bot1.Mulligan
+Bot1.Mulligan
+Bot1.Mulligan
+[T1 Bot1.Main1]
+
+[Expect]
+Turn = 1
+ActivePlayer = Bot1
+# Nothing kept, and the turn-one draw of a game of three (CR 103.8a).
+Bot1.Hand.Count = 1
+Bot1.Library.Count = 19
