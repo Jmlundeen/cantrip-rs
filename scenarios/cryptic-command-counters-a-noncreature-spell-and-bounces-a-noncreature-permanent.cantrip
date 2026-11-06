@@ -1,0 +1,46 @@
+# Cryptic Command's counter mode takes a noncreature spell and its return mode a noncreature permanent (CR 700.2,
+# 701.6a, 400.3): Bot2's Ancestral Recall is countered and Bot2's own Mox Sapphire is returned to its hand, so Bot2
+# draws nothing from the Recall (its hand is seven: eight after its draw step, one cast, one cast, one returned).
+# While choosing each target, a battlefield permanent is refused for the counter mode and a stack spell is refused for
+# the return mode (CR 109.2b, 110.1, 115.1a, 700.2c): the same Mox and Recall are accepted by their respective modes.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Cryptic Command
+Island x15
+
+[Bot2 Deck]
+Mox Sapphire
+Ancestral Recall
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Command.Cast
+Bot1.Modes(1; 2)
+! Bot1.Target(Bot2.Battlefield.Mox Sapphire)
+Bot1.Target(Stack.Ancestral Recall)
+! Bot1.Target(Stack.Ancestral Recall)
+Bot1.Target(Bot2.Battlefield.Mox Sapphire)
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Cryptic Command; Black Lotus
+Bot1.Hand.Count = 3
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ancestral Recall
+Bot2.Hand.Count = 7
+Stack.Count = 0
