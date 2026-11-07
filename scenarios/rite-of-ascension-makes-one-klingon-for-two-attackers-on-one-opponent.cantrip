@@ -1,0 +1,47 @@
+# "Whenever you attack" triggers once and "for each opponent you attacked" counts opponents, not attackers: Bot1
+# attacks Bot2 with two Ornithopters, so only one opponent was attacked and only one Klingon Warrior is made. A card
+# that triggered for each attacker, or counted attack declarations, would make two.
+
+[Bot1 Deck]
+Rite of Ascension
+Black Lotus
+Mox Ruby
+Ornithopter
+Ornithopter
+Plains
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rite of Ascension.Cast
+Bot1.Pass
+[T4 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Combat.Attackers = Klingon Warrior Token > Bot2; Ornithopter > Bot2; Ornithopter > Bot2
+? Bot1.Battlefield.Klingon Warrior Token#2 = (absent)
+[T4 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot3.Life = 20
+Bot1.Battlefield.Klingon Warrior Token.Power = 2
+Bot1.Battlefield.Klingon Warrior Token.Tapped = true
