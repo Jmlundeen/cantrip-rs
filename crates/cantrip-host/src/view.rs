@@ -280,7 +280,7 @@ pub fn hexproof_from_text(qualities: HexproofFrom) -> String {
 }
 
 /// The keywords as a card's text words them, for the ones an effect gave an object or took from it.
-const KEYWORD_WORDS: [(Keyword, &str); 54] = [
+const KEYWORD_WORDS: [(Keyword, &str); 55] = [
     (Keyword::Flying, "Flying"),
     (Keyword::Haste, "Haste"),
     (Keyword::Vigilance, "Vigilance"),
@@ -335,6 +335,7 @@ const KEYWORD_WORDS: [(Keyword, &str); 54] = [
     (Keyword::CantBeCopied, "This spell can't be copied."),
     (Keyword::ReadAhead, "Read ahead"),
     (Keyword::AssignsDamageByToughness, "This creature assigns combat damage equal to its toughness rather than its power."),
+    (Keyword::Suspend, "Suspend"),
 ];
 
 /// A rules line without its parenthesized reminder text, trimmed.

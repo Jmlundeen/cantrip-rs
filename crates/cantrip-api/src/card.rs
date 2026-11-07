@@ -3258,7 +3258,9 @@ pub struct CardDef {
     pub reconfigure: bool,
     /// Foretell (CR 702.143): the cost it is cast for from exile, on a later turn, once foretold.
     pub foretell: Option<ManaCost>,
-    /// Suspend (CR 702.62).
+    /// The suspend it prints (CR 702.62): its number and cost, what the static ability that exiles it from the hand reads. That
+    /// it has suspend is a keyword of its characteristics (`Keyword::Suspend`, from `printed_keywords`), which an effect can
+    /// give or take.
     pub suspend: Option<SuspendDef>,
     /// Its Adventure (CR 715): a second set of characteristics it can be cast with from hand. The definition must be
     /// in the card table (listed in the card's `EXTRA`).
@@ -3983,11 +3985,15 @@ impl CardDef {
         self.kicker.is_some() || matches!(self.optional_cost, Some(OptionalCost { kicker: true, .. }))
     }
 
-    /// The keywords the card prints: those it lists, and morph or disguise where it prints a way of that keyword (CR 702.37a,
-    /// 702.168a; `WayKind::Morph`, `Megamorph`, `Disguise`), which the way holds the cost of. What the layers start an object
-    /// of this card from (CR 613.1f takes them as it takes any ability).
+    /// The keywords the card prints: those it lists, morph or disguise where it prints a way of that keyword (CR 702.37a,
+    /// 702.168a; `WayKind::Morph`, `Megamorph`, `Disguise`), which the way holds the cost of, and suspend where it prints one
+    /// (CR 702.62a; `suspend`, which holds its number and cost). What the layers start an object of this card from (CR
+    /// 613.1f takes them as it takes any ability).
     pub fn printed_keywords(&self) -> Keywords {
         let mut keywords = self.keywords;
+        if self.suspend.is_some() {
+            keywords = keywords.with(Keyword::Suspend);
+        }
         for way in self.ways {
             if way.kind.morph() {
                 keywords = Keywords(keywords.0 | Keywords::of(&[Keyword::Morph]).0);

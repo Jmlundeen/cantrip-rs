@@ -1385,6 +1385,12 @@ pub enum Keyword {
     /// `CardDef::damage_by_toughness`, or a player's `EffectKind::CreaturesAssignDamageByToughness`; `static_rules::combat_damage_of`
     /// reads all three.
     AssignsDamageByToughness = 60,
+    /// Suspend (CR 702.62a): a card has it by the suspend it prints (`CardDef::suspend`, which holds its number and cost, for
+    /// the static ability that exiles it from the hand), or gains it - Delay's "if it doesn't have suspend, it gains suspend",
+    /// Epochrasite's "it gains suspend" - so "suspended" (CR 702.62b) reads the object's characteristics, not its card. The
+    /// layers give an object that has it once layer 6 is done suspend's two triggered abilities, which function in exile
+    /// (`intrinsic::SUSPEND_UPKEEP`, `SUSPEND_CAST`).
+    Suspend = 61,
 }
 
 impl Keyword {

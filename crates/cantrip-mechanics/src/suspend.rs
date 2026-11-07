@@ -3,9 +3,12 @@
 //! without paying its mana cost." Lotus Bloom and Rift Bolt print it.
 //!
 //! A card with suspend sets `suspend: Some(SuspendDef { count, cost })` and lists `ability(cost, text)`: the special
-//! action (CR 116.2) of exiling it from the hand whenever it could be cast. The two triggered abilities are the rules'
-//! own (`cantrip_api::intrinsic`), and so is the haste a creature spell cast by the second gains until its caster loses
-//! control of it (`intrinsic::SUSPEND_HASTE`, carried to the permanent it becomes, CR 400.7a).
+//! action (CR 116.2) of exiling it from the hand whenever it could be cast. Printing suspend gives the card the keyword
+//! (`Keyword::Suspend`, `CardDef::printed_keywords`); a card that gains suspend (Delay, Epochrasite) is given it by an effect
+//! (`EffectKind::AddKeywords`). Either way the layers give an object with the keyword suspend's two triggered abilities,
+//! which function in exile (`cantrip_api::intrinsic::SUSPEND_UPKEEP`, `SUSPEND_CAST`), and so is the haste a creature spell
+//! cast by the second gains until its caster loses control of it (`intrinsic::SUSPEND_HASTE`, carried to the permanent it
+//! becomes, CR 400.7a).
 
 use cantrip_api::*;
 

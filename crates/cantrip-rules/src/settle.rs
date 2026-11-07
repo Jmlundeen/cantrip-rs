@@ -1025,27 +1025,6 @@ fn inherent(cx: &mut Cx, index: u8, controller: PlayerId, subject: Target, event
     found.push((PendingTrigger { source, ability, controller, subject, data: [0; 2], members: Span::default(), count: None, since: None, acquired: Acquired::OWN, words: None }, t, again));
 }
 
-/// One of the rules' own triggered abilities that `source` has for a keyword or a subtype (`counters::last_counter_trigger`)
-/// that `event` triggered, controlled by `controller`: unless something stops it triggering, and once more for each static
-/// ability that makes it trigger again (CR 603.2d), as any other ability of an object is.
-#[allow(clippy::too_many_arguments)]
-fn rules_ability(cx: &mut Cx, source: ObjectId, index: u8, controller: PlayerId, event: &Event, seen: bool, statics: &mut TriggerStatics, found: &mut Found) {
-    let ability = AbilityRef { card: cx.cards().intrinsic, index };
-    let AbilityDef::Triggered(t) = cx.cards().ability(ability) else { return };
-    let permanent = cx.s().obj(source).zone.is(ZoneKind::Battlefield);
-    let triggering = Triggering { source, controller, def: t, permanent, looks_back: cx.cards().looks_back(ability, event, seen) };
-    if statics.stop(cx, event, &triggering) {
-        return;
-    }
-    let mut again = Again::new();
-    statics.additional(cx, event, &triggering, &mut again);
-    found.push((
-        PendingTrigger { source, ability, controller, subject: Target::None, data: [0; 2], members: Span::default(), count: None, since: None, acquired: Acquired::OWN, words: None },
-        t,
-        again,
-    ));
-}
-
 /// The slot of `chars`'s abilities that the `nth` of `Chars::abilities()` is in.
 fn slot_of(chars: &Chars, nth: usize) -> usize {
     chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(nth).map_or(0, |(slot, _)| slot)
@@ -1619,11 +1598,6 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             for (index, controller, subject) in crate::designations::inherent_triggers(cx, event) {
                 inherent(cx, index, controller, subject, event, seen, &mut statics, &mut found);
             }
-            // The rules' abilities an object has for a keyword or a subtype that trigger on its last counter of a kind coming
-            // off (suspend's, CR 702.62a; a Siege's, CR 310.12b).
-            if let Some((source, index, controller)) = crate::counters::last_counter_trigger(cx, event) {
-                rules_ability(cx, source, index, controller, event, seen, &mut statics, &mut found);
-            }
             let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
             if let Some(before) = before {
                 for &id in before {
@@ -1746,9 +1720,19 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             // Sun and Moon). One put into a hidden zone unrevealed (Library of Leng) has its characteristics, its abilities
             // among them, undefined (CR 701.9c, 109.3), so nothing of its own triggers (`Event::Discarded::undefined`).
             // A spell may also be given such an ability by a static ability (Thrumming Stone's ripple, CR 613.1f), which only
-            // a game that has had static abilities in play can have done.
+            // a game that has had static abilities in play can have done. And the layers give suspend's two abilities, which
+            // function in exile (CR 702.62a), to any object that has suspend, printed or gained (Delay, Epochrasite): they
+            // trigger only from a card in exile that has a time counter (the upkeep one's "if this card is suspended", CR
+            // 702.62b) or that this event took its last one from, so those are the cards in exile looked at for them, for the
+            // events they listen for (a step beginning, counters).
             let cards = cx.cards();
             let granted = mask.intersects(EventMask::SPELL_CAST) && cx.s().statics_seen;
+            let suspend_listens = mask.intersects(EventMask(EventMask::STEP_BEGAN.0 | EventMask::COUNTERS.0));
+            let timed = |id: ObjectId, obj: &Obj| {
+                suspend_listens
+                    && (obj.counters(CounterKind::Time) > 0
+                        || matches!(*event, Event::CountersRemoved { object, kind: CounterKind::Time, .. } if object == id))
+            };
             let elsewhere: Vec<ObjectId> = cx
                 .s()
                 .seats()
@@ -1757,7 +1741,8 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                 .flat_map(|z| cx.s().zone(z).iter().copied())
                 .filter(|&id| {
                     let obj = cx.s().obj(id);
-                    (!undefined.contains(&id) && cards.functions_elsewhere[obj.card.0 as usize].contains(obj.zone.kind()))
+                    (!undefined.contains(&id)
+                        && (cards.functions_elsewhere[obj.card.0 as usize].contains(obj.zone.kind()) || (obj.zone.is(ZoneKind::Exile) && timed(id, obj))))
                         || (granted && obj.zone.is(ZoneKind::Stack))
                 })
                 .collect();
@@ -1963,37 +1948,8 @@ pub fn step_began(cx: &mut Cx, step: Step) {
         }
     }
     // The monarch's and the initiative's step triggers are found from the event (`designations::inherent_triggers`).
+    // Suspend's upkeep ability (CR 702.62a) is an ability of each card that has suspend, found from the event in exile.
     cx.emit(Event::StepBegan { step });
-    if step == Step::Upkeep {
-        suspended_cards(cx, active);
-    }
-}
-
-/// "At the beginning of your upkeep, if this card is suspended, remove a time counter from it" (CR 702.62a): the rules'
-/// own ability for each suspended card its owner has in exile. A card is looked at only if it has time counters.
-fn suspended_cards(cx: &mut Cx, active: PlayerId) {
-    let intrinsic = cx.cards().intrinsic;
-    let suspended: Vec<ObjectId> = cx
-        .s()
-        .zone(Zone::exile(active))
-        .iter()
-        .copied()
-        .filter(|&id| cx.s().obj(id).counters(CounterKind::Time) > 0 && cx.card(cx.s().obj(id).card).suspend.is_some())
-        .collect();
-    for source in suspended {
-        cx.st().trigger_push(PendingTrigger {
-            source,
-            ability: AbilityRef { card: intrinsic, index: cantrip_api::intrinsic::SUSPEND_UPKEEP },
-            controller: active,
-            subject: Target::None,
-            data: [0; 2],
-            members: Span::default(),
-            count: None,
-            since: None,
-            acquired: Acquired::OWN,
-            words: None,
-        });
-    }
 }
 
 /// Whether a triggered ability's intervening "if" still holds as it resolves (CR 603.4).

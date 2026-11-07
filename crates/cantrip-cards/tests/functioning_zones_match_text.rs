@@ -33,6 +33,11 @@ fn said_zones(text: &str, name: &str) -> ZoneKinds {
     if CAST_KEYWORDS.iter().any(|k| text.starts_with(k)) {
         return ON_THE_STACK;
     }
+    // Suspend's two triggered abilities, which the rules give a card with suspend, "function in the exile zone" by the
+    // keyword's own rule (CR 702.62a), not by their words.
+    if text.starts_with("suspend: ") {
+        return ZoneKinds::of(&[ZoneKind::Exile]);
+    }
     let condition = text.split(", ").next().unwrap_or_default();
     let condition = condition.split(" - ").last().unwrap_or_default();
     let mut conditions = vec![condition.to_string()];

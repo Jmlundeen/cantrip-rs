@@ -674,10 +674,11 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
     // the battlefield, though no rule asks while it is phased out: what it shows, and what it is again as it phases in.
     let on_battlefield = (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) && obj.became.is_none();
     // A card in exile is as its card is, but for an ability an effect gave it there (CR 113.6b, 613.1f: Q, Stacking the
-    // Deck's). The effects list holds only what is live, so the grant ends with its duration, and an object that has become
-    // another (CR 400.7) is read as it last was, before any of this (`last_known`), so nothing follows a card across zones.
+    // Deck's; `given_in_exile`). The effects list holds only what is live, so the grant ends with its duration, and an object
+    // that has become another (CR 400.7) is read as it last was, before any of this (`last_known`), so nothing follows a card
+    // across zones.
     let in_exile = obj.zone.is(ZoneKind::Exile) && obj.became.is_none();
-    let granted_in_exile = in_exile && state.effects.iter().any(|e| e.affected == id && matches!(e.kind, EffectKind::AddAbility(_)));
+    let granted_in_exile = in_exile && state.effects.iter().any(|e| e.affected == id && given_in_exile(&e.kind));
     // What could apply at all, found once: most objects have no effects, no statics touch them, and no counters.
     // A spell's text can be changed too (CR 612.1: "target spell or permanent").
     // The effects on a card do not follow it to the stack (CR 400.7): a card judged as a spell has none.
@@ -701,6 +702,12 @@ fn object<'a>(cards: &CardTable, state: &'a GameState, id: ObjectId) -> Object<'
         }
     }
     Object::Full(ObjCtx { on_battlefield, in_exile, has_counters, has_hone, ..o })
+}
+
+/// The effects that apply to a card in exile: an ability an effect gave it there (CR 113.6b, 613.1f) - one written out (Q,
+/// Stacking the Deck's) or a keyword (Delay's and Epochrasite's "it gains suspend", CR 702.62a).
+fn given_in_exile(kind: &EffectKind) -> bool {
+    matches!(kind, EffectKind::AddAbility(_) | EffectKind::AddKeywords(_))
 }
 
 // --- The layer pass (CR 613.7, 613.8) ------------------------------------------------------------------------------------
@@ -1113,14 +1120,22 @@ fn keyword_counters(state: &GameState, id: ObjectId, obj: &Obj, fx: &mut Vec<Con
     }
 }
 
-/// The abilities the rules give an object for a keyword it has once layer 6 is done (CR 702.147a): decayed's triggered
-/// ability, whether the keyword is printed, granted or a counter's. Its static half ("this creature can't block") is read
-/// off the keyword by the blocking rule.
+/// The abilities the rules give an object for a keyword it has once layer 6 is done, whether the keyword is printed, granted
+/// or a counter's: decayed's triggered ability (CR 702.147a; its static half, "this creature can't block", is read off the
+/// keyword by the blocking rule), and suspend's two triggered abilities, which function in exile (CR 702.62a; its static
+/// one is the printed special action that exiles the card from the hand, `cantrip_mechanics::suspend`). One with as many
+/// abilities as it can hold is given no more.
 fn intrinsic_keyword_abilities(cards: &CardTable, chars: &mut Chars) {
-    if chars.keywords.has(Keyword::Decayed)
-        && let Some(slot) = chars.abilities.iter().position(|a| a.is_none())
-    {
-        chars.abilities[slot] = Some(AbilityRef { card: cards.intrinsic, index: cantrip_api::intrinsic::DECAYED });
+    use cantrip_api::intrinsic::{DECAYED, SUSPEND_CAST, SUSPEND_UPKEEP};
+    let given: &[u8] = match (chars.keywords.has(Keyword::Decayed), chars.keywords.has(Keyword::Suspend)) {
+        (false, false) => return,
+        (true, false) => &[DECAYED],
+        (false, true) => &[SUSPEND_UPKEEP, SUSPEND_CAST],
+        (true, true) => &[DECAYED, SUSPEND_UPKEEP, SUSPEND_CAST],
+    };
+    for &index in given {
+        let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) else { return };
+        chars.abilities[slot] = Some(AbilityRef { card: cards.intrinsic, index });
     }
 }
 
@@ -1769,7 +1784,7 @@ fn applies(view: &View, o: &ObjCtx, entry: &GEntry, snap: &Snap) -> bool {
         }
         GKind::Effect(e) => {
             e.affected == id
-                && (o.on_battlefield || o.spell || (o.in_exile && matches!(e.kind, EffectKind::AddAbility(_))))
+                && (o.on_battlefield || o.spell || (o.in_exile && given_in_exile(&e.kind)))
                 && match e.kind {
                     EffectKind::ChangeText { from: Word::Subtype(from), .. } => {
                         let chars = &snap.chars;

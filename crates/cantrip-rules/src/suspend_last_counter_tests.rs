@@ -2,7 +2,9 @@
 //! it's exiled, you may play it without paying its mana cost" triggers on the last time counter coming off however it does
 //! - an effect (Timecrafting, Clockspinning, Rift Elemental) as well as suspend's own upkeep ability - once however many
 //! came off at once (CR 603.2), never for a removal that leaves some, never from a card that has no suspend, and never from a
-//! card with suspend outside exile, where the ability does not function.
+//! card with suspend outside exile, where the ability does not function. Suspend is the object's (CR 702.62b), through the
+//! layers: a card that gains it in exile (Delay, Epochrasite) is suspended and cast. A Siege's "when the last defense counter
+//! is removed" (CR 310.12b) is the layers' too: one that has lost its abilities has none to trigger.
 
 use crate::{Cx, Game, Setup};
 use cantrip_api::*;
@@ -72,6 +74,75 @@ static SPIN: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "Each card your opponent owns in exile gains suspend" (Delay's "if it doesn't have suspend, it gains suspend",
+/// Epochrasite's "it gains suspend"): for as long as it stays there.
+fn give_suspend(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    let cards: Vec<ObjectId> = g.state().zone(Zone::exile(THEM)).iter().copied().collect();
+    for card in cards {
+        g.add_effect(item.object, card, EffectKind::AddKeywords(Keywords::of(&[Keyword::Suspend])), Duration::Indefinite);
+    }
+    Ok(())
+}
+
+static DELAY: CardDef = CardDef {
+    name: "Last Counter Test Delay",
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], give_suspend),
+    ..CardDef::BLANK
+};
+
+/// A Siege with a creature back face.
+static SIEGE: CardDef = CardDef {
+    name: "Last Counter Test Siege",
+    types: TypeSet::of(&[CardType::Battle]),
+    subtypes: SubtypeSet::of(&[Subtype::Siege]),
+    defense: Some(3),
+    back: Some(&SIEGE_BACK),
+    ..CardDef::BLANK
+};
+static SIEGE_BACK: CardDef = CardDef {
+    name: "Last Counter Test Siege Back",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(3),
+    toughness: Some(3),
+    ..CardDef::BLANK
+};
+
+fn battles(g: &dyn cantrip_api::Game) -> Vec<ObjectId> {
+    g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Battle)).collect()
+}
+
+/// "Remove a defense counter from each battle."
+fn remove_a_defense_counter(g: &mut dyn cantrip_api::Game, _: &StackItem) -> Result<(), Suspend> {
+    for battle in battles(g) {
+        g.remove_counters(battle, CounterKind::Defense, 1);
+    }
+    Ok(())
+}
+
+static BREACH: CardDef = CardDef {
+    name: "Last Counter Test Breach",
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], remove_a_defense_counter),
+    ..CardDef::BLANK
+};
+
+/// "Each battle loses all abilities, then remove a defense counter from each battle."
+fn strip_then_remove_a_defense_counter(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    for battle in battles(g) {
+        g.add_effect(item.object, battle, EffectKind::LoseAllAbilities, Duration::Indefinite);
+    }
+    remove_a_defense_counter(g, item)
+}
+
+static STRIP_AND_BREACH: CardDef = CardDef {
+    name: "Last Counter Test Strip And Breach",
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: spell(&[], strip_then_remove_a_defense_counter),
+    ..CardDef::BLANK
+};
+
 fn cx(game: &mut Game) -> Cx<'_> {
     Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
 }
@@ -84,7 +155,19 @@ fn game(def: &'static CardDef, time: i32, instant: &'static CardDef) -> (Game, O
 
 /// `game`, with `def` in `zone` instead.
 fn game_in(zone: Zone, def: &'static CardDef, time: i32, instant: &'static CardDef) -> (Game, ObjectId, ObjectId) {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &SPRINTER, &PLAIN, &TICK, &SPIN, &WIND_DOWN])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([
+        &FILLER,
+        &SPRINTER,
+        &PLAIN,
+        &TICK,
+        &SPIN,
+        &WIND_DOWN,
+        &DELAY,
+        &SIEGE,
+        &SIEGE_BACK,
+        &BREACH,
+        &STRIP_AND_BREACH,
+    ])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -119,6 +202,7 @@ fn play_until(g: &mut Game, instant: ObjectId, done: impl Fn(&Game) -> bool) {
                 .map_or(Answer::Pass, |o| Answer::Act(Action { targets: o.target_candidates.clone(), ..Action::of(o) })),
             RequestKind::Priority { .. } => Answer::Pass,
             RequestKind::May { purpose: Purpose::CastFree, .. } => Answer::Yes,
+            RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand.iter().copied().take(*count as usize).collect()),
             other => panic!("unexpected question {other:?}"),
         };
         g.answer(r.id, r.player, answer).expect("a legal answer");
@@ -201,4 +285,50 @@ fn a_permanent_with_suspend_on_the_battlefield_triggers_nothing() {
     assert_eq!(g.state.obj(card).counters(CounterKind::Time), 0, "the counter did come off");
     assert_eq!(cast_triggers(&g), 0, "no last-counter ability triggered");
     assert_eq!(on_battlefield(&g, &SPRINTER), Some(card), "still the same permanent, never cast");
+}
+
+/// A Siege with one defense counter, which `instant` takes off: whether its defeat ability triggered (CR 310.12b), the
+/// counter having come off.
+fn siege_defeat_triggers(instant: &'static CardDef) -> usize {
+    let (mut g, siege, instant) = game_in(Zone::BATTLEFIELD, &SIEGE, 0, instant);
+    // Their Siege, which you protect (CR 310.11a).
+    g.state.update_obj(siege, |o| o.marks.protector = Some(YOU));
+    crate::counters::put(&mut cx(&mut g), siege, CounterKind::Defense, 1, THEM, crate::counters::How::Effect);
+    let id = g.state.obj(instant).card;
+    let resolved = move |g: &Game| !in_hand(g, instant) && !g.state.stack.iter().any(|i| g.state.obj(i.object).card == id);
+    play_until(&mut g, instant, resolved);
+    assert_eq!(g.state.obj(siege).counters(CounterKind::Defense), 0, "the counter did come off");
+    let ability = AbilityRef { card: g.cards.intrinsic, index: cantrip_api::intrinsic::SIEGE_DEFEAT };
+    g.state.triggers.iter().filter(|t| t.ability == ability).count() + g.state.stack.iter().filter(|i| i.ability == ability).count()
+}
+
+/// A Siege's last defense counter coming off triggers its defeat ability, which the layers give it (CR 310.12b, 613.1f).
+#[test]
+fn a_sieges_last_defense_counter_coming_off_triggers_its_defeat() {
+    assert_eq!(siege_defeat_triggers(&BREACH), 1);
+}
+
+/// A Siege that has lost all its abilities has no defeat ability to trigger (CR 613.1f): its last defense counter coming off
+/// does nothing.
+#[test]
+fn a_siege_that_lost_its_abilities_triggers_no_defeat() {
+    assert_eq!(siege_defeat_triggers(&STRIP_AND_BREACH), 0);
+}
+
+/// A card with no suspend of its own gains it in exile, with two time counters on it (Delay, Epochrasite): it is suspended
+/// (CR 702.62b), so its owner's upkeep takes a counter off, and the next one the last, and its owner casts it (CR 702.62a) -
+/// suspend is the object's, through the layers, not its card's.
+#[test]
+fn a_card_that_gains_suspend_in_exile_is_suspended_and_cast() {
+    let (mut g, card, delay) = game(&PLAIN, 2, &DELAY);
+    play_until(&mut g, delay, |g| g.state.turn.active == THEM && g.state.obj(card).counters(CounterKind::Time) < 2);
+    assert!(g.state.zone(Zone::exile(THEM)).contains(&card), "still exiled");
+    assert_eq!(g.state.obj(card).counters(CounterKind::Time), 1, "its owner's upkeep took one counter off");
+    let first = g.state.turn.number;
+    play_until(&mut g, delay, |g| on_battlefield(g, &PLAIN).is_some());
+    let plain = on_battlefield(&g, &PLAIN).expect("cast and resolved");
+    assert_eq!(g.state.turn.active, THEM, "cast in its owner's turn");
+    assert!(g.state.turn.number > first, "in its owner's next upkeep");
+    assert_eq!(g.state.obj(plain).controller, THEM, "cast by its owner");
+    assert!(cx(&mut g).chars(plain).has(Keyword::Haste), "a creature cast this way has haste");
 }

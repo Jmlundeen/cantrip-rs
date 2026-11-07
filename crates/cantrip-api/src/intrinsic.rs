@@ -42,9 +42,10 @@ pub const MONARCH_DRAW: u8 = 5;
 pub const MONARCH_TAKEN: u8 = 6;
 pub const INITIATIVE_VENTURE: u8 = 7;
 pub const INITIATIVE_TAKEN: u8 = 8;
-/// A Siege's defeat ability (CR 310.12b).
+/// A Siege's defeat ability (CR 310.12b), which the layers give every Siege as layer 6 begins.
 pub const SIEGE_DEFEAT: u8 = 9;
-/// Suspend's two triggered abilities (CR 702.62a): the upkeep one and the one for the last counter removed.
+/// Suspend's two triggered abilities (CR 702.62a): the upkeep one and the one for the last counter removed, which the layers
+/// give an object that has suspend once layer 6 is done (`Keyword::Suspend`) and which function in exile.
 pub const SUSPEND_UPKEEP: u8 = 10;
 pub const SUSPEND_CAST: u8 = 11;
 /// The unlock special actions of a Room's locked doors (CR 709.5e): the rules give one for each locked door.
@@ -140,24 +141,56 @@ const fn unlock(text: &'static str, effect: Effect, condition: Condition) -> Abi
         .special_action()
 }
 
-/// "At the beginning of your upkeep, if this card is suspended, remove a time counter from it." (CR 702.62a)
-fn suspend_upkeep(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let card = item.object;
-    if !crate::game::is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Exile) || g.obj(card).counters(CounterKind::Time) <= 0 {
-        return Ok(());
+/// Suspend's two triggered abilities function in the exile zone (CR 702.62a, 113.6b), where a card's controller is its owner
+/// (CR 108.4a): "you" is its owner.
+const IN_EXILE: ZoneKinds = ZoneKinds::of(&[ZoneKind::Exile]);
+
+/// "At the beginning of your upkeep" (CR 702.62a), for a card in exile: its owner's upkeep.
+fn owners_upkeep(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::StepBegan { step: Step::Upkeep } if q.state().turn.active == q.obj(source).owner => Fired::PLAIN,
+        _ => None,
     }
-    // "When the last is removed" is a triggered ability of its own, which triggers on the counter coming off however it
-    // does - this ability or any effect (`Event::CountersRemoved`, the rules' `counters::last_counter_trigger`).
-    g.remove_counters(card, CounterKind::Time, 1);
+}
+
+/// "If this card is suspended" (CR 702.62b): in exile, with suspend, and with a time counter on it - the intervening "if"
+/// (CR 603.4), asked as it triggers and again as it resolves.
+fn suspended(q: &dyn Query, asker: &Asker) -> bool {
+    let obj = q.obj(asker.source);
+    crate::game::is_live(q, asker.source)
+        && obj.zone.is(ZoneKind::Exile)
+        && obj.counters(CounterKind::Time) > 0
+        && q.chars(asker.source).has(Keyword::Suspend)
+}
+
+/// "When the last time counter is removed from this card" (CR 702.62a): time counters came off it and none is left, however
+/// they came off - suspend's upkeep ability, or any effect (Timecrafting, Clockspinning, Rift Elemental) - once however many
+/// came off together (CR 603.2c).
+fn last_time_counter_removed(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::CountersRemoved { object, kind: CounterKind::Time, amount, total: 0 } if object == source && amount > 0 => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "If it's exiled" (CR 702.62a): the intervening "if" (CR 603.4), asked as it triggers and again as it resolves. The card is
+/// the object the ability came from (CR 400.7): one that left exile and came back is a new object.
+fn exiled(q: &dyn Query, asker: &Asker) -> bool {
+    crate::game::is_live(q, asker.source) && q.obj(asker.source).zone.is(ZoneKind::Exile)
+}
+
+/// "At the beginning of your upkeep, if this card is suspended, remove a time counter from it." (CR 702.62a) Removing the
+/// last is what triggers "when the last time counter is removed", an ability of its own (`last_time_counter_removed`).
+fn suspend_upkeep(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.remove_counters(item.object, CounterKind::Time, 1);
     Ok(())
 }
 
-/// "When the last is removed and the card is exiled, you may cast it without paying its mana cost. If you don't, it
-/// remains exiled." (CR 702.62a) Triggered by the last time counter coming off a card with suspend in exile, by whatever
-/// removed it (`Event::CountersRemoved`); "if it's exiled" is asked again here as it resolves (CR 603.4).
+/// "When the last time counter is removed from this card, if it's exiled, you may play it without paying its mana cost if
+/// able. If you don't, it remains exiled." (CR 702.62a)
 fn suspend_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let card = item.object;
-    if !crate::game::is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Exile) || !g.could_cast_during_resolution(card) {
+    if !g.could_cast_during_resolution(card) {
         return Ok(());
     }
     if g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastFree })? == Answer::Yes
@@ -185,8 +218,18 @@ fn caster_controls(q: &dyn Query, e: &ContinuousEffect) -> bool {
     q.obj(e.affected).controller == e.controller
 }
 
+/// "When the last defense counter is removed from this permanent" (CR 310.12b): defense counters came off it and none is
+/// left, however they came off, once however many came off together (CR 603.2c).
+fn last_defense_counter_removed(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::CountersRemoved { object, kind: CounterKind::Defense, amount, total: 0 } if object == source && amount > 0 => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "When the last defense counter is removed from this permanent, exile it, then you may cast it transformed without
-/// paying its mana cost" (CR 310.12b). "It" is the permanent the ability came from; if that has left the battlefield
+/// paying its mana cost" (CR 310.12b): the layers give it to every Siege at the start of layer 6, so one that loses its
+/// abilities has none to trigger. "It" is the permanent the ability came from; if that has left the battlefield
 /// since, it is a new object and nothing is exiled. Declined, or impossible to cast, the card stays in exile.
 fn siege_defeated(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !crate::game::is_live(g, item.object) || !g.is_on_battlefield(item.object) {
@@ -219,9 +262,23 @@ pub static INTRINSIC: CardDef = CardDef {
             "Whenever one or more creatures a player controls deal combat damage to the player who has the initiative, the controller of those creatures takes the initiative.",
             initiative_subject,
         ),
-        inherent("When the last defense counter is removed from this permanent, exile it. Then you may cast it transformed without paying its mana cost.", siege_defeated),
-        inherent("Suspend: at the beginning of your upkeep, if this card is suspended, remove a time counter from it.", suspend_upkeep),
-        inherent("Suspend: when the last time counter is removed from this card, if it's exiled, you may cast it without paying its mana cost.", suspend_cast),
+        triggered(
+            when(EventMask::COUNTERS, last_defense_counter_removed),
+            siege_defeated,
+            "When the last defense counter is removed from this permanent, exile it. Then you may cast it transformed without paying its mana cost.",
+        ),
+        triggered(
+            when(EventMask::STEP_BEGAN, owners_upkeep).functions_in(IN_EXILE),
+            suspend_upkeep,
+            "Suspend: at the beginning of your upkeep, if this card is suspended, remove a time counter from it.",
+        )
+        .condition(suspended),
+        triggered(
+            when(EventMask::COUNTERS, last_time_counter_removed).functions_in(IN_EXILE),
+            suspend_cast,
+            "Suspend: when the last time counter is removed from this card, if it's exiled, you may cast it without paying its mana cost.",
+        )
+        .condition(exiled),
         unlock("Unlock the left door by paying its mana cost.", unlock_left, left_is_locked),
         unlock("Unlock the right door by paying its mana cost.", unlock_right, right_is_locked),
         triggered(when(EventMask::ATTACKS, this_attacks), decayed_attacks, "When this creature attacks, sacrifice it at end of combat."),

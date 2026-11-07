@@ -169,7 +169,9 @@ neither a later change of control or color nor the source leaving can alter.
   counter that comes off an object is a `CountersRemoved` event, filed with those put on (`EventMask::COUNTERS`), with
   how many of the kind are left (`total`). Triggers are looked for as it is emitted (`counters::remove`), which is how
   the rules' "when the last [kind] counter is removed" abilities trigger however the counter came off: suspend's cast
-  (CR 702.62a) and a Siege's defeat (CR 310.12b), from `counters::last_counter_trigger`.
+  (CR 702.62a) and a Siege's defeat (CR 310.12b), real triggered abilities the layers give (`Keyword::Suspend` once
+  layer 6 is done, a Siege as layer 6 begins), found as any ability of the object is - so one that has lost its
+  abilities has none to trigger.
 - **Visibility is derived, not stored.** Who knows what follows from the state and the log, provided every action
   that gives a player knowledge is an event: a reveal, a look at cards (`seen_by` on a face-down card), a search.
 - **Narration, replay and training data are views of it.** "State before a decision, the options, the choice, the
@@ -866,7 +868,10 @@ Pyromancer's nonland cards). A cycle (CR 702.29c) is the discard paying a cyclin
 `cantrip-cards/tests/cycling_matches_oracle.rs`), never another "Discard this card" cost (channel): `Event::Cycled`
 follows that `Discarded` in the discard's batch, naming the same object, the card where it ended - or its own text
 names the zone (CR 113.6b, 113.6m: "return this card from your graveyard"), which the card declares with `functions_in`.
-`CardTable::functions_elsewhere` says per card which other zones to look in, and
+`CardTable::functions_elsewhere` says per card which other zones to look in - and the rules' own abilities the layers give
+for a keyword are looked for where that keyword's object can trigger: suspend's two (CR 702.62a), which function in exile,
+on a card in exile that has a time counter or that the event took its last from, whether it prints suspend or gained it
+(Delay, Epochrasite; a keyword an effect gives a card in exile applies there, as an ability does) - and
 `cantrip-cards/tests/functioning_zones_match_text.rs` holds every ability's zones, declared or derived, to its words and
 its card's Oracle text. "Leaves the battlefield" look-back (CR 603.10) reads the frozen last-known rows. Whether a triggering
 looks back is the rules' to say from the event it matched (`CardTable::looks_back`), never a card's: a zone change
@@ -2969,7 +2974,10 @@ second counter of the kind put on after the loss gives the keyword back to them 
 keyword once. Decayed (CR 702.147a) is a core keyword for this reason: the blocking rule reads its "can't block", and
 the layers give an object that has decayed once layer 6 is done the rules' triggered ability (`intrinsic::DECAYED`:
 "when this creature attacks, sacrifice it at end of combat", a delayed trigger at the next end of combat step), whether
-the keyword is printed, granted or a counter's. Not built, because no card in content needs them: exalted counters
+the keyword is printed, granted or a counter's. Suspend (CR 702.62a) is a core keyword the same way: printed (a card's
+`CardDef::suspend`, which holds its number and cost) or gained (Delay, Epochrasite), the layers give an object that has it
+suspend's upkeep and last-counter abilities (`intrinsic::SUSPEND_UPKEEP`, `SUSPEND_CAST`), which function in exile with
+their intervening "if"s as conditions (CR 603.4), so "suspended" (CR 702.62b) is the object's, not its card's. Not built, because no card in content needs them: exalted counters
 (exalted is a triggered ability each card prints, `triggers::EXALTED`), counters of a keyword's variants ("hexproof from
 white", CR 122.1b), and keyword counters on a card in a zone other than the battlefield. Adding ten counter kinds made
 every object 20 bytes larger (the dense counter array); the benchmark measured 6.12-6.56 us per decision before and
