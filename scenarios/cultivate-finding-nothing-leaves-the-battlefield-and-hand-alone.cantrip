@@ -1,0 +1,38 @@
+# Cultivate may find fewer than two, even none (CR 701.23b, "up to two"): Bot1 finds nothing, so no land arrives and the hand
+# is unchanged - the shuffle happens either way (CR 701.24) and the spell is still in the graveyard. Bot2's Islands in its hand
+# and library are not its library or hand to search.
+
+[Bot1 Deck]
+Cultivate
+Mox Emerald
+Mox Sapphire
+Forest
+Forest
+Forest
+Forest
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Cultivate.Cast
+Bot1.Search()
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Count = 3
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 14
+Bot1.Graveyard = Cultivate
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 13

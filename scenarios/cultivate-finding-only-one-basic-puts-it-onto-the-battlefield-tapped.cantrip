@@ -1,0 +1,40 @@
+# Cultivate's 2010-08-15 ruling: "If you choose to find only one basic land card, you put it onto the battlefield tapped."
+# Bot1 finds just a Plains, so it is put onto the battlefield tapped and no card goes into the hand (CR 701.23a, 608.2);
+# the up-to-two is not a must, and with a single card found there is no choice of which one (CR 701.23b).
+
+[Bot1 Deck]
+Cultivate
+Mox Emerald
+Mox Sapphire
+Forest
+Forest
+Forest
+Forest
+Plains
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Cultivate.Cast
+Bot1.Search(Plains)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 13
+Bot1.Graveyard = Cultivate
+Bot1.Revealed = Plains
+Bot2.Revealed = (absent)
