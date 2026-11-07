@@ -1,0 +1,33 @@
+# Disallow can counter a triggered ability (CR 115.1, 701.6). Bot2 casts Thraben Inspector; after it resolves,
+# its mandatory enters trigger is on the stack (Bot1 passes once). Bot1 flashes in Disallow off Black Lotus and
+# targets that trigger, so no Clue token is created. The Inspector itself stays on the battlefield.
+
+[Bot1 Deck]
+Black Lotus
+Disallow
+Island x18
+
+[Bot2 Deck]
+Plains
+Thraben Inspector
+Plains x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Disallow.Cast(Stack.Thraben Inspector)
+? Bot1.Mana =
+[T4 Bot2.Main2]
+? Stack.Count = 0
+
+[Expect]
+Turn = 4
+Bot1.Graveyard.Count = 2
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Plains; Thraben Inspector

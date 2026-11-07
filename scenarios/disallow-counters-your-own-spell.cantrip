@@ -1,0 +1,26 @@
+# Disallow can target a spell its controller controls (CR 115.1, 701.6). Bot1 casts Ornithopter, then counters
+# that own spell with Disallow paid by one Black Lotus. Both cards go to Bot1's graveyard and nothing stays on the
+# stack.
+
+[Bot1 Deck]
+Black Lotus
+Disallow
+Ornithopter
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Disallow.Cast(Stack.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Disallow; Ornithopter; Black Lotus
+Bot1.Battlefield.Count = 0
