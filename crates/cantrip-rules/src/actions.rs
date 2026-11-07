@@ -5926,8 +5926,6 @@ fn acquired_nth(cx: &Cx, source: ObjectId, index: usize) -> Acquired {
 /// activation of this ability index, past any a card prints.
 pub const EXTRA_LOYALTY_ALLOWED: u8 = AbilityRef::EXTRA_LOYALTY_ALLOWED;
 
-/// Whether a loyalty ability of `id` may be activated now (CR 606.3): none has been this turn, or effects have allowed
-/// more than have been. Counted in the history, where the activations and the allowances are both recorded.
 /// What `player` has to pay for an activation of `def`, an ability of `id`, with, where that is not all they have to pay
 /// anything with (`plain`, `available`): `None` where it is. Waterbend (CR 701.67a-b): each untapped artifact or creature
 /// may be tapped to pay {1} of the waterbend cost's generic mana - `bend`, its {X} as announced - and together no more than
@@ -5943,6 +5941,8 @@ fn activation_available<'a>(cx: &Cx, player: PlayerId, id: ObjectId, def: &Activ
     (def.cost.tap && (has_mana_source(cx, id, player) || plain().spent.contains(&id))).then(|| available_without(cx, player, Some(id), ManaWindow::Payment))
 }
 
+/// Whether a loyalty ability of `id` may be activated now (CR 606.3): none has been this turn, or effects have allowed
+/// more than have been. Counted in the history, where the activations and the allowances are both recorded.
 fn loyalty_available(cx: &Cx, id: ObjectId) -> bool {
     if cx.s().obj(id).loyalty_turn != cx.s().turn.number {
         return true;
