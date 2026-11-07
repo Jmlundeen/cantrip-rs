@@ -1,0 +1,61 @@
+# Vigilance (CR 702.20) lets Chancellor Gorkon attack and still be untapped in the second main phase, where Bot2's Lightning
+# Bolt kills it. Its dies trigger is then put on the stack with an Ornithopter of Bot1's available to take and Bot1 chooses
+# no target at all ("up to two target creatures", CR 601.2c, 603.3c): nothing is exiled and the Ornithopter stays.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Chancellor Gorkon
+Ornithopter
+Island
+Island x13
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chancellor Gorkon.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Chancellor Gorkon > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Chancellor Gorkon.Tapped = false
+? Bot1.Battlefield.Chancellor Gorkon.Keywords = Vigilance
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Chancellor Gorkon)
+Bot2.Pass
+Bot1.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 15
+Bot1.Life = 20
+Bot1.Graveyard = Chancellor Gorkon; Black Lotus
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Ornithopter.Power = 0

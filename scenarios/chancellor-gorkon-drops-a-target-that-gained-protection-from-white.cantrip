@@ -1,0 +1,70 @@
+# A target illegal by the time the trigger resolves is not exiled (CR 608.2b): Chancellor Gorkon (a white and black source)
+# dies to Bot2's Lightning Bolt on turn 4 and its trigger takes Bot1's Ornithopter and Bot2's. Bot1 then taps Mother of Runes
+# to give its own Ornithopter protection from white, so that target is dropped and only Bot2's Ornithopter is exiled; Bot1's
+# stays on the battlefield. Mother of Runes entered on turn 1, so it is not summoning sick on turn 4.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Mother of Runes
+Chancellor Gorkon
+Island x13
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chancellor Gorkon.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Chancellor Gorkon)
+Bot2.Pass
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mother of Runes.Activate(Ornithopter)
+Bot2.Pass
+Bot1.Colors(White)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Chancellor Gorkon = (absent)
+Bot1.Graveyard = Chancellor Gorkon; Black Lotus
+Bot2.Battlefield.Ornithopter = (absent)

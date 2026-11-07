@@ -1,0 +1,11 @@
+{
+  "name": "Chancellor Gorkon",
+  "manaCost": "{3}{W}{B}",
+  "type": "Legendary Creature — Klingon Noble",
+  "power": 5,
+  "toughness": 3,
+  "oracleText": "Vigilance\nWhen Chancellor Gorkon dies, exile up to two target creatures.",
+  "keywords": [
+    "Vigilance"
+  ]
+}
