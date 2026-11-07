@@ -1,0 +1,8 @@
+{
+  "name": "Extraction Integrant",
+  "manaCost": "{1}{B}",
+  "type": "Artifact Creature — Borg",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Artifact creatures you control have menace and \"Whenever a creature blocks this creature, that creature gets -1/-1 until end of turn.\""
+}

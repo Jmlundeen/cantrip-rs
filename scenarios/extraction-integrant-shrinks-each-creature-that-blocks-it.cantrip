@@ -1,0 +1,45 @@
+# Extraction Integrant's granted trigger (CR 603.2, 611.2): every creature declared as blocking it gets -1/-1 until end of
+# turn, so both of Bot2's 3/3 blockers are exactly 2/2 once the blockers are declared, while the Integrant is blocked by
+# the two of them (menace, CR 702.111) and dies to their 4 damage. The Integrant is paid for with exactly its two Swamps.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Extraction Integrant
+Swamp x12
+
+[Bot2 Deck]
+Black Lotus
+Forest
+Kalonian Tusker
+Kalonian Tusker
+Forest x12
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Kalonian Tusker.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Kalonian Tusker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Extraction Integrant.Cast
+? Bot1.Mana =
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Extraction Integrant > Bot2)
+Bot2.Block(Kalonian Tusker > Extraction Integrant; Kalonian Tusker#2 > Extraction Integrant)
+[T5 Bot1.Main2]
+
+[Expect]
+? Bot2.Battlefield.Kalonian Tusker#1.Power = 2
+? Bot2.Battlefield.Kalonian Tusker#1.Toughness = 2
+? Bot2.Battlefield.Kalonian Tusker#2.Power = 2
+? Bot2.Battlefield.Kalonian Tusker#2.Toughness = 2
+Bot1.Battlefield.Count = 2
+Bot2.Life = 20
