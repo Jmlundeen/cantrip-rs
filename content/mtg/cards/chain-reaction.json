@@ -1,0 +1,6 @@
+{
+  "name": "Chain Reaction",
+  "manaCost": "{2}{R}{R}",
+  "type": "Sorcery",
+  "oracleText": "Chain Reaction deals X damage to each creature, where X is the number of creatures on the battlefield."
+}
