@@ -1,0 +1,58 @@
+# "This turn" (CR 508.1): on Bot1's turn 4 it attacks only Bot2, making one Klingon Warrior; on its next turn, 7, it
+# attacks only Bot3, making one more. The two tokens from the two turns are on the battlefield, but the earlier turn's
+# attack must not be counted again, so the turn-7 trigger makes one token, not two.
+
+[Bot1 Deck]
+Rite of Ascension
+Black Lotus
+Mox Ruby
+Ornithopter
+Ornithopter
+Plains
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rite of Ascension.Cast
+Bot1.Pass
+[T4 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Combat.Attackers = Klingon Warrior Token > Bot2; Ornithopter > Bot2
+? Bot1.Battlefield.Klingon Warrior Token#2 = (absent)
+[T4 Bot1.Main2]
+[T7 Bot1.Main1]
+Bot1.Attack(Ornithopter#2 > Bot3)
+Bot1.Target(Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Combat.Attackers = Klingon Warrior Token > Bot3; Ornithopter > Bot3
+? Bot1.Battlefield.Klingon Warrior Token#2.Toughness = 1
+? Bot1.Battlefield.Klingon Warrior Token#3 = (absent)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot3.Life = 18
+Bot1.Battlefield.Klingon Warrior Token#1.Power = 2
+Bot1.Battlefield.Klingon Warrior Token#2.Power = 2
+Bot1.Battlefield.Klingon Warrior Token#3 = (absent)
