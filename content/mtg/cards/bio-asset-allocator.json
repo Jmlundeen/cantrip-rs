@@ -1,0 +1,8 @@
+{
+  "name": "Bio-Asset Allocator",
+  "manaCost": "{3}{B}{B}",
+  "type": "Artifact Creature — Borg",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Artifact creatures you control have \"Whenever this creature attacks, each opponent loses 1 life and you gain 1 life.\""
+}

@@ -1,0 +1,43 @@
+# The grant is to artifact creatures its controller controls ("you control", CR 604.1): Bot2's Ornithopter attacking on
+# turn 4 carries no such trigger, so nobody loses life and nobody gains any. Bot1's Bio-Asset Allocator, cast on turn 1,
+# grants only to Bot1's own artifact creatures.
+
+[Bot1 Deck]
+Black Lotus
+Swamp
+Mox Jet
+Mox Pearl
+Bio-Asset Allocator
+Island
+Island
+Swamp x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bio-Asset Allocator.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot2.Battlefield.Ornithopter.Tapped = true

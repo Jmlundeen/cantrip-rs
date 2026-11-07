@@ -1,0 +1,42 @@
+# Bio-Asset Allocator grants its artifact creatures "Whenever this creature attacks, each opponent loses 1 life and you
+# gain 1 life" (CR 604.1, in layer 6 as an ability). Cast on turn 1, it attacks on turn 3 beside an Ornithopter - also an
+# artifact creature, so it carries the granted ability too - and a Savannah Lions, which is no artifact and so has no
+# such trigger. Each of the two artifacts that attacks makes Bot2 lose 1 and Bot1 gain 1; combat damage adds 3 + 0 + 2.
+
+[Bot1 Deck]
+Black Lotus
+Swamp
+Mox Jet
+Mox Pearl
+Bio-Asset Allocator
+Ornithopter
+Savannah Lions
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bio-Asset Allocator.Cast
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Bio-Asset Allocator > Bot2; Ornithopter > Bot2; Savannah Lions > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 13
+Bot1.Life = 22
+Bot1.Battlefield.Bio-Asset Allocator.Tapped = true
