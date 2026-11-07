@@ -770,7 +770,6 @@ impl<'a> Projector<'a> {
                     d.when,
                     DelayedWhen::ThisTurn
                         | DelayedWhen::WatchingThisTurn
-                        | DelayedWhen::ThisTurnWatching(_)
                         | DelayedWhen::Step { .. }
                         | DelayedWhen::StepOfNextTurn { .. }
                         | DelayedWhen::NextThisTurn
@@ -1571,7 +1570,7 @@ impl<'a> Projector<'a> {
             // A delayed trigger can watch a particular permanent this turn (CR 603.7c); identify that object, even when
             // another permanent has the same name. The originating ability and its frozen words remain public.
             for d in &s.delayed {
-                if !matches!(d.when, DelayedWhen::ThisTurnWatching(watched) if watched == id) { continue; }
+                if d.when != DelayedWhen::WatchingThisTurn || d.watched() != id { continue; }
                 let ability_card = game.cards.get(d.ability.card);
                 let source = game.cards.get(game.chars(d.source).card).name;
                 let words = d.words.unwrap_or_else(|| Query::words(game, d.source));

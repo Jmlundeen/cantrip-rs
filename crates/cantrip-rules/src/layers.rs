@@ -155,7 +155,7 @@ pub fn acquired(cards: &CardTable, state: &GameState, log: &[Record], id: Object
 /// Exact activation identity, without changing the group that links related abilities (CR 607).
 /// Slot numbers are only used while deriving it; removal of another donor does not change this donor's key.
 pub fn instance(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, chars: &Chars, slot: usize) -> AbilityAcquisition {
-    let givers = (acquisition_possible(cards, state) && !surely_its_text(cards, chars, slot))
+    let givers = (!surely_its_text(cards, chars, slot) && acquisition_possible(cards, state))
         .then(|| ability_givers(cards, state, log, id));
     let text = state.copy_acquired(id);
     let base = |at: usize| {
@@ -249,30 +249,36 @@ fn watched_givers(id: ObjectId) -> Option<[Giver; cantrip_state::MAX_ABILITIES]>
 fn watching_givers(cards: &CardTable, id: ObjectId, giver: Giver, chars: &mut Chars, f: impl FnOnce(&mut Chars)) {
     let Some(givers) = watched_givers(id) else { return f(chars) };
     let before = chars.abilities;
-    let origins = chars.ability_origins;
+    // The donor of each ability there so far, as the earlier entries noted it; then what this entry lent.
+    let origins: [ObjectId; cantrip_state::MAX_ABILITIES] = std::array::from_fn(|slot| if before[slot].is_some() { givers[slot].origin } else { ObjectId::NONE });
+    let at = &*chars as *const Chars as usize;
+    let lent = cantrip_api::noting_lent(at, || f(chars));
+    let mut now = origins;
     for (slot, ability) in chars.abilities.iter().enumerate() {
-        if ability.is_none() { chars.ability_origins[slot] = ObjectId::NONE; }
+        if ability.is_none() || *ability != before[slot] { now[slot] = ObjectId::NONE; }
     }
-    f(chars);
+    for (slot, origin) in lent {
+        now[slot] = origin;
+    }
     let mut after = givers;
     // An ability that left a slot and is now in another was moved (the abilities kept by "loses all abilities except mana
     // abilities", packed together): it keeps its giver. Any other new one is the entry's.
     let mut moved = [false; cantrip_state::MAX_ABILITIES];
     for (slot, ability) in chars.abilities.iter().enumerate() {
-        if *ability == before[slot] && chars.ability_origins[slot] == origins[slot] {
+        if *ability == before[slot] && now[slot] == origins[slot] {
             continue;
         }
         let from = (0..before.len()).find(|&from| !moved[from] && before[from].is_some() && before[from] == *ability && chars.abilities[from] != before[from]);
         after[slot] = match from {
             Some(from) => {
                 moved[from] = true;
-                chars.ability_origins[slot] = origins[from];
+                now[slot] = origins[from];
                 givers[from]
             }
             None if giver.object == id && ability.is_some_and(|a| own_text(cards, chars, a)) => Giver { from: giver.from, by: giver.by, activation: giver.activation, static_grant: giver.static_grant, ..Giver::NONE },
             None => giver,
         };
-        after[slot].origin = chars.ability_origins[slot];
+        after[slot].origin = now[slot];
     }
     GIVERS.with(|g| g.set(after));
 }
@@ -1402,7 +1408,6 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         // Printed riot (CR 702.136a): one instance, the card's or the one it copies.
         riot: u16::from(def.riot),
         abilities,
-        ability_origins: [ObjectId::NONE; MAX_ABILITIES],
         no_cost,
         name_set: false,
         lost_all: false,
@@ -3088,19 +3093,22 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
     }
 }
 
-/// Every P/T counter, in layer 7c (CR 122.1a, 613.4c). Sum signed deltas before applying the engine's P/T width so
-/// unlike counters can offset one another without an intermediate wrap or clamp. Keyword counters belong to layer 6.
+/// Every P/T counter, in layer 7c (CR 122.1a, 613.4c): the signed deltas summed, so unlike counters offset one another.
+/// Keyword counters belong to layer 6.
 fn counters(obj: &Obj, chars: &mut Chars) {
     if !chars.is(CardType::Creature) {
         return;
     }
-    let (power, toughness) = CounterKind::POWER_TOUGHNESS.iter().fold((0i64, 0i64), |(p, t), &(kind, dp, dt)| {
-        let n = i64::from(obj.counters(kind));
-        (p + n * i64::from(dp), t + n * i64::from(dt))
-    });
-    let add = |base: i32, delta: i64| (i64::from(base) + delta).clamp(i64::from(i32::MIN), i64::from(i32::MAX)) as i32;
-    chars.power = chars.power.map(|v| add(v, power));
-    chars.toughness = chars.toughness.map(|v| add(v, toughness));
+    // Only the kinds on it are read (`Obj::counter_kinds`), against the kinds that change power and toughness.
+    let (mut power, mut toughness) = (0i32, 0i32);
+    for (kind, n) in obj.counter_kinds() {
+        if let Some(&(_, dp, dt)) = CounterKind::POWER_TOUGHNESS.iter().find(|(k, _, _)| *k == kind) {
+            power += n * i32::from(dp);
+            toughness += n * i32::from(dt);
+        }
+    }
+    chars.power = chars.power.map(|v| v + power);
+    chars.toughness = chars.toughness.map(|v| v + toughness);
 }
 
 /// Hone counters (CR 122.1j): "A hone counter on an Equipment gives +1/+0 to any creature that Equipment is attached to",
@@ -3327,6 +3335,33 @@ fn targeting_forbidden(cards: &CardTable, state: &GameState, log: &[Record], for
 /// attached (CR 303.4c, 704.5m) is judged by. Not what an Aura spell may target: that is its enchant ability's alone
 /// (CR 303.4a, 115.1b, 702.5a), so another Aura spell may target the permanent, and is put into its owner's graveyard as it
 /// resolves (CR 303.4i). Nothing when no permanent has a targeting rule.
+/// Whether a static ability of the permanent `source` applies to any of `others` (CR 604.1, 613): what taking `source` away
+/// could change about them. Judged on each as it is now; a permanent that has lost all its abilities has none.
+pub fn statics_reach(cards: &CardTable, state: &GameState, log: &[Record], source: ObjectId, others: &[ObjectId]) -> bool {
+    statics_apply(cards, state, log, source, others, false)
+}
+
+/// Whether a static ability of the permanent `id` applies to itself (CR 604.3: a characteristic-defining ability, or one "as
+/// long as" the board is some way): what changing the board could change about it.
+pub fn statics_reach_itself(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> bool {
+    statics_apply(cards, state, log, id, &[id], true)
+}
+
+fn statics_apply(cards: &CardTable, state: &GameState, log: &[Record], source: ObjectId, others: &[ObjectId], itself: bool) -> bool {
+    let obj = state.obj(source);
+    if !obj.zone.is(ZoneKind::Battlefield) || (!itself && others.iter().all(|&o| o == source)) {
+        return false;
+    }
+    let mut defs = cards.texts(state, obj).flat_map(|c| cards.get(c).statics).filter(|d| d.from == ZoneKind::Battlefield).peekable();
+    if defs.peek().is_none() || lost_all_abilities(cards, state, log, source) {
+        return false;
+    }
+    defs.any(|def| {
+        let view = View::new(cards, state, log, def.layer);
+        others.iter().any(|&other| (itself || other != source) && (def.affects)(&view, source, other, &chars(cards, state, log, other)))
+    })
+}
+
 pub fn enchanting_forbidden(cards: &CardTable, state: &GameState, log: &[Record], host: ObjectId, aura: ObjectId) -> bool {
     let sources: Vec<ObjectId> = {
         let found = static_sources(cards, state);
@@ -3515,7 +3550,7 @@ mod tests {
         let ability = AbilityRef::delayed(card, 0);
         let mut abilities = [None; MAX_ABILITIES];
         abilities[0] = Some(ability);
-        let chars = Chars { ability_origins: [ObjectId::NONE; MAX_ABILITIES],
+        let chars = Chars {
             card,
             name: "Holder",
             types: TypeSet::NONE,

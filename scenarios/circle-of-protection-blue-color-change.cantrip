@@ -41,7 +41,6 @@ Bot2.Pass
 Bot1.Choose(Mondo Gecko)
 Bot2.Battlefield.Mox Sapphire.Activate
 Bot2.Battlefield.Mondo Gecko.Activate(Ability: Discard a card)
-Bot2.Choose(Pay mana)
 Bot2.Choose(Island)
 Bot2.Colors(Red)
 Bot2.Pass
@@ -65,7 +64,6 @@ Bot2.Modes(Do nothing)
 Bot2.Choose()
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Battlefield.Mondo Gecko.Activate(Ability: Discard a card)
-Bot2.Choose(Pay mana)
 Bot2.Choose(Island)
 Bot2.Colors(Blue)
 Bot2.Pass

@@ -707,13 +707,6 @@ pub fn plus_pt<const P: i32, const T: i32>(_: &dyn LayerQuery, _: ObjectId, char
     chars.toughness = chars.toughness.map(|v| v + T);
 }
 
-/// A layer 7c power/toughness adjustment with the existing i32 boundary behavior (CR 613.4c, RX-5).
-/// Orcish Oriflamme, Audacity and Cartouche of Solidarity use this operation.
-pub fn plus_pt_saturating<const P: i32, const T: i32>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v.saturating_add(P));
-    chars.toughness = chars.toughness.map(|v| v.saturating_add(T));
-}
-
 /// "Creatures you control get +1/+1." (CR 613.4c, layer 7c): every creature its controller controls, itself among them once
 /// it is one (an Opalescence-animated Glorious Anthem pumps itself), judged on what the earlier layers made each object.
 /// Glorious Anthem, Warleader's Call and Cosmium Kiln (Clay-Fired Bricks' back face) print it.

@@ -163,8 +163,9 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     m.targets_optional = o.targets_optional;
     m.color_choices = colors_view(o.color_choices);
     m.description = describe(game.cards, &game.state, &game.log, o).to_string();
-    if o.kind == ActionKind::AssignMana && let Some(mana) = o.mana {
-        m.description = format!("Pay {} with {}{{{}}}", if o.pay_snow { "{S}" } else { "an ordinary symbol" }, if o.snow { "snow " } else { "" }, mana.symbol());
+    // Mana from a snow source spent on a {S} symbol (CR 107.4h) says so; any other pool mana keeps its own description.
+    if o.kind == ActionKind::AssignMana && o.pay_snow && let Some(mana) = o.mana {
+        m.description = format!("Pay {{S}} with snow {{{}}}", mana.symbol());
     }
     if m.kind == ActionKindView::UnlockDoor {
         m.description = format!("Unlock {} {}", m.spell_name, m.cost_text);
@@ -358,7 +359,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                     let mut cost = d.cost;
                     if let Some(&(total, life)) = activation_costs(game, player, src, o.index, &[]).first() {
                         cost.mana = total;
-                        cost.life = cost.life.saturating_add(life);
+                        cost.life += life;
                         m.life_cost = i32::try_from(cost.life).unwrap_or(i32::MAX);
                         if cost.mana != d.cost.mana || life > 0 {
                             let total = if cost.life > 0 { format!("{total} and {} life", cost.life) } else { total.to_string() };

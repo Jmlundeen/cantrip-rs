@@ -55,8 +55,6 @@ Bot1.Hand.Fling.Cast(Bot2)
 Bot1.Modes(Casualty 1)
 Bot1.Choose(additional cost of Fling)
 Bot1.Choose(Grizzly Bears)
-Bot1.Choose(Pay mana)
-Bot1.Choose(Silverquill, the Disputant)
 Bot1.Choose(Captain Jean-Luc Picard)
 Bot1.Pass
 Bot2.Pass

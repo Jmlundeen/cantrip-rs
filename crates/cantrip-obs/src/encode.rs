@@ -1186,7 +1186,7 @@ pub fn encode(
                     let shift = remaining * 4;
                     let low = ((prefix << 4) | t.n as usize) << shift;
                     let width = if shift == 0 { 1 } else { 1usize << shift };
-                    let end = low.saturating_add(width).min(choices.len());
+                    let end = (low + width).min(choices.len());
                     if low < end {
                         let mut kinds = [0usize; 15];
                         for choice in &choices[low..end] {

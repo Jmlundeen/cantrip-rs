@@ -61,9 +61,6 @@ pub struct Chars {
     /// enters (CR 702.136a, 614.12), its choice made separately.
     pub riot: u16,
     pub abilities: [Option<AbilityRef>; MAX_ABILITIES],
-    /// Physical donors of borrowed ability definitions. NONE for printed/copiable text and ordinary grants.
-    /// Kept beside slots during layer evaluation, then incorporated into the stable acquisition key.
-    pub ability_origins: [ObjectId; MAX_ABILITIES],
     /// It has no mana cost (CR 118.6, 707.9b): a copy that says so, whatever the card it copies prints. Its mana
     /// value is 0.
     pub no_cost: bool,
@@ -140,12 +137,35 @@ pub fn token_values(def: &CardDef, card: CardId, words: Words) -> Option<Copiabl
     Some(if def.back.is_some() { values.own_faces_of(card) } else { values })
 }
 
+thread_local! {
+    /// While the layers work out which object put each ability of one object's there (`noting_lent`): the abilities a
+    /// physical donor lent it (`Chars::grant_ability_from`), by the characteristics they went into, their slot and the donor.
+    static LENT: std::cell::RefCell<Option<Vec<(usize, usize, ObjectId)>>> = const { std::cell::RefCell::new(None) };
+}
+
+/// Runs `f`, noting which slots of the characteristics at `chars` (an address) an ability lent by a physical donor filled
+/// (`Chars::grant_ability_from`), with the donor: what the layers keep in the acquisition key of an ability another object
+/// lent (CR 607.5, Agatha's Soul Cauldron), read only while they work it out, so no characteristics carry it.
+pub fn noting_lent(chars: usize, f: impl FnOnce()) -> Vec<(usize, ObjectId)> {
+    let outer = LENT.with(|l| l.replace(Some(Vec::new())));
+    f();
+    let lent = LENT.with(|l| l.replace(outer)).unwrap_or_default();
+    lent.into_iter().filter(|&(at, _, _)| at == chars).map(|(_, slot, origin)| (slot, origin)).collect()
+}
+
 impl Chars {
     /// Gives one ability with its physical donor, preserving equal definitions as independent instances.
     pub fn grant_ability_from(&mut self, ability: AbilityRef, origin: ObjectId) {
         if let Some(slot) = self.abilities.iter().position(Option::is_none) {
             self.abilities[slot] = Some(ability);
-            self.ability_origins[slot] = origin;
+            if origin != ObjectId::NONE {
+                let at = self as *const Chars as usize;
+                LENT.with(|l| {
+                    if let Some(lent) = l.borrow_mut().as_mut() {
+                        lent.push((at, slot, origin));
+                    }
+                });
+            }
         }
     }
     /// The complete characteristics `last` kept (CR 400.7, 608.2h): expected-zone information, including a spell as it
@@ -179,7 +199,6 @@ impl Chars {
         self.hexproof_from = last.hexproof_from;
         self.must_attack = last.must_attack;
         self.abilities = last.abilities;
-        self.ability_origins = [ObjectId::NONE; MAX_ABILITIES];
         self
     }
 

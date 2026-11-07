@@ -110,6 +110,7 @@ fn game() -> Game {
         &STATE_CAP_ONLY,
         &STATE_CAP_ZERO,
         &REDIRECT_OTHER_TO_YOU,
+        &PLAIN_DOUBLER,
     ])));
     let mut g = Game::new(
         cards,
@@ -2035,5 +2036,41 @@ fn printed_stream_of_life_gains_bounded_life_for_large_x() {
         item.x = x;
         (stream.spell.unwrap().effect)(&mut cx(&mut g, spell), &item).unwrap();
         assert_eq!(g.state.player(YOU).life, expected_life);
+    }
+}
+
+// A replacement whose condition does not ask how much damage there is: it may be judged on a part of a converged event
+// that an earlier prevention left at 0.
+fn any_damage_at_all(_: &dyn Query, _: &Asker, p: &Proposal) -> bool {
+    matches!(p, Proposal::Damage(_))
+}
+static PLAIN_DOUBLER: CardDef = CardDef {
+    name: "Damage convergence plain doubler",
+    replacements: &[replacement(ReplacementKind::Damage, any_damage_at_all, double, "double damage")],
+    ..UNLIFE
+};
+
+/// The part of a converged event an effect is still eligible for may be damage a prevention effect already took to 0, while
+/// the part redirected there is not: the effect chosen for the whole meets nothing left of its own part, does nothing,
+/// and the event goes on (CR 615.1, 614.5) - never a panic. Every order of the choices is played.
+#[test]
+fn an_effect_chosen_for_a_part_prevented_to_zero_does_nothing_and_the_event_goes_on() {
+    for first in 0..2 {
+        for second in 0..2 {
+            for third in 0..2 {
+                let mut g = game();
+                let source = put(&mut g, &BEAR, YOU);
+                put(&mut g, &PREVENT_ALL, YOU);
+                put(&mut g, &REDIRECT_OTHER_TO_YOU, YOU);
+                put(&mut g, &PLAIN_DOUBLER, YOU);
+                let mut c = cx(&mut g, source);
+                answers(&mut c, vec![Answer::Index(first), Answer::Index(second), Answer::Index(third), Answer::Index(0), Answer::Index(0)]);
+                let dealt = c.damage_together(&[(source, Target::Player(YOU), 2), (source, Target::Player(THEM), 2)]);
+                // Everything ends up dealt to YOU, whom PREVENT_ALL protects from all of it.
+                assert_eq!(dealt, [0, 0], "answers {first} {second} {third}");
+                assert_eq!(c.state().player(YOU).life, 20);
+                assert_eq!(c.state().player(THEM).life, 20);
+            }
+        }
     }
 }

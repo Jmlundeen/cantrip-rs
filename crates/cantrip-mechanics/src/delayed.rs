@@ -102,7 +102,7 @@ pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
 /// The captured words belong to the creating ability.
 pub fn this_turn_watching(g: &mut dyn Game, item: &StackItem, watched: ObjectId) {
     let card = ability_card(g, item);
-    g.delayed_trigger(DelayedWhen::ThisTurnWatching(watched), item.object, item.controller, AbilityRef::delayed(card, 0), Target::None);
+    g.delayed_trigger(DelayedWhen::WatchingThisTurn, item.object, item.controller, AbilityRef::delayed(card, 0), Target::Object(watched));
 }
 
 /// Sets up the card's delayed ability number `ability` to trigger "when you next [event] this turn" (CR 603.7b): once, the

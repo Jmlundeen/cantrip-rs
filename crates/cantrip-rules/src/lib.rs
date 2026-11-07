@@ -1678,7 +1678,7 @@ impl<'a> Cx<'a> {
         let mut placements: Vec<counters::Placement> = Vec::with_capacity(len);
         for (by, object, kind, amount) in puts.filter(|&(_, _, _, amount)| amount > 0) {
             match placements.iter_mut().find(|p| p.object == object && p.by == by) {
-                Some(p) => p.counts[kind as usize] = p.counts[kind as usize].saturating_add(amount),
+                Some(p) => p.counts[kind as usize] += amount,
                 None => {
                     let mut counts = [0; CounterKind::COUNT];
                     counts[kind as usize] = amount;
@@ -2833,7 +2833,7 @@ impl cantrip_api::Game for Cx<'_> {
         debug_assert!(amount >= 0, "use remove_counters");
         if amount < 0 {
             let available = self.s().obj(object).counters(kind).max(0);
-            counters::remove(self, object, kind, amount.saturating_neg().min(available));
+            counters::remove(self, object, kind, (-amount).min(available));
             return;
         }
         let by = self.doer();

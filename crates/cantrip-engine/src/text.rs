@@ -37,7 +37,7 @@ pub fn changed_text(text: &str, name: &str, words: Words) -> String {
         if !c.is_alphabetic() {
             match c {
                 '(' => depth += 1,
-                ')' => depth = depth.saturating_sub(1),
+                ')' if depth > 0 => depth -= 1,
                 _ => {}
             }
             out.push(c);

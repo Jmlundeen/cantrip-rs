@@ -408,10 +408,11 @@ pub fn determinize_owned(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: I
         let rows: Vec<&Unseen> = unknown.iter().filter(|u| u.owner == owner && u.origin == origin && !u.face_down_casts.is_empty()).collect();
         if rows.is_empty() { continue; }
         let needed: Vec<u8> = rows.iter().map(|u| required(u)).collect();
+        // A world the pool cannot match (a prior that knows no card for a public role) keeps those cards as they are.
         let assignment = loop {
             let offered: Vec<u8> = pool.iter().map(|&card| mask(card)).collect();
             match match_cast_roles(&needed, &offered) {
-                Ok(assignment) => break assignment,
+                Ok(assignment) => break Some(assignment),
                 Err((row, occupied)) if mode == InfoMode::Hidden => {
                     // An incomplete prior can omit a publicly observed role. Replace one
                     // unassigned unseen card, never a known card or a successful match.
@@ -424,32 +425,38 @@ pub fn determinize_owned(game: &mut Game, k: &Knowledge, seat: PlayerId, mode: I
                             (def.oracle && game.cards.fronts[i].is_none() && fits(card)).then_some(card)
                         }).collect();
                     }
-                    let spare = occupied.iter().position(Option::is_none).expect("there is an unmatched unseen card");
-                    assert!(!candidates.is_empty(), "a hidden world needs a card for its public casting role");
+                    let Some(spare) = occupied.iter().position(Option::is_none) else { break None };
+                    if candidates.is_empty() {
+                        break None;
+                    }
                     pool[spare] = candidates[rng.below(candidates.len() as u32) as usize];
                 }
-                Err(_) => panic!("the known deck cannot satisfy its public face-down casts"),
+                Err(_) => break None,
             }
         };
+        let Some(assignment) = assignment else { continue };
         let mut taken: Vec<(usize, ObjectId)> = assignment.into_iter().zip(rows.iter().map(|u| u.chain[0])).collect();
         taken.sort_unstable_by_key(|&(index, _)| std::cmp::Reverse(index));
         for (index, id) in taken { selected.insert(id, pool.swap_remove(index)); }
     }
     for u in &unknown {
         if let Some(pool) = pools.get_mut(&(u.owner, u.origin)) {
-            let card = if u.face_down_casts.is_empty() { pool.pop().expect("an unseen card remains") }
-                else { selected.remove(&u.chain[0]).expect("a constrained card was matched") };
+            let card = if u.face_down_casts.is_empty() { pool.pop() } else { selected.remove(&u.chain[0]) };
+            let Some(card) = card else { continue };
             changed |= game.state.obj(u.chain[0]).card != card;
             let mut ways = Vec::new();
             for &(old, disguise) in &u.face_down_casts {
                 let card_ways = game.cards.get(card).ways;
                 let compatible = |way: &WayDef| way.kind.face_down() && way.kind.morph() != disguise;
-                let new = if card_ways.get(usize::from(old) - 1).is_some_and(compatible) {
+                let new = if old > 0 && card_ways.get(usize::from(old) - 1).is_some_and(compatible) {
                     usize::from(old)
                 } else {
-                    card_ways.iter().position(compatible).expect("a compatible face-down cast") + 1
+                    match card_ways.iter().position(compatible) {
+                        Some(at) => at + 1,
+                        None => continue,
+                    }
                 };
-                let new = u8::try_from(new).expect("casting way fits its index");
+                let Ok(new) = u8::try_from(new) else { continue };
                 if old != new { ways.push((old, new)); }
             }
             game.state.remap_hidden_cast_ways(&u.chain, &ways);

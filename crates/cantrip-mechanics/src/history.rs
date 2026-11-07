@@ -7,7 +7,8 @@ use cantrip_api::*;
 /// "This ability has been activated N times this turn" (CR 113.2c, 602.5c), for the exact selected instance.
 /// Vampire Bats and Farrelite Priest count their own independently acquired copies this way.
 pub fn this_ability_activations_this_turn(q: &dyn Query, asker: &Asker) -> usize {
-    let instance = asker.instance.expect("an activated ability is asked with its exact instance");
+    // Asked without its instance, the ability is no activation of its own to count.
+    let Some(instance) = asker.instance else { return 0 };
     q.history().select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(asker.source).this_turn())
         .filter(|r| matches!(r.event, Event::AbilityActivated { ability, instance: key, .. }
             if ability == instance.ability && key == instance.acquisition))

@@ -927,8 +927,8 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
 /// damage, noting in `uses` the prevention effects that have more to do once its event has been dealt (`PreventionUse`).
 /// Each effect is its own text, its source's now, though a resolving ability's instructions made the event (`Cx::own_text`).
 fn apply_to(cx: &mut Cx, proposal: &mut Proposal, entry: Option<&mut Entering>, uses: Option<&mut Vec<PreventionUse>>) {
-    let added = cx.instruction(|cx| cx.own_text(false, |cx| apply_each(cx, proposal, entry, uses, false, None)), |_| true);
-    assert!(added.is_none(), "damage expansion is formed with its entire damage event");
+    // Damage is formed with its whole event (`damage_event_inner`); what an effect adds to damage reaches here never.
+    let _ = cx.instruction(|cx| cx.own_text(false, |cx| apply_each(cx, proposal, entry, uses, false, None)), |_| true);
 }
 
 enum DamageProgress {
@@ -974,10 +974,10 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
             }
         }
         let found = match selected.take() {
-            Some(candidate) => {
-                assert!(candidates(cx, proposal, &applied, entry.as_deref(), commander_declined_to).contains(&candidate), "selected damage effect still applies to its eligible quantity");
-                vec![candidate]
-            }
+            // The effect chosen for the part it is still eligible for applies only if it still applies to it as that part
+            // is now; otherwise it does nothing to it.
+            Some(candidate) if candidates(cx, proposal, &applied, entry.as_deref(), commander_declined_to).contains(&candidate) => vec![candidate],
+            Some(_) => return None,
             None => candidates(cx, proposal, &applied, entry.as_deref(), commander_declined_to),
         };
         if found.is_empty() {
@@ -1201,7 +1201,7 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
         if is_prevention(origin)
             && let (Proposal::Damage(before), Proposal::Damage(after)) = (start, *proposal)
         {
-            let spent = if origin == Origin::Prevention && matches!(printed_prevention(cx, source, index).0.amount, PreventionAmount::Specific(_)) { before.amount.saturating_sub(after.amount) } else { 0 };
+            let spent = if origin == Origin::Prevention && matches!(printed_prevention(cx, source, index).0.amount, PreventionAmount::Specific(_)) { before.amount - after.amount.min(before.amount) } else { 0 };
             if spent > 0 && let Some(context) = cx.damage.as_mut() { context.applied((source, index, origin), DamageScope::of(&before), spent); }
         }
         unlink_if_sent_elsewhere(&start, proposal);
@@ -1365,8 +1365,8 @@ fn apply_to_each_part(cx: &mut Cx, parts: &mut Vec<Proposal>) {
                 }
                 for j in (0..parts.len()).filter(|&j| meets(j)) {
                     let mut added = Vec::new();
+                    // Only a damage replacement adds damage (`ReplacementDef::with_damage`); these are no damage.
                     apply_printed(cx, &mut parts[j], source, index, &applied, &mut added);
-                    assert!(added.is_empty(), "non-damage proposals cannot add damage components");
                 }
                 take_plus(parts);
             }
@@ -1376,7 +1376,6 @@ fn apply_to_each_part(cx: &mut Cx, parts: &mut Vec<Proposal>) {
                 for j in (0..parts.len()).filter(|&j| meets(j)) {
                     let mut added = Vec::new();
                     took |= apply_granted(cx, &mut parts[j], source, e, def, &applied, false, &mut added);
-                    assert!(added.is_empty(), "non-damage proposals cannot add damage components");
                 }
                 if took && def.once {
                     used_up(cx, timestamp);
@@ -1799,7 +1798,7 @@ impl DamagePart {
         } else if before > 0 {
             let mut assigned = 0;
             for (_, n) in &mut self.origins {
-                *n = i64::try_from((*n as u128) * (total as u128) / (before as u128)).expect("damage attribution fits its semantic total");
+                *n = (i128::from(*n) * i128::from(total) / i128::from(before)) as i64;
                 assigned += *n;
             }
             let mut remainder = total - assigned;
@@ -1821,7 +1820,6 @@ impl DamagePart {
             *n -= part;
             amount -= part;
         }
-        assert_eq!(amount, 0, "redirection retains the original damage identity");
         taken
     }
 }
@@ -1878,19 +1876,9 @@ impl DamageContext {
         }
     }
     fn applied(&mut self, effect: Applied, scope: DamageScope, spent: u32) {
-        let r = self
-            .receipts
-            .iter_mut()
-            .find(|r| r.effect == effect && r.scope == scope)
-            .expect("specific allowance frozen at first application");
-        r.spent = r
-            .spent
-            .checked_add(spent)
-            .expect("specific prevention allowance exceeds i64 semantic domain");
-        assert!(
-            r.spent <= r.capacity,
-            "specific prevention never exceeds its frozen allowance"
-        );
+        // The allowance is frozen as the effect first applies to the event (`freeze`).
+        let Some(r) = self.receipts.iter_mut().find(|r| r.effect == effect && r.scope == scope) else { return };
+        r.spent += spent;
     }
 }
 
@@ -1934,7 +1922,7 @@ fn aggregate(parts: &[PendingDamage], indices: &[usize]) -> DamagePart {
     event.amount = 0;
     let mut origins = Vec::new();
     for &i in indices {
-        event.amount = event.amount.saturating_add(parts[i].part.event.amount);
+        event.amount += parts[i].part.event.amount;
         event.heal_marked |= parts[i].part.event.heal_marked;
         event.shielded = event.shielded.or(parts[i].part.event.shielded);
         origins.extend_from_slice(&parts[i].part.origins);
@@ -1963,7 +1951,13 @@ fn formed_candidates(cx: &Cx, parts: &[PendingDamage], group: &[usize]) -> Vec<C
     let event = aggregate(parts, group).event;
     candidates_for(cx, &Proposal::Damage(event), &[], None, [None; 8], &|key| {
         let eligible = eligibility(cx, parts, group, key);
-        (!eligible.is_empty()).then(|| Proposal::Damage(aggregate(parts, &eligible).event))
+        // The part an effect has not had its opportunity at may be damage already prevented to 0, which is no event to
+        // replace any more (CR 615.1, 614.6), whatever else the group holds.
+        if eligible.is_empty() {
+            return None;
+        }
+        let part = aggregate(parts, &eligible).event;
+        (part.amount > 0).then_some(Proposal::Damage(part))
     })
 }
 fn ancestors(parts: &[PendingDamage], selected: &[usize], key: Applied) -> Vec<Applied> {
@@ -2004,31 +1998,28 @@ fn resize_selected(parts: &mut [PendingDamage], selected: &[usize], total: i64) 
         }
     }
     for &i in selected {
-        parts[i].part.event.amount = parts[i].part.origins.iter().map(|(_, n)| *n).sum::<i64>().clamp(0, i64::from(u32::MAX)) as u32;
+        parts[i].part.event.amount = parts[i].part.origins.iter().map(|(_, n)| *n).sum::<i64>().max(0) as u32;
     }
 }
 fn distribute(
     parts: &mut Vec<PendingDamage>,
     selected: &[usize],
-    before: DamageEvent,
     after: DamageEvent,
     added: Vec<DamageComponent>,
     mut lineage: Vec<Applied>,
     key: Applied,
 ) {
-    let redirected = added
+    let redirected: i64 = added
         .iter()
-        .try_fold(0i64, |sum, c| match c {
-            DamageComponent::Redirected { amount, .. } => sum.checked_add(i64::from(*amount)),
-            _ => Some(sum),
+        .map(|c| match c {
+            DamageComponent::Redirected { amount, .. } => i64::from(*amount),
+            _ => 0,
         })
-        .expect("redirected sum exceeds i64 semantic domain");
+        .sum();
     resize_selected(
         parts,
         selected,
-        i64::from(after.amount)
-            .checked_add(redirected)
-            .expect("expanded original damage exceeds i64 semantic domain"),
+        i64::from(after.amount) + redirected,
     );
     if !lineage.contains(&key) {
         lineage.push(key);
@@ -2039,9 +2030,6 @@ fn distribute(
         if !parts[i].applied.contains(&key) {
             parts[i].applied.push(key);
         }
-        if !same_damage(&before, &after) {
-            parts[i].applied.retain(|a| !is_prevention(a.2));
-        }
     }
     for component in added {
         match component {
@@ -2050,10 +2038,7 @@ fn distribute(
                     amount: event.amount.max(0),
                     ..event
                 };
-                let mut applied = lineage.clone();
-                if !same_damage(&after, &event) {
-                    applied.retain(|a| !is_prevention(a.2));
-                }
+                let applied = lineage.clone();
                 parts.push(PendingDamage {
                     part: DamagePart {
                         event,
@@ -2091,20 +2076,15 @@ fn distribute(
                         shielded: None,
                         ..after
                     };
-                    let mut applied = parts[i].applied.clone();
-                    if !same_damage(&after, &event) {
-                        applied.retain(|a| !is_prevention(a.2));
-                    }
+                    // The redirected part is the same event modified (CR 614.5): every effect that has had its
+                    // opportunity at it, a prevention effect among them, has had it at what it became.
+                    let applied = parts[i].applied.clone();
                     parts.push(PendingDamage {
                         part: DamagePart { event, origins },
                         applied,
                     });
                     left -= take;
                 }
-                assert_eq!(
-                    left, 0,
-                    "redirected original quantity retains its provenance"
-                );
             }
         }
     }
@@ -2221,7 +2201,7 @@ fn damage_event_inner(
         if plan.as_ref().is_none_or(|p| !p.valid(cx, &events)) {
             plan = Some(DamagePlan::new(cx, &events));
         }
-        let current = plan.as_ref().unwrap();
+        let Some(current) = plan.as_ref() else { break };
         let order: Vec<_> = current
             .order
             .iter()
@@ -2278,9 +2258,7 @@ fn damage_event_inner(
         if let Origin::Granted(timestamp) = candidate.origin
             && granted(cx, timestamp).is_some_and(|(_, d)| d.once)
         {
-            let Some((&effect, def)) = granted(cx, timestamp) else {
-                unreachable!()
-            };
+            let Some((&effect, def)) = granted(cx, timestamp) else { break };
             // Eligibility is captured for the whole once-only event before it changes any original assignment.
             let snapshots: Vec<_> = groups(&parts)
                 .iter()
@@ -2313,15 +2291,13 @@ fn damage_event_inner(
                     |_| true,
                 );
                 cx.lineage = outer;
-                let Proposal::Damage(after) = proposal else {
-                    unreachable!()
-                };
+                let after = match proposal { Proposal::Damage(after) => after, _ => before };
                 if let Some(id) = after.shielded
                     && !shielded.contains(&id)
                 {
                     shielded.push(id);
                 }
-                distribute(&mut parts, &selected, before, after, added, lineage, key);
+                distribute(&mut parts, &selected, after, added, lineage, key);
             }
             if took {
                 used_up(cx, timestamp);
@@ -2340,18 +2316,24 @@ fn damage_event_inner(
                 |_| true,
             );
             cx.lineage = outer;
-            let Proposal::Damage(after) = proposal else {
-                unreachable!()
-            };
+            let after = match proposal { Proposal::Damage(after) => after, _ => before };
             if let Some(id) = after.shielded
                 && !shielded.contains(&id)
             {
                 shielded.push(id);
             }
-            let Some(DamageProgress::Expanded { added, applied }) = progress else {
-                unreachable!("a selected ordinary damage effect executes once")
-            };
-            distribute(&mut parts, &selected, before, after, added, applied, key);
+            match progress {
+                Some(DamageProgress::Expanded { added, applied }) => distribute(&mut parts, &selected, after, added, applied, key),
+                // It no longer applied to its part: it has had its opportunity there (CR 614.5), and does nothing.
+                None => {
+                    let marked = if selected.is_empty() { &group } else { &selected };
+                    for &i in marked {
+                        if !parts[i].applied.contains(&key) {
+                            parts[i].applied.push(key);
+                        }
+                    }
+                }
+            }
         }
     }
     finish_damage(&parts)

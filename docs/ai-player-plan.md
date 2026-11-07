@@ -250,7 +250,7 @@ TensorRT-style compilers see static shapes:
 This is `cantrip_obs::encode` (its schema version and every width, list and vocabulary are in `ai/encoding.json`,
 which a fast test keeps equal to the code; `encoder_hash` is its FNV-1a). Every token has the same shape: a kind
 (pad, game, player, card, hidden, pool card, event, option, pooled), a card row (u16; 0 is the unknown card), 9
-categoricals (zone 10, owner 9, controller 9, step 13, ask kind 27, event kind 67, from-zone 10, option token kind
+categoricals (zone 10, owner 9, controller 9, step 13, ask kind 28, event kind 67, from-zone 10, option token kind
 29, action 13), 4 pointers to other tokens (255 for none), 96 numbers (powers-of-two scales, rounded through f16)
 and a legal bit; dense, a 64-token position is 13.6 kB, and the compact form (the nonzero numbers only) is about
 1.4 kB. Tokens come in a fixed order: the game, the players, the objects in canonical order (a library's top 3 kept,

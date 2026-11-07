@@ -322,7 +322,7 @@ impl View<'_> {
             mulligans: pl.mulligans,
             pool: pl.pool.0,
             snow_pool: std::array::from_fn(|m| {
-                let total = s.mana_from_of(p).filter(|e| e.snow).fold(0u64, |total, e| total.saturating_add(u64::from(e.pool.0[m])));
+                let total = s.mana_from_of(p).filter(|e| e.snow).map(|e| u64::from(e.pool.0[m])).sum::<u64>();
                 total.min(u64::from(u32::MAX)) as u32
             }),
             hand: s.zone(Zone::hand(p)).len() as u16,

@@ -37,7 +37,6 @@ Bot2.Hand.Quicksilver Dagger.Cast(Mondo Gecko)
 [T4 Bot2.Main1]
 Bot2.Battlefield.Mox Sapphire.Activate
 Bot2.Battlefield.Mondo Gecko.Activate(Ability: Discard a card)
-Bot2.Choose(Pay mana)
 Bot2.Choose(Island)
 Bot2.Colors(White)
 Bot2.Pass
@@ -50,7 +49,6 @@ Bot2.Pass
 Bot1.Choose(Mondo Gecko)
 Bot2.Battlefield.Mox Jet.Activate
 Bot2.Battlefield.Mondo Gecko.Activate(Ability: Discard a card)
-Bot2.Choose(Pay mana)
 Bot2.Choose(Island)
 Bot2.Colors(Red)
 Bot2.Pass
@@ -74,7 +72,6 @@ Bot2.Choose()
 ? Bot2.Battlefield.Mondo Gecko.Tapped = false
 Bot2.Battlefield.Mox Sapphire.Activate
 Bot2.Battlefield.Mondo Gecko.Activate(Ability: Discard a card)
-Bot2.Choose(Pay mana)
 Bot2.Choose(Island)
 Bot2.Colors(White)
 Bot2.Pass

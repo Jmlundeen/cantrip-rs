@@ -1716,7 +1716,7 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
     for at in (0..cx.s().delayed.len()).rev() {
         let delayed = cx.s().delayed[at];
         let expires = match delayed.when {
-            DelayedWhen::ThisTurn | DelayedWhen::WatchingThisTurn | DelayedWhen::ThisTurnWatching(_) | DelayedWhen::NextThisTurn => true,
+            DelayedWhen::ThisTurn | DelayedWhen::WatchingThisTurn | DelayedWhen::NextThisTurn => true,
             DelayedWhen::StepOfNextTurn { of, .. } => crate::settle::delayed_turn(cx, delayed.since, of) != crate::settle::DelayedTurn::Waiting,
             _ => false,
         };

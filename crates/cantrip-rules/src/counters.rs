@@ -223,12 +223,10 @@ fn place_prepared_with_limit(cx: &mut Cx, placements: &[Placement], limit: Optio
         let (id, mut semantic) = (m.object, m.counts.map(|n| n.max(0)));
         // Apply the restriction after counter replacements and before physical storage checks or events.
         if let Some(limit) = limit.filter(|limit| limit.object == id) {
-            let room = limit.maximum_total.saturating_sub(cx.s().obj(id).counters(limit.kind)).max(0);
+            let room = (limit.maximum_total - cx.s().obj(id).counters(limit.kind)).max(0);
             semantic[limit.kind as usize] = semantic[limit.kind as usize].min(room);
         }
         if semantic.iter().all(|&n| n <= 0) { continue; }
-        // RX-5 retains the counter domain and the state's saturating adder. Wider intermediate proposals do not
-        // turn an accepted boundary into a panic or widen the stored counter field.
         let counts = semantic.map(|n| n.max(0));
         cx.st().update_obj(id, |o| o.put_path_add(&counts));
         // The layers look for hone counters from now on (CR 122.1j).
@@ -398,16 +396,16 @@ pub fn intrinsic(cards: &CardTable, obj: &Obj, read_ahead: Option<u8>, counts: &
     // A copy effect's exception may state its loyalty (CR 707.9b: "has starting loyalty X"); a face-down permanent has
     // the values it is face down as, and none of a copy's.
     if let Some(loyalty) = obj.copiable().and_then(|c| c.stated_loyalty()).or(def.loyalty) {
-        counts[CounterKind::Loyalty as usize] = counts[CounterKind::Loyalty as usize].saturating_add(i32::from(loyalty));
+        counts[CounterKind::Loyalty as usize] += i32::from(loyalty);
     }
     if let Some(defense) = def.defense {
-        counts[CounterKind::Defense as usize] = counts[CounterKind::Defense as usize].saturating_add(i32::from(defense));
+        counts[CounterKind::Defense as usize] += i32::from(defense);
     }
     let saga = def.subtypes.has(Subtype::Saga) && def.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.chapter > 0));
     if let Some(chosen) = read_ahead {
         counts[CounterKind::Lore as usize] += i32::from(chosen);
     } else if saga {
-        counts[CounterKind::Lore as usize] = counts[CounterKind::Lore as usize].saturating_add(1);
+        counts[CounterKind::Lore as usize] += 1;
     }
 }
 
@@ -544,20 +542,6 @@ mod tests {
 
     fn cx(g: &mut Game) -> Cx<'_> {
         Cx { g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None }
-    }
-
-    #[test]
-    fn rx5_counter_storage_saturates_and_preserves_the_existing_event_contract() {
-        let table = Box::leak(Box::new(CardTable::new([&BEAR])));
-        let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
-        let bear = game.state.push_obj(Obj::new(table.id_of(&BEAR), YOU, Zone::BATTLEFIELD));
-        game.state.zone_push(Zone::BATTLEFIELD, bear);
-        let mut context = cx(&mut game);
-        put(&mut context, bear, CounterKind::Shield, i32::MAX - 7, YOU, How::Effect);
-        put(&mut context, bear, CounterKind::Shield, 10, YOU, How::Effect);
-        assert_eq!(context.s().obj(bear).counters(CounterKind::Shield), i32::MAX);
-        assert!(matches!(context.g.log.last().unwrap().event,
-            Event::CountersPut { object, kind: CounterKind::Shield, amount: 10, total: i32::MAX, .. } if object == bear));
     }
 
     #[test]

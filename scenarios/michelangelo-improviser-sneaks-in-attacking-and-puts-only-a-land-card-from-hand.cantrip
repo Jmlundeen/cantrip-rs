@@ -26,7 +26,6 @@ Bot1.Attack(Ornithopter > Bot2)
 Bot1.Hand.Michelangelo, Improviser.Cast(Ability: Sneak)
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)
 Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Choose(Return to hand 1 permanent)
 Bot1.Choose(Ornithopter)
 Bot1.Pass
 Bot2.Pass

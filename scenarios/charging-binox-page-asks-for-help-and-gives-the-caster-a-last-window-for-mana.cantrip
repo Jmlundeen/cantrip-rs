@@ -35,7 +35,7 @@ Bot1.Hand.Charging Binox.Cast
 Bot1.Accept
 Bot2.Battlefield.Forest.Activate
 Bot2.Battlefield.Forest.Activate
-? Client.Bot1.Prompt.Title = Make mana for Charging Binox
+? Client.Bot1.Prompt.Title = Pay for Charging Binox
 ? Client.Bot1.Button.Done.Enabled = true
 ? Client.Bot1.Button.Cancel.Enabled = true
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)

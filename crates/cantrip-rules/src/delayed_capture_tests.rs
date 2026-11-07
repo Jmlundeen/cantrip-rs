@@ -317,7 +317,7 @@ fn this_turn_watching_keeps_source_and_watched_death_separate() {
     let watched = put(&mut g, &BODY, Zone::BATTLEFIELD);
     let other = put(&mut g, &BODY, Zone::BATTLEFIELD);
     let ability = AbilityRef::delayed(g.state.obj(source).card, 0);
-    cx(&mut g).delayed_trigger(DelayedWhen::ThisTurnWatching(watched), source, YOU, ability, Target::None);
+    cx(&mut g).delayed_trigger(DelayedWhen::WatchingThisTurn, source, YOU, ability, Target::Object(watched));
     cx(&mut g).destroy_all(&[other]);
     assert!(g.state.triggers.is_empty());
     cx(&mut g).destroy_all(&[watched]);
@@ -342,7 +342,7 @@ fn this_turn_watching_keeps_event_payload_and_captured_words_until_cleanup() {
     let frame = g.state.agenda.len(); g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
     g.own_text.set(true);
     let mut run = Cx { frame, ..cx(&mut g) };
-    run.delayed_trigger(DelayedWhen::ThisTurnWatching(watched), source, YOU, ability, Target::None);
+    run.delayed_trigger(DelayedWhen::WatchingThisTurn, source, YOU, ability, Target::Object(watched));
     drop(run);
     cx(&mut g).exile_all(&[source]);
     cx(&mut g).emit(Event::Tapped { permanent: other });

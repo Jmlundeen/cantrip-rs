@@ -1562,7 +1562,7 @@ pub(crate) fn lost_the_game(cx: &mut Cx, losses: &[(PlayerId, LossReason)], batt
 pub(crate) fn delayed_fires(q: &dyn Query, d: &cantrip_state::Delayed, t: &TriggeredDef, asker: &Asker, event: &Event) -> Option<Fired> {
     let own = crate::resolve::Given { q, earlier: &[], subject: Target::None, slot_player: None, gift: false, x: None,
         text: d.words.map(|w| (d.watched(), w)) };
-    if matches!(d.when, DelayedWhen::ThisTurnWatching(_)) {
+    if d.when == DelayedWhen::WatchingThisTurn {
         let source_asker = Asker { source: d.source, ..*asker };
         let source_text = crate::resolve::Given { text: d.words.map(|w| (d.source, w)), ..own };
         if t.only_if.is_some_and(|c| !c(&source_text, &source_asker))
@@ -1726,10 +1726,11 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                                 // "Until" and "when [event]" are about the object they were made for (CR 603.7c), and the objects it
                                 // carries (`delayed_trigger_about`) go with it; so is any delayed ability made about one: a step
                                 // beginning is about no object, so a "next combat" ability keeps the creature it was made for.
-                                subject: if matches!(d.when, DelayedWhen::UntilEvent | DelayedWhen::WhenEvent) || d.subject != Target::None {
+                                // One watching an object for the turn is about what its event is about, else that object.
+                                subject: if d.when == DelayedWhen::WatchingThisTurn {
+                                    if fired.subject == Target::None { Target::Object(d.watched()) } else { fired.subject }
+                                } else if matches!(d.when, DelayedWhen::UntilEvent | DelayedWhen::WhenEvent) || d.subject != Target::None {
                                     d.subject
-                                } else if matches!(d.when, DelayedWhen::ThisTurnWatching(_)) && fired.subject == Target::None {
-                                    Target::Object(d.watched())
                                 } else {
                                     fired.subject
                                 },
@@ -1902,9 +1903,9 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
             })
         {
             if def.damage_amount {
-                let amount = trigger.event_amount.expect("damage trigger captured its matched amount");
-                let previous = existing.0.event_amount.expect("damage trigger captured its first matched amount");
-                existing.0.event_amount = Some(previous.saturating_add(amount));
+                let amount = trigger.event_amount.unwrap_or(0);
+                let previous = existing.0.event_amount.unwrap_or(0);
+                existing.0.event_amount = Some(previous + amount);
             } else {
                 existing.0.data[0] += trigger.data[0];
             }
@@ -1923,7 +1924,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
     for (mut trigger, def, members, again) in kept {
         // "Deals N or more damage": judged on the batch's total, once its events are added up (CR 603.2c).
         let amount = if def.damage_amount {
-            trigger.event_amount.expect("damage trigger captured its matched amount")
+            trigger.event_amount.unwrap_or(0)
         } else {
             trigger.data[0]
         };
@@ -2008,7 +2009,6 @@ pub fn step_began(cx: &mut Cx, step: Step) {
             DelayedWhen::NextTurnStep { step: s, player, after } => (s == step && player == active && cx.s().turn.number > after, true),
             DelayedWhen::ThisTurn
             | DelayedWhen::WatchingThisTurn
-            | DelayedWhen::ThisTurnWatching(_)
             | DelayedWhen::UntilEvent
             | DelayedWhen::UntilNextTurnOf(_)
             | DelayedWhen::NextThisTurn
@@ -2044,7 +2044,10 @@ pub fn still_holds(cx: &Cx, item: &StackItem) -> bool {
 
 /// Called only after the ability's matcher accepted this event.
 fn matched_damage_amount(def: &TriggeredDef, event: &Event) -> Option<u32> {
-    if !def.damage_amount { return None; }
-    let Event::Damage { amount, .. } = *event else { panic!("damage_amount requires a damage-only matcher") };
-    Some(amount)
+    // What a "that much damage" trigger captures is the damage of the event it matched; an event that is no damage dealt
+    // has none to capture.
+    match *event {
+        Event::Damage { amount, .. } if def.damage_amount => Some(amount),
+        _ => None,
+    }
 }

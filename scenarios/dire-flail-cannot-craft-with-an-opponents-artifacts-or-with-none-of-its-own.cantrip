@@ -47,7 +47,6 @@ Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mountain.Activate
 ! Bot1.Choose(Bot2.Battlefield.Ornithopter)
 ! Bot1.Choose(Black Lotus)
-Bot1.Choose(craft materials)
 Bot1.Choose(Bot1.Battlefield.Ornithopter)
 
 [Expect]

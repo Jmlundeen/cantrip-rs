@@ -510,7 +510,7 @@ pub type PreventionThen = fn(&mut dyn Game, &Asker, ObjectId, &[Prevented]);
 impl Prevented {
     /// How much the effect prevented in all, of these parts: "that much damage".
     pub fn total(parts: &[Prevented]) -> u32 {
-        parts.iter().map(|p| p.amount).fold(0u32, u32::saturating_add)
+        parts.iter().map(|p| p.amount).sum::<u32>()
     }
 }
 

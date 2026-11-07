@@ -534,7 +534,8 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
     };
     match &ask.kind {
         AskKind::ChooseCostPayment { choices } => {
-            let Some(span) = choices.len().checked_sub(1) else { return Err(Stop::Cancel) };
+            if choices.is_empty() { return Err(Stop::Cancel) }
+            let span = choices.len() - 1;
             let mut prefix = 0usize;
             for shift in (0..usize::BITS / 4).rev().map(|digit| digit * 4) {
                 let mut step = Step::default();
@@ -986,7 +987,7 @@ fn program(ask: &Ask, names: &[String], p: &mut Picker) -> Flow<FactoredAnswer> 
                     if t.kind != Tok::Block {
                         break;
                     }
-                    blocked[t.n as usize] = blocked[t.n as usize].saturating_add(1);
+                    blocked[t.n as usize] += 1;
                     blocks.push((c, t.b));
                     made += 1;
                 }

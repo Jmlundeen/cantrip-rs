@@ -429,7 +429,7 @@ impl<'a> History<'a> {
     pub fn snow_mana_spent_to_cast(&self, spell: ObjectId) -> u32 {
         self.this_turn().iter().filter_map(|r| match r.event {
             Event::ManaSpent { on, cast: true, snow, .. } if on == spell => Some(snow), _ => None,
-        }).fold(0u32, u32::saturating_add)
+        }).sum::<u32>()
     }
 
     /// Whether mana `source` produced was spent to cast `spell` (CR 106.3, 601.2h): "whenever you cast a spell using mana

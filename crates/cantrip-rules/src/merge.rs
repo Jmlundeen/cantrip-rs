@@ -35,7 +35,7 @@ fn unmutated(cards: &CardTable, card: CardId, values: Option<Copiable>) -> Optio
 /// CR 702.140b, 608.3b: a mutating creature spell whose target is illegal as it begins to resolve ceases to be one, and goes
 /// on resolving as the creature spell it is.
 pub(crate) fn cease_mutating(cx: &mut Cx, spell: ObjectId) {
-    let obj = *cx.s().obj(spell);
+    let obj = cx.s().obj(spell).clone();
     let values = unmutated(cx.cards(), obj.card, obj.copy);
     cx.st().update_obj(spell, |o| o.copy = values);
 }
@@ -63,8 +63,8 @@ pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
         _ => true,
     };
     let s = cx.s();
-    let card = *s.obj(spell);
-    let permanent = *s.obj(target);
+    let card = s.obj(spell).clone();
+    let permanent = s.obj(target).clone();
     let part = MergedPart {
         card: card.card,
         face: cx.cards().face(card.card, card.transformed),
@@ -145,7 +145,7 @@ pub(crate) fn merge(cx: &mut Cx, item: &StackItem, target: ObjectId) -> R<()> {
 pub(crate) fn meld_with(cx: &mut Cx, permanent: ObjectId, card: ObjectId) -> Event {
     let own = cx.s().obj(permanent).card;
     let into = cx.cards().id_of(cx.card(own).meld.expect("a melding card is a meld card").into);
-    let joining = *cx.s().obj(card);
+    let joining = cx.s().obj(card).clone();
     let known = ops::last_known_of(cx, card);
     let row = cx.st().last_known_push(known);
     cx.st().zone_remove(joining.zone, card);
@@ -270,7 +270,7 @@ pub(crate) fn turn_components(cx: &mut Cx, id: ObjectId) -> bool {
     let Some(mut merge) = cx.s().merge_of(id).cloned() else { return false };
     let cards = cx.cards();
     let can_turn = |card: CardId, transformed: bool| cards.backs[card.0 as usize].is_some() && !ops::instant_or_sorcery(cards.get(cards.face(card, !transformed)));
-    let obj = *cx.s().obj(id);
+    let obj = cx.s().obj(id).clone();
     let own = obj.represented_double_faced(cards.backs[obj.card.0 as usize].is_some()) && can_turn(obj.card, obj.transformed);
     let mut any = own;
     for p in &mut merge.parts {

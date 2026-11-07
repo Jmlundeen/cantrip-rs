@@ -41,11 +41,6 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Red)
 Bot1.Hand.Soul Immolation.Cast(X: 0)
-Bot1.Choose(Pay mana)
-Bot1.Choose(Pay mana)
-Bot1.Choose(Pay mana)
-Bot1.Choose(Pay mana)
-Bot1.Choose(Pay mana)
 Bot1.Choose(Gau, Feral Youth)
 Bot1.Pass
 Bot2.Pass

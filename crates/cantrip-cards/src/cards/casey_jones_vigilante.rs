@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// it), so it happens if he has left the battlefield. The ability is the card as the source has it, or the card it copies.
 fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 3);
-    let o = *g.obj(item.object);
+    let o = g.obj(item.object).clone();
     let card = o.copied_card().unwrap_or(o.card);
     g.delayed_trigger(
         DelayedWhen::Step { step: Step::Upkeep, on_turn_of: Some(item.controller) },

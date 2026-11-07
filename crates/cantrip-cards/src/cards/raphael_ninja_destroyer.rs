@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "Add that much {R}. Until end of turn, you don't lose this mana as steps and phases end" (CR 106.4, 500.5a): the damage
 /// dealt, however many sources dealt it at once (`sums_per_subject`).
 fn add_that_much_red(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_mana_until_end_of_turn(item.controller, Mana::R, u32::try_from(item.matched_damage_amount()).expect("mana amount exceeds existing u32 storage"));
+    g.add_mana_until_end_of_turn(item.controller, Mana::R, item.matched_damage_amount());
     Ok(())
 }
 

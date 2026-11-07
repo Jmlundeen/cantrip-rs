@@ -692,7 +692,7 @@ impl GameState {
 
     /// Changes one object's row.
     pub fn update_obj(&mut self, id: ObjectId, f: impl FnOnce(&mut Obj)) {
-        let old = self.objects[id.index()];
+        let old = self.objects[id.index()].clone();
         f(&mut self.objects[id.index()]);
         if self.objects[id.index()] != old {
             self.log(Undo::Object(id, Box::new(old)));
@@ -2189,8 +2189,8 @@ impl GameState {
     /// The entry that undoes applying `undo` to the state as it is now.
     fn inverse(&self, undo: &Undo) -> Undo {
         match undo {
-            Undo::Object(id, _) => Undo::Object(*id, Box::new(self.objects[id.index()])),
-            Undo::ObjectPushed => Undo::ObjectPopped(Box::new(*self.objects.last().expect("an object"))),
+            Undo::Object(id, _) => Undo::Object(*id, Box::new(self.objects[id.index()].clone())),
+            Undo::ObjectPushed => Undo::ObjectPopped(Box::new(self.objects.last().expect("an object").clone())),
             Undo::ObjectPopped(_) => Undo::ObjectPushed,
             Undo::Player(p, _) => Undo::Player(*p, self.players[p.index()]),
             Undo::Turn(_) => Undo::Turn(self.turn),

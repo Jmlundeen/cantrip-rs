@@ -137,14 +137,14 @@ fn a_token_copy_of_a_transformed_double_faced_permanent_has_both_faces_under_its
     let values = Copiable::of(table.id_of(&BEAST)).from_faces(Some(table.id_of(&VILLAGER)), true).named("Copycat");
     let mut cx = cx(&mut game);
     let token = ops::create_token_copies(&mut cx, values, YOU, 1).expect("nothing is asked")[0];
-    let obj = *cx.s().obj(token);
+    let obj = cx.s().obj(token).clone();
     assert_eq!(obj.card, table.id_of(&VILLAGER));
     assert!(obj.transformed);
     assert_eq!(cx.cards().current(&obj), table.id_of(&BEAST));
     assert_eq!(cx.chars(token).name, "Copycat");
     assert_eq!(cx.chars(token).power, Some(4));
     assert!(ops::turn_over(&mut cx, token).expect("nothing is asked"));
-    let obj = *cx.s().obj(token);
+    let obj = cx.s().obj(token).clone();
     assert_eq!(cx.cards().current(&obj), table.id_of(&VILLAGER));
     assert_eq!(cx.chars(token).name, "Copycat");
     assert_eq!(cx.chars(token).power, Some(1));
@@ -203,7 +203,7 @@ fn a_token_copy_over_a_daybound_card_enters_as_its_copy_at_night() {
     let values = Copiable::of(table.id_of(&BEAR)).from_faces(Some(table.id_of(&PUP)), false);
     let mut cx = cx(&mut game);
     let token = ops::create_token_copies(&mut cx, values, YOU, 1).expect("nothing is asked")[0];
-    let obj = *cx.s().obj(token);
+    let obj = cx.s().obj(token).clone();
     assert_eq!(obj.card, table.id_of(&PUP));
     assert!(!obj.transformed);
     assert!(!obj.has_counters());

@@ -6,7 +6,7 @@ const RED: u8 = ColorSet::of(Color::Red).0;
 
 /// "{1}: The next time a red source of your choice would deal damage to you this turn, prevent that damage." (CR 609.7a, 615.8).
 fn next_time_red_source_choice(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    prevention::next_time_source_of_colors_would_damage_you::<RED>(g, item, "red")?;
+    prevention::next_time_source_of_colors_would_damage_you::<RED>(g, item)?;
     Ok(())
 }
 

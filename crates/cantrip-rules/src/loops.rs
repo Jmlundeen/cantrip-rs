@@ -337,7 +337,7 @@ impl Hash for Name<'_> {
         // What an object that left still says (CR 608.2h: an ability of it reads it as it last was): its row and its
         // last-known information, without the ids and timestamps that differ round a loop.
         let departed = |h: &mut H| {
-            let mut o = *s.obj(id);
+            let mut o = s.obj(id).clone();
             o.timestamp = 0;
             o.became = None;
             o.last_known = None;
@@ -457,7 +457,7 @@ fn row(id: ObjectId, o: &Obj) -> u64 {
         if rows.len() <= at {
             rows.resize(at + 1, None);
         }
-        rows[at] = Some((*o, hash));
+        rows[at] = Some((o.clone(), hash));
         hash
     })
 }
@@ -481,7 +481,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
     for zone in &s.zones {
         zone.len().hash(h);
         for &id in zone {
-            let mut o = *s.obj(id);
+            let mut o = s.obj(id).clone();
             let stamp = canon.rank(o.timestamp);
             (
                 o.attached_to.map(|id| canon.id(id)),

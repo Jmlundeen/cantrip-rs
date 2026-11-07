@@ -18,7 +18,6 @@ Bot1.Hand.Ornithopter.Cast
 Bot1.Pass
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Culling the Weak.Cast
-Bot1.Choose(additional cost of Culling the Weak)
 Bot1.Choose(Ornithopter)
 Bot1.Pass
 Bot1.Hand.Dark Ritual.Cast

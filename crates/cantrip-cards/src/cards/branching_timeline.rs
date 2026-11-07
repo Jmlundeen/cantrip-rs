@@ -75,7 +75,7 @@ mod tests {
                 2 => "B",
                 _ => "A // B",
             };
-            Chars { ability_origins: [ObjectId::NONE; MAX_ABILITIES],
+            Chars {
                 card: CardId(0),
                 name,
                 types: TypeSet::of(&[CardType::Land]),

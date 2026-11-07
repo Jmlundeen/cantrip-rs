@@ -13,7 +13,7 @@ fn this_becomes_blocked(_: &dyn Query, source: ObjectId, event: &Event) -> Optio
 /// Count the creatures still blocking the source when the ability resolves (CR 702.23b), not as it triggers.
 fn grow<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let blockers = g.state().blocks.iter().filter(|b| b.attacker == item.object).count();
-    let bonus = blockers.saturating_sub(1).saturating_mul(usize::from(N)).min(i32::MAX as usize) as i32;
+    let bonus = if blockers > 1 { (blockers - 1) as i32 * i32::from(N) } else { 0 };
     if bonus != 0 { crate::pump(g, item.object, item.object, bonus, bonus); }
     Ok(())
 }

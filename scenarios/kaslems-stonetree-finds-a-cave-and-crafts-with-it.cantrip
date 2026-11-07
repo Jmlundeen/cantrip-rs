@@ -46,7 +46,6 @@ Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Mox Jet.Activate
 ! Bot1.Choose(Island)
-Bot1.Choose(craft materials)
 Bot1.Choose(Sunken Citadel)
 [T3 Bot1.Main2]
 

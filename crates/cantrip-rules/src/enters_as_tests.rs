@@ -177,7 +177,7 @@ fn it_enters_attached_to_a_legal_host_as_a_non_creature_aura() {
     put(&mut g, &FOREST, THEM, Zone::BATTLEFIELD);
     let card = put(&mut g, &TROLL, YOU, Zone::graveyard(YOU));
     let aura = return_as_aura(&mut g, card).expect("it entered");
-    let o = *g.state.obj(aura);
+    let o = g.state.obj(aura).clone();
     assert!(o.zone.is(ZoneKind::Battlefield));
     assert_eq!(o.attached_to, Some(forest));
     let q: &dyn Query = &cx(&mut g);
@@ -365,7 +365,7 @@ fn an_aura_put_onto_the_battlefield_can_enchant_a_player() {
     put(&mut g, &FOREST, YOU, Zone::BATTLEFIELD);
     let card = put(&mut g, &CURSE, YOU, Zone::graveyard(YOU));
     let curse = cantrip_api::Game::put_onto_battlefield(&mut cx(&mut g), card, YOU, false).expect("one host");
-    let o = *g.state.obj(curse);
+    let o = g.state.obj(curse).clone();
     assert!(g.state.battlefield().contains(&curse));
     assert_eq!((o.attached_to, o.attached_player), (None, Some(THEM)));
     assert!(!crate::settle::state_based_actions_alone(&mut cx(&mut g)).unwrap_or(true), "attached legally, it stays");

@@ -199,13 +199,55 @@ pub fn next_time_source_would_damage_you(g: &mut dyn Game, item: &StackItem, ind
     Ok(Some(source))
 }
 
+/// What a source of each set of colors (a `ColorSet`'s bits) is called in the question: "black or red source of damage".
+const COLORED_SOURCES: [&str; 32] = [
+    "source of damage",
+    "white source of damage",
+    "blue source of damage",
+    "white or blue source of damage",
+    "black source of damage",
+    "white or black source of damage",
+    "blue or black source of damage",
+    "white, blue, or black source of damage",
+    "red source of damage",
+    "white or red source of damage",
+    "blue or red source of damage",
+    "white, blue, or red source of damage",
+    "black or red source of damage",
+    "white, black, or red source of damage",
+    "blue, black, or red source of damage",
+    "white, blue, black, or red source of damage",
+    "green source of damage",
+    "white or green source of damage",
+    "blue or green source of damage",
+    "white, blue, or green source of damage",
+    "black or green source of damage",
+    "white, black, or green source of damage",
+    "blue, black, or green source of damage",
+    "white, blue, black, or green source of damage",
+    "red or green source of damage",
+    "white, red, or green source of damage",
+    "blue, red, or green source of damage",
+    "white, blue, red, or green source of damage",
+    "black, red, or green source of damage",
+    "white, black, red, or green source of damage",
+    "blue, black, red, or green source of damage",
+    "white, blue, black, red, or green source of damage",
+];
+
 /// "The next time a [color] source of your choice would deal damage to you this turn, prevent that damage" for the colors
-/// `COLORS`, worded `words` ("black or red") in the question: `next_time_source_would_damage_you` over `SOURCE` limited by
-/// `source_of_colors`, choosing none, and making no shield, when no source has those colors. The card
-/// lists `from_chosen_source_of_colors::<COLORS>` first (index 0) in its `granted_preventions`. Circle of Protection: Black
-/// and Blue and Greater Realm of Preservation print it.
-pub fn next_time_source_of_colors_would_damage_you<const COLORS: u8>(g: &mut dyn Game, item: &StackItem, words: &'static str) -> Result<Option<ObjectId>, Suspend> {
-    let rule = SOURCE.taking(crate::select::as_many_as_can(1)).with(crate::select::part(&(source_of_colors::<COLORS> as SelectFn), 0, words));
+/// `COLORS`, worded in the question as the text of the ability's source words them now (CR 612: a Circle of Protection: Blue
+/// whose "blue" became "red" asks for a red source): `next_time_source_would_damage_you` over `SOURCE` limited by
+/// `source_of_colors`, choosing none, and making no shield, when no source has those colors. The card lists
+/// `from_chosen_source_of_colors::<COLORS>` first (index 0) in its `granted_preventions`. Circle of Protection: Black and
+/// Blue and Greater Realm of Preservation print it.
+pub fn next_time_source_of_colors_would_damage_you<const COLORS: u8>(g: &mut dyn Game, item: &StackItem) -> Result<Option<ObjectId>, Suspend> {
+    let words = g.words(item.object);
+    let said = Color::ALL.into_iter().filter(|&c| ColorSet(COLORS).has(c)).fold(ColorSet::NONE, |set, c| set.with(words.color(c)));
+    let rule = SOURCE
+        .called(COLORED_SOURCES[usize::from(said.0 & 31)])
+        .taking(crate::select::as_many_as_can(1))
+        .with(crate::select::part(&(source_of_colors::<COLORS> as SelectFn), 0, ""));
     next_time_source_would_damage_you(g, item, 0, rule)
 }
 

@@ -30,8 +30,8 @@ fn delayed_watcher_marks_only_the_captured_battlefield_object_for_both_seats() {
     let other = put(&BODY, Zone::BATTLEFIELD);
     let hidden = put(&BODY, Zone::hand(you));
     game.state.delayed_push(Delayed {
-        when: DelayedWhen::ThisTurnWatching(watched), source, controller: you,
-        ability: AbilityRef::delayed(cards.id_of(&SOURCE), 0), subject: Target::None,
+        when: DelayedWhen::WatchingThisTurn, source, controller: you,
+        ability: AbilityRef::delayed(cards.id_of(&SOURCE), 0), subject: Target::Object(watched),
         members: Span::default(), since: 0, acquired: Acquired::OWN,
         words: Some(Words::NONE.changed(Word::Subtype(Subtype::Goblin), Word::Subtype(Subtype::Elf))),
     });

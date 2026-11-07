@@ -36,7 +36,6 @@ Bot1.Hand.Masked Meower.Cast
 Bot1.Pass
 Bot2.Pass
 Bot1.Battlefield.Masked Meower.Activate
-Bot1.Choose(Discard 1 card)
 Bot1.Choose(Island)
 Bot1.Pass
 Bot2.Pass
@@ -51,7 +50,6 @@ Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 2)
 Bot1.Pass
 Bot2.Pass
 Bot1.Battlefield.Masked Meower.Activate
-Bot1.Choose(Discard 1 card)
 Bot1.Choose(Island)
 Bot1.Target(Bot2)
 Bot1.Pass

@@ -11,7 +11,7 @@ fn death_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         let dealt = DamageDealt { source, target, amount, combat: kind.is_combat(), controller, known };
         (source != item.object && target == Target::Object(item.object) && dealt.chars(g).name == "Blazing Effigy")
             .then_some(amount)
-    }).fold(3u32, u32::saturating_add);
+    }).sum::<u32>() + 3;
     g.damage(item.object, Target::Object(target), amount);
     Ok(())
 }

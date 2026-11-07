@@ -965,13 +965,13 @@ pub enum BlockCapacity {
 
 impl BlockCapacity {
     /// How many creatures a creature under `capacities` can block (CR 509.1a): one, and each additional one; `u32::MAX` for
-    /// any number. Counts saturate at the number that represents any number, including generated dynamic allowances.
+    /// any number.
     pub fn total(capacities: impl IntoIterator<Item = BlockCapacity>) -> u32 {
         let mut total = 1u32;
         for c in capacities {
             match c {
                 BlockCapacity::AnyNumber => return u32::MAX,
-                BlockCapacity::Additional(n) => total = total.saturating_add(n),
+                BlockCapacity::Additional(n) => total += n,
             }
         }
         total

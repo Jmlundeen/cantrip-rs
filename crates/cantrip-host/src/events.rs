@@ -616,10 +616,10 @@ mod tests {
             ..Default::default()
         });
         let source = *game.state.zone(Zone::COMMAND).iter().find(|&&id| game.state.obj(id).owner == PlayerId(1)).expect("seat two commander");
-        let mut old_object = *game.state.obj(source);
+        let mut old_object = game.state.obj(source).clone();
         old_object.zone = Zone::graveyard(PlayerId(1));
         let old = game.state.push_obj(old_object);
-        let new = game.state.push_obj(*game.state.obj(source));
+        let new = game.state.push_obj(game.state.obj(source).clone());
         let mut handles = HandleSpace::new();
         let mut teller = Teller {
             game: &game,

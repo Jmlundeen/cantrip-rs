@@ -1,4 +1,4 @@
-# Cancelling Crystal Grotto while paying its cost leaves no completed Grotto activation to take back.
+# Cancelling Crystal Grotto while its {1} is still owed, before any mana is made for it, leaves no completed Grotto activation to take back.
 
 [Bot1 Deck]
 Crystal Grotto
@@ -15,7 +15,6 @@ Bot1.Arrange(Lightning Bolt | )
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Crystal Grotto.Activate(Ability: any color; Color: Red)
-Bot1.Battlefield.Island.Activate
 Bot1.Cancel
 ? Bot1.Mana =
 ? Bot1.Battlefield.Crystal Grotto.Tapped = false
