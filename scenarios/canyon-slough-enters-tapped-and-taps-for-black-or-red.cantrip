@@ -1,0 +1,26 @@
+# Canyon Slough enters tapped (CR 614.1d) and its "{T}: Add {B} or {R}." is a mana ability (CR 605.1a): Bot1 plays it on
+# turn 1 and it is tapped; on turn 3 it untaps and adds {B} and on turn 5 {R}, each the single mana the {T} cost buys. It is
+# a Swamp Mountain, so neither white nor green is offered.
+
+[Bot1 Deck]
+Canyon Slough
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Canyon Slough.Play
+? Bot1.Battlefield.Canyon Slough.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Canyon Slough.Activate(Ability: {G})
+Bot1.Battlefield.Canyon Slough.Activate(Ability: {B})
+? Bot1.Mana = {B}
+? Bot1.Battlefield.Canyon Slough.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Canyon Slough.Activate(Ability: {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Canyon Slough.Tapped = true
