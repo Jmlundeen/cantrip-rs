@@ -1,0 +1,26 @@
+# Coastal Peak enters tapped (CR 614.1d) and its "{T}: Add {U} or {R}." is a mana ability (CR 605.1a): Bot1 plays it on turn
+# 1 and it is tapped; on turn 3 it untaps and adds {U} and on turn 5 {R}, each the single mana the {T} cost buys. It is an
+# Island Mountain, so neither white nor green is offered.
+
+[Bot1 Deck]
+Coastal Peak
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Coastal Peak.Play
+? Bot1.Battlefield.Coastal Peak.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Coastal Peak.Activate(Ability: {G})
+Bot1.Battlefield.Coastal Peak.Activate(Ability: {U})
+? Bot1.Mana = {U}
+? Bot1.Battlefield.Coastal Peak.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Coastal Peak.Activate(Ability: {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Coastal Peak.Tapped = true
