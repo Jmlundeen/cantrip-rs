@@ -620,6 +620,22 @@ fn atomic_costs<'a>(cost: &'a Cost, out: &mut Vec<&'a Cost>) {
     if cost.components.is_empty() { out.push(cost); } else { for c in cost.components { atomic_costs(c, out); } }
 }
 
+/// `atomic_costs` as an iterator, allocating nothing for a cost of one part (nearly every cost).
+fn parts_of<'a>(cost: &'a Cost) -> impl Iterator<Item = &'a Cost> + 'a {
+    let flat = (!cost.components.is_empty()).then(|| {
+        let mut parts = Vec::new();
+        atomic_costs(cost, &mut parts);
+        parts
+    });
+    let single = flat.is_none().then_some(cost);
+    single.into_iter().chain(flat.into_iter().flatten())
+}
+
+/// How many atomic parts `cost` has (`atomic_costs`).
+fn part_count(cost: &Cost) -> usize {
+    if cost.components.is_empty() { 1 } else { cost.components.iter().map(part_count).sum() }
+}
+
 /// Which atomic component names the permanent whose producible mana the ability refers to.
 fn color_sacrifice_component(def: &ActivatedDef) -> Option<usize> {
     let mut parts = Vec::new();
@@ -784,10 +800,8 @@ fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
     if cost.remove_any_counter && !obj.counter_array().iter().any(|&n| n > 0) {
         return false;
     }
-    let mut discard_components = Vec::new();
-    atomic_costs(cost, &mut discard_components);
-    let instructions: Vec<_> = discard_components.iter().flat_map(|part| part.discard.parts()).collect();
-    if !instructions.is_empty() {
+    if parts_of(cost).any(|part| !part.discard.is_none()) {
+        let instructions: Vec<_> = parts_of(cost).flat_map(|part| part.discard.parts()).collect();
         let asker = Asker { instance: None, source, controller, by, spell: false };
         let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(controller)).iter().copied().filter(|&c| c != source).collect();
         // A card a mana ability could put into the hand may be any card: it may pay any instruction.
@@ -860,9 +874,7 @@ fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
         }
     }
     // Each independent choice retains its own filter.
-    let mut choice_parts = Vec::new();
-    atomic_costs(cost, &mut choice_parts);
-    if choice_parts.iter().any(|part| part.choose.is_some() && choose_candidates(cx, controller, part, source, by, judged == Judged::Cast).is_empty()) {
+    if parts_of(cost).any(|part| part.choose.is_some() && choose_candidates(cx, controller, part, source, by, judged == Judged::Cast).is_empty()) {
         return false;
     }
     // CR 701.68b: a player who controls no creature can't choose to blight.
@@ -2610,14 +2622,12 @@ fn pay_scheduled_costs(cx: &mut Cx, player: PlayerId, spell: ObjectId, scope: Pa
     let mut remaining = Vec::new();
     let crafting = cost.materials.is_some();
     append_fixed_payments(&mut remaining, CostOrigin::CastingWay, cost, chosen, SourceText::Own, x, sacrificed_any_number, scope, spell, crafting, 0);
-    let mut ability_offset = Vec::new();
-    atomic_costs(cost, &mut ability_offset);
-    let mut ability_offset = ability_offset.len();
+    let mut ability_offset = part_count(cost);
     for ((origin, part), objects) in extra.iter().zip(extra_chosen) {
         let label = SourceText::Extra(*origin);
         let offset = if matches!(scope, PaymentScope::Ability { .. } | PaymentScope::ManaAbility { .. } | PaymentScope::PlayerManaAbility) { ability_offset } else { 0 };
         append_fixed_payments(&mut remaining, *origin, part, objects, label, x, sacrificed_any_number, scope, spell, crafting, offset);
-        if offset > 0 { let mut parts = Vec::new(); atomic_costs(part, &mut parts); ability_offset += parts.len(); }
+        if offset > 0 { ability_offset += part_count(part); }
     }
     for (index, ((part, objects), origin)) in options.iter().zip(option_chosen).zip(option_origins).enumerate() {
         let (ability, giver) = paid_options[index];
@@ -2643,7 +2653,8 @@ fn pay_scheduled_costs(cx: &mut Cx, player: PlayerId, spell: ObjectId, scope: Pa
     let mut chosen_object_members: Vec<(usize, ObjectId)> = Vec::new();
     let mut mana_adds_nothing = None;
     let mut pay_next = |cx: &mut Cx, remaining: &mut Vec<SpellPayment<'_>>| -> R<bool> {
-        let controlled = cx.permanents_of(player);
+        // Whether `player` controls the permanent `id` (`Query::permanents_of`), asked without listing them.
+        let controls = |id: ObjectId| cx.s().obj(id).zone.is(ZoneKind::Battlefield) && cx.s().obj(id).controller == player;
         let asker = Asker { instance: None, source: spell, controller: player, by: scope.by(), spell: matches!(scope, PaymentScope::Spell) };
         // CR 601.2h: every cost with a random element is paid after all other costs.
         let has_nonrandom = remaining.iter().any(|step| !step.has_random_element());
@@ -2723,20 +2734,20 @@ fn pay_scheduled_costs(cx: &mut Cx, player: PlayerId, spell: ObjectId, scope: Pa
                 let candidates = material_candidates(cx, spell, player, m, scope.by());
                 (live(cx.s(), spell) && candidates.len() >= usize::from(m.count) && parts_can_be_matched(cx, spell, player, m, &candidates, scope.by())).then_some(i)
             }
-            SpellPayment::ExertSelf { .. } => controlled.contains(&spell).then_some(i),
-            SpellPayment::UnattachSelf { .. } => (controlled.contains(&spell) && cx.s().obj(spell).attached_to.is_some_and(|id| live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield))).then_some(i),
-            SpellPayment::TapSelf { .. } => (controlled.contains(&spell) && !cx.s().obj(spell).tapped
+            SpellPayment::ExertSelf { .. } => controls(spell).then_some(i),
+            SpellPayment::UnattachSelf { .. } => (controls(spell) && cx.s().obj(spell).attached_to.is_some_and(|id| live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield))).then_some(i),
+            SpellPayment::TapSelf { .. } => (controls(spell) && !cx.s().obj(spell).tapped
                 && (!summoning_sick(cx.cards(), cx.s(), &cx.g.log, spell) || static_rules::activates_as_though_haste(cx, player, spell))).then_some(i),
             SpellPayment::SacrificeSelf { object, .. } => {
                 // A successful sacrifice moves this exact object. It cannot later pay its own {T} cost (CR 400.7).
                 // Keep the independent mana/life/other-object choices available; no filter behavior is inferred here.
                 let blocks_own_tap = matches!(scope, PaymentScope::ManaAbility { .. }) && *object == spell && source_tap_pending;
-                (!blocks_own_tap && controlled.contains(object) && may_sacrifice_for(cx, player, *object, scope.paid_for())).then_some(i)
+                (!blocks_own_tap && controls(*object) && may_sacrifice_for(cx, player, *object, scope.paid_for())).then_some(i)
             }
             SpellPayment::MoveSelf { action, .. } => {
                 let object = match action { MoveSelf::ExileGranter(id) => *id, _ => spell };
                 let payable = live(cx.s(), object) && match action {
-                    MoveSelf::Return => controlled.contains(&spell),
+                    MoveSelf::Return => controls(spell),
                     MoveSelf::Exile => !cx.s().obj(spell).zone.is(ZoneKind::PhasedOut),
                     MoveSelf::ExileGranter(id) => cx.s().obj(*id).zone.is(ZoneKind::Battlefield),
                     MoveSelf::Discard => cx.s().obj(spell).zone == Zone::hand(player),
@@ -2745,17 +2756,17 @@ fn pay_scheduled_costs(cx: &mut Cx, player: PlayerId, spell: ObjectId, scope: Pa
                 (payable && !(step.has_random_element() && has_nonrandom)).then_some(i)
             }
             SpellPayment::Mana => Some(i),
-            SpellPayment::Reducer(object) => (controlled.contains(object) && !cx.s().obj(*object).tapped).then_some(i),
+            SpellPayment::Reducer(object) => (controls(*object) && !cx.s().obj(*object).tapped).then_some(i),
             SpellPayment::Permanent { cost, objects, .. } => {
                 let p = cost.permanents?;
                 let conflicts = !objects.is_empty() && !cost.tap_permanents && remaining.iter().any(|other| matches!(other,
                     SpellPayment::Permanent { cost: other_cost, objects: other_objects, .. }
                     if other_cost.tap_permanents && other_objects.iter().any(|id| objects.contains(id))));
-                let eligible = |id: ObjectId| controlled.contains(&id)
+                let eligible = |id: ObjectId| controls(id)
                     && (!cost.tap_permanents || !cx.s().obj(id).tapped)
                     && (!p.tapped || cx.s().obj(id).tapped)
                     && pays_permanents(cx, cost, &p, &asker, id, scope.paid_for());
-                let can_pay = if objects.is_empty() { controlled.iter().copied().filter(|&id| eligible(id)).count() >= p.count as usize }
+                let can_pay = if objects.is_empty() { cx.s().battlefield().iter().copied().filter(|&id| eligible(id)).count() >= p.count as usize }
                     else { objects.iter().copied().all(eligible) };
                 (!conflicts && can_pay).then_some(i)
             }

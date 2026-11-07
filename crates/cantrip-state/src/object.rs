@@ -6,7 +6,7 @@ use crate::vocab::*;
 ///
 /// Characteristics are not stored here beyond the card it is: they are computed from the card, the copy effect it
 /// entered with and the continuous effects that apply to it (CR 613), when asked.
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Obj {
     pub card: CardId,
     pub owner: PlayerId,
@@ -31,10 +31,12 @@ pub struct Obj {
     pub deathtouched: bool,
     /// The counters on it (CR 122). Private: they are read through `counters` and `counter_array`, taken off through
     /// `remove_counters`, and put on only by the put path, `cantrip_rules::counters`, which names the player who puts them
-    /// (CR 122.6a) and lets the replacement effects of counters being put apply (CR 614.1a). Boxed, and `None` while it
-    /// has none: most objects never have a counter, and every kind (`CounterKind::COUNT`) would otherwise be carried by
-    /// every object, every copy of the state and every undo record of it.
-    counters: Option<Box<[i32; CounterKind::COUNT]>>,
+    /// (CR 122.6a) and lets the replacement effects of counters being put apply (CR 614.1a). Kept in place: boxed, a state
+    /// copy allocates for every object with a counter and costs more than the bytes it saves (measured).
+    counters: [i32; CounterKind::COUNT],
+    /// Whether the current counter array is nonempty. Kept by the same private put/remove/clear paths so that the
+    /// layers' common no-counter guard does not scan every counter kind on every object.
+    any_counters: bool,
     /// When it entered its zone (CR 613.7d), for ordering and for layer timestamps.
     pub timestamp: u32,
     /// The copy effects on it (CR 707.2, 613.2, layer 1a): the values it copied, which are its copiable values unless it
@@ -619,6 +621,7 @@ impl Obj {
             damage: _,
             deathtouched: _,
             counters: _,
+            any_counters: _,
             timestamp: _,
             copy: _,
             loyalty_turn: _,
@@ -691,7 +694,8 @@ impl Obj {
             controlled_since: 0,
             damage: 0,
             deathtouched: false,
-            counters: None,
+            counters: [0; CounterKind::COUNT],
+            any_counters: false,
             timestamp: 0,
             copy: None,
             loyalty_turn: 0,
@@ -725,7 +729,7 @@ impl Obj {
     }
 
     pub fn counters(&self, kind: CounterKind) -> i32 {
-        self.counters.as_ref().map_or(0, |c| c[kind as usize])
+        self.counters[kind as usize]
     }
 
     /// A face-down card in a zone other than the battlefield and the stack (a card exiled face down): it has no
@@ -781,33 +785,34 @@ impl Obj {
 
     /// Whether it has any counter on it.
     pub fn has_counters(&self) -> bool {
-        self.counters.is_some()
+        self.any_counters
     }
 
     /// Every kind of counter on it, by `CounterKind` number.
     pub fn counter_array(&self) -> [i32; CounterKind::COUNT] {
-        self.counters.as_deref().copied().unwrap_or([0; CounterKind::COUNT])
+        self.counters
     }
 
     /// The kinds of counter on it, with how many of each, in `CounterKind` order.
     pub fn counter_kinds(&self) -> impl Iterator<Item = (CounterKind, i32)> + '_ {
-        self.counters.iter().flat_map(|c| c.iter().enumerate().filter(|(_, n)| **n != 0).map(|(k, &n)| (CounterKind::ALL[k], n)))
+        self.any_counters.then_some(&self.counters).into_iter().flat_map(|c| c.iter().enumerate().filter(|(_, n)| **n != 0).map(|(k, &n)| (CounterKind::ALL[k], n)))
     }
 
     /// Takes up to `n` counters of one kind off it (CR 122.1), never below none. Taking counters off is not putting
     /// them on, so anything may do it.
     pub fn remove_counters(&mut self, kind: CounterKind, n: i32) {
-        let Some(counters) = self.counters.as_mut() else { return };
-        let c = &mut counters[kind as usize];
+        let c = &mut self.counters[kind as usize];
+        let had = *c != 0;
         *c = (*c - n.max(0)).max(0);
-        if counters.iter().all(|&n| n == 0) {
-            self.counters = None;
+        if had && *c == 0 {
+            self.any_counters = self.counters.iter().any(|&n| n != 0);
         }
     }
 
     /// Takes every counter off it: an object made into a normal form, for comparing positions (`cantrip_rules::loops`).
     pub fn clear_counters(&mut self) {
-        self.counters = None;
+        self.counters = [0; CounterKind::COUNT];
+        self.any_counters = false;
     }
 
     /// The write of the put path. Only `cantrip_rules::counters` calls this, once it has named the player putting the
@@ -818,10 +823,10 @@ impl Obj {
         if !counts.iter().any(|&add| add > 0) {
             return;
         }
-        let counters = self.counters.get_or_insert_with(|| Box::new([0; CounterKind::COUNT]));
-        for (n, &add) in counters.iter_mut().zip(counts) {
+        for (n, &add) in self.counters.iter_mut().zip(counts) {
             if add > 0 {
                 *n += add;
+                self.any_counters = true;
             }
         }
     }
