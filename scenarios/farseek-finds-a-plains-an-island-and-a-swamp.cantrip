@@ -1,0 +1,51 @@
+# Farseek finds a card with any one of its four listed land types (CR 205.3i, the 2021-03-19 ruling: a Forest that is
+# also one of them counts). Three Farseeks each find a Forest dual with exactly one listed type besides Forest -
+# Savannah (Plains), Tropical Island (Island) and Bayou (Swamp) - so each of the three types is shown found on its own;
+# the Mountain is shown by the Taiga scenario. Each enters tapped and each search shuffles. Turn 1's Black Lotus, Mox
+# Emerald and Forest pay two Farseeks with one green left over; turn 3's two Forests pay the third exactly.
+
+[Bot1 Deck]
+Farseek
+Farseek
+Farseek
+Forest
+Forest
+Black Lotus
+Mox Emerald
+Savannah
+Tropical Island
+Bayou
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Farseek.Cast
+Bot1.Search(Savannah)
+Bot1.Hand.Farseek.Cast
+Bot1.Search(Tropical Island)
+? Bot1.Mana = {G}
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Savannah.Tapped = true
+? Bot1.Battlefield.Tropical Island.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Farseek.Cast
+Bot1.Search(Bayou)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Bayou.Tapped = true
+Bot1.Battlefield.Count = 6
+Bot1.Graveyard.Count = 4
+Bot1.Shuffles = 3
