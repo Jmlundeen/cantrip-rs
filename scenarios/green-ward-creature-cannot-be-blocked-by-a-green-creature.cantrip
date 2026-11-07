@@ -1,0 +1,53 @@
+# Protection from green stops green creatures blocking the enchanted creature (CR 702.16f) though Green Ward's Aura
+# stays. Bot2's Devoted Hero wears Green Ward and attacks on turn 4: Bot1's green Llanowar Elves may not block it (the
+# refusal), while the black Cabal Evangel may (the positive control), so Bot1 takes no damage.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Emerald
+Cabal Evangel
+Llanowar Elves
+Swamp x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Devoted Hero
+Green Ward
+Plains x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: B)
+Bot1.Hand.Cabal Evangel.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Devoted Hero.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Green Ward.Cast(Bot2.Battlefield.Devoted Hero)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Green Ward.AttachedTo = Devoted Hero
+? Bot2.Battlefield.Devoted Hero.ProtectionFrom = Green
+Bot2.Attack(Devoted Hero > Bot1)
+! Bot1.Block(Llanowar Elves > Devoted Hero)
+Bot1.Block(Cabal Evangel > Devoted Hero)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Battlefield.Cabal Evangel.Damage = 1
+Bot2.Graveyard = Green Ward; Devoted Hero
+Bot1.Life = 20

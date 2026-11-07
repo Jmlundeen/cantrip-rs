@@ -1,0 +1,67 @@
+# Green Ward's "green" is a color word of its text (CR 612.1, 702.16): Bot1's Sleight of Mind changes it to black, so
+# the Devoted Hero it enchants has protection from black and no longer from green (CR 612.2), and the Aura, white,
+# stays. Bot2 then cannot target the Hero with Go for the Throat, a black spell (the refusal; had the word become red
+# or stayed green the spell would be legal), while on turn 4 the same spell kills Bot1's Llanowar Elves (the positive
+# control: the spell works, only the Hero is protected).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Emerald
+Devoted Hero
+Green Ward
+Sleight of Mind
+Llanowar Elves
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Go for the Throat
+Swamp x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Devoted Hero.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Green Ward.Cast(Bot1.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.Green Ward)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Green)
+Bot1.Colors(Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+! Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Devoted Hero)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Go for the Throat.Cast(Bot1.Battlefield.Llanowar Elves)
+[Expect]
+Bot1.Battlefield.Devoted Hero.ProtectionFrom = Black
+Bot1.Battlefield.Green Ward.AttachedTo = Devoted Hero
+Bot1.Graveyard = Llanowar Elves; Sleight of Mind; Black Lotus
