@@ -1,0 +1,54 @@
+# Ceti Eel counts "artifact and/or creature card in your graveyard" (CR 608.2).
+# Bot2's Shatter destroys Bot1's Mox Jet, an artifact card that is not a
+# creature, before Ceti Eel enters. Ceti Eel mills two Islands, so neither
+# milled card counts; the Mox Jet is the only qualifying card and gives exactly
+# one +1/+1 counter, making Ceti Eel a 3/3. A filter that counted only creature
+# cards would leave it a 2/2.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Swamp
+Ceti Eel
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Shatter
+Island x17
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shatter.Cast(Bot1.Battlefield.Mox Jet)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ceti Eel.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ceti Eel.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ceti Eel.Power = 3
+Bot1.Battlefield.Ceti Eel.Toughness = 3
+Bot1.Graveyard.Count = 3
+Bot2.Graveyard = Shatter
