@@ -1,0 +1,56 @@
+# White Ward gives Bot2's Savannah Lions protection from white (CR 702.16). On turn 3 Bot1 cannot target the Lions with
+# Holy Strength, a white Aura spell (CR 702.16b; the refusal, and Bot1 has the mana to spare), and Bot1's Savannah Lions
+# attacking into it is blocked by the other Lions: the attacker's damage is white and prevented (CR 702.16e), so Bot2's
+# 2/1 Lions survives with no damage marked (without White Ward it would die) while Bot1's Lions dies. White Ward is
+# white itself, yet stays on the Lions (CR 702.16n).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Savannah Lions
+Holy Strength
+Plains
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Savannah Lions
+White Ward
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Savannah Lions.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.White Ward.Cast(Bot2.Battlefield.Savannah Lions)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+! Bot1.Hand.Holy Strength.Cast(Bot2.Battlefield.Savannah Lions)
+Bot1.Attack(Savannah Lions > Bot2)
+Bot2.Block(Savannah Lions > Savannah Lions)
+[T3 Bot1.CombatDamage]
+? Bot2.Battlefield.Savannah Lions.Damage = 0
+[Expect]
+Bot2.Battlefield.Savannah Lions.ProtectionFrom = White
+Bot2.Battlefield.Savannah Lions.Damage = 0
+Bot2.Battlefield.White Ward.AttachedTo = Savannah Lions
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Savannah Lions

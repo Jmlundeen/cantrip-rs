@@ -1,0 +1,88 @@
+# Each White Ward spares only itself (CR 702.16n: "this Aura") and is white from the start (CR 105.3). One cannot be cast
+# onto a creature the other already enchants (protection from white, CR 702.16b), but two Auras entering at once each
+# choose a creature that is still unprotected (CR 303.4f), and then each is protected-from by the other's effect: both
+# go to the graveyard together (CR 702.16c, 704.5m) with no colour change. Bot1's Devoted Hero and Bot2's Devoted Hero
+# each wear a White Ward; Pyroclasm kills both Heroes and so both Wards (Bot2's Yoked Ox survives it), and Second Sunrise
+# returns the Heroes and both Wards at once, the Wards onto the Ox, the only creature there to choose. `Attached` and
+# `LeftBattlefield` show that both Wards entered attached to the Ox and then left it, rather than staying in the
+# graveyard for want of a creature to enchant (CR 303.4g).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Devoted Hero
+White Ward
+White Ward
+Pyroclasm
+Plains
+Mox Jet
+Second Sunrise
+Plains x9
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Devoted Hero
+Yoked Ox
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Devoted Hero.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.White Ward.Cast(Bot1.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Devoted Hero.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Yoked Ox.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+! Bot1.Hand.White Ward.Cast(Bot1.Battlefield.Devoted Hero)
+Bot1.Hand.White Ward.Cast(Bot2.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.White Ward#1.AttachedTo = Devoted Hero
+? Bot1.Battlefield.White Ward#2.AttachedTo = Devoted Hero
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = White Ward; White Ward; Devoted Hero; Pyroclasm
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Second Sunrise.Cast
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = White Ward; White Ward; Second Sunrise; Pyroclasm
+Bot1.Battlefield = Devoted Hero; Mox Jet; Mox Pearl; Mox Ruby; Plains; Plains
+Bot2.Battlefield.Yoked Ox.Damage = 2
+Attached = White Ward > Devoted Hero; White Ward > Devoted Hero; White Ward > Yoked Ox; White Ward > Yoked Ox
+LeftBattlefield = Devoted Hero; Devoted Hero; White Ward; White Ward; White Ward; White Ward

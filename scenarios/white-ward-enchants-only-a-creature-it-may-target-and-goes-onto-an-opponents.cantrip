@@ -1,0 +1,52 @@
+# "Enchant creature" (CR 303.4a, 702.5a) lets White Ward go onto any creature that may be its target: Bot1 cannot cast it
+# onto its own Mox Pearl (not a creature; the first refusal) nor onto Bot2's Black Knight, whose protection from white
+# makes it an illegal target for the white Aura spell (CR 702.16b; the second refusal), but can onto Bot2's Devoted Hero,
+# an opponent's creature (the positive control), where it stays as the Hero's protection from white.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+White Ward
+Plains x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Black Knight
+Devoted Hero
+Swamp x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Black Knight.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Devoted Hero.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+! Bot1.Hand.White Ward.Cast(Bot1.Battlefield.Mox Pearl)
+! Bot1.Hand.White Ward.Cast(Bot2.Battlefield.Black Knight)
+Bot1.Hand.White Ward.Cast(Bot2.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.White Ward.AttachedTo = Devoted Hero
+Bot2.Battlefield.Devoted Hero.ProtectionFrom = White
+Bot2.Battlefield.Black Knight.ProtectionFrom = White

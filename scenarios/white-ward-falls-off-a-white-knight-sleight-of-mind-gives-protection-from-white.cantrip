@@ -1,0 +1,47 @@
+# White Ward's "This effect doesn't remove this Aura" spares it from its own protection only: another source of
+# protection from white still removes it (CR 702.16n, 704.5m). White Ward is white, so it cannot be cast onto a creature
+# that already has protection from white (CR 702.16b; that is why Black Knight is refused in the enchant scenario), but
+# a creature can get its own later. Bot1's White Knight wears White Ward, which stays at first (the Knight has only
+# protection from black). Sleight of Mind then changes "black" in the Knight's text to "white" (CR 612.2): the Knight's
+# own protection from white is no part of the Ward's effect, and the Aura is put into Bot1's graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+White Knight
+White Ward
+Sleight of Mind
+Plains x12
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.White Knight.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.White Ward.Cast(Bot1.Battlefield.White Knight)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.White Ward.AttachedTo = White Knight
+? Bot1.Battlefield.White Knight.ProtectionFrom = Black; White
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.White Knight)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+Bot1.Colors(White)
+[Expect]
+Bot1.Graveyard = White Ward; Sleight of Mind
+Bot1.Battlefield.White Knight.ProtectionFrom = White
