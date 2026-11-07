@@ -1,0 +1,6 @@
+{
+  "name": "Direct Hit",
+  "manaCost": "{2}{R}",
+  "type": "Sorcery",
+  "oracleText": "Direct Hit deals 5 damage to target creature."
+}
