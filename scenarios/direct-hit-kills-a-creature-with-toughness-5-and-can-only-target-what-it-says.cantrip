@@ -1,0 +1,47 @@
+# "Direct Hit deals 5 damage to target creature." A Aegis Turtle with toughness exactly 5 is dealt lethal damage and dies (CR 120.3e, 704.5g).
+# A Mox is refused: it is no legal target, and the refusals sit before the legal cast so they cannot pass for want of a target.
+# The pool is checked right after the cast, so the cost is exact.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Direct Hit
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Aegis Turtle
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Aegis Turtle.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Hand.Direct Hit.Cast(Bot2)
+! Bot1.Hand.Direct Hit.Cast(Bot2.Battlefield.Mox Pearl)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Direct Hit.Cast(Bot2.Battlefield.Aegis Turtle)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Aegis Turtle = (absent)
+Bot2.Graveyard = Aegis Turtle
+Bot1.Graveyard = Direct Hit
