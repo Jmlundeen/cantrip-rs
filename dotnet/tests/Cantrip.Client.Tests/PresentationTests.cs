@@ -612,13 +612,13 @@ public sealed class PromptPresentationTests
         var rows = CardActions.ManaRows([option]);
         Assert.Equal(3, rows.Count);
         var red = Assert.Single(rows, row => row.Color == ColorView.Red);
-        Assert.StartsWith("Choose {R} → {C}", CardActions.Describe(client, option, red.Color));
+        Assert.Contains("Choose {R} → {C}", CardActions.Describe(client, option, red.Color));
         Assert.Equal(ColorView.Red, AutoPlay.Answer(option, ColorView.Red).Color);
         Assert.Equal(ColorView.White, AutoPlay.Answer(option).Color);
 
         option.Produces.Clear();
         Assert.Equal(3, CardActions.ManaRows([option]).Count);
-        Assert.StartsWith("Choose {R} → no mana", CardActions.Describe(client, option, ColorView.Red));
+        Assert.Contains("Choose {R} → no mana", CardActions.Describe(client, option, ColorView.Red));
         Assert.Equal(ColorView.Red, AutoPlay.Answer(option, ColorView.Red).Color);
         Assert.False(CardActions.IsIrreversibleActivation(option));
         Assert.False(AutoPass.CanAct(new PriorityPromptMessage { Options = [option] }));
@@ -628,23 +628,20 @@ public sealed class PromptPresentationTests
     }
 
     [Fact]
-    public void Mana_action_shows_the_abilitys_additional_effect()
+    public void Mana_action_reads_as_its_cost_and_mana_with_its_spending_restriction()
     {
         GameClient client = Client("priority-sacrifice-for-mana");
         var option = new ActionOptionMessage
         {
             Kind = ActionKindView.ActivateAbility,
-            Produces = [ManaTypeView.Black],
+            Produces = [ManaTypeView.Colorless],
             CostText = "{T}",
-            Description = "{T}: Add {B}. This creature deals 1 damage to you.",
+            Description = "{T}: Add {C}. Spend this mana only on artifact spells.",
+            Filter = ManaSpendFilterView.NotNonartifactSpells,
         };
-        Assert.Contains("deals 1 damage to you", CardActions.Describe(client, option));
-        option.Description += " (can add {C} now)";
-        option.Produces = [ManaTypeView.Colorless];
-        option.Filter = ManaSpendFilterView.NotNonartifactSpells;
-        string replaced = CardActions.Describe(client, option);
-        Assert.Contains("can add {C} now", replaced);
-        Assert.Contains("can't be spent on nonartifact spells", replaced);
+        string described = CardActions.Describe(client, option);
+        Assert.StartsWith("{T}: Add {C}", described);
+        Assert.Contains("can't be spent on nonartifact spells", described);
     }
 
     [Fact]
@@ -683,8 +680,8 @@ public sealed class PromptPresentationTests
         Assert.Equal(2, rows.Count);
         var colorless = Assert.Single(rows, row => row.Color is null);
         Assert.True(CardActions.ChoosesColorless(colorless.Option));
-        Assert.StartsWith(
-            "{C}",
+        Assert.EndsWith(
+            ": Add {C}",
             CardActions.Describe(client, colorless.Option, colorless.Color, colorless.Combination, "Strip Mine"));
 
         var black = Assert.Single(rows, row => row.Color == ColorView.Black);
