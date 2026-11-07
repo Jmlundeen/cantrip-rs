@@ -1,0 +1,56 @@
+# Cubwarden mutates over Bio-Asset Allocator, on top (CR 702.140c): the merged creature is Cubwarden, a Cat and no
+# artifact, with all the abilities of both its cards (CR 702.140e), so Bio-Asset Allocator's grant still gives the
+# Ornithopter "Whenever this creature attacks, each opponent loses 1 life and you gain 1 life" (CR 604.1). Both attack
+# on turn 3: the Ornithopter drains 1, the merged Cubwarden - not an artifact creature - drains nothing, and its 3
+# lifelink damage makes Bot2 lose 3 more and Bot1 gain 3.
+
+[Bot1 Deck]
+Black Lotus
+Swamp
+Mox Jet
+Mox Pearl
+Bio-Asset Allocator
+Ornithopter
+Plains
+Cubwarden
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bio-Asset Allocator.Cast
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cubwarden.Cast(Bio-Asset Allocator; Ability: Mutate)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Modes(1)
+Bot1.Pass
+? Bot1.Battlefield.Cubwarden.Power = 3
+? Bot1.Battlefield.Cubwarden.Types = Creature
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Cubwarden > Bot2; Ornithopter > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Battlefield.Cubwarden.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
