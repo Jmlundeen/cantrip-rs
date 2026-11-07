@@ -139,6 +139,11 @@ fn the_reader_reads_the_printed_forms() {
         ("Whenever you cycle or discard another card, scry 1.", "Test", ON_THE_BATTLEFIELD),
         ("Offspring {2} (You may pay an additional {2} as you cast this spell.)", "Pawpatch Recruit", ON_THE_BATTLEFIELD),
         ("Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.", "Ugin, Eye of the Storms", ON_THE_BATTLEFIELD),
+        // Suspend's two triggered abilities function in exile by CR 702.62a, not by their words.
+        ("Suspend: at the beginning of your upkeep, if this card is suspended, remove a time counter from it.", "Lotus Bloom", ZoneKinds::of(&[ZoneKind::Exile])),
+        ("Suspend: when the last time counter is removed from this card, if it's exiled, you may cast it without paying its mana cost.", "Lotus Bloom", ZoneKinds::of(&[ZoneKind::Exile])),
+        // Without the keyword's name, the same words are read as any ability's: "if it's exiled" names no zone of its own.
+        ("When the last time counter is removed from this card, if it's exiled, you may cast it without paying its mana cost.", "Test", ON_THE_BATTLEFIELD),
         // The quoted ability is the exiled card's, not the trigger's: only it is at home in exile.
         ("When Q enters, shuffle your library, then exile cards from the top of your library until you exile a nonland card. That nonland card gains \"Exile a card from your hand: Create a copy of this card. You may cast the copy. Activate only during your turn and only if this card is exiled.\"", "Q, Stacking the Deck", ON_THE_BATTLEFIELD),
     ] {

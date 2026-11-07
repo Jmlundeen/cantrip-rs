@@ -759,7 +759,7 @@ end steps. A fix reads the pending additional steps and phases from the turn the
 | --- | --- | --- | --- |
 | Pri-2 | Open | engine types (`Keyword`, `Keywords::of`) | 2026-11-05, reviewing `Keyword::AssignsDamageByToughness` |
 
-**Notes.** `Keyword` uses 57 of the 64 bits of its set. `Keywords::of` fails at compile time only in a const context; at runtime
+**Notes.** `Keyword` uses 58 of the 64 bits of its set (the highest is 61, `Suspend`). `Keywords::of` fails at compile time only in a const context; at runtime
 `1u64 << k` panics with overflow checks on and, without them, aliases Flying. No game can reach it, since each keyword has its own
 bit: only a change adding a 65th keyword can. A compile-time assert, or a wider set, closes it before the bits run out.
 
