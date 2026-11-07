@@ -1,0 +1,6 @@
+{
+  "name": "Disallow",
+  "manaCost": "{1}{U}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target spell, activated ability, or triggered ability. (Mana abilities can't be targeted.)"
+}

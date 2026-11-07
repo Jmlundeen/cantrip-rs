@@ -1,0 +1,57 @@
+# Disallow covers a creature spell and a noncreature spell (CR 115.1, 701.6). On turn two Bot1 taps three Mox
+# Sapphires for {1}{U}{U} and counters Bot2's Llanowar Elves creature spell. On turn four Bot1 uses Black Lotus
+# to counter Bot2's Sol Ring artifact spell. A player and a permanent are refused as targets.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Disallow
+Disallow
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Sapphire
+Sol Ring
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+! Bot1.Hand.Disallow.Cast(Bot2)
+! Bot1.Hand.Disallow.Cast(Bot2.Battlefield.Forest)
+Bot1.Hand.Disallow.Cast(Stack.Llanowar Elves)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Llanowar Elves
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Disallow.Cast(Stack.Sol Ring)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Sol Ring; Llanowar Elves
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot2.Life = 20
+Bot2.Battlefield = Forest; Mox Sapphire
+Bot2.Graveyard.Count = 2
+Bot1.Graveyard.Count = 3
