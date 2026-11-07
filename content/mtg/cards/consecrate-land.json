@@ -1,0 +1,6 @@
+{
+  "name": "Consecrate Land",
+  "manaCost": "{W}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant land\nEnchanted land has indestructible and can't be enchanted by other Auras."
+}

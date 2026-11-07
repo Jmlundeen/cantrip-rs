@@ -1,0 +1,66 @@
+# Consecrate Land enchants a land (not a Mox) and gives it indestructible: Bot2's Stone Rain on it resolves and leaves the
+# Plains (CR 702.12b, ruling 2005-04-01). When Bot2 then destroys the Aura with Disenchant, the grant ends with it (CR 611.3a)
+# and a second Stone Rain destroys the Plains. Bot2's five Moxen pay for Disenchant {1}{W} and Stone Rain {2}{R} in one turn.
+
+[Bot1 Deck]
+Plains
+Consecrate Land
+Mox Pearl
+Plains x25
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Stone Rain
+Stone Rain
+Disenchant
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+! Bot1.Hand.Consecrate Land.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Hand.Consecrate Land.Cast(Bot1.Battlefield.Plains)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Plains.Keywords = Indestructible
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Stone Rain.Cast(Bot1.Battlefield.Plains)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Plains.Keywords = Indestructible
+? Bot1.Graveyard.Count = 0
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Consecrate Land)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Plains.Keywords = (absent)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Stone Rain.Cast(Bot1.Battlefield.Plains)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Plains = (absent)
+Bot1.Battlefield = Mox Pearl
+Bot1.Graveyard = Plains; Consecrate Land

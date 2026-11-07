@@ -1,0 +1,49 @@
+# Consecrate Land's "can't be enchanted by other Auras" is a rule of the Aura, so it ends when the Aura leaves (CR 303.4,
+# 611.3a): Bot2 destroys it with Disenchant, then Utopia Sprawl (Bot2's) enchants Bot1's Forest and stays attached. The Sprawl
+# that is cast, resolves and goes to the graveyard instead of entering (CR 303.4i) in the scenarios beside this one is the
+# control.
+
+[Bot1 Deck]
+Forest
+Consecrate Land
+Mox Pearl
+Plains x25
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Disenchant
+Utopia Sprawl
+Island x25
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Consecrate Land.Cast(Forest)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Consecrate Land)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Utopia Sprawl.Cast(Bot1.Battlefield.Forest)
+Bot2.Pass
+Bot1.Pass
+Bot2.Colors(Red)
+
+[Expect]
+Bot1.Graveyard = Consecrate Land
+Bot2.Battlefield.Utopia Sprawl.AttachedTo = Forest
+Bot2.Graveyard = Disenchant

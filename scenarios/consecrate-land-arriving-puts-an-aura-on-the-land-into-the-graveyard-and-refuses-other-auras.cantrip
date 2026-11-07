@@ -1,0 +1,63 @@
+# Utopia Sprawl is on Bot1's Forest when Consecrate Land arrives on it: the Sprawl is put into its owner's graveyard (the
+# 2006 ruling; CR 303.4, 704.5m) and the Consecrate Land stays. Bot2 can still cast its own Utopia Sprawl targeting the Forest
+# (CR 303.4a: only its enchant ability defines its targets) - it is on the stack, then goes to Bot2's graveyard instead of
+# entering (CR 303.4i). Bot1's second Consecrate Land is "another Aura": it too is cast targeting the Forest, resolves and
+# goes to the graveyard instead of entering, and the first stays. Only the enchanted land is indestructible: Bot1's Plains
+# is not.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Utopia Sprawl
+Consecrate Land
+Consecrate Land
+Plains
+Plains
+Plains x25
+
+[Bot2 Deck]
+Mox Emerald
+Utopia Sprawl
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Utopia Sprawl.Cast(Forest)
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+? Bot1.Battlefield.Utopia Sprawl.AttachedTo = Forest
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Consecrate Land.Cast(Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Utopia Sprawl
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Utopia Sprawl.Cast(Bot1.Battlefield.Forest)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Utopia Sprawl
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Consecrate Land.Cast(Forest)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Consecrate Land; Utopia Sprawl
+Bot1.Battlefield.Consecrate Land.AttachedTo = Forest
+Bot1.Battlefield.Forest.Keywords = Indestructible
+Bot1.Battlefield.Plains.Keywords = (absent)
+Bot2.Graveyard = Utopia Sprawl
+Bot2.Battlefield = Mox Emerald

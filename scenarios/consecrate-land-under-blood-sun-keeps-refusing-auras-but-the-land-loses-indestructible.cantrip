@@ -1,0 +1,60 @@
+# Blood Sun (all lands lose all abilities except mana abilities, layer 6) arrives after Consecrate Land, so the Plains loses
+# the indestructible the Aura granted (CR 613.1f, 613.7). The Aura's refusal of other Auras is a rule of the Aura's, not an
+# ability of the land (CR 303.4, 113.1a), so it holds: Bot2's Blight resolves into its owner's graveyard (CR 303.4i). Then
+# Stone Rain destroys the Plains.
+
+[Bot1 Deck]
+Plains
+Consecrate Land
+Plains x25
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Swamp
+Blood Sun
+Blight
+Mountain
+Stone Rain
+Island x25
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Consecrate Land.Cast(Plains)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Plains.Keywords = Indestructible
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Blood Sun.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Plains.Keywords = (absent)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Blight.Cast(Bot1.Battlefield.Plains)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Blight
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Stone Rain.Cast(Bot1.Battlefield.Plains)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Plains = (absent)
+Bot1.Graveyard = Consecrate Land; Plains
