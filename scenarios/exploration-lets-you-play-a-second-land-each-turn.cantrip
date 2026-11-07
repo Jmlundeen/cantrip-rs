@@ -1,0 +1,39 @@
+# Exploration: "You may play an additional land on each of your turns." (CR 305.2). Cast on turn 1, Bot1 plays
+# two lands and a third is refused; on its next turn it again plays two, so the extra land is on each of its
+# turns. Nothing forces the second land: one is always enough.
+
+[Bot1 Deck]
+Exploration
+Mox Emerald
+Forest
+Forest
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Exploration.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Plains.Play
+? Bot1.LandsPlayed = 2
+! Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Plains.Play
+? Bot1.LandsPlayed = 2
+! Bot1.Hand.Plains.Play
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.LandsPlayed = 2

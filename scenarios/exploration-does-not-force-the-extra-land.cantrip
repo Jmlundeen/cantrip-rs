@@ -1,0 +1,33 @@
+# Exploration: "You may play an additional land on each of your turns."
+# (CR 305.2). The extra land is optional: Bot1 plays exactly one land on each
+# of two consecutive turns and passes, and nothing forces a second land. The
+# two-land scenario shows the other answer.
+
+[Bot1 Deck]
+Exploration
+Mox Emerald
+Forest x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Exploration.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+? Bot1.LandsPlayed = 1
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.LandsPlayed = 1
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.LandsPlayed = 1
+Bot1.Battlefield.Count = 4
