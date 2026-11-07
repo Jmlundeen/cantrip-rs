@@ -1,0 +1,5 @@
+{
+  "name": "Desolate Lighthouse",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{1}{U}{R}, {T}: Draw a card, then discard a card."
+}

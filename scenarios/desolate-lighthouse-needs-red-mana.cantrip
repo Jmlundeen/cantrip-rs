@@ -1,0 +1,46 @@
+# Desolate Lighthouse's "{1}{U}{R}, {T}: Draw a card, then discard a card." needs red (CR 608.2c). Bot1 has
+# Mox Sapphire, Mox Jet and Mox Emerald - {U}{B}{G}, three mana but no red - while Mox Ruby is still in hand.
+# The activation is refused as short. Casting the Ruby adds its red, and the same activation then draws and
+# discards the top Island. Three non-red mana is enough to show the red symbol is required, not merely a third
+# mana.
+
+[Bot1 Deck]
+Desolate Lighthouse
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Ornithopter
+Ornithopter
+Mox Ruby
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Desolate Lighthouse.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Hand = Mox Ruby
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Desolate Lighthouse.Activate(Ability: Draw a card; Mana: short)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Desolate Lighthouse.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+? Bot1.Hand.Count = 0
+? Bot1.Graveyard = Island
+
+[Expect]
+Turn = 1
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Island
+Bot1.Library.Count = 12
+Bot1.Battlefield.Desolate Lighthouse.Tapped = true

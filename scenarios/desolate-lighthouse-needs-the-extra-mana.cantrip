@@ -1,0 +1,45 @@
+# Desolate Lighthouse prints "{1}{U}{R}, {T}: Draw a card, then discard a card." (CR 608.2c). With only Mox
+# Ruby and Mox Sapphire - {R}{U}, two mana - and Mox Jet still in hand, the activation is refused as short.
+# Casting and activating the Jet supplies the missing third mana, and the activation draws and discards the top
+# Island. A cost of {U}{R} would have been payable with the first two, so the refusal pins the {1}.
+
+[Bot1 Deck]
+Desolate Lighthouse
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+Mox Jet
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Desolate Lighthouse.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Hand = Mox Jet
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Desolate Lighthouse.Activate(Ability: Draw a card; Mana: short)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Desolate Lighthouse.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+? Bot1.Mana =
+? Bot1.Hand.Count = 0
+? Bot1.Graveyard = Island
+
+[Expect]
+Turn = 1
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Island
+Bot1.Library.Count = 12
+Bot1.Battlefield.Desolate Lighthouse.Tapped = true
