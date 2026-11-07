@@ -1,0 +1,66 @@
+# "The value of X is determined as Chain Reaction resolves" (CR 608.2): three creatures are on the battlefield when it is
+# cast - the Hill Giant, Bot1's Ornithopter and Bot2's Ornithopter - and Bot2 answers with Shatter on its own Ornithopter,
+# leaving two. X is therefore 2, not 3: the 3/3 Hill Giant takes 2 and survives, while its Ornithopter dies. Had the count
+# been fixed at casting, the Giant would take 3 and die (and the Ornithopter's own 2 would not be dealt at all).
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Hill Giant
+Chain Reaction
+Ornithopter
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Ornithopter
+Shatter
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chain Reaction.Cast
+? Bot1.Mana =
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Shatter.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Hill Giant.Damage = 2
+Bot1.Battlefield.Hill Giant.Power = 3
+Bot1.Battlefield.Ornithopter = (absent)
+Bot2.Battlefield.Count = 4
+Bot2.Graveyard = Shatter; Ornithopter

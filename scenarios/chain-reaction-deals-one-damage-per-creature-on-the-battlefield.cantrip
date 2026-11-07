@@ -1,0 +1,59 @@
+# Chain Reaction: "deals X damage to each creature, where X is the number of creatures on the battlefield" (CR 608.2,
+# 120.3). Cast on turn 3 with a Hill Giant and Bot2's Grizzly Bears out - two creatures, both players' - so X is 2: the
+# 3/3 Giant takes exactly 2 and lives, the 2/2 Bears take 2 and die. Counting only Bot1's creatures would make X 1 and
+# leave the Bears alive; counting the spell too would make X 3 and kill the Giant.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Hill Giant
+Chain Reaction
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Forest x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chain Reaction.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Hill Giant.Damage = 2
+Bot1.Battlefield.Hill Giant.Power = 3
+Bot1.Battlefield.Hill Giant.Toughness = 3
+Bot2.Battlefield.Grizzly Bears = (absent)
+Bot2.Graveyard = Grizzly Bears
+Bot1.Graveyard = Chain Reaction
