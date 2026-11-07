@@ -1379,7 +1379,7 @@ fn an_inflight_morph_replays_when_its_sampled_cards_way_has_a_different_index() 
             let saved = world.at;
             let request = world.pending().cloned().unwrap();
             let RequestKind::PayCosts { options, .. } = &request.kind else { unreachable!() };
-            let close = options.iter().find(|option| option.kind == ActionKind::ConfirmCasting).expect("the mana window can close");
+            let close = options.iter().find(|option| matches!(option.kind, ActionKind::ConfirmCasting | ActionKind::CancelCasting)).expect("the mana window can be answered");
             world.answer(request.id, request.player, Answer::Act(Action::of(close))).unwrap();
             world.rollback(saved);
             let saved_index = world.state.agenda.iter().flat_map(|f| &f.answers).find_map(|(_, answer)| match answer {

@@ -13557,7 +13557,11 @@ fn mana_activation_window(cx: &mut Cx, player: PlayerId, source: ObjectId, total
         if !helpers.no_mana && remaining.is_zero() { return Ok(()); }
         let mut options = mana_options_while_paying(cx, player, source, helpers.purpose);
         if options.is_empty() { return Ok(()); }
-        options.push(ActionOption::simple(ActionKind::ConfirmCasting));
+        // Closing the window with mana still owed is for paying the rest some other way (convoke, delve, improvise,
+        // waterbend: CR 601.2h); with none, there is nothing to close it for.
+        if helpers.any() {
+            options.push(ActionOption::simple(ActionKind::ConfirmCasting));
+        }
         options.push(ActionOption::simple(ActionKind::CancelCasting));
         let ask = RequestKind::PayCosts { source, total, remaining, options, mana_abilities: true, announcing: false, x: 0, most: 0, least: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life + u32::from(life), governs: "", assist: helpers.assist, x_cost: None };
         let answer = cx.ask_core(player, ask, true)?;

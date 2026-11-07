@@ -170,7 +170,9 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             Answer::Act(Action::of(options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).expect("confirm")))
         }
         RequestKind::PayCosts { remaining, options, mana_abilities: true, .. } => {
-            let done = || Answer::Act(Action::of(options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).expect("close mana window")));
+            // Closed where some other way may pay the rest; otherwise given up (CR 733.1).
+            let done = || Answer::Act(Action::of(options.iter().find(|o| o.kind == ActionKind::ConfirmCasting)
+                .or_else(|| options.iter().find(|o| o.kind == ActionKind::CancelCasting)).expect("close mana window")));
             if remaining.is_zero() { done() } else {
                 match pay(game, random, remaining, options) {
                     Answer::Act(action) if action.kind == ActionKind::ActivateAbility => Answer::Act(action),

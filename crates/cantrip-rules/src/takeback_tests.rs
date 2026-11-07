@@ -292,8 +292,13 @@ fn tap(g: &mut Game, source: ObjectId) {
     }
 }
 
+/// Closes the mana ability window where it can be closed with mana still owed (some other way to pay the rest); without
+/// one, it stays open until the mana covers the cost or the cast is taken back.
 fn close_mana_window(g: &mut Game) {
-    choose(g, |o| o.kind == ActionKind::ConfirmCasting, "closing the mana ability window");
+    let r = next(g);
+    if options(&r).iter().any(|o| o.kind == ActionKind::ConfirmCasting) {
+        choose(g, |o| o.kind == ActionKind::ConfirmCasting, "closing the mana ability window");
+    }
 }
 
 fn cancel(g: &mut Game) {
