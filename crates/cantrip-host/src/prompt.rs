@@ -163,9 +163,10 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     m.targets_optional = o.targets_optional;
     m.color_choices = colors_view(o.color_choices);
     m.description = describe(game.cards, &game.state, &game.log, o).to_string();
-    // Mana from a snow source spent on a {S} symbol (CR 107.4h) says so; any other pool mana keeps its own description.
-    if o.kind == ActionKind::AssignMana && o.pay_snow && let Some(mana) = o.mana {
-        m.description = format!("Pay {{S}} with snow {{{}}}", mana.symbol());
+    // Mana from a snow source says whether it pays a {S} symbol (CR 107.4h) or an ordinary one; any other pool mana keeps
+    // its own description.
+    if o.kind == ActionKind::AssignMana && (o.snow || o.pay_snow) && let Some(mana) = o.mana {
+        m.description = format!("Pay {} with snow {{{}}}", if o.pay_snow { "{S}" } else { "an ordinary symbol" }, mana.symbol());
     }
     if m.kind == ActionKindView::UnlockDoor {
         m.description = format!("Unlock {} {}", m.spell_name, m.cost_text);

@@ -25,11 +25,10 @@ fn position(pool: bool) -> Game {
     let RequestKind::Priority { options } = &r.kind else { panic!("priority") };
     let a = Action::of(options.iter().find(|o| o.kind == ActionKind::CastSpell).unwrap());
     g.answer(r.id, YOU, Answer::Act(a)).unwrap(); g.run();
-    if pool {
-        let window = g.pending().unwrap().clone();
-        let RequestKind::PayCosts { options, mana_abilities: true, .. } = &window.kind else {
-            panic!("the casting mana-ability window: {:?}", window.kind)
-        };
+    // The mana-ability window closes by itself where the pool covers the cost; one still open is closed.
+    if pool && let Some(window) = g.pending().cloned()
+        && let RequestKind::PayCosts { options, mana_abilities: true, .. } = &window.kind
+    {
         let close = Action::of(options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap());
         g.answer(window.id, YOU, Answer::Act(close)).unwrap();
         g.run();

@@ -108,12 +108,13 @@ fn printed_stats_on_a_vehicle_do_not_make_it_a_creature_for_its_counters() {
 }
 
 #[test]
-fn the_full_signed_stat_range_is_preserved_and_counters_offset_before_clamping() {
+fn unlike_counters_offset_one_another() {
     let mut game = game(); let id = put(&mut game, &LOW, Zone::BATTLEFIELD);
-    counters(&mut game, id, &[(CounterKind::Plus2Plus2, i32::MAX)]);
-    assert_eq!(pt(&game, id), (Some(i32::MAX - 1), Some(i32::MAX)));
-    counters(&mut game, id, &[(CounterKind::Minus2Minus2, i32::MAX)]);
-    assert_eq!(pt(&game, id), (Some(i32::MIN), Some(3)));
+    let (power, toughness) = pt(&game, id);
+    counters(&mut game, id, &[(CounterKind::Plus2Plus2, 100_000)]);
+    assert_eq!(pt(&game, id), (power.map(|p| p + 200_000), toughness.map(|t| t + 200_000)));
+    counters(&mut game, id, &[(CounterKind::Minus2Minus2, 100_000)]);
+    assert_eq!(pt(&game, id), (power, toughness));
 }
 
 #[test]

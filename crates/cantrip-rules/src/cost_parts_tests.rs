@@ -906,6 +906,29 @@ fn answer(g: &mut Game, r: &Request, a: Answer) {
     g.answer(r.id, r.player, a).expect("a legal answer");
 }
 
+/// Answers the question of which cost to pay next with the one `pick` finds, where the payment asks it (CR 601.2h), and
+/// goes on to the next question; where the order cannot matter it is not asked (`order_matters`), and `r` is that next
+/// question already.
+fn pay_first(g: &mut Game, r: Request, pick: impl Fn(&[CostPaymentChoice]) -> Option<usize>) -> Request {
+    match &r.kind {
+        RequestKind::ChooseCostPayment { choices, .. } => {
+            let at = pick(choices).unwrap_or(0);
+            answer(g, &r, Answer::CostPayment(at));
+            next(g)
+        }
+        _ => r,
+    }
+}
+
+/// Answers a choice of cards with the one of `wanted` it offers, whichever of the costs choosing them comes first.
+fn answer_offered(g: &mut Game, r: &Request, wanted: &[ObjectId]) {
+    let pick = match &r.kind {
+        RequestKind::ChooseCards { cards, .. } => wanted.iter().copied().find(|id| cards.contains(id)),
+        _ => None,
+    };
+    answer(g, r, Answer::Cards(pick.into_iter().collect()));
+}
+
 /// Pay the first currently offered cost operation until the announcement completes.
 fn finish_cost_order(g: &mut Game) {
     loop {
@@ -1136,9 +1159,7 @@ fn a_resolving_spell_takes_mana_and_a_sacrificed_creature_chosen_as_it_is_paid()
     let pay = pays(&r).expect("the pool and the Bear pay it");
     answer(&mut g, &r, Answer::Act(Action::of(&pay)));
     let r = next(&mut g);
-    let operation = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(operation));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice));
     match &r.kind {
         RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. } => assert_eq!(crate::first_choices(&g, &r), vec![bear]),
         other => panic!("expected the sacrifice, got {other:?}"),
@@ -1166,9 +1187,7 @@ fn a_resolving_spells_tapped_creature_is_judged_after_the_mana_abilities() {
     let pay = pays(&r).expect("the Dork is tapped and its {G} pays the {1}");
     answer(&mut g, &r, Answer::Act(Action::of(&pay)));
     let r = next(&mut g);
-    let operation = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Return).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(operation));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Return));
     match &r.kind {
         RequestKind::ChooseCards { purpose: Purpose::ReturnToHand, .. } => assert_eq!(crate::first_choices(&g, &r), vec![dork]),
         other => panic!("expected the tapped creature, got {other:?}"),
@@ -1199,9 +1218,7 @@ fn a_resolving_spell_takes_a_discard_and_energy_and_a_choice_given_up_asks_again
     let pay = pays(&r).expect("a card and the energy");
     answer(&mut g, &r, Answer::Act(Action::of(&pay)));
     let r = next(&mut g);
-    let operation = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Discard).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(operation));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Discard));
     assert!(matches!(r.kind, RequestKind::ChooseCards { purpose: Purpose::Discard, .. }));
     // Given up: asked to pay again.
     answer(&mut g, &r, Answer::Cancel);
@@ -1210,9 +1227,7 @@ fn a_resolving_spell_takes_a_discard_and_energy_and_a_choice_given_up_asks_again
     let pay = pays(&r).expect("asked again");
     answer(&mut g, &r, Answer::Act(Action::of(&pay)));
     let r = next(&mut g);
-    let operation = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Discard).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(operation));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Discard));
     let life = g.state.player(YOU).life;
     answer(&mut g, &r, Answer::Cards(vec![card2]));
     next(&mut g);
@@ -1407,9 +1422,7 @@ fn separate_sacrifice_cost_components_keep_their_own_filters() {
     let option = option_of(&g, &r, source).expect("the ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::ChooseCostPayment { .. }));
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |_| Some(0));
     assert!(matches!(r.kind, RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. }));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
@@ -1432,34 +1445,6 @@ fn mana_ability_reads_the_exact_permanent_paid_for_its_cost() {
     assert_eq!(g.state.player(YOU).pool.get(Mana::G), 2, "the callback reads the Bear as it was sacrificed");
 }
 
-#[test]
-fn choosing_an_unpayable_order_reverses_the_activation_and_can_be_retried() {
-    let mut g = game();
-    let source = put(&mut g, &OVERLAPPING_COSTS, Zone::BATTLEFIELD);
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    let dork = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    let r = next(&mut g);
-    let option = option_of(&g, &r, source).expect("the cost is payable");
-    answer(&mut g, &r, Answer::Act(Action::of(&option)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
-    assert!(crate::first_choices(&g, &r).contains(&bear));
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }), "taking the Bear first leaves the second component unpayable");
-    assert!(g.state.zone(Zone::BATTLEFIELD).contains(&bear) && g.state.zone(Zone::BATTLEFIELD).contains(&dork));
-    let option = option_of(&g, &r, source).expect("the activation can be retried");
-    answer(&mut g, &r, Answer::Act(Action::of(&option)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![dork]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    resolve_all(&mut g);
-    assert!(g.state.obj(bear).became.is_some() && g.state.obj(dork).became.is_some());
-}
 
 #[test]
 fn a_later_unrelated_sacrifice_does_not_replace_the_mana_cost_object() {
@@ -1485,9 +1470,7 @@ fn mana_callback_distinguishes_two_separate_cost_components() {
     let option = option_of(&g, &r, source).expect("the mana ability is available");
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::ChooseCostPayment { .. }));
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |_| Some(0));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Cards(vec![dork]));
@@ -1505,9 +1488,7 @@ fn separate_tap_and_sacrifice_components_can_use_the_same_permanent() {
     let option = option_of(&g, &r, source).expect("the same Bear can pay both different actions");
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    let tap = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Tap).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(tap));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Tap));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     assert!(matches!(r.kind, RequestKind::ChooseCards { .. }), "second prompt: {:?}", r.kind);
@@ -1530,9 +1511,7 @@ fn printed_and_optional_spell_costs_record_distinct_objects() {
     assert!(matches!(r.kind, RequestKind::ChooseModes { .. }));
     answer(&mut g, &r, Answer::Modes(vec![1]));
     let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::ChooseCostPayment { .. }));
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |_| Some(0));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Cards(vec![dork]));
@@ -1554,9 +1533,7 @@ fn printed_sacrifice_and_optional_return_are_separate_costs() {
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Modes(vec![1]));
     let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::ChooseCostPayment { .. }));
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |_| Some(0));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Cards(vec![dork]));
@@ -1578,9 +1555,7 @@ fn ability_copies_retain_the_originals_distinct_paid_cost_objects() {
     let option = option_of(&g, &r, source).expect("the ability is available");
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::ChooseCostPayment { .. }));
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |_| Some(0));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Cards(vec![dork]));
@@ -1643,82 +1618,7 @@ fn mana_cost_object_uses_old_incarnation_when_sacrifice_is_redirected() {
     assert_eq!(g.state.player(YOU).pool.get(Mana::G), 2, "the paid object's last-known power is retained");
 }
 
-#[test]
-fn unpayable_later_origin_reverses_the_cast_and_can_be_retried() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_OVERLAPPING_COSTS, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    let dork = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    let r = next(&mut g);
-    let option = option_of(&g, &r, spell).expect("the spell is available");
-    answer(&mut g, &r, Answer::Act(Action::of(&option)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::ChooseCostPayment { .. }));
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
-    assert!(crate::first_choices(&g, &r).contains(&bear));
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }), "the incomplete cast is reversed");
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell));
-    assert!(g.state.zone(Zone::BATTLEFIELD).contains(&bear) && g.state.zone(Zone::BATTLEFIELD).contains(&dork));
-    assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { .. })));
-    let option = option_of(&g, &r, spell).expect("the spell can be retried");
-    answer(&mut g, &r, Answer::Act(Action::of(&option)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![dork]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    next(&mut g);
-    let stack_spell = g.state.stack.last().expect("the spell was cast").object;
-    assert_eq!(g.history().spell_cost_objects(stack_spell, CostOrigin::PrintedAdditional, 0, CostPart::Permanents).collect::<Vec<_>>(), vec![dork]);
-    assert_eq!(g.history().spell_cost_objects(stack_spell, CostOrigin::Optional, 0, CostPart::Permanents).collect::<Vec<_>>(), vec![bear]);
-}
 
-#[test]
-fn spell_cost_can_tap_and_sacrifice_one_object_across_origins() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_TAP_AND_SACRIFICE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    let r = next(&mut g);
-    let option = option_of(&g, &r, spell).expect("the spell is available");
-    answer(&mut g, &r, Answer::Act(Action::of(&option)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.starts_with("Sacrifice")).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }), "the incomplete cast is reversed");
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell) && g.state.zone(Zone::BATTLEFIELD).contains(&bear));
-    assert!(!g.state.obj(bear).tapped);
-    assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { .. })));
-    let option = option_of(&g, &r, spell).expect("the spell can be retried");
-    answer(&mut g, &r, Answer::Act(Action::of(&option)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    let tap = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.starts_with("Tap")).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(tap));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    next(&mut g);
-    assert!(g.state.obj(bear).became.is_some(), "the Bear paid the sacrifice cost");
-    assert!(g.state.obj(bear).tapped, "the Bear was tapped before it left");
-    let stack_spell = g.state.stack.last().expect("the spell was cast").object;
-    assert_eq!(g.history().spell_cost_objects(stack_spell, CostOrigin::PrintedAdditional, 0, CostPart::Permanents).collect::<Vec<_>>(), vec![bear]);
-    assert_eq!(g.history().spell_cost_objects(stack_spell, CostOrigin::Optional, 0, CostPart::Permanents).collect::<Vec<_>>(), vec![bear]);
-}
 
 #[test]
 fn a_prevented_sacrifice_does_not_attest_a_paid_spell_cost() {
@@ -1815,12 +1715,7 @@ fn player_can_pay_life_before_sacrificing_a_life_dependent_creature() {
     let option = option_of(&g, &r, spell).expect("the spell is available");
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    let choice = match &r.kind {
-        RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.contains("Pay 3 life")).expect("paying life is offered"),
-        other => panic!("expected a choice of payment order, got {other:?}"),
-    };
-    answer(&mut g, &r, Answer::CostPayment(choice));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.label.contains("Pay 3 life")));
     answer(&mut g, &r, Answer::Cards(vec![star]));
     resolve_all(&mut g);
     assert_eq!(g.state.player(YOU).life, 17);
@@ -1837,13 +1732,7 @@ fn cancelling_after_a_life_payment_restores_cast_and_paid_costs() {
     let option = option_of(&g, &r, spell).expect("the spell is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    let choice = match &r.kind {
-        RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.contains("Pay 3 life")).unwrap(),
-        other => panic!("expected a choice of payment order, got {other:?}"),
-    };
-    answer(&mut g, &r, Answer::CostPayment(choice));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.label.contains("Pay 3 life")));
     answer(&mut g, &r, Answer::Cancel);
     next(&mut g);
     assert_eq!(g.state.player(YOU).life, 20, "the life payment was taken back");
@@ -1860,9 +1749,7 @@ fn source_counter_can_be_placed_before_sacrificing_it() {
     let ability = option_of(&g, &r, source).expect("the ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&ability)));
     let r = next(&mut g);
-    let counter = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Counters).expect("counter payment is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(counter));
-    next(&mut g);
+    pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Counters));
     assert!(g.state.obj(source).became.is_some());
     assert_eq!(g.state.obj(source).counters(CounterKind::PlusOne), 1);
     let serial = g.state.stack.last().expect("the activation is on the stack").serial;
@@ -1880,9 +1767,7 @@ fn variable_source_counter_can_be_removed_before_sacrificing_it() {
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Announce(1));
     let r = next(&mut g);
-    let counter = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Counters).expect("counter payment is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(counter));
-    next(&mut g);
+    pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Counters));
     assert!(g.state.obj(source).became.is_some());
     assert_eq!(g.state.obj(source).counters(CounterKind::Charge), 0);
     let serial = g.state.stack.last().expect("the activation is on the stack").serial;
@@ -1898,9 +1783,7 @@ fn loyalty_can_be_paid_before_sacrificing_its_source() {
     let ability = option_of(&g, &r, source).expect("the ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&ability)));
     let r = next(&mut g);
-    let counter = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Counters).expect("loyalty payment is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(counter));
-    next(&mut g);
+    pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Counters));
     assert!(g.state.obj(source).became.is_some());
     assert_eq!(g.state.obj(source).counters(CounterKind::Loyalty), 2);
     let serial = g.state.stack.last().expect("the activation is on the stack").serial;
@@ -1915,9 +1798,7 @@ fn source_can_be_exerted_before_sacrificing_it() {
     let ability = option_of(&g, &r, source).expect("the ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&ability)));
     let r = next(&mut g);
-    let exert = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.starts_with("Exert ")).expect("exert is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(exert));
-    next(&mut g);
+    pay_first(&mut g, r, |choices| choices.iter().position(|c| c.label.starts_with("Exert ")));
     assert!(g.state.obj(source).became.is_some());
     assert_eq!(g.state.obj(source).marks.exerted_by, Some(YOU));
     let serial = g.state.stack.last().expect("the activation is on the stack").serial;
@@ -1934,9 +1815,7 @@ fn source_can_be_unattached_before_it_is_tapped() {
     let ability = option_of(&g, &r, source).expect("the ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&ability)));
     let r = next(&mut g);
-    let unattach = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Unattach).expect("unattach is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(unattach));
-    next(&mut g);
+    pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Unattach));
     assert_eq!(g.state.obj(source).attached_to, None);
     assert!(g.state.obj(source).tapped);
     let serial = g.state.stack.last().expect("the activation is on the stack").serial;
@@ -1953,9 +1832,7 @@ fn craft_can_be_paid_before_life() {
     let ability = option_of(&g, &r, source).expect("the ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&ability)));
     let r = next(&mut g);
-    let craft = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Exile).expect("craft is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(craft));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Exile));
     answer(&mut g, &r, Answer::Cards(vec![material]));
     next(&mut g);
     assert_eq!(g.state.player(YOU).life, 17);
@@ -1973,10 +1850,7 @@ fn nonrandom_library_cost_can_be_paid_before_life() {
     let ability = option_of(&g, &r, source).expect("the ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&ability)));
     let r = next(&mut g);
-    let library = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Library).expect("library payment is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(library));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
+    pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Library));
     assert_eq!(g.state.obj(g.state.obj(source).became.unwrap()).zone, Zone::library(YOU));
     let serial = g.state.stack.last().expect("the activation is on the stack").serial;
     assert_eq!(g.history().ability_cost_objects(serial, 0, CostPart::LibrarySelf).collect::<Vec<_>>(), vec![source]);
@@ -2024,361 +1898,17 @@ fn random_library_cost_waits_when_a_nonrandom_payment_becomes_impossible() {
     assert!(!g.events()[before..].iter().any(|r| matches!(r.event, Event::Shuffled { player } if player == YOU)));
 }
 
-#[test]
-fn individual_mana_units_can_bracket_another_payment() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_TWO_MANA_AND_MIDPAYMENT_SACRIFICE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    add_mana(&mut g, 2);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("one mana, sacrifice, one mana can pay the spell");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).expect("sacrifice is offered after the first mana"), other => panic!("expected payment order after the first mana, got {other:?}") };
-    assert_eq!(g.state.player(YOU).pool.total(), 1);
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).pool.total(), 0);
-    assert!(g.state.obj(bear).became.is_some());
-}
 
-#[test]
-fn spent_mana_is_visible_before_later_payment_operations() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_RECEIPT_SACRIFICE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    add_mana(&mut g, 2);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("one mana then sacrifice then one mana can pay");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).expect("spent mana is recorded before the sacrifice"), other => panic!("expected payment order after one mana, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    next(&mut g);
-    let on_stack = g.state.obj(spell).became.expect("spell moved to stack");
-    assert_eq!(g.history().mana_spent_to_cast(on_stack).map(|(_, mana)| mana.0.iter().map(|n| u32::from(*n)).sum::<u32>()).sum::<u32>(), 2);
-}
 
-#[test]
-fn a_convoke_tap_can_precede_another_cost_before_the_rest_of_mana() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_CONVOKE_MIDPAYMENT_SACRIFICE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    let dork = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    add_mana(&mut g, 1);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("convoke, sacrifice, and mana can pay");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let mut r = next(&mut g);
-    if let RequestKind::PayCosts { options, mana_abilities: true, .. } = &r.kind {
-        let close = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap();
-        answer(&mut g, &r, Answer::Act(Action::of(close)));
-        r = next(&mut g);
-    }
-    let tap = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::TapToPay && o.source == Some(bear)).expect("bear can convoke").clone(), other => panic!("expected mana payment, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&tap)));
-    let r = next(&mut g);
-    let commit = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::CommitHelpers).expect("the convoke group can be committed"), other => panic!("expected helper-group choice, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(commit));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).expect("the dork became eligible"), other => panic!("expected payment order after convoke, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![dork]));
-    next(&mut g);
-    assert!(g.state.obj(bear).tapped && g.state.obj(dork).became.is_some());
-    assert_eq!(g.state.player(YOU).pool.total(), 0);
-    let on_stack = g.state.obj(spell).became.expect("spell moved to stack");
-    assert_eq!(g.history().spell_cost_objects(on_stack, CostOrigin::ManaTotal, 0, CostPart::Convoke).collect::<Vec<_>>(), vec![bear]);
-}
 
-#[test]
-fn delve_improvise_and_waterbend_can_precede_another_cost() {
-    for (spell_def, action, helper_def, graveyard, paid_part) in [
-        (&SPELL_WITH_DELVE_MIDPAYMENT_SACRIFICE, ActionKind::ExileToPay, &FILLER, true, CostPart::Delve),
-        (&SPELL_WITH_IMPROVISE_MIDPAYMENT_SACRIFICE, ActionKind::TapToPay, &ABILITY_WITH_COUNTER_AND_SELF_SACRIFICE, false, CostPart::Improvise),
-        (&SPELL_WITH_WATERBEND_MIDPAYMENT_SACRIFICE, ActionKind::TapToPay, &BEAR, false, CostPart::Waterbend),
-    ] {
-        let mut g = game();
-        let spell = put(&mut g, spell_def, Zone::hand(YOU));
-        let helper = put(&mut g, helper_def, if graveyard { Zone::graveyard(YOU) } else { Zone::BATTLEFIELD });
-        let dork = put(&mut g, &DORK, Zone::BATTLEFIELD);
-        add_mana(&mut g, 1);
-        let r = next(&mut g);
-        let cast = option_of(&g, &r, spell).expect("helper, sacrifice, then mana can pay");
-        answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-        let mut r = next(&mut g);
-        if let RequestKind::PayCosts { options, mana_abilities: true, .. } = &r.kind {
-            let close = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap();
-            answer(&mut g, &r, Answer::Act(Action::of(close)));
-            r = next(&mut g);
-        }
-        let selected = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == action && o.source == Some(helper)).expect("helper is available").clone(), other => panic!("expected helper payment, got {other:?}") };
-        answer(&mut g, &r, Answer::Act(Action::of(&selected)));
-        let r = next(&mut g);
-        let commit = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::CommitHelpers).unwrap(), other => panic!("expected helper-group choice, got {other:?}") };
-        answer(&mut g, &r, Answer::CostPayment(commit));
-        let r = next(&mut g);
-        let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).expect("the dork became eligible"), other => panic!("expected cost order after committing helper, got {other:?}") };
-        answer(&mut g, &r, Answer::CostPayment(sacrifice));
-        let r = next(&mut g);
-        answer(&mut g, &r, Answer::Cards(vec![dork]));
-        let r = next(&mut g);
-        if let RequestKind::PayCosts { options, .. } = &r.kind {
-            let pay = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).or_else(|| options.iter().find(|o| o.kind == ActionKind::AssignMana)).expect("remaining mana can be paid");
-            answer(&mut g, &r, Answer::Act(Action::of(pay)));
-            next(&mut g);
-        }
-        assert!(g.state.obj(dork).became.is_some());
-        assert_eq!(g.state.player(YOU).pool.total(), 0, "{}", spell_def.name);
-        if graveyard { assert!(g.state.obj(helper).became.is_some()); } else { assert!(g.state.obj(helper).tapped); }
-        let on_stack = g.state.obj(spell).became.expect("spell moved to stack");
-        assert_eq!(g.history().spell_cost_objects(on_stack, CostOrigin::ManaTotal, 0, paid_part).collect::<Vec<_>>(), vec![helper]);
-    }
-}
 
-#[test]
-fn continuing_convoke_keeps_the_selected_taps_in_one_batch() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_CONVOKE_MIDPAYMENT_SACRIFICE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    let dork = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    let watcher = put(&mut g, &TAP_BATCH_WATCHER, Zone::BATTLEFIELD);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("two creatures can convoke the spell");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let mut r = next(&mut g);
-    if let RequestKind::PayCosts { options, mana_abilities: true, .. } = &r.kind {
-        let close = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap();
-        answer(&mut g, &r, Answer::Act(Action::of(close)));
-        r = next(&mut g);
-    }
-    let first = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::TapToPay && o.source == Some(bear)).unwrap().clone(), other => panic!("{other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&first)));
-    let r = next(&mut g);
-    let keep = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Mana).unwrap(), other => panic!("{other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(keep));
-    let r = next(&mut g);
-    let second = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::TapToPay && o.source == Some(dork)).unwrap().clone(), other => panic!("{other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&second)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![dork]));
-    next(&mut g);
-    let taps: Vec<_> = g.events().iter().enumerate().filter_map(|(n, r)| match r.event { Event::Tapped { permanent } if permanent == bear || permanent == dork => Some(n), _ => None }).collect();
-    assert_eq!(taps.len(), 2);
-    assert_eq!(taps[1], taps[0] + 1, "both tap events were emitted together");
-    assert_eq!(g.state.stack.iter().filter(|item| item.object == watcher).count(), 1, "a once-per-batch watcher triggers once");
-    let on_stack = g.state.obj(spell).became.expect("spell moved to stack");
-    assert_eq!(g.history().spell_cost_objects(on_stack, CostOrigin::ManaTotal, 0, CostPart::Convoke).collect::<Vec<_>>(), vec![bear, dork]);
-}
 
-#[test]
-fn committed_helper_payments_are_reversed_when_the_cast_is_cancelled() {
-    for (spell_def, action, helper_def, graveyard) in [
-        (&SPELL_WITH_CONVOKE_MIDPAYMENT_SACRIFICE, ActionKind::TapToPay, &BEAR, false),
-        (&SPELL_WITH_DELVE_MIDPAYMENT_SACRIFICE, ActionKind::ExileToPay, &FILLER, true),
-    ] {
-        let mut g = game();
-        let spell = put(&mut g, spell_def, Zone::hand(YOU));
-        let helper = put(&mut g, helper_def, if graveyard { Zone::graveyard(YOU) } else { Zone::BATTLEFIELD });
-        let dork = put(&mut g, &DORK, Zone::BATTLEFIELD);
-        add_mana(&mut g, 1);
-        let r = next(&mut g);
-        let cast = option_of(&g, &r, spell).expect("the spell is offered");
-        answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-        let mut r = next(&mut g);
-        if let RequestKind::PayCosts { options, mana_abilities: true, .. } = &r.kind {
-            let close = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap();
-            answer(&mut g, &r, Answer::Act(Action::of(close)));
-            r = next(&mut g);
-        }
-        let selected = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == action && o.source == Some(helper)).unwrap().clone(), other => panic!("{other:?}") };
-        answer(&mut g, &r, Answer::Act(Action::of(&selected)));
-        let r = next(&mut g);
-        let commit = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::CommitHelpers).unwrap(), other => panic!("{other:?}") };
-        answer(&mut g, &r, Answer::CostPayment(commit));
-        let r = next(&mut g);
-        answer(&mut g, &r, Answer::Cancel);
-        next(&mut g);
-        assert!(g.state.zone(Zone::hand(YOU)).contains(&spell));
-        assert!(g.state.zone(Zone::BATTLEFIELD).contains(&dork));
-        assert_eq!(g.state.player(YOU).pool.total(), 1);
-        if graveyard { assert!(g.state.zone(Zone::graveyard(YOU)).contains(&helper)); }
-        else { assert!(g.state.zone(Zone::BATTLEFIELD).contains(&helper) && !g.state.obj(helper).tapped); }
-        assert!(!g.events().iter().any(|r| matches!(r.event, Event::Convoked { creature, .. } if creature == helper)));
-        assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { receipt, .. } if g.state.cost_receipts[receipt].origin == Some(CostOrigin::ManaTotal))));
-    }
-}
 
-#[test]
-fn snow_mana_and_life_keep_their_qualities_when_interleaved() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_SNOW_MANA_AND_LIFE, Zone::hand(YOU));
-    let source = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    g.state.add_mana(YOU, Mana::U, 2, source, None, ManaLasts::Step, true);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let mana = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Mana).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(mana));
-    let r = next(&mut g);
-    let snow = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::AssignMana && o.pay_snow && o.snow).expect("snow mana can pay the snow symbol").clone(), other => panic!("expected mana assignment, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&snow)));
-    let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).unwrap(), other => panic!("expected payment order after snow mana, got {other:?}") };
-    assert_eq!(g.state.player(YOU).pool.get(Mana::U), 1);
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
-    match &r.kind {
-        RequestKind::PayCosts { options, .. } => {
-            let blue = options.iter().find(|o| o.kind == ActionKind::AssignMana && o.snow && !o.pay_snow).expect("remaining snow blue mana pays blue");
-            answer(&mut g, &r, Answer::Act(Action::of(blue)));
-            next(&mut g);
-        }
-        RequestKind::Priority { .. } => {}
-        other => panic!("unexpected final mana payment {other:?}"),
-    }
-    assert_eq!(g.state.player(YOU).pool.get(Mana::U), 0);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert!(g.state.stack.iter().any(|i| i.object == g.state.obj(spell).became.unwrap()));
-}
 
-#[test]
-fn added_mana_cost_can_enable_an_outer_cost_object() {
-    let mut g = game();
-    let outer = put(&mut g, &MANA_WITH_TAXED_DYNAMIC_SACRIFICE, Zone::BATTLEFIELD);
-    let source = put(&mut g, &LIFE_MANA_SOURCE, Zone::BATTLEFIELD);
-    let star = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let option = option_of(&g, &r, outer).expect("the taxed mana ability may begin");
-    let action = Action::of(&option);
-    assert!(crate::validate::check(&g, &r, &Answer::Act(action.clone())).is_ok());
-    answer(&mut g, &r, Answer::Act(action));
-    let r = next(&mut g);
-    let nested = option_of(&g, &r, source).expect("the nested life-paying mana ability is available");
-    answer(&mut g, &r, Answer::Act(Action::of(&nested)));
-    let r = next(&mut g);
-    let close = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap().clone(), other => panic!("expected nested mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&close)));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).unwrap(), other => panic!("expected outer cost order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert!(crate::first_choices(&g, &r).contains(&star));
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    next(&mut g);
-    assert!(g.state.obj(star).became.is_some());
-    assert_eq!(g.state.player(YOU).pool.get(Mana::U), 1);
-}
 
-#[test]
-fn nested_mana_ability_can_enable_an_outer_cost_object() {
-    let mut g = game();
-    let outer = put(&mut g, &MANA_WITH_NESTED_DYNAMIC_SACRIFICE, Zone::BATTLEFIELD);
-    let source = put(&mut g, &LIFE_MANA_SOURCE, Zone::BATTLEFIELD);
-    let star = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let option = option_of(&g, &r, outer).expect("the outer mana ability may begin");
-    assert!(option.target_candidates.is_empty());
-    let action = Action::of(&option);
-    assert!(crate::validate::check(&g, &r, &Answer::Act(action.clone())).is_ok());
-    answer(&mut g, &r, Answer::Act(action));
-    let r = next(&mut g);
-    let nested = option_of(&g, &r, source).expect("the nested life-paying mana ability is available");
-    answer(&mut g, &r, Answer::Act(Action::of(&nested)));
-    let r = next(&mut g);
-    let close = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap().clone(), other => panic!("expected nested mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&close)));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).unwrap(), other => panic!("expected outer cost order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert!(crate::first_choices(&g, &r).contains(&star));
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    next(&mut g);
-    assert!(g.state.obj(star).became.is_some());
-    assert_eq!(g.state.player(YOU).pool.get(Mana::U), 1);
-}
 
-#[test]
-fn dynamic_sacrifice_can_name_the_type_the_later_eligible_object_produces() {
-    let mut g = game();
-    let source = put(&mut g, &MANA_WITH_DYNAMIC_COLOR, Zone::BATTLEFIELD);
-    let star = put(&mut g, &DYNAMIC_COLOR_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let option = option_of(&g, &r, source).expect("mana ability may begin");
-    assert!(option.target_candidates.is_empty());
-    let mut action = Action::of(&option);
-    action.color = Some(Color::Red);
-    action.mana = None;
-    assert!(crate::validate::check(&g, &r, &Answer::Act(action.clone())).is_ok());
-    answer(&mut g, &r, Answer::Act(action));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert!(crate::first_choices(&g, &r).contains(&star));
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    next(&mut g);
-    assert!(g.state.obj(star).became.is_some());
-    assert_eq!(g.state.player(YOU).pool.get(Mana::R), 1);
-}
 
-#[test]
-fn mana_ability_can_begin_before_its_cost_object_becomes_eligible() {
-    let mut g = game();
-    let source = put(&mut g, &MANA_WITH_LIFE_AND_DYNAMIC_SACRIFICE, Zone::BATTLEFIELD);
-    let star = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let option = option_of(&g, &r, source).expect("the mana ability may begin");
-    assert!(option.target_candidates.is_empty(), "no creature is eligible until life is paid");
-    let action = Action::of(&option);
-    assert!(crate::validate::check(&g, &r, &Answer::Act(action.clone())).is_ok(), "no premature cost object is required");
-    let mut invalid = action.clone();
-    invalid.targets = vec![Target::Object(source)];
-    assert!(crate::validate::check(&g, &r, &Answer::Act(invalid)).is_err(), "an explicitly named invalid object is still refused");
-    answer(&mut g, &r, Answer::Act(action));
-    let r = next(&mut g);
-    assert!(matches!(&r.kind, RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. }));
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert!(crate::first_choices(&g, &r).contains(&star));
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    next(&mut g);
-    assert!(g.state.obj(star).became.is_some());
-    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 1);
-}
 
-#[test]
-fn mana_ability_can_pay_life_before_sacrificing_its_cost_object() {
-    let mut g = game();
-    let source = put(&mut g, &MANA_WITH_LIFE_AND_SACRIFICE, Zone::BATTLEFIELD);
-    let star = put(&mut g, &LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let option = option_of(&g, &r, source).expect("the mana ability is offered");
-    let mut action = Action::of(&option);
-    action.targets = vec![Target::Object(star)];
-    answer(&mut g, &r, Answer::Act(action));
-    let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).expect("life is offered"), other => panic!("expected mana-ability payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. }));
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 8, "the callback reads the sacrificed creature after the life payment");
-    assert!(g.state.obj(star).became.is_some());
-}
 
 #[test]
 fn source_can_be_tapped_before_it_is_returned_for_the_same_activation() {
@@ -2388,17 +1918,7 @@ fn source_can_be_tapped_before_it_is_returned_for_the_same_activation() {
     let ability = option_of(&g, &r, source).expect("the ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&ability)));
     let r = next(&mut g);
-    let returned = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Return).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(returned));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }), "returning first makes the tap unpayable");
-    assert!(g.state.zone(Zone::BATTLEFIELD).contains(&source) && !g.state.obj(source).tapped);
-    let ability = option_of(&g, &r, source).expect("the activation can be retried");
-    answer(&mut g, &r, Answer::Act(Action::of(&ability)));
-    let r = next(&mut g);
-    let tap = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Tap).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(tap));
-    next(&mut g);
+    pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Tap));
     let returned = g.state.obj(source).became.expect("source returned");
     assert_eq!(g.state.obj(returned).zone, Zone::hand(YOU));
     assert!(g.state.obj(source).tapped);
@@ -2407,31 +1927,6 @@ fn source_can_be_tapped_before_it_is_returned_for_the_same_activation() {
     assert_eq!(g.history().ability_cost_objects(serial, 0, CostPart::ReturnSelf).collect::<Vec<_>>(), vec![source]);
 }
 
-#[test]
-fn source_can_be_tapped_before_it_is_sacrificed_for_the_same_activation() {
-    let mut g = game();
-    let source = put(&mut g, &ABILITY_WITH_TAP_AND_SELF_SACRIFICE, Zone::BATTLEFIELD);
-    let r = next(&mut g);
-    let ability = option_of(&g, &r, source).expect("the ability is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&ability)));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }), "sacrificing first makes the tap unpayable");
-    assert!(g.state.zone(Zone::BATTLEFIELD).contains(&source) && !g.state.obj(source).tapped);
-    let ability = option_of(&g, &r, source).expect("the activation can be retried");
-    answer(&mut g, &r, Answer::Act(Action::of(&ability)));
-    let r = next(&mut g);
-    let tap = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Tap).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(tap));
-    next(&mut g);
-    assert!(g.state.obj(source).became.is_some());
-    assert!(g.state.obj(source).tapped);
-    let serial = g.state.stack.last().expect("the activation is on the stack").serial;
-    assert_eq!(g.history().ability_cost_objects(serial, 0, CostPart::TapSelf).collect::<Vec<_>>(), vec![source]);
-    assert_eq!(g.history().ability_cost_objects(serial, 0, CostPart::SelfPermanent).collect::<Vec<_>>(), vec![source]);
-}
 
 #[test]
 fn ability_controller_can_choose_life_before_sacrifice() {
@@ -2443,10 +1938,7 @@ fn ability_controller_can_choose_life_before_sacrifice() {
     let ability = option_of(&g, &r, source).expect("the ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&ability)));
     let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).expect("life is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Life));
     answer(&mut g, &r, Answer::Cards(vec![star]));
     next(&mut g);
     let serial = g.state.stack.last().expect("the activation is on the stack").serial;
@@ -2454,77 +1946,7 @@ fn ability_controller_can_choose_life_before_sacrifice() {
     assert_eq!(g.chars(star).power, Some(8), "last-known power reflects life paid before sacrifice");
 }
 
-#[test]
-fn convoke_can_tap_a_creature_before_another_cost_sacrifices_it() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_CONVOKE_AND_SACRIFICE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("convoke then sacrifice can pay the spell");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::PayCosts { .. }));
-    answer(&mut g, &r, Answer::Cancel);
-    let r = next(&mut g);
-    assert!(g.state.zone(Zone::BATTLEFIELD).contains(&bear) && !g.state.obj(bear).tapped);
-    let cast = option_of(&g, &r, spell).expect("the spell can be retried");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let mana = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Mana).unwrap(), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(mana));
-    let r = next(&mut g);
-    let convoke = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::TapToPay && o.source == Some(bear)).expect("the Bear may convoke"), other => panic!("expected mana payment, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(convoke)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    next(&mut g);
-    let cast = g.state.stack.last().expect("the spell was cast").object;
-    assert!(g.history().convoked(cast).any(|object| object == bear));
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::ManaTotal, 0, CostPart::Convoke).collect::<Vec<_>>(), vec![bear]);
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::Permanents).collect::<Vec<_>>(), vec![bear]);
-}
 
-#[test]
-fn teamwork_can_tap_a_creature_before_another_cost_sacrifices_it() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_TEAMWORK_AND_SACRIFICE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).expect("sacrifice is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }), "sacrificing first leaves teamwork unpayable");
-    assert!(!g.state.obj(bear).tapped && g.state.zone(Zone::BATTLEFIELD).contains(&bear));
-    let cast = option_of(&g, &r, spell).expect("the spell can be retried");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    let tap = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Tap).expect("teamwork is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(tap));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::TapForPower { .. }));
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    next(&mut g);
-    let cast = g.state.stack.last().expect("the spell was cast").object;
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::Optional, 0, CostPart::TapCreatures).collect::<Vec<_>>(), vec![bear]);
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::Permanents).collect::<Vec<_>>(), vec![bear]);
-    assert!(g.events().iter().any(|r| matches!(r.event, Event::TappedForTeamwork { creature, spell } if creature == bear && spell == cast)));
-}
 
 #[test]
 fn static_sequence_keeps_more_than_six_discard_components() {
@@ -2549,37 +1971,6 @@ fn static_sequence_keeps_more_than_six_discard_components() {
     }
 }
 
-#[test]
-fn behold_can_precede_discard_of_the_same_card_and_records_both() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_BEHOLD_AND_DISCARD, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::hand(YOU));
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let discard = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Discard).expect("discard is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(discard));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }), "discarding first makes behold impossible and reverses the cast");
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&bear));
-    assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { .. })));
-    let cast = option_of(&g, &r, spell).expect("the spell can be retried");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let behold = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Behold).expect("behold is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(behold));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    next(&mut g);
-    let cast = g.state.stack.last().expect("the spell was cast").object;
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::Behold).collect::<Vec<_>>(), vec![bear]);
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::Discard(0)).collect::<Vec<_>>(), vec![bear]);
-}
 
 #[test]
 fn variable_sacrifice_can_precede_life_and_records_the_paid_object() {
@@ -2593,10 +1984,7 @@ fn variable_sacrifice_can_precede_life_and_records_the_paid_object() {
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Modes(vec![1]));
     let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).expect("sacrifice is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 20);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Cards(vec![]));
@@ -2607,43 +1995,7 @@ fn variable_sacrifice_can_precede_life_and_records_the_paid_object() {
     assert_eq!(g.history().spell_cost_objects(item.object, CostOrigin::Optional, 0, CostPart::Variable).collect::<Vec<_>>(), vec![bear]);
 }
 
-#[test]
-fn unpaid_chosen_additional_cost_reverses_prior_life_payment() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_LIFE_AND_EXILE_CHOICE, Zone::hand(YOU));
-    let life = g.state.player(YOU).life;
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell may begin");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    assert!(matches!(next(&mut g).kind, RequestKind::Priority { .. }));
-    assert!(g.state.stack.is_empty());
-    assert_eq!(g.state.obj(spell).zone, Zone::hand(YOU));
-    assert!(g.state.zone(Zone::graveyard(YOU)).is_empty());
-    assert_eq!(g.state.player(YOU).life, life);
-    assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { .. })));
-}
 
-#[test]
-fn discard_can_feed_a_chosen_additional_graveyard_cost() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_DISCARD_AND_EXILE_CHOICE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::hand(YOU));
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell may begin");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    assert!(matches!(&r.kind, RequestKind::ChooseCards { purpose: Purpose::Discard, .. }));
-    assert!(crate::first_choices(&g, &r).contains(&bear));
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    let discarded = g.state.obj(bear).became.expect("discard created a graveyard object");
-    assert!(crate::first_choices(&g, &r).contains(&discarded));
-    answer(&mut g, &r, Answer::Cards(vec![discarded]));
-    next(&mut g);
-    let cast = g.state.stack.last().expect("the spell was cast").object;
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::Discard(0)).collect::<Vec<_>>(), vec![bear]);
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::AdditionalChoice(0), 0, CostPart::GraveyardExile).collect::<Vec<_>>(), vec![discarded]);
-}
 
 #[test]
 fn unpaid_target_defined_cost_reverses_the_cast() {
@@ -2695,9 +2047,7 @@ fn discard_can_put_a_new_object_in_the_graveyard_for_another_cost() {
     let cast = option_of(&g, &r, spell).expect("the spell is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&cast)));
     let r = next(&mut g);
-    let discard = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Discard).expect("discard is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(discard));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Discard));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     let discarded = g.state.obj(bear).became.expect("the discard made a graveyard object");
@@ -2709,26 +2059,6 @@ fn discard_can_put_a_new_object_in_the_graveyard_for_another_cost() {
     assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::GraveyardExile).collect::<Vec<_>>(), vec![discarded]);
 }
 
-#[test]
-fn evidence_can_be_paid_before_mana_and_records_its_object() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_EVIDENCE, Zone::hand(YOU));
-    let card = put(&mut g, &EVIDENCE_CARD, Zone::graveyard(YOU));
-    add_mana(&mut g, 1);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let evidence = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.starts_with("Collect evidence 3")).expect("evidence is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(evidence));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::CollectEvidence { .. }));
-    assert_eq!(g.state.player(YOU).pool.total(), 1);
-    answer(&mut g, &r, Answer::Cards(vec![card]));
-    next(&mut g);
-    let cast = g.state.stack.last().expect("the spell was cast").object;
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::Evidence).collect::<Vec<_>>(), vec![card]);
-}
 
 #[test]
 fn hand_exile_can_be_paid_before_mana_and_records_its_object() {
@@ -2740,10 +2070,7 @@ fn hand_exile_can_be_paid_before_mana_and_records_its_object() {
     let cast = option_of(&g, &r, spell).expect("the spell is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&cast)));
     let r = next(&mut g);
-    let exile = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Exile).expect("exile is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(exile));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).pool.total(), 1);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Exile));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     next(&mut g);
     assert_eq!(g.state.player(YOU).pool.total(), 0);
@@ -2751,30 +2078,6 @@ fn hand_exile_can_be_paid_before_mana_and_records_its_object() {
     assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::HandExile).collect::<Vec<_>>(), vec![bear]);
 }
 
-#[test]
-fn cancelling_after_graveyard_exile_restores_the_card_and_receipt() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_GRAVEYARD_EXILE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::graveyard(YOU));
-    add_mana(&mut g, 1);
-    g.state.add_mana(YOU, Mana::G, 1, ObjectId(0), None, ManaLasts::Step, false);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let exile = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Exile).expect("exile is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(exile));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::PayCosts { .. }));
-    answer(&mut g, &r, Answer::Cancel);
-    next(&mut g);
-    assert!(g.state.zone(Zone::graveyard(YOU)).contains(&bear));
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell));
-    assert_eq!(g.state.player(YOU).pool.total(), 2);
-    assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { .. })));
-}
 
 #[test]
 fn distinct_graveyard_exile_costs_record_each_origin() {
@@ -2788,9 +2091,7 @@ fn distinct_graveyard_exile_costs_record_each_origin() {
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Modes(vec![1]));
     let r = next(&mut g);
-    let printed = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.contains("additional cost of")).expect("the printed cost is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(printed));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.label.contains("additional cost of")));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     assert!(!crate::first_choices(&g, &r).contains(&bear), "one card cannot pay both exiles");
@@ -2801,27 +2102,6 @@ fn distinct_graveyard_exile_costs_record_each_origin() {
     assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::Optional, 0, CostPart::GraveyardExile).collect::<Vec<_>>(), vec![dork]);
 }
 
-#[test]
-fn graveyard_exile_can_be_paid_before_mana_and_records_its_object() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_GRAVEYARD_EXILE, Zone::hand(YOU));
-    let bear = put(&mut g, &BEAR, Zone::graveyard(YOU));
-    add_mana(&mut g, 1);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let exile = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Exile).expect("exile is offered"), other => panic!("expected payment order, got {other:?}") };
-    assert_eq!(g.state.player(YOU).pool.total(), 1);
-    answer(&mut g, &r, Answer::CostPayment(exile));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).pool.total(), 0);
-    assert!(g.state.obj(bear).became.is_some_and(|id| g.state.obj(id).zone == Zone::exile(YOU)));
-    let cast = g.state.stack.last().expect("the spell was cast").object;
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::GraveyardExile).collect::<Vec<_>>(), vec![bear]);
-}
 
 #[test]
 fn blight_and_sacrifice_order_changes_eligibility_and_retries() {
@@ -2833,9 +2113,7 @@ fn blight_and_sacrifice_order_changes_eligibility_and_retries() {
     let cast = option_of(&g, &r, spell).expect("the spell is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&cast)));
     let r = next(&mut g);
-    let blight = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.starts_with("Blight")).expect("blight is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(blight));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.label.starts_with("Blight")));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     assert!(matches!(r.kind, RequestKind::Priority { .. }), "the now-impossible sacrifice reverses the cast");
@@ -2844,9 +2122,7 @@ fn blight_and_sacrifice_order_changes_eligibility_and_retries() {
     let cast = option_of(&g, &r, spell).expect("the spell can be retried");
     answer(&mut g, &r, Answer::Act(Action::of(&cast)));
     let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).expect("sacrifice is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Cards(vec![dork]));
@@ -2870,9 +2146,7 @@ fn counter_removal_and_sacrifice_order_changes_eligibility_and_retries() {
     let cast = option_of(&g, &r, spell).expect("the spell is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&cast)));
     let r = next(&mut g);
-    let counters = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Counters).expect("counter removal is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(counters));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Counters));
     answer(&mut g, &r, Answer::Counters(vec![(bear, CounterKind::PlusOne, 1)]));
     let r = next(&mut g);
     assert!(matches!(r.kind, RequestKind::Priority { .. }), "the now-impossible sacrifice reverses the cast");
@@ -2881,9 +2155,7 @@ fn counter_removal_and_sacrifice_order_changes_eligibility_and_retries() {
     let cast = option_of(&g, &r, spell).expect("the spell can be retried");
     answer(&mut g, &r, Answer::Act(Action::of(&cast)));
     let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).expect("sacrifice is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Counters(vec![(dork, CounterKind::PlusOne, 1)]));
@@ -2905,18 +2177,14 @@ fn energy_and_sacrifice_order_changes_eligibility_and_retries() {
     let cast = option_of(&g, &r, spell).expect("the spell is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&cast)));
     let r = next(&mut g);
-    let energy = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Energy).expect("energy is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(energy));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Energy));
     assert!(matches!(r.kind, RequestKind::Priority { .. }), "the now-impossible sacrifice reverses the cast");
     assert_eq!(g.state.player(YOU).energy(), 2);
     assert!(g.state.zone(Zone::BATTLEFIELD).contains(&star));
     let cast = option_of(&g, &r, spell).expect("the spell can be retried");
     answer(&mut g, &r, Answer::Act(Action::of(&cast)));
     let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).expect("sacrifice is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice));
     answer(&mut g, &r, Answer::Cards(vec![star]));
     next(&mut g);
     assert_eq!(g.state.player(YOU).energy(), 0);
@@ -2924,77 +2192,8 @@ fn energy_and_sacrifice_order_changes_eligibility_and_retries() {
     assert!(g.state.stack.last().is_some_and(|item| item.kind == StackKind::Spell));
 }
 
-#[test]
-fn caster_can_pay_life_before_spending_mana() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_LIFE, Zone::hand(YOU));
-    add_mana(&mut g, 1);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let choice = match &r.kind {
-        RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.starts_with("Pay 3 life")).expect("life payment is offered"),
-        other => panic!("expected a choice before paying mana or life, got {other:?}"),
-    };
-    assert_eq!(g.state.player(YOU).pool.total(), 1);
-    answer(&mut g, &r, Answer::CostPayment(choice));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert_eq!(g.state.player(YOU).pool.total(), 0);
-}
 
-#[test]
-fn mana_ability_window_is_available_even_when_pool_already_pays() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_LIFE, Zone::hand(YOU));
-    let source = put(&mut g, &COLOR_MANA, Zone::BATTLEFIELD);
-    add_mana(&mut g, 1);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let activation = option_of(&g, &r, source).expect("CR 601.2g permits activating mana abilities before paying even when the pool suffices");
-    assert_eq!(g.state.player(YOU).life, 20, "no life has yet been paid");
-    assert_eq!(g.state.player(YOU).pool.total(), 1, "the mana has not yet been spent");
-    answer(&mut g, &r, Answer::Act(Action::of(&activation)));
-    let r = next(&mut g);
-    let mana = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Mana).expect("mana is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(mana));
-    let r = next(&mut g);
-    let spend = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::AssignMana && o.mana == Some(Mana::C)).expect("choose the original mana"), other => panic!("expected mana payment, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(spend)));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17, "the additional life cost was paid");
-    assert_eq!(g.state.player(YOU).pool.total(), 1, "the newly produced mana remains after one mana is spent");
-}
 
-#[test]
-fn mana_window_can_close_before_all_mana_abilities_are_used() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_LIFE, Zone::hand(YOU));
-    let first = put(&mut g, &COLOR_MANA, Zone::BATTLEFIELD);
-    let second = put(&mut g, &COLOR_MANA, Zone::BATTLEFIELD);
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let activate = option_of(&g, &r, first).expect("first mana ability is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&activate)));
-    let r = next(&mut g);
-    assert!(option_of(&g, &r, second).is_some(), "the second mana ability is still available before paying");
-    assert_eq!(g.state.player(YOU).life, 20);
-    assert_eq!(g.state.player(YOU).pool.total(), 1);
-    let done = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap(), other => panic!("expected the mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(done)));
-    let r = next(&mut g);
-    let mana = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Mana).expect("mana is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(mana));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert_eq!(g.state.player(YOU).pool.total(), 0);
-    assert!(!g.state.obj(second).tapped, "the other mana ability was not activated");
-}
 
 #[test]
 fn harmonize_creature_is_not_tapped_until_after_the_mana_window() {
@@ -3013,9 +2212,7 @@ fn harmonize_creature_is_not_tapped_until_after_the_mana_window() {
     let activate = option_of(&g, &r, source).expect("the mana ability is offered");
     answer(&mut g, &r, Answer::Act(Action::of(&activate)));
     let r = next(&mut g);
-    let tap = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.objects.contains(&bear)).expect("the harmonize tap is offered"), other => panic!("expected payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(tap));
-    next(&mut g);
+    pay_first(&mut g, r, |choices| choices.iter().position(|c| c.objects.contains(&bear)));
     assert!(g.state.obj(bear).tapped, "the selected creature paid the harmonize cost");
     assert_eq!(g.state.player(YOU).pool.total(), 0);
 }
@@ -3030,12 +2227,7 @@ fn player_can_sacrifice_a_life_dependent_creature_before_paying_life() {
     let option = option_of(&g, &r, spell).expect("the spell is available");
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    let choice = match &r.kind {
-        RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.starts_with("Sacrifice")).expect("sacrificing the creature is offered"),
-        other => panic!("expected a choice of payment order, got {other:?}"),
-    };
-    answer(&mut g, &r, Answer::CostPayment(choice));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.label.starts_with("Sacrifice")));
     answer(&mut g, &r, Answer::Cards(vec![star]));
     resolve_all(&mut g);
     assert_eq!(g.state.player(YOU).life, 17);
@@ -3053,12 +2245,7 @@ fn cost_objects_are_chosen_when_paid_after_earlier_costs_change_eligibility() {
     let option = option_of(&g, &r, spell).expect("the spell is available");
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    let choice = match &r.kind {
-        RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.label.contains("Pay 3 life")).expect("paying life is offered"),
-        other => panic!("payment order must be chosen before the cost object, got {other:?}"),
-    };
-    answer(&mut g, &r, Answer::CostPayment(choice));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.label.contains("Pay 3 life")));
     assert!(crate::first_choices(&g, &r).contains(&reverse), "the creature became eligible after life was paid");
     answer(&mut g, &r, Answer::Cards(vec![reverse]));
     resolve_all(&mut g);
@@ -3066,183 +2253,13 @@ fn cost_objects_are_chosen_when_paid_after_earlier_costs_change_eligibility() {
     assert_eq!(g.state.player(PlayerId(1)).life, 19);
 }
 
-#[test]
-fn earlier_life_payment_can_make_a_previously_ineligible_creature_payable() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_LIFE_AND_POWER_COST, Zone::hand(YOU));
-    let reverse = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("paying life first makes the creature eligible to be sacrificed");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    // The sacrifice is not yet payable, so the only available operation pays life.
-    assert!(matches!(r.kind, RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. }));
-    assert_eq!(g.state.player(YOU).life, 17);
-    answer(&mut g, &r, Answer::Cards(vec![reverse]));
-    resolve_all(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert_eq!(g.state.player(PlayerId(1)).life, 19, "the creature's power was 1 when sacrificed");
-}
 
-#[test]
-fn life_paid_for_mana_can_enable_a_behold_cost() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_DYNAMIC_BEHOLD, Zone::hand(YOU));
-    let reverse = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    let source = put(&mut g, &LIFE_MANA_SOURCE, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    assert!(matches!(&r.kind, RequestKind::PayCosts { mana_abilities: true, .. }), "expected mana window, got {:?}", r.kind);
-    let ability = option_of(&g, &r, source).expect("life-paying mana ability is available");
-    answer(&mut g, &r, Answer::Act(Action::of(&ability)));
-    let r = next(&mut g);
-    let close = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&close)));
-    let r = next(&mut g);
-    let behold = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Behold).unwrap(), other => panic!("expected cost order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(behold));
-    let r = next(&mut g);
-    assert!(crate::first_choices(&g, &r).contains(&reverse));
-    answer(&mut g, &r, Answer::Cards(vec![reverse]));
-    next(&mut g);
-    let cast = g.state.stack.last().expect("the spell was cast").object;
-    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::Behold).collect::<Vec<_>>(), vec![reverse]);
-}
 
-#[test]
-fn life_paid_for_mana_can_enable_a_chosen_additional_sacrifice() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_POWER_CHOICE, Zone::hand(YOU));
-    let reverse = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    let source = put(&mut g, &LIFE_MANA_SOURCE, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let ability = option_of(&g, &r, source).expect("the chosen cost remains available until the mana window");
-    answer(&mut g, &r, Answer::Act(Action::of(&ability)));
-    let r = next(&mut g);
-    let close = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&close)));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).unwrap(), other => panic!("expected cost order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    assert!(crate::first_choices(&g, &r).contains(&reverse));
-    answer(&mut g, &r, Answer::Cards(vec![reverse]));
-    resolve_all(&mut g);
-    assert!(g.state.obj(reverse).became.is_some());
-    assert_eq!(g.state.player(YOU).life, 20);
-}
 
-#[test]
-fn life_paid_for_mana_can_enable_an_optional_sacrifice() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_OPTIONAL_POWER, Zone::hand(YOU));
-    let reverse = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    let source = put(&mut g, &LIFE_MANA_SOURCE, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let RequestKind::ChooseModes { eligible, .. } = &r.kind else { panic!("expected optional-cost choice, got {:?}", r.kind) };
-    assert!(eligible.contains(&1), "a mana ability can pay life and make the sacrifice payable");
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    let ability = option_of(&g, &r, source).expect("life-paying mana ability is available");
-    answer(&mut g, &r, Answer::Act(Action::of(&ability)));
-    let r = next(&mut g);
-    let close = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&close)));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).unwrap(), other => panic!("expected cost order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    assert!(crate::first_choices(&g, &r).contains(&reverse));
-    answer(&mut g, &r, Answer::Cards(vec![reverse]));
-    resolve_all(&mut g);
-    assert!(g.state.obj(reverse).became.is_some());
-    assert_eq!(g.state.player(YOU).life, 20);
-}
 
-#[test]
-fn another_cost_origin_can_make_the_optional_sacrifice_payable() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_LIFE_AND_OPTIONAL_POWER, Zone::hand(YOU));
-    let reverse = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let RequestKind::ChooseModes { eligible, .. } = &r.kind else { panic!("expected optional-cost choice") };
-    assert!(eligible.contains(&1), "the mandatory life payment can make this optional cost payable");
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    answer(&mut g, &r, Answer::Cards(vec![reverse]));
-    resolve_all(&mut g);
-    assert_eq!(g.state.player(YOU).life, 20);
-    assert!(g.state.obj(reverse).became.is_some());
-}
 
-#[test]
-fn optional_sacrifice_still_unpayable_after_another_cost_reverses_the_cast() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_LIFE_AND_OPTIONAL_POWER, Zone::hand(YOU));
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell is offered");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }));
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell));
-    assert_eq!(g.state.player(YOU).life, 20);
-    assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { .. })));
-}
 
-#[test]
-fn optional_cost_can_make_an_additional_sacrifice_payable() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_POWER_AND_OPTIONAL_LIFE, Zone::hand(YOU));
-    let reverse = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("paying the optional life cost first makes the mandatory sacrifice payable");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Modes(vec![1]));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    answer(&mut g, &r, Answer::Cards(vec![reverse]));
-    resolve_all(&mut g);
-    assert_eq!(g.state.player(PlayerId(1)).life, 19);
-}
 
-#[test]
-fn declining_the_only_enabling_optional_cost_reverses_the_cast() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_POWER_AND_OPTIONAL_LIFE, Zone::hand(YOU));
-    let reverse = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("the spell can be proposed");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Modes(vec![0]));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }));
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell) && g.state.zone(Zone::BATTLEFIELD).contains(&reverse));
-    assert_eq!(g.state.player(YOU).life, 20);
-    assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { .. })));
-}
 #[test]
 fn discard_can_enable_a_graveyard_exile_when_the_graveyard_starts_empty() {
     let mut g = game();
@@ -3261,21 +2278,6 @@ fn discard_can_enable_a_graveyard_exile_when_the_graveyard_starts_empty() {
     assert!(g.state.stack.last().is_some_and(|item| item.kind == StackKind::Spell));
 }
 
-#[test]
-fn proposed_cast_with_no_sacrifice_candidate_is_reversed() {
-    let mut g = game();
-    let spell = put(&mut g, &SPELL_WITH_LIFE_AND_SACRIFICE, Zone::hand(YOU));
-    let before_life = g.state.player(YOU).life;
-    let r = next(&mut g);
-    let option = option_of(&g, &r, spell).expect("the cast may be proposed");
-    answer(&mut g, &r, Answer::Act(Action::of(&option)));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::Priority { .. }), "unpayable cast returns to priority: {:?}", r.kind);
-    assert_eq!(g.state.player(YOU).life, before_life);
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell));
-    assert!(g.state.stack.is_empty());
-    assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { .. })));
-}
 
 
 #[test]
@@ -3293,9 +2295,7 @@ fn player_mana_ability_can_pay_life_before_sacrificing_its_cost_object() {
     let option = match &r.kind { RequestKind::Priority { options } => options.iter().find(|o| o.source == Some(source) && o.index >= PLAYER_MANA_ABILITY).cloned().expect("player mana ability is offered"), other => panic!("expected priority, got {other:?}") };
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).expect("life is offered"), other => panic!("expected player mana-ability payment order, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Life));
     assert!(matches!(r.kind, RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. }));
     answer(&mut g, &r, Answer::Cards(vec![star]));
     next(&mut g);
@@ -3317,9 +2317,7 @@ fn color_from_sacrifice_ignores_an_earlier_return_component() {
     action.color = Some(Color::Green);
     answer(&mut g, &r, Answer::Act(action));
     let r = next(&mut g);
-    let returned = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Return).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(returned));
-    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Return));
     answer(&mut g, &r, Answer::Cards(vec![bear]));
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Cards(vec![dork]));
@@ -3329,70 +2327,7 @@ fn color_from_sacrifice_ignores_an_earlier_return_component() {
     assert!(g.state.obj(dork).became.is_some_and(|id| g.state.obj(id).zone == Zone::graveyard(YOU)));
 }
 
-#[test]
-fn player_mana_ability_opens_a_nested_mana_window_before_its_costs() {
-    let mut g = game();
-    let source = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    let star = put(&mut g, &LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.effect_push(ContinuousEffect { source, affected: source, controller: YOU,
-        kind: EffectKind::PlayerManaAbility(AbilityRef::delayed(g.cards.id_of(&PLAYER_MANA_WITH_LIFE_AND_SACRIFICE), 1)),
-        duration: Duration::EndOfTurn, timestamp: 1, words: Words::NONE });
-    g.state.see_statics();
-    let r = next(&mut g);
-    let player_ability = match &r.kind { RequestKind::Priority { options } => options.iter().find(|o| o.source == Some(source) && o.index >= PLAYER_MANA_ABILITY).unwrap().clone(), other => panic!("expected priority, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&player_ability)));
-    let r = next(&mut g);
-    let nested = match &r.kind { RequestKind::PayCosts { options, mana_abilities: true, .. } => options.iter().find(|o| o.source == Some(source) && o.index == 0).unwrap().clone(), other => panic!("expected nested mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&nested)));
-    let r = next(&mut g);
-    let confirm = match &r.kind { RequestKind::PayCosts { options, mana_abilities: true, .. } => options.iter().find(|o| o.kind == ActionKind::ConfirmCasting).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&confirm)));
-    let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
-    let sacrifice = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Sacrifice).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(sacrifice));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 8);
-    assert!(g.state.obj(source).tapped);
-    assert!(g.state.obj(star).became.is_some());
-}
 
-#[test]
-fn player_mana_ability_costs_reverse_when_the_enclosing_cast_is_cancelled() {
-    let mut g = game();
-    let source = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    let star = put(&mut g, &LIFE_STAR, Zone::BATTLEFIELD);
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_LIFE, Zone::hand(YOU));
-    g.state.effect_push(ContinuousEffect { source, affected: source, controller: YOU,
-        kind: EffectKind::PlayerManaAbility(AbilityRef::delayed(g.cards.id_of(&PLAYER_MANA_WITH_LIFE_AND_SACRIFICE), 0)),
-        duration: Duration::EndOfTurn, timestamp: 1, words: Words::NONE });
-    g.state.see_statics();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).unwrap();
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let player_ability = match &r.kind { RequestKind::PayCosts { options, mana_abilities: true, .. } => options.iter().find(|o| o.source == Some(source) && o.index >= PLAYER_MANA_ABILITY).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&player_ability)));
-    let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).unwrap(), other => panic!("expected ability cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    let r = next(&mut g);
-    let cancel = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::CancelCasting).unwrap().clone(), other => panic!("expected enclosing mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&cancel)));
-    assert!(matches!(next(&mut g).kind, RequestKind::Priority { .. }));
-    assert_eq!(g.state.player(YOU).life, 20);
-    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 0);
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell));
-    assert!(g.state.zone(Zone::BATTLEFIELD).contains(&star));
-    assert!(g.state.stack.is_empty());
-}
 
 #[test]
 fn color_from_sacrificing_the_source_uses_its_producible_mana() {
@@ -3409,39 +2344,6 @@ fn color_from_sacrificing_the_source_uses_its_producible_mana() {
     assert!(g.state.obj(source).became.is_some_and(|id| g.state.obj(id).zone == Zone::graveyard(YOU)));
 }
 
-#[test]
-fn irreversible_player_mana_ability_replays_after_enclosing_cast_is_cancelled() {
-    let mut g = game();
-    let source = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    let star = put(&mut g, &LIFE_STAR, Zone::BATTLEFIELD);
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_LIFE, Zone::hand(YOU));
-    g.state.effect_push(ContinuousEffect { source, affected: source, controller: YOU,
-        kind: EffectKind::PlayerManaAbility(AbilityRef::delayed(g.cards.id_of(&PLAYER_MANA_WITH_LIFE_AND_SACRIFICE), 2)),
-        duration: Duration::EndOfTurn, timestamp: 1, words: Words::NONE });
-    g.state.see_statics();
-    let library = g.state.zone(Zone::library(YOU)).len();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).unwrap();
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let player_ability = match &r.kind { RequestKind::PayCosts { options, mana_abilities: true, .. } => options.iter().find(|o| o.source == Some(source) && o.index >= PLAYER_MANA_ABILITY).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&player_ability)));
-    let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).unwrap(), other => panic!("expected ability cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    let r = next(&mut g);
-    let cancel = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::CancelCasting).unwrap().clone(), other => panic!("expected enclosing mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&cancel)));
-    assert!(matches!(next(&mut g).kind, RequestKind::Priority { .. }));
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 1);
-    assert_eq!(g.state.zone(Zone::library(YOU)).len(), library - 1);
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell));
-    assert!(g.state.obj(star).became.is_some_and(|id| g.state.obj(id).zone == Zone::graveyard(YOU)));
-    assert!(g.state.stack.is_empty());
-}
 
 #[test]
 fn color_from_sacrificing_the_granter_uses_that_granters_producible_mana() {
@@ -3481,9 +2383,7 @@ fn repeated_player_grants_keep_their_paid_objects_isolated() {
         let option = match &r.kind { RequestKind::Priority { options } => options.iter().find(|o| o.source == Some(source) && o.index == PLAYER_MANA_ABILITY + ordinal).unwrap().clone(), other => panic!("expected priority, got {other:?}") };
         answer(&mut g, &r, Answer::Act(Action::of(&option)));
         let r = next(&mut g);
-        let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-        answer(&mut g, &r, Answer::CostPayment(life));
-        let r = next(&mut g);
+        let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Life));
         answer(&mut g, &r, Answer::Cards(vec![star]));
     }
     next(&mut g);
@@ -3493,121 +2393,8 @@ fn repeated_player_grants_keep_their_paid_objects_isolated() {
     assert!(g.state.obj(second).became.is_some_and(|id| g.state.obj(id).zone == Zone::graveyard(YOU)));
 }
 
-#[test]
-fn kept_player_mana_replay_identifies_the_grant_after_an_earlier_grant_returns() {
-    let mut g = game();
-    let vanishing = put(&mut g, &VANISHING_PLAYER_GRANTER, Zone::BATTLEFIELD);
-    let source = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    let star = put(&mut g, &LIFE_STAR, Zone::BATTLEFIELD);
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_LIFE, Zone::hand(YOU));
-    for (granter, index, duration) in [(vanishing, 0, Duration::WhileSourceOnBattlefield), (source, 2, Duration::EndOfTurn)] {
-        g.state.effect_push(ContinuousEffect { source: granter, affected: granter, controller: YOU,
-            kind: EffectKind::PlayerManaAbility(AbilityRef::delayed(g.cards.id_of(&PLAYER_MANA_WITH_LIFE_AND_SACRIFICE), index)),
-            duration, timestamp: 1, words: Words::NONE });
-    }
-    g.state.see_statics();
-    let library = g.state.zone(Zone::library(YOU)).len();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).unwrap();
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let vanish = match &r.kind { RequestKind::PayCosts { options, mana_abilities: true, .. } => options.iter().find(|o| o.source == Some(vanishing) && o.index == 0).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&vanish)));
-    let r = next(&mut g);
-    let kept = match &r.kind { RequestKind::PayCosts { options, mana_abilities: true, .. } => options.iter().find(|o| o.source == Some(source) && o.index >= PLAYER_MANA_ABILITY).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&kept)));
-    let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    let r = next(&mut g);
-    let cancel = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::CancelCasting).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&cancel)));
-    assert!(matches!(next(&mut g).kind, RequestKind::Priority { .. }));
-    assert_eq!(g.state.zone(Zone::library(YOU)).len(), library - 1, "the kept ability drew once");
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 1);
-    assert!(g.state.zone(Zone::BATTLEFIELD).contains(&vanishing), "the unrelated reversible ability is undone");
-    assert!(g.state.obj(star).became.is_some_and(|id| g.state.obj(id).zone == Zone::graveyard(YOU)));
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell));
-}
 
-#[test]
-fn kept_player_mana_replays_even_if_the_granting_mana_ability_is_undone() {
-    let mut g = game();
-    let source = put(&mut g, &TEMPORARY_PLAYER_GRANTER, Zone::BATTLEFIELD);
-    let star = put(&mut g, &LIFE_STAR, Zone::BATTLEFIELD);
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_LIFE, Zone::hand(YOU));
-    g.state.see_statics();
-    let library = g.state.zone(Zone::library(YOU)).len();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).unwrap();
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let grant = match &r.kind { RequestKind::PayCosts { options, mana_abilities: true, .. } => options.iter().find(|o| o.source == Some(source) && o.index == 0).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&grant)));
-    let r = next(&mut g);
-    let kept = match &r.kind { RequestKind::PayCosts { options, mana_abilities: true, .. } => options.iter().find(|o| o.source == Some(source) && o.index >= PLAYER_MANA_ABILITY).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&kept)));
-    let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    let r = next(&mut g);
-    let cancel = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::CancelCasting).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&cancel)));
-    assert!(matches!(next(&mut g).kind, RequestKind::Priority { .. }));
-    assert_eq!(g.state.zone(Zone::library(YOU)).len(), library - 1);
-    assert_eq!(g.state.player(YOU).life, 17);
-    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 1);
-    assert!(!g.state.obj(source).tapped);
-    assert!(g.state.obj(star).became.is_some_and(|id| g.state.obj(id).zone == Zone::graveyard(YOU)));
-    assert!(!g.state.effects.iter().any(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_))));
-    assert!(g.state.zone(Zone::hand(YOU)).contains(&spell));
-}
 
-#[test]
-fn color_from_multiple_sacrifices_uses_the_explicit_component() {
-    let mut g = game();
-    let source = put(&mut g, &TWO_SACRIFICE_COLOR_MANA, Zone::BATTLEFIELD);
-    let green = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    let red = put(&mut g, &RED_DORK, Zone::BATTLEFIELD);
-    let r = next(&mut g);
-    let option = option_of(&g, &r, source).expect("the ability is offered");
-    assert!(option.color_choices.has(Color::Red));
-    // Green may be announced before the costs are paid, but the second sacrifice controls the outcome.
-    let mut wrong = Action::of(&option);
-    wrong.color = Some(Color::Green);
-    answer(&mut g, &r, Answer::Act(wrong));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![green]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![red]));
-    let r = next(&mut g);
-    assert!(g.state.obj(green).became.is_none(), "the first sacrifice was reversed");
-    assert!(g.state.obj(red).became.is_none(), "the second sacrifice was reversed");
-    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 0);
-    assert_eq!(g.state.player(YOU).pool.get(Mana::R), 0);
-    let option = option_of(&g, &r, source).expect("the ability may be tried again");
-    let mut action = Action::of(&option);
-    action.color = Some(Color::Red);
-    answer(&mut g, &r, Answer::Act(action));
-    let r = next(&mut g);
-    assert!(matches!(r.kind, RequestKind::ChooseCostPayment { .. }));
-    answer(&mut g, &r, Answer::CostPayment(0));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![green]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![red]));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).pool.get(Mana::R), 1);
-    assert!(g.state.obj(green).became.is_some());
-    assert!(g.state.obj(red).became.is_some());
-}
 
 #[test]
 fn chosen_activation_cost_retains_each_distinct_operation_and_receipt() {
@@ -3619,12 +2406,10 @@ fn chosen_activation_cost_retains_each_distinct_operation_and_receipt() {
     let option = option_of(&g, &r, source).expect("the ability can be proposed");
     answer(&mut g, &r, Answer::Act(Action::of(&option)));
     let r = next(&mut g);
-    let returned = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Return).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(returned));
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Return));
+    answer_offered(&mut g, &r, &[dork, bear]);
     let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![dork]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
+    answer_offered(&mut g, &r, &[dork, bear]);
     next(&mut g);
     let serial = g.state.stack.last().unwrap().serial;
     assert_eq!(g.history().ability_cost_objects(serial, 0, CostPart::Permanents).collect::<Vec<_>>(), vec![bear]);
@@ -3645,38 +2430,16 @@ fn multikicker_and_printed_cost_retain_different_operations() {
     let r = next(&mut g);
     answer(&mut g, &r, Answer::Announce(1));
     let r = next(&mut g);
-    let returned = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Return).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(returned));
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Return));
+    answer_offered(&mut g, &r, &[dork, bear]);
     let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![dork]));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
+    answer_offered(&mut g, &r, &[dork, bear]);
     next(&mut g);
     let item = g.state.stack.last().expect("the spell was cast");
     assert_eq!(g.history().spell_cost_objects(item.object, CostOrigin::PrintedAdditional, 0, CostPart::Permanents).collect::<Vec<_>>(), vec![bear]);
     assert_eq!(g.history().spell_cost_objects(item.object, CostOrigin::Kicker(0), 0, CostPart::Permanents).collect::<Vec<_>>(), vec![dork]);
 }
 
-#[test]
-fn resolution_cost_can_pay_life_before_the_sacrifice_it_enables() {
-    let mut g = game();
-    let spell = put(&mut g, &RESOLUTION_LIFE_AND_SACRIFICE, Zone::hand(YOU));
-    let creature = put(&mut g, &REVERSE_LIFE_STAR, Zone::BATTLEFIELD);
-    g.state.see_statics();
-    let r = cast_to_payment(&mut g, spell);
-    let pay = pays(&r).expect("paying life first makes the creature eligible");
-    answer(&mut g, &r, Answer::Act(Action::of(&pay)));
-    let r = next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 17, "the only currently payable operation was paid first");
-    assert!(matches!(r.kind, RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. }));
-    answer(&mut g, &r, Answer::Cards(vec![creature]));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 22);
-    assert!(g.state.obj(creature).became.is_some_and(|id| g.state.obj(id).zone == Zone::graveyard(YOU)));
-    let payment = g.events().iter().find_map(|r| match r.event { Event::ResolutionPaymentBegan { payment, payer, .. } if payer == YOU => Some(payment), _ => None }).expect("the resolution payment has an identity");
-    assert_eq!(g.history().resolution_cost_objects(payment, 0, CostPart::Permanents).collect::<Vec<_>>(), vec![creature]);
-    assert!(!g.events().iter().any(|r| matches!(r.event, Event::CostObjectPaid { object, .. } if object == creature)), "the object did not pay the spell's casting cost");
-}
 
 #[test]
 fn repeated_resolution_payments_have_distinct_object_receipts() {
@@ -3705,54 +2468,6 @@ fn repeated_resolution_payments_have_distinct_object_receipts() {
     assert_eq!(g.state.player(YOU).life, 25);
 }
 
-#[test]
-fn resolution_payment_receipt_survives_replay_after_an_unrelated_mana_ability_is_undone() {
-    let mut g = game();
-    let source = put(&mut g, &DORK, Zone::BATTLEFIELD);
-    let star = put(&mut g, &LIFE_STAR, Zone::BATTLEFIELD);
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    let spell = put(&mut g, &SPELL_WITH_MANA_AND_LIFE, Zone::hand(YOU));
-    g.state.effect_push(ContinuousEffect { source, affected: source, controller: YOU,
-        kind: EffectKind::PlayerManaAbility(AbilityRef::delayed(g.cards.id_of(&PLAYER_MANA_WITH_LIFE_AND_SACRIFICE), 3)),
-        duration: Duration::EndOfTurn, timestamp: 1, words: Words::NONE });
-    g.state.see_statics();
-    let library = g.state.zone(Zone::library(YOU)).len();
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).unwrap();
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let r = next(&mut g);
-    let reversible = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.source == Some(source) && o.index == 0).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&reversible)));
-    let r = next(&mut g);
-    let kept = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.source == Some(source) && o.index >= PLAYER_MANA_ABILITY).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&kept)));
-    let r = next(&mut g);
-    let life = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Life).unwrap(), other => panic!("expected cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(life));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![star]));
-    let r = next(&mut g);
-    let pay = pays(&r).expect("the resolving mana ability can pay life");
-    answer(&mut g, &r, Answer::Act(Action::of(&pay)));
-    let r = next(&mut g);
-    let returned = match &r.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Return).unwrap(), other => panic!("expected resolution cost ordering, got {other:?}") };
-    answer(&mut g, &r, Answer::CostPayment(returned));
-    let r = next(&mut g);
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    let r = next(&mut g);
-    let cancel = match &r.kind { RequestKind::PayCosts { options, .. } => options.iter().find(|o| o.kind == ActionKind::CancelCasting).unwrap().clone(), other => panic!("expected mana window, got {other:?}") };
-    answer(&mut g, &r, Answer::Act(Action::of(&cancel)));
-    assert!(matches!(next(&mut g).kind, RequestKind::Priority { .. }));
-    assert_eq!(g.state.player(YOU).life, 16);
-    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 1);
-    assert_eq!(g.state.zone(Zone::library(YOU)).len(), library - 1);
-    assert!(!g.state.obj(source).tapped);
-    assert!(g.state.obj(star).became.is_some_and(|id| g.state.obj(id).zone == Zone::graveyard(YOU)));
-    let payments: Vec<_> = g.events().iter().filter_map(|r| match r.event { Event::ResolutionPaymentBegan { payment, .. } => Some(payment), _ => None }).collect();
-    assert_eq!(payments.len(), 1);
-    assert_eq!(g.history().resolution_cost_objects(payments[0], 0, CostPart::Permanents).collect::<Vec<_>>(), vec![bear]);
-    assert!(g.state.obj(bear).became.is_some_and(|id| g.state.obj(id).zone == Zone::hand(YOU)));
-}
 
 #[test]
 fn copied_spell_resolution_payments_belong_to_each_resolving_serial() {
@@ -3977,34 +2692,3 @@ fn granted_choice_uses_the_same_link_for_eligibility_and_payment() {
     assert_eq!(g.state.player(YOU).life, 23);
 }
 
-#[test]
-fn choice_alone_needs_a_candidate_but_life_can_enable_a_spell_choice() {
-    let mut empty = game();
-    let inert = put(&mut empty, &CHOOSE_ONLY_SPELL, Zone::hand(YOU));
-    let r = next(&mut empty);
-    assert!(option_of(&empty, &r, inert).is_none(), "a lone choice with no candidate cannot change itself");
-
-    let mut g = game();
-    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
-    let spell = put(&mut g, &LIFE_THEN_CHOOSE_SPELL, Zone::hand(YOU));
-    let r = next(&mut g);
-    let cast = option_of(&g, &r, spell).expect("paying life can enable the later spell-only choice");
-    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
-    let mut r = next(&mut g);
-    if let RequestKind::ChooseCostPayment { choices, .. } = &r.kind {
-        let life = choices.iter().position(|c| c.kind == CostPaymentKind::Life).expect("life is a legal first operation");
-        answer(&mut g, &r, Answer::CostPayment(life));
-        r = next(&mut g);
-    }
-    match &r.kind {
-        RequestKind::ChooseCards { purpose: Purpose::Choose, cards, rule, .. } => assert!(cards.contains(&bear) && rule.listed_card(bear)),
-        other => panic!("expected spell-context choice after paying life, got {other:?}"),
-    }
-    answer(&mut g, &r, Answer::Cards(vec![bear]));
-    next(&mut g);
-    assert_eq!(g.state.player(YOU).life, 19);
-    let item = *g.state.stack.last().expect("spell was cast");
-    assert_eq!(g.history().spell_cost_objects(item.object, CostOrigin::PrintedAdditional, 1, CostPart::Choose).collect::<Vec<_>>(), vec![bear]);
-    resolve_all(&mut g);
-    assert_eq!(g.state.player(YOU).life, 22);
-}

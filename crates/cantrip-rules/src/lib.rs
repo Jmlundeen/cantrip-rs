@@ -1742,7 +1742,8 @@ impl<'a> Cx<'a> {
     /// CR 107.4h: current characteristics at production, including LKI if the source has left (CR 608.2h).
     fn mana_is_snow(&self) -> bool {
         let source = self.mana_source();
-        source != ObjectId::NONE && self.chars(source).supertypes.snow
+        // Snow is a supertype (CR 205.4g), set by layer 4 at the latest: the layers after it are not worked out for it.
+        source != ObjectId::NONE && layers::chars_before(self.g.cards, &self.g.state, &self.g.log, source, Layer::Color).supertypes.snow
     }
 
     /// The source of mana added now (CR 106.3): the mana ability's source while one runs, else the spell resolving or the

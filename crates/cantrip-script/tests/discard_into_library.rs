@@ -1004,7 +1004,6 @@ Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)
 Bot1.Hand.Survival of the Fittest.Cast
 Bot1.Battlefield.Survival of the Fittest.Activate
-Bot1.Choose(Pay mana)
 Bot1.Choose(Birds of Paradise)
 Bot1.Search(Noble Hierarch)
 [Bot1.Main1]
@@ -1110,9 +1109,6 @@ Bot1.Graveyard.Collective Brutality.Cast
 Bot1.Modes(1; 3)
 Bot1.Target(Bot2)
 Bot1.Target(Bot2)
-Bot1.Choose(Pay mana)
-Bot1.Choose(Pay mana)
-Bot1.Choose(Cost: 1)
 Bot1.Choose(Forest)
 Bot1.Choose(Chain Lightning)
 Bot1.Choose(Lightning Bolt)

@@ -38,7 +38,8 @@ Bot2.Pass
     let RequestKind::ChooseCards { purpose, rule, cards, .. } = &request.kind else { panic!("expected a card choice") };
     assert_eq!(*purpose, Purpose::Choose);
     assert_eq!(rule.count, Count::AsManyAsCan(1));
-    assert_eq!(rule.kind, "source of damage");
-    assert_eq!(rule.words(&|_| String::new()), ["blue"]);
+    // The color is part of what the question calls the source, as the Circle's text words it now (CR 612).
+    assert_eq!(rule.kind, "blue source of damage");
+    assert!(rule.words(&|_| String::new()).is_empty());
     assert!(cards.iter().any(|id| result.game.cards.get(result.game.state.obj(*id).card).name == "Psionic Blast"));
 }

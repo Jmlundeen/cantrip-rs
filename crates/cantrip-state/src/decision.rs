@@ -970,7 +970,8 @@ impl BlockCapacity {
         let mut total = 1u32;
         for c in capacities {
             match c {
-                BlockCapacity::AnyNumber => return u32::MAX,
+                // `u32::MAX` additional is "any number" (`block_allowance`), as `AnyNumber` is.
+                BlockCapacity::AnyNumber | BlockCapacity::Additional(u32::MAX) => return u32::MAX,
                 BlockCapacity::Additional(n) => total += n,
             }
         }

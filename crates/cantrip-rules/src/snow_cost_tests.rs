@@ -157,6 +157,10 @@ fn snow_ability_advice_nested_cost_and_sacrificed_source_are_exact() {
     choose(&mut g, |o| o.source == Some(filter));
     choose(&mut g, |o| o.source == Some(snow));
     close_mana_window(&mut g);
+    // The window closed once the snow mana covered the {S}; that mana pays it.
+    if matches!(g.pending().map(|r| &r.kind), Some(RequestKind::PayCosts { mana_abilities: false, .. })) {
+        choose(&mut g, |o| o.kind == ActionKind::AssignMana && o.pay_snow);
+    }
     assert_eq!(g.state.player(YOU).pool.get(Mana::R), 2);
     assert!(g.state.mana_from_of(YOU).all(|m| !m.snow), "filter, not payment producer, is source of new mana");
     assert!(!g.state.obj(plain).tapped);

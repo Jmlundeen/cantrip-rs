@@ -2560,14 +2560,21 @@ fn order_matters(cx: &mut Cx, player: PlayerId, spell: ObjectId, scope: PaymentS
             SpellPayment::Energy { amount, .. } => (0, amount),
             _ => continue,
         };
+        // What the other steps could choose, and what each of those is (a sacrificed creature's power is read as it is
+        // paid, CR 608.2h), before and after.
+        let seen = |cx: &Cx| -> Vec<(ObjectId, Chars)> {
+            eligible.iter().enumerate().filter(|&(j, _)| j != k)
+                .flat_map(|(_, &other)| footprint(cx, player, spell, scope, taken, &remaining[other]).objects)
+                .map(|id| (id, cx.chars(id)))
+                .collect()
+        };
+        let before = seen(cx);
         let mark = cx.s().mark();
         cx.st().update_player(player, |p| {
             p.life -= life as i32;
             p.pay_energy(energy.min(u32::from(u8::MAX)) as u8);
         });
-        let changed = eligible.iter().enumerate().any(|(j, &other)| {
-            j != k && footprint(cx, player, spell, scope, taken, &remaining[other]).objects != prints[j].objects
-        });
+        let changed = seen(cx) != before;
         cx.st().revert(mark);
         if changed {
             return true;
@@ -8357,8 +8364,10 @@ impl<'a> Offer<'a> {
 
     /// `offer_costs` at a known speed.
     fn offer_costs_at(&self, card: ObjectId, face: &'static CardDef, way: u8, route: &Route, instant: bool, options: &mut Vec<ActionOption>) {
+        // What a permission adds is owed with the mana cost (CR 118.8): a cast that can't pay it is not offered.
         if instant == self.instants
             && let Some(base) = route.base(face)
+            && (route.by.is_none() || can_pay_other(self.cx, card, self.player, &route.additional))
         {
             self.offer(card, face, way, route, base, None, options);
         }
@@ -8434,9 +8443,6 @@ impl<'a> Offer<'a> {
     /// `ways` opens. What the permission names instead is the one alternative cost (CR 118.9a).
     fn by_route(&self, card: ObjectId, def: &'static CardDef, route: &Route, ways: impl Fn(&WayDef) -> bool, options: &mut Vec<ActionOption>) {
         let (cx, player) = (self.cx, self.player);
-        if route.by.is_some() && !can_pay_other(cx, card, player, &route.additional) {
-            return;
-        }
         let land = def.is(CardType::Land);
         let speed = self.speed(card);
         let mut whole_allowed = false;
@@ -11538,14 +11544,14 @@ fn ability_cost_payable(cx: &Cx, source: ObjectId, controller: PlayerId, whole: 
     def.cost_choice.iter().any(|way| can_pay_activation_parts(cx, source, controller, whole, &way.cost, paid, by))
 }
 
-/// Whether two independent parts of one cost could both be paid (CR 601.2h, 118.3): each on its own, what they ask
-/// together (`add_extra_totals`: the cards, life and the like they take between them), and their permanents by distinct
-/// objects, each by its own filter.
+/// Whether two independent parts of one cost could both be paid (CR 601.2h, 118.3): what they ask together
+/// (`add_extra_totals`: the cards, life and the like they take between them, a discard of one feeding a graveyard exile of
+/// the other), and their permanents by distinct objects, each by its own filter.
 #[allow(clippy::too_many_arguments)]
 fn can_pay_both(cx: &Cx, source: ObjectId, player: PlayerId, a: &Cost, b: &Cost, judged: Judged, paid: Option<CostFor>, by: Option<Linked>) -> bool {
-    can_pay_other_as(cx, source, player, a, judged, paid, by)
-        && can_pay_other_as(cx, source, player, b, judged, paid, by)
-        && can_pay_other_as(cx, source, player, &add_extra_totals(*a, *b), judged, paid, by)
+    can_pay_other_as(cx, source, player, &add_extra_totals(*a, *b), judged, paid, by)
+        // The aggregate keeps one choice (`add_extra_totals`): the other's is judged on its own.
+        && (a.choose.is_none() || b.choose.is_none() || can_pay_other_as(cx, source, player, b, judged, paid, by))
         && permanent_costs_payable(cx, source, player, &[a, b], judged, paid, by)
 }
 
@@ -12169,9 +12175,16 @@ fn activate_mana_as(
     // spell's are (CR 605.3a, 601.2g-h): a mana ability activated while paying it may have tapped them. So are those of a
     // cost of separately specified parts, each as it is paid, and of one a cost change may rewrite.
     let late = def.cost.permanents.is_some_and(|p| p.tapped);
-    let dynamic = late || !def.cost.components.is_empty() || def.cost_change.is_some() || !cost_change_sources(cx).is_empty();
-    let chosen: Vec<ObjectId> = if dynamic { Vec::new() } else { sacrifice.iter().filter_map(|t| t.object()).collect() };
     let color_component = if def.colors_from_sacrifice { color_sacrifice_component(def) } else { None };
+    // A color named for the source itself or the permanent that gave the ability, sacrificed for it (CR 106.7), is read
+    // as that part of the cost is paid: no permanent comes with the activation for it.
+    let by_itself = color_component.is_some_and(|at| {
+        let mut parts = Vec::new();
+        atomic_costs(&def.cost, &mut parts);
+        parts.get(at).is_some_and(|part| part.sacrifice_self || part.sacrifice_granter)
+    });
+    let dynamic = late || by_itself || !def.cost.components.is_empty() || def.cost_change.is_some() || !cost_change_sources(cx).is_empty();
+    let chosen: Vec<ObjectId> = if dynamic { Vec::new() } else { sacrifice.iter().filter_map(|t| t.object()).collect() };
 
     let mut adds_nothing = false;
     if def.colors_from_sacrifice && (!dynamic || color_component.is_none()) {

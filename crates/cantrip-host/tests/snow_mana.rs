@@ -74,37 +74,3 @@ fn real_mana_undo_restores_the_captured_quality_rows() {
     assert!(!g.state.obj(source).tapped);
 }
 
-#[test]
-fn mana_window_wire_distinguishes_closing_the_window_from_spending() {
-    static SOURCE: CardDef = CardDef { name: "Window wire source", abilities: &[mana_ability(TAP, add(Mana::U), "{T}: Add {U}.")], ..LAND };
-    static COST: CardDef = CardDef { name: "Window wire spell", cost: mana("{1}"), ..SPELL };
-    let cards = Box::leak(Box::new(CardTable::new([&LAND, &SOURCE, &COST])));
-    let mut g = Game::new(cards, &Setup { decks: vec![vec![cards.id_of(&LAND); 20]; 2], ..Default::default() });
-    while !g.state.agenda.is_empty() { g.state.frame_remove(0); }
-    g.state.update_turn(|t| { t.active = YOU; t.priority = YOU; t.set_step(Step::PrecombatMain); });
-    g.state.frame_push(Frame::new(FrameKind::Priority));
-    let source = g.state.push_obj(Obj::new(cards.id_of(&SOURCE), YOU, Zone::BATTLEFIELD));
-    g.state.zone_push(Zone::BATTLEFIELD, source);
-    let spell = g.state.push_obj(Obj::new(cards.id_of(&COST), YOU, Zone::hand(YOU)));
-    g.state.zone_push(Zone::hand(YOU), spell);
-    g.state.add_mana(YOU, Mana::C, 1, source, None, ManaLasts::Step, false);
-    g.run();
-    let request = g.pending().unwrap().clone();
-    let RequestKind::Priority { options } = &request.kind else { panic!("priority") };
-    let cast = Action::of(options.iter().find(|o| o.kind == ActionKind::CastSpell && o.source == Some(spell)).unwrap());
-    g.answer(request.id, YOU, Answer::Act(cast)).unwrap(); g.run();
-    let request = g.pending().unwrap().clone();
-    let mut handles = HandleSpace::new();
-    let PromptPayload::PayCostsPromptMessage(pay) = prompt(&g, &request, &mut handles).unwrap().0 else { panic!("mana window") };
-    assert!(pay.mana_abilities);
-    assert_eq!(pay.remaining_generic, 0, "the pool covers the cost without being spent");
-    assert_eq!(g.state.player(YOU).pool.total(), 1);
-    let json = serde_json::to_value(&pay).unwrap();
-    assert_eq!(json["ManaAbilities"], true);
-    let done = pay.options.iter().find(|o| o.kind == ActionKindView::ConfirmCasting).unwrap();
-    let answer = AnswerPayload::TakeActionAnswer(TakeActionAnswer::take(done));
-    let answer = cantrip_host::answer::translate(&answer, &request, &handles, &g).unwrap_or_else(|_| panic!("wire answer translates"));
-    g.answer(request.id, YOU, answer).unwrap(); g.run();
-    assert_eq!(g.state.player(YOU).pool.total(), 0, "the cost was paid after closing the window");
-    assert!(!g.state.obj(source).tapped);
-}

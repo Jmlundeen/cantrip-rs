@@ -1275,13 +1275,13 @@ fn alternate_way_and_permission_keep_distinct_permanent_costs() {
     game.run();
     let option = casts_of(&game, spell).into_iter().find(|o| by(o) == Some(giver) && o.index == 1).expect("the composed way is offered");
     take(&mut game, &option);
-    let request = { game.run(); game.pending().unwrap().clone() };
-    let selected = match &request.kind { RequestKind::ChooseCostPayment { choices, .. } => choices.iter().position(|c| c.kind == CostPaymentKind::Return).unwrap(), other => panic!("expected ordering, got {other:?}") };
-    game.answer(request.id, request.player, Answer::CostPayment(selected)).unwrap();
-    let request = { game.run(); game.pending().unwrap().clone() };
-    game.answer(request.id, request.player, Answer::Cards(vec![returned])).unwrap();
-    let request = { game.run(); game.pending().unwrap().clone() };
-    game.answer(request.id, request.player, Answer::Cards(vec![sacrifice])).unwrap();
+    // The two costs choose from different permanents, so their order is not asked (CR 601.2h): each is chosen in turn.
+    for _ in 0..2 {
+        let request = { game.run(); game.pending().unwrap().clone() };
+        let RequestKind::ChooseCards { cards, .. } = &request.kind else { panic!("expected a cost choice, got {:?}", request.kind) };
+        let pick = if cards.contains(&returned) { returned } else { sacrifice };
+        game.answer(request.id, request.player, Answer::Cards(vec![pick])).unwrap();
+    }
     game.run();
     assert!(game.state.obj(returned).became.is_some_and(|id| game.state.obj(id).zone == Zone::hand(ME)));
     assert!(game.state.obj(sacrifice).became.is_some_and(|id| game.state.obj(id).zone == Zone::graveyard(ME)));

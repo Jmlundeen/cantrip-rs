@@ -743,9 +743,6 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Kaito, Bane of Nightmares.Activate(Ability: Ninjutsu)
-Bot1.Choose(Pay mana)
-Bot1.Choose(Pay mana)
-Bot1.Choose(Pay mana)
 Bot1.Choose(Guerrilla Gorilla)
 Bot1.Pass
 [Handover Bot2.Pass]
@@ -1155,8 +1152,8 @@ Island x20
 [Actions]
 Bot1.Hand.Plains.Play
 Bot1.Hand.Black Lotus.Cast
-Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 Bot1.Hand.Ainok Tracker.Cast(Ability: Morph)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 Bot1.Pass
 Bot2.Pass
 Bot1.Hand.Mox Pearl.Cast

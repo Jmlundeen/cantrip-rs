@@ -125,15 +125,14 @@ fn action(game: &mut Game, kind: ActionKind, source: ObjectId) {
     game.answer(r.id, r.player, Answer::Act(Action::of(option))).unwrap();
 }
 
+/// Pays the mana first where the order of the costs is asked (CR 601.2h); where it cannot matter it is not, and the mana is
+/// paid first anyway.
 fn pay_mana_first(game: &mut Game) {
-    let mut paid = false;
     while let Some(r) = game.pending().cloned() {
         let RequestKind::ChooseCostPayment { choices, .. } = &r.kind else { break };
         let mana = choices.iter().position(|c| c.kind == CostPaymentKind::Mana).expect("mana payment is offered");
         game.answer(r.id, r.player, Answer::CostPayment(mana)).unwrap();
-        paid = true;
     }
-    assert!(paid, "payment order was asked");
 }
 
 fn finish_payment(game: &mut Game, source: ObjectId, land: ObjectId) {
