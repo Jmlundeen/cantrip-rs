@@ -242,28 +242,6 @@ public sealed class CardActions
 
             if (adds.Length > 0 || (color is not null && option.ColorChoices.Count > 0 && option.ProducesOfAnyColorEach == 0))
             {
-                // The ability's own words can contain more than the mana it adds (Ancient Tomb, Adarkar Wastes).
-                // Keep them, and distinguish rows that choose a color or a permanent for the cost.
-                string? fullDescription = null;
-                if (option.Description.Length > 0)
-                {
-                    string description = option.Description.TrimEnd('.');
-                    if (color is not null || combination is { Count: > 0 } || ChoosesColorless(option))
-                    {
-                        description = color is { } chosenColor && option.ProducesOfAnyOneColor == 0
-                            ? $"Choose {{{Symbol(chosenColor)}}} → {(adds.Length == 0 ? "no mana" : adds)} — {description}"
-                            : $"{adds} — {description}";
-                    }
-                    if (sacrificed.Length > 0)
-                    {
-                        description += $" ({sacrificed})";
-                    }
-                    if (option.Tap is { } chosenTap && !anyPermanent)
-                    {
-                        description += $" ({client.Object(chosenTap)?.Name ?? "permanent"})";
-                    }
-                    fullDescription = description;
-                }
                 // With more than one permanent able to pay the sacrifice, the cost line names the one this row would
                 // take: "Sacrifice a Forest" is the same sentence on every row and says nothing about which.
                 string cost = sacrificed.Length > 0 ? $"{option.CostText} ({sacrificed})" : option.CostText;
@@ -271,8 +249,10 @@ public sealed class CardActions
                 {
                     cost += $" ({client.Object(tapped)?.Name ?? "permanent"})";
                 }
-                string text = fullDescription ?? (cost.Length > 0 ? $"{cost}: Add {adds}" : $"{name}: add {adds}");
-                if (fullDescription is null && color is { } named && option.ProducesOfAnyOneColor == 0)
+                string text = cost.Length > 0 ? $"{cost}: Add {adds}" : $"{name}: add {adds}";
+                // A color chosen for the ability that is not the color of mana it adds (the type a sacrificed land could
+                // produce, CR 106.7) says it is chosen, and what that row then adds.
+                if (color is { } named && option.ProducesOfAnyOneColor == 0)
                 {
                     text = $"{(cost.Length > 0 ? cost : name)}: Choose {{{Symbol(named)}}} → {(adds.Length == 0 ? "no mana" : adds)}";
                 }

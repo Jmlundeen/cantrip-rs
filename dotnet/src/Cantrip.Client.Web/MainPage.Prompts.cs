@@ -340,7 +340,9 @@ public sealed partial class MainPage
 
         if (prompt.ManaAbilities)
         {
-            Prompt($"Make mana for {name}", $"{prompt.Total} is owed  ·  activate mana abilities now, then choose Done to begin paying");
+            // The chance to activate mana abilities before the cost is paid (CR 601.2g): it closes by itself once the mana
+            // made covers what is owed, so Done is only for paying the rest some other way (convoke, delve).
+            Prompt($"Pay for {name}", $"{prompt.Remaining} of {prompt.Total} still to pay  ·  tap a land or click mana in your pool{colorless}");
             if (_actions.Confirm is { } done)
             {
                 _pass = () => Send(client, AnswerFor(done));
@@ -950,7 +952,7 @@ public sealed partial class MainPage
 
         Prompt(
             $"Divide {prompt.Total} for {source}",
-            $"{prompt.Text}  ·  {assigned} of {prompt.Total} assigned, among {targeted} target{(targeted == 1 ? string.Empty : "s")}{(prompt.MaxTargets > 0 ? $" (up to {prompt.MaxTargets})" : string.Empty)}{(prompt.Optional ? "  ·  or no target at all" : string.Empty)}  ·  click a card or use the share controls");
+            $"{prompt.Text}  ·  {assigned} of {prompt.Total} assigned, among {targeted} target{(targeted == 1 ? string.Empty : "s")}{(prompt.MaxTargets > 0 ? $" (up to {prompt.MaxTargets})" : string.Empty)}{(prompt.Optional ? "  ·  or no target at all" : string.Empty)}  ·  click a card to add one, or use its − and +");
 
         bool none = prompt.Optional && assigned == 0;
 

@@ -620,7 +620,9 @@ public sealed partial class MainPage
                     0,
                     restricted.Amount,
                     restricted.Snow ? $"snow · from {from}" : $"from {from}",
-                    restricted.Snow ? "Mana produced by a snow source; may also pay {S}" : $"Mana {from} produced, kept apart because {from} cares whether it is spent",
+                    restricted.Snow
+                        ? $"Mana {from} produced, kept apart because {from} cares whether it is spent. Produced by a snow source; may also pay {{S}}"
+                        : $"Mana {from} produced, kept apart because {from} cares whether it is spent",
                     restricted.Source,
                     restricted.Snow));
                 continue;
@@ -634,7 +636,9 @@ public sealed partial class MainPage
                 restricted.SpendManaValue,
                 restricted.Amount,
                 restricted.Snow ? (restricted.Filter == ManaSpendFilterView.None && restricted.Effect == ManaSpendEffectView.None ? "snow" : $"snow · {RestrictionCaption(restricted.Filter, restricted.Effect, restricted.SpendSubtypes, restricted.SpendManaValue)}") : RestrictionCaption(restricted.Filter, restricted.Effect, restricted.SpendSubtypes, restricted.SpendManaValue),
-                restricted.Snow ? "Mana produced by a snow source; may also pay {S}" : RestrictionTooltip(restricted.Filter, restricted.Effect, restricted.SpendSubtypes, restricted.SpendManaValue),
+                SnowTooltip(restricted.Snow, restricted.Filter == ManaSpendFilterView.None && restricted.Effect == ManaSpendEffectView.None
+                    ? string.Empty
+                    : RestrictionTooltip(restricted.Filter, restricted.Effect, restricted.SpendSubtypes, restricted.SpendManaValue)),
                 snow: restricted.Snow));
         }
 
@@ -731,6 +735,16 @@ public sealed partial class MainPage
         (_, ManaSpendEffectView.GainsHaste) => "haste",
         (_, ManaSpendEffectView.CantBeCountered) => "uncounterable",
         _ => "restricted",
+    };
+
+    /// <summary>
+    /// A pool chip's tooltip: what restricts the mana, with what a snow source's mana may also pay ({S}, CR 107.4h) after it.
+    /// </summary>
+    private static string SnowTooltip(bool snow, string restriction) => (snow, restriction.Length > 0) switch
+    {
+        (false, _) => restriction,
+        (true, false) => "Mana produced by a snow source; may also pay {S}",
+        (true, true) => $"{restriction}. Produced by a snow source; may also pay {{S}}",
     };
 
     private static string RestrictionTooltip(ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue)
