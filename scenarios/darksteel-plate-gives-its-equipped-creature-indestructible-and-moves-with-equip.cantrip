@@ -1,0 +1,82 @@
+# "Equipped creature has indestructible" (CR 604.1, 702.12b) and "Equip {2}" (CR 702.6a, 701.3a): the equip refuses a
+# noncreature permanent of Bot1's and Bot2's creature, since its only targets are creatures its controller controls. Bot1 equips
+# Ornithopter, then moves the Plate to Llanowar Elves for another {2}, so Ornithopter loses indestructible and Bot2's Wrath of
+# God destroys it while the equipped Elf survives. Both equips are paid exactly with two moxes, the pool empty right after paying.
+
+[Bot1 Deck]
+Darksteel Plate
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Ornithopter
+Llanowar Elves
+Island x14
+
+[Bot2 Deck]
+Plains
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Wrath of God
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Darksteel Plate.Cast
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Darksteel Plate.Activate(Ability: Equip; Bot1.Battlefield.Mox Emerald)
+! Bot1.Battlefield.Darksteel Plate.Activate(Ability: Equip; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Darksteel Plate.Activate(Ability: Equip; Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Darksteel Plate.Activate(Ability: Equip; Llanowar Elves)
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 6
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Graveyard = Ornithopter
+Bot2.Graveyard = Wrath of God; Ornithopter
+Bot2.Battlefield.Count = 4
