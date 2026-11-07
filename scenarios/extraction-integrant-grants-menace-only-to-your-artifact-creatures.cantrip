@@ -1,0 +1,52 @@
+# Menace (CR 702.111) only on the artifact creatures its controller controls: Bot1's Ornithopter has flying and menace
+# beside the Integrant, a lone Ornithopter of Bot2's cannot block the Integrant (the refusal) while the same blocker can
+# block Bot1's Grizzly Bears, an ordinary creature, and Bot2's own Ornithopter never gains menace.
+
+[Bot1 Deck]
+Black Lotus
+Swamp
+Extraction Integrant
+Ornithopter
+Forest
+Grizzly Bears
+Swamp x8
+Forest x2
+
+[Bot2 Deck]
+Ornithopter
+Forest
+Grizzly Bears
+Forest x12
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Extraction Integrant.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Extraction Integrant > Bot2; Grizzly Bears > Bot2)
+! Bot2.Block(Ornithopter > Extraction Integrant)
+Bot2.Block(Grizzly Bears > Grizzly Bears)
+[T5 Bot1.Main2]
+
+[Expect]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Menace
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Count = 4
+Bot2.Battlefield.Count = 3
+Bot2.Life = 19

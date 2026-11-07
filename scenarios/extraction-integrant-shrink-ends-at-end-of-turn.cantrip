@@ -1,0 +1,43 @@
+# The -1/-1 from Extraction Integrant's granted trigger (CR 611.2) lasts only until end of turn: on Bot1's next turn both
+# blockers are back to their printed 3/3, so an effect without its end would leave them 2/2 here.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Extraction Integrant
+Swamp x12
+
+[Bot2 Deck]
+Black Lotus
+Forest
+Kalonian Tusker
+Kalonian Tusker
+Forest x12
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Kalonian Tusker.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Kalonian Tusker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Extraction Integrant.Cast
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Extraction Integrant > Bot2)
+Bot2.Block(Kalonian Tusker > Extraction Integrant; Kalonian Tusker#2 > Extraction Integrant)
+[T5 Bot1.Main2]
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+
+[Expect]
+? Bot2.Battlefield.Kalonian Tusker#1.Power = 3
+? Bot2.Battlefield.Kalonian Tusker#1.Toughness = 3
+? Bot2.Battlefield.Kalonian Tusker#2.Power = 3
+? Bot2.Battlefield.Kalonian Tusker#2.Toughness = 3
