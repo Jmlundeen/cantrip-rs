@@ -1,0 +1,21 @@
+# Choked Estuary: "As this land enters, you may reveal an Island or Swamp card from your hand. If you don't, this land
+# enters tapped." (CR 614.1d, 701.20a). The second type counts as well as the first: Bot1's hand holds only Swamps beside
+# the land, it reveals one, and Choked Estuary enters untapped. A land that took only Islands would offer nothing to reveal
+# and enter tapped.
+
+[Bot1 Deck]
+Choked Estuary
+Swamp x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Choked Estuary.Play
+Bot1.Accept
+Bot1.Choose(Swamp)
+? Bot1.Revealed = Swamp
+? Bot1.Battlefield.Choked Estuary.Tapped = false
+
+[Expect]
+Bot1.Battlefield.Choked Estuary.Tapped = false

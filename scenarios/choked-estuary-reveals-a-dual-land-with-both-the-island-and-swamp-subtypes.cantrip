@@ -1,0 +1,21 @@
+# "You may reveal any land card with either or both of the appropriate subtypes" (ruling, CR 701.20a): Bot1 reveals Watery
+# Grave, whose type line is "Land — Island Swamp", so Choked Estuary enters untapped.
+
+[Bot1 Deck]
+Choked Estuary
+Watery Grave
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Choked Estuary.Play
+Bot1.Accept
+Bot1.Choose(Watery Grave)
+? Bot1.Battlefield.Choked Estuary.Tapped = false
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Choked Estuary.Tapped = false
+Bot1.Hand.Count = 6
