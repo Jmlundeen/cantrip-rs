@@ -107,14 +107,24 @@ fn enchants_allow(q: &dyn Query, chars: &Chars, asker: &Asker, what: Target) -> 
 /// enchant abilities allow. An Aura that is also a creature can enchant no one (CR 303.4d).
 pub fn player_allows(cx: &Cx, aura: ObjectId, player: PlayerId) -> bool {
     let q: &dyn Query = cx;
-    if q.state().player(player).lost
-        || crate::layers::player_protection(cx.cards(), cx.s(), &cx.g.log, player, q.controller(aura)).is_some()
-    {
+    player_allows_as(cx, aura, &q.chars(aura), q.controller(aura), player)
+}
+
+/// `player_allows` for the Aura `aura` with the characteristics `ac` under `controller`: as it is (`player_allows`), or as
+/// it would exist on the battlefield when it is about to enter (`enters_attachable_to_player`, `aura_hosts`).
+fn player_allows_as(cx: &Cx, aura: ObjectId, ac: &Chars, controller: PlayerId, player: PlayerId) -> bool {
+    if cx.s().player(player).lost || crate::layers::player_protection(cx.cards(), cx.s(), &cx.g.log, player, controller).is_some() {
         return false;
     }
-    let ac = q.chars(aura);
-    let asker = Asker { source: aura, controller: q.controller(aura), by: None, spell: false };
-    !ac.is(CardType::Creature) && enchants_allow(q, &ac, &asker, Target::Player(player))
+    let asker = Asker { source: aura, controller, by: None, spell: false };
+    !ac.is(CardType::Creature) && enchants_allow(cx, ac, &asker, Target::Player(player))
+}
+
+/// Whether an Aura about to enter the battlefield attached to `player` - an Aura spell resolving, which names the player it
+/// targeted (CR 608.3c) - could enchant them: judged on it as it would exist there (`it`, CR 614.12) under `controller`
+/// (`player_allows`). Otherwise it doesn't enter (CR 303.4i).
+pub(crate) fn enters_attachable_to_player(cx: &Cx, id: ObjectId, it: &Chars, controller: PlayerId, player: PlayerId) -> bool {
+    it.has_subtype(Subtype::Aura) && player_allows_as(cx, id, it, controller, player)
 }
 
 /// What an Aura card about to enter would enchant (CR 303.4f: "a legal object or player"): the battlefield, then the
@@ -139,9 +149,7 @@ pub(crate) fn aura_hosts(cx: &Cx, aura: ObjectId, aura_chars: &Chars, controller
         }
     }
     for p in state.apnap() {
-        if enchants_allow(cx, aura_chars, &asker, Target::Player(p))
-            && crate::layers::player_protection(cx.cards(), state, &cx.g.log, p, controller).is_none()
-        {
+        if player_allows_as(cx, aura, aura_chars, controller, p) {
             hosts.push(Target::Player(p));
         }
     }

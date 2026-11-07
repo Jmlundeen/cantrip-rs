@@ -587,13 +587,20 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     melded: None,
                 };
                 ops::prepare_entry(cx, &mut entering)?;
+                // CR 303.4i, 608.3c: an Aura spell whose target is still legal, but which as it would exist on the
+                // battlefield (CR 614.12) can't legally enchant it, doesn't enter, and is put into its owner's graveyard
+                // instead - what its target check doesn't ask: "can't be enchanted by other Auras" (CR 303.4), an Aura that
+                // would be a creature (CR 303.4d). Protection from the Aura made its target illegal, so it didn't resolve
+                // (CR 702.16b, 608.3b).
+                let cant_enchant = (entering.attach.is_some() || entering.attach_player.is_some())
+                    && ops::attached_entry(cx, &entering, &[item.object]) == ops::AttachedEntry::Stays;
                 if let Some(at) = on_stack(cx) {
                     cx.st().stack_remove(at);
                 }
                 // CR 712.13a: one that would enter with an instant or sorcery face up - turned over as it enters, by its
                 // daybound at night (CR 702.145b) - doesn't enter, and is put into its owner's graveyard instead (CR 304.4,
                 // 307.4).
-                if ops::instant_or_sorcery_entering(cx, item.object, entering.transformed) {
+                if cant_enchant || ops::instant_or_sorcery_entering(cx, item.object, entering.transformed) {
                     leave_stack(cx, std::slice::from_ref(&item), ZoneReason::Resolve);
                     let card = cx.s().obj(item.object).card;
                     cx.record(Event::Resolved { source: item.object, ability: AbilityRef::spell(card) });

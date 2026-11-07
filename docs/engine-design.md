@@ -490,7 +490,11 @@ only the candidates the host's verdict on those picked says may be added.
   and unattached to anything else (an Equipment that would be a creature there among them, CR 301.5c). Only the card's own entry is
   made. `Game::could_enter_attached(card, controller, host)` asks the same judgement before the move, for an effect whose player
   chooses the Auras and their hosts (Storm Herald): only its own entering replacements (`prepare_entry`) are left out, as their
-  choices are made as it moves. `can_attach` is the question for an attachment already on the battlefield.
+  choices are made as it moves. `can_attach` is the question for an attachment already on the battlefield. An Aura spell resolving
+  is judged the same way (`ops::attached_entry`, for an object or a player it targeted): its target is still legal (608.3b, the
+  enchant ability and protection), but if as it would exist it can't legally enchant it ("can't be enchanted by other Auras", an
+  Aura that would be a creature) it is put into its owner's graveyard instead of entering (303.4i, 608.3c), and a copy of one makes
+  no token.
 
 - **An effect that says what a card is as it enters is that from the start (614.12)**: `Game::put_onto_battlefield_as`
   takes an `EntersAs` ("It's an enchantment", the Enduring cycle; "It's an Aura enchantment with enchant Forest you control

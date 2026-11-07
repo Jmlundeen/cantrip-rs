@@ -55,9 +55,39 @@ static EQUIPMENT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A creature with protection from blue, the Plain Aura's color.
+static WARDED_BEAR: CardDef = CardDef { name: "Sole Warded Bear", protection: ColorSet::of(Color::Blue), ..BEAR };
+
+fn an_enchantment_spell_cast(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, .. } if q.chars(*spell).is(CardType::Enchantment) => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+fn nothing(_: &mut dyn cantrip_api::Game, _: &StackItem) -> Result<(), Suspend> {
+    Ok(())
+}
+
+/// "Whenever a player casts an enchantment spell, do nothing."
+static WATCHER: CardDef = CardDef {
+    name: "Sole Watcher",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    abilities: &[triggered(when(EventMask::SPELL_CAST, an_enchantment_spell_cast), nothing, "Whenever a player casts an enchantment spell, do nothing.")],
+    ..CardDef::BLANK
+};
+
 fn game() -> Game {
-    let table: &'static CardTable =
-        Box::leak(Box::new(CardTable::new([&LAND, &BEAR, &SORCERY, &SOLE_AURA, &PLAIN_AURA, &EQUIPMENT])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([
+        &LAND,
+        &BEAR,
+        &SORCERY,
+        &SOLE_AURA,
+        &PLAIN_AURA,
+        &EQUIPMENT,
+        &WARDED_BEAR,
+        &WATCHER,
+    ])));
     let deck = || vec![table.id_of(&LAND); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -133,6 +163,130 @@ fn another_aura_spell_may_target_the_permanent() {
     assert!(spell_can_target(&g, sorcery, bear));
     let copy = put(&mut g, &SOLE_AURA, Zone::STACK);
     assert!(spell_can_target(&g, copy, bear), "a second copy may target it too");
+}
+
+/// Casts the Aura card `card` from its owner's hand onto `host`, through the game's own priority and targeting: the targets the
+/// spell was offered, and how many triggered abilities its cast put on the stack.
+fn cast_onto(g: &mut Game, card: ObjectId, host: ObjectId) -> (Vec<Target>, usize) {
+    g.run();
+    let r = g.pending().cloned().expect("priority");
+    let RequestKind::Priority { options } = &r.kind else { panic!("unexpected {:?}", r.kind) };
+    let option = options.iter().find(|o| o.kind == ActionKind::CastSpell && o.source == Some(card)).expect("the Aura can be cast");
+    let offered = option.target_candidates.to_vec();
+    let mut action = Action::of(option);
+    action.targets = vec![Target::Object(host)].into();
+    g.answer(r.id, r.player, Answer::Act(action)).expect("cast");
+    let r = g.pending().cloned().expect("priority");
+    assert!(matches!(r.kind, RequestKind::Priority { .. }), "unexpected {:?}", r.kind);
+    assert!(g.state.stack.iter().any(|i| i.kind == StackKind::Spell), "the Aura spell is on the stack");
+    (offered, g.state.stack.iter().filter(|i| i.kind == StackKind::Triggered).count())
+}
+
+/// Both players pass priority until the stack is empty.
+fn resolve_all(g: &mut Game) {
+    while !g.state.stack.is_empty() {
+        let r = g.pending().cloned().expect("priority");
+        assert!(matches!(r.kind, RequestKind::Priority { .. }), "unexpected {:?}", r.kind);
+        g.answer(r.id, r.player, Answer::Pass).expect("pass");
+    }
+}
+
+/// Whether `spell` resolved (CR 608.2): the history's `Resolved` record of it.
+fn resolved(g: &Game, spell: ObjectId) -> bool {
+    g.log.iter().any(|r| matches!(r.event, Event::Resolved { source, .. } if source == spell))
+}
+
+/// Whether anything entered the battlefield from the stack as `spell` (CR 608.3).
+fn entered_from(g: &Game, spell: ObjectId) -> bool {
+    g.log.iter().any(|r| matches!(r.event, Event::ZoneChange { old, to, .. } if old == spell && to.is(ZoneKind::Battlefield)))
+}
+
+/// Another Aura spell targeting the enchanted creature is cast (an "enchantment spell cast" trigger goes on the stack) and
+/// resolves, its target still legal; as it can't legally enchant it, it doesn't enter the battlefield - not even for a moment
+/// before the state-based actions - and is put into its owner's graveyard instead (CR 303.4i, 608.3c). The granting Aura stays.
+#[test]
+fn another_aura_spell_resolving_onto_the_permanent_goes_to_the_graveyard() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
+    let sole = attached(&mut g, &SOLE_AURA, bear);
+    put(&mut g, &WATCHER, Zone::BATTLEFIELD);
+    let card = put(&mut g, &PLAIN_AURA, Zone::hand(YOU));
+    let (offered, triggered) = cast_onto(&mut g, card, bear);
+    assert!(offered.contains(&Target::Object(bear)), "it may target the creature (CR 303.4a)");
+    assert_eq!(triggered, 1, "it was cast: the watcher triggered");
+    let spell = g.state.obj(card).became.expect("it is on the stack");
+    resolve_all(&mut g);
+    assert!(resolved(&g, spell), "its target is still legal: it resolves (CR 608.3b)");
+    assert!(!entered_from(&g, spell), "it never enters the battlefield (CR 303.4i)");
+    let gone = g.state.obj(spell).became.expect("it left the stack");
+    assert!(g.state.obj(gone).zone.is(ZoneKind::Graveyard), "it is put into its owner's graveyard");
+    assert!(stays(&g, sole, bear));
+}
+
+/// The same Aura spell onto a creature nothing restricts resolves and enters attached to it (CR 608.3c).
+#[test]
+fn another_aura_spell_resolving_onto_a_free_creature_enters_attached() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
+    let free = put(&mut g, &BEAR, Zone::BATTLEFIELD);
+    attached(&mut g, &SOLE_AURA, bear);
+    let card = put(&mut g, &PLAIN_AURA, Zone::hand(YOU));
+    cast_onto(&mut g, card, free);
+    let spell = g.state.obj(card).became.expect("it is on the stack");
+    resolve_all(&mut g);
+    let aura = g.state.obj(spell).became.expect("it left the stack");
+    assert!(stays(&g, aura, free));
+}
+
+/// Resolves the spell `spell` on the stack with `targets`, as its own resolution frame would.
+fn resolve_spell(g: &mut Game, def: &'static CardDef, spell: ObjectId, targets: &[Target]) {
+    let item = crate::actions::stack_item(StackKind::Spell, spell, AbilityRef::spell(g.cards.id_of(def)), YOU, targets);
+    g.state.stack_push(item);
+    let serial = g.state.stack.last().expect("the spell").serial;
+    g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
+    let frame = g.state.agenda.len() - 1;
+    let mut cx = Cx { g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    crate::resolve::resolve(&mut cx).expect("nothing is asked");
+}
+
+/// A copy of an Aura spell becomes a token as it resolves (CR 707.10f); onto the enchanted creature, its target still legal, the
+/// token isn't created (CR 303.4i). Onto a free creature it is, attached.
+#[test]
+fn a_copy_of_another_aura_spell_resolving_onto_the_permanent_makes_no_token() {
+    for restricted in [true, false] {
+        let mut g = game();
+        let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
+        let free = put(&mut g, &BEAR, Zone::BATTLEFIELD);
+        attached(&mut g, &SOLE_AURA, bear);
+        let host = if restricted { bear } else { free };
+        let copy = put(&mut g, &PLAIN_AURA, Zone::STACK);
+        g.state.update_obj(copy, |o| o.card_copy = true);
+        let before = g.state.battlefield().len();
+        resolve_spell(&mut g, &PLAIN_AURA, copy, &[Target::Object(host)]);
+        assert!(g.state.stack.is_empty());
+        assert!(resolved(&g, copy), "its target is still legal: it resolves");
+        if restricted {
+            assert_eq!(g.state.battlefield().len(), before, "no token is created (CR 303.4i)");
+        } else {
+            let token = g.state.obj(copy).became.expect("it became a token");
+            assert!(stays(&g, token, free));
+        }
+    }
+}
+
+/// Protection is different: an Aura spell whose target has protection from it has an illegal target (CR 702.16b), so it
+/// doesn't resolve at all (CR 608.3b) and is put into its owner's graveyard.
+#[test]
+fn an_aura_spell_onto_a_creature_with_protection_from_it_does_not_resolve() {
+    let mut g = game();
+    let bear = put(&mut g, &WARDED_BEAR, Zone::BATTLEFIELD);
+    let spell = put(&mut g, &PLAIN_AURA, Zone::STACK);
+    resolve_spell(&mut g, &PLAIN_AURA, spell, &[Target::Object(bear)]);
+    assert!(g.state.stack.is_empty());
+    assert!(!resolved(&g, spell), "its target is illegal: it doesn't resolve (CR 608.3b)");
+    assert!(!entered_from(&g, spell));
+    let gone = g.state.obj(spell).became.expect("it left the stack");
+    assert!(g.state.obj(gone).zone.is(ZoneKind::Graveyard));
 }
 
 /// Another Aura can't enter attached to it, named (CR 303.4i: it stays where it is) or chosen (CR 303.4f).

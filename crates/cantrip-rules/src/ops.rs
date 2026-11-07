@@ -2185,12 +2185,19 @@ fn entering_attached(cx: &Cx, bans: &[(ObjectId, PlayerId, &'static CardDef, Opt
 
 /// How `entering` (attached to its host, `Entering::attach`) would enter, judged on it as it would exist on the battlefield
 /// (CR 614.12) - seeing it attached to its host - against the game as it is before it moves, `entering_ids` the objects
-/// entering with it (`attach::enters_attachable`). The one judgement of the move (`put_all_onto_battlefield_attached`) and of
-/// the question asked before it (`could_enter_attached`).
+/// entering with it (`attach::enters_attachable`), or attached to a player (`Entering::attach_player`: an Aura spell resolving,
+/// CR 608.3c; `attach::enters_attachable_to_player`). The one judgement of the move (`put_all_onto_battlefield_attached`), of
+/// the question asked before it (`could_enter_attached`) and of an Aura spell resolving (CR 303.4i, `resolve`).
 pub(crate) fn attached_entry(cx: &mut Cx, entering: &Entering, entering_ids: &[ObjectId]) -> AttachedEntry {
-    let Some(host) = entering.attach else { return AttachedEntry::Unattached };
+    if entering.attach.is_none() && entering.attach_player.is_none() {
+        return AttachedEntry::Unattached;
+    }
     let it = as_it_would_exist(cx, entering).chars;
-    let attachable = crate::attach::enters_attachable(cx, entering.object, &it, entering.controller, host, entering_ids);
+    let attachable = match (entering.attach, entering.attach_player) {
+        (Some(host), _) => crate::attach::enters_attachable(cx, entering.object, &it, entering.controller, host, entering_ids),
+        (None, Some(player)) => crate::attach::enters_attachable_to_player(cx, entering.object, &it, entering.controller, player),
+        (None, None) => false,
+    };
     match (attachable, it.has_subtype(Subtype::Aura)) {
         (true, _) => AttachedEntry::Attached,
         (false, true) => AttachedEntry::Stays,
@@ -2659,6 +2666,12 @@ fn create_tokens_onto(
             o.copy = copy;
             o.transformed = transformed;
         });
+        // A copy of an Aura spell whose target is still legal becomes a token only if, as it would exist, it could legally
+        // enchant what the spell targeted; otherwise it isn't created (CR 303.4i, 608.3c, 707.10f) - "can't be enchanted by
+        // other Auras" or an Aura that would be a creature (CR 303.4d), which no target check asks.
+        if aura.is_some() && attached_entry(cx, &entering, &[id]) == AttachedEntry::Stays {
+            continue;
+        }
         // "Create a token attached to [a permanent]" (CR 303.4h-i, 301.5e): an Aura that could not enchant it is not
         // created; an Equipment that could not equip it is created unattached; anything else enters unattached.
         if let Some(host) = host {
