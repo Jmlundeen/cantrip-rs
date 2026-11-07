@@ -1,0 +1,52 @@
+# Red Ward's protection from red removes other red Auras from the creature (CR 702.16c, 704.5m) but not Red Ward
+# itself (CR 702.16n: "This effect doesn't remove this Aura"). Bot1's Devoted Hero wears Burrowing (red) first; when
+# Red Ward resolves on it, state-based actions put Burrowing into the graveyard and Ward stays. Painter's Servant then
+# names red, so Red Ward is itself red (CR 105.3) and still protects from red: it stays.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Devoted Hero
+Burrowing
+Red Ward
+Painter's Servant
+Plains x10
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Devoted Hero.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: R)
+Bot1.Hand.Burrowing.Cast(Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Red Ward.Cast(Bot1.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Burrowing; Black Lotus
+? Bot1.Battlefield.Red Ward.Colors = White
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Red)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Burrowing; Black Lotus
+Bot1.Battlefield.Red Ward.AttachedTo = Devoted Hero
+Bot1.Battlefield.Red Ward.Colors = Red; White
+Bot1.Battlefield.Devoted Hero.ProtectionFrom = Red

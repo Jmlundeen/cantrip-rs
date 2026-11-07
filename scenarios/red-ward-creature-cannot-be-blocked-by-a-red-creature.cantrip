@@ -1,0 +1,54 @@
+# Protection from red stops red creatures blocking the enchanted creature (CR 702.16f) though Red Ward's Aura stays.
+# Bot2's Devoted Hero wears Red Ward and attacks on turn 4: Bot1's red Mons's Goblin Raiders may not block it (the
+# refusal), while the black Cabal Evangel may (the positive control), so Bot1 takes no damage.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Mox Jet
+Cabal Evangel
+Mons's Goblin Raiders
+Swamp x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Devoted Hero
+Red Ward
+Plains x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cabal Evangel.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mons's Goblin Raiders.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Devoted Hero.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Red Ward.Cast(Bot2.Battlefield.Devoted Hero)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Red Ward.AttachedTo = Devoted Hero
+? Bot2.Battlefield.Devoted Hero.ProtectionFrom = Red
+Bot2.Attack(Devoted Hero > Bot1)
+! Bot1.Block(Mons's Goblin Raiders > Devoted Hero)
+Bot1.Block(Cabal Evangel > Devoted Hero)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Battlefield.Cabal Evangel.Damage = 1
+Bot2.Graveyard = Red Ward; Devoted Hero
+Bot1.Life = 20

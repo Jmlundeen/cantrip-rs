@@ -1,0 +1,68 @@
+# Red Ward's "red" is a color word of its text (CR 612.1, 702.16): Bot1's Sleight of Mind changes it to green, so the
+# Devoted Hero it enchants has protection from green and no longer from red (CR 612.2), and the Aura, white, stays.
+# Bot2 then cannot target the Hero with Rancor, a green Aura spell (the refusal; had the word stayed red the spell
+# would be legal), while on turn 4 the same spell enchants Bot1's Llanowar Elves (the positive control: the spell
+# works, only the Hero is protected).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Emerald
+Devoted Hero
+Red Ward
+Sleight of Mind
+Llanowar Elves
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Rancor
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Devoted Hero.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Red Ward.Cast(Bot1.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.Red Ward)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+Bot1.Colors(Green)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+! Bot2.Hand.Rancor.Cast(Bot1.Battlefield.Devoted Hero)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Rancor.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Devoted Hero.ProtectionFrom = Green
+Bot1.Battlefield.Red Ward.AttachedTo = Devoted Hero
+Bot2.Battlefield.Rancor.AttachedTo = Llanowar Elves

@@ -1,0 +1,52 @@
+# Red Ward gives Bot2's Savannah Lions protection from red (CR 702.16). On turn 3 Bot1 cannot target the Lions with
+# Burrowing, a red Aura spell (CR 702.16b; the refusal, and the runner offers it again with mana to spare), and Mons's
+# Goblin Raiders attacking into it is blocked by the Lions: the Raiders' damage is red and prevented (CR 702.16e), so
+# the 2/1 Lions survives with no damage marked (without Red Ward it would die) while the Raiders die.
+
+[Bot1 Deck]
+Mountain
+Mons's Goblin Raiders
+Burrowing
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Savannah Lions
+Red Ward
+Plains x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mons's Goblin Raiders.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Red Ward.Cast(Bot2.Battlefield.Savannah Lions)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+! Bot1.Hand.Burrowing.Cast(Bot2.Battlefield.Savannah Lions)
+Bot1.Attack(Mons's Goblin Raiders > Bot2)
+Bot2.Block(Savannah Lions > Mons's Goblin Raiders)
+[T3 Bot1.CombatDamage]
+? Bot2.Battlefield.Savannah Lions.Damage = 0
+[Expect]
+Bot2.Battlefield.Savannah Lions.ProtectionFrom = Red
+Bot2.Battlefield.Savannah Lions.Damage = 0
+Bot2.Battlefield.Red Ward.AttachedTo = Savannah Lions
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Mons's Goblin Raiders
