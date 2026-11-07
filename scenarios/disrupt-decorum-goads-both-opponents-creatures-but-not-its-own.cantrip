@@ -1,0 +1,49 @@
+# Disrupt Decorum goads every creature its caster does not control (CR 701.15a). In this three-player game Bot2 and
+# Bot3 each control a Llanowar Elves; both are goaded by Bot1, while Bot1's own Ornithopter is not. The spell is paid
+# exactly with Black Lotus's three red mana and one Mountain.
+
+[Bot1 Deck]
+Disrupt Decorum
+Black Lotus
+Mountain
+Ornithopter
+Mountain x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Bot3 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Battlefield.Forest.Activate
+Bot3.Hand.Llanowar Elves.Cast
+Bot3.Pass
+[T4 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Disrupt Decorum.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.GoadedBy = Bot1
+Bot3.Battlefield.Llanowar Elves.GoadedBy = Bot1
+Bot1.Battlefield.Ornithopter.GoadedBy = (absent)
