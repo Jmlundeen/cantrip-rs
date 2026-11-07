@@ -1,0 +1,51 @@
+# Drain Life X=1 at Bot2, on -1 life but kept in the game by Platinum Angel ("You can't lose the game"): the damage is dealt
+# (Bot2 -1 to -2, CR 120.3a), but no more life may be gained than the player's life total before it, -1, so Bot1 gains
+# nothing and stays on 20 (a cap of at least 1 would gain 1). Bot2 is put on 1 life and Shocked to -1 once the Angel is out
+# (Show and Tell, from Mox Sapphire and Black Lotus); Mox Ruby pays Shock, Black Lotus pays Drain Life's {1}{1}{B}.
+[Life]
+Bot2: 1
+
+[Bot1 Deck]
+Drain Life
+Shock
+Black Lotus
+Mox Ruby
+Swamp x3
+Swamp x20
+
+[Bot2 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Platinum Angel
+Island x3
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Show and Tell.Cast
+Bot2.Choose(Platinum Angel)
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = -1
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Drain Life.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = -2
+Bot2.Status = (absent)

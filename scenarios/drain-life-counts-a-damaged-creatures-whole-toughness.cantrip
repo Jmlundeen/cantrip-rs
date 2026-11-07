@@ -1,0 +1,55 @@
+# Drain Life at Tasseled Dromedary (0/4) already holding 2 damage from Bot1's Shock: the cap is the creature's toughness, 4, even
+# though it is already damaged (ruling 2004-10-04), so X=3 gains 3 (20 to 23); a cap of the 2 toughness it has left would gain
+# 2. The 3 damage is dealt in full and kills it (CR 704.5g). Mox Ruby pays Shock; Black Lotus, Mox Jet and Gleemox chosen
+# black pay Drain Life's X and {B} ({3}{1}{B}) with black only.
+[Bot1 Deck]
+Drain Life
+Shock
+Mox Ruby
+Black Lotus
+Mox Jet
+Gleemox
+Swamp x4
+Swamp x20
+
+[Bot2 Deck]
+Mox Pearl
+Tasseled Dromedary
+Plains x5
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Tasseled Dromedary.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Tasseled Dromedary)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Tasseled Dromedary.Damage = 2
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Drain Life.Cast(Bot2.Battlefield.Tasseled Dromedary; X: 3)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Battlefield = Mox Pearl
+Bot2.Graveyard = Tasseled Dromedary

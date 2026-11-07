@@ -1,0 +1,35 @@
+# Drain Life X=3 at a player on 2 life: the damage dealt is 3 (CR 120.3, life may go below zero), but the life gained is capped at
+# the life total before the damage (the card's text), so 2 is gained, not 3. Bot1 pays X with black only: Black Lotus
+# (BBB), Mox Jet and Gleemox chosen black are five black mana for {3}{1}{B}. Bot1 ends on 22, and Bot2, on -1, has lost the
+# game (CR 704.5a).
+[Life]
+Bot2: 2
+
+[Bot1 Deck]
+Drain Life
+Black Lotus
+Mox Jet
+Gleemox
+Swamp x4
+Swamp x20
+
+[Bot2 Deck]
+Island x26
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Drain Life.Cast(Bot2; X: 3)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Status = Lost

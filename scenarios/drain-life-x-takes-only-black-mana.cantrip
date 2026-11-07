@@ -1,0 +1,40 @@
+# Drain Life: "Spend only black mana on X" (CR 107.3, 601.2h). The pool holds four mana, two of it black (Mox Jet, Gleemox
+# chosen black) and two not (Mox Ruby, Mox Pearl): X=2 would cost {2}{1}{B}, four mana in all, but needs three black (two for
+# X and the {B}), so its payment cannot be finished and Bot1 cancels it (announcing X is not limited by the mana at hand, so
+# the cast itself is not refused); X=1 is paid with black on X and the {B}, the white on {1}, and red is left. Exactly X=1
+# is dealt to the opponent and gained (CR 120.3, 119.3).
+[Bot1 Deck]
+Drain Life
+Mox Jet
+Gleemox
+Mox Ruby
+Mox Pearl
+Swamp x3
+Swamp x20
+
+[Bot2 Deck]
+Island x26
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Drain Life.Cast(Bot2; X: 2)
+Bot1.Cancel
+Bot1.Hand.Drain Life.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19

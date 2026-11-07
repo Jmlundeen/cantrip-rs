@@ -1,0 +1,50 @@
+# Drain Life X=3 at Bot2, who is on 2 life but has Ancient Adamantoise (8/20): all damage that would be dealt to Bot2 is dealt to
+# the Adamantoise instead (CR 614.1a, 614.9). The damage dealt is 3, to a creature, so the cap is its toughness, 20, and not
+# the 2 life of the player aimed at: Bot1 gains 3 (20 to 23), Bot2 is still on 2. Black Lotus, Mox Jet and Gleemox chosen
+# black pay {3}{1}{B} with black only.
+[Life]
+Bot2: 2
+
+[Bot1 Deck]
+Drain Life
+Black Lotus
+Mox Jet
+Gleemox
+Swamp x4
+Swamp x20
+
+[Bot2 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Ancient Adamantoise
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Show and Tell.Cast
+Bot2.Choose(Ancient Adamantoise)
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Drain Life.Cast(Bot2; X: 3)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 2
+Bot2.Battlefield.Ancient Adamantoise.Damage = 3

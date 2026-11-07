@@ -1,0 +1,39 @@
+# Drain Life X=1 at Bot2, who answers with Alabaster Potion (X=1, WWW from Black Lotus) to prevent the next 1 damage to them this
+# turn (CR 615.7): all of the damage is prevented, so none is dealt (CR 120.3) and Bot1 gains nothing; both stay on 20.
+# Black Lotus pays Drain Life's {1}{1}{B}, black only.
+[Bot1 Deck]
+Drain Life
+Black Lotus
+Swamp x5
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Alabaster Potion
+Plains x5
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Drain Life.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Alabaster Potion.Cast(X: 1)
+Bot2.Modes(Prevent the next X damage)
+Bot2.Target(Bot2)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Prevented = 1 Drain Life > Bot2 by Alabaster Potion

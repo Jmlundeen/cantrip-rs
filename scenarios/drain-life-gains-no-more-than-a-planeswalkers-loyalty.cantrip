@@ -1,0 +1,51 @@
+# Drain Life X=3 at Bot2's Ajani Resolute, which has 2 loyalty: the 3 damage is dealt (CR 120.3c, loyalty counters removed, so it
+# is put into the graveyard, CR 704.5i), but only the loyalty before the damage, 2, is gained (the card's text): Bot1 20 to 22,
+# not 23. Black Lotus, Mox Jet and Gleemox chosen black pay {3}{1}{B} with black only.
+[Bot1 Deck]
+Drain Life
+Black Lotus
+Mox Jet
+Gleemox
+Swamp x4
+Swamp x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Ajani Resolute
+Plains x5
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Ajani Resolute.Counters.Loyalty = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Drain Life.Cast(Bot2.Battlefield.Ajani Resolute; X: 3)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
+Bot2.Graveyard = Ajani Resolute

@@ -6,6 +6,7 @@ mod concession;
 mod counter_duration_ends;
 mod demonic_hordes_unsacrificeable;
 mod demonic_pact;
+mod drain_life_redirected;
 mod eluge;
 mod fantasticar_cant_be_sacrificed;
 mod floodpits_drowner_self;

@@ -1,0 +1,46 @@
+# Drain Life X=3 at Devoted Hero (1/2): 3 damage is dealt, but only the creature's toughness, 2, is gained (the card's text), so
+# Bot1 goes from 20 to 22, not 23; the Hero dies to the damage (CR 704.5g), so the cap was read before it. X is paid with black
+# only: Black Lotus (BBB), Mox Jet and Gleemox chosen black pay {3}{1}{B}.
+[Bot1 Deck]
+Drain Life
+Black Lotus
+Mox Jet
+Gleemox
+Swamp x4
+Swamp x20
+
+[Bot2 Deck]
+Mox Pearl
+Devoted Hero
+Plains x5
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Devoted Hero.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Drain Life.Cast(Bot2.Battlefield.Devoted Hero; X: 3)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
+Bot2.Battlefield = Mox Pearl
+Bot2.Graveyard = Devoted Hero
