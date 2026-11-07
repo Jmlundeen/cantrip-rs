@@ -1,0 +1,52 @@
+# Blue Ward's protection from blue removes other blue Auras from the creature (CR 702.16c, 704.5m) but not Blue Ward
+# itself (CR 702.16n: "This effect doesn't remove this Aura"). Bot1's Devoted Hero wears Curious Obsession (blue)
+# first; when Blue Ward resolves on it, state-based actions put Curious Obsession into the graveyard and Ward stays.
+# Painter's Servant then names blue, so Blue Ward is itself blue (CR 105.3) and still protects from blue: it stays.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Devoted Hero
+Curious Obsession
+Blue Ward
+Painter's Servant
+Plains x10
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Devoted Hero.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Curious Obsession.Cast(Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Blue Ward.Cast(Bot1.Battlefield.Devoted Hero)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Curious Obsession; Black Lotus
+? Bot1.Battlefield.Blue Ward.Colors = White
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Blue)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Curious Obsession; Black Lotus
+Bot1.Battlefield.Blue Ward.AttachedTo = Devoted Hero
+Bot1.Battlefield.Blue Ward.Colors = Blue; White
+Bot1.Battlefield.Devoted Hero.ProtectionFrom = Blue

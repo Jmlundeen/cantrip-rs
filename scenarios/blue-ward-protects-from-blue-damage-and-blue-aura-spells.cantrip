@@ -1,0 +1,55 @@
+# Blue Ward gives Bot2's Savannah Lions protection from blue (CR 702.16). On turn 3 Bot1 cannot target the Lions with
+# Curious Obsession, a blue Aura spell (CR 702.16b; the refusal, and the runner offers it again with mana to spare),
+# and Fugitive Wizard attacking into it is blocked by the Lions: the Wizard's damage is blue and prevented
+# (CR 702.16e), so the 2/1 Lions survives with no damage marked (without Blue Ward it would die) while the Wizard dies.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Fugitive Wizard
+Curious Obsession
+Island
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Savannah Lions
+Blue Ward
+Plains x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Fugitive Wizard.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Savannah Lions.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Blue Ward.Cast(Bot2.Battlefield.Savannah Lions)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+! Bot1.Hand.Curious Obsession.Cast(Bot2.Battlefield.Savannah Lions)
+Bot1.Attack(Fugitive Wizard > Bot2)
+Bot2.Block(Savannah Lions > Fugitive Wizard)
+[T3 Bot1.CombatDamage]
+? Bot2.Battlefield.Savannah Lions.Damage = 0
+[Expect]
+Bot2.Battlefield.Savannah Lions.ProtectionFrom = Blue
+Bot2.Battlefield.Savannah Lions.Damage = 0
+Bot2.Battlefield.Blue Ward.AttachedTo = Savannah Lions
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Fugitive Wizard

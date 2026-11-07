@@ -1,0 +1,52 @@
+# Blue Ward's "This effect doesn't remove this Aura" spares it from its own protection only: another instance of
+# protection from blue still removes it once it is blue (CR 702.16n, 704.5m). Blue Ward enchants a creature, any
+# player's (CR 303.4a): Bot1 cannot cast it on its Mox Jet (the refusal) but enchants Bot2's Voice of Reason, which has
+# protection from blue of its own. While the Ward is white it stays; Painter's Servant naming blue makes it blue
+# (CR 105.3), and the Angel's protection puts it into Bot1's graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Blue Ward
+Painter's Servant
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Voice of Reason
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: W)
+Bot2.Hand.Voice of Reason.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Blue Ward.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Hand.Blue Ward.Cast(Bot2.Battlefield.Voice of Reason)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blue Ward.AttachedTo = Voice of Reason
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Blue)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Blue Ward
+Bot2.Battlefield.Voice of Reason.ProtectionFrom = Blue
