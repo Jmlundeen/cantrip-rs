@@ -1,0 +1,52 @@
+# Curzon Dax's first ability is "another Klingon or Warrior you control", so
+# Curzon dying alone deals no damage: Bot2 stays at 20. Its second ability
+# (CR 608.2) offers creature cards with mana value 3 or less from its
+# controller's hand. Gray Ogre is exactly {2}{R}, mana value 3, and is put onto
+# the battlefield untapped (the text says nothing of tapped); Hill Giant is {3}{R}, mana value 4, and is not offered.
+# Bot2's own Memnite is in Bot2's hand, not Curzon's, and stays there.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Curzon Dax, Bound by Blood
+Gray Ogre
+Hill Giant
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Memnite
+Island x17
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Curzon Dax, Bound by Blood.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Curzon Dax, Bound by Blood)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 20
+? Bot2.Life = 20
+Bot2.Pass
+Bot1.Pass
+! Bot1.Choose(Hill Giant)
+Bot1.Choose(Gray Ogre)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Gray Ogre.Types = Creature
+Bot1.Battlefield.Gray Ogre.Tapped = false
+Bot1.Battlefield.Hill Giant = (absent)
+Bot1.Hand.Hill Giant.Power = 3
+Bot2.Hand.Memnite.Power = 1
+Bot1.Graveyard.Count = 2

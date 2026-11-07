@@ -1,0 +1,79 @@
+# Curzon Dax's first ability (CR 603.2, 603.10a): Wrath of God destroys Curzon,
+# Bot1's Storied Veteran (a Klingon) and Goblin Piker (a Warrior), and Bot2's
+# Defense Force Aggressor (a Klingon Warrior) at once. The trigger looks back,
+# so it sees the two creatures Bot1 controlled that died with Curzon, but not
+# Curzon itself ("another") and not the opponent's Warrior ("you control").
+# Two triggers therefore deal 1 to each opponent: Bot2 and Bot3 go to 18, and
+# Bot1 stays at 20. Curzon's own dies trigger finds no creature in hand and
+# resolves without putting anything onto the battlefield.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mountain
+Mox Ruby
+Mox Pearl
+Curzon Dax, Bound by Blood
+Storied Veteran
+Mox Jet
+Goblin Piker
+Wrath of God
+Island x10
+
+[Bot2 Deck]
+Mountain
+Defense Force Aggressor
+Island x18
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Curzon Dax, Bound by Blood.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Defense Force Aggressor.Cast
+Bot2.Pass
+[T4 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Storied Veteran.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Piker.Cast
+Bot1.Pass
+[T10 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Triggers(Curzon Dax, Bound by Blood; Curzon Dax, Bound by Blood; Curzon Dax, Bound by Blood)
+? Stack.Count = 3
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot3.Life = 18
+Bot1.Battlefield.Curzon Dax, Bound by Blood = (absent)
+Bot1.Battlefield.Storied Veteran = (absent)
+Bot1.Battlefield.Goblin Piker = (absent)
+Bot2.Battlefield.Defense Force Aggressor = (absent)
+Bot1.Graveyard.Count = 6
+Bot2.Graveyard.Defense Force Aggressor.Power = 2

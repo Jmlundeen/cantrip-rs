@@ -1,0 +1,42 @@
+# Curzon Dax's dies trigger is "you may put ...", so choosing none puts nothing
+# onto the battlefield and leaves the eligible Gray Ogre in hand
+# (CR 608.2). Curzon dying alone still deals no damage to Bot2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Curzon Dax, Bound by Blood
+Gray Ogre
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Curzon Dax, Bound by Blood.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Curzon Dax, Bound by Blood)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+Bot1.Choose()
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Gray Ogre = (absent)
+Bot1.Hand.Gray Ogre.Toughness = 2
+Bot1.Graveyard.Count = 2
