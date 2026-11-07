@@ -1,0 +1,46 @@
+# Disruptor Pistol may target its controller's own creature too (CR 115.1): Ornithopter, a 0/2 artifact
+# creature, takes 5 damage and dies, and the Pistol is sacrificed to pay for its own ability (CR 602.2b).
+
+[Bot1 Deck]
+Disruptor Pistol
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Disruptor Pistol.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Disruptor Pistol.Activate(Bot1.Battlefield.Ornithopter; Ability: 5 damage)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Ornithopter; Disruptor Pistol
+Bot1.Battlefield.Count = 4

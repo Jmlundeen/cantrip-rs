@@ -1,0 +1,6 @@
+{
+  "name": "Disruptor Pistol",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "{4}, {T}, Sacrifice this artifact: It deals 5 damage to target creature."
+}

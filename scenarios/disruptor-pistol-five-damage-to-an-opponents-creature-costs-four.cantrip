@@ -1,0 +1,65 @@
+# Disruptor Pistol: "{4}, {T}, Sacrifice this artifact: It deals 5 damage to target creature."
+# The {4} is paid exactly. Turn 1 casts five Moxen and the {2} Pistol, paid with two of them, leaving three
+# untapped: the ability is not offered then (Mana: short), and on turn 3 four tapped Moxen pay it and empty the
+# pool. The target may be an opponent's creature (Fortress Crab, 1/6), which takes exactly 5 damage and survives
+# with 5 marked (CR 120.3, 120.3d). A noncreature permanent, Mox Pearl, is refused (CR 115.1). The artifact is
+# sacrificed as part of the cost (CR 602.2b, 118.3), so it is in the graveyard.
+
+[Bot1 Deck]
+Disruptor Pistol
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Fortress Crab
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Disruptor Pistol.Cast
+Bot1.Pass
+! Bot1.Battlefield.Disruptor Pistol.Activate(Bot1.Battlefield.Ornithopter; Ability: 5 damage; Mana: short)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Fortress Crab.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Disruptor Pistol.Activate(Bot1.Battlefield.Mox Pearl; Ability: 5 damage)
+Bot1.Battlefield.Disruptor Pistol.Activate(Bot2.Battlefield.Fortress Crab; Ability: 5 damage)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield.Fortress Crab.Damage = 5
+Bot1.Graveyard = Disruptor Pistol
+Bot1.Mana =
