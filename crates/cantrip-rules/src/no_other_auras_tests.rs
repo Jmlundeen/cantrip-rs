@@ -55,6 +55,17 @@ static EQUIPMENT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The Aura a blue creature with bestow is while it is bestowed (CR 702.103b): an Aura enchantment with "enchant creature".
+static BESTOWED: CardDef = CardDef { name: "Sole Bestowed", power: None, toughness: None, ..aura("Sole Bestowed", &[]) };
+/// A blue 2/2 creature with bestow.
+static BESTOWER: CardDef = CardDef {
+    name: "Sole Bestower",
+    colors: Some(ColorSet::of(Color::Blue)),
+    types: TypeSet::of(&[CardType::Enchantment, CardType::Creature]),
+    bestow: Some(&BESTOWED),
+    ..BEAR
+};
+
 /// A creature with protection from blue, the Plain Aura's color.
 static WARDED_BEAR: CardDef = CardDef { name: "Sole Warded Bear", protection: ColorSet::of(Color::Blue), ..BEAR };
 
@@ -87,6 +98,8 @@ fn game() -> Game {
         &EQUIPMENT,
         &WARDED_BEAR,
         &WATCHER,
+        &BESTOWED,
+        &BESTOWER,
     ])));
     let deck = || vec![table.id_of(&LAND); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
@@ -272,6 +285,54 @@ fn a_copy_of_another_aura_spell_resolving_onto_the_permanent_makes_no_token() {
             assert!(stays(&g, token, free));
         }
     }
+}
+
+/// A bestowed Aura spell (CR 702.103b), as a bestow cast leaves it on the stack, targeting `host`, resolved.
+fn resolve_bestowed(g: &mut Game, host: ObjectId) -> ObjectId {
+    let spell = put(g, &BESTOWER, Zone::STACK);
+    let face = g.cards.id_of(&BESTOWED);
+    g.state.update_obj(spell, |o| o.copy = Some(Copiable::of(face)));
+    let mut item = crate::actions::stack_item(StackKind::Spell, spell, AbilityRef::spell(face), YOU, &[Target::Object(host)]);
+    item.way = WAY_BESTOW;
+    g.state.stack_push(item);
+    let serial = g.state.stack.last().expect("the spell").serial;
+    g.state.frame_push(Frame::new(FrameKind::Resolve { serial }));
+    let frame = g.state.agenda.len() - 1;
+    let mut cx = Cx { g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None };
+    crate::resolve::resolve(&mut cx).expect("nothing is asked");
+    spell
+}
+
+/// A bestowed Aura spell ceases to be bestowed only if its target is illegal (CR 702.103e, 608.3b). Its target the enchanted
+/// creature, still legal, it resolves as the Aura spell it is (CR 608.3c), can't legally enchant it, and is put into its owner's
+/// graveyard instead of entering (CR 303.4i) - it doesn't enter as a creature. Onto a free creature it enters attached; onto
+/// one with protection from it, its target illegal, it resolves as a creature spell and enters unattached.
+#[test]
+fn a_bestowed_aura_spell_onto_the_permanent_goes_to_the_graveyard() {
+    let mut g = game();
+    let bear = put(&mut g, &BEAR, Zone::BATTLEFIELD);
+    let sole = attached(&mut g, &SOLE_AURA, bear);
+    let spell = resolve_bestowed(&mut g, bear);
+    assert!(g.state.stack.is_empty());
+    assert!(resolved(&g, spell), "its target is still legal: it resolves (CR 608.3b)");
+    assert!(!entered_from(&g, spell), "it never enters the battlefield, as an Aura or a creature (CR 303.4i)");
+    let gone = g.state.obj(spell).became.expect("it left the stack");
+    assert!(g.state.obj(gone).zone.is(ZoneKind::Graveyard), "it is put into its owner's graveyard");
+    assert!(stays(&g, sole, bear));
+
+    let mut g = game();
+    let free = put(&mut g, &BEAR, Zone::BATTLEFIELD);
+    let spell = resolve_bestowed(&mut g, free);
+    let aura = g.state.obj(spell).became.expect("it left the stack");
+    assert!(stays(&g, aura, free), "onto a free creature it enters attached");
+
+    let mut g = game();
+    let warded = put(&mut g, &WARDED_BEAR, Zone::BATTLEFIELD);
+    let spell = resolve_bestowed(&mut g, warded);
+    let creature = g.state.obj(spell).became.expect("it left the stack");
+    let o = g.state.obj(creature);
+    assert!(o.zone.is(ZoneKind::Battlefield) && o.attached_to.is_none(), "its target illegal, it enters unattached (CR 702.103e)");
+    assert!(cx(&mut g).chars(creature).is(CardType::Creature), "as the creature it is");
 }
 
 /// Protection is different: an Aura spell whose target has protection from it has an illegal target (CR 702.16b), so it
