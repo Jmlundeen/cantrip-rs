@@ -1,0 +1,8 @@
+{
+  "name": "Defense Force Aggressor",
+  "manaCost": "{R}",
+  "type": "Creature — Klingon Warrior",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": ""
+}

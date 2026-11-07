@@ -1,0 +1,26 @@
+# Defense Force Aggressor has no rules text and no abilities: it is cast for its printed cost and has its printed color, types, power and toughness (CR 202.2, 205.2).
+
+[Bot1 Deck]
+Mox Ruby
+Defense Force Aggressor
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Defense Force Aggressor.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+? Bot1.Battlefield.Defense Force Aggressor.Colors = Red
+? Bot1.Battlefield.Defense Force Aggressor.Types = Creature
+? Bot1.Battlefield.Defense Force Aggressor.Subtypes = Klingon; Warrior
+Bot1.Battlefield.Defense Force Aggressor.Power = 2
+Bot1.Battlefield.Defense Force Aggressor.Toughness = 1
+Bot1.Battlefield.Defense Force Aggressor.Keywords = (absent)
