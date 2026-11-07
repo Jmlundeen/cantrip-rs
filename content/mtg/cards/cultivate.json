@@ -1,0 +1,6 @@
+{
+  "name": "Cultivate",
+  "manaCost": "{2}{G}",
+  "type": "Sorcery",
+  "oracleText": "Search your library for up to two basic land cards, reveal those cards, put one onto the battlefield tapped and the other into your hand, then shuffle."
+}

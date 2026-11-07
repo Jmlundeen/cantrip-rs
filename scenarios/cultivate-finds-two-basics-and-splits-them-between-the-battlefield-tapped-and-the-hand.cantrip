@@ -1,0 +1,63 @@
+# Cultivate searches its controller's library for up to two basic land cards, reveals them, puts ONE onto the battlefield
+# tapped and the OTHER into the hand (CR 701.23a, 701.20, 400.7, 608.2). The library holds three basics and a nonbasic land:
+# the search refuses Tropical Island (not basic) and three basics at once (the most is two), then takes an Island and a Plains,
+# revealing both. The Island is chosen for the battlefield, so it arrives tapped, and the Plains - not the Island - is the one
+# in the hand; if the two steps were swapped the hand would hold the Island. The library is shuffled (CR 701.24), so the order
+# it would have kept is gone. Bot2's seven Islands stay in its hand and its library (CR 701.23b).
+
+[Bot1 Deck]
+Cultivate
+Mox Emerald
+Mox Sapphire
+Forest
+Forest
+Forest
+Forest
+Island
+Plains
+Forest
+Tropical Island
+Opt
+Ponder
+Brainstorm
+Counterspell
+Duress
+Dark Ritual
+Giant Growth
+Lightning Bolt
+Ancestral Recall
+Time Walk
+Sol Ring
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Cultivate.Cast
+? Bot1.Mana =
+! Bot1.Search(Tropical Island)
+! Bot1.Search(Island; Plains; Forest)
+Bot1.Search(Island; Plains)
+Bot1.Choose(Island)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 13
+Bot1.Library != Forest; Tropical Island; Opt; Ponder; Brainstorm; Counterspell; Duress; Dark Ritual; Giant Growth; Lightning Bolt; Ancestral Recall; Time Walk; Sol Ring
+Bot1.Graveyard = Cultivate
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 13
+Bot1.Revealed = Island; Plains
+Bot2.Revealed = (absent)
