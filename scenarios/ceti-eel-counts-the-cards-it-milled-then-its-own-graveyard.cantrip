@@ -1,0 +1,44 @@
+# Ceti Eel: "When this creature enters, mill two cards, then put a +1/+1 counter on this creature for each artifact and/or
+# creature card in your graveyard" (CR 701.17a, 608.2c, 122.1). Cast on turn 1, it mills exactly two - the Ornithopter
+# (an artifact creature, one card, so one counter, not two) and the Llanowar Elves (a creature) - and only then counts, so
+# both are counted: two counters and a 4/4. Counting before the mill would leave it a 2/2.
+
+[Bot1 Deck]
+Ceti Eel
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Swamp x2
+Ornithopter
+Llanowar Elves
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ceti Eel.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Llanowar Elves; Ornithopter
+Bot1.Library.Count = 12
+Bot1.Battlefield.Ceti Eel.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ceti Eel.Power = 4
+Bot1.Battlefield.Ceti Eel.Toughness = 4
