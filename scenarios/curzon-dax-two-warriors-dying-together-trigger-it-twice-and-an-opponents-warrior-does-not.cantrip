@@ -1,0 +1,78 @@
+# Several Warriors dying at once each trigger the ability (CR 603.2, 603.3b, 608.2), and only the ones "you control" count:
+# Bot2's Pyroclasm deals 2 damage to each creature, killing Bot1's Aven Sunstriker and Aven Skirmisher together, so Curzon Dax
+# deals 1 damage twice to Bot2 (20 to 18). Bot2's own Aven Skirmisher dies in the same event and burns nobody; Curzon Dax, a
+# 4/3, survives the 2 damage.
+
+[Bot1 Deck]
+Curzon Dax, Bound by Blood
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aven Skirmisher
+Aven Sunstriker
+Plains
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mountain
+Mox Ruby
+Aven Skirmisher
+Pyroclasm
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Curzon Dax, Bound by Blood.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Aven Skirmisher.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aven Sunstriker.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aven Skirmisher.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Pyroclasm.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 6
+Bot2.Life = 18
+Bot1.Life = 20
+Bot1.Battlefield.Count = 6
+Bot2.Battlefield.Count = 3
+Bot1.Graveyard.Count = 2
+Bot2.Graveyard = Aven Skirmisher; Pyroclasm
+Bot2.Graveyard.Count = 2

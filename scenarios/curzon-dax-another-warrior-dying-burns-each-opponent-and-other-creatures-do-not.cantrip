@@ -1,0 +1,67 @@
+# "Whenever another Klingon or Warrior you control dies, Curzon Dax deals 1 damage to each opponent" (CR 603.2, 608.2, 120.3):
+# Bot2's Lightning Bolt kills Bot1's Aven Skirmisher, a Bird Warrior, so Curzon Dax deals 1 damage to Bot2 (its only opponent,
+# whose life goes 20 to 19 and whose permanents are untouched). A Savannah Lions - a Cat, neither Klingon nor Warrior - dies the
+# same way and deals nothing more.
+
+[Bot1 Deck]
+Curzon Dax, Bound by Blood
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aven Skirmisher
+Savannah Lions
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Curzon Dax, Bound by Blood.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Skirmisher.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Aven Skirmisher)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Savannah Lions)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 6
+Bot2.Life = 19
+Bot1.Life = 20
+Bot1.Graveyard = Savannah Lions; Aven Skirmisher
+Bot2.Hand.Count = 6
+Bot2.Battlefield.Count = 2
