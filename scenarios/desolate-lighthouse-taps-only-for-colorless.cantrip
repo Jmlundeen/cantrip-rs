@@ -1,0 +1,20 @@
+# Desolate Lighthouse prints "{T}: Add {C}." (CR 605.1a): the ability adds colorless mana, not a color, and
+# tapping is its whole cost. Bot1 plays it on turn 1, is refused a red activation, then taps it for exactly {C}.
+
+[Bot1 Deck]
+Desolate Lighthouse
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Desolate Lighthouse.Play
+! Bot1.Battlefield.Desolate Lighthouse.Activate(Color: Red)
+Bot1.Battlefield.Desolate Lighthouse.Activate
+? Bot1.Mana = {C}
+? Bot1.Battlefield.Desolate Lighthouse.Tapped = true
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Desolate Lighthouse.Tapped = true
