@@ -1,0 +1,60 @@
+# When Borg Queen enters, it assimilates a creature card from an opponent's graveyard (CR 122.6, 205.1b, 614.12).
+# Bot2 mills Memnite and Ornithopter with Thought Scour, two creature cards, so the target question is actually asked
+# (CR 603.3d); the Thought Scour in that same graveyard is a sorcery card and so no target at all (CR 115.1). The
+# Memnite is the one taken: it arrives under Bot1 with a +1/+1 counter, a Borg artifact creature, getting her +2/+0.
+
+[Bot1 Deck]
+Borg Queen, Perfection Manifest
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Thought Scour
+Island x4
+Island
+Memnite
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Thought Scour.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard.Count = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Borg Queen, Perfection Manifest.Cast
+? Bot1.Mana =
+! Bot1.Target(Bot2.Graveyard.Thought Scour)
+Bot1.Target(Bot2.Graveyard.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Types = Artifact; Creature
+Bot1.Battlefield.Memnite.Subtypes = Borg
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Memnite.Power = 4
+Bot1.Battlefield.Memnite.Toughness = 2
+Bot2.Graveyard = Thought Scour; Ornithopter

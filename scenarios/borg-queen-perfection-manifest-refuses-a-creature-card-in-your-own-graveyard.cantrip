@@ -1,0 +1,71 @@
+# Borg Queen's enters trigger targets "a creature card from an opponent's
+# graveyard" (CR 115.1, 404.1). Bot2's Thought Scour mills Memnite and
+# Ornithopter, so Bot2's graveyard has two creature cards; Bot1's own Memnite
+# was killed by Lightning Bolt, so Bot1's graveyard also has one. The own
+# Memnite must be refused, and the opponent's Memnite is the one assimilated:
+# it arrives under Bot1 with a +1/+1 counter, a Borg artifact creature, and
+# Bot1's +2/+0 makes it 4/2. Bot1's own graveyard keeps its Memnite.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Memnite
+Borg Queen, Perfection Manifest
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Sapphire
+Thought Scour
+Lightning Bolt
+Island
+Island
+Island
+Island
+Memnite
+Ornithopter
+Island x10
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Thought Scour.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard.Count = 3
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Borg Queen, Perfection Manifest.Cast
+! Bot1.Target(Bot1.Graveyard.Memnite)
+Bot1.Target(Bot2.Graveyard.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 2
+Bot1.Battlefield.Memnite.Types = Artifact; Creature
+Bot1.Battlefield.Memnite.Subtypes = Borg
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Memnite.Power = 4
+Bot1.Battlefield.Memnite.Toughness = 2
+Bot2.Graveyard.Count = 3

@@ -1,0 +1,46 @@
+# Borg Queen, Perfection Manifest gives artifact creatures you control +2/+0 (CR 613.1g, 613.4). Bot1 casts it with
+# Black Lotus and three Moxen; its own 1/4 becomes 3/4, Ornithopter becomes 2/2 and Memnite 3/1. Bot2's Ornithopter is
+# not yours and stays 0/2.
+
+[Bot1 Deck]
+Borg Queen, Perfection Manifest
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Ornithopter
+Memnite
+Island x13
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Borg Queen, Perfection Manifest.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+
+[Expect]
+Bot1.Battlefield.Borg Queen, Perfection Manifest.Power = 3
+Bot1.Battlefield.Borg Queen, Perfection Manifest.Toughness = 4
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Memnite.Power = 3
+Bot1.Battlefield.Memnite.Toughness = 1
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
