@@ -1,0 +1,36 @@
+# The ruling (2022-12-08): Exploration's ability is cumulative with other effects that allow you to play
+# additional lands, including ones created by other Explorations. Two of them let Bot1 play three lands in one
+# turn (CR 305.2), and a fourth is refused.
+
+[Bot1 Deck]
+Exploration
+Exploration
+Black Lotus
+Forest
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Exploration.Cast
+Bot1.Hand.Exploration.Cast
+? Bot1.Mana = {G}
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+? Bot1.LandsPlayed = 3
+! Bot1.Hand.Plains.Play
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.LandsPlayed = 3
+Bot1.Battlefield.Count = 5

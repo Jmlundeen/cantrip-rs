@@ -1,0 +1,6 @@
+{
+  "name": "Exploration",
+  "manaCost": "{G}",
+  "type": "Enchantment",
+  "oracleText": "You may play an additional land on each of your turns."
+}
