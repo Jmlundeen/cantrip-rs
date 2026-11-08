@@ -1,0 +1,47 @@
+# Stonespeaker Crystal exiles only the graveyards of the players it targets (CR 115.1c, 406.2): Bot1 targets Bot2 alone,
+# so Bot2's Black Lotus is exiled while Bot1's own Black Lotus and the sacrificed Crystal stay in Bot1's graveyard. The draw
+# still happens.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Stonespeaker Crystal
+Island x16
+
+[Bot2 Deck]
+Black Lotus
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stonespeaker Crystal.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Stonespeaker Crystal.Activate(Ability: Sacrifice this artifact)
+Bot1.Target(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Exile.Count = 1
+Bot1.Graveyard = Stonespeaker Crystal; Black Lotus
+Bot2.Graveyard.Count = 0
+Bot1.Hand = Island; Island; Island; Island; Island

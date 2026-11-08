@@ -1,0 +1,81 @@
+# Stonespeaker Crystal: "{T}: Add {C}{C}." (CR 106.1b) taps for exactly two colorless on turn 3; on turn 5, untapped
+# again, its "{2}, {T}, Sacrifice this artifact" ability exiles both graveyards (each Lotus leaves, and the sacrificed
+# Crystal with its owner's graveyard) and draws (CR 406.2, 121.1).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Stonespeaker Crystal
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Black Lotus
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stonespeaker Crystal.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Stonespeaker Crystal.Activate(Ability: {T}: Add {C}{C}.)
+? Bot1.Mana = {C}{C}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Stonespeaker Crystal.Activate(Ability: Sacrifice this artifact)
+Bot1.Target(Bot1; Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Exile.Count = 3
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0

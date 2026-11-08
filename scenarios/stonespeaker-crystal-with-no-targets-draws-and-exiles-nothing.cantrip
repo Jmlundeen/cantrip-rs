@@ -1,0 +1,79 @@
+# Stonespeaker Crystal with no targets: "any number" includes none (CR 115.1c, 601.2c), so choosing no player exiles nothing -
+# both Lotuses stay in their graveyards - and the draw still happens. A permanent is outside the player filter and is
+# refused as a target.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Stonespeaker Crystal
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Black Lotus
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stonespeaker Crystal.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Stonespeaker Crystal.Activate(Ability: Sacrifice this artifact)
+! Bot1.Target(Bot1.Battlefield.Mox Sapphire)
+Bot1.Target()
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Exile.Count = 0
+Bot1.Graveyard = Stonespeaker Crystal; Black Lotus
+Bot2.Graveyard = Black Lotus
+Bot1.Hand = Island; Island; Island; Island; Island
