@@ -1,0 +1,51 @@
+# Locutus of Borg (3/3): an artifact creature, so it has its own granted trigger (CR 613.1f): it hits Bot2 for 3 on
+# turn 3. Lifelink (CR 702.15a) gains Bot1 3 (at 23), and "Whenever this creature deals combat damage to a player,
+# create a 1/1 colorless Borg artifact creature token" makes exactly one Borg: a 1/1 colorless Borg artifact, and no
+# second token. One more or less would fail a life total or a token line.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Locutus of Borg
+Island x2
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Locutus of Borg.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Locutus of Borg > Bot2)
+[T3 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield.Borg Token.Types = Artifact; Creature
+Bot1.Battlefield.Borg Token.Power = 1
+Bot1.Battlefield.Borg Token.Toughness = 1
+Bot1.Battlefield.Borg Token.Subtypes = Borg
+Bot1.Battlefield.Borg Token.Colors = (absent)
+Bot1.Battlefield.Borg Token#2 = (absent)
+Bot1.Library.Count = 12
+Bot2.Library.Count = 12

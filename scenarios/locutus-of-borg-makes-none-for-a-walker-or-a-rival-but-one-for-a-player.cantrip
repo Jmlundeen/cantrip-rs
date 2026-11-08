@@ -1,0 +1,83 @@
+# Locutus of Borg grants its trigger only to artifact creatures "you control" that deal combat damage "to a player"
+# (CR 613.1f, 603.2, 510.2). Bot1's Memnite hits Bot2's Ral Zarek, Guest Lecturer on turn 3 with Locutus out: damage to
+# a planeswalker, no token. On turn 4 Bot2's Memnite hits Bot1: an opponent's creature, no token for either side. On
+# turn 5 Bot1's Memnite hits Bot2: its own creature to a player, exactly one 1/1 Borg. Bot1 stays at 19, Ral keeps 2
+# loyalty, and Bot2 falls to 19.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Memnite
+Locutus of Borg
+Island
+Island x13
+
+[Bot2 Deck]
+Black Lotus
+Ral Zarek, Guest Lecturer
+Memnite
+Island x4
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot2.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Locutus of Borg.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Ral Zarek, Guest Lecturer)
+[T3 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+[T4 Bot2.Main2]
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Bot2)
+[T5 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
+Bot2.Battlefield.Ral Zarek, Guest Lecturer.Counters.Loyalty = 2
+Bot1.Battlefield.Borg Token.Power = 1
+Bot1.Battlefield.Borg Token.Toughness = 1
+Bot1.Battlefield.Borg Token#2 = (absent)
+Bot1.Battlefield = Borg Token; Island; Locutus of Borg; Memnite; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot2.Battlefield = Memnite; Ral Zarek, Guest Lecturer
+Bot2.Graveyard = Black Lotus
+Bot1.Library.Count = 11
+Bot2.Library.Count = 11
