@@ -1,0 +1,33 @@
+# Rain-Slicked Copse's cycling {2} (CR 702.29a): paying it and discarding the card from the hand draws a card. The cost {2}
+# is paid exactly with Mana Crypt's {C}{C}, so the pool ends empty; with only Blasted Landscape's {C} the ability is not
+# offered. The second copy is then played on turn 3 and enters tapped, as the card's own enters ability says.
+
+[Bot1 Deck]
+Blasted Landscape
+Mana Crypt
+Rain-Slicked Copse
+Rain-Slicked Copse
+Island x4
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Blasted Landscape.Play
+! Bot1.Hand.Rain-Slicked Copse.Activate(Mana: short)
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Rain-Slicked Copse#1.Activate
+Bot1.Pass
+? Bot1.Mana =
+? Bot1.Graveyard = Rain-Slicked Copse
+[T3 Bot1.Main1]
+Bot1.Hand.Rain-Slicked Copse.Play
+? Bot1.Battlefield.Rain-Slicked Copse.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Rain-Slicked Copse.Tapped = true
+Bot1.Hand.Count = 5
