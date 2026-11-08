@@ -1,0 +1,61 @@
+# "until end of turn" (CR 611.2c): the +2/+0 and trample are gone by Bot1's next main phase, so Gagh Slinger is back to 3/2
+# with no keyword.
+
+[Bot1 Deck]
+Gnarling Targ
+Gagh Slinger
+Burnout Bashtronaut
+Mountain x9
+Island x8
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gnarling Targ.Cast
+? Bot1.Mana =
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gagh Slinger.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Burnout Bashtronaut.Cast
+? Bot1.Mana =
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Attack(Gnarling Targ > Bot2; Gagh Slinger > Bot2; Burnout Bashtronaut > Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Gagh Slinger.Power = 5
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Island.Play
+? Bot1.Battlefield.Gagh Slinger.Power = 3
+? Bot1.Battlefield.Gagh Slinger.Toughness = 2
+? Bot1.Battlefield.Gagh Slinger.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield.Gagh Slinger.Power = 3

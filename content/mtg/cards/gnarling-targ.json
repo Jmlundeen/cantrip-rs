@@ -1,0 +1,11 @@
+{
+  "name": "Gnarling Targ",
+  "manaCost": "{4}{R}",
+  "type": "Creature — Boar",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "Trample\nWhenever you attack, Klingons and Warriors you control get +2/+0 and gain trample until end of turn.",
+  "keywords": [
+    "Trample"
+  ]
+}
