@@ -1,0 +1,77 @@
+# McCoy, Not a Bricklayer (0/4): "Whenever McCoy or another Doctor you control enters, put a +1/+1 counter on each
+# creature you control" (CR 603.6a, 201.5, 122.1). McCoy entering on turn 3 fires exactly once - McCoy itself is not
+# "another Doctor" - so Memnite goes to 2/2 and McCoy to 1/5. Dr. Pulaski entering on turn 5 fires again: Memnite to
+# 3/3, McCoy to 2/6, Pulaski to 3/3. Bot2's Grizzly Bears never takes a counter. One trigger more or less would fail a
+# power line.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Memnite
+McCoy, Not a Bricklayer
+Forest
+Dr. Pulaski, Cynical Clinician
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.McCoy, Not a Bricklayer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Power = 2
+? Bot1.Battlefield.McCoy, Not a Bricklayer.Power = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Dr. Pulaski, Cynical Clinician.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Memnite.Power = 3
+Bot1.Battlefield.McCoy, Not a Bricklayer.Power = 2
+Bot1.Battlefield.Dr. Pulaski, Cynical Clinician.Power = 3
+Bot2.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Grizzly Bears.Toughness = 2
+Bot1.Library.Count = 11
+Bot2.Library.Count = 11

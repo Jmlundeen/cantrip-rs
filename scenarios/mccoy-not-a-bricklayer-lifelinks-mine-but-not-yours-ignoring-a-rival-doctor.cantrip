@@ -1,0 +1,91 @@
+# McCoy, Not a Bricklayer (0/4): "Creatures you control with counters on them have lifelink" (CR 613.1f, 702.15a).
+# Memnite takes its counter when McCoy enters on turn 3, then hits Bot2 for 2 on turn 5: lifelink gains Bot1 2 (at 22).
+# A second Memnite cast on turn 5 takes no counter and hits for 1 on turn 7: with no counters it has no lifelink, so
+# Bot1 stays at 20. Bot2's Doctor entering on turn 6 fires nothing - it is not yours - so the first Memnite stays 2/2,
+# and Bot2's Bears hitting for 2 gains Bot2 nothing (at 17) while Bot1 falls to 20.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Memnite
+McCoy, Not a Bricklayer
+Forest
+Memnite
+Island
+Island x13
+
+[Bot2 Deck]
+Plains
+Forest
+Mox Emerald
+Grizzly Bears
+Dr. Pulaski, Cynical Clinician
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.McCoy, Not a Bricklayer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite#1 > Bot2)
+[T5 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Dr. Pulaski, Cynical Clinician.Cast
+? Bot1.Battlefield.Memnite#1.Power = 2
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Grizzly Bears > Bot1)
+[T6 Bot2.Main2]
+Bot2.Pass
+Bot1.Pass
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite#2 > Bot2)
+[T7 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot1.Battlefield.Memnite#1.Power = 2
+Bot1.Battlefield.Memnite#2.Power = 1
+Bot1.Battlefield.McCoy, Not a Bricklayer.Power = 1
+Bot2.Battlefield.Grizzly Bears.Power = 2
+Bot1.Library.Count = 10
+Bot2.Library.Count = 10
