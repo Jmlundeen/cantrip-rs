@@ -1,0 +1,11 @@
+{
+  "name": "Kurn, Son of Mogh",
+  "manaCost": "{2}{B}",
+  "type": "Legendary Creature — Klingon Warrior Officer",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Deathtouch\nBattlefront — Whenever Kurn attacks, you draw X cards and lose X life, where X is the number of opponents you attacked this turn.",
+  "keywords": [
+    "Deathtouch"
+  ]
+}

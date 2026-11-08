@@ -1,0 +1,55 @@
+# Kurn, Son of Mogh (2/3): Deathtouch (CR 702.2a) destroys the blocking Acridian (2/4) though Kurn deals only 2, while
+# Kurn survives the 2 back. Kurn attacks Bot2 alone, so X is 1: Bot1 draws one and loses 1 (at 19). Without deathtouch
+# the 2/4 would live; unblocked Bot2 would fall to 18 instead of staying at 20.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Kurn, Son of Mogh
+Island x4
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Acridian
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Kurn, Son of Mogh.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Acridian.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Kurn, Son of Mogh > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot2.Block(Acridian > Kurn, Son of Mogh)
+[T3 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20
+Bot2.Graveyard = Acridian
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 2
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 11
+Bot2.Library.Count = 12
