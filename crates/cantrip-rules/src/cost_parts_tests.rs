@@ -3112,4 +3112,46 @@ fn teamwork_can_tap_a_creature_before_another_cost_sacrifices_it() {
     assert!(g.events().iter().any(|r| matches!(r.event, Event::TappedForTeamwork { creature, spell } if creature == bear && spell == cast)));
 }
 
+#[test]
+fn behold_can_precede_discard_of_the_same_card_and_records_both() {
+    let mut g = game();
+    let spell = put(&mut g, &SPELL_WITH_BEHOLD_AND_DISCARD, Zone::hand(YOU));
+    let bear = put(&mut g, &BEAR, Zone::hand(YOU));
+    let r = next(&mut g);
+    let cast = option_of(&g, &r, spell).expect("the spell is offered");
+    answer(&mut g, &r, Answer::Act(Action::of(&cast)));
+    let r = next(&mut g);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Behold));
+    answer(&mut g, &r, Answer::Cards(vec![bear]));
+    let r = next(&mut g);
+    answer(&mut g, &r, Answer::Cards(vec![bear]));
+    next(&mut g);
+    let cast = g.state.stack.last().expect("the spell was cast").object;
+    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::Behold).collect::<Vec<_>>(), vec![bear]);
+    assert_eq!(g.history().spell_cost_objects(cast, CostOrigin::PrintedAdditional, 0, CostPart::Discard(0)).collect::<Vec<_>>(), vec![bear]);
+}
 
+#[test]
+fn mana_ability_can_pay_life_before_sacrificing_its_cost_object() {
+    let mut g = game();
+    let source = put(&mut g, &MANA_WITH_LIFE_AND_SACRIFICE, Zone::BATTLEFIELD);
+    let star = put(&mut g, &LIFE_STAR, Zone::BATTLEFIELD);
+    g.state.see_statics();
+    let r = next(&mut g);
+    let option = option_of(&g, &r, source).expect("the mana ability is offered");
+    let mut action = Action::of(&option);
+    action.targets = vec![Target::Object(star)];
+    answer(&mut g, &r, Answer::Act(action));
+    let r = next(&mut g);
+    // Paying the life first changes what the sacrificed creature is (its power is half its controller's life), so the
+    // payer is asked which to pay first (CR 601.2h).
+    assert!(matches!(r.kind, RequestKind::ChooseCostPayment { .. }), "the order is asked: {:?}", r.kind);
+    let r = pay_first(&mut g, r, |choices| choices.iter().position(|c| c.kind == CostPaymentKind::Life));
+    if matches!(r.kind, RequestKind::ChooseCards { purpose: Purpose::SacrificeCost, .. }) {
+        answer(&mut g, &r, Answer::Cards(vec![star]));
+        next(&mut g);
+    }
+    assert_eq!(g.state.player(YOU).life, 17);
+    assert_eq!(g.state.player(YOU).pool.get(Mana::G), 8, "the callback reads the sacrificed creature after the life payment");
+    assert!(g.state.obj(star).became.is_some());
+}

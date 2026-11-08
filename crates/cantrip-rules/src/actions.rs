@@ -735,6 +735,37 @@ fn payable_after_life(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Co
     if !chooses {
         return false;
     }
+    // A cost of separate parts keeps each part's life and energy with it.
+    let (required, energy) = if cost.components.is_empty() {
+        (cost.life, cost.energy)
+    } else {
+        parts_of(cost).fold((0, 0), |(l, e), p| (l + p.life, e + p.energy))
+    };
+    let mut phyrexian: u64 = cost.mana.phyrexian.iter().map(|&n| u64::from(n)).sum();
+    let mut mana_owed = !cost.mana.is_zero();
+    // A spell's other costs are paid with this one, in the order its caster chooses: the life its mana cost's Phyrexian
+    // symbols, its additional costs, a chosen one and an optional one may take can be paid first too (CR 601.2f-h).
+    let mut elsewhere: u64 = 0;
+    if judged == Judged::Cast {
+        let def = cx.card(cx.s().obj(source).card);
+        phyrexian += def.cost.phyrexian.iter().map(|&n| u64::from(n)).sum::<u64>();
+        mana_owed |= !def.cost.is_zero();
+        let life_of = |c: &Cost| -> u64 { if c.components.is_empty() { u64::from(c.life) } else { parts_of(c).map(|p| u64::from(p.life)).sum() } };
+        elsewhere += def.additional_cost.as_ref().map_or(0, life_of);
+        elsewhere += def.additional_choice.iter().map(|c| life_of(&c.cost)).max().unwrap_or(0);
+        elsewhere += def.optional_cost.as_ref().map_or(0, |o| life_of(&o.cost));
+    }
+    // The mana abilities activated before the costs are paid (CR 601.2g) - of a mana ability's own mana cost too - are
+    // looked at only where an ability that pays life could be one: printed on a permanent of the payer's, given by an
+    // effect, or a player's own.
+    let pays_life = |a: &AbilityDef| matches!(a, AbilityDef::Activated(d) if d.cost.life > 0 && d.is_mana_ability());
+    let life_mana = mana_owed && (feeds || paid == Some(CostFor::ManaAbility)) && (
+        cx.s().battlefield().iter().any(|&id| {
+            cx.s().obj(id).controller == controller && cx.cards().texts(cx.s(), cx.s().obj(id)).any(|c| cx.card(c).abilities.iter().any(pays_life))
+        }) || cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::AddAbility(_) | EffectKind::PlayerManaAbility(_))));
+    if required == 0 && energy == 0 && phyrexian == 0 && elsewhere == 0 && !life_mana {
+        return false;
+    }
     // Only a static ability - a characteristic-defining one among them, which functions in every zone (CR 604.3) - can make
     // a characteristic depend on life: on the battlefield, or on a card in the zones a cost takes cards from.
     let has_statics = |id: &ObjectId| cx.cards().texts(cx.s(), cx.s().obj(*id)).any(|c| !cx.card(c).statics.is_empty());
@@ -745,33 +776,10 @@ fn payable_after_life(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Co
         return false;
     }
     let player = *cx.s().player(controller);
-    // A cost of separate parts keeps each part's life and energy with it.
-    let (required, energy) = if cost.components.is_empty() {
-        (cost.life, cost.energy)
-    } else {
-        parts_of(cost).fold((0, 0), |(l, e), p| (l + p.life, e + p.energy))
-    };
     if !can_pay_life_for(cx, controller, required, paid) || player.energy() < energy {
         return false;
     }
-    let mut phyrexian: u64 = cost.mana.phyrexian.iter().map(|&n| u64::from(n)).sum();
-    let mut mana_owed = !cost.mana.is_zero();
-    // A spell's other costs are paid with this one, in the order its caster chooses: the life its additional costs, a chosen
-    // one and an optional one may take can be paid first too (CR 601.2f-h).
-    let mut elsewhere: u64 = 0;
-    if judged == Judged::Cast {
-        let obj = cx.s().obj(source);
-        let mana = cantrip_api::mana_cost_of(&|c| cx.card(c), obj, &cx.chars(source));
-        phyrexian += mana.phyrexian.iter().map(|&n| u64::from(n)).sum::<u64>();
-        mana_owed |= !mana.is_zero();
-        let def = cx.card(obj.card);
-        let life_of = |c: &Cost| -> u64 { if c.components.is_empty() { u64::from(c.life) } else { parts_of(c).map(|p| u64::from(p.life)).sum() } };
-        elsewhere += def.additional_cost.as_ref().map_or(0, life_of);
-        elsewhere += def.additional_choice.iter().map(|c| life_of(&c.cost)).max().unwrap_or(0);
-        elsewhere += def.optional_cost.as_ref().map_or(0, |o| life_of(&o.cost));
-    }
-    // The mana abilities activated before the costs are paid (CR 601.2g) - of a mana ability's own mana cost too.
-    let from_mana = if mana_owed && (feeds || paid == Some(CostFor::ManaAbility)) { u64::from(mana_feed(cx, controller).life) } else { 0 };
+    let from_mana = if life_mana { u64::from(mana_feed(cx, controller).life) } else { 0 };
     let optional = 2 * phyrexian + from_mana + elsewhere;
     if required == 0 && energy == 0 && optional == 0 {
         return false;
@@ -779,9 +787,8 @@ fn payable_after_life(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Co
     let most = u64::from(payable_life_for(cx, controller, paid).max(0) as u32);
     let top = (u64::from(required) + optional).min(most) as u32;
     let mut copy = cx.g.hypothetical();
-    let sim = Cx { g: &mut copy, frame: cx.frame, cursor: cx.cursor, mana_source: cx.mana_source, entering: cx.entering,
+    let mut sim = Cx { g: &mut copy, frame: cx.frame, cursor: cx.cursor, mana_source: cx.mana_source, entering: cx.entering,
         lineage: Vec::new(), damage: None, asked_at: cx.asked_at, doer: cx.doer, producing: None };
-    let mut sim = sim;
     for lost in required..=top {
         for energy_paid in [true, false] {
             if !energy_paid && (energy == 0 || lost == 0) {
@@ -2590,6 +2597,9 @@ impl Footprint {
             || other.writes & self.reads != 0
             || ((self.act == Act::Counters || other.act == Act::Counters) && overlap())
             || (matches!((self.act, other.act), (Act::Tap, Act::TakesTapped) | (Act::TakesTapped, Act::Tap)) && overlap())
+            // Taking away first an object the other step could choose without taking it (behold a creature card, then
+            // discard it; tap a creature, then sacrifice it) can leave that step nothing to choose.
+            || ((self.act == Act::Removes) != (other.act == Act::Removes) && overlap())
             || changes_others(self, other)
             || changes_others(other, self)
     }
