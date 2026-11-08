@@ -1,0 +1,6 @@
+{
+  "name": "Harmonize",
+  "manaCost": "{2}{G}{G}",
+  "type": "Sorcery",
+  "oracleText": "Draw three cards."
+}
