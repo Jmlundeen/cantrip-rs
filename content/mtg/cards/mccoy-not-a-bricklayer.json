@@ -1,0 +1,8 @@
+{
+  "name": "McCoy, Not a Bricklayer",
+  "manaCost": "{3}{G}{W}",
+  "type": "Legendary Creature — Human Doctor",
+  "power": 0,
+  "toughness": 4,
+  "oracleText": "Whenever McCoy or another Doctor you control enters, put a +1/+1 counter on each creature you control.\nCreatures you control with counters on them have lifelink."
+}
