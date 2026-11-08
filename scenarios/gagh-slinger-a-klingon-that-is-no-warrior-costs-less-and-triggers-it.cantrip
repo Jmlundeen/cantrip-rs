@@ -1,0 +1,55 @@
+# Gagh Slinger: "Klingon spells and Warrior spells you cast cost {1} less to cast" and "Whenever another Klingon or
+# Warrior you control enters, this creature deals 1 damage to each opponent" (CR 601.2f, 118.7a, 603.6a). Battle-Scarred
+# Survivalist is a Klingon Scout, no Warrior: the Klingon half of each line, which a card that read only Warriors would
+# miss. Gagh Slinger is on the battlefield first, then two black mana is tapped for a {1}{B} spell that costs {B} - one
+# black left - and its entry deals exactly one damage to Bot2. Galvanizing Tenor ({3}{R}, a Klingon Performer) then costs
+# {2}{R}: three red mana pay it exactly, so a reduction of two would leave one, and its entry deals a second damage.
+
+[Bot1 Deck]
+Mox Ruby
+Mana Confluence
+City of Brass
+Mountain
+Gagh Slinger
+Battle-Scarred Survivalist
+Galvanizing Tenor
+Mountain x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mana Confluence.Play
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.City of Brass.Play
+Bot1.Battlefield.Mana Confluence.Activate(Color: Red)
+Bot1.Battlefield.City of Brass.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gagh Slinger.Cast
+? Bot1.Mana = 
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mana Confluence.Activate(Color: Black)
+Bot1.Battlefield.City of Brass.Activate(Color: Black)
+Bot1.Hand.Battle-Scarred Survivalist.Cast
+? Bot1.Mana = {B}
+[T5 Bot1.Main2]
+? Bot2.Life = 19
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Galvanizing Tenor.Cast
+? Bot1.Mana =
+[T7 Bot1.Main2]
+? Bot2.Life = 18
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Gagh Slinger.Types = Creature
+Bot1.Battlefield.Battle-Scarred Survivalist.Types = Creature
+Bot1.Battlefield.Galvanizing Tenor.Types = Creature
+Bot2.Life = 18
