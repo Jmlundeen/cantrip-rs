@@ -1,0 +1,35 @@
+# Reclamation Specialist: "{1}, Sacrifice an artifact creature: Draw a card." (CR 118.3, 602.2b). Bot1 casts it with a Swamp,
+# a Mox Jet and a Dark Ritual, then pays {1} with the one black left over and sacrifices a Memnite (an artifact creature) to
+# draw: the pool ends empty and both the Ritual and the Memnite are in the graveyard.
+
+[Bot1 Deck]
+Reclamation Specialist
+Swamp
+Mox Jet
+Dark Ritual
+Memnite
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast(Spend: B)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Reclamation Specialist.Cast(Spend: B, B, B)
+? Bot1.Mana = {B}
+Bot1.Battlefield.Reclamation Specialist.Activate(Ability: {1}, Sacrifice an artifact creature)
+Bot1.Choose(Memnite)
+? Bot1.Mana =
+? Bot1.Graveyard = Memnite; Dark Ritual
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 2
