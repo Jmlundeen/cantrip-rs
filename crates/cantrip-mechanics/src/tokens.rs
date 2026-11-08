@@ -553,6 +553,18 @@ pub fn create(g: &mut dyn Game, controller: PlayerId, def: &'static CardDef, cou
     g.create_tokens(def, controller, count, false)
 }
 
+/// "create X [tokens], where X is its power" (CR 608.2h, 107.1b): `count` tokens of `def` made together (CR 101.4) under
+/// the ability's controller, `count` being the power the object the ability came from had as it last existed on the
+/// battlefield - its counters, pumps and everything else it had as it left - and none for a power of 0 or less, since a
+/// negative number of tokens is none (CR 107.1b). `tapped` as the card prints it. Goldvein Hydra and Stratagem Emulator call it.
+pub fn create_equal_to_last_known_power(g: &mut dyn Game, item: &StackItem, def: &'static CardDef, tapped: bool) -> Result<(), Suspend> {
+    let power = crate::targets::power_or_last_known(g, item.object);
+    if power > 0 {
+        create_by_rule(g, item.controller, def, power as u32, tapped)?;
+    }
+    Ok(())
+}
+
 /// "Create a 0/0 green and blue Fractal creature token. Put `n` +1/+1 counters on it" (CR 111.1, 122.1, 608.2c): two
 /// instructions, the counters put on every token that was made (a token doubler makes two) all together as one event. With
 /// `n` of 0 nothing is put, and the 0/0 token goes to the graveyard as a state-based action (CR 704.5f). The card file lists
