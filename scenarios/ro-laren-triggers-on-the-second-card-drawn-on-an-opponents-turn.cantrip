@@ -1,0 +1,44 @@
+# "each turn" (CR 603.2): Ro Laren triggers on cards its controller draws in any turn. On Bot2's turn Bot1's first Opt is its
+# first card of that turn and draws nothing from Ro Laren, and the second Opt is the second card: Ro Laren deals 2 damage to
+# Bot2 (CR 120.3).
+
+[Bot1 Deck]
+Ro Laren, Double Agent
+Black Lotus
+Mox Sapphire
+Island
+Opt
+Opt
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ro Laren, Double Agent.Cast(Spend: R, R, R)
+[T2 Bot2.Main1]
+? Bot2.Life = 20
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Plains |)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Plains |)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+
+[Expect]
+Turn = 2
+Bot2.Life = 18
+Bot1.Life = 20

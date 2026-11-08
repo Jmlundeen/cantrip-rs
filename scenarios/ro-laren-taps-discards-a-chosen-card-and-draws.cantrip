@@ -1,0 +1,41 @@
+# "{1}, {T}, Discard a card: Draw a card." All three are costs, paid as the ability is activated (CR 118.3, 602.2b): Bot1
+# pays {1} with a Mox Sapphire, taps Ro Laren and discards a chosen Plains, then draws as the ability resolves. The tapped
+# Ro Laren cannot be tapped again the same turn, even with the mana in the pool.
+
+[Bot1 Deck]
+Ro Laren, Double Agent
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ro Laren, Double Agent.Cast(Spend: R, R, R)
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Ro Laren, Double Agent.Activate(Ability: {1}, {T}, Discard a card)
+Bot1.Choose(Plains)
+? Bot1.Mana =
+? Bot1.Hand.Count = 3
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Ro Laren, Double Agent.Activate(Ability: {1}, {T}, Discard a card)
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Plains; Black Lotus
+Bot1.Battlefield.Ro Laren, Double Agent.Tapped = true
