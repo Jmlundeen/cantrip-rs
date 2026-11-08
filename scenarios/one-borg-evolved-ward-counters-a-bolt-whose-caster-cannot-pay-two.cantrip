@@ -1,0 +1,57 @@
+# One, Borg Evolved gives Bot1's Memnite ward {2}. Turn 4: Bot2's only mana is one Mountain, so its Lightning Bolt at
+# Memnite is countered by the ward trigger (it cannot pay {2}) and Memnite takes no damage. CR 702.21a.
+
+[Bot1 Deck]
+One, Borg Evolved
+Black Lotus
+Black Lotus
+Mox Jet
+Island
+Island
+Island
+Memnite
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.One, Borg Evolved.Cast(Spend: W, U, B, W, W, U, U)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Memnite.Damage = 0
+? Bot2.Graveyard.Count = 1
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Memnite.Damage = 0
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard.Count = 2
