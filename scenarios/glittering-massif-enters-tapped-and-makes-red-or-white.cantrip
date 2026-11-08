@@ -1,0 +1,23 @@
+# "({T}: Add {R} or {W}.) This land enters tapped." (CR 305.6, 614.1d): played on turn 1 it is tapped, and its two basic land
+# types give it both intrinsic mana abilities - Mountain's red and Plains' white - with no ability text of its own.
+
+[Bot1 Deck]
+Glittering Massif
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Glittering Massif.Play
+? Bot1.Battlefield.Glittering Massif.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Glittering Massif.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Glittering Massif.Activate(Ability: Add {W})
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Battlefield.Glittering Massif.Tapped = true
