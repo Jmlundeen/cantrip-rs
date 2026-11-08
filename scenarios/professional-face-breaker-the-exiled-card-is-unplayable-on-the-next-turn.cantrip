@@ -1,0 +1,49 @@
+# "You may play that card this turn." (CR 601.3, 514.2): the permission is for this turn only, and declining it is
+# allowed. Turn 3: the Treasure is sacrificed and the top card of Bot1's library (a Lightning Bolt) is exiled but not
+# played; on Bot1's next turn it has the Mountain, Mox Ruby and Mox Jet untapped and could pay {R}, so the cast is possible only
+# if the grant outlived the turn - the refusal and the card still in exile fail a grant that never expires.
+
+[Bot1 Deck]
+Professional Face-Breaker
+Mountain
+Mox Ruby
+Mox Jet
+Memnite
+Island
+Island
+Island
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Professional Face-Breaker.Cast(Spend: R, R, B)
+? Bot1.Mana =
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Professional Face-Breaker > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+Bot1.Battlefield.Professional Face-Breaker.Activate(Ability: Sacrifice a Treasure)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Exile.Lightning Bolt.Colors = Red
+[T5 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast
+
+[Expect]
+Turn = 5
+Bot1.Exile.Lightning Bolt.Colors = Red
+Bot2.Life = 18
+Bot1.Battlefield.Treasure Token = (absent)

@@ -1,0 +1,42 @@
+# Professional Face-Breaker: "Whenever one or more creatures you control deal combat damage to a player, create a Treasure
+# token." (CR 510.2, 603.2c). On turn 3 Face-Breaker (2/3, menace) and a Memnite attack Bot2 together, so the batch is one
+# player damaged and the trigger makes exactly one Treasure, not one per creature; Bot2 takes 3 (17). Menace is on the
+# creature from the moment it enters.
+
+[Bot1 Deck]
+Professional Face-Breaker
+Mountain
+Mox Ruby
+Mox Jet
+Memnite
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Professional Face-Breaker.Cast(Spend: R, R, B)
+? Bot1.Mana =
+Bot1.Hand.Memnite.Cast
+? Bot1.Battlefield.Professional Face-Breaker.Keywords = Menace
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Professional Face-Breaker > Bot2; Memnite > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Treasure Token.Token = true
+Bot1.Battlefield.Treasure Token.Tapped = false
