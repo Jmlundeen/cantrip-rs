@@ -87,6 +87,10 @@ class LaneTest(unittest.TestCase):
         self.write("crates/cantrip-cards/src/cards/some_card.rs", "use cantrip_api::*;\n\n// prior art\n")
         self.write("scenarios/some-card-does-things.cantrip", "# a prior scenario\n\n[Bot1 Deck]\nIsland x20\n")
         self.write("tools/maintenance/new-card.py", NEW_CARD)
+        shutil.copyfile(os.path.join(HERE, "missing-cards.py"),
+                        os.path.join(self.main, "tools", "maintenance", "missing-cards.py"))
+        self.write("docs/cube-lists/TestCube.txt", "Card A\nCard B\nCard C\nCard E\n")
+        self.write("docs/cube-lists/AllImplemented.txt", "Card A\n")
         self.git(self.main, "add", ".")
         self.git(self.main, "commit", "--quiet", "-m", "initial")
         self.git(self.main, "push", "--quiet", "-u", "origin", "main")
@@ -173,6 +177,35 @@ class LaneTest(unittest.TestCase):
         self.assertEqual(self.queue("--card", "Card C").returncode, 0)
         self.assertEqual(self.queue("--card", "Card D").returncode, 0)
         self.assertEqual([card["name"] for card in self.state()["cards"]], ["Card C", "Card D"])
+
+    def test_queue_backlog_uses_missing_cards_in_its_order(self):
+        made = self.queue("--backlog")
+        self.assertEqual(made.returncode, 0, made.stderr)
+        self.assertIn("backlog: 3 missing card(s)", made.stdout)
+        self.assertIn("added 3", made.stdout)
+        self.assertEqual([card["name"] for card in self.state()["cards"]], ["Card B", "Card C", "Card E"])
+
+        again = self.queue("--backlog")
+        self.assertEqual(again.returncode, 0, again.stderr)
+        self.assertIn("already queued 3", again.stdout)
+
+        one = self.queue("--backlog", "--list", "TestCube", name="one")
+        self.assertEqual(one.returncode, 0, one.stderr)
+        self.assertIn("cube list TestCube", one.stdout)
+        self.assertEqual([card["name"] for card in self.state("one")["cards"]], ["Card B", "Card C", "Card E"])
+
+        refused = self.queue("--backlog", "--card", "Card E")
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn("own source", refused.stderr)
+        without = self.queue("--list", "TestCube")
+        self.assertEqual(without.returncode, 2)
+        self.assertIn("--backlog", without.stderr)
+
+    def test_queue_backlog_when_nothing_is_missing_is_a_no_op(self):
+        made = self.queue("--backlog", "--list", "AllImplemented", name="empty")
+        self.assertEqual(made.returncode, 0, made.stderr)
+        self.assertIn("nothing to queue", made.stdout)
+        self.assertFalse(os.path.exists(os.path.join(self.main, ".git", "card-lane", "empty", "queue.json")))
 
     # -- claims and packets ------------------------------------------------------------------------------------------
 

@@ -8,6 +8,7 @@ the card's "name" field or by the file-name slug the loader requires, both case-
     python tools/maintenance/missing-cards.py --pick    the first missing name alphabetically, and nothing else
     python tools/maintenance/missing-cards.py --pick 5  the first five, one per line, in the same order
     python tools/maintenance/missing-cards.py --count   how many are missing, of how many distinct names
+    python tools/maintenance/missing-cards.py --names   every missing name, one per line, and nothing else
 
 Any of them takes --list <Cube> to look at that one list (docs/cube-lists/<Cube>.txt) instead of all of them, or
 --file <path> to look at any list of names (what card-list.py writes, a decklist, a set's cards).
@@ -91,6 +92,7 @@ def main():
     parser.add_argument("--pick", type=int, nargs="?", const=1, metavar="N",
                         help="print the first N missing names alphabetically (default 1), and nothing else")
     parser.add_argument("--count", action="store_true", help="print how many are missing")
+    parser.add_argument("--names", action="store_true", help="print every missing name, one per line, and nothing else")
     parser.add_argument("--list", metavar="CUBE", help="only this list, docs/cube-lists/<CUBE>.txt")
     parser.add_argument("--file", metavar="PATH", help="only the names in this file, one a line")
     args = parser.parse_args()
@@ -105,6 +107,11 @@ def main():
         ((name, lists) for name, lists in names.items() if slug(name) not in known),
         key=lambda pair: (slug(pair[0]), pair[0]),
     )
+
+    if args.names:
+        for name, _ in missing:
+            print(name)
+        return
 
     if args.count:
         print("%d of %d listed names have no card file" % (len(missing), len(names)))
