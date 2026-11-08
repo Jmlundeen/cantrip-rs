@@ -31,7 +31,7 @@ Bot1.Hand.Forest.Play
 Bot1.Hand.Spider-Man, Brooklyn Visionary.Cast(Ability: Web-slinging)
 ? Client.Bot1.Prompt.Detail = {2}{G} of {2}{G} still to pay  ·  tap a land  ·  tap a creature for mana: it will be the one returned
 Bot1.Battlefield.Llanowar Elves.Activate
-? Client.Bot1.Prompt.Detail = {2}{G} of {2}{G} still to pay  ·  click mana in your pool, or tap a land
+? Client.Bot1.Prompt.Detail = {2} of {2}{G} still to pay  ·  tap a land
 Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Forest#2.Activate
 Bot1.Choose(Llanowar Elves)
