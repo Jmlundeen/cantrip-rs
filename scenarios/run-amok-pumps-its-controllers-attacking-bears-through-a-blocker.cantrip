@@ -1,0 +1,56 @@
+# Run Amok: "Target attacking creature gets +3/+3 and gains trample until end of turn." On turn 3 Bot1 attacks with
+# Grizzly Bears, Bot2 blocks with Llanowar Elves, and Bot1 casts it for exactly {1}{R}: the blocking Elves is no
+# attacking creature and is refused, the 2/2 Bears becomes 5/5 with trample (CR 506.4, 608.2b), 1 damage kills the Elves
+# and 4 tramples through to Bot2 (20 to 16).
+# Run Amok {1}{R}: Instant
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Grizzly Bears
+Mountain
+Run Amok
+Plains x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast(Spend: G, R)
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast(Spend: G)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot2.Block(Llanowar Elves > Grizzly Bears)
+! Bot1.Hand.Run Amok.Cast(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Run Amok.Cast(Bot1.Battlefield.Grizzly Bears; Spend: R, R)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 5
+? Bot1.Battlefield.Grizzly Bears.Toughness = 5
+Bot1.AssignDamage(Grizzly Bears > Llanowar Elves: 1; Grizzly Bears > Bot2: 4)
+[T3 Bot1.Damage]
+? Bot2.Life = 16
+
+[Expect]
+Bot2.Life = 16
+Bot2.Graveyard = Llanowar Elves
