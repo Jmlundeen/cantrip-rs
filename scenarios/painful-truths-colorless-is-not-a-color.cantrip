@@ -1,0 +1,32 @@
+# Painful Truths: colorless mana is not a color (CR 105.1): an Ancient Tomb's {C}{C} and a Mox Jet's {B} pay {2}{B}
+# exactly, the pool empty after, so X = 1 — Bot1 draws one and loses 1 life on top of the Tomb's 2 (20 to 17), the
+# control for the three-color scenario.
+
+[Bot1 Deck]
+Painful Truths
+Ancient Tomb
+Mox Jet
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Painful Truths.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 12
+Bot1.Life = 17
+Bot1.Graveyard = Painful Truths

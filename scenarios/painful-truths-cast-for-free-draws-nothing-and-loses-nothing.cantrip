@@ -1,0 +1,33 @@
+# Painful Truths: cast without paying its mana cost (here through Omniscience, put onto the battlefield with Show and
+# Tell), no mana is spent, so Converge sees zero colors — X = 0 (CR 207.2c, 118.9). Bot1 draws nothing and loses nothing:
+# the hand holds the two leftover Islands, life stays 20, the library untouched by the draw. A max(1) mutant would draw
+# one and lose one.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Omniscience
+Painful Truths
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast(Spend: U, U, U)
+Bot1.Choose(Omniscience)
+Bot1.Hand.Painful Truths.Cast(Ability: Without paying)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Library.Count = 13
+Bot1.Life = 20
+Bot1.Graveyard = Painful Truths; Show and Tell; Black Lotus
