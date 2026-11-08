@@ -1,0 +1,20 @@
+# Umbral Expanse is a Land - Plains Swamp that enters tapped (CR 614.1d): played on turn 1 it arrives tapped, so it
+# cannot be tapped for mana that turn. It keeps both basic land types, which is where its "{T}: Add {W} or {B}" comes
+# from (CR 305.6, 106.4) - the card file writes no mana ability of its own.
+
+[Bot1 Deck]
+Umbral Expanse
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Umbral Expanse.Play
+? Bot1.Battlefield.Umbral Expanse.Tapped = true
+? Bot1.Battlefield.Umbral Expanse.Subtypes = Plains; Swamp
+
+[Expect]
+Bot1.Battlefield.Umbral Expanse.Tapped = true
+Bot1.Battlefield.Umbral Expanse.Subtypes = Plains; Swamp
+Bot1.Battlefield.Umbral Expanse.Types = Land

@@ -1,0 +1,29 @@
+# "Cycling {2}" (CR 702.29a): from hand, {2} and discarding this card draws a card. The discard is the cost, so the
+# card itself is in the graveyard as the draw happens and no land was ever played for it; the pool is empty afterwards,
+# so exactly {2} was paid.
+
+[Bot1 Deck]
+Umbral Expanse x2
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Umbral Expanse.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Umbral Expanse.Activate(Ability: Cycling)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Umbral Expanse
+Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Count = 3
