@@ -1,0 +1,46 @@
+# Forsaken Monument (CR 613.4c, layer 7c; CR 603.2): colorless creatures its controller controls get +2/+2 - the Ornithopter
+# is 2/4 while the green Grizzly Bears stay 2/2 and Bot2's Ornithopter stays 0/2. Its last ability gains 2 life when Bot1
+# casts the colorless Ornithopter and nothing for the colored Bears; the Monument itself was cast before it was on the
+# battlefield, so its own cast gains nothing.
+
+[Bot1 Deck]
+Forest
+Plains
+Black Lotus
+Mox Jet
+Mox Pearl
+Forsaken Monument
+Ornithopter
+Grizzly Bears
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Forsaken Monument.Cast
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Grizzly Bears.Cast
+
+[Expect]
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot1.Life = 22
