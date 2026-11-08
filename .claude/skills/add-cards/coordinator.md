@@ -38,7 +38,10 @@ core-feature agents and review agents run on Opus. Agents read only what their w
      shared, so a `Mechanics:` or `Engine:` commit made by one agent is merged into the next agent's `next`. The lane
      is dispatch and the mechanical gate, not the claim or the review: the card's GitHub issue is still claimed first
      (`claims.md`), and `review.md` is still the verdict. The command model is
-     `.claude/skills/card-lane/SKILL.md`.
+     `.claude/skills/card-lane/SKILL.md`. A fresh lane implementor gets
+     `.claude/skills/card-lane/PROMPT.md`, filled with its queue, worker id and token (never its slot path or lease);
+     the prompt points at that skill and at `add-cards`/`write-game-script`, and its composer section is the
+     acquire/token/spawn/land/release loop.
 
    The hooks deny an edit or shell command into a slot by anyone but its member, and the main thread while a member
    is in it; and they keep a member in its own tree: its edit outside the tree (the temp directory aside), or its

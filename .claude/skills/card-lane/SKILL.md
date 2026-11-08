@@ -29,11 +29,18 @@ claim, the packet, the shared branch, `check` and `commit`.
 The lane commands are run from the checkout or worktree they act on. `--queue` defaults to `default`; everyone who
 should share a queue passes the same name.
 
+## Pointing an agent at this lane
+
+`PROMPT.md` beside this file is the handoff a composer gives a fresh implementor: the queue, worker id and pool token,
+never the slot path or lease, and it points back here for the card and gate rules. It also has a solo form for an agent
+running in a checkout without the pool. Use the prompt rather than copying this file into a message; this file stays
+the one instruction set.
+
 ## Coordinator
 
-1. **Pool first.** `tools\worktree.cmd acquire --for "card: <Name>"` per card, then a token per implementor
-   (`coordinator.md` step 0). The lane reads the pool's own state: in a slot it refuses a claim with no lease, and
-   one with no joined member.
+1. **Pool first.** `tools\worktree.cmd acquire --for "card: next <queue>"` per implementor, then a token per
+   implementor (`coordinator.md` step 0). The lane reads the pool's own state: in a slot it refuses a claim with no
+   lease, and one with no joined member.
 2. **Build the queue once**, from the main checkout or any worktree:
 
    ```sh
@@ -50,8 +57,9 @@ should share a queue passes the same name.
    what no card file defines, in the order `missing-cards.py` prints it. It is a source of its own, so narrow it with
    `--list`/`--file`, not with `--format`/`--card`; an empty backlog queues nothing and says so. Use `--queue trc` on
    every later command of that lane.
-3. **Start one implementor per slot** with its worker id (`w1`, `w2`, ...), the queue name, and this file plus
-   `add-cards` and `write-game-script`. Never name the card: `next` chooses it.
+3. **Start one implementor per slot** with its worker id (`w1`, `w2`, ...), the queue name, and the prompt in
+   `PROMPT.md` (it points at this file plus `add-cards` and `write-game-script`). Never name the card: `next` chooses
+   it, and never give the agent the slot path or the lease; the token is its only way in.
 4. **Watch, do not hand out:** `python tools/maintenance/card-lane.py status --queue trc` lists who holds what and
    whether a claim's lease or member has gone. A dead claim is freed with `release --id <id> --reason "..."` from
    its worktree, or from any worktree when the slot is gone.
@@ -60,7 +68,8 @@ should share a queue passes the same name.
 
 ## Implementor
 
-Your first command is `join` (`POOL.md`, worktree-pool-setup), so the slot has its one member. Then:
+Your first command is `join` (`POOL.md`, worktree-pool-setup), so the slot has its one member. If a composer started
+you from `PROMPT.md`, it already gives your queue, id, token and core scope; this section is the long form. Then:
 
 1. **Take the card:**
 
