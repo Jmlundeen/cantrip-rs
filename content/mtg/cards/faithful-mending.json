@@ -1,0 +1,6 @@
+{
+  "name": "Faithful Mending",
+  "manaCost": "{W}{U}",
+  "type": "Instant",
+  "oracleText": "You gain 2 life, draw two cards, then discard two cards.\nFlashback {1}{W}{U} (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+}
