@@ -1,0 +1,30 @@
+# Reliquary Tower: "You have no maximum hand size" (CR 402.2). Bot1 plays it on turn 1 and taps it for {C}; from then on it
+# draws without playing anything, so after its turn-5 draw its hand holds eight cards and the cleanup step discards nothing.
+# Bot2, without the Tower, has to discard down to seven (CR 514.1).
+
+[Bot1 Deck]
+Reliquary Tower
+Island
+Island
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Reliquary Tower.Play
+Bot1.Battlefield.Reliquary Tower.Activate
+? Bot1.Mana = {C}
+[T3 Bot1.Main1]
+? Bot2.Hand.Count = 7
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 8
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Hand.Count = 8
+Bot1.Battlefield = Reliquary Tower
