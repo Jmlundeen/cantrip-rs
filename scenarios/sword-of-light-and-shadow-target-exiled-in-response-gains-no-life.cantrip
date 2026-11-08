@@ -1,0 +1,90 @@
+# Sword of Light and Shadow, the 2020-08-07 ruling: a chosen target that is illegal by the time the trigger resolves stops
+# the whole ability (CR 608.2b) - no 3 life. Bot1's equipped Ornithopter hits Bot2 and the trigger targets Memnite#2, just
+# killed in that combat; in response Bot2 sacrifices Tormod's Crypt to exile Bot1's graveyard, so the trigger does nothing
+# and Bot1 stays at 20, no "you may" asked.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Sword of Light and Shadow
+Memnite
+Memnite
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Forest
+Mox Emerald
+Grizzly Bears
+Memnite
+Tormod's Crypt
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sword of Light and Shadow.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite#1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Tormod's Crypt.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sword of Light and Shadow.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Memnite > Bot1)
+Bot1.Block(Ornithopter > Memnite)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2; Memnite > Bot2)
+Bot2.Block(Grizzly Bears > Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Graveyard.Memnite#2)
+Bot1.Pass
+Bot2.Battlefield.Tormod's Crypt.Activate(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot1.Hand = Island; Island
+Bot1.Graveyard.Count = 0
+Exile.Count = 2
+Bot2.Graveyard = Tormod's Crypt; Memnite; Lightning Bolt
