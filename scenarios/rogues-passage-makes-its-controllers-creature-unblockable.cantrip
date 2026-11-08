@@ -1,0 +1,59 @@
+# Rogue's Passage: "{4}, {T}: Target creature can't be blocked this turn." (CR 509.1b, 611.2a). Bot1 casts Grizzly Bears on
+# turn 1, plays the Passage on turn 3 and pays the {4} with Black Lotus and Mox Sapphire (the pool empty afterwards) and the
+# {T} with the land itself, so the Bears attacks unblocked - the Elves may not block it - and Bot2 takes 2. A noncreature
+# permanent is refused as the target. On turn 5 the restriction has ended - the Elves blocks the same Bears and Bot2 takes
+# nothing more.
+
+[Bot1 Deck]
+Black Lotus
+Rogue's Passage
+Mox Jet
+Mox Sapphire
+Forest
+Grizzly Bears
+Plains
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grizzly Bears.Cast(Spend: G, B)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast(Spend: G)
+[T3 Bot1.Main1]
+Bot1.Hand.Rogue's Passage.Play
+? Bot2.Life = 20
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Rogue's Passage.Activate(Ability: {4}, {T}: Target creature can't be blocked this turn; Bot1.Battlefield.Mox Sapphire)
+Bot1.Battlefield.Rogue's Passage.Activate(Ability: {4}, {T}: Target creature can't be blocked this turn; Bot1.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.BeginCombat]
+? Bot1.Battlefield.Grizzly Bears.CantBeBlocked = true
+Bot1.Attack(Grizzly Bears > Bot2)
+! Bot2.Block(Llanowar Elves > Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.BeginCombat]
+? Bot2.Life = 18
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot2.Block(Llanowar Elves > Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Llanowar Elves

@@ -1,0 +1,38 @@
+# "{T}: Add {C}" (CR 605.1a): the land taps for one colorless mana and untaps next turn, when its second ability targets any
+# creature - an opponent's Ornithopter here (CR 115.1) - which can't be blocked for the rest of that turn.
+
+[Bot1 Deck]
+Rogue's Passage
+Black Lotus
+Mox Jet
+Plains
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Rogue's Passage.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Rogue's Passage.Activate
+? Bot1.Mana = {C}
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Rogue's Passage.Activate(Ability: {4}, {T}: Target creature can't be blocked this turn; Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.CantBeBlocked = true
+Bot1.Battlefield.Rogue's Passage.Tapped = true
