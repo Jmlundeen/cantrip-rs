@@ -1,0 +1,54 @@
+# The ruling: if the target creature is illegal by the time Pongify tries to resolve, the spell does not resolve and no
+# player creates an Ape (CR 608.2b). Bot2 answers the first Pongify with Lightning Bolt on Bot1's first Memnite; the Bolt
+# kills it, the first Pongify fizzles with the battlefield still at two, and a second Pongify on the second Memnite does
+# leave the 3/3 green Ape.
+
+[Bot1 Deck]
+Island
+Memnite
+Memnite
+Pongify
+Pongify
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite#1.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pongify.Cast(Bot1.Battlefield.Memnite#1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Memnite#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pongify.Cast(Bot1.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Ape Token.Power = 3
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard = Lightning Bolt

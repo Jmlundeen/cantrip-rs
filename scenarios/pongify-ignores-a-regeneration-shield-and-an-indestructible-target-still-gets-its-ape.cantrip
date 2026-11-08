@@ -1,0 +1,67 @@
+# Pongify: "Destroy target creature. It can't be regenerated. Its controller creates a 3/3 green Ape creature token."
+# (CR 701.8, 701.19c, and the ruling: a legal target that is not destroyed still gets its Ape). On turn 3 Bot1 Pongifies
+# Bot2's Drudge Skeletons and Bot2 regenerates it in response off its Swamp: the shield does not save it, and Bot2 gets an
+# Ape. Bot1's second Pongify targets Bot2's indestructible Darksteel Myr: it stays, and Bot2 gets a second Ape all the
+# same. A regenerable destroy would leave the Skeletons; an Ape only for a creature destroyed would leave one Ape.
+
+[Bot1 Deck]
+Island
+Pongify
+Pongify
+Island
+Island x16
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Black Lotus
+Drudge Skeletons
+Darksteel Myr
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Darksteel Myr.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Drudge Skeletons.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pongify.Cast(Bot2.Battlefield.Drudge Skeletons)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Drudge Skeletons.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Drudge Skeletons; Black Lotus; Black Lotus
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pongify.Cast(Bot2.Battlefield.Darksteel Myr)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Pongify; Pongify
+Bot2.Graveyard = Drudge Skeletons; Black Lotus; Black Lotus
+Bot2.Battlefield = Ape Token; Ape Token; Darksteel Myr; Swamp
+Bot1.Battlefield = Island; Island

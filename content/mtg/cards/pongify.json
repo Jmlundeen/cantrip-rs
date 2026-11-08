@@ -1,0 +1,6 @@
+{
+  "name": "Pongify",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Destroy target creature. It can't be regenerated. Its controller creates a 3/3 green Ape creature token."
+}
