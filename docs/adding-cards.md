@@ -526,6 +526,11 @@ shapes have an example:
   rule with its land type (`Keyword::LANDWALKS`); a card that grants one names it through its words,
   `Keyword::landwalk(q.words(source).subtype(Subtype::Island))` (Lord of Atlantis).
   A scenario refuses an attack or a block with `! Bot2.Attack(A > B)` / `! Bot2.Block(A > B)`.
+  A target is refused by naming it in the action, positional or `Target:` - `! Bot1.Hand.Lightning Bolt.Cast(Bot2)`,
+  `! Bot1.Battlefield.Spot, Felis catus.Activate(Target: Llanowar Elves)`. The line holds only when no option of that action
+  could take it as a target, so an ability whose target slot refuses it stays offered (CR 601.2c, 602.2b); an offered
+  action that could take it fails the line. An action whose targets are chosen as it resolves has no slot to judge
+  them by, and is refused as before, by whether it is offered at all; `Mana: short` is judged by the mana, not the target.
   **Toxic N** (CR 702.164) is the core's: printed, a JSON `keywords` entry `"Toxic 2"` (`CardDef::toxic`); granted, `EffectKind::Toxic(n)` or a layer-6 static's `chars.toxic += n`. `Chars::toxic` is the total toxic value (CR 702.164b), which combat damage to a player gives as poison counters (`ops::deal_damage_with`); the dump's `.Toxic` key shows it.
 - **Reflexive triggers** (CR 603.12, "when you do"): `Game::reflexive_trigger`; one whose quantity is what the first part
   did ("tap up to that many target creatures") is `Game::reflexive_trigger_counted(.., count)`, and its slot's

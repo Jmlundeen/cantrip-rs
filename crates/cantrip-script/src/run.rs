@@ -2762,9 +2762,15 @@ impl<'s> Run<'s> {
     /// action, and with targets or `Sacrifice:` named only the options that could be announced or paid with them.
     fn refused_offered(&self, action: &ActionStep, line: usize, text: &str, options: &[ActionOption]) -> R<Vec<ActionOption>> {
         let mut offered = self.offered(action, options, true)?;
-        // A refusal that names targets (`! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Emrakul)`) refuses only
-        // the option that could be announced with them, and proves nothing when no such object exists.
-        let specs: Vec<&str> = action.positional().collect();
+        // A refusal that names targets - in its arguments or as `Target:` - refuses the action only as it would be announced
+        // with them (`! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Emrakul)`), so an activation whose target slot cannot
+        // take them is refused while the ability itself stays offered (CR 601.2c, 602.2b): `! Bot1.Battlefield.Spot, Felis
+        // catus.Activate(Target: Llanowar Elves)`. An action whose targets are chosen as it resolves has no slot to judge
+        // them by, so it is refused as before, by whether it is offered at all. It proves nothing when no such object exists.
+        let specs: Vec<&str> = action
+            .positional()
+            .chain(action.arguments.iter().filter(|a| a.key.as_deref() == Some("Target")).map(|a| a.value.as_str()))
+            .collect();
         if !specs.is_empty() {
             let all: Vec<ObjectId> = (0..self.game.state.objects.len()).map(|i| ObjectId(i as u32)).collect();
             for spec in &specs {
@@ -2774,13 +2780,20 @@ impl<'s> Run<'s> {
             }
             let mut kept = Vec::new();
             for o in offered {
-                let mut every = true;
+                // An option with no target slot takes none of them.
+                let mut every = o.targets_required > 0;
                 for spec in &specs {
                     every &= self.target(action, spec, &o.target_candidates)?.is_some();
                 }
                 if every {
                     kept.push(o);
                 }
+            }
+            // A refusal that says the mana is short is refused for that, not for the target: it is judged below, where the
+            // same line must hold with mana to spare. Any other holds only if no option could be announced with the target.
+            let short = action.named("Mana").is_some_and(|v| v.trim().eq_ignore_ascii_case("short"));
+            if !kept.is_empty() && !short {
+                return fail(format!("line {line}: {text} must not be offered, but it is: {} may be chosen", specs.join(", ")));
             }
             offered = kept;
         }
