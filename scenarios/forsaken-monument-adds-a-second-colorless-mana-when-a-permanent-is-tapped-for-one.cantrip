@@ -1,0 +1,37 @@
+# "Whenever you tap a permanent for {C}, add an additional {C}" (CR 106.12a, 605.1b, 605.4a): tapping the Inn for one
+# colorless mana leaves two in the pool, and the Forest tapped for {G} right after adds only its own green - the trigger is
+# about colorless mana, not about tapping a permanent for any mana.
+
+[Bot1 Deck]
+Adventurer's Inn
+Forest
+Black Lotus
+Mox Jet
+Mox Pearl
+Forsaken Monument
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Adventurer's Inn.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Forsaken Monument.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Adventurer's Inn.Activate(Ability: Add {C})
+? Bot1.Mana = {C}{C}
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}{C}{C}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Forsaken Monument.Tapped = false

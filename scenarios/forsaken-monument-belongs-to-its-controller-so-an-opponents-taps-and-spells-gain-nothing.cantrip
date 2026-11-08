@@ -1,0 +1,44 @@
+# "you": the Monument's abilities belong to its controller. Bot2 casts one, so its own tapping of the Inn for {C} leaves
+# two colorless mana in Bot2's pool, its own colorless Ornithopter gains 2 life, Bot1's colorless spells gain nothing and
+# Bot1's own life stays at 20.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Bot2 Deck]
+Adventurer's Inn
+Black Lotus
+Mox Jet
+Mox Pearl
+Forsaken Monument
+Ornithopter
+Forest x14
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Adventurer's Inn.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Forsaken Monument.Cast
+? Bot2.Mana =
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Life = 20
+[T4 Bot2.Main1]
+Bot2.Battlefield.Adventurer's Inn.Activate(Ability: Add {C})
+? Bot2.Mana = {C}{C}
+Bot2.Hand.Ornithopter.Cast
+? Bot2.Life = 22
+
+[Expect]
+? Bot2.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter#1.Power = 0
