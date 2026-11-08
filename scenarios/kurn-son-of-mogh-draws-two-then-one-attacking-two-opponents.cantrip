@@ -1,0 +1,55 @@
+# Kurn, Son of Mogh (2/3): "Battlefront — Whenever Kurn attacks, you draw X cards and lose X life, where X is the
+# number of opponents you attacked this turn" (CR 508.1, 508.3d, 121.1, 119.3). On turn 4 Kurn attacks Bot2 and
+# Ornithopter attacks Bot3, so X is 2: Bot1 draws two and loses 2 (at 18). On turn 7 both attack Bot2 alone, so X is 1 -
+# the earlier turn's attacks are not this turn's - and Bot1 draws one more and loses 1 (at 17). Two more or fewer would
+# fail either life total.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Kurn, Son of Mogh
+Ornithopter
+Island x3
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Kurn, Son of Mogh.Cast
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Kurn, Son of Mogh > Bot2; Ornithopter > Bot3)
+[T4 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Kurn, Son of Mogh > Bot2; Ornithopter > Bot2)
+[T7 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot1.Hand.Count = 9
+Bot1.Library.Count = 7
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 3
+Bot2.Life = 16
+Bot2.Library.Count = 11
+Bot3.Life = 20
+Bot3.Library.Count = 11
