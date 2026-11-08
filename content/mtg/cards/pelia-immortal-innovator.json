@@ -1,0 +1,8 @@
+{
+  "name": "Pelia, Immortal Innovator",
+  "manaCost": "{3}{U}",
+  "type": "Legendary Creature — Lanthanite Artificer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When Pelia enters, return target creature an opponent controls to its owner's hand."
+}
