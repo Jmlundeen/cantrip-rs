@@ -1,0 +1,26 @@
+# Shineshadow Snarl: "you may reveal a Plains or Swamp card from your hand" (CR 701.20a, 614.1d) - the Swamp half as well
+# as the Plains half. Bot1's hand holds a Plains and a Swamp; revealing the Swamp alone leaves the Snarl untapped and able
+# to tap for black, so a filter that took only Plains fails here.
+
+[Bot1 Deck]
+Shineshadow Snarl
+Plains
+Swamp
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shineshadow Snarl.Play
+Bot1.Accept
+Bot1.Choose(Swamp)
+? Bot1.Revealed = Swamp
+? Bot1.Battlefield.Shineshadow Snarl.Tapped = false
+[T3 Bot1.Main1]
+Bot1.Battlefield.Shineshadow Snarl.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Shineshadow Snarl.Tapped = true
