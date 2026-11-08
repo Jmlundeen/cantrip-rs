@@ -1,0 +1,43 @@
+# Scute Swarm, a 1/1: "Landfall - Whenever a land you control enters, create a 1/1 green Insect creature token. If you
+# control six or more lands, create a token that's a copy of this creature instead." Cast on turn 1 off Black Lotus cracked for green (the pool empties exactly), Bot2's turn-2 Forest is no land of its controller's (CR 603.2), so no
+# token arrives. Bot1's turn-3 Island makes exactly one 1/1 Insect (no second token) that is green.
+# Scute Swarm {2}{G}: Creature - Insect
+
+[Bot1 Deck]
+Scute Swarm
+Forest
+Black Lotus
+Island
+Plains
+Mountain
+Island x13
+
+[Bot2 Deck]
+Forest
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Scute Swarm.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Insect Token = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Insect Token.Power = 1
+? Bot1.Battlefield.Insect Token.Toughness = 1
+? Bot1.Battlefield.Insect Token#2 = (absent)
+
+[Expect]
+Bot1.Battlefield.Insect Token.Colors = Green
+Bot1.Battlefield.Insect Token.Subtypes = Insect
+Bot1.Battlefield.Insect Token#2 = (absent)
