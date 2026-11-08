@@ -376,23 +376,105 @@ def requested_names(args, root):
 
 # ---- the shared branch ----------------------------------------------------------------------------------------------
 
-def branch_tip(root, branch):
-    found = git(root, "rev-parse", "--verify", "--quiet", f"refs/heads/{branch}", check=False)
+MAIN = "origin/main"
+LANE_FILES = {"tools/README.md", ".claude/skills/add-cards/coordinator.md"}
+LANE_DIRS = ("tools/maintenance/", ".claude/skills/card-lane/")
+
+
+def ref_tip(root, ref):
+    found = git(root, "rev-parse", "--verify", "--quiet", ref, check=False)
     return found.stdout.strip() if found.returncode == 0 else None
+
+
+def branch_tip(root, branch):
+    return ref_tip(root, f"refs/heads/{branch}")
 
 
 def ancestor(root, older, newer):
     return git(root, "merge-base", "--is-ancestor", older, newer, check=False).returncode == 0
 
 
+def main_tip(root, refresh=False):
+    """Remote main, the only base a queue branch is cut from."""
+    if refresh:
+        git(root, "fetch", "--quiet", "origin", "main", check=False)
+    tip = ref_tip(root, MAIN)
+    if not tip:
+        raise Refused(f"no {MAIN}: a queue branch starts at remote main; fetch it first (`git fetch origin main`)")
+    return tip
+
+
+def lane_path(path):
+    return path in LANE_FILES or any(path.startswith(prefix) for prefix in LANE_DIRS)
+
+
+def queue_branch_problem(root, store):
+    """The lane's own paths on the queue branch, or None. A queue branch carries only card work."""
+    tip = branch_tip(root, store.branch)
+    if not tip:
+        return None
+    main = main_tip(root)
+    if tip == main:
+        return None
+    changed = git(root, "diff", "--name-only", f"{main}..{tip}", check=False).stdout.splitlines()
+    lane = [path for path in changed if lane_path(path)]
+    return ", ".join(lane[:6]) if lane else None
+
+
 def ensure_branch(root, store):
-    """The queue's branch, created on origin/main the first time and then shared by every worktree."""
+    """The queue's branch, cut from remote main the first time and shared by every worktree.
+
+    It is never cut from this checkout: while the lane itself is being tested, the checkout has the lane's own
+    commits and none of them belong on a queue branch.
+    """
     tip = branch_tip(root, store.branch)
     if tip:
+        lane = queue_branch_problem(root, store)
+        if lane:
+            raise Refused(f"{store.branch} was cut from a checkout carrying the lane's own work ({lane}); a queue "
+                          f"branch starts at {MAIN}. Recreate it from {MAIN} before queueing cards.")
         return tip
-    base = branch_tip(root, "origin/main") or head_sha(root)
+    base = main_tip(root, refresh=True)
     git(root, "branch", store.branch, base, check=False)  # another first worker may have won the race
-    return branch_tip(root, store.branch) or base
+    tip = branch_tip(root, store.branch) or base
+    lane = queue_branch_problem(root, store)
+    if lane:
+        raise Refused(f"{store.branch} was cut from a checkout carrying the lane's own work ({lane}); a queue "
+                      f"branch starts at {MAIN}. Recreate it from {MAIN} before queueing cards.")
+    return tip
+
+
+def claim_base_problem(root, store, claim):
+    """The lane's own paths in a claim's starting point, or None. Card work before the claim stays allowed."""
+    base = (claim or {}).get("head")
+    if not base:
+        return None
+    tip = branch_tip(root, store.branch)
+    if not tip or base == tip or ancestor(root, base, tip):
+        return None
+    changed = git(root, "diff", "--name-only", f"{tip}..{base}", check=False).stdout.splitlines()
+    lane = [path for path in changed if lane_path(path)]
+    return ", ".join(lane[:6]) if lane else None
+
+
+def require_claim_base(root, store, claim):
+    lane = claim_base_problem(root, store, claim)
+    if lane:
+        raise Refused(f"the claim started from the lane's own work ({lane}); a queue branch starts at {MAIN} and "
+                      f"carries card work only. Move the claim to a queue worktree based on {MAIN}.")
+
+
+def queue_worktree_problem(root, store):
+    """The lane's own files in this worktree, or None. A queue worktree carries the queue branch and card work."""
+    tip = branch_tip(root, store.branch)
+    if not tip:
+        return f"{store.branch} is missing"
+    head = head_sha(root)
+    if head == tip:
+        return None
+    changed = git(root, "diff", "--name-only", f"{tip}..{head}", check=False).stdout.splitlines()
+    lane = [path for path in changed if lane_path(path)]
+    return ", ".join(lane[:6]) if lane else None
 
 
 def checked_out_elsewhere(root, branch):
@@ -418,8 +500,10 @@ def merge_branch(root, store):
     return tip
 
 
-def publish(root, store):
+def publish(root, store, claim=None):
     """Move the queue's branch to this worktree's HEAD, merging in whatever other workers shared meanwhile."""
+    ensure_branch(root, store)
+    require_claim_base(root, store, claim)
     branch = require_branch(root)
     elsewhere = checked_out_elsewhere(root, store.branch)
     if elsewhere:
@@ -1424,6 +1508,8 @@ def cmd_commit(args):
     claim = card["claim"]
     if norm(claim.get("worktree", "")) != norm(root):
         raise Refused(f"{card['name']} is open for {wid} in {claim.get('worktree')}; commit it there")
+    ensure_branch(root, store)
+    require_claim_base(root, store, claim)
     packet = packet_dir(root, store, card["name"])
     reference_path = os.path.join(packet, "reference.md")
     if not os.path.isfile(reference_path):
@@ -1514,6 +1600,13 @@ def cmd_next(args):
     store = Store(common_dir(root), args.queue)
     context = pool_context(root)
     require_branch(root)
+    ensure_branch(root, store)
+    lane = queue_worktree_problem(root, store)
+    if lane:
+        raise Refused(f"{root} is not a queue worktree: it carries the lane's own files ({lane}). A queue worktree "
+                      f"starts at {MAIN} and carries only {store.branch} and card work; the lane's own work stays in "
+                      f"its checkout. Use a queue worktree based on {MAIN}, with card-lane.py from the lane checkout "
+                      f"while the lane is not on main.")
     fresh, opened, card, claim, packet, brief = False, False, None, None, None, None
     with store.locked() as state:
         card = open_claim(state, wid)
@@ -1605,9 +1698,9 @@ def cmd_status(args):
     print(f"  {len(state['cards'])} card(s): " + ", ".join(f"{n} {kind}" for kind, n in counts.items() if n or kind != "pending"))
     if tip:
         ahead = 0
-        if branch_tip(root, "origin/main"):
-            ahead = int(git(root, "rev-list", "--count", f"origin/main..{tip}", check=False).stdout.strip() or 0)
-        print(f"  shared branch {store.branch} at {tip[:9]}: {ahead} commit(s) not on origin/main")
+        if ref_tip(root, MAIN):
+            ahead = int(git(root, "rev-list", "--count", f"{MAIN}..{tip}", check=False).stdout.strip() or 0)
+        print(f"  shared branch {store.branch} at {tip[:9]}: {ahead} commit(s) not on {MAIN}")
     else:
         print(f"  shared branch {store.branch}: not created yet (the first claim makes it)")
     working = [card for card in state["cards"] if card["status"] == "working"]
@@ -1653,6 +1746,8 @@ def close(args, outcome):
         if norm(claim.get("worktree", "")) != norm(root):
             raise Refused(f"{card['name']} is open for {wid} in {claim.get('worktree')}; close it there")
         if requires_commit:
+            ensure_branch(root, store)
+            require_claim_base(root, store, claim)
             require_clean(root, "before the card is marked done")
             head = head_sha(root)
             commit = args.commit or head
@@ -1668,7 +1763,7 @@ def close(args, outcome):
     packet, untracked = save_patch(root, store, card["name"])
     shared = []
     try:
-        new, shared = publish(root, store)
+        new, shared = publish(root, store, claim)
     except Refused as error:
         if requires_commit:
             raise
@@ -1736,7 +1831,7 @@ def cmd_share(args):
             raise Refused(f"{wid} has no open card in queue {store.name}")
         if norm(card["claim"].get("worktree", "")) != norm(root):
             raise Refused(f"{card['name']} is open for {wid} in {card['claim'].get('worktree')}")
-    new, shared = publish(root, store)
+    new, shared = publish(root, store, card["claim"])
     with store.locked() as state:
         recorded = open_claim(state, wid)
         if recorded and recorded["name"] == card["name"]:

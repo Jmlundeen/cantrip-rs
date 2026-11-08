@@ -35,7 +35,9 @@ core-feature agents and review agents run on Opus. Agents read only what their w
      card's scope, Oracle, scenario, corpus, lint, citation and report gates (`--fast` skips coverage and mutation),
      and `commit` runs every gate, writes the `Engine:`/`Mechanics:`/`Client:` commits and one `Card:` commit, then
      closes the claim; `done`, `block` and `release` close one by hand. The lane's `card-lane/<queue>` branch is
-     shared, so a `Mechanics:` or `Engine:` commit made by one agent is merged into the next agent's `next`. The lane
+     shared, so a `Mechanics:` or `Engine:` commit made by one agent is merged into the next agent's `next`; it starts
+     at `origin/main`, so while the lane itself is being tested, run its script from the lane checkout against a
+     queue worktree based on `origin/main` and keep the lane's own commits off the shared branch. The lane
      is dispatch and the mechanical gate, not the claim or the review: the card's GitHub issue is still claimed first
      (`claims.md`), and `review.md` is still the verdict. The command model is
      `.claude/skills/card-lane/SKILL.md`. A fresh lane implementor gets
