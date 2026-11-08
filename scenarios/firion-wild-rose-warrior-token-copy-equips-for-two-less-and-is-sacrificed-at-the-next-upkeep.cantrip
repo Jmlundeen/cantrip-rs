@@ -37,7 +37,7 @@ Bot2.Pass
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Loxodon Warhammer#2.Token = true
-? Client.Bot1.Battlefield.Loxodon Warhammer#2.Rules = Equipped creature gets +3/+0 and has trample and lifelink. / Equip {3} / This Equipment's equip abilities cost {2} less to activate.
+? Client.Bot1.Battlefield.Loxodon Warhammer#2.Rules = Equipped creature gets +3/+0 and has trample and lifelink. / Equip {3} / This Equipment's equip abilities cost {2} less to activate. / Pending delayed ability from Firion, Wild Rose Warrior (next upkeep): Sacrifice that token at the beginning of the next upkeep.
 Bot1.Battlefield.Mountain.Activate
 ? Bot1.Mana = {R}
 Bot1.Battlefield.Loxodon Warhammer#2.Activate(Firion, Wild Rose Warrior)

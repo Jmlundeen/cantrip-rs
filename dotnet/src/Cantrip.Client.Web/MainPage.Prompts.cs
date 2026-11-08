@@ -338,25 +338,6 @@ public sealed partial class MainPage
             return;
         }
 
-        if (prompt.ManaAbilities)
-        {
-            // The chance to activate mana abilities before the cost is paid (CR 601.2g): it closes by itself once the mana
-            // made covers what is owed, so Done is only for paying the rest some other way (convoke, delve).
-            Prompt($"Pay for {name}", $"{prompt.Remaining} of {prompt.Total} still to pay  ·  tap a land or click mana in your pool{colorless}");
-            if (_actions.Confirm is { } done)
-            {
-                _pass = () => Send(client, AnswerFor(done));
-                AddButton("Done", () => Send(client, AnswerFor(done)), primary: true).Tooltip = "Done activating mana abilities" + Suffix(PassKey);
-            }
-
-            if (_actions.Cancel is { } cancel)
-            {
-                AddCancelButton(() => Send(client, AnswerFor(cancel)));
-            }
-
-            return;
-        }
-
         if (prompt.AnnouncesXOrKicks)
         {
             FillAnnouncement(client, prompt, name);
@@ -367,7 +348,9 @@ public sealed partial class MainPage
         {
             // The pool covers the cost in one way, and something other than mana could pay some of it instead
             // (CR 601.2h): the player confirms the pool, or taps or exiles to keep some of it.
-            bool covered = !owing && _actions.Confirm is not null;
+            // The chance to activate mana abilities before the cost is paid (CR 601.2g) reads as the payment does: it closes
+            // by itself once the mana made covers what is owed, and Done closes it for paying the rest another way.
+            bool covered = !prompt.ManaAbilities && !owing && _actions.Confirm is not null;
 
             string how = covered
                 ? "Okay pays it from your pool"
@@ -475,6 +458,13 @@ public sealed partial class MainPage
                 _pass = () => Send(client, AnswerFor(pay));
                 AddButton("Okay", () => Send(client, AnswerFor(pay)), primary: true).Tooltip =
                     $"Pay {prompt.Total} with the mana in your pool" + Suffix(PassKey);
+            }
+
+            if (prompt.ManaAbilities && _actions.Confirm is { } done)
+            {
+                _pass = () => Send(client, AnswerFor(done));
+                AddButton("Done", () => Send(client, AnswerFor(done)), primary: true).Tooltip =
+                    "Done making mana: pay the rest another way" + Suffix(PassKey);
             }
 
             foreach (ActionOptionMessage life in _actions.PayLife)
