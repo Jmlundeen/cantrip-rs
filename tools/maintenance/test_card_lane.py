@@ -7,6 +7,8 @@ network, no cargo, no actual card: what is under test is the shared queue, the c
 and the shared branch.
 """
 
+import argparse
+import importlib.util
 import json
 import os
 import shutil
@@ -14,6 +16,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.dont_write_bytecode = True
 
@@ -21,6 +24,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPT = os.path.join(HERE, "card-lane.py")
 GIT_ENV = {"GIT_AUTHOR_NAME": "Test", "GIT_AUTHOR_EMAIL": "test@example.com",
            "GIT_COMMITTER_NAME": "Test", "GIT_COMMITTER_EMAIL": "test@example.com"}
+
+
+def load_lane():
+    spec = importlib.util.spec_from_file_location("card_lane_under_test", SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 NEW_CARD = r'''import json, os, re, sys
 
@@ -319,6 +329,183 @@ class LaneTest(unittest.TestCase):
         self.assertEqual(taken.returncode, 0, taken.stderr)
         self.assertIn("not a pool slot", taken.stderr)
         self.assertIsNone(self.state()["cards"][0]["claim"]["lease"])
+
+    # -- the gates ---------------------------------------------------------------------------------------------------
+
+    def card_b_scenario(self):
+        return self.write("scenarios/card-b-shows-itself.cantrip",
+                          "# Card B: it is cast.\n# CR 601.2.\n\n[Bot1 Deck]\nCard B\n\n[Bot2 Deck]\nIsland x20\n\n"
+                          "[Actions]\nBot1.Hand.Card B.Cast\n? Bot1.Mana =\n\n[Expect]\nBot1.Battlefield.Card B = 1\n")
+
+    def report_path(self):
+        return os.path.join(self.main, ".card-lane", "q", "card-b", "report.json")
+
+    def check_path(self):
+        return os.path.join(self.main, ".card-lane", "q", "card-b", "check.json")
+
+    def test_check_fast_skips_coverage_and_mutation_and_enforces_the_report(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--issue", "5")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.card_b_scenario()
+        with open(self.report_path(), encoding="utf-8") as f:
+            report = json.load(f)
+        report["decision"] = "done"
+        self.write(os.path.relpath(self.report_path(), self.main), json.dumps(report))
+        passing = mock.Mock(return_value=("checks out", ""))
+
+        def check():
+            saved = os.getcwd()
+            os.chdir(self.main)
+            try:
+                return lane.cmd_check(argparse.Namespace(queue="q", id="w1", card=None, fast=True))
+            finally:
+                os.chdir(saved)
+
+        with mock.patch.object(lane, "gate_scope", passing), \
+                mock.patch.object(lane, "gate_oracle", passing), \
+                mock.patch.object(lane, "gate_scenarios", passing), \
+                mock.patch.object(lane, "gate_corpus", passing), \
+                mock.patch.object(lane, "gate_lint", mock.Mock(return_value=("clean", {"looks": []}))), \
+                mock.patch.object(lane, "gate_citations", passing), \
+                mock.patch.object(lane, "gate_coverage", side_effect=AssertionError("coverage ran under --fast")), \
+                mock.patch.object(lane, "gate_mutation", side_effect=AssertionError("mutation ran under --fast")):
+            self.assertEqual(check(), 0)
+            with open(self.check_path(), encoding="utf-8") as f:
+                checked = json.load(f)
+            self.assertTrue(checked["passed"])
+            statuses = {gate["name"]: gate["status"] for gate in checked["gates"]}
+            self.assertEqual(statuses["coverage"], "skip")
+            self.assertEqual(statuses["mutation"], "skip")
+
+            self.write("content/mtg/cards/card-b.json", json.dumps({"name": "Card B", "oracleText": "Flying"}))
+            self.assertEqual(check(), 1)
+            with open(self.check_path(), encoding="utf-8") as f:
+                failed = json.load(f)
+            self.assertFalse(failed["passed"])
+            report_gate = next(gate for gate in failed["gates"] if gate["name"] == "report")
+            self.assertIn("no validation entry for the printed line: Flying", report_gate["detail"])
+
+    def test_a_test_point_needs_an_expectation_line_in_a_scenario_holding_the_card(self):
+        lane = load_lane()
+        self.card_b_scenario()
+        scenario = "scenarios/card-b-shows-itself.cantrip"
+        self.assertIsNone(lane.scenario_line_problem(self.main, scenario, 12, "Card B"))
+        self.assertIn("not a ? check", lane.scenario_line_problem(self.main, scenario, 7, "Card B"))
+        self.assertIn("does not hold", lane.scenario_line_problem(self.main, scenario, 12, "Card C"))
+
+    def test_commit_plan_writes_engine_mechanics_client_then_one_card_commit(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--engine", "--issue", "7")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.card_b_scenario()
+        self.write("crates/cantrip-state/src/lib.rs", "// the core change\n")
+        self.write("crates/cantrip-mechanics/src/shared_thing.rs", "// the shared recipe\n")
+        self.write("dotnet/src/Thing.cs", "// the client change\n")
+        state = self.state()
+        card = next(entry for entry in state["cards"] if entry["name"] == "Card B")
+        claim = card["claim"]
+        with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
+            reference = f.read()
+        store = lane.Store(lane.common_dir(self.main), "q")
+        made = lane.plan_commits(self.main, store, card, claim, reference, 7)
+        self.assertEqual([entry["kind"] for entry in made], ["engine", "mechanics", "client", "card"])
+        self.assertEqual(self.git(self.main, "log", "-4", "--format=%s").splitlines(),
+                         ["Card: Card B", "Client: what Card B adds to the client",
+                          "Mechanics: what Card B needs of the shared mechanics",
+                          "Engine: what Card B needs of the engine"])
+        body = self.git(self.main, "log", "-1", "--format=%B")
+        self.assertTrue(body.startswith("Card: Card B"))
+        self.assertIn("Closes #7", body)
+        self.assertNotIn("Co-Authored-By", body)
+        self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
+
+    def test_commit_plan_refuses_core_without_engine_scope(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--issue", "8").returncode, 0)
+        self.card_b_scenario()
+        self.write("crates/cantrip-state/src/lib.rs", "// the core change\n")
+        state = self.state()
+        card = next(entry for entry in state["cards"] if entry["name"] == "Card B")
+        with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
+            reference = f.read()
+        store = lane.Store(lane.common_dir(self.main), "q")
+        with self.assertRaises(lane.Refused) as caught:
+            lane.plan_commits(self.main, store, card, card["claim"], reference, 8)
+        self.assertIn("core", str(caught.exception))
+
+    def test_a_card_design_note_must_be_deleted(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q").returncode, 0)
+        self.card_b_scenario()
+        note = self.write("docs/card-notes/card_b.md", "# the owner's design\n")
+        state = self.state()
+        card = next(entry for entry in state["cards"] if entry["name"] == "Card B")
+        with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
+            reference = f.read()
+        with self.assertRaises(lane.GateFailed) as caught:
+            lane.gate_scope(self.main, card, card["claim"], reference)
+        self.assertIn("card_b.md", str(caught.exception))
+        os.remove(note)
+        summary, _ = lane.gate_scope(self.main, card, card["claim"], reference)
+        self.assertIn("card", summary)
+
+    def test_deleting_a_card_file_is_still_the_card_path(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Some Card").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--card", "Some Card")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.write("scenarios/some-card-shows-itself.cantrip",
+                   "# Some Card: it is shown.\n\n[Bot1 Deck]\nSome Card\n\n[Expect]\nBot1.Battlefield.Some Card = 1\n")
+        os.remove(os.path.join(self.main, "crates", "cantrip-cards", "src", "cards", "some_card.rs"))
+        state = self.state()
+        card = next(entry for entry in state["cards"] if entry["name"] == "Some Card")
+        with open(os.path.join(self.main, ".card-lane", "q", "some-card", "reference.md"), encoding="utf-8") as f:
+            reference = f.read()
+        summary, facts = lane.gate_scope(self.main, card, card["claim"], reference)
+        self.assertIn("card", summary)
+        self.assertIn("some_card.rs", facts["card"])
+
+    def test_a_mutation_survivor_passes_only_with_a_declared_equivalent(self):
+        lane = load_lane()
+        self.write("tools/maintenance/card-mutate.py",
+                   "print('1 caught, 1 survived, 0 did not build')\n"
+                   "print('SURVIVED crates/cantrip-cards/src/cards/card_b.rs:4: 4 to 5')\n"
+                   "raise SystemExit(1)\n")
+        survivor = {"path": "crates/cantrip-cards/src/cards/card_b.rs", "line": "4", "what": "4 to 5"}
+        with self.assertRaises(lane.GateFailed):
+            lane.gate_mutation(self.main, {"name": "Card B"}, {})
+        summary, facts = lane.gate_mutation(
+            self.main, {"name": "Card B"},
+            {"equivalent_mutants": [{"mutant": "crates/cantrip-cards/src/cards/card_b.rs:4",
+                                     "why": "the amount is four on both faces"}]})
+        self.assertIn("declared equivalent", summary)
+        self.assertEqual(facts["survivors"], [survivor])
+
+    def test_commit_closes_the_claim_and_shares_the_branch(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--issue", "9")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.card_b_scenario()
+        gates = [{"name": "scope", "status": "pass", "summary": "checks out", "detail": "", "facts": {}}]
+        saved = os.getcwd()
+        os.chdir(self.main)
+        try:
+            with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)):
+                code = lane.cmd_commit(argparse.Namespace(queue="q", id="w1", issue=None, note=""))
+        finally:
+            os.chdir(saved)
+        self.assertEqual(code, 0)
+        self.assertEqual(self.status(self.state(), "Card B"), "done")
+        self.assertEqual(self.git(self.main, "rev-parse", "card-lane/q"), self.git(self.main, "rev-parse", "HEAD"))
+        body = self.git(self.main, "log", "-1", "--format=%B")
+        self.assertTrue(body.startswith("Card: Card B"))
+        self.assertIn("Closes #9", body)
 
 
 if __name__ == "__main__":

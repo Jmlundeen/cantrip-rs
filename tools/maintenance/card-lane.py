@@ -1,8 +1,10 @@
 """The card lane: one shared queue for a pool of implementors, and one packet per card.
 
     python tools/maintenance/card-lane.py queue  [--queue NAME] [--format F | --file PATH | --card NAME ...]
-    python tools/maintenance/card-lane.py next   --id WORKER [--queue NAME] [--card NAME] [--refresh]
+    python tools/maintenance/card-lane.py next   --id WORKER [--queue NAME] [--card NAME] [--refresh] [--engine] [--issue N]
     python tools/maintenance/card-lane.py status [--queue NAME] [--id WORKER]
+    python tools/maintenance/card-lane.py check  [--queue NAME] [--id WORKER | --card NAME] [--fast]
+    python tools/maintenance/card-lane.py commit --id WORKER [--queue NAME] [--issue N] [--note TEXT]
     python tools/maintenance/card-lane.py done   --id WORKER [--queue NAME] [--commit SHA | --no-commit] [--note TEXT]
     python tools/maintenance/card-lane.py block  --id WORKER --rule CR [--queue NAME] [--note TEXT]
     python tools/maintenance/card-lane.py release --id WORKER --reason TEXT [--queue NAME]
@@ -32,6 +34,18 @@ parallel without taking the same card:
   claim records that lease and member. A worktree outside the pool may still be used solo, and its claim says so.
 
 There is no agent loop, no driver and no generated track: a worker (or its coordinator) runs the commands.
+
+The card's quality gates are the lane's too, adapted from the add-cards flow and run where the worker can see them:
+
+- **`check`** runs the claim and packet check, the path scope (the card's content, its Rust file, its scenarios, a
+  shared mechanic, a client change, or the core only for a card opened `--engine`), Scryfall's current Oracle text,
+  the scenario shape (no TODO or known bug, an `[Expect]`, the cost paid exactly), `corpus --card`, `card-lint` and
+  `card-dupes` (each LOOK answered in `report.json`), `cr.py check --show`, and the report (every printed line, each
+  test point with its scenario line, each ruling). A full check adds `card-coverage` and `card-mutate`; `--fast`
+  skips only those two while the card is being written.
+- **`commit`** runs every gate, then writes the `Engine:`, `Mechanics:` and `Client:` commits the change needs, each
+  with only its own paths, and exactly one `Card: <Name>` commit ending `Closes #N`; no commit carries
+  `Co-Authored-By`. It closes the claim (`done`) and shares the branch. Nothing is committed if the gate refuses.
 """
 
 import argparse
@@ -71,8 +85,9 @@ class Failed(Exception):
 
 # ---- running --------------------------------------------------------------------------------------------------------
 
-def run(args, cwd, check=False):
-    result = subprocess.run(args, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+def run(args, cwd, check=False, env=None):
+    result = subprocess.run(args, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                            env=env)
     if check and result.returncode != 0:
         raise Failed(f"{' '.join(str(a) for a in args)} failed in {cwd}:\n{(result.stderr or result.stdout).strip()}")
     return result
@@ -545,13 +560,31 @@ def write_brief(root, store, card, claim, reference, packet):
         "`.claude/skills/add-cards/SKILL.md` this card needs - \"The loop for one card\" - and",
         "`.claude/skills/write-game-script/SKILL.md` for its scenarios. Read nothing else whole.",
         "",
+        f"`{REPORT}` is yours to fill in as you go: every printed Oracle line and the code that implements it, each",
+        "test point with the scenario line that catches it, each ruling (a scenario line, or why the card does not",
+        "decide it), and a line answering every LOOK the lint prints. For a mutation survivor no scenario catches,",
+        "add `{\"mutant\": \"<file>:<line>: <what>\", \"why\": \"<why it means the same>\"}` to `equivalent_mutants`.",
+        "It is in the packet; it is never committed.",
+        "",
         "## Goal",
         "",
         "The card is exact to its Oracle text and the Comprehensive Rules, every line of its code is executed by its",
-        f"scenarios and passes, and it is committed as `Card: {card['name']}` (a `Mechanics:` or `Engine:` commit first",
-        "when it needs one, each building on its own), ending `Closes #N` for its issue. Then close the claim:",
+        f"scenarios and passes, and it is committed as `Card: {card['name']}`, ending `Closes #N` for its issue.",
+        "`commit` is the gated path: it runs every check, writes the `Engine:`, `Mechanics:` and `Client:` commits the",
+        "change needs (each with only its own paths), then exactly one `Card:` commit, and closes the claim.",
         "",
-        f"    python tools/maintenance/card-lane.py done --id {claim['id']} --queue {store.name}",
+        f"    python tools/maintenance/card-lane.py check --id {claim['id']} --queue {store.name} --fast",
+        f"    python tools/maintenance/card-lane.py commit --id {claim['id']} --queue {store.name}",
+        "",
+        "`check --fast` skips only coverage and mutation while the card is being written; `commit` runs both. A failed",
+        "check names the gate and nothing is committed.",
+        "",
+        (f"The issue is #{claim['issue']}; the Card commit ends `Closes #{claim['issue']}`." if claim.get("issue")
+         else "No issue number is set: pass `--issue N` to `next` or `commit`, or set report.json's issue."),
+        "",
+        ("This card was opened with `--engine`: the core (cantrip-state, cantrip-rules, cantrip-api) may be changed,"
+         " in its own `Engine:` commit." if claim.get("engine") else
+         "The core is closed to this card: a missing rule is a gap, never a workaround."),
         "",
         "Claim the card's GitHub issue before working on it, as the skill says (`python tools/maintenance/card-issues.py",
         f"claim \"{card['name']}\"`), unless you already hold it.",
@@ -566,8 +599,10 @@ def write_brief(root, store, card, claim, reference, packet):
         "",
         "## When the card needs the engine",
         "",
-        "The core is closed: a missing rule is a gap, never a workaround. Commit what is safe, log the gap on the",
-        "issue, and close the claim with the rule:",
+        (("This card may change the core: commit the core alone in its own `Engine:` commit. A rule the engine cannot"
+          " express is still a gap: block it, never work around it.") if claim.get("engine") else
+         ("The core is closed: a missing rule is a gap, never a workaround. Commit what is safe, log the gap on the"
+          " issue, and close the claim with the rule:")),
         "",
         f"    python tools/maintenance/card-lane.py block --id {claim['id']} --queue {store.name} --rule <CR> --note \"...\"",
         "",
@@ -580,7 +615,8 @@ def write_brief(root, store, card, claim, reference, packet):
         "",
         f"    python tools/maintenance/card-lane.py share --id {claim['id']} --queue {store.name}",
         "",
-        "The next implementor's `next` merges it, so a shared function is written once. `done` shares automatically.",
+        "The next implementor's `next` merges it, so a shared function is written once. `commit` and `done` share",
+        "automatically.",
     ]
     if claim.get("slot"):
         lines += ["", "## Leaving the slot",
@@ -592,7 +628,7 @@ def write_brief(root, store, card, claim, reference, packet):
         lines += ["", "## Solo",
                   "",
                   "This worktree is not a pool slot, so there is no member to leave. Commit the card on this branch;",
-                  "`done` shares it to the queue's branch."]
+                  "`commit` (or `done`) shares it to the queue's branch."]
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -615,6 +651,17 @@ def build_packet(root, store, card, claim):
     content = content_from(reference, root)
     if content:
         shutil.copyfile(content, os.path.join(packet, "content.json"))
+    report = os.path.join(packet, REPORT)
+    if not os.path.isfile(report):
+        write_json(report, report_skeleton(reference, content, (claim or {}).get("issue")))
+    else:
+        try:
+            existing = read_json(report)
+            if isinstance(existing, dict) and not existing.get("issue") and (claim or {}).get("issue"):
+                existing["issue"] = int(claim["issue"])
+                write_json(report, existing)
+        except (OSError, json.JSONDecodeError, TypeError, ValueError):
+            pass  # the check gate reports a report that cannot be read or filled
     with open(os.path.join(packet, "prior-art.md"), "w", encoding="utf-8", newline="\n") as f:
         f.write(prior_art(root, reference))
     with open(os.path.join(packet, "state.json"), "w", encoding="utf-8", newline="\n") as f:
@@ -637,6 +684,741 @@ def save_patch(root, store, name):
     untracked = [line[3:].strip() for line in git(root, "status", "--porcelain").stdout.splitlines()
                  if line.startswith("??") and not line[3:].strip().startswith(PACKETS + "/")]
     return packet if diff.strip() else None, untracked
+
+
+# ---- the gates ------------------------------------------------------------------------------------------------------
+
+REPORT = "report.json"
+CHECK = "check.json"
+ENGINE_DIRS = ("crates/cantrip-state/", "crates/cantrip-rules/", "crates/cantrip-api/")
+ORACLE_DIRS = ("crates/cantrip-oracle/",)
+HARNESS_DIRS = ("crates/cantrip-script/",)
+HARNESS_DOCS = {"scenarios/README.md"}
+MECHANICS_DIRS = ("crates/cantrip-mechanics/",)
+CLIENT_DIRS = ("dotnet/", "web_src/", "crates/cantrip-host/", "crates/cantrip-ai-host/")
+CLIENT_DOCS = {"docs/client-boundary.md", "docs/host-protocol.md", "docs/web-client.md",
+               "docs/scenarios-in-the-browser.md"}
+KNOWN_ISSUES = "docs/known-issues.md"
+
+
+class GateFailed(Exception):
+    """A gate says the card is not ready; the message is the line, `detail` the evidence."""
+
+    def __init__(self, message, detail=""):
+        super().__init__(message)
+        self.detail = detail or ""
+
+
+def read_text(path):
+    with open(path, encoding="utf-8-sig") as f:
+        return f.read()
+
+
+def read_json(path):
+    with open(path, encoding="utf-8-sig") as f:
+        return json.load(f)
+
+
+def write_json(path, data):
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(data, f, indent=1, ensure_ascii=False)
+        f.write("\n")
+
+
+def changed_paths(root):
+    """Every uncommitted path, with its two-letter status, in git's NUL form (names keep their spaces)."""
+    out = git(root, "status", "--porcelain", "-z", "--untracked-files=all").stdout
+    fields = out.split("\0")
+    entries, i = [], 0
+    while i < len(fields):
+        entry = fields[i]
+        i += 1
+        if len(entry) < 4:
+            continue
+        status, path = entry[:2], entry[3:].replace("\\", "/")
+        renamed = status[0] in "RC"
+        if renamed and i < len(fields):
+            i += 1  # the name it was
+        if path == PACKETS or path.startswith(PACKETS + "/"):
+            continue
+        entries.append({"status": status, "path": path})
+    return entries
+
+
+def tree_sha(root):
+    return git(root, "rev-parse", "HEAD^{tree}").stdout.strip()
+
+
+def under(path, prefixes):
+    return any(path == prefix.rstrip("/") or path.startswith(prefix) for prefix in prefixes)
+
+
+def file_stem(name):
+    return re.sub(r"[^a-z0-9]+", "_", name.replace("'", "").lower()).strip("_")
+
+
+def notes_relative(name):
+    return f"docs/card-notes/{file_stem(name)}.md"
+
+
+def card_relative(name):
+    """The card's Rust file, even when it was just deleted (a card of core keywords needs none)."""
+    return f"crates/cantrip-cards/src/cards/{file_stem(name)}.rs"
+
+
+def commit_kind(path, content_rel, card_rel, engine, notes_rel=None):
+    """Which commit a changed path belongs to, or `core` (refused without `--engine`) or `other`."""
+    if path == content_rel or (card_rel and path == card_rel) or (notes_rel and path == notes_rel):
+        return "card"
+    if path.startswith("scenarios/") and path.endswith(".cantrip"):
+        return "card"
+    if path == KNOWN_ISSUES:
+        return "card"
+    if under(path, MECHANICS_DIRS):
+        return "mechanics"
+    if under(path, ORACLE_DIRS) or under(path, HARNESS_DIRS) or path in HARNESS_DOCS:
+        return "engine"
+    if under(path, ENGINE_DIRS):
+        return "engine" if engine else "core"
+    if under(path, CLIENT_DIRS) or path in CLIENT_DOCS:
+        return "client"
+    return "other"
+
+
+def content_card(path):
+    if not path or not os.path.isfile(path):
+        return None
+    text = "\n".join(line for line in read_text(path).splitlines() if not line.lstrip().startswith("//"))
+    try:
+        card = json.loads(text)
+    except json.JSONDecodeError as error:
+        raise GateFailed(f"{path} is not JSON: {error}")
+    return card if isinstance(card, dict) else None
+
+
+def printed_lines(content):
+    """Every printed Oracle line, from every face the content file defines."""
+    card = content_card(content)
+    if not card:
+        return []
+    lines = []
+
+    def add(text):
+        if isinstance(text, str):
+            lines.extend(line.strip() for line in text.splitlines() if line.strip())
+
+    add(card.get("oracleText"))
+    for key in ("backFace", "adventure", "omen", "aftermath"):
+        face = card.get(key)
+        if isinstance(face, dict):
+            add(face.get("oracleText"))
+    for half in card.get("halves") or []:
+        if isinstance(half, dict):
+            add(half.get("oracleText"))
+    meld = card.get("meld")
+    if isinstance(meld, dict) and isinstance(meld.get("into"), dict):
+        add(meld["into"].get("oracleText"))
+    return list(dict.fromkeys(lines))
+
+
+def content_costs_mana(content):
+    card = content_card(content)
+    if not card:
+        return False
+    faces = [card] + [card.get(key) for key in ("backFace", "adventure", "omen", "aftermath")]
+    faces += [half for half in card.get("halves") or [] if isinstance(half, dict)]
+    return any(isinstance(face, dict) and str(face.get("manaCost") or "").strip() for face in faces)
+
+
+def reference_points(reference):
+    block = section(reference, "=== Test points")
+    points = []
+    for line in block.splitlines():
+        match = re.match(r"\s*\[\d+\]\s+(.+)$", line)
+        if match:
+            points.append(match.group(1).strip())
+    return points
+
+
+def reference_rulings(reference):
+    block = section(reference, "=== Scryfall")
+    rulings = []
+    for line in block.splitlines():
+        match = re.match(r"\s+-\s+\d{4}-\d{2}-\d{2}\s+(.+)$", line)
+        if match:
+            rulings.append(match.group(1).strip())
+    return rulings
+
+
+def report_skeleton(reference, content, issue=0):
+    return {
+        "issue": int(issue or 0),
+        "decision": "todo",
+        "reason": "",
+        "validation": [{"line": line, "code": "", "agrees": True} for line in printed_lines(content)],
+        "test_points": [{"point": point, "scenario": "", "line": 0} for point in reference_points(reference)],
+        "rulings": [{"ruling": ruling, "scenario": "", "line": 0, "no_decision": ""}
+                    for ruling in reference_rulings(reference)],
+        "look_answers": [],
+        "equivalent_mutants": [],
+        "notes": "",
+    }
+
+
+def report_file(root, store, name):
+    return os.path.join(packet_dir(root, store, name), REPORT)
+
+
+def check_file(root, store, name):
+    return os.path.join(packet_dir(root, store, name), CHECK)
+
+
+def holds_card(text, name):
+    pattern = r"^\s*(?:\d+\s+)?" + re.escape(name) + r"(?:\s+x\d+)?\s*$"
+    return re.search(pattern, text, re.M | re.I) is not None
+
+
+def scenario_line_problem(root, scenario, number, name):
+    """Why a scenario line is not an expectation that catches a test point, or None."""
+    scenario = str(scenario or "").replace("\\", "/")
+    path = os.path.join(root, scenario.replace("/", os.sep))
+    if not str(scenario).startswith("scenarios/") or not str(scenario).endswith(".cantrip"):
+        return f"{scenario} is not a scenario under scenarios/"
+    if not os.path.isfile(path):
+        return f"{scenario} does not exist"
+    try:
+        number = int(number)
+    except (TypeError, ValueError):
+        return f"{scenario}: line is not a number"
+    lines = read_text(path).splitlines()
+    if number < 1 or number > len(lines):
+        return f"{scenario}:{number} is not a line of the file"
+    text = lines[number - 1]
+    if not text.strip() or text.lstrip().startswith("#"):
+        return f"{scenario}:{number} is blank or a comment"
+    if re.match(r"\s*[?!]", text):
+        return None if holds_card("\n".join(lines), name) else f"{scenario} does not hold {name}"
+    heading = None
+    for earlier in reversed(lines[:number]):
+        match = re.match(r"\s*\[([^]]+)]", earlier)
+        if match:
+            heading = match.group(1).strip()
+            break
+    if heading != "Expect":
+        return f"{scenario}:{number} is not a ? check or an [Expect] line"
+    if "=" not in text:
+        return f"{scenario}:{number} asserts nothing"
+    return None if holds_card("\n".join(lines), name) else f"{scenario} does not hold {name}"
+
+
+def gate_scope(root, card, claim, reference):
+    entries = changed_paths(root)
+    content = content_from(reference, root)
+    if content is None:
+        raise GateFailed("the packet has no content file: run new-card.py and `next --refresh`")
+    content_rel = clean_relative(root, content)
+    data = content_card(content)
+    if data is None:
+        raise GateFailed(f"{content_rel} is not a card object")
+    card_file = card_file_from(reference, root)
+    card_rel = clean_relative(root, card_file) if card_file else card_relative(data["name"])
+    notes = notes_relative(data["name"])
+    if os.path.exists(os.path.join(root, notes)):
+        raise GateFailed(f"{notes} is still there: follow the owner's design and delete it in the card's commit")
+    kinds, core, other = {}, [], []
+    for entry in entries:
+        kind = commit_kind(entry["path"], content_rel, card_rel, bool((claim or {}).get("engine")), notes)
+        if kind == "core":
+            core.append(entry["path"])
+        elif kind == "other":
+            other.append(entry["path"])
+        else:
+            kinds[entry["path"]] = kind
+    if core:
+        raise GateFailed("the core is closed to a card not opened `--engine`: " + ", ".join(core[:5]),
+                         "Release it and open it again with `next --engine` when the coordinator has put the core"
+                         " in scope.")
+    if other:
+        raise GateFailed("these changed paths are neither the card's nor a shared mechanic, client or harness: "
+                         + ", ".join(other[:8]))
+    card_paths = [path for path, kind in kinds.items() if kind == "card"]
+    scenarios = [path for path in card_paths if path.startswith("scenarios/")]
+    if not card_paths:
+        raise GateFailed("nothing of the card is changed: its content, Rust file or a scenario")
+    if not scenarios:
+        raise GateFailed("no scenario is changed: the card needs one that shows it working")
+    holding = [path for path in scenarios
+               if os.path.isfile(os.path.join(root, path.replace("/", os.sep)))
+               and holds_card(read_text(os.path.join(root, path.replace("/", os.sep))), data["name"])]
+    if not holding:
+        raise GateFailed(f"no changed scenario holds {data['name']}: the card's own scenario must name it in a deck")
+    counts = {kind: sum(1 for value in kinds.values() if value == kind)
+              for kind in ("card", "mechanics", "engine", "client")}
+    summary = ", ".join(f"{n} {kind}" for kind, n in counts.items() if n) + " changed"
+    return summary, {"content": content_rel, "card": card_rel, "scenarios": scenarios}
+
+
+def gate_oracle(root, card):
+    tool = os.path.join(root, "tools", "maintenance", "new-card.py")
+    if not os.path.isfile(tool):
+        raise GateFailed(f"new-card.py is missing at {clean_relative(root, tool)}")
+    result = run([sys.executable, tool, card["name"], "--no-write"], root)
+    out = (result.stdout or "") + ("\n" + result.stderr if result.stderr.strip() else "")
+    if "DIFFERS from Scryfall" in out or "no face of that name on Scryfall" in out:
+        raise GateFailed("the content's Oracle text is not Scryfall's current text", out)
+    if "not found on Scryfall (or Scryfall unreachable)" in out:
+        return "Scryfall unreachable: the Oracle text was checked by hand", out
+    if result.returncode != 0 or "Oracle text matches Scryfall's" not in out:
+        raise GateFailed("new-card.py did not confirm the Oracle text", out)
+    return "Oracle text matches Scryfall's", out
+
+
+def gate_scenarios(root, card, content, reference):
+    paths = [entry["path"] for entry in changed_paths(root)
+             if entry["path"].startswith("scenarios/") and entry["path"].endswith(".cantrip")]
+    problems, holding, mana_checked = [], 0, False
+    for relative in paths:
+        path = os.path.join(root, relative.replace("/", os.sep))
+        if not os.path.isfile(path):
+            continue
+        text = read_text(path)
+        if not text.lstrip("\ufeff \t\r\n").startswith("#"):
+            problems.append(f"{relative}: starts with the comment saying what it shows and the rule")
+        if re.search(r"^\s*#\s*TODO\b", text, re.M):
+            problems.append(f"{relative}: has a TODO comment")
+        if re.search(r"^\s*#\s*Known bug\b", text, re.M | re.I):
+            problems.append(f"{relative}: a known bug is not landed in this lane; fix it or block the card")
+        if "[Expect]" not in text:
+            problems.append(f"{relative}: has no [Expect] section")
+        else:
+            expect = text.split("[Expect]", 1)[1]
+            if re.search(r"\bTODO\b", expect):
+                problems.append(f"{relative}: [Expect] still has a TODO")
+            if not any(line.strip() and not line.lstrip().startswith("#") for line in expect.splitlines()):
+                problems.append(f"{relative}: [Expect] asserts nothing")
+        if holds_card(text, card["name"]):
+            holding += 1
+        if ".Mana =" in text:
+            mana_checked = True
+    if not paths:
+        problems.append("no scenario is changed")
+    if paths and not holding:
+        problems.append(f"no changed scenario holds {card['name']}")
+    cost_point = any("the cost '" in point for point in reference_points(reference))
+    if paths and (content_costs_mana(content) or cost_point) and not mana_checked:
+        problems.append("no changed scenario checks the cost paid exactly: `? Bot1.Mana =` right after the cast")
+    if problems:
+        raise GateFailed(f"{len(problems)} scenario problem(s)", "\n".join(problems))
+    return f"{len(paths)} scenario(s), {holding} holding {card['name']}", ""
+
+
+def gate_corpus(root, card, changed):
+    command = ["cargo", "run", "--profile", "cards", "-p", "cantrip-script", "--bin", "corpus",
+               "--", "--card", card["name"], "--brief"]
+    print(f"corpus: running {card['name']}'s scenarios ...", file=sys.stderr, flush=True)
+    result = run(command, root, env=dict(os.environ, CANTRIP_VERIFY="1"))
+    out = (result.stdout or "") + ("\n" + result.stderr if result.stderr.strip() else "")
+    found = re.search(r"(\d+) scenarios: (\d+) pass, (\d+) fail, (\d+) known bugs, (\d+) need cards", out)
+    if not found:
+        raise GateFailed("the corpus did not report a summary", out[-8000:])
+    total, passed, failed, known, blocked = (int(value) for value in found.groups())
+    warnings = []
+    for block in re.split(r"(?=^warning:)", out, flags=re.M)[1:]:
+        if any(path in block for path in changed):
+            warnings.append(block.strip()[:1200])
+    if warnings:
+        raise GateFailed(f"the build warns from the card's files ({len(warnings)})", "\n\n".join(warnings))
+    if result.returncode != 0 or failed or known or blocked:
+        raise GateFailed(f"{passed} pass, {failed} fail, {known} known bug(s), {blocked} need cards", out[-8000:])
+    if passed == 0:
+        raise GateFailed("no scenario passed: the card has no scenario that holds it", out[-4000:])
+    return f"{passed} pass, 0 fail ({total} scenario(s))", out
+
+
+def gate_lint(root, card):
+    lint = os.path.join(root, "tools", "maintenance", "card-lint.py")
+    dupes = os.path.join(root, "tools", "maintenance", "card-dupes.py")
+    if not os.path.isfile(lint) or not os.path.isfile(dupes):
+        raise GateFailed("card-lint.py or card-dupes.py is missing")
+    linted = run([sys.executable, lint, card["name"]], root)
+    doubled = run([sys.executable, dupes, card["name"]], root)
+    out = (linted.stdout or "") + (linted.stderr or "") + (doubled.stdout or "") + (doubled.stderr or "")
+    looks, never = [], []
+    for line in out.splitlines():
+        match = re.search(r"([^\s:]+\.rs):(\d+): (NEVER|LOOK): (.*)", line)
+        if match:
+            (never if match.group(3) == "NEVER" else looks).append(
+                {"where": f"{match.group(1)}:{match.group(2)}", "text": match.group(4).strip()})
+        shared = re.search(r"fn (\w+): the same body as", line)
+        if shared:
+            looks.append({"where": f"fn {shared.group(1)}", "text": line.strip()})
+    if linted.returncode != 0 or never:
+        raise GateFailed(f"card-lint has {len(never)} NEVER finding(s)", out)
+    if doubled.returncode != 0:
+        raise GateFailed("card-dupes.py failed", out)
+    summary = "clean" if not looks else f"{len(looks)} LOOK finding(s), each answered in {REPORT}"
+    return summary, {"looks": looks, "output": out}
+
+
+def gate_citations(root, card, reference):
+    tool = os.path.join(root, "tools", "maintenance", "cr.py")
+    if not os.path.isfile(tool):
+        raise GateFailed("cr.py is missing")
+    paths = []
+    card_file = card_file_from(reference, root)
+    if card_file:
+        paths.append(clean_relative(root, card_file))
+    scenario_dir = os.path.join(root, "scenarios")
+    if os.path.isdir(scenario_dir):
+        for entry in sorted(os.listdir(scenario_dir)):
+            if entry.endswith(".cantrip"):
+                path = os.path.join(scenario_dir, entry)
+                if holds_card(read_text(path), card["name"]):
+                    paths.append(clean_relative(root, path))
+    if not paths:
+        return "no card file or scenario to cite", ""
+    result = run([sys.executable, tool, "check", "--show", *paths], root)
+    out = (result.stdout or "") + ("\n" + result.stderr if result.stderr.strip() else "")
+    if result.returncode != 0:
+        raise GateFailed("a cited rule does not exist", out)
+    return "every cited rule exists", out
+
+
+def gate_coverage(root, card):
+    tool = os.path.join(root, "tools", "maintenance", "card-coverage.py")
+    if not os.path.isfile(tool):
+        raise GateFailed("card-coverage.py is missing")
+    print(f"coverage: running card-coverage.py for {card['name']} ...", file=sys.stderr, flush=True)
+    result = run([sys.executable, tool, card["name"]], root)
+    out = (result.stdout or "") + ("\n" + result.stderr if result.stderr.strip() else "")
+    if result.returncode != 0:
+        raise GateFailed("some lines of the card never ran", out)
+    lines = [line for line in out.splitlines() if line.strip()]
+    return (lines[-1].strip() if lines else "every line ran"), out
+
+
+def equivalent_excuse(report, survivor):
+    where = f"{survivor['path']}:{survivor['line']}"
+    for excuse in (report or {}).get("equivalent_mutants") or []:
+        if not isinstance(excuse, dict):
+            continue
+        mutant = str(excuse.get("mutant") or "")
+        why = str(excuse.get("why") or "").strip()
+        if where in mutant and len(why) >= 20:
+            return why
+    return None
+
+
+def gate_mutation(root, card, report):
+    tool = os.path.join(root, "tools", "maintenance", "card-mutate.py")
+    if not os.path.isfile(tool):
+        raise GateFailed("card-mutate.py is missing")
+    print(f"mutation: running card-mutate.py for {card['name']} ...", file=sys.stderr, flush=True)
+    result = run([sys.executable, tool, card["name"]], root)
+    out = (result.stdout or "") + ("\n" + result.stderr if result.stderr.strip() else "")
+    summary = re.search(r"(\d+) caught, (\d+) survived, (\d+) did not build", out)
+    survivors = [{"path": match.group(1), "line": match.group(2), "what": match.group(3).strip()}
+                 for match in re.finditer(r"^SURVIVED (\S+):(\d+): (.+)$", out, re.M)]
+    if result.returncode == 0:
+        if summary and int(summary.group(2)):
+            raise GateFailed("card-mutate.py exited 0 with survivors", out)
+        caught = int(summary.group(1)) if summary else 0
+        return f"{caught} caught, 0 survived", {"detail": out, "survivors": []}
+    if not summary:
+        raise GateFailed("card-mutate.py failed before reporting", out)
+    caught, survived, unbuilt = (int(value) for value in summary.groups())
+    if unbuilt:
+        raise GateFailed(f"{unbuilt} mutation(s) did not build", out)
+    if len(survivors) != survived:
+        raise GateFailed(f"card-mutate.py reported {survived} survivor(s) but {len(survivors)} could be read", out)
+    if not survived:
+        raise GateFailed("card-mutate.py exited 1 but reported no survivor", out)
+    missing = [survivor for survivor in survivors if not equivalent_excuse(report, survivor)]
+    if missing:
+        detail = "\n".join(f"{s['path']}:{s['line']}: {s['what']}" for s in missing)
+        raise GateFailed(f"{len(missing)} mutation survivor(s) no scenario catches and the report does not excuse",
+                         detail + "\n\n" + out[-5000:])
+    return f"{caught} caught, {survived} survived (all declared equivalent)", {"detail": out, "survivors": survivors}
+
+
+def gate_report(root, card, content, reference, report, looks, survivors, issue=0):
+    if not isinstance(report, dict):
+        raise GateFailed(f"{REPORT} is missing or not an object: fill it in from the packet")
+    problems = []
+    if report.get("decision") != "done":
+        problems.append(f"decision is {report.get('decision')!r}: finish the card and set it to \"done\"")
+    report_issue = report.get("issue")
+    try:
+        report_issue = int(report_issue)
+    except (TypeError, ValueError):
+        report_issue = 0
+    if report_issue <= 0 and not issue:
+        problems.append("no issue number: set report.json's \"issue\" or pass --issue N")
+    seen = {}
+    for entry in report.get("validation") or []:
+        if isinstance(entry, dict) and isinstance(entry.get("line"), str):
+            seen[entry["line"].strip()] = entry
+    for line in printed_lines(content):
+        entry = seen.get(line.strip())
+        if entry is None:
+            problems.append(f"no validation entry for the printed line: {line}")
+        elif entry.get("agrees") is not True:
+            problems.append(f"the report says the code disagrees with: {line}")
+        elif len(str(entry.get("code") or "").strip()) < 8:
+            problems.append(f"the validation line has no code that implements it: {line}")
+    points = [entry for entry in report.get("test_points") or [] if isinstance(entry, dict)]
+    for point in reference_points(reference):
+        entry = next((entry for entry in points if str(entry.get("point")).strip() == point), None)
+        if entry is None:
+            problems.append(f"no test-point entry for: {point}")
+            continue
+        problem = scenario_line_problem(root, entry.get("scenario"), entry.get("line"), card["name"])
+        if problem:
+            problems.append(f"test point {point!r}: {problem}")
+    rulings = [entry for entry in report.get("rulings") or [] if isinstance(entry, dict)]
+    for ruling in reference_rulings(reference):
+        entry = next((entry for entry in rulings if str(entry.get("ruling")).strip() == ruling), None)
+        if entry is None:
+            problems.append(f"no ruling entry for: {ruling[:100]}")
+            continue
+        if str(entry.get("scenario") or "").strip():
+            problem = scenario_line_problem(root, entry.get("scenario"), entry.get("line"), card["name"])
+            if problem:
+                problems.append(f"ruling {ruling[:60]!r}: {problem}")
+        elif len(str(entry.get("no_decision") or "").strip()) < 20:
+            problems.append(f"ruling {ruling[:60]!r}: give the scenario line that decides it, or say in "
+                            "no_decision why the card does not decide it")
+    answers = [answer for answer in report.get("look_answers") or [] if isinstance(answer, str)]
+    for look in looks:
+        if not any(look["where"] in answer and len(answer.strip()) >= 20 for answer in answers):
+            problems.append(f"no report answer for {look['where']}: {look['text'][:120]}")
+    for survivor in survivors:
+        if not equivalent_excuse(report, survivor):
+            problems.append(f"mutation survivor {survivor['path']}:{survivor['line']} is not declared equivalent")
+    if problems:
+        raise GateFailed(f"{len(problems)} problem(s) in {REPORT}", "\n".join(problems))
+    return (f"{len(printed_lines(content))} printed line(s), {len(reference_points(reference))} test point(s), "
+            f"{len(reference_rulings(reference))} ruling(s)"), ""
+
+
+def check_card(root, store, card, claim, reference, fast=False):
+    """Every gate, in order; fast skips only the two that rebuild and mutate the card."""
+    gates = []
+    changed = [entry["path"] for entry in changed_paths(root)]
+
+    def add(name, function):
+        try:
+            summary, facts = function()
+            status = "pass"
+        except GateFailed as error:
+            status, summary, facts = "fail", str(error), {"detail": error.detail}
+        except Exception as error:  # a broken tool is a failed gate, never a pass
+            status, summary, facts = "fail", f"{type(error).__name__}: {error}", {"detail": ""}
+        if status == "pass" and summary.startswith("Scryfall unreachable"):
+            status = "warn"
+        if isinstance(facts, dict):
+            detail = str(facts.get("detail") or "")
+            kept = facts
+        elif isinstance(facts, str):
+            detail, kept = facts, {}
+        else:
+            detail, kept = "", {}
+        gates.append({"name": name, "status": status, "summary": summary,
+                      "detail": detail[:20000], "facts": kept})
+        return gates[-1]
+
+    add("scope", lambda: gate_scope(root, card, claim, reference))
+    content = content_from(reference, root)
+    add("oracle", lambda: gate_oracle(root, card))
+    add("scenarios", lambda: gate_scenarios(root, card, content, reference))
+    add("corpus", lambda: gate_corpus(root, card, changed))
+    linted = add("lint", lambda: gate_lint(root, card))
+    add("citations", lambda: gate_citations(root, card, reference))
+    if fast:
+        gates.append({"name": "coverage", "status": "skip", "summary": "--fast", "detail": "", "facts": {}})
+    else:
+        add("coverage", lambda: gate_coverage(root, card))
+    if fast:
+        gates.append({"name": "mutation", "status": "skip", "summary": "--fast", "detail": "", "facts": {}})
+        mutation = {"facts": {}}
+    else:
+        report_data = {}
+        if os.path.isfile(report_file(root, store, card["name"])):
+            try:
+                report_data = read_json(report_file(root, store, card["name"]))
+            except json.JSONDecodeError:
+                report_data = {}
+        mutation = add("mutation", lambda: gate_mutation(root, card, report_data))
+    report = None
+    try:
+        report = read_json(report_file(root, store, card["name"]))
+    except FileNotFoundError:
+        gates.append({"name": "report", "status": "fail", "summary": f"{REPORT} is missing: fill it in",
+                      "detail": "", "facts": {}})
+    except json.JSONDecodeError as error:
+        gates.append({"name": "report", "status": "fail", "summary": f"{REPORT} is not JSON: {error}",
+                      "detail": "", "facts": {}})
+    if report is not None:
+        looks = (linted.get("facts") or {}).get("looks") or []
+        survivors = (mutation.get("facts") or {}).get("survivors") or []
+        add("report", lambda: gate_report(root, card, content, reference, report, looks, survivors,
+                                          (claim or {}).get("issue")))
+    return gates
+
+
+def save_check(root, store, card, gates, fast):
+    passed = all(gate["status"] != "fail" for gate in gates)
+    data = {"queue": store.name, "card": card["name"], "head": head_sha(root), "tree": tree_sha(root),
+            "fast": bool(fast), "time": now(), "passed": passed, "gates": gates}
+    write_json(check_file(root, store, card["name"]), data)
+    return passed
+
+
+def print_gates(card, root, gates, fast):
+    print(f"check {card['name']} in {root}" + (" (fast: coverage and mutation skipped)" if fast else ""))
+    for gate in gates:
+        print(f"  {gate['name']:<10} {gate['status'].upper():<5} {gate['summary']}")
+    for gate in gates:
+        if gate["status"] in ("fail", "warn") and gate.get("detail"):
+            print(f"  {gate['name']} detail:")
+            for line in gate["detail"].splitlines()[:40]:
+                print(f"    {line}")
+    print("check: PASS" if all(gate["status"] != "fail" for gate in gates) else "check: FAIL - nothing is committed")
+
+
+def plan_commits(root, store, card, claim, reference, issue):
+    """Stage by category and commit Engine, Mechanics, Client, then exactly one Card commit."""
+    entries = changed_paths(root)
+    content = content_from(reference, root)
+    content_rel = clean_relative(root, content) if content else None
+    card_file = card_file_from(reference, root)
+    card_rel = clean_relative(root, card_file) if card_file else card_relative(card["name"])
+    notes = notes_relative(card["name"])
+    groups = {"engine": [], "mechanics": [], "client": [], "card": []}
+    for entry in entries:
+        kind = commit_kind(entry["path"], content_rel, card_rel, bool(claim.get("engine")), notes)
+        if kind == "core":
+            raise Refused(f"{entry['path']} is core and this card was not opened --engine")
+        if kind == "other":
+            raise Refused(f"{entry['path']} is not the card's, a shared mechanic, the client or the harness")
+        groups[kind].append(entry["path"])
+    if not groups["card"]:
+        raise Refused("nothing of the card is changed: its content, Rust file or a scenario")
+    messages = {"engine": f"Engine: what {card['name']} needs of the engine",
+                "mechanics": f"Mechanics: what {card['name']} needs of the shared mechanics",
+                "client": f"Client: what {card['name']} adds to the client",
+                "card": f"Card: {card['name']}\n\nCloses #{issue}"}
+    made = []
+    for kind in ("engine", "mechanics", "client", "card"):
+        paths = groups[kind]
+        if not paths:
+            continue
+        before = head_sha(root)
+        added = git(root, "add", "-A", "--", *paths, check=False)
+        if added.returncode != 0:
+            raise Failed(f"git add failed:\n{(added.stdout + added.stderr).strip()}")
+        message = messages[kind]
+        committed = git(root, "commit", "-m", message, check=False)
+        if committed.returncode != 0:
+            raise Refused(f"git commit failed for {kind}:\n{(committed.stdout + committed.stderr).strip()[-3000:]}")
+        after = head_sha(root)
+        count = int(git(root, "rev-list", "--count", f"{before}..{after}").stdout.strip() or 0)
+        body = git(root, "log", "-1", "--format=%B").stdout.rstrip()
+        if count != 1:
+            raise Refused(f"the {kind} commit made {count} commits, not one; inspect the branch")
+        if "co-authored-by" in body.lower():
+            raise Refused(f"the {kind} commit carries Co-Authored-By, which this repository forbids; amend it")
+        if kind == "card":
+            if not body.startswith(f"Card: {card['name']}"):
+                raise Refused(f"the card commit's subject is not `Card: {card['name']}`: {body.splitlines()[0]}")
+            if not re.search(rf"^Closes #{issue}$", body, re.M):
+                raise Refused(f"the card commit does not end with `Closes #{issue}`")
+        made.append({"kind": kind, "sha": after[:9], "message": body.splitlines()[0], "paths": paths})
+    dirty = status_paths(root)
+    if dirty:
+        raise Refused("commits were made but the tree is still dirty:\n  " + "\n  ".join(dirty[:12]))
+    return made
+
+
+def cmd_check(args):
+    root = worktree_root()
+    store = Store(common_dir(root), args.queue)
+    state = store.read()
+    card, claim = None, {}
+    if args.id:
+        wid = worker_id(args.id)
+        card = open_claim(state, wid)
+        if card:
+            claim = card["claim"]
+            if norm(claim.get("worktree", "")) != norm(root):
+                raise Refused(f"{card['name']} is open for {wid} in {claim.get('worktree')}; check it there")
+            if args.card and args.card.casefold() != card["name"].casefold():
+                raise Refused(f"{wid} holds {card['name']}, not {args.card}")
+        elif args.card:
+            card = card_of(state, args.card) or {"name": args.card}
+        else:
+            raise Refused(f"{wid} has no open card in queue {store.name}")
+    elif args.card:
+        card = card_of(state, args.card) or {"name": args.card}
+    else:
+        card = open_in(state, root)
+        if card:
+            claim = card["claim"]
+        else:
+            raise Refused("name the card: --id WORKER (its open card) or --card NAME")
+    packet = packet_dir(root, store, card["name"])
+    reference_path = os.path.join(packet, "reference.md")
+    if not os.path.isfile(reference_path):
+        raise Refused(f"no packet for {card['name']} at {packet}: run `next --id ...` first")
+    reference = read_text(reference_path)
+    gates = check_card(root, store, card, claim, reference, bool(args.fast))
+    passed = save_check(root, store, card, gates, bool(args.fast))
+    print_gates(card, root, gates, bool(args.fast))
+    return 0 if passed else 1
+
+
+def cmd_commit(args):
+    wid = worker_id(args.id)
+    root = worktree_root()
+    store = Store(common_dir(root), args.queue)
+    pool_context(root)
+    require_branch(root)
+    state = store.read()
+    card = open_claim(state, wid)
+    if card is None:
+        raise Refused(f"{wid} has no open card in queue {store.name}")
+    claim = card["claim"]
+    if norm(claim.get("worktree", "")) != norm(root):
+        raise Refused(f"{card['name']} is open for {wid} in {claim.get('worktree')}; commit it there")
+    packet = packet_dir(root, store, card["name"])
+    reference_path = os.path.join(packet, "reference.md")
+    if not os.path.isfile(reference_path):
+        raise Refused(f"no packet for {card['name']} at {packet}: run `next --id ...` first")
+    reference = read_text(reference_path)
+    report = {}
+    try:
+        report = read_json(report_file(root, store, card["name"]))
+    except (FileNotFoundError, json.JSONDecodeError):
+        report = {}
+    issue = args.issue or claim.get("issue") or (report.get("issue") if isinstance(report, dict) else 0)
+    try:
+        issue = int(issue)
+    except (TypeError, ValueError):
+        issue = 0
+    if issue <= 0:
+        raise Refused("no issue number: pass --issue N or set report.json's issue (the Card commit ends Closes #N)")
+    gates = check_card(root, store, card, claim, reference, fast=False)
+    passed = save_check(root, store, card, gates, False)
+    print_gates(card, root, gates, False)
+    if not passed:
+        raise Refused("the check failed; nothing was committed")
+    made = plan_commits(root, store, card, claim, reference, issue)
+    print(f"{card['name']}: committed")
+    for commit in made:
+        print(f"  {commit['sha']} {commit['message']}  ({len(commit['paths'])} path(s))")
+    close_args = argparse.Namespace(id=wid, queue=store.name, commit=made[-1]["sha"], no_commit=False,
+                                    note=args.note or "")
+    return close(close_args, "done")
 
 
 # ---- commands -------------------------------------------------------------------------------------------------------
@@ -681,6 +1463,14 @@ def cmd_queue(args):
 
 def cmd_next(args):
     wid = worker_id(args.id)
+    issue = None
+    if getattr(args, "issue", None) is not None:
+        try:
+            issue = int(args.issue)
+        except (TypeError, ValueError):
+            raise Refused("--issue takes a GitHub issue number, as --issue 123")
+        if issue <= 0:
+            raise Refused("--issue takes a positive GitHub issue number")
     root = worktree_root()
     store = Store(common_dir(root), args.queue)
     context = pool_context(root)
@@ -690,6 +1480,8 @@ def cmd_next(args):
         card = open_claim(state, wid)
         if card:
             claim = card["claim"]
+            if issue and not claim.get("issue"):
+                claim["issue"] = issue
             moved = norm(claim.get("worktree", "")) != norm(root)
             if moved:
                 if os.path.isdir(claim.get("worktree", "")):
@@ -726,9 +1518,10 @@ def cmd_next(args):
                         commit=None, finished=None, failure=None)
             card["claim"] = {"id": wid, "worktree": root, "packet": packet_dir(root, store, card["name"]),
                              "slot": context["slot"], "lease": context["lease"], "member": context["member"],
-                             "agent": context["agent"], "head": head_sha(root)}
+                             "agent": context["agent"], "head": head_sha(root), "engine": bool(getattr(args, "engine", False)),
+                             "issue": issue}
             store.log(state, "claim", id=wid, card=card["name"], worktree=root, slot=context["slot"],
-                      lease=context["lease"], member=context["member"])
+                      lease=context["lease"], member=context["member"], engine=bool(getattr(args, "engine", False)))
             claim, fresh, opened = card["claim"], True, True
             packet = packet_dir(root, store, card["name"])
     try:
@@ -877,6 +1670,7 @@ def close(args, outcome):
 
 
 def cmd_done(args):
+    print("note: `done` closes without the check and commit gates; `commit` is the gated path.", file=sys.stderr)
     return close(args, "done")
 
 
@@ -939,6 +1733,8 @@ def command_line(argv=None):
     cmd.add_argument("--id", required=True, metavar="WORKER")
     cmd.add_argument("--card", metavar="NAME", help="take this card specifically")
     cmd.add_argument("--refresh", action="store_true", help="rebuild the packet even if it is there")
+    cmd.add_argument("--engine", action="store_true", help="this card may change the core (state, rules, api)")
+    cmd.add_argument("--issue", type=int, metavar="N", help="the GitHub issue the Card commit closes")
     cmd.set_defaults(handler=cmd_next)
 
     cmd = sub.add_parser("status", help="the queue, its claims and the shared branch")
@@ -946,7 +1742,21 @@ def command_line(argv=None):
     cmd.add_argument("--id", metavar="WORKER")
     cmd.set_defaults(handler=cmd_status)
 
-    cmd = sub.add_parser("done", help="the card is committed: close the claim and share its commits")
+    cmd = sub.add_parser("check", help="run the card's gates (fast skips coverage and mutation)")
+    queue_flag(cmd)
+    cmd.add_argument("--id", metavar="WORKER", help="check this id's open card")
+    cmd.add_argument("--card", metavar="NAME", help="check this card's packet")
+    cmd.add_argument("--fast", action="store_true", help="skip only coverage and mutation")
+    cmd.set_defaults(handler=cmd_check)
+
+    cmd = sub.add_parser("commit", help="gate the card, commit it in the add-cards shape, and close it")
+    queue_flag(cmd)
+    cmd.add_argument("--id", required=True, metavar="WORKER")
+    cmd.add_argument("--issue", type=int, metavar="N", help="the GitHub issue the Card commit closes")
+    cmd.add_argument("--note", metavar="TEXT")
+    cmd.set_defaults(handler=cmd_commit)
+
+    cmd = sub.add_parser("done", help="close the claim without the gates (commit is the gated path)")
     queue_flag(cmd)
     cmd.add_argument("--id", required=True, metavar="WORKER")
     cmd.add_argument("--commit", metavar="SHA", help="the card's commit (default HEAD)")
