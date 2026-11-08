@@ -1,0 +1,56 @@
+# Mosswort Bridge: "may" means Bot1 can decline even at exactly 10 power (Cobblebrute, two Bears, Memnite).
+# On turn 5 the paid ability resolves, Bot1 declines, the hidden Lightning Bolt stays in exile and Bot2 stays at 20.
+
+[Bot1 Deck]
+Cobblebrute
+Grizzly Bears
+Grizzly Bears
+Memnite
+Black Lotus
+Black Lotus
+Black Lotus
+Mosswort Bridge
+Lightning Bolt
+Island x3
+Mox Emerald
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Cobblebrute.Cast
+Bot1.Hand.Mosswort Bridge.Play
+Bot1.Arrange(Lightning Bolt | Island; Island; Island)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mosswort Bridge.Activate(Ability: You may play)
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Exile.Count = 1
+Bot2.Life = 20
+Bot1.Library.Count = 11
+Bot2.Library.Count = 11
