@@ -28,6 +28,14 @@ core-feature agents and review agents run on Opus. Agents read only what their w
      (after a compaction, before every `acquire`). `reconcile` finds what is stale. A slot set aside as needing
      attention is the user's: `status pool-<n>` shows what it holds, and `clean pool-<n> --reason` empties it on
      their say.
+   - **A shared queue, when several implementors run at once:** `tools\maintenance\card-lane.py` hands the cards out
+     instead of the coordinator choosing one per agent. `queue` builds one queue for a format or a list, each
+     implementor runs `next --id <worker>` in its joined slot, and the claim is atomic, so no two take the same card;
+     the same id gets its open card back, and each packet is written in that implementor's worktree. `done`, `block`
+     and `release` close the claim, and the lane's `card-lane/<queue>` branch is shared, so a `Mechanics:` or
+     `Engine:` commit made by one agent is merged into the next agent's `next`. The lane is dispatch, not the claim:
+     the card's GitHub issue is still claimed first (`claims.md`). The command model is
+     `.claude/skills/card-lane/SKILL.md`.
 
    The hooks deny an edit or shell command into a slot by anyone but its member, and the main thread while a member
    is in it; and they keep a member in its own tree: its edit outside the tree (the temp directory aside), or its
