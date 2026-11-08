@@ -5,22 +5,58 @@
 //! the same.
 
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 
+use cantrip_script::corpus_report::{ReportSession, ScenarioOutcome};
 use cantrip_script::{GameScript, known_bug, run};
+
+static REPORT: OnceLock<Option<ReportSession>> = OnceLock::new();
 
 fn scripts() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../scenarios")
 }
 
 fn scenario(name: &str) {
+    let report = REPORT.get_or_init(|| {
+        std::env::var_os("CANTRIP_CORPUS_REPORT").map(|path| {
+            let run_id = std::env::var("CANTRIP_CORPUS_RUN_ID")
+                .expect("CANTRIP_CORPUS_REPORT requires CANTRIP_CORPUS_RUN_ID");
+            ReportSession::new(Path::new(&path), run_id, SCENARIO_COUNT)
+                .unwrap_or_else(|e| panic!("corpus report: {e}"))
+        })
+    });
+    let mut outcome = ScenarioOutcome::Failed;
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        scenario_run(name, &mut outcome)
+    }));
+    if let Some(report) = report {
+        report
+            .record(name, outcome)
+            .unwrap_or_else(|e| panic!("corpus report: {e}"));
+    }
+    if let Err(panic) = result {
+        std::panic::resume_unwind(panic);
+    }
+}
+
+fn scenario_run(name: &str, outcome: &mut ScenarioOutcome) {
     let path = scripts().join(format!("{name}.cantrip"));
     let text = std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{name}: {e}"));
-    let script = GameScript::load(&path).unwrap_or_else(|e| panic!("{name}: {e}"));
-    let mut missing: Vec<String> = script.cards().into_iter().filter(|c| cantrip_engine::card(c).is_none()).collect();
+    scenario_text(name, &text, outcome);
+}
+
+fn scenario_text(name: &str, text: &str, outcome: &mut ScenarioOutcome) {
+    let script = GameScript::parse(text, &format!("{name}.cantrip")).unwrap_or_else(|e| panic!("{name}: {e}"));
+    let mut missing: Vec<String> = script
+        .cards()
+        .into_iter()
+        .filter(|c| cantrip_engine::card(c).is_none())
+        .collect();
     missing.sort();
     missing.dedup();
     if !missing.is_empty() {
         println!("{name}: skipped, the engine has no {}", missing.join(", "));
+        *outcome = ScenarioOutcome::Missing(missing);
         return;
     }
     match known_bug(&text) {
@@ -33,20 +69,60 @@ fn scenario(name: &str) {
             // runner answers alone.
             let through = driven(script);
             if through.as_ref() != Ok(&alone) {
-                panic!("{name} ends differently with its seats driven: {}", through.err().unwrap_or_else(|| "the final state differs".into()));
+                panic!(
+                    "{name} ends differently with its seats driven: {}",
+                    through
+                        .err()
+                        .unwrap_or_else(|| "the final state differs".into())
+                );
             }
+            *outcome = ScenarioOutcome::Passed;
         }
         Some(bug) => {
-            let outcome = std::panic::catch_unwind(|| run(&script).map(|_| ()));
-            if let Ok(Ok(())) = outcome {
-                panic!("{name} passes: the known bug is fixed ({bug}). Remove its `# Known bug:` line.");
+            let result = std::panic::catch_unwind(|| run(&script).map(|_| ()));
+            if let Ok(Ok(())) = result {
+                *outcome = ScenarioOutcome::Fixed;
+                panic!(
+                    "{name} passes: the known bug is fixed ({bug}). Remove its `# Known bug:` line."
+                );
             }
             println!("{name}: known bug, still failing ({bug})");
+            *outcome = ScenarioOutcome::KnownBug;
         }
     }
 }
 
 include!(concat!(env!("OUT_DIR"), "/scenarios.rs"));
+
+/// Reporting preserves the harness's execution semantics: a known failure passes its test, a fixed marker fails,
+/// and malformed input stays a failure even when it carries a bug marker. These helper probes are not corpus rows.
+#[test]
+fn corpus_accounting_preserves_known_bug_missing_and_failure_semantics() {
+    let valid = std::fs::read_to_string(scripts().join("duress-takes-the-named-card.cantrip")).unwrap();
+    let wrong = valid.replace("Bot2.Graveyard = Counterspell", "Bot2.Graveyard = Lightning Bolt");
+    assert_ne!(valid, wrong);
+    for (text, status, panics) in [
+        (valid.clone(), "passed", false),
+        (wrong.clone(), "failed", true),
+        (format!("# Known bug: reporting fixture\n{wrong}"), "known", false),
+        (format!("# Known bug: reporting fixture\n{valid}"), "fixed", true),
+        ("[Bot1 Deck]\nCantrip Report Missing Fixture\n".into(), "missing", false),
+        ("# Known bug: malformed\nno section\n".into(), "failed", true),
+    ] {
+        let mut outcome = ScenarioOutcome::Failed;
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| scenario_text("accounting-fixture", &text, &mut outcome)));
+        assert_eq!(result.is_err(), panics, "{status}");
+        let actual = match outcome {
+            ScenarioOutcome::Passed => "passed", ScenarioOutcome::Failed => "failed",
+            ScenarioOutcome::KnownBug => "known", ScenarioOutcome::Fixed => "fixed",
+            ScenarioOutcome::Missing(cards) => {
+                assert_eq!(cards, vec!["Cantrip Report Missing Fixture"]);
+                "missing"
+            }
+        };
+        assert_eq!(actual, status);
+    }
+}
 
 /// The checker itself: a scenario with one expectation changed must fail.
 #[test]

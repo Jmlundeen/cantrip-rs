@@ -5,6 +5,10 @@ description: Add one or more Magic cards to the Cantrip rules engine - each card
 
 # Adding cards
 
+For queued batches, follow [card-lane](../card-lane/SKILL.md) for canonical intake, user-selected models,
+fast author checks, durable finish/ready, and PR delivery. That run manifest takes precedence over older
+provider-specific coordination defaults; the rules and independent review requirements below still apply.
+
 This is the standard for every card in Cantrip, whoever writes it. A card that does not meet all of it is not added.
 `docs/adding-cards.md` is the reference for a card file's fields; `docs/engine-design.md` is the architecture;
 CLAUDE.md is the repository's rules. The `write-game-script` skill is the scenario syntax, in full.

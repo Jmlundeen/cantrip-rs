@@ -2,6 +2,7 @@
 
     python tools/maintenance/new-card.py "Mind Stone" [--no-write]
     python tools/maintenance/new-card.py "Mind Stone" --scenario [what-it-shows]
+    python tools/maintenance/new-card.py "Mind Stone" --oracle-only
 
 Writes the card's content JSON from Scryfall when content/ has none (a single face, a double-faced card, an adventure, a
 prototype card;
@@ -21,10 +22,13 @@ real ones are written.
 """
 
 import importlib.util
+import hashlib
 import json
 import os
 import re
 import sys
+import tempfile
+from pathlib import Path
 
 import subprocess
 import unicodedata
@@ -67,24 +71,199 @@ def file_stem(name):
 
 
 
-def find_card(name):
-    for dataset in sorted(os.listdir(CONTENT)):
-        folder = os.path.join(CONTENT, dataset, "cards")
-        if not os.path.isdir(folder):
-            continue
-        for file in os.listdir(folder):
-            if not file.endswith(".json"):
-                continue
-            path = os.path.join(folder, file)
-            text = open(path, encoding="utf-8-sig").read()
-            body = "\n".join(line for line in text.split("\n") if not line.strip().startswith("//"))
+def _signature(path):
+    stat = path.stat()
+    return [stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_ino]
+
+
+def _cached_files(kind, paths, extract):
+    """Per-file index, invalidated by source metadata, additions, deletions and this tool's code.
+
+    This index selects files only; it never caches a validation verdict. A selected
+    content file is read again before comparing its actual Oracle data.
+    """
+    cache = Path(ROOT) / "target" / f"card-reference-{kind}.json"
+    version = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    try:
+        saved = json.loads(cache.read_text(encoding="utf-8"))
+        previous = saved.get("files", {}) if isinstance(saved, dict) and saved.get("version") == version else {}
+        if not isinstance(previous, dict):
+            previous = {}
+    except (OSError, ValueError, KeyError):
+        previous = {}
+    current = {}
+    for path in sorted(paths):
+        key = path.relative_to(Path(ROOT)).as_posix()
+        signature = _signature(path)
+        old = previous.get(key)
+        current[key] = old if isinstance(old, dict) and "value" in old and old.get("signature") == signature else {
+            "signature": signature, "value": extract(path)}
+    if current != previous:
+        try:
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=cache.parent, delete=False) as partial:
+                temporary = Path(partial.name)
+                json.dump({"version": version, "files": current}, partial, ensure_ascii=False)
             try:
-                card = json.loads(body)
-            except ValueError:
-                continue
-            if card.get("name", "").lower() == name.lower():
-                return dataset, path, text, card
+                os.replace(temporary, cache)
+            finally:
+                temporary.unlink(missing_ok=True)
+        except OSError:
+            pass  # An optional read index must not make the report depend on target/ being writable.
+    return current
+
+
+def _content_name(path):
+    try:
+        body = "\n".join(line for line in path.read_text(encoding="utf-8-sig").splitlines()
+                         if not line.strip().startswith("//"))
+        return json.loads(body).get("name", "").lower()
+    except (ValueError, AttributeError):
+        return ""
+
+
+def find_card(name):
+    paths = Path(CONTENT).glob("*/cards/*.json")
+    indexed = _cached_files("content", paths, _content_name)
+    for relative, item in indexed.items():
+        if item["value"] != name.lower():
+            continue
+        path = Path(ROOT) / relative
+        text = path.read_text(encoding="utf-8-sig")
+        body = "\n".join(line for line in text.splitlines() if not line.strip().startswith("//"))
+        card = json.loads(body)
+        if card.get("name", "").lower() == name.lower():
+            return path.parts[-3], str(path), text, card
     return None
+
+
+def scenario_files(name):
+    """The same standalone name/count lines as the old report scan, indexed once per edited file."""
+    def names(path):
+        found = set()
+        for line in path.read_text(encoding="utf-8-sig").splitlines():
+            line = line.strip()
+            if not line or line.startswith(("#", "[")):
+                continue
+            for candidate in (line, re.sub(r"^\d+\s+", "", line)):
+                found.add(_name_key(candidate))
+                found.add(_name_key(re.sub(r"\s+x\d+$", "", candidate, flags=re.I)))
+        return sorted(found)
+    indexed = _cached_files("scenarios", Path(SCRIPTS).glob("*.cantrip"), names)
+    # Re-read selected files for the exact prior regex contract (including Python's Unicode IGNORECASE).
+    pattern = re.compile(r"^\s*(?:\d+\s+)?" + re.escape(name) + r"(?:\s+x\d+)?\s*$", re.M | re.I)
+    return [relative for relative, item in indexed.items() if _name_key(name) in item["value"]
+            and pattern.search((Path(ROOT) / relative).read_text(encoding="utf-8-sig"))]
+
+
+def _name_key(name):
+    # Python's IGNORECASE also equates these letters with ASCII I and S.
+    return name.lower().replace("ı", "i").replace("i\u0307", "i").replace("ſ", "s")
+
+
+def _ability_index():
+    spec = importlib.util.spec_from_file_location("ability_index", os.path.join(os.path.dirname(__file__), "ability-index.py"))
+    index = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(index)
+    return index
+
+
+def oracle_comparison(card, found=None, index=None):
+    """Direct Oracle characteristics/text comparison; no corpus scan or prior-art Index construction.
+
+    Accept already-fetched Scryfall data for lane callers. `differences` is a
+    structured list; unavailable evidence is explicitly not a match.
+    """
+    found = scryfall.card(card["name"]) if found is None else found
+    if found is None:
+        return {"available": False, "matches": False, "differences": [], "found": None}
+    index = index or _ability_index()
+    theirs = {face["name"].lower(): face for face in found["faces"]}
+    if len(found["faces"]) == 1:
+        theirs[found["name"].lower()] = found["faces"][0]
+    names = [name for name, _ in index.card_texts(card)] + [card["name"]]
+    differences, compared = [], set()
+
+    def walk(node):
+        if isinstance(node, dict):
+            if isinstance(node.get("oracleText"), str):
+                face_name = node.get("name", card["name"])
+                current = theirs.get(face_name.lower())
+                if current is None:
+                    # The combined split text has no Scryfall face; still walk and compare both halves.
+                    if not (face_name == card["name"] and "//" in face_name):
+                        differences.append({"face": face_name, "field": "name", "local": face_name, "oracle": None})
+                else:
+                    compared.add(current["name"].lower())
+                    if _abilities(index, node["oracleText"], names) != _abilities(index, current["oracle_text"], names):
+                        differences.append({"face": face_name, "field": "oracleText", "local": node["oracleText"],
+                                            "oracle": current["oracle_text"]})
+                    for local, remote in (("manaCost", "mana_cost"), ("type", "type_line"), ("power", "power"),
+                                          ("toughness", "toughness"), ("loyalty", "loyalty"), ("defense", "defense")):
+                        if local in ("power", "toughness") and node.get("stationPt"):
+                            continue
+                        mine, oracle = str(node.get(local, "")), str(current.get(remote, ""))
+                        if mine != oracle:
+                            differences.append({"face": face_name, "field": local, "local": mine, "oracle": oracle})
+                    if node.get("stationPt") and node["stationPt"] != f"{current.get('power', '')}/{current.get('toughness', '')}":
+                        differences.append({"face": face_name, "field": "stationPt", "local": node["stationPt"],
+                                            "oracle": f"{current.get('power', '')}/{current.get('toughness', '')}"})
+                    colors = sorted(current.get("color_indicator") or [])
+                    mine = sorted({"White": "W", "Blue": "U", "Black": "B", "Red": "R", "Green": "G"}.get(c, c)
+                                  for c in node.get("colorIndicator", []))
+                    if mine != colors:
+                        differences.append({"face": face_name, "field": "colorIndicator", "local": mine, "oracle": colors})
+            for key, value in node.items():
+                if key != "oracleText":
+                    walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value)
+    walk(card)
+    for current in found["faces"]:
+        if current["name"].lower() not in compared:
+            differences.append({"face": current["name"], "field": "face", "local": None, "oracle": current["name"]})
+    return {"available": True, "matches": not differences, "differences": differences, "found": found}
+
+
+def oracle_comparison_report(comparison):
+    if not comparison["available"]:
+        return "  not found on Scryfall (or Scryfall unreachable): check the Oracle text and rulings by hand"
+    lines = []
+    for difference in comparison["differences"]:
+        lines.append(f"  {difference['face']}: DIFFERS from Scryfall's current Oracle {difference['field']} - fix the content JSON first:")
+        lines.append("    " + str(difference["oracle"]).replace("\n", "\n    "))
+    return "\n".join(lines) or "  Oracle text matches Scryfall's"
+
+
+def prior_art_report(card, index, abilities):
+    """Reuse an unchanged card's rendered prior art, never unpickle executable cache data."""
+    paths = list(Path(CONTENT).glob("*/cards/*.json")) + list((Path(ROOT) / "crates").rglob("*.rs"))
+    paths += [Path(__file__), Path(__file__).with_name("ability-index.py")]
+    fingerprint = hashlib.sha256(json.dumps([(str(path.resolve()), _signature(path))
+                                             for path in sorted(paths)], sort_keys=True).encode()).hexdigest()
+    cache = Path(ROOT) / "target" / "card-reference-prior-art.json"
+    try:
+        data = json.loads(cache.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        data = {}
+    if not isinstance(data, dict):
+        data = {}
+    if data.get("fingerprint") == fingerprint and data.get("name") == card["name"]:
+        return data["report"]
+    report = index.report(index.Index(exclude=[card["name"]]), abilities) or "  (no rules text)"
+    try:
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=cache.parent, delete=False) as partial:
+            temporary = Path(partial.name)
+            json.dump({"fingerprint": fingerprint, "name": card["name"], "report": report}, partial)
+        try:
+            os.replace(temporary, cache)
+        finally:
+            temporary.unlink(missing_ok=True)
+    except OSError:
+        pass
+    return report
 
 
 def _abilities(index, text, names):
@@ -472,9 +651,13 @@ def main():
     if not args:
         sys.exit(__doc__)
     found = find_card(args[0])
-    spec = importlib.util.spec_from_file_location("ability_index", os.path.join(os.path.dirname(__file__), "ability-index.py"))
-    index = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(index)
+    if "--oracle-only" in sys.argv:
+        if found is None:
+            sys.exit(f"no card named {args[0]!r} in content/")
+        comparison = oracle_comparison(found[3])
+        print(oracle_comparison_report(comparison))
+        return 0 if comparison["matches"] else 1
+    index = _ability_index()
     drafted = False
     if found is None:
         if "--no-write" in sys.argv:
@@ -498,10 +681,8 @@ def main():
         print(open(notes, encoding="utf-8").read().strip())
 
     print("\n=== Scenarios naming it")
-    pattern = re.compile(r"^\s*(?:\d+\s+)?" + re.escape(name) + r"(?:\s+x\d+)?\s*$", re.M | re.I)
-    for file in sorted(os.listdir(SCRIPTS)):
-        if file.endswith(".cantrip") and pattern.search(open(os.path.join(SCRIPTS, file), encoding="utf-8-sig").read()):
-            print(f"  scenarios/{file}")
+    for file in scenario_files(name):
+        print(f"  {file}")
 
     abilities = index.card_abilities(card)
 
@@ -516,7 +697,7 @@ def main():
     print("    its numbers, its verb at the end or its own object left out differing - that part is not written again: it")
     print("    moves into one shared function in cantrip-mechanics, in a `Mechanics:` commit before the card, and both")
     print("    cards call it (SKILL.md, \"Share what is the same\"). Reviews send back every card that skips this.")
-    print(index.report(index.Index(exclude=[name]), abilities) or "  (no rules text)")
+    print(prior_art_report(card, index, abilities))
 
     print("\n=== Test points: each needs an expectation that fails if the card gets it wrong (list the line that catches")
     print("    each in your report; the reviewer checks the list). A refusal (`! ...`) pins nothing unless the action could")
@@ -538,4 +719,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

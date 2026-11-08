@@ -7,6 +7,16 @@ sparse list of actions, and the state the game should end in. The harness is `cr
 scenarios and prints the full report of any that fail (`docs/adding-cards.md`). The corpus began as the C# engine's
 test suite; the C# engine and its harness are gone, and this folder is the engine-independent record of what a card does.
 
+Focused card-lane checks use `python tools/maintenance/card-mutate.py "Name" --check`: a small card registry in the
+`mutate` profile with debug assertions and `CANTRIP_VERIFY=1`, with whole-registry fallback for missing dependencies
+or panics. The corpus uses a source-validated card index; `--scenario` filters names before file reads.
+`--selection-stats` prints read/parse/index-hit counts and selection time. Edits/additions/deletions invalidate
+membership; malformed unrelated scripts still fail card selection as before.
+
+The required `tools/test.cmd` run uses checked workspace tests and emits fresh corpus accounting, including known
+bugs and missing cards, under `target/test-results`. `corpus-report.py` checks the run ID and completion before
+printing it. This replaces an extra global replay; an interrupted or filtered run cannot reuse stale accounting.
+
 ```
 # comment lines start with #
 

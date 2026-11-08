@@ -10,6 +10,10 @@
 //! failure, the cards still missing for one that cannot run. `--scenario <part of a file name>` runs only the scenarios
 //! whose names hold it, reported the same way; `--file <path>` runs one scenario file from anywhere (a draft in a
 //! scratchpad, a reviewer's probe).
+//! Filename selection runs before loading, so an unrelated malformed file is excluded by `--scenario`. `--card`
+//! keeps malformed files as failures, since their card membership cannot be established. Full corpus/workspace gates
+//! still parse every scenario. Summaries count selected files; `--selection-stats` prints source read/parse counts.
+//! Card selection validates source bytes, including unchanged timestamps, but reads unselected sources to do so.
 //!
 //! For writing a scenario, with `--card` or `--scenario`:
 //!
@@ -22,19 +26,34 @@
 
 use std::collections::BTreeMap;
 use std::path::Path;
+use std::time::Instant;
 
 use cantrip_engine::card;
-use cantrip_script::{GameScript, Watch, known_bug, run_watched};
+use cantrip_script::selection::{ScenarioIndex, select_sources};
+use cantrip_script::{Watch, known_bug, run_watched};
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let show_failing = args.iter().any(|a| a == "--failing");
     let list = args.iter().any(|a| a == "--list");
-    let card_only: Option<String> = args.iter().position(|a| a == "--card").and_then(|i| args.get(i + 1)).cloned();
-    let scenario_only: Option<String> = args.iter().position(|a| a == "--scenario").and_then(|i| args.get(i + 1)).cloned();
+    let card_only: Option<String> = args
+        .iter()
+        .position(|a| a == "--card")
+        .and_then(|i| args.get(i + 1))
+        .cloned();
+    let scenario_only: Option<String> = args
+        .iter()
+        .position(|a| a == "--scenario")
+        .and_then(|i| args.get(i + 1))
+        .cloned();
     let dump = args.iter().any(|a| a == "--dump");
+    let selection_stats = args.iter().any(|a| a == "--selection-stats");
     let watch = Watch {
-        before_line: args.iter().position(|a| a == "--diff").and_then(|i| args.get(i + 1)).and_then(|v| v.parse().ok()),
+        before_line: args
+            .iter()
+            .position(|a| a == "--diff")
+            .and_then(|i| args.get(i + 1))
+            .and_then(|v| v.parse().ok()),
         next: args.iter().any(|a| a == "--next"),
         brief: args.iter().any(|a| a == "--brief"),
     };
@@ -42,7 +61,11 @@ fn main() {
         eprintln!("--diff takes the number of a line of the scenario file, as --diff 31");
         std::process::exit(2);
     }
-    let file: Option<String> = args.iter().position(|a| a == "--file").and_then(|i| args.get(i + 1)).cloned();
+    let file: Option<String> = args
+        .iter()
+        .position(|a| a == "--file")
+        .and_then(|i| args.get(i + 1))
+        .cloned();
     let only = card_only.clone().or(scenario_only.clone()).or(file.clone());
     let missing_top: usize = args
         .iter()
@@ -50,6 +73,7 @@ fn main() {
         .and_then(|i| args.get(i + 1))
         .and_then(|v| v.parse().ok())
         .unwrap_or(25);
+    let selecting = Instant::now();
     let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../scenarios");
 
     let mut files: Vec<_> = match &file {
@@ -62,6 +86,23 @@ fn main() {
             .collect(),
     };
     files.sort();
+    let index: ScenarioIndex = if card_only.is_some() {
+        serde_json::from_str(include_str!(concat!(
+            env!("OUT_DIR"),
+            "/scenario-index.json"
+        )))
+        .expect("generated scenario index")
+    } else {
+        ScenarioIndex::default()
+    };
+    let (sources, mut stats) = select_sources(
+        &files,
+        card_only.as_deref(),
+        scenario_only.as_deref(),
+        &index,
+    );
+    let selected_count = sources.len();
+    let selection_time = selecting.elapsed();
 
     let mut passed = Vec::new();
     let mut failed = Vec::new();
@@ -69,27 +110,22 @@ fn main() {
     let mut fixed = Vec::new();
     let mut lacking: BTreeMap<String, usize> = BTreeMap::new();
     let mut blocked = 0;
-    for path in &files {
+    for source in sources {
+        let path = &source.path;
         let name = path.file_stem().unwrap().to_string_lossy().to_string();
-        let bug = std::fs::read_to_string(path).ok().and_then(|t| known_bug(&t));
-        let script = match GameScript::load(path) {
+        let (text, script) = match source.load(&mut stats) {
             Ok(s) => s,
             Err(e) => {
                 failed.push((name, format!("does not parse: {e}")));
                 continue;
             }
         };
-        if let Some(only) = &card_only
-            && !script.cards().into_iter().any(|c| c.eq_ignore_ascii_case(only))
-        {
-            continue;
-        }
-        if let Some(part) = &scenario_only
-            && !name.to_ascii_lowercase().contains(&part.to_ascii_lowercase())
-        {
-            continue;
-        }
-        let mut missing: Vec<String> = script.cards().into_iter().filter(|c| card(c).is_none()).collect();
+        let bug = known_bug(&text);
+        let mut missing: Vec<String> = script
+            .cards()
+            .into_iter()
+            .filter(|c| card(c).is_none())
+            .collect();
         missing.sort();
         missing.dedup();
         if !missing.is_empty() {
@@ -130,7 +166,9 @@ fn main() {
             match outcome {
                 Ok(Ok(())) => {
                     if detailed {
-                        println!("  FIXED {name}: the known bug no longer fails ({bug}); remove its `# Known bug:` line");
+                        println!(
+                            "  FIXED {name}: the known bug no longer fails ({bug}); remove its `# Known bug:` line"
+                        );
                     }
                     fixed.push(name);
                 }
@@ -157,7 +195,9 @@ fn main() {
         }
         match outcome {
             Ok(Ok(())) => passed.push(name),
-            Ok(Err(message)) => failed.push((name, message.lines().next().unwrap_or("").to_string())),
+            Ok(Err(message)) => {
+                failed.push((name, message.lines().next().unwrap_or("").to_string()))
+            }
             Err(panic) => {
                 let text = panic
                     .downcast_ref::<String>()
@@ -171,12 +211,18 @@ fn main() {
 
     println!(
         "{} scenarios: {} pass, {} fail, {} known bugs, {} need cards the engine does not have.",
-        files.len(),
+        selected_count,
         passed.len(),
         failed.len() + fixed.len(),
         known.len(),
         blocked
     );
+    if selection_stats {
+        println!(
+            "selection: {} source reads, {} script parses, {} validated index hits; preparation {:.1} ms (before selected script loading/games)",
+            stats.sources_read, stats.scripts_parsed, stats.index_hits, selection_time.as_secs_f64() * 1000.0
+        );
+    }
     for name in &fixed {
         println!("  FIXED {name}: a known bug that now passes; remove its `# Known bug:` line");
     }

@@ -11,6 +11,14 @@ staged = ["cantrip-engine/staged"]
 
 [dependencies]
 cantrip-engine.workspace = true
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[build-dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
 
 [dev-dependencies]
 cantrip-cards.workspace = true

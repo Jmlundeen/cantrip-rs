@@ -12,14 +12,14 @@ import os
 import re
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-CARDS = os.path.join(ROOT, "crates", "cantrip-cards", "src", "cards")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import importlib.util  # noqa: E402
 
 _spec = importlib.util.spec_from_file_location("new_card", os.path.join(os.path.dirname(__file__), "new-card.py"))
 new_card = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(new_card)
+ROOT = new_card.ROOT  # companion tools may live in the unmerged lane; sources belong to the caller's Git worktree
+CARDS = os.path.join(ROOT, "crates", "cantrip-cards", "src", "cards")
 
 KINDS = r"\b(?:CounterKind|Subtype|Color|CardType|Supertype|Keyword|Mana|ZoneKind|Step|Phase)::\w+"
 MIN_STATEMENTS = 2
@@ -27,7 +27,8 @@ MIN_STATEMENTS = 2
 
 def functions(path):
     """(name, normalized body, statements) for each `fn` in a file, found by brace matching."""
-    text = open(path, encoding="utf-8").read()
+    with open(path, encoding="utf-8") as source:
+        text = source.read()
     text = re.sub(r"//[^\n]*", "", text)
     out = []
     for m in re.finditer(r"\bfn\s+(\w+)[^{;]*\{", text):
@@ -38,6 +39,8 @@ def functions(path):
         body = text[m.end():i - 1]
         norm = re.sub(r"\s+", " ", re.sub(r"\b\d+\b", "N", re.sub(KINDS, "KIND", body))).strip()
         statements = norm.count(";") + norm.count("=>") + 1
+        if re.fullmatch(r"(?:return )?(?:cantrip_mechanics::\w+::|effects::)\w+\([^{};]*\)\??;?", norm):
+            statements = 1  # already composes a shared recipe; no second copy to extract
         out.append((m.group(1), norm, statements))
     return out
 

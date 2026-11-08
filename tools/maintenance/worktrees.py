@@ -19,7 +19,7 @@ tools\\worktree.cmd runs it. The pool is .claude/worktrees/pool-<n>, each slot o
 warm target/ (a shared or copied target/ compiles another tree's files: never one). Nobody reaches a slot but through
 this tool:
 
-    - `acquire` takes a clean slot on today's origin/main for one piece of new work - a lease. Its holder (the
+    - `acquire` takes a clean slot on the selected canonical base for one piece of new work - a lease. Its holder (the
       coordinator) keeps the lease ID and the path to itself. New work is a new lease, never a reused one.
     - The holder starts each subagent with a `token`: single-use, dead two minutes after it is made. The subagent's
       first command is `join`, which makes it the slot's member and tells it the path. A slot has one member at a
@@ -56,6 +56,9 @@ import sys
 import tempfile
 import time
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from card_tool_runtime import build_env
+
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
 sys.dont_write_bytecode = True  # no __pycache__ left in tools/maintenance
@@ -73,7 +76,7 @@ SETUP_RE = re.compile(r"(?:export|cd|pushd|set-location)\s|\$env:\w+\s*=", re.IG
 SEPARATOR_RE = re.compile(r"&&|\|\||[;|\n]")
 EDIT_TOOLS = {"Edit", "Write", "NotebookEdit", "MultiEdit"}
 SHELL_TOOLS = {"Bash", "PowerShell"}
-WARM = ["cargo", "build", "--profile", "cards", "-p", "cantrip-script", "--bin", "corpus"]
+WARM = ["cargo", "build", "--profile", "mutate", "-p", "cantrip-rules", "-p", "cantrip-mechanics"]
 GRANTED, REFUSED = 0, 2
 
 
@@ -221,8 +224,19 @@ class Pool:
 
     # --- git -----------------------------------------------------------------------------------------------------
 
+    def base(self, ref=None):
+        ref = ref or ("upstream/main" if "upstream" in git(self.root, "remote").splitlines() else "origin/main")
+        if ref.startswith("-") or ":" in ref or ".." in ref:
+            raise Refused("base-ref must name one commit or remote branch")
+        if "/" in ref and not ref.startswith("refs/"):
+            remote, branch = ref.split("/", 1)
+            if remote in git(self.root, "remote").splitlines():
+                git(self.root, "fetch", "--quiet", remote, branch)
+        sha = git(self.root, "rev-parse", "--verify", ref + "^{commit}")
+        return ref, sha
+
     def fetch(self):
-        git(self.root, "fetch", "--quiet", "origin")
+        self.base()
 
     def dirty(self, path):
         return [line for line in git(path, "status", "--porcelain").splitlines() if line.strip()]
@@ -251,19 +265,20 @@ class Pool:
             found.append(f"{len(lost)} unlanded commit(s): " + "; ".join(lost[:5]))
         return found
 
-    def reset(self, slot):
+    def reset(self, slot, base=None):
         path = self.path(slot)
-        git(path, "checkout", "--quiet", "-B", slot, "origin/main")
+        target = base or self.base()[1]
+        git(path, "checkout", "--quiet", "-B", slot, target)
 
     def _cargo_warm(self, path):
         print(f"Warming {path}: {' '.join(WARM)}", flush=True)
-        if subprocess.run(WARM, cwd=path).returncode != 0:
+        if subprocess.run(WARM, cwd=path, env=build_env(path)).returncode != 0:
             raise Refused(f"the warm build failed in {path}; the slot is not registered")
 
     # --- commands ------------------------------------------------------------------------------------------------
 
-    def create(self, count=1):
-        self.fetch()
+    def create(self, count=1, base_ref=None):
+        base_ref, base_sha = self.base(base_ref)
         made = []
         for _ in range(count):
             with self.locked() as state:
@@ -275,7 +290,7 @@ class Pool:
                 state["slots"][slot] = {"state": "creating", "note": ""}
             path = self.path(slot)
             try:
-                git(self.root, "worktree", "add", "--quiet", "-B", slot, path, "origin/main")
+                git(self.root, "worktree", "add", "--quiet", "-B", slot, path, base_sha)
                 self.warm(path)
             except Refused:
                 with self.locked() as state:
@@ -285,16 +300,32 @@ class Pool:
                 state["slots"][slot] = {"state": "free", "note": ""}
                 self.log(state, "create", slot=slot)
             made.append(slot)
-        return "\n".join(f"Created {s}: free, warm, on origin/main." for s in made)
+        return "\n".join(f"Created {s}: free, warm, on {base_ref} at {base_sha}." for s in made)
 
-    def acquire(self, purpose, name=None):
+    def acquire(self, purpose, name=None, base_ref=None, queue=None):
         if not self.hooks_ready():
             raise Refused("the pool's hooks are not installed on this machine, so its agents cannot join a worktree "
                           "and nothing keeps them out of one. Managing worktrees through the pool is opt-in: the "
                           "`worktree-pool-setup` skill (`tools\\worktree.cmd hooks install`, then a restart) sets "
                           "it up.")
-        self.fetch()
+        if queue:
+            if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,40}", queue) or ".." in queue:
+                raise Refused("invalid queue name")
+            with open(os.path.join(self.common, "card-lane", queue, "queue.json"), encoding="utf-8") as source:
+                run = json.load(source)
+            if "validation" not in purpose.lower() and not any(c["status"] == "pending" for c in run["cards"]):
+                raise Refused("queue has no pending cards; allocate no implementors")
+            pinned = run["run"]["base_sha"]
+            if base_ref and self.base(base_ref)[1] != pinned:
+                raise Refused("base-ref differs from the queue's pinned base")
+            base_ref = pinned
+        base_ref, base_sha = self.base(base_ref)
         with self.locked() as state:
+            if queue and "validation" not in purpose.lower():
+                active = sum(lease.get("queue") == queue and "validation" not in lease["purpose"].lower()
+                             for lease in state["leases"].values())
+                if active >= run["run"]["concurrency"]:
+                    raise Refused("the queue's requested implementor concurrency is already leased")
             skipped = []
             for slot in sorted(state["slots"], key=slot_number):
                 if state["slots"][slot]["state"] != "free":
@@ -302,7 +333,7 @@ class Pool:
                 found = self.problems(slot)
                 if not found:
                     try:
-                        self.reset(slot)
+                        self.reset(slot, base_sha)
                     except Refused as e:
                         found = [str(e)]
                 if found:
@@ -313,7 +344,7 @@ class Pool:
                 lease_id = "L-" + secrets.token_urlsafe(12)
                 state["slots"][slot] = {"state": "leased", "note": ""}
                 state["leases"][lease_id] = {"slot": slot, "purpose": purpose, "name": name or "",
-                                             "acquired": self.stamp()}
+                                             "acquired": self.stamp(), "base_ref": base_ref, "base_sha": base_sha, "queue": queue}
                 self.log(state, "acquire", slot=slot, lease=lease_id, purpose=purpose)
                 return holder_brief(lease_id, slot, self.path(slot), purpose)
             table = self.pool_table(state)
@@ -876,9 +907,12 @@ def main():
     p = sub.add_parser("create", help="add warm slots to the pool")
     p.add_argument("--count", type=int, default=1)
     p.add_argument("--no-warm", action="store_true", help="skip the warm build")
+    p.add_argument("--base-ref", help="canonical remote branch or pinned commit")
     p = sub.add_parser("acquire", help="take a clean slot for new work")
     p.add_argument("--for", dest="purpose", required=True, help="what the work is, e.g. \"card: Lightning Bolt\"")
     p.add_argument("--name", help="who holds it, for people reading status")
+    p.add_argument("--base-ref", help="canonical remote branch or pinned commit")
+    p.add_argument("--queue", help="use this card-lane run's pinned base; refuse an empty queue")
     p = sub.add_parser("token", help="a single-use token that lets one subagent join a lease's slot")
     p.add_argument("lease_id")
     p.add_argument("--read-only", action="store_true")
@@ -934,8 +968,8 @@ def main():
     pool = Pool(warm=(lambda path: None) if getattr(args, "no_warm", False) else None)
     try:
         out = {
-            "create": lambda: pool.create(args.count),
-            "acquire": lambda: pool.acquire(args.purpose, args.name),
+            "create": lambda: pool.create(args.count, args.base_ref),
+            "acquire": lambda: pool.acquire(args.purpose, args.name, args.base_ref, args.queue),
             "token": lambda: pool.token(args.lease_id, args.read_only, args.name),
             "join": lambda: pool.join(args.token, args.agent_id),
             "leave": lambda: pool.leave(args.member_id),

@@ -104,7 +104,10 @@ else
   # the workspace's directory so its rust-toolchain.toml chooses the toolchain. A --filter names dotnet tests, so it
   # leaves these out.
   if [ "$RESULT" = 0 ] && [ -z "$FILTERED" ]; then
+    export CANTRIP_CORPUS_RUN_ID="$$-$RANDOM-$RANDOM"
+    export CANTRIP_CORPUS_REPORT="${CANTRIP_CORPUS_REPORT:-$ROOT/target/test-results/corpus-$CANTRIP_CORPUS_RUN_ID.json}"
     (cd "$ROOT" && CANTRIP_VERIFY=1 cargo test --profile checked --workspace --quiet) || RESULT=1
+    python3 "$ROOT/tools/maintenance/corpus-report.py" "$CANTRIP_CORPUS_REPORT" --run-id "$CANTRIP_CORPUS_RUN_ID" || RESULT=1
   fi
 fi
 

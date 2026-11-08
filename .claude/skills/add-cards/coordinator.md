@@ -1,7 +1,9 @@
 # Many cards: the coordinator and its agents
 
-The coordinator dispatches, lands and keeps the queue; it does not implement cards itself. Card agents run on Sonnet;
-core-feature agents and review agents run on Opus. Agents read only what their work needs: a card agent `SKILL.md`
+The coordinator dispatches, delivers and keeps the queue; it does not implement cards itself. Use the user's chosen
+provider/models and delivery mode for every role; otherwise inherit the current model. For card-lane runs, follow
+the provider-neutral `.agents/skills/card-lane/SKILL.md`: canonical queue first, pinned-base acquire, fast checks,
+durable finish/ready and feature-branch PR delivery. Agents read only what their work needs: a card agent `SKILL.md`
 (and the `write-game-script` skill), a reviewer `review.md` and the parts of `SKILL.md` it names, a core-feature agent
 `SKILL.md`'s "Where code goes" and the rule it builds.
 
@@ -12,7 +14,7 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    machine (its hooks in the local settings): when `acquire` says they are not installed, stop and offer the user the
    `worktree-pool-setup` skill.
    - **New work is a new lease**: `worktree.cmd acquire --for "card: <Name>"` (or `"gap: <rule>"`, `"PR #N"`) gives a
-     clean slot on today's `origin/main`, its path and a lease ID that stay with you - never in a prompt or a message.
+     clean slot on the selected canonical base (`--queue Q` pins it), its path and lease ID stay with you.
      `NO WORKTREE AVAILABLE` means wait for a release; growing the pool (`create`) is the user's call. A lease is
      never reused for the next card.
    - **Every agent in the slot is let in by a token**: `worktree.cmd token <lease>` (a reviewer's too: it breaks the card in place and restores it, `review.md`) -
@@ -33,11 +35,11 @@ core-feature agents and review agents run on Opus. Agents read only what their w
      implementor runs `next --id <worker>` in its joined slot, and the claim is atomic, so no two take the same card;
      the same id gets its open card back, and each packet is written in that implementor's worktree. `check` runs the
      card's scope, Oracle, scenario, corpus, lint, citation and report gates (`--fast` skips coverage and mutation),
-     and `commit` runs every gate, writes the `Engine:`/`Mechanics:`/`Client:` commits and one `Card:` commit, then
-     closes the claim; `done`, `block` and `release` close one by hand. The lane's `card-lane/<queue>` branch is
+     and `finish` runs or safely reuses author gates, commits and freezes a durable review handoff before leaving.
+     `ready` lists handoffs whose author member has left. The lane's `card-lane/<queue>` branch is
      shared, so a `Mechanics:` or `Engine:` commit made by one agent is merged into the next agent's `next`; it starts
-     at `origin/main`, so while the lane itself is being tested, run its script from the lane checkout against a
-     queue worktree based on `origin/main` and keep the lane's own commits off the shared branch. The lane
+     at the manifest's canonical SHA. Run the unmerged lane script from its checkout against a
+     queue worktree at that SHA and keep the lane's own commits off the shared branch. The lane
      is dispatch and the mechanical gate, not the claim or the review: the card's GitHub issue is still claimed first
      (`claims.md`), and `review.md` is still the verdict. The command model is
      `.claude/skills/card-lane/SKILL.md`. A fresh lane implementor gets

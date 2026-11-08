@@ -6,13 +6,15 @@
     python tools/maintenance/card-lane.py status [--queue NAME] [--id WORKER]
     python tools/maintenance/card-lane.py check  [--queue NAME] [--id WORKER | --card NAME] [--fast]
     python tools/maintenance/card-lane.py commit --id WORKER [--queue NAME] [--issue N] [--note TEXT]
+    python tools/maintenance/card-lane.py finish --id WORKER [--queue NAME] [--issue N]
+    python tools/maintenance/card-lane.py ready  [--queue NAME]
     python tools/maintenance/card-lane.py done   --id WORKER [--queue NAME] [--commit SHA | --no-commit] [--note TEXT]
     python tools/maintenance/card-lane.py block  --id WORKER --rule CR [--queue NAME] [--note TEXT]
     python tools/maintenance/card-lane.py release --id WORKER --reason TEXT [--queue NAME]
     python tools/maintenance/card-lane.py abandon --id WORKER --reason TEXT [--queue NAME]
     python tools/maintenance/card-lane.py share  --id WORKER [--queue NAME]
 
-The lane is dispatch, not implementation: a worker still follows `.claude/skills/add-cards/SKILL.md` for the card.
+The lane dispatches work; a worker still follows `.agents/skills/add-cards/SKILL.md` for the card.
 It moves the lane's queue and packets into the Cantrip checkout's own worktree pool, so several implementors work in
 parallel without taking the same card:
 
@@ -38,15 +40,15 @@ There is no agent loop, no driver and no generated track: a worker (or its coord
 
 The card's quality gates are the lane's too, adapted from the add-cards flow and run where the worker can see them:
 
-- **`check`** runs the claim and packet check, the path scope (the card's content, its Rust file, its scenarios, a
-  shared mechanic, a client change, or the core only for a card opened `--engine`), Scryfall's current Oracle text,
-  the scenario shape (no TODO or known bug, an `[Expect]`, the cost paid exactly), `corpus --card`, `card-lint` and
-  `card-dupes` (each LOOK answered in `report.json`), `cr.py check --show`, and the report (every printed line, each
-  test point with its scenario line, each ruling). A full check adds `card-coverage` and `card-mutate`; `--fast`
-  skips only those two while the card is being written.
-- **`commit`** runs every gate, then writes the `Engine:`, `Mechanics:` and `Client:` commits the change needs, each
+- **`check`** runs cheap scope/report/Oracle/scenario/lint/citation checks before the checked small-registry corpus.
+  A full check adds coverage and mutation; `--fast` skips only those two. It stops on the first failing gate.
+- **`commit`** runs author gates or reuses a recent full receipt matching actual inputs, then writes the `Engine:`, `Mechanics:` and `Client:` commits the change needs, each
   with only its own paths, and exactly one `Card: <Name>` commit ending `Closes #N`; no commit carries
   `Co-Authored-By`. It closes the claim (`done`) and shares the branch. Nothing is committed if the gate refuses.
+- **`finish`** commits, freezes evidence, records a durable review handoff and leaves author membership. `ready`
+  recovers these handoffs independently of final chat delivery. PR delivery uses feature branches.
+- **`queue`** inventories the canonical Git tree and defers missing cards covered by cached open upstream PRs.
+  `--refresh-prs` refreshes membership immediately; unchanged PR heads reuse their file inventories.
 """
 
 import argparse
@@ -59,6 +61,8 @@ import shutil
 import subprocess
 import sys
 import time
+import threading
+import types
 import unicodedata
 
 sys.dont_write_bytecode = True
@@ -66,6 +70,23 @@ sys.dont_write_bytecode = True
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import worktrees  # noqa: E402  the pool's state is read through its own model, never by editing its file
+import card_lane_runtime as runtime
+import card_lane_prs as upstream_prs
+
+PROGRESS = None
+
+
+def api():
+    return types.SimpleNamespace(**globals())
+
+
+def tool_dir():
+    """Companion tools follow the lane version, even before it is merged into the card worktree's base."""
+    return os.environ.get("CANTRIP_LANE_TOOLS_DIR", HERE)
+
+
+def card_tool(filename):
+    return os.path.join(tool_dir(), filename)
 
 PACKETS = ".card-lane"
 DEFAULT_QUEUE = "default"
@@ -87,8 +108,39 @@ class Failed(Exception):
 # ---- running --------------------------------------------------------------------------------------------------------
 
 def run(args, cwd, check=False, env=None):
-    result = subprocess.run(args, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace",
-                            env=env)
+    if PROGRESS is None:
+        result = subprocess.run(args, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
+    else:
+        process = subprocess.Popen(args, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   text=True, encoding="utf-8", errors="replace", env=env)
+        output, errors = [], []
+        PROGRESS["data"].update(child_pid=process.pid, command=[str(a) for a in args], last_progress=now())
+        write_json(PROGRESS["path"], PROGRESS["data"])
+        def drain(stream, captured):
+            for line in stream:
+                captured.append(line)
+                print(line.rstrip(), file=sys.stderr, flush=True)
+        readers = [threading.Thread(target=drain, args=(process.stdout, output)),
+                   threading.Thread(target=drain, args=(process.stderr, errors))]
+        for reader in readers:
+            reader.start()
+        try:
+            while process.poll() is None:
+                PROGRESS["data"]["last_progress"] = now()
+                write_json(PROGRESS["path"], PROGRESS["data"])
+                time.sleep(0.5)
+        except BaseException:
+            process.terminate()
+            process.wait()
+            raise
+        finally:
+            for reader in readers:
+                reader.join()
+            process.stdout.close()
+            process.stderr.close()
+        result = subprocess.CompletedProcess(args, process.returncode, "".join(output), "".join(errors))
+        PROGRESS["data"].update(returncode=result.returncode, child_pid=None, last_progress=now())
+        write_json(PROGRESS["path"], PROGRESS["data"])
     if check and result.returncode != 0:
         raise Failed(f"{' '.join(str(a) for a in args)} failed in {cwd}:\n{(result.stderr or result.stdout).strip()}")
     return result
@@ -188,6 +240,8 @@ class Store:
         self.lock_path = os.path.join(self.dir, "queue.lock")
         self.branch = f"card-lane/{self.name}"
         os.makedirs(self.dir, exist_ok=True)
+        if os.path.isfile(self.path):
+            self.branch = self.read().get("branch", self.branch)
 
     def read(self):
         for attempt in range(20):
@@ -396,9 +450,10 @@ def ancestor(root, older, newer):
 
 def main_tip(root, refresh=False):
     """Remote main, the only base a queue branch is cut from."""
+    ref = runtime.default_base(api(), root)
     if refresh:
-        git(root, "fetch", "--quiet", "origin", "main", check=False)
-    tip = ref_tip(root, MAIN)
+        return runtime.fetch_base(api(), root, ref)
+    tip = ref_tip(root, ref)
     if not tip:
         raise Refused(f"no {MAIN}: a queue branch starts at remote main; fetch it first (`git fetch origin main`)")
     return tip
@@ -413,7 +468,7 @@ def queue_branch_problem(root, store):
     tip = branch_tip(root, store.branch)
     if not tip:
         return None
-    main = main_tip(root)
+    main = store.read().get("run", {}).get("base_sha") or main_tip(root)
     if tip == main:
         return None
     changed = git(root, "diff", "--name-only", f"{main}..{tip}", check=False).stdout.splitlines()
@@ -434,7 +489,7 @@ def ensure_branch(root, store):
             raise Refused(f"{store.branch} was cut from a checkout carrying the lane's own work ({lane}); a queue "
                           f"branch starts at {MAIN}. Recreate it from {MAIN} before queueing cards.")
         return tip
-    base = main_tip(root, refresh=True)
+    base = store.read().get("run", {}).get("base_sha") or main_tip(root, refresh=True)
     git(root, "branch", store.branch, base, check=False)  # another first worker may have won the race
     tip = branch_tip(root, store.branch) or base
     lane = queue_branch_problem(root, store)
@@ -688,13 +743,13 @@ def write_brief(root, store, card, claim, reference, packet):
         "",
         "The card is exact to its Oracle text and the Comprehensive Rules, every line of its code is executed by its",
         f"scenarios and passes, and it is committed as `Card: {card['name']}`, ending `Closes #N` for its issue.",
-        "`commit` is the gated path: it runs every check, writes the `Engine:`, `Mechanics:` and `Client:` commits the",
-        "change needs (each with only its own paths), then exactly one `Card:` commit, and closes the claim.",
+        "`finish` is the gated path: it runs or safely reuses every author check, writes categorized commits,",
+        "then exactly one Card commit, freezes the review handoff and leaves membership. Stop after finish.",
         "",
         f"    python tools/maintenance/card-lane.py check --id {claim['id']} --queue {store.name} --fast",
-        f"    python tools/maintenance/card-lane.py commit --id {claim['id']} --queue {store.name}",
+        f"    python tools/maintenance/card-lane.py finish --id {claim['id']} --queue {store.name}",
         "",
-        "`check --fast` skips only coverage and mutation while the card is being written; `commit` runs both. A failed",
+        "`check --fast` skips only coverage and mutation while the card is being written; `finish` requires both. A failed",
         "check names the gate and nothing is committed.",
         "",
         (f"The issue is #{claim['issue']}; the Card commit ends `Closes #{claim['issue']}`." if claim.get("issue")
@@ -739,22 +794,28 @@ def write_brief(root, store, card, claim, reference, packet):
     if claim.get("slot"):
         lines += ["", "## Leaving the slot",
                   "",
-                  "Commit everything first; the slot is reset when its lease is released. Your last command is `leave`",
-                  "with the MEMBER id `join` printed: `tools\\worktree.cmd leave <MEMBER>`. Do not `git push`, and do not",
-                  "release the lease - that is the coordinator's."]
+                  "Your last command is finish. It saves the handoff before leaving membership; do not edit afterward.",
+                  "Do not git push or release the lease; the coordinator retains it for independent review."]
     else:
         lines += ["", "## Solo",
                   "",
                   "This worktree is not a pool slot, so there is no member to leave. Commit the card on this branch;",
                   "`commit` (or `done`) shares it to the queue's branch."]
-    return "\n".join(lines).rstrip() + "\n"
+    lines.insert(5, f"Run manifest: `{os.path.join(store.dir, 'queue.json')}`; delivery and models come from it.")
+    lines.insert(6, f"Canonical lane skill: `{os.path.abspath(os.path.join(HERE, '../../.agents/skills/card-lane/SKILL.md'))}`")
+    brief = "\n".join(lines).rstrip() + "\n"
+    brief = brief.replace("tools/maintenance/card-lane.py", '"' + os.path.join(HERE, "card-lane.py") + '"')
+    repo = store.read().get("run", {}).get("repo")
+    if repo:
+        brief = brief.replace("tools/maintenance/card-issues.py", f"tools/maintenance/card-issues.py --repo {repo}")
+    return brief
 
 
 def build_packet(root, store, card, claim):
     """Everything the worker starts from, in the implementor's own worktree. Regenerable, never committed."""
     packet = packet_dir(root, store, card["name"])
     os.makedirs(packet, exist_ok=True)
-    tool = os.path.join(root, "tools", "maintenance", "new-card.py")
+    tool = card_tool("new-card.py")
     if os.path.isfile(tool):
         result = run([sys.executable, tool, card["name"]], root)
         reference = (result.stdout or "")
@@ -838,9 +899,14 @@ def read_json(path):
 
 
 def write_json(path, data):
-    with open(path, "w", encoding="utf-8", newline="\n") as f:
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    temp = f"{path}.{os.getpid()}.tmp"
+    with open(temp, "w", encoding="utf-8", newline="\n") as f:
         json.dump(data, f, indent=1, ensure_ascii=False)
         f.write("\n")
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(temp, path)
 
 
 def changed_paths(root):
@@ -1077,15 +1143,15 @@ def gate_scope(root, card, claim, reference):
 
 
 def gate_oracle(root, card):
-    tool = os.path.join(root, "tools", "maintenance", "new-card.py")
+    tool = card_tool("new-card.py")
     if not os.path.isfile(tool):
         raise GateFailed(f"new-card.py is missing at {clean_relative(root, tool)}")
-    result = run([sys.executable, tool, card["name"], "--no-write"], root)
+    result = run([sys.executable, tool, card["name"], "--oracle-only"], root)
     out = (result.stdout or "") + ("\n" + result.stderr if result.stderr.strip() else "")
     if "DIFFERS from Scryfall" in out or "no face of that name on Scryfall" in out:
         raise GateFailed("the content's Oracle text is not Scryfall's current text", out)
     if "not found on Scryfall (or Scryfall unreachable)" in out:
-        return "Scryfall unreachable: the Oracle text was checked by hand", out
+        return "Scryfall unreachable: manual Oracle verification is required", out
     if result.returncode != 0 or "Oracle text matches Scryfall's" not in out:
         raise GateFailed("new-card.py did not confirm the Oracle text", out)
     return "Oracle text matches Scryfall's", out
@@ -1131,8 +1197,7 @@ def gate_scenarios(root, card, content, reference):
 
 
 def gate_corpus(root, card, changed):
-    command = ["cargo", "run", "--profile", "cards", "-p", "cantrip-script", "--bin", "corpus",
-               "--", "--card", card["name"], "--brief"]
+    command = [sys.executable, card_tool("card-mutate.py"), card["name"], "--check"]
     print(f"corpus: running {card['name']}'s scenarios ...", file=sys.stderr, flush=True)
     result = run(command, root, env=dict(os.environ, CANTRIP_VERIFY="1"))
     out = (result.stdout or "") + ("\n" + result.stderr if result.stderr.strip() else "")
@@ -1155,7 +1220,7 @@ def gate_corpus(root, card, changed):
 
 def gate_lint(root, card):
     lint = os.path.join(root, "tools", "maintenance", "card-lint.py")
-    dupes = os.path.join(root, "tools", "maintenance", "card-dupes.py")
+    dupes = card_tool("card-dupes.py")
     if not os.path.isfile(lint) or not os.path.isfile(dupes):
         raise GateFailed("card-lint.py or card-dupes.py is missing")
     linted = run([sys.executable, lint, card["name"]], root)
@@ -1203,7 +1268,7 @@ def gate_citations(root, card, reference):
 
 
 def gate_coverage(root, card):
-    tool = os.path.join(root, "tools", "maintenance", "card-coverage.py")
+    tool = card_tool("card-coverage.py")
     if not os.path.isfile(tool):
         raise GateFailed("card-coverage.py is missing")
     print(f"coverage: running card-coverage.py for {card['name']} ...", file=sys.stderr, flush=True)
@@ -1228,7 +1293,7 @@ def equivalent_excuse(report, survivor):
 
 
 def gate_mutation(root, card, report):
-    tool = os.path.join(root, "tools", "maintenance", "card-mutate.py")
+    tool = card_tool("card-mutate.py")
     if not os.path.isfile(tool):
         raise GateFailed("card-mutate.py is missing")
     print(f"mutation: running card-mutate.py for {card['name']} ...", file=sys.stderr, flush=True)
@@ -1320,11 +1385,26 @@ def gate_report(root, card, content, reference, report, looks, survivors, issue=
 
 
 def check_card(root, store, card, claim, reference, fast=False):
-    """Every gate, in order; fast skips only the two that rebuild and mutate the card."""
+    """Cheap failures first, live evidence per gate, then focused execution and proof."""
+    global PROGRESS
     gates = []
     changed = [entry["path"] for entry in changed_paths(root)]
+    source_before = runtime.fingerprint(api(), root, store, card)
+    packet = packet_dir(root, store, card["name"])
+    live = {"schema": runtime.SCHEMA, "card": card["name"], "pid": os.getpid(),
+            "started": now(), "state": "running", "gates": gates}
 
     def add(name, function):
+        global PROGRESS
+        if any(gate["status"] == "fail" for gate in gates):
+            gates.append({"name": name, "status": "skip", "summary": "earlier gate failed", "facts": {}, "detail": ""})
+            return gates[-1]
+        started = time.monotonic()
+        started_at = now()
+        live.update(phase=name, last_progress=now())
+        PROGRESS = {"path": os.path.join(packet, "check-live.json"), "data": live}
+        write_json(PROGRESS["path"], live)
+        print(f"gate {name}: started", file=sys.stderr, flush=True)
         try:
             summary, facts = function()
             status = "pass"
@@ -1332,6 +1412,8 @@ def check_card(root, store, card, claim, reference, fast=False):
             status, summary, facts = "fail", str(error), {"detail": error.detail}
         except Exception as error:  # a broken tool is a failed gate, never a pass
             status, summary, facts = "fail", f"{type(error).__name__}: {error}", {"detail": ""}
+        finally:
+            PROGRESS = None
         if status == "pass" and summary.startswith("Scryfall unreachable"):
             status = "warn"
         if isinstance(facts, dict):
@@ -1342,51 +1424,51 @@ def check_card(root, store, card, claim, reference, fast=False):
         else:
             detail, kept = "", {}
         gates.append({"name": name, "status": status, "summary": summary,
-                      "detail": detail[:20000], "facts": kept})
+                      "detail": detail[:20000], "facts": kept, "started": started_at,
+                      "ended": now(), "seconds": round(time.monotonic() - started, 3)})
+        write_json(os.path.join(packet, "check-live.json"), live)
+        print(f"gate {name}: {status} ({gates[-1]['seconds']}s)", file=sys.stderr, flush=True)
         return gates[-1]
+
+    def load_report():
+        try:
+            report = read_json(report_file(root, store, card["name"]))
+        except (OSError, ValueError) as error:
+            raise GateFailed(f"{REPORT} is missing or invalid JSON", str(error))
+        return gate_report(root, card, content, reference, report, [], [], (claim or {}).get("issue"))
 
     add("scope", lambda: gate_scope(root, card, claim, reference))
     content = content_from(reference, root)
+    add("report-shape", load_report)
     add("oracle", lambda: gate_oracle(root, card))
     add("scenarios", lambda: gate_scenarios(root, card, content, reference))
-    add("corpus", lambda: gate_corpus(root, card, changed))
     linted = add("lint", lambda: gate_lint(root, card))
     add("citations", lambda: gate_citations(root, card, reference))
-    if fast:
-        gates.append({"name": "coverage", "status": "skip", "summary": "--fast", "detail": "", "facts": {}})
-    else:
-        add("coverage", lambda: gate_coverage(root, card))
-    if fast:
-        gates.append({"name": "mutation", "status": "skip", "summary": "--fast", "detail": "", "facts": {}})
-        mutation = {"facts": {}}
-    else:
-        report_data = {}
-        if os.path.isfile(report_file(root, store, card["name"])):
-            try:
-                report_data = read_json(report_file(root, store, card["name"]))
-            except json.JSONDecodeError:
-                report_data = {}
-        mutation = add("mutation", lambda: gate_mutation(root, card, report_data))
-    report = None
     try:
         report = read_json(report_file(root, store, card["name"]))
-    except FileNotFoundError:
-        gates.append({"name": "report", "status": "fail", "summary": f"{REPORT} is missing: fill it in",
-                      "detail": "", "facts": {}})
-    except json.JSONDecodeError as error:
-        gates.append({"name": "report", "status": "fail", "summary": f"{REPORT} is not JSON: {error}",
-                      "detail": "", "facts": {}})
-    if report is not None:
-        looks = (linted.get("facts") or {}).get("looks") or []
-        survivors = (mutation.get("facts") or {}).get("survivors") or []
-        add("report", lambda: gate_report(root, card, content, reference, report, looks, survivors,
-                                          (claim or {}).get("issue")))
+    except (OSError, ValueError):
+        report = None
+    looks = linted.get("facts", {}).get("looks", [])
+    add("report", lambda: gate_report(root, card, content, reference, report, looks, [], (claim or {}).get("issue")))
+    add("corpus", lambda: gate_corpus(root, card, changed))
+    for name, function in (("coverage", lambda: gate_coverage(root, card)),
+                           ("mutation", lambda: gate_mutation(root, card, report))):
+        if fast:
+            gates.append({"name": name, "status": "skip", "summary": "--fast", "detail": "", "facts": {}})
+        else:
+            add(name, function)
+    if source_before != runtime.fingerprint(api(), root, store, card):
+        gates.append({"name": "restoration", "status": "fail", "summary": "source or evidence changed during gates",
+                      "facts": {}, "detail": "Restore the original inputs and check again."})
+    live.update(state="completed", ended=now(), phase=None)
+    write_json(os.path.join(packet, "check-live.json"), live)
     return gates
 
 
 def save_check(root, store, card, gates, fast):
     passed = all(gate["status"] != "fail" for gate in gates)
     data = {"queue": store.name, "card": card["name"], "head": head_sha(root), "tree": tree_sha(root),
+            "schema": runtime.SCHEMA, "fingerprint": runtime.fingerprint(api(), root, store, card),
             "fast": bool(fast), "time": now(), "passed": passed, "gates": gates}
     write_json(check_file(root, store, card["name"]), data)
     return passed
@@ -1502,6 +1584,8 @@ def cmd_commit(args):
     pool_context(root)
     require_branch(root)
     state = store.read()
+    if state.get("run", {}).get("delivery", "pr") == "pr" and current_branch(root) in ("main", "master"):
+        raise Refused("PR delivery requires a feature branch; commit never lands on main")
     card = open_claim(state, wid)
     if card is None:
         raise Refused(f"{wid} has no open card in queue {store.name}")
@@ -1527,17 +1611,25 @@ def cmd_commit(args):
         issue = 0
     if issue <= 0:
         raise Refused("no issue number: pass --issue N or set report.json's issue (the Card commit ends Closes #N)")
-    gates = check_card(root, store, card, claim, reference, fast=False)
+    # Scope and current Oracle data remain cheap commit-time checks even when proof is reused.
+    gate_scope(root, card, claim, reference)
+    gates = runtime.reusable(api(), root, store, card)
+    if gates is not None:
+        gate_oracle(root, card)
+        print("reusing unchanged full author gates")
+    else:
+        gates = check_card(root, store, card, claim, reference, fast=False)
     passed = save_check(root, store, card, gates, False)
     print_gates(card, root, gates, False)
     if not passed:
         raise Refused("the check failed; nothing was committed")
+    proof = runtime.evidence(api(), root, store, card)
     made = plan_commits(root, store, card, claim, reference, issue)
     print(f"{card['name']}: committed")
     for commit in made:
         print(f"  {commit['sha']} {commit['message']}  ({len(commit['paths'])} path(s))")
     close_args = argparse.Namespace(id=wid, queue=store.name, commit=made[-1]["sha"], no_commit=False,
-                                    note=args.note or "")
+                                    note=args.note or "", gated=True, issue=issue, evidence=proof)
     return close(close_args, "done")
 
 
@@ -1545,16 +1637,24 @@ def cmd_commit(args):
 
 def cmd_queue(args):
     root = worktree_root()
-    names = requested_names(args, root)
-    if getattr(args, "backlog", False) and not names:
-        print(f"backlog: every card on {backlog_scope(args)} has a card file; nothing to queue")
-        return 0
     store = Store(common_dir(root), args.queue)
-    implemented = implemented_names(root)
+    if getattr(args, "branch", None):
+        if args.branch in ("main", "master") or args.branch.startswith("-") or git(root, "check-ref-format", "--branch", args.branch, check=False).returncode:
+            raise Refused("branch must name a feature branch")
+        if store.read().get("run") and store.branch != args.branch:
+            raise Refused("a run's branch is immutable; use a new queue")
+        store.branch = args.branch
+    run_manifest = runtime.manifest(api(), root, store, args)
+    names = runtime.source_names(api(), root, args, run_manifest["inventory_sha"])
+    implemented = runtime.names_at(api(), root, run_manifest["inventory_sha"])
+    pr_work, pr_check = upstream_prs.inventory(api(), root, run_manifest["repo"], getattr(args, "refresh_prs", False))
+    with store.locked() as state:
+        state.update(run=run_manifest, branch=store.branch, upstream_pr_check=pr_check)
+        state.setdefault("sources", []).append({"time": now(), "names": names, "base_sha": run_manifest["inventory_sha"]})
+        runtime.reconcile(api(), state, implemented, run_manifest["inventory_sha"])
     with store.locked() as state:
         if not state["cards"]:
             state["created"] = now()
-        ensure_branch(root, store)
         added, present, skipped = [], [], []
         for name in names:
             card = card_of(state, name)
@@ -1568,15 +1668,27 @@ def cmd_queue(args):
             state["cards"].append({"name": name, "status": "pending", "listed": True, "attempts": 0,
                                    "claim": None, "commit": None, "finished": None})
             added.append(name)
+        upstream_prs.reconcile(api(), state, pr_work)
         store.log(state, "queue", added=len(added), present=len(present), skipped_implemented=len(skipped))
         total = len(state["cards"])
         counts = {kind: sum(1 for card in state["cards"] if card["status"] == kind)
-                  for kind in ("pending", "working", "done", "blocked", "abandoned")}
+                  for kind in ("pending", "deferred-pr", "working", "done", "blocked", "abandoned")}
+        deferred = [(c["name"], c["upstream_prs"]) for c in state["cards"] if c["status"] == "deferred-pr"]
+    if counts["pending"]:
+        ensure_branch(root, store)
     print(f"queue {store.name} ({store.path})")
+    print(f"  canonical base: {run_manifest['base_ref']} at {run_manifest['base_sha']}; inventory {run_manifest['inventory_sha']}")
+    print(f"  upstream PR check: {pr_check['state']}" + (f" ({pr_check['open_prs']} open)" if "open_prs" in pr_check else ""))
+    if pr_check.get("warning"):
+        print(f"  WARNING: upstream PR refresh failed; no PR deferrals were applied: {pr_check['warning']}", file=sys.stderr)
     if getattr(args, "backlog", False):
-        print(f"  backlog: {len(names)} missing card(s) from missing-cards.py on {backlog_scope(args)}")
+        print(f"  backlog: {len(added)} missing card(s) on {backlog_scope(args)}")
+        if not added:
+            print("  nothing to queue")
     print(f"  {total} card(s): " + ", ".join(f"{n} {kind}" for kind, n in counts.items()))
     print(f"  added {len(added)}, already queued {len(present)}, already implemented {len(skipped)}")
+    for name, links in deferred[:12]:
+        print(f"  deferred-pr: {name}: " + ", ".join(link["url"] for link in links))
     for label, values in (("added", added), ("implemented, skipped", skipped)):
         for name in values[:12]:
             print(f"  {label}: {name}")
@@ -1609,6 +1721,10 @@ def cmd_next(args):
                       f"while the lane is not on main.")
     fresh, opened, card, claim, packet, brief = False, False, None, None, None, None
     with store.locked() as state:
+        run_manifest = state.get("run", {})
+        latest = ref_tip(root, run_manifest.get("base_ref", MAIN)) or run_manifest.get("base_sha")
+        if latest:
+            runtime.reconcile(api(), state, runtime.names_at(api(), root, latest), latest)
         card = open_claim(state, wid)
         if card:
             claim = card["claim"]
@@ -1650,7 +1766,7 @@ def cmd_next(args):
                         commit=None, finished=None, failure=None)
             card["claim"] = {"id": wid, "worktree": root, "packet": packet_dir(root, store, card["name"]),
                              "slot": context["slot"], "lease": context["lease"], "member": context["member"],
-                             "agent": context["agent"], "head": head_sha(root), "engine": bool(getattr(args, "engine", False)),
+                             "agent": context["agent"], "head": head_sha(root), "engine": bool(getattr(args, "engine", False) or state.get("run", {}).get("engine")),
                              "issue": issue}
             store.log(state, "claim", id=wid, card=card["name"], worktree=root, slot=context["slot"],
                       lease=context["lease"], member=context["member"], engine=bool(getattr(args, "engine", False)))
@@ -1693,7 +1809,7 @@ def cmd_status(args):
     leases, members = pool_claims(common)
     tip = branch_tip(root, store.branch)
     counts = {kind: sum(1 for card in state["cards"] if card["status"] == kind)
-              for kind in ("working", "done", "blocked", "abandoned", "pending")}
+              for kind in ("working", "done", "blocked", "abandoned", "deferred-pr", "pending")}
     print(f"queue {store.name} ({store.path})")
     print(f"  {len(state['cards'])} card(s): " + ", ".join(f"{n} {kind}" for kind, n in counts.items() if n or kind != "pending"))
     if tip:
@@ -1725,6 +1841,9 @@ def cmd_status(args):
     blocked = [card for card in state["cards"] if card["status"] == "blocked"]
     for card in blocked:
         print(f"blocked: {card['name']}" + (f" (CR {card.get('rule')})" if card.get("rule") else ""))
+    for card in state["cards"]:
+        if card["status"] == "deferred-pr":
+            print(f"deferred-pr: {card['name']}: " + ", ".join(pr["url"] for pr in card["upstream_prs"]))
     pending = [card["name"] for card in state["cards"] if card["status"] == "pending"]
     if pending:
         print("pending: " + ", ".join(pending[:10]) + (f" (+{len(pending) - 10} more)" if len(pending) > 10 else ""))
@@ -1778,6 +1897,13 @@ def close(args, outcome):
         card["commit"] = commit
         card["finished"] = now()
         card["failure"] = None
+        if outcome == "done":
+            card["author"] = dict(claim)
+            card["author"]["issue"] = getattr(args, "issue", None) or claim.get("issue")
+            card["author_gated"] = bool(getattr(args, "gated", False))
+            card["author_evidence"] = getattr(args, "evidence", {})
+            if card["author_gated"]:
+                card["review"] = {"state": "awaiting-finish", "sha": head_sha(root)}
         if outcome == "block":
             card["rule"] = args.rule
         if outcome in ("block", "abandon", "release"):
@@ -1844,6 +1970,159 @@ def cmd_share(args):
     return 0
 
 
+def cmd_finish(args):
+    """Gated commit plus a durable handoff; safe to resume after a lost final response."""
+    root = worktree_root()
+    store = Store(common_dir(root), args.queue)
+    wid = worker_id(args.id)
+    if open_claim(store.read(), wid):
+        cmd_commit(args)
+    candidates = [c for c in store.read()["cards"] if c.get("status") == "done"
+                  and c.get("author", {}).get("id") == wid
+                  and norm(c["author"]["worktree"]) == norm(root)]
+    card = next((c for c in reversed(candidates) if c.get("author_gated")), None)
+    if not card:
+        raise Refused("finish needs a gated author commit in this worktree")
+    author = card["author"]
+    require_clean(root, "before handoff and leave")
+    if card.get("author_evidence") != runtime.evidence(api(), root, store, card):
+        raise Refused("the checked author evidence changed; recover its checked packet before handoff")
+    if head_sha(root) != card.get("review", {}).get("sha"):
+        raise Refused("the committed source changed after its author gates; review that change before handoff")
+    handoff = {"schema": runtime.SCHEMA, "queue": store.name, "card": card["name"],
+               "sha": head_sha(root), "card_commit": card["commit"], "tree": tree_sha(root),
+               "issue": author.get("issue"), "worktree": root, "lease": author.get("lease"),
+               "member": author.get("member"), "author": author.get("agent") or wid, "time": now(),
+               "run": store.read().get("run", {}), "delivery": {"state": "pending"}}
+    path = runtime.handoff_path(store, slug(card["name"]))
+    if os.path.isfile(path):
+        existing = read_json(path)
+        if existing.get("sha") != handoff["sha"]:
+            raise Refused("existing handoff names a different source")
+        handoff = existing
+    destination = os.path.join(store.dir, "handoffs", slug(card["name"]))
+    os.makedirs(destination, exist_ok=True)
+    for filename in ("reference.md", "prior-art.md", "report.json", "check.json", "content.json"):
+        source = os.path.join(packet_dir(root, store, card["name"]), filename)
+        if os.path.isfile(source):
+            shutil.copyfile(source, os.path.join(destination, filename))
+    handoff["packet"] = destination
+    write_json(path, handoff)  # durable before an external logging attempt or membership change
+    if handoff["delivery"]["state"] != "posted":
+        tool = os.path.join(root, "tools", "maintenance", "card-issues.py")
+        repo = handoff["run"].get("repo")
+        command = [sys.executable, tool] + (["--repo", repo] if repo else [])
+        command += ["log", str(handoff.get("issue") or 0), "committed", "--commit", handoff["card_commit"]]
+        try:
+            logged = run(command, root)
+            handoff["delivery"] = {"state": "posted" if logged.returncode == 0 else "retry", "detail": logged.stderr[-2000:]}
+        except OSError as error:
+            handoff["delivery"] = {"state": "retry", "detail": str(error)}
+        write_json(path, handoff)
+    with store.locked() as state:
+        recorded = card_of(state, card["name"])
+        recorded["review"] = {"state": "awaiting-review", "sha": handoff["sha"], "handoff": path, "time": now()}
+        store.log(state, "awaiting-review", card=card["name"], sha=handoff["sha"])
+    require_clean(root, "before leaving after handoff")
+    if author.get("member"):
+        pool = worktrees.Pool(root=os.path.dirname(common_dir(root)))
+        members = pool.read()["members"]
+        if author["member"] in members:
+            if members[author["member"]].get("lease") != author["lease"]:
+                raise Refused("membership no longer belongs to the author's lease")
+            print(pool.leave(author["member"]))
+    print(f"awaiting-review {card['name']} at {handoff['sha']}; handoff {path}")
+    return 0
+
+
+def cmd_ready(args):
+    root = worktree_root()
+    store = Store(common_dir(root), args.queue)
+    print(json.dumps(runtime.ready(api(), root, store), indent=1))
+    return 0
+
+
+def cmd_prompt(args):
+    root = worktree_root()
+    store = Store(common_dir(root), args.queue)
+    run_manifest = store.read().get("run")
+    if not run_manifest:
+        raise Refused("build the canonical run manifest before preparing a role prompt")
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", args.token):
+        raise Refused("token must be the single-use value printed by the pool")
+    tool = os.path.join(HERE, "card-lane.py")
+    pool_tool = os.path.join(HERE, "worktrees.py")
+    role = args.role
+    print(f"Model: {run_manifest['implementor_model' if role == 'implementor' else 'reviewer_model']}; role: {role}")
+    print(f'Your first command: python "{pool_tool}" join {args.token} --agent-id {args.agent_id}')
+    skill = os.path.abspath(os.path.join(HERE, "../../.agents/skills/card-lane/SKILL.md"))
+    print(f"Continue in the worktree join returns. Read {skill} and the relevant rules skills.")
+    print(f"Canonical base: {run_manifest['base_sha']}; issue repository: {run_manifest['repo']}; delivery: {run_manifest['delivery']}.")
+    if role == "implementor":
+        print(f'Run python "{tool}" next --queue {store.name} --id {worker_id(args.id)}.')
+        print(f'Use check --fast during edits; fill report.json; end with finish --queue {store.name} --id {args.id}, then stop.')
+        print(f"Engine scope: {run_manifest['engine']}. Do not push or release the lease.")
+    else:
+        card = card_of(store.read(), args.card or "")
+        if not card or card.get("review", {}).get("state") != "awaiting-review":
+            raise Refused("review prompt needs --card with a durable awaiting-review handoff")
+        handoff = read_json(runtime.handoff_path(store, slug(card["name"])))
+        print(f"Review {card['name']} at exact SHA {handoff['sha']}; frozen packet: {handoff['packet']}.")
+        print(f'Run python "{card_tool("card-mutate.py")}" "{card["name"]}" --check, then automatic mutations and --probes probes.json.')
+        print(f'Run python "{card_tool("card-coverage.py")}" "{card["name"]}" for coverage; restore baseline and leave MEMBER. No commits or release.')
+    return 0
+
+
+def cmd_prepare(args):
+    """Prepare fast card checks by default; full-suite artifacts only on a validation lease."""
+    root = worktree_root()
+    store = Store(common_dir(root), args.queue)
+    context = pool_context(root)
+    recorded = store.read().get("run", {})
+    base = recorded.get("base_sha")
+    if base and not ancestor(root, base, "HEAD"):
+        raise Refused("prepare must run on the pinned run base")
+    if args.full and context.get("slot") and "validation" not in context.get("purpose", "").lower():
+        raise Refused("full preparation needs a validation lease; author slots use focused fast checks")
+    commands = []
+    if args.full:
+        commands = [["cargo", "test", "--profile", "checked", "--workspace", "--no-run", "--timings"],
+                    ["cargo", "build", "--profile", "cards", "-p", "cantrip-host"],
+                    ["dotnet", "build", os.path.join(root, "dotnet", "Cantrip.sln"), "-v", "q", "--nologo"]]
+    else:
+        card = args.card or (open_claim(store.read(), args.id or "") or {}).get("name")
+        if not card:
+            raise Refused("fast prepare needs --card or an open --id")
+        commands = [[sys.executable, card_tool("card-mutate.py"), card, "--prepare"]]
+    results = []
+    for command in commands:
+        started = time.monotonic()
+        result = run(command, root, env=worktrees.build_env(root))
+        results.append({"command": command, "seconds": round(time.monotonic() - started, 3), "returncode": result.returncode})
+        if result.returncode:
+            break
+    write_json(os.path.join(root, PACKETS, store.name, "prepare.json"),
+               {"head": head_sha(root), "base": base, "full": args.full, "time": now(), "commands": results})
+    print(json.dumps(results, indent=1))
+    return 0 if all(r["returncode"] == 0 for r in results) else 1
+
+
+@contextlib.contextmanager
+def operation_lock(root):
+    path = os.path.join(root, PACKETS, "operation.lock")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    try:
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
+    except FileExistsError:
+        raise Refused(f"a lane operation is already active: {path}; verify its process ended before recovering the lock")
+    try:
+        os.write(fd, f"{os.getpid()} {now()}".encode())
+        os.close(fd)
+        yield
+    finally:
+        os.remove(path)
+
+
 # ---- the command line -----------------------------------------------------------------------------------------------
 
 def command_line(argv=None):
@@ -1856,6 +2135,15 @@ def command_line(argv=None):
 
     cmd = sub.add_parser("queue", help="make or extend the shared queue")
     queue_flag(cmd)
+    cmd.add_argument("--base-ref", help="canonical remote branch (defaults upstream/main, then origin/main)")
+    cmd.add_argument("--repo", help="canonical GitHub owner/repository for issue logging")
+    cmd.add_argument("--refresh-prs", action="store_true", help="refresh open upstream PR membership now (normally cached five minutes)")
+    cmd.add_argument("--branch", help="feature branch to publish for a PR (default card-lane/<queue>)")
+    cmd.add_argument("--delivery", choices=["pr", "main"], help="delivery mode; default pr")
+    cmd.add_argument("--implementor-model", help="model selected by the user; default inherit")
+    cmd.add_argument("--reviewer-model", help="model selected by the user; default inherit")
+    cmd.add_argument("--concurrency", type=int, help="requested maximum implementors")
+    cmd.add_argument("--engine", action="store_true", help="core changes authorized for this run")
     cmd.add_argument("--format", metavar="F", help="docs/formats/<F>.json, in its own order")
     cmd.add_argument("--file", metavar="PATH",
                      help="a card list, one name a line; with --backlog, the list missing-cards.py reads")
@@ -1894,6 +2182,33 @@ def command_line(argv=None):
     cmd.add_argument("--note", metavar="TEXT")
     cmd.set_defaults(handler=cmd_commit)
 
+    cmd = sub.add_parser("finish", help="gated commit, durable review handoff, issue log and leave membership")
+    queue_flag(cmd)
+    cmd.add_argument("--id", required=True)
+    cmd.add_argument("--issue", type=int)
+    cmd.add_argument("--note")
+    cmd.set_defaults(handler=cmd_finish)
+
+    cmd = sub.add_parser("ready", help="JSON review handoffs ready after author membership ended")
+    queue_flag(cmd)
+    cmd.set_defaults(handler=cmd_ready)
+
+    cmd = sub.add_parser("prompt", help="generate a role handoff from the pinned run manifest")
+    queue_flag(cmd)
+    cmd.add_argument("--id", required=True)
+    cmd.add_argument("--role", choices=["implementor", "reviewer"], required=True)
+    cmd.add_argument("--token", required=True)
+    cmd.add_argument("--agent-id", required=True, help="the launched agent identity used by pool membership")
+    cmd.add_argument("--card")
+    cmd.set_defaults(handler=cmd_prompt)
+
+    cmd = sub.add_parser("prepare", help="warm fast focused checks, or full validation artifacts")
+    queue_flag(cmd)
+    cmd.add_argument("--id")
+    cmd.add_argument("--card")
+    cmd.add_argument("--full", action="store_true", help="prepare required suite on a validation lease")
+    cmd.set_defaults(handler=cmd_prepare)
+
     cmd = sub.add_parser("done", help="close the claim without the gates (commit is the gated path)")
     queue_flag(cmd)
     cmd.add_argument("--id", required=True, metavar="WORKER")
@@ -1931,6 +2246,9 @@ def command_line(argv=None):
 def main(argv=None):
     args = command_line(argv).parse_args(argv)
     try:
+        if args.command in ("check", "commit", "finish", "prepare"):
+            with operation_lock(worktree_root()):
+                return args.handler(args)
         return args.handler(args)
     except Refused as error:
         print(f"REFUSED: {error}", file=sys.stderr)

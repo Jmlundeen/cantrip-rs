@@ -63,3 +63,4 @@ debug-assertions = true
 # its own under `target/`, so they never cost that profile a rebuild.
 [profile.mutate]
 inherits = "cards"
+debug-assertions = true

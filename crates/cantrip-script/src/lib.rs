@@ -1,9 +1,11 @@
 //! The `.cantrip` scenario runner against the engine (docs/engine-design.md, "Scenarios"): the scenario corpus in
 //! `scenarios/` is the engine's acceptance test.
 
+pub mod corpus_report;
 pub mod dump;
 pub mod parse;
 pub mod run;
+pub mod selection;
 
 pub use parse::GameScript;
 pub use parse::Expectation;

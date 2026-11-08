@@ -46,13 +46,18 @@ checked for sufficiency, not exhaustiveness:
   it offers is clickable with its cost, and a browser scenario proves each new user interaction (`client.md`) - or the
   card needs nothing the client did not already do, and no browser scenario is owed. The tactical bot is never checked.
 
-A reviewer runs only the card's scenarios and coverage (`corpus -- --card "Name"`, `python tools/maintenance/card-coverage.py "Name"`), and those of a
+A reviewer runs only the card's checked focused scenarios and coverage (`python tools/maintenance/card-mutate.py "Name" --check`, `python tools/maintenance/card-coverage.py "Name"`), and those of a
 card whose shared code the change touched - nothing wider, except that a card adding or granting a static ability also
 runs the layer contract check (`cargo test --profile checked -p cantrip-script --test layer_pass_cases`; an effect that
 changes no characteristic by design, such as a granted attack cap, is listed in its `INERT` table with the reason). It **breaks the card** to see which expectation catches each
 decision its code makes (a number, a filter, whose objects, a condition): `card-mutate.py "Name"` makes the mechanical
-breaks and lists the survivors (it restores the file itself), and the breaks of meaning it cannot make are one
-temporary edit at a time in the card's own worktree, run, then restored at once with `git checkout -- <file>` (every run goes through `cargo run`, never a prebuilt `target/.../corpus` binary: after a restore that binary still holds the break, and a review once reported an engine bug that was only a stale build); a scenario it proposes is written to its scratchpad
+breaks and lists the survivors. For semantic breaks, `card-mutate.py "Name" --probes probes.json` takes named entries
+with repo-relative Rust `file`, unique `before`/`after` text and `expected_failing_assertion`. Each must fail its intended
+assertion; build failures and missing dependencies never count as caught. It restores exact source bytes and rebuilds
+and runs the baseline after restoration. Focused builds use the small registry and the checked `mutate` profile
+(`CANTRIP_VERIFY=1`); missing dependencies or panics retry the whole registry. Each run builds current source; never
+run a prebuilt `target/.../corpus` binary. A manual semantic edit is restored from its exact original bytes, followed
+by `--check`; never discard unrelated work with a blanket checkout. A scenario it proposes is written to its scratchpad
 and tried there the same way (`corpus -- --file <path>`). It commits only the fixes the next paragraph but one gives it, cleans nothing, never
 clones the repository elsewhere, and leaves `git status` clean. It reaches that worktree only by the token in its prompt (`tools\worktree.cmd join`, its first
 command, and `leave` its last), never by a path it was given. Every command runs in the foreground with a long timeout

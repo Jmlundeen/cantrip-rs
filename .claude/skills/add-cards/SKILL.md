@@ -5,6 +5,10 @@ description: Add one or more Magic cards to the Cantrip rules engine - each card
 
 # Adding cards
 
+For queued batches, follow [card-lane](../card-lane/SKILL.md) for canonical intake, user-selected models,
+fast author checks, durable finish/ready and PR delivery. That manifest overrides older provider-specific
+coordination defaults; the rules and independent review requirements below still apply.
+
 This is the standard for every card in Cantrip, whoever writes it. A card that does not meet all of it is not added.
 This file is what the author of a card reads. **Running many cards through agents (or `import-cards`) starts from
 `coordinator.md`.** Beside it: `review.md` (reviewing a card), `client.md` (a card that

@@ -70,13 +70,15 @@ print(("\n=== wrote " if written else "\n=== ") + relative + (" (characteristics
 
 class LaneTest(unittest.TestCase):
     def setUp(self):
-        self.saved_env = {key: os.environ.get(key) for key in GIT_ENV}
+        self.saved_env = {key: os.environ.get(key) for key in (*GIT_ENV, "CANTRIP_LANE_TOOLS_DIR")}
         os.environ.update(GIT_ENV)
         self.tmp = tempfile.mkdtemp(prefix="card-lane-test-")
         self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
         self.origin = os.path.join(self.tmp, "origin.git")
         self.git(self.tmp, "init", "--quiet", "--bare", "-b", "main", self.origin)
         self.main = os.path.join(self.tmp, "main")
+        # Exercise queue/state behavior with throwaway helpers, while production uses the lane's companion tools.
+        os.environ["CANTRIP_LANE_TOOLS_DIR"] = os.path.join(self.main, "tools", "maintenance")
         self.git(self.tmp, "clone", "--quiet", self.origin, self.main)
         self.git(self.main, "checkout", "--quiet", "-b", "main")
         self.write(".gitignore", ".card-lane/\n.claude/worktrees/\ntarget/\n")
@@ -250,7 +252,8 @@ class LaneTest(unittest.TestCase):
         made = self.queue("--backlog", "--list", "AllImplemented", name="empty")
         self.assertEqual(made.returncode, 0, made.stderr)
         self.assertIn("nothing to queue", made.stdout)
-        self.assertFalse(os.path.exists(os.path.join(self.main, ".git", "card-lane", "empty", "queue.json")))
+        self.assertEqual(self.state("empty")["cards"], [])
+        self.assertFalse(self.git(self.main, "rev-parse", "--verify", "refs/heads/card-lane/empty", check=False))
 
     # -- claims and packets ------------------------------------------------------------------------------------------
 
@@ -462,7 +465,7 @@ class LaneTest(unittest.TestCase):
             with open(self.check_path(), encoding="utf-8") as f:
                 failed = json.load(f)
             self.assertFalse(failed["passed"])
-            report_gate = next(gate for gate in failed["gates"] if gate["name"] == "report")
+            report_gate = next(gate for gate in failed["gates"] if gate["name"] == "report-shape")
             self.assertIn("no validation entry for the printed line: Flying", report_gate["detail"])
 
     def test_a_test_point_needs_an_expectation_line_in_a_scenario_holding_the_card(self):
@@ -566,6 +569,7 @@ class LaneTest(unittest.TestCase):
 
     def test_commit_closes_the_claim_and_shares_the_branch(self):
         lane = load_lane()
+        self.git(self.main, "switch", "--quiet", "-c", "card/test")
         self.assertEqual(self.queue("--card", "Card B").returncode, 0)
         taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--issue", "9")
         self.assertEqual(taken.returncode, 0, taken.stderr)

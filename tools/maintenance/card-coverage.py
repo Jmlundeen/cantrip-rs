@@ -11,15 +11,17 @@ every line covered.
 """
 
 import os
-import glob
-import json
 import re
 import subprocess
 import sys
 import tempfile
 import unicodedata
+import uuid
+from pathlib import Path
 
-ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from card_tool_runtime import build_env, build_lock, workspace_root
+
+ROOT = workspace_root(__file__)
 CARDS = os.path.join(ROOT, "crates", "cantrip-cards", "src", "cards")
 
 
@@ -57,6 +59,48 @@ def const_fn_lines(source):
     return lines
 
 
+def coverage_lcov(name):
+    """Fresh counters over compatible instrumented artifacts, serialized by the caller."""
+    env = build_env(ROOT)
+    coverage_dir = Path(env["CARGO_TARGET_DIR"]) / "llvm-cov-target"
+    env["CARGO_LLVM_COV_TARGET_DIR"] = str(coverage_dir)
+    identity = "card-coverage-" + uuid.uuid4().hex
+    env["LLVM_PROFILE_FILE_NAME"] = identity + "-%p-%m.profraw"
+
+    def command(args, **kwargs):
+        proc = subprocess.run(args, cwd=ROOT, env=env, capture_output="stdout" not in kwargs,
+                              text=True, encoding="utf-8", errors="replace", **kwargs)
+        if proc.returncode:
+            raise RuntimeError((proc.stdout or "")[-4000:] + (proc.stderr or "")[-4000:])
+        return proc
+
+    # --no-report already implies --no-clean in cargo-llvm-cov; specifying both
+    # is rejected. Explicitly clear only counters, retaining compatible builds.
+    command(["cargo", "llvm-cov", "clean", "--workspace", "--profraw-only"])
+    run = command(["cargo", "llvm-cov", "run", "--profile", "cards", "--dep-coverage", "cantrip-cards",
+                   "-p", "cantrip-script", "--bin", "corpus", "--no-report", "--", "--card", name])
+    summary = [line for line in run.stdout.splitlines() if "scenarios:" in line]
+    if not summary or not re.search(r"\b0 need cards\b", summary[-1]):
+        raise RuntimeError(run.stdout[-4000:] + "\ncard-coverage: scenarios are missing dependencies or a summary")
+    host = command(["rustc", "-vV"]).stdout
+    triple = next((line.removeprefix("host: ") for line in host.splitlines() if line.startswith("host: ")), None)
+    sysroot = command(["rustc", "--print", "sysroot"]).stdout.strip()
+    extension = ".exe" if os.name == "nt" else ""
+    tool_dir = Path(sysroot) / "lib" / "rustlib" / (triple or "") / "bin"
+    llvm_profdata, llvm_cov = tool_dir / ("llvm-profdata" + extension), tool_dir / ("llvm-cov" + extension)
+    raw = sorted(coverage_dir.glob(identity + "-*.profraw"))
+    binary = coverage_dir / "cards" / ("corpus" + extension)
+    if not raw or not llvm_profdata.is_file() or not llvm_cov.is_file() or not binary.is_file():
+        raise RuntimeError("llvm-tools-preview or the instrumented corpus/profile is missing")
+    with tempfile.TemporaryDirectory(prefix="card-coverage-") as scratch:
+        profile, lcov = Path(scratch) / "card.profdata", Path(scratch) / "card.lcov"
+        command([str(llvm_profdata), "merge", "-sparse", *map(str, raw), "-o", str(profile)])
+        with lcov.open("w", encoding="utf-8") as output:
+            command([str(llvm_cov), "export", "-format=lcov", f"-instr-profile={profile}", str(binary)],
+                    stdout=output, stderr=subprocess.PIPE)
+        return summary, lcov.read_text(encoding="utf-8")
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
@@ -65,52 +109,19 @@ def main():
     if path is None:
         print(f"{name}: no Rust file in {os.path.relpath(CARDS, ROOT)} (a card of core keywords only needs none).")
         return 0
-    metadata = subprocess.run(
-        ["cargo", "metadata", "--no-deps", "--format-version", "1"],
-        cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
-    if metadata.returncode != 0:
-        sys.stdout.write(metadata.stdout[-4000:] + metadata.stderr[-4000:])
-        sys.exit("card-coverage: cargo metadata failed")
-    target_dir = json.loads(metadata.stdout)["target_directory"]
-    coverage_dir = os.path.join(target_dir, "llvm-cov-target")
-    clean = subprocess.run(["cargo", "llvm-cov", "clean", "--workspace"], cwd=ROOT, capture_output=True, text=True)
-    if clean.returncode != 0:
-        sys.stdout.write(clean.stdout[-4000:] + clean.stderr[-4000:])
-        sys.exit("card-coverage: could not clear previous coverage profiles")
-    run = subprocess.run(
-        ["cargo", "llvm-cov", "run", "--profile", "cards", "--dep-coverage", "cantrip-cards", "-p", "cantrip-script", "--bin", "corpus",
-         "--no-report", "--", "--card", name],
-        cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
-    summary = [l for l in run.stdout.splitlines() if "scenarios:" in l]
-    if run.returncode == 0:
-        host = subprocess.run(["rustc", "-vV"], cwd=ROOT, capture_output=True, text=True).stdout
-        triple = next((line.removeprefix("host: ") for line in host.splitlines() if line.startswith("host: ")), None)
-        sysroot = subprocess.run(["rustc", "--print", "sysroot"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-        extension = ".exe" if os.name == "nt" else ""
-        tool_dir = os.path.join(sysroot, "lib", "rustlib", triple or "", "bin")
-        llvm_profdata = os.path.join(tool_dir, "llvm-profdata" + extension)
-        llvm_cov = os.path.join(tool_dir, "llvm-cov" + extension)
-        raw = glob.glob(os.path.join(coverage_dir, "*.profraw"))
-        profile = os.path.join(coverage_dir, "card-coverage.profdata")
-        binary = os.path.join(coverage_dir, "cards", "corpus" + extension)
-        lcov = os.path.join(tempfile.mkdtemp(prefix="card-coverage-"), "card.lcov")
-        if not raw or not os.path.isfile(llvm_profdata) or not os.path.isfile(llvm_cov) or not os.path.isfile(binary):
-            run.returncode = 1
-            run.stderr += "\ncard-coverage: llvm-tools-preview is not installed or the instrumented corpus/profile is missing"
-        else:
-            merge = subprocess.run([llvm_profdata, "merge", "-sparse", *raw, "-o", profile], cwd=ROOT, capture_output=True, text=True)
-            if merge.returncode == 0:
-                with open(lcov, "w", encoding="utf-8") as output:
-                    run = subprocess.run([llvm_cov, "export", "-format=lcov", f"-instr-profile={profile}", binary],
-                        cwd=ROOT, stdout=output, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
-            else:
-                run = merge
-    if run.returncode != 0 or not os.path.isfile(lcov):
-        sys.stdout.write(run.stdout[-4000:] + run.stderr[-4000:])
-        sys.exit("card-coverage: the coverage run failed (is cargo-llvm-cov installed?)")
+    with build_lock(ROOT):
+        try:
+            summary, lcov = coverage_lcov(name)
+        except RuntimeError as error:
+            print(str(error))
+            sys.exit("card-coverage: the coverage run failed (is cargo-llvm-cov installed?)")
+        return report_coverage(name, path, summary, lcov)
+
+
+def report_coverage(name, path, summary, lcov):
     target = os.path.normcase(os.path.abspath(path))
     hits, current = {}, None
-    for line in open(lcov, encoding="utf-8"):
+    for line in lcov.splitlines():
         if line.startswith("SF:"):
             named = line[3:].strip()
             if named.startswith("\\\\?\\"):

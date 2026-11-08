@@ -143,11 +143,15 @@ rem /filter names dotnet tests, so it leaves these out.
 if "%RESULT%"=="0" if not defined FILTERED (
   pushd "%ROOT%"
   set "CANTRIP_VERIFY=1"
+  set "CANTRIP_CORPUS_RUN_ID=%RANDOM%%RANDOM%-%RANDOM%%RANDOM%"
+  if not defined CANTRIP_CORPUS_REPORT set "CANTRIP_CORPUS_REPORT=%ROOT%\target\test-results\corpus-%RANDOM%%RANDOM%.json"
   if defined DETAILED (
     cargo test --profile checked --workspace --quiet
   ) else (
     cargo test --profile checked --workspace --quiet > "%LOG%-engine.txt" 2>&1
   )
+  if errorlevel 1 set "RESULT=1"
+  call python "%ROOT%\tools\maintenance\corpus-report.py" "%%CANTRIP_CORPUS_REPORT%%" --run-id "%%CANTRIP_CORPUS_RUN_ID%%"
   if errorlevel 1 set "RESULT=1"
   popd
 )
