@@ -1,0 +1,73 @@
+# Talarian Hook Spider's Reach (CR 702.17): the ground 2/2 blocks Bot2's attacking flying Ornithopter, which takes 2 and
+# dies while the Spider takes 0 and survives; no damage reaches Bot1.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Talarian Hook Spider
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Talarian Hook Spider.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Block(Talarian Hook Spider > Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Talarian Hook Spider.Damage = 0

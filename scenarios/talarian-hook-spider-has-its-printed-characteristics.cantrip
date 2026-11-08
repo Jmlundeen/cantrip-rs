@@ -1,0 +1,27 @@
+# Talarian Hook Spider has no text but Reach: it is cast for its printed cost and has its printed power, toughness and keywords (CR 702).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Talarian Hook Spider
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Talarian Hook Spider.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Talarian Hook Spider.Power = 2
+Bot1.Battlefield.Talarian Hook Spider.Toughness = 2
+Bot1.Battlefield.Talarian Hook Spider.Keywords = Reach
