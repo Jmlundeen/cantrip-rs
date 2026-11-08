@@ -1,0 +1,39 @@
+# Wayfarer's Bauble's one ability: {2}, {T}, Sacrifice this artifact: search my library for a basic land card, put it
+# onto the battlefield tapped, then shuffle (CR 701.21 sacrifice as cost, 701.23 search, 701.24 shuffle).
+# Shows: the exact {2} and the tap are paid (pool empty after the cast and again after the activation), the artifact is
+# sacrificed, the basic land comes from Bot1's library only and arrives tapped.
+
+[Bot1 Deck]
+Wayfarer's Bauble
+Mox Pearl
+Mox Emerald
+Island x4
+Forest
+Island x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Wayfarer's Bauble.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Mana =
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Wayfarer's Bauble.Activate
+? Bot1.Mana =
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Graveyard.Count = 1
+Bot2.Battlefield.Count = 0
