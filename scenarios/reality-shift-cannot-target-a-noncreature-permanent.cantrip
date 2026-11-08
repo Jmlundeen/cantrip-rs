@@ -1,0 +1,39 @@
+# "target creature" (CR 115.1): Bot2's Mox Ruby is a permanent but not a creature, so it is not a legal target for Reality
+# Shift and the cast is refused; nothing is exiled and no card is manifested. A second Reality Shift on Bot2's Memnite, the
+# legal target beside it, then exiles the Memnite and has Bot2 manifest.
+
+[Bot1 Deck]
+Island
+Island
+Reality Shift
+Reality Shift
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Memnite
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+! Bot1.Hand.Reality Shift.Cast(Bot2.Battlefield.Mox Ruby)
+Bot1.Hand.Reality Shift.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Mox Ruby.Tapped = false
+Bot2.Battlefield.Memnite = (absent)
+Bot2.Battlefield..FaceDown = true
+Bot1.Hand.Count = 5
