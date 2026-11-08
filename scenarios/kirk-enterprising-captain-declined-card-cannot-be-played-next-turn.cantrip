@@ -1,0 +1,54 @@
+# "You may play that card this turn" (CR 701.18b, 514.2): the permission ends with the turn (CR 514.2). The Island exiled by the
+# turn-5 attack is not played, and on turn 7, with a land drop open, Bot1 may no longer play it from exile (the Island
+# played right after from the hand is the control that the drop was open). Bot2 takes 8 from the unblocked attack.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Jet
+Kirk, Enterprising Captain
+Grizzly Bears
+Grizzly Bears
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kirk, Enterprising Captain.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Kirk, Enterprising Captain > Bot2; Grizzly Bears > Bot2; Grizzly Bears#2 > Bot2)
+[T5 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+! Bot1.Exile.Island.Play
+Bot1.Hand.Island.Play
+
+[Expect]
+Exile = Island
+Bot2.Life = 12
+Bot1.Battlefield.Count = 7

@@ -1,0 +1,53 @@
+# Menace (CR 702.111a): Kirk can't be blocked except by two or more creatures. On turn 5 Kirk attacks while Bot2 controls a
+# Grizzly Bears and a Memnite: the lone Bears block is refused, and the two together block him, dealing him 3 in combat so
+# he dies and Bot2 takes no damage. Kirk's 4 power alone is short of 8, so no card is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Kirk, Enterprising Captain
+Island x17
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Memnite
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kirk, Enterprising Captain.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Kirk, Enterprising Captain.Keywords = Menace
+Bot1.Attack(Kirk, Enterprising Captain > Bot2)
+[T5 Bot1.DeclareBlockers]
+! Bot2.Block(Grizzly Bears > Kirk, Enterprising Captain)
+Bot2.Block(Grizzly Bears > Kirk, Enterprising Captain; Memnite > Kirk, Enterprising Captain)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = Kirk, Enterprising Captain; Black Lotus
+Exile.Count = 0
