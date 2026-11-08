@@ -1,0 +1,25 @@
+# Frostboil Snarl: "you may reveal an Island or Mountain card from your hand" (CR 701.20a, 614.1c) - the second subtype
+# qualifies as the first does. Bot1's hand holds an Island and a Mountain, and revealing the Mountain leaves the Snarl
+# untapped and able to tap for mana, so a filter that took only Islands fails here.
+
+[Bot1 Deck]
+Frostboil Snarl
+Mountain
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Frostboil Snarl.Play
+Bot1.Accept
+Bot1.Choose(Mountain)
+? Bot1.Revealed = Mountain
+? Bot1.Battlefield.Frostboil Snarl.Tapped = false
+[T3 Bot1.Main1]
+Bot1.Battlefield.Frostboil Snarl.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Frostboil Snarl.Tapped = true
