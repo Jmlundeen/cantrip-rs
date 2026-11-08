@@ -178,6 +178,51 @@ class LaneTest(unittest.TestCase):
         self.assertEqual(self.queue("--card", "Card D").returncode, 0)
         self.assertEqual([card["name"] for card in self.state()["cards"]], ["Card C", "Card D"])
 
+    def test_queue_branch_is_cut_from_remote_main_not_the_lane_checkout(self):
+        lane = self.worktree("lane")
+        self.write("tools/maintenance/card-lane.py", "# the lane's own tool\n", root=lane)
+        self.git(lane, "add", "tools/maintenance/card-lane.py")
+        self.git(lane, "commit", "--quiet", "-m", "lane: the card lane")
+        lane_head = self.git(lane, "rev-parse", "HEAD")
+        self.assertNotEqual(lane_head, self.git(self.main, "rev-parse", "origin/main"))
+
+        made = self.queue("--card", "Card B", cwd=lane)
+        self.assertEqual(made.returncode, 0, made.stderr)
+        self.assertEqual(self.git(self.main, "rev-parse", "card-lane/q"),
+                         self.git(self.main, "rev-parse", "origin/main"))
+
+        refused = self.lane(lane, "next", "--id", "w1", "--queue", "q")
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn("not a queue worktree", refused.stderr)
+        self.assertIn("lane's own files", refused.stderr)
+        self.assertEqual(self.status(self.state(), "Card B"), "pending")
+
+    def test_a_queue_branch_with_the_lanes_own_work_is_refused(self):
+        lane = self.worktree("lane")
+        self.write("tools/maintenance/card-lane.py", "# the lane's own tool\n", root=lane)
+        self.git(lane, "add", "tools/maintenance/card-lane.py")
+        self.git(lane, "commit", "--quiet", "-m", "lane: the card lane")
+        lane_head = self.git(lane, "rev-parse", "HEAD")
+        self.git(self.main, "branch", "card-lane/q", lane_head)
+
+        refused = self.queue("--card", "Card B")
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn("lane's own work", refused.stderr)
+        self.assertEqual(self.git(self.main, "rev-parse", "card-lane/q"), lane_head)
+
+    def test_a_claim_opened_from_lane_work_cannot_be_shared(self):
+        lane = self.worktree("lane")
+        self.write("tools/maintenance/card-lane.py", "# the lane's own tool\n", root=lane)
+        self.git(lane, "add", "tools/maintenance/card-lane.py")
+        self.git(lane, "commit", "--quiet", "-m", "lane: the card lane")
+        lane_head = self.git(lane, "rev-parse", "HEAD")
+        self.assertEqual(self.queue("--card", "Card B", cwd=lane).returncode, 0)
+        provided = load_lane()
+        store = provided.Store(os.path.join(self.main, ".git"), "q")
+        with self.assertRaises(provided.Refused) as caught:
+            provided.require_claim_base(lane, store, {"head": lane_head})
+        self.assertIn("lane's own work", str(caught.exception))
+
     def test_queue_backlog_uses_missing_cards_in_its_order(self):
         made = self.queue("--backlog")
         self.assertEqual(made.returncode, 0, made.stderr)

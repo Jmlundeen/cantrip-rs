@@ -22,9 +22,11 @@ claim, the packet, the shared branch, `check` and `commit`.
   code and a scenario), `content.json`, `report.json` (the line-by-line evidence `check` reads) and `state.json`.
   Gitignored, regenerable, thrown away with the slot.
 - **One shared branch**, `card-lane/<queue>`. `next` merges its tip into the slot before a card is opened; `share`,
-  `done`, `block` and `release` update it with a compare-and-swap. A `Mechanics:` or `Engine:` commit made by one
-  implementor is therefore in the next implementor's worktree: shared mechanics and implemented engine gaps are
-  reused instead of written twice.
+  `done`, `block` and `release` update it with a compare-and-swap. It is cut from remote main (`origin/main`), never
+  from the checkout that ran `queue`; a worktree carrying the lane's own files is refused, and an existing queue
+  branch cut from the lane's work is refused. A `Mechanics:` or `Engine:` commit made by one implementor is therefore
+  in the next implementor's worktree: shared mechanics and implemented engine gaps are reused instead of written
+  twice.
 
 The lane commands are run from the checkout or worktree they act on. `--queue` defaults to `default`; everyone who
 should share a queue passes the same name.
@@ -165,11 +167,34 @@ was given. Its shape:
 A ruling the card does not decide needs no scenario line, only a `no_decision` of a sentence saying why. The file is
 never committed; the `check`/`commit` output and `check.json` in the packet are the evidence.
 
+## Testing the lane before it lands
+
+A queue branch starts at `origin/main`, so the lane's own unmerged commits never enter a queue branch. Build the
+queue from the lane checkout, but work cards in a queue worktree based on `origin/main` (a pool slot, or a worktree
+made with `git worktree add -b queue-test ../queue-test origin/main`). Run the lane script from the lane checkout
+against that worktree:
+
+```sh
+# in the lane checkout
+python tools/maintenance/card-lane.py queue --queue test --backlog
+
+# in the queue worktree
+python <lane-checkout>/tools/maintenance/card-lane.py next --id w1 --queue test
+python <lane-checkout>/tools/maintenance/card-lane.py check --id w1 --queue test --fast
+python <lane-checkout>/tools/maintenance/card-lane.py commit --id w1 --queue test
+```
+
+The worktree's ordinary tools come from `origin/main`; the lane script adds the queue, gates and publication. Do
+not take a card in the lane checkout: its lane commits are not on `origin/main`, and `next` refuses it. The queue
+branch then contains only the card commits, which is what you can test before the lane itself is shared.
+
 ## Solo, without the pool
 
-The lane works in any checkout: in a worktree outside `.claude/worktrees/pool-<n>` a claim is marked `solo` and no
-lease or member is needed. Do the card, `commit`, and push or land the branch as `claims.md` says. The pool is
-preferred when more than one implementor works at once; its slot is also what keeps two builds off each other.
+The lane works in any queue worktree: in a worktree outside `.claude/worktrees/pool-<n>` a claim is marked `solo`
+and no lease or member is needed. A solo worktree starts at `origin/main` too; while the lane is not on main, create
+one at `origin/main` and run the lane script from the lane checkout. Do the card, `commit`, and push or land the
+branch as `claims.md` says. The pool is preferred when more than one implementor works at once; its slot is also
+what keeps two builds off each other.
 
 ## What the lane will not do
 

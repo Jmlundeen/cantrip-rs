@@ -24,9 +24,13 @@ Use this when a composer owns the queue and the pool, and each fresh agent takes
 > (`.claude/skills/add-cards/SKILL.md`) and the `write-game-script` skill
 > (`.claude/skills/write-game-script/SKILL.md`). You are worker `<WORKER>` on queue `<QUEUE>`.
 >
+> The card-lane script is `<LANE>`: normally `tools/maintenance/card-lane.py` in the slot; while the lane is being
+> tested before it lands on main, use the absolute path `<CHECKOUT>/tools/maintenance/card-lane.py` from the lane
+> checkout. The queue worktree itself stays at `origin/main`; `next` refuses one carrying the lane's own files.
+>
 > The composer built the queue; do not run `queue`. Take the next card:
 >
-> `python tools/maintenance/card-lane.py next --id <WORKER> --queue <QUEUE>`
+> `python <LANE> next --id <WORKER> --queue <QUEUE>`
 >
 > Do not name or choose a card; `next` chooses. It prints the brief and writes the packet in your slot. If it says the
 > queue has no pending card, report that and leave. Claim the card's GitHub issue
@@ -35,15 +39,15 @@ Use this when a composer owns the queue and the pool, and each fresh agent takes
 > `cantrip-api`); otherwise never.
 >
 > Do the card as `add-cards` says. Fill the packet's `report.json`, run
-> `python tools/maintenance/card-lane.py check --id <WORKER> --queue <QUEUE> --fast` while writing, and
-> `python tools/maintenance/card-lane.py commit --id <WORKER> --queue <QUEUE>` when it passes. `commit` runs every
+> `python <LANE> check --id <WORKER> --queue <QUEUE> --fast` while writing, and
+> `python <LANE> commit --id <WORKER> --queue <QUEUE>` when it passes. `commit` runs every
 > gate, writes the `Engine:`/`Mechanics:`/`Client:` commits the change needs and one `Card: <Name>` commit ending
 > `Closes #N`, then closes the claim and shares the queue branch. Do not use `done` for a card you wrote.
 >
 > If the card waits on the core, run
-> `python tools/maintenance/card-lane.py block --id <WORKER> --queue <QUEUE> --rule <CR> --note "..."`, report the gap,
+> `python <LANE> block --id <WORKER> --queue <QUEUE> --rule <CR> --note "..."`, report the gap,
 > and leave; never fake the core. If you must stop, run
-> `python tools/maintenance/card-lane.py release --id <WORKER> --queue <QUEUE> --reason "..."` so the card goes back.
+> `python <LANE> release --id <WORKER> --queue <QUEUE> --reason "..."` so the card goes back.
 > Work one card per lease: after `commit`, `block` or `release`, leave the slot with
 > `python tools/maintenance/worktrees.py leave <MEMBER_ID>` (the member id `join` printed), then report to the
 > composer with the card, its commits, the corpus line, coverage, test points, client needs and any core gap. Do not
@@ -56,28 +60,33 @@ Use this when a composer owns the queue and the pool, and each fresh agent takes
 
 The composer:
 
-1. Build the queue once, from the main checkout or any worktree:
-   `python tools/maintenance/card-lane.py queue --queue <QUEUE> --backlog` (or `--format` / `--file`).
+1. Build the queue once, from the lane checkout while the lane is not on main (otherwise the main checkout or any
+   worktree): `python <LANE> queue --queue <QUEUE> --backlog` (or `--format` / `--file`).
 2. For each implementor: `tools\worktree.cmd acquire --for "card: next <QUEUE>"`, then
    `tools\worktree.cmd token <LEASE> --name "card: <WORKER>"`. Start the agent immediately; the token dies in two
    minutes.
-3. Start one fresh agent with the prompt above; fill `<CHECKOUT>`, `<QUEUE>`, `<WORKER>`, `<TOKEN>`, and whether the
-   core is open. Leave `<AGENT_ID>` for the agent to fill from its own context (or `<WORKER>` when its harness has
-   none). Give each agent a unique `<WORKER>`; never give it the slot path or lease ID, and never a card name.
-4. Watch `python tools/maintenance/card-lane.py status --queue <QUEUE>`; when the agent leaves, land its commits from
+3. Start one fresh agent with the prompt above; fill `<CHECKOUT>`, `<QUEUE>`, `<WORKER>`, `<TOKEN>`, `<LANE>`, and
+   whether the core is open. `<LANE>` is the card-lane.py path: the lane checkout's copy while the lane is not on
+   main, otherwise `tools/maintenance/card-lane.py` in the slot. Leave `<AGENT_ID>` for the agent to fill from its
+   own context (or `<WORKER>` when its harness has none). Give each agent a unique `<WORKER>`; never give it the
+   slot path or lease ID, and never a card name.
+4. Watch `python <LANE> status --queue <QUEUE>`; when the agent leaves, land its commits from
    `card-lane/<QUEUE>`, then `tools\worktree.cmd release <LEASE>`. A new card gets a new lease and a fresh agent.
 
 ## A solo implementor
 
-Use this in a checkout with no pool.
+Use this in a queue worktree with no pool.
 
 > Read `.claude/skills/card-lane/SKILL.md` in the Cantrip checkout (absolute path if your harness starts elsewhere),
 > and the `add-cards` (`.claude/skills/add-cards/SKILL.md`) and `write-game-script`
-> (`.claude/skills/write-game-script/SKILL.md`) skills. Your queue is `<QUEUE>`; your id is `<WORKER>`. Build the queue
-> if it is not there (`python tools/maintenance/card-lane.py queue --queue <QUEUE> --backlog`), then work cards with
-> `python tools/maintenance/card-lane.py next --id <WORKER> --queue <QUEUE>`,
-> `python tools/maintenance/card-lane.py check --id <WORKER> --queue <QUEUE> --fast` and
-> `python tools/maintenance/card-lane.py commit --id <WORKER> --queue <QUEUE>` until the queue is empty. Do the card as
+> (`.claude/skills/write-game-script/SKILL.md`) skills. Your queue is `<QUEUE>`; your id is `<WORKER>`. Work in a
+> queue worktree based on `origin/main`; the lane checkout itself carries the lane's own commits and `next` refuses
+> it. While the lane is not on main, build the queue from the lane checkout with
+> `python <LANE> queue --queue <QUEUE> --backlog` (with `<LANE>` the lane checkout's
+> `tools/maintenance/card-lane.py`), then work cards in the queue worktree with
+> `python <LANE> next --id <WORKER> --queue <QUEUE>`,
+> `python <LANE> check --id <WORKER> --queue <QUEUE> --fast` and
+> `python <LANE> commit --id <WORKER> --queue <QUEUE>` until the queue is empty. Do the card as
 > `add-cards` says; one `Card:` commit per card, no `Co-Authored-By`; push or land the queue branch as `claims.md`
 > says.
 
