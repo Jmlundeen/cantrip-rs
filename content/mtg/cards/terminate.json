@@ -1,0 +1,6 @@
+{
+  "name": "Terminate",
+  "manaCost": "{B}{R}",
+  "type": "Instant",
+  "oracleText": "Destroy target creature. It can't be regenerated."
+}
