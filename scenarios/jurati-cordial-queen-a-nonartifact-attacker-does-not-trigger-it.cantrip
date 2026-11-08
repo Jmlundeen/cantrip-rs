@@ -1,0 +1,50 @@
+# Jurati, Cordial Queen triggers for "artifact creatures" (CR 603.2): Grizzly Bears are no artifact, so their combat damage
+# to Bot2 on turn 3 goes unanswered even with a Clue waiting to be copied. No trigger goes off: no target is asked and the
+# Clue count stays at one.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Thraben Inspector
+Grizzly Bears
+Island
+Jurati, Cordial Queen
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jurati, Cordial Queen.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Count = 8

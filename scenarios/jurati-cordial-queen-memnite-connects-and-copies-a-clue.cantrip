@@ -1,0 +1,55 @@
+# Jurati, Cordial Queen (3/3): "Whenever one or more artifact creatures you control deal combat damage to a player, create a
+# token that's a copy of target artifact token you control" (CR 510.2, 603.2c). Two Thraben Inspectors investigated on turn 1,
+# so Bot1 controls two Clue artifact tokens; Memnite (a 1/1 artifact creature) attacks unblocked on turn 3 and deals 1 combat
+# damage to Bot2. The trigger asks which Clue to copy (two legal targets), targets the first, and a third Clue enters.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Thraben Inspector
+Thraben Inspector
+Memnite
+Jurati, Cordial Queen
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Hand.Thraben Inspector.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Jurati, Cordial Queen.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Bot2)
+[T3 Bot1.CombatDamage]
+Bot1.Target(Clue Token#1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Count = 11
