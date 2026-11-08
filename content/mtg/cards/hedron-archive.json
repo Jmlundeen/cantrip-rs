@@ -1,0 +1,6 @@
+{
+  "name": "Hedron Archive",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "{T}: Add {C}{C}.\n{2}, {T}, Sacrifice this artifact: Draw two cards."
+}
