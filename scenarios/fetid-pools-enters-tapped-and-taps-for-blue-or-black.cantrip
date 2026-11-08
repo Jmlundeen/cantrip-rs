@@ -1,0 +1,22 @@
+# Fetid Pools is an Island Swamp, so its basic land types give it the intrinsic mana abilities (CR 305.6), and it enters
+# tapped (CR 614.1d): played on turn 1 it is tapped, and from turn 3 it makes blue and then black.
+
+[Bot1 Deck]
+Fetid Pools
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Fetid Pools.Play
+? Bot1.Battlefield.Fetid Pools.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Fetid Pools.Activate(Ability: Add {U})
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Fetid Pools.Activate(Ability: Add {B})
+
+[Expect]
+? Bot1.Mana = {B}
