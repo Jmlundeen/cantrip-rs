@@ -8,12 +8,8 @@ token from a composer, and this file is the handoff. Any harness that can run a 
 
 Use this when a composer owns the queue and the pool, and each fresh agent takes one card in its own leased slot.
 
-> Read `.claude/skills/card-lane/SKILL.md` in the Cantrip checkout at `<CHECKOUT>` (the absolute path if your harness
-> starts elsewhere), and follow it together with the `add-cards` skill (`.claude/skills/add-cards/SKILL.md`) and the
-> `write-game-script` skill (`.claude/skills/write-game-script/SKILL.md`). You are worker `<WORKER>` on queue
-> `<QUEUE>`.
->
-> Your first action, before anything else, is to join the slot:
+> Your first action, before anything else, is to join the slot; the token is single-use and dies in two minutes, so
+> join now:
 >
 > `cd <CHECKOUT>`
 > `python tools/maintenance/worktrees.py join <TOKEN> --agent-id <AGENT_ID>`
@@ -21,8 +17,12 @@ Use this when a composer owns the queue and the pool, and each fresh agent takes
 > (or `tools\worktree.cmd join ...`). `<AGENT_ID>` is the agent id your harness gave you at start (in Claude Code, the
 > `SubagentStart` context); if your harness has no such id, use `<WORKER>`. `join` prints the slot path and your member
 > id. `cd` into that slot and work only there. Never the main checkout, another slot, or a worktree of your own. If
-> `join` refuses, stop and tell the composer; do not work in any worktree meanwhile. The token is single-use and dies
-> in two minutes, so join now.
+> `join` refuses, stop and tell the composer; do not work in any worktree meanwhile.
+>
+> After you join, read `.claude/skills/card-lane/SKILL.md` in the Cantrip checkout at `<CHECKOUT>` (the absolute path
+> if your harness starts elsewhere), and follow it together with the `add-cards` skill
+> (`.claude/skills/add-cards/SKILL.md`) and the `write-game-script` skill
+> (`.claude/skills/write-game-script/SKILL.md`). You are worker `<WORKER>` on queue `<QUEUE>`.
 >
 > The composer built the queue; do not run `queue`. Take the next card:
 >
