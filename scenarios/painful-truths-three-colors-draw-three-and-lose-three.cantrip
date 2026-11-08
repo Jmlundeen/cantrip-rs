@@ -1,0 +1,34 @@
+# Painful Truths: Converge — X is the number of colors of mana spent to cast it (CR 701.9). Paid here with white, blue
+# and black (a Mox Pearl, a Mox Sapphire and a Mox Jet), the pool empty after; X = 3, so Bot1 draws three and loses 3
+# life (20 to 17), the hand three larger and the library three fewer (CR 121.1, 119.3).
+
+[Bot1 Deck]
+Painful Truths
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Painful Truths.Cast(Spend: W, U, B)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 10
+Bot1.Life = 17
+Bot1.Graveyard = Painful Truths

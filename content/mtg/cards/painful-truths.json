@@ -1,0 +1,6 @@
+{
+  "name": "Painful Truths",
+  "manaCost": "{2}{B}",
+  "type": "Sorcery",
+  "oracleText": "Converge — You draw X cards and lose X life, where X is the number of colors of mana spent to cast this spell."
+}
