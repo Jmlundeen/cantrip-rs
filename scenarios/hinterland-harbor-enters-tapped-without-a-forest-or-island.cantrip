@@ -1,0 +1,26 @@
+# "This land enters tapped unless you control a Forest or an Island": Bot1 controls nothing, so Hinterland Harbor
+# enters tapped (CR 614.1), and it untaps in the next untap step. Its "{T}: Add {G} or {U}." (CR 605.1a) is then
+# activated for green and, on a later turn, for blue, each alone in the pool.
+
+[Bot1 Deck]
+Hinterland Harbor
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Hinterland Harbor.Play
+? Bot1.Battlefield.Hinterland Harbor.Tapped = true
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Hinterland Harbor.Tapped = false
+Bot1.Battlefield.Hinterland Harbor.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Hinterland Harbor.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Mana = {U}
+Bot1.Battlefield.Hinterland Harbor.Tapped = true

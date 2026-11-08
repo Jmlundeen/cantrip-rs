@@ -1,0 +1,24 @@
+# "unless you control": Bot1 controls only a Mountain, and Bot2's Island does not count (CR 109.5: "you" is the
+# land's controller), so Hinterland Harbor enters tapped. With a Forest of its own it would not (the scenario above).
+
+[Bot1 Deck]
+Mountain
+Hinterland Harbor
+Island x18
+
+[Bot2 Deck]
+Island
+Island x19
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Hinterland Harbor.Play
+? Bot1.Battlefield.Hinterland Harbor.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Hinterland Harbor.Tapped = true
+Bot1.Battlefield.Count = 2

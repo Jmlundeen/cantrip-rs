@@ -1,0 +1,22 @@
+# With an Island of its own, Hinterland Harbor enters untapped: Bot1 plays an Island on turn 1 and the Harbor on turn 3.
+# Its "{T}: Add {G} or {U}." is tapped right away in the same turn, so the land is untapped as it enters.
+
+[Bot1 Deck]
+Island
+Hinterland Harbor
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Hinterland Harbor.Play
+? Bot1.Battlefield.Hinterland Harbor.Tapped = false
+Bot1.Battlefield.Hinterland Harbor.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Mana = {G}
