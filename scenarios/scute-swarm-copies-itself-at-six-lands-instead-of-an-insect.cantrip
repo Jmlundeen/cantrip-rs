@@ -1,0 +1,89 @@
+# Scute Swarm at six or more lands (CR 608.2c): the same 1/1, cast on turn 1 the same way, makes a plain Insect on
+# turns 3, 5 and 7 (two, three and four lands), and on turn 9 with five lands still a plain fourth Insect, never a copy.
+# On turn 11 the sixth land resolves with six lands, so the ability copies Scute Swarm itself instead (CR 707.2) and no
+# fifth Insect arrives; one trigger makes exactly one copy, so no third Scute Swarm.
+# Scute Swarm {2}{G}: Creature - Insect
+
+[Bot1 Deck]
+Scute Swarm
+Forest
+Black Lotus
+Island
+Plains
+Mountain
+Forest
+Island
+Island
+Island
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Forest
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Scute Swarm.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Insect Token = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Insect Token.Power = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Insect Token#2.Power = 1
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Insect Token#3.Power = 1
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Insect Token#4.Power = 1
+? Bot1.Battlefield.Scute Swarm#2 = (absent)
+[T10 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+[T11 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Scute Swarm#2.Power = 1
+Bot1.Battlefield.Scute Swarm#2.Toughness = 1
+Bot1.Battlefield.Scute Swarm#2.Colors = Green
+Bot1.Battlefield.Scute Swarm#3 = (absent)
+Bot1.Battlefield.Insect Token#5 = (absent)
+Bot1.Battlefield.Insect Token#4.Toughness = 1
