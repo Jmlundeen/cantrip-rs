@@ -1,0 +1,46 @@
+# "Draw a card, then discard a card" (CR 608.2c): the draw comes first, so a hand that is empty when Refute resolves draws
+# one card and then discards that very card - it ends empty, and the drawn Island is in the graveyard. In the other order
+# the discard would find nothing and the hand would end with the drawn card. Bot1 empties its hand on turn 1 by casting six
+# zero-cost artifacts, then pays {1}{U}{U} with two Mox Sapphires and a Mox Jet to counter Bot2's Llanowar Elves.
+
+[Bot1 Deck]
+Refute
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Hand.Count = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Refute.Cast(Target: Stack.Llanowar Elves)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Refute; Island
+Bot2.Graveyard = Llanowar Elves
+Stack.Count = 0

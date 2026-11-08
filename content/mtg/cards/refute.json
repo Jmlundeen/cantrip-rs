@@ -1,0 +1,6 @@
+{
+  "name": "Refute",
+  "manaCost": "{1}{U}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target spell. Draw a card, then discard a card."
+}

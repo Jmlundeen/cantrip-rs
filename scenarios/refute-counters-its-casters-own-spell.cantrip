@@ -1,0 +1,36 @@
+# "Counter target spell" is any spell, the caster's own included (CR 115.1a): Bot1 casts Ornithopter and then Refutes it, so
+# Ornithopter is countered out of its own controller's stack into their graveyard (CR 701.5a), never reaching the battlefield.
+# Bot1 then draws a card and discards an Island.
+
+[Bot1 Deck]
+Refute
+Island
+Island
+Island
+Ornithopter
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Refute.Cast(Target: Stack.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Battlefield = Island; Island; Island
+Stack.Count = 0
+? Bot1.Graveyard = Refute; Island; Ornithopter

@@ -1,0 +1,47 @@
+# Refute: "Counter target spell. Draw a card, then discard a card." (CR 701.5a, 121.1, 701.9). Bot2's Grizzly Bears is on the
+# stack; countering it puts it in Bot2's graveyard instead of the battlefield (CR 608.2b), then Bot1 draws an Island and
+# discards the Swamp it no longer wants.
+
+[Bot1 Deck]
+Refute
+Island
+Island
+Island
+Swamp
+Plains
+Mountain
+Island x13
+
+[Bot2 Deck]
+Forest
+Grizzly Bears
+Forest x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Refute.Cast(Target: Stack.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Swamp)
+
+[Expect]
+Bot2.Graveyard = Grizzly Bears
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Refute; Swamp
+Stack.Count = 0
