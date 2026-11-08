@@ -1,0 +1,8 @@
+{
+  "name": "One, Borg Evolved",
+  "manaCost": "{4}{W}{U}{B}",
+  "type": "Legendary Artifact Creature — Borg Artificer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Artifact creatures you control have flying, double strike, vigilance, menace, lifelink, and ward {2}."
+}
