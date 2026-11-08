@@ -1,0 +1,20 @@
+# "you may reveal ... If you don't, this land enters tapped" (CR 614.1d): Bot1 declines the reveal, so Furycalm Snarl
+# enters the battlefield tapped and cannot be tapped for mana that turn.
+
+[Bot1 Deck]
+Furycalm Snarl
+Mountain
+Plains x18
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Furycalm Snarl.Play
+Bot1.Decline
+? Bot1.Battlefield.Furycalm Snarl.Tapped = true
+! Bot1.Battlefield.Furycalm Snarl.Activate(Color: Red)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Furycalm Snarl.Tapped = true

@@ -1,0 +1,25 @@
+# Furycalm Snarl: "you may reveal a Mountain or Plains card from your hand" (CR 701.20a, 614.1c) - the second subtype
+# qualifies as the first does. Bot1's hand holds a Mountain and a Plains, and revealing the Plains leaves the Snarl
+# untapped and able to tap for white, so a filter that took only Mountains fails here.
+
+[Bot1 Deck]
+Furycalm Snarl
+Plains
+Mountain x18
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Furycalm Snarl.Play
+Bot1.Accept
+Bot1.Choose(Plains)
+? Bot1.Revealed = Plains
+? Bot1.Battlefield.Furycalm Snarl.Tapped = false
+[T3 Bot1.Main1]
+Bot1.Battlefield.Furycalm Snarl.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Furycalm Snarl.Tapped = true
