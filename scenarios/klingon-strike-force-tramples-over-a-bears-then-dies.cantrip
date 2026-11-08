@@ -1,0 +1,61 @@
+# Klingon Strike Force: Trample (CR 702.19b) assigns lethal damage to its blocker and the excess to the player. Bot2's
+# Grizzly Bears blocks on turn 3, so 2 of the 5 goes to the Bears (which dies) and 3 tramples to Bot2; without trample all
+# 5 would stop on the Bears. In Main2 Go for the Throat destroys the Force and its dies trigger deals exactly 2 more to
+# Bot2 (CR 700.4, 603.10a, 120.3).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Klingon Strike Force
+Go for the Throat
+Island x15
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Klingon Strike Force.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Klingon Strike Force > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot2.Block(Grizzly Bears > Klingon Strike Force)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Go for the Throat.Cast(Bot1.Battlefield.Klingon Strike Force)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Grizzly Bears
+Bot1.Graveyard = Go for the Throat; Klingon Strike Force; Black Lotus
+Bot1.Battlefield.Count = 2

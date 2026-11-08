@@ -1,0 +1,47 @@
+# Klingon Strike Force (5/5): Haste (CR 702.10a) lets it attack the turn it enters, so cast on turn 1 it hits unblocked for
+# 5 that turn; without haste the turn-1 attack would be illegal. On turn 3 Go for the Throat destroys it and "When this
+# creature dies, it deals 2 damage to each opponent" deals exactly 2 more to Bot2 (CR 700.4, 603.10a, 120.3).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Klingon Strike Force
+Go for the Throat
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Klingon Strike Force.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Attack(Klingon Strike Force > Bot2)
+[T1 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Go for the Throat.Cast(Bot1.Battlefield.Klingon Strike Force)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 13
+Bot1.Graveyard = Go for the Throat; Klingon Strike Force; Black Lotus
+Bot1.Battlefield.Count = 2
+Bot2.Library.Count = 12

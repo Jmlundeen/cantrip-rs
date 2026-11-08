@@ -1,0 +1,56 @@
+# Klingon Strike Force: "When this creature dies, it deals 2 damage to each opponent" (CR 700.4, 603.10a, 120.3). Go for
+# the Throat destroys it on turn 3, and the trigger deals exactly 2 to Bot2 (the only opponent) while Bot2's Grizzly Bears
+# takes no damage. One more or less would fail the life total.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Klingon Strike Force
+Go for the Throat
+Island x15
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Klingon Strike Force.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Go for the Throat.Cast(Bot1.Battlefield.Klingon Strike Force)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Go for the Throat; Klingon Strike Force; Black Lotus
+Bot2.Battlefield.Grizzly Bears.Toughness = 2
+Bot2.Library.Count = 12
