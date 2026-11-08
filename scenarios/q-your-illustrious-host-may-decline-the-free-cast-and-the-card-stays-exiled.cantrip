@@ -1,0 +1,60 @@
+# "You may cast that card without paying its mana cost" (CR 118.9, 608.2): the cast is optional, so Bot1 declines and the
+# exiled Grizzly Bears stays in exile with the Forest passed over above it, not in a graveyard and not on the battlefield —
+# the three Faeries are still tapped, because the cost was paid as the ability was activated.
+
+[Bot1 Deck]
+Q, Your Illustrious Host
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Scryb Sprites
+Island
+Zephyr Sprite
+Zephyr Sprite
+Island
+Forest
+Grizzly Bears
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Q, Your Illustrious Host.Cast(Spend: W, U, B, R, G)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Scryb Sprites.Cast(Spend: G)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Zephyr Sprite#1.Cast(Spend: U)
+Bot1.Hand.Zephyr Sprite.Cast(Spend: U)
+Bot1.Battlefield.Q, Your Illustrious Host.Activate(Ability: Tap three untapped Faeries you control)
+Bot1.Choose(Scryb Sprites; Zephyr Sprite; Zephyr Sprite)
+Bot1.Choose()
+
+[Expect]
+Bot1.Battlefield.Count = 11
+Bot1.Battlefield.Scryb Sprites.Tapped = true
+Bot1.Battlefield.Zephyr Sprite#1.Tapped = true
+Bot1.Battlefield.Zephyr Sprite#2.Tapped = true
+Exile = Forest; Grizzly Bears
+Bot1.Graveyard.Count = 0
