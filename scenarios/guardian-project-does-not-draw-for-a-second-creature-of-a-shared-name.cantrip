@@ -1,0 +1,40 @@
+# A second Grizzly Bears while Bot1 already controls one: nothing is drawn for it, because the entering creature does
+# share its name with another creature Bot1 controls (CR 201.2, 603.4). The first one, entering with Guardian Project
+# out and no other Grizzly Bears, does draw a card.
+
+[Bot1 Deck]
+Black Lotus x4
+Guardian Project
+Grizzly Bears
+Grizzly Bears
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Guardian Project.Cast
+Bot1.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 2
+[T1 Bot1.Main2]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 1
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears#1.Types = Creature

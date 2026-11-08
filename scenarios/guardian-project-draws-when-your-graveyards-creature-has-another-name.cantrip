@@ -1,0 +1,67 @@
+# A creature card of a different name in Bot1's own graveyard shares nothing with the entering Grizzly Bears, so Bot1
+# draws (CR 201.2, 603.6a): only a creature card whose name matches stops the draw. Bot1's Llanowar Elves died blocking
+# on turn 5, before Guardian Project was cast.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Guardian Project
+Grizzly Bears
+Forest
+Forest
+Forest
+Forest
+Forest x9
+
+[Bot2 Deck]
+Forest
+Forest
+Grizzly Bears
+Forest x17
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Llanowar Elves > Bot2)
+[T3 Bot1.Main2]
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot2.Block(Grizzly Bears > Llanowar Elves)
+[T5 Bot1.Main2]
+? Bot1.Graveyard = Llanowar Elves
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Guardian Project.Cast
+? Bot1.Mana = {U}{B}{G}{G}{G}{G}
+Bot1.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 1
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves

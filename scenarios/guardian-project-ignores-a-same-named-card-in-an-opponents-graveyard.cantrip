@@ -1,0 +1,57 @@
+# Guardian Project: "if it doesn't have the same name as another creature you control or a creature card in your
+# graveyard" (CR 201.2, 603.4) reads its controller's graveyard alone. Bot2's Grizzly Bears died blocking on turn 5, so a
+# Grizzly Bears card of the same name lies in Bot2's graveyard; Bot1 controls none of that name and has none in its own
+# graveyard, so its first Grizzly Bears draws a card and Bot2's card does not stop it.
+
+[Bot1 Deck]
+Black Lotus x4
+Hill Giant
+Guardian Project
+Grizzly Bears
+Island x13
+
+[Bot2 Deck]
+Forest
+Forest
+Grizzly Bears
+Forest x17
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Hill Giant.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Hill Giant > Bot2)
+Bot2.Block(Grizzly Bears > Hill Giant)
+[T5 Bot1.Main2]
+? Bot2.Graveyard = Grizzly Bears
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Guardian Project.Cast
+Bot1.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 3
+
+[Expect]
+Bot2.Graveyard = Grizzly Bears
+Bot1.Battlefield.Grizzly Bears.Types = Creature
+Bot1.Hand.Count = 3
