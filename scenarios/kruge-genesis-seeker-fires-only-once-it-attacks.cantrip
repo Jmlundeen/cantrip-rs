@@ -1,0 +1,55 @@
+# Kruge, Genesis Seeker (2/2): the trigger fires only when Kruge itself attacks. Held back on turn 5, Gagh Slinger
+# attacks alone as a 3/2 for 3 (Bot2 at 17); when Kruge joins the attack on turn 7 both pump for 7 more (Bot2 at 10). If
+# the trigger fired without Kruge attacking, turn 5 would already deal 4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Kruge, Genesis Seeker
+Gagh Slinger
+Mountain
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kruge, Genesis Seeker.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gagh Slinger.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Gagh Slinger > Bot2)
+[T5 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Attack(Kruge, Genesis Seeker > Bot2; Gagh Slinger > Bot2)
+[T7 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 10
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 5
+Bot1.Library.Count = 10
+Bot2.Library.Count = 10

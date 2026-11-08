@@ -1,0 +1,45 @@
+# Kruge, Genesis Seeker (2/2): the trigger pumps only Klingons, so Goblin Balloon Brigade attacks alongside Kruge on
+# turn 5 but stays 1/1 while Kruge grows to 3/3, for 4 total (Bot2 at 16); if the trigger wrongly pumped every attacker
+# it would deal 5.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Kruge, Genesis Seeker
+Goblin Balloon Brigade
+Mountain
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kruge, Genesis Seeker.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Balloon Brigade.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Kruge, Genesis Seeker > Bot2; Goblin Balloon Brigade > Bot2)
+[T5 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 4
+Bot1.Library.Count = 11
+Bot2.Library.Count = 11

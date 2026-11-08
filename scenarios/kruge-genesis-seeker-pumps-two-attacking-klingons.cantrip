@@ -1,0 +1,60 @@
+# Kruge, Genesis Seeker (2/2): "Whenever Kruge attacks, attacking Klingons you control get +1/+1 until end of turn" (CR
+# 508.3d, 611.2c). Kruge and Gagh Slinger both attack on turn 5, so the trigger pumps both - Kruge to 3/3 and Gagh to
+# 4/3 - for 7 total (Bot2 at 13); unpumped they would deal only 5. By turn 7 the pump has worn off: both are back to 2/2
+# and 3/2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Kruge, Genesis Seeker
+Gagh Slinger
+Mountain
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kruge, Genesis Seeker.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gagh Slinger.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Kruge, Genesis Seeker > Bot2; Gagh Slinger > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Kruge, Genesis Seeker.Power = 3
+? Bot1.Battlefield.Kruge, Genesis Seeker.Toughness = 3
+? Bot1.Battlefield.Gagh Slinger.Power = 4
+? Bot1.Battlefield.Gagh Slinger.Toughness = 3
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Kruge, Genesis Seeker.Power = 2
+? Bot1.Battlefield.Gagh Slinger.Power = 3
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 13
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 5
+Bot1.Library.Count = 10
+Bot2.Library.Count = 10
