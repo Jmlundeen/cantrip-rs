@@ -1,0 +1,77 @@
+# "goad up to X target creatures, where X is the number of opponents you attacked this turn" (CR 508.1, 701.15a, 603.3d):
+# Bot1 attacks Bot2 and Bot3, so X is 2 and the two creatures it names - its own Ornithopter and Bot2's Llanowar Elves - are
+# goaded. On the next turn it attacks both again but goads only one - "up to X" takes fewer, the earlier goad having
+# lapsed - and on the third it names none at all, which "up to" allows.
+
+[Bot1 Deck]
+Ornithopter
+Mountain x3
+Galvanizing Tenor
+Mountain x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Bot3 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Battlefield.Forest.Activate
+Bot3.Hand.Llanowar Elves.Cast
+[T4 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T10 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Galvanizing Tenor.Cast
+? Bot1.Mana = 
+[T13 Bot1.DeclareAttackers]
+Bot1.Attack(Galvanizing Tenor > Bot2; Ornithopter > Bot3)
+Bot1.Target(Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Battlefield.Llanowar Elves.GoadedBy = Bot1
+? Bot3.Battlefield.Llanowar Elves.GoadedBy = (absent)
+[T16 Bot1.DeclareAttackers]
+Bot1.Attack(Galvanizing Tenor > Bot2; Ornithopter > Bot3)
+Bot1.Target(Bot3.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Battlefield.Llanowar Elves.GoadedBy = (absent)
+? Bot3.Battlefield.Llanowar Elves.GoadedBy = Bot1
+
+[T19 Bot1.DeclareAttackers]
+Bot1.Attack(Galvanizing Tenor > Bot2; Ornithopter > Bot3)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Battlefield.Llanowar Elves.GoadedBy = (absent)
+? Bot3.Battlefield.Llanowar Elves.GoadedBy = (absent)
+
+[Expect]
+Turn = 19
+Bot1.Battlefield.Galvanizing Tenor.Types = Creature
+Bot1.Battlefield.Galvanizing Tenor.Keywords = Menace
+Bot2.Battlefield.Llanowar Elves.GoadedBy = (absent)
+Bot3.Battlefield.Llanowar Elves.GoadedBy = (absent)
