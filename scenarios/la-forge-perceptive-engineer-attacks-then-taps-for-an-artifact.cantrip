@@ -1,0 +1,41 @@
+# La Forge, Perceptive Engineer (1/4): Vigilance (CR 702.14a) leaves it untapped after attacking on turn 3 (Bot2 at
+# 19), so it still taps for {U} (ArtifactSpells) in Main2 and casts Sol Ring. Tapped after combat, the artifact could
+# not be cast.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+La Forge, Perceptive Engineer
+Sol Ring
+Island x3
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.La Forge, Perceptive Engineer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(La Forge, Perceptive Engineer > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.La Forge, Perceptive Engineer.Tapped = false
+Bot1.Battlefield.La Forge, Perceptive Engineer.Activate
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Library.Count = 12
+Bot2.Library.Count = 12

@@ -1,0 +1,46 @@
+# La Forge, Perceptive Engineer (1/4): "{T}: Add {U}. Spend this mana only to cast an artifact spell." (CR 106.6).
+# Tapped on turn 3 alongside the Island, Delver of Secrets (a {U} non-artifact) is paid with the Island's mana while La
+# Forge's {U} stays in the pool, still restricted; that {U} then pays the {1} of Sol Ring, an artifact. Either mana
+# spent the other way would fail a pool check.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+La Forge, Perceptive Engineer
+Delver of Secrets
+Sol Ring
+Island x2
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.La Forge, Perceptive Engineer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.La Forge, Perceptive Engineer.Activate
+? Bot1.Battlefield.La Forge, Perceptive Engineer.Tapped = true
+Bot1.Hand.Delver of Secrets.Cast
+? Bot1.Mana = {U} (ArtifactSpells)
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Delver of Secrets.Power = 1
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 12
+Bot2.Library.Count = 12
