@@ -1,0 +1,11 @@
+{
+  "name": "La Forge, Perceptive Engineer",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Creature — Human Artificer",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "Vigilance (Attacking doesn't cause this creature to tap.)\n{T}: Add {U}. Spend this mana only to cast an artifact spell.",
+  "keywords": [
+    "Vigilance"
+  ]
+}
