@@ -1,0 +1,8 @@
+{
+  "name": "Reclamation Specialist",
+  "manaCost": "{2}{B}",
+  "type": "Artifact Creature — Borg",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{1}, Sacrifice an artifact creature: Draw a card."
+}

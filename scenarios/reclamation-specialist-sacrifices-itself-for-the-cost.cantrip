@@ -1,0 +1,34 @@
+# Reclamation Specialist may sacrifice itself: the cost says "an artifact creature", not "another" (CR 602.2b, 118.3).
+# The Mox Jet beside it is only an artifact, so it cannot pay; the Specialist is the single legal choice and the ability
+# resolves with the Specialist in the graveyard and the pool empty.
+
+[Bot1 Deck]
+Reclamation Specialist
+Swamp
+Mox Jet
+Dark Ritual
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast(Spend: B)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reclamation Specialist.Cast(Spend: B, B, B)
+? Bot1.Mana = {B}
+Bot1.Battlefield.Reclamation Specialist.Activate(Ability: {1}, Sacrifice an artifact creature)
+Bot1.Choose(Reclamation Specialist)
+? Bot1.Mana =
+Bot1.Pass
+? Bot1.Graveyard = Reclamation Specialist; Dark Ritual
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Swamp
+Bot1.Hand.Count = 4
