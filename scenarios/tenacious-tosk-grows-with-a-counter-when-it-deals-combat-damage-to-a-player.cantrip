@@ -1,0 +1,53 @@
+# Tenacious Tosk {3}{G} is a 4/4 Tosk Rogue. Cast on turn 1 off four Moxen, it attacks Bot2 on turn 3. "This creature can't
+# be blocked by more than one creature" (CR 509.1b; the core keyword CantBeBlockedByMoreThanOne, which the card file grants): Bot2's two
+# Ornithopters may not both block it (the refusal), and Bot2 leaves it unblocked. The combat damage to a player triggers
+# (CR 603.2, 510.1) and puts a +1/+1 counter on it, so it is a 5/5 at the end.
+
+[Bot1 Deck]
+Tenacious Tosk
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tenacious Tosk.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Tenacious Tosk > Bot2)
+! Bot2.Block(Ornithopter#1 > Tenacious Tosk; Ornithopter#2 > Tenacious Tosk)
+Bot2.Block()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot2.Battlefield.Count = 2
+Bot1.Battlefield.Tenacious Tosk.Power = 5
+Bot1.Battlefield.Tenacious Tosk.Toughness = 5
