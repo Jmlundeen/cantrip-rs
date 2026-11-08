@@ -1,0 +1,5 @@
+{
+  "name": "Temple of the False God",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}{C}. Activate only if you control five or more lands."
+}

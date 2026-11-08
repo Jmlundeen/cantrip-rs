@@ -1,0 +1,30 @@
+# Temple of the False God: "{T}: Add {C}{C}. Activate only if you control five or more lands" (CR 602.5b). With three lands
+# on turn 5 and with four on turn 7 the activation is refused; with five on turn 9 it is allowed and adds exactly {C}{C} -
+# the pool is checked right after it, so a one- or three-mana version fails. The temple, tapped, still counts as one of
+# the five, because the condition is judged before the cost is paid.
+
+[Bot1 Deck]
+Temple of the False God
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Temple of the False God.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Temple of the False God.Activate
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Temple of the False God.Activate
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Temple of the False God.Activate
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Temple of the False God.Tapped = true
