@@ -1,0 +1,6 @@
+{
+  "name": "Growth Spiral",
+  "manaCost": "{G}{U}",
+  "type": "Instant",
+  "oracleText": "Draw a card. You may put a land card from your hand onto the battlefield."
+}

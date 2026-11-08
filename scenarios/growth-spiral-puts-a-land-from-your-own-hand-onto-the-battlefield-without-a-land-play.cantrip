@@ -1,0 +1,38 @@
+# "Draw a card. You may put a land card from your hand onto the battlefield." (CR 121.1, 608.2c): the card comes from
+# Bot1's own hand - Bot2's Island is refused - and is a land card - Bot1's own Grizzly Bears is refused; putting it onto
+# the battlefield is not a land play, so it enters with the turn's drop already used (the 2019-01-25 ruling).
+
+[Bot1 Deck]
+Growth Spiral
+Mox Emerald
+Mox Sapphire
+Forest
+Island x2
+Grizzly Bears
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.LandsPlayed = 1
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Growth Spiral.Cast
+? Bot1.Mana =
+! Bot1.Choose(Bot2.Hand.Island)
+! Bot1.Choose(Bot1.Hand.Grizzly Bears)
+Bot1.Choose(Bot1.Hand.Island)
+? Bot1.Hand.Count = 3
+? Bot1.Battlefield.Island.Types = Land
+? Bot1.LandsPlayed = 1
+? Bot2.Hand.Count = 7
+
+[Expect]
+Bot1.Battlefield.Island.Tapped = false
+Bot1.Graveyard = Growth Spiral
+Bot2.Battlefield.Count = 0
