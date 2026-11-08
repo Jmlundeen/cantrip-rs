@@ -1,0 +1,60 @@
+# Sunpetal Grove: "This land enters tapped unless you control a Forest or a Plains." (CR 614.12, 614.1d: read on
+# the battlefield as it enters, so the land itself is never one of the two). Beside a Swamp only the first copy enters
+# tapped (turn 3); once a Forest is out the second enters untapped (turn 7), the positive control for the first. It also
+# taps for {G} or {W}: blue is refused beside the green it does add, and the {G} activation is that positive control; the first copy then
+# taps for {W} on turn 7, the other half of the choice. Bot2's Forest and Plains do not count: not "you control".
+
+[Bot1 Deck]
+Swamp
+Sunpetal Grove
+Forest
+Sunpetal Grove
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+
+[Bot2 Deck]
+Forest
+Plains
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Sunpetal Grove.Play
+? Bot1.Battlefield.Sunpetal Grove.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Sunpetal Grove.Activate(Ability: {G} or {W}; Color: Blue)
+Bot1.Battlefield.Sunpetal Grove.Activate(Ability: {G} or {W}; Color: Green)
+? Bot1.Mana = {G}
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Sunpetal Grove.Play
+? Bot1.Battlefield.Sunpetal Grove#2.Tapped = false
+Bot1.Battlefield.Sunpetal Grove.Activate(Ability: {G} or {W}; Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 7
