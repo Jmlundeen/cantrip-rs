@@ -1,0 +1,50 @@
+# "Klingons and Warriors you control have vigilance": Creakwood Safewright (an Elf Warrior) attacks and is not tapped
+# (CR 702.20b). "You control" is Bot1 alone: Bot2's own Creakwood Safewright gets nothing from Bot1's Spacecraft and taps
+# when it attacks.
+
+[Bot1 Deck]
+I.K.S. Negh'Var, Imperial Flagship
+Black Lotus
+Mox Jet
+Mox Pearl
+Creakwood Safewright
+Island x15
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Creakwood Safewright
+Island x17
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.I.K.S. Negh'Var, Imperial Flagship.Cast
+Bot1.Hand.Creakwood Safewright.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Creakwood Safewright.Cast
+? Bot2.Mana =
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Creakwood Safewright.Keywords = Vigilance
+? Bot2.Battlefield.Creakwood Safewright.Keywords = (absent)
+Bot1.Attack(Creakwood Safewright > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Creakwood Safewright.Tapped = false
+[T4 Bot2.Main1]
+Bot2.Attack(Creakwood Safewright > Bot1)
+[T4 Bot2.Main2]
+? Bot2.Battlefield.Creakwood Safewright.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Creakwood Safewright.Tapped = false
+Bot2.Battlefield.Creakwood Safewright.Tapped = true

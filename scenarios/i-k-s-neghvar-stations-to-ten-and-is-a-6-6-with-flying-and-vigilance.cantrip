@@ -1,0 +1,77 @@
+# Station (CR 702.184a): each creature is tapped as the cost and its power goes on as charge counters, so Juggernaut
+# (5), Gorn Captain (4) and Haywire Mite (1) take the Spacecraft to 5, 9 and 10. At nine it is still only an artifact;
+# the tenth counter makes it an artifact creature with base power and toughness 6/6 in addition to its other types, with
+# flying and vigilance (CR 721.2a-b).
+
+[Bot1 Deck]
+I.K.S. Negh'Var, Imperial Flagship
+Black Lotus
+Mox Emerald
+Mox Emerald
+Gorn Captain
+Juggernaut
+Haywire Mite
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.I.K.S. Negh'Var, Imperial Flagship.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Gorn Captain.Cast
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Juggernaut.Cast
+Bot1.Hand.Haywire Mite.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Juggernaut.Power = 5
+? Bot1.Battlefield.Gorn Captain.Power = 4
+? Bot1.Battlefield.Haywire Mite.Power = 1
+Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Activate(Ability: Station)
+Bot1.Choose(Juggernaut)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Counters.Charge = 5
+? Bot1.Battlefield.Juggernaut.Tapped = true
+Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Activate(Ability: Station)
+Bot1.Choose(Gorn Captain)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Counters.Charge = 9
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Types = Artifact
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Power = (absent)
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Keywords = (absent)
+Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Activate(Ability: Station)
+Bot1.Choose(Haywire Mite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Counters.Charge = 10
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Types = Artifact; Creature
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Power = 6
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Toughness = 6
+? Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Keywords = Flying; Vigilance
+
+[Expect]
+Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Power = 6
+Bot1.Battlefield.I.K.S. Negh'Var, Imperial Flagship.Types = Artifact; Creature
