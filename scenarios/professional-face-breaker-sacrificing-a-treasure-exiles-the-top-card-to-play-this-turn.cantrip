@@ -1,0 +1,51 @@
+# "Sacrifice a Treasure: Exile the top card of your library. You may play that card this turn." (CR 118.3, 601.3): the
+# Treasure is the cost, so it leaves the battlefield as the ability is activated; the top card of Bot1's library (a
+# Lightning Bolt) is exiled and Bot1 casts it from exile at Bot2 the same turn for 3 more damage (18 to 15). The red
+# mana left over from the Mountain pays for it, so the sacrifice, not the mana, is what the Treasure bought.
+
+[Bot1 Deck]
+Professional Face-Breaker
+Mountain
+Mox Ruby
+Mox Jet
+Memnite
+Island
+Island
+Island
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Professional Face-Breaker.Cast(Spend: R, R, B)
+? Bot1.Mana =
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Professional Face-Breaker > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+Bot1.Battlefield.Professional Face-Breaker.Activate(Ability: Sacrifice a Treasure)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Treasure Token = (absent)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Count = 5
+Bot1.Graveyard = Lightning Bolt

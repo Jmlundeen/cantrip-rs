@@ -1,0 +1,11 @@
+{
+  "name": "Professional Face-Breaker",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Human Warrior",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Menace\nWhenever one or more creatures you control deal combat damage to a player, create a Treasure token.\nSacrifice a Treasure: Exile the top card of your library. You may play that card this turn.",
+  "keywords": [
+    "Menace"
+  ]
+}
