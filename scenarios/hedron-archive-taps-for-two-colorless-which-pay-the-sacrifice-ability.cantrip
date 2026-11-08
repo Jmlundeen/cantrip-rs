@@ -1,0 +1,57 @@
+# Hedron Archive {4}: both activated abilities paid exactly, the pool read after each payment.
+# Turn 1: the first Archive is cast for four (Black Lotus and Mox Pearl), the pool empty, and it taps for
+# "{T}: Add {C}{C}." (CR 605.1a): exactly two colorless mana. Turn 3 a second Archive is cast for four (Mox Jet,
+# Mox Sapphire and two Islands), and that {C}{C} pays the {2} of its "{2}, {T}, Sacrifice this artifact: Draw two
+# cards." (CR 107.5, 701.21a), which draws exactly two cards (CR 121.1): #1 stays on the battlefield tapped, #2 is
+# sacrificed, and the pool is empty at the end.
+
+[Bot1 Deck]
+Hedron Archive
+Hedron Archive
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hedron Archive.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Hedron Archive.Activate(Ability: Add {C}{C})
+? Bot1.Mana = {C}{C}
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Hedron Archive.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Hedron Archive#1.Activate(Ability: Add {C}{C})
+? Bot1.Mana = {C}{C}
+Bot1.Battlefield.Hedron Archive#2.Activate(Ability: Draw two cards)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+
+[Expect]
+Bot1.Battlefield.Hedron Archive.Tapped = true
+Bot1.Graveyard = Hedron Archive; Black Lotus
+Bot1.Hand.Count = 2
+Bot1.Mana =
