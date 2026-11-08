@@ -1,0 +1,25 @@
+# Fortified Village: "you may reveal a Forest or Plains card from your hand" (CR 701.20a, 614.1c) - the second subtype
+# qualifies as the first does. Bot1's hand holds a Plains and Forests, and revealing the Plains leaves the Village
+# untapped and able to tap for mana, so a filter that took only Forests fails here.
+
+[Bot1 Deck]
+Fortified Village
+Plains
+Forest x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Fortified Village.Play
+Bot1.Accept
+Bot1.Choose(Plains)
+? Bot1.Revealed = Plains
+? Bot1.Battlefield.Fortified Village.Tapped = false
+[T3 Bot1.Main1]
+Bot1.Battlefield.Fortified Village.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Fortified Village.Tapped = true

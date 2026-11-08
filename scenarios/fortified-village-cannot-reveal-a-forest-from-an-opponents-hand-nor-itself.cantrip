@@ -1,0 +1,22 @@
+# "a Forest or Plains card from your hand" (CR 701.20a, 400.7): Bot2's hand holds Forests but Bot1's holds none - an Island is
+# no Forest or Plains, and a land is not one just because it can make the corresponding mana. So no card can be revealed,
+# Bot2's hand stays where it is, and this one enters tapped.
+
+[Bot1 Deck]
+Fortified Village
+Island
+Swamp x18
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Fortified Village.Play
+Bot1.Accept
+? Bot1.Battlefield.Fortified Village.Tapped = true
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Fortified Village.Tapped = true
+Bot1.Hand.Count = 6
+Bot2.Hand.Count = 7
