@@ -1,0 +1,23 @@
+# "a Plains or Swamp card from your hand" (CR 701.20a, 400.7): Bot2's hand holds a Plains but Bot1's holds none - and the
+# other Shineshadow Snarl in Bot1's hand cannot be revealed either, because a land is not a Plains or a Swamp just because it
+# can make the corresponding mana. So Bot1 reveals nothing and this one enters tapped.
+
+[Bot1 Deck]
+Shineshadow Snarl
+Shineshadow Snarl
+Mountain x18
+
+[Bot2 Deck]
+Plains
+Island x19
+
+[Actions]
+Bot1.Hand.Shineshadow Snarl.Play
+Bot1.Accept
+? Bot1.Battlefield.Shineshadow Snarl.Tapped = true
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Shineshadow Snarl.Tapped = true
+Bot1.Hand.Count = 6
+Bot2.Hand.Count = 7
