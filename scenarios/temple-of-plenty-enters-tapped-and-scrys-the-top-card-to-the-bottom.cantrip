@@ -1,0 +1,28 @@
+# Temple of Plenty enters tapped (its first sentence) and, when it enters, scry 1 (CR 701.22): Bot1 sends the Lightning Bolt it
+# looks at to the bottom, so the Black Lotus under it is on top and Counterspell next, with every card still in the
+# library (scry is not surveil: none goes to the graveyard). On turn 3, untapped, its {T} adds exactly one green mana.
+
+[Bot1 Deck]
+Temple of Plenty
+Island x6
+Lightning Bolt
+Black Lotus
+Counterspell
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Temple of Plenty.Play
+Bot1.Arrange( | Lightning Bolt)
+? Bot1.Library = Black Lotus; Counterspell; Lightning Bolt
+? Bot1.Graveyard.Count = 0
+
+[T3 Bot1.Main1]
+Bot1.Battlefield.Temple of Plenty.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Temple of Plenty
+Bot1.Battlefield.Temple of Plenty.Tapped = true
