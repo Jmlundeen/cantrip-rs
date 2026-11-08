@@ -1,0 +1,20 @@
+# "you may reveal ... If you don't, this land enters tapped" (CR 614.1d): Bot1 declines the reveal, so Frostboil Snarl
+# enters the battlefield tapped and cannot be tapped for mana that turn.
+
+[Bot1 Deck]
+Frostboil Snarl
+Island
+Mountain x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Frostboil Snarl.Play
+Bot1.Decline
+? Bot1.Battlefield.Frostboil Snarl.Tapped = true
+! Bot1.Battlefield.Frostboil Snarl.Activate(Color: Blue)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Frostboil Snarl.Tapped = true

@@ -1,0 +1,30 @@
+# Frostboil Snarl: "As this land enters, you may reveal an Island or Mountain card from your hand. If you don't, this land
+# enters tapped. {T}: Add {U} or {R}" (CR 614.1d, 701.20a, 605.1a). Bot1 reveals an Island, so it enters untapped; on turns
+# 3 and 5 it taps for {U} and for {R}, each the single mana the {T} buys, and it offers no green.
+
+[Bot1 Deck]
+Frostboil Snarl
+Island
+Mountain x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Frostboil Snarl.Play
+Bot1.Accept
+Bot1.Choose(Island)
+? Bot1.Revealed = Island
+? Bot2.Revealed = (absent)
+? Bot1.Battlefield.Frostboil Snarl.Tapped = false
+[T3 Bot1.Main1]
+Bot1.Battlefield.Frostboil Snarl.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Frostboil Snarl.Activate(Color: Green)
+Bot1.Battlefield.Frostboil Snarl.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Frostboil Snarl.Tapped = true
