@@ -1,0 +1,47 @@
+# Nature's Lore searches its controller's library for a Forest card - basic or not (CR 109.2, 205.3i, 701.23b) - and puts it
+# onto the battlefield, then shuffles (CR 701.23, 701.24). Bot1's library holds Temple Garden (a Forest though
+# nonbasic and also a Plains) and a Forest: the search refuses an Island, takes the Garden, and Bot1 pays 2 life for
+# its entry so it arrives untapped. Bot2's Forest stays in its hand: only your own library is searched.
+
+[Bot1 Deck]
+Nature's Lore
+Mox Emerald
+Mox Pearl
+Island
+Island
+Island
+Island
+Temple Garden
+Forest
+Island x11
+
+[Bot2 Deck]
+Forest
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Nature's Lore.Cast
+? Bot1.Mana =
+! Bot1.Search(Island)
+! Bot1.Search(Temple Garden; Forest)
+Bot1.Search(Temple Garden)
+Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Life = 18
+Bot1.Battlefield.Temple Garden.Tapped = false
+Bot1.Battlefield.Count = 3
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 12
+Bot1.Graveyard = Nature's Lore
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 13
+Bot1.Shuffles = 1
