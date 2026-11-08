@@ -1,0 +1,8 @@
+{
+  "name": "Warship Flight Crew",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Klingon Pilot",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": ""
+}
