@@ -1,0 +1,5 @@
+{
+  "name": "Rogue's Passage",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{4}, {T}: Target creature can't be blocked this turn."
+}
