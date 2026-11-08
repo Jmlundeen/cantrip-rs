@@ -1,0 +1,78 @@
+# Talisman of Hierarchy prints two mana abilities (CR 605.1a): "{T}: Add {C}." costs nothing, while "{T}: Add {W} or {B}.
+# This artifact deals 1 damage to you." deals the damage as it resolves (a mana ability has no stack, CR 605.3b) and names its
+# color as it resolves. Cast for {2} on turn 1, Bot1 taps it for {C} on turn 3 and stays at 20, for {W} on turn 5 and for {B}
+# on turn 7, one damage each. The colored ability refuses red (the {W} activation is the positive control), and the
+# colorless ability takes no color at all.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Talisman of Hierarchy
+Plains
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Talisman of Hierarchy.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Talisman of Hierarchy.Activate(Ability: {C}; Color: White)
+Bot1.Battlefield.Talisman of Hierarchy.Activate(Ability: {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Talisman of Hierarchy.Activate(Ability: {W} or {B}; Color: Red)
+Bot1.Battlefield.Talisman of Hierarchy.Activate(Ability: {W} or {B}; Color: White)
+? Bot1.Mana = {W}
+? Bot1.Life = 19
+[T7 Bot1.Main1]
+Bot1.Battlefield.Talisman of Hierarchy.Activate(Ability: {W} or {B}; Color: Black)
+? Bot1.Mana = {B}
+? Bot1.Life = 18
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Talisman of Hierarchy.Tapped = true
+Bot1.Life = 18
