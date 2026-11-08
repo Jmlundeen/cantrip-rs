@@ -1,0 +1,58 @@
+# "Whenever you attack, Klingons and Warriors you control get +2/+0 and gain trample until end of turn." (CR 611.2c): Gagh
+# Slinger (a Klingon Warrior) and Burnout Bashtronaut (a Goblin Warrior) each get +2/+0 with toughness untouched and trample,
+# while Gnarling Targ the Boar gets nothing, and so does Bot2's Glistener Elf - an Elf Warrior, but not one Bot1 controls.
+
+[Bot1 Deck]
+Gnarling Targ
+Gagh Slinger
+Burnout Bashtronaut
+Mountain x9
+Island x8
+
+[Bot2 Deck]
+Forest
+Glistener Elf
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gnarling Targ.Cast
+? Bot1.Mana =
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gagh Slinger.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Burnout Bashtronaut.Cast
+? Bot1.Mana =
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Glistener Elf.Cast
+Bot1.Attack(Gnarling Targ > Bot2; Gagh Slinger > Bot2; Burnout Bashtronaut > Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Gagh Slinger.Power = 5
+? Bot1.Battlefield.Gagh Slinger.Toughness = 2
+? Bot1.Battlefield.Gagh Slinger.Keywords = Trample
+? Bot1.Battlefield.Burnout Bashtronaut.Power = 3
+? Bot1.Battlefield.Burnout Bashtronaut.Toughness = 1
+? Bot1.Battlefield.Gnarling Targ.Power = 4
+? Bot2.Battlefield.Glistener Elf.Power = 1
+? Bot2.Battlefield.Glistener Elf.Keywords = Infect
+
+[Expect]
+Bot1.Battlefield.Gnarling Targ.Keywords = Trample
+Bot1.Battlefield.Gnarling Targ.Toughness = 5

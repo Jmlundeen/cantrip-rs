@@ -1,0 +1,55 @@
+# Gnarling Targ: "Klingons and Warriors you control get +2/+0 and gain trample until end of turn" (CR 611.2c) - the Klingon
+# half as well as the Warrior half. Battle-Scarred Survivalist is a Klingon Scout, no Warrior, so a filter that read only
+# Warriors leaves it 1/1; the pump gives it +2/+0, toughness untouched, and trample, and leaves the Boar alone.
+
+[Bot1 Deck]
+Gnarling Targ
+Mountain
+Mountain
+Mountain
+City of Brass
+Mountain
+Mountain
+Battle-Scarred Survivalist
+Mountain x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.City of Brass.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Battlefield.City of Brass.Activate(Color: Red)
+Bot1.Hand.Gnarling Targ.Cast
+? Bot1.Mana = 
+[T11 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.City of Brass.Activate(Color: Black)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Battle-Scarred Survivalist.Cast
+? Bot1.Mana = 
+[T11 Bot1.DeclareAttackers]
+Bot1.Attack(Gnarling Targ > Bot2)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Battle-Scarred Survivalist.Power = 3
+? Bot1.Battlefield.Battle-Scarred Survivalist.Toughness = 1
+? Bot1.Battlefield.Battle-Scarred Survivalist.Keywords = Menace; Trample
+
+[Expect]
+Turn = 11
+Bot1.Battlefield.Battle-Scarred Survivalist.Power = 3
+Bot1.Battlefield.Battle-Scarred Survivalist.Keywords = Menace; Trample
+Bot1.Battlefield.Gnarling Targ.Power = 4

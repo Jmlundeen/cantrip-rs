@@ -1,0 +1,57 @@
+# Probe: Firdoch Core (changeling, a Warrior and a Klingon, no creature) is among "Klingons and Warriors you control" as
+# Gnarling Targ's trigger resolves (CR 109.2, 611.2c); animated afterwards it is 6/4 with trample.
+
+[Bot1 Deck]
+Firdoch Core
+Gnarling Targ
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Battlefield.Mountain#5.Activate
+Bot1.Hand.Gnarling Targ.Cast
+[T11 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T11 Bot1.DeclareAttackers]
+Bot1.Attack(Gnarling Targ > Bot2)
+Bot1.Pass
+Bot1.Pass
+[T11 Bot1.Main2]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Battlefield.Firdoch Core.Activate(Ability: {4})
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 11
+Bot1.Battlefield.Firdoch Core.Power = 6
+Bot1.Battlefield.Firdoch Core.Toughness = 4
+Bot1.Battlefield.Firdoch Core.Keywords = Changeling; Trample
