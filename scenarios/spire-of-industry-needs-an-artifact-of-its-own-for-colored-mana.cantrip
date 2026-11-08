@@ -1,0 +1,30 @@
+# "Activate only if you control an artifact" (CR 602.5b): with no artifact of its own the any-color ability is not
+# offered even though Bot2's Mox Ruby sits untapped - only the controller's artifacts count. The {C} ability has no
+# condition and still taps.
+
+[Bot1 Deck]
+Spire of Industry
+Island x19
+
+[Bot2 Deck]
+Mox Ruby
+Island x19
+
+[Actions]
+Bot1.Hand.Spire of Industry.Play
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Spire of Industry.Activate(Ability: any color; Color: White)
+Bot1.Battlefield.Spire of Industry.Activate(Ability: {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+? Bot2.Battlefield.Mox Ruby.Tapped = false
+
+[Expect]
+Bot1.Battlefield.Spire of Industry.Tapped = true
+Bot1.Life = 20
