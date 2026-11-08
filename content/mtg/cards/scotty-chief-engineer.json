@@ -1,0 +1,8 @@
+{
+  "name": "Scotty, Chief Engineer",
+  "manaCost": "{3}{U}",
+  "type": "Legendary Creature — Human Artificer",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Tap an untapped artifact you control: Target creature can't be blocked this turn."
+}

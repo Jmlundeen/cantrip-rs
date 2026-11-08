@@ -1,0 +1,53 @@
+# Scotty, Chief Engineer: "Tap an untapped artifact you control: Target creature can't be blocked this turn." Cast on turn 1
+# off Island and three Moxen (the pool empties exactly), it taps a Mox for its own Memnite (CR 602.2a) on turn 3: the
+# Memnite cannot be blocked (the refusal, CR 509.1b), so it connects alone and the Ornithopter survives to show the
+# control: on turn 5 the effect has worn off (CR 611.2a) and the Ornithopter blocks the Memnite, so Bot2 stays at 19.
+
+[Bot1 Deck]
+Scotty, Chief Engineer
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Memnite
+Island
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Scotty, Chief Engineer.Cast(Spend: U, U, W, B)
+? Bot1.Mana =
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Scotty, Chief Engineer.Activate(Memnite; Tap: Mox Sapphire)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Bot2)
+! Bot2.Block(Ornithopter > Memnite)
+Bot2.Pass
+[T3 Bot1.Main2]
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite > Bot2)
+Bot2.Block(Ornithopter > Memnite)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
