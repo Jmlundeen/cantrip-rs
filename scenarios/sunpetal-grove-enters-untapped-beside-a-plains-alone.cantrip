@@ -1,0 +1,20 @@
+# Sunpetal Grove: "This land enters tapped unless you control a Forest or a Plains." (CR 614.1d): the Plains half of the
+# condition on its own - beside Bot1's Plains, with no Forest anywhere, the Grove enters untapped on turn 3.
+
+[Bot1 Deck]
+Plains
+Sunpetal Grove
+Swamp x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Sunpetal Grove.Play
+? Bot1.Battlefield.Sunpetal Grove.Tapped = false
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Plains; Sunpetal Grove
