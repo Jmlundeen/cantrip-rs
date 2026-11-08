@@ -1,0 +1,53 @@
+# "create a number of 2/1 red Klingon Warrior creature tokens with haste equal to the number of opponents you have" (CR 111.1,
+# 608.2c): in a three-player game Bot1 has two opponents, so the enters trigger makes exactly two of the shared tokens.
+
+[Bot1 Deck]
+Glory to the Empire!
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Gleemox
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Hand.Glory to the Empire!.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot1.Battlefield.Klingon Warrior Token#1.Power = 2
+Bot1.Battlefield.Klingon Warrior Token#1.Toughness = 1
+Bot1.Battlefield.Klingon Warrior Token#1.Colors = Red
+Bot1.Battlefield.Klingon Warrior Token#1.Keywords = Haste
+Bot1.Battlefield.Klingon Warrior Token#1.Subtypes = Klingon; Warrior
+Bot1.Battlefield.Klingon Warrior Token#2.Power = 2
+Bot1.Battlefield.Klingon Warrior Token#2.Toughness = 1
+Bot1.Battlefield = Gleemox; Glory to the Empire!; Klingon Warrior Token; Klingon Warrior Token; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire

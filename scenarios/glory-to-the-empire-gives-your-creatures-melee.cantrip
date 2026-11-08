@@ -1,0 +1,72 @@
+# "Creatures you control have melee." (CR 702.121a): in a three-player game each token that attacks both opponents gets +1/+1 for
+# each of them, so 2/1 becomes 4/3; Bot2's own Llanowar Elves has no melee, so attacking Bot1 leaves it 1/1.
+
+[Bot1 Deck]
+Glory to the Empire!
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Gleemox
+Mountain x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Hand.Glory to the Empire!.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Klingon Warrior Token#1 > Bot2; Klingon Warrior Token#2 > Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Battlefield.Klingon Warrior Token#1.Power = 4
+? Bot1.Battlefield.Klingon Warrior Token#1.Toughness = 3
+? Bot1.Battlefield.Klingon Warrior Token#2.Power = 4
+[T5 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T5 Bot2.Main2]
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+
+[Expect]
+Bot2.Life = 16
+Bot3.Life = 16
+Bot1.Life = 19
