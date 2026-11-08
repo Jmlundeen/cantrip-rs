@@ -1,0 +1,22 @@
+# "a Mountain or Plains card from your hand" (CR 701.20a, 400.7): Bot2's hand holds Mountains but Bot1's holds none - a Forest
+# is no Mountain or Plains, and the Snarl itself has no land subtypes, so it cannot be revealed either. Bot2's hand stays
+# where it is, and this one enters tapped.
+
+[Bot1 Deck]
+Furycalm Snarl
+Furycalm Snarl
+Forest x18
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Furycalm Snarl.Play
+Bot1.Accept
+? Bot1.Battlefield.Furycalm Snarl.Tapped = true
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Furycalm Snarl.Tapped = true
+Bot1.Hand.Count = 6
+Bot2.Hand.Count = 7
