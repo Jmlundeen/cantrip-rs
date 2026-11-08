@@ -1,0 +1,22 @@
+# "a Swamp or Mountain card from your hand" (CR 701.20a, 400.7): Bot2's hand holds Swamps but Bot1's holds none - an Island is
+# no Swamp or Mountain, and a land is not one just because it can make the corresponding mana. So no card can be revealed,
+# Bot2's hand stays where it is, and this one enters tapped.
+
+[Bot1 Deck]
+Foreboding Ruins
+Island
+Forest x18
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Foreboding Ruins.Play
+Bot1.Accept
+? Bot1.Battlefield.Foreboding Ruins.Tapped = true
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Foreboding Ruins.Tapped = true
+Bot1.Hand.Count = 6
+Bot2.Hand.Count = 7
