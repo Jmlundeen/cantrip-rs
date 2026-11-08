@@ -5,9 +5,10 @@ description: Hand cards to several implementors from one shared queue in the wor
 
 # The card lane
 
-`tools/maintenance/card-lane.py` is dispatch. It does not write a card, review it or land it, and it has no agent
-loop and no generated track. The card itself is still the `add-cards` skill; its scenarios are still
-`write-game-script`. This file is the queue, the claim, the packet and the shared branch.
+`tools/maintenance/card-lane.py` is dispatch and the card's mechanical gates. It does not write a card, review it or
+land it, and it has no agent loop and no generated track. The card itself is still the `add-cards` skill; its
+scenarios are still `write-game-script`; its review is still someone who did not write it. This file is the queue, the
+claim, the packet, the shared branch, `check` and `commit`.
 
 ## The model
 
@@ -18,7 +19,8 @@ loop and no generated track. The card itself is still the `add-cards` skill; its
   works one pool slot.
 - **A packet in the implementor's worktree:** `.card-lane/<queue>/<card>/` - `brief.md`, `reference.md` (everything
   `new-card.py` prints: Oracle text, rulings, CR rules, prior art, test points), `prior-art.md` (the matched cards'
-  code and a scenario), `content.json` and `state.json`. Gitignored, regenerable, thrown away with the slot.
+  code and a scenario), `content.json`, `report.json` (the line-by-line evidence `check` reads) and `state.json`.
+  Gitignored, regenerable, thrown away with the slot.
 - **One shared branch**, `card-lane/<queue>`. `next` merges its tip into the slot before a card is opened; `share`,
   `done`, `block` and `release` update it with a compare-and-swap. A `Mechanics:` or `Engine:` commit made by one
   implementor is therefore in the next implementor's worktree: shared mechanics and implemented engine gaps are
@@ -62,27 +64,43 @@ Your first command is `join` (`POOL.md`, worktree-pool-setup), so the slot has i
 
    It prints the brief and writes the packet into your worktree. If you lose your place, run exactly the same line:
    the card is still yours and nothing new is taken. `--card "<Name>"` picks a named card instead of the next one;
-   `--refresh` rebuilds the packet (after `queue` added cards, for example).
-2. **Do the card as `add-cards` says** - `new-card.py`, the rules, prior art, code, scenarios, the break loop, citations,
-   coverage, client, review, and one `Card:` commit ending `Closes #N`. Claim the card's GitHub issue first
-   (`card-issues.py claim "<Name>"`), unless you already hold it. `reference.md` and `prior-art.md` are your starting
-   point; read only the sections of the skills the card needs.
-3. **Share a mechanic as soon as it is committed.** After a `Mechanics:` or `Engine:` commit, and before the card is
-   done:
+   `--refresh` rebuilds the packet (after `queue` added cards, for example). Claim the card's GitHub issue
+   (`card-issues.py claim "<Name>"`, unless you already hold it), then run the same line with `--issue <N>` so the
+   claim and the `Card:` commit carry it. `--engine` is only for a card the coordinator has put the core in scope
+   for; a card opened without it cannot change `cantrip-state`, `cantrip-rules` or `cantrip-api`.
+2. **Do the card as `add-cards` says** - the rules, prior art, code, scenarios, the break loop, citations, coverage and
+   client. `reference.md` and `prior-art.md` are your starting point; read only the sections of the skills the card
+   needs. Fill the packet's `report.json` as you go: every printed Oracle line and the code that implements it, each
+   test point with the scenario line that catches it, each ruling (a scenario line, or why the card does not decide
+   it), a line answering every lint LOOK, and `equivalent_mutants` for a mutation survivor that means the same thing.
+3. **Check while you write:**
+
+   ```sh
+   python tools/maintenance/card-lane.py check --id w1 --queue trc --fast
+   ```
+
+   It runs the claim, scope, Oracle text, scenario, corpus, lint, citation and report gates. `--fast` skips only
+   coverage and mutation; the full `check` runs both. Read the gate's detail, fix it, and run it again.
+4. **Commit and close - the gated path:**
+
+   ```sh
+   python tools/maintenance/card-lane.py commit --id w1 --queue trc
+   ```
+
+   It runs every gate, writes the `Engine:`, `Mechanics:` and `Client:` commits the change needs (each with only its
+   own paths), then exactly one `Card: <Name>` commit ending `Closes #N`, and closes the claim. No commit carries
+   `Co-Authored-By`. If it refuses, nothing is committed (or only the commits before the failing one): fix the gate
+   and run it again. `done` also closes a claim, but it is the manual close for work committed by hand and does not
+   run the gates; a card you wrote uses `commit`.
+5. **Share a mechanic as soon as it is committed.** `commit` shares when it closes. If you commit an `Engine:` or
+   `Mechanics:` change by hand before the card is ready, share it so the next worker starts with it:
 
    ```sh
    python tools/maintenance/card-lane.py share --id w1 --queue trc
    ```
 
    That merges the queue's branch into your slot if someone else moved it, then moves the branch to your `HEAD`.
-4. **Close the claim:**
-
-   ```sh
-   python tools/maintenance/card-lane.py done --id w1 --queue trc
-   ```
-
-   It requires a clean tree and a commit since the card was opened (or `--no-commit` for a card that needed none), and
-   shares your commits. For a card that waits on the engine:
+6. **Block or release.** For a card that waits on the engine (never a workaround):
 
    ```sh
    python tools/maintenance/card-lane.py block --id w1 --queue trc --rule 601.2c --note "..."
@@ -90,13 +108,52 @@ Your first command is `join` (`POOL.md`, worktree-pool-setup), so the slot has i
 
    For work that stops: `release --id w1 --queue trc --reason "..."` puts the card back. `abandon` closes it for good
    with the reason. `block`, `abandon` and `release` save any uncommitted diff as the packet's `work.patch` first.
-5. **Leave the slot** with the MEMBER id `join` printed: `tools\worktree.cmd leave <MEMBER>`. Commit before leaving;
+7. **Leave the slot** with the MEMBER id `join` printed: `tools\worktree.cmd leave <MEMBER>`. Commit before leaving;
    do not push, and do not release the lease.
+
+## The gates
+
+`check` (and `commit`) runs these in order. A full check adds the last two; `--fast` skips only those while the card
+is being written.
+
+| gate | what it refuses |
+|---|---|
+| `scope` | a path that is not the card's content, its Rust file, a scenario, a card note it deletes, a shared mechanic, the client, the harness, `docs/known-issues.md`, or the core without `--engine`; no card path or no changed scenario that holds the card |
+| `oracle` | content whose Oracle text is not Scryfall's current text (an unreachable Scryfall is shown as WARN; check it by hand) |
+| `scenarios` | a changed scenario with `# TODO`, `# Known bug`, no `[Expect]` or no assertion in it; no scenario holding the card; a card with a mana cost and no `? Bot1.Mana =` |
+| `corpus` | any fail, known bug or need-cards count from `corpus --card`, a build warning from a changed file, or no passing scenario |
+| `lint` | a `card-lint.py` NEVER finding; every LOOK and every `card-dupes.py` shared body must be answered in `report.json` |
+| `citations` | a `CR` citation in the card file or a scenario that is not a rule of the current Comprehensive Rules |
+| `report` | `decision` not `"done"`, no issue, a printed line with no code or marked disagreeing, a test point with no `?`/`[Expect]` line in a scenario holding the card, a ruling with no scenario or reason, an unanswered LOOK, or an unexcused survivor |
+| `coverage` | any line of the card's file its scenarios never ran (`card-coverage.py`; full check only) |
+| `mutation` | a `card-mutate.py` survivor that `report.json` does not declare equivalent (full check only) |
+
+`report.json` starts in the packet from `new-card.py`'s printed text, test points and rulings, with the issue if one
+was given. Its shape:
+
+```json
+{
+  "issue": 123,
+  "decision": "done",
+  "reason": "",
+  "validation": [{"line": "Flying", "code": "the generated Flying keyword", "agrees": true}],
+  "test_points": [{"point": "...", "scenario": "scenarios/foo-shows-it.cantrip", "line": 31}],
+  "rulings": [{"ruling": "...", "scenario": "scenarios/foo-shows-it.cantrip", "line": 31,
+               "no_decision": ""}],
+  "look_answers": ["crates/cantrip-cards/src/cards/foo.rs:12: the one object is the chosen target"],
+  "equivalent_mutants": [{"mutant": "crates/cantrip-cards/src/cards/foo.rs:12: 4 to 5",
+                          "why": "both faces print four"}],
+  "notes": ""
+}
+```
+
+A ruling the card does not decide needs no scenario line, only a `no_decision` of a sentence saying why. The file is
+never committed; the `check`/`commit` output and `check.json` in the packet are the evidence.
 
 ## Solo, without the pool
 
 The lane works in any checkout: in a worktree outside `.claude/worktrees/pool-<n>` a claim is marked `solo` and no
-lease or member is needed. Do the card, commit, `done`, and push or land the branch as `CLAIMS.md` says. The pool is
+lease or member is needed. Do the card, `commit`, and push or land the branch as `claims.md` says. The pool is
 preferred when more than one implementor works at once; its slot is also what keeps two builds off each other.
 
 ## What the lane will not do
@@ -109,3 +166,5 @@ preferred when more than one implementor works at once; its slot is also what ke
   packet is in the worktree, and nothing is committed.
 - It is not a claim on GitHub. Two people in different clones have two queues; the issue claim is still the rule
   across contributors (`claims.md`).
+- It is not a review. `check` finds the mechanical items; the card is still sent to someone who did not write it
+  (`review.md`), and that review, not a green `check`, is the verdict.
