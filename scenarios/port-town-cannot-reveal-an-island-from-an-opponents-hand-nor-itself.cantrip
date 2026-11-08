@@ -1,0 +1,22 @@
+# "a Plains or Island card from your hand" (CR 701.20a, 400.7): Bot2's hand holds Islands but Bot1's holds none - and
+# the other Port Town in Bot1's hand cannot be revealed either, because a land is not a Plains or an Island just because
+# it can make the corresponding mana. So Bot1 reveals nothing and this one enters tapped.
+
+[Bot1 Deck]
+Port Town
+Port Town
+Mountain x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Port Town.Play
+Bot1.Accept
+? Bot1.Battlefield.Port Town.Tapped = true
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Port Town.Tapped = true
+Bot1.Hand.Count = 6
+Bot2.Hand.Count = 7

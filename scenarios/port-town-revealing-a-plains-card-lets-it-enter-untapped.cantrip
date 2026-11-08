@@ -1,0 +1,25 @@
+# Port Town: "you may reveal a Plains or Island card from your hand" (CR 701.20a, 614.1c) - the Plains half as well as
+# the Island half. Bot1's hand holds a Plains and an Island, and revealing the Plains alone leaves Port Town untapped and
+# able to tap for white, so a filter that took only Islands fails here.
+
+[Bot1 Deck]
+Port Town
+Plains
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Port Town.Play
+Bot1.Accept
+Bot1.Choose(Plains)
+? Bot1.Revealed = Plains
+? Bot1.Battlefield.Port Town.Tapped = false
+[T3 Bot1.Main1]
+Bot1.Battlefield.Port Town.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Port Town.Tapped = true

@@ -1,0 +1,21 @@
+# Any land card with either or both of the subtypes satisfies the reveal: Bot1 reveals Hallowed Fountain, a Plains and an
+# Island, so Port Town enters untapped.
+
+[Bot1 Deck]
+Port Town
+Hallowed Fountain
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Port Town.Play
+Bot1.Accept
+Bot1.Choose(Hallowed Fountain)
+? Bot1.Revealed = Hallowed Fountain
+? Bot1.Battlefield.Port Town.Tapped = false
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Port Town.Tapped = false
