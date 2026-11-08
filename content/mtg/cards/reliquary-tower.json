@@ -1,0 +1,5 @@
+{
+  "name": "Reliquary Tower",
+  "type": "Land",
+  "oracleText": "You have no maximum hand size.\n{T}: Add {C}."
+}
