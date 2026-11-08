@@ -1,0 +1,35 @@
+# Pongify's "target creature" is any creature, the caster's included: Bot1 destroys its own Memnite at instant speed,
+# and Bot1, its controller, creates exactly one 3/3 green Ape (CR 701.7, 701.8a); Bot2 controls nothing of it.
+
+[Bot1 Deck]
+Island
+Memnite
+Pongify
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Memnite.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pongify.Cast(Bot1.Battlefield.Memnite)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Count = 2
+Bot1.Battlefield.Ape Token.Power = 3
+Bot1.Battlefield.Ape Token.Toughness = 3
+Bot1.Battlefield.Ape Token.Colors = Green
+Bot1.Battlefield.Ape Token.Token = true
+Bot1.Graveyard = Pongify; Memnite
+Bot2.Battlefield.Count = 0

@@ -1,0 +1,33 @@
+# Pongify on Bot2's Memnite: the Ape goes to Memnite's controller, Bot2, not to Pongify's caster (CR 701.7). Bot1 casts
+# it on Bot2's turn at instant speed off its Island.
+
+[Bot1 Deck]
+Island
+Pongify
+Island x18
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pongify.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 1
+Bot2.Battlefield.Ape Token.Power = 3
+Bot2.Battlefield.Ape Token.Toughness = 3
+Bot2.Battlefield.Ape Token.Colors = Green
+Bot2.Battlefield.Ape Token.Token = true
+Bot2.Graveyard = Memnite
+Bot1.Graveyard = Pongify
+Bot1.Battlefield.Count = 1
