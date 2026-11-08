@@ -1,0 +1,46 @@
+# "If it's a creature card of the chosen type, you may reveal it and put it into your hand" - the "may" answered No:
+# the Goblin Piker on top of Bot1's library stays there, unrevealed, and is drawn in the draw step (the 2017-08-25
+# ruling). The matching Goblin Pikers in Bot2's hand and on top of Bot2's library are not Bot2's to reveal here: they
+# stay in Bot2's zones, and Bot2's hand is not touched.
+
+[Bot1 Deck]
+Herald's Horn
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Goblin Piker
+Island x13
+
+[Bot2 Deck]
+Goblin Piker
+Island x6
+Goblin Piker
+Island x12
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Herald's Horn.Cast
+Bot1.Modes(Goblin)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Looked = Goblin Piker
+Bot1.Decline
+? Bot1.Revealed = (absent)
+? Bot1.Hand.Count = 5
+? Bot2.Hand.Count = 7
+? Bot2.Library.Count = 12
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 6
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot2.Hand.Count = 7

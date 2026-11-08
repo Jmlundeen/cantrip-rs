@@ -1,0 +1,45 @@
+# The reduction is by exactly {1} (CR 601.2f) and only for the Horn's controller's creature spells of the chosen type:
+# Old Thrush {2} (a Bird, the chosen type) costs {1} for Bot1 and is paid with one green mana, the pool empty; Bot2's own
+# Old Thrush is no cheaper - it pays the full {2} with Mox Ruby and Mox Emerald, and the pool is empty again.
+
+[Bot1 Deck]
+Herald's Horn
+Black Lotus
+Mox Emerald
+Old Thrush
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Old Thrush
+Island x17
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Herald's Horn.Cast
+? Bot1.Mana =
+Bot1.Modes(Bird)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Old Thrush.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Old Thrush.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Old Thrush.Power = 1
+Bot2.Battlefield.Old Thrush.Power = 1
+Bot1.Mana =
+Bot2.Mana =

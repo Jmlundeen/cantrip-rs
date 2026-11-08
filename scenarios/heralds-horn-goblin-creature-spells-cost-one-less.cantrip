@@ -1,0 +1,36 @@
+# "As this artifact enters, choose a creature type" (CR 614.12a): Goblin is chosen and kept on the artifact (CR 607.2d).
+# "Creature spells you cast of the chosen type cost {1} less to cast": Goblin Piker ({1}{R}) is paid with one red mana
+# alone - the whole generic {1} comes off, and the pool is empty afterwards, so the reduction is exactly one (CR 601.2f).
+# Herald's Horn's own {3} is paid exactly too, by Black Lotus and nothing else.
+
+[Bot1 Deck]
+Herald's Horn
+Black Lotus
+Mox Ruby
+Mox Emerald
+Goblin Piker
+Grizzly Bears
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Herald's Horn.Cast
+? Bot1.Mana =
+Bot1.Modes(Goblin)
+? Bot1.Battlefield.Herald's Horn.ChosenSubtype = Goblin
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Piker.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Goblin Piker.Power = 2
+Bot1.Mana =

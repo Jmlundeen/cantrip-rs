@@ -1,0 +1,49 @@
+# Herald's Horn: "Creature spells you cast of the chosen type" and "a creature card of the chosen type" (CR 109.2b,
+# 205.3m). Firdoch Core is a Kindred Artifact with changeling - a Goblin, but no creature: cast with Goblin chosen it still
+# costs its whole {3} (two mana are refused, the pool is empty after three), and on top of the library at the upkeep it is
+# looked at but cannot be revealed and put into the hand.
+
+[Bot1 Deck]
+Herald's Horn
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Firdoch Core
+Island
+Firdoch Core
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Herald's Horn.Cast
+? Bot1.Mana =
+Bot1.Modes(Goblin)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Firdoch Core.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Firdoch Core.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Looked = Firdoch Core
+! Bot1.Accept
+? Bot1.Revealed = (absent)
+? Bot1.Hand.Count = 1
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Firdoch Core.Tapped = false

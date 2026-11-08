@@ -1,0 +1,39 @@
+# The top card must be a creature card of the chosen type: the Bird chosen, the Grizzly Bears on top of Bot1's library is
+# looked at and nothing else - no card is revealed, the hand stays at 5, and the Bears stay on top and are drawn.
+
+[Bot1 Deck]
+Herald's Horn
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Grizzly Bears
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Herald's Horn.Cast
+Bot1.Modes(Bird)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Looked = Grizzly Bears
+! Bot1.Accept
+? Bot1.Revealed = (absent)
+? Bot1.Hand.Count = 5
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 6
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Revealed = (absent)

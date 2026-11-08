@@ -1,0 +1,36 @@
+# An empty library has nothing to look at: on turn 5 Bot1's library holds no card (the turn 3 upkeep looked at the
+# Island and left it on top, and the draw step drew it), so the upkeep trigger looks at nothing and no card is revealed.
+
+[Bot1 Deck]
+Herald's Horn
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Herald's Horn.Cast
+Bot1.Modes(Goblin)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Looked = Island
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 0
+
+[Expect]
+Bot1.Library.Count = 0
