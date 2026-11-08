@@ -1,0 +1,50 @@
+# Flashback (CR 702.34a): Faithful Mending is cast from the graveyard for {1}{W}{U}. The Lotus Petal that paid the blue for
+# the first cast is gone by turn 5, so with a Plains and a Swamp the blue symbol is one source short and the cast is not
+# offered; playing and tapping the Island pays it exactly, the pool is empty afterwards, and the card is exiled as it leaves
+# the stack rather than going back to the graveyard.
+
+[Bot1 Deck]
+Plains
+Island
+Swamp
+Faithful Mending
+Forest
+Forest
+Forest
+Lotus Petal
+Memnite
+Ornithopter
+Grizzly Bears
+Mox Jet
+Sol Ring
+Island x3
+Plains x3
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Hand.Faithful Mending.Cast
+? Bot1.Mana =
+Bot1.Choose(Memnite; Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Plains.Activate
+! Bot1.Graveyard.Faithful Mending.Cast(Ability: Flashback; Mana: short)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Graveyard.Faithful Mending.Cast(Ability: Flashback)
+? Bot1.Mana =
+Bot1.Choose(Mox Jet; Sol Ring)
+
+[Expect]
+? Bot1.Life = 24
+Exile = Faithful Mending
+Bot1.Graveyard.Count = 5

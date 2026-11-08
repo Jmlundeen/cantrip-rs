@@ -1,0 +1,35 @@
+# Faithful Mending (CR 119.3, 121.1, 701.9): Bot1 gains exactly 2 life, draws two cards, then discards two. Memnite is
+# turn 3's draw and the spell draws Ornithopter and a Plains; Memnite and Ornithopter are the two discarded: if the discard
+# came before the draw Ornithopter would not be in the hand to choose, so this pins "then" too.
+
+[Bot1 Deck]
+Plains
+Island
+Faithful Mending
+Mountain
+Forest
+Swamp
+Grizzly Bears
+Memnite
+Ornithopter
+Plains x6
+Island x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Faithful Mending.Cast
+? Bot1.Mana =
+Bot1.Choose(Memnite; Ornithopter)
+
+[Expect]
+? Bot1.Life = 22
+? Bot1.Hand.Count = 5
+Bot1.Graveyard.Count = 3
