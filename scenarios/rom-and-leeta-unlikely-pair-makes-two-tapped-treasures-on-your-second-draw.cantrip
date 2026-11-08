@@ -1,0 +1,61 @@
+# Rom and Leeta, Unlikely Pair: "Seek out — Whenever you draw your second card each turn, create two tapped Treasure
+# tokens." Cast on turn 1 off four Moxen (the pool empties exactly), it does nothing on turn 3's draw step (first draw).
+# The first Opt is the second draw and makes two tapped Treasures at once (CR 111.10a); the second Opt is the third draw
+# and makes no third token (CR 603.2a: once per turn, on the second draw).
+# Rom and Leeta, Unlikely Pair {3}{R}: Legendary Creature — Ferengi Bajoran
+
+[Bot1 Deck]
+Rom and Leeta, Unlikely Pair
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Sapphire
+Island
+Opt
+Opt
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Rom and Leeta, Unlikely Pair.Cast(Spend: R, W, U, U)
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Plains |)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Treasure Token#1.Tapped = true
+? Bot1.Battlefield.Treasure Token#2.Tapped = true
+? Bot1.Battlefield.Treasure Token#1.Subtypes = Treasure
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Plains |)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Treasure Token#3 = (absent)
+
+[Expect]
+Bot1.Battlefield.Treasure Token#1.Tapped = true
+Bot1.Battlefield.Treasure Token#2.Tapped = true
+Bot1.Battlefield.Treasure Token#1.Token = true
+Bot1.Battlefield.Treasure Token#2.Token = true
