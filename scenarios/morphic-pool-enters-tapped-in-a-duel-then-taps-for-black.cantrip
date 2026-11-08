@@ -1,0 +1,55 @@
+# Morphic Pool: with one opponent it enters tapped on turn 1 (CR 614.1d), untapping on turn 3. On turn 5 it taps for
+# {B}: the {B}{B} pool check with Mox Jet's mana pins the Pool's color, and Go for the Throat's {1}{B} spends exactly
+# it, destroying Bot2's Grizzly Bears. Any other color from the Pool would fail the pool check.
+
+[Bot1 Deck]
+Morphic Pool
+Mox Jet
+Go for the Throat
+Grizzly Bears
+Island x3
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Island x17
+
+[Actions]
+Bot1.Hand.Morphic Pool.Play
+? Bot1.Battlefield.Morphic Pool.Tapped = true
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Morphic Pool.Tapped = false
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Morphic Pool.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}{B}
+Bot1.Hand.Go for the Throat.Cast(Bot2.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot2.Graveyard = Grizzly Bears; Island
+Bot1.Graveyard = Go for the Throat
+Bot1.Battlefield.Count = 2
+Bot1.Library.Count = 11
+Bot2.Library.Count = 11

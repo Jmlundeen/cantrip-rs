@@ -1,0 +1,53 @@
+# Morphic Pool: the ruling - if you began the game with two or more opponents but only one is left, it enters tapped.
+# Blightsteel Colossus hits Bot3 for 11 infect on turn 4, eliminating them with poison. With only Bot2 left, the Pool
+# played on turn 6 enters tapped though the game began with two opponents.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Blightsteel Colossus
+Morphic Pool
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Blightsteel Colossus.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Blightsteel Colossus > Bot3)
+[T4 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+[T6 Bot1.Main1]
+Bot1.Hand.Morphic Pool.Play
+? Bot1.Battlefield.Morphic Pool.Tapped = true
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 6
+Bot1.Battlefield.Morphic Pool.Tapped = true
+Bot1.Library.Count = 10
+Bot2.Library.Count = 11

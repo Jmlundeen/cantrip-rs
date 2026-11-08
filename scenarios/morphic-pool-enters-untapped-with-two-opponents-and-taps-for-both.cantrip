@@ -1,0 +1,47 @@
+# Morphic Pool: "This land enters tapped unless you have two or more opponents" (CR 614.1d). With two opponents it
+# enters untapped on turn 1. On turn 4 it taps for {U} to cast Delver of Secrets; on turn 7 it taps for {B} to cast Sol
+# Ring. Either color refused would fail its pool check.
+
+[Bot1 Deck]
+Morphic Pool
+Delver of Secrets
+Sol Ring
+Island x4
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Morphic Pool.Play
+? Bot1.Battlefield.Morphic Pool.Tapped = false
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T4 Bot1.Main1]
+Bot1.Battlefield.Morphic Pool.Activate(Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Hand.Delver of Secrets.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Morphic Pool.Activate(Color: Black)
+? Bot1.Mana = {B}
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Delver of Secrets.Power = 1
+Bot1.Library.Count = 10
+Bot2.Library.Count = 11
+Bot3.Library.Count = 11
