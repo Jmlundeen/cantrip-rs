@@ -39,11 +39,17 @@ should share a queue passes the same name.
    ```sh
    python tools/maintenance/card-lane.py queue --queue trc --format pioneer
    python tools/maintenance/card-lane.py queue --queue trc --file docs/cube-lists/MyCube.txt
+   python tools/maintenance/card-lane.py queue --queue trc --backlog
+   python tools/maintenance/card-lane.py queue --queue trc --backlog --list LSVCube
    python tools/maintenance/card-lane.py queue --queue trc --card "Lightning Bolt" --card "Counterspell"
    ```
 
-   It takes the format list in its own order, skips cards `content/` already has, and keeps cards added earlier
-   (`pending`, `done`, `blocked` and all). Use `--queue trc` on every later command of that lane.
+   A source's names are kept in their order (the format's, the list's, `missing-cards.py`'s), cards `content/` already
+   has are skipped, and cards added earlier (`pending`, `done`, `blocked` and all) are kept. `--backlog` is the real
+   cube backlog: it runs `missing-cards.py` over every cube list (or `--list <Cube>`, or `--file <list>`) and queues
+   what no card file defines, in the order `missing-cards.py` prints it. It is a source of its own, so narrow it with
+   `--list`/`--file`, not with `--format`/`--card`; an empty backlog queues nothing and says so. Use `--queue trc` on
+   every later command of that lane.
 3. **Start one implementor per slot** with its worker id (`w1`, `w2`, ...), the queue name, and this file plus
    `add-cards` and `write-game-script`. Never name the card: `next` chooses it.
 4. **Watch, do not hand out:** `python tools/maintenance/card-lane.py status --queue trc` lists who holds what and

@@ -1,6 +1,7 @@
 """The card lane: one shared queue for a pool of implementors, and one packet per card.
 
     python tools/maintenance/card-lane.py queue  [--queue NAME] [--format F | --file PATH | --card NAME ...]
+    python tools/maintenance/card-lane.py queue  [--queue NAME] --backlog [--list CUBE | --file PATH]
     python tools/maintenance/card-lane.py next   --id WORKER [--queue NAME] [--card NAME] [--refresh] [--engine] [--issue N]
     python tools/maintenance/card-lane.py status [--queue NAME] [--id WORKER]
     python tools/maintenance/card-lane.py check  [--queue NAME] [--id WORKER | --card NAME] [--fast]
@@ -321,7 +322,40 @@ def file_names(path):
     return names
 
 
+def backlog_scope(args):
+    if getattr(args, "list", None):
+        return f"cube list {args.list}"
+    if getattr(args, "file", None):
+        return f"file {args.file}"
+    return "all cube lists"
+
+
+def backlog_names(root, args):
+    """The real backlog: every name `missing-cards.py` says no card file defines, in its own order."""
+    tool = os.path.join(root, "tools", "maintenance", "missing-cards.py")
+    if not os.path.isfile(tool):
+        raise Refused("no tools/maintenance/missing-cards.py: the backlog source needs it")
+    command = [sys.executable, tool, "--names"]
+    if getattr(args, "list", None):
+        command += ["--list", args.list]
+    if getattr(args, "file", None):
+        command += ["--file", os.path.abspath(args.file)]
+    result = run(command, root)
+    if result.returncode != 0:
+        raise Failed(f"missing-cards.py failed:\n{(result.stderr or result.stdout).strip()[-2000:]}")
+    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+
 def requested_names(args, root):
+    if getattr(args, "list", None) and not getattr(args, "backlog", False):
+        raise Refused("--list goes with --backlog: it narrows the cube-list backlog to one list")
+    if getattr(args, "backlog", False):
+        if getattr(args, "format", None) or getattr(args, "card", None) or getattr(args, "names", None):
+            raise Refused("--backlog is its own source: use --list or --file to narrow it, and queue other cards "
+                          "in a later call")
+        if getattr(args, "list", None) and getattr(args, "file", None):
+            raise Refused("--list and --file name one backlog scope; use one")
+        return backlog_names(root, args)
     names = []
     if getattr(args, "format", None):
         names += format_names(root, args.format)
@@ -1425,8 +1459,11 @@ def cmd_commit(args):
 
 def cmd_queue(args):
     root = worktree_root()
-    store = Store(common_dir(root), args.queue)
     names = requested_names(args, root)
+    if getattr(args, "backlog", False) and not names:
+        print(f"backlog: every card on {backlog_scope(args)} has a card file; nothing to queue")
+        return 0
+    store = Store(common_dir(root), args.queue)
     implemented = implemented_names(root)
     with store.locked() as state:
         if not state["cards"]:
@@ -1450,6 +1487,8 @@ def cmd_queue(args):
         counts = {kind: sum(1 for card in state["cards"] if card["status"] == kind)
                   for kind in ("pending", "working", "done", "blocked", "abandoned")}
     print(f"queue {store.name} ({store.path})")
+    if getattr(args, "backlog", False):
+        print(f"  backlog: {len(names)} missing card(s) from missing-cards.py on {backlog_scope(args)}")
     print(f"  {total} card(s): " + ", ".join(f"{n} {kind}" for kind, n in counts.items()))
     print(f"  added {len(added)}, already queued {len(present)}, already implemented {len(skipped)}")
     for label, values in (("added", added), ("implemented, skipped", skipped)):
@@ -1723,7 +1762,11 @@ def command_line(argv=None):
     cmd = sub.add_parser("queue", help="make or extend the shared queue")
     queue_flag(cmd)
     cmd.add_argument("--format", metavar="F", help="docs/formats/<F>.json, in its own order")
-    cmd.add_argument("--file", metavar="PATH", help="a card list, one name a line")
+    cmd.add_argument("--file", metavar="PATH",
+                     help="a card list, one name a line; with --backlog, the list missing-cards.py reads")
+    cmd.add_argument("--backlog", action="store_true",
+                     help="the cube-list cards missing-cards.py finds unbuilt, in its order")
+    cmd.add_argument("--list", metavar="CUBE", help="with --backlog, only docs/cube-lists/<CUBE>.txt")
     cmd.add_argument("--card", action="append", default=[], metavar="NAME", help="one card (repeatable)")
     cmd.add_argument("names", nargs="*", metavar="NAME", help="card names")
     cmd.set_defaults(handler=cmd_queue)
