@@ -1,0 +1,22 @@
+# "Gin'tak Charge deals 2 damage to any target." Bot2 loses exactly 2 life (CR 120.3a).
+
+[Bot1 Deck]
+Mox Ruby
+Gin'tak Charge
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gin'tak Charge.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Gin'tak Charge

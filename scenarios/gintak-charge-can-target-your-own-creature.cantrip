@@ -1,0 +1,26 @@
+# "Gin'tak Charge deals 2 damage to any target." "Target" reads either player's creature: Bot1's own Crimson Kobolds is a legal target and dies (CR 115.1, 704.5g).
+# The spell goes to the graveyard as the last step of resolving and the creature dies after, at the next check, so the creature is on top (CR 307.2, 704.3).
+
+[Bot1 Deck]
+Crimson Kobolds
+Mox Ruby
+Gin'tak Charge
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Crimson Kobolds.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gin'tak Charge.Cast(Bot1.Battlefield.Crimson Kobolds)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Crimson Kobolds = (absent)
+Bot1.Graveyard = Crimson Kobolds; Gin'tak Charge
