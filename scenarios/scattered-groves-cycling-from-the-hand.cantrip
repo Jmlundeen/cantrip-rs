@@ -1,0 +1,29 @@
+# Scattered Groves's cycling {2} (CR 702.29a): paying it and discarding the card from the hand draws a card, the
+# Plains on top. The cost {2} is paid exactly with two Moxen's {U}{W}, so the pool ends empty; with no mana at all the
+# ability is not offered.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Scattered Groves
+Plains x3
+Mountain
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+! Bot1.Hand.Scattered Groves.Activate(Mana: short)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Scattered Groves.Activate
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Graveyard = Scattered Groves
+Bot1.Hand = Mountain; Plains; Plains; Plains; Plains
+Bot1.Library.Count = 12
