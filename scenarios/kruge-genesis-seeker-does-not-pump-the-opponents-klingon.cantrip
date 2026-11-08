@@ -1,0 +1,59 @@
+# Kruge, Genesis Seeker (2/2): Kruge attacks alone on turn 3 and grows to 3/3 (Bot2 at 17); on turn 4 Bot2's own Gagh
+# Slinger, a Klingon, attacks as an unpumped 3/2 (Bot1 at 17): another player's attack does not trigger Kruge, and the
+# turn-3 pump is over. (No other player's creature can be attacking while Kruge's trigger resolves - a creature that
+# changes control leaves combat, CR 506.4 - so "you control" is not observable here.)
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Kruge, Genesis Seeker
+Island x17
+
+[Bot2 Deck]
+Black Lotus
+Mountain
+Mox Ruby
+Gagh Slinger
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kruge, Genesis Seeker.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Gagh Slinger.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Kruge, Genesis Seeker > Bot2)
+[T3 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Gagh Slinger > Bot1)
+[T4 Bot2.Main2]
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 17
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 2
+Bot2.Battlefield.Count = 3
+Bot1.Library.Count = 12
+Bot2.Library.Count = 11

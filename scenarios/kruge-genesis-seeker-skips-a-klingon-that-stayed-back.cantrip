@@ -1,0 +1,76 @@
+# Kruge, Genesis Seeker (2/2): only attacking Klingons are pumped, so when Kruge attacks alone on turn 3 it grows to
+# 3/3 (Bot2 at 17) while the just-cast Gagh Slinger stays 3/2. On turn 5 Gagh blocks Bot2's Blech, Loafing Pest (3/4):
+# taking exactly 3 leaves Blech alive; if the trigger had wrongly pumped the non-attacking Gagh to 4/3, Blech would die.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Kruge, Genesis Seeker
+Gagh Slinger
+Mountain
+Island
+Island x13
+
+[Bot2 Deck]
+Black Lotus
+Forest
+Mox Jet
+Blech, Loafing Pest
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kruge, Genesis Seeker.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gagh Slinger.Cast
+? Bot1.Mana =
+Bot1.Attack(Kruge, Genesis Seeker > Bot2)
+[T3 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Blech, Loafing Pest.Cast
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Attack(Blech, Loafing Pest > Bot1)
+[T6 Bot2.DeclareBlockers]
+Bot1.Block(Gagh Slinger > Blech, Loafing Pest)
+[T6 Bot2.Main2]
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Blech, Loafing Pest.Toughness = 4
+Bot1.Graveyard = Gagh Slinger; Black Lotus
+Bot2.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 4
+Bot2.Battlefield.Count = 3
+Bot1.Library.Count = 11
+Bot2.Library.Count = 10
