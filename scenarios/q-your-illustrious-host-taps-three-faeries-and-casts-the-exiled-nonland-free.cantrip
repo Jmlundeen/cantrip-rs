@@ -1,0 +1,63 @@
+# Q: "Tap three untapped Faeries you control: Exile cards from the top of your library until you exile a nonland card. You
+# may cast that card without paying its mana cost." (CR 602.2b, 701.57a, 118.9). Three Faeries are in play on turn 5; the
+# cost taps all three, so they are tapped afterwards. The first card is an Island, which is exiled and passed over, and the
+# Grizzly Bears under it is offered and cast for nothing, so it is on the battlefield and Q itself never taps.
+
+[Bot1 Deck]
+Q, Your Illustrious Host
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Scryb Sprites
+Island
+Zephyr Sprite
+Zephyr Sprite
+Island
+Grizzly Bears
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Q, Your Illustrious Host.Cast(Spend: W, U, B, R, G)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Scryb Sprites.Cast(Spend: G)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Zephyr Sprite#1.Cast(Spend: U)
+Bot1.Hand.Zephyr Sprite.Cast(Spend: U)
+? Bot1.Battlefield.Count = 10
+Bot1.Battlefield.Q, Your Illustrious Host.Activate(Ability: Tap three untapped Faeries you control)
+Bot1.Choose(Scryb Sprites; Zephyr Sprite; Zephyr Sprite)
+? Bot1.Battlefield.Scryb Sprites.Tapped = true
+Bot1.Choose(Grizzly Bears)
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.Count = 12
+Bot1.Battlefield.Scryb Sprites.Tapped = true
+Bot1.Battlefield.Zephyr Sprite#1.Tapped = true
+Bot1.Battlefield.Zephyr Sprite#2.Tapped = true
+Bot1.Battlefield.Q, Your Illustrious Host.Tapped = false

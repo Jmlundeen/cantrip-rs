@@ -1,0 +1,8 @@
+{
+  "name": "Q, Your Illustrious Host",
+  "manaCost": "{W}{U}{B}{R}{G}",
+  "type": "Legendary Creature — Q",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Tap three untapped Faeries you control: Exile cards from the top of your library until you exile a nonland card. You may cast that card without paying its mana cost."
+}
