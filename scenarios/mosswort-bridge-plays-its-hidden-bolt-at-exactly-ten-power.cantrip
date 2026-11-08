@@ -1,0 +1,61 @@
+# Mosswort Bridge: "{G}, {T}: You may play the exiled card without paying its mana cost if creatures you control have
+# total power 10 or greater" (CR 118.9, 608.2g). Klingon Strike Force (5), two Grizzly Bears (2+2) and Memnite (1) are
+# exactly 10, so on turn 5 the paid ability offers the hidden Lightning Bolt and Bot1 accepts, casting it free at Bot2
+# (at 17). Nine would keep it exiled.
+
+[Bot1 Deck]
+Klingon Strike Force
+Grizzly Bears
+Grizzly Bears
+Memnite
+Black Lotus
+Black Lotus
+Black Lotus
+Mosswort Bridge
+Lightning Bolt
+Island x3
+Mox Emerald
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Klingon Strike Force.Cast
+Bot1.Hand.Mosswort Bridge.Play
+Bot1.Arrange(Lightning Bolt | Island; Island; Island)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mosswort Bridge.Activate(Ability: You may play)
+? Bot1.Mana =
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Black Lotus; Black Lotus; Black Lotus
+Bot1.Library.Count = 11
+Bot2.Library.Count = 11

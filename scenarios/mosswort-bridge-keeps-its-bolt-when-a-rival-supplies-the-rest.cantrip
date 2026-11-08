@@ -1,0 +1,80 @@
+# Mosswort Bridge: only creatures you control count, so Bot2's 5-power Klingon Strike Force adds nothing. Bot1's
+# Strike Force and two Bears are exactly 9, one short of 10: on turn 5 the paid ability resolves without playing the
+# hidden Lightning Bolt, which stays in exile and no question is asked. Nine combined with the rival's five would have
+# played it had theirs counted.
+
+[Bot1 Deck]
+Mosswort Bridge
+Black Lotus
+Black Lotus
+Black Lotus
+Grizzly Bears
+Grizzly Bears
+Klingon Strike Force
+Lightning Bolt
+Island x3
+Mox Emerald
+Island
+Island x7
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Klingon Strike Force
+Island x3
+Island x13
+
+[Actions]
+Bot1.Hand.Mosswort Bridge.Play
+Bot1.Arrange(Lightning Bolt | Island; Island; Island)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Klingon Strike Force.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Klingon Strike Force.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mosswort Bridge.Activate(Ability: You may play)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Exile.Count = 1
+Bot1.Library.Count = 10
+Bot2.Library.Count = 11

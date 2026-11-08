@@ -1,0 +1,38 @@
+# Mosswort Bridge: Hideaway 4 (CR 702.75a) exiles Lightning Bolt face down on turn 1 and bottoms three Islands, in
+# any order - all three the same, so no order is shown. It enters tapped (CR 614.1d). Tapped on turn 3 for exactly {G},
+# that mana with the Forest's pays Grizzly Bears' {1}{G}; the pool is empty after.
+
+[Bot1 Deck]
+Mosswort Bridge
+Forest
+Grizzly Bears
+Island x4
+Lightning Bolt
+Island x3
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mosswort Bridge.Play
+Bot1.Arrange(Lightning Bolt | Island; Island; Island)
+? Bot1.Battlefield.Mosswort Bridge.Tapped = true
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mosswort Bridge.Activate(Ability: Add {G}.)
+? Bot1.Mana = {G}
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Grizzly Bears.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Exile.Count = 1
+Bot1.Battlefield.Grizzly Bears.Toughness = 2
+Bot1.Library.Count = 11
+Bot2.Library.Count = 12
