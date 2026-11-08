@@ -1,0 +1,8 @@
+{
+  "name": "Rom and Leeta, Unlikely Pair",
+  "manaCost": "{3}{R}",
+  "type": "Legendary Creature — Ferengi Bajoran",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Seek out — Whenever you draw your second card each turn, create two tapped Treasure tokens."
+}

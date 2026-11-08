@@ -1,0 +1,50 @@
+# Rom and Leeta, Unlikely Pair: "each turn" counts any turn (CR 603.2). On Bot2's turn 2 Bot1 draws nothing in a draw
+# step, so its first Opt is its first card of that turn and makes nothing, and its second Opt is the second card: the
+# trigger fires and two tapped Treasure tokens arrive as it resolves (CR 111.10a), still on Bot2's turn.
+# Rom and Leeta, Unlikely Pair {3}{R}: Legendary Creature — Ferengi Bajoran
+
+[Bot1 Deck]
+Rom and Leeta, Unlikely Pair
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Sapphire
+Opt
+Opt
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rom and Leeta, Unlikely Pair.Cast(Spend: R, R, R, R)
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Plains |)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Treasure Token#1 = (absent)
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Plains |)
+? Stack = Rom and Leeta, Unlikely Pair
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Treasure Token#1.Tapped = true
+Bot1.Battlefield.Treasure Token#2.Tapped = true
+Bot1.Battlefield.Treasure Token#1.Token = true
+Bot1.Battlefield.Treasure Token#2.Token = true
