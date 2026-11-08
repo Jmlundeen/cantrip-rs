@@ -1,0 +1,33 @@
+# Guardian Project and Bot1's first Grizzly Bears: the creature itself is no "another" creature (CR 201.2), so its
+# name is unshared and Bot1 draws exactly one card (CR 603.6a, 603.4).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Guardian Project
+Grizzly Bears
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Guardian Project.Cast
+? Bot1.Mana = {G}{G}
+Bot1.Pass
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 4
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Tapped = false
