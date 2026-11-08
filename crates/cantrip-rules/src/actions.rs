@@ -711,6 +711,100 @@ fn permanent_costs_payable(cx: &Cx, source: ObjectId, controller: PlayerId, cost
 /// gives them none (CR 601.2g, 605.3a).
 #[allow(clippy::too_many_arguments)]
 fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost, judged: Judged, paid: Option<CostFor>, by: Option<Linked>, feeds: bool) -> bool {
+    can_pay_other_judged(cx, source, controller, cost, judged, paid, by, feeds, false)
+        || payable_after_life(cx, source, controller, cost, judged, paid, by, feeds)
+}
+
+/// Whether the cost could be paid with life or energy paid first (CR 601.2h: its parts are paid in the order the payer
+/// chooses, and the mana abilities activated before them may pay life too, CR 601.2g). What a player's life or energy is
+/// can change what another part may take - a creature whose power is 13 minus its controller's life (Death's Shadow), one
+/// that has flying while they have 30 or more (Serra Ascendant) - so the cost is judged again at every life total the
+/// payment could reach: its own life, each Phyrexian symbol paid with life or not (CR 107.4f), and what the mana abilities
+/// could pay. Asked only once the cost as it stands is refused, of a cost whose parts choose objects, while a static
+/// ability could make any characteristic depend on life; each total is tried on a copy of the game, never the game itself.
+#[allow(clippy::too_many_arguments)]
+fn payable_after_life(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost, judged: Judged, paid: Option<CostFor>, by: Option<Linked>, feeds: bool) -> bool {
+    if judged == Judged::Nested {
+        return false;
+    }
+    let chooses = parts_of(cost).any(|p| {
+        p.permanents.is_some() || p.choose.is_some() || p.behold.is_some() || p.tap_creatures.is_some() || p.materials.is_some()
+            || p.blight > 0 || !p.discard.is_none() || p.exile_from_hand.is_some() || p.variable.is_some()
+            || p.exile_from_graveyard > 0 || p.remove_counters_among.is_some()
+    });
+    if !chooses {
+        return false;
+    }
+    // Only a static ability - a characteristic-defining one among them, which functions in every zone (CR 604.3) - can make
+    // a characteristic depend on life: on the battlefield, or on a card in the zones a cost takes cards from.
+    let has_statics = |id: &ObjectId| cx.cards().texts(cx.s(), cx.s().obj(*id)).any(|c| !cx.card(c).statics.is_empty());
+    if !cx.s().battlefield().iter().any(has_statics)
+        && !cx.s().zone(Zone::hand(controller)).iter().any(has_statics)
+        && !cx.s().zone(Zone::graveyard(controller)).iter().any(has_statics)
+    {
+        return false;
+    }
+    let player = *cx.s().player(controller);
+    // A cost of separate parts keeps each part's life and energy with it.
+    let (required, energy) = if cost.components.is_empty() {
+        (cost.life, cost.energy)
+    } else {
+        parts_of(cost).fold((0, 0), |(l, e), p| (l + p.life, e + p.energy))
+    };
+    if !can_pay_life_for(cx, controller, required, paid) || player.energy() < energy {
+        return false;
+    }
+    let mut phyrexian: u64 = cost.mana.phyrexian.iter().map(|&n| u64::from(n)).sum();
+    let mut mana_owed = !cost.mana.is_zero();
+    // A spell's other costs are paid with this one, in the order its caster chooses: the life its additional costs, a chosen
+    // one and an optional one may take can be paid first too (CR 601.2f-h).
+    let mut elsewhere: u64 = 0;
+    if judged == Judged::Cast {
+        let obj = cx.s().obj(source);
+        let mana = cantrip_api::mana_cost_of(&|c| cx.card(c), obj, &cx.chars(source));
+        phyrexian += mana.phyrexian.iter().map(|&n| u64::from(n)).sum::<u64>();
+        mana_owed |= !mana.is_zero();
+        let def = cx.card(obj.card);
+        let life_of = |c: &Cost| -> u64 { if c.components.is_empty() { u64::from(c.life) } else { parts_of(c).map(|p| u64::from(p.life)).sum() } };
+        elsewhere += def.additional_cost.as_ref().map_or(0, life_of);
+        elsewhere += def.additional_choice.iter().map(|c| life_of(&c.cost)).max().unwrap_or(0);
+        elsewhere += def.optional_cost.as_ref().map_or(0, |o| life_of(&o.cost));
+    }
+    // The mana abilities activated before the costs are paid (CR 601.2g) - of a mana ability's own mana cost too.
+    let from_mana = if mana_owed && (feeds || paid == Some(CostFor::ManaAbility)) { u64::from(mana_feed(cx, controller).life) } else { 0 };
+    let optional = 2 * phyrexian + from_mana + elsewhere;
+    if required == 0 && energy == 0 && optional == 0 {
+        return false;
+    }
+    let most = u64::from(payable_life_for(cx, controller, paid).max(0) as u32);
+    let top = (u64::from(required) + optional).min(most) as u32;
+    let mut copy = cx.g.hypothetical();
+    let sim = Cx { g: &mut copy, frame: cx.frame, cursor: cx.cursor, mana_source: cx.mana_source, entering: cx.entering,
+        lineage: Vec::new(), damage: None, asked_at: cx.asked_at, doer: cx.doer, producing: None };
+    let mut sim = sim;
+    for lost in required..=top {
+        for energy_paid in [true, false] {
+            if !energy_paid && (energy == 0 || lost == 0) {
+                continue;
+            }
+            sim.st().update_player(controller, |p| {
+                *p = player;
+                p.life -= lost as i32;
+                if energy_paid {
+                    p.pay_energy(energy);
+                }
+            });
+            if can_pay_other_judged(&sim, source, controller, cost, judged, paid, by, feeds, true) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// `can_pay_other_fed` as the cost stands, its life and energy already paid where `life_paid` (`payable_after_life`).
+#[allow(clippy::too_many_arguments)]
+fn can_pay_other_judged(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost, judged: Judged, paid: Option<CostFor>, by: Option<Linked>, feeds: bool, life_paid: bool) -> bool {
     let obj = cx.s().obj(source);
     let feed = std::cell::OnceCell::new();
     let fed = || -> ManaFeed {
@@ -718,6 +812,21 @@ fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
             return ManaFeed::NONE;
         }
         *feed.get_or_init(|| mana_feed(cx, controller))
+    };
+    // A spell's other costs are paid with this one, in the order its caster chooses (CR 601.2f-h): what its additional
+    // cost, a chosen one or an optional one discards may feed this one's exile from the graveyard too.
+    let discarded_elsewhere = || -> usize {
+        if judged != Judged::Cast {
+            return 0;
+        }
+        let def = cx.card(cx.s().obj(source).card);
+        let hand = cx.s().zone(Zone::hand(controller)).iter().filter(|&&c| c != source).count();
+        let discards = |c: &Cost| -> usize {
+            parts_of(c).map(|p| if p.discard_hand { hand } else { p.discard.count() as usize }).sum::<usize>().min(hand)
+        };
+        def.additional_cost.as_ref().map_or(0, discards)
+            + def.additional_choice.iter().map(|c| discards(&c.cost)).max().unwrap_or(0)
+            + def.optional_cost.as_ref().map_or(0, |o| discards(&o.cost))
     };
     // A discard among the cost's parts puts cards into the graveyard that an exile from it, paid after it, may take
     // (CR 601.2h: the parts are paid in the order the payer chooses): as many as it discards.
@@ -730,7 +839,7 @@ fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
             if part.discard_hand || matches!(part.variable, Some(VariableCost::DiscardOneOrMore(_))) { n = hand; }
             if part.discard_self { n += 1; }
             n
-        }).sum()
+        }).sum::<usize>() + discarded_elsewhere()
     };
     // A creature's {T} ability needs it under its controller's control since their turn began, unless it has haste or the
     // ability may be activated as though it had (CR 302.6).
@@ -758,7 +867,7 @@ fn can_pay_other_fed(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
     }
     // Energy is paid from the payer's counters (CR 107.14, 118.3): payable only with at least that many. Both are judged
     // again once the mana is paid (`rest_payable`).
-    if (cx.s().player(controller).energy() < cost.energy || !can_pay_life_for(cx, controller, cost.life, paid)) && !fed().opaque {
+    if !life_paid && (cx.s().player(controller).energy() < cost.energy || !can_pay_life_for(cx, controller, cost.life, paid)) && !fed().opaque {
         return false;
     }
     // CR 101.2, 701.21a: a permanent a static ability says can't be sacrificed for this cost can't pay "sacrifice this".
@@ -1290,7 +1399,7 @@ fn limit_reached(cx: &Cx, id: ObjectId, chars: &Chars, index: usize, def: &Activ
         let mut activations = cx
             .history()
             .select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(id))
-            .filter(|r| matches!(r.event, Event::AbilityActivated { ability: a, instance: key, .. } if a == ability && key == instance));
+            .filter(|r| matches!(r.event, Event::AbilityActivated { ability: a, .. } if a == ability) && cx.history().activation_instance(r) == instance);
         if activations.next().is_some() {
             if def.power_up {
                 allowed += static_rules::extra_power_up_activations(cx, cx.s().obj(id).controller);
@@ -1309,7 +1418,7 @@ fn limit_reached(cx: &Cx, id: ObjectId, chars: &Chars, index: usize, def: &Activ
     let obj = cx.s().obj(id);
     obj.activated_turn == cx.s().turn.number && cx.history()
         .select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(id).this_turn())
-        .any(|r| matches!(r.event, Event::AbilityActivated { ability: a, instance: key, .. } if a == ability && key == instance))
+        .any(|r| matches!(r.event, Event::AbilityActivated { ability: a, .. } if a == ability) && cx.history().activation_instance(r) == instance)
 }
 
 /// "You may activate each of those abilities only once each turn" (CR 602.5b, `CardDef::granted_once_each_turn`): the
@@ -1331,7 +1440,7 @@ fn granted_limit_reached(cx: &Cx, id: ObjectId, chars: &Chars, index: usize) -> 
     let used = cx
         .history()
         .select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(id).this_turn())
-        .filter(|r| matches!(r.event, Event::AbilityActivated { ability: a, instance: key, .. } if a == ability && key == instance))
+        .filter(|r| matches!(r.event, Event::AbilityActivated { ability: a, .. } if a == ability) && cx.history().activation_instance(r) == instance)
         .count();
     used > 0
 }
@@ -1608,12 +1717,15 @@ struct ManaFeed {
     /// The most mana value those cards could have between them in the graveyard (collect evidence's measure, CR 701.59a).
     evidence: u32,
     hand: u32,
+    /// The most life those mana abilities could have their controller pay between them (Mana Confluence's "Pay 1 life"):
+    /// `u32::MAX` where one of them could be activated again and again.
+    life: u32,
     opaque: bool,
 }
 
 impl ManaFeed {
     /// Nothing a mana ability could do changes a cost: what a mana ability's own cost is judged with.
-    const NONE: ManaFeed = ManaFeed { graveyard: 0, evidence: 0, hand: 0, opaque: false };
+    const NONE: ManaFeed = ManaFeed { graveyard: 0, evidence: 0, hand: 0, life: 0, opaque: false };
 
     fn graveyard_may_grow(&self) -> bool {
         self.opaque || self.graveyard > 0
@@ -1678,6 +1790,11 @@ fn mana_feed(cx: &Cx, player: PlayerId) -> ManaFeed {
         };
         let cost = &def.cost;
         feed.opaque |= def.mana.is_some() || cost.variable.is_some();
+        if cost.life > 0 {
+            // One limited by nothing but life can be activated as often as its controller can pay it (CR 605.3a).
+            let repeatable = !cost.tap && !cost.sacrifice_self && cost.permanents.is_none() && cost.remove_counters.is_none();
+            feed.life = if repeatable || feed.life == u32::MAX { u32::MAX } else { feed.life + cost.life };
+        }
         if cost.sacrifice_self && cx.s().obj(source).zone.is(ZoneKind::Battlefield) {
             graveyard.push(source);
         }
@@ -2182,7 +2299,7 @@ fn pay_permanents(cx: &mut Cx, player: PlayerId, cost: &Cost, chosen: &[ObjectId
 #[derive(Clone, Copy)]
 enum PaymentScope {
     Spell,
-    Resolution { payment: usize, payer: PlayerId },
+    Resolution { payment: u32, payer: PlayerId },
     Ability { serial: u32, linked: Linked, paid: Option<CostFor>, by: Option<Linked>, granter: Option<ObjectId>, cycling: bool },
     ManaAbility { linked: Linked, by: Option<Linked>, granter: Option<ObjectId>, colors: Option<(usize, Option<Color>, bool)> },
     PlayerManaAbility,
@@ -2322,83 +2439,83 @@ fn append_fixed_payments<'a>(out: &mut Vec<SpellPayment<'a>>, origin: CostOrigin
         let n = part.permanents.map_or(0, |p| p.count as usize);
         let objects = if chosen.is_empty() { &[] } else { &chosen[at..at + n] };
         at += n;
-        if n > 0 { out.push(SpellPayment::Permanent { origin, component, cost: part, objects, source_text: source_text.clone() }); }
+        if n > 0 { out.push(SpellPayment::Permanent { origin, component, cost: part, objects, source_text: source_text }); }
         if part.life > 0 {
             component_life += part.life;
-            out.push(SpellPayment::Life { amount: part.life, source_text: source_text.clone() });
+            out.push(SpellPayment::Life { amount: part.life, source_text: source_text });
         }
         if part.energy > 0 {
             component_energy += u32::from(part.energy);
-            out.push(SpellPayment::Energy { amount: u32::from(part.energy), source_text: source_text.clone() });
+            out.push(SpellPayment::Energy { amount: u32::from(part.energy), source_text: source_text });
         }
         if part.remove_counters_among.is_some() {
-            out.push(SpellPayment::CountersAmong { origin, component, cost: part, source_text: source_text.clone() });
+            out.push(SpellPayment::CountersAmong { origin, component, cost: part, source_text: source_text });
         }
         let count = blight_count(part, x);
         // Blight X still requires a creature when X is zero (CR 701.68a-b).
         if count > 0 || matches!(part.variable, Some(VariableCost::BlightX)) {
-            out.push(SpellPayment::Blight { origin, component, cost: part, count, source_text: source_text.clone() });
+            out.push(SpellPayment::Blight { origin, component, cost: part, count, source_text: source_text });
         }
         if part.exile_from_graveyard > 0 {
             let cost = Cost { exile_from_graveyard: part.exile_from_graveyard, exile_from_graveyard_of: part.exile_from_graveyard_of, ..Cost::NONE };
-            out.push(SpellPayment::ZoneExile { origin, component, cost, part: CostPart::GraveyardExile, source_text: source_text.clone() });
+            out.push(SpellPayment::ZoneExile { origin, component, cost, part: CostPart::GraveyardExile, source_text: source_text });
         }
         if part.exile_from_hand.is_some_and(|(n, _)| n > 0) {
             let cost = Cost { exile_from_hand: part.exile_from_hand, ..Cost::NONE };
-            out.push(SpellPayment::ZoneExile { origin, component, cost, part: CostPart::HandExile, source_text: source_text.clone() });
+            out.push(SpellPayment::ZoneExile { origin, component, cost, part: CostPart::HandExile, source_text: source_text });
         }
         if part.collect_evidence > 0 {
             let cost = Cost { collect_evidence: part.collect_evidence, ..Cost::NONE };
-            out.push(SpellPayment::ZoneExile { origin, component, cost, part: CostPart::Evidence, source_text: source_text.clone() });
+            out.push(SpellPayment::ZoneExile { origin, component, cost, part: CostPart::Evidence, source_text: source_text });
         }
         if part.exile_symbols.is_some_and(|(_, n)| n > 0) {
             let cost = Cost { exile_symbols: part.exile_symbols, ..Cost::NONE };
-            out.push(SpellPayment::ZoneExile { origin, component, cost, part: CostPart::ExileSymbols, source_text: source_text.clone() });
+            out.push(SpellPayment::ZoneExile { origin, component, cost, part: CostPart::ExileSymbols, source_text: source_text });
         }
         for (index, (n, filter)) in part.discard.parts().enumerate() {
             if n > 0 {
                 let cost = Cost { discard: Discards::one(n, filter), ..Cost::NONE };
-                out.push(SpellPayment::Discard { origin, component, cost, part: CostPart::Discard(index), source_text: source_text.clone() });
+                out.push(SpellPayment::Discard { origin, component, cost, part: CostPart::Discard(index), source_text: source_text });
             }
         }
         if part.discard_hand {
             let cost = Cost { discard_hand: true, ..Cost::NONE };
-            out.push(SpellPayment::Discard { origin, component, cost, part: CostPart::DiscardHand, source_text: source_text.clone() });
+            out.push(SpellPayment::Discard { origin, component, cost, part: CostPart::DiscardHand, source_text: source_text });
         }
-        if part.choose.is_some() { out.push(SpellPayment::ChooseObject { origin, component, declaration: 0, cost: part, source_text: source_text.clone() }); }
+        if part.choose.is_some() { out.push(SpellPayment::ChooseObject { origin, component, declaration: 0, cost: part, source_text: source_text }); }
         if part.behold.is_some_and(|(n, _, _)| n > 0) {
-            out.push(SpellPayment::Behold { origin, component, cost: part, source_text: source_text.clone() });
+            out.push(SpellPayment::Behold { origin, component, cost: part, source_text: source_text });
         }
         if part.tap_creatures.is_some() {
-            out.push(SpellPayment::TapCreatures { origin, component, cost: part, source_text: source_text.clone() });
+            out.push(SpellPayment::TapCreatures { origin, component, cost: part, source_text: source_text });
         }
         if matches!(scope, PaymentScope::Ability { .. } | PaymentScope::ManaAbility { .. } | PaymentScope::Resolution { .. }) {
             let granter = match scope { PaymentScope::Ability { granter, .. } | PaymentScope::ManaAbility { granter, .. } => granter, _ => None };
-            if let Some((kind, n)) = part.remove_counters { out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::Remove(kind, n), source_text: source_text.clone() }); }
-            if let Some((kind, n)) = part.put_counters { out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::Put(kind, n), source_text: source_text.clone() }); }
-            if let Some(VariableCost::RemoveAnyNumberOfCounters(kind)) = part.variable && x > 0 { out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::RemoveVariable(kind, x), source_text: source_text.clone() }); }
+            if let Some((kind, n)) = part.remove_counters { out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::Remove(kind, n), source_text: source_text }); }
+            if let Some((kind, n)) = part.put_counters { out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::Put(kind, n), source_text: source_text }); }
+            if let Some(VariableCost::RemoveAnyNumberOfCounters(kind)) = part.variable && x > 0 { out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::RemoveVariable(kind, x), source_text: source_text }); }
             if let Some(loyalty) = part.loyalty {
                 let change = if loyalty == LOYALTY_MINUS_X { -(x as i32) } else { i32::from(loyalty) };
-                out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::Loyalty(change), source_text: source_text.clone() });
+                out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::Loyalty(change), source_text: source_text });
             }
-            if part.remove_any_counter { out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::RemoveAny, source_text: source_text.clone() }); }
-            if part.materials.is_some() { out.push(SpellPayment::Craft { origin, component, cost: part, source_text: source_text.clone() }); }
-            if part.exert { out.push(SpellPayment::ExertSelf { origin, component, source_text: source_text.clone() }); }
-            if part.unattach_self { out.push(SpellPayment::UnattachSelf { origin, component, source_text: source_text.clone() }); }
-            if part.tap { out.push(SpellPayment::TapSelf { origin, component, source_text: source_text.clone() }); }
-            if part.sacrifice_self { out.push(SpellPayment::SacrificeSelf { origin, component, object: source, part: CostPart::SelfPermanent, source_text: source_text.clone() }); }
+            if part.remove_any_counter { out.push(SpellPayment::SourceCounters { origin, component, action: SourceCounters::RemoveAny, source_text: source_text }); }
+            if part.materials.is_some() { out.push(SpellPayment::Craft { origin, component, cost: part, source_text: source_text }); }
+            if part.exert { out.push(SpellPayment::ExertSelf { origin, component, source_text: source_text }); }
+            if part.unattach_self { out.push(SpellPayment::UnattachSelf { origin, component, source_text: source_text }); }
+            if part.tap { out.push(SpellPayment::TapSelf { origin, component, source_text: source_text }); }
+            if part.sacrifice_self { out.push(SpellPayment::SacrificeSelf { origin, component, object: source, part: CostPart::SelfPermanent, source_text: source_text }); }
             if part.sacrifice_granter {
                 let object = granter.unwrap_or(ObjectId::NONE);
-                out.push(SpellPayment::SacrificeSelf { origin, component, object, part: CostPart::Granter, source_text: source_text.clone() });
+                out.push(SpellPayment::SacrificeSelf { origin, component, object, part: CostPart::Granter, source_text: source_text });
             }
             if part.exile_granter {
                 let object = granter.unwrap_or(ObjectId::NONE);
-                out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::ExileGranter(object), source_text: source_text.clone() });
+                out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::ExileGranter(object), source_text: source_text });
             }
-            if let Some(place) = part.put_self_into_library { out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::Library(place), source_text: source_text.clone() }); }
-            if part.return_self { out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::Return, source_text: source_text.clone() }); }
-            if part.exile_self && !crafting { out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::Exile, source_text: source_text.clone() }); }
-            if part.discard_self { out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::Discard, source_text: source_text.clone() }); }
+            if let Some(place) = part.put_self_into_library { out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::Library(place), source_text: source_text }); }
+            if part.return_self { out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::Return, source_text: source_text }); }
+            if part.exile_self && !crafting { out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::Exile, source_text: source_text }); }
+            if part.discard_self { out.push(SpellPayment::MoveSelf { origin, component, action: MoveSelf::Discard, source_text: source_text }); }
         }
         if let Some(variable) = part.variable {
             let amount = if matches!(variable, VariableCost::SacrificeAnyNumber { .. }) { sacrificed_any_number } else { x };
@@ -2408,12 +2525,12 @@ fn append_fixed_payments<'a>(out: &mut Vec<SpellPayment<'a>>, origin: CostOrigin
                 VariableCost::BlightX | VariableCost::RemoveAnyNumberOfCounters(_) => false,
                 _ => true,
             };
-            if nonempty { out.push(SpellPayment::Variable { origin, component, cost: part, amount, source_text: source_text.clone() }); }
+            if nonempty { out.push(SpellPayment::Variable { origin, component, cost: part, amount, source_text: source_text }); }
         }
     }
     // A cost increase can add life to the aggregate after its static components were constructed.
     let added = cost.life - component_life.min(cost.life);
-    if added > 0 { out.push(SpellPayment::Life { amount: added, source_text: source_text.clone() }); }
+    if added > 0 { out.push(SpellPayment::Life { amount: added, source_text: source_text }); }
     let added_energy = u32::from(cost.energy) - component_energy.min(u32::from(cost.energy));
     if added_energy > 0 { out.push(SpellPayment::Energy { amount: added_energy, source_text }); }
 }
@@ -3217,7 +3334,9 @@ fn mana_ability_options_as(cx: &Cx, player: PlayerId, window: ManaWindow, option
                 option.targets_required = p.count;
                 // A cost of separately specified parts, or one a cost change may rewrite, chooses its objects as each part
                 // is paid (`activate_mana`), not with the activation.
-                option.targets_optional = !def.cost.components.is_empty() || !changers.is_empty() || def.cost_change.is_some();
+                // So does one with too few of them now, payable only once its life is paid (`payable_after_life`, CR 601.2h).
+                option.targets_optional = !def.cost.components.is_empty() || !changers.is_empty() || def.cost_change.is_some()
+                    || option.target_candidates.len() < p.count as usize;
             }
             if def.colors_from_sacrifice {
                 // Each sacrifice component has its own filter. Other permanent operations do not name the object
@@ -4085,7 +4204,7 @@ fn some_cast(
                     _ => (x, kicks.min(255) as u8),
                 };
                 let counted = if x > 0 { x } else { u32::from(kicked) };
-                let mut obj = cx.s().obj(card).clone();
+                let mut obj = *cx.s().obj(card);
                 (obj.x, obj.kicked, obj.paid) = (x, kicked, u32::from(paid));
                 // A kicker that is not mana is kicked by paying it (CR 702.33a).
                 if paid && def.optional_cost.is_some_and(|o| o.kicker) {
@@ -4103,7 +4222,7 @@ fn some_cast(
                 };
                 for &gift in &gifts {
                     obj.gift = gift;
-                    let view = Announcing { q: cx, spell: card, obj: obj.clone() };
+                    let view = Announcing { q: cx, spell: card, obj: obj };
                     let key = |targets: &[Target], watching: &Watching| {
                         deltas_watched(cx, &a.changers, player, Costed::Spell(card), face, targets, Some(&obj), Some(watching))
                     };
@@ -4125,7 +4244,7 @@ fn some_cast(
                                 segments.push(spliced.spell.map_or(Vec::new(), |s| s.targets.to_vec()));
                                 splice = add_cost(splice, spliced.splice.unwrap_or(ManaCost::ZERO));
                             }
-                            let earlier = Earlier { modes: mask, x, kicks, paid, splice, spell: Some(obj.clone()) };
+                            let earlier = Earlier { modes: mask, x, kicks, paid, splice, spell: Some(obj) };
                             some_announcement(
                                 &view,
                                 cx,
@@ -4637,10 +4756,10 @@ fn x_payable(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, paid: &
         XCosted::SpecialAction(ability) => (Costed::SpecialAction(source, ability), None, false, None),
     };
     let asker = Asker { instance: None, source, controller: player, by, spell };
-    let obj = cx.s().obj(source).clone();
+    let obj = *cx.s().obj(source);
     let card = spell.then(|| cx.card(obj.copied_card().unwrap_or(obj.card)));
     // The spell as it is once X is announced (`cast`), for the changes and the targets to read.
-    let mut announced = obj.clone();
+    let mut announced = obj;
     if spell {
         announced.x = n;
         if paid.kicker.is_some() {
@@ -4648,7 +4767,7 @@ fn x_payable(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, paid: &
         }
     }
     let earlier = spell.then_some(&announced);
-    let view = Announcing { q: cx, spell: source, obj: announced.clone() };
+    let view = Announcing { q: cx, spell: source, obj: announced };
     let pays_for = match costed {
         Costed::Spell(_) => Some(CostFor::Spell),
         _ => ability.and_then(activating),
@@ -5083,7 +5202,7 @@ fn deltas_watched(
     let patched;
     let announced_q: &dyn Query = match (announced, costed) {
         (Some(obj), Costed::Spell(spell)) => {
-            patched = Announcing { q: as_face, spell, obj: obj.clone() };
+            patched = Announcing { q: as_face, spell, obj: *obj };
             &patched
         }
         _ => as_face,
@@ -11921,7 +12040,10 @@ fn activate(
 
     note_activation(cx, source, index as usize, def);
 
-    cx.emit(Event::AbilityActivated { source, ability, player, by: Grant::of(granted), instance: item.instance });
+    cx.emit(Event::AbilityActivated { source, ability, player, by: Grant::of(granted) });
+    if item.instance != AbilityAcquisition::OWN {
+        cx.record(Event::ActivatedAs { instance: item.instance });
+    }
 
     ops::became_targets(cx, targets.iter().copied(), source, player, true);
     ops::commit_crime(cx, player, source, &targets);
@@ -12185,7 +12307,8 @@ fn activate_mana_as(
     // are paid. Tapped ones ("return a tapped creature you control") are chosen once the ability's own mana is paid, as a
     // spell's are (CR 605.3a, 601.2g-h): a mana ability activated while paying it may have tapped them. So are those of a
     // cost of separately specified parts, each as it is paid, and of one a cost change may rewrite.
-    let late = def.cost.permanents.is_some_and(|p| p.tapped);
+    // Nor do any where the activation names none of them: none could pay it until another part of its cost is paid.
+    let late = def.cost.permanents.is_some_and(|p| p.tapped || p.count > 0 && sacrifice.is_empty());
     let color_component = if def.colors_from_sacrifice { color_sacrifice_component(def) } else { None };
     // A color named for the source itself or the permanent that gave the ability, sacrificed for it (CR 106.7), is read
     // as that part of the cost is paid: no permanent comes with the activation for it.
@@ -12277,11 +12400,14 @@ fn activate_mana_as(
     // history says so. It is emitted too: "whenever you activate an ability of a creature" (Elrond, Moon-Reader) triggers on a
     // mana ability's activation (its ruling), the trigger waiting for the next time a player would receive priority
     // (CR 603.3); the abilities that mean only the ones that use the stack ask `ActivatedDef::is_mana_ability` of it themselves.
-    let activated = Event::AbilityActivated { source, ability, player, by: granted, instance };
+    let activated = Event::AbilityActivated { source, ability, player, by: granted };
     if crate::settle::activation_watched(cx) {
         cx.emit(activated);
     } else {
         cx.record(activated);
+    }
+    if instance != AbilityAcquisition::OWN {
+        cx.record(Event::ActivatedAs { instance });
     }
     let asker = Asker { instance: Some(AbilityInstance { ability, acquisition: instance }), source, controller: player, by, spell: false };
     // What the ability itself produces (CR 106.12a), told from every pool before and after it - its tapper's, and another's
@@ -14239,7 +14365,7 @@ fn pay_resolution_cost(cx: &mut Cx, payer: PlayerId, source: ObjectId, cost: &Co
     // individual mana units, may be paid in any order; a failed payment is reversed by the enclosing payment journal.
     let helpers = Helpers { waterbend: cost.waterbend.generic, abilities_closed: true, ..Helpers::NONE };
     let extra_life = life - cost.life.min(life);
-    let payment = cx.g.log.len();
+    let payment = cx.g.log.len() as u32;
     let resolving = if cx.g.mana_interval.is_none() {
         cx.s().agenda.get(cx.frame).and_then(|frame| match frame.kind { cantrip_state::FrameKind::Resolve { serial } => Some(serial), _ => None })
     } else { None };

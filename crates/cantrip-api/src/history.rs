@@ -174,7 +174,7 @@ pub enum Cause {
     /// A spell resolving.
     Spell(ObjectId),
     /// An activated or triggered ability resolving.
-    Ability { source: ObjectId, ability: AbilityRef, acquired: Acquired },
+    Ability { source: ObjectId, ability: AbilityRef },
 }
 
 /// One thing that happened, as the history keeps it.
@@ -346,6 +346,17 @@ impl<'a> History<'a> {
     }
 
     /// The records that answer a question, oldest first.
+    /// Which instance of its ability (CR 113.2c) an `AbilityActivated` record of this history was: the `ActivatedAs`
+    /// record after it, or the source's own text where there is none.
+    pub fn activation_instance(&self, r: &Record) -> AbilityAcquisition {
+        let base = self.records.first().map_or(0, |f| f.serial);
+        let at = (r.serial + 1).checked_sub(base).map(|i| i as usize);
+        match at.and_then(|i| self.records.get(i)).map(|n| n.event) {
+            Some(Event::ActivatedAs { instance }) => instance,
+            _ => AbilityAcquisition::OWN,
+        }
+    }
+
     pub fn select(&self, q: EventQuery) -> impl DoubleEndedIterator<Item = &'a Record> + 'a {
         let scope = if q.this_turn { self.this_turn() } else { self.records };
         scope.iter().filter(move |r| q.matches(r))
@@ -459,7 +470,7 @@ impl<'a> History<'a> {
         let receipts = self.receipts;
         self.records.iter().filter_map(move |r| match r.event {
             Event::CostObjectPaid { spell: paid, object, receipt }
-                if paid == spell && { let d = &receipts[receipt]; d.origin == Some(origin) && d.component == component && d.part == part } => Some(object),
+                if paid == spell && receipts.get(receipt as usize).is_some_and(|d| d.origin == Some(origin) && d.component == component && d.part == part) => Some(object),
             _ => None,
         })
     }
@@ -474,7 +485,7 @@ impl<'a> History<'a> {
         let receipts = self.receipts;
         self.records.iter().filter_map(move |r| match r.event {
             Event::AbilityCostObjectPaid { serial: paid, object, receipt }
-                if paid == serial && { let d = &receipts[receipt]; d.component == component && d.part == part } => Some(object),
+                if paid == serial && receipts.get(receipt as usize).is_some_and(|d| d.component == component && d.part == part) => Some(object),
             _ => None,
         })
     }
@@ -487,23 +498,23 @@ impl<'a> History<'a> {
         }) { serial = original; }
         let receipts = self.receipts;
         self.records.iter().filter_map(move |r| match r.event {
-            Event::AbilityCostObjectPaid { serial: paid, object, receipt } if paid == serial && receipts[receipt].part == part => Some(object),
+            Event::AbilityCostObjectPaid { serial: paid, object, receipt } if paid == serial && receipts.get(receipt as usize).is_some_and(|d| d.part == part) => Some(object),
             _ => None,
         })
     }
 
     /// Objects paid to a particular resolution payment and component, using their pre-move identities.
-    pub fn resolution_cost_objects(&self, payment: usize, component: usize, part: crate::CostPart) -> impl Iterator<Item = ObjectId> + 'a {
+    pub fn resolution_cost_objects(&self, payment: u32, component: usize, part: crate::CostPart) -> impl Iterator<Item = ObjectId> + 'a {
         let receipts = self.receipts;
         self.records.iter().filter_map(move |r| match r.event {
             Event::ResolutionCostObjectPaid { payment: paid, object, receipt, .. }
-                if paid == payment && { let d = &receipts[receipt]; d.component == component && d.part == part } => Some(object),
+                if paid == payment && receipts.get(receipt as usize).is_some_and(|d| d.component == component && d.part == part) => Some(object),
             _ => None,
         })
     }
 
     /// The individual payments made while this particular stack item resolved, in their recorded order.
-    pub fn resolution_payments(&self, serial: u32) -> impl Iterator<Item = usize> + 'a {
+    pub fn resolution_payments(&self, serial: u32) -> impl Iterator<Item = u32> + 'a {
         self.records.iter().filter_map(move |r| match r.event {
             Event::ResolutionPaymentBegan { payment, resolving: Some(which), .. } if which == serial => Some(payment),
             _ => None,

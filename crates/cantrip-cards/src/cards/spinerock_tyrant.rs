@@ -24,7 +24,7 @@ fn copy_it_and_both_gain_wither(g: &mut dyn Game, item: &StackItem) -> Result<()
         return Ok(());
     }
     let wither = EffectKind::AddKeywords(Keywords::of(&[Keyword::Wither]));
-    g.add_effect(item.object, spell, wither.clone(), Duration::Indefinite);
+    g.add_effect(item.object, spell, wither, Duration::Indefinite);
     if let Some(copy) = g.copy_spell(spell, item.controller, true)? {
         g.add_effect(item.object, copy, wither, Duration::Indefinite);
     }

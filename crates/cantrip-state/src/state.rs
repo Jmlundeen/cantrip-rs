@@ -692,7 +692,7 @@ impl GameState {
 
     /// Changes one object's row.
     pub fn update_obj(&mut self, id: ObjectId, f: impl FnOnce(&mut Obj)) {
-        let old = self.objects[id.index()].clone();
+        let old = self.objects[id.index()];
         f(&mut self.objects[id.index()]);
         if self.objects[id.index()] != old {
             self.log(Undo::Object(id, Box::new(old)));
@@ -1261,8 +1261,8 @@ impl GameState {
 
 
     /// Add immutable receipt provenance and journal its allocation.
-    pub fn cost_receipt_push(&mut self, receipt: CostReceiptDetails) -> usize {
-        let id = self.cost_receipts.len();
+    pub fn cost_receipt_push(&mut self, receipt: CostReceiptDetails) -> u32 {
+        let id = self.cost_receipts.len() as u32;
         self.cost_receipts.push(receipt);
         self.log(Undo::CostReceiptPushed);
         id
@@ -2189,8 +2189,8 @@ impl GameState {
     /// The entry that undoes applying `undo` to the state as it is now.
     fn inverse(&self, undo: &Undo) -> Undo {
         match undo {
-            Undo::Object(id, _) => Undo::Object(*id, Box::new(self.objects[id.index()].clone())),
-            Undo::ObjectPushed => Undo::ObjectPopped(Box::new(self.objects.last().expect("an object").clone())),
+            Undo::Object(id, _) => Undo::Object(*id, Box::new(self.objects[id.index()])),
+            Undo::ObjectPushed => Undo::ObjectPopped(Box::new(*self.objects.last().expect("an object"))),
             Undo::ObjectPopped(_) => Undo::ObjectPushed,
             Undo::Player(p, _) => Undo::Player(*p, self.players[p.index()]),
             Undo::Turn(_) => Undo::Turn(self.turn),
@@ -2353,7 +2353,7 @@ mod tests {
         let mut state = GameState::new(2, 1);
         let mark = state.mark();
         let receipt = CostReceiptDetails { origin: Some(CostOrigin::AdditionalChoice(700)), component: 900, part: CostPart::Discard(1000) };
-        let id = state.cost_receipt_push(receipt);
+        let id = state.cost_receipt_push(receipt) as usize;
         assert_eq!(state.cost_receipts[id], receipt);
         let mut copy = state.clone_with_journal();
         let (undos, redos) = state.step_back(mark);

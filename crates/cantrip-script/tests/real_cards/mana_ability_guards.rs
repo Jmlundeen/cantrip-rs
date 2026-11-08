@@ -26,7 +26,7 @@ fn board() -> (Game, ObjectId, ObjectId, ObjectId) {
 }
 
 fn activated(game: &Game, source: ObjectId) -> Event {
-    Event::AbilityActivated { source, ability: AbilityRef { card: game.state.obj(source).card, index: 0 }, player: THEM, by: Grant::NONE, instance: AbilityAcquisition::OWN }
+    Event::AbilityActivated { source, ability: AbilityRef { card: game.state.obj(source).card, index: 0 }, player: THEM, by: Grant::NONE }
 }
 
 #[test]

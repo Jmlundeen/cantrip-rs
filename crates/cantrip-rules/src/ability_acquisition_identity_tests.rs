@@ -125,17 +125,6 @@ fn acquisition_single_bats_donor_has_exactly_two_uses() {
     g.state.add_mana(YOU,Mana::B,8,id,None,ManaLasts::Step,false);activate(&mut g,id,0);activate(&mut g,id,0);
     assert!(options(&mut g,id).is_empty());
 }
-#[test]
-fn acquisition_dance_token_history_distinguishes_another_copy_acquisition() {
-    let mut g=game();let id=put(&mut g,&DANCE,Zone::BATTLEFIELD);let card=g.cards.id_of(&DANCE);let token=g.cards.id_of(&BODY);let mut causes=vec![];
-    for acquired in [Acquired::OWN,Acquired {by:AcquiredBy::Copy,stamp:100,part:0}] {
-        let mut item=crate::actions::stack_item(StackKind::Triggered,id,AbilityRef {card,index:0},YOU,&[]);item.acquired=acquired;g.state.stack_push(item);let serial=g.state.stack.last().unwrap().serial;
-        let at=g.state.agenda.len();g.state.frame_push(Frame::new(FrameKind::Resolve {serial}));let made=cantrip_api::Game::create_tokens(&mut cx(&mut g,at),token,YOU,1,false).unwrap()[0];
-        causes.push(g.log.iter().rev().find(|r|matches!(r.event,Event::Entered {permanent,..} if permanent==made)).unwrap().cause);
-        g.state.frame_remove(at);g.state.stack_remove(g.state.stack.len()-1);
-    }
-    assert_ne!(causes[0],causes[1],"the later linked ability acquisition cannot claim the original token's creation");
-}
 
 #[test]
 fn acquisition_concurrent_grants_each_have_a_once_budget_and_keep_it_after_slot_shift() {
@@ -193,7 +182,7 @@ fn acquisition_an_external_layer_six_static_grant_surviving_a_copy_keeps_its_bud
     let ability=AbilityRef::delayed(g.cards.id_of(&LENDER),0);
     cantrip_api::Game::add_effect(&mut cx(&mut g,usize::MAX),lender,id,EffectKind::AddAbility(ability),Duration::EndOfTurn);
     let available=options(&mut g,id);assert_eq!(available.len(),1);activate(&mut g,id,available[0].index);
-    let key=g.log.iter().find_map(|r|if let Event::AbilityActivated {instance,..}=r.event {Some(instance)} else {None}).unwrap();
+    let key=g.log.iter().find(|r|matches!(r.event, Event::AbilityActivated {..})).map(|r|g.history().activation_instance(r)).unwrap();
     let values=cx(&mut g,usize::MAX).copiable_values(source);cantrip_api::Game::become_copy(&mut cx(&mut g,usize::MAX),source,id,values,Duration::EndOfTurn);
     assert_eq!(options(&mut g,id).len(),1,"only the newly copied text's grant is fresh; the external static survives unchanged");
     let chars=crate::layers::chars(g.cards,&g.state,&g.log,id);

@@ -166,7 +166,7 @@ fn the_limit_is_applied_after_the_entire_replacement_chain_not_between_replaceme
 fn the_abilitys_actual_putter_is_independent_of_the_clockworks_current_controller() {
     let (mut g, object) = board(&BEAST, 3, 1, None);
     put(&mut g, &PUTTER, THEM, Zone::BATTLEFIELD);
-    let mut item = g.state.stack[0].clone(); item.controller = THEM; g.state.stack_set(0, item);
+    let mut item = g.state.stack[0]; item.controller = THEM; g.state.stack_set(0, item);
     number(&mut g, 1);
     assert_eq!(g.controller(object), YOU);
     assert_eq!(g.obj(object).counters(KIND), 5);

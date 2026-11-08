@@ -146,7 +146,7 @@ fn phase_in(cx: &mut Cx, permanents: &[ObjectId]) {
         });
     }
     for &id in &direct {
-        let obj = cx.s().obj(id).clone();
+        let obj = *cx.s().obj(id);
         if let Some(host) = obj.attached_to
             && !(live(cx.s(), host) && cx.s().obj(host).zone.is(ZoneKind::Battlefield))
         {

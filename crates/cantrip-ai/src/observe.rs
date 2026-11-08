@@ -390,7 +390,7 @@ impl View<'_> {
             .log
             .iter()
             .rev()
-            .filter(|r| !matches!(r.event, Event::Looked { .. } | Event::Shown { .. } | Event::Randomized { .. }))
+            .filter(|r| !matches!(r.event, Event::Looked { .. } | Event::Shown { .. } | Event::Randomized { .. } | Event::ActivatedAs { .. }))
             .take(EVENTS)
             .map(|r| {
                 let e = &r.event;

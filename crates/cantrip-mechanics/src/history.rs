@@ -9,9 +9,10 @@ use cantrip_api::*;
 pub fn this_ability_activations_this_turn(q: &dyn Query, asker: &Asker) -> usize {
     // Asked without its instance, the ability is no activation of its own to count.
     let Some(instance) = asker.instance else { return 0 };
-    q.history().select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(asker.source).this_turn())
-        .filter(|r| matches!(r.event, Event::AbilityActivated { ability, instance: key, .. }
-            if ability == instance.ability && key == instance.acquisition))
+    let history = q.history();
+    history.select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(asker.source).this_turn())
+        .filter(|r| matches!(r.event, Event::AbilityActivated { ability, .. } if ability == instance.ability)
+            && history.activation_instance(r) == instance.acquisition)
         .count()
 }
 

@@ -75,13 +75,13 @@ pub struct MillResult {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Event {
     /// An object paid a distinct spell cost component; its identity is the one before any zone change.
-    CostObjectPaid { spell: ObjectId, object: ObjectId, receipt: usize },
+    CostObjectPaid { spell: ObjectId, object: ObjectId, receipt: u32 },
     /// An old permanent paid one specific component of a stack activation.
-    AbilityCostObjectPaid { serial: u32, object: ObjectId, receipt: usize },
+    AbilityCostObjectPaid { serial: u32, object: ObjectId, receipt: u32 },
     /// A distinct payment requested by a resolving spell or ability; its identity is its journal position.
-    ResolutionPaymentBegan { payment: usize, source: ObjectId, payer: PlayerId, resolving: Option<u32> },
+    ResolutionPaymentBegan { payment: u32, source: ObjectId, payer: PlayerId, resolving: Option<u32> },
     /// An object paid one component of that resolution payment, identified before any zone change.
-    ResolutionCostObjectPaid { payment: usize, source: ObjectId, payer: PlayerId, object: ObjectId, receipt: usize },
+    ResolutionCostObjectPaid { payment: u32, source: ObjectId, payer: PlayerId, object: ObjectId, receipt: u32 },
     /// An ability copy's serial and the serial it copied, including copies of copies.
     AbilityCopied { copy: u32, original: u32 },
     /// A spell became cast (CR 601.2i), with how many spells its caster has cast this turn, this one included. `options` has a
@@ -142,9 +142,13 @@ pub enum Event {
     /// An ability was activated (CR 602.2, 605.3): `ability` of `source`, by `player`; `by` names the other object whose effect
     /// gave the source that ability (CR 113.2c, 613.1f: Chromatic Lantern's mana ability on a land, an Equipment's ability on
     /// the creature), with the ability, or is `Grant::NONE` for one of the source's own (`Grant::some` reads it).
-    /// `instance` is captured before paying costs and distinguishes independent identical acquisitions; it is not the
-    /// mutable slot offered to the player, nor the CR607 group of linked abilities.
-    AbilityActivated { source: ObjectId, ability: AbilityRef, player: PlayerId, by: Grant, instance: AbilityAcquisition },
+    /// Which instance of the ability it was (CR 113.2c) is the record after it where that is not the source's own text
+    /// (`ActivatedAs`, `History::activation_instance`): rare, and kept out of every record's size.
+    AbilityActivated { source: ObjectId, ability: AbilityRef, player: PlayerId, by: Grant },
+    /// The instance of an ability activated just before (`AbilityActivated`), captured before its costs were paid, where it
+    /// is not `AbilityAcquisition::OWN`: what tells independent identical acquisitions apart (CR 113.2c, 602.5b-c). It is no
+    /// event of its own - nothing triggers on it and no kind files it.
+    ActivatedAs { instance: AbilityAcquisition },
     /// A creature was declared as an attacker (CR 508.1). `known` is the last-known row (`GameState::last_known`) that keeps
     /// its characteristics as it was declared, which "you attacked with a Rogue" asks of it once it has changed, left or
     /// changed controllers (`history::Attacked::chars`). `defending` is its defending player as it attacked (CR 508.5,
@@ -501,7 +505,7 @@ impl Event {
             Event::AbilityCostObjectPaid { object: paid, .. } => paid == object,
             Event::ResolutionPaymentBegan { source, .. } => source == object,
             Event::ResolutionCostObjectPaid { source, object: paid, .. } => source == object || paid == object,
-            Event::AbilityCopied { .. } => false,
+            Event::AbilityCopied { .. } | Event::ActivatedAs { .. } => false,
             Event::PaidAlternative { spell, .. } => spell == object,
             Event::LandPlayed { land, .. } => land == object,
             Event::Copied { copy, original, .. } => copy == object || original == object,
@@ -658,6 +662,7 @@ impl EventMask {
             Event::Looked { .. } => EventMask::LOOKED,
             Event::Countered { .. } => EventMask::COUNTERED,
             Event::AbilityActivated { .. } => EventMask::ABILITY_ACTIVATED,
+            Event::ActivatedAs { .. } => EventMask(0),
             // The alternative cost a cast was paid with is part of the cast's record.
             Event::Cast(_) | Event::PaidAlternative { .. } => EventMask::CAST,
             Event::LandPlayed { .. } => EventMask::LAND_PLAYED,
@@ -782,6 +787,6 @@ mod tests {
     /// The composed 64-bit Record includes the acquisition-aware Cause and measures 72 bytes.
     #[test]
     fn an_event_stays_small() {
-        assert!(std::mem::size_of::<Event>() <= 40, "Event is {} bytes", std::mem::size_of::<Event>());
+        assert!(std::mem::size_of::<Event>() <= 28, "Event is {} bytes", std::mem::size_of::<Event>());
     }
 }

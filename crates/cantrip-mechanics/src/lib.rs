@@ -750,7 +750,7 @@ pub fn airbend_targets(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 /// creature") airbend what they name without targeting it; `airbend` is the targeted form.
 pub fn airbend_all(g: &mut dyn Game, objects: &[ObjectId]) {
     for exiled in g.exile_all(objects) {
-        let obj = g.obj(exiled).clone();
+        let obj = *g.obj(exiled);
         if obj.zone.is(ZoneKind::Exile) && !obj.token && !obj.card_copy {
             g.allow_play(exiled, obj.owner, PlayGrant { instead: Some(mana("{2}")), ..PlayGrant::CAST });
         }

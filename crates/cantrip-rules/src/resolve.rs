@@ -440,7 +440,7 @@ fn leave_stack(cx: &mut Cx, items: &[StackItem], reason: ZoneReason) {
     let mut ceasing = Vec::new();
     let mut moves = Vec::new();
     for item in items.iter().filter(|i| i.kind == StackKind::Spell) {
-        let obj = cx.s().obj(item.object).clone();
+        let obj = *cx.s().obj(item.object);
         // A copy of a card leaves the stack for nowhere: it ceases to exist (CR 707.10a, 722.3c). A copy of an Omen is an Omen
         // too (CR 720.3c): resolving, its owner's library is still shuffled, though the copy, in no zone it can be in, is not
         // put there (CR 707.10a, 704.5e).
@@ -738,7 +738,7 @@ pub fn remove_spell(cx: &mut Cx, spell: ObjectId, to: CounterTo) {
 /// Takes the spell at `at` off the stack and into the zone `to` names, its owner's.
 fn send_spell(cx: &mut Cx, at: usize, to: CounterTo, reason: ZoneReason) {
     let item = cx.st().stack_remove(at);
-    let obj = cx.s().obj(item.object).clone();
+    let obj = *cx.s().obj(item.object);
     if obj.card_copy {
         ops::cease_to_exist(cx, Zone::STACK, item.object);
         return;

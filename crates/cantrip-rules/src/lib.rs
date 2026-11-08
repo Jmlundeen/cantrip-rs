@@ -402,6 +402,27 @@ impl Clone for Game {
     }
 }
 
+impl Game {
+    /// A copy of the game to ask "what if" of and throw away: its state (no journal to roll back with), its history and
+    /// nothing of the search tree or of a call under way. Nothing done to it reaches the game.
+    pub(crate) fn hypothetical(&self) -> Game {
+        Game {
+            state: self.state.clone(),
+            log: self.log.clone(),
+            tree: tree::Tree::new(),
+            at: tree::NodeId::ROOT,
+            cards: self.cards,
+            verify: false,
+            max_events: self.max_events,
+            history_end: self.history_end,
+            check: StateCheck::NONE,
+            spells_as_cast: Default::default(),
+            own_text: Default::default(), effect_words: Default::default(), mana_activation_x: None, mana_interval: None,
+            takeback: Default::default(),
+        }
+    }
+}
+
 /// What dealing a game needs.
 #[derive(Clone, Debug)]
 pub struct Setup {
@@ -1697,7 +1718,7 @@ impl<'a> Cx<'a> {
             FrameKind::BeginStep | FrameKind::Opening => Cause::Turn,
             FrameKind::Resolve { .. } => match self.resolving() {
                 Some(item) if item.kind == StackKind::Spell => Cause::Spell(item.object),
-                Some(item) => Cause::Ability { source: item.object, ability: item.ability, acquired: item.acquired },
+                Some(item) => Cause::Ability { source: item.object, ability: item.ability },
                 None => Cause::Rules,
             },
             _ => Cause::Rules,
@@ -3053,7 +3074,7 @@ impl cantrip_api::Game for Cx<'_> {
         let player = self.g.state.obj(permanent).controller;
         let ability = AbilityRef { card: self.g.state.obj(permanent).card, index: actions::EXTRA_LOYALTY_ALLOWED };
         for _ in 0..times {
-            self.record(Event::AbilityActivated { source: permanent, ability, player, by: Grant::NONE, instance: AbilityAcquisition::OWN });
+            self.record(Event::AbilityActivated { source: permanent, ability, player, by: Grant::NONE });
         }
     }
 

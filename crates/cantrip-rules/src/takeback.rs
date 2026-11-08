@@ -484,13 +484,13 @@ fn same_events(replayed: &[Record], did: &[Event], new_receipts: &[cantrip_state
         (Event::ResolutionCostObjectPaid { payment: new, source: a, payer: b, object: c, receipt: d },
          Event::ResolutionCostObjectPaid { payment: old, source: f, payer: g, object: h, receipt: i }) => {
             payments.contains(&(new, old)) && (a, b, c) == (f, g, h)
-                && new_receipts.get(d).zip(old_receipts.get(i)).is_some_and(|(x, y)| x == y)
+                && new_receipts.get(d as usize).zip(old_receipts.get(i as usize)).is_some_and(|(x, y)| x == y)
         }
         (Event::CostObjectPaid { spell: a, object: b, receipt: c }, Event::CostObjectPaid { spell: d, object: e, receipt: f }) => {
-            (a, b) == (d, e) && new_receipts.get(c).zip(old_receipts.get(f)).is_some_and(|(x, y)| x == y)
+            (a, b) == (d, e) && new_receipts.get(c as usize).zip(old_receipts.get(f as usize)).is_some_and(|(x, y)| x == y)
         }
         (Event::AbilityCostObjectPaid { serial: a, object: b, receipt: c }, Event::AbilityCostObjectPaid { serial: d, object: e, receipt: f }) => {
-            (a, b) == (d, e) && new_receipts.get(c).zip(old_receipts.get(f)).is_some_and(|(x, y)| x == y)
+            (a, b) == (d, e) && new_receipts.get(c as usize).zip(old_receipts.get(f as usize)).is_some_and(|(x, y)| x == y)
         }
         (new, old) => plain(new) == plain(old),
     })

@@ -333,7 +333,7 @@ fn move_together_entering_event(cx: &mut Cx, moves: &[Moving], reason: ZoneReaso
     let outer_leaving = std::mem::replace(&mut *cx.s().leaving_together.borrow_mut(), leaving);
     for m in moves {
         let reason = m.reason.unwrap_or(reason);
-        let old = cx.s().obj(m.id).clone();
+        let old = *cx.s().obj(m.id);
         let from = old.zone;
         let to = m.to;
         let mut m = *m;
@@ -592,7 +592,7 @@ fn move_together_entering_event(cx: &mut Cx, moves: &[Moving], reason: ZoneReaso
         // A basic land of a Limited event's supply (`GameState::outside_supply`) that leaves the sideboard, however it is
         // brought into the game (CR 400.11b), is replaced there by another, since a Limited sideboard holds any number of them.
         if from.is(ZoneKind::Sideboard) && cx.s().outside_supply.contains(&cx.s().obj(m.id).card) {
-            let supplied = cx.s().obj(m.id).clone();
+            let supplied = *cx.s().obj(m.id);
             let fresh = cx.st().push_obj(supplied);
             cx.st().zone_push(from, fresh);
         }
@@ -2013,7 +2013,7 @@ pub fn meld(cx: &mut Cx, first: ObjectId, second: ObjectId, controller: PlayerId
     if first == second || !live(cx.s(), first) || !live(cx.s(), second) {
         return Ok(None);
     }
-    let (a, b) = (cx.s().obj(first).clone(), cx.s().obj(second).clone());
+    let (a, b) = (*cx.s().obj(first), *cx.s().obj(second));
     let pair = |x: &Obj, y: &Obj| !x.token && !x.card_copy && cx.card(x.card).meld.is_some_and(|m| m.with == cx.card(y.card).name);
     let Some(into) = cx.card(a.card).meld.filter(|_| pair(&a, &b) && pair(&b, &a)).map(|m| cx.cards().id_of(m.into)) else {
         return Ok(None);
@@ -2988,12 +2988,12 @@ pub fn copy_spell_as(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets
     if cx.s().player(copier).lost {
         return Ok(None);
     }
-    let original = cx.s().obj(spell).clone();
+    let original = *cx.s().obj(spell);
     // An instant or sorcery, or a permanent spell (a copy of one becomes a token as it resolves, CR 707.10f).
 
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
-    let mut obj = original.clone();
+    let mut obj = original;
     (obj.owner, obj.controller, obj.zone, obj.timestamp, obj.controlled_since) = (copier, copier, Zone::STACK, timestamp, turn);
     // A spell copy is not the designated physical commander card.
     obj.commander = false;
@@ -3400,7 +3400,7 @@ pub fn set_spell_exile_instead(cx: &mut Cx, spell: ObjectId, instead: ExileInste
 /// the spell's permanent. An Aura token enters attached to what the spell targeted (CR 303.4f, 608.3b, 707.10c); the copy itself
 /// ceases to exist on the stack (CR 707.10a).
 pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> {
-    let spell = cx.s().obj(item.object).clone();
+    let spell = *cx.s().obj(item.object);
     cx.st().stack_remove(at);
     cease_to_exist(cx, Zone::STACK, item.object);
     // A copy of a Room spell keeps the choice of door and the characteristics of both (CR 709.5b); the token it becomes is a
@@ -4623,7 +4623,7 @@ pub fn end_lapsed_durations(cx: &mut Cx, id: ObjectId) {
         // A simultaneous instruction settles every conditional duration after all its changes.
         return;
     }
-    let obj = cx.s().obj(id).clone();
+    let obj = *cx.s().obj(id);
     if cx.s().effects.iter().any(|e| e.affected == id && !e.duration.holds_for(&obj)) {
         let control = cx.s().effects.iter().any(|e| e.affected == id && !e.duration.holds_for(&obj) && matches!(e.kind, EffectKind::Control(_)));
         let effects_before = cx.s().effects.len();
@@ -5026,7 +5026,7 @@ fn settle_controller(cx: &mut Cx, id: ObjectId) -> bool {
 /// Writes what layer 2 made of a permanent's controller: `controller`, given by a control-changing effect or not. The
 /// controller it had before any did is kept beside it (`Marks::control_base`). Whether its controller changed.
 fn write_controller(cx: &mut Cx, id: ObjectId, controller: PlayerId, by_effect: bool) -> bool {
-    let obj = cx.s().obj(id).clone();
+    let obj = *cx.s().obj(id);
     let base = obj.marks.control_base.unwrap_or(obj.controller);
     let control_base = by_effect.then_some(base);
     if controller == obj.controller && control_base == obj.marks.control_base {
@@ -5825,7 +5825,7 @@ mod tests {
     fn the_object_about_to_enter_is_answered_as_it_would_exist_and_left_where_it_is() {
         let (mut game, held) = game_with(&[&ANIMATOR, &HUMBLER]);
         let relic = held[1];
-        let row = game.state.obj(relic).clone();
+        let row = *game.state.obj(relic);
         let battlefield = game.state.battlefield().to_vec();
         let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
         let would = as_it_would_exist(&mut cx, &entering(relic));

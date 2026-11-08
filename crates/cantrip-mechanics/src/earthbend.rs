@@ -22,7 +22,7 @@ pub fn effect<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
         return Ok(());
     }
     let Target::Object(land) = item.target(0) else { return Ok(()) };
-    let o = g.obj(item.object).clone();
+    let o = *g.obj(item.object);
     let card = o.copied_card().unwrap_or(o.card);
     // "It becomes a 0/0 land creature with haste": one instruction (`Game::one_instruction`).
     g.one_instruction(&mut |g| {
