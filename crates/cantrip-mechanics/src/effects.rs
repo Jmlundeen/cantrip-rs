@@ -63,8 +63,8 @@ pub fn enters_with_a_counter<const KIND: usize>(_: &mut dyn Game, entering: &mut
     Ok(())
 }
 
-/// "This permanent enters with `N` +1/+1 counters on it" (CR 614.1c, 122.1). Botanical Brawler and Costume Closet (two) print
-/// it; one is `enters_with_a_counter`.
+/// "This permanent enters with `N` +1/+1 counters on it" (CR 614.1c, 122.1). Botanical Brawler, Costume Closet (two) and
+/// Triskelion (three) print it; one is `enters_with_a_counter`.
 pub fn enters_with_plus_one_counters<const N: i32>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.counters[CounterKind::PlusOne as usize] += N;
     Ok(())

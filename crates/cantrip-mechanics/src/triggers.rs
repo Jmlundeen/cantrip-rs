@@ -495,6 +495,25 @@ pub fn this_attacks_or_blocks(_: &dyn Query, source: ObjectId, event: &Event) ->
     }
 }
 
+/// "Whenever this creature deals damage to an opponent" (CR 603.2, 120.2): damage of more than 0 dealt by `asker.source` to one of its
+/// controller's opponents, the player the subject. Hypnotic Specter and Nicol Bolas print it.
+pub fn this_deals_damage_to_opponent(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    if let Event::Damage { source, target: Target::Player(player), amount, .. } = event
+        && *source == asker.source && *amount > 0
+        && q.state().opponents(asker.controller).any(|p| p == *player)
+    {
+        return Fired::about(Target::Player(*player));
+    }
+    None
+}
+
+/// "Whenever this creature blocks or becomes blocked by a creature" (CR 603.2, 509.3b): the other creature in the block is the
+/// subject (`other_creature_in_block_with_this`). Aisling Leprechaun and Lim-Dul's Cohort print it as it stands.
+pub fn blocks_or_becomes_blocked(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    let other = other_creature_in_block_with_this(q, asker.source, event)?;
+    Fired::about(Target::Object(other))
+}
+
 /// "The other creature in a block involving this one" (CR 509.1, 509.3b, 603.2): when `source` blocks a creature or is blocked
 /// by one, that creature, still a creature as the block happens. Aisling Leprechaun, Cockatrice and Abomination ("whenever this
 /// creature blocks or becomes blocked by ...") print it; each adds its own condition on the other creature.
