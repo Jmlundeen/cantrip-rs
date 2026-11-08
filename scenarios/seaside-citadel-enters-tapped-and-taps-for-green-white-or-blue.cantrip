@@ -1,0 +1,29 @@
+# Seaside Citadel enters tapped (CR 614.1d) and its "{T}: Add {G}, {W}, or {U}." is a mana ability (CR 605.1a) that takes no
+# other color: Bot1 plays it on turn 1 and it is tapped; on turn 3 it untaps and adds {G}, on turn 5 {W} and on turn 7
+# {U}, each the single mana the {T} cost buys, and red is not offered.
+
+[Bot1 Deck]
+Seaside Citadel
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Seaside Citadel.Play
+? Bot1.Battlefield.Seaside Citadel.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Seaside Citadel.Activate(Color: Red)
+Bot1.Battlefield.Seaside Citadel.Activate(Color: Green)
+? Bot1.Mana = {G}
+? Bot1.Battlefield.Seaside Citadel.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Seaside Citadel.Activate(Color: White)
+? Bot1.Mana = {W}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Seaside Citadel.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Seaside Citadel.Tapped = true
