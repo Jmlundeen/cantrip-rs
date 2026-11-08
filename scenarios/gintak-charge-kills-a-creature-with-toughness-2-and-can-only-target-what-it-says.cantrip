@@ -1,0 +1,38 @@
+# "Gin'tak Charge deals 2 damage to any target." A Devoted Hero with toughness exactly 2 is dealt lethal damage and dies (CR 120.3e, 704.5g).
+# A Mox is refused: it is no legal target, and the refusals sit before the legal cast so they cannot pass for want of a target.
+# The pool is checked right after the cast, so the cost is exact.
+
+[Bot1 Deck]
+Mox Ruby
+Gin'tak Charge
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Devoted Hero
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Devoted Hero.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Hand.Gin'tak Charge.Cast(Bot2.Battlefield.Mox Pearl)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gin'tak Charge.Cast(Bot2.Battlefield.Devoted Hero)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Devoted Hero = (absent)
+Bot2.Graveyard = Devoted Hero
+Bot1.Graveyard = Gin'tak Charge

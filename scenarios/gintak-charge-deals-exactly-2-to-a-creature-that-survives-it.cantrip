@@ -1,0 +1,27 @@
+# "Gin'tak Charge deals 2 damage to any target." A Phyrexian Walker with toughness 3 survives with exactly 2 damage marked (CR 120.3e): one more would have killed it.
+
+[Bot1 Deck]
+Mox Ruby
+Gin'tak Charge
+Island x20
+
+[Bot2 Deck]
+Phyrexian Walker
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Phyrexian Walker.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gin'tak Charge.Cast(Bot2.Battlefield.Phyrexian Walker)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Phyrexian Walker.Damage = 2
+Bot1.Graveyard = Gin'tak Charge
