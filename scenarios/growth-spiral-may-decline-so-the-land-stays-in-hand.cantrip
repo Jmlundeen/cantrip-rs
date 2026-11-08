@@ -1,0 +1,30 @@
+# "You may": Bot1 declines the offer, so the drawn card stays in hand and no land enters.
+
+[Bot1 Deck]
+Growth Spiral
+Mox Emerald
+Mox Sapphire
+Forest
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.LandsPlayed = 1
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Growth Spiral.Cast
+? Bot1.Mana =
+Bot1.Choose()
+? Bot1.Hand.Count = 4
+? Bot1.Battlefield.Island = (absent)
+? Bot1.LandsPlayed = 1
+
+[Expect]
+Bot1.Battlefield.Forest.Types = Land
+Bot1.Graveyard = Growth Spiral
