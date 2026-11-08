@@ -1,0 +1,6 @@
+{
+  "name": "Unwinding Clock",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "Untap all artifacts you control during each other player's untap step."
+}

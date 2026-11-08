@@ -1,0 +1,53 @@
+# Unwinding Clock {4}: "Untap all artifacts you control during each other player's untap step" (CR 502.3, 611.3a).
+# Four Moxen pay exactly {4} for it, so the pool is empty as it resolves; an Island is tapped afterwards, which is not an
+# artifact and must stay tapped. In Bot2's untap step on turn 2 the artifacts untap - the tapped Island does not, and
+# Bot2's own Mox Jet, tapped in Bot2's main phase, stays tapped: only artifacts its controller controls untap there.
+
+[Bot1 Deck]
+Unwinding Clock
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Unwinding Clock.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Pearl.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+? Bot2.Battlefield.Mox Jet.Tapped = true
+? Bot1.Battlefield.Island.Tapped = true
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+? Bot1.Battlefield.Mox Jet.Tapped = false
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot2.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Count = 6
