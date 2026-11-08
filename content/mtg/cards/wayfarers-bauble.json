@@ -1,0 +1,6 @@
+{
+  "name": "Wayfarer's Bauble",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "{2}, {T}, Sacrifice this artifact: Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle."
+}
