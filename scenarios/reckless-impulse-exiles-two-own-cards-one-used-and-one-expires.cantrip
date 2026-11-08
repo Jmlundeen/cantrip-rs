@@ -1,0 +1,59 @@
+# Reckless Impulse exiles exactly Bot1's top two cards (Boltwave and Chain Lightning), not the matching cards on top of
+# Bot2's library (CR 701.13). Its permission keeps normal timing and costs: Boltwave is refused during Bot2's turn,
+# then cast for {R} during Bot1's next turn (CR 307.1, 601.2f, 601.2h). Chain Lightning is left unused and is refused
+# on turn 5 after the stated duration has ended (CR 611.2a).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Reckless Impulse
+Island
+Island
+Island
+Boltwave
+Chain Lightning
+Island x11
+
+[Bot2 Deck]
+Island x7
+Boltwave
+Chain Lightning
+Island x11
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Reckless Impulse.Cast
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+? Exile = Boltwave; Chain Lightning
+? Bot1.Library.Count = 11
+? Bot2.Library.Count = 13
+[T2 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+! Bot1.Exile.Boltwave.Cast
+? Bot1.Mana = {R}{R}{R}
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Boltwave.Cast
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+? Bot2.Life = 17
+? Exile = Chain Lightning
+[T5 Bot1.Main1]
+! Bot1.Exile.Chain Lightning.Cast(Bot2)
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Exile = Chain Lightning
