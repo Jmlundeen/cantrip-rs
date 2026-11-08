@@ -1,0 +1,40 @@
+# The limit is four or more (CR 603.2): with three cards in hand before the end-step draw Bot2 draws to four and takes 2;
+# with two cards it draws to three and takes nothing.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Fevered Visions
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Island x15
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fevered Visions.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+
+[Expect]
+? Bot2.Life = 20
+? Bot2.Hand.Count = 3
