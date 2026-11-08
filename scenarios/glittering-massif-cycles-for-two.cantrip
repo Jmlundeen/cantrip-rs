@@ -1,0 +1,25 @@
+# Cycling {2} (CR 702.29a): one Mountain is not enough for the {2}, so the cycle is refused; the second mana pays it exactly,
+# the pool is empty afterwards, and the card goes to the graveyard and draws a card.
+
+[Bot1 Deck]
+Mountain
+Glittering Massif
+Grizzly Bears
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Hand.Glittering Massif.Activate(Ability: Cycling; Mana: short)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Glittering Massif.Activate(Ability: Cycling)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Graveyard = Glittering Massif
