@@ -1,0 +1,44 @@
+# Sea of Clouds: "This land enters tapped unless you have two or more opponents" (CR 614.1d). With two opponents it
+# enters untapped on turn 1. On turn 4 it taps for {W} to cast Savannah Lions (the pool empties exactly); on turn 7 it
+# taps for {U} to cast Delver of Secrets (the pool empties exactly).
+
+[Bot1 Deck]
+Sea of Clouds
+Savannah Lions
+Delver of Secrets
+Island x4
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Sea of Clouds.Play
+? Bot1.Battlefield.Sea of Clouds.Tapped = false
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T4 Bot1.Main1]
+Bot1.Battlefield.Sea of Clouds.Activate(Color: White)
+? Bot1.Mana = {W}
+Bot1.Hand.Savannah Lions.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Sea of Clouds.Activate(Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Hand.Delver of Secrets.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Savannah Lions.Power = 2
+Bot1.Battlefield.Delver of Secrets.Power = 1
