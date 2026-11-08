@@ -1,0 +1,32 @@
+# Double strike (CR 702.4) and melee (CR 702.121a): a 0/1 double striker attacking an opponent beside a 0/2 Ornithopter
+# gets +1/+1 from its own melee trigger, so it is 1/2 and deals 1 twice, 2 damage. Without melee it would deal nothing, and
+# without double strike only 1. The Mox Ruby and the Mountain pay {1}{R} exactly.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ferocious Colonist
+Ornithopter
+Mountain x8
+Mox Ruby
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ferocious Colonist.Cast
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ferocious Colonist > Bot2; Ornithopter > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+? Bot1.Battlefield.Ferocious Colonist.Power = 1
+? Bot1.Battlefield.Ferocious Colonist.Keywords = DoubleStrike
+Bot2.Life = 18
