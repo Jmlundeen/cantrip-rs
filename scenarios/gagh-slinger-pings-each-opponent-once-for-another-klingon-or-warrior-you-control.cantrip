@@ -1,0 +1,62 @@
+# "Whenever another Klingon or Warrior you control enters, this creature deals 1 damage to each opponent" (CR 603.6a,
+# 120.3): Gagh Slinger's own entry does not trigger it, Bot2's own Klingons do not trigger it, and Bot1's Munitions
+# Enthusiast does - one damage to Bot2 alone, none to General Chang on the battlefield.
+
+[Bot1 Deck]
+Mox Ruby
+Mana Confluence
+City of Brass
+Mountain
+Goblin Balloon Brigade
+Gagh Slinger
+Munitions Enthusiast
+Mountain x11
+
+[Bot2 Deck]
+Swamp x4
+General Chang, Cold Warrior
+Battle-Scarred Survivalist
+Swamp x8
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mana Confluence.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Balloon Brigade.Cast
+? Bot1.Mana = 
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.General Chang, Cold Warrior.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.City of Brass.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mana Confluence.Activate(Color: Red)
+Bot1.Battlefield.City of Brass.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gagh Slinger.Cast
+? Bot2.Life = 20
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Battle-Scarred Survivalist.Cast
+? Bot2.Life = 20
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Munitions Enthusiast.Cast
+? Bot1.Mana = 
+[T7 Bot1.Main2]
+? Bot2.Life = 19
+? Bot2.Battlefield.General Chang, Cold Warrior.Damage = 0
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Gagh Slinger.Types = Creature
+Bot1.Battlefield.Munitions Enthusiast.Types = Creature
+Bot2.Life = 19
+Bot2.Battlefield.General Chang, Cold Warrior.Damage = 0

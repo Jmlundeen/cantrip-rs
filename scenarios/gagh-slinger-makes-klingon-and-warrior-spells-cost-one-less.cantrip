@@ -1,0 +1,61 @@
+# "Klingon spells and Warrior spells you cast cost {1} less to cast" (CR 601.2f, 118.7a, 118.7c): without Gagh Slinger on
+# the battlefield the first Skystinger ({2}{G}, an Insect Warrior) pays its full cost of three green mana; with it the second
+# costs {1}{G} - three tapped, two spent, one left - and Impact Tremors ({1}{R}, no Klingon or Warrior spell) pays in full.
+
+[Bot1 Deck]
+Mox Ruby
+Mana Confluence
+City of Brass
+Forest
+Skystinger
+Gagh Slinger
+Forest
+Skystinger
+Impact Tremors
+Forest x11
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mana Confluence.Play
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.City of Brass.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mana Confluence.Activate(Color: Green)
+Bot1.Battlefield.City of Brass.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Skystinger.Cast
+? Bot1.Mana = 
+? Bot2.Life = 20
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mana Confluence.Activate(Color: Red)
+Bot1.Battlefield.City of Brass.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gagh Slinger.Cast
+? Bot1.Mana = 
+[T7 Bot1.Main2]
+? Bot2.Life = 20
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mana Confluence.Activate(Color: Green)
+Bot1.Battlefield.City of Brass.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Skystinger.Cast
+? Bot1.Mana = {G}
+[T9 Bot1.Main2]
+? Bot2.Life = 19
+[T11 Bot1.Main1]
+Bot1.Battlefield.Mana Confluence.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Impact Tremors.Cast
+? Bot1.Mana = 
+
+[Expect]
+Turn = 11
+Bot1.Battlefield.Gagh Slinger.Types = Creature
+Bot1.Battlefield.Impact Tremors.Types = Enchantment
+Bot2.Life = 19
