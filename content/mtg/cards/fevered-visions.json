@@ -1,0 +1,6 @@
+{
+  "name": "Fevered Visions",
+  "manaCost": "{1}{U}{R}",
+  "type": "Enchantment",
+  "oracleText": "At the beginning of each player's end step, that player draws a card. If the player is your opponent and has four or more cards in hand, this enchantment deals 2 damage to that player."
+}

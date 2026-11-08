@@ -1,0 +1,41 @@
+# Fevered Visions' damage needs four or more cards in the opponent's hand after the draw: here Bot2 casts five
+# Ornithopters, holds two cards, draws to three at its end step and takes nothing (the other scenario shows exactly four
+# dealing 2).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Fevered Visions
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Island x15
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fevered Visions.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+
+[Expect]
+? Bot2.Life = 20
+? Bot2.Hand.Count = 3
