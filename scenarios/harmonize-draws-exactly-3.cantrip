@@ -1,0 +1,28 @@
+# Harmonize: the caster draws exactly 3 (CR 121.1), and the opponent nothing. The pool is checked right after the cast, so the cost is exact.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Harmonize
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Harmonize.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 13
+Bot2.Hand.Count = 7
+Bot1.Graveyard = Harmonize; Black Lotus
