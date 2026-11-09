@@ -2,23 +2,12 @@ use cantrip_api::*;
 use cantrip_mechanics::{effects, targets, tokens};
 use cantrip_oracle as oracle;
 
-/// The 1/1 blue Faerie creature token with flying (colors and creature type are those of the text that makes it, CR 612.4).
-pub static FAERIE: CardDef = CardDef {
-    colors: Some(ColorSet::of(Color::Blue)),
-    types: TypeSet::of(&[CardType::Creature]),
-    power: Some(1),
-    toughness: Some(1),
-    keywords: Keywords::of(&[Keyword::Flying]),
-    text: "Flying",
-    ..token!(Faerie)
-};
-
 /// "Create two 1/1 blue Faerie creature tokens with flying. When you do, tap target creature an opponent controls."
 /// The reflexive ability (CR 603.12) triggers only if the tokens were created, and its target is chosen as it is put on
 /// the stack, so it is not chosen when the spell is cast (ruling); with no creature an opponent controls it is not put on
 /// the stack.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let created = tokens::create(g, item.controller, &FAERIE, 2)?;
+    let created = tokens::create(g, item.controller, &tokens::FAERIE, 2)?;
     if !created.is_empty() {
         let this = g.card_id(&CARD);
         g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
@@ -33,4 +22,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::FAEBLOOM_TRICK
 };
 
-pub static EXTRA: &[&CardDef] = &[&FAERIE];
+pub static EXTRA: &[&CardDef] = &[&tokens::FAERIE];

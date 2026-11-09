@@ -1127,6 +1127,17 @@ pub static INKLING: CardDef = CardDef {
     ..token!(Inkling)
 };
 
+/// The 1/1 blue Faerie creature token with flying. Faebloom Trick and Troi, Winging It make it.
+pub static FAERIE: CardDef = CardDef {
+    colors: Some(ColorSet::of(Color::Blue)),
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Flying]),
+    text: "Flying",
+    ..token!(Faerie)
+};
+
 /// The 1/1 blue and black Faerie creature token with flying. Pestered Wellguard and Glen Elendra's Answer make it.
 pub static FAERIE_BLUE_BLACK: CardDef = CardDef {
     colors: Some(ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Black).0)),
