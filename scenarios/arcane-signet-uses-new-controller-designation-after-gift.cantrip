@@ -1,0 +1,41 @@
+# CR 109.5, 903.4a: changing Signet's controller changes whose fixed identity it reads, immediately.
+[Format]
+Commander
+[Bot1 Commander]
+Rograkh, Son of Rohgahh
+[Bot2 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Sol Ring
+Arcane Signet
+Mox Ruby
+Mox Pearl
+Harmless Offering
+Plains x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Arcane Signet)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Arcane Signet
+! Bot2.Battlefield.Arcane Signet.Activate(Color: Red)
+Bot2.Battlefield.Arcane Signet.Activate(Color: White)
+? Bot2.Mana = {W}
+[Expect]
+Bot1.CommanderColorIdentity = Red
+Bot2.CommanderColorIdentity = White
+Bot2.Battlefield.Arcane Signet.Tapped = true

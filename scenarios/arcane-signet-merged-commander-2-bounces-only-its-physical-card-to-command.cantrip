@@ -1,0 +1,47 @@
+# CR 903.3c, 903.9c, 730.3: merged permanence is designated, but only its commander component goes to command on accepted bounce.
+[Format]
+Commander
+[Bot1 Commander]
+Snapdax, Apex of the Hunt
+[Bot1 Deck]
+Plains
+Sol Ring
+Arcane Signet
+Ornithopter
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Unsummon
+Plains x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+Bot1.Command.Snapdax, Apex of the Hunt.Cast(Ornithopter; Ability: Mutate)
+? Bot1.Mana =
+Bot1.Modes(2)
+Bot1.Pass
+? Bot1.Commanders = Ornithopter
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Ornithopter)
+Bot1.Accept
+? Bot1.Command = Snapdax, Apex of the Hunt
+? Bot1.Hand.Ornithopter.Colors =
+? Bot1.Commanders = Snapdax, Apex of the Hunt
+Bot1.Battlefield.Arcane Signet.Activate(Color: Black)
+? Bot1.Mana = {B}
+[Expect]
+Bot1.CommanderColorIdentity = White; Black; Red
+Bot1.Command = Snapdax, Apex of the Hunt

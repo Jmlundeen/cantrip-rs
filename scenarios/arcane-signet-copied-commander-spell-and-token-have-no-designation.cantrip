@@ -1,0 +1,54 @@
+# CR 903.3, 707.2: Jackal's copy of a designated Isamaru spell is not a physical commander, on the stack or as a token.
+[Format]
+Commander
+[Bot1 Commander]
+Isamaru, Hound of Konda
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Sol Ring
+Arcane Signet
+Jackal, Genius Geneticist
+Island
+Island x30
+[Bot2 Deck]
+Plains x35
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jackal, Genius Geneticist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Command.Isamaru, Hound of Konda.Cast
+? Bot1.Commanders = Isamaru, Hound of Konda
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 2
+? Bot1.Commanders = Isamaru, Hound of Konda
+Bot1.Pass
+Bot2.Pass
+? Bot1.Commanders = Isamaru, Hound of Konda
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Island; Mox Emerald; Mox Sapphire; Mox Pearl; Sol Ring; Arcane Signet; Jackal, Genius Geneticist; Isamaru, Hound of Konda; Isamaru, Hound of Konda
+? Bot1.Commanders = Isamaru, Hound of Konda
+Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+? Bot1.Mana = {W}
+[Expect]
+Stack.Count = 0
+Bot1.CommanderColorIdentity = White
+Bot1.Commanders = Isamaru, Hound of Konda

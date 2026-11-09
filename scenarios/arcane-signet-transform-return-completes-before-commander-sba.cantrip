@@ -1,0 +1,38 @@
+# CR 903.9a, 704.4, 712: Kytheon's exile-return happens within one resolution, before any Commander return opportunity; the new Gideon object remains designated.
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Plains
+Sol Ring
+Arcane Signet
+Mox Pearl
+Ornithopter
+Ornithopter
+Plains x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Command.Kytheon, Hero of Akros.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Kytheon, Hero of Akros > Bot2; Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Commanders = Gideon, Battle-Forged
+? Bot1.Battlefield.Gideon, Battle-Forged.Counters.Loyalty = 3
+? Bot1.Command.Count = 0
+? Exile.Count = 0
+Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+? Bot1.Mana = {W}
+[Expect]
+Bot1.CommanderColorIdentity = White
+Bot2.Life = 38

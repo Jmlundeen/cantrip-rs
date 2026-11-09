@@ -1,0 +1,6 @@
+{
+  "name": "Arcane Signet",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "{T}: Add one mana of any color in your commander's color identity."
+}

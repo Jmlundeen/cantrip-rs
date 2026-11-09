@@ -57,7 +57,10 @@ Partner B
 ```
 
 `BotN.Command` is the list of that player's designated commanders still in the shared command zone; it is empty after
-they leave it. `BotN.Commander.<Name>.CastCount` counts successful casts of that commander from the command zone, and
+they leave it. `BotN.Commanders` is every card of theirs that carries a commander designation wherever it is, named as
+it currently is (a merged permanent by the name it shows), and `BotN.CommanderColorIdentity` is their commanders'
+combined color identity in WUBRG order, `(none)` for a seat with no commander. `BotN.Commander.<Name>.CastCount` counts
+successful casts of that commander from the command zone, and
 `BotN.Commander.<Name>.DamageTo.BotM` is the combat damage that physical commander dealt to BotM across zone changes.
 For a same-named pair, labels include `#1` and `#2`. These totals come from the event history, so replay and undo restore
 them with the rest of the game.
@@ -723,3 +726,4 @@ Expectations then describe the position mid-game rather than a finished one, whi
 `Combat.Blocks = ...`, and every `.Damage` still `0` says the division is outstanding and not already answered.
 
 Snow source mana (CR 107.4h) retains its production-time quality. `Spend:` items may qualify a mana symbol with `Snow` or `NonSnow`, and with `for {S}` or `for mana` to choose which demand a snow unit pays; for example `Spend: {U} Snow for {S}`. Unqualified items retain the existing payment behavior.
+`BotN.Library.Top` is the name of the card on top of that player's library (CR 401.1), whoever can see it; absent for an empty library.

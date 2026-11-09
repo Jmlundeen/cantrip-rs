@@ -1,0 +1,47 @@
+# Kenrith is white, but the colored symbols in all its printed abilities fix a five-color identity (CR 903.4a). Signet adds exactly one of each selected color, immediately (CR 605.3b).
+
+[Format]
+Commander
+[Bot1 Commander]
+Kenrith, the Returned King
+
+[Bot1 Deck]
+Sol Ring
+Arcane Signet
+Plains x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+? Bot1.Mana =
+Bot1.Pass
+? Bot1.Life = 40
+? Bot1.CommanderColorIdentity = White; Blue; Black; Red; Green
+! Bot1.Battlefield.Arcane Signet.Activate(Color: C)
+Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+? Bot1.Mana = {W}
+? Bot1.Battlefield.Arcane Signet.Tapped = true
+! Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Arcane Signet.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Arcane Signet.Activate(Color: Black)
+? Bot1.Mana = {B}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Arcane Signet.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T9 Bot1.Main1]
+Bot1.Battlefield.Arcane Signet.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Command = Kenrith, the Returned King
+Bot1.Battlefield.Arcane Signet.Tapped = true

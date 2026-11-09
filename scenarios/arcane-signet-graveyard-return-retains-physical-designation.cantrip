@@ -1,0 +1,40 @@
+# CR 903.9a: lethal damage puts the commander in the graveyard; the owner chooses command at the subsequent state-based check.
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Plains
+Sol Ring
+Arcane Signet
+Mox Pearl
+Mox Ruby
+Lightning Bolt
+Plains x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Command.Kytheon, Hero of Akros.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Kytheon, Hero of Akros)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Kytheon, Hero of Akros.Colors = White
+? Bot1.Command.Count = 0
+Bot1.Accept
+? Bot1.Command = Kytheon, Hero of Akros
+? Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+? Bot1.Mana = {W}
+[Expect]
+Bot1.Commanders = Kytheon, Hero of Akros
+Bot1.CommanderColorIdentity = White

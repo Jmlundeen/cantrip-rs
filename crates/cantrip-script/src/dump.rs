@@ -494,6 +494,10 @@ impl StateDump {
                 d.list(&format!("{b}.Crimes"), crimes, true);
             }
             d.list(&format!("{b}.Library"), names(s.zone(Zone::library(p))), true);
+            // The card on top of the player's library, by name (CR 401.1): absent for an empty library.
+            if let Some(&top) = s.zone(Zone::library(p)).first() {
+                d.set(format!("{b}.Library.Top"), game.known_name(top));
+            }
             // The companion the player revealed before the game (CR 103.2b), wherever it has gone since; empty for none.
             d.set(format!("{b}.Companion"), s.player(p).companion.map_or("", |companion| game.known_name(companion)));
             // The cards the player owns outside the game (CR 400.11a), in the order the sideboard lists them.
@@ -569,6 +573,18 @@ impl StateDump {
             // Commanders in the shared command zone, by owner (CR 903.8).
             let commanders = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p && s.obj(id).commander).map(|&id| game.known_name(id).to_string()).collect();
             d.list(&format!("{b}.Command"), commanders, false);
+            // Every card the player owns that carries a commander designation, wherever it is (CR 903.3c): a merged
+            // permanent is named as it currently is, and a commander keeps its designation outside the command zone.
+            let mut designated: Vec<ObjectId> = s.zones.iter().flatten().copied()
+                .filter(|&id| s.obj(id).commander && s.obj(id).owner == p).collect();
+            designated.sort_by_key(|&id| s.obj(id).commander_id.unwrap_or(id).0);
+            let designated: Vec<String> = designated.iter().map(|&id| game.known_name(id).to_string()).collect();
+            d.list(&format!("{b}.Commanders"), designated, false);
+            // The combined color identity of the player's designated commanders (CR 903.4a), in WUBRG order; `(none)`
+            // for a seat with no commander.
+            let identity = game.commander_color_identity(p).map_or_else(|| "(none)".to_string(),
+                |set| set.iter().map(|c| c.name().to_string()).collect::<Vec<_>>().join("; "));
+            d.set(format!("{b}.CommanderColorIdentity"), identity);
             // Per-identity Commander counters are derived from event history, not a mutable total (`Game::commander_*`).
             let mut commander_ids: Vec<ObjectId> = s.objects.iter().enumerate().filter_map(|(index, obj)| {
                 (obj.commander && obj.owner == p && obj.commander_id == Some(ObjectId(index as u32))).then_some(ObjectId(index as u32))
@@ -977,7 +993,7 @@ const GAME_KEYS: &[&str] = &[
 const PLAYER_KEYS: &[&str] = &[
     "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "MayLookAtLibraryTop", "LostTo", "Mana", "ManaFrom", "LandsPlayed", "CitysBlessing",
     "EnduringStory", "Speed", "Dungeon", "DungeonsCompleted", "TurnsToSkip", "ControlledBy", "NextTurnControlledBy", "Looked", "Surveilled", "Shuffles",
-    "Hand", "Revealed", "Crimes", "Library", "Companion", "Sideboard", "Graveyard", "Emblems", "Emblems.MadeBy", "Emblems.ExiledWithMakers", "Command", "Battlefield", "PhasedOut",
+    "Hand", "Revealed", "Crimes", "Library", "Library.Top", "Companion", "Sideboard", "Graveyard", "Emblems", "Emblems.MadeBy", "Emblems.ExiledWithMakers", "Command", "Commanders", "CommanderColorIdentity", "Battlefield", "PhasedOut",
 ];
 
 /// The keys the dump writes of a permanent, after `BotN.Battlefield.<name>.` (or `.PhasedOut.`), beside `Counters.<Kind>`.
@@ -1163,7 +1179,10 @@ Bot1.Battlefield.Data probe.Counters.Corpse = (absent)
         assert!(!writable("Bot1.Battlefield.Grizzly Bears.Taped"));
         assert!(!writable("Bot1.Hand.Lightning Bolt.Tapped"));
         assert!(!writable("Bot1.Exile.Llanowar Elves.Counters"));
-        assert!(!writable("Bot1.Commanders"));
+        assert!(writable("Bot1.Commanders"));
+        assert!(writable("Bot1.CommanderColorIdentity"));
+        assert!(writable("Bot1.Library.Top"));
+        assert!(!writable("Bot1.CommanderColourIdentity"));
         assert!(!writable("Bot1.Commander.CastCount"));
         assert!(!writable("Bot1.Commander.Hakoda.CastCounts"));
         assert!(!writable("Bot1.Commander.Hakoda.DamageTo.Bot0"));

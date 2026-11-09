@@ -1,0 +1,53 @@
+# Rograkh's red indicator fixes its identity (CR 903.4); each Signet reads its controller's commanders, including a third seat, never opponents' designations (CR 109.5).
+
+[Format]
+Commander
+[Bot1 Commander]
+Rograkh, Son of Rohgahh
+
+[Bot2 Commander]
+Kytheon, Hero of Akros
+
+[Bot1 Deck]
+Sol Ring
+Arcane Signet
+Plains x30
+
+[Bot2 Deck]
+Island x35
+
+[Bot3 Deck]
+Sol Ring
+Arcane Signet
+Forest x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+? Bot1.Mana =
+Bot1.Pass
+? Bot1.CommanderColorIdentity = Red
+! Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+Bot1.Battlefield.Arcane Signet.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Battlefield.Forest.Activate
+Bot3.Hand.Sol Ring.Cast
+Bot3.Pass
+Bot3.Battlefield.Sol Ring.Activate
+Bot3.Hand.Arcane Signet.Cast
+? Bot3.Mana =
+Bot3.Pass
+? Bot3.CommanderColorIdentity = (none)
+Bot3.Battlefield.Arcane Signet.Activate
+? Bot3.Mana =
+
+[Expect]
+Bot1.Command = Rograkh, Son of Rohgahh
+Bot2.Command = Kytheon, Hero of Akros
+Bot3.Battlefield.Arcane Signet.Tapped = true

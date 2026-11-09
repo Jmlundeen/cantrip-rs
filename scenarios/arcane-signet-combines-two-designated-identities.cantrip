@@ -1,0 +1,35 @@
+# Commander Masters Draft pairing (CR 903.13f): both monocolor legendary creatures have partner for deckbuilding, then ordinary Commander gameplay (CR 903.13g). Short library fixtures omit format deck validation.
+
+[Format]
+Commander
+[Bot1 Commander]
+Rograkh, Son of Rohgahh
+Kytheon, Hero of Akros
+
+[Bot1 Deck]
+Sol Ring
+Arcane Signet
+Plains x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+? Bot1.Mana =
+Bot1.Pass
+? Bot1.CommanderColorIdentity = White; Red
+! Bot1.Battlefield.Arcane Signet.Activate(Color: Blue)
+Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+? Bot1.Mana = {W}
+[T3 Bot1.Main1]
+Bot1.Battlefield.Arcane Signet.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Commanders = Rograkh, Son of Rohgahh; Kytheon, Hero of Akros

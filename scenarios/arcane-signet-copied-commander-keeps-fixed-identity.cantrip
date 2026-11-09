@@ -1,0 +1,45 @@
+# CR 903.3, 903.4a, 707: a commander becoming a colorless copy retains designation and its pregame identity.
+[Format]
+Commander
+[Bot1 Commander]
+Lazav, the Multifarious
+[Bot1 Deck]
+Plains
+Sol Ring
+Arcane Signet
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Plains
+Ornithopter
+Plains x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Command.Lazav, the Multifarious.Cast
+Bot1.Arrange(| Ornithopter)
+? Bot1.Graveyard = Ornithopter
+? Bot1.Battlefield.Lazav, the Multifarious.Colors = Black; Blue
+Bot1.Battlefield.Lazav, the Multifarious.Activate(X: 0)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lazav, the Multifarious.Colors = (absent)
+? Bot1.Battlefield.Lazav, the Multifarious.Power = 0
+? Bot1.Commanders = Lazav, the Multifarious
+! Bot1.Battlefield.Arcane Signet.Activate(Color: Red)
+Bot1.Battlefield.Arcane Signet.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[Expect]
+Bot1.CommanderColorIdentity = Blue; Black
+Bot1.Command.Count = 0

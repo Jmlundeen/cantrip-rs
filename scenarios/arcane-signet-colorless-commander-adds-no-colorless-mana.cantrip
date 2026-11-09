@@ -1,0 +1,34 @@
+# Ulamog has a colorless identity; Signet still activates for {T} and produces no mana, including no {C} (CR 106.5, 903.4f; official ruling).
+
+[Format]
+Commander
+[Bot1 Commander]
+Ulamog, the Defiler
+
+[Bot1 Deck]
+Sol Ring
+Arcane Signet
+Plains x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+? Bot1.Mana =
+Bot1.Pass
+? Bot1.CommanderColorIdentity =
+! Bot1.Battlefield.Arcane Signet.Activate(Color: Green)
+! Bot1.Battlefield.Arcane Signet.Activate(Color: C)
+Bot1.Battlefield.Arcane Signet.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Arcane Signet.Tapped = true
+
+[Expect]
+Bot1.Command = Ulamog, the Defiler
+Bot1.Mana =

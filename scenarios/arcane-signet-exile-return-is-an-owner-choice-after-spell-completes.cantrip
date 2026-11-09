@@ -1,0 +1,58 @@
+# CR 903.9a, 704.3: exiling is not replaced; Swords gains its controller life before the owner may return the new object.
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Sol Ring
+Arcane Signet
+Mox Pearl
+Swords to Plowshares
+Swords to Plowshares
+Plains x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Command.Kytheon, Hero of Akros.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Kytheon, Hero of Akros)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 42
+? Bot1.Exile.Kytheon, Hero of Akros.Colors = White
+? Stack.Count = 0
+Bot1.Accept
+? Bot1.Life = 42
+? Bot1.Command = Kytheon, Hero of Akros
+? Exile.Count = 0
+? Stack.Count = 0
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Command.Kytheon, Hero of Akros.Cast
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Kytheon, Hero of Akros)
+Bot1.Decline
+? Bot1.Life = 44
+? Bot1.Exile.Kytheon, Hero of Akros.Colors = White
+Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+? Bot1.Mana = {W}
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Accept
+? Bot1.Exile.Kytheon, Hero of Akros.Colors = White
+[Expect]
+Bot1.Command.Count = 0
+Bot1.Commanders = Kytheon, Hero of Akros
+Bot1.CommanderColorIdentity = White

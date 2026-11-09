@@ -1,0 +1,64 @@
+# CR 903.3, 903.8, 903.9b: command casts pay tax, hand casts do not; accepted and declined bounce choices preserve designation.
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Plains
+Sol Ring
+Arcane Signet
+Mox Pearl
+Mox Sapphire
+Unsummon
+Unsummon
+Unsummon
+Plains x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Command.Kytheon, Hero of Akros.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Kytheon, Hero of Akros)
+Bot1.Decline
+? Bot1.Hand.Kytheon, Hero of Akros.Colors = White
+? Bot1.Commanders = Kytheon, Hero of Akros
+? Bot1.Command.Count = 0
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kytheon, Hero of Akros.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Kytheon, Hero of Akros)
+Bot1.Accept
+? Bot1.Command = Kytheon, Hero of Akros
+Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Command.Kytheon, Hero of Akros.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Arcane Signet.Activate(Color: White)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unsummon.Cast(Kytheon, Hero of Akros)
+Bot1.Accept
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Command.Kytheon, Hero of Akros.Cast(Mana: short)
+[Expect]
+Bot1.Command = Kytheon, Hero of Akros
+Bot1.CommanderColorIdentity = White
+Bot1.Mana = {W}{C}{C}

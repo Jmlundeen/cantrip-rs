@@ -1,0 +1,64 @@
+# CR 903.9a, 704.3, 101.4: after simultaneous deaths, owners choose in APNAP order before any chosen returns happen.
+[Format]
+Commander
+[Bot1 Commander]
+Rograkh, Son of Rohgahh
+[Bot2 Commander]
+Rograkh, Son of Rohgahh
+[Bot3 Commander]
+Rograkh, Son of Rohgahh
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Sol Ring
+Arcane Signet
+Wrath of God
+Plains x30
+[Bot2 Deck]
+Island x35
+[Bot3 Deck]
+Forest x35
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Signet.Cast
+Bot1.Command.Rograkh, Son of Rohgahh.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Command.Rograkh, Son of Rohgahh.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Command.Rograkh, Son of Rohgahh.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Graveyard = Wrath of God; Rograkh, Son of Rohgahh
+? Bot2.Graveyard = Rograkh, Son of Rohgahh
+? Bot3.Graveyard = Rograkh, Son of Rohgahh
+? PriorityPlayer = Bot1
+Bot1.Accept
+? PriorityPlayer = Bot2
+? Bot1.Command.Count = 0
+? Bot1.Graveyard = Wrath of God; Rograkh, Son of Rohgahh
+Bot2.Accept
+? PriorityPlayer = Bot3
+? Bot2.Command.Count = 0
+Bot3.Decline
+? Bot1.Command = Rograkh, Son of Rohgahh
+? Bot2.Command = Rograkh, Son of Rohgahh
+? Bot3.Command.Count = 0
+Bot1.Battlefield.Arcane Signet.Activate(Color: Red)
+? Bot1.Mana = {R}
+[Expect]
+Bot3.Graveyard = Rograkh, Son of Rohgahh
+Bot3.Commanders = Rograkh, Son of Rohgahh
+Bot1.CommanderColorIdentity = Red
