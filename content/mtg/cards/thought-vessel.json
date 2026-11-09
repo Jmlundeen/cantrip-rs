@@ -1,0 +1,6 @@
+{
+  "name": "Thought Vessel",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "You have no maximum hand size.\n{T}: Add {C}."
+}
