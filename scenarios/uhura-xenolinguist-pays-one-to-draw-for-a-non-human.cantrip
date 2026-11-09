@@ -1,0 +1,49 @@
+# Uhura, Xenolinguist: "Whenever a non-Human creature enters, you may pay {1}. If you do, draw a card." Cast on turn 1
+# for {4}{U} off a Lotus and two Moxen. On turn 3 Grizzly Bears (non-Human) enters; Bot1 pays exactly {1} from the mana
+# left after the cast, the pool empties, and draws the top card.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Uhura, Xenolinguist
+Mox Emerald
+Forest
+Grizzly Bears
+Island
+Island
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Uhura, Xenolinguist.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Uhura, Xenolinguist; Forest; Mox Emerald; Grizzly Bears

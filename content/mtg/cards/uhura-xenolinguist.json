@@ -1,0 +1,8 @@
+{
+  "name": "Uhura, Xenolinguist",
+  "manaCost": "{4}{U}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Whenever a non-Human creature enters, you may pay {1}. If you do, draw a card."
+}

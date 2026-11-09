@@ -1,0 +1,51 @@
+# Uhura, Xenolinguist: the "may" declined draws nothing (CR 608.2d), and neither a Human (Elite Vanguard) nor a
+# noncreature artifact (Mox Jet) entering triggers it at all - no question is asked for either. The turn-5 Vanguard needs
+# no trigger to resolve.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Uhura, Xenolinguist
+Mox Emerald
+Forest
+Grizzly Bears
+Island
+Elite Vanguard
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Uhura, Xenolinguist.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Uhura, Xenolinguist; Forest; Mox Emerald; Grizzly Bears; Island; Elite Vanguard
