@@ -1,0 +1,46 @@
+# Thrill of Possibility: "As an additional cost to cast this spell, discard a card" (CR 601.2b, 118.8). The discard is a cost
+# (CR 118.3) that can't be paid with the spell itself, which has left the hand (CR 601.2a) - and exactly one card is discarded
+# (ruling 2023-02-04). On turn 1 Bot1 empties its hand onto the battlefield, so the Thrill is refused though its mana is there
+# to pay; on turn 2 it draws an Island, discards it as the cost, and draws two cards (CR 608.2c).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Thrill of Possibility
+Memnite
+Mountain
+Ornithopter
+Island
+Island x12
+
+[Bot2 Deck]
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Hand = Thrill of Possibility
+! Bot1.Hand.Thrill of Possibility.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Thrill of Possibility.Cast
+Bot1.Choose(Island)
+? Bot1.Mana =
+? Bot1.Graveyard = Island
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Island; Island
+Bot1.Graveyard = Thrill of Possibility; Island
