@@ -2,6 +2,13 @@
 
 use cantrip_api::*;
 
+/// "This creature can't be blocked by Walls" (CR 509.1b) as a `CardDef::block_rules` entry: a Wall, read through the source's own
+/// text (CR 612), may block anything but it. Juggernaut and Bog Rats print it (Clockwork Swarm, Otarian Juggernaut and Rampart
+/// Crawler too).
+pub fn cant_be_blocked_by_walls(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
+    source != attacker || !q.chars(blocker).has_subtype(q.words(source).subtype(Subtype::Wall))
+}
+
 /// "This creature can't be blocked by creatures with power 3 or greater" (CR 509.1b): check current power
 /// when blockers are declared. Amrou Kithkin and April O'Neil, Kunoichi Trainee print it.
 pub fn power_three_or_greater_cant_block(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {

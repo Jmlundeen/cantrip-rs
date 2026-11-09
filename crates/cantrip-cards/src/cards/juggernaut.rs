@@ -1,19 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics;
+use cantrip_mechanics::{combat, statics};
 use cantrip_oracle as oracle;
-
-/// "This creature can't be blocked by Walls." (CR 509.1b): a Wall, read through Juggernaut's own text (CR 612), may block
-/// anything but it.
-fn creature_attacks_combat_if_able_rule(
-    q: &dyn Query,
-    source: ObjectId,
-    blocker: ObjectId,
-    attacker: ObjectId,
-) -> bool {
-    let asker = &Asker::new(source, q.controller(source));
-    !(attacker == asker.source
-        && q.chars(blocker).has_subtype(q.words(asker.source).subtype(Subtype::Wall)))
-}
 
 pub static CARD: CardDef = CardDef {
     statics: &[
@@ -24,6 +11,6 @@ pub static CARD: CardDef = CardDef {
             "This creature attacks each combat if able.",
         ),
     ],
-    block_rules: &[creature_attacks_combat_if_able_rule],
+    block_rules: &[combat::cant_be_blocked_by_walls],
     ..oracle::JUGGERNAUT
 };
