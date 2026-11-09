@@ -1,0 +1,33 @@
+# Independent Captain America / exert collision proof. Exert is not tapping (CR 701.43a-b); Captain must see only the creature's actual first tap. Paired scenario changes only the exert answer.
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Captain America, Living Legend
+Ornithopter
+Island x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Captain America, Living Legend.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Combat Celebrant)
+Bot1.Decline
+[T3 Bot1.Blockers]
+? Bot1.Exertions.Count = 0
+? Bot1.Battlefield.Combat Celebrant.Exerted = (absent)
+? Bot1.Battlefield.Combat Celebrant.Tapped = false
+[Expect]
+Bot1.Battlefield.Captain America, Living Legend.Tapped = false

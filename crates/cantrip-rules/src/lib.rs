@@ -39,6 +39,8 @@ mod attack_option_tests;
 #[cfg(test)]
 mod exert_tests;
 #[cfg(test)]
+mod history_event_kind_tests;
+#[cfg(test)]
 mod attacking_tokens_tests;
 mod attach;
 #[cfg(test)]

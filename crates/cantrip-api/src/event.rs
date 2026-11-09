@@ -600,7 +600,8 @@ impl Event {
 }
 
 /// The kinds of event, as a bitset, so a triggered ability names what it listens for and an event is checked only
-/// against the abilities that could match it.
+/// against the abilities that could match it. Every kind has its own bit, including history-only kinds;
+/// a predicate need not repair collisions between different rules events.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub struct EventMask(pub u128);
 
@@ -679,9 +680,8 @@ impl EventMask {
     pub const PHASED_OUT: EventMask = EventMask(1 << 56);
     /// An optional cost to attack was paid (CR 508.1g, 508.1j).
     pub const PAID_TO_ATTACK: EventMask = EventMask(1 << 57);
-    /// A permanent was exerted (CR 701.43a). Like MUTATED, this shares a dispatch bit
-    /// because all 64 are occupied; trigger/history predicates distinguish the exact Event variant.
-    pub const EXERTED: EventMask = EventMask::TAPPED;
+    /// A permanent was exerted (CR 701.43a-b), a distinct event from becoming tapped.
+    pub const EXERTED: EventMask = EventMask(1 << 64);
     /// A creature convoked a spell (CR 702.51c): recorded only, for the history.
     pub const CONVOKED: EventMask = EventMask(1 << 58);
     /// The player controlling a player changed (CR 723.1): recorded only, for what each player saw.
@@ -695,10 +695,9 @@ impl EventMask {
     pub const ENTERED: EventMask = EventMask(1 << 62);
     /// A creature crewed a Vehicle (CR 702.122b): recorded only, for the history.
     pub const CREWED: EventMask = EventMask(1 << 63);
-    /// A spell merged with a permanent (CR 702.140d). Kept at its existing coarse trigger bit for compatibility:
-    /// transform and mutate matchers distinguish their event variants.
-    pub const MUTATED: EventMask = EventMask::TRANSFORMED;
-    /// A meld card's counterpart melded with it (CR 701.42a): recorded only, sharing transforming's bit as mutating does.
+    /// A spell merged with a permanent (CR 702.140d), a distinct event from transforming.
+    pub const MUTATED: EventMask = EventMask(1 << 65);
+    /// A meld card's counterpart melded with it (CR 701.42a): recorded only, sharing transforming's bit.
     pub const MELDED: EventMask = EventMask::TRANSFORMED;
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
