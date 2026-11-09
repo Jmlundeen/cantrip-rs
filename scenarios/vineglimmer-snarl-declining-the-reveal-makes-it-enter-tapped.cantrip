@@ -1,0 +1,20 @@
+# "you may reveal ... If you don't, this land enters tapped" (CR 614.1d): Bot1 declines the reveal even with a Forest in
+# hand, so Vineglimmer Snarl enters the battlefield tapped and cannot be tapped for mana that turn.
+
+[Bot1 Deck]
+Vineglimmer Snarl
+Forest
+Mountain x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Vineglimmer Snarl.Play
+Bot1.Decline
+? Bot1.Battlefield.Vineglimmer Snarl.Tapped = true
+! Bot1.Battlefield.Vineglimmer Snarl.Activate(Color: Green)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Vineglimmer Snarl.Tapped = true
