@@ -1393,3 +1393,109 @@ fn an_opaque_callback_after_combination_is_executed_with_the_actual_hypothetical
     let source = put(&mut g, &OPAQUE, 1);
     assert_capability_isolated(&mut g, source, (ColorSet(0b11010), false));
 }
+
+// Reviewer counterexample, with a positive control using the chance-aware Game API.
+// Both abilities can produce G or R. Only the order of two known library cards matters;
+// no seed is searched, and whichever one ordinary RNG picks cannot prove the other type.
+fn random_bottom_mana(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    let library = g.state().zone(Zone::library(item.controller)).to_vec();
+    let pair = &library[library.len()-2..];
+    g.bottom_in_random_order(item.controller, pair);
+    let bottom = *g.state().zone(Zone::library(item.controller)).last().unwrap();
+    let mana = if g.chars(bottom).colors.has(Color::Green) { Mana::G } else { Mana::R };
+    g.add_mana(item.controller, mana, 1);
+    Ok(())
+}
+
+fn direct_random_mana_control(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    let mana = if g.random(2) == 0 { Mana::G } else { Mana::R };
+    g.add_mana(item.controller, mana, 1);
+    Ok(())
+}
+
+#[test]
+fn random_bottom_order_enumerates_all_mana_types() {
+    static BOTTOM: CardDef = CardDef { name: "Reviewer random bottom mana producer",
+        abilities: &[ability(Cost::NONE, random_bottom_mana,
+            "Randomize two library cards; add the bottom card's color.").produces_mana()], ..FILLER };
+    static DIRECT: CardDef = CardDef { name: "Reviewer direct random positive control",
+        abilities: &[ability(Cost::NONE, direct_random_mana_control,
+            "Randomly add green or red.").produces_mana()], ..FILLER };
+    let mut g = choice_game([&FILLER, &BOTTOM, &DIRECT, &GREEN_TARGET, &RED_TARGET]);
+    let direct = put(&mut g, &DIRECT, 1);
+    let expected = (ColorSet::of(Color::Green).with(Color::Red), false);
+    assert_capability_isolated(&mut g, direct, expected);
+    let source = put(&mut g, &BOTTOM, 1);
+    add_object(&mut g, &GREEN_TARGET, PlayerId(1), Zone::library(PlayerId(1)));
+    add_object(&mut g, &RED_TARGET, PlayerId(1), Zone::library(PlayerId(1)));
+    let library = g.state.zone(Zone::library(PlayerId(1))).to_vec();
+    let last = &library[library.len()-2..];
+    assert!(g.chars(last[0]).colors.has(Color::Green));
+    assert!(g.chars(last[1]).colors.has(Color::Red));
+    assert_eq!(g.producible_types(source), expected,
+        "reviewer: random bottom order must include both possible produced mana colors");
+    assert_capability_isolated(&mut g, source, expected);
+}
+
+
+fn random_bottom_placement_mana(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    let library = g.state().zone(Zone::library(item.controller)).to_vec();
+    let pair = &library[library.len()-2..];
+    g.put_into_library(pair, LibraryPlace::BottomInRandomOrder);
+    let bottom = *g.state().zone(Zone::library(item.controller)).last().unwrap();
+    let mana = if g.chars(bottom).colors.has(Color::Green) { Mana::G } else { Mana::R };
+    g.add_mana(item.controller, mana, 1);
+    Ok(())
+}
+
+// CR 106.7/401.4: the library-placement verb shares the same exhaustive chance authority.
+#[test]
+fn random_bottom_library_placement_enumerates_all_mana_types() {
+    static SOURCE: CardDef = CardDef { name: "Random library placement mana producer",
+        abilities: &[ability(Cost::NONE, random_bottom_placement_mana,
+            "Put two library cards on the bottom at random; add the bottom card's color.").produces_mana()], ..FILLER };
+    let mut g = choice_game([&FILLER, &SOURCE, &GREEN_TARGET, &RED_TARGET]);
+    let source = put(&mut g, &SOURCE, 1);
+    add_object(&mut g, &GREEN_TARGET, PlayerId(1), Zone::library(PlayerId(1)));
+    add_object(&mut g, &RED_TARGET, PlayerId(1), Zone::library(PlayerId(1)));
+    assert_capability_isolated(&mut g, source, (ColorSet::of(Color::Green).with(Color::Red), false));
+}
+
+// Ordinary play retains its generator and exact randomized events. Reversing a fixed input
+// is a deterministic control, not a search through seeds or random game positions.
+#[test]
+fn actual_random_bottom_order_preserves_rng_and_randomized_event_contract() {
+    for reverse in [false, true] {
+        let mut g = choice_game([&FILLER, &GREEN_TARGET, &RED_TARGET]);
+        let player = PlayerId(1);
+        let zone = Zone::library(player);
+        let green = add_object(&mut g, &GREEN_TARGET, player, zone);
+        let red = add_object(&mut g, &RED_TARGET, player, zone);
+        let pair = if reverse { vec![red, green] } else { vec![green, red] };
+        let mut expected = pair.clone();
+        let mut ordinary = g.state.clone();
+        let index = ordinary.random(2) as usize;
+        expected.swap(1, index);
+        let mut expected_library = g.state.zone(zone).to_vec();
+        expected_library.retain(|id| !pair.contains(id));
+        expected_library.extend(expected.iter().copied());
+        let history = g.log.len();
+        in_frame(&mut g, cantrip_state::FrameKind::Settle, vec![], |cx| {
+            cantrip_api::Game::bottom_in_random_order(cx, player, &pair);
+        });
+        assert_eq!(g.state.rng, ordinary.rng, "ordinary RNG advances exactly once for a two-card order");
+        assert_eq!(g.state.zone(zone), expected_library.as_slice(), "ordinary order uses the same RNG value");
+        let events: Vec<_> = g.log[history..].iter().filter_map(|record| match record.event {
+            Event::Randomized { player: actor, card } if actor == player => Some(card),
+            _ => None,
+        }).collect();
+        assert_eq!(events, expected, "every randomized card is recorded in actual order");
+        let rng = g.state.rng;
+        in_frame(&mut g, cantrip_state::FrameKind::Settle, vec![], |cx| {
+            assert_eq!(crate::ops::random_below(cx, 0), 0);
+            assert_eq!(crate::ops::random_below(cx, 1), 0);
+        });
+        assert_eq!(g.state.rng, rng, "an empty or singleton choice consumes no real random value");
+        assert!(g.state.player(player).pool.is_empty(), "ordering does not itself add mana");
+    }
+}

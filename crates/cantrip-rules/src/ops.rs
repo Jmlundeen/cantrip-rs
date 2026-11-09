@@ -4465,7 +4465,7 @@ pub fn exile_all(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
 
 /// A number below `bound` from the game's own generator (none is drawn when there is no choice).
 pub fn random_below(cx: &mut Cx, bound: u32) -> u32 {
-    if bound <= 1 { 0 } else { cx.st().random(bound) }
+    if bound <= 1 { 0 } else { cx.random_below(bound) }
 }
 
 /// Puts cards of a player's library on its top in this order, the first on top, or on its bottom, the last lowest. The
