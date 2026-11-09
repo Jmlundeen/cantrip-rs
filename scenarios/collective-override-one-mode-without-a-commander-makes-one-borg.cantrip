@@ -1,0 +1,43 @@
+# Collective Override without a commander: "Choose one" is the whole permission. One Raging Goblin attacks, two modes
+# are refused, and the token mode makes one Borg token for the one attacking creature. The draw mode is not chosen, so
+# the hand is unchanged.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Raging Goblin
+Collective Override
+Island
+Island x33
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raging Goblin.Cast
+Bot1.Pass
+Bot1.Attack(Raging Goblin > Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Collective Override.Cast
+! Bot1.Modes(1; 2)
+Bot1.Modes(1)
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Borg Token.Types = Artifact; Creature
+Bot1.Battlefield.Borg Token.Subtypes = Borg
+Bot1.Battlefield.Borg Token.Power = 1
+Bot1.Battlefield.Borg Token.Toughness = 1
+Bot1.Battlefield.Borg Token.Colors = (absent)
+Bot1.Battlefield.Borg Token#1 = (absent)
+Bot1.Hand.Count = 2

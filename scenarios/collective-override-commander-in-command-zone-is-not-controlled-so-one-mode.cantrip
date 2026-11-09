@@ -1,0 +1,34 @@
+# "If you control a commander as you cast this spell" (CR 903.3, 700.2a): the commander is in the command zone, where its
+# owner does not control it. With no commander permanent, choosing both is refused. There are no attacking creatures, so
+# the draw mode draws nothing and the hand stays as it was; no Borg token is made.
+
+[Format]
+Commander
+[Bot1 Commander]
+Raging Goblin
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Collective Override
+Island x37
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Collective Override.Cast
+! Bot1.Modes(1; 2)
+Bot1.Modes(2)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Command = Raging Goblin
+Bot1.Battlefield.Raging Goblin = (absent)
+Bot1.Battlefield.Borg Token = (absent)
+Bot1.Hand.Count = 4

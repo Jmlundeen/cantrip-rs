@@ -1,0 +1,56 @@
+# Collective Override ({2}{W}{U}): "Choose one. If you control a commander as you cast this spell, you may choose both
+# instead. • Create a 1/1 colorless Borg artifact creature token for each attacking creature. • Draw a card for each
+# attacking creature." Bot1 has cast Raging Goblin (its commander) and Monastery Swiftspear, both with haste, and
+# attacks with both. With a commander on the battlefield the two modes are offered, and each counts the two attackers.
+
+[Format]
+Commander
+[Bot1 Commander]
+Raging Goblin
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mountain
+Monastery Swiftspear
+Collective Override
+Island
+Island x33
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Command.Raging Goblin.Cast
+Bot1.Pass
+Bot1.Hand.Monastery Swiftspear.Cast
+Bot1.Pass
+Bot1.Attack(Raging Goblin > Bot2; Monastery Swiftspear > Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Collective Override.Cast
+Bot1.Modes(1; 2)
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Raging Goblin.Power = 1
+# Prowess triggers on the Collective Override cast and resolves first, but the Swiftspear is still an attacker.
+Bot1.Battlefield.Monastery Swiftspear.Power = 2
+Bot1.Battlefield.Borg Token#1.Types = Artifact; Creature
+Bot1.Battlefield.Borg Token#1.Subtypes = Borg
+Bot1.Battlefield.Borg Token#1.Power = 1
+Bot1.Battlefield.Borg Token#1.Toughness = 1
+Bot1.Battlefield.Borg Token#1.Colors = (absent)
+Bot1.Battlefield.Borg Token#2.Power = 1
+Bot1.Battlefield.Borg Token#3 = (absent)
+Bot1.Hand.Count = 3
