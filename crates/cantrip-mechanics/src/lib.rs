@@ -153,6 +153,7 @@ pub mod suspend;
 pub mod teamwork;
 pub mod typecycling;
 pub mod scavenge;
+pub mod scarab;
 pub mod transmute;
 pub mod transfigure;
 pub mod unearth;
