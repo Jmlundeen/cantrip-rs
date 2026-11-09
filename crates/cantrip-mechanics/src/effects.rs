@@ -2639,3 +2639,14 @@ pub fn tap_target_it_doesnt_untap_while_this_remains_tapped(g: &mut dyn Game, it
     g.add_effect(item.object, target, EffectKind::DoesntUntap, Duration::WhileSourceTapped);
     Ok(())
 }
+
+/// "Untap all creatures that attacked this turn" (CR 701.26b, 508.1, 400.7): Own the Day and World at War.
+/// Current creatures, irrespective of controller; only the same object that was declared attacking counts.
+/// All untap as one instruction, before any resulting triggers or state-based actions are processed.
+pub fn untap_creatures_that_attacked_this_turn(g: &mut dyn Game) {
+    let creatures: Vec<_> = g.state().battlefield().iter().copied()
+        .filter(|&id| g.chars(id).is(CardType::Creature) && g.history().attacked_this_turn(id)).collect();
+    instruction(g, |g| {
+        for id in creatures { g.untap(id); }
+    });
+}
