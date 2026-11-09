@@ -543,6 +543,17 @@ pub fn other_creature_in_block_with_this(q: &dyn Query, source: ObjectId, event:
     q.chars(other).is(CardType::Creature).then_some(other)
 }
 
+/// "Whenever this creature blocks or becomes blocked by a non-Wall creature" (CR 509.1, 509.3b, 603.2) as a `when_asked`
+/// condition with `EventMask::BLOCKS`: `other_creature_in_block_with_this` when that creature is not a Wall, the type read
+/// through the words of the source's text (CR 612), about it. Cockatrice and Thicket Basilisk print it.
+pub fn blocks_or_becomes_blocked_by_non_wall(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    let other = other_creature_in_block_with_this(q, asker.source, event)?;
+    if q.chars(other).has_subtype(q.words(asker.source).subtype(Subtype::Wall)) {
+        return None;
+    }
+    Fired::about(Target::Object(other))
+}
+
 /// "Whenever this permanent enters or attacks" (CR 603.2, 603.6a): one triggered ability with two conditions, either its own entering the
 /// battlefield or its own attack. Overlord of the Balemurk, Overlord of the Mistmoors, Sentinel of the Nameless City, Archon of Cruelty
 /// Dragonhawk, Fate's Tempest and Dread Osseosaur print it. The `listens` mask is `ZONE_CHANGE` and `ATTACKS`.
