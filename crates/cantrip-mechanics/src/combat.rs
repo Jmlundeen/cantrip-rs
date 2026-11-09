@@ -193,3 +193,12 @@ pub fn only_before_combat_damage_step(q: &dyn Query, _: &Asker) -> bool {
     q.state().turn.step() < Step::CombatDamage
         && !q.history().this_turn().iter().any(|r| matches!(r.event, Event::StepBegan { step: Step::EndOfCombat }))
 }
+
+/// "Cast this spell / activate only during an opponent's turn, before attackers are declared" (CR 506.8a, 506.8d, 506.8e,
+/// 506.8g): the active player is an opponent of the controller, the turn has not reached the declare attackers step, and none
+/// has begun this turn (so not in a second combat phase's beginning of combat step). Nettling Imp and Siren's Call print it.
+pub fn during_opponents_turn_before_attackers(q: &dyn Query, asker: &Asker) -> bool {
+    q.state().opponents(asker.controller).any(|p| p == q.state().turn.active)
+        && q.state().turn.step() < Step::DeclareAttackers
+        && !q.history().this_turn().iter().any(|r| matches!(r.event, Event::StepBegan { step: Step::DeclareAttackers }))
+}
