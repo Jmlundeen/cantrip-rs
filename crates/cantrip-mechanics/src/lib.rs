@@ -1200,3 +1200,5 @@ pub fn hideaway(g: &mut dyn Game, item: &StackItem, count: usize) -> Result<(), 
     g.bottom_in_random_order(player, &rest);
     Ok(())
 }
+
+pub mod commander;
