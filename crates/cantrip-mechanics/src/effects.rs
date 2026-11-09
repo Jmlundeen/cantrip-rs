@@ -1677,6 +1677,20 @@ pub fn return_first_target_to_hand(g: &mut dyn Game, item: &StackItem) -> Result
     Ok(())
 }
 
+const MAY_RETURN_TARGET_TO_BATTLEFIELD: Question = Question::new("ReturnToBattlefield", "return the targeted card to the battlefield?", "", "Return it", "Leave it");
+
+/// "You may return target [permanent] card from your graveyard to the battlefield" (CR 608.2b, 117.3, 110.2a): the target is
+/// mandatory, chosen as the ability goes on the stack; the "may" is asked as it resolves, and only if the target is still
+/// legal. The card enters untapped under the ability's controller. Sun Titan and Bishop of Rebirth print it; Eternal
+/// Witness's `may_return_first_target_to_hand` is its sibling.
+pub fn may_return_first_target_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(card) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    if ask_may(g, item.controller, item.object, Purpose::Ask(&MAY_RETURN_TARGET_TO_BATTLEFIELD))? {
+        g.put_onto_battlefield(card, item.controller, false)?;
+    }
+    Ok(())
+}
+
 /// "Return up to one target [permanent] to its owner's hand. If you do, put a +1/+1 counter on this creature" (CR 400.3, 122.1): a
 /// target that became illegal is not returned (CR 608.2b); the source gets the counter only if the permanent really arrived in a
 /// hand ("if a permanent was returned this way"), and only if it is still on the battlefield. Mirkwood Nurturer and Nurturing Pixie
