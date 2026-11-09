@@ -19,6 +19,6 @@ fn may_put_a_counter_and_add_mana(g: &mut dyn Game, item: &StackItem) -> Result<
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(cantrip_mechanics::triggers::EACH_PLAYERS_FIRST_MAIN_PHASE, may_put_a_counter_and_add_mana, "At the beginning of each player's first main phase, that player may put a +1/+1 counter on this creature. If they do, they add {C} for each counter on it.")],
+    abilities: &[triggered(cantrip_mechanics::triggers::EACH_PLAYERS_FIRST_MAIN_PHASE, may_put_a_counter_and_add_mana, "At the beginning of each player's first main phase, that player may put a +1/+1 counter on this creature. If they do, they add {C} for each counter on it.").produces_mana()],
     ..oracle::CHEERING_CROWD
 };

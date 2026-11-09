@@ -198,7 +198,7 @@ fn run_fused(cx: &mut Cx, item: &StackItem, left: &'static CardDef, right: &'sta
 /// still takes it, nothing forbids the source to target it, and for a slot whose targets together are judged
 /// (`TargetSpec::together`), the rule still allows the slot's targets together - each read as it is, or as it last was if
 /// it has left (Run Away Together's ruling) - or none of them is legal (Nethroi, Apex of Death's ruling).
-pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], item: &StackItem, slot: usize) -> bool {
+pub fn target_legal(cards: &'static CardTable, state: &GameState, events: &[Record], item: &StackItem, slot: usize) -> bool {
     let target = state.target(item, slot);
     // A slot that chose no target (an "up to" slot) has nothing to be legal (CR 601.2c).
     if target == Target::None {
@@ -283,6 +283,10 @@ impl Query for Given<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        self.q.producible_types(permanent)
+    }
+
     fn linked_card(&self, card: CardId) -> CardId {
         self.q.linked_card(card)
     }
@@ -362,7 +366,7 @@ impl Query for Given<'_> {
 
 /// A read-only `Query` over a state, for checks made outside a frame's run.
 pub struct Reader<'a> {
-    pub cards: &'a CardTable,
+    pub cards: &'static CardTable,
     pub state: &'a GameState,
     pub events: &'a [Record],
 }
@@ -378,6 +382,10 @@ impl Query for Reader<'_> {
 
     fn can_untap(&self, permanent: ObjectId) -> bool {
         crate::ops::can_untap(self, self.cards, permanent)
+    }
+
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        crate::actions::producible_types_on(self.cards, self.state, self.events, permanent)
     }
 
     fn linked_card(&self, card: CardId) -> CardId {
@@ -492,6 +500,32 @@ pub(crate) fn its_own_exile(cx: &Cx, item: &StackItem, moving: ops::Moving, reas
 }
 
 pub fn resolve(cx: &mut Cx) -> R<Flow> {
+    resolve_inner(cx, false)
+}
+
+/// The normal resolver, allowed to summarize only a declared terminal mana instruction for
+/// CR 106.7. Opaque effects and all preparation instructions still execute normally.
+pub(crate) fn resolve_for_mana_capability(cx: &mut Cx) -> R<Flow> {
+    resolve_inner(cx, true)
+}
+
+/// Executes the generated effect itself, in play and in hypothetical resolution. Summarization
+/// is requested only for the outer ability in a capability query, never for nested callbacks.
+pub(crate) fn triggered_effect(cx: &mut Cx, item: &StackItem, def: &TriggeredDef, summarize: bool) -> Result<(), Suspend> {
+    let Some(combination) = def.mana_combination else { return (def.effect)(cx, item); };
+    let count = (combination.prepare)(cx, item)?;
+    // Only a capability advice copy summarizes: for any positive fixed total, every listed color can occur and no
+    // other color can. Record types, never invented representative amounts or partial game-state output.
+    if summarize && let Some(chance) = cx.g.hypothetical_chance.as_mut() {
+        if count > 0 { chance.terminal_types |= combination.colors.0; }
+        Ok(())
+    } else {
+        Game::add_mana_in_any_combination(cx,
+            &Asker::new(item.object, item.controller), combination.colors, count)
+    }
+}
+
+fn resolve_inner(cx: &mut Cx, summarize_terminal_mana: bool) -> R<Flow> {
     // The item this frame resolves (`Cx::resolving`), wherever it is: what it cast or copied as it resolved went above it.
     let Some(&item) = cx.resolving() else { return Ok(Flow::Done) };
     // Nothing of the ability's own text is read yet (`Cx::own_text`), whatever a run cut short by a panic left.
@@ -696,7 +730,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     AbilityDef::Activated(ActivatedDef { modal: Some(modal), .. }) => run_modes(cx, &item, modal),
                     AbilityDef::Activated(a) => (a.effect)(cx, &item),
                     AbilityDef::Triggered(TriggeredDef { modal: Some(modal), .. }) => run_modes(cx, &item, modal),
-                    AbilityDef::Triggered(t) => (t.effect)(cx, &item),
+                    AbilityDef::Triggered(t) => triggered_effect(cx, &item, t, summarize_terminal_mana),
                     AbilityDef::Static(_) | AbilityDef::PlayRule(_) | AbilityDef::RegenerationBan(_) | AbilityDef::BlockAllowance(_) => unreachable!("a static ability is never on the stack"),
                 })?;
                 // It has resolved (CR 608.2m: "the first time this ability has resolved this turn").

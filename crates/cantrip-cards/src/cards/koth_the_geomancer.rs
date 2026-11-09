@@ -33,6 +33,6 @@ pub static CARD: CardDef = CardDef {
         when(EventMask::ZONE_CHANGE, a_land_you_control_enters),
         landfall,
         "Landfall \u{2014} Whenever a land you control enters, Koth deals 1 damage to each opponent. If that land is a Mountain, add {R}.",
-    )],
+    ).produces_mana()],
     ..oracle::KOTH_THE_GEOMANCER
 };

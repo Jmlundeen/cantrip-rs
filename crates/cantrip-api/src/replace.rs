@@ -352,6 +352,23 @@ pub enum DamageComponent {
     Redirected { target: Target, amount: u32 },
 }
 
+/// The part of a mana replacement's condition independent of the amount and types produced.
+/// Damping Sphere and Contamination ask whether the permanent is a land. Restricting this
+/// predicate to the source makes the quantity contract executable authority, rather than
+/// an assertion about an opaque callback that might inspect an undeclared amount.
+pub type ManaReplacementSource = fn(&dyn Query, &Asker, ObjectId, PlayerId) -> bool;
+
+/// Replace a qualifying tap's entire mana output by a fixed type and amount (CR 106.12b,
+/// 614.1a). `minimum` is the printed total-quantity threshold. The actual replacement and
+/// the CR 106.7 quantity-domain partition both use this same definition.
+#[derive(Clone, Copy)]
+pub struct FixedManaReplacement {
+    pub minimum: u32,
+    pub source: ManaReplacementSource,
+    pub mana: Mana,
+    pub amount: u32,
+}
+
 /// A replacement effect of a static ability (CR 614.1, 604).
 #[derive(Clone, Copy)]
 pub struct ReplacementDef {
@@ -364,6 +381,7 @@ pub struct ReplacementDef {
     pub own_everywhere: bool,
     pub applies: ReplacementApplies,
     pub apply: ReplacementApply,
+    pub fixed_mana: Option<FixedManaReplacement>,
     /// Game operations the effect performs as it applies (see [`ReplacementThen`]).
     pub then: Option<ReplacementThen>,
     /// Additional components of a damage event; see [`ReplacementDamage`].
@@ -528,9 +546,30 @@ impl ReplacementDef {
         own_everywhere: false,
         applies: never,
         apply: nothing,
+        fixed_mana: None,
         then: None,
         damage: None,
         optional: None,
         in_graveyard: false,
     };
+
+    pub fn applies_to(&self, q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+        if let Some(rule) = self.fixed_mana {
+            matches!(proposal, Proposal::ManaProduction(m) if m.total() >= rule.minimum
+                && (rule.source)(q, asker, m.permanent, m.player))
+        } else {
+            (self.applies)(q, asker, proposal)
+        }
+    }
+
+    pub fn reshape(&self, q: &dyn Query, asker: &Asker, proposal: &mut Proposal) {
+        if let Some(rule) = self.fixed_mana {
+            if let Proposal::ManaProduction(m) = proposal {
+                m.mana = ManaPool::default();
+                m.mana.0[rule.mana as usize] = rule.amount;
+            }
+        } else {
+            (self.apply)(q, asker, proposal);
+        }
+    }
 }

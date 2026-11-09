@@ -47,7 +47,7 @@ fn deal_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(INSTANT_OR_SORCERY_YOU_CAST, add_red, "Whenever you cast an instant or sorcery spell, add {R}."),
+        triggered(INSTANT_OR_SORCERY_YOU_CAST, add_red, "Whenever you cast an instant or sorcery spell, add {R}.").produces_mana(),
         triggered(THIS_LEAVES, pay_x, "When Electro leaves the battlefield, you may pay {X}. When you do, he deals X damage to target player."),
     ],
     delayed: &[delayed_trigger(deal_x, "When you do, he deals X damage to target player.").targets(&[targets::PLAYER])],

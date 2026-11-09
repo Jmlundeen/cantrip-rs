@@ -36,7 +36,7 @@ pub static EMBLEM: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), impulse, "+1: Exile the top card of your library. You may cast that card. If you don't, Chandra deals 2 damage to each opponent."),
-        ability(loyalty(1), add_red_red, "+1: Add {R}{R}."),
+        ability(loyalty(1), add_red_red, "+1: Add {R}{R}.").produces_mana(),
         ability(loyalty(-3), effects::damage_first_target::<4>, "\u{2212}3: Chandra deals 4 damage to target creature.")
             .targets(&[targets::CREATURE]),
         ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"Whenever you cast a spell, this emblem deals 5 damage to any target.\""),

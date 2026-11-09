@@ -27,6 +27,6 @@ pub static CARD: CardDef = CardDef {
         THIS_ENTERS,
         &MODAL,
         "When Culber and Stamets enter, choose one — Put a +1/+1 counter on target creature; or add two mana of any one color.",
-    )],
+    ).produces_mana()],
     ..oracle::CULBER_AND_STAMETS_STAR_CROSSED
 };

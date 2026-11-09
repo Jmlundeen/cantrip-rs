@@ -188,6 +188,15 @@ pub trait Query {
         (!roots.is_empty()).then_some(identity)
     }
 
+    /// The mana types this permanent could produce now (CR 106.7), including replacement effects in every possible
+    /// order and ignoring activation costs, tapped state and spending restrictions. The first result contains only
+    /// colors; the second says whether it could produce colorless mana. An undefined recursive dependency produces
+    /// no mana (CR 106.5). Exotic Orchard and Squandered Resources ask this rules question.
+    /// Implemented by the rules host; a detached query used only for other questions cannot judge mana production.
+    fn producible_types(&self, _permanent: ObjectId) -> (ColorSet, bool) {
+        panic!("mana production requires a rules-host query")
+    }
+
     /// The "defending player" of `attacker`, an attacking creature or one that attacked (CR 508.5, 310.9d): the player it
     /// attacks, or the controller of the planeswalker or the protector of the battle it attacks, as it began attacking
     /// (`Attacker::defending`) - so still once that planeswalker or battle has changed controller or protector, or been
@@ -1491,6 +1500,10 @@ pub trait Game: Query {
     /// `lose_life_together`. Returns the actual life lost, excluding blocked losses and losses replaced with gains.
     fn each_opponent_loses_life(&mut self, player: PlayerId, amount: i32) -> i32;
     fn add_mana(&mut self, player: PlayerId, mana: Mana, amount: u32);
+    /// Adds a full-width count in any combination of the listed colors (CR 106.4, 608.2d):
+    /// independently choose each unit, in successive wire-sized requests. Wizard's Rockets and
+    /// Vivi Ornitier use this exact procedure. It never summarizes an opaque caller's later steps.
+    fn add_mana_in_any_combination(&mut self, asker: &Asker, colors: ColorSet, count: u32) -> Result<(), Suspend>;
     /// Adds mana that lasts until the end of combat (CR 106.4, 500.5a): not lost as the steps before it end.
     fn add_mana_until_end_of_combat(&mut self, player: PlayerId, mana: Mana, amount: u32);
     /// Adds mana that lasts until the end of the turn (CR 106.4, 500.5a): not lost as the steps and phases before it end.

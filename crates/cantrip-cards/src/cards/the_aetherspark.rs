@@ -66,7 +66,7 @@ pub static CARD: CardDef = CardDef {
         ability(loyalty(1), plus_one, "+1: Attach The Aetherspark to up to one target creature you control. Put a +1/+1 counter on that creature.")
             .targets(&[targets::CREATURE_YOU_CONTROL.optional()]),
         ability(loyalty(-5), |g, item| effects::draw(g, item, 2), "\u{2212}5: Draw two cards."),
-        ability(loyalty(-10), minus_ten, "\u{2212}10: Add ten mana of any one color."),
+        ability(loyalty(-10), minus_ten, "\u{2212}10: Add ten mana of any one color.").produces_mana(),
     ],
     delayed: &[triggered(when(EventMask::DAMAGE, equipped_creature_deals_combat_damage), put_loyalty, "Whenever equipped creature deals combat damage during your turn, put that many loyalty counters on The Aetherspark.").damage_amount()
         .sums_per_subject()],

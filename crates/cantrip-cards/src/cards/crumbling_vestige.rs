@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 pub static CARD: CardDef = CardDef {
     enters: Some(mana::enters_tapped),
     abilities: &[
-        triggered(THIS_ENTERS, effects::add_one_mana_of_any_color, "When this land enters, add one mana of any color."),
+        triggered(THIS_ENTERS, effects::add_one_mana_of_any_color, "When this land enters, add one mana of any color.").produces_mana(),
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
     ],
     ..oracle::CRUMBLING_VESTIGE

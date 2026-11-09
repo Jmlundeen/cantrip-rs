@@ -15,6 +15,6 @@ pub static CARD: CardDef = CardDef {
         YOUR_FIRST_MAIN_PHASE,
         add_blue_red,
         "At the beginning of your first main phase, add {U}{R}. Spend this mana only to cast instant and sorcery spells.",
-    )],
+    ).produces_mana()],
     ..oracle::ABSTRACT_PAINTMAGE
 };

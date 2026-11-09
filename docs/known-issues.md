@@ -67,7 +67,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-119](#ki-119-a-triggered-abilitys-text-in-a-card-file-is-not-always-its-oracle-text) | A triggered ability's text in a card file is not always its Oracle text | Pri-2 | Open |
 | [KI-121](#ki-121-the-host-never-marks-a-kicker-x-as-variable) | The host never marks a kicker {X} as variable | Pri-2 | Open |
 | [KI-122](#ki-122-a-declaration-taken-back-for-an-enlisted-creature-tapped-for-mana-says-nothing) | A declaration taken back for an enlisted creature tapped for mana says nothing | Pri-2 | Open |
-| [KI-124](#ki-124-what-a-land-could-produce-is-judged-for-at-most-256-answers-to-its-mana-abilitys-questions) | What a land could produce is judged for at most 256 answers to its mana ability's questions | Pri-3 | Won't fix: beyond practical scale |
+| [KI-124](#ki-124-what-a-permanent-could-produce-is-judged-for-at-most-4096-answers-to-its-abilitys-questions) | What a permanent could produce is judged for at most 4,096 answers to its ability's questions | Pri-3 | Won't fix: beyond practical scale |
 | [KI-125](#ki-125-a-mana-abilitys-row-can-show-what-its-ability-lists-or-the-best-of-several-outcomes-under-replacement-effects-on-its-mana) | A mana ability's row can show what its ability lists, or the best of several outcomes, under replacement effects on its mana | Pri-2 | Open |
 | [KI-128](#ki-128-the-non-tactical-bots-drop-an-attack-whose-phyrexian-cost-only-life-could-pay) | The non-tactical bots drop an attack whose Phyrexian cost only life could pay | Pri-2 | Open |
 | [KI-129](#ki-129-a-cost-holds-at-most-six-discard-instructions) | A cost holds at most six discard instructions | Pri-3 | Won't fix: beyond practical scale |
@@ -452,21 +452,35 @@ should say the enlisted creature was tapped.
 
 **Scenarios.** None: display.
 
-### KI-124: What a land could produce is judged for at most 256 answers to its mana ability's questions
+### KI-124: What a permanent could produce is judged for at most 4,096 answers to its ability's questions
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Pri-3 | Won't fix: beyond practical scale | engine | 2026-10-22, review of the CR 106.7 effect-decided yields |
+| Pri-3 | Won't fix: beyond practical scale | engine | 2026-10-22, review of the CR 106.7 effect-decided yields; brought up to date 2026-11-10, review of PR #2649 |
 
-**Notes.** The types a permanent could produce (CR 106.7, `actions::producible_types`) count a mana ability whose mana is
-its own effect's by running the effect for every answer to the questions it asks (`effect_productions`): each color the
-activation may name, each multiset of "N mana in any combination of colors", each "you may", mode or player. Past 256 runs
-it is not judged: its listed mana stands for it, and with `CANTRIP_VERIFY` it panics naming the card. "Could produce" is
-asked only of lands (Squandered Resources' sacrifice, `colors_from_sacrifice`), and no printed land comes near: the most
-is Cascading Cataracts, five mana in any combination of colors, 126 runs; a filter land is 3 runs, a single color 5. Seven
-mana in any combination of five colors (330) on one land's ability, or two such questions on one, is what would reach it.
+**Notes.** The types a permanent could produce (CR 106.7, `actions::producible_types`) count an ability whose mana is its
+own effect's - a mana ability's, or a stack ability's that produces mana (Deathrite Shaman, Lotus Cobra's landfall,
+Quintorius Kand's -6) - by running the effect on a copy of the position for every answer that can make a difference to
+it (`effect_productions`): each color the activation may name, each set of targets for a slot, each set of cards, each
+set (or, where one may repeat, multiset) of modes, each multiset of "N mana in any combination of colors", each "you
+may", number or player, and each outcome of a die, coin or random pick. Past 4,096 runs of one ability, or a question
+with more answers than the runs left, the rest is not tried: what the runs found stands, with what the ability lists
+(never a type it could not produce), and with `CANTRIP_VERIFY` it panics naming the card, so a scenario reaching it fails.
+So do a question kind it does not try, an X no target bounds on an ability that does not declare X its mana amount, and
+a counted cost other than X - none of which any implemented card asks of this query (every card's ability, judged on a
+board of lands, creatures and cards in every zone, under Ritual of Subdual and under Damping Sphere, reaches none). An
+announced X in any combination of colors (Wizard's Rockets' recipe) is judged without trying amounts: one mana and two
+of each color, and each threshold of a fixed-output replacement (Damping Sphere), through the replacement effects.
 
-**Scenarios.** None: no printed card reaches it.
+"Could produce" is asked of lands (Exotic Orchard, Squandered Resources' sacrifice): no printed land comes near the
+bound - the most is Cascading Cataracts' five mana in any combination of five colors, 126 runs. Past it takes a
+permanent with a many-answered ability made a land: Quintorius Kand's "exile any number of target cards from your
+graveyard" with twelve or more cards there (2^12 sets), on a Quintorius that Mycosynth Lattice, March of the Machines and
+an effect that makes creatures Forests (Life and Limb with its creature made a Saproling) have made a land, while an
+opponent asks. Even then the first sets tried find the {R} it would add.
+
+**Scenarios.** `exotic-orchard-asks-what-wizards-rockets-made-a-land-could-produce-under-deep-water` (the replacement
+path that once panicked); the bound itself in `mana_producible_tests::an_ability_with_too_many_answers_is_judged_in_bounded_time`.
 
 ### KI-129: A cost holds at most six discard instructions
 

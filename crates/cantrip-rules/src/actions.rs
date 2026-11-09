@@ -245,6 +245,10 @@ impl Query for AsSpell<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        self.q.producible_types(permanent)
+    }
+
     fn linked_card(&self, card: CardId) -> CardId {
         self.q.linked_card(card)
     }
@@ -314,6 +318,10 @@ impl Query for WithWords<'_> {
 
     fn can_untap(&self, permanent: ObjectId) -> bool {
         self.q.can_untap(permanent)
+    }
+
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        self.q.producible_types(permanent)
     }
 
     fn words(&self, id: ObjectId) -> Words {
@@ -3692,6 +3700,10 @@ impl Query for Announcing<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        self.q.producible_types(permanent)
+    }
+
     fn linked_card(&self, card: CardId) -> CardId {
         self.q.linked_card(card)
     }
@@ -3787,6 +3799,11 @@ impl Query for Watch<'_> {
     fn can_untap(&self, permanent: ObjectId) -> bool {
         self.w.told.set(true);
         self.q.can_untap(permanent)
+    }
+
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        self.w.told.set(true);
+        self.q.producible_types(permanent)
     }
 
     fn linked_card(&self, card: CardId) -> CardId {
@@ -4479,6 +4496,10 @@ impl Query for AsFace<'_> {
         self.cx.can_untap(permanent)
     }
 
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        self.cx.producible_types(permanent)
+    }
+
     fn linked_card(&self, card: CardId) -> CardId {
         self.cx.linked_card(card)
     }
@@ -4550,7 +4571,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
         return Vec::new();
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
     // The ability asked as it is (CR 607.5): its own cost change reads its own links.
     let by = cx.link_of_nth(source, index as usize);
@@ -4608,7 +4629,7 @@ pub fn cast_face_of(game: &crate::Game, card: ObjectId, index: u8) -> &'static C
 
 /// A copy of the position (no tree) to ask the rules of, through a frame's view, for a menu row's advice.
 fn advice_game(game: &crate::Game) -> crate::Game {
-    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() }
+    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: game.producible_path.clone(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() }
 }
 
 /// What `player` would be offered at this priority with a thousand mana of every type in their pool: what a script's refusal
@@ -8202,6 +8223,10 @@ impl Query for QueryAsFace<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        self.q.producible_types(permanent)
+    }
+
     fn linked_card(&self, card: CardId) -> CardId {
         self.q.linked_card(card)
     }
@@ -9278,7 +9303,7 @@ fn assist_could_pay(cx: &Cx, caster: PlayerId, card: ObjectId, def: &CardDef, ge
 /// (Snapcaster Mage), "Cast without paying its mana cost", "Cast by paying {1}{U} instead". A cast another object makes
 /// possible says which, where its cost does not already (`ActionOption::granted_by`): "Mystic Forge", "Pay {E} rather than its
 /// mana cost (Lurrus of the Dream-Den)", so two permissions that would both let a card be cast read apart.
-pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption) -> std::borrow::Cow<'static, str> {
+pub fn describe(cards: &'static CardTable, state: &GameState, log: &[Record], option: &ActionOption) -> std::borrow::Cow<'static, str> {
     let Some(source) = option.source else { return "".into() };
     match option.kind {
         ActionKind::CastSpell => {
@@ -9342,7 +9367,7 @@ fn permission_named(cards: &CardTable, state: &GameState, source: ObjectId, g: G
         || state.permissions.iter().filter(|p| state.permission_covers(p, source)).count() > 1
 }
 
-fn describe_cast(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption, source: ObjectId) -> std::borrow::Cow<'static, str> {
+fn describe_cast(cards: &'static CardTable, state: &GameState, log: &[Record], option: &ActionOption, source: ObjectId) -> std::borrow::Cow<'static, str> {
     let whole = cards.get(state.obj(source).card);
     let face = cast_face(whole, option.index);
     // A face other than the card itself is named by its name, the prototyped face, which has the card's, by its keyword
@@ -12166,7 +12191,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
     if !changers {
         return None;
     }
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);
@@ -12386,6 +12411,9 @@ fn activate_mana_as(
         if mana.x > 0 {
             mana = ManaCost { x: 0, ..x_total(&paid_x, n) };
         }
+        // X announced with the activation is local to it (CR 107.3a): a recipe-backed ability reads it through
+        // `mana_ability_x()` as it resolves, even after the cost sacrificed the source, and the source's own X is
+        // never replaced.
         cx.g.mana_activation_x = Some(n);
     }
     // The total is determined after announcing X and how its symbols are paid, before any cost changes the source
@@ -12496,6 +12524,24 @@ fn activate_mana_as(
     Ok(())
 }
 
+/// Adds every unit of a color combination (CR 106.4, 608.2d), preserving the full quantity and
+/// the order of the answers across wire-sized requests. Wizard's Rockets and Vivi Ornitier use
+/// this same rules procedure. It executes normally even inside opaque callbacks; only an outer
+/// generated terminal instruction can be summarized by the stack resolver for CR 106.7.
+pub(crate) fn add_in_any_combination(cx: &mut Cx, asker: &Asker, colors: ColorSet, mut count: u32) -> Result<(), Suspend> {
+    while count > 0 {
+        let batch = count.min(u8::MAX as u32) as u8;
+        let Answer::Colors(chosen) = Game::ask(cx, asker.controller, RequestKind::ChooseColors {
+            source: asker.source, choices: colors, count: batch, purpose: ColorUse::AddMana,
+        })? else { unreachable!("the core answers a color choice with colors") };
+        for color in chosen {
+            Game::add_mana(cx, asker.controller, color.mana(), 1);
+        }
+        count -= u32::from(batch);
+    }
+    Ok(())
+}
+
 /// The mana `source`, tapped for mana by `player`, produces (CR 106.12b): what its mana ability's effect added (`held`),
 /// proposed as one event to the replacement effects, and what they leave of it added to the pool it was going to, produced by
 /// `source` (CR 106.3) - the tapper's, or another player's ("that player adds", Spectral Searchlight), whose mana the effects
@@ -12599,6 +12645,9 @@ fn activate_player_mana_effect(cx: &mut Cx, player: PlayerId, source: ObjectId, 
         if mana.x > 0 {
             mana = ManaCost { x: 0, ..x_total(&paid_x, n) };
         }
+        // X announced with the activation is local to it (CR 107.3a): a recipe-backed ability reads it through
+        // `mana_ability_x()` as it resolves, even after the cost sacrificed the source, and the source's own X is
+        // never replaced.
         cx.g.mana_activation_x = Some(n);
     }
     let sacrificed_any_number = if let Some(variable @ VariableCost::SacrificeAnyNumber { less_each, .. }) = def.cost.variable {
@@ -12664,43 +12713,98 @@ fn activate_player_mana_effect(cx: &mut Cx, player: PlayerId, source: ObjectId, 
 /// effect's (a filter land's "{U}{U}, {U}{B}, or {B}{B}", Gemstone Caverns' {C} or a color) is run on a copy of the position
 /// for every answer to the questions it asks (`effect_productions`). Through the replacement effects on a tap for mana where
 /// its cost has {T} (CR 106.12b).
+pub(crate) fn producible_types_in(game: &crate::Game, permanent: ObjectId) -> (ColorSet, bool) {
+    let mut copy = advice_game(game);
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    producible_types(&cx, permanent)
+}
+
+/// A rules query over a read-only state, as target and cost checks outside a frame read it.
+pub(crate) fn producible_types_on(cards: &'static CardTable, state: &GameState, events: &[Record], permanent: ObjectId) -> (ColorSet, bool) {
+    let mut copy = crate::Game { state: state.clone(), log: events.to_vec(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards, verify: false, max_events: crate::MAX_GAME_EVENTS, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    producible_types(&cx, permanent)
+}
+
+/// Restores a query's dependency path, including when an unjudgeable production panics under verification.
+struct ProduciblePath<'a>(&'a std::cell::RefCell<Vec<ObjectId>>);
+
+impl Drop for ProduciblePath<'_> {
+    fn drop(&mut self) {
+        self.0.borrow_mut().pop();
+    }
+}
+
 pub(crate) fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
+    if !cx.is_on_battlefield(land) || cx.g.producible_path.borrow().contains(&land) {
+        return (ColorSet::NONE, false);
+    }
+    cx.g.producible_path.borrow_mut().push(land);
+    let _path = ProduciblePath(&cx.g.producible_path);
     let controller = cx.s().obj(land).controller;
     let mut types = 0u8;
     let replaceable = crate::replace::mana_may_be_replaced(cx);
     let chars = cx.chars(land);
     let given = layers::acquisition_possible(cx.cards(), cx.s());
     for (nth, ability) in chars.abilities().enumerate() {
+        let definition = cx.cards().ability(ability);
+        // Triggering is not simulated: CR 106.7 asks what the ability would produce if resolving now.
+        // It keeps its own links, intervening condition, legal targets and ordinary resolution semantics.
+        let by = if given { cx.link_nth(land, &chars, nth) } else { None };
+        if let AbilityDef::Triggered(t) = definition {
+            if (t.produces_mana || t.mana_ability) && t.functions.contains(ZoneKind::Battlefield) {
+                if let Some(productions) = effect_productions(cx, land, controller, definition, ability, nth, by) {
+                    types |= productions.terminal_types;
+                    for made in productions.pools {
+                        types |= (0..6).filter(|&m| made[m] > 0).fold(0u8, |types, m| types | 1 << m);
+                    }
+                }
+            }
+            continue;
+        }
         let Some(def) = activated(cx, ability) else { continue };
-        if !def.is_mana_ability() || def.from != ZoneKind::Battlefield {
+        if (!def.is_mana_ability() && !def.produces_mana) || def.from != ZoneKind::Battlefield {
+            continue;
+        }
+        // A shared recipe can describe its entire unbounded-X output family. This proves all types
+        // without selecting guessed X values or using affordability (CR 106.7). Opaque quantity-dependent
+        // replacement callbacks still require a symbolic contract, rather than sampling their guards.
+        if let Some(capability) = def.mana_capability {
+            let (colors, total) = match capability {
+                ManaCapability::AnnouncedXCombination(colors) => (colors, None),
+                ManaCapability::CurrentPowerCombination(colors) =>
+                    (colors, Some(chars.power.unwrap_or(0).max(0) as u32)),
+            };
+            if total == Some(0) { continue; }
+            if replaceable && def.cost.tap {
+                let restriction = def.restricted.map(|r| restriction_from(cx, land, r, by));
+                types |= crate::replace::combination_types(cx, land, controller, colors, total, restriction);
+            } else {
+                types |= colors.0;
+            }
             continue;
         }
         // Asked as the ability it is (CR 607.5): one an effect gave the land reads only its own links.
-        let by = if given { cx.link_nth(land, &chars, nth) } else { None };
         let any = if def.any_color { any_types(cx, land, controller, def, by) } else { 0 };
         // The mana it would produce, by each answer to its own questions: what its effect adds, or what it lists.
-        let instance = AbilityInstance { ability, acquisition: instance_nth(cx, land, &chars, nth) };
-        let productions: Vec<[u32; 6]> = match def.mana.and_then(|effect| effect_productions(cx, land, controller, def, effect, by, instance)) {
-            Some(made) => made,
-            None => {
-                let k = if any != 0 { u32::from(def.adds_any.max(1)) } else { 0 };
-                if k > 0 {
-                    (0..6)
-                        .filter(|&m| any & (1 << m) != 0)
-                        .map(|m| {
-                            let mut made = def.adds.0;
-                            made[m] = made[m].saturating_add(k);
-                            made
-                        })
-                        .collect()
-                } else {
-                    vec![def.adds.0]
+        let productions: Vec<[u32; 6]> = match (def.mana.is_some() || def.produces_mana)
+            .then(|| effect_productions(cx, land, controller, definition, ability, nth, by)).flatten() {
+            // Only triggered definitions have a terminal instruction today; the types it names are the ability's
+            // whatever is asking. Past what can be judged, the listed mana stands beside what was found (KI-124).
+            Some(productions) => {
+                types |= productions.terminal_types;
+                let mut pools = productions.pools;
+                if productions.unjudged {
+                    pools.extend(listed_productions(def, any));
                 }
+                pools
             }
+            None => listed_productions(def, any),
         };
         let restriction = def.restricted.map(|r| restriction_from(cx, land, r, by));
         for made in productions {
-            let outcomes: Option<Vec<[u32; 6]>> = if replaceable && def.cost.tap {
+            // A stack ability with a tap cost is not a tap for mana (CR 106.12, 106.12b, 605.1a).
+            let outcomes: Option<Vec<[u32; 6]>> = if replaceable && def.is_mana_ability() && def.cost.tap {
                 replaced_yields(cx, land, controller, made, 0, 0, restriction).map(|o| o.into_iter().map(|p| p.mana.0).collect())
             } else {
                 None
@@ -12713,131 +12817,418 @@ pub(crate) fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
     (ColorSet(types & ANY_COLOR), types & (1 << Mana::C as u8) != 0)
 }
 
-/// What the mana ability `def` of `id`, whose mana is its own `effect`'s, would add if it resolved now for `player` (CR 106.7):
+/// What a mana ability lists (CR 106.7): the mana it adds, and its mana of one color any it may name; the stand-in for
+/// an effect whose answers are not tried (`effect_productions`, KI-124).
+fn listed_productions(def: &ActivatedDef, any: u8) -> Vec<[u32; 6]> {
+    let k = if any != 0 { u32::from(def.adds_any.max(1)) } else { 0 };
+    if k > 0 {
+        (0..6)
+            .filter(|&m| any & (1 << m) != 0)
+            .map(|m| {
+                let mut made = def.adds.0;
+                made[m] = made[m].saturating_add(k);
+                made
+            })
+            .collect()
+    } else {
+        vec![def.adds.0]
+    }
+}
+
+/// A deterministic replay prefix for chance operations in an advice copy. A new operation tries its first
+/// outcome and queues every other outcome, retaining only questions answered before that operation. Later
+/// questions can depend on the chance result and must be announced anew (CR 106.7, 705, 706).
+pub(crate) struct HypotheticalChance {
+    route: Vec<u32>,
+    chosen: Vec<u32>,
+    alternatives: Vec<(usize, Vec<u32>)>,
+    pub(crate) terminal_types: u8,
+}
+
+impl HypotheticalChance {
+    fn new(route: Vec<u32>) -> Self { Self { route, chosen: Vec::new(), alternatives: Vec::new(), terminal_types: 0 } }
+
+    pub(crate) fn choose(&mut self, count: u32, answers_used: usize) -> u32 {
+        let at = self.chosen.len();
+        // The replay is of the same operations in the same order, so a replayed outcome is one of this one's.
+        let value = if let Some(&value) = self.route.get(at) {
+            value.min(count.saturating_sub(1))
+        } else {
+            for value in 1..count {
+                let mut branch = self.chosen.clone();
+                branch.push(value);
+                self.alternatives.push((answers_used, branch));
+            }
+            0
+        };
+        self.chosen.push(value);
+        value
+    }
+}
+
+/// What the annotated stack ability or effect-backed mana ability `def` of `id` would add if it resolved now (CR 106.7):
 /// its effect run on a copy of the position, once for each color the activation may name and each answer to each question it
 /// asks as it adds (the colors of "in any combination of", a "you may", a choice of one), the mana held as a tap's would be
 /// (`Cx::producing`). Each run is on the advice copy of the position every menu row's advice is judged on (`advice_game`):
 /// it is asked from a view of the game (`&Cx`), in the middle of a run, where the working state can't be moved.
 ///
-/// None where it asks a question whose answers `answers_to_try` does not list, or would need more than `MOST_RUNS` runs:
-/// then what it lists stands for it, which may not be what it could produce - so with `CANTRIP_VERIFY` that panics, naming
-/// the card and the question, and the first card to need it fails its scenarios. No printed land (the permanents "could
-/// produce" is asked of: `colors_from_sacrifice`) asks more than one question of a few answers, the most being Cascading
-/// Cataracts' five colors in any combination, 126 runs (`docs/known-issues.md`, KI-124).
-fn effect_productions(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef, effect: ManaEffect, by: Option<Linked>, instance: AbilityInstance) -> Option<Vec<[u32; 6]>> {
-    let unjudged = |why: String| {
-        if crate::layers::verifying() {
-            panic!("{}: what its mana ability could produce (CR 106.7) can't be judged: {why}", cx.chars(id).name);
-        }
-        None
+/// Every legal answer is tried, once for each answer that can make a difference: the targets of a slot, the cards
+/// chosen and the modes chosen as sets, and the colors of "in any combination" as multisets, since none of them has an
+/// order (CR 601.2c, 700.2, 106.1b). Up to `MOST_RUNS` runs of the effect are made. A question whose answers are not
+/// tried, an announcement that can't be bounded, or more runs than that, is a gap (`EffectProductions::unjudged`):
+/// what was found stands, with what the ability lists - and with `CANTRIP_VERIFY` it panics, naming the card and the
+/// gap, so the first card to reach one fails its scenarios (KI-124). Nothing in a real game panics here.
+#[derive(Default)]
+struct EffectProductions {
+    pools: Vec<[u32; 6]>,
+    terminal_types: u8,
+    /// Not every answer was judged: the productions found are some of what it could produce, not all.
+    unjudged: bool,
+}
+
+/// More runs of one ability's effect than this are not tried (KI-124): no printed land comes near it, Cascading
+/// Cataracts' five mana in any combination of colors being 126.
+const MOST_RUNS: usize = 4096;
+
+#[allow(clippy::too_many_arguments)]
+fn effect_productions(cx: &Cx, id: ObjectId, player: PlayerId, definition: &AbilityDef, ability: AbilityRef, nth: usize, by: Option<Linked>) -> Option<EffectProductions> {
+    let (def, trigger) = match definition {
+        AbilityDef::Activated(def) => (Some(def), None),
+        AbilityDef::Triggered(trigger) => (None, Some(trigger)),
+        _ => unreachable!("only an activated or triggered ability produces mana"),
     };
-    let named: Vec<Option<Color>> = if def.any_color {
+    // A gap in the judgment (KI-124): a panic only under verification, so that a card reaching one is found.
+    let gap = |why: String| {
+        if crate::layers::verifying() {
+            panic!("{}: what its ability could produce (CR 106.7) can't be judged: {why}", cx.chars(id).name);
+        }
+    };
+    let unjudged = |why: String| -> Option<EffectProductions> {
+        gap(why);
+        Some(EffectProductions { unjudged: true, ..Default::default() })
+    };
+    // An announcement may be bounded by its required targets, never by ability to pay its costs (CR 106.7).
+    // Unbounded X still needs a symbolic effect judgment; substituting zero would silently lose legal types.
+    let xs = if let Some(def) = def {
+        let variable_x = matches!(def.cost.variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeWithPowerX(_)
+            | VariableCost::RemoveAnyNumberOfCounters(_) | VariableCost::BlightX | VariableCost::TapX(_)));
+        if def.cost.variable.is_some() && !variable_x {
+            return unjudged("a counted non-X cost needs hypothetical cost-effect context".to_string());
+        }
+        if def.cost.total_mana().x > 0 || def.cost.loyalty == Some(LOYALTY_MINUS_X) || variable_x {
+            // The filter itself may read X, so its unannounced candidates cannot bound X. A required X slot
+            // cannot name more distinct objects/players than exist, irrespective of that filter (CR 601.2c).
+            let cap = if def.targets.iter().any(|s| s.min == TargetSpec::COUNTED) {
+                cantrip_state::count_u32(cx.s().objects.len()).saturating_add(cantrip_state::count_u32(cx.s().players.len()))
+            } else { u32::MAX };
+            let cap = if cap == u32::MAX {
+                // A declared mana amount (`x_is_mana_amount`) changes only how much mana X makes, never its kinds:
+                // one positive X and two (for a replacement with a threshold) witness every type, though the cost
+                // that would pay it is ignored (CR 106.7). Anything else has no symbolic contract yet.
+                if !def.x_is_mana_amount {
+                    return unjudged("unbounded X needs a symbolic hypothetical effect judgment, not an affordability cap".to_string());
+                }
+                2
+            } else {
+                cap
+            };
+            least_x(def.x_cant_be_zero)..=cap
+        } else {
+            0..=0
+        }
+    } else {
+        0..=0
+    };
+    let acquired = acquired_nth(cx, id, nth);
+    let chars = cx.chars(id);
+    let slot = chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(nth).map_or(0, |(slot, _)| slot);
+    let words = layers::granted_words_at(cx.cards(), cx.s(), &cx.g.log, id, &chars, slot)
+        .unwrap_or_else(|| cantrip_api::words(cx.s(), id));
+    // Only real, still-pending trigger instances supply event context. No matcher is called on an invented event,
+    // and a historical triggering that has finished is not treated as pending now (CR 603.3, 608.2h, 106.7).
+    let mut contexts: Vec<cantrip_state::PendingTrigger> = if trigger.is_some() {
+        let mut contexts: Vec<_> = cx.s().triggers.iter().copied()
+            .filter(|t| t.source == id && t.ability == ability && t.controller == player && t.acquired == acquired).collect();
+        contexts.extend(cx.s().stack.iter()
+            .filter(|t| t.kind == StackKind::Triggered && t.object == id && t.ability == ability && t.controller == player && t.acquired == acquired)
+            .map(|t| cantrip_state::PendingTrigger { source: id, ability, controller: player, subject: t.subject,
+                data: t.data, event_amount: t.event_amount, members: t.members, count: Some(t.x), since: Some(t.since), acquired, words: Some(t.words) }));
+        contexts
+    } else {
+        Vec::new()
+    };
+    if contexts.is_empty() {
+        if trigger.is_some_and(|t| t.subject_chooses_targets && !t.targets.is_empty()) {
+            return unjudged("subject-chosen trigger targets have no current real chooser context".to_string());
+        }
+        // No triggering is invented to fill missing references. An undetermined numerical amount is zero
+        // (CR 107.2), and no object/player or batch members are supplied by an absent real triggering.
+        contexts.push(cantrip_state::PendingTrigger { source: id, ability, controller: player, subject: Target::None,
+            data: [0; 2], event_amount: None, members: Default::default(), count: None, since: None, acquired, words: Some(words) });
+    }
+    let named: Vec<Option<Color>> = if let Some(def) = def.filter(|d| d.any_color) {
         let colors = any_types(cx, id, player, def, by);
         let named: Vec<Option<Color>> = Color::ALL.into_iter().filter(|c| colors & (1 << c.mana() as u8) != 0).map(Some).collect();
         if named.is_empty() { vec![None] } else { named }
     } else {
         vec![None]
     };
-    let mut out: Vec<[u32; 6]> = Vec::new();
-    let mut runs = 0;
-    let x_values: &[Option<u32>] = if def.cost.mana.x > 0 || matches!(def.cost.variable, Some(VariableCost::RemoveAnyNumberOfCounters(_))) {
-        if !def.x_is_mana_amount {
-            return unjudged("its activation X may change more than the amount of mana".into());
-        }
-        // Costs are ignored (CR 106.7), so one positive X is possible even without counters or mana to pay it.
-        // The declaration guarantees equal raw types for every positive X; zero can have different types.
-        // Also retain a production of two or more: Damping Sphere changes its type (CR 106.7).
-        if def.x_cant_be_zero { &[Some(1), Some(2)] } else { &[Some(0), Some(1), Some(2)] }
-    } else { &[None] };
+    let mut out = EffectProductions::default();
+    let mut runs = 0usize;
     for color in named {
-      for &x in x_values {
-        let mut waiting: Vec<Vec<Answer>> = vec![Vec::new()];
-        while let Some(answers) = waiting.pop() {
-            runs += 1;
-            if runs > MOST_RUNS {
-                return unjudged(format!("more than {MOST_RUNS} answers to try"));
-            }
-            let mut copy = advice_game(cx.g);
-            copy.mana_activation_x = x;
-            copy.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));
-            let frame = copy.state.agenda.len() - 1;
-            copy.state.update_frame(frame, |f| f.answers = answers.iter().cloned().map(|a| (None, a)).collect());
-            let mut run = Cx {
-                g: &mut copy,
-                frame,
-                cursor: 0,
-                mana_source: Some(id),
-                entering: None,
-                lineage: Vec::new(), damage: None,
-                asked_at: None,
-                doer: None,
-                producing: Some(Vec::new()),
-            };
-            let asker = Asker { instance: Some(instance), source: id, controller: player, by, spell: false };
-            let done = run.acting_as(player, |run| effect(run, &asker, color)).is_ok();
-            let held = run.producing.take().unwrap_or_default();
-            if done {
-                let mut made = [0u32; 6];
-                for h in held {
-                    made[h.mana as usize] += h.amount;
+        for x in xs.clone() {
+            for context in &contexts {
+                let mut waiting: Vec<(Vec<Answer>, Vec<u32>)> = vec![(Vec::new(), Vec::new())];
+                while let Some((answers, chance_route)) = waiting.pop() {
+                    runs += 1;
+                    if runs > MOST_RUNS {
+                        gap(format!("more than {MOST_RUNS} answers to try"));
+                        out.unjudged = true;
+                        return Some(out);
+                    }
+                    let mut copy = advice_game(cx.g);
+                    copy.hypothetical_chance = Some(HypotheticalChance::new(chance_route));
+                    copy.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));
+                    let frame = copy.state.agenda.len() - 1;
+                    copy.state.update_frame(frame, |f| f.answers = answers.iter().cloned().map(|a| (None, a)).collect());
+                    let mut run = Cx {
+                        g: &mut copy,
+                        frame,
+                        cursor: 0,
+                        // Stack effects add mana immediately to this copy as well as recording it, so later instructions see
+                        // the changed pool. A tap's production is held whole for its replacement effects (CR 106.12b).
+                        mana_source: if def.is_some_and(|d| d.mana.is_some()) { Some(id) } else { None },
+                        entering: None,
+                        lineage: Vec::new(),
+                        damage: None,
+                        asked_at: None,
+                        doer: None,
+                        producing: Some(Vec::new()),
+                    };
+                    let asker = Asker { instance: Some(AbilityInstance { ability, acquisition: instance_nth(cx, id, &chars, nth) }), source: id, controller: player, by, spell: false };
+                    let result = run.acting_as(player, |run| -> R<()> {
+                        if let Some(effect) = def.and_then(|d| d.mana) {
+                            // ManaEffect callbacks read the announced X on their source (CR 107.3a, 605.3a).
+                            // Only the advice copy is announced; the actual source and costs stay untouched.
+                            if def.is_some_and(|d| d.cost.total_mana().x > 0 || d.cost.loyalty == Some(LOYALTY_MINUS_X)
+                                || matches!(d.cost.variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeWithPowerX(_)
+                                    | VariableCost::RemoveAnyNumberOfCounters(_) | VariableCost::BlightX | VariableCost::TapX(_)))) {
+                                // Only the advice copy is announced, never the actual source (CR 107.3a):
+                                // recipes read the announced X through `mana_ability_x()`.
+                                run.g.mana_activation_x = Some(x);
+                            }
+                            effect(run, &asker, color)?;
+                        } else {
+                            // Reuse the actual announcement procedures, without paying costs or testing activation restrictions.
+                            if let Some(def) = def {
+                                let mut item = stack_item(StackKind::Activated, id, ability, player, &[]);
+                                item.instance = instance_nth(cx, id, &chars, nth);
+                                item.acquired = acquired;
+                                item.words = words;
+                                item.x = x;
+                                item.counted = x;
+                                if let Some(modal) = def.modal {
+                                    item.modes = hypothetical_modes(run, &asker, ability, modal, x)?;
+                                }
+                                run.st().stack_push(item);
+                                if let Some(modal) = def.modal {
+                                    let (targets, of) = choose_slots(run, player, id, false, &mode_specs(modal, item.modes),
+                                        x, 0, announced_x(&item), by)?;
+                                    set_item_targets(run, &targets, &of);
+                                } else if let Some(divide) = def.divide.filter(|_| !def.targets.is_empty()) {
+                                    announce_divided(run, player, id, false, divide, def.targets, &item, x, by)?;
+                                } else {
+                                    let (targets, of) = choose_slots(run, player, id, false, def.targets, x, 0, announced_x(&item), by)?;
+                                    set_item_targets(run, &targets, &of);
+                                }
+                            } else {
+                                let before = run.s().stack.len();
+                                crate::settle::announce_trigger(run, *context, by)?;
+                                // An impossible announcement is removed, rather than resolving the preexisting top of stack.
+                                if run.s().stack.len() == before {
+                                    return Ok(());
+                                }
+                            }
+                            let Some(serial) = run.s().stack.last().map(|i| i.serial) else { return Err(Stop::Cancel) };
+                            run.st().update_frame(frame, |f| f.kind = cantrip_state::FrameKind::Resolve { serial });
+                            crate::resolve::resolve_for_mana_capability(run)?;
+                        }
+                        Ok(())
+                    });
+                    let held = run.producing.take().unwrap_or_default();
+                    let chance = run.g.hypothetical_chance.take().unwrap_or_else(|| HypotheticalChance::new(Vec::new()));
+                    for (used, route) in chance.alternatives {
+                        waiting.push((answers[..used.min(answers.len())].to_vec(), route));
+                    }
+                    if result.is_ok() {
+                        let mut made = [0u32; 6];
+                        for h in held {
+                            made[h.mana as usize] += h.amount;
+                        }
+                        out.terminal_types |= chance.terminal_types;
+                        if !out.pools.contains(&made) {
+                            out.pools.push(made);
+                        }
+                        continue;
+                    }
+                    if matches!(result, Err(Stop::Cancel)) {
+                        // No legal announcement, or a combination rejected by the targeting rules, produces no mana.
+                        continue;
+                    }
+                    let Some(request) = copy.state.agenda[frame].pending.clone() else {
+                        gap("its effect stopped without a question".to_string());
+                        out.unjudged = true;
+                        return Some(out);
+                    };
+                    // More answers than runs are left (those made and those waiting): the first of them are tried, what they find stands (KI-124).
+                    let tries = match answers_to_try(&request.kind, MOST_RUNS.saturating_sub(runs + waiting.len())) {
+                        Ok((tries, true)) => tries,
+                        Ok((tries, false)) => {
+                            gap(format!("more than {MOST_RUNS} answers to try"));
+                            out.unjudged = true;
+                            tries
+                        }
+                        Err(why) => {
+                            gap(why);
+                            out.unjudged = true;
+                            return Some(out);
+                        }
+                    };
+                    for answer in tries {
+                        if crate::validate::check(&copy, &request, &answer).is_err() {
+                            continue;
+                        }
+                        let mut next = answers.clone();
+                        next.push(answer);
+                        waiting.push((next, chance.chosen.clone()));
+                    }
                 }
-                if !out.contains(&made) {
-                    out.push(made);
-                }
-                continue;
-            }
-            let Some(request) = copy.state.agenda[frame].pending.clone() else {
-                return unjudged("its effect stopped without a question".to_string());
-            };
-            let tries = match answers_to_try(&request.kind) {
-                Ok(tries) => tries,
-                Err(why) => return unjudged(why),
-            };
-            for answer in tries {
-                let mut next = answers.clone();
-                next.push(answer);
-                waiting.push(next);
             }
         }
-      }
     }
     Some(out)
 }
 
-/// More runs than this is no mana ability of a land a card prints (KI-124).
-const MOST_RUNS: usize = 256;
+/// Modes a mana-producing activated ability could announce now (CR 601.2b, 602.2b, 700.2).
+/// Eligibility and the printed range apply; ability to pay the mode or escalate costs does not (CR 106.7).
+fn hypothetical_modes(cx: &mut Cx, asker: &Asker, ability: AbilityRef, modal: &ModalDef, counted: u32) -> R<u32> {
+    let eligible = eligible_modes(cx, asker, modal);
+    let most = modal.most(cx, asker, counted);
+    if (!modal.repeat && eligible.len() < modal.min as usize) || (eligible.is_empty() && modal.min > 0) {
+        return Err(Stop::Cancel);
+    }
+    let ask = RequestKind::ChooseModes { source: asker.source,
+        modes: (0..modal.modes.len() as u8).map(|i| Label::Mode(ability, i)).collect(),
+        eligible, count: modal.min, at_most: if most > modal.min { most } else { 0 },
+        affordable: Vec::new(), additional_cost: false, repeat: modal.repeat };
+    let Answer::Modes(chosen) = cx.ask_core(asker.controller, ask, true)? else { return Err(Stop::Cancel) };
+    let mask = chosen.iter().fold(0u32, |mask, &i| modal.with(mask, i as usize));
+    cx.emit(Event::ModesChosen { player: asker.controller, source: asker.source, ability, modes: mask });
+    Ok(mask)
+}
 
-/// Every answer to a question a mana ability's effect asks as it adds its mana, where they are few enough to try
-/// (`effect_productions`): colors for each mana (repeats allowed, their order no matter to the mana), "you may", one of
-/// several modes or players. For any other question, or more colors than `MOST_RUNS` runs could try, why not.
-fn answers_to_try(kind: &RequestKind) -> Result<Vec<Answer>, String> {
+/// Every answer to a question a mana-producing ability asks that can make a difference to what it produces, at most
+/// `budget` of them (`effect_productions`): the targets of one slot as a set (CR 601.2c, 115.1: a slot's targets have
+/// no order), the cards chosen as a set (`Selection` judges sets), the modes as a set - a multiset where one may be
+/// chosen again (CR 700.2, 700.2d: modes are performed in printed order, whatever order they were chosen in) - and the
+/// colors of "in any combination" as a multiset (CR 106.1b), a "you may", a number, a player, which replacement effect
+/// applies first, with whether that is all of them. For any other question, why not.
+fn answers_to_try(kind: &RequestKind, budget: usize) -> Result<(Vec<Answer>, bool), String> {
+    /// Each choice of `least..=most` of `n` items by index, ascending: a set (`again` false) or a multiset (`again`).
+    /// False, with the first `budget` of them, where there are more.
+    fn choices(n: usize, least: usize, most: usize, again: bool, budget: usize, out: &mut Vec<Vec<usize>>) -> bool {
+        #[allow(clippy::too_many_arguments)]
+        fn visit(n: usize, least: usize, most: usize, again: bool, from: usize, at: &mut Vec<usize>, budget: usize, out: &mut Vec<Vec<usize>>) -> bool {
+            if at.len() >= least {
+                if out.len() >= budget {
+                    return false;
+                }
+                out.push(at.clone());
+            }
+            if at.len() < most {
+                for i in from..n {
+                    at.push(i);
+                    if !visit(n, least, most, again, if again { i } else { i + 1 }, at, budget, out) {
+                        return false;
+                    }
+                    at.pop();
+                }
+            }
+            true
+        }
+        let most = if again { most } else { most.min(n) };
+        visit(n, least, most, again, 0, &mut Vec::new(), budget, out)
+    }
     match kind {
-        RequestKind::ChooseColors { choices, count, .. } => {
-            let colors: Vec<Color> = Color::ALL.into_iter().filter(|&c| choices.has(c)).collect();
+        RequestKind::ChooseTarget { candidates, least, count, .. } => {
+            let mut sets = Vec::new();
+            let all = choices(candidates.len(), *least as usize, *count as usize, false, budget, &mut sets);
+            Ok((sets.into_iter().map(|set| Answer::Targets(set.into_iter().map(|i| candidates[i]).collect())).collect(), all))
+        }
+        RequestKind::ChooseCards { cards, rule, .. } => {
+            let most = rule.count.most().map_or(cards.len(), |n| (n as usize).min(cards.len()));
+            let mut sets = Vec::new();
+            let all = choices(cards.len(), 0, most, false, budget, &mut sets);
+            Ok((sets.into_iter().map(|set| Answer::Cards(set.into_iter().map(|i| cards[i]).collect())).collect(), all))
+        }
+        RequestKind::ChooseReplacement { sources, .. } =>
+            Ok(((0..sources.len()).map(|i| Answer::Index(i as u8)).collect(), true)),
+        RequestKind::ChooseColors { choices: allowed, count, .. } => {
+            let colors: Vec<Color> = Color::ALL.into_iter().filter(|&c| allowed.has(c)).collect();
+            if *count == 0 {
+                return Ok((vec![Answer::Colors(Vec::new())], true));
+            }
             if colors.is_empty() {
                 return Err("it asks a choice of colors among none".to_string());
             }
-            // Each multiset of `count` colors, as a non-decreasing run of indices.
-            let mut out = Vec::new();
-            let mut at = vec![0usize; *count as usize];
-            loop {
-                out.push(Answer::Colors(at.iter().map(|&i| colors[i]).collect()));
-                if out.len() > MOST_RUNS {
-                    return Err(format!("it asks {count} mana in any combination of {} colors, more than {MOST_RUNS} ways", colors.len()));
-                }
-                let Some(i) = (0..at.len()).rev().find(|&i| at[i] + 1 < colors.len()) else { break };
-                at[i] += 1;
-                let v = at[i];
-                for j in at.iter_mut().skip(i + 1) {
-                    *j = v;
-                }
-            }
-            Ok(out)
+            let mut sets = Vec::new();
+            let all = choices(colors.len(), *count as usize, *count as usize, true, budget, &mut sets);
+            Ok((sets.into_iter().map(|set| Answer::Colors(set.into_iter().map(|i| colors[i]).collect())).collect(), all))
         }
-        RequestKind::May { .. } => Ok(vec![Answer::Yes, Answer::No]),
-        RequestKind::ChooseNumber { least, most, .. } => Ok((*least..=*most).map(Answer::Announce).collect()),
-        RequestKind::ChooseModes { eligible, count: 1, at_most: 0, .. } => Ok(eligible.iter().map(|&i| Answer::Modes(vec![i])).collect()),
-        RequestKind::ChoosePlayer { candidates, .. } => Ok(candidates.iter().map(|&p| Answer::Player(p)).collect()),
+        RequestKind::May { .. } => Ok((vec![Answer::Yes, Answer::No], true)),
+        RequestKind::ChooseNumber { least, most, .. } => {
+            let all = u64::from(*most).saturating_sub(u64::from(*least)) < budget as u64;
+            Ok(((*least..=*most).take(budget).map(Answer::Announce).collect(), all))
+        }
+        RequestKind::ChooseModes { eligible, count, at_most, repeat, .. } => {
+            let mut sets = Vec::new();
+            let all = choices(eligible.len(), *count as usize, (*at_most).max(*count) as usize, *repeat, budget, &mut sets);
+            Ok((sets.into_iter().map(|set| Answer::Modes(set.into_iter().map(|i| eligible[i]).collect())).collect(), all))
+        }
+        RequestKind::ChooseDividedTargets { candidates, total, max_targets, optional, .. } => {
+            // Which targets get how much: a set of targets, each given a positive share (CR 601.2d).
+            #[allow(clippy::too_many_arguments)]
+            fn visit(candidates: &[Target], remaining: u32, most: usize, from: usize, selected: &mut Vec<(Target, u32)>, budget: usize, out: &mut Vec<Answer>) -> bool {
+                if remaining == 0 {
+                    if out.len() >= budget {
+                        return false;
+                    }
+                    out.push(Answer::Divided(selected.clone()));
+                    return true;
+                }
+                if selected.len() >= most {
+                    return true;
+                }
+                for (i, &candidate) in candidates.iter().enumerate().skip(from) {
+                    for amount in 1..=remaining {
+                        selected.push((candidate, amount));
+                        if !visit(candidates, remaining - amount, most, i + 1, selected, budget, out) {
+                            return false;
+                        }
+                        selected.pop();
+                    }
+                }
+                true
+            }
+            let mut out = Vec::new();
+            if *optional || *total == 0 {
+                out.push(Answer::Divided(Vec::new()));
+            }
+            let most = if *max_targets == 0 { candidates.len() } else { (*max_targets as usize).min(candidates.len()) };
+            let all = *total == 0 || visit(candidates, *total, most, 0, &mut Vec::new(), budget, &mut out);
+            Ok((out, all))
+        }
+        RequestKind::ChoosePlayer { candidates, .. } => Ok((candidates.iter().map(|&p| Answer::Player(p)).collect(), true)),
         other => {
             let kind = format!("{other:?}");
             Err(format!("it asks {}, whose answers are not tried", kind.split([' ', '{', '(']).next().unwrap_or("")))
@@ -12887,7 +13278,7 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: Ma
                 let outer = cx.mana_source.replace(id);
                 let mut added = Ok(());
                 for _ in 0..=again.len() {
-                    added = cx.with_mana_interval(id, |cx| cx.acting_as(controller, |cx| (t.effect)(cx, &item)));
+                    added = cx.with_mana_interval(id, |cx| cx.acting_as(controller, |cx| crate::resolve::triggered_effect(cx, &item, t, false)));
                     if added.is_err() {
                         break;
                     }
@@ -12943,7 +13334,7 @@ fn delayed_mana_abilities(cx: &mut Cx, event: &Event, statics: &mut crate::settl
         item.data = fired.data;
         item.acquired = d.acquired;
         let outer = cx.mana_source.replace(d.source);
-        let added = cx.with_mana_interval(d.source, |cx| cx.acting_as(d.controller, |cx| (t.effect)(cx, &item)));
+        let added = cx.with_mana_interval(d.source, |cx| cx.acting_as(d.controller, |cx| crate::resolve::triggered_effect(cx, &item, t, false)));
         cx.mana_source = outer;
         added?;
     }

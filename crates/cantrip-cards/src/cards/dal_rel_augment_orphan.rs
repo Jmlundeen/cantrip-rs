@@ -12,7 +12,7 @@ fn add_red_or_green(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::LANDFALL, add_red_or_green, "Landfall — Whenever a land you control enters, add {R} or {G}."),
+        triggered(triggers::LANDFALL, add_red_or_green, "Landfall — Whenever a land you control enters, add {R} or {G}.").produces_mana(),
         ability(cost("{3}").and(sacrifice(1, targets::filters::land)), |g, item| effects::draw(g, item, 1), "{3}, Sacrifice a land: Draw a card."),
     ],
     ..oracle::DAL_REL_AUGMENT_ORPHAN

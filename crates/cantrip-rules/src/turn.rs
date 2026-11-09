@@ -30,9 +30,25 @@ pub fn shuffle(state: &mut GameState, zone: Zone) {
 /// Shuffles a player's library and records it (`Event::Shuffled`): whatever anyone knew of its order is gone.
 pub fn shuffle_library(cx: &mut Cx, player: PlayerId) {
     crate::library_visibility::conceal(cx, player);
-    shuffle(cx.st(), Zone::library(player));
+    shuffle_in(cx, Zone::library(player));
     cx.record(Event::Shuffled { player });
     crate::library_visibility::sync(cx);
+}
+
+/// A resolving instruction shuffles through its effect context. CR 106.7 advice tries all orders;
+/// actual play uses the unchanged generator procedure.
+pub(crate) fn shuffle_in(cx: &mut Cx, zone: Zone) {
+    if cx.g.hypothetical_chance.is_none() {
+        shuffle(cx.st(), zone);
+        return;
+    }
+    let mut cards = cx.s().zone(zone).to_vec();
+    for i in (1..cards.len()).rev() {
+        let j = cx.random_below(i as u32 + 1) as usize;
+        cards.swap(i, j);
+    }
+    for &id in &cards { cx.st().zone_remove(zone, id); }
+    for id in cards { cx.st().zone_push(zone, id); }
 }
 
 /// Puts a list in random order with the state's own generator (Fisher-Yates), drawing as `shuffle` does.

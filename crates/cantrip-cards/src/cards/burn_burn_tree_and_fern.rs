@@ -21,8 +21,8 @@ pub static CARD: CardDef = CardDef {
             .targets(&[targets::CREATURE_AN_OPPONENT_CONTROLS]),
         chapter(2, destroy_artifact, "II \u{2014} Destroy target artifact an opponent controls.")
             .targets(&[targets::ARTIFACT_AN_OPPONENT_CONTROLS]),
-        chapter(3, add_red, "III, IV \u{2014} Add {R}."),
-        chapter(4, add_red, "III, IV \u{2014} Add {R}."),
+        chapter(3, add_red, "III, IV \u{2014} Add {R}.").produces_mana(),
+        chapter(4, add_red, "III, IV \u{2014} Add {R}.").produces_mana(),
     ],
     ..oracle::BURN_BURN_TREE_AND_FERN
 };

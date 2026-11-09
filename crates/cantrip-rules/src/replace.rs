@@ -341,6 +341,7 @@ fn nothing_prevented(_: &dyn Query, _: &Asker, _: &DamageEvent) -> bool {
 /// What a printed effect a candidate named is, once its source no longer has it - one of a merged permanent's components
 /// whose text an earlier part of the event changed: it applies to nothing and does nothing.
 static NO_REPLACEMENT: ReplacementDef = ReplacementDef {
+    fixed_mana: None,
     hint: "",
     kind: ReplacementKind::ZoneChange,
     own_everywhere: false,
@@ -532,8 +533,8 @@ fn candidates_for(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Opti
                 continue;
             }
             let Some(selected) = select((id, index, Origin::Printed)) else { continue };
-            if (def.applies)(cx, &asker, &selected)
-                && valid_redirection(cx, &selected, |after| (def.apply)(cx, &asker, after))
+            if def.applies_to(cx, &asker, &selected)
+                && valid_redirection(cx, &selected, |after| def.reshape(cx, &asker, after))
             {
                 found.push(Candidate { source: id, index, origin: Origin::Printed });
             }
@@ -1241,12 +1242,12 @@ fn normalize_damage(proposal: &mut Proposal) {
 /// (CR 614.9), and what it does to the game as it applies (`run_then`).
 fn apply_printed(cx: &mut Cx, proposal: &mut Proposal, source: ObjectId, index: u8, applied: &[Applied], added: &mut Vec<DamageComponent>) {
     let def = printed_replacement(cx, source, index);
-    let (apply, then) = (def.apply, def.then);
+    let then = def.then;
     let controller = printed_controller(cx, source, index, proposal);
     let asker = Asker { instance: None, source, controller, by: printed_link(cx, source, index), spell: false };
     let before = *proposal;
     let mut after = before;
-    apply(&*cx, &asker, &mut after);
+    def.reshape(&*cx, &asker, &mut after);
     normalize_damage(&mut after);
     if !valid_redirection(&*cx, &before, |p| *p = after) { return; }
     let components = if let (Some(damage), Proposal::Damage(before), Proposal::Damage(after)) = (def.damage, before, after) {
@@ -1407,7 +1408,7 @@ fn reshape(cx: &Cx, c: &Candidate, proposal: &mut Proposal) {
         Origin::Printed => {
             let def = printed_replacement(cx, c.source, c.index);
             let asker = Asker { instance: None, source: c.source, controller: controller_of(cx, c.source, proposal), by: printed_link(cx, c.source, c.index), spell: false };
-            (def.apply)(cx, &asker, proposal);
+            def.reshape(cx, &asker, proposal);
         }
         Origin::Granted(timestamp) => {
             let Some((e, def)) = granted(cx, timestamp) else { return };
@@ -1492,6 +1493,49 @@ pub(crate) fn mana_outcomes(cx: &Cx, production: ManaProduction) -> Vec<ManaProd
     let mut out = Vec::new();
     walk(cx, Proposal::ManaProduction(production), &mut cx.lineage.clone(), &mut Vec::new(), &mut out);
     out
+}
+
+/// The types an announced-X color combination could produce through the replacement effects on its tap (CR 106.7):
+/// each listed color, at the totals that can make a difference. A fixed-output replacement (`FixedManaReplacement`)
+/// reads only whether the total reaches its threshold and the source, so [1, first threshold), [first, second), ...
+/// each take one path - the color survives, or the first replacement leaves a fixed pool - and each interval's least
+/// total stands for all of it, the last, unbounded one included. Any other mana replacement is tried at one mana and
+/// at two: each printed one reads no amount (Ritual of Subdual's and Deep Water's "instead of any other type") or
+/// multiplies it (Mana Reflection), and none reads more than whether there are two or more (Damping Sphere's). Mixed
+/// colors add no distinct output type: every such replacement maps each unit, or the whole total, alike.
+pub(crate) fn combination_types(cx: &Cx, permanent: ObjectId, player: PlayerId, colors: ColorSet,
+    total: Option<u32>, restriction: Option<ManaRestriction>) -> u8 {
+    if total == Some(0) { return 0; }
+    let mut bounds = match total { Some(total) => vec![total], None => vec![1, 2] };
+    if total.is_none() {
+        for &id in cx.s().battlefield() {
+            if !live(cx.s(), id) || cx.lost_all_abilities(id) { continue; }
+            for (index, (def, by)) in printed_replacements(cx, id).enumerate() {
+                if def.kind != ReplacementKind::ManaProduction || def.in_graveyard
+                    || cx.lineage.contains(&(id, index as u8, Origin::Printed)) { continue; }
+                let Some(rule) = def.fixed_mana else { continue };
+                let asker = Asker { instance: None, source: id, controller: cx.controller(id), by, spell: false };
+                if (rule.source)(cx, &asker, permanent, player) && rule.minimum > 1 {
+                    bounds.push(rule.minimum);
+                }
+            }
+        }
+    }
+    bounds.sort_unstable();
+    bounds.dedup();
+    let mut types = 0;
+    for total in bounds {
+        for color in colors.iter() {
+            let mut mana = ManaPool::default();
+            mana.0[color.mana() as usize] = total;
+            for outcome in mana_outcomes(cx, ManaProduction { permanent, player, to: player, mana, restriction, lasts: ManaLasts::Step }) {
+                for m in Mana::ALL {
+                    if outcome.mana.get(m) > 0 { types |= 1 << m as u8; }
+                }
+            }
+        }
+    }
+    types
 }
 
 /// Whether a replacement effect might change damage about to be dealt ("it deals that much damage plus 1 instead"): one a

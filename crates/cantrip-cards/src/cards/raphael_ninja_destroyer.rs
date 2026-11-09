@@ -15,7 +15,7 @@ pub static CARD: CardDef = CardDef {
         add_that_much_red,
         "Enrage — Whenever Raphael is dealt damage, add that much {R}. Until end of turn, you don't lose this mana as steps and phases end.",
     ).damage_amount()
-    .sums_per_subject()],
+    .produces_mana().sums_per_subject()],
     // "Raphael must be blocked if able" (CR 509.1c): the attacker it names is itself.
     must_be_blocked: &[|_, source, attacker| attacker == source],
     ..oracle::RAPHAEL_NINJA_DESTROYER

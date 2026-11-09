@@ -18,7 +18,7 @@ fn add_red_red(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(YOUR_FIRST_MAIN_PHASE, add_red_red, "At the beginning of your first main phase, add {R}{R}.")],
+    abilities: &[triggered(YOUR_FIRST_MAIN_PHASE, add_red_red, "At the beginning of your first main phase, add {R}{R}.").produces_mana()],
     adventure: Some(&EASY_PICKINGS),
     ..oracle::GL_IN_THE_MIGHTY
 };

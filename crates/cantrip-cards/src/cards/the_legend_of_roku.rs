@@ -50,7 +50,7 @@ pub static BACK: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         chapter(1, chapter_one, "I \u{2014} Exile the top three cards of your library. Until the end of your next turn, you may play those cards."),
-        chapter(2, cantrip_mechanics::effects::add_one_mana_of_any_color, "II \u{2014} Add one mana of any color."),
+        chapter(2, cantrip_mechanics::effects::add_one_mana_of_any_color, "II \u{2014} Add one mana of any color.").produces_mana(),
         chapter(3, chapter_three, "III \u{2014} Exile this Saga, then return it to the battlefield transformed under your control."),
     ],
     back: Some(&BACK),

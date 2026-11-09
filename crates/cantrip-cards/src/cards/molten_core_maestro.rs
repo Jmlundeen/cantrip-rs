@@ -22,6 +22,6 @@ pub static CARD: CardDef = CardDef {
         triggers::INSTANT_OR_SORCERY_YOU_CAST,
         opus,
         "Opus \u{2014} Whenever you cast an instant or sorcery spell, put a +1/+1 counter on this creature. If five or more mana was spent to cast that spell, add an amount of {R} equal to this creature's power.",
-    )],
+    ).produces_mana()],
     ..oracle::MOLTEN_CORE_MAESTRO
 };

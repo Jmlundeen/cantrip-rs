@@ -61,7 +61,7 @@ pub static EMBLEM: CardDef = CardDef {
 pub static BACK: CardDef = CardDef {
     abilities: &[
         ability(loyalty(2), plus_two, "+2: Until your next turn, whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end of turn."),
-        ability(loyalty(-3), minus_three, "\u{2212}3: Return target instant or sorcery card from your graveyard to your hand. If it's a green card, add one mana of any color.")
+        ability(loyalty(-3), minus_three, "\u{2212}3: Return target instant or sorcery card from your graveyard to your hand. If it's a green card, add one mana of any color.").produces_mana()
             .targets(&[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD]),
         ability(loyalty(-7), minus_seven, "\u{2212}7: Draw cards equal to half the number of cards in your library, rounded up. You get an emblem with \"You have no maximum hand size.\""),
     ],

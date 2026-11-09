@@ -22,7 +22,7 @@ fn transfer(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::YOUR_FIRST_MAIN_PHASE, first_main, "At the beginning of your first main phase, put a +1/+1 counter on Jadzia Dax, then add an amount of {G} equal to the number of counters on her."),
+        triggered(triggers::YOUR_FIRST_MAIN_PHASE, first_main, "At the beginning of your first main phase, put a +1/+1 counter on Jadzia Dax, then add an amount of {G} equal to the number of counters on her.").produces_mana(),
         ability(cost("{2}{G}").and(DISCARD_THIS), transfer, "Transfer Symbiont — {2}{G}, Discard this card: Put two +1/+1 counters on target creature.")
             .targets(&[targets::CREATURE])
             .from(ZoneKind::Hand),

@@ -695,7 +695,7 @@ fn move_together_entering_event(cx: &mut Cx, moves: &[Moving], reason: ZoneReaso
         }
         // Shuffled now, announced after the move that put it there is: the history says it arrived, then was shuffled.
         if change.shuffle && to.is(ZoneKind::Library) {
-            crate::turn::shuffle(cx.st(), to);
+            crate::turn::shuffle_in(cx, to);
             shuffled.push(to.player);
         }
         // Rebound exiled it as it resolved (CR 702.88a), if no later effect sent it elsewhere: its delayed triggered ability is

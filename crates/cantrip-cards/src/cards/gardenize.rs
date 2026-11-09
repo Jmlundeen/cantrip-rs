@@ -26,7 +26,7 @@ pub static CARD: CardDef = CardDef {
             YOUR_FIRST_MAIN_PHASE,
             add_green,
             "At the beginning of your first main phase, add {G} for each charge counter on this enchantment.",
-        ),
+        ).produces_mana(),
     ],
     ..oracle::GARDENIZE
 };

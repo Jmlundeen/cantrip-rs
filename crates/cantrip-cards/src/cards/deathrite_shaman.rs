@@ -41,7 +41,7 @@ fn exile_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(TAP, exile_land, "{T}: Exile target land card from a graveyard. Add one mana of any color.")
-            .targets(&[target(land_card)]),
+            .targets(&[target(land_card)]).produces_mana(),
         ability(cost("{B}, {T}"), exile_spell, "{B}, {T}: Exile target instant or sorcery card from a graveyard. Each opponent loses 2 life.")
             .targets(&[target(instant_or_sorcery_card)]),
         ability(cost("{G}, {T}"), exile_creature, "{G}, {T}: Exile target creature card from a graveyard. You gain 2 life.")

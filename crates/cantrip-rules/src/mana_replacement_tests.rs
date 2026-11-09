@@ -450,3 +450,17 @@ fn the_types_a_permanent_could_produce_count_its_effects_mana_through_the_replac
     put(&mut g, &SPHERE);
     assert_eq!(producible_types(&cx(&mut g), ruins), (ColorSet::NONE, true));
 }
+
+/// CR 106.7 considers every order, not one arbitrary order: the filter's two mana become {B}, doubled to {B}{B}, then
+/// replaced by {C}; or become {C}, doubled to {C}{C}, then replaced by {B}. Both types are possible.
+#[test]
+fn producible_types_union_every_order_of_multiple_mana_replacements() {
+    let mut g = game();
+    let ruins = put(&mut g, &RUINS);
+    put(&mut g, &CONTAMINATION);
+    put(&mut g, &REFLECTION);
+    put(&mut g, &SPHERE);
+    assert_eq!(g.producible_types(ruins), (ColorSet::of(Color::Black), true));
+    assert!(g.state.player(YOU).pool.is_empty());
+    assert!(!g.state.obj(ruins).tapped);
+}

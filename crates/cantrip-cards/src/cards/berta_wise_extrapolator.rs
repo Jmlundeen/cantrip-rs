@@ -16,7 +16,7 @@ pub static CARD: CardDef = CardDef {
             triggers::PLUS_ONE_COUNTERS_PUT_ON_THIS,
             effects::add_one_mana_of_any_color,
             "Whenever one or more +1/+1 counters are put on Berta, add one mana of any color.",
-        ),
+        ).produces_mana(),
         ability(cost("{X}").and(TAP), fractal, "{X}, {T}: Create a 0/0 green and blue Fractal creature token and put X +1/+1 counters on it."),
     ],
     ..oracle::BERTA_WISE_EXTRAPOLATOR

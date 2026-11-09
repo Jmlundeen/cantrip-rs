@@ -60,7 +60,7 @@ pub static EMBLEM: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), surveil_and_take, "+1: Surveil 1. If you put a noncreature, nonland card into your graveyard this way, put that card into your hand."),
-        ability(loyalty(1), blue_mana, "+1: Add {U}. Spend this mana only to cast a noncreature spell."),
+        ability(loyalty(1), blue_mana, "+1: Add {U}. Spend this mana only to cast a noncreature spell.").produces_mana(),
         ability(loyalty_minus_x(), tap_and_stun, "\u{2212}X: Tap target artifact or creature. Put X stun counters on it.")
             .targets(&[targets::ARTIFACT_OR_CREATURE]),
         ability(loyalty(-6), emblem, "\u{2212}6: You get an emblem with \"Whenever you cast a spell, draw a card.\""),

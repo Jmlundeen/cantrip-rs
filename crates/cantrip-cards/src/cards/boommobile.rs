@@ -22,7 +22,7 @@ fn x_damage_and_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, four_mana, "When this Vehicle enters, add four mana of any one color. Spend this mana only to activate abilities."),
+        triggered(THIS_ENTERS, four_mana, "When this Vehicle enters, add four mana of any one color. Spend this mana only to activate abilities.").produces_mana(),
         ability(cost("{X}{2}{R}"), x_damage_and_counter, "Exhaust \u{2014} {X}{2}{R}: This Vehicle deals X damage to any target. Put a +1/+1 counter on this Vehicle. (Activate each exhaust ability only once.)")
             .targets(&[targets::ANY])
             .exhaust(),

@@ -47,7 +47,7 @@ pub static CARD: CardDef = CardDef {
         triggered(YOU_CAST_A_SPELL_FROM_EXILE, ping_and_gain, "Whenever you cast a spell from exile, Quintorius Kand deals 2 damage to each opponent and you gain 2 life."),
         ability(loyalty(1), spirit, "+1: Create a 3/2 red and white Spirit creature token."),
         ability(loyalty(-3), discover_four, "\u{2212}3: Discover 4."),
-        ability(loyalty(-6), exile_and_play, "\u{2212}6: Exile any number of target cards from your graveyard. Add {R} for each card exiled this way. You may play those cards this turn.")
+        ability(loyalty(-6), exile_and_play, "\u{2212}6: Exile any number of target cards from your graveyard. Add {R} for each card exiled this way. You may play those cards this turn.").produces_mana()
             .targets(&[up_to(TargetSpec::ANY_NUMBER, targets::any_card_in_your_graveyard)]),
     ],
     ..oracle::QUINTORIUS_KAND

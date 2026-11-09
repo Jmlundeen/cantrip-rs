@@ -12,7 +12,7 @@ fn add_black_and_red(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, add_black_and_red, "When this creature enters, if an opponent lost life this turn, add {B}{R}.")
+        triggered(THIS_ENTERS, add_black_and_red, "When this creature enters, if an opponent lost life this turn, add {B}{R}.").produces_mana()
             .condition(an_opponent_lost_life),
         ability(cost("{1}{R}").and(discard_cards(1)), |g, item| effects::draw(g, item, 1), "{1}{R}, Discard a card: Draw a card."),
     ],

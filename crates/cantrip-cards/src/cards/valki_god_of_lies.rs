@@ -100,7 +100,7 @@ pub static BACK: CardDef = CardDef {
     abilities: &[
         ability(loyalty(2), exile_each_top_card, "+2: Exile the top card of each player's library."),
         ability(loyalty(-3), exile_target, "\u{2212}3: Exile target artifact or creature.").targets(&[targets::ARTIFACT_OR_CREATURE]),
-        ability(loyalty(-8), exile_graveyards_add_red, "\u{2212}8: Exile all graveyards. Add {R}{R}{R}."),
+        ability(loyalty(-8), exile_graveyards_add_red, "\u{2212}8: Exile all graveyards. Add {R}{R}{R}.").produces_mana(),
     ],
     ..oracle::TIBALT_COSMIC_IMPOSTOR
 };

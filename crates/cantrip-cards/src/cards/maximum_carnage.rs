@@ -31,7 +31,7 @@ fn burn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         chapter(1, carnage, "I \u{2014} Until your next turn, each creature attacks each combat if able and attacks a player other than you if able."),
-        chapter(2, add_red, "II \u{2014} Add {R}{R}{R}."),
+        chapter(2, add_red, "II \u{2014} Add {R}{R}{R}.").produces_mana(),
         chapter(3, burn, "III \u{2014} This Saga deals 5 damage to each opponent."),
     ],
     lasting_rules: &[LastingRule {

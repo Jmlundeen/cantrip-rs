@@ -23,6 +23,6 @@ pub static CARD: CardDef = CardDef {
         ExtraCost { text: "Pay {2}", cost: Cost { mana: mana("{2}"), ..Cost::NONE } },
     ],
     abilities: &[ability(cost("{R}"), trample_and_maybe_mana, "{R}: Target creature you control gains trample until end of turn. If this is the third time this ability has resolved this turn, add {R}{R}{R}{R}.")
-        .targets(&[targets::CREATURE_YOU_CONTROL])],
+        .targets(&[targets::CREATURE_YOU_CONTROL]).produces_mana()],
     ..oracle::SOULBRIGHT_SEEKER
 };

@@ -313,6 +313,10 @@ impl Query for AsText<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        self.q.producible_types(permanent)
+    }
+
     fn linked_card(&self, card: CardId) -> CardId {
         self.q.linked_card(card)
     }

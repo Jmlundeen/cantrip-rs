@@ -61,7 +61,7 @@ fn chapter_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static BACK: CardDef = CardDef {
     abilities: &[
         chapter(1, chapter_one, "I \u{2014} Reveal the top card of your library. If it's a permanent card, put it into your hand."),
-        chapter(2, chapter_two, "II \u{2014} Add {G}{G}."),
+        chapter(2, chapter_two, "II \u{2014} Add {G}{G}.").produces_mana(),
         chapter(3, chapter_three, "III \u{2014} Other creatures you control get +2/+2 and gain trample until end of turn."),
     ],
     ..oracle::SUMMON_ESPER_MADUIN

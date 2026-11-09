@@ -47,7 +47,7 @@ fn roll(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, enters_not_from_graveyard_or_exile), roll, "When this creature enters from anywhere other than a graveyard or exile, if it's on the battlefield and you control 9 or fewer creatures named \"Name Sticker\" Goblin, roll a 20-sided die. 1-6 | Add {R}{R}{R}{R}. 7-14 | Add {R}{R}{R}{R}{R}. 15-20 | Add {R}{R}{R}{R}{R}{R}.")
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, enters_not_from_graveyard_or_exile), roll, "When this creature enters from anywhere other than a graveyard or exile, if it's on the battlefield and you control 9 or fewer creatures named \"Name Sticker\" Goblin, roll a 20-sided die. 1-6 | Add {R}{R}{R}{R}. 7-14 | Add {R}{R}{R}{R}{R}. 15-20 | Add {R}{R}{R}{R}{R}{R}.").produces_mana()
         .condition(on_battlefield_and_nine_or_fewer)],
     ..oracle::NAME_STICKER_GOBLIN
 };

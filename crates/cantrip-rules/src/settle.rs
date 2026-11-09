@@ -707,8 +707,19 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
 }
 
 fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R<()> {
+    if let Some(targets) = announce_trigger(cx, trigger, by)? {
+        ops::became_targets(cx, targets.iter().copied(), trigger.source, trigger.controller, true);
+        // Actual placement on the stack commits a crime (CR 603.3a, 700.13). A capability query does neither.
+        ops::commit_crime(cx, trigger.controller, trigger.source, &targets);
+    }
+    Ok(())
+}
+
+/// Shared target/mode announcement for real triggers (CR 603.3c-d) and CR 106.7 advice copies. It does not
+/// fabricate a triggering, becoming-targeted event or crime: only actual placement announces those events.
+pub(crate) fn announce_trigger(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R<Option<Vec<Target>>> {
     if left_the_game(cx, trigger.controller) {
-        return Ok(());
+        return Ok(None);
     }
     let def = triggered(cx, trigger.ability);
     // Its text as it is put on the stack (CR 603.3, 113.7a): its source's words now, or last, if it has left. A reflexive or
@@ -729,13 +740,13 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
         let most = modal.most(cx, &asker, trigger_counted(cx, &trigger));
         let eligible = crate::actions::eligible_modes(cx, &asker, modal);
         if eligible.len() < modal.min.max(1) as usize || most == 0 {
-            return Ok(());
+            return Ok(None);
         }
         let chosen = if most == modal.min && eligible.len() == modal.min as usize {
             eligible
         } else {
             if left_the_game(cx, trigger.controller) {
-                return Ok(());
+                return Ok(None);
             }
             let ask = RequestKind::ChooseModes {
                 source: trigger.source,
@@ -759,7 +770,7 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
         // 700.2b), so it never stays there for anyone to respond to, copy or count. No mode was chosen, so nothing is
         // recorded as chosen.
         if mask == 0 {
-            return Ok(());
+            return Ok(None);
         }
         // Chosen as it goes on the stack: chosen even if the ability is later countered (CR 603.3c, 700.2).
         cx.emit(Event::ModesChosen { player: trigger.controller, source: trigger.source, ability: trigger.ability, modes: mask });
@@ -767,7 +778,7 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
         for (n, mode) in modal.modes.iter().enumerate() {
             for _ in 0..modal.times(mask, n) {
                 if !choose_trigger_targets(cx, &trigger, mode.targets, true, &mut targets, &mut of, first_spec)? {
-                    return Ok(());
+                    return Ok(None);
                 }
                 first_spec += mode.targets.len() as u8;
             }
@@ -779,7 +790,7 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
         let x = trigger.count.unwrap_or(cx.s().obj(trigger.source).x);
         let total = divide.total_for(&*cx, &Asker { instance: None, source: trigger.source, controller: trigger.controller, by, spell: false }, x);
         if left_the_game(cx, trigger.controller) {
-            return Ok(());
+            return Ok(None);
         }
         match crate::actions::ask_divided(cx, trigger.controller, trigger.source, false, spec, total, None, false, by, Some((trigger.ability, words)))? {
             crate::actions::Divided::Chosen(chosen, given) => {
@@ -787,14 +798,14 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
                 shares = given;
             }
             crate::actions::Divided::Skipped => {}
-            crate::actions::Divided::Impossible => return Ok(()),
+            crate::actions::Divided::Impossible => return Ok(None),
         }
         of.resize(targets.len(), 0);
         if !choose_trigger_targets_after(cx, &trigger, &def.targets[1..], false, &mut targets, &mut of, 1, true)? {
-            return Ok(());
+            return Ok(None);
         }
     } else if !choose_trigger_targets(cx, &trigger, def.targets, false, &mut targets, &mut of, 0)? {
-        return Ok(());
+        return Ok(None);
     }
     let mut item = StackItem { instance: AbilityAcquisition::OWN, event_amount: trigger.event_amount,
         kind: StackKind::Triggered,
@@ -833,14 +844,11 @@ fn put_trigger_as(cx: &mut Cx, trigger: PendingTrigger, by: Option<Linked>) -> R
     };
     // Its controller left as one of its choices was asked (CR 800.4d).
     if cx.s().player(trigger.controller).lost {
-        return Ok(());
+        return Ok(None);
     }
     cx.st().set_item_targets(&mut item, &targets, &of, &shares);
     cx.st().stack_push(item);
-    ops::became_targets(cx, targets.iter().copied(), trigger.source, trigger.controller, true);
-    // The controller of a triggered ability puts it on the stack (CR 603.3a) and is who commits its crime (CR 700.13).
-    ops::commit_crime(cx, trigger.controller, trigger.source, &targets);
-    Ok(())
+    Ok(Some(targets))
 }
 
 /// Effects that made one triggering trigger additional times (CR 603.2d), identified independently so each counts once
@@ -1384,6 +1392,10 @@ struct BoardThen<'a> {
 }
 
 impl Query for BoardThen<'_> {
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        self.q.producible_types(permanent)
+    }
+
     fn state(&self) -> &GameState {
         self.q.state()
     }

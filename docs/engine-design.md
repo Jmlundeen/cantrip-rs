@@ -2552,12 +2552,76 @@ and what is left added to the pool with the ability's rider (CR 106.6) - before 
 abilities it triggers see the mana as replaced (CR 106.12a). Everything that predicts a tap's yield judges it through the
 same effects (`replace::mana_outcomes`: every outcome, in every order the player could choose, each "you may" taken or not,
 no `then` run): what the player has to pay with (`available_without`, one alternative per outcome, its triggers judged on
-it), the types a permanent could produce (CR 106.7, `producible_types`), a mana ability's row (`replaced_mana_yields`, the
+it), the types a permanent could produce (CR 106.7, `Query::producible_types`), a mana ability's row (`replaced_mana_yields`, the
 host's `produces`) and the scenario harness's "for {B}". The triggered mana abilities it triggers (CR 605.1b) resolve at once, and only when
 it produced some mana (CR 106.12a); one that asks (`cantrip_mechanics::mana::add_one_mana_of_any_type_that_land_produced`,
 a type of `Label::ManaType`, "Choose which type of mana to add") suspends the activation, which runs again with the
 answer. "One mana of any type that land produced" reads `produced`: Lavaleaper, Mana Flare, and Heartbeat of Spring,
 Dictate of Karametra, Zendikar Resurgent, Mirari's Wake and Vorinclex, Voice of Hunger as written.
+
+Cards read a permanent's mana capabilities with `Query::producible_types` (CR 106.7), which returns colors and whether
+colorless is possible. It ignores activation costs and spending restrictions and reads conditional effects on an advice
+copy, capturing their production without activating the real permanent. Recursive dependencies use a scoped path of
+permanents being queried: a cycle without an independently defined output supplies no mana type (CR 106.5), while a
+reachable independent output propagates through the dependency. This path is bookkeeping of the query, outside the
+journal, and is inherited by advice copies; no persistent capability cache can become stale after undo or redo.
+Exotic Orchard filters opponents' lands before asking; Squandered Resources asks the same core operation of the land
+selected for its sacrifice cost. Controller identity and continuous effects remain the rules host's authority.
+
+An activated stack ability that can add mana declares `.produces_mana()` (Deathrite Shaman's targeted land ability).
+This metadata does not make it a mana ability (CR 605.1a). The capability query chooses legal targets and effect
+answers, then runs the ordinary stack resolver on each advice copy; mana added there is recorded and remains in
+that copy's pool for later instructions. Tap-for-mana replacements apply only to activated mana abilities with
+the tap symbol in their cost (CR 106.12b). Unsupported hypothetical announcements or questions report the exact
+gap. Hypothetical announcements use the normal target, modal, divided and late-target rules, including
+target-bounded X without an affordability limit. Effect questions enumerate legal ordered targets, colors,
+card selections, modes and chance outcomes; each advice copy preserves ordinary sequencing and history.
+Mana-producing triggered abilities can also declare `.produces_mana()` (Lotus Cobra's Landfall trigger). The
+query resolves their effect hypothetically without making a trigger event happen. The annotation leaves their
+ordinary stack/mana classification unchanged (CR 605.1b). Current intervening conditions are checked by the
+resolver; trigger-only conditions do not constrain what an ability would do if resolving now (CR 603.4, 106.7).
+Granted abilities keep their acquisition and text links for targeting, conditions and resolution (CR 607.5).
+Every supported legal target and ordered answer path is explored, without a trial or target-count budget.
+The actual Lotus Cobra made a Forest and actual Forest Deathrite with 43 legal land targets have regressions;
+capability reads leave state, history and the game-log tree untouched through all Query adapters.
+
+Actual pending/on-stack triggers supply their subject, data, members, acquisition and word context. No event
+is invented for an ability with no current triggering: missing numerical values use zero (CR 107.2), and missing
+objects/players remain absent. Subject-chosen targets without a current chooser report an explicit gap.
+
+Wizard's Rockets and Vivi Ornitier use shared executable color-combination recipes with capability contracts.
+An announced-X recipe denotes the entire positive-total family, independently of what can pay its activation;
+the current-power recipe reads layers and treats nonpositive/undetermined power as zero. Actual production asks
+successive wire-sized color batches and preserves every mana unit, including amounts above 255. Changing an
+`Adds` callback clears its recipe contract. Unbounded opaque callbacks require a new declared quantity rule.
+
+`triggered_mana_combination` constructs an executable preparation followed by a terminal color-combination
+instruction (CR 608.2c-d), rather than metadata about an opaque effect. Coalition Relic keeps counter removal
+in its card file and returns the actual removed count; both actual resolution and capability analysis run
+that preparation fully, with ordinary targets, conditions and advice-copy state. Actual play then uses the
+same full-width combination procedure as Wizard's Rockets and Vivi. A capability query records the terminal
+instruction's exact possible types for its resulting fixed total: zero gives none, any positive count gives
+each listed color. These are type facts, not sampled pools, and apply only to the outer generated effect.
+Nested or subsequent opaque callbacks retain normal execution and explicit unsupported-judgment gaps.
+Pentad Prism and storage lands remove counters as costs, so they are not peers for Coalition's removal effect;
+no shared counter-removal recipe or peer-card migration is inferred from similar Oracle words.
+
+Damping Sphere and the Contamination core fixture declare fixed-output/total-threshold replacements. Actual
+guard/application and the capability's quantity partition execute the same declaration; no independent amount
+callback can contradict it. The thresholds partition positive totals into equivalence classes, including the
+final unbounded interval. Within each class, replacement paths depend only on total comparisons and source
+qualification, and either preserve the original colors or yield a fixed pool. Each color's representative therefore
+denotes a whole class, with no guessed X witness or cutoff. All legal replacement orders and optional declines
+use the normal CR 614.5/616.1 procedure. A sacrificed source retains its land qualification through LKI.
+
+The registered ordinary activated/triggered mana producers carry `.produces_mana()` independently of timing.
+Capabilities still depend on each printed definition being exact: metadata cannot repair a faulty callback.
+A mana replacement without that declaration (Ritual of Subdual, Deep Water) is tried at one mana and at two of each
+color: each printed one reads no amount or only "two or more". Answers are tried as what they are - a slot's targets,
+cards and modes as sets, "any combination" colors as multisets - for at most 4,096 runs of one ability. A gap
+(an unsupported question kind or cost context, an X nothing bounds, more answers than that) never panics in a game:
+what was found stands beside what the ability lists, and under verification it panics so the first card to reach one
+fails its scenarios (KI-124).
 
 A delayed triggered ability can be a mana ability too (CR 603.7, 605.1b): "until end of turn, whenever you tap a Mountain
 for mana, add an additional {R}" (Molten Tide, High Tide, Bubbling Muck) is a `DelayedWhen::ThisTurn` ability whose def

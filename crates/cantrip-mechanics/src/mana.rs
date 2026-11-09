@@ -315,3 +315,39 @@ pub const fn mana_battery<const M: u8>(text: &'static str) -> [AbilityDef; 2] {
         .x_is_mana_amount(),
     ]
 }
+
+/// Adds `count` mana in any combination of the given colors (CR 106.1b, 106.4). Wizard's Rockets,
+/// Vivi Ornitier and Desolation of Smaug print this procedure with different counts or colors.
+/// Each request fits the existing wire count; successive requests preserve every ordered answer and
+/// every mana unit, including counts above 255. No first chunk is mistaken for the entire production.
+pub fn add_in_any_combination(g: &mut dyn Game, asker: &Asker, colors: ColorSet, count: u32) -> Result<(), Suspend> {
+    g.add_mana_in_any_combination(asker, colors, count)
+}
+
+fn add_announced_x<const COLORS: u8>(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    // X announced with the activation is local to it (CR 107.3a, 605.3a) and never replaces the source's own X;
+    // only an ability with no announced X of its own falls back to the quantity its source carries.
+    let count = g.mana_ability_x().unwrap_or(g.obj(asker.source).x);
+    add_in_any_combination(g, asker, ColorSet(COLORS), count)
+}
+
+fn add_current_power<const COLORS: u8>(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    let count = g.chars(asker.source).power.unwrap_or(0).max(0) as u32;
+    add_in_any_combination(g, asker, ColorSet(COLORS), count)
+}
+
+/// Wizard's Rockets' freely announced X in any combination of colors (CR 106.7, 107.3a, 605.3a).
+/// The same quantity/choice contract applies to any printed X producer using this exact recipe.
+pub const fn announced_x_in_any_combination<const COLORS: u8>() -> Adds {
+    assert!(COLORS > 0 && COLORS & !0b11111 == 0, "a combination needs at least one color");
+    Adds { capability: Some(ManaCapability::AnnouncedXCombination(ColorSet(COLORS))),
+        ..add_by(add_announced_x::<COLORS>) }
+}
+
+/// Vivi Ornitier's current-power variant of the same color-combination procedure used by
+/// Wizard's Rockets. A negative or undetermined amount adds none (CR 107.1b, 107.2).
+pub const fn current_power_in_any_combination<const COLORS: u8>() -> Adds {
+    assert!(COLORS > 0 && COLORS & !0b11111 == 0, "a combination needs at least one color");
+    Adds { capability: Some(ManaCapability::CurrentPowerCombination(ColorSet(COLORS))),
+        ..add_by(add_current_power::<COLORS>) }
+}

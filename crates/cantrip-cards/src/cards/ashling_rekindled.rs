@@ -35,7 +35,7 @@ fn add_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static BACK: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask(EventMask::TRANSFORMED.0 | EventMask::STEP_BEGAN.0), transforms_or_first_main), add_mana, "Whenever this creature transforms into Ashling, Rimebound and at the beginning of your first main phase, add two mana of any one color. Spend this mana only to cast spells with mana value 4 or greater."),
+        triggered(when(EventMask(EventMask::TRANSFORMED.0 | EventMask::STEP_BEGAN.0), transforms_or_first_main), add_mana, "Whenever this creature transforms into Ashling, Rimebound and at the beginning of your first main phase, add two mana of any one color. Spend this mana only to cast spells with mana value 4 or greater.").produces_mana(),
         triggered(triggers::YOUR_FIRST_MAIN_PHASE, pay_red, "At the beginning of your first main phase, you may pay {R}. If you do, transform Ashling."),
     ],
     ..oracle::ASHLING_RIMEBOUND

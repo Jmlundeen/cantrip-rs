@@ -16,7 +16,7 @@ use cantrip_state::*;
 
 use crate::card::*;
 use crate::event::EventMask;
-use crate::game::Game;
+use crate::game::{Game, Suspend};
 use crate::replace::{GrantedApplies, GrantedApply, GrantedDamage, GrantedReplacementDef, GrantedThen, ReplacementApplies, ReplacementApply, ReplacementDamage, ReplacementDef, ReplacementKind, ReplacementThen};
 
 /// The tap symbol, {T} (CR 107.5).
@@ -280,6 +280,7 @@ pub const fn mana_ability(cost: Cost, adds: Adds, text: &'static str) -> Ability
         text,
         cost,
         mana: adds.effect,
+        mana_capability: adds.capability,
         adds: adds.pool,
         adds_any: adds.any,
         any_color: adds.any_color,
@@ -360,6 +361,18 @@ pub const fn triggered(trigger: Trigger, effect: Effect, text: &'static str) -> 
     })
 }
 
+/// A triggered effect whose preparation determines a full-width mana count, followed only by
+/// independently choosing each unit's color (CR 106.4, 608.2c-d). This constructs the actual effect
+/// and its hypothetical terminal authority together; it does not annotate an opaque effect.
+/// The trigger retains ordinary timing and conditions (CR 603.4, 605.1b).
+pub const fn triggered_mana_combination(trigger: Trigger,
+    prepare: fn(&mut dyn Game, &StackItem) -> Result<u32, Suspend>, colors: ColorSet, text: &'static str) -> AbilityDef {
+    assert!(colors.0 > 0 && colors.0 & !0b11111 == 0, "a combination needs at least one color");
+    AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches,
+        asked: trigger.asked, functions: trigger.functions, produces_mana: true,
+        mana_combination: Some(ManaCombinationEffect { prepare, colors }), ..TriggeredDef::BLANK })
+}
+
 /// A state-triggered ability (CR 603.8): "when [a game state is true], [effect]". It triggers as soon as `state` holds of
 /// its source, and not again until it has left the stack; then, if its source is still there and the state still holds, it
 /// triggers again. Mazemind Tome ("when there are four or more page counters on this artifact"), Dandân ("when you control
@@ -426,6 +439,16 @@ pub const fn chapter(n: u8, effect: Effect, text: &'static str) -> AbilityDef {
 /// What a mana ability adds (CR 106.4): mana of kinds it lists, mana of one color chosen as it is activated, or what an
 /// effect of the card's own adds.
 #[derive(Clone, Copy)]
+pub enum ManaCapability {
+    /// Exactly X mana, with each unit independently one of these colors, for freely announced X
+    /// (CR 106.7, 107.3a). This is a recipe contract, never an estimate from selected X witnesses.
+    AnnouncedXCombination(ColorSet),
+    /// Exactly the source's current nonnegative power mana, independently in these colors.
+    /// Power is read through layers at resolution (Vivi Ornitier, CR 208.2, 608.2h).
+    CurrentPowerCombination(ColorSet),
+}
+
+#[derive(Clone, Copy)]
 pub struct Adds {
     pub pool: ManaPool,
     /// How many mana of the one color chosen as the ability is activated (CR 106.5).
@@ -438,10 +461,11 @@ pub struct Adds {
     /// The card's own effect, where the ability does more than add the mana listed: the listing is then only what
     /// anyone may know of it before it is activated.
     pub effect: Option<ManaEffect>,
+    pub capability: Option<ManaCapability>,
 }
 
 impl Adds {
-    const NOTHING: Adds = Adds { pool: ManaPool([0; 6]), any: 0, any_color: false, colors: ColorSet::NONE, restricted: None, effect: None };
+    const NOTHING: Adds = Adds { pool: ManaPool([0; 6]), any: 0, any_color: false, colors: ColorSet::NONE, restricted: None, effect: None, capability: None };
 
     /// "Spend this mana only ..." (CR 106.6): the mana goes to the pool apart from unrestricted mana.
     /// A restriction of card types that is not one of `ManaRestriction::NAMED` fails the build.
@@ -470,7 +494,7 @@ impl Adds {
     /// What the card's own effect adds, listed as this: "{T}: Add {G} for each creature you control" is
     /// `add(Mana::G).by(green_for_each_creature)`.
     pub const fn by(self, effect: ManaEffect) -> Adds {
-        Adds { effect: Some(effect), ..self }
+        Adds { effect: Some(effect), capability: None, ..self }
     }
 }
 
@@ -562,6 +586,17 @@ impl AbilityDef {
             AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { targets, ..d }),
             AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { targets, ..t }),
             AbilityDef::Static(_) | AbilityDef::PlayRule(_) | AbilityDef::RegenerationBan(_) | AbilityDef::BlockAllowance(_) => panic!("a static ability has no targets"),
+        }
+    }
+
+    /// An ability whose effect can add mana (CR 106.7): Deathrite Shaman's targeted land ability,
+    /// Chandra, Torch of Defiance's loyalty ability, or Lotus Cobra's Landfall trigger. This metadata
+    /// preserves its mana-ability classification and ordinary timing (CR 605.1a-b).
+    pub const fn produces_mana(self) -> AbilityDef {
+        match self {
+            AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { produces_mana: true, ..d }),
+            AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { produces_mana: true, ..t }),
+            AbilityDef::Static(_) | AbilityDef::PlayRule(_) | AbilityDef::RegenerationBan(_) | AbilityDef::BlockAllowance(_) => panic!("only an activated or triggered ability produces mana"),
         }
     }
 
@@ -1113,6 +1148,14 @@ impl StaticDef {
 /// reshapes it. `hint` is what it does in a few words.
 pub const fn replacement(kind: ReplacementKind, applies: ReplacementApplies, apply: ReplacementApply, hint: &'static str) -> ReplacementDef {
     ReplacementDef { hint, kind, applies, apply, ..ReplacementDef::BLANK }
+}
+
+/// A printed total-quantity condition and fixed replacement output, shared by Damping
+/// Sphere and Contamination. Both play and capability evaluation execute this contract.
+pub const fn fixed_mana_replacement(minimum: u32, source: crate::ManaReplacementSource, mana: Mana, amount: u32, hint: &'static str) -> ReplacementDef {
+    ReplacementDef { hint, kind: ReplacementKind::ManaProduction,
+        fixed_mana: Some(crate::FixedManaReplacement { minimum, source, mana, amount }),
+        ..ReplacementDef::BLANK }
 }
 
 impl ReplacementDef {

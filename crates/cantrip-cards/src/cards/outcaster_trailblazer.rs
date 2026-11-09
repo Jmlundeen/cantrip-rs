@@ -15,7 +15,7 @@ fn another_creature_with_power_four_enters(q: &dyn Query, me: &Asker, event: &Ev
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::THIS_ENTERS, effects::add_one_mana_of_any_color, "When this creature enters, add one mana of any color."),
+        triggered(triggers::THIS_ENTERS, effects::add_one_mana_of_any_color, "When this creature enters, add one mana of any color.").produces_mana(),
         triggered(
             when_asked(EventMask::ZONE_CHANGE, another_creature_with_power_four_enters),
             |g, item| effects::draw(g, item, 1),

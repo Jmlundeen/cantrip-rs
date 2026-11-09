@@ -28,7 +28,7 @@ fn dragons(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), rummage, "+1: You may discard a card. If you do, draw a card."),
-        ability(loyalty(1), dragon_mana, "+1: Add two mana in any combination of colors. Spend this mana only to cast Dragon spells."),
+        ability(loyalty(1), dragon_mana, "+1: Add two mana in any combination of colors. Spend this mana only to cast Dragon spells.").produces_mana(),
         ability(loyalty(-7), dragons, "\u{2212}7: Create four 5/5 red Dragon creature tokens with flying."),
     ],
     ..oracle::SARKHAN_FIREBLOOD

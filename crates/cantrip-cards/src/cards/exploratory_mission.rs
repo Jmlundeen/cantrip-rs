@@ -28,7 +28,7 @@ pub static CARD: CardDef = CardDef {
         triggers::LANDFALL,
         landfall,
         "Landfall — Whenever a land you control enters, put a quest counter on this enchantment. Then exile cards from the top of your library until you exile a nonland card. You may play that card this turn. If this enchantment has five or more quest counters on it, add {R}{R}.",
-    )],
+    ).produces_mana()],
     ..oracle::EXPLORATORY_MISSION
 };
 

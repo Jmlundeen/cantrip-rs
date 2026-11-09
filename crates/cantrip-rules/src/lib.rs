@@ -204,6 +204,9 @@ mod effect_text_tests;
 mod mana_cost_change_tests;
 #[cfg(test)]
 mod mana_replacement_tests;
+
+#[cfg(test)]
+mod mana_producible_tests;
 #[cfg(test)]
 mod replacement_instruction_tests;
 #[cfg(test)]
@@ -329,6 +332,11 @@ pub struct Game {
     /// The current immediate mana ability's history anchors (CR 605.3, 611.2b), scoped with its activation X.
     /// Bookkeeping of this call, never per-card remembered state; nested abilities restore the enclosing interval.
     mana_interval: Option<ManaInterval>,
+    /// The permanent dependencies currently being read for CR 106.7. Bookkeeping of a query, not game state:
+    /// a dependency with no independently defined output supplies no type (CR 106.5).
+    pub(crate) producible_path: std::cell::RefCell<Vec<ObjectId>>,
+    /// Chance outcomes tried by a CR 106.7 advice run, independent of the real game's random generator.
+    pub(crate) hypothetical_chance: Option<actions::HypotheticalChance>,
     /// What the run under way has done with mana abilities, for taking an action back without reversing the ones that may
     /// not be (`takeback`, CR 733.1). Bookkeeping of a run, not of the game.
     pub(crate) takeback: takeback::Takeback,
@@ -407,7 +415,7 @@ impl Clone for Game {
             history_end: self.history_end,
             check: StateCheck::NONE,
             spells_as_cast: Default::default(),
-            own_text: Default::default(), effect_words: Default::default(), mana_activation_x: None, mana_interval: None,
+            own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None,
             takeback: Default::default(),
         }
     }
@@ -428,7 +436,8 @@ impl Game {
             history_end: self.history_end,
             check: StateCheck::NONE,
             spells_as_cast: Default::default(),
-            own_text: Default::default(), effect_words: Default::default(), mana_activation_x: None, mana_interval: None,
+            own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None,
+            effect_words: Default::default(), mana_activation_x: None, mana_interval: None,
             takeback: Default::default(),
         }
     }
@@ -567,7 +576,7 @@ impl Game {
             t.priority = chooser;
         });
 
-        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
+        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
         // CR 103.2b: the companion chosen as the deck was built is revealed once the starting player is known, if the starting
         // deck - the library as dealt - fulfils its condition; one that doesn't is a sideboard card, and nothing is said of it.
         for (p, id) in companions {
@@ -1011,7 +1020,7 @@ impl Game {
         let state = self.state.clone_with_journal_from(floor);
         let root = self.tree.next();
         let tree = tree::Tree::rooted(root, (state.mark(), self.log.len()));
-        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() }
+        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() }
     }
 
     /// Gives the game's generator another seed (`GameState::reseed`): a fork for search that must not shuffle or roll
@@ -1653,7 +1662,7 @@ impl<'a> Cx<'a> {
     fn flip_together(&mut self, player: PlayerId, n: u32, natural: fn(bool) -> CoinFlip) -> Vec<CoinFlip> {
         let fixed = static_rules::coin_flips_won_on_heads(self, self.cards(), player);
         let results: Vec<CoinFlip> =
-            (0..n).map(|_| if fixed { CoinFlip::WonHeads } else { natural(self.g.state.roll_die(2) == 1) }).collect();
+            (0..n).map(|_| if fixed { CoinFlip::WonHeads } else { natural(self.roll_face(2) == 1) }).collect();
         let events: Vec<Event> = results.iter().map(|&result| Event::CoinFlipped { player, result }).collect();
         self.emit_batch(&events, None);
         results
@@ -1673,6 +1682,23 @@ impl<'a> Cx<'a> {
 
     /// Records an event in the history without looking for triggers: the records no ability triggers on, or an event
     /// whose triggers are collected separately at the time the rules require.
+    /// Random choices in a hypothetical resolution branch over every possible outcome (CR 106.7, 705, 706).
+    /// Actual games keep their ordinary generator and scripted faces.
+    fn roll_face(&mut self, sides: u32) -> u32 {
+        if let Some(chance) = self.g.hypothetical_chance.as_mut() {
+            chance.choose(sides, self.cursor) + 1
+        } else {
+            self.g.state.roll_die(sides)
+        }
+    }
+
+    pub(crate) fn random_below(&mut self, bound: u32) -> u32 {
+        if let Some(chance) = self.g.hypothetical_chance.as_mut() {
+            chance.choose(bound, self.cursor)
+        } else {
+            self.g.state.random(bound)
+        }
+    }
     pub fn record(&mut self, event: Event) {
         let turn = self.g.state.turn;
         let cause = self.cause();
@@ -1755,13 +1781,13 @@ impl<'a> Cx<'a> {
         }
     }
 
-    /// Holds mana added to a pool as part of the production of a permanent tapped for mana (`Cx::producing`), whoever's pool
-    /// it goes to: whether it was, rather than added now.
+    /// Records mana being judged (`Cx::producing`), whoever's pool it goes to. A mana source holds it whole for tap
+    /// replacements; a hypothetical stack resolution also adds it to its private pool for later instructions.
     fn hold(&mut self, produced: Produced) -> bool {
         match &mut self.producing {
             Some(held) if produced.amount > 0 => {
                 held.push(produced);
-                true
+                self.mana_source.is_some()
             }
             _ => false,
         }
@@ -1871,6 +1897,10 @@ impl Query for Game {
         ops::can_untap(self, self.cards, permanent)
     }
 
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        actions::producible_types_in(self, permanent)
+    }
+
     fn state(&self) -> &GameState {
         &self.state
     }
@@ -1936,6 +1966,10 @@ impl Query for Cx<'_> {
 
     fn mana_ability_x(&self) -> Option<u32> {
         self.g.mana_activation_x
+    }
+
+    fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
+        actions::producible_types(self, permanent)
     }
 
     fn state(&self) -> &GameState {
@@ -2615,7 +2649,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn roll_die_modified(&mut self, player: PlayerId, sides: u32, modifier: i32) -> Roll {
-        let natural = self.g.state.roll_die(sides);
+        let natural = self.roll_face(sides);
         let result = natural as i32 + modifier;
         self.emit(Event::DieRolled { player, sides: sides as u8, natural: natural as u8, result: result as i32 });
         Roll { natural, result }
@@ -2625,7 +2659,7 @@ impl cantrip_api::Game for Cx<'_> {
         if count <= 1 {
             return 0;
         }
-        let index = if count <= 20 { self.g.state.roll_die(count as u32) as usize - 1 } else { self.g.state.random(count as u32) as usize };
+        let index = if count <= 20 { self.roll_face(count as u32) as usize - 1 } else { self.random_below(count as u32) as usize };
         self.emit(Event::ChosenAtRandom { count: count_u32(count), index: count_u32(index) });
         index
     }
@@ -2642,7 +2676,7 @@ impl cantrip_api::Game for Cx<'_> {
         if bound <= 1 {
             return 0;
         }
-        self.g.state.random(bound)
+        self.random_below(bound)
     }
 
     fn place_in_library(&mut self, card: ObjectId, from_top: usize) {
@@ -2864,6 +2898,10 @@ impl cantrip_api::Game for Cx<'_> {
         let source = self.mana_source();
         takeback::produced(self.g, source);
         self.g.state.add_mana(player, mana, amount, source, None, ManaLasts::Step, snow);
+    }
+
+    fn add_mana_in_any_combination(&mut self, asker: &Asker, colors: ColorSet, count: u32) -> Result<(), Suspend> {
+        actions::add_in_any_combination(self, asker, colors, count)
     }
 
     fn become_day(&mut self) -> Result<(), Suspend> {
