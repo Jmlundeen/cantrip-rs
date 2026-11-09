@@ -1,0 +1,34 @@
+# Command Beacon's second ability (CR 903.3, 903.9b): with two designated commanders in Bot1's command zone, Bot1
+# chooses one to put into hand; the other stays in the command zone, as does Bot2's commander. (The scenario harness does
+# not validate deck construction, so the pair need not be printed partners; the two-commander choice is the point.) The
+# land taps for {C} first and later pays {T} and sacrifices itself, so the pool is empty after each payment.
+
+[Format]
+Commander
+[Bot1 Commander]
+Rograkh, Son of Rohgahh
+Kytheon, Hero of Akros
+[Bot2 Commander]
+Raging Goblin
+[Bot1 Deck]
+Command Beacon
+Mountain x39
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Command Beacon.Play
+Bot1.Battlefield.Command Beacon.Activate(Ability: {C})
+? Bot1.Mana = {C}
+[T3 Bot1.Main1]
+Bot1.Battlefield.Command Beacon.Activate(Ability: Put your commander)
+! Bot1.Choose(Raging Goblin)
+Bot1.Choose(Kytheon, Hero of Akros)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Command = Rograkh, Son of Rohgahh
+Bot1.Command.Count = 1
+Bot2.Command = Raging Goblin
+Bot1.Hand.Count = 8
+Bot1.Battlefield.Command Beacon = (absent)
+Bot1.Graveyard = Command Beacon
