@@ -1655,7 +1655,7 @@ counter_kinds! {
     Storage = 88, "storage", "Storage";
     Tide = 89, "tide", "Tide";
     Music = 90, "music", "Music";
-
+    Vow = 91, "vow", "Vow";
 }
 
 impl CounterKind {
@@ -2333,7 +2333,8 @@ mod carrion_counter_tests {
         assert_eq!(CounterKind::Music as usize, 90);
         assert_eq!(CounterKind::Film as usize, 64);
         assert_eq!(CounterKind::Peace as usize, 65);
-        assert_eq!(CounterKind::COUNT, 91);
+        assert_eq!(CounterKind::Vow as usize, 91);
+        assert_eq!(CounterKind::COUNT, 92);
         assert!(!CounterKind::POWER_TOUGHNESS.iter().any(|(kind, _, _)| *kind == carrion));
     }
 }

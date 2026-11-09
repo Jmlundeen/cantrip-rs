@@ -671,13 +671,13 @@ fn restrictors_allow(q: &dyn Query, restrictors: &[(Asker, &'static CardDef)], c
 /// you", Storm, Windrider). A creature none of whose attacks is left can't attack at all.
 pub fn attacks_barred(q: &dyn Query, cards: &CardTable, creatures: &[ObjectId], targets: &[Target]) -> Vec<(ObjectId, Target)> {
     let restrictors = attack_restrictors(q, cards);
+    let mut barred = lasting_rules_barring_attacks(q, cards, creatures, targets);
     if restrictors.is_empty() {
-        return Vec::new();
+        return barred;
     }
-    let mut barred = Vec::new();
     for &creature in creatures {
         for &at in targets {
-            if !restrictors_allow(q, &restrictors, creature, at) {
+            if !restrictors_allow(q, &restrictors, creature, at) && !barred.contains(&(creature, at)) {
                 barred.push((creature, at));
             }
         }
@@ -685,29 +685,34 @@ pub fn attacks_barred(q: &dyn Query, cards: &CardTable, creatures: &[ObjectId], 
     barred
 }
 
-/// What the rules about an open set of objects that resolved spells and abilities made (CR 611.2c, `EffectKind::LastingRule`)
-/// forbid `creatures` to attack among `targets` (CR 508.1c): for each such rule of `LastingRuleKind::CantAttackYou` whose
-/// set takes the creature in as it is now, the attack on the player the effect's words named as its "you" - that player
-/// only, never a planeswalker or battle. A rule of the game, not an ability of the creature or of the source, so it holds
-/// whatever abilities either has lost (CR 613.1f) and outlives the source (CR 611.2a); its set is asked as the attackers are
-/// declared, so a creature that arrives under it later is under it too. Chronomantic Escape's "until your next turn,
-/// creatures can't attack you".
-pub fn lasting_rules_barring_attacks(
-    q: &dyn Query,
-    cards: &'static CardTable,
-    creatures: &[ObjectId],
-    targets: &[Target],
-) -> Vec<(ObjectId, Target)> {
+/// Attacks forbidden by resolved rules (CR 508.1c, 611.2c): Chronomantic Escape's open set is asked
+/// as attackers are declared; Promise of Loyalty names individual objects. Neither grants an ability,
+/// and both outlive their source. The named player is fixed on resolution; their planeswalkers, if the
+/// wording includes them, are read under their current controller and types. Battles are not included.
+pub fn lasting_rules_barring_attacks(q: &dyn Query, cards: &CardTable, creatures: &[ObjectId], targets: &[Target]) -> Vec<(ObjectId, Target)> {
     let mut barred = Vec::new();
-    if q.state().effects.is_empty() {
-        return barred;
-    }
-    for &creature in creatures {
-        for e in lasting_rules_on(q, cards, creature, LastingRuleKind::CantAttackYou) {
-            let EffectKind::LastingRule { about: Target::Player(you), .. } = e.kind else { continue };
-            let at = Target::Player(you);
-            if targets.contains(&at) && !barred.contains(&(creature, at)) {
-                barred.push((creature, at));
+    for e in &q.state().effects {
+        let (player, planeswalkers) = match e.kind {
+            EffectKind::CantAttackPlayer { player, planeswalkers } => (player, planeswalkers),
+            EffectKind::LastingRule { card, index, about: Target::Player(player) }
+                if cards.get(card).lasting_rules.get(index as usize).is_some_and(|r| r.rule == LastingRuleKind::CantAttackYou) => (player, false),
+            _ => continue,
+        };
+        for &creature in creatures {
+            let applies = match e.kind {
+                EffectKind::CantAttackPlayer { .. } => e.affected == creature,
+                EffectKind::LastingRule { card, index, about } =>
+                    (cards.get(card).lasting_rules[index as usize].applies)(q, &Asker::new(e.source, e.controller), about, creature),
+                _ => unreachable!(),
+            };
+            if !applies { continue; }
+            for &at in targets {
+                let protected = match at {
+                    Target::Player(p) => p == player,
+                    Target::Object(id) => planeswalkers && q.controller(id) == player && q.chars(id).is(CardType::Planeswalker),
+                    _ => false,
+                };
+                if protected && !barred.contains(&(creature, at)) { barred.push((creature, at)); }
             }
         }
     }
@@ -718,11 +723,12 @@ pub fn lasting_rules_barring_attacks(
 /// or `targets` is empty; the targets are worked out only where some permanent restricts attacking.
 pub fn attack_rules_allow_any(q: &dyn Query, cards: &CardTable, creature: ObjectId, targets: impl FnOnce() -> Vec<Target>) -> bool {
     let restrictors = attack_restrictors(q, cards);
-    if restrictors.is_empty() {
+    if restrictors.is_empty() && q.state().effects.is_empty() {
         return true;
     }
     let targets = targets();
-    targets.is_empty() || targets.iter().any(|&at| restrictors_allow(q, &restrictors, creature, at))
+    let barred = lasting_rules_barring_attacks(q, cards, &[creature], &targets);
+    targets.is_empty() || targets.iter().any(|&at| !barred.contains(&(creature, at)) && restrictors_allow(q, &restrictors, creature, at))
 }
 
 /// The requirements to block that the static abilities of the permanents on the battlefield with their abilities (CR 613.1f)

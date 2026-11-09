@@ -1552,6 +1552,10 @@ pub enum EffectKind {
     CantActivatePowerUp,
     /// "Can't attack" (CR 508.1c) for as long as the effect lasts: a restriction on declaring the creature as an attacker.
     CantAttack,
+    /// "Can't attack [player]", optionally "or planeswalkers [player] controls" (CR 508.1c, 611.2c).
+    /// A rule on the named object, not an ability: changing control or losing abilities does not end it.
+    /// Promise of Loyalty; Chronomantic Escape uses the open-set `LastingRuleKind::CantAttackYou` counterpart.
+    CantAttackPlayer { player: PlayerId, planeswalkers: bool },
     /// "It can't be sacrificed" (CR 101.2, 701.21a) for as long as the effect lasts (Slicer, Hired Muscle's "this turn"): as
     /// `Keyword::CantBeSacrificed`, but an effect, not an ability, so a permanent that loses its abilities is still under it.
     CantBeSacrificed,

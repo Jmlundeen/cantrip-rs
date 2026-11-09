@@ -33,6 +33,8 @@ mod attack_limit_tests;
 #[cfg(test)]
 mod attack_restriction_tests;
 #[cfg(test)]
+mod lasting_attack_tests;
+#[cfg(test)]
 mod attack_option_tests;
 #[cfg(test)]
 mod attacking_tokens_tests;

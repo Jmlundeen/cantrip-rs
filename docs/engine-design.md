@@ -3003,9 +3003,11 @@ under caps never offer or choose one; the brute-force tests in `cantrip_state::a
 declaration there is, with and without forbidden attacks. The host fills the prompt's `Forbidden` pairs with them, which the
 clients already read (`AttacksFor`, the tactical bot, "Attack with all"), and the AI's ask carries them (`barred`) to mask
 those attacks. It is judged as attackers are declared: an attacking creature whose condition fails later, or that gains
-flying, stays attacking what it attacks (CR 506.4, Patchwork Beastie's ruling). Not built, as no implemented card needs it
-yet: a resolved effect that forbids one attack ("until your next turn, creatures can't attack you", Chronomantic Escape),
-which would be an `EffectKind` read beside `CantAttack` into the same `barred`. The benchmark, three runs alternating with origin/main on a shared machine (2026-10-29): 15.10, 14.83, 14.73 us per
+flying, stays attacking what it attacks (CR 506.4, Patchwork Beastie's ruling). A resolved restriction enters the same `barred` through `EffectKind::CantAttackPlayer`: a fixed creature and player,
+optionally that player's current planeswalkers (Promise of Loyalty). It is a rule, survives losing abilities and
+changing control, and never restricts battles. `Duration::WhileCounter` permanently removes it when the last vow
+counter is removed; readding a counter cannot restart an ended duration (CR 611.2b). The canonical Chronomantic Escape
+reader uses `LastingRuleKind::CantAttackYou` for an open set of creatures and the fixed player alone (CR 611.2c). The benchmark, three runs alternating with origin/main on a shared machine (2026-10-29): 15.10, 14.83, 14.73 us per
 decision after against 14.39, 15.32, 14.49 us before - lost in the noise, as nothing new runs while no permanent restricts
 attacking.
 
