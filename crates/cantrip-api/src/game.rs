@@ -172,6 +172,21 @@ fn mana_value_with_x(card: &dyn Fn(CardId) -> &'static CardDef, obj: &Obj, c: &C
 /// Reading the game.
 pub trait Query {
     fn state(&self) -> &GameState;
+    /// The combined pregame color identities of `player`'s designated commanders (CR 903.4a, 903.4f; two commanders,
+    /// CR 702.124c). None is no commander; Some(NONE) is a colorless identity. Neither contains colorless mana.
+    /// Arcane Signet, Command Tower, Commander's Sphere and Path of Ancestry use this same quality.
+    fn commander_color_identity(&self, player: PlayerId) -> Option<ColorSet> {
+        let mut roots: Vec<ObjectId> = Vec::new();
+        let mut identity = ColorSet::NONE;
+        for (index, o) in self.state().objects.iter().enumerate() {
+            if !o.commander || o.owner != player { continue; }
+            let root = o.commander_id.unwrap_or(ObjectId(index as u32));
+            if roots.contains(&root) { continue; }
+            roots.push(root);
+            identity = ColorSet(identity.0 | self.card(o.card).color_identity.0);
+        }
+        (!roots.is_empty()).then_some(identity)
+    }
 
     /// The "defending player" of `attacker`, an attacking creature or one that attacked (CR 508.5, 310.9d): the player it
     /// attacks, or the controller of the planeswalker or the protector of the battle it attacks, as it began attacking

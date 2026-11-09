@@ -427,7 +427,8 @@ fn face_fields(card: &Card, is_back: bool, source: &str, known: &HashSet<String>
             if !keywords.contains(&keyword) { keywords.push(keyword); }
         }
     }
-    let mut fields = vec![format!("    name: {},", rust_str(&name))];
+    let mut fields = vec![format!("    name: {},", rust_str(&name)),
+        format!("    color_identity: ColorSet({}),", color_identity(card))];
     match mana {
         Some(m) => fields.push(format!("    cost: {m},")),
         None => fields.push("    has_cost: false,".into()),
@@ -587,4 +588,38 @@ mod landwalk_tests {
         assert!(fields.contains(&"    keywords: Keywords::of(&[Keyword::Desertwalk]),".into()));
         assert!(!is_plain(card.as_object().unwrap()), "the prevention still needs card behavior");
     }
+}
+
+/// CR 903.4: mana symbols (not reminder text), indicators and color-defining abilities,
+/// over every face and alternative characteristic. Devoid never subtracts an identity color.
+fn color_identity(card: &Card) -> u32 {
+    let mut colors = 0;
+    let text = without_reminder(&str_of(card, "oracleText"));
+    for words in [str_of(card, "manaCost"), text.clone()] {
+        for symbol in words.split('{').skip(1).filter_map(|s| s.split_once('}').map(|(body, _)| body)) {
+            for part in symbol.split('/') {
+                if let Some(at) = ["W", "U", "B", "R", "G"].iter().position(|c| *c == part) { colors |= 1 << at; }
+            }
+        }
+    }
+    for color in card.get("colorIndicator").and_then(Value::as_array).into_iter().flatten().filter_map(Value::as_str) {
+        if let Some(at) = COLOR_NAMES.iter().position(|c| *c == color) { colors |= 1 << at; }
+    }
+    let defines = format!("{} is ", str_of(card, "name"));
+    for line in text.lines().filter_map(|l| l.strip_prefix(&defines)) {
+        let definition = line.split('.').next().unwrap_or("");
+        if definition == "all colors" { colors |= 31; }
+        else {
+            for (at, color) in COLOR_NAMES.iter().enumerate() {
+                if definition.split(|c: char| !c.is_ascii_alphabetic()).any(|w| w == color.to_ascii_lowercase()) { colors |= 1 << at; }
+            }
+        }
+    }
+    for key in ["backFace", "adventure", "omen", "prototype"] {
+        if let Some(face) = card.get(key).and_then(Value::as_object) { colors |= color_identity(face); }
+    }
+    for face in card.get("halves").and_then(Value::as_array).into_iter().flatten().filter_map(Value::as_object) {
+        colors |= color_identity(face);
+    }
+    colors
 }

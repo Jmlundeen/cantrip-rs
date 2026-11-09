@@ -3235,6 +3235,9 @@ pub type CompanionCondition = fn(&dyn Query, &StartingDeck) -> bool;
 /// A card: characteristics from the Oracle data, behavior as code.
 #[derive(Clone, Copy)]
 pub struct CardDef {
+    /// This physical card's pregame color identity (CR 903.4), including every face and alternative characteristic.
+    /// Arcane Signet and Command Tower read it through the Commander query, never the current colors.
+    pub color_identity: ColorSet,
     pub name: &'static str,
     /// Whether these are a card's characteristics, generated from its Oracle data (a face of a card included), rather than
     /// a token's or an emblem's written in code: only a card's name may be chosen as a card name (CR 201.4, 114.5). The
@@ -3748,6 +3751,7 @@ impl CardDef {
         cost: ManaCost::ZERO,
         has_cost: true,
         colors: None,
+        color_identity: ColorSet::NONE,
         types: TypeSet::NONE,
         supertypes: Supertypes { basic: false, legendary: false, snow: false },
         subtypes: SubtypeSet::NONE,
