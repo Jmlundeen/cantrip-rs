@@ -30,6 +30,19 @@ fn creature_planeswalker_or_battle_filter(q: &dyn Query, _: &Asker, t: Target) -
 /// the Source and Tandem Takedown print it.
 pub const CREATURE_PLANESWALKER_OR_BATTLE: TargetSpec = target(creature_planeswalker_or_battle_filter);
 
+fn is_rule_source(_: &dyn LayerQuery, source: ObjectId, subject: ObjectId) -> bool {
+    subject == source
+}
+
+fn aura_spells_cant_target(q: &dyn LayerQuery, source: ObjectId, by: &Asker, by_source: &Chars) -> bool {
+    by.spell && by_source.has_subtype(q.words(source).subtype(Subtype::Aura))
+}
+
+/// "[This creature] can't be the target of Aura spells" (CR 303.4a, 604.1) as a `CardDef::targeting_rules` entry: an Aura spell
+/// (the Aura word read through the rule source's words, CR 612) can't target its source. Bartel Runeaxe and Tetsuo Umezawa print it.
+pub const CANT_BE_TARGET_OF_AURA_SPELLS: TargetingRule =
+    TargetingRule { kind: TargetingRuleKind::Forbid(aura_spells_cant_target), applies: is_rule_source };
+
 pub fn creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Creature))
 }
