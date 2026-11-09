@@ -94,6 +94,25 @@ pub fn all_combat_damage_dealt_by_target_this_turn(g: &mut dyn Game, item: &Stac
     Ok(())
 }
 
+/// "Prevent all damage that would be dealt by target creature this turn. That creature gets +0/+X until end of turn, where X is
+/// its mana value" (CR 615.1, 608.2h, 611.2a), for the creature the resolving ability or spell targeted in slot 0, if it is
+/// still a legal target (CR 608.2b): the prevention, then (CR 608.2c) the toughness. The card lists its prevention (all damage,
+/// `DAMAGE_DEALT_BY`, or all combat damage, `COMBAT_DAMAGE_DEALT_BY`) first in its `granted_preventions`. Kry Shield and Subdue
+/// print it.
+pub fn prevent_damage_by_target_then_toughness_equal_to_mana_value(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    g.add_effect(
+        item.object,
+        creature,
+        EffectKind::Prevention { card: item.ability.card, index: 0, to: Target::None, shield: Shield::All },
+        Duration::EndOfTurn,
+    );
+    g.end_sentence();
+    let toughness = g.mana_value(creature) as i32;
+    g.add_effect(item.object, creature, EffectKind::Pump(0, toughness), Duration::EndOfTurn);
+    Ok(())
+}
+
 /// Makes the prevention effect the resolving spell or ability's card lists `index`th in its `granted_preventions`, of damage
 /// to `to` (`Target::None` for damage to anyone), until end of turn: all of it, or the next N (CR 615.7).
 pub fn this_turn(g: &mut dyn Game, item: &StackItem, to: Target, index: u8, shield: Shield) {
