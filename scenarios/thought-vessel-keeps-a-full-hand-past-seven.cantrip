@@ -1,0 +1,40 @@
+# Thought Vessel: "You have no maximum hand size" (CR 402.2) plus "{T}: Add {C}" (CR 605.1a). Bot1 casts it on
+# turn 1 off two Moxes and taps it for exactly one colorless mana, then draws without playing anything: its hand grows
+# past seven and the turn-9 cleanup discards nothing, while Bot2, without the Vessel, discards down to seven every turn.
+
+[Bot1 Deck]
+Thought Vessel
+Mox Pearl
+Mox Sapphire
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Vessel.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Thought Vessel.Activate
+? Bot1.Mana = {C}
+? Bot1.Battlefield.Thought Vessel.Tapped = true
+[T3 Bot1.Main1]
+? Bot2.Hand.Count = 7
+[T5 Bot1.Main1]
+[T7 Bot1.Main1]
+[T9 Bot1.Main1]
+[T10 Bot2.Main1]
+
+[Expect]
+Bot1.Hand.Count = 8
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Thought Vessel
