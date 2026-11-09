@@ -12,13 +12,20 @@
 
 use cantrip_api::*;
 
-fn suspend(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let card = item.object;
-    let count = g.card(g.obj(card).card).suspend.map_or(0, |s| s.count);
+/// "Exile [this card] with N time counters on it" (CR 702.62a, 122.1): the card is exiled and, only if it really is in exile
+/// afterwards (a replacement effect may have sent it elsewhere), the counters go on the object it became there. The special
+/// action of suspend and the resolving spells that print it - Chronomantic Escape and Rousing Refrain, Arc Blade, Cyclical
+/// Evolution - exile their own card this way.
+pub fn exile_with_time_counters(g: &mut dyn Game, card: ObjectId, count: u8) {
     let exiled = g.exile(card);
     if g.obj(exiled).zone.is(ZoneKind::Exile) {
-        g.add_counters(exiled, CounterKind::Time, count as i32);
+        g.add_counters(exiled, CounterKind::Time, i32::from(count));
     }
+}
+
+fn suspend(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let count = g.card(g.obj(item.object).card).suspend.map_or(0, |s| s.count);
+    exile_with_time_counters(g, item.object, count);
     Ok(())
 }
 
