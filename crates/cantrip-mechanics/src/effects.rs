@@ -959,6 +959,15 @@ pub fn gain_that_much_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
     gain_life(g, item, item.data[0].min(i32::MAX as u32) as i32)
 }
 
+/// "{cost}: Target creature gets +`P`/+`T` for as long as this artifact remains tapped" (CR 611.2a, 608.2b): the creature the
+/// resolving ability targeted in slot 0, if it is still a legal target. Ashnod's Battle Gear (+2/-2) and Tawnos's Weaponry
+/// (+1/+1) print it.
+pub fn target_creature_gets_while_source_tapped<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    instruction(g, |g| g.add_effect(item.object, creature, EffectKind::Pump(P, T), Duration::WhileSourceTapped));
+    Ok(())
+}
+
 /// Gain the bounded quantity frozen by `.damage_amount()` from the matched
 /// damage events. This has no legacy `data[0]` fallback.
 pub fn gain_matched_damage_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
