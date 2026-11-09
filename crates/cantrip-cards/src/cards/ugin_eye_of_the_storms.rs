@@ -66,7 +66,7 @@ pub static CARD: CardDef = CardDef {
         triggered(when(EventMask::SPELL_CAST, colorless_spell_you_cast), exile_colored, "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.")
             .targets(&[up_to_one(colored_permanent)]),
         ability(loyalty(2), plus_two, "+2: You gain 3 life and draw a card."),
-        ability(loyalty(0), cantrip_mechanics::effects::add_colorless::<3>, "0: Add {C}{C}{C}."),
+        ability(loyalty(0), cantrip_mechanics::effects::add_colorless::<3>, "0: Add {C}{C}{C}.").produces_mana(),
         ability(loyalty(-11), minus_eleven, "\u{2212}11: Search your library for any number of colorless nonland cards, exile them, then shuffle. Until end of turn, you may cast those cards without paying their mana costs."),
     ],
     ..oracle::UGIN_EYE_OF_THE_STORMS
