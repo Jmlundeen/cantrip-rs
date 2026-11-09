@@ -2646,9 +2646,7 @@ pub fn tap_target_it_doesnt_untap_while_this_remains_tapped(g: &mut dyn Game, it
 pub fn untap_creatures_that_attacked_this_turn(g: &mut dyn Game) {
     let creatures: Vec<_> = g.state().battlefield().iter().copied()
         .filter(|&id| g.chars(id).is(CardType::Creature) && g.history().attacked_this_turn(id)).collect();
-    instruction(g, |g| {
-        for id in creatures { g.untap(id); }
-    });
+    g.untap_together(&creatures);
 }
 
 /// "Untap all other creatures you control" (CR 701.26b): Combat Celebrant and Ahn-Crop Champion.
@@ -2657,10 +2655,6 @@ pub fn untap_creatures_that_attacked_this_turn(g: &mut dyn Game) {
 pub fn untap_other_creatures_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures: Vec<_> = g.permanents_of(item.controller).into_iter()
         .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature)).collect();
-    instruction(g, |g| {
-        for creature in creatures {
-            g.untap(creature);
-        }
-    });
+    g.untap_together(&creatures);
     Ok(())
 }

@@ -3567,3 +3567,55 @@ Game::add_phases accepts the current phase, a main-phase ordinal (CR 505.1b), or
 Returned identities support DelayedWhen::PhaseStep, such as World at War's "at the beginning of that combat".
 Game::add_combat_phase uses the same schedule. Combat boundaries expire combat-duration effects and mana before
 the next phase; ending the turn discards the remaining phase schedule and proceeds to cleanup.
+<<<<<<< HEAD
+=======
+
+## Commander designation and fixed color identity (CR 903)
+
+`Setup::commanders` supplies the physical cards designated by each owner before the game. Its outer vector is empty
+for ordinary games. Otherwise setup puts those cards face up in the shared command zone before shuffling the remaining
+libraries and dealing, and starts each player at 40 life (CR 903.6–903.7). `Outside::commanders`, native `NewGame` seat
+`Commanders`, and C# `RulesSeat.Commanders` expose this to real callers. They are separate from the remaining `Deck`.
+The caller validates format legality, commander eligibility and pairing, as it already validates other deck formats;
+short deterministic scenarios exercise runtime rules without claiming legal tournament decklists.
+
+Designation is physical-card metadata, never a name, subtype, zone test or copiable characteristic (CR 903.3).
+`Obj::commander` carries the setup root through new objects; merged components carry their own roots. Query exposes
+`is_commander`, `commander_roots`, `commanders(owner)` (current objects in every zone), and
+`commander_color_identity(owner)` (the fixed union, `None` without a commander, `Some(NONE)` for a colorless one).
+Oracle generation includes colored cost/text symbols outside reminder text, color indicators, color-defining text,
+both faces and alternative characteristics (CR 903.4). Current colors, copying, face-down status, control changes and
+zone changes do not recompute identity. Arcane Signet and Command Tower use the same printed identity clause;
+Commander's Sphere and the mana portion of Path of Ancestry also consume it. Command Beacon can filter the current
+owned designations to command; Collective Override can test designated permanents controlled on the battlefield.
+Their card packets remain separate.
+
+Command casts use the ordinary casting routes and timing. Additional tax is computed from prior command-zone
+`SpellCast` records for the same physical root and caster, before reductions (CR 903.8); hand casts do not add tax.
+Hand/library return is ordered as a replacement effect, repeatable after another replacement changes the destination
+(CR 903.9b). Merged noncommander components keep that original destination (903.9c). Graveyard/exile return is an owner
+choice at the first subsequent state-based check, after the whole resolving spell completes (903.9a), with APNAP
+choices and simultaneous moves. A checkpoint event records that opportunity, including a decline. Combat damage
+records freeze each physical commander root at the actual damage event, then history totals the 21-damage loss
+separately per commander and victim (903.10a); prevention and loss-prevention remain the ordinary core procedures.
+Ordinary outside-game selectors return no cards in Commander (903.11); the companion special action keeps its explicit
+rules permission, and starting-deck companion conditions include designated commanders (702.139b).
+
+This API supplies ordinary Commander gameplay and Commander Draft's identical gameplay rules (903.13g), not the
+Brawl options. Deck construction is not engine-enforced. Pregame chosen-color commanders (903.4b) and meld cards are
+not currently implemented in the card registry and require their own rules/card support before they can be dealt;
+this change does not invent a color choice or meld behavior for them.
+
+### Simultaneous untaps
+
+`Game::untap_together` owns simultaneous untapping (CR 502.3, 608.2c, 701.26b). It selects eligible
+live battlefield objects, their prohibitions and intrinsic stun replacements from the pre-event state,
+then writes all tap states and counter removals before expiring durations or settling control.
+A restriction source untapping or losing a stun counter in that event cannot enable another recipient.
+Duplicate object IDs describe one untap. Single-object untaps use the same procedure. Optional untap-step
+choices and the active player's exert prohibitions are collected before the simultaneous operation.
+
+The shared recipes for Combat Celebrant and Ahn-Crop Champion, Own the Day and World at War,
+untapping legal targets, and untapping all controlled lands call that authority. The recipes still
+select their own printed sets; simultaneous legality and replacement timing belong to the core.
+>>>>>>> b019bdca5 (Engine: apply untaps simultaneously)

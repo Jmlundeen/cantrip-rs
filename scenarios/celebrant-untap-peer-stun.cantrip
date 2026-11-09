@@ -1,0 +1,40 @@
+# Independent positive scenario: Celebrant untaps an attacking peer with a stun replacement; one counter replaces one untap, without removing it from combat (CR 122.1d, 701.26b, 506.4).
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Sol Ring
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Cryogenic Stasis
+Island x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Combat Celebrant; Ornithopter)
+Bot1.Accept
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Cryogenic Stasis.Cast(Ornithopter)
+[T3 Bot1.Blockers]
+? Bot1.Battlefield.Ornithopter.Tapped = true
+? Bot1.Battlefield.Ornithopter.Counters.Stun = (absent)
+? Bot1.Battlefield.Combat Celebrant.Tapped = true
+? Combat.Attackers = Combat Celebrant > Bot2; Ornithopter > Bot2
+? Bot1.Exertions.Count = 1
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Life = 16
