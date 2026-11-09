@@ -1,0 +1,64 @@
+# The Immortal Sun: "Players can't activate planeswalkers' loyalty abilities." (CR 602.5, 606.3) - those only: an ability of
+# a planeswalker's that costs no loyalty can still be activated. Gideon, Ally of Zendikar's +1 makes him a 5/5 creature
+# "that's still a planeswalker" on turn 7, before the Sun is cast; Paradise Mantle then equips him and gives him "{T}: Add
+# one mana of any color.", which he activates under the Sun for exactly {G} - he has been Bot1's since turn 1. Black Lotus
+# and Mox Pearl pay Gideon's {2}{W}{W}; Mana Crypt, two Moxen and two Islands the Sun's {6}, and Mox Pearl the equip.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Gideon, Ally of Zendikar
+Paradise Mantle
+Mox Sapphire
+Mox Jet
+Mana Crypt
+Island
+The Immortal Sun
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gideon, Ally of Zendikar.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mana Crypt.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Gideon, Ally of Zendikar.Activate(Ability: becomes)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Gideon, Ally of Zendikar.Types = Planeswalker; Creature
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.The Immortal Sun.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Gideon, Ally of Zendikar; Ability: Equip)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Paradise Mantle.AttachedTo = Gideon, Ally of Zendikar
+Bot1.Battlefield.Gideon, Ally of Zendikar.Activate(Ability: any color; Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Gideon, Ally of Zendikar.Tapped = true
+Bot1.Battlefield.Gideon, Ally of Zendikar.Counters.Loyalty = 5

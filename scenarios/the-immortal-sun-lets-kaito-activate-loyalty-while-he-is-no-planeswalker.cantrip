@@ -1,0 +1,53 @@
+# The Immortal Sun: "Players can't activate planeswalkers' loyalty abilities." (CR 602.5, 606.3) asks whether the permanent
+# is a planeswalker now, not whether the ability costs loyalty. During his controller's turn Kaito, Bane of Nightmares is a
+# 3/4 Ninja creature and no planeswalker (its ruling: "You can still activate Kaito's loyalty abilities"), so under the Sun
+# his "+1: You get an emblem with "Ninjas you control get +1/+1."" is activated on turn 5: loyalty 5, and the 3/4 is 5/6
+# with the Sun's +1/+1 and the emblem's. Black Lotus and three Moxen pay the Sun's {6}; on turn 3 the Sun takes {1} off
+# Kaito ({1}{U}{B} off the three Moxen).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+The Immortal Sun
+Island
+Island
+Kaito, Bane of Nightmares
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Immortal Sun.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Types = Creature
+Bot1.Battlefield.Kaito, Bane of Nightmares.Activate(Ability: emblem)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Kaito, Bane of Nightmares.Counters.Loyalty = 5
+Bot1.Battlefield.Kaito, Bane of Nightmares.Power = 5
+Bot1.Battlefield.Kaito, Bane of Nightmares.Toughness = 6
