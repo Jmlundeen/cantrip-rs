@@ -1016,6 +1016,12 @@ pub const CREATURE_AN_OPPONENT_CONTROLS_THAT_DEALT_DAMAGE_THIS_TURN: TargetSpec 
     target(creature_an_opponent_controls_that_dealt_damage_this_turn_filter);
 /// "Target land". Candelabra of Tawnos and Strip Mine print it.
 pub const LAND: TargetSpec = target(land_filter);
+fn snow_land_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    land_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).supertypes.snow)
+}
+/// "Target snow land" (CR 115.1, 205.4g). Avalanche, Balduvian Conjurer, Arcum's Weathervane, Balduvian Frostwaker
+/// and Sculptor of Winter print it.
+pub const SNOW_LAND: TargetSpec = target(snow_land_filter);
 /// "Target nonbasic land" (CR 115.1, 205.4a). Wasteland prints it.
 pub const NONBASIC_LAND: TargetSpec = target(nonbasic_land_filter);
 /// "Target nonbasic land an opponent controls" (CR 115.1, 205.4a). Demolition Field and Magmatic Hellkite print it.
