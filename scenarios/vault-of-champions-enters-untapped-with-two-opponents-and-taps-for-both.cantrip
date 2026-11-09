@@ -1,0 +1,47 @@
+# Vault of Champions: "This land enters tapped unless you have two or more opponents" (CR 614.1d). With two opponents it
+# enters untapped on turn 1. On turn 4 it taps for {W} to cast Elite Vanguard; on turn 7 it taps for {B} to cast Sol
+# Ring. Either color refused would fail its pool check.
+
+[Bot1 Deck]
+Vault of Champions
+Elite Vanguard
+Sol Ring
+Island x4
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Vault of Champions.Play
+? Bot1.Battlefield.Vault of Champions.Tapped = false
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T4 Bot1.Main1]
+Bot1.Battlefield.Vault of Champions.Activate(Color: White)
+? Bot1.Mana = {W}
+Bot1.Hand.Elite Vanguard.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Vault of Champions.Activate(Color: Black)
+? Bot1.Mana = {B}
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Elite Vanguard.Power = 2
+Bot1.Library.Count = 10
+Bot2.Library.Count = 11
+Bot3.Library.Count = 11
