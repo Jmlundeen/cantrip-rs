@@ -1,0 +1,47 @@
+# CR 101.2, 609.3, 611.2b: counters prohibited still leave a chosen survivor. Its restriction never begins; it attacks.
+
+[Bot1 Deck]
+Promise of Loyalty
+Black Lotus x2
+Solemnity
+Plains x3
+Plains x16
+
+[Bot2 Deck]
+Plains
+Mox Emerald
+Grizzly Bears
+Memnite
+Ornithopter
+Memnite
+Plains
+Plains x16
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Solemnity.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Promise of Loyalty.Cast
+Bot2.Choose(Grizzly Bears)
+? Bot2.Battlefield.Grizzly Bears.Counters.Vow = (absent)
+[T4 Bot2.Main1]
+Bot2.Attack(Grizzly Bears > Bot1)
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 18
+Bot1.Graveyard = Promise of Loyalty; Black Lotus; Black Lotus
+Bot2.Graveyard = Ornithopter; Memnite

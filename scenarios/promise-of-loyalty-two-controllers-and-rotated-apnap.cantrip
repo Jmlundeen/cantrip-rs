@@ -1,0 +1,76 @@
+# CR 101.4, 611.2b-c: the second caster is active, chooses first, and each fixed creature is bound to both controllers.
+[Bot1 Deck]
+Promise of Loyalty
+Black Lotus x2
+Grizzly Bears
+Memnite
+Plains x2
+Memnite
+Plains x16
+
+[Bot2 Deck]
+Plains
+Black Lotus x2
+Grizzly Bears
+Memnite
+Promise of Loyalty
+Memnite
+Plains
+Plains x16
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Promise of Loyalty.Cast
+? Bot1.Mana =
+Bot1.Choose(Grizzly Bears)
+Bot2.Choose(Grizzly Bears)
+? Bot1.Battlefield.Grizzly Bears.Counters.Vow = 1
+? Bot2.Battlefield.Grizzly Bears.Counters.Vow = 1
+? Bot1.Graveyard = Promise of Loyalty; Memnite; Black Lotus; Black Lotus
+? Bot2.Graveyard = Memnite; Black Lotus
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Promise of Loyalty.Cast
+Bot2.Choose(Grizzly Bears)
+? Bot1.Battlefield.Grizzly Bears.Counters.Vow = 1
+? Bot2.Battlefield.Grizzly Bears.Counters.Vow = 1
+Bot1.Choose(Grizzly Bears)
+? Bot1.Battlefield.Grizzly Bears.Counters.Vow = 2
+? Bot2.Battlefield.Grizzly Bears.Counters.Vow = 2
+Bot2.Hand.Memnite.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+[T6 Bot2.Main1]
+Bot2.Pass
+! Bot2.Attack(Grizzly Bears > Bot1)
+Bot2.Attack(Memnite > Bot1)
+[T6 Bot2.Main2]
+[T7 Bot1.Main1]
+Bot1.Pass
+! Bot1.Attack(Grizzly Bears > Bot2)
+Bot1.Attack(Memnite > Bot2)
+[T7 Bot1.Main2]
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 19
+Bot1.Battlefield.Grizzly Bears.Tapped = false
+Bot2.Battlefield.Grizzly Bears.Tapped = false

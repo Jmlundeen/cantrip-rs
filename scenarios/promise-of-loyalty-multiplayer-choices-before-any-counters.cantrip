@@ -1,0 +1,74 @@
+# CR 101.4: Bot1, Bot2, then Bot3 choose before any counters or sacrifices; Bot4 has no creatures. Vowed bear can attack a different player.
+
+[Bot1 Deck]
+Promise of Loyalty
+Black Lotus x2
+Grizzly Bears
+Memnite
+Plains x2
+Plains x16
+
+[Bot2 Deck]
+Plains
+Mox Emerald
+Grizzly Bears
+Memnite
+Ornithopter
+Memnite
+Plains
+Plains x16
+
+[Bot3 Deck]
+Memnite
+Ornithopter
+Island x25
+
+[Bot4 Deck]
+Island x28
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Memnite.Cast
+Bot3.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Promise of Loyalty.Cast
+Bot1.Choose(Grizzly Bears)
+? Bot1.Battlefield.Grizzly Bears.Counters.Vow = (absent)
+? Bot1.Battlefield.Memnite.Tapped = false
+Bot2.Choose(Grizzly Bears)
+? Bot1.Battlefield.Grizzly Bears.Counters.Vow = (absent)
+? Bot2.Battlefield.Grizzly Bears.Counters.Vow = (absent)
+? Bot3.Battlefield.Ornithopter.Tapped = false
+Bot3.Choose(Memnite)
+? Bot1.Battlefield.Grizzly Bears.Counters.Vow = 1
+? Bot2.Battlefield.Grizzly Bears.Counters.Vow = 1
+? Bot1.Graveyard = Promise of Loyalty; Memnite; Black Lotus; Black Lotus
+? Bot2.Graveyard = Ornithopter; Memnite
+? Bot3.Battlefield.Memnite.Counters.Vow = 1
+? Bot3.Graveyard = Ornithopter
+[T6 Bot2.Main1]
+Bot2.Pass
+! Bot2.Attack(Grizzly Bears > Bot1)
+Bot2.Attack(Grizzly Bears > Bot4)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot4.Life = 18

@@ -1,0 +1,69 @@
+# CR 611.2c and ruling: the caster's own chosen bear cannot attack them after Control Magic steals it; a new Memnite may.
+[Bot1 Deck]
+Promise of Loyalty
+Black Lotus x2
+Grizzly Bears
+Memnite
+Plains x2
+Plains x16
+
+[Bot2 Deck]
+Plains
+Mox Emerald
+Grizzly Bears
+Memnite
+Ornithopter
+Control Magic
+Black Lotus
+Memnite
+Plains x16
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Promise of Loyalty.Cast
+? Bot1.Mana =
+Bot1.Choose(Grizzly Bears)
+Bot2.Choose(Grizzly Bears)
+? Bot1.Battlefield.Grizzly Bears.Counters.Vow = 1
+? Bot2.Battlefield.Grizzly Bears.Counters.Vow = 1
+? Bot1.Graveyard = Promise of Loyalty; Memnite; Black Lotus; Black Lotus
+? Bot2.Graveyard = Ornithopter; Memnite
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Control Magic.Cast(Bot1.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T8 Bot2.Main1]
+Bot2.Pass
+! Bot2.Attack(Grizzly Bears#1 > Bot1)
+! Bot2.Attack(Grizzly Bears#2 > Bot1)
+Bot2.Attack(Memnite > Bot1)
+[T8 Bot2.Main2]
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Count = 2
+Bot2.Battlefield.Grizzly Bears#1.Tapped = false
+Bot2.Battlefield.Grizzly Bears#2.Tapped = false
+Bot2.Battlefield.Grizzly Bears#1.Counters.Vow = 1
+Bot2.Battlefield.Grizzly Bears#2.Counters.Vow = 1

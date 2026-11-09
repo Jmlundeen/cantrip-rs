@@ -1,0 +1,59 @@
+# CR 101.4, 701.21, 611.2c: both players keep one; the resolved source is gone. A later untapped Memnite attacks while the vowed bear is refused.
+
+[Bot1 Deck]
+Promise of Loyalty
+Black Lotus x2
+Grizzly Bears
+Memnite
+Plains x2
+Plains x16
+
+[Bot2 Deck]
+Plains
+Mox Emerald
+Grizzly Bears
+Memnite
+Ornithopter
+Memnite
+Plains
+Plains x16
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Promise of Loyalty.Cast
+? Bot1.Mana =
+Bot1.Choose(Grizzly Bears)
+Bot2.Choose(Grizzly Bears)
+? Bot1.Battlefield.Grizzly Bears.Counters.Vow = 1
+? Bot2.Battlefield.Grizzly Bears.Counters.Vow = 1
+? Bot1.Graveyard = Promise of Loyalty; Memnite; Black Lotus; Black Lotus
+? Bot2.Graveyard = Ornithopter; Memnite
+[T4 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T6 Bot2.Main1]
+Bot2.Pass
+! Bot2.Attack(Grizzly Bears > Bot1)
+Bot2.Attack(Memnite > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Battlefield.Grizzly Bears.Tapped = false
+Bot2.Battlefield.Grizzly Bears.Counters.Vow = 1
