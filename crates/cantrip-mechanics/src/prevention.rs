@@ -45,6 +45,41 @@ fn combat_dealt_by(_: &dyn Query, _: &Asker, source: ObjectId, d: &DamageEvent) 
 /// dealt by target creature this turn". Horn of Deafening and Lady Evangela print it. The card gives its own words (`.text(..)`).
 pub const COMBAT_DAMAGE_DEALT_BY: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents all combat damage dealt by that creature", damage: "combat damage", of_it: Some("dealt by it"), applies: combat_dealt_by, then: None, text: "" };
 
+fn combat_dealt_to_and_by(_: &dyn Query, _: &Asker, creature: ObjectId, d: &DamageEvent) -> bool {
+    d.combat && (d.source == creature || d.target == Target::Object(creature))
+}
+
+/// Combat damage (CR 510.2) whose source or recipient is the creature the effect is about (CR 615.1): "prevent all combat
+/// damage that would be dealt to and dealt by that creature this turn". Once that creature has left the battlefield it is a new
+/// object (CR 400.7), which the effect is not about. Maze of Ith and Ebony Horse print it.
+pub const COMBAT_DAMAGE_DEALT_TO_AND_BY: GrantedPreventionDef = GrantedPreventionDef {
+    hint: "prevents all combat damage dealt to and dealt by that creature",
+    damage: "combat damage",
+    of_it: Some("to and dealt by it"),
+    applies: combat_dealt_to_and_by,
+    then: None,
+    text: "Prevent all combat damage that would be dealt to and dealt by that creature this turn.",
+};
+
+/// "Untap target [attacking creature]. Prevent all combat damage that would be dealt to and dealt by that creature this turn"
+/// (CR 701.26b, 615.1, 608.2b): the creature the resolving ability targeted in slot 0, if it is still a legal target, is untapped
+/// and gets the prevention. It stays in combat, still blocked or unblocked (the rulings): the damage it would deal and be dealt
+/// is prevented as it is dealt, after it is assigned (CR 510.1-2). The prevention lasts until the turn ends (CR 615.4, 514.2), and
+/// none applies where damage can't be prevented (CR 615.12, the core). Maze of Ith and Ebony Horse print it; the card lists
+/// `COMBAT_DAMAGE_DEALT_TO_AND_BY` first in its `granted_preventions`.
+pub fn untap_target_and_prevent_combat_damage_to_and_by_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    instruction(g, |g| g.untap(creature));
+    g.end_sentence();
+    g.add_effect(
+        item.object,
+        creature,
+        EffectKind::Prevention { card: item.ability.card, index: 0, to: Target::None, shield: Shield::All },
+        Duration::EndOfTurn,
+    );
+    Ok(())
+}
+
 /// "Prevent all combat damage that would be dealt by target creature this turn" (CR 615.1, 611.2a): the creature the resolving
 /// ability targeted in slot 0, if it is still a legal target (CR 608.2b). The card lists `COMBAT_DAMAGE_DEALT_BY` first in its
 /// `granted_preventions`.
