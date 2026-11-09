@@ -22,7 +22,7 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Command Bridge.Play
 Bot1.Pass
 Bot2.Pass
-! Bot1.PayCost
+! Bot1.Decline
 
 [Expect]
 Bot1.Battlefield = Mox Ruby

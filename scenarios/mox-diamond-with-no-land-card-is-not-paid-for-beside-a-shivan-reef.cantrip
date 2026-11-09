@@ -25,8 +25,7 @@ Bot1.Hand.Mox Jet.Cast
 Bot1.Hand.Mox Emerald.Cast
 Bot1.Hand.Mox Diamond.Cast
 Bot1.Pass
-! Bot1.PayCost
-Bot1.Decline
+! Bot1.Decline
 [T1 Bot1.Main2]
 
 [Expect]

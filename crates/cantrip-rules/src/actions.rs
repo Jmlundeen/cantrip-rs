@@ -14081,7 +14081,8 @@ pub fn payable_life(cx: &Cx, player: PlayerId) -> i32 {
 /// together, with whatever else it has - permanents, cards, counters, energy - chosen and paid as an activated ability's
 /// are. The payer may activate mana abilities while asked, when the cost has mana in it (CR 605.3a, 118.3c); paying is
 /// offered once the pool covers the mana, the life total covers the life (CR 118.3) and every other part can be paid, and
-/// the life is judged as it is paid (CR 119.4): a player without that much life is not asked at all, and one whose mana
+/// the life is judged as it is paid (CR 119.4): a player without that much life, or who can't pay another part (too few
+/// permanents to sacrifice, CR 118.3), is not asked at all, and one whose mana
 /// ability takes it below that (Mana Confluence's life, a painland's damage) can no longer pay, and is offered only
 /// declining. An {X} the text does not define is chosen by the payer as they pay (CR 107.3f), as `may_pay_x` chooses it.
 /// Whether it was paid.
@@ -14197,6 +14198,8 @@ fn pay_during_resolution_inner(
     let mut times_total = cost.mana;
     // A payment refused without a question since the position last changed (`ActionKind::PayCost` below).
     let mut refused = false;
+    // Whether the payer has not been asked yet.
+    let mut first = true;
     loop {
         // The cost as X now stands: each {X} is X generic mana (CR 107.3f).
         let total = match x {
@@ -14239,6 +14242,13 @@ fn pay_during_resolution_inner(
         let mana_asked = total != ManaCost::ZERO || x.is_some();
         let payable = life_payable && resolution_rest_payable(cx, payer, source, cost, x.unwrap_or(0), false);
         let may_become = payable || mana_asked && life_payable && resolution_rest_payable(cx, payer, source, cost, x.unwrap_or(0), true);
+        // CR 118.3: a payer who can't pay the cost - too few permanents to sacrifice, cards to discard, counters to remove,
+        // even with what their mana abilities could feed it - is not asked at all, as one without the life is not (above).
+        // Once asked, a payment a mana ability has since made unpayable is left to declining.
+        if first && !may_become {
+            return Ok(None);
+        }
+        first = false;
         if may_become && mana_asked {
             options = mana_options_while_paying(cx, payer, source, Paying::Other);
         }

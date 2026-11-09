@@ -1109,6 +1109,16 @@ fn cast_to_payment(g: &mut Game, spell: ObjectId) -> Request {
     r
 }
 
+/// Casts `spell` (free) and passes until it resolves, its cost one the payer can't pay: nothing is asked (CR 118.3), and
+/// the payer is given priority again.
+fn cast_unasked(g: &mut Game, spell: ObjectId) {
+    let r = next(g);
+    let cast = option_of(g, &r, spell).expect("the spell is offered");
+    answer(g, &r, Answer::Act(Action::of(&cast)));
+    let r = resolve_all(g);
+    assert!(matches!(r.kind, RequestKind::Priority { .. }), "an unpayable cost asks nothing, got {:?}", r.kind);
+}
+
 fn pays(r: &Request) -> Option<ActionOption> {
     match &r.kind {
         RequestKind::UnlessPays { options, .. } => options.iter().find(|o| o.kind == ActionKind::PayCost).cloned(),
@@ -1157,12 +1167,12 @@ fn a_resolving_spell_takes_mana_and_a_sacrificed_creature_chosen_as_it_is_paid()
     put(&mut g, &BEAR, Zone::BATTLEFIELD);
     let r = cast_to_payment(&mut g, offer);
     assert!(pays(&r).is_none());
-    // No creature: only declining.
+    // No creature: nothing is asked.
     let mut g = game();
     let offer = put(&mut g, &OFFER, Zone::hand(YOU));
     add_mana(&mut g, 1);
-    let r = cast_to_payment(&mut g, offer);
-    assert!(pays(&r).is_none());
+    cast_unasked(&mut g, offer);
+    assert_eq!(g.state.player(YOU).pool.total(), 1, "nothing was paid");
 
     let mut g = game();
     let offer = put(&mut g, &OFFER, Zone::hand(YOU));
@@ -1219,8 +1229,8 @@ fn a_resolving_spell_takes_a_discard_and_energy_and_a_choice_given_up_asks_again
     let mut g = game();
     let tithe = put(&mut g, &TITHE, Zone::hand(YOU));
     let card = put(&mut g, &BEAR, Zone::hand(YOU));
-    let r = cast_to_payment(&mut g, tithe);
-    assert!(pays(&r).is_none(), "no energy");
+    // No energy: nothing is asked.
+    cast_unasked(&mut g, tithe);
 
     let mut g = game();
     let tithe = put(&mut g, &TITHE, Zone::hand(YOU));
@@ -1407,8 +1417,8 @@ fn a_sacrifice_cost_past_a_byte_is_paid_in_full() {
     for _ in 0..299 {
         put(&mut g, &BEAR, Zone::BATTLEFIELD);
     }
-    let r = cast_to_payment(&mut g, offer);
-    assert!(pays(&r).is_none(), "299 creatures cannot sacrifice 300");
+    // 299 creatures cannot sacrifice 300: nothing is asked.
+    cast_unasked(&mut g, offer);
 }
 
 /// A cost of 300 counters put on the creature is paid in full: 300 -1/-1 counters, as 300 age counters ask of Aboroth.

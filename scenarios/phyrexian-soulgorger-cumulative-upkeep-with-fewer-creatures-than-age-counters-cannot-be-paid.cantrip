@@ -1,7 +1,7 @@
 # Phyrexian Soulgorger, an 8/8 snow artifact creature, "Cumulative upkeep--Sacrifice a creature." (CR 702.24a). At Bot1's turn 3
 # upkeep, with the Soulgorger and a Balduvian Bears, one creature is sacrificed for the one age counter: the Bears. At turn 5 the
 # second age counter makes it two creatures, and Bot1 has only the Soulgorger: a creature can't be sacrificed twice, so
-# paying is not offered and the Soulgorger is sacrificed.
+# the cost can't be paid, Bot1 is asked nothing (CR 118.3), and the Soulgorger is sacrificed.
 
 [Bot1 Deck]
 Phyrexian Soulgorger
@@ -42,8 +42,7 @@ Bot1.Pass
 ? Stack.Count = 1
 Bot1.Pass
 Bot2.Pass
-! Bot1.PayCost
-Bot1.Decline
+! Bot1.Decline
 
 [Expect]
 Bot1.Graveyard = Phyrexian Soulgorger; Balduvian Bears; Black Lotus

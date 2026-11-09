@@ -38,8 +38,7 @@ Bot1.Pass
 ? Bot1.Hand.Count = 0
 Bot1.Pass
 Bot2.Pass
-! Bot1.PayCost
-Bot1.Decline
+! Bot1.Decline
 
 [Expect]
 Bot1.Graveyard = Deepcavern Imp
