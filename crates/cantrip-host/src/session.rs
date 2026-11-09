@@ -894,6 +894,52 @@ impl Session {
 mod tests {
     use super::*;
 
+    /// The actual host boundary shares continuous reveal with every seat and the
+    /// public, while keeping the rest of every library closed (CR 401.2, 701.20a).
+    #[test]
+    fn continuous_library_top_is_public_and_source_loss_restores_hidden_information() {
+        for (name, text, expected) in [
+            ("revealed", include_str!("../../../scenarios/benjamin-sisko-besieged-reveals-only-your-current-top-to-every-opponent.cantrip"), Some("Grizzly Bears")),
+            ("source-lost", include_str!("../../../scenarios/benjamin-sisko-besieged-sacrificing-source-hides-the-top-immediately.cantrip"), None),
+        ] {
+            let scripted = Session::scenario(text, name, Vec::new(), &[]).ok().unwrap();
+            assert!(scripted.scenario.as_ref().unwrap().verdict.as_ref().unwrap().is_ok());
+            let mut session = Session::of_game(scripted.game);
+            session.show_public();
+            let step = session.step();
+            let mut views: Vec<&Value> = step["Views"].as_object().unwrap().values().collect();
+            views.push(&step["Public"]["View"]);
+            for view in views {
+                let library: Vec<&Value> = view["Objects"].as_array().unwrap().iter().filter(|o| o["Zone"] == "Library").collect();
+                assert_eq!(library.len(), usize::from(expected.is_some()), "{name}: {view}");
+                if let Some(expected) = expected {
+                    assert_eq!(library[0]["Name"], expected);
+                    assert_eq!(library[0]["ZoneOwner"], 1);
+                }
+                assert!(view["Zones"].as_array().unwrap().iter().filter(|z| z["Kind"] == "Library").all(|z| {
+                    z["ContentsVisible"] == false && z["Contents"].as_array().unwrap().is_empty()
+                }), "continuous reveal must not open the whole library");
+            }
+        }
+    }
+
+    /// New tops are hidden from the paying player, opponents and public until
+    /// announcement completes (CR 401.5), including a view built mid-payment.
+    #[test]
+    fn a_library_casts_new_top_is_hidden_in_every_host_projection_while_paying() {
+        let original = include_str!("../../../scenarios/benjamin-sisko-besieged-new-top-is-hidden-while-paying-and-cancel-restores-it.cantrip");
+        let prefix = original.split("Bot1.Cancel").next().unwrap();
+        let text = format!("{prefix}[Handover Bot1.PayCost]\n");
+        let scripted = Session::scenario(&text, "payment", Vec::new(), &[]).ok().unwrap();
+        assert!(matches!(scripted.game.pending().unwrap().kind, RequestKind::PayCosts { .. }));
+        let mut session = Session::of_game(scripted.game);
+        session.show_public();
+        let step = session.step();
+        for view in step["Views"].as_object().unwrap().values().chain(std::iter::once(&step["Public"]["View"])) {
+            assert!(!view["Objects"].as_array().unwrap().iter().any(|o| o["Zone"] == "Library"), "new top leaked during payment: {view}");
+        }
+    }
+
     /// Plays both seats from the prompts alone, as the bot of `tests/stdio_game.rs` does, until `done` has seen
     /// what it is looking for in the events some seat was told. Returns every event each seat heard.
     fn play_until(session: &mut Session, done: impl Fn(&[Value]) -> bool) -> HashMap<String, Vec<Value>> {
