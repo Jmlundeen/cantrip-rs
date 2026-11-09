@@ -1,0 +1,43 @@
+# Countering the linked trigger removes both its effects but cannot undo the paid exert cost (CR 701.5, 607.2h).
+
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Ornithopter
+Birds of Paradise
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Stifle
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Green)
+Bot1.Attack(Combat Celebrant; Ornithopter)
+Bot1.Accept
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stifle.Cast(Stack.Combat Celebrant)
+[T3 Bot1.EndCombat]
+? Bot1.Battlefield.Birds of Paradise.Tapped = true
+? Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Combat Celebrant.Tapped = true
+Bot2.Life = 16

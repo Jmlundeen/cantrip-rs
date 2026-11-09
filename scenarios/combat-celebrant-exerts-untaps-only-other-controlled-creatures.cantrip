@@ -1,0 +1,72 @@
+# Browser
+# The linked trigger resolves before blockers, untaps attacking and nonattacking creatures, excludes its source and opponent, and adds exactly combat (CR 607.2h, 500.8).
+
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Ornithopter
+Birds of Paradise
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Island
+Island x25
+
+[Bot2 Deck]
+Mox Emerald
+Birds of Paradise
+Island x28
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Attack(Combat Celebrant; Ornithopter)
+? Client.Bot1.Prompt.Title = Combat Celebrant: exert it as it attacks?
+? Client.Bot1.Prompt.Detail = An exerted creature won't untap during your next untap step
+? Client.Bot1.Dock = Exert it; Don't exert it
+Bot1.Accept
+Bot1.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Birds of Paradise.Tapped = true
+? Bot1.Battlefield.Combat Celebrant.Exerted = true
+Bot2.Battlefield.Birds of Paradise.Activate(Color: Green)
+[T5 Bot1.Blockers]
+? Bot2.Battlefield.Birds of Paradise.Tapped = true
+? Bot1.Battlefield.Birds of Paradise.Tapped = false
+? Bot1.Battlefield.Ornithopter.Tapped = false
+? Bot1.Battlefield.Combat Celebrant.Tapped = true
+? Bot1.Battlefield.Mox Ruby.Tapped = true
+? Combat.Attackers = Combat Celebrant > Bot2; Ornithopter > Bot2
+? Bot1.Exertions = Combat Celebrant
+[T5 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+! Bot1.Hand.Island.Play
+[T5 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Combat Celebrant.Tapped = true
+? Bot1.Battlefield.Combat Celebrant.Exerted = (absent)
+[T9 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Combat Celebrant.Tapped = false
+Bot2.Life = 16

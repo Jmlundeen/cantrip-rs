@@ -1,0 +1,28 @@
+# An empty untap set still adds a combat; the source remains tapped (CR 608.2c, 500.8).
+
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Island x5
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Combat Celebrant)
+Bot1.Accept
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Bot1.Battlefield.Combat Celebrant.Tapped = true
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Exertions.Count = 1

@@ -1,0 +1,39 @@
+# Kinscaer Sentry puts Celebrant into combat, rather than declaring it (CR 508.4, 701.43d).
+# The already-attacking creature gets no exert offer, linked trigger, or additional combat.
+
+[Bot1 Deck]
+Kinscaer Sentry
+Combat Celebrant
+Ornithopter
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Island
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kinscaer Sentry.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Kinscaer Sentry; Ornithopter; Ornithopter)
+Bot1.Choose(Combat Celebrant)
+! Bot1.Accept
+[T3 Bot1.EndCombat]
+? Bot1.Exertions.Count = 0
+? Bot1.Battlefield.Combat Celebrant.Exerted = (absent)
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 22
+Bot1.Battlefield.Combat Celebrant.Tapped = true

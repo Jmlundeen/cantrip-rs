@@ -1,0 +1,38 @@
+# Declining the CR 508.1g optional cost creates no trigger or added combat; the next untap is normal (CR 701.43a).
+
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Ornithopter
+Birds of Paradise
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Island
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Combat Celebrant)
+Bot1.Decline
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Exertions.Count = 0
+? Bot1.Battlefield.Combat Celebrant.Exerted = (absent)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Combat Celebrant.Tapped = false
+Bot1.Exertions.Count = 0

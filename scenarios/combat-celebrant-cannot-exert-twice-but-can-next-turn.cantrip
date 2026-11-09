@@ -1,0 +1,55 @@
+# Unrelated untaps allow repeat attacks but do not reset exert history (CR 701.43b, 508.1g).
+# Already untapped at the missed step, exert expires; next turn exert is offered again.
+
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Sewer-veillance Cam
+Sewer-veillance Cam
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Island
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Combat Celebrant)
+Bot1.Accept
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sewer-veillance Cam.Cast
+Bot1.Target(Combat Celebrant)
+Bot1.Modes(Untap)
+Bot1.Attack(Combat Celebrant)
+! Bot1.Accept
+[T3 Bot1.Main2]
+? Bot1.Exertions.Count = 1
+? Bot2.Life = 12
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sewer-veillance Cam.Cast
+Bot1.Target(Combat Celebrant)
+Bot1.Modes(Untap)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Combat Celebrant.Tapped = false
+? Bot1.Battlefield.Combat Celebrant.Exerted = (absent)
+Bot1.Attack(Combat Celebrant)
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Exertions.Count = 1
+Bot2.Life = 8

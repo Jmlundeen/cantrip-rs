@@ -1,0 +1,50 @@
+# CR 500.8: Celebrant inserts one combat after its current combat. Existing scheduled phases retain order.
+
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Black Lotus
+Sol Ring
+Mox Ruby
+Own the Day
+Ornithopter
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Own the Day.Cast
+Bot1.Attack(Combat Celebrant; Ornithopter)
+Bot1.Accept
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+
+[Expect]
+Bot1.Exertions.Count = 1
+Bot2.Life = 16

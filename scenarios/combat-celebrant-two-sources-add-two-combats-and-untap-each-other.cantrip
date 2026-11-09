@@ -1,0 +1,52 @@
+# Two simultaneous linked triggers untap each other now and insert two combats; no beginning-of-combat untap is created (CR 607.2h, 500.8).
+
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Combat Celebrant
+Mox Ruby
+Sol Ring
+Ornithopter
+Mountain
+Island
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Combat Celebrant; Combat Celebrant; Ornithopter)
+Bot1.Accept
+Bot1.Accept
+[T3 Bot1.EndCombat]
+? Bot1.Battlefield.Combat Celebrant#1.Tapped = false
+? Bot1.Battlefield.Combat Celebrant#2.Tapped = false
+? Bot1.Exertions.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+Bot1.Attack(Combat Celebrant; Combat Celebrant; Ornithopter)
+! Bot1.Accept
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Bot1.Battlefield.Combat Celebrant#1.Tapped = true
+? Bot1.Battlefield.Combat Celebrant#2.Tapped = true
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 4
+Bot1.Exertions.Count = 2

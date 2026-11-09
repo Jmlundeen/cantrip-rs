@@ -1,0 +1,46 @@
+# Stealing Celebrant removes it from combat but leaves its linked ability controlled by its original controller
+# (CR 113.7a, 506.4). Their other attacker untaps, and the additional combat is still created.
+
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Ornithopter
+Island x27
+
+[Bot2 Deck]
+Black Lotus
+Old Man of the Sea
+Mox Emerald
+Giant Growth
+Island x26
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Old Man of the Sea.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Combat Celebrant; Ornithopter)
+Bot1.Accept
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Old Man of the Sea)
+Bot2.Battlefield.Old Man of the Sea.Activate(Combat Celebrant)
+[T5 Bot1.Blockers]
+? Bot2.Battlefield.Combat Celebrant.Tapped = true
+? Bot1.Battlefield.Ornithopter.Tapped = false
+? Combat.Attackers = Ornithopter > Bot2
+? Bot1.Exertions = Combat Celebrant
+[T5 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Combat Celebrant.Exerted = true

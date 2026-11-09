@@ -1,0 +1,41 @@
+# The exerting player controls the trigger and untaps their creatures. Returning control at cleanup
+# lets the owner's untap proceed before the exerting player's next step (CR 701.43a, 611.2a).
+
+[Bot1 Deck]
+Mox Ruby
+Claim the Firstborn
+Ornithopter
+Island x27
+
+[Bot2 Deck]
+Black Lotus
+Combat Celebrant
+Island x28
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Combat Celebrant.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Claim the Firstborn.Cast(Combat Celebrant)
+Bot1.Attack(Combat Celebrant; Ornithopter)
+Bot1.Accept
+[T3 Bot1.EndCombat]
+? Bot1.Battlefield.Combat Celebrant.Tapped = true
+? Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Combat Celebrant.Tapped = false
+? Bot2.Battlefield.Combat Celebrant.Exerted = true
+[T5 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield.Combat Celebrant.Exerted = (absent)
+Bot2.Battlefield.Combat Celebrant.Tapped = false
+Bot2.Life = 16

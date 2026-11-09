@@ -1,0 +1,43 @@
+# The exert payment is complete before priority; removing the source in response leaves its trigger and additional combat intact (CR 113.7a).
+
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Ornithopter
+Birds of Paradise
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Lightning Bolt
+Island x25
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Combat Celebrant; Ornithopter)
+Bot1.Accept
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Combat Celebrant)
+[T3 Bot1.EndCombat]
+? Bot1.Graveyard = Combat Celebrant; Lightning Bolt; Black Lotus
+? Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+Bot1.Attack(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Exertions.Count = 1
