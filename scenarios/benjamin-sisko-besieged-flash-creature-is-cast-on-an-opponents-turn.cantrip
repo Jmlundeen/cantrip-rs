@@ -1,0 +1,40 @@
+# Benjamin Sisko: flash-creature-is-cast-on-an-opponents-turn. CR 401.5, 401.6, 305.1, 601.2-3.
+
+[Bot1 Deck]
+Mox Emerald
+Black Lotus
+Black Lotus
+Sol Ring
+Benjamin Sisko, Besieged
+Black Lotus
+Swamp
+Forest
+Tigra, Feline Fury
+Forest x9
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Benjamin Sisko, Besieged.Cast
+Bot1.Pass
+? Bot1.Mana = {G}{G}
+Bot2.Pass
+Bot1.Library.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Library.Tigra, Feline Fury.Cast
+Bot1.Pass
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Tigra, Feline Fury.Power = 2

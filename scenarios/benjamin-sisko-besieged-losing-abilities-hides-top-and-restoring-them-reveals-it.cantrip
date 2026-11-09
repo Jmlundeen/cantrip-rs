@@ -1,0 +1,50 @@
+# Benjamin Sisko: losing-abilities-hides-top-and-restoring-them-reveals-it. CR 401.5, 401.6, 305.1, 601.2-3.
+
+[Bot1 Deck]
+Mox Emerald
+Black Lotus
+Black Lotus
+Sol Ring
+Benjamin Sisko, Besieged
+Plains
+Swamp
+Grizzly Bears
+Forest x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+Dress Down
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Benjamin Sisko, Besieged.Cast
+Bot1.Pass
+? Bot1.Mana = {G}{G}
+Bot2.Pass
+? Bot1.Sees.Bot1.LibraryTop = Grizzly Bears
+? Bot2.Sees.Bot1.LibraryTop = Grizzly Bears
+? Bot1.Sees.Bot2.LibraryTop = (hidden)
+? Bot2.Sees.Bot2.LibraryTop = (hidden)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Dress Down.Cast
+[T2 Bot2.Main2]
+? Bot1.Sees.Bot1.LibraryTop = (hidden)
+? Bot2.Sees.Bot1.LibraryTop = (hidden)
+! Bot1.Library.Grizzly Bears.Cast
+[T3 Bot1.Upkeep]
+? Bot2.Sees.Bot1.LibraryTop = Grizzly Bears
+
+[Expect]
+Bot2.Graveyard.Count = 2

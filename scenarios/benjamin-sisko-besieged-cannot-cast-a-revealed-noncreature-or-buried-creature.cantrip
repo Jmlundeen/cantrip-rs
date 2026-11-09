@@ -1,0 +1,45 @@
+# Benjamin Sisko: cannot-cast-a-revealed-noncreature-or-buried-creature. CR 401.5, 401.6, 305.1, 601.2-3.
+
+[Bot1 Deck]
+Mox Emerald
+Black Lotus
+Black Lotus
+Sol Ring
+Benjamin Sisko, Besieged
+Grizzly Bears
+Mox Ruby
+Lightning Bolt
+Grizzly Bears
+Forest x8
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Benjamin Sisko, Besieged.Cast
+Bot1.Pass
+? Bot1.Mana = {G}{G}
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Ruby.Tapped = False
+? Bot2.Sees.Bot1.LibraryTop = Lightning Bolt
+! Bot1.Library.Lightning Bolt.Cast(Bot2)
+! Bot1.Library.Grizzly Bears.Cast
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot2.Life = 20
+Bot1.Library.Count = 10

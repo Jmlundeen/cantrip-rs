@@ -1,0 +1,54 @@
+# Sisko and the actual Sensei's Divining Top: A remains first while B/C swap.
+# CR 701.20d renews A's identity; both viewers still see the same card name.
+# The initial object-ID assertion makes the later inequality non-vacuous.
+
+[Bot1 Deck]
+Mox Emerald
+Black Lotus
+Black Lotus
+Sol Ring
+Benjamin Sisko, Besieged
+Sensei's Divining Top
+Plains
+Grizzly Bears
+Forest
+Mountain
+Forest x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Benjamin Sisko, Besieged.Cast
+Bot1.Pass
+? Bot1.Mana = {G}{G}
+Bot2.Pass
+Bot1.Hand.Sensei's Divining Top.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+? Bot1.Sees.Bot1.LibraryTop = Grizzly Bears
+? Bot2.Sees.Bot1.LibraryTop = Grizzly Bears
+? Bot1.Sees.Bot1.LibraryTopObject = 7
+? Bot2.Sees.Bot1.LibraryTopObject = 7
+Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look)
+Bot1.Arrange(Grizzly Bears; Mountain; Forest)
+? Bot1.Sees.Bot1.LibraryTop = Grizzly Bears
+? Bot2.Sees.Bot1.LibraryTop = Grizzly Bears
+? Bot1.Sees.Bot1.LibraryTopObject != 7
+? Bot2.Sees.Bot1.LibraryTopObject != 7
+Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Sees.Bot1.LibraryTop = Sensei's Divining Top
+
+[Expect]
+Bot1.Hand = Grizzly Bears
+Bot1.Library = Sensei's Divining Top; Mountain; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest

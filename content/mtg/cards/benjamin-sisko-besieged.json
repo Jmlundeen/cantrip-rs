@@ -1,0 +1,8 @@
+{
+  "name": "Benjamin Sisko, Besieged",
+  "manaCost": "{4}{G}{G}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Play with the top card of your library revealed.\nYou may play lands and cast creature spells from the top of your library."
+}
