@@ -1,0 +1,59 @@
+# "Each turn" counts the opponent's turn too (CR 603.2): on Bot2's turn Bot1's first Opt draws its first card this turn
+# and creates nothing, while the second Opt draws its second card and creates the Officer token. "Officers you control":
+# Bot2's Tactical Officer stays 2/1 while Bot1's token is a 2/2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Sapphire
+Worf, Son of Mogh
+Opt
+Opt
+Island x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Tactical Officer
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Worf, Son of Mogh.Cast
+? Bot1.Mana = {R}
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Tactical Officer.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Island |)
+? Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Island |)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 5
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Officer Token.Power = 2
+Bot2.Battlefield.Tactical Officer.Power = 2
+Bot2.Battlefield.Tactical Officer.Toughness = 1
+Bot1.Battlefield.Worf, Son of Mogh.Power = 3
