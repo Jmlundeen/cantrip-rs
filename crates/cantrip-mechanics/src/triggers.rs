@@ -509,6 +509,18 @@ pub fn this_attacks_or_blocks(_: &dyn Query, source: ObjectId, event: &Event) ->
     }
 }
 
+/// "Whenever this creature deals damage to a player" (CR 603.2, 120.2, 120.8): damage of more than 0 dealt by `source` to a
+/// player, that player the subject (not the trigger's controller). Abyssal Specter, Pit Scorpion and Serpent Generator's Snake
+/// print it.
+pub fn this_deals_damage_to_a_player(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: from, target: Target::Player(player), amount, .. } if *from == source && *amount > 0 => {
+            Fired::about(Target::Player(*player))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever this creature deals damage to an opponent" (CR 603.2, 120.2): damage of more than 0 dealt by `asker.source` to one of its
 /// controller's opponents, the player the subject. Hypnotic Specter and Nicol Bolas print it.
 pub fn this_deals_damage_to_opponent(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {

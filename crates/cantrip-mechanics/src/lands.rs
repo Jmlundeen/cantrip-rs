@@ -41,6 +41,12 @@ pub fn controls_land_type(q: &dyn Query, controller: PlayerId, land_type: Subtyp
     q.state().battlefield().iter().any(|&id| q.controller(id) == controller && q.chars(id).has_subtype(land_type))
 }
 
+/// Whether `player` controls a snow land (CR 205.4g), through the layers. Arctic Foxes and Arcum's Sleigh ask it of the defending
+/// player.
+pub fn controls_snow_land(q: &dyn Query, player: PlayerId) -> bool {
+    q.state().battlefield().iter().any(|&id| q.controller(id) == player && q.chars(id).supertypes.snow && q.chars(id).is(CardType::Land))
+}
+
 /// "This creature can't attack unless defending player controls an Island" (CR 508.5, 509.1b): the attack rule of the creature
 /// itself, the defending player (including a battle's protector) read through the layers and the creature's words (CR 612.2).
 /// Island Fish Jasconius, Merchant Ship, Pirate Ship, Dandân and Sea Serpent print it.
