@@ -3176,6 +3176,10 @@ pub enum PlayRule {
     /// "You may look at the top card of your library any time" (CR 401.2): the player sees it whenever they could look, which
     /// the host shows them. Bolas's Citadel, Mystic Forge, Case of the Locked Hothouse (solved).
     LookAtLibraryTop,
+    /// "Play with the top card of your library revealed" (CR 401.5, 401.6, 701.20a):
+    /// Benjamin Sisko, Besieged and Garruk's Horde. Every player sees the current top,
+    /// subject to the announcement barrier of CR 401.5. This grants no play permission.
+    RevealLibraryTop,
     /// "As long as [condition], [rules]": the rules apply only while the condition holds, asked with the permanent as source
     /// and its controller. A Case's "Solved - [static ability]" means "As long as this Case is solved, [static ability]"
     /// (CR 702.169b): `cantrip_mechanics::solved::play_rules`.

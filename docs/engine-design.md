@@ -944,8 +944,16 @@ instruction moving it is the one that reveals it ("reveal it and put it into you
 `Game::return_to_hand_revealed` and its kin, mark the move; an effect's reveal lasts only through that instruction, so a
 later draw in the same effect moves a hidden card), a replacement reveals it as it moves, a cost or announcement of a
 spell or ability still on the stack revealed it (`StackItem::members`: behold, splice),
-or its reveal triggered an ability not yet off the stack (miracle). No card the engine has keeps a card revealed by a
-continuous effect; the first that does builds that. The history's `Event::Revealed` is what was shown, never whether a card is revealed
+or its reveal triggered an ability not yet off the stack (miracle). Continuous library-top reveal is
+`PlayRule::RevealLibraryTop` (Benjamin Sisko, Besieged; Garruk's Horde). `library_visibility` owns the CR 401.5
+announcement barrier and CR 401.6 identity renewal. A mana activation releases only its own barrier before
+its immediate resolution (605.3b); a surrounding spell or ability announcement retains its barrier. Insertion and
+final library ordering are one instruction;
+shuffling interrupts the reveal even if the same card finishes on top. Static reveals carry a rules cause.
+`Game::revealed_in_hidden_zones`, `visible_library_top` and `ops::seen_by_all` share that derived rule for host/AI
+visibility and rules look-back. Play permissions remain independent. Frame snapshots and the currently revealed top
+are journaled state, so `goto` undoes/redoes them with the rest of the game.
+The history's `Event::Revealed` is what was shown, never whether a card is revealed
 now. The card an ability is activated from in a hand or a library is revealed by the activation itself, one
 `Event::Revealed` by the activator as it is announced and before any cost (CR 602.2a; a mana ability's too, CR 605.3; a
 special action none, CR 116.2), and is not kept revealed while the ability is on the stack (RX-7 in

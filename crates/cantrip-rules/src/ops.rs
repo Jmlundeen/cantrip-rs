@@ -146,8 +146,8 @@ struct Plan {
 /// still on the stack revealed it (behold, splice); or its revealing triggered an ability that has not yet left the stack
 /// (miracle, CR 702.94a). The card an ability is activated from in a hidden zone is revealed by the activation alone, one
 /// event (CR 602.2a, `Event::Revealed`), and is not kept revealed while the ability is on the stack (RX-7,
-/// `docs/rules-exceptions.md`). No card the engine has keeps a card revealed by a continuous effect ("play with the top card
-/// of your library revealed"): the first that does adds that here.
+/// `docs/rules-exceptions.md`). A continuous library-top reveal is derived through
+/// `library_visibility`, including the announcement barrier of CR 401.5.
 pub(crate) fn seen_by_all(cx: &Cx, id: ObjectId, revealed_by_move: bool) -> bool {
     seen_by_all_in(cx.g, id, revealed_by_move)
 }
@@ -184,6 +184,9 @@ fn seen_by_all_in(g: &crate::Game, id: ObjectId, revealed_by_move: bool) -> bool
         ZoneKind::Exile => !o.face_down || s.apnap().all(|p| o.seen_by & (1 << p.0) != 0),
         ZoneKind::Hand | ZoneKind::Library => {
             revealed_by_move
+                || (o.zone.is(ZoneKind::Library)
+                    && crate::library_visibility::reveals(g, o.owner)
+                    && crate::library_visibility::top(g, o.owner) == Some(id))
                 || s.stack.iter().any(|i| match i.kind {
                     // The cards its cost or announcement revealed are among the objects its cost chose (`StackItem::members`):
                     // a spell's spliced cards and those it beheld (CR 702.47a, 701.4a), revealed from its announcement
@@ -4478,6 +4481,7 @@ pub fn arrange_library(cx: &mut Cx, player: PlayerId, top: &[ObjectId], bottom: 
     for &id in bottom {
         cx.st().zone_push(library, id);
     }
+    crate::library_visibility::sync(cx);
 }
 
 /// Puts cards already in a player's library on its bottom in a random order (CR 401.4), the order drawn from the game's own
@@ -4496,6 +4500,10 @@ pub fn bottom_in_random_order(cx: &mut Cx, player: PlayerId, cards: &[ObjectId])
 
 /// Puts objects into their owners' libraries together and arranges them there (CR 401.4).
 pub fn put_into_library(cx: &mut Cx, ids: &[ObjectId], place: LibraryPlace) -> Vec<ObjectId> {
+    as_one_instruction(cx, |cx| put_into_library_ordered(cx, ids, place))
+}
+
+fn put_into_library_ordered(cx: &mut Cx, ids: &[ObjectId], place: LibraryPlace) -> Vec<ObjectId> {
     // Shuffling specific objects is a separate instruction from moving them. CR 701.24c requires the referenced
     // owners' libraries to be shuffled even when an object has left, or a replacement prevents it from arriving.
     // Shuffling the owner's library doesn't affect a phased-out permanent, so its owner is still a shuffle reference.
@@ -5315,6 +5323,7 @@ pub fn as_one_instruction<T>(cx: &mut Cx, f: impl FnOnce(&mut Cx) -> T) -> T {
     };
     if held == 0 {
         settle_at_once(cx);
+        crate::library_visibility::sync(cx);
     }
     done
 }

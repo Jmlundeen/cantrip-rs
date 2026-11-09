@@ -2285,6 +2285,10 @@ pub struct Player {
     pub lands_played: u32,
     /// Drew from an empty library since the last state-based action check (CR 704.5b).
     pub drew_from_empty: bool,
+    /// The card currently continuously revealed on top of this library (CR 401.5).
+    /// Current visibility, not a record of earlier reveals. Used to renew identity
+    /// when that reveal ends without a zone change (CR 401.6).
+    pub revealed_library_top: Option<ObjectId>,
     pub lost: bool,
     pub mulligans: u8,
     pub kept: bool,

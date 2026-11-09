@@ -7671,7 +7671,7 @@ fn land_rules(cx: &Cx, player: PlayerId) -> LandRules {
         PlayRule::LibraryTop | PlayRule::LibraryTopLands => {
             rules.top_lands.push(Grant { object: source, ability });
         }
-        PlayRule::LibraryTopSpells(..) | PlayRule::MaximumHandSize(_) | PlayRule::LookAtLibraryTop | PlayRule::While(..) => {}
+        PlayRule::LibraryTopSpells(..) | PlayRule::MaximumHandSize(_) | PlayRule::LookAtLibraryTop | PlayRule::RevealLibraryTop | PlayRule::While(..) => {}
     });
     // "You may play an additional land this turn" (CR 305.2, 611.2c): an effect a resolved spell or ability made, added to
     // the rest - the number a player can play is the sum of everything that increases it.
@@ -9466,6 +9466,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
     let source = action.source.expect("an action names its source");
     match action.kind {
         ActionKind::PlayLand => {
+            crate::library_visibility::hold(cx);
             // The land play is counted as the land is played (CR 305.1), before anything that watches it triggers:
             // Fastbond's "if it wasn't the first land you played this turn" counts this one.
             cx.st().update_player(player, |p| p.lands_played = p.lands_played.saturating_add(1));
@@ -9501,6 +9502,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             }
         }
         ActionKind::CastSpell => {
+            crate::library_visibility::hold(cx);
             // The cast is made by what the option offered it by (CR 601.2b, 601.3): that permission, on its terms - from where
             // it lets the card be cast, for what it names instead of the mana cost or with what it adds - and for the
             // alternative cost the option names, if any (CR 118.9).
@@ -9545,6 +9547,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             if def.is_mana_ability() {
                 activate_mana(cx, player, source, action.index, action.color, action.color.is_none() && action.mana == Some(Mana::C), &action.targets)?;
             } else {
+                crate::library_visibility::hold(cx);
                 // Asked as the ability it is (CR 607.5): one an effect gave the source reads only its own links, from its
                 // costs and targets to its effect.
                 let by = cx.link_of_nth(source, action.index as usize);
@@ -9555,7 +9558,10 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
                 }
             }
         }
-        ActionKind::TakeCompanion => take_companion(cx, player, source)?,
+        ActionKind::TakeCompanion => {
+            crate::library_visibility::hold(cx);
+            take_companion(cx, player, source)?;
+        }
         _ => unreachable!("not a priority action"),
     }
     // Whoever acted receives priority again, and the run of passes is broken (CR 117.3c).
@@ -10738,6 +10744,15 @@ pub fn could_play_land_during_resolution(cx: &Cx, card: ObjectId) -> bool {
 /// Plays `card` as a land as an effect resolves (CR 305.1, 608.2g): put onto the battlefield as a land play, counted
 /// against the turn's land plays as the special action is (CR 305.2a). The new object, or nothing if it could not be.
 pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<ObjectId>> {
+    let held = crate::library_visibility::hold(cx);
+    let result = play_land_during_resolution_inner(cx, card);
+    if result.is_ok() && held {
+        crate::library_visibility::release(cx);
+    }
+    result
+}
+
+fn play_land_during_resolution_inner(cx: &mut Cx, card: ObjectId) -> R<Option<ObjectId>> {
     if !could_play_land_during_resolution(cx, card) {
         return Ok(None);
     }
@@ -10761,6 +10776,15 @@ pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<Obje
 /// controller: they announce it, make its choices, pay its costs (CR 601.2) and control it (CR 405.4). A cast given up
 /// (CR 733.1) is undone, and nothing happens.
 pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> R<bool> {
+    let held = crate::library_visibility::hold(cx);
+    let result = cast_during_resolution_inner(cx, card, terms);
+    if result.is_ok() && held {
+        crate::library_visibility::release(cx);
+    }
+    result
+}
+
+fn cast_during_resolution_inner(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> R<bool> {
     let Some(player) = terms.caster.or_else(|| cx.resolving().map(|i| i.controller)) else { return Ok(false) };
     let ways = cast_ways_during_resolution(cx, card, player);
     // CR 709.3, 715.3, 712.8a: which face is cast is chosen as it is cast, before it goes on the stack.
@@ -12249,7 +12273,7 @@ pub(crate) fn activate_recorded_mana(cx: &mut Cx, act: &crate::takeback::Activat
             // ability still has to be replayed even though the grant itself disappeared with that action.
             let run = crate::takeback::begin(cx.g, act.clone());
             let done = cx.with_mana_interval(act.source, |cx| cx.own_text(false, |cx|
-                activate_player_mana_effect(cx, act.player, act.source, grant)));
+                activate_player_mana_effect(cx, act.player, act.source, grant, false)));
             crate::takeback::end(cx.g, run, done.is_ok());
             return done;
         };
@@ -12269,6 +12293,9 @@ pub fn activate_mana(
     colorless: bool,
     sacrifice: &[Target],
 ) -> R<()> {
+    // Only this activation's barrier ends before its immediate resolution
+    // (CR 401.5, 605.3b). A surrounding cast or activation keeps its own barrier.
+    let held = crate::library_visibility::hold(cx);
     // Asked as the ability it is (CR 607.5): one an effect gave the source reads only its own links - its colors, its
     // restriction, its costs and its effect.
     let by = if index < PLAYER_MANA_ABILITY { cx.link_of_nth(source, index as usize) } else { None };
@@ -12278,7 +12305,7 @@ pub fn activate_mana(
     // A mana ability activated while an ability resolves (paying a cost it asks for) is its own text, its source's now, as are
     // the triggered mana abilities it triggers (`Cx::own_text`).
     let done = cx.with_mana_interval(source, |cx| {
-        cx.own_text(false, |cx| activate_mana_as(cx, player, source, index, color, colorless, sacrifice, by))
+        cx.own_text(false, |cx| activate_mana_as(cx, player, source, index, color, colorless, sacrifice, by, held))
     });
     crate::takeback::end(cx.g, run, done.is_ok());
     done
@@ -12294,9 +12321,10 @@ fn activate_mana_as(
     colorless: bool,
     sacrifice: &[Target],
     by: Option<Linked>,
+    held: bool,
 ) -> R<()> {
     if index >= PLAYER_MANA_ABILITY {
-        return activate_player_mana(cx, player, source, index - PLAYER_MANA_ABILITY);
+        return activate_player_mana(cx, player, source, index - PLAYER_MANA_ABILITY, held);
     }
     let ability = cx.chars(source).abilities().nth(index as usize).expect("ability");
     let def = activated(cx, ability).expect("activated");
@@ -12411,6 +12439,7 @@ fn activate_mana_as(
     // history says so. It is emitted too: "whenever you activate an ability of a creature" (Elrond, Moon-Reader) triggers on a
     // mana ability's activation (its ruling), the trigger waiting for the next time a player would receive priority
     // (CR 603.3); the abilities that mean only the ones that use the stack ask `ActivatedDef::is_mana_ability` of it themselves.
+    if held { crate::library_visibility::release(cx); }
     let activated = Event::AbilityActivated { source, ability, player, by: granted };
     if crate::settle::activation_watched(cx) {
         cx.emit(activated);
@@ -12541,14 +12570,14 @@ fn mana_held_everywhere(cx: &Cx) -> ManaPool {
 
 /// Activating a mana ability the player has of their own (CR 605.1a, 611.2a, 605.3): the nth of those that effects gave them.
 /// Its cost is paid, then its mana added at once. It has no source object (CR 605.1a): `source` is only the card that gave it.
-fn activate_player_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, n: u8) -> R<()> {
+fn activate_player_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, n: u8, held: bool) -> R<()> {
     let Some(effect) = cx.s().effects.iter()
         .filter(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player)
         .nth(n as usize).copied() else { return Err(Stop::Cancel) };
-    activate_player_mana_effect(cx, player, source, effect)
+    activate_player_mana_effect(cx, player, source, effect, held)
 }
 
-fn activate_player_mana_effect(cx: &mut Cx, player: PlayerId, source: ObjectId, effect: ContinuousEffect) -> R<()> {
+fn activate_player_mana_effect(cx: &mut Cx, player: PlayerId, source: ObjectId, effect: ContinuousEffect, held: bool) -> R<()> {
     let EffectKind::PlayerManaAbility(ability) = effect.kind else { return Err(Stop::Cancel) };
     let def = activated(cx, ability).expect("activated");
     let mut mana = def.cost.mana;
@@ -12614,6 +12643,7 @@ fn activate_player_mana_effect(cx: &mut Cx, player: PlayerId, source: ObjectId, 
     })();
     if !mana.is_zero() { crate::takeback::end_paying(cx.g); }
     payment?;
+    if held { crate::library_visibility::release(cx); }
     // Its mana has no source (CR 605.1a, 106.3).
     let outer = cx.mana_source.replace(ObjectId::NONE);
     let added = match def.mana {

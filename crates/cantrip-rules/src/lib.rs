@@ -45,6 +45,9 @@ mod combat_assignment_tests;
 mod day_night;
 mod designations;
 mod layers;
+mod library_visibility;
+#[cfg(test)]
+mod library_visibility_tests;
 mod loops;
 mod merge;
 #[cfg(test)]
@@ -767,6 +770,10 @@ impl Game {
                     self.state.frame_remove(at);
                 }
             }
+            {
+                let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+                library_visibility::sync(&mut cx);
+            }
             self.forget();
         }
     }
@@ -1226,12 +1233,24 @@ impl Game {
         actions::may_look_at_library_top(self, self.cards, player)
     }
 
+    /// The top eligible for an authorized look/reveal, unless CR 401.5 keeps it hidden.
+    /// This supplies timing, not permission; the caller must check the look/reveal rule.
+    pub fn visible_library_top(&self, player: PlayerId) -> Option<ObjectId> {
+        library_visibility::top(self, player)
+    }
+
     /// The cards in a hand or a library that every player sees now, a reveal of them in effect (CR 701.20a): the cards a
     /// spell or ability on the stack revealed as it was announced or paid for (behold, splice), and a card whose revealing
     /// triggered an ability not yet off the stack (miracle). The card an ability was activated from there is revealed by
     /// the activation's event alone (CR 602.2a, RX-7 in `docs/rules-exceptions.md`).
     pub fn revealed_in_hidden_zones(&self) -> Vec<ObjectId> {
-        ops::revealed_in_hidden_zones(self)
+        let mut revealed = ops::revealed_in_hidden_zones(self);
+        for player in self.state.seats() {
+            if library_visibility::reveals(self, player) {
+                revealed.extend(self.visible_library_top(player));
+            }
+        }
+        revealed
     }
 }
 
@@ -1473,6 +1492,7 @@ impl<'a> Cx<'a> {
     /// are asked now (CR 603.8), or, inside an instruction the card performs as several calls (`Game::one_instruction`), once
     /// it is done - an exchange of control is not judged with one permanent given and the other not yet taken.
     pub(crate) fn state_changed(&mut self) {
+        library_visibility::sync(self);
         // An attacking or blocking creature that is no longer a creature, and a planeswalker or battle being attacked that is
         // no longer one, leave combat as they stop being one (CR 506.4), not when an event next settles the game; inside an
         // instruction, once it is done (`ops::as_one_instruction`).
@@ -1611,6 +1631,7 @@ impl<'a> Cx<'a> {
         ops::settle_at_once(self);
         let start = self.g.log.len();
         self.record(event);
+        library_visibility::sync(self);
         settle::collect_triggers(self, &event, None, start);
     }
 
@@ -1619,6 +1640,7 @@ impl<'a> Cx<'a> {
     /// abilities (CR 603.10a).
     pub fn emit_batch(&mut self, events: &[Event], before: Option<settle::Before>) {
         let start = self.record_batch(events);
+        library_visibility::sync(self);
         settle::collect_batch(self, events, before, start);
     }
 

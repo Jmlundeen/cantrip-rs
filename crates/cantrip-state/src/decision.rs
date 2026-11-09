@@ -42,6 +42,9 @@ pub struct Frame {
     /// not judged yet (CR 603.8). The resolution goes on with it when answered, as a run never stopped would
     /// (`cantrip_rules::StateCheck`).
     pub unjudged: bool,
+    /// Top cards at the start of an announcement or special action (CR 401.5).
+    /// New top cards cannot be revealed or looked at before that procedure finishes.
+    pub library_tops: Option<Vec<Option<ObjectId>>>,
 }
 
 impl Frame {
@@ -59,6 +62,7 @@ impl Frame {
             staged: false,
             scratch: [0; 4],
             unjudged: false,
+            library_tops: None,
         }
     }
 
@@ -81,7 +85,7 @@ impl Frame {
 /// Two frames are the same work in progress whatever bookkeeping their runs carry: the marks and request ids.
 impl PartialEq for Frame {
     fn eq(&self, other: &Frame) -> bool {
-        self.position() == other.position()
+        self.position() == other.position() && self.library_tops == other.library_tops
     }
 }
 
@@ -90,6 +94,7 @@ impl Eq for Frame {}
 impl std::hash::Hash for Frame {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.position().hash(state);
+        self.library_tops.hash(state);
     }
 }
 
