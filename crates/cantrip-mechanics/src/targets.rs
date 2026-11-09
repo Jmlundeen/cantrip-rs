@@ -607,6 +607,31 @@ fn creature_with_flying_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool 
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if has_flying_creature(q, id))
 }
 
+fn creature_without_flying_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if !q.chars(id).has(Keyword::Flying))
+}
+
+/// "Target creature without flying" (CR 115.1, 702.9): flying as the layers give it when it is chosen and again as the ability or
+/// spell resolves (CR 608.2b), so a creature that gains flying in response is no longer a legal target. High-Flying Ace, Twinmaw
+/// Stormbrood (Charring Bite) and Flood print it.
+pub const CREATURE_WITHOUT_FLYING: TargetSpec = target(creature_without_flying_filter);
+
+fn attacking_creature_without_flying_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    attacking_creature_filter(q, asker, t) && creature_without_flying_filter(q, asker, t)
+}
+
+/// "Target attacking creature without flying" (CR 115.1, 506.4, 702.9). Oteclan Landmark (Oteclan Levitator) and Pit Trap print it.
+pub const ATTACKING_CREATURE_WITHOUT_FLYING: TargetSpec = target(attacking_creature_without_flying_filter);
+
+fn creature_without_flying_attacking_you_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_without_flying_filter(q, asker, t)
+        && matches!(t, Target::Object(id) if q.state().attackers.iter().any(|a| a.id == id && a.target == Target::Player(asker.controller)))
+}
+
+/// "Target creature without flying that's attacking you" (CR 115.1, 506.3, 508.1b, 702.9): "attacking you" is attacking the
+/// player, so a creature attacking a planeswalker or battle you control is not one. Ice Floe and Snow Fortress print it.
+pub const CREATURE_WITHOUT_FLYING_ATTACKING_YOU: TargetSpec = target(creature_without_flying_attacking_you_filter);
+
 /// "Target creature with flying" (CR 115.1, 702.9), read from its computed characteristics. Bow of Nylea, Pawpatch
 /// Formation, Glorious Decay, Warg Tactics and Konstrari Charm print it.
 pub const CREATURE_WITH_FLYING: TargetSpec = target(creature_with_flying_filter);

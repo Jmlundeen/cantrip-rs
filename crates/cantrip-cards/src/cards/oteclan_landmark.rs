@@ -3,12 +3,6 @@ use cantrip_mechanics::triggers::{THIS_ATTACKS, THIS_ENTERS};
 use cantrip_mechanics::{craft, effects, targets};
 use cantrip_oracle as oracle;
 
-/// "Target attacking creature without flying": attacking now (CR 506.3), and judged again as the ability resolves (CR
-/// 608.2b), so one that has gained flying since is no longer a legal target.
-fn attacking_without_flying(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.is_attacking(id) && !q.chars(id).has(Keyword::Flying))
-}
-
 /// "... gains flying until end of turn."
 fn gains_flying(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
@@ -19,7 +13,7 @@ fn gains_flying(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static BACK: CardDef = CardDef {
     abilities: &[triggered(THIS_ATTACKS, gains_flying, "Whenever this creature attacks, target attacking creature without flying gains flying until end of turn.")
-        .targets(&[target(attacking_without_flying)])],
+        .targets(&[targets::ATTACKING_CREATURE_WITHOUT_FLYING])],
     ..oracle::OTECLAN_LEVITATOR
 };
 
