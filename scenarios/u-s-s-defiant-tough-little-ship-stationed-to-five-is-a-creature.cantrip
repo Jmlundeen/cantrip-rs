@@ -1,0 +1,62 @@
+# U.S.S. Defiant: exactly five charge counters meet the 5+ striation (CR 721.2a), so it is a 7/4 artifact creature with
+# flying and hexproof. Station taps 5-power Juggernaut ({4}, not an artifact, paid in full).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Black Lotus
+U.S.S. Defiant, Tough Little Ship
+Island
+Juggernaut
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.U.S.S. Defiant, Tough Little Ship.Cast
+Bot1.Pass
+Bot1.Target(Count: 0)
+[T1 Bot1.Main2]
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Juggernaut.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Activate(Ability: Station)
+Bot1.Choose(Juggernaut)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Counters.Charge = 5
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Types = Artifact; Creature
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Power = 7
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Toughness = 4
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Keywords = Flying; Hexproof
+
+[Expect]
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Counters.Charge = 5
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Types = Artifact; Creature
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Power = 7
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Toughness = 4
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Keywords = Flying; Hexproof

@@ -1,0 +1,47 @@
+# U.S.S. Defiant: its entering trigger may target its controller's own permanents. Bot1 suits up Memnite with Rancor on
+# turn 1, then destroys its own Rancor (an enchantment) with the Defiant on turn 5 - and Rancor returns to hand when put
+# into the graveyard from the battlefield, which is where the Expect finds it. Memnite survives it.
+
+[Bot1 Deck]
+Forest
+Memnite
+Rancor
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+U.S.S. Defiant, Tough Little Ship
+Mox Sapphire
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Rancor.Cast(Bot1.Battlefield.Memnite)
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.U.S.S. Defiant, Tough Little Ship.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Rancor)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Rancor
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Forest; Memnite; Mox Emerald; Mox Jet; Mox Ruby; Mox Pearl; U.S.S. Defiant, Tough Little Ship
