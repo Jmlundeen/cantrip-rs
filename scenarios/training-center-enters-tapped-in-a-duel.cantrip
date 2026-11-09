@@ -1,0 +1,15 @@
+# Training Center: with one opponent it enters tapped (CR 614.1d) - one is just past "two or more".
+
+[Bot1 Deck]
+Training Center
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Training Center.Play
+? Bot1.Battlefield.Training Center.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Training Center.Tapped = true
