@@ -89,6 +89,17 @@ static EXERTER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A static permission, not an intervening trigger condition.
+fn at_twenty(q: &dyn Query, me: &Asker) -> bool {
+    q.state().player(me.controller).life == 20
+        && !q.history().this_turn().iter().any(|r| matches!(r.event, Event::Exerted { permanent, .. } if permanent == me.source))
+}
+static CONDITIONAL: CardDef = CardDef {
+    name: "Attack Option Conditional",
+    abilities: &[paid_as_it_attacks(AttackOption::Exert, gain_one, "At life 20, you may exert it as it attacks. When you do, gain 1 life.").attack_condition(at_twenty)],
+    ..EXERTER
+};
+
 fn one_to_attack_them(q: &dyn Query, me: &Asker, _: ObjectId, target: Target) -> Option<ManaCost> {
     (target == Target::Player(q.obj(me.source).controller)).then_some(ManaCost { generic: 1, ..ManaCost::ZERO })
 }
@@ -119,7 +130,7 @@ static GIFT: CardDef = CardDef { name: "Attack Option Gift", types: TypeSet::of(
 
 fn game() -> Game {
     let table: &'static CardTable =
-        Box::leak(Box::new(CardTable::new([&FILLER, &RECRUITER, &DOUBLE, &BEAR, &PUMPER, &VIGILANT, &HASTY, &ELF, &EXERTER, &TOLL, &GIFT, &ANNEX, &BLUE_ANNEX])));
+        Box::leak(Box::new(CardTable::new([&FILLER, &RECRUITER, &DOUBLE, &BEAR, &PUMPER, &VIGILANT, &HASTY, &ELF, &EXERTER, &CONDITIONAL, &TOLL, &GIFT, &ANNEX, &BLUE_ANNEX])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     g.verify = true;
@@ -425,7 +436,7 @@ fn exerting_as_it_attacks_is_a_choice_with_its_own_trigger() {
         assert!(matches!(r.kind, RequestKind::May { source, purpose: Purpose::Ask(q) } if source == exerter && q.verb == "Exert"), "{:?}", r.kind);
         answer(&mut g, &r, if exert { Answer::Yes } else { Answer::No });
         to_blockers(&mut g);
-        assert_eq!(g.state.obj(exerter).marks.exerted_by, exert.then_some(YOU));
+        assert_eq!(g.state.obj(exerter).marks.exerted_by, if exert { 1 << YOU.0 } else { 0 });
         assert_eq!(g.state.player(YOU).life, if exert { 21 } else { 20 });
     }
 }
@@ -498,4 +509,62 @@ fn a_later_page_of_phyrexian_symbols_offers_only_what_the_life_left_covers() {
     let r = next(&mut g);
     let RequestKind::ChooseModes { modes, at_most, .. } = &r.kind else { panic!("the rest, not {:?}", r.kind) };
     assert_eq!((modes.len(), *at_most), (65, 5));
+}
+
+#[test]
+fn attack_permission_is_checked_at_declaration_not_trigger_resolution() {
+    for allowed in [true, false] {
+        let mut g = game();
+        let source = put(&mut g, &CONDITIONAL, YOU);
+        if !allowed { g.state.update_player(YOU, |p| p.life = 19); }
+        attack(&mut g, &[source]);
+        if allowed {
+            let r = next(&mut g);
+            assert!(matches!(r.kind, RequestKind::May { purpose: Purpose::Ask(q), .. } if q.verb == "Exert"), "permitted exert must be offered");
+            answer(&mut g, &r, Answer::Yes);
+        }
+        to_blockers(&mut g);
+        assert_eq!(g.state.obj(source).marks.exerted_by != 0, allowed, "static permission controls payment");
+        assert_eq!(g.state.player(YOU).life, if allowed { 21 } else { 19 }, "linked trigger must resolve despite changed static condition");
+    }
+}
+
+#[test]
+fn exert_choice_history_trigger_and_duration_survive_undo_redo_and_a_declined_branch() {
+    let mut g = game();
+    let source = put(&mut g, &EXERTER, YOU);
+    attack(&mut g, &[source]);
+    let r = next(&mut g);
+    let before = g.checkpoint();
+    answer(&mut g, &r, Answer::Yes);
+    to_blockers(&mut g);
+    let yes = g.checkpoint();
+    let history = g.log.clone();
+    assert!(history.iter().any(|r| matches!(r.event, Event::Exerted { permanent, player: YOU } if permanent == source)), "exert must be recorded");
+    g.goto(before);
+    assert_eq!(g.state.obj(source).marks.exerted_by, 0, "undo exert duration");
+    assert!(!g.log.iter().any(|r| matches!(r.event, Event::Exerted { .. })), "undo exert history");
+    answer(&mut g, &r, Answer::No);
+    to_blockers(&mut g);
+    let no = g.checkpoint();
+    assert_eq!(g.state.player(YOU).life, 20, "decline branch has no trigger");
+    g.goto(yes);
+    assert_eq!(g.log, history, "redo exact history");
+    assert_eq!(g.state.obj(source).marks.exerted_by, 1, "redo exert duration");
+    assert_eq!(g.state.player(YOU).life, 21, "redo trigger effect");
+    g.goto(no);
+    assert_eq!(g.state.obj(source).marks.exerted_by, 0, "undo across common ancestor");
+}
+
+#[test]
+fn put_into_combat_is_not_an_exert_permission_or_a_paid_attack_cost() {
+    let mut g = game();
+    let source = put(&mut g, &EXERTER, YOU);
+    g.state.update_turn(|t| { t.set_step(Step::DeclareAttackers); t.attacked = true; });
+    let mut cx = crate::Cx { g: &mut g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    crate::ops::enter_attacking(&mut cx, &[source], Target::Player(THEM));
+    assert!(g.state.attackers.iter().any(|a| a.id == source), "creature entered attacking");
+    assert_eq!(g.state.obj(source).marks.exerted_by, 0, "putting into combat does not exert");
+    assert!(!g.log.iter().any(|r| matches!(r.event, Event::PaidToAttack { .. } | Event::Exerted { .. })), "no declaration cost event");
+    assert!(g.state.triggers.is_empty(), "no linked exert trigger");
 }

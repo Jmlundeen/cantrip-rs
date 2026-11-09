@@ -1439,7 +1439,7 @@ impl<'a> Projector<'a> {
             station_pt: cantrip_oracle::station_pt(def.name).unwrap_or_default().to_string(),
             printed_power: printed_pt.map(|(p, _)| p),
             printed_toughness: printed_pt.map(|(_, t)| t),
-            exerted: obj.marks.exerted_by.is_some(),
+            exerted: obj.marks.exerted_by != 0,
             saddled: game.is_saddled(id),
             goaded: effect(EffectKind::Goaded),
             band: s.attackers.iter().find(|a| a.id == id).map_or(0, |a| crate::prompt::wire(a.band)),

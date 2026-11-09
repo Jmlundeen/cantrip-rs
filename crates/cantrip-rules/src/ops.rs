@@ -4841,13 +4841,13 @@ pub fn untap_together(cx: &mut Cx, ids: &[ObjectId]) {
     }
 }
 
-/// Exerts a permanent (CR 701.43a): it won't untap during its controller's next untap step.
-pub fn exert(cx: &mut Cx, id: ObjectId) {
+/// Exerts a permanent (CR 701.43a): it won't untap during `player`'s next untap step.
+pub fn exert(cx: &mut Cx, id: ObjectId, player: PlayerId) {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
         return;
     }
-    let controller = cx.s().obj(id).controller;
-    cx.st().update_obj(id, |o| o.marks.exerted_by = Some(controller));
+    cx.st().update_obj(id, |o| o.marks.exerted_by |= 1 << player.0);
+    cx.emit(Event::Exerted { permanent: id, player });
 }
 
 /// Monstrosity N (CR 701.37a): a permanent that is not monstrous gets N +1/+1 counters and becomes monstrous, and what

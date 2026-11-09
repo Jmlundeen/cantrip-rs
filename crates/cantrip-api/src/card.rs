@@ -1747,6 +1747,7 @@ impl TriggeredDef {
         flanking: false,
         on_sacrifice: false,
         attack_option: None,
+        attack_condition: None,
         cast_option: None,
     };
 }
@@ -1910,6 +1911,10 @@ pub struct TriggeredDef {
     /// triggers on that instance's `Event::PaidToAttack` - the core owns the trigger, `listens` and `matches` are not used.
     /// Its subject is the creature the cost tapped (enlist's), or none.
     pub attack_option: Option<AttackOption>,
+    /// Whether this optional cost may be chosen as attackers are declared (CR 508.1g). This is the static
+    /// permission, distinct from the linked trigger's intervening `condition` (CR 603.4); it is never checked
+    /// again as that trigger resolves. Combat Celebrant restricts exert to an object not exerted this turn.
+    pub attack_condition: Option<TriggerCondition>,
     /// The optional additional cost to cast a spell (CR 601.2b) this ability is linked to (CR 607.2h): casualty's (CR 702.153a)
     /// or conspire's (CR 702.78a), on a spell whose abilities include it - its own card's `delayed` ability given to it by
     /// another object ("Each instant and sorcery spell you cast has casualty 1") - beside the printed one

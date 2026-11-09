@@ -37,6 +37,8 @@ mod lasting_attack_tests;
 #[cfg(test)]
 mod attack_option_tests;
 #[cfg(test)]
+mod exert_tests;
+#[cfg(test)]
 mod attacking_tokens_tests;
 mod attach;
 #[cfg(test)]
@@ -2819,7 +2821,8 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn exert(&mut self, permanent: ObjectId) {
-        ops::exert(self, permanent);
+        let player = self.doer();
+        ops::exert(self, permanent, player);
     }
 
     fn monstrosity(&mut self, permanent: ObjectId, counters: i32) {

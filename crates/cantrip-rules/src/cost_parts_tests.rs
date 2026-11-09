@@ -1823,7 +1823,7 @@ fn source_can_be_exerted_before_sacrificing_it() {
     let r = next(&mut g);
     pay_first(&mut g, r, |choices| choices.iter().position(|c| c.label.starts_with("Exert ")));
     assert!(g.state.obj(source).became.is_some());
-    assert_eq!(g.state.obj(source).marks.exerted_by, Some(YOU));
+    assert_eq!(g.state.obj(source).marks.exerted_by, 1 << YOU.0);
     let serial = g.state.stack.last().expect("the activation is on the stack").serial;
     assert_eq!(g.history().ability_cost_objects(serial, 0, CostPart::ExertSelf).collect::<Vec<_>>(), vec![source]);
 }

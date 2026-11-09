@@ -3453,8 +3453,11 @@ Known gaps:
   made while an effect resolves paying its costs is offered the card's own ways open from where it is too (`Label::Way`).
 - Mandatory costs to attack are mana only: one that asks for life (Sivitri, Dragon Master's +1), a Phyrexian symbol paid
   with life (Norn's Annex), tapping or sacrificing is not built, nor anything that changes a cost to attack. Optional costs
-  to attack are enlist and exert (above); one with a condition of its own ("if it hasn't been exerted this turn, you may
-  exert it", Combat Celebrant) or a mana part would extend `AttackOption`. No card in content needs them.
+  to attack are enlist and exert (above). `TriggeredDef::attack_condition` limits choosing the optional cost
+  (CR 508.1g), independently of the linked trigger: Combat Celebrant queries this turn's `Exerted` history
+  for its exact object. `Event::Exerted` records every exertion, including activated costs and repeats;
+  exert's active untap prohibitions keep one bit per exerting player and expire in that player's next
+  untap step (CR 701.43a-b). A mana part would further extend `AttackOption`.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
 - Several permanents one effect puts
   onto the battlefield enter together (`ops::put_onto_battlefield`, `Game::put_all_onto_battlefield*`: Show and Tell,

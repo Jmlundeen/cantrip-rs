@@ -184,8 +184,9 @@ pub struct Marks {
     /// `DOOR_RIGHT` "right half unlocked". Given as it enters (CR 709.5d) or by an unlock (CR 709.5e-f); a new object
     /// (CR 400.7) has neither.
     pub doors: u8,
-    /// The player whose next untap step it sits out (CR 701.43a).
-    pub exerted_by: Option<PlayerId>,
+    /// A bit for each player whose next untap step it sits out (CR 701.43a-b). Multiple exertions by
+    /// one player expire together; exertions by different players retain their own expiry.
+    pub exerted_by: u8,
     /// It has become monstrous (CR 701.37b).
     pub monstrous: bool,
     /// It has become solved (CR 719.3b): a designation, neither an ability nor a copiable value, kept until it leaves the

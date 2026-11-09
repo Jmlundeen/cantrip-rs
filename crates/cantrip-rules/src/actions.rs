@@ -1386,7 +1386,8 @@ fn tap_source(cx: &mut Cx, source: ObjectId, cost: &Cost, others: bool) -> Vec<O
 /// Pays the exert and tap-creatures parts of a cost.
 fn pay_exert_and_tappers(cx: &mut Cx, source: ObjectId, cost: &Cost, tappers: &[ObjectId], pending: &mut Vec<ObjectId>) {
     if cost.exert {
-        ops::exert(cx, source);
+        let player = cx.doer();
+        ops::exert(cx, source, player);
     }
     if cost.unattach_self {
         ops::unattach(cx, source);
@@ -3168,7 +3169,7 @@ fn pay_scheduled_costs(cx: &mut Cx, player: PlayerId, spell: ObjectId, scope: Pa
                 for object in materials { scope.record(cx, spell, object, origin, component, CostPart::CraftMaterial); }
             }
             SpellPayment::ExertSelf { origin, component, .. } => {
-                ops::exert(cx, spell);
+                ops::exert(cx, spell, player);
                 scope.record(cx, spell, spell, origin, component, CostPart::ExertSelf);
             }
             SpellPayment::UnattachSelf { origin, component, .. } => {

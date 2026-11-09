@@ -218,6 +218,9 @@ pub enum Event {
     /// permanent, or an untap replaced by removing a stun counter (CR 122.1d). Wake Thrasher and Mesmeric Orb listen
     /// for this event; a simultaneous untap announces all its events in one batch (CR 603.2c).
     Untapped { permanent: ObjectId },
+    /// A player exerted a permanent (CR 701.43a-c), independently of tapping or paying an attack cost.
+    /// Each exertion is recorded even when the permanent was already untapped or exerted.
+    Exerted { permanent: ObjectId, player: PlayerId },
     /// A permanent was tapped for mana (CR 106.12, 605.1b): a mana ability with {T} in its cost was activated by `player` and
     /// resolved. `produced` is the mana that ability added (CR 106.12a), of any restriction - not what the triggered mana
     /// abilities it triggers add: "one mana of any type that land produced" reads it. Recorded for the history; the
@@ -502,6 +505,7 @@ impl Event {
             | Event::Cycled { player, .. }
             | Event::Searched { player, .. }
             | Event::AttackersDeclared { player, .. }
+            | Event::Exerted { player, .. }
             | Event::TappedForMana { player, .. }
             | Event::ManaSpent { player, .. }
             | Event::BecameMonarch { player }
@@ -571,6 +575,7 @@ impl Event {
             | Event::Transformed { object: o } => o == object,
             Event::Tapped { permanent }
             | Event::Untapped { permanent }
+            | Event::Exerted { permanent, .. }
             | Event::TappedForMana { permanent, .. }
             | Event::Monstrous { permanent }
             | Event::Solved { permanent }
@@ -674,6 +679,9 @@ impl EventMask {
     pub const PHASED_OUT: EventMask = EventMask(1 << 56);
     /// An optional cost to attack was paid (CR 508.1g, 508.1j).
     pub const PAID_TO_ATTACK: EventMask = EventMask(1 << 57);
+    /// A permanent was exerted (CR 701.43a). Like MUTATED, this shares a dispatch bit
+    /// because all 64 are occupied; trigger/history predicates distinguish the exact Event variant.
+    pub const EXERTED: EventMask = EventMask::TAPPED;
     /// A creature convoked a spell (CR 702.51c): recorded only, for the history.
     pub const CONVOKED: EventMask = EventMask(1 << 58);
     /// The player controlling a player changed (CR 723.1): recorded only, for what each player saw.
@@ -745,6 +753,7 @@ impl EventMask {
             Event::Cycled { .. } => EventMask::CYCLED,
             Event::Attacks { .. } => EventMask::ATTACKS,
             Event::PaidToAttack { .. } => EventMask::PAID_TO_ATTACK,
+            Event::Exerted { .. } => EventMask::EXERTED,
             Event::ClassLevel { .. } => EventMask::CLASS_LEVEL,
             Event::Searched { .. } => EventMask::SEARCHED,
             Event::Drew { .. } => EventMask::DREW,

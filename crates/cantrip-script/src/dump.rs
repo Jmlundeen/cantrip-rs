@@ -347,6 +347,12 @@ impl StateDump {
             if !looked.is_empty() {
                 d.list(&format!("{b}.Looked"), looked, true);
             }
+            // Every exertion by this player this turn, including repeated exertions of one object (CR 701.43b).
+            let exerted = game.history().this_turn().iter().filter_map(|record| match record.event {
+                Event::Exerted { permanent, player: by } if by == p => Some(game.known_name(permanent).to_string()),
+                _ => None,
+            }).collect();
+            d.list(&format!("{b}.Exertions"), exerted, false);
             // A completed surveil (CR 701.25d): both the number instructed and how many cards were actually looked at.
             let surveilled: Vec<String> = game
                 .history()
@@ -684,7 +690,7 @@ impl StateDump {
                     if game.is_saddled(id) {
                         d.set(format!("{key}.Saddled"), true);
                     }
-                    if obj.marks.exerted_by.is_some() {
+                    if obj.marks.exerted_by != 0 {
                         d.set(format!("{key}.Exerted"), true);
                     }
                     // The players who goaded it (CR 701.15a), while any goad lasts.
@@ -1000,7 +1006,7 @@ const GAME_KEYS: &[&str] = &[
 /// The keys the dump writes of a player, after `BotN.`.
 const PLAYER_KEYS: &[&str] = &[
     "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "MayLookAtLibraryTop", "LostTo", "Mana", "ManaFrom", "LandsPlayed", "CitysBlessing",
-    "EnduringStory", "Speed", "Dungeon", "DungeonsCompleted", "TurnsToSkip", "ControlledBy", "NextTurnControlledBy", "Looked", "Surveilled", "Shuffles",
+    "Exertions", "EnduringStory", "Speed", "Dungeon", "DungeonsCompleted", "TurnsToSkip", "ControlledBy", "NextTurnControlledBy", "Looked", "Surveilled", "Shuffles",
     "Sees", "Hand", "Revealed", "Crimes", "Library", "Library.Top", "Companion", "Sideboard", "Graveyard", "Emblems", "Emblems.MadeBy", "Emblems.ExiledWithMakers", "Command", "Commanders", "CommanderColorIdentity", "Battlefield", "PhasedOut",
 ];
 

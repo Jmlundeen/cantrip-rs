@@ -728,7 +728,7 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
             continue;
         }
         if !obj.tapped
-            || obj.marks.exerted_by == Some(active)
+            || obj.marks.exerted_by & (1 << active.0) != 0
             || cx.chars(id).has(Keyword::DoesNotUntap)
             || crate::static_rules::untap_banned(cx, cx.cards(), id)
             || crate::static_rules::untap_step_skips(cx, cx.cards(), id, active)
@@ -752,7 +752,7 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
     if !others.is_empty() {
         for id in cx.s().battlefield().to_vec() {
             let obj = cx.s().obj(id);
-            if obj.controller == active || !obj.tapped {
+            if obj.controller == active || !obj.tapped || obj.marks.exerted_by & (1 << active.0) != 0 {
                 continue;
             }
             if others.iter().any(|&(source, controller, def, by)| {
@@ -783,8 +783,8 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
     ops::settle_lasting_and_control(cx);
     // That untap step has now happened for everything its player exerted, whoever controls it now (CR 701.43a).
     for id in cx.s().battlefield().to_vec() {
-        if cx.s().obj(id).marks.exerted_by == Some(active) {
-            cx.st().update_obj(id, |o| o.marks.exerted_by = None);
+        if cx.s().obj(id).marks.exerted_by & (1 << active.0) != 0 {
+            cx.st().update_obj(id, |o| o.marks.exerted_by &= !(1 << active.0));
         }
     }
     Ok(())
@@ -955,7 +955,7 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
         for o in &options {
             match o.option {
                 AttackOption::Enlist => ops::tap(cx, o.tapped),
-                AttackOption::Exert => ops::exert(cx, o.attacker),
+                AttackOption::Exert => ops::exert(cx, o.attacker, active),
             }
         }
         break (attacks, bands, options);
@@ -1028,7 +1028,11 @@ fn choose_attack_options(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Ta
             .abilities()
             .enumerate()
             .filter_map(|(nth, a)| match cx.cards().ability(a) {
-                AbilityDef::Triggered(t) => t.attack_option.map(|o| (a, chars.instance(nth), o)),
+                AbilityDef::Triggered(t) => t.attack_option.filter(|_| {
+                    t.attack_condition.is_none_or(|condition| {
+                        condition(cx, &Asker { instance: None, source: attacker, controller: active, by: cx.link_nth(attacker, &chars, nth), spell: false })
+                    })
+                }).map(|o| (a, chars.instance(nth), o)),
                 _ => None,
             })
             .collect();

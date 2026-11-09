@@ -2745,7 +2745,7 @@ impl<'s> Run<'s> {
                     | Event::DoorUnlocked { .. }
                     | Event::TurnBegan { .. } => true,
                     Event::ZoneChange { from, .. } => from.is(ZoneKind::Stack),
-                    Event::AttackersDeclared { player: attacker, .. } => bands && attacker == player,
+                    Event::AttackersDeclared { player: attacker, .. } => (bands || matches!(verb, ScriptVerb::Accept | ScriptVerb::Decline)) && attacker == player,
                     // The step under the header began: a point only where its turn-based action asks this (the declaration
                     // of blockers, the discard to hand size). Any later step began because every player passed with the
                     // stack empty (CR 500.2).

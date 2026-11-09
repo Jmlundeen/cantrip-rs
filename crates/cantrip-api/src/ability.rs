@@ -661,6 +661,16 @@ impl AbilityDef {
         }
     }
 
+    /// A condition on choosing an optional cost to attack (CR 508.1g), rather than on its linked trigger.
+    pub const fn attack_condition(self, condition: TriggerCondition) -> AbilityDef {
+        match self {
+            AbilityDef::Triggered(t) if t.attack_option.is_some() => {
+                AbilityDef::Triggered(TriggeredDef { attack_condition: Some(condition), ..t })
+            }
+            _ => panic!("only an optional cost to attack has an attack condition"),
+        }
+    }
+
     /// "This ability triggers only if ..." (CR 702.169c): asked with the trigger event only, never as the ability resolves.
     pub const fn only_if(self, only_if: Condition) -> AbilityDef {
         match self {

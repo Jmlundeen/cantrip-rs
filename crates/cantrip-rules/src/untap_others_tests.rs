@@ -103,11 +103,11 @@ fn doesnt_untap_during_your_untap_step_does_not_stop_the_untap_in_another_player
 fn an_exerted_permanent_untaps_in_another_players_untap_step_and_stays_exerted() {
     let mut game = game();
     let skin = tapped(&mut game, &SKIN, YOU);
-    game.state.update_obj(skin, |o| o.marks.exerted_by = Some(YOU));
+    game.state.update_obj(skin, |o| o.marks.exerted_by = 1 << YOU.0);
     // CR 701.43a: it won't untap during its controller's next untap step, which this isn't.
     untap_step_of(&mut game, THEM);
     assert!(!is_tapped(&game, skin));
-    assert_eq!(game.state.obj(skin).marks.exerted_by, Some(YOU));
+    assert_eq!(game.state.obj(skin).marks.exerted_by, 1 << YOU.0);
 }
 
 #[test]
@@ -166,4 +166,16 @@ fn a_source_that_lost_all_its_abilities_untaps_nothing() {
     cantrip_api::Game::add_effect(&mut cx(&mut game), skin, skin, EffectKind::LoseAllAbilities, Duration::Indefinite);
     untap_step_of(&mut game, THEM);
     assert!(is_tapped(&game, skin));
+}
+
+#[test]
+fn exert_also_prohibits_an_others_untap_ability_in_the_exerting_players_next_step() {
+    let mut game = game();
+    let skin = tapped(&mut game, &SKIN, THEM);
+    crate::ops::exert(&mut cx(&mut game), skin, YOU);
+    untap_step_of(&mut game, YOU);
+    assert!(is_tapped(&game, skin), "exert prohibits even a special untap in that player's next step");
+    assert_eq!(game.state.obj(skin).marks.exerted_by, 0, "exert expires in that step");
+    untap_step_of(&mut game, YOU);
+    assert!(!is_tapped(&game, skin), "the following special untap proceeds");
 }
