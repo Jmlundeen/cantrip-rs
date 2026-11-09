@@ -10,6 +10,38 @@ namespace Cantrip.Server.Tests;
 /// </summary>
 public sealed class DeckListTests
 {
+    [Theory]
+    [InlineData("Commander")]
+    [InlineData("commanders")]
+    public void Explicit_commanders_are_set_aside_and_main_headers_resume_the_library(string header)
+    {
+        DeckList deck = DeckList.Parse("partners", $"{header}\n1 Kytheon, Hero of Akros\nIsamaru, Hound of Konda\nDeck\n97 Plains\nArcane Signet\nSideboard\n1 Lightning Bolt\nCompanion\nLurrus of the Dream-Den\n", "test");
+        Assert.Equal(["Kytheon, Hero of Akros", "Isamaru, Hound of Konda"], deck.Commanders.Select(entry => entry.Card));
+        Assert.Equal(100, deck.Count);
+        Cantrip.Server.Rules.RulesSeat seat = deck.ToRulesSeat("Alice");
+        Assert.Equal(["Kytheon, Hero of Akros", "Isamaru, Hound of Konda"], seat.Commanders);
+        Assert.Equal(98, seat.Deck.Count);
+        Assert.DoesNotContain("Kytheon, Hero of Akros", seat.Deck);
+        Assert.Equal(["Lightning Bolt"], seat.Sideboard);
+        Assert.Equal("Lurrus of the Dream-Den", seat.Companion);
+        Assert.Equal("partners", seat.DeckName);
+    }
+
+    [Theory]
+    [InlineData("Commander\n")]
+    [InlineData("Commander\nDeck\nPlains")]
+    [InlineData("Companion\nCommander\nKytheon, Hero of Akros")]
+    public void A_designation_header_without_a_card_is_refused(string text) =>
+        Assert.Throws<FormatException>(() => DeckList.Parse("d", text, "test"));
+
+    [Fact]
+    public void A_legendary_card_in_the_main_deck_is_never_inferred_to_be_a_commander()
+    {
+        DeckList deck = DeckList.Parse("ordinary", "Kytheon, Hero of Akros\nArcane Signet\n98 Plains", "test");
+        Assert.Empty(deck.ToRulesSeat("Alice").Commanders);
+        Assert.Equal(100, deck.ToRulesSeat("Alice").Deck.Count);
+    }
+
     private static string Content => Path.Combine(RepoRoot.Path, "content");
 
     public static TheoryData<string> Decklists()
@@ -89,6 +121,8 @@ public sealed class DeckListTests
 
         Assert.Equal([new DeckListEntry("Balin, Loremaster", 1, 2)], deck.Commanders);
         Assert.Equal([new DeckListEntry("Forest", 99, 4)], deck.Entries);
-        Assert.Equal(99, deck.Count);
+        // CR 903.5a: a Commander deck is 100 cards, its commander included.
+        Assert.Equal(100, deck.Count);
     }
+
 }

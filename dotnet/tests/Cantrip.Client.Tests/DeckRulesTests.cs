@@ -230,6 +230,37 @@ public sealed class DeckRulesTests
         Assert.False(DeckRules.CanJoinCommanders(Bear, []));
     }
 
+    [Fact]
+    public void Legendary_Vehicles_and_Spacecraft_with_printed_boxes_can_be_commanders()
+    {
+        CatalogCard vehicle = Card("Skysovereign, Consul Flagship", CardTypeView.Artifact, legendary: true, subtypes: ["Vehicle"]);
+        vehicle.Card.PrintedPower = 6;
+        vehicle.Card.PrintedToughness = 5;
+        Assert.True(DeckRules.CanBeCommander(vehicle));
+        Assert.True(DeckRules.CanJoinCommanders(vehicle, []));
+
+        CatalogCard spacecraft = Card("Enterprise NX-01", CardTypeView.Artifact, legendary: true, subtypes: ["Spacecraft"], identity: [ColorView.Blue]);
+        spacecraft.Card.StationPt = "4/3";
+        Assert.Null(spacecraft.Card.Power);
+        Assert.Null(spacecraft.Card.Toughness);
+        Assert.True(DeckRules.CanBeCommander(spacecraft));
+        Assert.True(DeckRules.CanJoinCommanders(spacecraft, []));
+        CatalogCard island = Card("Island", CardTypeView.Land, basic: true, identity: [ColorView.Blue]);
+        Assert.Empty(DeckRules.Problems(Deck("commander", [new("Island", 99)], commanders: [new(spacecraft.Name, 1)]), Catalog(spacecraft, island)));
+
+        spacecraft.Card.StationPt = string.Empty;
+        Assert.False(DeckRules.CanBeCommander(spacecraft));
+        spacecraft.Card.PrintedPower = 0;
+        Assert.False(DeckRules.CanBeCommander(spacecraft));
+        spacecraft.Card.PrintedToughness = 0;
+        Assert.True(DeckRules.CanBeCommander(spacecraft));
+        spacecraft.Card.Supertypes.Clear();
+        Assert.False(DeckRules.CanBeCommander(spacecraft));
+        vehicle.Card.Supertypes.Clear();
+        Assert.False(DeckRules.CanBeCommander(vehicle));
+        Assert.False(DeckRules.CanBeCommander(Card("Legendary artifact", CardTypeView.Artifact, legendary: true)));
+    }
+
     private static readonly CatalogCard Wilson = Card("Wilson, Refined Grizzly", text: "Choose a Background (You can have a Background as a second commander.)\nTrample, ward {2}", legendary: true, identity: [ColorView.Green]);
     private static readonly CatalogCard Background = Card("Raised by Giants", CardTypeView.Enchantment, "Commander creatures you own have base power and toughness 10/10 and are Giants in addition to their other types.", legendary: true, subtypes: ["Background"], identity: [ColorView.Green]);
 

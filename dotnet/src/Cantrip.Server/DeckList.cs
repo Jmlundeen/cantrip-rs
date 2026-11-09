@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Cantrip.Cards.Model;
+using Cantrip.Server.Rules;
 
 namespace Cantrip.Server;
 
@@ -14,6 +15,8 @@ public sealed record DeckListEntry(string Card, int Copies, int Line);
 /// among (North Wind Avatar). A line reading <c>Companion</c> names, on the next line, the deck's companion (CR 702.139a): a
 /// sideboard card of its own, revealed before the game (CR 103.2b) - the server refuses the deck if it doesn't fulfil the
 /// companion's condition.
+/// <c>Commander</c> (or <c>Commanders</c>) starts explicit commander selections; <c>Deck</c> or <c>Main</c> resumes the
+/// library list. Designated commanders count toward the deck's size but begin in the command zone (CR 903.3, 903.6).
 /// <para>
 /// A data file rather than code, and kept outside <c>content</c>: cards are content the game ships, while a deck is
 /// something a player makes, so decks are headed for user data. Cards are named rather than given by id for the same
@@ -45,7 +48,19 @@ public sealed class DeckList
     /// <summary>The card after the <c>Companion</c> line: the deck's companion (CR 702.139a), or null for none.</summary>
     public string? Companion { get; init; }
 
-    public int Count => Entries.Sum(entry => entry.Copies);
+    public int Count => Entries.Concat(Commanders).Sum(entry => entry.Copies);
+
+    /// <summary>The actual deal: designated commanders are separate from the library, sideboard and companion.</summary>
+    public RulesSeat ToRulesSeat(string playerName)
+    {
+        static List<string> Named(IReadOnlyList<DeckListEntry> entries) =>
+            [.. entries.SelectMany(entry => Enumerable.Repeat(entry.Card, entry.Copies))];
+        return new RulesSeat(playerName, Named(Entries), Named(Sideboard), Companion)
+        {
+            Commanders = Named(Commanders),
+            DeckName = Name,
+        };
+    }
 
     /// <summary>Reads a decklist file.</summary>
     /// <exception cref="FormatException">A line is not a card with an optional count of at least one.</exception>
@@ -100,8 +115,9 @@ public sealed class DeckList
         List<DeckListEntry> commanders = [];
         List<DeckListEntry> sideboard = [];
         string[] lines = text.Split('\n');
-        bool afterSideboardLine = false;
-        bool inCommanders = false;
+        List<DeckListEntry> section = entries;
+        bool commanderSeen = false;
+        bool commanderNext = false;
         bool companionNext = false;
         string? companion = null;
 
@@ -113,29 +129,37 @@ public sealed class DeckList
                 continue;
             }
 
-            // The one header this format has. Everything after it is outside the game.
-            if (string.Equals(line, "Sideboard", StringComparison.OrdinalIgnoreCase))
+            int number = index + 1;
+            bool commanderHeader = string.Equals(line, "Commander", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(line, "Commanders", StringComparison.OrdinalIgnoreCase);
+            bool mainHeader = string.Equals(line, "Deck", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(line, "Main", StringComparison.OrdinalIgnoreCase);
+            bool sideHeader = string.Equals(line, "Sideboard", StringComparison.OrdinalIgnoreCase);
+            bool companionHeader = string.Equals(line, "Companion", StringComparison.OrdinalIgnoreCase);
+            if ((commanderNext || companionNext) && (commanderHeader || mainHeader || sideHeader || companionHeader))
             {
-                afterSideboardLine = true;
-                inCommanders = false;
+                throw new FormatException($"{source} line {number}: the preceding header names no card after it.");
+            }
+            if (commanderHeader)
+            {
+                if (commanderSeen) throw new FormatException($"{source} line {number}: a deck has one Commander section.");
+                commanderSeen = true;
+                section = commanders;
+                commanderNext = true;
                 continue;
             }
-            if (string.Equals(line, "Commander", StringComparison.OrdinalIgnoreCase) || string.Equals(line, "Commanders", StringComparison.OrdinalIgnoreCase))
+            if (mainHeader)
             {
-                if (commanders.Count > 0 || inCommanders) throw new FormatException($"{source} line {index + 1}: a deck has one Commander section.");
-                afterSideboardLine = false;
-                inCommanders = true;
+                section = entries;
                 continue;
             }
-            if (string.Equals(line, "Deck", StringComparison.OrdinalIgnoreCase) || string.Equals(line, "Main", StringComparison.OrdinalIgnoreCase))
+            if (sideHeader)
             {
-                inCommanders = false;
-                afterSideboardLine = false;
+                section = sideboard;
                 continue;
             }
 
-            int number = index + 1;
-            if (string.Equals(line, "Companion", StringComparison.OrdinalIgnoreCase))
+            if (companionHeader)
             {
                 companionNext = companion is null ? true : throw new FormatException($"{source} line {number}: a deck has one companion.");
                 continue;
@@ -151,7 +175,8 @@ public sealed class DeckList
                 continue;
             }
 
-            List<DeckListEntry> into = afterSideboardLine ? sideboard : inCommanders ? commanders : entries;
+            commanderNext = false;
+            List<DeckListEntry> into = section;
             if (Counted.Match(line) is { Success: true } counted)
             {
                 int copies = int.Parse(counted.Groups[1].Value, CultureInfo.InvariantCulture);
@@ -169,6 +194,10 @@ public sealed class DeckList
         {
             throw new FormatException($"{source}: the Companion line names no card after it.");
         }
+        if (commanderNext)
+        {
+            throw new FormatException($"{source}: the Commander line names no card after it.");
+        }
 
         return new DeckList { Name = name, Source = source, Entries = entries, Commanders = commanders, Sideboard = sideboard, Companion = companion };
     }
@@ -181,6 +210,9 @@ public sealed class DeckList
 
     /// <summary>The sideboard as card ids, resolved the same way.</summary>
     public List<CardId> ResolveSideboard(IEnumerable<CardCatalog> catalogs) => Resolve(catalogs, Sideboard);
+
+    /// <summary>The explicitly designated commanders, resolved separately from the library.</summary>
+    public List<CardId> ResolveCommanders(IEnumerable<CardCatalog> catalogs) => Resolve(catalogs, Commanders);
 
     private List<CardId> Resolve(IEnumerable<CardCatalog> catalogs, IReadOnlyList<DeckListEntry> lines)
     {

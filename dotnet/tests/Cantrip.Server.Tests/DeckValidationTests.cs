@@ -17,6 +17,20 @@ namespace Cantrip.Server.Tests;
 /// </summary>
 public sealed class DeckValidationTests
 {
+    [Fact]
+    public void Production_commander_metadata_reaches_the_format_and_identity_validation()
+    {
+        DeckFormat format = DeckFormat.Find(DeckFormat.CommanderKey)!;
+        DeckList list = DeckList.Parse("commander", "Commander\nKytheon, Hero of Akros\nMain\n99 Plains", "test");
+        SavedDeck deck = DeckValidation.Of(list, format);
+        Assert.Equal([new DeckEntry("Kytheon, Hero of Akros", 1)], deck.Commanders);
+        Assert.Equal(99, deck.Main.Sum(entry => entry.Count));
+        Assert.Empty(DeckValidation.Problems(deck, format, Catalog, new Judge(true)));
+        deck.Main = [new DeckEntry("Plains", 98), new DeckEntry("Lightning Bolt", 1)];
+        Assert.Contains("Lightning Bolt is outside the commander's color identity.", DeckValidation.Problems(deck, format, Catalog, new Judge(true)));
+        deck.Commanders.Clear();
+        Assert.Contains("A Commander deck needs a commander.", DeckValidation.Problems(deck, format, Catalog, new Judge(true)));
+    }
     private static IReadOnlyDictionary<string, CatalogCard> Catalog => DeckCatalog.ByName(RepoRoot.ContentRoot);
 
     private static readonly DeckFormat Modern = DeckFormat.Find(DeckFormat.ModernKey)!;

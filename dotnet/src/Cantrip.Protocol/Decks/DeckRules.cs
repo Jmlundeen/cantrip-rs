@@ -161,9 +161,11 @@ public static partial class DeckRules
         ObjectView face = card.Card;
         bool legendary = face.Supertypes.Contains(SupertypeView.Legendary);
         bool creature = face.CardTypes.Contains(CardTypeView.Creature);
-        bool poweredVehicle = (face.Subtypes.Contains("Vehicle", StringComparer.Ordinal) || face.Subtypes.Contains("Spacecraft", StringComparer.Ordinal))
-            && face.Power is not null && face.Toughness is not null;
-        return (legendary && (creature || poweredVehicle))
+        bool box = (face.Power is not null && face.Toughness is not null)
+            || (face.PrintedPower.HasValue && face.PrintedToughness.HasValue);
+        bool vehicleOrSpacecraftBox = (face.Subtypes.Contains("Vehicle", StringComparer.Ordinal) || face.Subtypes.Contains("Spacecraft", StringComparer.Ordinal)) && box;
+        bool spacecraftStation = face.Subtypes.Contains("Spacecraft", StringComparer.Ordinal) && !string.IsNullOrEmpty(face.StationPt);
+        return (legendary && (creature || vehicleOrSpacecraftBox || spacecraftStation))
             || face.OracleText.Contains("can be your commander", StringComparison.Ordinal);
     }
 
