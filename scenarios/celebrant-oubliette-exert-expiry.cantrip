@@ -1,0 +1,39 @@
+# Independent counterexample: exert expires during the next untap even while Oubliette keeps the same object phased out (CR 701.43a-b, 702.26d,f).
+[Bot1 Deck]
+Black Lotus
+Combat Celebrant
+Black Lotus
+Oubliette
+Mox Pearl
+Disenchant
+Ornithopter
+Island x30
+[Bot2 Deck]
+Island x35
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Combat Celebrant.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Combat Celebrant)
+Bot1.Accept
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Combat Celebrant.Exerted = true
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Oubliette.Cast
+Bot1.Target(Combat Celebrant)
+[T5 Bot1.Main1]
+? Bot1.PhasedOut = Combat Celebrant
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Oubliette)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Combat Celebrant.Tapped = true
+? Bot1.Battlefield.Combat Celebrant.Exerted = (absent)
+[T7 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Combat Celebrant.Tapped = false

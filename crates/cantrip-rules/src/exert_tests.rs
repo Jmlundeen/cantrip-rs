@@ -104,3 +104,92 @@ fn foreign_permanent_exert_uses_the_doer_and_zone_changes_clear_the_prohibition(
     assert_ne!(new, id, "new object identity");
     assert_eq!(g.state.obj(new).marks.exerted_by, 0, "new object has no exert duration");
 }
+
+
+// Independent review counterexamples retained as regression tests.
+#[test]
+fn review_independent_phased_out_exert_expires_during_the_exerting_players_step() {
+    let (mut g, id) = game();
+    ops::exert(&mut cx(&mut g), id, YOU);
+    g.state.update_obj(id, |o| { o.controller = THEM; o.tapped = true; });
+    crate::phasing::phase_out(&mut cx(&mut g), &[id], None, false);
+    crate::phasing::untap_step(&mut cx(&mut g), YOU);
+    assert!(g.state.obj(id).zone.is(ZoneKind::PhasedOut), "positive control: creature stays phased out");
+    untap(&mut g, YOU);
+    assert_eq!(g.state.obj(id).marks.exerted_by, 0, "CR 701.43a-b/702.26f: exert expires while phased out");
+    crate::phasing::untap_step(&mut cx(&mut g), THEM);
+    assert!(g.state.obj(id).zone.is(ZoneKind::Battlefield));
+    g.state.update_obj(id, |o| o.controller = YOU);
+    untap(&mut g, YOU);
+    assert!(!g.state.obj(id).tapped, "returning cannot resurrect expired exert");
+}
+
+#[test]
+fn review_independent_three_players_keep_each_others_pending_exertions() {
+    let table = Box::leak(Box::new(CardTable::new([&CREATURE])));
+    let mut g = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new(), Vec::new()], ..Default::default() });
+    let id = g.state.push_obj(Obj::new(table.id_of(&CREATURE), YOU, Zone::BATTLEFIELD));
+    g.state.zone_push(Zone::BATTLEFIELD, id);
+    ops::exert(&mut cx(&mut g), id, YOU);
+    ops::exert(&mut cx(&mut g), id, THEM);
+    ops::exert(&mut cx(&mut g), id, PlayerId(2));
+    assert_eq!(g.state.obj(id).marks.exerted_by, 7, "three distinct players retain their exertions");
+    untap(&mut g, THEM);
+    assert_eq!(g.state.obj(id).marks.exerted_by, 5, "expiry clears only one player's bit");
+    untap(&mut g, YOU);
+    assert_eq!(g.state.obj(id).marks.exerted_by, 4);
+    untap(&mut g, PlayerId(2));
+    assert_eq!(g.state.obj(id).marks.exerted_by, 0);
+}
+
+#[test]
+fn review_independent_doer_differs_from_controller_and_untap_does_not_erase_history() {
+    let (mut g, id) = game();
+    g.state.update_obj(id, |o| { o.controller = THEM; o.tapped = true; });
+    let mut context = cx(&mut g);
+    context.doer = Some(YOU);
+    cantrip_api::Game::exert(&mut context, id);
+    assert_eq!(g.state.obj(id).marks.exerted_by, 1, "duration uses doer rather than current controller");
+    ops::untap(&mut cx(&mut g), id);
+    assert!(!g.state.obj(id).tapped, "positive unrelated untap");
+    assert_eq!(g.state.obj(id).marks.exerted_by, 1, "unrelated untap preserves pending exert");
+    assert_eq!(g.log.iter().filter(|r| matches!(r.event, Event::Exerted { permanent, player: YOU } if permanent == id)).count(), 1, "untap preserves one exact exert event");
+}
+
+
+#[test]
+fn phased_out_three_player_exert_expiry_undo_redo_keeps_other_prohibitions_and_stun() {
+    let table = Box::leak(Box::new(CardTable::new([&CREATURE])));
+    let mut g = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new(), Vec::new()], ..Default::default() });
+    let id = g.state.push_obj(Obj::new(table.id_of(&CREATURE), THEM, Zone::BATTLEFIELD));
+    g.state.zone_push(Zone::BATTLEFIELD, id);
+    g.state.update_obj(id, |o| o.tapped = true);
+    for player in [YOU, THEM, PlayerId(2)] { ops::exert(&mut cx(&mut g), id, player); }
+    crate::counters::put(&mut cx(&mut g), id, CounterKind::Stun, 1, THEM, crate::counters::How::Effect);
+    crate::phasing::phase_out(&mut cx(&mut g), &[id], None, false);
+    let before = g.at;
+    let mark = (g.state.mark(), g.log.len());
+    g.tree.close(before, mark);
+    let child = g.tree.add(before, (0, YOU, Answer::Yes), mark, &[]);
+    untap(&mut g, YOU);
+    g.at = child;
+    assert!(g.state.obj(id).zone.is(ZoneKind::PhasedOut), "expiry does not phase the object in");
+    assert_eq!(g.state.obj(id).marks.exerted_by, 6, "only exerting player's next step expires");
+    assert_eq!(g.state.obj(id).counters(CounterKind::Stun), 1, "phased-out expiry never attempts an untap");
+    g.goto(before);
+    assert_eq!(g.state.obj(id).marks.exerted_by, 7, "tree undo restores all three prohibitions");
+    g.goto(child);
+    assert_eq!(g.state.obj(id).marks.exerted_by, 6, "tree redo restores exact one-player expiry");
+    untap(&mut g, PlayerId(2));
+    assert_eq!(g.state.obj(id).marks.exerted_by, 2, "other phased-out duration expires independently");
+    crate::phasing::untap_step(&mut cx(&mut g), THEM);
+    assert!(g.state.obj(id).zone.is(ZoneKind::Battlefield));
+    untap(&mut g, THEM);
+    assert!(g.state.obj(id).tapped, "remaining prohibition prevents returning object's first untap");
+    assert_eq!(g.state.obj(id).counters(CounterKind::Stun), 1, "prohibited return keeps stun");
+    untap(&mut g, THEM);
+    assert!(g.state.obj(id).tapped);
+    assert_eq!(g.state.obj(id).counters(CounterKind::Stun), 0, "later allowed untap consumes stun exactly once");
+    untap(&mut g, THEM);
+    assert!(!g.state.obj(id).tapped);
+}

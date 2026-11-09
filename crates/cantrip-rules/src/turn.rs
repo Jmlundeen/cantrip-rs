@@ -781,8 +781,11 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
     // an effect "for as long as [it] remains tapped" ends the moment its source untaps (CR 611.2b), and the controller it
     // gave back is the one the upkeep's "at the beginning of your upkeep" abilities see (CR 613.1b).
     ops::settle_lasting_and_control(cx);
-    // That untap step has now happened for everything its player exerted, whoever controls it now (CR 701.43a).
-    for id in cx.s().battlefield().to_vec() {
+    // That untap step has now happened for everything its player exerted, whoever controls it now
+    // (CR 701.43a-b). Phasing leaves the object and its timed effects intact (CR 702.26d,f): a
+    // prohibition expires even while Oubliette keeps that object phased out. Other players' bits remain.
+    let surviving: Vec<_> = cx.s().battlefield().iter().chain(cx.s().zone(Zone::PHASED_OUT)).copied().collect();
+    for id in surviving {
         if cx.s().obj(id).marks.exerted_by & (1 << active.0) != 0 {
             cx.st().update_obj(id, |o| o.marks.exerted_by &= !(1 << active.0));
         }

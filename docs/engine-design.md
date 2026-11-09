@@ -3458,7 +3458,9 @@ Known gaps:
   (CR 508.1g), independently of the linked trigger: Combat Celebrant queries this turn's `Exerted` history
   for its exact object. `Event::Exerted` records every exertion, including activated costs and repeats;
   exert's active untap prohibitions keep one bit per exerting player and expire in that player's next
-  untap step (CR 701.43a-b). A mana part would further extend `AttackOption`.
+  untap step (CR 701.43a-b), including surviving phased-out objects: phasing preserves identity
+  and timed effects continue to expire (CR 702.26d,f). Only that exerting player's bit is cleared.
+  A mana part would further extend `AttackOption`.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
 - Several permanents one effect puts
   onto the battlefield enter together (`ops::put_onto_battlefield`, `Game::put_all_onto_battlefield*`: Show and Tell,
