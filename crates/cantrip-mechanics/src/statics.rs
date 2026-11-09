@@ -306,6 +306,20 @@ pub fn itself_while_you_control_another<const SUBTYPE: u16>(view: &dyn LayerQuer
     state.battlefield().iter().any(|&id| id != source && state.obj(id).controller == you && view.chars(id).has_subtype(word))
 }
 
+/// "As long as you control a [subtype], this creature gets ..." (CR 604.1, 613.1f) as `StaticDef::affects`, `SUBTYPE` a
+/// `Subtype` as `u16` (`lands::sub`): only the source itself, and only while its controller controls a permanent with that
+/// subtype (the source counts), as the earlier layers made it, the subtype read through the words of the source's text
+/// (CR 612.2). An opponent's permanent is not one "you control". Kird Ape (Forest) and Sedge Troll (Swamp) print it.
+pub fn itself_while_you_control_a<const SUBTYPE: u16>(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    if affected != source {
+        return false;
+    }
+    let Some(word) = subtype_word(view, source, SUBTYPE) else { return false };
+    let state = view.state();
+    let you = state.obj(source).controller;
+    state.battlefield().iter().any(|&id| state.obj(id).controller == you && view.chars(id).has_subtype(word))
+}
+
 /// "You may cast this spell as though it had flash if you control a [subtype]" (CR 307.5, 702.8) as `CardDef::flash_if`,
 /// `SUBTYPE` a `Subtype` as `u16` (`lands::sub`): asked of the player who would cast it as the casting begins, and not again
 /// (the rulings). A [subtype] is a permanent with that creature type, read through the words of the card's text (CR 612); an
