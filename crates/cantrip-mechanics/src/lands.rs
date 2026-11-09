@@ -43,14 +43,14 @@ pub fn controls_land_type(q: &dyn Query, controller: PlayerId, land_type: Subtyp
 
 /// "This creature can't attack unless defending player controls an Island" (CR 508.5, 509.1b): the attack rule of the creature
 /// itself, the defending player (including a battle's protector) read through the layers and the creature's words (CR 612.2).
-/// Island Fish Jasconius, Merchant Ship, Dandân and Sea Serpent print it.
+/// Island Fish Jasconius, Merchant Ship, Pirate Ship, Dandân and Sea Serpent print it.
 pub fn attack_rule_defender_controls_island(q: &dyn Query, asker: &Asker, attacker: ObjectId, defender: Target) -> bool {
     attacker != asker.source || defending_player_of(q.state(), defender)
         .is_none_or(|player| controls_land_type(q, player, q.words(asker.source).subtype(Subtype::Island)))
 }
 
 /// "When you control no Islands, sacrifice this creature" (CR 603.8): the state trigger's condition, read through the layers and
-/// the creature's words (CR 612.2). Island Fish Jasconius, Merchant Ship, Dandân and Sea Serpent print it.
+/// the creature's words (CR 612.2). Island Fish Jasconius, Merchant Ship, Pirate Ship, Dandân and Sea Serpent print it.
 pub fn you_control_no_islands(q: &dyn Query, asker: &Asker) -> bool {
     !controls_land_type(q, asker.controller, q.words(asker.source).subtype(Subtype::Island))
 }

@@ -21,11 +21,6 @@ fn have_trample_lifelink_and_ward(view: &dyn LayerQuery, source: ObjectId, chars
     grant_delayed_ability(view, source, chars);
 }
 
-/// "Target enchantment card from your graveyard" (CR 115.1, 400.7).
-fn enchantment_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard(q, asker, t, &[CardType::Enchantment])
-}
-
 /// "Return up to one target enchantment card from your graveyard to the battlefield with a finality counter on it": the
 /// counter is on it as it enters (CR 122.6, 614.1c).
 fn return_with_finality(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -41,7 +36,7 @@ pub static CARD: CardDef = CardDef {
         return_with_finality,
         "At the beginning of your end step, return up to one target enchantment card from your graveyard to the battlefield with a finality counter on it.",
     )
-    .targets(&[target(enchantment_card_in_your_graveyard).between(0, 1)])],
+    .targets(&[targets::ENCHANTMENT_CARD_IN_YOUR_GRAVEYARD.between(0, 1)])],
     delayed: &[ward::<2>("Ward {2} (Whenever this permanent becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)")],
     statics: &[
         static_ability(
