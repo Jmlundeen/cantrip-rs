@@ -727,3 +727,4 @@ Expectations then describe the position mid-game rather than a finished one, whi
 
 Snow source mana (CR 107.4h) retains its production-time quality. `Spend:` items may qualify a mana symbol with `Snow` or `NonSnow`, and with `for {S}` or `for mana` to choose which demand a snow unit pays; for example `Spend: {U} Snow for {S}`. Unqualified items retain the existing payment behavior.
 `BotN.Library.Top` is the name of the card on top of that player's library (CR 401.1), whoever can see it; absent for an empty library.
+`BotN.Sees.BotM.LibraryTop` is the current top card name visible to that viewer, or `(hidden)`; it uses the engine visibility projection, including CR 401.5's announcement barrier.

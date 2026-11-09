@@ -101,7 +101,7 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
             // "You may look at the top card of your library any time" (CR 401.2): its player sees it while a permanent says
             // so, and so does the player controlling them (CR 723.4).
             if game.may_look_at_library_top(p)
-                && let Some(&top) = s.zone(Zone::library(p)).first()
+                && let Some(top) = game.visible_library_top(p)
             {
                 visible.insert(top);
             }

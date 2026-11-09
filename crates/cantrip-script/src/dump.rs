@@ -394,6 +394,12 @@ impl StateDump {
             if game.may_look_at_library_top(p) {
                 d.set(format!("{b}.MayLookAtLibraryTop"), true);
             }
+            // The engine's filtered visibility, for each opponent as well as the owner.
+            let shown = visibility::observable(game, p, &Default::default());
+            for owner in s.seats() {
+                let top = s.zone(Zone::library(owner)).first().copied();
+                d.set(format!("{b}.Sees.{}.LibraryTop", bot(owner)), top.filter(|id| shown.contains(id)).map_or("(hidden)".to_string(), |id| game.known_name(id).to_string()));
+            }
             // How they lost (CR 104.3), from the history: absent for a player who has not, or who left another way.
             if let Some(reason) = game.log.iter().find_map(|r| match r.event {
                 Event::GameLost { player, reason } if player == p => Some(reason),
@@ -993,7 +999,7 @@ const GAME_KEYS: &[&str] = &[
 const PLAYER_KEYS: &[&str] = &[
     "Life", "Poison", "Energy", "Experience", "Status", "CantWin", "MayLookAtLibraryTop", "LostTo", "Mana", "ManaFrom", "LandsPlayed", "CitysBlessing",
     "EnduringStory", "Speed", "Dungeon", "DungeonsCompleted", "TurnsToSkip", "ControlledBy", "NextTurnControlledBy", "Looked", "Surveilled", "Shuffles",
-    "Hand", "Revealed", "Crimes", "Library", "Library.Top", "Companion", "Sideboard", "Graveyard", "Emblems", "Emblems.MadeBy", "Emblems.ExiledWithMakers", "Command", "Commanders", "CommanderColorIdentity", "Battlefield", "PhasedOut",
+    "Sees", "Hand", "Revealed", "Crimes", "Library", "Library.Top", "Companion", "Sideboard", "Graveyard", "Emblems", "Emblems.MadeBy", "Emblems.ExiledWithMakers", "Command", "Commanders", "CommanderColorIdentity", "Battlefield", "PhasedOut",
 ];
 
 /// The keys the dump writes of a permanent, after `BotN.Battlefield.<name>.` (or `.PhasedOut.`), beside `Counters.<Kind>`.
