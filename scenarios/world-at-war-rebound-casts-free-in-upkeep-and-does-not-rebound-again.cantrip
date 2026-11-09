@@ -1,0 +1,58 @@
+# CR 702.88: hand cast exiles directly, next own upkeep casts free, later resolution goes to graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+World at War
+Fanatical Firebrand
+Mountain
+Mountain
+Mountain x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Attack(Fanatical Firebrand)
+[T3 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.World at War.Cast
+[T3 Bot1.End]
+? Exile = World at War
+[T5 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = World at War; Black Lotus
+? Exile.Count = 0
+[T5 Bot1.BeginCombat]
+? Stack.Count = 0
+Bot1.Attack(Fanatical Firebrand)
+[T5 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Stack.Count = 1
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = false
+Bot1.Attack(Fanatical Firebrand)
+[T5 Bot1.End]
+[T7 Bot1.Upkeep]
+? Stack.Count = 0
+
+
+[Expect]
+Turn = 7
+Exile.Count = 0
+Bot2.Life = 17

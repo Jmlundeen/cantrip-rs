@@ -1,0 +1,45 @@
+# CR 702.88: countered spell never resolves, adds no phases, has no rebound trigger.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+World at War
+Fanatical Firebrand
+Mountain
+Mountain
+Mountain x30
+
+[Bot2 Deck]
+Island
+Spell Pierce
+Island x33
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+[T3 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.World at War.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Spell Pierce.Cast(Stack.World at War)
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 0
+? Step = End
+[T5 Bot1.Upkeep]
+? Stack.Count = 0
+
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Graveyard = World at War; Black Lotus

@@ -1,0 +1,64 @@
+# CR 500.5, 510.4: each full combat resets double strike and empties mana at its step boundaries.
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Boros Swiftblade
+Sol Ring
+Black Lotus
+World at War
+Mountain
+Mox Jet
+Mountain x24
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Boros Swiftblade.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Attack(Boros Swiftblade)
+[T3 Bot1.Damage]
+? Bot2.Life = 19
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Step = Damage
+? Bot2.Life = 18
+? Bot1.Mana =
+[T3 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.World at War.Cast
+? Bot1.Mana =
+Bot1.Attack(Boros Swiftblade)
+[T3 Bot1.Damage]
+? Bot2.Life = 17
+Bot1.Pass
+Bot2.Pass
+? Step = Damage
+? Bot2.Life = 16
+[T3 Bot1.EndCombat]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Step = End
+
+[Expect]
+Turn = 3
+Bot2.Life = 16
+Bot1.Battlefield.Boros Swiftblade.Tapped = true
+

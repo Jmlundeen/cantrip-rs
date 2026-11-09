@@ -1,0 +1,60 @@
+# CR 500.8, 702.88: Brazen Bluff casts from hand during combat; only the exact later added combat untaps.
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Fanatical Firebrand
+World at War
+Brazen Bluff
+Sol Ring
+Mountain
+Mountain x24
+
+[Bot2 Deck]
+Island
+Opt
+Island x28
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Fanatical Firebrand)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Opt.Cast
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Brazen Bluff.Cast(Opt)
+Bot1.Pass
+Bot2.Pass
+Bot2.Decline
+Bot1.Choose(World at War)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+[T3 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Stack.Count = 1
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = false
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+? Step = End
+
+
+[Expect]
+Bot2.Life = 19
+Exile = World at War
+Bot1.Graveyard = Brazen Bluff; Black Lotus

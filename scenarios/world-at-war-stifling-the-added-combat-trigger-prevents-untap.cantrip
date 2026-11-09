@@ -1,0 +1,52 @@
+# CR 603.7, 701.5: combat exists even when its delayed untap ability is countered, and that ability is used up.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+World at War
+Fanatical Firebrand
+Mountain
+Mountain
+Mountain x30
+
+[Bot2 Deck]
+Mox Sapphire
+Stifle
+Island x35
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Attack(Fanatical Firebrand)
+[T3 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.World at War.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Stack.Count = 1
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Stifle.Cast(Stack.World at War)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+? Delayed.Count = 1
+[T3 Bot1.End]
+
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Exile = World at War
+Bot1.Battlefield.Fanatical Firebrand.Tapped = true

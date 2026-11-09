@@ -1,0 +1,45 @@
+# CR 702.88, 603.7b: countered rebound trigger offers no cast and is used up.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+World at War
+Fanatical Firebrand
+Mountain
+Mountain
+Mountain x30
+
+[Bot2 Deck]
+Mox Sapphire
+Stifle
+Island x35
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+[T3 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.World at War.Cast
+[T5 Bot1.Upkeep]
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Stifle.Cast(Stack.World at War)
+Bot1.Pass
+Bot2.Pass
+? Exile = World at War
+? Delayed.Count = 0
+[T7 Bot1.Upkeep]
+? Stack.Count = 0
+
+
+[Expect]
+Turn = 7
+Exile = World at War
+Delayed.Count = 0

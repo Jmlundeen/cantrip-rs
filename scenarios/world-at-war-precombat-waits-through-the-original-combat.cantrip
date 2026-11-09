@@ -1,0 +1,55 @@
+# CR 505.1b: a future second main is the anchor; no untap trigger in the ordinary combat.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+World at War
+Fanatical Firebrand
+Mountain
+Mountain
+Mountain x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.World at War.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+? Stack.Count = 0
+Bot1.Attack(Fanatical Firebrand)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Stack.Count = 1
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = false
+Bot1.Attack()
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+? Step = End
+
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Fanatical Firebrand.Tapped = false

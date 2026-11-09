@@ -1,0 +1,53 @@
+# CR 400.7: blinked attacker is a new object; tapping it with Drum does not make it an attacked creature.
+[Bot1 Deck]
+Fanatical Firebrand
+Mox Ruby
+Mox Pearl
+Sol Ring
+Black Lotus
+World at War
+Ephemerate
+Springleaf Drum
+Mountain x24
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Attack(Fanatical Firebrand)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Fanatical Firebrand)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Fanatical Firebrand; Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.World at War.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+
+
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Fanatical Firebrand.Tapped = true

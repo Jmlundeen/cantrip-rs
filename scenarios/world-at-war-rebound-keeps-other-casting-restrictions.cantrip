@@ -1,0 +1,52 @@
+# CR 702.88, 101.2: rebound ignores sorcery timing but Archon's spell limit prevents a cast after an upkeep Opt.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+World at War
+Fanatical Firebrand
+Mox Sapphire
+Opt
+Mountain x30
+
+[Bot2 Deck]
+Black Lotus
+Archon of Emeria
+Island x35
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+[T3 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.World at War.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Archon of Emeria.Cast
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+[T5 Bot1.Main1]
+? Exile = World at War
+? Bot1.Graveyard = Opt; Black Lotus
+[T5 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+? Step = End
+[T7 Bot1.Upkeep]
+? Stack.Count = 0
+
+
+[Expect]
+Turn = 7
+Exile = World at War
+Delayed.Count = 0

@@ -1,0 +1,88 @@
+# CR 500.8, 603.7: each insertion has its own one-shot trigger, including attackers from earlier added combats.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+Black Lotus
+World at War
+World at War
+Fanatical Firebrand
+Sol Ring
+Mountain
+Mountain x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Attack(Fanatical Firebrand)
+[T5 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring#1.Activate
+Bot1.Hand.World at War.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring#2.Activate
+Bot1.Hand.World at War.Cast
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Stack.Count = 1
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = false
+Bot1.Attack(Fanatical Firebrand)
+[T5 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Stack.Count = 1
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = false
+Bot1.Attack(Fanatical Firebrand)
+[T5 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+? Step = End
+[T7 Bot1.Upkeep]
+Bot1.Decline
+Bot1.Decline
+[T7 Bot1.Main1]
+Bot1.Attack(Fanatical Firebrand)
+[T7 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+? Step = End
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+
+
+[Expect]
+Turn = 7
+Exile.Count = 2
+Bot2.Life = 16

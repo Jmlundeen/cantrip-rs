@@ -1,0 +1,48 @@
+# CR 702.34, 702.88: a non-hand cast resolves with phases but no rebound; flashback itself exiles it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Sol Ring
+World at War
+Faithless Looting
+Snapcaster Mage
+Black Lotus
+Mountain x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(World at War; Mountain)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Snapcaster Mage.Cast
+Bot1.Target(World at War)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Graveyard.World at War.Cast
+Bot1.Pass
+Bot2.Pass
+? Delayed.Count = 1
+? Exile = World at War
+[T3 Bot1.End]
+? Delayed.Count = 0
+[T5 Bot1.Upkeep]
+? Stack.Count = 0
+[T5 Bot1.Main1]
+! Bot1.Exile.World at War.Cast
+
+
+[Expect]
+Turn = 5
+Exile = World at War
+Bot1.Graveyard = Black Lotus; Faithless Looting; Mountain

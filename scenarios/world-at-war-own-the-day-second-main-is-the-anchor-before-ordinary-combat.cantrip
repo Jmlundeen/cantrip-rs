@@ -1,0 +1,72 @@
+# CR 505.1a-b: Own the Day's inserted main is already the second main, so World at War adds phases before normal combat.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+Black Lotus
+Own the Day
+World at War
+Fanatical Firebrand
+Sol Ring
+Mountain
+Mountain x30
+
+[Bot2 Deck]
+Island x35
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Own the Day.Cast
+Bot1.Attack(Fanatical Firebrand)
+[T5 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring#2.Activate
+Bot1.Hand.World at War.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Stack.Count = 1
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = false
+Bot1.Attack(Fanatical Firebrand)
+[T5 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Stack.Count = 0
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+[T5 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+? Step = End
+
+
+[Expect]
+Turn = 5
+Bot2.Life = 18
