@@ -19,7 +19,8 @@ pub fn lands<const N: i32>(g: &mut dyn Game, entering: &mut Entering) -> Result<
     if chosen.is_empty() {
         return Ok(());
     }
-    let sacrificed = g.sacrifice(you, &chosen).objects().len() as i32;
+    // "For each permanent sacrificed this way": a merged land once (CR 730.2), however many cards it became.
+    let sacrificed = g.sacrifice(you, &chosen).count() as i32;
     entering.counters[CounterKind::PlusOne as usize] += N * sacrificed;
     Ok(())
 }

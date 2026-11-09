@@ -1,0 +1,45 @@
+# Hellfire destroys a merged creature (Cubwarden mutated onto Ornithopter) and the two Cat tokens its mutation made: three
+# creatures died (a merged permanent dies once, CR 730.2, though both its cards go to the graveyard, CR 730.3c), so
+# Hellfire deals 3 plus 3 damage to Bot1, not 7.
+[Bot1 Deck]
+Swamp
+Black Lotus
+Ornithopter
+Mox Pearl
+Mox Jet
+Cubwarden
+Hellfire
+Swamp
+Swamp
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hellfire.Cast
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Life = 14
+Bot1.Battlefield.Cubwarden = (absent)
+Bot1.Battlefield.Cat Token = (absent)
+Bot1.Graveyard.Count = 4

@@ -1,0 +1,42 @@
+# Culling Ritual destroys Mox Pearl, a merged permanent (Cubwarden mutated under Ornithopter, so it has Ornithopter's
+# mana value 0) and the two Cat tokens the mutation made: four permanents were destroyed (a merged permanent once, CR
+# 730.2, though both its cards go to the graveyard, CR 730.3c), so it adds four mana, not five.
+[Bot1 Deck]
+Swamp
+Black Lotus
+Ornithopter
+Mox Pearl
+Cubwarden
+Culling Ritual
+Forest
+Swamp
+Swamp
+Island x12
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(2)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Culling Ritual.Cast
+Bot1.Colors(Black; Black; Green; Green)
+? Bot1.Mana = {B}{B}{G}{G}
+[T5 Bot1.Main2]
+[Expect]
+Bot1.Battlefield = Swamp; Forest; Swamp
+Bot1.Graveyard.Count = 5

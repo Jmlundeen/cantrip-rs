@@ -55,12 +55,10 @@ fn sacrifice_many_nontoken_permanents_if(g: &mut dyn Game, item: &StackItem) -> 
         .called("nontoken permanent");
     let permanents = g.permanents_of(item.controller);
     let chosen = choose::select(g, item.controller, item.object, Purpose::Sacrifice, permanents, rule)?;
-    // Permanents sacrificed, not cards: `sacrifice` returns one new object per card, and a merged permanent is one permanent
-    // (CR 730.2) however many cards it becomes (CR 730.3c).
-    let sacrificed = chosen.iter().filter(|&&id| g.can_sacrifice(item.controller, id)).count();
-    g.sacrifice(item.controller, &chosen);
+    // Permanents sacrificed, not cards: a merged permanent is one permanent (CR 730.2) however many cards it becomes (CR 730.3c).
+    let sacrificed = g.sacrifice(item.controller, &chosen).count();
     g.end_sentence();
-    if (sacrificed as u64) < u64::from(owed) {
+    if sacrificed < owed {
         g.lose_game(item.controller);
     }
     Ok(())

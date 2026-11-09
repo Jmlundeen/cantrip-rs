@@ -1,0 +1,55 @@
+# Settle the Wreckage exiles one attacking merged creature (Cubwarden mutated onto Ornithopter, attacking the turn it
+# mutated: the permanent is Ornithopter, under Bot1's control since turn one, CR 730.2, 302.6): "that many" is one, the
+# creatures exiled, not the two cards it becomes (CR 730.3c). Finding two basics is refused, and one Forest is found.
+[Bot1 Deck]
+Plains
+Black Lotus
+Ornithopter
+Mox Pearl
+Mox Jet
+Cubwarden
+Island
+Island
+Forest
+Plains
+Island x10
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Settle the Wreckage
+Island x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+Bot1.Attack(Cubwarden > Bot2)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Settle the Wreckage.Cast(Bot1)
+Bot1.Accept
+! Bot1.Search(Forest; Plains)
+Bot1.Search(Forest)
+[Bot1.Main2]
+[Expect]
+Exile.Count = 2
+Bot1.Battlefield.Cubwarden = (absent)
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Plains.Tapped = false

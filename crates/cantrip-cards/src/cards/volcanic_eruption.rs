@@ -22,7 +22,13 @@ fn destroy_x_target_mountains_volcanic(
     let objects_0 = cantrip_mechanics::targets::legal_objects(g, item);
     let destroyed = g.destroy_all(&objects_0);
     g.end_sentence();
-    let amount = destroyed.objects().iter().filter(|&&id| g.obj(id).zone.is(ZoneKind::Graveyard)).count();
+    // Each Mountain whose own move put it into a graveyard, a merged one once however many cards it became (CR 730.2,
+    // 730.3c).
+    let amount = destroyed
+        .permanents()
+        .iter()
+        .filter(|&&old| g.obj(old).became.is_some_and(|new| g.obj(new).zone.is(ZoneKind::Graveyard)))
+        .count();
     cantrip_mechanics::effects::damage_each_creature_and_player_n(g, item, amount as u32);
     Ok(())
 }

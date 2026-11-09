@@ -1,0 +1,40 @@
+# The Eagles Are Coming! returning one merged creature (Cubwarden mutated onto Ornithopter) makes one Bird Soldier at the
+# next upkeep: one creature was returned to Bot1's hand (CR 730.2), though both its cards went there (CR 730.3c).
+[Bot1 Deck]
+Plains
+Black Lotus
+Ornithopter
+Mox Pearl
+Mox Jet
+Cubwarden
+The Eagles Are Coming!
+Plains
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast
+Bot1.Target(Cubwarden)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Cubwarden; Ornithopter
+[T4 Bot2.Main1]
+[Expect]
+Bot1.Battlefield = Bird Soldier Token; Cat Token; Cat Token; Mox Jet; Mox Pearl; Plains; Plains
+Bot1.Hand = Cubwarden; Ornithopter

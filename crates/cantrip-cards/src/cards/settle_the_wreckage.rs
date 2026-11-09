@@ -8,8 +8,9 @@ const ASK: Question = Question::new("SearchLibrary", "search your library for th
 /// "Exile all attacking creatures target player controls. That player may search their library for that many basic land
 /// cards, put those cards onto the battlefield tapped, then shuffle." The spell targets only the player (CR 115.1), so
 /// hexproof creatures are exiled too. The creatures go in one move (CR 608.2f); "that many" is the number of attacking
-/// creatures exiled by the spell, those a replacement sent elsewhere included (CR 608.2c). A spell whose only target
-/// is illegal is not resolved at all (CR 608.2b). The "may" is asked of that player; declining skips search and shuffle.
+/// creatures exiled by the spell, those a replacement sent elsewhere included (CR 608.2c), a merged creature once however
+/// many cards it became (CR 730.2, 730.3c). A spell whose only target is illegal is not resolved at all (CR 608.2b). The
+/// "may" is asked of that player; declining skips search and shuffle.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(player) = item.target(0).player() else { return Ok(()) };
     let attackers: Vec<ObjectId> = g
@@ -19,7 +20,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .copied()
         .filter(|&id| g.controller(id) == player && g.is_attacking(id) && g.chars(id).is(CardType::Creature))
         .collect();
-    let count = u32::try_from(g.exile_all(&attackers).len()).unwrap_or(u32::MAX);
+    let exiled = g.exile_all(&attackers);
+    let count = g.permanents_left(&exiled).len() as u32;
     // With "that many" zero the player is still asked, and a search for zero cards is still a search and a shuffle.
     if !ask_may_search(g, player, item.object, &ASK)? {
         return Ok(());

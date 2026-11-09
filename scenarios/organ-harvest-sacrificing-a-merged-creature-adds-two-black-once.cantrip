@@ -1,0 +1,36 @@
+# Organ Harvest sacrificing one merged creature (Cubwarden mutated onto Ornithopter) adds {B}{B} once: one creature is
+# sacrificed (CR 730.2), however many cards it becomes as it leaves (CR 730.3c). The Cats Cubwarden's mutate trigger made
+# are left alone, so the one choice is the merged creature.
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Mox Pearl
+Mox Jet
+Cubwarden
+Organ Harvest
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Organ Harvest.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Cubwarden)
+? Bot1.Mana = {B}{B}
+[Expect]
+Bot1.Battlefield.Cubwarden = (absent)
+Bot1.Battlefield.Cat Token#1.Power = 1
+Bot1.Graveyard.Count = 4

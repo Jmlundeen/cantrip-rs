@@ -770,9 +770,10 @@ pub fn sacrifice_any_number_of_lands_for_lands(g: &mut dyn Game, item: &StackIte
     let you = item.controller;
     let lands: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&p| g.chars(p).is(CardType::Land)).collect();
     let chosen = crate::choose::select(g, you, item.object, Purpose::Sacrifice, lands, crate::select::land_cards(crate::select::ANY_NUMBER))?;
-    let sacrificed = g.sacrifice(you, &chosen).objects().len();
+    // "That many" is the lands sacrificed, a merged permanent once (CR 730.2), not the cards they became.
+    let sacrificed = g.sacrifice(you, &chosen).count();
     g.end_sentence();
-    crate::library::find_to_battlefield(g, you, item.object, crate::select::land_cards(crate::select::up_to(sacrificed as u32)), true)?;
+    crate::library::find_to_battlefield(g, you, item.object, crate::select::land_cards(crate::select::up_to(sacrificed)), true)?;
     Ok(())
 }
 
@@ -2174,11 +2175,13 @@ pub fn exile_first_target_players_graveyard(g: &mut dyn Game, item: &StackItem) 
 }
 
 /// "Exile all creatures" (CR 406.2, 608.2f): every creature on the battlefield, whoever controls it, in one move, tokens too.
-/// How many were exiled (CR 608.2c: the moves made, those a replacement sent elsewhere included), for "X is the number of
-/// creatures exiled this way". Sunfall and Overwrite the Multiverse print it.
+/// How many were exiled (CR 608.2c: the moves made, those a replacement sent elsewhere included; a merged creature once
+/// however many cards it became, CR 730.2, 730.3c), for "X is the number of creatures exiled this way". Sunfall and
+/// Overwrite the Multiverse print it.
 pub fn exile_all_creatures(g: &mut dyn Game) -> usize {
     let creatures: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    g.exile_all(&creatures).len()
+    let exiled = g.exile_all(&creatures);
+    g.permanents_left(&exiled).len()
 }
 
 /// "Exile all graveyards" (CR 406.2): every card in every graveyard, each to its owner's exile zone, in one move (CR 608.2c).

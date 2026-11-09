@@ -12,9 +12,9 @@ fn harvest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if chosen.is_empty() {
         return Ok(());
     }
-    let sacrificed = g.sacrifice(you, &chosen).objects().len();
+    let sacrificed = g.sacrifice(you, &chosen).count();
     if sacrificed > 0 {
-        g.add_mana(you, Color::Black.mana(), 2 * sacrificed as u32);
+        g.add_mana(you, Color::Black.mana(), 2 * sacrificed);
     }
     Ok(())
 }

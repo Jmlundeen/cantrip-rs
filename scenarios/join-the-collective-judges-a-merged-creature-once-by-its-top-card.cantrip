@@ -1,0 +1,45 @@
+# Join the Collective destroys a merged creature (Cubwarden mutated under Ornithopter) and the two Cat tokens its
+# mutation made. The merged creature is one creature (CR 730.2), an artifact as it last existed (its top card's
+# characteristics, CR 730.2a, 608.2h), though one of the cards it becomes is the nonartifact Cubwarden (CR 730.3c): only
+# the two Cats are nonartifact creatures destroyed this way, so two Borg tokens, not three.
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Ornithopter
+Cubwarden
+Join the Collective
+Black Lotus
+Mox Jet
+Black Lotus
+Mox Emerald
+Island x12
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Join the Collective.Cast
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Cat Token = (absent)
+Bot1.Battlefield.Borg Token#2.Power = 1
+Bot1.Battlefield.Borg Token#3 = (absent)
+Bot1.Graveyard.Count = 6

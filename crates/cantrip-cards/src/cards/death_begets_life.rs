@@ -13,8 +13,8 @@ fn destroy_then_draw_for_each(g: &mut dyn Game, item: &StackItem) -> Result<(), 
         .copied()
         .filter(|&id| g.chars(id).is(CardType::Creature) || g.chars(id).is(CardType::Enchantment))
         .collect();
-    let destroyed = g.destroy_all(&doomed).objects().len();
-    effects::draw(g, item, destroyed as u32)
+    let destroyed = g.destroy_all(&doomed).count();
+    effects::draw(g, item, destroyed)
 }
 
 pub static CARD: CardDef = CardDef {

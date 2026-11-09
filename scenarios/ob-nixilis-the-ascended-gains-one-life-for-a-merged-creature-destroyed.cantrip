@@ -1,0 +1,50 @@
+# Ob Nixilis, the Ascended destroys Bot2's tapped merged creature (Cubwarden mutated onto Ornithopter, tapped by its
+# attack) and gains Bot1 1 life for it: one creature destroyed (a merged permanent once, CR 730.2, though both its cards
+# go to the graveyard, CR 730.3c), not two. The untapped Cat tokens stay. Bot1 took 3 from the lifelinking attack (20 to
+# 17) and gains 1 (18).
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Pearl
+Ob Nixilis, the Ascended
+Island
+Island
+Island x12
+[Bot2 Deck]
+Ornithopter
+Black Lotus
+Mox Pearl
+Cubwarden
+Island x16
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(1)
+Bot2.Attack(Cubwarden > Bot1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+? Bot1.Life = 17
+Bot1.Hand.Ob Nixilis, the Ascended.Cast
+[T5 Bot1.Main2]
+[Expect]
+Bot1.Life = 18
+Bot2.Battlefield.Cubwarden = (absent)
+Bot2.Battlefield.Cat Token#2.Power = 1
+Bot2.Graveyard.Count = 3

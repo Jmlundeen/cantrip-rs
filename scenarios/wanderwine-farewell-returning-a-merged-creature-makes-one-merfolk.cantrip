@@ -1,0 +1,47 @@
+# Wanderwine Farewell returns a merged creature (Cubwarden mutated onto Ornithopter) to Bot1's hand while Bot1 keeps its
+# Merfolk of the Pearl Trident: one permanent returned (a merged permanent once, CR 730.2, though both its cards go to the
+# hand, CR 730.3c), so one Merfolk token, not two. Black Lotus, the three Moxen and the Merfolk tapped for convoke pay it.
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Mox Pearl
+Cubwarden
+Merfolk of the Pearl Trident
+Wanderwine Farewell
+Mox Sapphire
+Black Lotus
+Mox Jet
+Island x12
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Merfolk of the Pearl Trident.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wanderwine Farewell.Cast(Convoke: Merfolk of the Pearl Trident)
+Bot1.Target(Bot1.Battlefield.Cubwarden)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Cubwarden = (absent)
+Bot1.Battlefield.Merfolk Token.Power = 1
+Bot1.Battlefield.Merfolk Token#2 = (absent)
+Bot1.Battlefield.Cat Token#2.Power = 1

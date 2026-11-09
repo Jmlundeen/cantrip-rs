@@ -1,0 +1,51 @@
+# Scapeshift sacrificing a merged land - Cubwarden mutated under Dryad Arbor, so the merged permanent is the land creature
+# Dryad Arbor (CR 702.140c, 730.2) - searches for up to one land card: "that many" is the lands sacrificed, one, not the two
+# cards it becomes as it leaves (CR 730.3c). Finding two is refused, and Tundra is found.
+[Bot1 Deck]
+Dryad Arbor
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Pearl
+Cubwarden
+Scapeshift
+Forest
+Tundra
+Plains
+Island x10
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Dryad Arbor; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(2)
+Bot1.Pass
+? Bot1.Battlefield.Dryad Arbor.Power = 1
+[T3 Bot1.Main2]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Dryad Arbor.Activate
+Bot1.Hand.Scapeshift.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Dryad Arbor)
+! Bot1.Search(Tundra; Plains)
+Bot1.Search(Tundra)
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Dryad Arbor = (absent)
+Bot1.Battlefield.Tundra.Tapped = true
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Graveyard.Count = 4
+Bot1.Shuffles = 1

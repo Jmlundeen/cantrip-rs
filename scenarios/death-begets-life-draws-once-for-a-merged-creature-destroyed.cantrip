@@ -1,0 +1,46 @@
+# Death Begets Life destroys a merged creature (Cubwarden mutated onto Ornithopter) and the two Cat tokens its mutation
+# made: three permanents were destroyed (a merged permanent once, CR 730.2, though both its cards go to the graveyard, CR
+# 730.3c), so Bot1 draws three cards, not four - its library goes from 12 to 9.
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Ornithopter
+Cubwarden
+Death Begets Life
+Black Lotus
+Mox Emerald
+Black Lotus
+Mox Sapphire
+Island x12
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cubwarden.Cast(Ornithopter; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Library.Count = 12
+Bot1.Hand.Death Begets Life.Cast
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Library.Count = 9
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Cubwarden = (absent)
+Bot1.Battlefield.Cat Token = (absent)
+Bot1.Battlefield = Mox Pearl; Mox Emerald; Mox Sapphire

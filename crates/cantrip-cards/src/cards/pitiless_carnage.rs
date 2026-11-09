@@ -14,9 +14,9 @@ fn sacrifice_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     if chosen.is_empty() {
         return Ok(());
     }
-    let sacrificed = g.sacrifice(you, &chosen).objects().len();
+    let sacrificed = g.sacrifice(you, &chosen).count();
     if sacrificed > 0 {
-        g.draw(you, sacrificed as u32);
+        g.draw(you, sacrificed);
     }
     Ok(())
 }

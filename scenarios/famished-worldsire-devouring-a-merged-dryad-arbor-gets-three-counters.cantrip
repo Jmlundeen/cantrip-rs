@@ -1,0 +1,54 @@
+# Famished Worldsire devouring a merged land - Cubwarden mutated under Dryad Arbor, so the merged permanent is the land
+# creature Dryad Arbor (CR 702.140c, 730.2) - enters with three +1/+1 counters: devour land 3 counts each permanent
+# sacrificed (CR 702.82a), and the merged one is one permanent however many cards it becomes (CR 730.3c). The Arbor taps for
+# the Worldsire first; the Plains and the Forest are not devoured.
+[Bot1 Deck]
+Dryad Arbor
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Cubwarden
+Famished Worldsire
+Island
+Forest
+Island x10
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Dryad Arbor.Activate
+Bot1.Hand.Cubwarden.Cast(Dryad Arbor; Ability: Mutate)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(2)
+Bot1.Pass
+? Bot1.Battlefield.Dryad Arbor.Power = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Dryad Arbor.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Famished Worldsire.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Dryad Arbor)
+Bot1.Pass
+[Expect]
+Bot1.Battlefield.Famished Worldsire.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Famished Worldsire.Power = 3
+Bot1.Battlefield.Dryad Arbor = (absent)
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Battlefield.Forest.Tapped = true

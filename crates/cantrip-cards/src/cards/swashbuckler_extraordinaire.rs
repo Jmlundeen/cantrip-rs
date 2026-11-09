@@ -20,7 +20,7 @@ fn sacrifice_treasures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     let sacrificed = g.sacrifice(you, &chosen);
     if !sacrificed.is_empty() {
         let this = g.card_id(&CARD);
-        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, count_u32(sacrificed.objects().len()));
+        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, sacrificed.count());
     }
     Ok(())
 }
