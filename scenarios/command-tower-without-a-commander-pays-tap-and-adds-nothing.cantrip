@@ -1,0 +1,21 @@
+# With no commander there is no defined color identity (CR 903.4f); Command Tower can still activate, pays {T},
+# and produces no mana (CR 106.5), never {C}.
+
+[Bot1 Deck]
+Command Tower
+Plains x39
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Command Tower.Play
+? Bot1.Life = 20
+? Bot1.CommanderColorIdentity = (none)
+! Bot1.Battlefield.Command Tower.Activate(Color: C)
+Bot1.Battlefield.Command Tower.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Command Tower.Tapped = true
+! Bot1.Battlefield.Command Tower.Activate
+
+[Expect]
+Bot1.Commanders =
+Bot1.Mana =

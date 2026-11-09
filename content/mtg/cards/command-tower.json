@@ -1,0 +1,5 @@
+{
+  "name": "Command Tower",
+  "type": "Land",
+  "oracleText": "{T}: Add one mana of any color in your commander's color identity."
+}

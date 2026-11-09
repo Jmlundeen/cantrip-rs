@@ -1,0 +1,27 @@
+# Command Tower adds one mana of any color in the combined identity of two commanders (CR 903.4f). It enters
+# untapped, taps for the mana, and the pool is exactly one mana of the chosen color.
+
+[Format]
+Commander
+[Bot1 Commander]
+Rograkh, Son of Rohgahh
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Command Tower
+Plains x39
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Command Tower.Play
+? Bot1.CommanderColorIdentity = White; Red
+Bot1.Battlefield.Command Tower.Activate(Color: White)
+? Bot1.Mana = {W}
+? Bot1.Battlefield.Command Tower.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Command Tower.Activate(Color: Red)
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Command Tower.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Command Tower.Tapped = true
+Bot2.Life = 40

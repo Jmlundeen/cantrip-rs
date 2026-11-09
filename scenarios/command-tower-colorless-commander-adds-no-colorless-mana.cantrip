@@ -1,0 +1,24 @@
+# A commander with no colors in its identity gives Command Tower no color to add; the ability still pays {T}
+# and produces nothing, not even {C} (CR 106.5, 903.4f; official ruling).
+
+[Format]
+Commander
+[Bot1 Commander]
+Ulamog, the Defiler
+[Bot1 Deck]
+Command Tower
+Plains x39
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Command Tower.Play
+? Bot1.CommanderColorIdentity =
+! Bot1.Battlefield.Command Tower.Activate(Color: Green)
+! Bot1.Battlefield.Command Tower.Activate(Color: C)
+Bot1.Battlefield.Command Tower.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Command Tower.Tapped = true
+
+[Expect]
+Bot1.Mana =
+Bot1.Command = Ulamog, the Defiler
