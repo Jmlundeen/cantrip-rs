@@ -353,7 +353,12 @@ client's `{cost}` text in the `UnlessPays` question is built from the mana and l
 `CostText`), so a card whose cost has other parts must spell them out in its own question text. A fix sends the cost's
 other parts with the prompt and has the client write them.
 
-**Scenarios.** None yet.
+Spelling a part out in the card's own text also fixes its wording: Mold Demon's "sacrifice two Swamps, or sacrifice
+{subject}?" (`mold_demon.rs`, PR #2597) still says Swamps after a text-changing effect makes its filter read Islands. The
+engine asks for the right lands (`q.words`), only the caption is stale. The same fix covers it: a sacrifice part sent with
+its noun, read through the card's words.
+
+**Scenarios.** None yet. Mold Demon with Magical Hack (Swamp to Island) shows it.
 
 ### KI-117: A search's world keeps what the real game did with hidden cards it cannot resample
 
