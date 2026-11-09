@@ -1,0 +1,48 @@
+# Worf, Defiant Commander in a duel. "When Worf enters, create a 2/1 red Klingon Warrior creature token with haste"
+# (CR 603.6a, 701.7): the 2/1 red hasty Klingon Warrior arrives under Bot1. "Battlefront — Whenever you attack, exile the
+# top X cards of your library, where X is the number of opponents you attacked this turn" (CR 508.1): one opponent
+# attacked, so one card (a Plains) is exiled and nothing of Bot2's library is touched. "Until the end of your next turn,
+# you may play those cards": on Bot1's next turn the Plains is played from exile as the land for the turn (CR 305.1).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Worf, Defiant Commander
+Island x3
+Plains
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Worf, Defiant Commander.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Klingon Warrior Token > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 1
+? Bot1.Library.Count = 11
+? Exile = Plains
+? Bot2.Library.Count = 13
+[T3 Bot1.Main1]
+Bot1.Exile.Plains.Play
+
+[Expect]
+Bot1.Battlefield.Klingon Warrior Token.Power = 2
+Bot1.Battlefield.Klingon Warrior Token.Toughness = 1
+Bot1.Battlefield.Klingon Warrior Token.Keywords = Haste
+Bot1.Battlefield.Klingon Warrior Token.Colors = Red
+Bot1.Battlefield.Klingon Warrior Token.Subtypes = Klingon; Warrior
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Worf, Defiant Commander; Klingon Warrior Token; Plains
+Exile.Count = 0
+Turn = 3

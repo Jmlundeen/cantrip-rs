@@ -1,0 +1,59 @@
+# Battlefront with two opponents: the hasty token attacks Bot2 while Memnite attacks Bot3, so X is 2 and two cards leave
+# Bot1's library together while both opponents' libraries stay untouched. "You may play those cards" both ways: the Plains
+# is played from exile on Bot1's next turn, the Ornithopter is left, and after that turn ends the permission is gone.
+
+[Bot1 Deck]
+Mountain
+Memnite
+Black Lotus
+Mox Pearl
+Mox Jet
+Worf, Defiant Commander
+Island
+Island
+Island
+Plains
+Ornithopter
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Memnite.Cast
+[T4 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Worf, Defiant Commander.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Exile.Count = 0
+Bot1.Attack(Klingon Warrior Token > Bot2; Memnite > Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Exile.Count = 2
+? Bot1.Library.Count = 9
+? Exile = Ornithopter; Plains
+? Bot2.Library.Count = 12
+? Bot3.Library.Count = 12
+[T7 Bot1.Main1]
+Bot1.Exile.Plains.Play
+? Exile = Ornithopter
+[T10 Bot1.Main1]
+! Bot1.Exile.Ornithopter.Cast
+
+[Expect]
+Turn = 10
+Bot1.Battlefield.Plains.Tapped = false
+Exile = Ornithopter
