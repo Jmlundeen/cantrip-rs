@@ -230,6 +230,39 @@ pub fn attacking_or_blocking_creature_filter(q: &dyn Query, _: &Asker, t: Target
         && (q.is_attacking(id) || q.is_blocking(id)))
 }
 pub const ATTACKING_OR_BLOCKING_CREATURE: TargetSpec = target(attacking_or_blocking_creature_filter);
+
+fn attacking_creature_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    attacking_creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
+}
+
+/// "Target attacking creature you control" (CR 115.1, 508.1, 109.5): a creature on the battlefield under your control that is
+/// attacking when it is chosen. Ebony Horse and Elvish Scout print it.
+pub const ATTACKING_CREATURE_YOU_CONTROL: TargetSpec = target(attacking_creature_you_control_filter);
+
+fn blocking_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.is_blocking(id))
+}
+
+/// "Target blocking creature" (CR 115.1, 509.1): a creature on the battlefield that is blocking when it is chosen. Righteousness
+/// and Elven Fortress print it.
+pub const BLOCKING_CREATURE: TargetSpec = target(blocking_creature_filter);
+
+fn artifact_creature_or_land_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if on_battlefield(q, id)
+        && (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Land)))
+}
+
+/// "Target artifact, creature, or land" (CR 115.1, 205.2a): a permanent that is any of the three types. Icy Manipulator and
+/// Enervate print it.
+pub const ARTIFACT_CREATURE_OR_LAND: TargetSpec = target(artifact_creature_or_land_filter);
+
+fn opponent_or_planeswalker_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    player_or_planeswalker_filter(q, asker, t) && t != Target::Player(asker.controller)
+}
+
+/// "Target opponent or planeswalker" (CR 115.1, 109.5): a player other than the spell's controller, or a planeswalker on the
+/// battlefield, whoever controls it. Bedeck // Bedazzle and Eternal Flame print it.
+pub const OPPONENT_OR_PLANESWALKER: TargetSpec = target(opponent_or_planeswalker_filter);
 pub const CREATURE_YOU_CONTROL: TargetSpec = target(creature_you_control_filter);
 
 /// "Target creature you own": a creature on the battlefield whose owner is the caster, whoever controls it (CR 108.3, 115.1).

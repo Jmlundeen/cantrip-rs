@@ -124,6 +124,19 @@ pub fn target_creature_gets_and_gains_haste<const P: i32, const T: i32>(g: &mut 
     Ok(())
 }
 
+/// "Target creature gets +`P`/+`T` and gains trample until end of turn" (CR 611.2a, 702.19): one instruction, the creature
+/// being the ability's first target; nothing if it is no longer a legal target as the spell resolves (CR 608.2b). Blitzball
+/// Shot (+3/+3) and Fanatical Fever (+3/+0) print it.
+pub fn target_creature_gets_and_gains_trample<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(creature) = crate::targets::object(g, item, 0) {
+        instruction(g, |g| {
+            crate::pump(g, item.object, creature, P, T);
+            crate::trample_until_end_of_turn(g, item.object, creature);
+        });
+    }
+    Ok(())
+}
+
 /// "One or two target creatures each get +`P`/+`T` until end of turn" (CR 611.2a): every target still legal as the spell
 /// resolves (CR 608.2b), pumped as one instruction. Appeal to Eirdu (+2/+1), Opera Love Song's mode (+2/+0) and Spiritcall
 /// Enthusiast's Scrollboost (+2/+2) print it.
