@@ -1,0 +1,47 @@
+# Uhura, Xenolinguist: "Whenever a non-Human creature enters" reads any player's creature, not only its controller's
+# (CR 603.2). Bot1 casts Uhura on turn 1 and keeps Mox Emerald untapped; on turn 2 Bot2's Grizzly Bears enters, Uhura's
+# controller pays {1} from the Mox as the ability resolves (CR 608.2d) and draws a card on Bot2's turn.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Uhura, Xenolinguist
+Mox Emerald
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Uhura, Xenolinguist.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.PayCost
+? Bot1.Battlefield.Mox Emerald.Tapped = true
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island
+Bot2.Battlefield.Grizzly Bears.Power = 2
