@@ -1186,7 +1186,9 @@ pub fn encode(
                     let shift = remaining * 4;
                     let low = ((prefix << 4) | t.n as usize) << shift;
                     let width = if shift == 0 { 1 } else { 1usize << shift };
-                    let end = (low + width).min(choices.len());
+                    // `low + width` can pass `usize::MAX` for a high first digit (15 << 60 plus 1 << 60), so the
+                    // range is bounded by what is left after `low` instead.
+                    let end = if low < choices.len() { low + width.min(choices.len() - low) } else { low };
                     if low < end {
                         let mut kinds = [0usize; 15];
                         for choice in &choices[low..end] {
