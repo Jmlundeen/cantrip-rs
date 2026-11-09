@@ -956,7 +956,7 @@ pub fn gain_three_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 /// "You gain that much life" as a triggered ability (CR 119.3): the amount the trigger carries in `data[0]`. Bloodthirsty
 /// Conqueror (life lost) prints it. Damage uses gain_matched_damage_life instead.
 pub fn gain_that_much_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    gain_life(g, item, item.data[0].min(i32::MAX as u32) as i32)
+    gain_life(g, item, item.data[0] as i32)
 }
 
 /// "{cost}: Target creature gets +`P`/+`T` for as long as this artifact remains tapped" (CR 611.2a, 608.2b): the creature the
@@ -971,7 +971,7 @@ pub fn target_creature_gets_while_source_tapped<const P: i32, const T: i32>(g: &
 /// Gain the bounded quantity frozen by `.damage_amount()` from the matched
 /// damage events. This has no legacy `data[0]` fallback.
 pub fn gain_matched_damage_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.gain_life(item.controller, item.matched_damage_amount().min(i32::MAX as u32) as i32);
+    g.gain_life(item.controller, item.matched_damage_amount() as i32);
     Ok(())
 }
 
@@ -2502,7 +2502,7 @@ pub fn set_first_target_base_pt<const P: i32, const T: i32>(g: &mut dyn Game, it
 /// Damage equal to the number of cards in a player's hand (CR 608.2h).
 /// Storm Seeker and Emberwilde Captain use this amount.
 pub fn damage_for_cards_in_hand(q: &dyn Query, player: PlayerId) -> u32 {
-    u32::try_from(crate::cards_in_hand(q, player)).unwrap_or(u32::MAX)
+    crate::cards_in_hand(q, player) as u32
 }
 
 /// Add N colorless mana (CR 106.4). Su-Chi, Konstrari Charm and Ugin, Eye of the Storms use this effect.
