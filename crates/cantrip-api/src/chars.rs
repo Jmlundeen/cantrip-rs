@@ -279,6 +279,12 @@ impl Chars {
         self.protection_spared.add(colors, types, spares);
     }
 
+    /// Protection from mana value `least` or greater (CR 702.16a, layer 6), beside any it has (CR 702.16j): a source covered
+    /// by any instance has a mana value at least the least of them, so the least is the whole of what they cover together.
+    pub fn protect_from_mana_value_at_least(&mut self, least: u32) {
+        self.protection_mana_value = Some(self.protection_mana_value.map_or(least, |had| had.min(least)));
+    }
+
     /// "Loses all abilities" (CR 613.1f): every ability it has now goes, keywords, protections and "hexproof from"
     /// included. What is granted after it, in timestamp order, it keeps (CR 613.7).
     pub fn lose_all_abilities(&mut self) {

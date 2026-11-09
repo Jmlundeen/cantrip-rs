@@ -2913,6 +2913,9 @@ pub(crate) fn effect_layer(kind: EffectKind) -> Option<Layer> {
         | EffectKind::Protection(_)
         | EffectKind::ProtectionFromColorless
         | EffectKind::ProtectionFromTypes(_)
+        | EffectKind::ProtectionFromSubtype(_)
+        | EffectKind::ProtectionFromManaValueAtLeast(_)
+        | EffectKind::ProtectionFromColoredSpells
         | EffectKind::HexproofFrom(_)
         | EffectKind::ProtectionFromEverything
         | EffectKind::ProtectionFromPlayer(_)
@@ -3041,6 +3044,9 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
             (Layer::Ability, EffectKind::Protection(colors)) => chars.protection = ColorSet(chars.protection.0 | colors.0),
             (Layer::Ability, EffectKind::ProtectionFromColorless) => chars.protection_colorless = true,
             (Layer::Ability, EffectKind::ProtectionFromTypes(types)) => chars.protection_types = TypeSet(chars.protection_types.0 | types.0),
+            (Layer::Ability, EffectKind::ProtectionFromSubtype(t)) => chars.protection_subtypes = chars.protection_subtypes.with(t),
+            (Layer::Ability, EffectKind::ProtectionFromManaValueAtLeast(least)) => chars.protect_from_mana_value_at_least(least),
+            (Layer::Ability, EffectKind::ProtectionFromColoredSpells) => chars.protection_colored_spells = true,
             (Layer::Ability, EffectKind::HexproofFrom(qualities)) => chars.hexproof_from = chars.hexproof_from.and(qualities),
             (Layer::Ability, EffectKind::ProtectionFromEverything) => chars.protection_everything = true,
             (Layer::Ability, EffectKind::ProtectionFromPlayer(p)) => chars.protection_players |= 1 << p.0,

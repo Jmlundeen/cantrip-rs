@@ -64,7 +64,7 @@ pub const fn from_each_color(text: &'static str) -> StaticDef {
 /// target of, enchanted or equipped by, blocked by, or dealt damage by a source whose mana value (CR 202.3) is `LEAST` or more
 /// (CR 702.16b-e, `Chars::protection_mana_value`). With more than one, the least rules. Mistmeadow Skulk prints it.
 pub fn from_mana_value_at_least_apply<const LEAST: u32>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.protection_mana_value = Some(chars.protection_mana_value.map_or(LEAST, |least| least.min(LEAST)));
+    chars.protect_from_mana_value_at_least(LEAST);
 }
 
 /// The permanent's own "protection from mana value N or greater" (CR 702.16a): Mistmeadow Skulk's "protection from mana value

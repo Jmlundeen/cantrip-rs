@@ -1408,6 +1408,14 @@ pub enum EffectKind {
     ProtectionFromColorless,
     /// Protection from objects of these card types (CR 702.16a): "protection from creatures", layer 6.
     ProtectionFromTypes(TypeSet),
+    /// Protection from objects that have this subtype (CR 702.16a): "protection from Dragons", layer 6. One instance per
+    /// subtype, as "protection from Demons and from Dragons" is two (CR 702.16j).
+    ProtectionFromSubtype(Subtype),
+    /// Protection from objects with this mana value or greater (CR 702.16a, 202.3): "protection from mana value 3 or greater",
+    /// layer 6. Several instances add up to the least of them (`Chars::protection_mana_value`).
+    ProtectionFromManaValueAtLeast(u32),
+    /// Protection from spells that are one or more colors (CR 702.16a): Emrakul, the Aeons Torn's quality, layer 6.
+    ProtectionFromColoredSpells,
     /// Hexproof from these qualities (CR 702.11d-h), layer 6: "gains hexproof from [the color of your choice]" (Mondo Gecko; Veil of
     /// Summer's "hexproof from blue and from black" prints the same). The qualities add to any it has (CR 702.11f).
     HexproofFrom(HexproofFrom),

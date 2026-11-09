@@ -844,6 +844,10 @@ impl StateDump {
                     if let Some(least) = c.protection_mana_value {
                         d.set(format!("{key}.ProtectionFromManaValue"), least);
                     }
+                    // Its protection from spells that are one or more colors (CR 702.16a), printed or granted.
+                    if c.protection_colored_spells {
+                        d.set(format!("{key}.ProtectionFromColoredSpells"), true);
+                    }
                     if c.is(CardType::Creature) {
                         d.set(format!("{key}.Power"), c.power.unwrap_or(0));
                         d.set(format!("{key}.Toughness"), c.toughness.unwrap_or(0));
@@ -981,7 +985,7 @@ const PERMANENT_KEYS: &[&str] = &[
     "Tapped", "Toxic", "Riot", "FaceDown", "FaceDownName", "Token", "Prototyped", "Transformed", "ManaValue", "X", "Doors", "Prepared", "AttachedTo", "Monstrous",
     "Solved", "Suspected", "Saddled", "Exerted", "GoadedBy", "MustAttack", "CantBeBlocked", "BlockRestriction", "DoesntUntap", "LastingRules", "ChosenPlayer", "ChosenOption", "ChosenNumber", "ChosenObject",
     "ChosenModes", "ChosenName", "ClassLevel", "Types", "Supertypes", "Subtypes", "Colors", "Keywords", "HexproofFrom",
-    "ProtectionFrom", "ProtectionFromSubtypes", "ProtectionFromManaValue", "Power", "Toughness", "Damage", "SummoningSick", "ChosenColor", "ChosenSubtype",
+    "ProtectionFrom", "ProtectionFromSubtypes", "ProtectionFromManaValue", "ProtectionFromColoredSpells", "Power", "Toughness", "Damage", "SummoningSick", "ChosenColor", "ChosenSubtype",
 ];
 
 /// The keys the dump writes of a card in a hand, a graveyard, a library, a sideboard or exile, after `BotN.<zone>.<name>.`,

@@ -1,6 +1,7 @@
 //! Protection from a creature type and from a mana value (CR 702.16a-f): what the creature that has it can't be - the target of,
 //! equipped by, blocked by, dealt damage by - judged against a source of that type or of that mana value, over test cards. The
-//! Equipment path (CR 702.16d) is here because no printed Equipment is a creature type that a printed protection names.
+//! Equipment path (CR 702.16d) is here because no printed Equipment is a creature type that a printed protection names. Those
+//! qualities and protection from colored spells granted by a resolved effect in layer 6 are here too (Concerted Effort).
 
 use crate::{Game, Setup};
 use cantrip_api::*;
@@ -20,6 +21,21 @@ fn from_mana_value_three_or_more(_: &dyn LayerQuery, _: ObjectId, chars: &mut Ch
 const DRAGON_WARDED_STATICS: &[StaticDef] = &[static_ability(Layer::Ability, itself, from_dragons, "Protection from Dragons")];
 const VALUE_WARDED_STATICS: &[StaticDef] = &[static_ability(Layer::Ability, itself, from_mana_value_three_or_more, "Protection from mana value 3 or greater")];
 
+static PLAIN_CREATURE: CardDef = CardDef {
+    name: "Plain Test Creature",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    ..CardDef::BLANK
+};
+/// A colored instant, as a spell on the stack is judged.
+static RED_INSTANT: CardDef = CardDef {
+    name: "Red Test Instant",
+    cost: ManaCost { generic: 1, ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    colors: Some(ColorSet::of(Color::Red)),
+    ..CardDef::BLANK
+};
 static DRAGON_WARDED: CardDef = CardDef {
     name: "Dragon Warded Test Creature",
     types: TypeSet::of(&[CardType::Creature]),
@@ -67,7 +83,16 @@ static CHEAP_EQUIPMENT: CardDef = CardDef {
 
 fn game() -> Game {
     let table: &'static CardTable =
-        Box::leak(Box::new(CardTable::new([&DRAGON_WARDED, &VALUE_WARDED, &DRAGON_EQUIPMENT, &PLAIN_EQUIPMENT, &COSTLY_EQUIPMENT, &CHEAP_EQUIPMENT])));
+        Box::leak(Box::new(CardTable::new([
+            &DRAGON_WARDED,
+            &VALUE_WARDED,
+            &DRAGON_EQUIPMENT,
+            &PLAIN_EQUIPMENT,
+            &COSTLY_EQUIPMENT,
+            &CHEAP_EQUIPMENT,
+            &PLAIN_CREATURE,
+            &RED_INSTANT,
+        ])));
     Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() })
 }
 
@@ -107,6 +132,62 @@ fn an_equipment_of_mana_value_three_can_not_equip_a_creature_with_protection_fro
     assert_eq!(q.chars(host).protection_mana_value, Some(3));
     assert!(!crate::attach::host_allows(&cx, costly, host, true), "mana value 3 is covered (CR 702.16d)");
     assert!(crate::attach::host_allows(&cx, cheap, host, true), "mana value 2 is not");
+}
+
+fn grant(game: &mut Game, affected: ObjectId, kind: EffectKind) {
+    let timestamp = game.state.timestamp();
+    game.state.effect_push(ContinuousEffect {
+        source: affected,
+        controller: PlayerId(0),
+        timestamp,
+        affected,
+        kind,
+        duration: Duration::Indefinite,
+        words: Words::NONE,
+    });
+}
+
+#[test]
+fn a_resolved_effect_grants_protection_from_a_subtype_a_mana_value_and_colored_spells_in_layer_6() {
+    let mut game = game();
+    let bear = put(&mut game, &PLAIN_CREATURE, 0);
+    let dragon = put(&mut game, &DRAGON_EQUIPMENT, 1);
+    let plain = put(&mut game, &PLAIN_EQUIPMENT, 1);
+    let costly = put(&mut game, &COSTLY_EQUIPMENT, 1);
+    let cheap = put(&mut game, &CHEAP_EQUIPMENT, 1);
+    let mut obj = Obj::new(game.cards.id_of(&RED_INSTANT), PlayerId(1), Zone::STACK);
+    obj.timestamp = game.state.timestamp();
+    let spell = game.state.push_obj(obj);
+    game.state.zone_push(Zone::STACK, spell);
+    grant(&mut game, bear, EffectKind::ProtectionFromSubtype(Subtype::Dragon));
+    grant(&mut game, bear, EffectKind::ProtectionFromSubtype(Subtype::Demon));
+    // Two instances (CR 702.16j): together they cover what the least does.
+    grant(&mut game, bear, EffectKind::ProtectionFromManaValueAtLeast(5));
+    grant(&mut game, bear, EffectKind::ProtectionFromManaValueAtLeast(3));
+    grant(&mut game, bear, EffectKind::ProtectionFromColoredSpells);
+    let cx = crate::Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let q: &dyn Query = &cx;
+    let c = q.chars(bear);
+    assert!(c.protection_subtypes.has(Subtype::Dragon) && c.protection_subtypes.has(Subtype::Demon), "each subtype instance adds its own");
+    assert_eq!(c.protection_mana_value, Some(3), "mana value 3 or greater and 5 or greater cover 3 or greater together");
+    assert!(c.protection_colored_spells);
+    let judged = |source: ObjectId| q.chars(bear).protected_from_by(&q.chars(source), || q.mana_value(source), PlayerId(1));
+    assert!(judged(dragon) && !judged(plain), "a Dragon source is covered");
+    assert!(judged(costly) && !judged(cheap), "mana value 3 is covered, 2 is not");
+    assert!(judged(spell), "a red spell is covered by protection from colored spells");
+}
+
+#[test]
+fn losing_all_abilities_takes_granted_protection_from_a_subtype_a_mana_value_and_colored_spells() {
+    let mut game = game();
+    let bear = put(&mut game, &PLAIN_CREATURE, 0);
+    grant(&mut game, bear, EffectKind::ProtectionFromSubtype(Subtype::Dragon));
+    grant(&mut game, bear, EffectKind::ProtectionFromManaValueAtLeast(3));
+    grant(&mut game, bear, EffectKind::ProtectionFromColoredSpells);
+    grant(&mut game, bear, EffectKind::LoseAllAbilities);
+    let cx = crate::Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let q: &dyn Query = &cx;
+    assert!(!q.chars(bear).has_protection(), "CR 613.1f: what is granted before the loss goes with it");
 }
 
 #[test]

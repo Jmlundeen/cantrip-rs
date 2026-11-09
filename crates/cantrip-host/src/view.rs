@@ -1186,6 +1186,9 @@ impl<'a> Projector<'a> {
                     EffectKind::Protection(colors) => given.protection = ColorSet(given.protection.0 | colors.0),
                     EffectKind::ProtectionFromColorless => given.protection_colorless = true,
                     EffectKind::ProtectionFromTypes(types) => given.protection_types = TypeSet(given.protection_types.0 | types.0),
+                    EffectKind::ProtectionFromSubtype(t) => given.protection_subtypes = given.protection_subtypes.with(t),
+                    EffectKind::ProtectionFromManaValueAtLeast(least) => given.protect_from_mana_value_at_least(least),
+                    EffectKind::ProtectionFromColoredSpells => given.protection_colored_spells = true,
                     EffectKind::ProtectionFromEverything => given.protection_everything = true,
                     EffectKind::ProtectionFromPlayer(p) => given.protection_players |= 1 << p.0,
                     _ => {}
