@@ -2650,3 +2650,17 @@ pub fn untap_creatures_that_attacked_this_turn(g: &mut dyn Game) {
         for id in creatures { g.untap(id); }
     });
 }
+
+/// "Untap all other creatures you control" (CR 701.26b): Combat Celebrant and Ahn-Crop Champion.
+/// The ability's controller chooses the set as it resolves; its source identity stays excluded even if
+/// that object left, returned as a new object, or changed controllers (CR 113.7a, 400.7, 608.2h).
+pub fn untap_other_creatures_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let creatures: Vec<_> = g.permanents_of(item.controller).into_iter()
+        .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature)).collect();
+    instruction(g, |g| {
+        for creature in creatures {
+            g.untap(creature);
+        }
+    });
+    Ok(())
+}
