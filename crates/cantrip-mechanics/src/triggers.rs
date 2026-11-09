@@ -1290,6 +1290,18 @@ pub fn repartee(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
 /// Repartee, "whenever you cast an instant or sorcery spell that targets a creature": see `repartee`.
 pub const REPARTEE: Trigger = when_asked(EventMask::SPELL_CAST, repartee);
 
+/// "Whenever this creature blocks a creature" (CR 509.1, 603.2): the source is the blocker, and the ability is about the creature it
+/// blocks (`StackItem::subject`). One block declaration makes one `Blocks` event per attacker, so a creature blocking two attackers
+/// triggers once for each. Use with `when_asked(EventMask::BLOCKS, ..)`. Infernal Medusa, Wall of Dust and Wall of Caltrops print it.
+pub fn this_blocks_a_creature(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Blocks { blocker, attacker, .. } if *blocker == asker.source && q.chars(*attacker).is(CardType::Creature) => {
+            Fired::about(Target::Object(*attacker))
+        }
+        _ => None,
+    }
+}
+
 /// A player casts a spell of the given type; capture that spell as the subject (CR 603.2).
 /// Bloodbond March checks creatures and Presence of the Master checks enchantments.
 pub fn player_casts_spell_of_type(q: &dyn Query, event: &Event, kind: CardType) -> Option<Fired> {
