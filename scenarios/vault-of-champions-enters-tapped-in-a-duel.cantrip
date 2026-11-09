@@ -1,0 +1,15 @@
+# Vault of Champions: with one opponent it enters tapped (CR 614.1d) - one is just past "two or more".
+
+[Bot1 Deck]
+Vault of Champions
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Vault of Champions.Play
+? Bot1.Battlefield.Vault of Champions.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Vault of Champions.Tapped = true
