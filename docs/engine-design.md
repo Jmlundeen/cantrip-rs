@@ -3472,3 +3472,18 @@ with the historical schema-2 byte golden using its historical header. The number
 controls use the same protocol.
 
 A copy that permits new targets chooses them before it is placed on the stack (CR 707.10c). The shared retarget procedure keeps each original occurrence on an empty answer, even if that object has left or become illegal; a different target is judged under the item's controller and the completed target set is checked together (CR 115.7d-e). Modes, target counts and divisions stay as copied. An invalid final set leaves the item unchanged and is offered again. The host names the occurrence without offering the stale target as a candidate; protocol 230 tells the client that the empty answer means “Keep current target.”
+
+### Additional phases
+
+The core schedules additional phases by CR 500.8: a group is inserted in printed order directly after an individual
+current or future phase; a later group at the same anchor goes first. Ordinary turns use the normal step transition
+without an allocated schedule. The first insertion materialises the current and remaining phases in
+GameState::phase_schedule, journalled for Game::goto undo/redo. Whole phases run their usual steps and turn-based
+actions; PhaseSpec::Only creates the containing phase and skips its other steps (CR 500.10). An upkeep-only
+beginning phase therefore neither untaps nor draws. A whole additional beginning phase does untap and draw but does
+not start another turn or reset land plays. Main phases after the first are postcombat main phases (CR 505.1a).
+
+Game::add_phases accepts the current phase, a main-phase ordinal (CR 505.1b), or an individual phase identity.
+Returned identities support DelayedWhen::PhaseStep, such as World at War's "at the beginning of that combat".
+Game::add_combat_phase uses the same schedule. Combat boundaries expire combat-duration effects and mana before
+the next phase; ending the turn discards the remaining phase schedule and proceeds to cleanup.

@@ -2155,6 +2155,8 @@ pub enum DelayedWhen {
     /// the step (Sundial of the Infinite) or is never taken (skipped, CR 500.11), it never triggers, and it is dropped as
     /// the next turn begins.
     ExtraTurnStep { step: Step, turn: u32 },
+    /// "At the beginning of that combat" (CR 500.8, 603.7): the individual phase an effect added.
+    PhaseStep { step: Step, phase: u32 },
 
     /// At this step of the next turn to actually begin, or the named player's next turn (CR 603.7, 614.10a).
     /// Extra occurrences in the current turn do not count; a skipped target step cannot move the trigger to a later turn.
@@ -2985,9 +2987,14 @@ pub struct Turn {
     pub day_night: DayNight,
     /// The player who took the previous turn (CR 502.2, 731.2): whose spells the untap step counts.
     pub previous: PlayerId,
-    /// Additional combat phases still to come this turn (CR 500.8): each follows the combat phase it was created in, or the
-    /// precombat main phase's, as the end of combat step ends.
-    pub extra_combats: u32,
+    /// A phase schedule is active this turn (CR 500.8, 500.10). Ordinary turns need no allocated schedule.
+    pub scheduled: bool,
+    /// The individual phase underway, named by the schedule; 0 without a schedule.
+    pub phase_id: u32,
+    /// This is an additional phase, rather than an ordinary phase materialised in the schedule.
+    pub phase_additional: bool,
+    /// A phase with all steps except this one skipped (CR 500.10); none for a whole phase.
+    pub phase_only_step: Option<Step>,
     /// Additional end steps still to come this turn ("there is an additional end step after this step"): each follows the
     /// end step under way, as an end step alone, with no cleanup step between them (Y'shtola Rhul's ruling).
     pub extra_end_steps: u32,
@@ -3005,6 +3012,14 @@ pub struct Turn {
     /// The extra turn this turn is (CR 500.7), by its `ExtraTurn::id`: what "that turn" names in an ability that created it
     /// (Final Fortune's "at the beginning of that turn's end step"). 0 for a turn of the ordinary rotation.
     pub extra: u32,
+}
+
+/// An individual phase in the current turn schedule (CR 500.8, 500.10), with a unique game identity.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct ScheduledPhase {
+    pub id: u32,
+    pub spec: PhaseSpec,
+    pub additional: bool,
 }
 
 /// An extra turn waiting to be taken (CR 500.7): whose it is, and the number that names it, unique in the game, by which an

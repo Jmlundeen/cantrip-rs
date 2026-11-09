@@ -576,6 +576,7 @@ fn write_position<H: Hasher>(s: &GameState, canon: &Canon, h: &mut H, hashed: bo
         (canon.id(b.blocker), canon.id(b.attacker)).hash(h);
     }
     s.extra_turns.hash(h);
+    s.phase_schedule.hash(h);
     s.rng.hash(h);
     s.agenda.len().hash(h);
     for f in &s.agenda {

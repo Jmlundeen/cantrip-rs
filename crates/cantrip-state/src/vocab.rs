@@ -1702,6 +1702,24 @@ impl CounterKind {
     }
 }
 
+/// A phase of a turn (CR 500.1). Main phases are classified when they begin (CR 505.1a).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Phase { Beginning, Main, Combat, Ending }
+
+/// A whole phase (CR 500.8), or a phase containing just the named step (CR 500.10).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum PhaseSpec { Whole(Phase), Only(Step) }
+
+impl PhaseSpec {
+    pub fn phase(self) -> Phase {
+        match self { Self::Whole(phase) => phase, Self::Only(step) => step.phase() }
+    }
+}
+
+/// The phase after which an effect inserts phases. Main ordinals count this turn only (CR 505.1b).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum PhaseAnchor { Current, Main(u32), Id(u32) }
+
 /// The steps of a turn (CR 500), in order.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u8)]
@@ -1721,6 +1739,15 @@ pub enum Step {
 }
 
 impl Step {
+    pub fn phase(self) -> Phase {
+        match self {
+            Self::Untap | Self::Upkeep | Self::Draw => Phase::Beginning,
+            Self::PrecombatMain | Self::PostcombatMain => Phase::Main,
+            Self::End | Self::Cleanup => Phase::Ending,
+            _ => Phase::Combat,
+        }
+    }
+
     pub fn next(self) -> Option<Step> {
         use Step::*;
         Some(match self {

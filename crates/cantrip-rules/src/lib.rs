@@ -80,6 +80,8 @@ mod assist_tests;
 #[cfg(test)]
 mod extra_turn_history_tests;
 #[cfg(test)]
+mod additional_phase_tests;
+#[cfg(test)]
 mod surge_freerunning_tests;
 #[cfg(test)]
 mod control_at_once_tests;
@@ -2653,8 +2655,8 @@ impl cantrip_api::Game for Cx<'_> {
         ops::bottom_in_random_order(self, player, cards);
     }
 
-    fn add_combat_phase(&mut self) {
-        self.g.state.update_turn(|t| t.extra_combats = t.extra_combats + 1);
+    fn add_phases(&mut self, after: PhaseAnchor, phases: &[PhaseSpec]) -> Vec<u32> {
+        turn::add_phases(self, after, phases)
     }
 
     fn add_end_step(&mut self) {

@@ -46,9 +46,9 @@ pub fn next_step(game: &mut Game) {
     let turn = game.state.turn;
     let ending = turn.step();
     // The combat phase ends with its end of combat step, or with whatever step of it an effect ended the turn or the
-    // combat phase in (CR 724.1d, 724.2d).
+    // combat phase in (CR 724.1d, 724.2d), or with the only step of a scheduled combat phase.
     let combat_ends = ending == Step::EndOfCombat
-        || ((turn.ending || turn.combat_ending)
+        || ((turn.ending || turn.combat_ending || turn.phase_only_step.is_some())
             && matches!(ending, Step::BeginCombat | Step::DeclareAttackers | Step::DeclareBlockers | Step::CombatDamage));
 
     // Mana empties as each step ends (CR 500.5), except the mana that lasts until the end of combat, which is lost as
@@ -72,6 +72,7 @@ pub fn next_step(game: &mut Game) {
             s.empty_mana_keeping(p, ends, keep);
         }
     }
+    let main_seen = turn.scheduled && game.log.iter().rev().take_while(|r| r.turn == turn.number).any(|r| matches!(r.event, Event::StepBegan { step } if step.is_main()));
     let s = &mut game.state;
     // CR 724.1d, 724.2d: a turn or combat phase ended during combat removes every creature and planeswalker from combat as
     // the step ends, as the end of the combat phase does, and "until end of combat" effects expire.
@@ -93,7 +94,7 @@ pub fn next_step(game: &mut Game) {
     // combat step had just ended: the end of combat step itself is skipped, and nothing triggers "at end of combat". The
     // next phase is the postcombat main phase, or an additional combat phase that follows this one (CR 500.8).
     let ending = if turn.combat_ending && !turn.ending { Step::EndOfCombat } else { ending };
-    let (number, active, step) = if turn.number == 0 {
+    let (mut number, mut active, mut step) = if turn.number == 0 {
         (1, turn.starting, Step::Untap)
     } else if turn.ending || (ending == Step::Cleanup && turn.cleanup_again) {
         // CR 724.1d: the turn ended, so the game skips straight to the cleanup step, a new one if it was ended during
@@ -108,17 +109,38 @@ pub fn next_step(game: &mut Game) {
             Some(Step::EndOfCombat) if ending == Step::CombatDamage && turn.damage_round == 1 => {
                 (turn.number, turn.active, Step::CombatDamage)
             }
-            // An additional combat phase follows the one that ends (CR 500.8): a whole new one, from its beginning.
-            Some(Step::PostcombatMain) if ending == Step::EndOfCombat && turn.extra_combats > 0 => {
-                (turn.number, turn.active, Step::BeginCombat)
-            }
             // An additional end step follows the end step that ends, alone: the cleanup step comes after the last of them
             // (Y'shtola Rhul's ruling).
             Some(Step::Cleanup) if ending == Step::End && turn.extra_end_steps > 0 => (turn.number, turn.active, Step::End),
             Some(next) => (turn.number, turn.active, next),
+            None if turn.scheduled => (turn.number, turn.active, Step::Cleanup),
             None => (turn.number + 1, next_turn_taker(s, turn.active), Step::Untap),
         }
     };
+    // CR 500.8, 500.10: leave an individual phase only after its last unskipped step. Skipped combat steps
+    // and first-strike damage remain within that phase; repeat cleanup/end steps remain within the ending phase.
+    let boundary = turn.phase_only_step.is_some()
+        || ending.next().is_none_or(|next| next.phase() != ending.phase());
+    if turn.scheduled && !turn.ending && !turn.cleanup_again && !(ending == Step::End && turn.extra_end_steps > 0) && boundary {
+        let mut schedule = s.phase_schedule.clone();
+        if !schedule.is_empty() { schedule.remove(0); }
+        if let Some(next) = schedule.first().copied() {
+            step = first_step(next.spec, main_seen);
+            number = turn.number;
+            active = turn.active;
+            s.update_turn(|t| {
+                t.phase_id = next.id;
+                t.phase_additional = next.additional;
+                t.phase_only_step = match next.spec { PhaseSpec::Only(step) => Some(step), _ => None };
+            });
+        }
+        if schedule.is_empty() {
+            number = turn.number + 1;
+            active = next_turn_taker(s, turn.active);
+            step = Step::Untap;
+        }
+        s.set_phase_schedule(schedule);
+    }
     let previous = turn.active;
     s.update_turn(|t| {
         if number != turn.number {
@@ -127,12 +149,20 @@ pub fn next_step(game: &mut Game) {
         t.number = number;
         t.active = active;
         if number != turn.number {
-            t.extra_combats = 0;
+            t.scheduled = false;
+            t.phase_id = 0;
+            t.phase_additional = false;
+            t.phase_only_step = None;
             t.extra_end_steps = 0;
-        } else if ending == Step::EndOfCombat && step == Step::BeginCombat {
-            t.extra_combats -= 1;
-        } else if ending == Step::End && step == Step::End {
+        } else if ending == Step::End && step == Step::End && turn.extra_end_steps > 0 {
             t.extra_end_steps -= 1;
+        }
+        if turn.ending {
+            t.scheduled = false;
+            t.phase_id = 0;
+            t.phase_additional = false;
+            t.phase_only_step = None;
+            t.extra_end_steps = 0;
         }
         t.set_step(step);
         t.priority = active;
@@ -141,7 +171,63 @@ pub fn next_step(game: &mut Game) {
         t.combat_ending = false;
         t.cleanup_again = false;
     });
+    if (turn.ending || number != turn.number) && !s.phase_schedule.is_empty() {
+        s.set_phase_schedule(Vec::new());
+    }
     s.frame_push(Frame::new(FrameKind::BeginStep));
+}
+
+/// CR 500.8 and 500.10: materialise the remaining ordinary phases only when an effect needs a schedule.
+/// Own the Day inserts after the current main; World at War anchors the second main and names the added combat.
+pub fn add_phases(cx: &mut Cx, after: PhaseAnchor, phases: &[PhaseSpec]) -> Vec<u32> {
+    if phases.is_empty() || cx.s().turn.number == 0 || cx.s().turn.ending { return Vec::new(); }
+    let turn = cx.s().turn;
+    let mut schedule = cx.s().phase_schedule.clone();
+    if !turn.scheduled {
+        let future: &[Phase] = match turn.step() {
+            Step::Untap | Step::Upkeep | Step::Draw => &[Phase::Main, Phase::Combat, Phase::Main, Phase::Ending],
+            Step::PrecombatMain => &[Phase::Combat, Phase::Main, Phase::Ending],
+            Step::BeginCombat | Step::DeclareAttackers | Step::DeclareBlockers | Step::CombatDamage | Step::EndOfCombat => &[Phase::Main, Phase::Ending],
+            Step::PostcombatMain => &[Phase::Ending],
+            Step::End | Step::Cleanup => &[],
+        };
+        for phase in std::iter::once(turn.step().phase()).chain(future.iter().copied()) {
+            let id = cx.st().timestamp();
+            schedule.push(cantrip_state::ScheduledPhase { id, spec: PhaseSpec::Whole(phase), additional: false });
+        }
+    }
+    let anchor = match after {
+        PhaseAnchor::Current => Some(0),
+        PhaseAnchor::Id(id) => schedule.iter().position(|p| p.id == id),
+        PhaseAnchor::Main(n) => {
+            let occurred = cx.history().this_turn().iter().filter(|r| matches!(r.event, Event::StepBegan { step } if step.is_main())).count();
+            let mut ordinal = occurred.saturating_sub(usize::from(turn.step().is_main()));
+            schedule.iter().position(|p| {
+                if p.spec.phase() == Phase::Main { ordinal += 1; ordinal == n as usize } else { false }
+            })
+        }
+    };
+    let Some(anchor) = anchor else { return Vec::new() };
+    let added: Vec<_> = phases.iter().map(|&spec| cantrip_state::ScheduledPhase { id: cx.st().timestamp(), spec, additional: true }).collect();
+    let ids = added.iter().map(|p| p.id).collect();
+    schedule.splice(anchor + 1..anchor + 1, added);
+    let current = schedule[0];
+    cx.st().update_turn(|t| {
+        t.scheduled = true;
+        t.phase_id = current.id;
+    });
+    cx.st().set_phase_schedule(schedule);
+    ids
+}
+
+fn first_step(spec: PhaseSpec, main_seen: bool) -> Step {
+    match spec {
+        PhaseSpec::Only(step) => step,
+        PhaseSpec::Whole(Phase::Beginning) => Step::Untap,
+        PhaseSpec::Whole(Phase::Main) => if main_seen { Step::PostcombatMain } else { Step::PrecombatMain },
+        PhaseSpec::Whole(Phase::Combat) => Step::BeginCombat,
+        PhaseSpec::Whole(Phase::Ending) => Step::End,
+    }
 }
 
 /// Who takes the next turn: the most recently created extra turn first (CR 500.7), skipping a player who has left the
@@ -194,6 +280,7 @@ fn next_turn_taker(s: &mut GameState, after: PlayerId) -> PlayerId {
     // and what it became is a new object the ability doesn't refer to (CR 400.7, 603.7c). The event that moved it was looked
     // at for triggers as it happened, so dropping it now loses nothing.
     let stale = |d: &cantrip_state::Delayed, s: &GameState| match d.when {
+        DelayedWhen::PhaseStep { .. } => true,
         DelayedWhen::ExtraTurnStep { turn, .. } => turn != extra && !s.extra_turns.iter().any(|t| t.id == turn),
         // "On your next turn" is the turn ending now, if it is that player's first since the ability was made, and it began: a
         // skipped turn ends here too, under the player who skipped it, but it is not their next turn, and the ability waits
@@ -409,6 +496,13 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
     }
     match turn.step() {
         Step::Untap => {
+            if turn.phase_additional {
+                // CR 500.8, 501.1: another beginning phase in this same turn runs untap/upkeep/draw again.
+                crate::phasing::untap_step(cx, active);
+                crate::day_night::check_untap_step(cx)?;
+                untap_step(cx, active)?;
+                return Ok(Flow::Done);
+            }
             // CR 614.10, 500.11: a turn that would begin may be skipped instead, and then never begins. The control of a
             // player is still in force while that is decided: it ends only as the next turn begins (CR 723.1).
             if skip_turn(cx, active)? {
@@ -463,7 +557,7 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
         }
         Step::Draw => {
             // CR 103.8a: the player who goes first skips the draw of their first turn (in a two-player game).
-            let skip = turn.number == 1 && active == turn.starting && cx.s().players.len() == 2;
+            let skip = turn.number == 1 && active == turn.starting && cx.s().players.len() == 2 && !turn.phase_additional;
             if !skip {
                 ops::draw_cards(cx, active, 1);
             }

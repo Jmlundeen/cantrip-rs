@@ -1181,9 +1181,16 @@ pub trait Game: Query {
     fn flip_coins_for_heads(&mut self, player: PlayerId, n: u32) -> Vec<bool>;
     /// Moves a card already in a library to `from_top` cards from its top (0 is the top): "second from the top".
     fn place_in_library(&mut self, card: ObjectId, from_top: usize);
-    /// "After this phase, there is an additional combat phase" (CR 500.8), from the precombat main phase or a combat phase: a
-    /// whole combat phase, from its beginning, follows the combat phase that is under way (or the one that is next).
-    fn add_combat_phase(&mut self);
+    /// Inserts phases directly after the named phase (CR 500.8), in the listed order. Repeated insertions at the same
+    /// anchor put the most recently created group first. An absent/already completed anchor adds nothing.
+    /// Each returned identity names "that phase" in DelayedWhen::PhaseStep (World at War).
+    /// PhaseSpec::Only creates the containing phase with its other steps skipped (CR 500.10: Obeka's upkeep).
+    /// The card applies "you get" only on its controller's turn (CR 500.10a).
+    fn add_phases(&mut self, after: PhaseAnchor, phases: &[PhaseSpec]) -> Vec<u32>;
+    /// "After this phase, there is an additional combat phase" (CR 500.8): Aurelia, the Warleader and Fear of Missing Out.
+    fn add_combat_phase(&mut self) {
+        self.add_phases(PhaseAnchor::Current, &[PhaseSpec::Whole(Phase::Combat)]);
+    }
     /// "There is an additional end step after this step", from the end step: another end step follows the one under way,
     /// with no other step between them: Y'shtola Rhul's ruling, "Additional end steps don't come with any other additional
     /// steps (such as cleanup)". Abilities that trigger "at the beginning of the end step" trigger at its beginning too, and

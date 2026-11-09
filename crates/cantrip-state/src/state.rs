@@ -73,6 +73,8 @@ pub struct GameState {
     pub blocks: Vec<Block>,
     /// Extra turns waiting to be taken (CR 500.7): the most recently created last, and taken first.
     pub extra_turns: Vec<ExtraTurn>,
+    /// Current and future phases, allocated only when an effect changes this turn (CR 500.8).
+    pub phase_schedule: Vec<ScheduledPhase>,
     /// What the rules watch to find a loop of passes (`docs/rules-exceptions.md`, RX-4): see `LoopWatch`.
     pub loop_watch: LoopWatch,
     /// The positions seen at priority in the present run of passes, each with the rounds the loop has come round it (see
@@ -291,7 +293,7 @@ impl GameState {
         &Turn,
         &Vec<ContinuousEffect>,
         (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<PlayPermission>),
-        (&Vec<Attacker>, &Vec<ObjectId>, &Vec<Block>, &Vec<ExtraTurn>, (&LoopWatch, &Vec<LoopKey>)),
+        (&Vec<Attacker>, &Vec<ObjectId>, &Vec<Block>, &Vec<ExtraTurn>, &Vec<ScheduledPhase>, (&LoopWatch, &Vec<LoopKey>)),
         &Vec<Frame>,
         (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>, (&Vec<Target>, &Vec<u8>, &Vec<u32>), (&Vec<Merge>, &Vec<Vec<Copiable>>, &Vec<(ObjectId, u32)>)),
     ) {
@@ -303,7 +305,7 @@ impl GameState {
             &self.turn,
             &self.effects,
             (&self.triggers, &self.delayed, &self.permissions),
-            (&self.attackers, &self.blockers, &self.blocks, &self.extra_turns, (&self.loop_watch, &self.loop_keys)),
+            (&self.attackers, &self.blockers, &self.blocks, &self.extra_turns, &self.phase_schedule, (&self.loop_watch, &self.loop_keys)),
             &self.agenda,
             (
                 &self.rng,
@@ -438,6 +440,7 @@ pub enum Undo {
     BlockersSet(Vec<ObjectId>),
     BlocksSet(Vec<Block>),
     ExtraTurnsSet(Vec<ExtraTurn>),
+    PhaseScheduleSet(Vec<ScheduledPhase>),
     LoopWatchSet(LoopWatch),
     LoopKeyPushed,
     LoopKeyPopped(LoopKey),
@@ -548,6 +551,7 @@ impl GameState {
             blockers: Vec::new(),
             blocks: Vec::new(),
             extra_turns: Vec::new(),
+            phase_schedule: Vec::new(),
             loop_watch: LoopWatch::default(),
             loop_keys: Vec::new(),
             loop_index: LoopIndex::default(),
@@ -1647,6 +1651,11 @@ impl GameState {
         }
     }
 
+    pub fn set_phase_schedule(&mut self, phases: Vec<ScheduledPhase>) {
+        let old = std::mem::replace(&mut self.phase_schedule, phases);
+        self.log(Undo::PhaseScheduleSet(old));
+    }
+
     pub fn set_extra_turns(&mut self, turns: Vec<ExtraTurn>) {
         let old = std::mem::replace(&mut self.extra_turns, turns);
         self.log(Undo::ExtraTurnsSet(old));
@@ -2136,6 +2145,7 @@ impl GameState {
             Undo::BlockersSet(old) => self.blockers = old,
             Undo::BlocksSet(old) => self.blocks = old,
             Undo::ExtraTurnsSet(old) => self.extra_turns = old,
+            Undo::PhaseScheduleSet(old) => self.phase_schedule = old,
             Undo::LoopWatchSet(old) => self.loop_watch = old,
             Undo::LoopKeyPushed => {
                 if let Some(key) = self.loop_keys.pop() {
@@ -2249,6 +2259,7 @@ impl GameState {
             Undo::BlockersSet(_) => Undo::BlockersSet(self.blockers.clone()),
             Undo::BlocksSet(_) => Undo::BlocksSet(self.blocks.clone()),
             Undo::ExtraTurnsSet(_) => Undo::ExtraTurnsSet(self.extra_turns.clone()),
+            Undo::PhaseScheduleSet(_) => Undo::PhaseScheduleSet(self.phase_schedule.clone()),
             Undo::LoopWatchSet(_) => Undo::LoopWatchSet(self.loop_watch.clone()),
             Undo::LoopKeyPushed => Undo::LoopKeyPopped(self.loop_keys.last().expect("a key").clone()),
             Undo::LoopKeyPopped(_) => Undo::LoopKeyPushed,
