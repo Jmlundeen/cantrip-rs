@@ -1,0 +1,111 @@
+# The Immortal Sun {6}: cast on turn 1 off Mana Crypt and four Moxen ({C}{C}{U}{B}{R}{G} pays {6} exactly, the pool empty
+# afterwards). "At the beginning of your draw step, draw an additional card." (CR 603.2, 121.1): only the active player
+# draws each turn (and the first turn is skipped), so on turn 3 Bot1 holds three cards (the normal plus the extra) and on
+# turn 5 four. "Spells you cast cost {1} less to cast." (CR 601.2f, 118.7a): the Grizzly Bears costs just {G} (the pool
+# empty after), Bot2's own Bears on turn 2 costs the full {1}{G}, and Ashiok, Dream Render on turn 5 costs {U}{B} instead
+# of {1}{U}{B}, and Mind Stone {2} is cast for exactly {1} off Mana Crypt (a {2} reduction would leave {C}{C}, pinning the
+# amount from above). "Creatures you control get +1/+1." (CR 604.1): Bot1's Bears is 3/3 while Bot2's stays 2/2. "Players
+# can't activate planeswalkers' loyalty abilities." (CR 602.5, 606.3): on turn 7 Ashiok's "-1: Target player mills four
+# cards." can't be activated.
+
+[Bot1 Deck]
+Mana Crypt
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+The Immortal Sun
+Grizzly Bears
+Ashiok, Dream Render
+Island
+Mind Stone
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Grizzly Bears
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The Immortal Sun.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Grizzly Bears.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ashiok, Dream Render.Cast(Spend: U, B)
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Mind Stone.Cast(Spend: C)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C}
+[T7 Bot1.Main1]
+! Bot1.Battlefield.Ashiok, Dream Render.Activate(Ability: mills four)
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Grizzly Bears.Power = 3
+Bot1.Battlefield.Grizzly Bears.Toughness = 3
+Bot2.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Grizzly Bears.Toughness = 2
+Bot1.Battlefield.Ashiok, Dream Render.Counters.Loyalty = 5
