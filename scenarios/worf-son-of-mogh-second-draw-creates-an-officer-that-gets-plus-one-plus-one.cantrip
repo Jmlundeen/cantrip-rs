@@ -1,0 +1,46 @@
+# Worf, Son of Mogh on Bot1's own turn. "Seek out — Whenever you draw your second card each turn" (CR 603.2): the first
+# Opt is the first card drawn and creates nothing; the second Opt is the second card and creates exactly one "1/1 red
+# Officer creature token" (CR 701.7). "Other Officers you control get +1/+1": the token enters as a 2/2 while Worf itself,
+# no other Officer, stays 3/3. Menace shows on Worf.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Worf, Son of Mogh
+Opt
+Opt
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Worf, Son of Mogh.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Island |)
+? Bot1.Battlefield.Count = 3
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Island |)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 4
+
+[Expect]
+Bot1.Battlefield.Officer Token.Power = 2
+Bot1.Battlefield.Officer Token.Toughness = 2
+Bot1.Battlefield.Officer Token.Colors = Red
+Bot1.Battlefield.Officer Token.Subtypes = Officer
+Bot1.Battlefield.Worf, Son of Mogh.Power = 3
+Bot1.Battlefield.Worf, Son of Mogh.Toughness = 3
+Bot1.Battlefield.Worf, Son of Mogh.Keywords = Menace
