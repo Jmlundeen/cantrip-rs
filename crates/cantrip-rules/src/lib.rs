@@ -9,6 +9,8 @@ mod actions;
 mod ability_acquisition_identity_tests;
 #[cfg(test)]
 mod delayed_capture_tests;
+#[cfg(test)]
+mod rebound_hand_tests;
 mod takeback;
 #[cfg(test)]
 mod base_power_tests;
