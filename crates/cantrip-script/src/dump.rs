@@ -397,8 +397,10 @@ impl StateDump {
             // The engine's filtered visibility, for each opponent as well as the owner.
             let shown = visibility::observable(game, p, &Default::default());
             for owner in s.seats() {
+                let owner_bot = bot(owner);
                 let top = s.zone(Zone::library(owner)).first().copied();
-                d.set(format!("{b}.Sees.{}.LibraryTop", bot(owner)), top.filter(|id| shown.contains(id)).map_or("(hidden)".to_string(), |id| game.known_name(id).to_string()));
+                d.set(format!("{b}.Sees.{owner_bot}.LibraryTop"), top.filter(|id| shown.contains(id)).map_or("(hidden)".to_string(), |id| game.known_name(id).to_string()));
+                d.set(format!("{b}.Sees.{owner_bot}.LibraryTopObject"), top.filter(|id| shown.contains(id)).map_or("(hidden)".to_string(), |id| id.0.to_string()));
             }
             // How they lost (CR 104.3), from the history: absent for a player who has not, or who left another way.
             if let Some(reason) = game.log.iter().find_map(|r| match r.event {
@@ -1055,6 +1057,9 @@ fn writable(key: &str) -> bool {
     if PLAYER_KEYS.contains(&rest) {
         return true;
     }
+    if let Some((owner, property)) = rest.strip_prefix("Sees.Bot").and_then(|r| r.split_once('.')) {
+        return owner.parse::<u8>().is_ok() && matches!(property, "LibraryTop" | "LibraryTopObject");
+    }
     if let Some(commander) = rest.strip_prefix("Commander.") {
         if let Some(name) = commander.strip_suffix(".CastCount") {
             return !name.is_empty();
@@ -1125,7 +1130,7 @@ mod tests {
                 let Some(piece) = piece.trim_start().strip_prefix(open) else { continue };
                 let key = &piece[..piece.find(close).unwrap()];
                 checked += 1;
-                let sample = key.replace("{b}", "Bot1").replace("{key}", "Bot1.Battlefield.Card").replace("{row}", "Battlefield").replace("{label}", "Card");
+                let sample = key.replace("{b}", "Bot1").replace("{owner_bot}", "Bot2").replace("{key}", "Bot1.Battlefield.Card").replace("{row}", "Battlefield").replace("{label}", "Card");
                 let sample = if key.contains(".DamageTo.") { sample.replace("{}", "Bot2") } else { sample.replace("{}", CounterKind::ALL[0].token()) };
                 if !writable(&sample) && !writable(&key.replace("{b}", "Bot1").replace("{key}", "Bot1.Graveyard.Card")) {
                     missing.push(key.to_string());
@@ -1180,6 +1185,11 @@ Bot1.Battlefield.Data probe.Counters.Corpse = (absent)
         assert!(writable("Bot1.Commander.Hakoda, Selfless Commander#2.DamageTo.Bot4"));
         assert!(writable("Bot1.Battlefield.Grizzly Bears.Keywords.Count"));
         assert!(writable("Monarch"));
+        assert!(writable("Bot1.Sees.Bot2.LibraryTop"));
+        assert!(writable("Bot2.Sees.Bot1.LibraryTopObject"));
+        assert!(!writable("Bot1.Sees.Bot2"));
+        assert!(!writable("Bot1.Sees.BotX.LibraryTopObject"));
+        assert!(!writable("Bot1.Sees.Bot2.LibraryTopObjct"));
         assert!(!writable("Bot1.Battlefield.Grizzly Bears.Counters"));
         assert!(!writable("Bot1.Battlefield.Grizzly Bears.Counters.MinusOne"));
         assert!(!writable("Bot1.Battlefield.Grizzly Bears.Taped"));

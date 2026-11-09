@@ -1,0 +1,50 @@
+# Will Riker: "When Will Riker enters, put a +1/+1 counter on another target creature you control." Bot1's two Ornithopters
+# are both eligible; Bot2's Memnite is not (not yours), and Riker itself is not (not another). The single counter lands on
+# Ornithopter#2, exactly one, and nothing else gains one.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Ornithopter
+Plains x2
+Will Riker, Assuming Command
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Will Riker, Assuming Command.Cast
+! Bot1.Target(Will Riker, Assuming Command)
+! Bot1.Target(Bot2.Battlefield.Memnite)
+Bot1.Target(Bot1.Battlefield.Ornithopter#2)
+? Bot1.Mana =
+[T9 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Will Riker, Assuming Command.Counters.PlusOnePlusOne = (absent)
+? Bot2.Battlefield.Memnite.Counters.PlusOnePlusOne = (absent)
+
+[Expect]
+Turn = 9
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
