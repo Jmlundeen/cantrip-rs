@@ -75,6 +75,13 @@ once the fix agent has left) to confirm each finding is resolved and
 nothing new is broken; loop until it passes, or stop and tell the user when a finding needs a decision only they can
 make. No blocking findings: nothing to fix.
 
+A re-review is scoped to what the fixes changed; the landing's test run (step 4) is the full gate. It builds each commit
+from the first one the fixes changed onward (`git rebase -x "cargo check --workspace --tests" <that commit>^`), runs
+the scenarios and coverage of the cards whose files changed and of every card that calls changed shared code, and
+breaks the changed lines (shared code included) to check a scenario catches each break. It does not run the whole
+`cargo test`, the per-commit build of unchanged commits, or the other cards' scenarios again, and it does not rebase
+the stack onto a newer `main` (the landing does that). Tell it this in the SendMessage.
+
 ## 4. Land by merging the PR itself
 
 A PR lands **merged**, never closed: the reviewed and fixed commits go onto the PR's own branch, and `main` is
