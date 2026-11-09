@@ -1,0 +1,104 @@
+# The Sword of Kahless {4}: cast on turn 1 off a Forest and three Moxen ({G}{G}{W}{U} pays {4} exactly). On turn 3
+# Grizzly Bears is cast ({1}{G} off a Forest and a Mox, the pool empty) and the Sword is equipped for {2} (the pool
+# empty again, and the Sword attached). "Equipped creature gets +2/+2" (CR 604.1, 613.1f): the Bears is 4/4. "Whenever
+# this creature attacks, look at the top five cards of your library. You may put a Klingon or Warrior creature card
+# from among them onto the battlefield. Put the rest on the bottom of your library in a random order." (CR 603.2,
+# 608.2c, 401.4): on turn 5 the Bears attacks and Bot1 looks at Memnite, Sol Ring, Battle-Scarred Survivalist, an
+# Island and Alesha's Vanguard. Memnite (a creature, neither Klingon nor Warrior) and Sol Ring (not a creature) can't
+# be chosen; Alesha's Vanguard (a Warrior) can and is put onto the battlefield, and the other four go to the bottom,
+# so the turn-7 draw is the Island that was sixth. Bot2's Abzan Guide (a Warrior) stays in Bot2's library.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+The Sword of Kahless
+Forest
+Grizzly Bears
+Forest
+Memnite
+Sol Ring
+Battle-Scarred Survivalist
+Island
+Alesha's Vanguard
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Abzan Guide
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Sword of Kahless.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.The Sword of Kahless.Activate(Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The Sword of Kahless.AttachedTo = Grizzly Bears
+[T4 Bot2.BeginCombat]
+Bot2.Attack(Bot2.Battlefield.Ornithopter > Bot1)
+[T5 Bot1.BeginCombat]
+Bot1.Attack(Grizzly Bears > Bot2)
+! Bot1.Choose(Memnite)
+! Bot1.Choose(Sol Ring)
+Bot1.Choose(Alesha's Vanguard)
+? Bot1.Battlefield.Alesha's Vanguard.Tapped = false
+[T7 Bot1.Main1]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Sapphire; Mox Ruby; The Sword of Kahless; Forest; Grizzly Bears; Alesha's Vanguard
+Bot1.Battlefield.Grizzly Bears.Power = 4
+Bot1.Battlefield.Grizzly Bears.Toughness = 4
+Bot1.Looked = Memnite; Sol Ring; Battle-Scarred Survivalist; Island; Alesha's Vanguard
+Bot1.Hand = Forest; Island
+Bot1.Library.Count = 9
+Bot2.Life = 16
+Bot2.Battlefield = Ornithopter
+Bot2.Library = Island; Island; Abzan Guide; Island; Island; Island; Island; Island; Island; Island

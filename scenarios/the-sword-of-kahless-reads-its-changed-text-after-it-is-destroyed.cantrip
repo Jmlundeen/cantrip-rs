@@ -1,0 +1,83 @@
+# The Sword of Kahless: the quoted ability it grants is the Sword's text, so a text-changing effect on the Sword changes
+# what the equipped creature's trigger looks for (CR 612.1, 113.7a), and the ability keeps those words once it has
+# triggered, even after the Sword is gone (CR 113.7a, 608.2h). Artificial Evolution turns the Sword's "Warrior" into
+# "Soldier"; the Bears attacks and Bot2 Shatters the Sword with the trigger on the stack. Among the top five, Alesha's
+# Vanguard (an Orc Warrior) can't be chosen now, while Elite Vanguard (a Human Soldier) can and enters - alone: "a
+# Klingon or Warrior creature card" is one, so it and Battle-Scarred Survivalist (a Klingon) together are refused. The Bears' own
+# text is unchanged, so reading the creature's words, or the printed types, would get both wrong.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+The Sword of Kahless
+Forest
+Grizzly Bears
+Artificial Evolution
+Memnite
+Sol Ring
+Battle-Scarred Survivalist
+Elite Vanguard
+Alesha's Vanguard
+Island x6
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Shatter
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Sword of Kahless.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.The Sword of Kahless.Activate(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(The Sword of Kahless)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Warrior)
+Bot1.Modes(Soldier)
+[T5 Bot1.BeginCombat]
+Bot1.Attack(Grizzly Bears > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shatter.Cast(Bot1.Battlefield.The Sword of Kahless)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = The Sword of Kahless; Artificial Evolution
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Alesha's Vanguard)
+! Bot1.Choose(Battle-Scarred Survivalist; Elite Vanguard)
+Bot1.Choose(Elite Vanguard)
+
+[Expect]
+Bot1.Battlefield.Elite Vanguard.Tapped = false
+Bot1.Looked = Memnite; Sol Ring; Battle-Scarred Survivalist; Elite Vanguard; Alesha's Vanguard
+Bot1.Graveyard = The Sword of Kahless; Artificial Evolution
