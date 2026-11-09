@@ -1,0 +1,22 @@
+# "a Forest or Island card from your hand" (CR 701.20a, 400.7): Bot2's hand holds Forests but Bot1's holds none - a
+# Mountain is no Forest or Island, and the Snarl itself has no land subtypes, so it cannot be revealed either. Bot2's
+# hand stays where it is, and this one enters tapped.
+
+[Bot1 Deck]
+Vineglimmer Snarl
+Vineglimmer Snarl
+Mountain x18
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Vineglimmer Snarl.Play
+Bot1.Accept
+? Bot1.Battlefield.Vineglimmer Snarl.Tapped = true
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Vineglimmer Snarl.Tapped = true
+Bot1.Hand.Count = 6
+Bot2.Hand.Count = 7

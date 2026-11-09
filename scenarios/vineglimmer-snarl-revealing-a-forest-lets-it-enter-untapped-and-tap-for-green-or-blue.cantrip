@@ -1,0 +1,31 @@
+# Vineglimmer Snarl: "As this land enters, you may reveal a Forest or Island card from your hand. If you don't, this land
+# enters tapped. {T}: Add {G} or {U}" (CR 614.1d, 701.20a, 605.1a). Bot1 reveals a Forest - exactly one, though an Island sits in the same hand - so it enters untapped; on turns
+# 3 and 5 it taps for {G} and for {U}, each the single mana the {T} buys, and it offers no white.
+
+[Bot1 Deck]
+Vineglimmer Snarl
+Forest
+Island
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Vineglimmer Snarl.Play
+Bot1.Accept
+Bot1.Choose(Forest)
+? Bot1.Revealed = Forest
+? Bot2.Revealed = (absent)
+? Bot1.Battlefield.Vineglimmer Snarl.Tapped = false
+[T3 Bot1.Main1]
+Bot1.Battlefield.Vineglimmer Snarl.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Vineglimmer Snarl.Activate(Color: White)
+Bot1.Battlefield.Vineglimmer Snarl.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Vineglimmer Snarl.Tapped = true
