@@ -184,3 +184,12 @@ pub fn cast_only_before_blockers(q: &dyn Query, _: &Asker) -> bool {
 pub fn activate_only_during_combat(q: &dyn Query, _: &Asker) -> bool {
     during_combat(q)
 }
+
+/// "Cast this spell / activate only before the combat damage step" (CR 506.8d, 506.8e, 506.8g): any step of the turn up to the
+/// combat damage step, but only of the turn's first combat phase, so not once an end of combat step has begun (a second
+/// combat phase, as Aurelia, the Warleader's, is too late), even when the damage step of the first was skipped. Berserk and
+/// Angus Mackenzie print it, as a cast restriction (`CardDef::cast_only_if`) and an activation condition.
+pub fn only_before_combat_damage_step(q: &dyn Query, _: &Asker) -> bool {
+    q.state().turn.step() < Step::CombatDamage
+        && !q.history().this_turn().iter().any(|r| matches!(r.event, Event::StepBegan { step: Step::EndOfCombat }))
+}

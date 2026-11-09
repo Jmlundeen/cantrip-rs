@@ -1,0 +1,33 @@
+# Berserk: "Cast this spell only before the combat damage step" refers to the turn's first combat phase (CR 506.8d). Aurelia, the
+# Warleader attacks and adds a second combat phase; once the first combat has ended, Berserk is refused at the second combat's
+# beginning of combat step even though that step comes before a combat damage step.
+[Bot1 Deck]
+Mox Emerald
+Berserk
+Island x20
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Aurelia, the Warleader
+Island x20
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Aurelia, the Warleader.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Aurelia, the Warleader > Bot1)
+[T4 Bot2.BeginCombat]
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Berserk.Cast(Bot2.Battlefield.Aurelia, the Warleader)
+? Bot1.Mana = {G}
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard.Count = 0

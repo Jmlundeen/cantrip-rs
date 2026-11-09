@@ -1,11 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, delayed};
+use cantrip_mechanics::{combat, delayed, targets};
 use cantrip_oracle as oracle;
-
-/// "Cast this spell only before the combat damage step" (CR 601.3): any step of the turn before it.
-fn before_combat_damage(q: &dyn Query, _: &Asker) -> bool {
-    q.state().turn.step() < Step::CombatDamage
-}
 
 /// "Target creature gains trample and gets +X/+0 until end of turn, where X is its power. At the beginning of the next end
 /// step, destroy that creature if it attacked this turn." X is the power as Berserk resolves; a negative power gives +0/+0
@@ -35,6 +30,6 @@ fn destroy_if_attacked(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::CREATURE], frenzy),
     delayed: &[delayed_trigger(destroy_if_attacked, "At the beginning of the next end step, destroy that creature if it attacked this turn.")],
-    cast_only_if: Some(before_combat_damage),
+    cast_only_if: Some(combat::only_before_combat_damage_step),
     ..oracle::BERSERK
 };
