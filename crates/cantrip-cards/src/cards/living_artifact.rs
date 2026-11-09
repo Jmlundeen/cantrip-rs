@@ -2,21 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
 
-/// "Whenever you're dealt damage" (CR 603.2).
-fn when_youre_dealt_damage(
-    _: &dyn Query,
-    asker: &Asker,
-    event: &Event,
-) -> Option<Fired> {
-    let Event::Damage { target, amount, .. } = event else { return None };
-    let subject = *target;
-    let data = [*amount, 0];
-    if matches!(* target, Target::Player(p) if asker.controller == p) {
-        return Some(Fired { subject, data });
-    }
-    None
-}
-
 /// "Whenever you're dealt damage, put that many vitality counters on this Aura." (CR 608.2, 122.1).
 fn put_many_vitality_counters_aura(
     g: &mut dyn Game,
@@ -44,7 +29,7 @@ static PAY: Question = Question::new("RemoveACounter", "remove a vitality counte
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-                when_asked(EventMask::DAMAGE, when_youre_dealt_damage),
+                triggers::YOU_ARE_DEALT_DAMAGE,
                 put_many_vitality_counters_aura,
                 "Whenever you're dealt damage, put that many vitality counters on this Aura.",
             )

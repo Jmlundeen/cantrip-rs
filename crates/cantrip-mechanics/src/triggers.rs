@@ -474,6 +474,20 @@ pub fn a_source_deals_damage_to_this(_: &dyn Query, source: ObjectId, event: &Ev
     }
 }
 
+/// "Whenever you're dealt damage" (CR 120.8, 603.2): damage of more than 0 dealt to `asker.controller`, the player the subject and
+/// the damage `data[0]` (or the bounded frozen payload with `.damage_amount()`, "that much"). The ability is `.sums_per_subject()`.
+/// Lich and Living Artifact print it. The `listens` mask is `EventMask::DAMAGE`.
+pub fn you_are_dealt_damage(_: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { target: Target::Player(p), amount, .. } if *p == asker.controller && *amount > 0 => {
+            Some(Fired { subject: Target::Player(*p), data: [*amount, 0] })
+        }
+        _ => None,
+    }
+}
+
+pub const YOU_ARE_DEALT_DAMAGE: Trigger = when_asked(EventMask::DAMAGE, you_are_dealt_damage);
+
 /// "Whenever you sacrifice [a permanent]" (CR 701.21a): the permanent `player` sacrificed, as it last was on the
 /// battlefield, for the card to judge the quality it names. The ability is `.on_sacrifice()`, and looks back as any ability
 /// that triggers on a sacrifice does (CR 603.10a). Tireless Tracker (a Clue) and Biotech Specialist (an artifact) print it.
