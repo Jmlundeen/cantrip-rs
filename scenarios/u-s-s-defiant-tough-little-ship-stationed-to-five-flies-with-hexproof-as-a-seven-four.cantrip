@@ -1,0 +1,72 @@
+# U.S.S. Defiant: Station (CR 702.184) taps 7-power Kalakscion for five-plus charge counters, so the 5+ striation
+# (CR 721.2a) makes it a 7/4 artifact creature with flying and hexproof itself. Kalakscion ({1}{B}{B}, not an artifact)
+# pays full price with {B} left. The hexproof (CR 702.11) then stops Bot2's Disenchant: the creature-Defiant cannot be
+# chosen, so the cast is refused and the Disenchant stays in Bot2's hand.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Black Lotus
+U.S.S. Defiant, Tough Little Ship
+Black Lotus
+Kalakscion, Hunger Tyrant
+Island x11
+
+[Bot2 Deck]
+Plains
+Disenchant
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.U.S.S. Defiant, Tough Little Ship.Cast
+Bot1.Pass
+Bot1.Target(Count: 0)
+[T1 Bot1.Main2]
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Kalakscion, Hunger Tyrant.Cast
+? Bot1.Mana = {B}
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Activate(Ability: Station)
+Bot1.Choose(Kalakscion, Hunger Tyrant)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Counters.Charge = 7
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Types = Artifact; Creature
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Power = 7
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Toughness = 4
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Keywords = Flying; Hexproof
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+! Bot2.Hand.Disenchant.Cast(U.S.S. Defiant, Tough Little Ship)
+
+[Expect]
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Counters.Charge = 7
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Types = Artifact; Creature
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Power = 7
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Toughness = 4
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Keywords = Flying; Hexproof
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 2

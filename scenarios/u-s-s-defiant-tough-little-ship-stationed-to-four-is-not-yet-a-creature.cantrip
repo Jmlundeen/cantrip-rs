@@ -1,0 +1,58 @@
+# U.S.S. Defiant: four charge counters do not meet the 5+ striation (CR 721.2a), so it stays a noncreature artifact
+# with no keywords. Station taps 4-power Barkhide Mauler ({4}{G}, not an artifact, paid in full).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Black Lotus
+U.S.S. Defiant, Tough Little Ship
+Island
+Barkhide Mauler
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.U.S.S. Defiant, Tough Little Ship.Cast
+Bot1.Pass
+Bot1.Target(Count: 0)
+[T1 Bot1.Main2]
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Barkhide Mauler.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Activate(Ability: Station)
+Bot1.Choose(Barkhide Mauler)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Counters.Charge = 4
+? Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Types = Artifact
+
+[Expect]
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Counters.Charge = 4
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Types = Artifact
+Bot1.Battlefield.U.S.S. Defiant, Tough Little Ship.Keywords = (absent)
