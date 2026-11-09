@@ -1,0 +1,52 @@
+# Own the Day before attacking pays the full six (CR 601.2f), then inserts combat and main directly after this
+# main (CR 500.8). The added main is postcombat (CR 505.1a); the ordinary combat still follows it.
+# An attacker is not untapped between the two combats, and a main phase does not reset the land play (CR 305.2).
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+Own the Day
+Fanatical Firebrand
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Own the Day.Cast
+? Bot1.Mana =
+Bot1.Attack(Fanatical Firebrand)
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+! Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+? Step = BeginCombat
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+[T3 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+? Step = End
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Fanatical Firebrand.Tapped = true

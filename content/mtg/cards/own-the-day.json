@@ -1,0 +1,6 @@
+{
+  "name": "Own the Day",
+  "manaCost": "{4}{R}{R}",
+  "type": "Sorcery",
+  "oracleText": "Battlefront — This spell costs {1} less to cast for each opponent you attacked this turn.\nUntap all creatures that attacked this turn. After this main phase, there is an additional combat phase followed by an additional main phase."
+}

@@ -1,0 +1,43 @@
+# Three attackers across two opponents count two distinct opponents, reducing six to four (CR 508.1, 601.2f).
+# The exact pool is exhausted; the untapped attackers can attack both opponents again in the additional combat.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+Fanatical Firebrand
+Fanatical Firebrand
+Fanatical Firebrand
+Own the Day
+Black Lotus
+Mountain x24
+
+[Bot2 Deck]
+Island x30
+
+[Bot3 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Hand.Fanatical Firebrand.Cast
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Fanatical Firebrand#1 > Bot2; Fanatical Firebrand#2 > Bot2; Fanatical Firebrand#3 > Bot3)
+[T4 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Own the Day.Cast
+? Bot1.Mana =
+Bot1.Attack(Fanatical Firebrand#1 > Bot2; Fanatical Firebrand#2 > Bot2; Fanatical Firebrand#3 > Bot3)
+[T4 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot3.Life = 18

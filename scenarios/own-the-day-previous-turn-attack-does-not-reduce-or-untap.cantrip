@@ -1,0 +1,40 @@
+# An Elf attacked in the previous turn, then taps for mana in this turn. That history neither reduces Own the Day
+# nor makes it untap the Elf (CR 508.1, 601.2f, 701.26b). Six mana exactly is spent; the tapped Elf cannot attack.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Sol Ring
+Black Lotus
+Own the Day
+Mountain
+Mountain x24
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves)
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Own the Day.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Tapped = true
+
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves.Tapped = true

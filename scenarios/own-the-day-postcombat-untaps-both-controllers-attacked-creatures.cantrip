@@ -1,0 +1,61 @@
+# Two Firebrands attack the same opponent, so the reduction is one, not two (CR 508.1, 601.2f).
+# One attacker is donated without changing zones before Own the Day resolves. Both untap (CR 701.26b),
+# including the opponent-controlled attacker; then the added combat and main lead directly to the ending phase.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+Black Lotus
+Own the Day
+Harmless Offering
+Fanatical Firebrand
+Fanatical Firebrand
+Mountain x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Attack(Fanatical Firebrand#1; Fanatical Firebrand#2)
+[T5 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Fanatical Firebrand#1)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Fanatical Firebrand.Tapped = true
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = true
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Own the Day.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Tapped = false
+? Bot2.Battlefield.Fanatical Firebrand.Tapped = false
+Bot1.Attack(Fanatical Firebrand)
+Bot2.Block()
+[T5 Bot1.EndCombat]
+Bot1.Pass
+Bot2.Pass
+? Step = Main2
+Bot1.Pass
+Bot2.Pass
+? Step = End
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Fanatical Firebrand.Tapped = false
