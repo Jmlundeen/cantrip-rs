@@ -184,6 +184,19 @@ pub fn player(g: &mut dyn Game, chooser: PlayerId, source: ObjectId, candidates:
     }
 }
 
+/// "As this permanent enters, choose an opponent" (CR 614.12a, 608.2d): asked of the entering permanent's controller and
+/// remembered as the permanent's chosen player (`Entering::chosen_player`), for the damage dealt to that player at the beginning
+/// of their upkeep. Black Vise and The Rack print it.
+pub fn opponent_as_enters_to_take_upkeep_damage(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    let candidates = g.state().opponents(entering.controller).collect();
+    if let Some(chosen) =
+        player(g, entering.controller, entering.object, candidates, "takes damage at the beginning of their upkeep", 0)?
+    {
+        entering.chosen_player = Some(chosen);
+    }
+    Ok(())
+}
+
 /// One of the labelled options `modes`, by index (a pile, a mode, "tap or untap"), asked even when the choice is forced.
 pub fn one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, mut modes: Vec<Label>) -> Result<u8, Suspend> {
     if modes.iter().any(|label| matches!(label, Label::Card(..) | Label::Option(..))) {

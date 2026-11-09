@@ -1544,6 +1544,18 @@ pub fn each_opponents_upkeep(q: &dyn Query, me: &Asker, event: &Event) -> Option
     }
 }
 
+/// "At the beginning of the chosen player's upkeep" (CR 603.2, 503.1a): the upkeep of the player this ability's source chose as it
+/// entered (CR 614.12a); the trigger is about that player. Black Vise and The Rack print it.
+pub fn chosen_players_upkeep(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    let active = q.state().turn.active;
+    match event {
+        Event::StepBegan { step: Step::Upkeep } if q.state().chosen_player(q.linked_to(me)) == Some(active) => {
+            Fired::about(Target::Player(active))
+        }
+        _ => None,
+    }
+}
+
 /// "At the beginning of your first main phase" or, as older cards say it, "your precombat main phase" (CR 505.1a: only the
 /// first main phase of a turn is the precombat one). Coalition Relic and both faces of Ashling, Rekindled print it.
 pub fn your_first_main_phase(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -2387,6 +2399,7 @@ pub const YOU_LOSE_CONTROL_OF_THIS: Trigger =
     when_asked(EventMask(EventMask::CONTROL_CHANGED.0 | EventMask::ZONE_CHANGE.0), you_lose_control_of_this);
 pub const AN_OPPONENT_DRAWS_THEIR_SECOND_CARD: Trigger = when_asked(EventMask::DREW, an_opponent_draws_their_second_card);
 pub const YOU_DRAW_YOUR_SECOND_CARD: Trigger = when_asked(EventMask::DREW, you_draw_your_second_card);
+pub const CHOSEN_PLAYERS_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, chosen_players_upkeep);
 pub const YOUR_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_upkeep);
 pub const THIS_ENTERS_OR_YOUR_UPKEEP: Trigger = when_asked(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::STEP_BEGAN.0), this_enters_or_your_upkeep);
 pub const YOUR_DRAW_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_draw_step);
