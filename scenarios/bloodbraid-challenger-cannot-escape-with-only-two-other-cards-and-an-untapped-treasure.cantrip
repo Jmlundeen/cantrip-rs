@@ -1,0 +1,50 @@
+# Escape exiles three *other* cards from the graveyard (CR 702.138a). Faithless Looting, paid with Mox Ruby, discards the
+# Challenger and an Island, so on turn 3 the graveyard holds the Challenger plus only two others (Looting and the Island).
+# Gold Pan makes an untapped Treasure. Three Moxen and Sol Ring then float {R}{G}{W}{C}{C}, enough for {3}{R}{G}, while the
+# Treasure stays untapped: its mana ability must not be read as a way to feed the escape's exile cost, so the cast is
+# refused. The positive control, with three others, is bloodbraid-challenger-escapes-exiling-three-other-cards-then-cascades-and-attacks.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Faithless Looting
+Bloodbraid Challenger
+Sol Ring
+Island
+Gold Pan
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Bloodbraid Challenger; Island)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 3
+Bot1.Hand.Gold Pan.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Battlefield.Treasure Token.Tapped = false
+! Bot1.Graveyard.Bloodbraid Challenger.Cast(Ability: Escape)
+
+[Expect]
+Bot1.Graveyard.Count = 3
+Exile.Count = 0
+Bot1.Battlefield.Treasure Token.Tapped = false
