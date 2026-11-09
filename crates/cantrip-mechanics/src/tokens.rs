@@ -121,15 +121,10 @@ pub static CLUE: CardDef = CardDef {
     ..token!(Clue)
 };
 
-fn add_one_of_any_color(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> Result<(), Suspend> {
-    g.add_mana(asker.controller, color.unwrap_or(Color::White).mana(), 1);
-    Ok(())
-}
-
 /// A colorless Treasure artifact token with "{T}, Sacrifice this artifact: Add one mana of any color." (CR 111.10a).
 pub static TREASURE: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Artifact]),
-    abilities: &[mana_ability(TAP.and(SACRIFICE_THIS), add_any_color(1).by(add_one_of_any_color), "{T}, Sacrifice this artifact: Add one mana of any color.")],
+    abilities: &[mana_ability(TAP.and(SACRIFICE_THIS), add_any_color(1), "{T}, Sacrifice this artifact: Add one mana of any color.")],
     text: "{T}, Sacrifice this artifact: Add one mana of any color.",
     ..token!(Treasure)
 };
@@ -525,7 +520,7 @@ pub fn create_a_pest_that_gains_life_on_attack(g: &mut dyn Game, item: &StackIte
 /// A colorless Gold artifact token with "Sacrifice this artifact: Add one mana of any color." (CR 111.10c).
 pub static GOLD: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Artifact]),
-    abilities: &[mana_ability(SACRIFICE_THIS, add_any_color(1).by(add_one_of_any_color), "Sacrifice this artifact: Add one mana of any color.")],
+    abilities: &[mana_ability(SACRIFICE_THIS, add_any_color(1), "Sacrifice this artifact: Add one mana of any color.")],
     text: "Sacrifice this artifact: Add one mana of any color.",
     ..token!(Gold)
 };
@@ -1235,7 +1230,7 @@ pub static NEW_PLANET: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Land]),
     subtypes: SubtypeSet::of(&[Subtype::Planet]),
-    abilities: &[mana_ability(TAP, add_any_color(1).by(add_one_of_any_color), "{T}: Add one mana of any color.")],
+    abilities: &[mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any color.")],
     text: "{T}: Add one mana of any color.",
     ..CardDef::BLANK
 };
