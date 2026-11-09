@@ -1,0 +1,23 @@
+# CR 106.1b/106.5: Ancient Tomb produces only colorless, so Orchard adds nothing; a later Swamp supplies black.
+[Bot1 Deck]
+Exotic Orchard
+Island x25
+[Bot2 Deck]
+Ancient Tomb
+Swamp
+Island x25
+[Actions]
+Bot1.Hand.Exotic Orchard.Play
+Bot2.Hand.Ancient Tomb.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: C)
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: Black)
+Bot1.Battlefield.Exotic Orchard.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Exotic Orchard.Tapped = true
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Black)
+? Bot1.Mana = {B}
+[Expect]
+Bot2.Battlefield.Ancient Tomb.Tapped = false

@@ -1,0 +1,45 @@
+# CR 106.7/second ruling: a tapped Gemstone Mine with zero counters still could produce every color; querying its
+# mana effect must not pay its cost, sacrifice the real land, or add mana to its controller's real pool.
+[Bot1 Deck]
+Exotic Orchard
+Mox Jet
+Mox Jet
+Vampire Hexmage
+Lightning Bolt
+Island x25
+[Bot2 Deck]
+Gemstone Mine
+Island x25
+[Actions]
+Bot1.Hand.Exotic Orchard.Play
+Bot2.Hand.Gemstone Mine.Play
+Bot2.Battlefield.Gemstone Mine.Activate(Color: Red)
+? Bot2.Battlefield.Gemstone Mine.Counters.Mining = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Vampire Hexmage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vampire Hexmage.Activate(Bot2.Battlefield.Gemstone Mine)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Gemstone Mine.Counters.Mining = (absent)
+? Bot2.Battlefield.Gemstone Mine.Tapped = true
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Red)
+? Bot1.Mana = {R}
+? Bot2.Mana =
+? Bot2.Battlefield.Gemstone Mine.Tapped = true
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield = Gemstone Mine

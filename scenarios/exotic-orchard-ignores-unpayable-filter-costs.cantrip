@@ -1,0 +1,24 @@
+# CR 106.7 ignores Sunken Ruins' hybrid activation cost: neither player has blue or black mana to pay it.
+[Bot1 Deck]
+Exotic Orchard
+Ancestral Recall
+Island x25
+[Bot2 Deck]
+Sunken Ruins
+Island x25
+[Actions]
+Bot1.Hand.Exotic Orchard.Play
+Bot2.Hand.Sunken Ruins.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: Green)
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: C)
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Blue)
+? Bot1.Mana = {U}
+? Bot2.Mana =
+? Bot2.Battlefield.Sunken Ruins.Tapped = false
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Ancestral Recall

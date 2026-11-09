@@ -1,0 +1,40 @@
+# CR 106.7 tries every output and applies Damping Sphere. Cataracts' five colors become colorless; its cost is ignored.
+[Bot1 Deck]
+Exotic Orchard
+Mox Pearl
+Mox Jet
+Damping Sphere
+Island x25
+[Bot2 Deck]
+Cascading Cataracts
+Island x25
+[Actions]
+Bot1.Hand.Exotic Orchard.Play
+Bot2.Hand.Cascading Cataracts.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Red)
+? Bot1.Mana = {R}
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Damping Sphere.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: Red)
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: Blue)
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: C)
+Bot1.Battlefield.Exotic Orchard.Activate
+? Bot1.Mana =
+? Bot2.Battlefield.Cascading Cataracts.Tapped = false
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[Expect]
+Bot1.Battlefield.Damping Sphere.Tapped = false

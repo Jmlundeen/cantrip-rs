@@ -1,0 +1,23 @@
+# CR 106.7 and the first ruling: Cavern's restricted colored mana lets Orchard produce unrestricted B.
+[Bot1 Deck]
+Exotic Orchard
+Sol Ring
+Island x25
+[Bot2 Deck]
+Cavern of Souls
+Island x25
+[Actions]
+Bot1.Hand.Exotic Orchard.Play
+Bot2.Hand.Cavern of Souls.Play
+Bot2.Modes(Human)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Black)
+? Bot1.Mana = {B}
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sol Ring.Tapped = false
+? Bot2.Battlefield.Cavern of Souls.Tapped = false
+[Expect]
+Bot1.Battlefield = Exotic Orchard; Sol Ring

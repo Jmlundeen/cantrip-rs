@@ -1,0 +1,110 @@
+# What a land could produce is asked of a permanent whose ability adds X mana in any combination of colors, under a
+# mana replacement with no declared contract (CR 106.7, 614.1a). March of the Machines makes Bot2's Wizard's Rockets
+# an artifact creature, then Bot2's Arcane Adaptation naming Saproling makes it a Saproling and Life and Limb a Forest
+# land, each later than the one before (CR 613.7: timestamp order); Bot2's Llanowar Elves becomes a Forest too. Bot2 activates Deep Water ("until end of turn, if
+# you tap a land you control for mana, it produces {U} instead of any other type"), and Bot1's Exotic Orchard asks
+# at Bot1's next priority what Bot2's lands could produce. The query once hit an `assert` there and crashed the game.
+# Under Deep Water Bot2's Islands and the Rockets could produce only {U}: the Orchard names blue and nothing else. The
+# turn after, Deep Water's effect has ended and the Rockets' any color is back.
+[Bot1 Deck]
+Exotic Orchard
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+March of the Machines
+Life and Limb
+Forest
+Forest
+Forest x10
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Wizard's Rockets
+Deep Water
+Arcane Adaptation
+Llanowar Elves
+Island
+Island
+Island
+Island x10
+[Actions]
+Bot1.Hand.Exotic Orchard.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wizard's Rockets.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Deep Water.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.March of the Machines.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Llanowar Elves.Activate
+Bot2.Hand.Arcane Adaptation.Cast
+Bot2.Pass
+Bot2.Modes(Saproling)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Life and Limb.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Wizard's Rockets.Types = Artifact; Land; Creature
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Deep Water.Activate
+Bot2.Pass
+Bot1.Pass
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: Red)
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: Green)
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Red)
+? Bot1.Mana = {R}
+[Expect]
+Bot2.Battlefield.Wizard's Rockets.Subtypes = Forest; Saproling

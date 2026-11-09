@@ -1,0 +1,25 @@
+# CR 106.7/800.4a: the third opponent's Plains counts. After that player concedes only the remaining Forest contributes.
+[Bot1 Deck]
+Exotic Orchard
+Island x25
+[Bot2 Deck]
+Forest
+Island x25
+[Bot3 Deck]
+Plains
+Island x25
+[Actions]
+Bot1.Hand.Exotic Orchard.Play
+Bot2.Hand.Forest.Play
+Bot3.Hand.Plains.Play
+[T4 Bot1.Main1]
+Bot1.Battlefield.Exotic Orchard.Activate(Color: White)
+? Bot1.Mana = {W}
+Bot3.Concede
+[T6 Bot1.Main1]
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: White)
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Green)
+? Bot1.Mana = {G}
+[Expect]
+Bot2.Battlefield.Forest.Tapped = false
+Bot3.Battlefield.Count = 0

@@ -1,0 +1,23 @@
+# CR 106.7 reads the conditional effect rather than assuming the land's any-color flag always yields all five colors.
+[Bot1 Deck]
+Exotic Orchard
+Island x25
+[Bot2 Deck]
+Gemstone Caverns
+Mountain
+Island x25
+[Actions]
+Bot2.Decline
+Bot1.Hand.Exotic Orchard.Play
+Bot2.Hand.Gemstone Caverns.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: Blue)
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: C)
+Bot1.Battlefield.Exotic Orchard.Activate
+? Bot1.Mana =
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Red)
+? Bot1.Mana = {R}
+[Expect]
+Bot2.Battlefield.Gemstone Caverns.Counters.Luck = (absent)

@@ -1,0 +1,17 @@
+# CR 106.7: a luck counter changes Caverns' own output to a color. Inspecting it leaves its mana pool and tap unchanged.
+[Bot1 Deck]
+Exotic Orchard
+Island x25
+[Bot2 Deck]
+Gemstone Caverns
+Plains x25
+[Actions]
+Bot2.Accept
+Bot2.Choose(Plains)
+Bot1.Hand.Exotic Orchard.Play
+Bot1.Battlefield.Exotic Orchard.Activate(Color: Blue)
+? Bot1.Mana = {U}
+? Bot2.Mana =
+? Bot2.Battlefield.Gemstone Caverns.Tapped = false
+[Expect]
+Bot2.Battlefield.Gemstone Caverns.Counters.Luck = 1

@@ -1,0 +1,23 @@
+# CR 707.2/106.7: Vesuva copies Orchard's ability and later uses the copying land's controller and opponents.
+[Bot1 Deck]
+Exotic Orchard
+Vesuva
+Island x25
+[Bot2 Deck]
+Mountain
+Island x25
+[Actions]
+Bot1.Hand.Exotic Orchard.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Exotic Orchard)
+? Bot1.Battlefield.Exotic Orchard#2.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Exotic Orchard#2.Activate(Color: Red)
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Exotic Orchard#1.Tapped = false
+? Bot2.Battlefield.Mountain.Tapped = false
+[Expect]
+Bot1.Battlefield = Exotic Orchard; Exotic Orchard

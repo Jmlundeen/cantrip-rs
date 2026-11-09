@@ -1,0 +1,16 @@
+# CR 106.5: an undefined type adds nothing, but a mana ability with a payable tap cost is still activatable.
+[Bot1 Deck]
+Exotic Orchard
+Island x25
+[Bot2 Deck]
+Island x25
+[Actions]
+Bot1.Hand.Exotic Orchard.Play
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: Red)
+! Bot1.Battlefield.Exotic Orchard.Activate(Color: C)
+Bot1.Battlefield.Exotic Orchard.Activate
+? Bot1.Mana =
+? Stack.Count = 0
+? Bot1.Battlefield.Exotic Orchard.Tapped = true
+[Expect]
+Bot2.Battlefield.Count = 0
