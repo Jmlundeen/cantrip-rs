@@ -300,18 +300,26 @@ pub fn discard_two_unless_discarding(
 /// replacement through the engine's recorded random-choice API. A hand no larger than `count` leaves whole without
 /// a random choice. All selected cards leave together, as one discard (CR 701.9a).
 pub fn discard_at_random(g: &mut dyn Game, player: PlayerId, count: usize) {
+    let cards = cards_at_random_from_hand(g, player, count);
+    if !cards.is_empty() {
+        g.discard_together(&cards);
+    }
+}
+
+/// `count` cards of `player`'s hand chosen at random (CR 701.9b, 701.20a): uniformly without replacement, through the engine's
+/// recorded random-choice API. A hand no larger than `count` is taken whole without a random choice. Hymn to Tourach and
+/// Mind Twist discard them; Nebuchadnezzar reveals them.
+pub fn cards_at_random_from_hand(g: &mut dyn Game, player: PlayerId, count: usize) -> Vec<ObjectId> {
     let mut hand = g.state().zone(Zone::hand(player)).to_vec();
     let count = hand.len().min(count);
-    if count == 0 {
-        return;
-    }
     if count < hand.len() {
         for i in 0..count {
             let j = i + g.choose_at_random(hand.len() - i);
             hand.swap(i, j);
         }
     }
-    g.discard_together(&hand[..count]);
+    hand.truncate(count);
+    hand
 }
 
 /// "[Player] sacrifices a [kind]" (CR 701.21): chosen by that player when there is a choice, taken when there is not.
