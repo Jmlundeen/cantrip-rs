@@ -4472,6 +4472,8 @@ pub fn random_below(cx: &mut Cx, bound: u32) -> u32 {
 /// cards are already in the library; nothing changes zones.
 pub fn arrange_library(cx: &mut Cx, player: PlayerId, top: &[ObjectId], bottom: &[ObjectId]) {
     let library = Zone::library(player);
+    let reordered_revealed = cx.s().player(player).revealed_library_top
+        .is_some_and(|id| top.contains(&id) || bottom.contains(&id));
     for &id in top.iter().chain(bottom) {
         cx.st().zone_remove(library, id);
     }
@@ -4480,6 +4482,11 @@ pub fn arrange_library(cx: &mut Cx, player: PlayerId, top: &[ObjectId], bottom: 
     }
     for &id in bottom {
         cx.st().zone_push(library, id);
+    }
+    // CR 701.20d: a revealed card in the reordered selection becomes a new object,
+    // even when it finishes on top. Renew after ordering so the input IDs stay live.
+    if reordered_revealed {
+        crate::library_visibility::conceal(cx, player);
     }
     crate::library_visibility::sync(cx);
 }

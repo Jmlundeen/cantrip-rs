@@ -1,4 +1,4 @@
-//! Continuous library-top visibility (CR 401.5, 401.6, 701.20a).
+//! Continuous library-top visibility (CR 401.5, 401.6, 701.20a, 701.20d).
 //! Benjamin Sisko, Besieged and Garruk's Horde share the reveal capability.
 //! The API rule grants visibility; the core owns its timing and object identity.
 
@@ -78,7 +78,7 @@ pub(crate) fn sync(cx: &mut Cx) {
     }
 }
 
-/// A shuffle interrupts even a reveal whose card happens to end up on top again.
+/// Shuffling or reordering a revealed card interrupts its reveal even if it ends on top (CR 701.20d).
 pub(crate) fn conceal(cx: &mut Cx, player: PlayerId) {
     set_top(cx, player, None);
 }

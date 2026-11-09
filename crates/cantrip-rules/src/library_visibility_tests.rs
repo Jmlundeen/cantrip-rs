@@ -132,6 +132,55 @@ fn each_successive_top_is_revealed_before_the_next_draw_with_a_rules_cause() {
 }
 
 #[test]
+fn reordered_revealed_selection_renews_even_when_same_card_finishes_on_top() {
+    let (mut game, [a, b, c]) = game();
+    source(&mut game, &SISKO);
+    let before = game.state.clone();
+    let mark = game.state.mark();
+    let from = game.log.len();
+    // Sensei's Divining Top and Ponder use this API to put their selection back.
+    ops::arrange_library(&mut cx(&mut game), YOU, &[a, c, b], &[]);
+    let renewed = game.state.zone(Zone::library(YOU))[0];
+    assert_ne!(renewed, a, "CR 701.20d: a revealed card in the reordered selection becomes a new object even when it finishes on top");
+    assert_eq!(game.state.obj(renewed).card, game.cards.id_of(&A));
+    assert_eq!(game.state.zone(Zone::library(YOU))[1..], [c, b]);
+    assert_eq!(game.revealed_in_hidden_zones(), [renewed]);
+    assert_eq!(game.state.obj(a).zone, Zone::GONE);
+    assert!(game.state.obj(a).last_known.is_some());
+    assert_eq!(cx(&mut game).chars(a).name, "Library A", "old references retain LKI");
+    assert_eq!(game.state.obj(a).became, None, "stale references do not follow the new object");
+    assert!(!game.log[from..].iter().any(|r| matches!(r.event, Event::ZoneChange { .. })), "renewal is not a zone change");
+    assert!(game.log[from..].iter().any(|r| matches!(r.event, Event::Revealed { card, .. } if card == renewed)
+        && r.cause == cantrip_api::history::Cause::Rules));
+    game.state.rollback(mark);
+    game.log.truncate(from);
+    assert!(game.state == before, "ordering, visibility, identity and LKI roll back together");
+    assert_eq!(game.revealed_in_hidden_zones(), [a]);
+}
+
+#[test]
+fn reordering_only_hidden_cards_preserves_the_revealed_top_identity() {
+    let (mut game, [a, b, c]) = game();
+    source(&mut game, &SISKO);
+    let from = game.log.len();
+    ops::arrange_library(&mut cx(&mut game), YOU, &[], &[c, b]);
+    assert_eq!(game.state.zone(Zone::library(YOU)), [a, c, b]);
+    assert_eq!(game.revealed_in_hidden_zones(), [a]);
+    assert!(game.log[from..].is_empty(), "hidden reordering does not interrupt the top's reveal");
+    ops::arrange_library(&mut cx(&mut game), YOU, &[], &[]);
+    assert_eq!(game.revealed_in_hidden_zones(), [a]);
+}
+
+#[test]
+fn reordering_without_a_reveal_preserves_every_object_identity() {
+    let (mut game, [a, b, c]) = game();
+    ops::arrange_library(&mut cx(&mut game), YOU, &[a, c, b], &[]);
+    assert_eq!(game.state.zone(Zone::library(YOU)), [a, c, b]);
+    assert!(game.revealed_in_hidden_zones().is_empty());
+    assert!(game.state.obj(a).last_known.is_none());
+}
+
+#[test]
 fn insertion_and_ordering_never_reveal_a_provisional_top() {
     for place in [LibraryPlace::Top, LibraryPlace::Bottom, LibraryPlace::FromTop(1)] {
         let (mut game, [a, _, _]) = game();
