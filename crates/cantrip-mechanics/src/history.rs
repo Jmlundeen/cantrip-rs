@@ -347,6 +347,13 @@ pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
         .next().map_or(0, |creature| q.chars(creature).power.unwrap_or(0) as i32)
 }
 
+/// "The sacrificed creature's mana value" (CR 601.2h, 608.2h, 202.3): the mana value of the creature paid for the spell's own first
+/// printed additional cost, as it last existed. A copy uses the original spell's cost object. Sacrifice and Burnt Offering print it.
+pub fn sacrificed_creatures_mana_value(q: &dyn Query, spell: ObjectId) -> u32 {
+    q.history().spell_cost_objects(spell, CostOrigin::PrintedAdditional, 0, CostPart::Permanents)
+        .next().map_or(0, |creature| q.mana_value(creature))
+}
+
 /// "That creature's power" of a creature a resolving ability sacrificed (CR 701.21, 608.2h): the power of the permanent that
 /// `sacrificed` (the new object in the graveyard, as `effects::may_sacrifice` returns it) was before the sacrifice, as it last
 /// existed on the battlefield, pumps, counters and copy effects included. It is the old object of the zone change that made

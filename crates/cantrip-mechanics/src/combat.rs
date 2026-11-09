@@ -15,6 +15,12 @@ pub fn power_three_or_greater_cant_block(q: &dyn Query, source: ObjectId, blocke
     source != attacker || q.chars(blocker).power.unwrap_or(0) < 3
 }
 
+/// "This creature can't block creatures with power 2 or greater" (CR 509.1b): as the source, a blocker, would block an attacker
+/// whose current power is 2 or more, as blockers are declared. Ironclaw Orcs and Brassclaw Orcs print it.
+pub fn this_cant_block_power_two_or_greater(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
+    source != blocker || q.chars(attacker).power.unwrap_or(0) < 2
+}
+
 /// "Creatures with power less than this creature's power can't block it" (CR 509.1b): of a possible block with the source as
 /// the attacker, the blocker's power must be at least its own, both as they are as blockers are declared. A block that has been
 /// made stands if powers change afterwards, since this is only asked when blocks are declared. Formation Breaker and Elusive

@@ -363,6 +363,14 @@ pub fn your_ability_from_a_source_of_types<const TYPES: u16>(q: &dyn Query, aske
         .iter()
         .any(|i| i.kind != StackKind::Spell && i.serial == serial && i.controller == asker.controller && q.chars(i.object).types.0 & TYPES != 0)
 }
+/// "Target activated ability from an artifact source" (CR 115.1, 113.3, 113.7a, 602.1): an activated ability on the stack (a mana
+/// ability never is, CR 605.3b; a triggered ability is not activated) whose source is an artifact, as it last existed if it has
+/// left the battlefield. Ayesha Tanaka and Brown Ouphe print it.
+pub fn activated_ability_from_an_artifact_source(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    let Target::Ability(serial) = t else { return false };
+    q.state().stack.iter().any(|i| i.serial == serial && i.kind == StackKind::Activated && q.chars(i.object).is(CardType::Artifact))
+}
+
 pub const ACTIVATED_OR_TRIGGERED_ABILITY: TargetSpec = target(activated_or_triggered_ability_filter);
 
 /// "Target activated or triggered ability you control" (CR 115.1): an ability on the stack (a mana ability never is, CR

@@ -1,21 +1,6 @@
 use cantrip_api::*;
+use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
-
-/// "{T}: Counter target activated ability from an artifact source unless that ability's controller pays {W}." (CR 115.1).
-fn counter_target_activated_ability_artifact_target_0(
-    q: &dyn Query,
-    _: &Asker,
-    t: Target,
-) -> bool {
-    q.state()
-        .stack
-        .iter()
-        .any(|e| {
-            matches!(t, Target::Ability(serial) if e.serial == serial)
-                && e.kind == StackKind::Activated
-                && q.chars(e.object).is(CardType::Artifact)
-        })
-}
 
 /// "{T}: Counter target activated ability from an artifact source unless that ability's controller pays {W}." (CR 608.2, 701.6a, 118.1).
 fn counter_target_activated_ability_artifact(
@@ -52,7 +37,7 @@ pub static CARD: CardDef = CardDef {
                 counter_target_activated_ability_artifact,
                 "{T}: Counter target activated ability from an artifact source unless that ability's controller pays {W}.",
             )
-            .targets(&[target(counter_target_activated_ability_artifact_target_0)]),
+            .targets(&[target(targets::activated_ability_from_an_artifact_source)]),
     ],
     ..oracle::AYESHA_TANAKA
 };
