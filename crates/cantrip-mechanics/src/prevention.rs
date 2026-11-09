@@ -37,6 +37,28 @@ fn dealt_by(_: &dyn Query, _: &Asker, source: ObjectId, d: &DamageEvent) -> bool
 /// is not about. Old Fat Spider Can't See Me and Gideon of the Trials (+1) print it. The card gives its own words (`.text(..)`).
 pub const DAMAGE_DEALT_BY: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents all damage dealt by that permanent", damage: "damage", of_it: Some("dealt by it"), applies: dealt_by, then: None, text: "" };
 
+fn combat_dealt_by(_: &dyn Query, _: &Asker, source: ObjectId, d: &DamageEvent) -> bool {
+    d.combat && d.source == source
+}
+
+/// Combat damage (CR 510.2) whose source is the object the effect is about (CR 615.1): "prevent all combat damage that would be
+/// dealt by target creature this turn". Horn of Deafening and Lady Evangela print it. The card gives its own words (`.text(..)`).
+pub const COMBAT_DAMAGE_DEALT_BY: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents all combat damage dealt by that creature", damage: "combat damage", of_it: Some("dealt by it"), applies: combat_dealt_by, then: None, text: "" };
+
+/// "Prevent all combat damage that would be dealt by target creature this turn" (CR 615.1, 611.2a): the creature the resolving
+/// ability targeted in slot 0, if it is still a legal target (CR 608.2b). The card lists `COMBAT_DAMAGE_DEALT_BY` first in its
+/// `granted_preventions`.
+pub fn all_combat_damage_dealt_by_target_this_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    g.add_effect(
+        item.object,
+        creature,
+        EffectKind::Prevention { card: item.ability.card, index: 0, to: Target::None, shield: Shield::All },
+        Duration::EndOfTurn,
+    );
+    Ok(())
+}
+
 /// Makes the prevention effect the resolving spell or ability's card lists `index`th in its `granted_preventions`, of damage
 /// to `to` (`Target::None` for damage to anyone), until end of turn: all of it, or the next N (CR 615.7).
 pub fn this_turn(g: &mut dyn Game, item: &StackItem, to: Target, index: u8, shield: Shield) {
