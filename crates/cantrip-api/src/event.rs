@@ -70,6 +70,46 @@ pub struct MillResult {
     pub count: u32,
 }
 
+/// What a verb that takes permanents off the battlefield did - `Game::sacrifice` (CR 701.21a), `Game::destroy_all` (CR
+/// 701.8a). A merged permanent is one permanent (CR 730.2) that becomes one new object for each of its cards and tokens as
+/// it leaves (CR 730.3c), so the two are kept apart: `permanents` are the permanents that left, by their ids on the
+/// battlefield, a merged one once; `objects` are every new object they became. "For each creature sacrificed this way",
+/// "that many", "a card for each permanent destroyed this way" count `count()`; what is then done to the cards ("exile
+/// them") is done to `objects()`. There is no `len`: the number of objects is not the number of permanents.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct LeftBattlefield {
+    permanents: Vec<ObjectId>,
+    objects: Vec<ObjectId>,
+}
+
+impl LeftBattlefield {
+    /// The permanents that left (by their old ids, each once) and the new objects the verb returned.
+    pub fn new(permanents: Vec<ObjectId>, objects: Vec<ObjectId>) -> Self {
+        LeftBattlefield { permanents, objects }
+    }
+    /// Whether nothing left: "if you do", "if you sacrificed it" asks this.
+    pub fn is_empty(&self) -> bool {
+        self.permanents.is_empty()
+    }
+    /// How many permanents left: a merged permanent counts once (CR 730.2).
+    pub fn count(&self) -> u32 {
+        self.permanents.len() as u32
+    }
+    /// The permanents that left, by their ids on the battlefield (their last-known information, CR 608.2h), in the order
+    /// their moves were made. `Query::obj(old).became` is the new object its own move made.
+    pub fn permanents(&self) -> &[ObjectId] {
+        &self.permanents
+    }
+    /// Every new object the permanents became, in order: each card of a merged permanent (CR 730.3c).
+    pub fn objects(&self) -> &[ObjectId] {
+        &self.objects
+    }
+    /// The new objects, as `objects`.
+    pub fn into_objects(self) -> Vec<ObjectId> {
+        self.objects
+    }
+}
+
 /// One thing that happened. Each names what it is about by id; a zone change names both the old object and the new
 /// one it became (CR 400.7).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

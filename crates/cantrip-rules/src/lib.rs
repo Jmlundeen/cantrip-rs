@@ -1982,6 +1982,12 @@ impl Query for Cx<'_> {
 }
 
 impl Cx<'_> {
+    /// What a sacrifice or a destruction did (`LeftBattlefield`): the new objects it returned, and the permanents whose own
+    /// moves made them, a merged permanent once (CR 730.2, 730.3c; `Query::permanents_left`).
+    fn left_battlefield(&self, objects: Vec<ObjectId>) -> LeftBattlefield {
+        LeftBattlefield::new(self.permanents_left(&objects), objects)
+    }
+
     /// Gives `player` a permission to play `what` under `grant` (CR 601.3, 305.1), made by the spell or ability resolving,
     /// which a cast or land play by it is recorded as made by - or, outside a resolution, by `fallback`'s own card.
     fn permit(&mut self, what: Playable, fallback: ObjectId, player: PlayerId, grant: PlayGrant) {
@@ -2229,20 +2235,24 @@ impl cantrip_api::Game for Cx<'_> {
         ops::each_opponent_loses_life(self, player, amount)
     }
 
-    fn destroy_all(&mut self, permanents: &[ObjectId]) -> Vec<ObjectId> {
-        ops::destroy_together(self, permanents, ZoneReason::Destroy)
+    fn destroy_all(&mut self, permanents: &[ObjectId]) -> LeftBattlefield {
+        let objects = ops::destroy_together(self, permanents, ZoneReason::Destroy);
+        self.left_battlefield(objects)
     }
 
-    fn destroy_all_no_regen(&mut self, permanents: &[ObjectId]) -> Vec<ObjectId> {
-        ops::destroy_together(self, permanents, ZoneReason::DestroyNoRegen)
+    fn destroy_all_no_regen(&mut self, permanents: &[ObjectId]) -> LeftBattlefield {
+        let objects = ops::destroy_together(self, permanents, ZoneReason::DestroyNoRegen);
+        self.left_battlefield(objects)
     }
 
-    fn sacrifice(&mut self, player: PlayerId, permanents: &[ObjectId]) -> Vec<ObjectId> {
-        ops::sacrifice(self, player, permanents)
+    fn sacrifice(&mut self, player: PlayerId, permanents: &[ObjectId]) -> LeftBattlefield {
+        let objects = ops::sacrifice(self, player, permanents);
+        self.left_battlefield(objects)
     }
 
-    fn sacrifice_each(&mut self, sacrifices: &[(PlayerId, ObjectId)]) -> Vec<ObjectId> {
-        ops::sacrifice_each(self, sacrifices)
+    fn sacrifice_each(&mut self, sacrifices: &[(PlayerId, ObjectId)]) -> LeftBattlefield {
+        let objects = ops::sacrifice_each(self, sacrifices);
+        self.left_battlefield(objects)
     }
 
     fn return_to_hand(&mut self, objects: &[ObjectId]) -> Vec<ObjectId> {

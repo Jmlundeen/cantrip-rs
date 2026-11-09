@@ -19,7 +19,7 @@ fn return_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// card in a hand has no X in its cost (CR 202.3e), and a permanent card is any card that is not an instant or a sorcery (CR 110.4a).
 fn sacrifice_draw_put(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let Some(&sacrificed) = effects::may_sacrifice(g, you, item.object, select::another_creature_permanents(select::up_to(1)))?.first() else {
+    let Some(&sacrificed) = effects::may_sacrifice(g, you, item.object, select::another_creature_permanents(select::up_to(1)))?.objects().first() else {
         return Ok(());
     };
     g.end_sentence();

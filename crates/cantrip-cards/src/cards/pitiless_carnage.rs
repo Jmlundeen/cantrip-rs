@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 
 /// Sacrifice any number of permanents you control, then draw that many cards. The permanents are chosen as the spell
 /// resolves (CR 701.21a, not targeted), including none, and sacrificed together; the draw is as many as were actually
-/// sacrificed (CR 608.2c), so choosing none draws none.
+/// sacrificed (CR 608.2c), a merged permanent once (CR 730.2), so choosing none draws none.
 fn sacrifice_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let yours = g.permanents_of(you);
@@ -14,7 +14,7 @@ fn sacrifice_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     if chosen.is_empty() {
         return Ok(());
     }
-    let sacrificed = g.sacrifice(you, &chosen).len();
+    let sacrificed = g.sacrifice(you, &chosen).objects().len();
     if sacrificed > 0 {
         g.draw(you, sacrificed as u32);
     }

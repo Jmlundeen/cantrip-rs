@@ -11,7 +11,7 @@ use cantrip_oracle as oracle;
 /// battlefield; the sacrifice may not be itself.
 fn sacrifice_for_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let rule = select::another_creature_permanents(select::up_to(1));
-    let Some(&sacrificed) = effects::may_sacrifice(g, item.controller, item.object, rule)?.first() else { return Ok(()) };
+    let Some(&sacrificed) = effects::may_sacrifice(g, item.controller, item.object, rule)?.objects().first() else { return Ok(()) };
     g.end_sentence();
     let power = history::power_of_sacrificed_permanent(g, sacrificed);
     if power > 0 {

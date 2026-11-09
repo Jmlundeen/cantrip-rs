@@ -47,7 +47,7 @@ fn a_player_cant_sacrifice_a_permanent_another_player_controls() {
     assert!(cantrip_api::Game::can_sacrifice(&cx, THEM, bear));
     assert!(cantrip_api::Game::sacrifice(&mut cx, YOU, &[bear]).is_empty());
     assert!(cx.s().obj(bear).zone.is(ZoneKind::Battlefield));
-    assert_eq!(cantrip_api::Game::sacrifice(&mut cx, THEM, &[bear]).len(), 1);
+    assert_eq!(cantrip_api::Game::sacrifice(&mut cx, THEM, &[bear]).count(), 1);
     assert_eq!(cx.s().zone(Zone::graveyard(THEM)).len(), 1);
 }
 
@@ -65,7 +65,7 @@ fn a_permanent_another_player_took_is_sacrificed_only_by_its_new_controller() {
     assert!(cantrip_api::Game::sacrifice(&mut cx, YOU, &[bear]).is_empty());
     assert!(cx.s().obj(bear).zone.is(ZoneKind::Battlefield));
     assert!(cantrip_api::Game::can_sacrifice(&cx, THEM, bear));
-    assert_eq!(cantrip_api::Game::sacrifice(&mut cx, THEM, &[bear]).len(), 1);
+    assert_eq!(cantrip_api::Game::sacrifice(&mut cx, THEM, &[bear]).count(), 1);
     assert_eq!(cx.s().zone(Zone::graveyard(YOU)).len(), 1);
     assert!(cx.s().zone(Zone::graveyard(THEM)).is_empty());
 }
@@ -80,7 +80,7 @@ fn players_sacrificing_together_each_sacrifice_only_their_own() {
     let their_relic = put(&mut game, table, &RELIC, THEM);
     let mut cx = cx(&mut game);
     let gone = cantrip_api::Game::sacrifice_each(&mut cx, &[(YOU, mine), (YOU, theirs), (THEM, their_relic)]);
-    assert_eq!(gone.len(), 2);
+    assert_eq!(gone.permanents(), &[mine, their_relic]);
     assert_eq!(cx.s().battlefield().to_vec(), vec![theirs]);
     assert_eq!(cx.s().zone(Zone::graveyard(YOU)).len(), 1);
     assert_eq!(cx.s().zone(Zone::graveyard(THEM)).len(), 1);

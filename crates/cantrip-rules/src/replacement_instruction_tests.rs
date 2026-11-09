@@ -258,7 +258,7 @@ fn consuming_a_once_only_replacement_and_healing_is_one_core_action() {
     assert!(!cx.obj(target).deathtouched);
     assert!(cx.state().effects.is_empty());
     cx.end_sentence();
-    assert_eq!(cx.destroy_all(&[target]).len(), 1);
+    assert_eq!(cx.destroy_all(&[target]).count(), 1);
 }
 #[test]
 fn exhausting_a_partial_shield_before_a_once_only_replacement_is_not_a_card_instruction() {

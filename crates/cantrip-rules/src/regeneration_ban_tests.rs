@@ -106,7 +106,7 @@ fn a_resolved_ban_holds_after_the_target_loses_abilities_or_the_source_leaves() 
     effect(&mut game, source, id, EffectKind::CantBeRegenerated);
     effect(&mut game, id, id, EffectKind::LoseAllAbilities);
     cx(&mut game).exile_all(&[source]);
-    assert_eq!(cx(&mut game).destroy_all(&[id]).len(), 1);
+    assert_eq!(cx(&mut game).destroy_all(&[id]).count(),1);
     assert!(!game.state.battlefield().contains(&id));
 }
 
@@ -132,7 +132,7 @@ fn static_bans_apply_to_the_named_objects_even_after_those_lose_abilities() {
     effect(&mut game, bear, bear, EffectKind::LoseAllAbilities);
     effect(&mut game, bear, bear, EffectKind::RegenerationShield);
     effect(&mut game, land, land, EffectKind::RegenerationShield);
-    assert_eq!(cx(&mut game).destroy_all(&[bear]).len(), 1);
+    assert_eq!(cx(&mut game).destroy_all(&[bear]).count(),1);
     assert!(cx(&mut game).destroy_all(&[land]).is_empty(), "a noncreature is not banned");
     assert_regenerated(&game, land);
 }
@@ -157,7 +157,7 @@ fn a_ban_source_destroyed_simultaneously_still_bans_regeneration_for_that_event(
     let source = put(&mut game, &BAN, Zone::BATTLEFIELD);
     let id = put(&mut game, &BEAR, Zone::BATTLEFIELD);
     effect(&mut game, id, id, EffectKind::RegenerationShield);
-    assert_eq!(cx(&mut game).destroy_all(&[source, id]).len(), 2);
+    assert_eq!(cx(&mut game).destroy_all(&[source, id]).count(),2);
 }
 
 #[test]
@@ -166,7 +166,7 @@ fn an_emblem_can_forbid_regeneration_too() {
     put(&mut game, &EMBLEM, Zone::COMMAND);
     let id = put(&mut game, &BEAR, Zone::BATTLEFIELD);
     effect(&mut game, id, id, EffectKind::RegenerationShield);
-    assert_eq!(cx(&mut game).destroy_all(&[id]).len(), 1);
+    assert_eq!(cx(&mut game).destroy_all(&[id]).count(),1);
 }
 
 #[test]
@@ -197,9 +197,9 @@ fn a_prohibition_also_defeats_static_regeneration_and_one_shot_no_regen_destruct
         let id = put(&mut game, &CLERIC, Zone::BATTLEFIELD);
         if lasting {
             effect(&mut game, id, id, EffectKind::CantBeRegenerated);
-            assert_eq!(cx(&mut game).destroy_all(&[id]).len(), 1);
+            assert_eq!(cx(&mut game).destroy_all(&[id]).count(),1);
         } else {
-            assert_eq!(cx(&mut game).destroy_all_no_regen(&[id]).len(), 1);
+            assert_eq!(cx(&mut game).destroy_all_no_regen(&[id]).count(),1);
         }
     }
 }
@@ -260,7 +260,7 @@ fn a_ban_granted_after_ability_loss_functions_and_ends_when_its_holder_leaves() 
     grant_ban(&mut game, holder);
     let target = put(&mut game, &BEAR, Zone::BATTLEFIELD);
     effect(&mut game, target, target, EffectKind::RegenerationShield);
-    assert_eq!(cx(&mut game).destroy_all(&[target]).len(), 1);
+    assert_eq!(cx(&mut game).destroy_all(&[target]).count(),1);
     cx(&mut game).exile_all(&[holder]);
     let free = put(&mut game, &BEAR, Zone::BATTLEFIELD);
     effect(&mut game, free, free, EffectKind::RegenerationShield);

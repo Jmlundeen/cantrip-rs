@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "Your team may sacrifice any number of creatures. For each creature sacrificed this way, you add {B}{B}." There are
 /// no teams here, so the team is the caster alone: they choose any number of their creatures, all are sacrificed at
-/// once (CR 701.21a), and the mana counts those that actually were.
+/// once (CR 701.21a), and the mana counts those that actually were - a merged creature once (CR 730.2).
 fn harvest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let eligible: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
@@ -12,7 +12,7 @@ fn harvest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if chosen.is_empty() {
         return Ok(());
     }
-    let sacrificed = g.sacrifice(you, &chosen).len();
+    let sacrificed = g.sacrifice(you, &chosen).objects().len();
     if sacrificed > 0 {
         g.add_mana(you, Color::Black.mana(), 2 * sacrificed as u32);
     }

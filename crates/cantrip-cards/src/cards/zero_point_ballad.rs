@@ -22,7 +22,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if x < 6 {
         return Ok(());
     }
-    let cards: Vec<ObjectId> = destroyed.into_iter().filter(|&id| !g.obj(id).token && g.obj(id).zone.is(ZoneKind::Graveyard)).collect();
+    let cards: Vec<ObjectId> = destroyed.into_objects().into_iter().filter(|&id| !g.obj(id).token && g.obj(id).zone.is(ZoneKind::Graveyard)).collect();
     if let Some(&card) = choose::select(g, you, item.object, Purpose::PutOntoBattlefield, cards, select::creature_cards(select::exactly(1)))?.first() {
         g.put_onto_battlefield(card, you, false)?;
     }

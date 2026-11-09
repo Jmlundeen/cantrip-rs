@@ -36,7 +36,7 @@ fn destroy_nonbasic_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
     g.end_sentence();
     let searchers: Vec<(PlayerId, u32)> = controllers
         .iter()
-        .filter(|&&(land, _)| g.obj(land).became.is_some_and(|new| destroyed.contains(&new)))
+        .filter(|&&(land, _)| destroyed.permanents().contains(&land))
         .map(|&(_, player)| (player, 1))
         .collect();
     each_may_search_basic_lands_together(g, &searchers, item.object, true)

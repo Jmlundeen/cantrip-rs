@@ -20,7 +20,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut returning = Vec::new();
     for player in g.state().apnap().collect::<Vec<_>>() {
         for &card in g.state().zone(Zone::graveyard(player)) {
-            if !sacrificed.contains(&card) && g.chars(card).is(CardType::Creature) {
+            if !sacrificed.objects().contains(&card) && g.chars(card).is(CardType::Creature) {
                 returning.push((card, player));
             }
         }

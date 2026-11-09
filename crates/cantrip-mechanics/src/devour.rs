@@ -19,7 +19,7 @@ pub fn lands<const N: i32>(g: &mut dyn Game, entering: &mut Entering) -> Result<
     if chosen.is_empty() {
         return Ok(());
     }
-    let sacrificed = g.sacrifice(you, &chosen).len() as i32;
+    let sacrificed = g.sacrifice(you, &chosen).objects().len() as i32;
     entering.counters[CounterKind::PlusOne as usize] += N * sacrificed;
     Ok(())
 }

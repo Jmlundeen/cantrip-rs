@@ -20,7 +20,7 @@ fn destroy_all_nonblack_creatures_hellfire(
     };
     let destroyed = g.destroy_all(&nonblack_creatures);
     g.end_sentence();
-    let died = destroyed.iter().filter(|&&id| g.obj(id).zone.is(ZoneKind::Graveyard)).count() as u32;
+    let died = destroyed.objects().iter().filter(|&&id| g.obj(id).zone.is(ZoneKind::Graveyard)).count() as u32;
     g.damage_together(&[(item.object, Target::Player(item.controller), died + 3)]);
     Ok(())
 }

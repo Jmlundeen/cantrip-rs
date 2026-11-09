@@ -500,7 +500,9 @@ fn a_merged_permanent_dies_as_one_and_each_card_goes_to_the_graveyard() {
     resolve_all(&mut g, true);
     let life = g.state.player(YOU).life;
     let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[bear]);
-    assert_eq!(gone.len(), 2, "both new objects");
+    assert_eq!(gone.permanents(), &[bear], "one permanent sacrificed (CR 730.2)");
+    assert_eq!(gone.count(), 1);
+    assert_eq!(gone.objects().len(), 2, "both new objects");
     settle(&mut g);
     assert_eq!(g.state.player(YOU).life, life + 1, "the Bear's dies trigger, once");
     let graveyard = g.state.zone(Zone::graveyard(YOU)).to_vec();
@@ -589,7 +591,7 @@ fn a_copy_of_a_merged_permanent_has_the_merged_values_and_is_one_object() {
     assert!(c.has(Keyword::Trample), "the Beast's ability is copiable");
     assert_eq!(c.abilities().count(), 2);
     assert!(g.state.merge_of(token).is_none(), "not a merged permanent");
-    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[token]);
+    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[token]).into_objects();
     assert_eq!(gone.len(), 1, "one object");
 }
 
@@ -627,7 +629,7 @@ fn a_card_on_top_of_a_token_is_no_token() {
     cast_mutating(&mut g, beast, cat);
     resolve_all(&mut g, true);
     assert!(!g.state.obj(cat).token, "its topmost component is a card");
-    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]);
+    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]).into_objects();
     assert_eq!(gone.iter().filter(|&&c| g.state.obj(c).token).count(), 1, "the Cat token among them");
 }
 
@@ -693,7 +695,7 @@ fn a_card_on_top_of_a_face_down_permanent_is_face_up_and_the_face_down_card_give
     let c = g.chars(manifested);
     assert_eq!(c.name, "Mutate Test Beast");
     assert_eq!(c.abilities().count(), 1, "the face-down Bear gives no abilities");
-    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[manifested]);
+    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[manifested]).into_objects();
     let bear_card = gone.iter().copied().find(|&c| g.state.obj(c).card == g.cards.id_of(&BEAR)).expect("the Bear card");
     assert!(g.history().all().iter().any(|r| matches!(r.event, Event::Revealed { card, .. } if card == bear_card)), "revealed as it moved");
 }
@@ -732,7 +734,7 @@ fn a_card_only_replacement_moves_every_component_of_a_nontoken_merged_permanent(
     cast_mutating(&mut g, beast, cat);
     resolve_all(&mut g, true);
     assert!(!g.state.obj(cat).token, "its topmost component is a card");
-    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]);
+    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]).into_objects();
     assert_eq!(gone.len(), 2, "both components moved");
     assert!(gone.iter().all(|&c| g.state.obj(c).zone.is(ZoneKind::Exile)), "the token component is exiled with the card");
     assert!(gone.iter().all(|&c| g.state.obj(c).exiled.is_some_and(|l| l.by == void)), "each exiled with the Void (CR 607.2b, 730.3d)");
@@ -756,7 +758,7 @@ fn a_card_only_replacement_moves_only_the_card_components_of_a_token_merged_perm
     cast_mutating(&mut g, beast, cat);
     resolve_all(&mut g, false);
     assert!(g.state.obj(cat).token, "its topmost component is a token");
-    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]);
+    let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[cat]).into_objects();
     assert_eq!(gone.len(), 2, "both components moved");
     let token = gone.iter().copied().find(|&c| g.state.obj(c).token).expect("the token component");
     let card = gone.iter().copied().find(|&c| !g.state.obj(c).token).expect("the card component");

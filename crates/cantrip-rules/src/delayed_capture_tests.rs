@@ -19,7 +19,7 @@ fn destroy_then_schedule(g: &mut dyn Rules, item: &StackItem) -> Result<(), Susp
     let destroyed = g.destroy_all(&others);
     if !destroyed.is_empty() {
         let next = AbilityRef::delayed(item.ability.card, 1);
-        capture(g, at(Step::End), item.object, item.controller, next, item.subject, &destroyed);
+        capture(g, at(Step::End), item.object, item.controller, next, item.subject, destroyed.objects());
     }
     Ok(())
 }

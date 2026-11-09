@@ -55,12 +55,12 @@ fn super_nova(g: &mut dyn Game, asker: &Asker) -> Result<(), Suspend> {
 }
 
 /// "Whenever Sephiroth attacks, you may sacrifice any number of other creatures. If you do, draw that many cards." The cards
-/// drawn are the creatures actually sacrificed (CR 608.2c).
+/// drawn are the creatures actually sacrificed (CR 608.2c), a merged creature once (CR 730.2).
 fn sacrifice_any_number_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let eligible = other_creatures(g, you, item.object);
     let chosen = choose::any_number_of(g, you, item.object, Purpose::Sacrifice, "", eligible.clone(), eligible)?;
-    let sacrificed = g.sacrifice(you, &chosen).len() as u32;
+    let sacrificed = g.sacrifice(you, &chosen).objects().len() as u32;
     if sacrificed > 0 {
         g.draw(you, sacrificed);
     }

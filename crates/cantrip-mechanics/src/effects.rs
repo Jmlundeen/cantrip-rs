@@ -140,7 +140,7 @@ pub fn targets_get<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackIte
 /// "Destroy all nonland permanents with mana value `limit` or less" (CR 701.8a): every such permanent on the battlefield,
 /// destroyed at once. The permanents it destroyed, for what the rest of the text does with them. Culling Ritual (2) and
 /// Pest Control (1) print it.
-pub fn destroy_nonland_permanents_with_mana_value_at_most(g: &mut dyn Game, limit: u32) -> Vec<ObjectId> {
+pub fn destroy_nonland_permanents_with_mana_value_at_most(g: &mut dyn Game, limit: u32) -> LeftBattlefield {
     let doomed: Vec<ObjectId> = g
         .state()
         .battlefield()
@@ -172,7 +172,7 @@ pub fn creatures_you_control_gain_keywords_they_have(g: &mut dyn Game, item: &St
 /// battlefield whose mana value is in the range, destroyed at once (CR 101.4). A card in play with {X} in its cost has the
 /// X it was cast with (CR 202.3e), which `Query::mana_value` reads. The mana-value-bounded destruction both halves of
 /// Austere Command use; the two wrappers below name each half.
-pub fn destroy_creatures_with_mana_value_between(g: &mut dyn Game, min: u32, max: u32) -> Vec<ObjectId> {
+pub fn destroy_creatures_with_mana_value_between(g: &mut dyn Game, min: u32, max: u32) -> LeftBattlefield {
     let doomed: Vec<ObjectId> = g
         .state()
         .battlefield()
@@ -199,7 +199,7 @@ pub fn destroy_creatures_with_mana_value_at_least<const N: u32>(g: &mut dyn Game
 
 /// "Destroy all artifacts with mana value `limit` or less" (CR 701.8a): every such artifact on the battlefield, destroyed at
 /// once. The artifacts it destroyed. Brotherhood's End (3), Hammer Mage (X) and Meltdown (X) print it.
-pub fn destroy_artifacts_with_mana_value_at_most(g: &mut dyn Game, limit: u32) -> Vec<ObjectId> {
+pub fn destroy_artifacts_with_mana_value_at_most(g: &mut dyn Game, limit: u32) -> LeftBattlefield {
     let doomed: Vec<ObjectId> = g
         .state()
         .battlefield()
@@ -770,7 +770,7 @@ pub fn sacrifice_any_number_of_lands_for_lands(g: &mut dyn Game, item: &StackIte
     let you = item.controller;
     let lands: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&p| g.chars(p).is(CardType::Land)).collect();
     let chosen = crate::choose::select(g, you, item.object, Purpose::Sacrifice, lands, crate::select::land_cards(crate::select::ANY_NUMBER))?;
-    let sacrificed = g.sacrifice(you, &chosen).len();
+    let sacrificed = g.sacrifice(you, &chosen).objects().len();
     g.end_sentence();
     crate::library::find_to_battlefield(g, you, item.object, crate::select::land_cards(crate::select::up_to(sacrificed as u32)), true)?;
     Ok(())
@@ -781,11 +781,11 @@ pub fn sacrifice_any_number_of_lands_for_lands(g: &mut dyn Game, item: &StackIte
 /// and nothing is asked when none qualifies. Returns what was actually sacrificed, so "if you do" and "when you do" (CR 608.2c,
 /// 603.12) are a non-empty check. Tenured Tethermage (a land), Way of the Deathbringer and Grist, the Hunger Tide (a creature), Winter,
 /// Tormented Loner (a creature or planeswalker), Entrust the Spark (a planeswalker) and Witherbloom Charm (a permanent) print it.
-pub fn may_sacrifice(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: Selection) -> Result<Vec<ObjectId>, Suspend> {
+pub fn may_sacrifice(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule: Selection) -> Result<LeftBattlefield, Suspend> {
     let permanents = g.permanents_of(player);
     let chosen = crate::choose::select(g, player, source, Purpose::Sacrifice, permanents, rule)?;
     if chosen.is_empty() {
-        return Ok(chosen);
+        return Ok(LeftBattlefield::default());
     }
     Ok(g.sacrifice(player, &chosen))
 }

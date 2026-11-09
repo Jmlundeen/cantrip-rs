@@ -20,7 +20,7 @@ fn resolve(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut exiled: Vec<(ObjectId, PlayerId)> = Vec::new();
     let mut revealers: Vec<PlayerId> = Vec::new();
     for (old, player) in targets {
-        if !g.obj(old).became.is_some_and(|new| destroyed.contains(&new)) {
+        if !destroyed.permanents().contains(&old) {
             continue;
         }
         if !revealers.contains(&player) {

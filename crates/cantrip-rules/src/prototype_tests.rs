@@ -193,7 +193,7 @@ fn a_prototyped_spell_resolves_into_a_prototyped_permanent_that_leaves_as_its_no
     assert!(g.state.obj(permanent).zone.is(ZoneKind::Battlefield));
     assert_prototyped(&g, permanent);
     let gone = cantrip_api::Game::sacrifice(&mut cx(&mut g), YOU, &[permanent]);
-    assert_eq!(gone.len(), 1);
+    assert_eq!(gone.objects().len(), 1);
     let card = g.state.obj(permanent).became.expect("it went to the graveyard");
     assert!(g.state.obj(card).zone.is(ZoneKind::Graveyard));
     assert_normal(&g, card);

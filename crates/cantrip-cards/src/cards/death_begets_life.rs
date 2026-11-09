@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "Destroy all creatures and enchantments. Draw a card for each permanent destroyed this way" (CR 701.8a, 101.4, 608.2c): every
 /// creature and every enchantment goes at once (an enchantment creature once), and the draw counts what was actually destroyed,
-/// not an indestructible permanent nor one a regeneration shield saved.
+/// not an indestructible permanent nor one a regeneration shield saved, and a merged permanent once (CR 730.2).
 fn destroy_then_draw_for_each(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let doomed: Vec<ObjectId> = g
         .state()
@@ -13,7 +13,7 @@ fn destroy_then_draw_for_each(g: &mut dyn Game, item: &StackItem) -> Result<(), 
         .copied()
         .filter(|&id| g.chars(id).is(CardType::Creature) || g.chars(id).is(CardType::Enchantment))
         .collect();
-    let destroyed = g.destroy_all(&doomed).len();
+    let destroyed = g.destroy_all(&doomed).objects().len();
     effects::draw(g, item, destroyed as u32)
 }
 

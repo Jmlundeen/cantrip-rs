@@ -20,8 +20,8 @@ fn probe(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.end_sentence();
     let moved = g.sacrifice(YOU, &[token]);
     g.end_sentence();
-    assert_eq!(moved.len(), 1);
-    let in_graveyard = moved[0];
+    assert_eq!(moved.count(), 1);
+    let in_graveyard = moved.objects()[0];
     assert!(g.obj(in_graveyard).token);
     assert_eq!(g.obj(in_graveyard).zone, Zone::graveyard(YOU));
     let asker = Asker::new(item.object, YOU);

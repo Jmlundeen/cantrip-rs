@@ -332,7 +332,7 @@ pub fn sacrifice_chosen(
     source: ObjectId,
     count: u8,
     kind: fn(&Chars) -> bool,
-) -> Result<Vec<ObjectId>, Suspend> {
+) -> Result<LeftBattlefield, Suspend> {
     let eligible: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| kind(&g.chars(id))).collect();
     sacrifice_one_of(g, player, source, count, eligible)
 }
@@ -451,7 +451,7 @@ fn sacrifice_together(
 /// quality of the group, such as the greatest mana value among them), chosen by that player when there is a choice and all
 /// of them taken when there are no more than `count`. `sacrifice_chosen` filters by kind; Break Under Pressure's "with the
 /// greatest mana value among creatures and planeswalkers they control" cannot be a kind.
-pub fn sacrifice_one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<Vec<ObjectId>, Suspend> {
+pub fn sacrifice_one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<LeftBattlefield, Suspend> {
     let chosen = chosen_to_sacrifice(g, player, source, count, eligible)?;
     Ok(g.sacrifice(player, &chosen))
 }

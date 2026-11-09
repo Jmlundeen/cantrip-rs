@@ -8,7 +8,7 @@ use crate::card::{CounterTo, Entering, EntersAs, FaceDown, LibraryPlace, TurnUp,
 use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef, CauseKind, PlayerCounter, TriggeredDef};
 use crate::chars::Chars;
 use crate::history::{History, Record};
-use crate::{DamageResult, MillResult};
+use crate::{DamageResult, LeftBattlefield, MillResult};
 use crate::Event;
 
 /// A die roll (CR 706.2): the face the die showed, and the result once the roll was modified (CR 706.4).
@@ -559,6 +559,25 @@ pub trait Query {
         all
     }
 
+    /// The permanents, by their ids on the battlefield, whose own moves made objects among `moved` (the new objects a verb
+    /// such as `exile_all` or `return_to_hand` returned), in that order: one for each permanent that left the battlefield,
+    /// a merged permanent once however many cards it became (CR 730.2; its other components' arrivals are
+    /// `ZoneChange::part`, CR 730.3), and none for a card moved from any other zone. "For each creature exiled this way",
+    /// "that many" of the permanents such a verb moved, counts these; `sacrifice` and `destroy_all` return them already
+    /// (`LeftBattlefield`). Read from the event history, which recorded each move.
+    fn permanents_left(&self, moved: &[ObjectId]) -> Vec<ObjectId> {
+        let log = self.events();
+        moved
+            .iter()
+            .filter_map(|&arrived| {
+                log.iter().rev().find_map(|r| match r.event {
+                    Event::ZoneChange { old, new, from, part, .. } if new == arrived => Some((!part && from.is(ZoneKind::Battlefield)).then_some(old)),
+                    _ => None,
+                })?
+            })
+            .collect()
+    }
+
     /// `found_after_move` of every object `left` became (`became_all`): each still where its move put it (CR 400.7e, 730.3c).
     /// "Return it to the battlefield" from a "when this dies" ability returns each card of a merged permanent that died, and
     /// the same is done to each (CR 730.3c).
@@ -811,10 +830,11 @@ pub trait Game: Query {
     /// Destroys permanents at once (CR 701.8a, 101.4, 603.10a): a leaves-the-battlefield ability sees all of them leave. An
     /// indestructible one stays (CR 702.12b); a regeneration shield replaces its destruction (CR 701.19a); the rest go to
     /// their owners' graveyards. Something that is no longer the object it was is not destroyed (CR 400.7). The new objects,
-    /// in order, of what was destroyed.
-    fn destroy_all(&mut self, permanents: &[ObjectId]) -> Vec<ObjectId>;
+    /// of what was destroyed, and the permanents that were (`LeftBattlefield`: "for each permanent destroyed this way" counts
+    /// a merged permanent once, CR 730.2).
+    fn destroy_all(&mut self, permanents: &[ObjectId]) -> LeftBattlefield;
     /// `destroy_all` for permanents that "can't be regenerated" (CR 701.19c): a regeneration shield does not save them.
-    fn destroy_all_no_regen(&mut self, permanents: &[ObjectId]) -> Vec<ObjectId>;
+    fn destroy_all_no_regen(&mut self, permanents: &[ObjectId]) -> LeftBattlefield;
     /// Destroys a permanent (CR 701.8a): the one-object case of `destroy_all`.
     fn destroy(&mut self, permanent: ObjectId) {
         self.destroy_all(&[permanent]);
@@ -827,12 +847,13 @@ pub trait Game: Query {
     /// can't sacrifice ... a permanent they don't control"), one that can't be sacrificed, or any when an opponent's spell or
     /// ability can't make `player` sacrifice, stays (CR 101.2, `can_sacrifice`). The player is the one the text names: "you"
     /// (the spell's or ability's controller, a delayed ability's included, CR 603.7d-e), "target player", or for "its
-    /// controller sacrifices it" that permanent's controller as it resolves. The new objects, in order, of what was
-    /// sacrificed: "if you do" asks whether this is empty.
-    fn sacrifice(&mut self, player: PlayerId, permanents: &[ObjectId]) -> Vec<ObjectId>;
+    /// controller sacrifices it" that permanent's controller as it resolves. The permanents sacrificed and the new objects
+    /// they became (`LeftBattlefield`): "if you do" asks whether it is empty, and "for each creature sacrificed this way",
+    /// "that many" count the permanents, a merged one once however many cards it became (CR 730.2, 730.3c).
+    fn sacrifice(&mut self, player: PlayerId, permanents: &[ObjectId]) -> LeftBattlefield;
     /// Several players sacrifice at once (CR 701.21a, 101.4): "each player sacrifices", each pair who sacrifices and what,
-    /// each judged as `sacrifice` judges it. The new objects, in order.
-    fn sacrifice_each(&mut self, sacrifices: &[(PlayerId, ObjectId)]) -> Vec<ObjectId>;
+    /// each judged as `sacrifice` judges it. What was sacrificed, as `sacrifice` returns it.
+    fn sacrifice_each(&mut self, sacrifices: &[(PlayerId, ObjectId)]) -> LeftBattlefield;
     /// Whether `player` could sacrifice this permanent now, as `sacrifice` would (CR 701.21a, 101.2): it is on the
     /// battlefield and `player` controls it, nothing says it can't be sacrificed (`Keyword::CantBeSacrificed`,
     /// `EffectKind::CantBeSacrificed`, `CardDef::sacrifice_bans`), and the resolving spell or ability may cause `player` to

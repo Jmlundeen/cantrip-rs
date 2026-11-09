@@ -18,11 +18,11 @@ fn destroy_all_and_make_borg(g: &mut dyn Game, item: &StackItem) -> Result<(), S
     // creature it did not move - indestructible (CR 702.12b), or regenerated as the destruction was applied - is not in it.
     let destroyed = g.destroy_all(&creatures);
     // Each is judged as it last existed on the battlefield (CR 608.2h): an artifact there, whatever its card is in the graveyard
-    // (Mycosynth Lattice makes every permanent one). `destroyed` holds the new objects; an old one that became one of them was
-    // destroyed.
+    // (Mycosynth Lattice makes every permanent one). `destroyed.objects()` holds the new objects; an old one that became one
+    // of them was destroyed.
     let count = creatures
         .iter()
-        .filter(|&&old| g.obj(old).became.is_some_and(|new| destroyed.contains(&new)))
+        .filter(|&&old| g.obj(old).became.is_some_and(|new| destroyed.objects().contains(&new)))
         .filter(|&&old| g.state().last_known(old).is_some_and(|known| !known.types.has(CardType::Artifact)))
         .count();
     let made = u32::try_from(count).unwrap_or(u32::MAX);

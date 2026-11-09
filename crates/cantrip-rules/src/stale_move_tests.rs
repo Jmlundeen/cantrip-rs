@@ -163,9 +163,9 @@ fn putting_onto_the_battlefield_moves_nothing() {
 #[test]
 fn a_permanent_that_left_is_not_destroyed_or_sacrificed_again() {
     let from = Zone::BATTLEFIELD;
-    moves_nothing(from, |cx, old, _| cx.destroy_all(&[old]), none);
-    moves_nothing(from, |cx, old, _| cx.destroy_all_no_regen(&[old]), none);
-    moves_nothing(from, |cx, old, _| cx.sacrifice(P0, &[old]), none);
+    moves_nothing(from, |cx, old, _| cx.destroy_all(&[old]).into_objects(), none);
+    moves_nothing(from, |cx, old, _| cx.destroy_all_no_regen(&[old]).into_objects(), none);
+    moves_nothing(from, |cx, old, _| cx.sacrifice(P0, &[old]).into_objects(), none);
     moves_nothing(from, |cx, old, _| cx.move_to(old, Zone::graveyard(P0)), |old, got| assert_eq!(got, old));
 }
 

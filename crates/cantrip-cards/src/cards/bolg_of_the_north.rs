@@ -11,7 +11,7 @@ use cantrip_oracle as oracle;
 fn may_sacrifice_another_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let rule = select::another_creature_permanents(select::up_to(1));
-    let Some(&card) = effects::may_sacrifice(g, you, item.object, rule)?.first() else { return Ok(()) };
+    let Some(&card) = effects::may_sacrifice(g, you, item.object, rule)?.objects().first() else { return Ok(()) };
     let power = history::power_of_sacrificed_permanent(g, card).max(0) as u32;
     let this = g.card_id(&CARD);
     g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, power);
