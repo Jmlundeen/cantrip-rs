@@ -105,6 +105,38 @@ fn expect_ok(reply: &Value) -> &Value {
     reply.get("Ok").unwrap_or_else(|| panic!("the host refused: {reply}"))
 }
 
+/// The real JSON-lines setup path accepts explicit physical designations and publishes them to both seats.
+#[test]
+fn commander_setup_crosses_stdio_as_public_cards_with_forty_life() {
+    let mut host = Host::start();
+    let dealt = host.call(json!({
+        "Cmd": "NewGame",
+        "Seats": [
+            { "Name": "North", "Deck": vec!["Plains"; 30], "Commanders": ["Kytheon, Hero of Akros"] },
+            { "Name": "South", "Deck": vec!["Island"; 30] },
+        ],
+        "Seed": 1, "Shuffle": false, "FirstPlayer": 1, "MinimumDeckSize": 100, "Commander": true,
+    }));
+    let game = expect_ok(&dealt)["GameId"].as_u64().unwrap();
+    let started = host.call(json!({ "Cmd": "Start", "GameId": game }));
+    for seat in ["1", "2"] {
+        let view: PlayerView = serde_json::from_value(expect_ok(&started)["Views"][seat].clone()).unwrap();
+        assert!(view.players.iter().all(|p| p.life == 40));
+        let commander = view.objects.iter().find(|o| o.name == "Kytheon, Hero of Akros").unwrap();
+        assert_eq!(commander.kind, ObjectKindView::Card);
+        assert_eq!(commander.zone, Some(ZoneKindView::Command));
+    }
+    let refused = host.call(json!({
+        "Cmd": "NewGame",
+        "Seats": [
+            { "Name": "North", "Deck": vec!["Plains"; 30], "Commanders": ["No Such Commander"] },
+            { "Name": "South", "Deck": vec!["Island"; 30] },
+        ],
+        "Seed": 1, "MinimumDeckSize": 100, "Commander": true,
+    }));
+    assert_eq!(refused["Rejected"]["Code"], "InvalidSetup");
+}
+
 #[test]
 fn a_whole_game_over_stdio() {
     let mut host = Host::start();

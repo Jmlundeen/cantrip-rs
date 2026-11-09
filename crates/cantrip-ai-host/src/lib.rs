@@ -272,6 +272,9 @@ struct ScenarioSpec {
 
 #[derive(Deserialize)]
 struct SeatSpec {
+    /// Pregame physical Commander designations, mirrored with the table's remaining deck (CR 903.6).
+    #[serde(rename = "Commanders", default)]
+    commanders: Vec<String>,
     #[serde(rename = "Name")]
     name: String,
     #[serde(rename = "Deck")]
@@ -455,12 +458,12 @@ impl AiHost {
                     )),
                     None => Session::new(Deal {
                         companions: seats.iter().map(|s| s.companion.clone()).collect(),
+                        commanders: seats.iter().map(|s| s.commanders.clone()).collect(),
                         seats: seats
                             .into_iter()
                             .map(|s| (s.name, s.deck, s.sideboard))
                             .collect(),
                         basic_lands_outside,
-                        commanders: Vec::new(),
                         commander: false,
                         minimum_deck_size: minimum_deck_size.unwrap_or_default(),
                         seed,

@@ -23,6 +23,19 @@ public sealed class NativeRulesHostTests
     ];
 
     [Fact]
+    public void Commander_designations_are_explicit_metadata_separate_from_the_remaining_library()
+    {
+        var host = new ScriptedHost();
+        RulesSeat[] seats = [new("Alice", ["Plains", "Arcane Signet"]) { Commanders = ["Kytheon, Hero of Akros"] }, new("Bob", ["Island"])];
+        NativeRulesHost.NewGame(host, seats, 1, new RulesGameOptions { MinimumDeckSize = 100 });
+        using var request = JsonDocument.Parse(Assert.Single(host.Requests));
+        var first = request.RootElement.GetProperty("Seats")[0];
+        Assert.Equal("Kytheon, Hero of Akros", first.GetProperty("Commanders")[0].GetString());
+        Assert.Equal(2, first.GetProperty("Deck").GetArrayLength());
+        Assert.Empty(request.RootElement.GetProperty("Seats")[1].GetProperty("Commanders").EnumerateArray());
+    }
+
+    [Fact]
     public void A_deal_asks_the_host_for_a_new_game_and_lists_each_deck_for_the_welcome()
     {
         var host = new ScriptedHost();
