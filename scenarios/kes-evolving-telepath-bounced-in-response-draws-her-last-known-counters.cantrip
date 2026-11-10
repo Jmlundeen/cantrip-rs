@@ -1,0 +1,56 @@
+# Kes, Evolving Telepath returned to hand in response to her end-step trigger: the time counter cannot be put on her, and X is
+# the number of time counters she had as she last existed on the battlefield (CR 608.2h) - one, from turn 1 - so Bot1 draws one
+# card, and nothing is sacrificed.
+
+[Bot1 Deck]
+Kes, Evolving Telepath
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Ruby
+Island x13
+
+[Bot2 Deck]
+Mox Sapphire
+Unsummon
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kes, Evolving Telepath.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.End]
+? Stack.Count = 1
+? Bot1.Library.Count = 10
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Kes, Evolving Telepath)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Kes, Evolving Telepath = (absent)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Library.Count = 9
+
+[Expect]
+Bot1.Library.Count = 9
+Bot1.Graveyard.Count = 0

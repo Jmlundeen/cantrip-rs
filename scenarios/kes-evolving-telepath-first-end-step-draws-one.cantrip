@@ -1,0 +1,40 @@
+# Kes, Evolving Telepath's end-step trigger puts the time counter on first and then draws X cards, where X counts the
+# counter just placed (CR 608.2c): the first end step draws one card, not zero (CR 603.2, 121.1, 122.1).
+
+[Bot1 Deck]
+Kes, Evolving Telepath
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Ruby
+Island x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kes, Evolving Telepath.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana =
+Bot1.Pass
+[T1 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Kes, Evolving Telepath.Counters.Time = 1
+Bot1.Library.Count = 11
+Bot1.Battlefield.Count = 6
