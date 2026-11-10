@@ -614,10 +614,17 @@ pub fn draw_a_card_and_lose_1_life(g: &mut dyn Game, item: &StackItem) -> Result
 /// a card that was already in hand (ruling 2024-06-07), not only one of the N just drawn. Brainsurge (four), Brainstorm and
 /// Jace, the Mind Sculptor's 0 ability (three) print it.
 pub fn draw_then_put_two_back(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
-    let player = item.controller;
-    g.draw(player, n);
+    g.draw(item.controller, n);
+    put_cards_from_hand_on_top(g, item.controller, item.object, 2)
+}
+
+/// "[Player] chooses N cards from their hand and puts them on top of their library in any order" (CR 608.2d, 401.4): the cards are
+/// chosen together (as many as the hand holds, up to `n`) and put back one at a time in the order chosen, so the last chosen ends
+/// on top. Brainstorm, Brainsurge and Jace, the Mind Sculptor's 0 ability (two, through `draw_then_put_two_back`) and Stunted
+/// Growth (three, for the player it targets) print it.
+pub fn put_cards_from_hand_on_top(g: &mut dyn Game, player: PlayerId, source: ObjectId, n: u32) -> Result<(), Suspend> {
     let hand = g.state().zone(Zone::hand(player)).to_vec();
-    let cards = crate::choose::select(g, player, item.object, Purpose::PutOnTop, hand, crate::select::cards(crate::select::as_many_as_can(2)))?;
+    let cards = crate::choose::select(g, player, source, Purpose::PutOnTop, hand, crate::select::cards(crate::select::as_many_as_can(n)))?;
     // The last card chosen ends up on top.
     let order: Vec<ObjectId> = cards.iter().rev().copied().collect();
     g.put_into_library(&order, LibraryPlace::Top);

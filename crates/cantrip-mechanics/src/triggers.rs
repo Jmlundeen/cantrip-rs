@@ -516,6 +516,16 @@ pub fn this_blocks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fir
     }
 }
 
+/// "Whenever this creature blocks or becomes blocked" (CR 509.3a, 509.3c): it blocks (`this_blocks`), or it becomes blocked (CR
+/// 509.1h, the transition once, however many creatures block it, or an effect makes it blocked). Use with
+/// `when_asked(EventMask(EventMask::BLOCKS.0 | EventMask::BECAME_BLOCKED.0), ..)`. Chub Toad and Spitting Slug print it.
+pub fn this_blocks_or_becomes_blocked(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::BecameBlocked { attacker } if attacker == asker.source => Fired::PLAIN,
+        _ => this_blocks(q, asker.source, event),
+    }
+}
+
 /// "Whenever this creature deals damage to a player" (CR 603.2, 120.2, 120.8): damage of more than 0 dealt by `source` to a
 /// player, that player the subject (not the trigger's controller). Abyssal Specter, Pit Scorpion and Serpent Generator's Snake
 /// print it.
