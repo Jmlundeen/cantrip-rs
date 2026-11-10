@@ -194,6 +194,22 @@ pub fn may_put_onto_battlefield_tapped(
     put_from_hand(g, player, source, true, eligible)
 }
 
+/// "You may put up to N cards from your hand onto the battlefield tapped", the cards `rule` selects (CR 608.2d, 614.1c):
+/// the cards are chosen together and put all at once, so what an entering card turns on is not seen by the choice (CR 101.4,
+/// 608.2). A card put this way is not played, so it uses no land play (CR 305.2). Lt. Arex, Ever-Adapting prints it, of three
+/// land cards (`select::land_cards(select::up_to(3))`).
+pub fn may_put_up_to_onto_battlefield_tapped(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    rule: Selection,
+) -> Result<Vec<ObjectId>, Suspend> {
+    let hand = g.state().zone(Zone::hand(player)).to_vec();
+    let chosen = choose::select(g, player, source, Purpose::PutOntoBattlefield, hand, rule)?;
+    let cards: Vec<(ObjectId, PlayerId, bool)> = chosen.iter().map(|&c| (c, player, true)).collect();
+    g.put_all_onto_battlefield_as(&cards)
+}
+
 /// `may_put_onto_battlefield_tapped` for "... from your hand onto the battlefield tapped and attacking" (CR 508.4): the card
 /// enters attacking what its controller chooses (`combat::choose_attack_target`, asked after the card), or just tapped when there
 /// is nothing to attack (CR 508.4: outside combat it is only tapped). The new object, or none if nothing was put. Kinscaer
