@@ -1,0 +1,59 @@
+# "Exile target opponent's graveyard": in a three-player game the question offers Bot2 and Bot3, and Bot1 is refused as a
+# target (CR 115.1). Bot1 takes Bot2, whose graveyard is empty, so the exiled pile holds no creature card and the attack
+# trigger has nothing to assimilate: the Assessor attacks for 5 and no permanent is added (CR 608.2d).
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Jet
+Black Lotus
+Assimilation Assessor
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Forest x15
+
+[Bot3 Deck]
+Island
+Island x15
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Island.Play
+[T4 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Assimilation Assessor.Cast
+Bot1.Pass
+! Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Attack(Assimilation Assessor > Bot2)
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Grizzly Bears = (absent)
+Bot2.Battlefield.Grizzly Bears.Power = 2
+Bot2.Graveyard.Count = 0

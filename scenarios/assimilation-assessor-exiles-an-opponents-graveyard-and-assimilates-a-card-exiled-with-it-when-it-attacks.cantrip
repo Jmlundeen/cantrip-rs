@@ -1,0 +1,58 @@
+# Assimilation Assessor ({4}{B}) in a two-player game: Terror kills Bot2's Grizzly Bears on turn 4, then the Assessor enters
+# and its entry trigger exiles target opponent's graveyard (CR 406.2), linking that pile to it (CR 607.2a). On turn 7 it
+# attacks, and "assimilate a creature card exiled with it" puts the exiled Grizzly Bears onto the battlefield under Bot1's
+# control with a +1/+1 counter, as a 3/3 Borg artifact creature (CR 122.6, 205.1b, 614.12).
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Jet
+Black Lotus
+Terror
+Assimilation Assessor
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Grizzly Bears
+Forest x15
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Terror.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot1.Pass
+Bot1.Hand.Assimilation Assessor.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Attack(Assimilation Assessor > Bot2)
+
+[Expect]
+Bot1.Battlefield.Assimilation Assessor.Power = 5
+Bot1.Battlefield.Assimilation Assessor.Toughness = 5
+Bot1.Battlefield.Grizzly Bears.Subtypes = Borg
+Bot1.Battlefield.Grizzly Bears.Power = 3
+Bot1.Battlefield.Grizzly Bears.Toughness = 3
+Bot2.Graveyard.Count = 0
