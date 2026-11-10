@@ -1,0 +1,64 @@
+# Lt. Arex, Ever-Adapting: a creature that loses all abilities loses its characteristic-defining P/T (CR 604.3, 613.1f),
+# and the printed */* is then 0/0 - power as well as toughness. A Giant Growth resolved first keeps it alive under Dress
+# Down (CR 613.4c applies the +3/+3 on top of the 0/0), so both numbers can be read: 3/3, not 4/3 or 3/4 counting its
+# four differently named lands, and not 1/0 + 3.
+
+[Bot1 Deck]
+Lt. Arex, Ever-Adapting
+Swamp
+Dress Down
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Forest
+Island
+Plains
+Giant Growth
+Island x20
+
+[Bot2 Deck]
+Plains
+Forest
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lt. Arex, Ever-Adapting.Cast
+Bot1.Pass
+Bot1.Choose(Forest; Island; Plains)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lt. Arex, Ever-Adapting.Power = 4
+? Bot1.Battlefield.Lt. Arex, Ever-Adapting.Keywords = Trample
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Lt. Arex, Ever-Adapting)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lt. Arex, Ever-Adapting.Power = 7
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lt. Arex, Ever-Adapting.Power = 3
+? Bot1.Battlefield.Lt. Arex, Ever-Adapting.Toughness = 3
+? Bot1.Battlefield.Lt. Arex, Ever-Adapting.Keywords = (absent)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Lt. Arex, Ever-Adapting.Power = 3
+Bot1.Battlefield.Lt. Arex, Ever-Adapting.Toughness = 3

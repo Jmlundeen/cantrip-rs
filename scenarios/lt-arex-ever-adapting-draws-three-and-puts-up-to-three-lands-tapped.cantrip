@@ -1,0 +1,57 @@
+# Lt. Arex, Ever-Adapting ({5}{G}{U}): "When Lt. Arex enters, draw three cards. You may put up to three land cards from
+# your hand onto the battlefield tapped." (CR 121.1, 608.2c, 608.2d, 305.2). One land is already on the battlefield when
+# it enters, so its characteristic-defining P/T (CR 604.3) is at least 1/1 and it is not a 0/0 put into its owner's
+# graveyard by a state-based action (CR 704.5f) before this ability resolves. Four land cards are in hand when it
+# resolves - three just drawn and one kept from an earlier turn - so the "up to three" is the limit: exactly three are
+# put tapped and the fourth stays in hand. Putting them is not a land play (CR 305.2). Bot2's land cards in hand are
+# not offered - only the controller's own hand is.
+
+[Bot1 Deck]
+Lt. Arex, Ever-Adapting
+Swamp
+Plains
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Forest
+Island
+Mountain
+Island x20
+
+[Bot2 Deck]
+Plains
+Forest
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lt. Arex, Ever-Adapting.Cast
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Choose(Forest; Island; Mountain)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Plains = (absent)
+Bot1.Hand = Island; Plains
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Lt. Arex, Ever-Adapting.Power = 4
+Bot1.Battlefield.Lt. Arex, Ever-Adapting.Toughness = 4
+Bot2.Hand.Count = 7

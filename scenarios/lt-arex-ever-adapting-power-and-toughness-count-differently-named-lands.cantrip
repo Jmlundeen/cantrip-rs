@@ -1,0 +1,56 @@
+# Lt. Arex, Ever-Adapting: "Strange new worlds — Lt. Arex's power and toughness are each equal to the number of
+# differently named lands you control" (CR 604.3, 613.4a): a characteristic-defining ability, so it reads the current
+# lands through the layers and applies in every zone. "You control" excludes Bot2's lands, a repeated land name counts
+# once, and "each ... equal" makes both power and toughness the same number. Trample is on the card.
+
+[Bot1 Deck]
+Lt. Arex, Ever-Adapting
+Forest
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Island
+Plains
+Forest
+Mountain
+Island x20
+
+[Bot2 Deck]
+Plains
+Mountain
+Forest
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lt. Arex, Ever-Adapting.Cast
+Bot1.Pass
+Bot1.Choose(Island; Plains)
+Bot1.Pass
+Bot2.Pass
+# Bot1 has Forest, Island, Plains - three differently named lands - so Lt. Arex is 3/3.
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Lt. Arex, Ever-Adapting.Power = 3
+Bot1.Battlefield.Lt. Arex, Ever-Adapting.Toughness = 3
+Bot1.Battlefield.Lt. Arex, Ever-Adapting.Keywords = Trample

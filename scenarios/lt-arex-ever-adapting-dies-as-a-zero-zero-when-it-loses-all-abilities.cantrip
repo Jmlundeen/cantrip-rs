@@ -1,0 +1,52 @@
+# Lt. Arex, Ever-Adapting: "Strange new worlds - Lt. Arex's power and toughness are each equal to ..." is a
+# characteristic-defining ability (CR 604.3); a creature that loses all abilities loses it, and with no other P/T source
+# its power and toughness are the `.lost_pt` value the ability names - 0/0 - so a state-based action puts it into its
+# owner's graveyard (CR 704.5f). Dress Down makes creatures lose all abilities (CR 613.1f); Lt. Arex then dies as a 0/0.
+
+[Bot1 Deck]
+Lt. Arex, Ever-Adapting
+Swamp
+Dress Down
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Forest
+Island
+Plains
+Island x20
+
+[Bot2 Deck]
+Plains
+Forest
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lt. Arex, Ever-Adapting.Cast
+Bot1.Pass
+Bot1.Choose(Forest; Island; Plains)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lt. Arex, Ever-Adapting.Toughness = 4
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Lt. Arex, Ever-Adapting = (absent)
