@@ -900,6 +900,12 @@ SCENARIO_NOTES = """
     `{R} lasting {R}`.
   - A card put on the bottom of a library does not change the library's count: check the order, not the size.
   - A mono-colored Mox needs no `Color:`; `! Bot1.Attack()` then proves a must-attack static.
+  - Answer a multi-color mana choice in one line: `Colors(Red, Red)`, not two `Colors(Red)`.
+  - Two cards drawn at once are one draw event, so "whenever you draw your second card" does not fire on a spell that
+    draws two (`you_draw_your_second_card` wants exactly one card drawn earlier in the turn): draw the second card with
+    a single-card effect instead.
+  - Cycling is `Activate`, not `Cycle`, and a draw-step trigger's target prompt is not answered by a `[Tn BotX.Draw]`
+    section: draw the extra card in a main phase, where the prompt is live.
 """
 ENGINE_DIRS = ("crates/cantrip-state/", "crates/cantrip-rules/", "crates/cantrip-api/")
 ORACLE_DIRS = ("crates/cantrip-oracle/",)
