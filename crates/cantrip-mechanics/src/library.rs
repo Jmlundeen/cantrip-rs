@@ -1266,6 +1266,44 @@ pub fn reveal_until_n(
     (found, rest)
 }
 
+/// The order "all other cards revealed this way" go to the bottom of the library in: the order the player chooses ("in any
+/// order", CR 401.4), or a random order (CR 401.4).
+pub enum BottomOrder {
+    Chosen,
+    Random,
+}
+
+/// "You may instead choose land or nonland and reveal cards from the top of your library until you reveal a card of the
+/// chosen kind, instead of drawing a card?" (CR 121.6, 614.1a): asked of the player whose draw would be replaced.
+pub static REVEAL_UNTIL_KIND: Question = Question::new(
+    "RevealUntilKind",
+    "choose land or nonland and reveal cards until you reveal one of that kind, instead of drawing a card?",
+    "That card goes into your hand and the other cards revealed on the bottom of your library. If you don't, the draw goes on as it was.",
+    "Reveal instead",
+    "Don't",
+);
+
+/// "Choose land or nonland and reveal cards from the top of your library until you reveal a card of the chosen kind. Put that
+/// card into your hand and put all other cards revealed this way on the bottom of your library in any order" (CR 701.20,
+/// 401.4), `card` being the source's definition, whose two labels are the kinds: the chosen card is put into the hand, not
+/// drawn (CR 121.5), and with no card of the kind the whole library is revealed, `order` fixing where the rest go. Abundance
+/// (`BottomOrder::Chosen`) and Pavel Chekov, First Posting (`BottomOrder::Random`) print it.
+pub fn reveal_until_land_or_nonland(g: &mut dyn Game, player: PlayerId, source: ObjectId, card: CardId, order: BottomOrder) -> Result<(), Suspend> {
+    let land = crate::choose::one_of(g, player, source, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0;
+    let (found, rest) = reveal_until(g, player, &|q, c| q.chars(c).is(CardType::Land) == land);
+    if let Some(found) = found {
+        g.return_to_hand_revealed(&[found]);
+    }
+    match order {
+        BottomOrder::Chosen => {
+            let bottom = ask_library_order(g, player, source, &rest, DestinationKind::LibraryBottom)?;
+            g.arrange_library(player, &[], &bottom);
+        }
+        BottomOrder::Random => rest_to_bottom_in_random_order(g, player, &rest),
+    }
+    Ok(())
+}
+
 /// "Reveal cards from the top of your library until you reveal a land card. Put that card onto the battlefield tapped and the rest
 /// on the bottom of your library in a random order" (CR 701.20, 401.4): the cards are revealed together down to the first land card,
 /// or the whole library when it holds none (then nothing enters); the land enters tapped under `player` and every other revealed card
