@@ -1,0 +1,6 @@
+{
+  "name": "Deliver from Chaos",
+  "manaCost": "{3}{W}{B}",
+  "type": "Instant",
+  "oracleText": "Exile target artifact or creature. Create X 1/1 colorless Borg artifact creature tokens, where X is that permanent's mana value."
+}

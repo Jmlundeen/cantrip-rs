@@ -1,0 +1,56 @@
+# Deliver from Chaos: "Exile target artifact or creature. Create X 1/1 colorless Borg artifact creature tokens, where X is that
+# permanent's mana value." A creature is a legal target too (CR 115.1): Bot2's Llanowar Elves (mana value 1) is exiled and exactly
+# one Borg token is made - one off both ways - and it enters untapped.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Deliver from Chaos
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Llanowar Elves
+Forest
+Forest x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deliver from Chaos.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Exile = Llanowar Elves
+? Bot1.Battlefield.Borg Token.Power = 1
+? Bot1.Battlefield.Borg Token.Tapped = false
+? Bot1.Battlefield.Count = 6
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Battlefield.Borg Token.Power = 1
+Bot1.Battlefield.Borg Token.Tapped = false
+Bot1.Battlefield.Count = 6
