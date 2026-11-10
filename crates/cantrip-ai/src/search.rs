@@ -1024,7 +1024,10 @@ impl Forks<'_> {
             return Reached::Dead;
         }
         guards[actor].after(&w.game, cancelled);
-        runs[actor] = crate::record::run_key(&request).map(|k| (k, factored));
+        // An answer that ends the payment ends the run: the next request of its key is a new ask.
+        runs[actor] = crate::record::run_key(&request)
+            .filter(|_| !crate::record::ends_run(&answer))
+            .map(|k| (k, factored));
         for forced in 0usize.. {
             let w = &mut self.worlds[world];
             if w.game.is_over() {
@@ -1076,6 +1079,9 @@ impl Forks<'_> {
                 let cancelled = guards[i].before(&w.game, &request, &a);
                 if w.game.answer(request.id, request.player, a.clone()).is_ok() {
                     guards[i].after(&w.game, cancelled);
+                    if crate::record::ends_run(&a) {
+                        runs[i] = None;
+                    }
                     continue;
                 }
                 guards[i] = saved;
@@ -1095,7 +1101,7 @@ impl Forks<'_> {
                         return Reached::Stuck;
                     }
                     guards[i].after(&w.game, cancelled);
-                    runs[i] = run.map(|k| (k, f));
+                    runs[i] = run.filter(|_| !crate::record::ends_run(&a)).map(|k| (k, f));
                 }
                 Forward::Stuck => {
                     self.refused += 1;

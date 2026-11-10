@@ -79,6 +79,20 @@ pub(crate) fn run_key(request: &Request) -> Option<(PlayerId, u8, ObjectId, Obje
     }
 }
 
+/// Whether `answer` ends the payment it answers - the cost paid, declined or the casting cancelled - so that a request
+/// of the same `run_key` after it is a new ask, not the same payment going on: Thrull Wizard's "unless pays {3}" after
+/// its {B} is declined is asked by the same source about the same spell with no answer between them.
+pub(crate) fn ends_run(answer: &Answer) -> bool {
+    match answer {
+        Answer::Cancel => true,
+        Answer::Act(a) => matches!(
+            a.kind,
+            ActionKind::PayCost | ActionKind::DeclineCost | ActionKind::CancelCasting
+        ),
+        _ => false,
+    }
+}
+
 fn lives(game: &Game) -> Vec<i64> {
     game.state.players.iter().map(|p| p.life as i64).collect()
 }
@@ -248,6 +262,7 @@ pub fn record_distilled(
         let key = run_key(&request);
         let mut last = k;
         while key.is_some()
+            && !ends_run(&answers[last].2)
             && last + 1 < answers.len()
             && asked[last + 1].as_ref().and_then(run_key) == key
         {

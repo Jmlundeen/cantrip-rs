@@ -169,6 +169,9 @@ fn scenarios_that_once_failed_record() {
             // The same with a token that died: the object the delayed ability names keeps the zone it left (the graveyard
             // copy is what ceases), so it is shown as it last existed too.
             "deflecting-palm-chooses-a-dead-elemental-token-whose-delayed-sacrifice-waits",
+            // Thrull Wizard asks for {B}, then, declined, for {3}: two asks from the same source about the same spell
+            // with no answer between them, the second a new decision, not the first one's payment going on.
+            "thrull-wizard-three-mana-saves-spell",
         ]
         .iter()
         .map(|n| {

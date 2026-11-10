@@ -133,6 +133,10 @@ impl Payment {
                 Answering::new(game, request, &obs, &index).engine(game, request, &factored)
             })
         {
+            if crate::record::ends_run(&answer) {
+                self.run = None;
+                self.decided = None;
+            }
             self.proposed = Some((request.id, answer.clone()));
             return Ok(Decision {
                 answer,
@@ -166,6 +170,8 @@ impl Payment {
             d.answer = Answer::Pass;
             d.fallback = true;
         }
+        // An answer that ends the payment ends the run: the next request of its key is a new ask, decided afresh.
+        let run = run.filter(|_| decided.as_ref().is_ok_and(|d| !crate::record::ends_run(&d.answer)));
         self.run = run;
         self.decided = match (&decided, run) {
             (Ok(d), Some(_)) => Some((d.factored.clone(), d.value)),
