@@ -1,0 +1,43 @@
+# Class-4 Tactical Cube {4}: its enters trigger creates two 1/1 colorless Borg artifact creature tokens at once, and its
+# own "Artifact creatures you control get +1/+1" makes each of them 2/2 - while Bot2's Memnite, an artifact creature
+# nobody here controls, stays 1/1 (CR 603.6a, 111.2, 604.1, 611.2c). Lotus plus Mox Pearl pay {4} exactly.
+
+[Bot1 Deck]
+Class-4 Tactical Cube
+Black Lotus
+Mox Pearl
+Island x12
+
+[Bot2 Deck]
+Memnite
+Island x10
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Class-4 Tactical Cube.Cast
+Bot1.Pass
+? Bot1.Mana = 
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Borg Token; Borg Token; Class-4 Tactical Cube; Mox Pearl
+? Bot1.Battlefield.Borg Token#1.Power = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Memnite.Power = 1
+
+[Expect]
+Bot1.Battlefield = Borg Token; Borg Token; Class-4 Tactical Cube; Mox Pearl
+Bot1.Battlefield.Borg Token#1.Toughness = 2
+Bot1.Battlefield.Borg Token#2.Power = 2
+Bot1.Battlefield.Borg Token#1.Colors = (absent)
+Bot2.Battlefield.Memnite.Power = 1
