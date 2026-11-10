@@ -520,10 +520,11 @@ pub enum Subtype {
     JemHadar,
     Talaxian,
     Communicator,
+    Edosian,
 }
 
 impl Subtype {
-    pub const ALL: [Subtype; 507] = [
+    pub const ALL: [Subtype; 508] = [
         Subtype::Adventure,
         Subtype::Advisor,
         Subtype::Aetherborn,
@@ -1031,6 +1032,7 @@ impl Subtype {
         Subtype::JemHadar,
         Subtype::Talaxian,
         Subtype::Communicator,
+        Subtype::Edosian,
     ];
 
     pub const fn name(self) -> &'static str {
@@ -1542,6 +1544,7 @@ impl Subtype {
             Subtype::Brikar => "Brikar",
             Subtype::JemHadar => "Jem'Hadar",
             Subtype::Talaxian => "Talaxian",
+            Subtype::Edosian => "Edosian",
         }
     }
 
@@ -1582,7 +1585,7 @@ impl Subtype {
     /// Every creature type (CR 205.3m), in the order the removed C# engine offered them for "choose a creature type",
     /// and after them each one added since (Borg, Klingon, Andorian, Caitian, Gorn, Vulcan, then the Star Trek set's Aenar to Xindi, then Melkotian, then Brikar, Jem'Hadar and Talaxian). The order is load-bearing: a creature-type question's answer is its
     /// position here, so a new type is appended, never inserted.
-    pub const CREATURE_TYPES: [Subtype; 366] = [
+    pub const CREATURE_TYPES: [Subtype; 367] = [
         Subtype::Advisor,
         Subtype::Aetherborn,
         Subtype::Alien,
@@ -1949,6 +1952,7 @@ impl Subtype {
         Subtype::Brikar,
         Subtype::JemHadar,
         Subtype::Talaxian,
+        Subtype::Edosian,
     ];
 
     pub fn named(name: &str) -> Option<Subtype> {
@@ -2063,11 +2067,11 @@ mod card_type_tests {
             (Subtype::JemHadar, "Jem'Hadar"),
             (Subtype::Talaxian, "Talaxian"),
         ];
-        assert_eq!(Subtype::ALL.len(), 470 + appended.len() + 1);
-        assert_eq!(Subtype::CREATURE_TYPES.len(), 330 + appended.len());
-        // Communicator is the artifact type added after those creature types, so it holds the last number and no
-        // creature-type place.
-        assert_eq!(Subtype::Communicator as u16, Subtype::ALL.len() as u16 - 1);
+        assert_eq!(Subtype::ALL.len(), 470 + appended.len() + 1 + 1);
+        assert_eq!(Subtype::CREATURE_TYPES.len(), 330 + appended.len() + 1);
+        // Communicator is the artifact type added after those creature types, so it holds no creature-type place; Edosian,
+        // a creature type added after it, holds the last number but the last creature-type place.
+        assert_eq!(Subtype::Communicator as u16, Subtype::ALL.len() as u16 - 2);
         assert_eq!(Subtype::named("Communicator"), Some(Subtype::Communicator));
         assert!(!Subtype::Communicator.is_creature_type());
         for (i, (n, name)) in appended.into_iter().enumerate() {
@@ -2078,6 +2082,14 @@ mod card_type_tests {
             assert_eq!(Subtype::ALL[470 + i], n);
             assert_eq!(Subtype::CREATURE_TYPES[330 + i], n);
         }
+        // Edosian, a creature type added after the Communicator artifact type, takes the last subtype number and the last
+        // creature-type place.
+        assert_eq!(Subtype::named("Edosian"), Some(Subtype::Edosian));
+        assert_eq!(Subtype::Edosian.name(), "Edosian");
+        assert!(Subtype::Edosian.is_creature_type());
+        assert_eq!(Subtype::Edosian as u16, Subtype::ALL.len() as u16 - 1);
+        assert_eq!(Subtype::ALL[Subtype::ALL.len() - 1], Subtype::Edosian);
+        assert_eq!(Subtype::CREATURE_TYPES[Subtype::CREATURE_TYPES.len() - 1], Subtype::Edosian);
     }
 
     /// A subtype's number (`Subtype as u16`) and a creature type's place in `CREATURE_TYPES` are recorded - the AI's
