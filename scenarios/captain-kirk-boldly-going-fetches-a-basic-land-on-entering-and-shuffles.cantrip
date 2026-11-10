@@ -1,0 +1,44 @@
+# Captain Kirk, Boldly Going {1}{G}{W}{U} 3/4: as he enters he searches his library and/or graveyard for a basic land card or a
+# card named Starship Enterprise. Bot1 searches the library: Darksteel Citadel is a land but not a basic land card, refused, and a
+# Forest is revealed into the hand. The library was searched, so it is shuffled. Bot2's own library and hand are no part of it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Captain Kirk, Boldly Going
+Island
+Island
+Darksteel Citadel
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Captain Kirk, Boldly Going.Cast
+? Bot1.Mana =
+Bot1.Accept
+! Bot1.Search(Darksteel Citadel)
+Bot1.Search(Forest)
+? Bot1.Revealed = Forest
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Forest
+Bot1.Battlefield.Captain Kirk, Boldly Going.Power = 3
+Bot1.Battlefield.Captain Kirk, Boldly Going.Toughness = 4
+Bot1.Battlefield.Captain Kirk, Boldly Going.Keywords = Vigilance
+Bot1.Library.Count = 13
+Bot2.Library.Count = 21
+Bot2.Hand.Count = 7

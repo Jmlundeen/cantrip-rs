@@ -1,0 +1,11 @@
+{
+  "name": "Captain Kirk, Boldly Going",
+  "manaCost": "{1}{G}{W}{U}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Vigilance\nSpacecraft creatures you control get +3/+3.\nWhenever Captain Kirk enters or attacks, search your library and/or graveyard for a basic land card or a card named Starship Enterprise, reveal it, and put it into your hand. If you search your library this way, shuffle.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

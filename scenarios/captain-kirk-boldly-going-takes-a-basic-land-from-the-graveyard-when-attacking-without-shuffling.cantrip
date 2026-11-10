@@ -1,0 +1,64 @@
+# Captain Kirk, Boldly Going's second trigger is the same fetch whenever he attacks. Wheel of Fortune empties both hands on turn 1, so a
+# Forest and a Plains are in Bot1's graveyard; Kirk is cast on turn 3, declines the library search, and must take a basic land from the
+# public graveyard instead (the Forest), then attacks on turn 5 and takes the Plains. Neither search touched the library, so neither
+# shuffled it: its order is exactly what the draws left.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Wheel of Fortune
+Forest
+Plains
+Mox Jet
+Captain Kirk, Boldly Going
+Plains
+Island
+Island
+Island
+Plains
+Island
+Island
+Island
+Plains
+Island
+Island
+Island
+Plains
+Island
+Island
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Captain Kirk, Boldly Going.Cast
+Bot1.Decline
+! Bot1.Choose(Captain Kirk, Boldly Going)
+Bot1.Choose(Forest)
+[T5 Bot1.Main1]
+Bot1.Attack(Captain Kirk, Boldly Going)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Choose(Plains)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 9
+Bot1.Graveyard = Wheel of Fortune; Black Lotus
+Bot1.Library = Island; Plains; Island; Island; Island; Plains; Island; Island
+Bot2.Library.Count = 12
