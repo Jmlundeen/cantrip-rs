@@ -1,0 +1,52 @@
+# Chief Montgomery Scott: a Spacecraft card enters with X charge counters instead of +1/+1 ones, X being the number of differently
+# named lands *you* control. Bot1 has a Forest and an Island (two names) while Bot2 has three differently named lands of its own, so
+# the Galvanizing Sawship enters with exactly two charge counters and not five.
+
+[Bot1 Deck]
+Forest
+Island
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Chief Montgomery Scott
+Galvanizing Sawship
+Forest x16
+
+[Bot2 Deck]
+Island
+Mountain
+Swamp
+Island x24
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chief Montgomery Scott.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Chief Montgomery Scott.Activate(Ability: Strange new worlds)
+Bot1.Choose(Galvanizing Sawship)
+? Bot1.Mana =
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Galvanizing Sawship.Counters.Charge = 2
