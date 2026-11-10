@@ -76,3 +76,36 @@ pub fn distribute(g: &mut dyn Game, controller: PlayerId, source: ObjectId, amon
     g.add_counters_together(&puts);
     Ok(())
 }
+
+fn player_puts_subtype_onto_battlefield<const SUBTYPE: u16>(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    let Event::ZoneChange { new, to, put_by: Some(put_by), .. } = event else { return None };
+    if to.is(ZoneKind::Battlefield) && q.chars(*new).has_subtype(crate::lands::word(q, asker.source, SUBTYPE)) {
+        return Fired::about(Target::Player(*put_by));
+    }
+    None
+}
+
+fn damage_player_unless_minus_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    static QUESTION: Question = Question::new(
+        "PutCounter", "put a -1/-1 counter on a creature you control?",
+        "If you don't, this deals 3 damage to you.", "Put a counter", "Take damage",
+    ).no_default();
+    let Some(player) = item.subject.player() else { return Ok(()) };
+    let creatures = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    if may_pay_on_one(g, player, item.object, CounterKind::MinusOne, 1, creatures, &QUESTION)?.is_none() {
+        g.damage(item.object, Target::Player(player), 3);
+    }
+    Ok(())
+}
+
+/// "Whenever a player puts a [land type] onto the battlefield, this enchantment deals 3 damage to that player unless they put a
+/// -1/-1 counter on a creature they control" (CR 603.2, 118.12a, 120.3): the trigger's subject is the player who put it there.
+/// `SUBTYPE` is a `Subtype` as `u16` (`lands::sub`), read through the words of the source's text (CR 612.2), and `text` is the
+/// card's own. Thelon's Chant (Swamp) and Tourach's Chant (Forest) print it.
+pub const fn damage_unless_counter_when_player_puts<const SUBTYPE: u16>(text: &'static str) -> AbilityDef {
+    triggered(
+        when_asked(EventMask::ZONE_CHANGE, player_puts_subtype_onto_battlefield::<SUBTYPE>),
+        damage_player_unless_minus_counter,
+        text,
+    )
+}
