@@ -608,20 +608,29 @@ class LaneTest(unittest.TestCase):
             lane.gate_scope(self.main, card, card["claim"], reference)
         self.assertIn("card-c-shows-itself.cantrip", str(caught.exception))
 
-    def test_commit_plan_refuses_core_without_engine_scope(self):
+    def test_commit_plan_takes_core_without_engine_scope(self):
+        """The core is always in scope: a card opened without --engine still plans its core change as an Engine: commit."""
         lane = load_lane()
         self.assertEqual(self.queue("--card", "Card B").returncode, 0)
         self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--issue", "8").returncode, 0)
         self.card_b_scenario()
-        self.write("crates/cantrip-state/src/lib.rs", "// the core change\n")
+        self.write("crates/cantrip-state/src/lib.rs", "// the core change" + chr(10))
         state = self.state()
         card = next(entry for entry in state["cards"] if entry["name"] == "Card B")
         with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
             reference = f.read()
         store = lane.Store(lane.common_dir(self.main), "q")
-        with self.assertRaises(lane.Refused) as caught:
-            lane.plan_commits(self.main, store, card, card["claim"], reference, 8)
-        self.assertIn("core", str(caught.exception))
+        made = lane.plan_commits(self.main, store, card, card["claim"], reference, 8)
+        kinds = [entry["kind"] for entry in made]
+        self.assertIn("engine", kinds)
+        self.assertLess(kinds.index("engine"), kinds.index("card"))
+
+    def test_a_claim_records_the_core_as_open(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q").returncode, 0)
+        card = next(entry for entry in self.state()["cards"] if entry["name"] == "Card B")
+        self.assertTrue(card["claim"]["engine"])
 
     def test_a_card_design_note_must_be_deleted(self):
         lane = load_lane()

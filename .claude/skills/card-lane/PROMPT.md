@@ -34,17 +34,19 @@ Use this when a composer owns the queue and the pool, and each fresh agent takes
 >
 > Do not name or choose a card; `next` chooses. It prints the brief and writes the packet in your slot. If it says the
 > queue has no pending card, report that and leave. Claim the card's GitHub issue
-> (`python tools/maintenance/card-issues.py claim "<Name>"`) and run the same `next` with `--issue <N>`. Add `--engine`
-> to the first `next` only if the composer says this card may change the core (`cantrip-state`, `cantrip-rules`,
-> `cantrip-api`); otherwise never.
+> (`python tools/maintenance/card-issues.py claim "<Name>"`) and run the same `next` with `--issue <N>`. The core
+> (`cantrip-state`, `cantrip-rules`, `cantrip-api`) is always in scope: a card whose text needs a rule the engine does
+> not have changes the core rather than waiting on it. `--engine` is accepted and ignored.
 >
-> Do the card as `add-cards` says. Fill the packet's `report.json`, run
+> Do the card as `add-cards` says. A missing rule is a gap to fill in the core, proper and for every card, never a
+> reason to block and never a workaround; `commit` writes it as the `Engine:` commit before the `Mechanics:` and card
+> commits, so `share` puts the core first. Fill the packet's `report.json`, run
 > `python <LANE> check --id <WORKER> --queue <QUEUE> --fast` while writing, and
 > `python <LANE> commit --id <WORKER> --queue <QUEUE>` when it passes. `commit` runs every
 > gate, writes the `Engine:`/`Mechanics:`/`Client:` commits the change needs and one `Card: <Name>` commit ending
 > `Closes #N`, then closes the claim and shares the queue branch. Do not use `done` for a card you wrote.
 >
-> If the card waits on the core, run
+> If the text needs something even a core change cannot express, run
 > `python <LANE> block --id <WORKER> --queue <QUEUE> --rule <CR> --note "..."`, report the gap,
 > and leave; never fake the core. If you must stop, run
 > `python <LANE> release --id <WORKER> --queue <QUEUE> --reason "..."` so the card goes back.
@@ -65,8 +67,9 @@ The composer:
 2. For each implementor: `tools\worktree.cmd acquire --for "card: next <QUEUE>"`, then
    `tools\worktree.cmd token <LEASE> --name "card: <WORKER>"`. Start the agent immediately; the token dies in two
    minutes.
-3. Start one fresh agent with the prompt above; fill `<CHECKOUT>`, `<QUEUE>`, `<WORKER>`, `<TOKEN>`, `<LANE>`, and
-   whether the core is open. `<LANE>` is the card-lane.py path: the lane checkout's copy while the lane is not on
+3. Start one fresh agent with the prompt above; fill `<CHECKOUT>`, `<QUEUE>`, `<WORKER>`, `<TOKEN>`, `<LANE>`. The
+   core is in scope for every card, so there is no scope flag to set. `<LANE>` is the card-lane.py path: the lane
+   checkout's copy while the lane is not on
    main, otherwise `tools/maintenance/card-lane.py` in the slot. Leave `<AGENT_ID>` for the agent to fill from its
    own context (or `<WORKER>` when its harness has none). Give each agent a unique `<WORKER>`; never give it the
    slot path or lease ID, and never a card name.

@@ -39,14 +39,15 @@ There is no agent loop, no driver and no generated track: a worker (or its coord
 The card's quality gates are the lane's too, adapted from the add-cards flow and run where the worker can see them:
 
 - **`check`** runs the claim and packet check, the path scope (the card's content, its Rust file, its scenarios - new
-  or rewritten, so a card can come back for a stronger proof - a shared mechanic, a client change, or the core
-  only for a card opened `--engine`), Scryfall's current Oracle text,
+  or rewritten, so a card can come back for a stronger proof - a shared mechanic, a client change, or the core,
+  which is always in scope), Scryfall's current Oracle text,
   the scenario shape (no TODO or known bug, an `[Expect]`, the cost paid exactly), `corpus --card`, `card-lint` and
   `card-dupes` (each LOOK answered in `report.json`), `cr.py check --show`, and the report (every printed line, each
   test point with its scenario line, each ruling). A full check adds `card-coverage` and `card-mutate`; `--fast`
   skips only those two while the card is being written.
 - **`commit`** runs every gate, then writes the `Engine:`, `Mechanics:` and `Client:` commits the change needs, each
-  with only its own paths, and exactly one `Card: <Name>` commit ending `Closes #N` - or, when it only rewrites
+  with only its own paths and in that order, so a core change a card needs lands before the card's own commits and is
+  on the queue's branch for the next implementor, and exactly one `Card: <Name>` commit ending `Closes #N` - or, when it only rewrites
   scenarios the card already has, saying what it is and closing nothing; no commit carries `Co-Authored-By`. It
   closes the claim (`done`) and shares the branch. Nothing is committed if the gate refuses. A `Mechanics:` commit is
   not the shared function alone: it carries every existing card that already printed the same thing, refactored to
@@ -717,9 +718,9 @@ def write_brief(root, store, card, claim, reference, packet):
         (f"The issue is #{claim['issue']}; the Card commit ends `Closes #{claim['issue']}`." if claim.get("issue")
          else "No issue number is set: pass `--issue N` to `next` or `commit`, or set report.json's issue."),
         "",
-        ("This card was opened with `--engine`: the core (cantrip-state, cantrip-rules, cantrip-api) may be changed,"
-         " in its own `Engine:` commit." if claim.get("engine") else
-         "The core is closed to this card: a missing rule is a gap, never a workaround."),
+        ("This card may change the core (cantrip-state, cantrip-rules, cantrip-api) when its text needs a rule the"
+         " engine does not have: do not block for it and do not work around it. The core change lands first, in its own"
+         " `Engine:` commit, before any `Mechanics:` or card commit, so the next implementor starts with it."),
         "",
         "Claim the card's GitHub issue before working on it, as the skill says (`python tools/maintenance/card-issues.py",
         f"claim \"{card['name']}\"`), unless you already hold it.",
@@ -734,11 +735,15 @@ def write_brief(root, store, card, claim, reference, packet):
         "",
         "## When the card needs the engine",
         "",
-        (("This card may change the core: commit the core alone in its own `Engine:` commit. A rule the engine cannot"
-          " express is still a gap: block it, never work around it.") if claim.get("engine") else
-         ("The core is closed: a missing rule is a gap, never a workaround. Commit what is safe, log the gap on the"
-          " issue, and close the claim with the rule:")),
+        "This card may change the core: a missing rule is not a reason to block, it is a gap to fill. The core change",
+        "lands first, in its own `Engine:` commit, before the `Mechanics:` or card commits, because `commit` writes the",
+        "commits in that order and `share` then puts the core on the queue's branch for the next implementor. Keep it",
+        "proper and for every card: mirror the rule it implements and cite the CR, never widen a central switch for one",
+        "card, and benchmark it (`cargo run --release -p cantrip-bench -- --games 128`, the \"engine answering\" line",
+        "before and after, reported with the change).",
         "",
+        "A rule the engine cannot express even with a core change is still a gap: block it, never work around it. Block",
+        "only for that, and say what it needs and which CR rule it comes from:",
         f"    python tools/maintenance/card-lane.py block --id {claim['id']} --queue {store.name} --rule <CR> --note \"...\"",
         "",
         "If the work has to stop instead, put the card back in the queue with",
@@ -912,8 +917,12 @@ def card_relative(name):
     return f"crates/cantrip-cards/src/cards/{file_stem(name)}.rs"
 
 
-def commit_kind(path, content_rel, card_rel, engine, notes_rel=None):
-    """Which commit a changed path belongs to, or `core` (refused without `--engine`) or `other`.
+def commit_kind(path, content_rel, card_rel, engine=True, notes_rel=None):
+    """Which commit a changed path belongs to, or `other`.
+
+    The core is always in scope: a card that needs a rule the engine does not have changes the core, in its own
+    `Engine:` commit, which `commit` writes before the `Mechanics:` and card commits. `engine` is kept for callers
+    that still pass the old claim flag and no longer closes anything.
 
     A card file that is not the open card's own is `mechanics`: it is an existing card that repeated what the new
     shared function does, changed to call it, and the repository's `Mechanics:` commits carry that refactor together
@@ -932,7 +941,7 @@ def commit_kind(path, content_rel, card_rel, engine, notes_rel=None):
     if under(path, ORACLE_DIRS) or under(path, HARNESS_DIRS) or path in HARNESS_DOCS:
         return "engine"
     if under(path, ENGINE_DIRS):
-        return "engine" if engine else "core"
+        return "engine"
     if under(path, CLIENT_DIRS) or path in CLIENT_DOCS:
         return "client"
     return "other"
@@ -1086,10 +1095,8 @@ def gate_scope(root, card, claim, reference):
         raise GateFailed(f"{notes} is still there: follow the owner's design and delete it in the card's commit")
     kinds, core, other = {}, [], []
     for entry in entries:
-        kind = commit_kind(entry["path"], content_rel, card_rel, bool((claim or {}).get("engine")), notes)
-        if kind == "core":
-            core.append(entry["path"])
-        elif kind == "other":
+        kind = commit_kind(entry["path"], content_rel, card_rel, True, notes)
+        if kind == "other":
             other.append(entry["path"])
         else:
             kinds[entry["path"]] = kind
@@ -1097,10 +1104,7 @@ def gate_scope(root, card, claim, reference):
                  if kind == "card" and path.startswith("scenarios/") and not scenario_holds(root, path, data["name"])]
     for path in strangers:
         kinds.pop(path)
-    if core:
-        raise GateFailed("the core is closed to a card not opened `--engine`: " + ", ".join(core[:5]),
-                         "Release it and open it again with `next --engine` when the coordinator has put the core"
-                         " in scope.")
+
     if strangers:
         raise GateFailed("these changed scenarios do not name " + data["name"] + " in a deck, so they are not its own: "
                          + ", ".join(strangers[:8]),
@@ -1533,9 +1537,7 @@ def plan_commits(root, store, card, claim, reference, issue, note=""):
     notes = notes_relative(card["name"])
     groups = {"engine": [], "mechanics": [], "client": [], "card": []}
     for entry in entries:
-        kind = commit_kind(entry["path"], content_rel, card_rel, bool(claim.get("engine")), notes)
-        if kind == "core":
-            raise Refused(f"{entry['path']} is core and this card was not opened --engine")
+        kind = commit_kind(entry["path"], content_rel, card_rel, True, notes)
         if kind == "other":
             raise Refused(f"{entry['path']} is not the card's, a shared mechanic, the client or the harness")
         groups[kind].append(entry["path"])
@@ -1777,10 +1779,10 @@ def cmd_next(args):
                         commit=None, finished=None, failure=None)
             card["claim"] = {"id": wid, "worktree": root, "packet": packet_dir(root, store, card["name"]),
                              "slot": context["slot"], "lease": context["lease"], "member": context["member"],
-                             "agent": context["agent"], "head": head_sha(root), "engine": bool(getattr(args, "engine", False)),
+                             "agent": context["agent"], "head": head_sha(root), "engine": True,
                              "issue": issue}
             store.log(state, "claim", id=wid, card=card["name"], worktree=root, slot=context["slot"],
-                      lease=context["lease"], member=context["member"], engine=bool(getattr(args, "engine", False)))
+                      lease=context["lease"], member=context["member"], engine=True)
             claim, fresh, opened = card["claim"], True, True
             packet = packet_dir(root, store, card["name"])
     try:
@@ -2005,7 +2007,8 @@ def command_line(argv=None):
     cmd.add_argument("--id", required=True, metavar="WORKER")
     cmd.add_argument("--card", metavar="NAME", help="take this card specifically")
     cmd.add_argument("--refresh", action="store_true", help="rebuild the packet even if it is there")
-    cmd.add_argument("--engine", action="store_true", help="this card may change the core (state, rules, api)")
+    cmd.add_argument("--engine", action="store_true",
+                     help="accepted and ignored: the core is always in scope, in its own Engine: commit")
     cmd.add_argument("--issue", type=int, metavar="N", help="the GitHub issue the Card commit closes")
     cmd.set_defaults(handler=cmd_next)
 

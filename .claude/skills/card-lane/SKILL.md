@@ -83,8 +83,9 @@ you from `PROMPT.md`, it already gives your queue, id, token and core scope; thi
    the card is still yours and nothing new is taken. `--card "<Name>"` picks a named card instead of the next one;
    `--refresh` rebuilds the packet (after `queue` added cards, for example). Claim the card's GitHub issue
    (`card-issues.py claim "<Name>"`, unless you already hold it), then run the same line with `--issue <N>` so the
-   claim and the `Card:` commit carry it. `--engine` is only for a card the coordinator has put the core in scope
-   for; a card opened without it cannot change `cantrip-state`, `cantrip-rules` or `cantrip-api`.
+   claim and the `Card:` commit carry it. The core (`cantrip-state`, `cantrip-rules`, `cantrip-api`) is always in
+   scope: a card whose text needs a rule the engine does not have changes it rather than waiting. `--engine` is
+   accepted and ignored.
 2. **Do the card as `add-cards` says** - the rules, prior art, code, scenarios, the break loop, citations, coverage and
    client. `reference.md` and `prior-art.md` are your starting point; read only the sections of the skills the card
    needs. Fill the packet's `report.json` as you go: every printed Oracle line and the code that implements it, each
@@ -119,7 +120,14 @@ you from `PROMPT.md`, it already gives your queue, id, token and core scope; thi
    ```
 
    That merges the queue's branch into your slot if someone else moved it, then moves the branch to your `HEAD`.
-6. **Block or release.** For a card that waits on the engine (never a workaround):
+6. **The core is yours when the card needs it.** A missing rule is a gap to fill, never a reason to block and never a
+   workaround: write the core change proper and for every card (mirror the rule, cite the CR, never widen a central
+   switch for one card), and benchmark it (`cargo run --release -p cantrip-bench -- --games 128`, the "engine
+   answering" line before and after, reported with it). `commit` writes it as the `Engine:` commit *before* the
+   `Mechanics:` and `Card:` commits, so `share` puts the core on the queue's branch first and the next implementor
+   starts with it.
+7. **Block only what the core cannot express.** If even a core change cannot say what the text needs, block with the
+   rule - never a workaround:
 
    ```sh
    python tools/maintenance/card-lane.py block --id w1 --queue trc --rule 601.2c --note "..."
@@ -127,7 +135,7 @@ you from `PROMPT.md`, it already gives your queue, id, token and core scope; thi
 
    For work that stops: `release --id w1 --queue trc --reason "..."` puts the card back. `abandon` closes it for good
    with the reason. `block`, `abandon` and `release` save any uncommitted diff as the packet's `work.patch` first.
-7. **Leave the slot** with the MEMBER id `join` printed: `tools\worktree.cmd leave <MEMBER>`. Commit before leaving;
+8. **Leave the slot** with the MEMBER id `join` printed: `tools\worktree.cmd leave <MEMBER>`. Commit before leaving;
    do not push, and do not release the lease.
 
 ## The gates
@@ -137,7 +145,7 @@ is being written.
 
 | gate | what it refuses |
 |---|---|
-| `scope` | a path that is not the card's content, its Rust file, a scenario that names it, a card note it deletes, a shared mechanic, the client, the harness, `docs/known-issues.md`, or the core without `--engine`; no card path or no changed scenario that holds the card |
+| `scope` | a path that is not the card's content, its Rust file, a scenario that names it, a card note it deletes, a shared mechanic, the client, the harness, `docs/known-issues.md`, or the core (always in scope, in its own `Engine:` commit); no card path or no changed scenario that holds the card |
 | `oracle` | content whose Oracle text is not Scryfall's current text (an unreachable Scryfall is shown as WARN; check it by hand) |
 | `scenarios` | a changed scenario with `# TODO`, `# Known bug`, no `[Expect]` or no assertion in it; no scenario holding the card; a card with a mana cost and no `? Bot1.Mana =` |
 | `corpus` | any fail, known bug or need-cards count from `corpus --card`, a build warning from a changed file, or no passing scenario |
