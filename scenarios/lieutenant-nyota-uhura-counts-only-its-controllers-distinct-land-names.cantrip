@@ -1,0 +1,67 @@
+# Lieutenant Nyota Uhura's X is "the number of differently named lands you control": Bot2's own Forest is not one of them, and a
+# second Forest adds no name to the two Bot1 already has. Each activation exiles exactly two cards, and the Lightning Bolt that a
+# third card would have made castable is never reached - so no free cast is offered and nothing is dealt. Turn 3: one Island and
+# one Forest for X of 2 while Bot2 has a Forest of its own (X of 3 would exile its Lightning Bolt and offer it). Turn 5: a second
+# Forest, three lands and still two names (X of 3 would reach the further Bolt). Both exiles are bottomed, leaving nothing exiled.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Lieutenant Nyota Uhura
+Island
+Forest
+Forest
+Forest
+Island x11
+
+[Bot2 Deck]
+Forest
+Island x7
+Grizzly Bears
+Grizzly Bears
+Lightning Bolt
+Island
+Island
+Lightning Bolt
+Island x14
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lieutenant Nyota Uhura.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lieutenant Nyota Uhura.Activate(Bot2)
+? Bot1.Mana =
+? Bot2.Library.Count = 20
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lieutenant Nyota Uhura.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot2.Life = 20
+Bot2.Library.Count = 19
+Exile.Count = 0

@@ -1,0 +1,54 @@
+# Lieutenant Nyota Uhura offers an instant or sorcery from among the exiled cards - one spell, not two. Its top two cards are
+# both Lightning Bolts, so only the first is cast (3 damage, Bot2 17) and the ability asks for no second: the uncast Bolt goes to
+# the bottom of Bot2's library, after the cast rather than before it (cast first, it is in the graveyard and not among the rest).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Lieutenant Nyota Uhura
+Island
+Forest
+Forest
+Island x12
+
+[Bot2 Deck]
+Forest
+Island x7
+Lightning Bolt
+Lightning Bolt
+Grizzly Bears
+Island x16
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lieutenant Nyota Uhura.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lieutenant Nyota Uhura.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot2.Graveyard.Count = 1
+Bot2.Library.Count = 18
+Exile.Count = 0

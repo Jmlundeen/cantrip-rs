@@ -1,0 +1,56 @@
+# Lieutenant Nyota Uhura: "You may cast an instant or sorcery spell from among them". A cast given up (CR 733.1) puts the card back
+# and the player may take any other action (CR 733.2), here the same choice again. Bot2's top two cards are Lightning Bolt and
+# Shock: Bot1 starts casting the Bolt, cancels, is offered the cards again and casts Shock (2 damage, Bot2 20 to 18). The Bolt
+# was not cast, so it is still among them and goes to the bottom of Bot2's library (CR 401.4).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Lieutenant Nyota Uhura
+Island
+Forest
+Forest
+Island x12
+
+[Bot2 Deck]
+Forest
+Island x7
+Lightning Bolt
+Shock
+Grizzly Bears
+Island x16
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lieutenant Nyota Uhura.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lieutenant Nyota Uhura.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Choose(Lightning Bolt)
+Bot1.Cancel
+Bot1.Choose(Shock)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Shock
+Exile.Count = 0
+Bot2.Library.Count = 18
+Bot2.Library = Grizzly Bears; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Lightning Bolt

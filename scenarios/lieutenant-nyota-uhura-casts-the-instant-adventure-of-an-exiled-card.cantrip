@@ -1,0 +1,54 @@
+# Lieutenant Nyota Uhura: "You may cast an instant or sorcery spell from among them" - the spell that would be cast is judged, so
+# Bonecrusher Giant (a creature card) can be cast as its instant Adventure Stomp (CR 715.3a, 709.3a): Bot2's top two cards are
+# Bonecrusher Giant and Lightning Bolt, Bot1 casts Stomp free (2 damage to Bot2, 20 to 18), the Giant now on an adventure in exile,
+# and the uncast Bolt goes to the bottom of Bot2's library (CR 401.4), below every Island, so the library reads Bears, Islands, Bolt.
+# (A random order of one card is not observable; the bottom placement is.)
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Lieutenant Nyota Uhura
+Island
+Forest
+Forest
+Island x12
+
+[Bot2 Deck]
+Forest
+Island x7
+Bonecrusher Giant
+Lightning Bolt
+Grizzly Bears
+Island x16
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lieutenant Nyota Uhura.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lieutenant Nyota Uhura.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Choose(Bonecrusher Giant)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Exile = Bonecrusher Giant
+Bot2.Library.Count = 18
+Bot2.Library = Grizzly Bears; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Lightning Bolt

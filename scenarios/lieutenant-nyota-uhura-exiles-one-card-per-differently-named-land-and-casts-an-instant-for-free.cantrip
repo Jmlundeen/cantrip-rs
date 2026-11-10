@@ -1,0 +1,72 @@
+# Lieutenant Nyota Uhura: "Strange new worlds — {4}, {T}: Target opponent exiles the top X cards of their library, where X is the
+# number of differently named lands you control. You may cast an instant or sorcery spell from among them without paying its
+# mana cost. Then that player puts the rest on the bottom of their library in a random order."
+# Turn 3: Bot1 controls an Island and a Forest, and Bot2 a Forest of its own - X is 2, its land and Bot1's two names counted once,
+# and the top two cards of Bot2's library (an Island and a Lightning Bolt) are exiled. Only the Bolt is offered (with X of 1 the
+# Island alone would be, so nothing would be castable), and cast for nothing it deals 3 (Bot2 17); the Island goes to the bottom.
+# Turn 5: a second Forest makes three lands but still two names, so X is again 2, and Bot1 declines the free cast: both cards go to
+# the bottom and nothing is left exiled.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Lieutenant Nyota Uhura
+Island
+Forest
+Forest
+Forest
+Island x11
+
+[Bot2 Deck]
+Forest
+Island x7
+Island
+Lightning Bolt
+Island
+Lightning Bolt
+Grizzly Bears
+Island x15
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lieutenant Nyota Uhura.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lieutenant Nyota Uhura.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lieutenant Nyota Uhura.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot2.Graveyard = Island; Lightning Bolt
+Bot2.Library.Count = 18
+Exile.Count = 0

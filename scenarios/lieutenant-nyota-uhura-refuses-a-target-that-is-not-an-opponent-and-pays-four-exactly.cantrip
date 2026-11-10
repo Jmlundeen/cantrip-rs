@@ -1,0 +1,48 @@
+# Lieutenant Nyota Uhura's "{4}, {T}" paid exactly (the pool empty right after) and its "target opponent": Bot1 itself is no
+# opponent to target, and with X of 1 the single card exiled is a creature, which is no instant or sorcery to cast for free, so
+# nothing is offered and it goes to the bottom of Bot2's library.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Lieutenant Nyota Uhura
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Island x7
+Grizzly Bears
+Island x18
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lieutenant Nyota Uhura.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Lieutenant Nyota Uhura.Activate(Bot1)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lieutenant Nyota Uhura.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Lieutenant Nyota Uhura.Tapped = true
+Bot2.Life = 20
+Bot2.Library.Count = 19
+Exile.Count = 0
