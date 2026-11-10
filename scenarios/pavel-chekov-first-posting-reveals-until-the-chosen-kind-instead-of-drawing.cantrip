@@ -1,0 +1,62 @@
+# Pavel Chekov, First Posting: "If you would draw a card, you may instead choose land or nonland and reveal cards from the
+# top of your library until you reveal a card of the chosen kind. Put that card into your hand and put all other cards
+# revealed this way on the bottom of your library in a random order" (CR 121.6, 614.1a, 701.20). Bot1 casts it on turn 1
+# and takes the effect on its turn 3 draw, choosing land: a Grizzly Bears is on top, so it and the Island under it are
+# revealed, the Island goes into the hand and the Bears to the bottom - two cards left the library and only one reached the
+# hand, so the draw itself did not happen. Turn 5 declines and draws normally; turn 7 chooses nonland and takes the Bears
+# past an Island. Bot2's library is never touched.
+
+[Bot1 Deck]
+Pavel Chekov, First Posting
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Island
+Grizzly Bears
+Forest
+Grizzly Bears
+Island
+Forest
+Island
+Grizzly Bears
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pavel Chekov, First Posting.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Modes(Land)
+[T3 Bot1.Main1]
+? Bot1.Hand = Forest; Grizzly Bears; Island; Island
+? Bot1.Library.Count = 14
+? Bot2.Library.Count = 12
+[T5 Bot1.Upkeep]
+Bot1.Decline
+[T5 Bot1.Main1]
+? Bot1.Hand = Forest; Forest; Grizzly Bears; Island; Island
+? Bot1.Library.Count = 13
+[T7 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Modes(Nonland)
+[T7 Bot1.Main1]
+? Bot1.Hand = Forest; Forest; Grizzly Bears; Grizzly Bears; Island; Island
+? Bot1.Library.Count = 12
+
+[Expect]
+Bot1.Hand = Forest; Forest; Grizzly Bears; Grizzly Bears; Island; Island
+Bot1.Library.Count = 12
+Bot2.Library.Count = 10
