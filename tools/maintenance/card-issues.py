@@ -260,11 +260,23 @@ missing = load("missing-cards")
 slug = missing.slug
 
 
+def tracked_cards(root):
+    """The cards git knows in `root`, by slug. A content file the lane has just scaffolded is untracked, and
+    an untracked scaffold is not a card done: claiming it must still work."""
+    paths = subprocess.run(["git", "-C", root, "ls-files", "content/*/cards/*.json"],
+                           capture_output=True, text=True).stdout.split()
+    return {slug(os.path.basename(path)[: -len(".json")]) for path in paths}
+
+
 @functools.cache
 def done_anywhere():
     """Every card done in this checkout or on any local branch of the repository: a card is given out to nobody once
-    its content file exists, landed or not (a reviewed card waiting on a land/ branch, another worktree's slot)."""
-    done = missing.implemented()
+    its content file exists, landed or not (a reviewed card waiting on a land/ branch, another worktree's slot).
+
+    Only a file git knows counts. The lane's own `next` writes a card's content JSON before anyone works the card, so
+    reading the working tree would refuse every card just scaffolded; `ls-files` sees the tracked cards and nothing more.
+    """
+    done = tracked_cards(ROOT)
     # One walk of every commit on a local branch that this checkout lacks, for the card files they add.
     added = subprocess.run(["git", "-C", ROOT, "log", "--branches", "--not", "HEAD", "--diff-filter=A", "--name-only",
                             "--format=", "--", "content/*/cards/*.json"], capture_output=True, text=True).stdout.split()

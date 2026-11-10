@@ -269,6 +269,18 @@ def card_of(state, name):
     return None
 
 
+def card_of_or_hint(state, name):
+    """`card_of`, refusing with the whole names the queue does hold when `name` is a cut-down of
+    one of them - a name with a comma in it ("Cmdr. Troi, Outgoing Empath") is easy to truncate."""
+    card = card_of(state, name)
+    if card is not None:
+        return card
+    whole = [entry["name"] for entry in state["cards"]
+             if entry["name"].casefold().startswith(name.casefold())]
+    hint = "; the queue has " + ", ".join(whole) if whole else ""
+    raise Refused(f"{name} is not in queue; add it with `queue --card \"...\"`{hint}")
+
+
 def open_claim(state, wid):
     for card in state["cards"]:
         if card.get("status") == "working" and (card.get("claim") or {}).get("id") == wid:
@@ -1749,9 +1761,7 @@ def cmd_next(args):
                               f"card per worktree: `done`, `block` or `release` it first.")
             require_clean(root, "before opening a card")
             if args.card:
-                card = card_of(state, args.card)
-                if card is None:
-                    raise Refused(f"{args.card} is not in queue {store.name}; add it with `queue --card \"...\"`")
+                card = card_of_or_hint(state, args.card)
                 if card["status"] == "done":
                     raise Refused(f"{card['name']} is already done in queue {store.name}")
                 if card["status"] == "working" and (card.get("claim") or {}).get("id") != wid:
@@ -1844,7 +1854,13 @@ def cmd_status(args):
         print(f"blocked: {card['name']}" + (f" (CR {card.get('rule')})" if card.get("rule") else ""))
     pending = [card["name"] for card in state["cards"] if card["status"] == "pending"]
     if pending:
-        print("pending: " + ", ".join(pending[:10]) + (f" (+{len(pending) - 10} more)" if len(pending) > 10 else ""))
+        # One name per line: a card name carries commas ("Cmdr. Troi, Outgoing Empath"), so a
+        # comma-joined list cannot be read back whole by anything that splits it.
+        print(f"pending: {len(pending)} card(s), one per line below")
+        for name in pending[:10]:
+            print(f"  {name}")
+        if len(pending) > 10:
+            print(f"  (+{len(pending) - 10} more)")
     return 0
 
 

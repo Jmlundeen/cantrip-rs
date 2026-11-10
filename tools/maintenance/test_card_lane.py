@@ -549,6 +549,25 @@ class LaneTest(unittest.TestCase):
             lane.surface_message("Mechanics", self.main, ["crates/cantrip-mechanics/src/shared_thing.rs"], note),
             note)
 
+    def test_a_card_name_with_a_comma_survives_the_pending_list_and_next(self):
+        lane = load_lane()
+        name = "Cmdr. Troi, Outgoing Empath"
+        self.assertEqual(self.queue("--card", name).returncode, 0)
+        status = self.lane(self.main, "status", "--queue", "q")
+        self.assertEqual(status.returncode, 0, status.stderr)
+        self.assertIn("  " + name, status.stdout.replace(chr(13) + chr(10), chr(10)))
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--card", name, "--issue", "7")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.assertIn("# Card: " + name, taken.stdout)
+
+    def test_next_names_the_whole_card_when_given_a_cut_down_name(self):
+        lane = load_lane()
+        name = "Cmdr. Troi, Outgoing Empath"
+        self.assertEqual(self.queue("--card", name).returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--card", "Cmdr. Troi")
+        self.assertNotEqual(taken.returncode, 0)
+        self.assertIn(name, taken.stdout + taken.stderr)
+
     def test_a_rewritten_scenario_of_the_card_is_in_scope_and_lands_again(self):
         lane = load_lane()
         self.assertEqual(self.queue("--card", "Card B").returncode, 0)
