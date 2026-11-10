@@ -135,7 +135,7 @@ is being written.
 
 | gate | what it refuses |
 |---|---|
-| `scope` | a path that is not the card's content, its Rust file, a scenario, a card note it deletes, a shared mechanic, the client, the harness, `docs/known-issues.md`, or the core without `--engine`; no card path or no changed scenario that holds the card |
+| `scope` | a path that is not the card's content, its Rust file, a scenario that names it, a card note it deletes, a shared mechanic, the client, the harness, `docs/known-issues.md`, or the core without `--engine`; no card path or no changed scenario that holds the card |
 | `oracle` | content whose Oracle text is not Scryfall's current text (an unreachable Scryfall is shown as WARN; check it by hand) |
 | `scenarios` | a changed scenario with `# TODO`, `# Known bug`, no `[Expect]` or no assertion in it; no scenario holding the card; a card with a mana cost and no `? Bot1.Mana =` |
 | `corpus` | any fail, known bug or need-cards count from `corpus --card`, a build warning from a changed file, or no passing scenario |

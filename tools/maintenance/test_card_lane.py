@@ -500,6 +500,68 @@ class LaneTest(unittest.TestCase):
         self.assertNotIn("Co-Authored-By", body)
         self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
 
+    def test_a_mechanics_commit_carries_the_existing_cards_that_adopt_the_function(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--issue", "7")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.card_b_scenario()
+        self.write("crates/cantrip-mechanics/src/shared_thing.rs", "pub fn shared_recipe() {}" + '\\n')
+        self.write("crates/cantrip-cards/src/cards/card_c.rs", "pub static CARD: usize = 3;" + '\\n')
+        state = self.state()
+        card = next(entry for entry in state["cards"] if entry["name"] == "Card B")
+        claim = card["claim"]
+        with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
+            reference = f.read()
+        store = lane.Store(lane.common_dir(self.main), "q")
+        made = lane.plan_commits(self.main, store, card, claim, reference, 7)
+        self.assertEqual([entry["kind"] for entry in made], ["mechanics", "card"])
+        self.assertEqual(sorted(made[0]["paths"]),
+                         ["crates/cantrip-cards/src/cards/card_c.rs", "crates/cantrip-mechanics/src/shared_thing.rs"])
+        self.assertTrue(made[0]["message"].startswith("Mechanics: "))
+        self.assertEqual(made[1]["message"], "Card: Card B")
+        self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
+
+    def test_a_rewritten_scenario_of_the_card_is_in_scope_and_lands_again(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--issue", "9")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        path = self.card_b_scenario()
+        state = self.state()
+        card = next(entry for entry in state["cards"] if entry["name"] == "Card B")
+        with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
+            reference = f.read()
+        store = lane.Store(lane.common_dir(self.main), "q")
+        self.assertEqual([entry["kind"] for entry in lane.plan_commits(self.main, store, card, card["claim"], reference, 9)],
+                         ["card"])
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        self.write("scenarios/card-b-shows-itself.cantrip", text + "? Bot1.Graveyard.Card B = 0\n")
+        summary, facts = lane.gate_scope(self.main, card, card["claim"], reference)
+        self.assertIn("scenarios/card-b-shows-itself.cantrip", facts["scenarios"])
+        made = lane.plan_commits(self.main, store, card, card["claim"], reference, 9)
+        self.assertEqual([entry["kind"] for entry in made], ["card"])
+        body = self.git(self.main, "log", "-1", "--format=%B")
+        self.assertTrue(body.startswith("Card: Card B"))
+        self.assertNotIn("Closes", body)
+        self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
+
+    def test_a_scenario_that_does_not_name_the_card_is_not_its_own(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q").returncode, 0)
+        self.card_b_scenario()
+        self.write("scenarios/card-c-shows-itself.cantrip",
+                   "# Card C: it is cast.\n\n[Bot1 Deck]\nCard C\n\n[Expect]\nBot1.Battlefield.Card C = 1\n")
+        state = self.state()
+        card = next(entry for entry in state["cards"] if entry["name"] == "Card B")
+        with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
+            reference = f.read()
+        with self.assertRaises(lane.GateFailed) as caught:
+            lane.gate_scope(self.main, card, card["claim"], reference)
+        self.assertIn("card-c-shows-itself.cantrip", str(caught.exception))
+
     def test_commit_plan_refuses_core_without_engine_scope(self):
         lane = load_lane()
         self.assertEqual(self.queue("--card", "Card B").returncode, 0)

@@ -38,15 +38,19 @@ There is no agent loop, no driver and no generated track: a worker (or its coord
 
 The card's quality gates are the lane's too, adapted from the add-cards flow and run where the worker can see them:
 
-- **`check`** runs the claim and packet check, the path scope (the card's content, its Rust file, its scenarios, a
-  shared mechanic, a client change, or the core only for a card opened `--engine`), Scryfall's current Oracle text,
+- **`check`** runs the claim and packet check, the path scope (the card's content, its Rust file, its scenarios - new
+  or rewritten, so a card can come back for a stronger proof - a shared mechanic, a client change, or the core
+  only for a card opened `--engine`), Scryfall's current Oracle text,
   the scenario shape (no TODO or known bug, an `[Expect]`, the cost paid exactly), `corpus --card`, `card-lint` and
   `card-dupes` (each LOOK answered in `report.json`), `cr.py check --show`, and the report (every printed line, each
   test point with its scenario line, each ruling). A full check adds `card-coverage` and `card-mutate`; `--fast`
   skips only those two while the card is being written.
 - **`commit`** runs every gate, then writes the `Engine:`, `Mechanics:` and `Client:` commits the change needs, each
-  with only its own paths, and exactly one `Card: <Name>` commit ending `Closes #N`; no commit carries
-  `Co-Authored-By`. It closes the claim (`done`) and shares the branch. Nothing is committed if the gate refuses.
+  with only its own paths, and exactly one `Card: <Name>` commit ending `Closes #N` - or, when it only rewrites
+  scenarios the card already has, saying what it is and closing nothing; no commit carries `Co-Authored-By`. It
+  closes the claim (`done`) and shares the branch. Nothing is committed if the gate refuses. A `Mechanics:` commit is
+  not the shared function alone: it carries every existing card that already printed the same thing, refactored to
+  call that function, so those card files are in its scope and the `Card:` commit stays the card's own files.
 """
 
 import argparse
@@ -296,8 +300,9 @@ def implemented_names(root):
                     text = f.read()
             except OSError:
                 continue
-            for name in re.findall(r'"name"\s*:\s*"((?:[^"\\]|\\.)*)"', text):
-                known.add(slug(name))
+            match = re.search(r'"name"\s*:\s*"((?:[^"\\]|\\.)*)"', text)
+            if match:
+                known.add(slug(match.group(1)))
     return known
 
 
@@ -729,6 +734,13 @@ def write_brief(root, store, card, claim, reference, packet):
         "",
         "## Sharing mechanics as you go",
         "",
+        "A shared function is shared only once the cards that already print it call it. If another card does the same",
+        "thing in its own code - the prior art lists them, or `python tools/maintenance/card-dupes.py \"Card Name\"`",
+        "does - move it into one function in cantrip-mechanics and change every card that has a copy to call it, in",
+        "this change: those card files ride in the `Mechanics:` commit with the function, and the card commit stays the",
+        "card's own files. The callers' scenarios stay as they are, because the shared function must not change what",
+        "they do. A shared function that no existing card adopts is a note left for later, and review sends it back.",
+        "",
         "After a `Mechanics:` or `Engine:` commit, and before the card is finished, run",
         "",
         f"    python tools/maintenance/card-lane.py share --id {claim['id']} --queue {store.name}",
@@ -813,6 +825,10 @@ ORACLE_DIRS = ("crates/cantrip-oracle/",)
 HARNESS_DIRS = ("crates/cantrip-script/",)
 HARNESS_DOCS = {"scenarios/README.md"}
 MECHANICS_DIRS = ("crates/cantrip-mechanics/",)
+# A card file that is not the open card's own: an existing card that had a copy of the shared function and now
+# calls it. Such a file rides in the `Mechanics:` commit, as the repository's own `Mechanics:` commits carry the
+# cards they refactor along with the function.
+CARD_DIRS = ("crates/cantrip-cards/src/cards/",)
 CLIENT_DIRS = ("dotnet/", "web_src/", "crates/cantrip-host/", "crates/cantrip-ai-host/")
 CLIENT_DOCS = {"docs/client-boundary.md", "docs/host-protocol.md", "docs/web-client.md",
                "docs/scenarios-in-the-browser.md"}
@@ -885,13 +901,20 @@ def card_relative(name):
 
 
 def commit_kind(path, content_rel, card_rel, engine, notes_rel=None):
-    """Which commit a changed path belongs to, or `core` (refused without `--engine`) or `other`."""
+    """Which commit a changed path belongs to, or `core` (refused without `--engine`) or `other`.
+
+    A card file that is not the open card's own is `mechanics`: it is an existing card that repeated what the new
+    shared function does, changed to call it, and the repository's `Mechanics:` commits carry that refactor together
+    with the function.
+    """
     if path == content_rel or (card_rel and path == card_rel) or (notes_rel and path == notes_rel):
         return "card"
     if path.startswith("scenarios/") and path.endswith(".cantrip"):
         return "card"
     if path == KNOWN_ISSUES:
         return "card"
+    if under(path, CARD_DIRS):
+        return "mechanics"
     if under(path, MECHANICS_DIRS):
         return "mechanics"
     if under(path, ORACLE_DIRS) or under(path, HARNESS_DIRS) or path in HARNESS_DOCS:
@@ -996,6 +1019,12 @@ def holds_card(text, name):
     return re.search(pattern, text, re.M | re.I) is not None
 
 
+def scenario_holds(root, path, name):
+    """Whether a scenario names the card in a deck: what makes a changed one the card's own to rewrite."""
+    full = os.path.join(root, path.replace("/", os.sep))
+    return os.path.isfile(full) and holds_card(read_text(full), name)
+
+
 def scenario_line_problem(root, scenario, number, name):
     """Why a scenario line is not an expectation that catches a test point, or None."""
     scenario = str(scenario or "").replace("\\", "/")
@@ -1052,10 +1081,19 @@ def gate_scope(root, card, claim, reference):
             other.append(entry["path"])
         else:
             kinds[entry["path"]] = kind
+    strangers = [path for path, kind in kinds.items()
+                 if kind == "card" and path.startswith("scenarios/") and not scenario_holds(root, path, data["name"])]
+    for path in strangers:
+        kinds.pop(path)
     if core:
         raise GateFailed("the core is closed to a card not opened `--engine`: " + ", ".join(core[:5]),
                          "Release it and open it again with `next --engine` when the coordinator has put the core"
                          " in scope.")
+    if strangers:
+        raise GateFailed("these changed scenarios do not name " + data["name"] + " in a deck, so they are not its own: "
+                         + ", ".join(strangers[:8]),
+                         "A card may rewrite its own scenarios, committed or not. A sibling card's scenario"
+                         " lands in the sibling's commit.")
     if other:
         raise GateFailed("these changed paths are neither the card's nor a shared mechanic, client or harness: "
                          + ", ".join(other[:8]))
@@ -1425,7 +1463,9 @@ def surface_message(prefix, root, paths):
     """`Mechanics: assimilate::assimilate_all` - the repository's subjects name the surface changed, never the card.
 
     Each changed file contributes its module and the public items it adds; one that adds none names only its module,
-    as `Mechanics: targets::SNOW_LAND` names the constant it adds.
+    as `Mechanics: targets::SNOW_LAND` names the constant it adds. A `Mechanics:` commit also carries the existing
+    cards refactored to call the function, and their modules are named with it, so the subject says what left them as
+    well as what arrived in cantrip-mechanics.
     """
     names = []
     for path in paths:
@@ -1458,13 +1498,19 @@ def plan_commits(root, store, card, claim, reference, issue):
         if kind == "other":
             raise Refused(f"{entry['path']} is not the card's, a shared mechanic, the client or the harness")
         groups[kind].append(entry["path"])
+    strangers = [path for path in groups["card"]
+                 if path.startswith("scenarios/") and not scenario_holds(root, path, card["name"])]
+    if strangers:
+        raise Refused("these changed scenarios do not name " + card["name"] + " in a deck, so they are not its own: "
+                      + ", ".join(strangers[:8]))
     if not groups["card"]:
         raise Refused("nothing of the card is changed: its content, Rust file or a scenario")
+    lands = any(path in (content_rel, card_rel) for path in groups["card"])
     prefixes = {"engine": "Engine", "mechanics": "Mechanics", "client": "Client"}
     messages = {"engine": None,  # each named from the surface it changes, once its paths are staged
-                "mechanics": None,
+                "mechanics": None,  # named from the shared code it adds, once its paths are staged
                 "client": None,
-                "card": f"Card: {card['name']}\n\nCloses #{issue}"}
+                "card": f"Card: {card['name']}" + (f"\n\nCloses #{issue}" if lands else "")}
     made = []
     for kind in ("engine", "mechanics", "client", "card"):
         paths = groups[kind]
@@ -1488,8 +1534,11 @@ def plan_commits(root, store, card, claim, reference, issue):
         if kind == "card":
             if not body.startswith(f"Card: {card['name']}"):
                 raise Refused(f"the card commit's subject is not `Card: {card['name']}`: {body.splitlines()[0]}")
-            if not re.search(rf"^Closes #{issue}$", body, re.M):
+            closing = re.search(rf"^Closes #{issue}$", body, re.M)
+            if lands and not closing:
                 raise Refused(f"the card commit does not end with `Closes #{issue}`")
+            if not lands and re.search(r"^Closes #", body, re.M):
+                raise Refused("this card commit only rewrites its scenarios, so it must not close the issue again")
         made.append({"kind": kind, "sha": after[:9], "message": body.splitlines()[0], "paths": paths})
     dirty = status_paths(root)
     if dirty:
