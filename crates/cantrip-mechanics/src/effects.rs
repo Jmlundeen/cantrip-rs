@@ -1665,6 +1665,24 @@ pub fn may_draw(g: &mut dyn Game, player: PlayerId, source: ObjectId, n: u32, qu
 
 const MAY_DRAW_A_CARD: Question = Question::new("Draw", "draw a card?", "", "Draw", "Don't draw");
 
+const MAY_DRAW_THAT_MANY_ONCE: Question = Question::new("Draw", "draw that many cards?", "One for each +1/+1 counter put  ·  only once each turn", "Draw", "Don't draw");
+
+/// "You may draw that many cards. Do this only once each turn." (CR 603.2h, 121.3): the effect of a triggered ability whose
+/// `item.data[0]` is the number of +1/+1 counters just put, so it offers to draw that many. Asked only while its source has
+/// not drawn with this ability this turn, and spent only once a card was actually drawn, not by a yes whose draws a
+/// replacement took (CR 614.6, 603.2h); not offered to a player who can't draw that many (CR 121.3,
+/// 121.2b). Terrasymbiosis (counters put on a creature you control) and Chekov and McCoy (on itself) print it.
+pub fn may_draw_that_many_once_each_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if item.data[0] == 0 || g.history().done(item.object, item.ability, item.controller) {
+        return Ok(());
+    }
+    let before = g.history().drawn(item.controller);
+    if may_draw(g, item.controller, item.object, item.data[0], &MAY_DRAW_THAT_MANY_ONCE)? && g.history().drawn(item.controller) > before {
+        g.note_done(item.object, item.ability, item.controller);
+    }
+    Ok(())
+}
+
 /// "You may draw a card" (CR 121.3, 608.2d): asked of the ability's controller, not offered a player who can't draw a card
 /// (`may_draw`). Leovold, Emissary of Trest and Mister Fantastic, Reed Richards print it.
 pub fn may_draw_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
