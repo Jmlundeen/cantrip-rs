@@ -1,0 +1,59 @@
+# Giant Space Amoeba: "target creature defending player controls gets -3/-0 until end of turn". On turn 3 the attack makes Bot2's
+# Grizzly Bears -1/2 (CR 611.2a); the effect ends in the cleanup step (CR 514.2), so on turn 4 the Bears is a 2/2 again and never
+# had damage marked - it survives, 0 power never having been reached (CR 704.5f, 704.5g).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Giant Space Amoeba
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Giant Space Amoeba.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Giant Space Amoeba > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Grizzly Bears.Power = -1
+? Bot2.Battlefield.Grizzly Bears.Toughness = 2
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Grizzly Bears.Power = 2
+
+[Expect]
+Turn = 4
+Bot2.Life = 17
+Bot2.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Grizzly Bears.Toughness = 2
