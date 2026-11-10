@@ -214,11 +214,72 @@ pub fn only_before_combat_damage_step(q: &dyn Query, _: &Asker) -> bool {
         && !q.history().this_turn().iter().any(|r| matches!(r.event, Event::StepBegan { step: Step::EndOfCombat }))
 }
 
-/// "Cast this spell / activate only during an opponent's turn, before attackers are declared" (CR 506.8a, 506.8d, 506.8e,
-/// 506.8g): the active player is an opponent of the controller, the turn has not reached the declare attackers step, and none
-/// has begun this turn (so not in a second combat phase's beginning of combat step). Nettling Imp and Siren's Call print it.
-pub fn during_opponents_turn_before_attackers(q: &dyn Query, asker: &Asker) -> bool {
-    q.state().opponents(asker.controller).any(|p| p == q.state().turn.active)
-        && q.state().turn.step() < Step::DeclareAttackers
+/// "Activate only before attackers are declared" (CR 506.8a, 506.8d): the turn has not reached the declare attackers step, and
+/// none has begun this turn (so not in a second combat phase's beginning of combat step). Arcum's Whistle and Norritt print it
+/// (and it is the second half of `during_opponents_turn_before_attackers`).
+pub fn before_attackers_are_declared(q: &dyn Query, _: &Asker) -> bool {
+    q.state().turn.step() < Step::DeclareAttackers
         && !q.history().this_turn().iter().any(|r| matches!(r.event, Event::StepBegan { step: Step::DeclareAttackers }))
+}
+
+/// "Cast this spell / activate only during an opponent's turn, before attackers are declared" (CR 506.8a, 506.8d, 506.8e,
+/// 506.8g): the active player is an opponent of the controller and `before_attackers_are_declared`. Nettling Imp and Siren's
+/// Call print it.
+pub fn during_opponents_turn_before_attackers(q: &dyn Query, asker: &Asker) -> bool {
+    q.state().opponents(asker.controller).any(|p| p == q.state().turn.active) && before_attackers_are_declared(q, asker)
+}
+
+fn compel_target_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    let Target::Object(id) = t else { return false };
+    crate::targets::permanent(q, id)
+        && q.chars(id).is(CardType::Creature)
+        && !q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Wall))
+        && q.controller(id) == q.state().turn.active
+        && q.obj(id).controlled_since < q.state().turn.number
+}
+
+/// "Target non-Wall creature the active player has controlled continuously since the beginning of the turn" (CR 115.1, 302.6).
+/// Nettling Imp and Norritt print it; Arcum's Whistle words it its own way.
+pub const COMPEL_TARGET: TargetSpec = target(compel_target_filter);
+
+fn compel_must_attack(_: &dyn Query, _: &Asker, about: Target, id: ObjectId) -> bool {
+    about.object() == Some(id)
+}
+
+/// "That creature attacks this turn if able" (CR 508.1d, 611.2a): the card's `lasting_rules` entry, started by
+/// `must_attack_and_destroy_if_it_doesnt`. Nettling Imp and Norritt print it; Arcum's Whistle words it its own way.
+pub const MUST_ATTACK_THIS_TURN: LastingRule =
+    LastingRule { text: "That creature attacks this turn if able.", rule: LastingRuleKind::MustAttack, applies: compel_must_attack };
+
+/// The delayed body of `DESTROY_IT_IF_IT_DIDNT_ATTACK` (CR 701.8): destroy the creature unless it attacked this turn. Arcum's
+/// Whistle words its clause differently and declares this body with its own text.
+pub fn destroy_if_it_didnt_attack(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(creature) = item.subject
+        && !g.history().attacked_this_turn(creature)
+    {
+        g.destroy(creature);
+    }
+    Ok(())
+}
+
+/// "Destroy it at the beginning of the next end step if it didn't attack this turn" (CR 603.7, 701.8): the card's `delayed`
+/// ability number 0, set up by `must_attack_and_destroy_if_it_doesnt`. Nettling Imp and Norritt print it; Arcum's Whistle words it its own way.
+pub const DESTROY_IT_IF_IT_DIDNT_ATTACK: AbilityDef =
+    delayed_trigger(destroy_if_it_didnt_attack, "Destroy it at the beginning of the next end step if it didn't attack this turn.");
+
+/// "That creature attacks this turn if able. Destroy it at the beginning of the next end step if it didn't attack this turn"
+/// (CR 508.1d, 603.7) about `creature`: starts `MUST_ATTACK_THIS_TURN` (lasting rule 0) and sets up
+/// `DESTROY_IT_IF_IT_DIDNT_ATTACK` (delayed ability 0). Nettling Imp and Norritt print it; Arcum's Whistle words it its own way.
+pub fn must_attack_and_destroy_if_it_doesnt(g: &mut dyn Game, item: &StackItem, creature: ObjectId) {
+    g.add_lasting_rule(item, 0, Target::Object(creature), Duration::EndOfTurn);
+    g.end_sentence();
+    crate::delayed::at_next_end_step(g, item, 0, Target::Object(creature));
+}
+
+/// "Choose target [compel target]. That creature attacks this turn if able. Destroy it at the beginning of the next end step if
+/// it didn't attack this turn." as an ability's effect, over `COMPEL_TARGET`. Nettling Imp and Norritt print it.
+pub fn compel(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    must_attack_and_destroy_if_it_doesnt(g, item, creature);
+    Ok(())
 }
