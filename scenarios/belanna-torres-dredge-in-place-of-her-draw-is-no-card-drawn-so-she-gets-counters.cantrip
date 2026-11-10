@@ -1,0 +1,45 @@
+# B'Elanna Torres's "If you don't draw a card this way": her surveil bins Golgari Grave-Troll and keeps Ornithopter on top,
+# she reveals the artifact, and Bot1 dredges the Troll back in place of the draw (CR 702.52a). A replaced draw never happens
+# (CR 614.6), so no card was drawn this way and she gets her two +1/+1 counters, a 4/4 with the Troll in hand.
+
+[Bot1 Deck]
+Mox Emerald
+B'Elanna Torres, Scrapper
+Island
+Island
+Mountain
+Island
+Island
+Island
+Island
+Golgari Grave-Troll
+Ornithopter
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.B'Elanna Torres, Scrapper.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.B'Elanna Torres, Scrapper.Activate
+Bot1.Arrange(Ornithopter | Golgari Grave-Troll)
+Bot1.Accept
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Golgari Grave-Troll; Island; Island; Island; Island; Island
+Bot1.Battlefield.B'Elanna Torres, Scrapper.Power = 4
