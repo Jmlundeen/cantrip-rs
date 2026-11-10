@@ -1,0 +1,52 @@
+# Reconnaissance Partition: "This creature enters with two charge counters on it" and "{T}, Remove a counter from this
+# creature: Choose one — • Search your library for a basic land card, put it onto the battlefield tapped, then shuffle. •
+# Draw a card." (CR 614.1c, 700.2, 701.23). Bot1 casts it on turn 1 and it enters with exactly two counters. On turn 3 it
+# taps and removes one to fetch an Island, which arrives tapped and the pool it paid with is empty; on turn 5 it removes
+# the last counter to draw a card. On turn 7 there is no counter to remove, so the ability is not offered.
+
+[Bot1 Deck]
+Reconnaissance Partition
+Black Lotus
+Mox Ruby
+Island
+Forest
+Plains
+Swamp
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Reconnaissance Partition.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Reconnaissance Partition.Counters.Charge = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Reconnaissance Partition.Activate
+Bot1.Modes(Search your library for a basic land card)
+Bot1.Search(Island)
+? Bot1.Mana =
+? Bot1.Battlefield.Reconnaissance Partition.Counters.Charge = 1
+? Bot1.Battlefield.Island.Tapped = true
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Reconnaissance Partition.Tapped = false
+Bot1.Hand.Island.Play
+? Bot1.Hand.Count = 5
+Bot1.Battlefield.Reconnaissance Partition.Activate
+Bot1.Modes(Draw a card)
+[T5 Bot1.Main2]
+? Bot1.Hand.Count = 6
+? Bot1.Battlefield.Reconnaissance Partition.Counters.Charge = (absent)
+[T7 Bot1.Main1]
+! Bot1.Battlefield.Reconnaissance Partition.Activate
+
+[Expect]
+Bot1.Battlefield.Reconnaissance Partition.Counters.Charge = (absent)
+Bot1.Battlefield.Reconnaissance Partition.Tapped = false
