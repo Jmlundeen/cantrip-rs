@@ -2616,3 +2616,12 @@ pub fn type_you_control_to_graveyard<const TYPE: u8>(q: &dyn Query, me: &Asker, 
         _ => None,
     }
 }
+
+/// "Whenever this creature attacks and isn't blocked" (CR 509.1h, 603.2): the creature itself was declared as an attacker and
+/// no creature blocked it. The ability is about the attacker. Merchant Ship and Murk Dwellers print it.
+pub fn this_attacks_and_isnt_blocked(_: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Unblocked { attacker, .. } if *attacker == asker.source => Fired::about(Target::Object(*attacker)),
+        _ => None,
+    }
+}
