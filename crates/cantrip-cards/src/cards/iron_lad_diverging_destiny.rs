@@ -1,15 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::top_of_library;
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
-/// "Reveal the top card of your library. If it's an artifact card, draw a card." (CR 701.20a, 121.1): the card revealed stays
-/// on top unless it is an artifact, in which case it is the card drawn. An empty library reveals nothing and draws nothing.
+/// "Reveal the top card of your library. If it's an artifact card, draw a card." (CR 701.20a, 121.1):
+/// `effects::reveal_top_and_draw_if_artifact`, the same reveal-and-draw B'Elanna Torres, Scrapper prints with a may.
 fn reveal_and_draw_an_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(&top) = top_of_library(g, item.controller, 1).first() else { return Ok(()) };
-    g.reveal(item.controller, &[top]);
-    if g.chars(top).is(CardType::Artifact) {
-        g.draw(item.controller, 1);
-    }
+    effects::reveal_top_and_draw_if_artifact(g, item, None)?;
     Ok(())
 }
 
