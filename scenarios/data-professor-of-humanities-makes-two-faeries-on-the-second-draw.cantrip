@@ -1,0 +1,59 @@
+# Data, Professor of Humanities: "Seek out — Whenever you draw your second card each turn, create two 1/1 blue
+# Faerie creature tokens with flying." A Howling Mine makes turn 5's draw step two cards; the second of them is the
+# trigger, and both Faeries are made at once, so there are two and no third (CR 121.2, 111.1).
+
+[Bot1 Deck]
+Data, Professor of Humanities
+Howling Mine
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Sapphire
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Howling Mine.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Data, Professor of Humanities.Cast(Spend: R, W, U, U)
+? Bot1.Mana =
+Bot1.Pass
+
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Faerie Token#1.Keywords = Flying
+? Bot1.Battlefield.Faerie Token#2.Keywords = Flying
+? Bot1.Battlefield.Faerie Token#1.Power = 1
+? Bot1.Battlefield.Faerie Token#3 = (absent)
+? Bot1.Battlefield.Faerie Token#1.Tapped = False
+? Bot1.Battlefield.Faerie Token#2.Tapped = False
+
+[Expect]
+Bot1.Battlefield.Faerie Token#1.Power = 1
+Bot1.Battlefield.Faerie Token#2.Power = 1

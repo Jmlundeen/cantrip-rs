@@ -1,0 +1,8 @@
+{
+  "name": "Data, Professor of Humanities",
+  "manaCost": "{3}{U}",
+  "type": "Legendary Artifact Creature — Android Scientist",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Seek out — Whenever you draw your second card each turn, create two 1/1 blue Faerie creature tokens with flying."
+}
