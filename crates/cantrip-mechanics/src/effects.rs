@@ -2627,3 +2627,15 @@ pub fn blocking_creatures_get(g: &mut dyn Game, source: ObjectId, power: i32, to
         }
     });
 }
+
+/// "Tap target [permanent]. It doesn't untap during its controller's untap step for as long as this [permanent] remains tapped"
+/// (CR 701.26a, 611.2a, 502.3): taps the target if it is still legal (CR 608.2b), and that is a separate sentence from the
+/// effect that holds it tapped (CR 608.2c). The card also sets `may_not_untap`. Ice Floe, Mole Worms and Phyrexian Gremlins
+/// print it.
+pub fn tap_target_it_doesnt_untap_while_this_remains_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(target) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    tap_targets(g, item)?;
+    g.end_sentence();
+    g.add_effect(item.object, target, EffectKind::DoesntUntap, Duration::WhileSourceTapped);
+    Ok(())
+}
