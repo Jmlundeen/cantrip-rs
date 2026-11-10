@@ -75,6 +75,17 @@ pub fn put_plus_one_counter_on_this_turn(history: History<'_>, player: PlayerId,
         .any(|record| matches!(record.event, Event::CountersPut { kind: CounterKind::PlusOne, amount, by, .. } if amount > 0 && by == player))
 }
 
+/// "You've put a counter on [it] this turn" (CR 122.6): `player` put at least one counter of any kind on `object` this turn,
+/// whether it was on the battlefield or entering with them (the counters' putter is the event's), however many and of however
+/// many kinds. The object is the one that received them, so a permanent that left and came back has had none put on it (CR
+/// 400.7). Fractal Tender's intervening "if you put a counter on this creature this turn" and La Forge, Thoughtful as Ever's
+/// "for each permanent you control that you've put a counter on this turn" ask it.
+pub fn put_a_counter_on_this_turn(history: History<'_>, player: PlayerId, object: ObjectId) -> bool {
+    history
+        .select(EventQuery::kind(EventMask::COUNTERS).this_turn().object(object))
+        .any(|record| matches!(record.event, Event::CountersPut { amount, by, .. } if amount > 0 && by == player))
+}
+
 /// How the spell on the stack as `spell` was cast, if it was cast from a graveyard (CR 601.2i, 400.7): the cast the history
 /// holds, kept only when its `from` is a graveyard (the graveyard of the spell's owner, CR 404.1). A copy was not cast, and a
 /// permanent put onto the battlefield was never a spell, so neither has one. A trigger matching the entry of a permanent
