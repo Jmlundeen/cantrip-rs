@@ -1,0 +1,52 @@
+# Alexander, Ship's Fool in a three-player game: its ability deals X damage "to a random opponent," one of the two
+# opponents chosen at random. The fixed die shows 2, and the opponents in turn order are Bot2 then Bot3,
+# so Bot3 is chosen. Bot1 (whose turn-1 draw leaves Ornithopter on top) reveals Ornithopter (mana value 0), Bot2 Grizzly
+# Bears (2) and Bot3 Serra Angel (5): X is the greatest of all three, 5, dealt to Bot3 alone.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Black Lotus
+Alexander, Ship's Fool
+Island
+Island
+Island
+Serra Angel
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Forest x7
+Grizzly Bears
+Island x10
+
+[Bot3 Deck]
+Island x7
+Serra Angel
+Island x10
+
+[Dice]
+2
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Alexander, Ship's Fool.Cast
+Bot1.Battlefield.Alexander, Ship's Fool.Activate
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Alexander, Ship's Fool.Tapped = true
+Bot1.Hand.Count = 5
+Bot2.Hand.Count = 8
+Bot3.Hand.Count = 8
+Bot1.Life = 20
+Bot2.Life = 20
+Bot3.Life = 15

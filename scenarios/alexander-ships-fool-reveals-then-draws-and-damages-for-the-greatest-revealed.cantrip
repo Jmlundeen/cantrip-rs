@@ -1,0 +1,45 @@
+# Alexander, Ship's Fool ({3}{R}{W}), vigilance and haste: "{T}: Each player reveals the top card of their library,
+# then draws a card. Alexander deals X damage to a random opponent, where X is the greatest mana value among cards
+# revealed this way." Cast on turn 1 off two Moxen and Black Lotus, it taps the turn it enters (haste). Bot1 reveals
+# Grizzly Bears (mana value 2) and Bot2 Serra Angel (mana value 5), so the greatest is 5 and Bot2 takes 5. Had each
+# player drawn before revealing, the 0-mana Ornithopter under Grizzly Bears would have been revealed instead (CR 701.20,
+# 121.2c), and X would be 0.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Black Lotus
+Alexander, Ship's Fool
+Island
+Island
+Island
+Grizzly Bears
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Forest x7
+Serra Angel
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Alexander, Ship's Fool.Cast
+Bot1.Battlefield.Alexander, Ship's Fool.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Alexander, Ship's Fool.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Alexander, Ship's Fool.Keywords = Haste; Vigilance
+Bot1.Battlefield.Alexander, Ship's Fool.Tapped = true
+Bot1.Hand.Count = 4
+Bot2.Hand.Count = 8
+Bot2.Life = 15
