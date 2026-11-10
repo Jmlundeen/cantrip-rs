@@ -30,7 +30,9 @@ the live claim of any checkout of that account. `next` lists what can be taken -
 with no issue opens the issue first, then claims it. Commit messages and pull request descriptions of a card say
 `Closes #N`, so the issue closes when it lands.
 
-The repository is origin's (--repo owner/name to override); gh is the GitHub client and must be signed in.
+The repository is the upstream one when the checkout has an `upstream` remote (a fork usually has its own issues
+disabled, and `Closes #N` has to land where the cards live), else origin; --repo owner/name or $CANTRIP_ISSUES_REPO
+overrides both. gh is the GitHub client and must be signed in.
 """
 
 import argparse
@@ -93,15 +95,27 @@ def load(name):
     return module
 
 
+ISSUE_REMOTES = ("upstream", "cantrip-rs", "origin")
+
+
 def repository(override):
+    """The repository the card issues live in: the upstream one when the checkout has it.
+
+    A fork usually has its own issues disabled, and a card's `Closes #N` has to land in the repository that owns the
+    cards, so the upstream remote wins over origin. `--repo owner/name` or $CANTRIP_ISSUES_REPO overrides both.
+    """
     if override:
         return override
-    url = subprocess.run(["git", "-C", ROOT, "remote", "get-url", "origin"], capture_output=True, text=True,
-                         check=True).stdout.strip()
-    match = re.search(r"github\.com[:/]([^/]+/[^/]+?)(?:\.git)?$", url)
-    if not match:
-        sys.exit(f"origin is not a GitHub repository: {url}")
-    return match.group(1)
+    if os.environ.get("CANTRIP_ISSUES_REPO"):
+        return os.environ["CANTRIP_ISSUES_REPO"]
+    for remote in ISSUE_REMOTES:
+        url = subprocess.run(["git", "-C", ROOT, "remote", "get-url", remote], capture_output=True, text=True)
+        if url.returncode != 0:
+            continue
+        match = re.search(r"github\.com[:/]([^/]+/[^/]+?)(?:\.git)?$", url.stdout.strip())
+        if match:
+            return match.group(1)
+    sys.exit("no GitHub remote to read issues from: add one, or pass --repo owner/name")
 
 
 def gh(*args, body=None):
@@ -449,8 +463,12 @@ def find_or_open(repo, issues, name):
 
 def take(repo, issues, me, name, branch_ok=False):
     """Claim one card: True when it is now ours, False when someone else holds it or has implemented it. `branch_ok`
-    claims a card that is implemented only on a local branch - a pull request's under review, whose cards have no issue."""
-    if slug(name) in (missing.implemented() if branch_ok else done_anywhere()):
+    claims a card that is implemented only on a local branch - a pull request's under review, whose cards have no issue.
+
+    Both cases ask `done_anywhere()`, which counts only content files git knows: the lane's own `next` scaffolds a card's
+    JSON before the worker claims its issue, so reading the working tree here would refuse every card just handed out.
+    """
+    if slug(name) in done_anywhere():
         print(f"{name}: already implemented, here or on a local branch")
         return False
     issue = find_or_open(repo, issues, name)

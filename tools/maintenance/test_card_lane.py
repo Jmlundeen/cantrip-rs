@@ -780,5 +780,32 @@ class LaneTest(unittest.TestCase):
         self.assertEqual(corpus.call_count, 1)
 
 
+    def test_next_claims_the_cards_issue_and_the_brief_closes_it(self):
+        tool = self.write("fake-card-issues.py", '''print("#42 is yours (Closes #42)")
+''', root=self.tmp)
+        os.environ["CANTRIP_ISSUES_TOOL"] = tool
+        self.addCleanup(os.environ.pop, "CANTRIP_ISSUES_TOOL", None)
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        claim = next(entry for entry in self.state()["cards"] if entry["name"] == "Card B")["claim"]
+        self.assertEqual(claim["issue"], 42)
+        self.assertIn("Closes #42", taken.stdout)
+
+    def test_next_survives_an_issue_it_cannot_claim(self):
+        tool = self.write("fake-card-issues.py", '''import sys
+print("gh: not signed in", file=sys.stderr)
+raise SystemExit(1)
+''', root=self.tmp)
+        os.environ["CANTRIP_ISSUES_TOOL"] = tool
+        self.addCleanup(os.environ.pop, "CANTRIP_ISSUES_TOOL", None)
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        claim = next(entry for entry in self.state()["cards"] if entry["name"] == "Card B")["claim"]
+        self.assertIsNone(claim.get("issue"))
+        self.assertIn("has no issue to close", taken.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

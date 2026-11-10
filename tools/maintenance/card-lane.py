@@ -738,8 +738,11 @@ def write_brief(root, store, card, claim, reference, packet):
          " engine does not have: do not block for it and do not work around it. The core change lands first, in its own"
          " `Engine:` commit, before any `Mechanics:` or card commit, so the next implementor starts with it."),
         "",
-        "Claim the card's GitHub issue before working on it, as the skill says (`python tools/maintenance/card-issues.py",
-        f"claim \"{card['name']}\"`), unless you already hold it.",
+        ("`next` claimed this card's issue in the repository that holds them (the checkout's upstream remote) and "
+         "opened it when there was none; the Card commit ends `Closes #" + str(claim["issue"]) + "`."
+         if claim.get("issue") else
+         "No issue could be claimed for this card: `commit` needs `--issue N`, or `--no-issue` to close it with no "
+         "`Closes` line. `python tools/maintenance/card-issues.py claim \"" + card['name'] + "\"` tries again."),
         "",
         "## Paths",
         "",
@@ -793,6 +796,25 @@ def write_brief(root, store, card, claim, reference, packet):
                   "This worktree is not a pool slot, so there is no member to leave. Commit the card on this branch;",
                   "`commit` (or `done`) shares it to the queue's branch."]
     return "\n".join(lines).rstrip() + "\n"
+
+
+def card_issue(root, name):
+    """The card's issue in the repository that holds them - claimed, and opened first when there is none - with what
+    `card-issues.py` said.
+
+    The gated `commit` ends the Card commit with `Closes #N`, so a card that is being worked on claims its issue where
+    the work will land, even from a fork whose own issues are disabled. A failure is not fatal: the claim then carries
+    no issue, which `commit` accepts (as `--no-issue`).
+    """
+    tool = os.environ.get("CANTRIP_ISSUES_TOOL") or os.path.join(root, "tools", "maintenance", "card-issues.py")
+    if not os.path.isfile(tool):
+        return None, "card-issues.py is missing"
+    result = run([sys.executable, tool, "claim", name], root)
+    out = ((result.stdout or "") + (result.stderr or "")).strip()
+    number = re.search(r"#(\d+)", out)
+    if result.returncode == 0 and number:
+        return int(number.group(1)), out
+    return None, out or f"card-issues.py exited {result.returncode}"
 
 
 def packet_stale(packet):
@@ -1924,6 +1946,18 @@ def cmd_next(args):
                     recorded["claim"]["head"] = claim["head"]
                     if merged:
                         store.log(state, "sync", id=wid, card=recorded["name"], branch=store.branch, tip=merged)
+            if not claim.get("issue") and not claim.get("no_issue"):
+                number, said = card_issue(root, card["name"])
+                if number:
+                    claim["issue"] = number
+                    with store.locked() as state:
+                        recorded = open_claim(state, wid)
+                        if recorded and recorded["name"] == card["name"]:
+                            recorded["claim"]["issue"] = number
+                            store.log(state, "issue", id=wid, card=card["name"], issue=number)
+                else:
+                    print(f"warning: {card['name']} has no issue to close: {said.splitlines()[-1] if said else ''}",
+                          file=sys.stderr)
             packet, brief = build_packet(root, store, card, claim)
         else:
             with open(os.path.join(packet, "brief.md"), encoding="utf-8") as f:
