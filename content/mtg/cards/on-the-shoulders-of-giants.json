@@ -1,0 +1,6 @@
+{
+  "name": "On the Shoulders of Giants",
+  "manaCost": "{2}{U}",
+  "type": "Enchantment",
+  "oracleText": "Historic creatures you control have flying. (Artifacts, legendaries, and Sagas are historic.)"
+}

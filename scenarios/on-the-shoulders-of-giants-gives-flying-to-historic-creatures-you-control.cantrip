@@ -1,0 +1,70 @@
+# On the Shoulders of Giants: "Historic creatures you control have flying" (CR 700.6, 702.9). Bot1 casts it on turn 1 off
+# Black Lotus, then Memnite (an artifact creature) and Isamaru, Hound of Konda (a legendary creature), the two ways a
+# creature is historic, alongside Fugitive Wizard, a creature that is not. Bot2 casts its own Memnite, an artifact
+# creature it controls. On turn 3 Bot1 attacks with all three: Bot2's Memnite may not block the legendary attacker, and
+# the two historic creatures get through, while Bot2's historic creature has no flying and Bot1's non-historic Wizard has
+# none either (the "you control" and "historic" limits). On turn 5 the Wizard attacks alone and Bot2's Memnite blocks
+# it - the same blocker refused the flying creature, so it is the grant that stops the block, not the creature.
+
+[Bot1 Deck]
+On the Shoulders of Giants
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Memnite
+Isamaru, Hound of Konda
+Fugitive Wizard
+Island x13
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.On the Shoulders of Giants.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fugitive Wizard.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Memnite.Keywords = Flying
+? Bot1.Battlefield.Isamaru, Hound of Konda.Keywords = Flying
+? Bot1.Battlefield.Fugitive Wizard.Keywords = (absent)
+? Bot1.Battlefield.Mox Sapphire.Keywords = (absent)
+? Bot2.Battlefield.Memnite.Keywords = (absent)
+Bot1.Attack(Memnite; Isamaru, Hound of Konda; Fugitive Wizard > Bot2)
+[T3 Bot1.DeclareBlockers]
+! Bot2.Block(Bot2.Battlefield.Memnite > Bot1.Battlefield.Isamaru, Hound of Konda)
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+[T5 Bot1.Main1]
+Bot1.Attack(Fugitive Wizard > Bot2)
+[T5 Bot1.DeclareBlockers]
+Bot2.Block(Bot2.Battlefield.Memnite > Bot1.Battlefield.Fugitive Wizard)
+[T5 Bot1.Main2]
+? Bot2.Life = 16
+
+[Expect]
+Bot1.Battlefield.Memnite.Keywords = Flying
+Bot1.Battlefield.Isamaru, Hound of Konda.Keywords = Flying
+Bot1.Battlefield.Fugitive Wizard = (absent)
+Bot2.Battlefield.Memnite = (absent)
