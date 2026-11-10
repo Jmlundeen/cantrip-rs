@@ -1,0 +1,76 @@
+# Lieutenant Hikaru Sulu: "{2}{U}: Target creature can't be blocked this turn." Bot1's own Grizzly Bears is the target on turn 3,
+# paid for with exactly {2}{U} (the pool empty right after), and Bot2's Ornithopter may not block it (CR 509.1b). On turn 5 the
+# same three mana targets Bot2's own Ornithopter - an opponent's creature is a legal target - and the Bears, no longer protected,
+# may be blocked and damaged: the ability lasts only this turn (CR 611.2a). Sulu's own explores, from attacking, reveal lands only.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Forest
+Lieutenant Hikaru Sulu
+Grizzly Bears
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lieutenant Hikaru Sulu.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lieutenant Hikaru Sulu.Activate(Bot1.Battlefield.Grizzly Bears)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears > Bot2; Lieutenant Hikaru Sulu > Bot2)
+! Bot2.Block(Ornithopter > Grizzly Bears)
+[T3 Bot1.Main2]
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Lieutenant Hikaru Sulu.Activate(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears > Bot2; Lieutenant Hikaru Sulu > Bot2)
+Bot2.Block(Ornithopter > Grizzly Bears)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Lieutenant Hikaru Sulu.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Ornithopter = (absent)
+Bot2.Life = 12

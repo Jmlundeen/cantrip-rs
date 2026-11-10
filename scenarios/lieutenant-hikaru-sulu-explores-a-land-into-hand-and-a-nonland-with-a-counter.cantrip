@@ -1,0 +1,55 @@
+# Lieutenant Hikaru Sulu: "Whenever Lieutenant Sulu becomes tapped, he explores." (CR 701.44a, 603.2) He is tapped by being declared
+# as an attacker (CR 508.1f), and explores twice: on turn 3 the revealed Forest is a land card and goes into the hand with no
+# counter; on turn 5 the revealed Lightning Bolt is a nonland card, so he gets a +1/+1 counter and Bot1 puts it into the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Lieutenant Hikaru Sulu
+Island
+Island
+Island
+Island
+Forest
+Island
+Lightning Bolt
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lieutenant Hikaru Sulu.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Lieutenant Hikaru Sulu > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Lieutenant Hikaru Sulu > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Lieutenant Hikaru Sulu.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Lieutenant Hikaru Sulu.Power = 4
+Bot1.Battlefield.Lieutenant Hikaru Sulu.Toughness = 4
+Bot1.Graveyard = Lightning Bolt
+Bot1.Revealed = Forest; Lightning Bolt
+Bot2.Life = 13

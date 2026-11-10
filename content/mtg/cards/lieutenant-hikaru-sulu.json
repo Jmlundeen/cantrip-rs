@@ -1,0 +1,8 @@
+{
+  "name": "Lieutenant Hikaru Sulu",
+  "manaCost": "{2}{G}",
+  "type": "Legendary Creature — Human Pilot",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever Lieutenant Sulu becomes tapped, he explores. (Reveal the top card of your library. Put that card into your hand if it's a land. Otherwise, put a +1/+1 counter on this creature, then put the card back or put it into your graveyard.)\n{2}{U}: Target creature can't be blocked this turn."
+}

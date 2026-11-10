@@ -1,0 +1,64 @@
+# Lieutenant Hikaru Sulu's costs and its target. {2}{G} needs green: three mana of other colors with no green source anywhere
+# cannot pay it. The ability's "target creature" is no land, so with {2}{U} in the pool the land is refused and not a point of
+# mana spent. {2}{U} needs blue too: with the blue sources tapped out and spent and three nonblue mana in the pool, the
+# activation cannot start.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Lieutenant Hikaru Sulu
+Delver of Secrets
+Merfolk of the Pearl Trident
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Lieutenant Hikaru Sulu.Cast(; Mana: short)
+? Bot1.Mana = {W}{U}{B}
+[T1 Bot1.Main2]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lieutenant Hikaru Sulu.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Lieutenant Hikaru Sulu.Activate(Bot2.Battlefield.Island)
+? Bot1.Mana = {U}{U}{B}
+Bot1.Hand.Delver of Secrets.Cast
+Bot1.Pass
+? Bot1.Mana = {U}{B}
+Bot1.Hand.Merfolk of the Pearl Trident.Cast
+Bot1.Pass
+? Bot1.Mana = {B}
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+! Bot1.Battlefield.Lieutenant Hikaru Sulu.Activate(Bot1.Battlefield.Lieutenant Hikaru Sulu; Mana: short)
+? Bot1.Mana = {W}{B}{G}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Lieutenant Hikaru Sulu.Tapped = false
+Bot1.Battlefield.Lieutenant Hikaru Sulu.Counters.PlusOnePlusOne = (absent)
+Bot2.Life = 20
