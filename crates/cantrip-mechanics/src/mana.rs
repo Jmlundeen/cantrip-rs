@@ -287,3 +287,31 @@ pub fn enchanted_permanents_controller_adds_the_chosen_color(g: &mut dyn Game, i
     g.add_mana(controller, color.mana(), 1);
     Ok(())
 }
+
+fn put_charge_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_counters(item.object, CounterKind::Charge, 1);
+    Ok(())
+}
+
+fn add_one_then_one_for_each_charge_counter_removed<const M: u8>(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    let mana = Mana::ALL[M as usize];
+    g.add_mana(asker.controller, mana, 1);
+    g.add_mana(asker.controller, mana, g.mana_ability_x().unwrap_or(0));
+    Ok(())
+}
+
+/// A mana battery's two abilities (CR 122.1, 605.1a, 106.3): "{2}, {T}: Put a charge counter on this artifact." and "{T}, Remove
+/// any number of charge counters from this artifact: Add [`M`], then add an additional [`M`] for each charge counter removed
+/// this way." (`text` is the mana ability's full text; `M` is `Mana::X as u8`). White Mana Battery and Red Mana Battery print
+/// it.
+pub const fn mana_battery<const M: u8>(text: &'static str) -> [AbilityDef; 2] {
+    [
+        ability(cost("{2}").and(TAP), put_charge_counter, "{2}, {T}: Put a charge counter on this artifact."),
+        mana_ability(
+            TAP.and(Cost { variable: Some(VariableCost::RemoveAnyNumberOfCounters(CounterKind::Charge)), ..Cost::NONE }),
+            add(Mana::ALL[M as usize]).by(add_one_then_one_for_each_charge_counter_removed::<M>),
+            text,
+        )
+        .x_is_mana_amount(),
+    ]
+}
