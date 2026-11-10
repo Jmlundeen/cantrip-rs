@@ -1,0 +1,33 @@
+# Bot1's commander is Kytheon, a Human Soldier; Bot2's commander is Spot, a Cat. Sacred Cat shares Cat
+# only with Bot2's commander, so spending Path mana on it must not scry.
+
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot2 Commander]
+Spot, Felis catus
+[Bot1 Deck]
+Path of Ancestry
+Sacred Cat
+Plains x5
+Plains
+Mountain
+Island
+Plains x30
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Path of Ancestry.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+Bot1.Hand.Sacred Cat.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Arrange
+? Bot1.Battlefield.Sacred Cat.Power = 1
+
+[Expect]
+Bot1.Battlefield.Path of Ancestry.Tapped = true
+Bot1.Battlefield.Sacred Cat.Power = 1
+Bot1.Graveyard =

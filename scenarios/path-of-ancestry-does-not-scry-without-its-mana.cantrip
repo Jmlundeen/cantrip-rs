@@ -1,0 +1,32 @@
+# Elite Vanguard shares Human and Soldier with Kytheon, but it is cast with a Plains, not Path mana.
+# Spending no mana from Path of Ancestry must not trigger the delayed scry.
+
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Path of Ancestry
+Elite Vanguard
+Plains x5
+Plains
+Mountain
+Island
+Plains x30
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Path of Ancestry.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Arrange
+? Bot1.Battlefield.Elite Vanguard.Power = 2
+
+[Expect]
+Bot1.Battlefield.Path of Ancestry.Tapped = false
+Bot1.Battlefield.Elite Vanguard.Power = 2
+Bot1.Graveyard =

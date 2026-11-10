@@ -1,0 +1,35 @@
+# Path of Ancestry enters tapped and taps for a color in the commander's identity (CR 903.4f). Spending that mana
+# on Elite Vanguard (Human Soldier) shares Human and Soldier with Kytheon, so the delayed trigger scries 1.
+# The scry bottoms Mountain, leaving Island on top.
+
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Path of Ancestry
+Elite Vanguard
+Plains x5
+Forest
+Mountain
+Island
+Plains x30
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Path of Ancestry.Play
+? Bot1.Battlefield.Path of Ancestry.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+? Bot1.Mana = {W}
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Arrange( | Mountain)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Elite Vanguard.Power = 2
+? Bot1.Battlefield.Elite Vanguard.Toughness = 1
+
+[Expect]
+Bot1.Battlefield.Path of Ancestry.Tapped = true
+Bot1.Graveyard =

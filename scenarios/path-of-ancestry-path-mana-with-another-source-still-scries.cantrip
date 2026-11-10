@@ -1,0 +1,37 @@
+# Path of Ancestry's mana is told apart from mana from another source (CR 106.3). Paying {1}{W} for
+# Bearer of Glory with one mana from Path and one from a Plains still scries 1.
+
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Path of Ancestry
+Bearer of Glory
+Plains x5
+Plains
+Mountain
+Island
+Plains x30
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Path of Ancestry.Play
+? Bot1.Battlefield.Path of Ancestry.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+? Bot1.Mana = {W}{W}
+Bot1.Hand.Bearer of Glory.Cast
+Bot1.Arrange( | Mountain)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bearer of Glory.Power = 2
+? Bot1.Battlefield.Bearer of Glory.Toughness = 1
+
+[Expect]
+Bot1.Battlefield.Path of Ancestry.Tapped = true
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Graveyard =

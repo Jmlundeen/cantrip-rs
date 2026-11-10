@@ -1,0 +1,45 @@
+# "That mana" is the mana Path of Ancestry's own ability produced (CR 603.7a, 106.3), not any mana Path produced: tapped
+# for the ability Chromatic Lantern gives it ("{T}: Add one mana of any color"), its {W} spent on Elite Vanguard (Human
+# Soldier, like Kytheon) makes no scry, and the library is as it was. The same turn, Path's own ability's {W} would.
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Path of Ancestry
+Plains
+Plains
+Chromatic Lantern
+Elite Vanguard
+Plains
+Plains
+Plains
+Plains
+Plains
+Mountain
+Island
+Plains x30
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Path of Ancestry.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Chromatic Lantern.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White; Ability: any color.)
+? Bot1.Mana = {W}
+Bot1.Hand.Elite Vanguard.Cast
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Elite Vanguard.Power = 2
+Bot1.Library.Top = Mountain

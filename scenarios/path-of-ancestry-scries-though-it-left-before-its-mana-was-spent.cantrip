@@ -1,0 +1,40 @@
+# "When that mana is spent ..." is a delayed triggered ability the mana ability creates as it resolves (CR 603.7a, 106.3),
+# riding the mana, not an ability of Path of Ancestry: Path destroyed by Wasteland while its {W} floats still makes Elite
+# Vanguard (Human Soldier, like Kytheon) cast with that {W} scry 1. The scry bottoms Mountain, leaving Island on top.
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Path of Ancestry
+Wasteland
+Elite Vanguard
+Plains
+Plains
+Plains
+Plains
+Plains
+Mountain
+Island
+Plains x30
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Path of Ancestry.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Wasteland.Play
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+Bot1.Battlefield.Wasteland.Activate(Path of Ancestry; Ability: Destroy)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 2
+? Bot1.Mana = {W}
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Arrange( | Mountain)
+Bot1.Pass
+Bot2.Pass
+# All of that mana is spent: the delayed ability that rode it is gone (CR 603.7a).
+? Delayed.Count = 0
+[Expect]
+Bot1.Battlefield.Elite Vanguard.Power = 2
+Bot1.Library.Top = Island

@@ -1,0 +1,43 @@
+# "Your commander" is found wherever it is (CR 903.3e). Kytheon cast from the command zone with Path of Ancestry's {W}
+# shares a creature type with itself on the stack (the ruling: "If you cast your commander with mana from Path of
+# Ancestry ... you'll scry 1"): Mountain to the bottom. Two turns later, with Kytheon on the battlefield, Elite Vanguard
+# (Human Soldier) cast with Path's {W} scries again: Island to the bottom, Forest on top.
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Path of Ancestry
+Elite Vanguard
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Mountain
+Plains
+Island
+Forest
+Plains x30
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Path of Ancestry.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+Bot1.Command.Kytheon, Hero of Akros.Cast
+Bot1.Arrange( | Mountain)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Top = Plains
+[T5 Bot1.Main1]
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+Bot1.Hand.Elite Vanguard.Cast
+Bot1.Arrange( | Island)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Kytheon, Hero of Akros.Power = 2
+Bot1.Battlefield.Elite Vanguard.Power = 2
+Bot1.Library.Top = Forest

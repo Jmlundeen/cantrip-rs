@@ -1,0 +1,51 @@
+# Each mana Path of Ancestry's ability produced carries its "when that mana is spent" (CR 603.7a, 106.3): two of its mana
+# spent on one creature spell sharing a creature type with the commander are two triggers, two scries of 1 - never one
+# scry, nor a scry 2 (its ruling). Candelabra of Tawnos untaps Path between its two activations; both {W} pay for Glory
+# Seeker (Human Soldier, like Kytheon); the Plains' {W}, told apart from Path's, pays for the untap. Each scry bottoms the top card: Mountain, then Island, leaving Forest on top.
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Path of Ancestry
+Plains
+Candelabra of Tawnos
+Glory Seeker
+Plains
+Plains
+Plains
+Plains
+Plains
+Mountain
+Island
+Forest
+Plains x30
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Path of Ancestry.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Candelabra of Tawnos.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 1; Spend: W)
+Bot1.Target(Path of Ancestry)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Path of Ancestry.Tapped = false
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+? Bot1.Mana = {W}{W}
+Bot1.Hand.Glory Seeker.Cast
+Bot1.Arrange( | Mountain)
+Bot1.Arrange( | Island)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Glory Seeker.Power = 2
+Bot1.Library.Top = Forest

@@ -1,0 +1,63 @@
+# Path of Ancestry's own {W} carries its "when that mana is spent" scry (CR 603.7a); the {W} Path makes with the ability
+# Chromatic Lantern gives it does not. Both are Path's (CR 106.3) yet told apart for the payer (CR 601.2h): Candelabra of
+# Tawnos untaps Path between the two, the riding {W} made first. Authority of the Consuls is paid with the plain {W},
+# kept back the riding {W}, and Elite Vanguard (Human Soldier, like Kytheon) cast with it scries 1: Mountain to the
+# bottom, Island on top.
+[Format]
+Commander
+[Bot1 Commander]
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Path of Ancestry
+Plains
+Plains
+Chromatic Lantern
+Plains
+Candelabra of Tawnos
+Authority of the Consuls
+Elite Vanguard
+Plains
+Plains
+Mountain
+Island
+Forest
+Plains x30
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Path of Ancestry.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Chromatic Lantern.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate(Ability: {W})
+Bot1.Hand.Candelabra of Tawnos.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White; Ability: commander)
+Bot1.Battlefield.Plains#2.Activate(Ability: {W})
+Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 1; Spend: W)
+Bot1.Target(Path of Ancestry)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Path of Ancestry.Activate(Color: White; Ability: any color.)
+? Bot1.Mana = {W}{W}
+Bot1.Hand.Authority of the Consuls.Cast(Spend: W)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Elite Vanguard.Cast(Spend: W Riding from Path of Ancestry)
+Bot1.Arrange( | Mountain)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Elite Vanguard.Power = 2
+Bot1.Library.Top = Island
+Delayed.Count = 0
