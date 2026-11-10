@@ -328,7 +328,7 @@ pub fn creatures_you_control_where_gain(g: &mut dyn Game, item: &StackItem, keyw
 /// `source`'s spell or ability resolves, whoever controls it, and no creature that enters later. Toxic Deluge (-X/-X) and
 /// Withering Curse (-2/-2) print it.
 pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i32, toughness: i32) {
-    pump_creatures_other_than(g, source, &[], power, toughness);
+    pump_creatures_where(g, source, |_, _| true, power, toughness);
 }
 
 /// "Creatures other than [these] get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): `pump_all_creatures`, with
@@ -336,7 +336,16 @@ pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i32, toughn
 /// "all other creatures get -1/-1" leave out their source; Zenos yae Galvus's "creatures other than Zenos yae Galvus and the
 /// chosen creature get -2/-2" its source and the creature it chose.
 pub fn pump_creatures_other_than(g: &mut dyn Game, source: ObjectId, other_than: &[ObjectId], power: i32, toughness: i32) {
-    let creatures: Vec<ObjectId> = creatures_on_the_battlefield(g).into_iter().filter(|id| !other_than.contains(id)).collect();
+    pump_creatures_where(g, source, |_, id| !other_than.contains(&id), power, toughness);
+}
+
+/// "All nonartifact creatures get -`power`/-`toughness` until end of turn" (CR 611.2c): the creatures on the battlefield at
+/// this moment that `counts` accepts, whoever controls them, pumped in one instruction so state triggers wait for all of them
+/// (CR 603.3b). Battle of Wolf 359 ("All nonartifact creatures get -X/-X") and Olivia's Wrath ("Each non-Vampire creature
+/// gets -X/-X") print it; `pump_all_creatures` and `pump_creatures_other_than` are it with a filter that takes all or all
+/// but some.
+pub fn pump_creatures_where(g: &mut dyn Game, source: ObjectId, counts: impl Fn(&dyn Game, ObjectId) -> bool, power: i32, toughness: i32) {
+    let creatures: Vec<ObjectId> = creatures_on_the_battlefield(g).into_iter().filter(|&id| counts(g, id)).collect();
     instruction(g, |g| {
         for id in creatures {
             crate::pump(g, source, id, power, toughness);
