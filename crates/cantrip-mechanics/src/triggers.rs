@@ -2466,6 +2466,27 @@ pub const END_OF_COMBAT: Trigger = when(EventMask::STEP_BEGAN, end_of_combat);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);
 pub const CREATURE_WITH_POWER_FOUR_OR_MORE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_with_power_four_or_more_you_control_enters);
 pub const CREATURE_YOU_CONTROL_ATTACKS: Trigger = when_asked(EventMask::ATTACKS, creature_you_control_attacks);
+
+/// "Whenever a commander you control enters or attacks" (CR 603.2, 903.3): a permanent that is a player's designated commander
+/// (`Obj::commander`, which follows the card between zones and that no copy ever receives, CR 707.2) entering the battlefield under
+/// this ability's controller, or attacking. The commander is the trigger's subject, so "put a +1/+1 counter on it" reads it. Janice
+/// Rand, Essential Aide prints it.
+pub fn commander_you_control_enters_or_attacks(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if to.is(ZoneKind::Battlefield) && q.controller(*new) == me.controller && q.obj(*new).commander =>
+        {
+            Fired::about(Target::Object(*new))
+        }
+        Event::Attacks { attacker, .. } if q.controller(*attacker) == me.controller && q.obj(*attacker).commander => {
+            Fired::about(Target::Object(*attacker))
+        }
+        _ => None,
+    }
+}
+
+pub const COMMANDER_YOU_CONTROL_ENTERS_OR_ATTACKS: Trigger =
+    when_asked(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0), commander_you_control_enters_or_attacks);
 /// "Whenever a Dragon you control enters" (CR 603.6a). Sarkhan, Dragon Ascendant and Roiling Dragonstorm print it.
 pub const DRAGON_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, of_subtype_you_control_enters::<{ crate::lands::sub(Subtype::Dragon) }>);
 pub const OPPONENTS_CREATURE_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, opponents_creature_enters);
