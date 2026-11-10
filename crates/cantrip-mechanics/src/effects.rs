@@ -1139,6 +1139,28 @@ pub fn surveil(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspe
     crate::surveil(g, item.controller, item.object, n)
 }
 
+/// "Reveal the top card of your library. Draw a card if it's an artifact card." (CR 701.20a, 121.1): the card revealed
+/// stays on top unless it is an artifact, in which case it is the card drawn. `may` makes the revealing its controller's
+/// choice ("you may reveal it"); an empty library reveals nothing and a nonartifact card is left on top, so neither
+/// draws. Says whether a card was drawn, for text that does something else when it wasn't ("If you don't draw a card this
+/// way"). Iron Lad, Diverging Destiny reveals it, B'Elanna Torres, Scrapper may.
+pub fn reveal_top_and_draw_if_artifact(g: &mut dyn Game, item: &StackItem, may: Option<&'static Question>) -> Result<bool, Suspend> {
+    let player = item.controller;
+    let Some(&top) = crate::top_of_library(g, player, 1).first() else { return Ok(false) };
+    if let Some(question) = may {
+        if !ask_may(g, player, item.object, Purpose::Ask(question))? {
+            return Ok(false);
+        }
+    }
+    g.reveal(player, &[top]);
+    if !g.chars(top).is(CardType::Artifact) {
+        return Ok(false);
+    }
+    g.draw(player, 1);
+    Ok(true)
+}
+
+
 /// "Choose a card name" / "choose a land card name" (CR 201.4, 201.4a) as an ability resolves: the controller names a card of
 /// `kind` (an unscripted player the `suggestion`), and the name is remembered by the ability's source as the object it is (CR
 /// 607.2d), for the rest of its text to refer to (`GameState::chosen_card`). The name chosen, if one was; if the source has left
