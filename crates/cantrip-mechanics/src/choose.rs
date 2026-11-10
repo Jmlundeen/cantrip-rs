@@ -287,15 +287,15 @@ pub fn cast_way(g: &mut dyn Game, player: PlayerId, card: ObjectId, ways: Vec<Ca
 /// "You may cast a spell from your hand [that `fits`] without paying its mana cost" as an effect resolves (CR 608.2g, 118.9):
 /// the controller chooses a card in their hand with a way to cast it that `fits` the words (a mana value, a type of the face
 /// that would be cast, CR 709.3a, 715.3a), then the way if the card has several, and casts it for nothing. Nothing is asked when
-/// no card in hand qualifies; `kind` is how the question words the card ("artifact", or "" for any). Buster Sword and Lady
-/// Octopus, Inspired Inventor print it.
-pub fn may_cast_from_hand_free(
+/// no card in hand qualifies; `kind` is how the question words the card ("artifact", or "" for any). The spell cast, for an
+/// effect that does something with "that spell" (Cmdr. Troi, Outgoing Empath copies it, CR 707.10), or nothing.
+pub fn may_cast_from_hand_free_spell(
     g: &mut dyn Game,
     player: PlayerId,
     source: ObjectId,
     kind: &'static str,
     fits: impl Fn(&dyn Game, &CastWay) -> bool,
-) -> Result<(), Suspend> {
+) -> Result<Option<ObjectId>, Suspend> {
     let ways_of = |g: &mut dyn Game, card: ObjectId| -> Vec<CastWay> {
         let ways = g.cast_ways_during_resolution_by(card, player);
         ways.into_iter().filter(|w| fits(&*g, w)).collect()
@@ -308,12 +308,25 @@ pub fn may_cast_from_hand_free(
         }
     }
     let Some(&card) = cards_from_kind(g, player, source, Purpose::CastFree, kind, hand, eligible, 1, true)?.first() else {
-        return Ok(());
+        return Ok(None);
     };
     let ways = ways_of(&mut *g, card);
     let way = cast_way(g, player, card, ways)?.map(|w| w.way);
-    g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(player), ..CastTerms::default() })?;
-    Ok(())
+    let cast = g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(player), ..CastTerms::default() })?;
+    Ok(cast.then(|| g.obj(card).became).flatten())
+}
+
+/// `may_cast_from_hand_free_spell` for an effect that does nothing with the spell cast: the card stays in hand when the player
+/// declines or cannot cast it. Buster Sword, Brazen Bluff, Founding the Third Path, Lady Octopus, Inspired Inventor and Yue, the
+/// Moon Spirit print it.
+pub fn may_cast_from_hand_free(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    kind: &'static str,
+    fits: impl Fn(&dyn Game, &CastWay) -> bool,
+) -> Result<(), Suspend> {
+    may_cast_from_hand_free_spell(g, player, source, kind, fits).map(|_| ())
 }
 
 /// "You may cast any number of spells from among [these cards] without paying their mana costs" (CR 608.2g, 118.9): the
