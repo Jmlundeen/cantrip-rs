@@ -1,0 +1,58 @@
+# Probe: Chief Montgomery Scott's "if it's a creature" is judged of the permanent as it would exist on the battlefield
+# (CR 614.12). Under Bot2's March of the Machines a noncreature artifact is a creature, so Class-4 Tactical Cube enters as an
+# artifact creature and a Spacecraft: X = 2 (Forest, Island), so two +1/+1 counters and two charge counters.
+[Bot1 Deck]
+Forest
+Island
+Forest
+Island
+Chief Montgomery Scott
+Class-4 Tactical Cube
+Forest
+Island
+Forest
+Island
+Forest x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+March of the Machines
+Island x25
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.March of the Machines.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Chief Montgomery Scott.Cast
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Chief Montgomery Scott.Activate(Ability: Strange new worlds)
+Bot1.Choose(Class-4 Tactical Cube)
+[T11 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Class-4 Tactical Cube.Counters.Charge = 2
+Bot1.Battlefield.Class-4 Tactical Cube.Counters.PlusOnePlusOne = 2

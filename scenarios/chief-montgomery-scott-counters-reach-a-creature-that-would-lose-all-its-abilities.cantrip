@@ -1,0 +1,45 @@
+# Chief Montgomery Scott's counters are the replacement effect of the ability putting the card onto the battlefield, not an
+# ability of the permanent (CR 614.1c): under Dress Down, cast in response, Walking Ballista would have none of its own "enters with X +1/+1
+# counters" (CR 613.1f, 614.12), but still enters with Scott's X = 1 (Forest) and survives as a 1/1.
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Chief Montgomery Scott
+Walking Ballista
+Black Lotus
+Dress Down
+Forest x14
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chief Montgomery Scott.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Chief Montgomery Scott.Activate(Ability: Strange new worlds)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Choose(Walking Ballista)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Walking Ballista.Power = 1

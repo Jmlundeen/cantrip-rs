@@ -1,0 +1,42 @@
+# Chief Montgomery Scott's "it enters with X additional +1/+1 counters on it if it's a creature" adds to the counters the
+# permanent already enters with (CR 614.1c, 122.6): Triskelion's own "this creature enters with three +1/+1 counters on it" is
+# ordered first (CR 616.1), and Scott's one counter (X = 1, Forest) comes on top of those three - four, not one.
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Chief Montgomery Scott
+Triskelion
+Black Lotus
+Forest x15
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chief Montgomery Scott.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Chief Montgomery Scott.Activate(Ability: Strange new worlds)
+Bot1.Choose(Triskelion)
+Bot1.Replace(three)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Triskelion.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Triskelion.Power = 5

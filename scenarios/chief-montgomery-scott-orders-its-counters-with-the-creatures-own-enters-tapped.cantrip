@@ -1,0 +1,43 @@
+# Chief Montgomery Scott's "it enters with X additional +1/+1 counters on it if it's a creature" is a replacement effect
+# (CR 614.1c) ordered with the others that modify how the permanent enters, by the player it enters under (CR 616.1):
+# Shambling Cie'th's own "this creature enters tapped" is offered with it, and both apply. X = 1 (Forest).
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Chief Montgomery Scott
+Shambling Cie'th
+Black Lotus
+Forest x15
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chief Montgomery Scott.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Chief Montgomery Scott.Activate(Ability: Strange new worlds)
+Bot1.Choose(Shambling Cie'th)
+Bot1.Replace(additional counters)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Shambling Cie'th.Tapped = true
+Bot1.Battlefield.Shambling Cie'th.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Shambling Cie'th.Power = 4
