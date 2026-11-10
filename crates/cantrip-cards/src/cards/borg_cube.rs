@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{affinity, assimilate, choose, select, station, statics, targets, triggers};
+use cantrip_mechanics::{affinity, assimilate, station, statics, targets, triggers};
 use cantrip_oracle as oracle;
 
 const STATION_TEXT: &str = "Station (Tap another creature you control: Put charge counters equal to its power on this Spacecraft. Station only as a sorcery. It's an artifact creature at 12+.)";
@@ -10,24 +10,7 @@ const TWELVE_PLUS: &str = "12+ | Artifact creatures you control have flying.";
 /// linked creature card if possible, otherwise exiles its legal target and links it for the next trigger. A lone available
 /// card is forced; otherwise the controller chooses as the ability resolves (CR 608.2d).
 fn assimilate_or_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let exiled = g.exiled_with(g.linked(item));
-    let eligible: Vec<ObjectId> = exiled.into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    let chosen = if eligible.is_empty() {
-        None
-    } else {
-        choose::select(
-            g,
-            item.controller,
-            item.object,
-            Purpose::PutOntoBattlefield,
-            eligible,
-            select::creature_cards(select::exactly(1)),
-        )?
-        .into_iter()
-        .next()
-    };
-    let assimilated = if let Some(card) = chosen { assimilate::assimilate(g, item, card)?.is_some() } else { false };
-    if !assimilated {
+    if assimilate::a_creature_card_exiled_with(g, item)?.is_none() {
         if let Some(creature) = targets::object(g, item, 0) {
             g.exile_with(&[creature], g.linked(item), false);
         }

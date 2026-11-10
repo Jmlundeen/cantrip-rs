@@ -1,0 +1,45 @@
+# "Assimilate a creature card exiled with it" takes only a creature card: Bot2 discards an Island to hand size on turn 2,
+# the Assessor's entry trigger exiles that graveyard on turn 3, and when it attacks on turn 5 the pile holds the Island
+# alone. Nothing is assimilated and nothing is asked (CR 608.2d): the Island stays in exile and the Assessor deals 5.
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Jet
+Black Lotus
+Assimilation Assessor
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Island
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Assimilation Assessor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Island
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Assimilation Assessor > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Life = 15
+
+[Expect]
+Bot1.Battlefield = Assimilation Assessor; Mox Jet; Sol Ring; Swamp
+Exile = Island
