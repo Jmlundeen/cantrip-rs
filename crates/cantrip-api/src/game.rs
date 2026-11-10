@@ -711,6 +711,7 @@ pub trait Query {
         self.state().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::Suspected)
     }
 
+
     /// Whether `target` could be chosen by `asker` for a spell or ability: hexproof and protection (CR 702.11,
     /// 702.16b). The slot's own filter is the card's; this is the rules'.
     fn can_target(&self, asker: &Asker, target: Target) -> bool;
@@ -1736,4 +1737,25 @@ pub fn instruction(g: &mut dyn Game, f: impl FnOnce(&mut dyn Game)) {
         }
         Ok(())
     });
+}
+
+/// Every player goading `id` (CR 701.15a): the goader of a resolved goad effect and, for a static ability that says the
+/// creature is goaded, the controller of its source (CR 701.15b) - each player once (CR 701.15d). A goaded creature attacks
+/// each combat if able and attacks a player other than each of them if able (CR 701.15b).
+pub fn goaders(q: &dyn Query, id: ObjectId) -> Vec<PlayerId> {
+    let mut goaders: Vec<PlayerId> =
+        q.state().effects.iter().filter(|e| e.affected == id && e.kind == EffectKind::Goaded).map(|e| e.controller).collect();
+    for &source in q.state().battlefield() {
+        if q.lost_all_abilities(source) {
+            continue;
+        }
+        let obj = q.state().obj(source);
+        let asker = Asker::new(source, obj.controller);
+        if q.card(obj.card).goads.iter().any(|rule| rule(q, &asker, id)) {
+            goaders.push(obj.controller);
+        }
+    }
+    goaders.sort_unstable_by_key(|p| p.0);
+    goaders.dedup();
+    goaders
 }

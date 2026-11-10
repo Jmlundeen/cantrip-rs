@@ -1,0 +1,49 @@
+# Koloth, Tribble Hunter: "All Tribbles get +1/+0 and are goaded" is about Tribbles and nothing else (CR 701.15a) - Bot2's
+# Ornithopter, a creature that is no Tribble, stays a 0/2 and is not goaded, while the two Tribble tokens each player got at
+# Bot1's end step are 2/1 and goaded. Bot1's own Tribbles are goaded by Bot1's Koloth as well, so they attack on turn 5 by the
+# requirement "attacks each combat if able" (CR 701.15b) and deal 4: Bot2 is at 16.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Koloth, Tribble Hunter
+Mountain x2
+Mountain x12
+
+[Bot2 Deck]
+Ornithopter
+Forest x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Koloth, Tribble Hunter.Cast
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+? Bot2.Battlefield.Ornithopter.GoadedBy = (absent)
+? Bot1.Battlefield.Tribble Token#1.Power = 2
+? Bot1.Battlefield.Tribble Token#1.Toughness = 1
+? Bot1.Battlefield.Tribble Token#1.GoadedBy = Bot1
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Tribble Token#1 > Bot2; Tribble Token#2 > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Life = 16
+
+[Expect]
+Bot2.Life = 16

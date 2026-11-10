@@ -3242,6 +3242,10 @@ pub struct StartingDeck<'a> {
 pub type CompanionCondition = fn(&dyn Query, &StartingDeck) -> bool;
 
 /// A card: characteristics from the Oracle data, behavior as code.
+/// A static ability that goads creatures (CR 701.15a): whether `source`, the `Asker`, goads the creature, the goader
+/// being the source's controller (CR 701.15b).
+pub type GoadRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 #[derive(Clone, Copy)]
 pub struct CardDef {
     pub name: &'static str,
@@ -3579,6 +3583,9 @@ pub struct CardDef {
     /// Its static abilities that let creatures attack as though they didn't have defender (CR 702.3b, 609.4), while it is
     /// on the battlefield with its abilities. Asked only of a creature with defender as attackers are declared.
     pub attacks_despite_defender: &'static [AttackDespiteDefenderRule],
+    /// Its static abilities that goad creatures (CR 701.15a), while it is on the battlefield with its abilities: "All
+    /// Tribbles ... are goaded". The goader is the source's controller (CR 701.15b).
+    pub goads: &'static [GoadRule],
     /// Its static abilities that change who can target what and whether ward triggers, while it is on the battlefield.
     pub targeting_rules: &'static [TargetingRule],
     /// Its static abilities that give players keyword abilities ("You have shroud", CR 702.18a), while it is on the
@@ -3862,6 +3869,7 @@ impl CardDef {
         attack_costs: &[],
         attack_limits: &[],
         attacks_despite_defender: &[],
+        goads: &[],
         targeting_rules: &[],
         player_keywords: &[],
         player_protection: &[],
@@ -3968,6 +3976,7 @@ impl CardDef {
             (!self.attack_costs.is_empty(), "attack costs"),
             (!self.attack_limits.is_empty(), "attack limits"),
             (!self.attacks_despite_defender.is_empty(), "attacking despite defender"),
+            (!self.goads.is_empty(), "static goads"),
             (!self.targeting_rules.is_empty(), "targeting rules"),
             (!self.player_keywords.is_empty(), "player keywords"),
             (!self.player_protection.is_empty(), "player protection"),
@@ -4217,6 +4226,8 @@ pub struct CardTable {
     pub attack_rules: Vec<bool>,
     /// Which cards forbid attacking alone (CR 508.1c).
     pub attack_alone_rules: Vec<bool>,
+    /// Which cards goad creatures with a static ability (CR 701.15a).
+    pub goads: Vec<bool>,
     /// Per card: it has a targeting rule. Read to find the few battlefield sources of one, never to ask the table.
     pub targeting_rules: Vec<bool>,
     /// Per card: it gives players keyword abilities (`CardDef::player_keywords`) or protection (`CardDef::player_protection`).
@@ -4811,6 +4822,7 @@ impl CardTable {
             cards.iter().map(|c| !c.block_rules.is_empty() || !c.blocker_limits.is_empty() || !c.block_capacities.is_empty() || !c.additional_blocks.is_empty()).collect();
         let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
         let attack_alone_rules: Vec<bool> = cards.iter().map(|c| !c.attack_alone_rules.is_empty()).collect();
+        let goads: Vec<bool> = cards.iter().map(|c| !c.goads.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let player_keywords: Vec<bool> = cards.iter().map(|c| !c.player_keywords.is_empty() || !c.player_protection.is_empty()).collect();
         // Like `look_back`: one it prints, one it lists to give, or any a static ability of its own could give itself.
@@ -4891,6 +4903,7 @@ impl CardTable {
             block_rules,
             attack_rules,
             attack_alone_rules,
+            goads,
             targeting_rules,
             player_keywords,
             mana_triggers,
