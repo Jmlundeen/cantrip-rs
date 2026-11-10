@@ -313,6 +313,10 @@ impl Query for AsText<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        self.q.goaders(creature)
+    }
+
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
         self.q.producible_types(permanent)
     }

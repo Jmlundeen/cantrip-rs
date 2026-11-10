@@ -1913,6 +1913,10 @@ impl Query for Game {
         ops::can_untap(self, self.cards, permanent)
     }
 
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        static_rules::goaders(self, self.cards, creature)
+    }
+
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
         actions::producible_types_in(self, permanent)
     }
@@ -1978,6 +1982,10 @@ impl Query for Cx<'_> {
 
     fn can_untap(&self, permanent: ObjectId) -> bool {
         ops::can_untap(self, self.cards(), permanent)
+    }
+
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        static_rules::goaders(self, self.cards(), creature)
     }
 
     fn mana_ability_x(&self) -> Option<u32> {

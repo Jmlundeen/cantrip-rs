@@ -1,0 +1,53 @@
+# Koloth, Tribble Hunter's "All Tribbles ... are goaded" is part of its copiable values (CR 707.2), so Bot2's Clone that
+# enters as a copy of Bot1's Koloth has it too, its goader Bot2 (CR 701.15b): every Tribble is then goaded by both Bot1 and
+# Bot2, each once (CR 701.15d) - Bot1's Tribbles and Bot2's alike.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Koloth, Tribble Hunter
+Mountain x2
+Mountain x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Clone
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Koloth, Tribble Hunter.Cast
+? Bot1.Mana =
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Tribble Token#1.GoadedBy = Bot1
+? Bot2.Battlefield.Tribble Token#1.GoadedBy = Bot1
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Clone.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+Bot2.Target(Bot1.Battlefield.Koloth, Tribble Hunter)
+[T4 Bot2.Main2]
+? Bot2.Battlefield.Koloth, Tribble Hunter.Power = 3
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Tribble Token#1.GoadedBy = Bot1; Bot2
+Bot1.Battlefield.Tribble Token#2.GoadedBy = Bot1; Bot2
+Bot2.Battlefield.Tribble Token#1.GoadedBy = Bot1; Bot2
+Bot2.Battlefield.Tribble Token#2.GoadedBy = Bot1; Bot2

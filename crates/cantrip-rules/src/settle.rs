@@ -1464,6 +1464,10 @@ impl Query for BoardThen<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        self.q.goaders(creature)
+    }
+
     fn words(&self, id: ObjectId) -> Words {
         self.q.words(id)
     }

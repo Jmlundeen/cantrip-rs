@@ -283,6 +283,10 @@ impl Query for Given<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        self.q.goaders(creature)
+    }
+
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
         self.q.producible_types(permanent)
     }
@@ -382,6 +386,10 @@ impl Query for Reader<'_> {
 
     fn can_untap(&self, permanent: ObjectId) -> bool {
         crate::ops::can_untap(self, self.cards, permanent)
+    }
+
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        crate::static_rules::goaders(self, self.cards, creature)
     }
 
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {

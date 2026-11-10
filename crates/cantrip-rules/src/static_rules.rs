@@ -642,6 +642,41 @@ fn attack_restrictors(q: &dyn Query, cards: &CardTable) -> Vec<(Asker, &'static 
         .collect()
 }
 
+/// The permanents on the battlefield with a static ability that goads creatures (`CardDef::goads`, CR 701.15a), each text
+/// that has one with the `Asker` its rules are asked with: every text the permanent has (CR 707.2, 613.2a: a copy's, a
+/// merged permanent's components', an exception's), and none of one that has lost its abilities (CR 613.1f). Nearly every
+/// board has none.
+pub fn goad_sources(q: &dyn Query, cards: &CardTable) -> Vec<(Asker, &'static CardDef)> {
+    q.state()
+        .battlefield()
+        .iter()
+        .flat_map(|&id| {
+            let obj = q.state().obj(id);
+            cards
+                .texts_linked(q.state(), id)
+                .filter(move |(card, _)| cards.goads[card.0 as usize] && !q.lost_all_abilities(id))
+                .map(move |(card, by)| (Asker { instance: None, source: id, controller: obj.controller, by, spell: false }, cards.get(card)))
+        })
+        .collect()
+}
+
+/// Every player goading `creature` (CR 701.15a), in seat order, each once (CR 701.15d): the goader of a resolved goad effect,
+/// and the controller of a source among `sources` (`goad_sources`) whose static ability says the creature is goaded (CR
+/// 701.15b).
+pub fn goaders_among(q: &dyn Query, sources: &[(Asker, &'static CardDef)], creature: ObjectId) -> Vec<PlayerId> {
+    let effects = q.state().effects.iter().filter(|e| e.affected == creature && e.kind == EffectKind::Goaded).map(|e| e.controller);
+    let statics = sources.iter().filter(|(asker, def)| def.goads.iter().any(|rule| rule(q, asker, creature))).map(|(asker, _)| asker.controller);
+    let mut goaders: Vec<PlayerId> = effects.chain(statics).collect();
+    goaders.sort_unstable_by_key(|p| p.0);
+    goaders.dedup();
+    goaders
+}
+
+/// Every player goading `creature` now (`goaders_among` the battlefield's `goad_sources`).
+pub fn goaders(q: &dyn Query, cards: &CardTable, creature: ObjectId) -> Vec<PlayerId> {
+    goaders_among(q, &goad_sources(q, cards), creature)
+}
+
 /// The creatures among `creatures` that a static ability forbids to attack alone (CR 508.1c; `CardDef::attack_alone_rules`),
 /// each asked of a rule of the permanent that says so with that permanent's `Asker`. Pet Sehlat.
 pub fn attacks_alone_barred(q: &dyn Query, cards: &CardTable, creatures: &[ObjectId]) -> Vec<ObjectId> {

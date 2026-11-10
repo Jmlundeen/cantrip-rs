@@ -245,6 +245,10 @@ impl Query for AsSpell<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        self.q.goaders(creature)
+    }
+
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
         self.q.producible_types(permanent)
     }
@@ -318,6 +322,10 @@ impl Query for WithWords<'_> {
 
     fn can_untap(&self, permanent: ObjectId) -> bool {
         self.q.can_untap(permanent)
+    }
+
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        self.q.goaders(creature)
     }
 
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
@@ -3701,6 +3709,10 @@ impl Query for Announcing<'_> {
         self.q.can_untap(permanent)
     }
 
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        self.q.goaders(creature)
+    }
+
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
         self.q.producible_types(permanent)
     }
@@ -3800,6 +3812,11 @@ impl Query for Watch<'_> {
     fn can_untap(&self, permanent: ObjectId) -> bool {
         self.w.told.set(true);
         self.q.can_untap(permanent)
+    }
+
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        self.w.told.set(true);
+        self.q.goaders(creature)
     }
 
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
@@ -4495,6 +4512,10 @@ impl Query for AsFace<'_> {
 
     fn can_untap(&self, permanent: ObjectId) -> bool {
         self.cx.can_untap(permanent)
+    }
+
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        self.cx.goaders(creature)
     }
 
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {
@@ -8222,6 +8243,10 @@ impl Query for QueryAsFace<'_> {
 
     fn can_untap(&self, permanent: ObjectId) -> bool {
         self.q.can_untap(permanent)
+    }
+
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId> {
+        self.q.goaders(creature)
     }
 
     fn producible_types(&self, permanent: ObjectId) -> (ColorSet, bool) {

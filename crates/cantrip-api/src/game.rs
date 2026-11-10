@@ -754,6 +754,12 @@ pub trait Query {
     /// unpayable: removing one replaces the untap and still pays it (CR 118.11, 122.1d). Restrictions on the untap step
     /// alone do not prohibit untapping as a cost. Soldevi Golem and Pili-Pala's untap costs use this authority.
     fn can_untap(&self, permanent: ObjectId) -> bool;
+
+    /// Every player goading `creature` (CR 701.15a), in seat order, each once (CR 701.15d): the goader of a resolved goad
+    /// effect and, for a static ability that says the creature is goaded ("All Tribbles ... are goaded"), the controller of
+    /// its source (CR 701.15b), whatever text the source has it from (CR 707.2, 613.2a) and while it has its abilities (CR
+    /// 613.1f). A goaded creature attacks each combat if able and attacks a player other than each of them if able.
+    fn goaders(&self, creature: ObjectId) -> Vec<PlayerId>;
 }
 
 /// Changing the game.

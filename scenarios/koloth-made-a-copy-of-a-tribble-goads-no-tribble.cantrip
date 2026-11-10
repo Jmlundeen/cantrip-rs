@@ -1,0 +1,54 @@
+# Koloth, Tribble Hunter's "All Tribbles ... are goaded" is in its copiable values (CR 707.2, 613.2a): once Koloth has
+# become a copy of something else, it no longer has that ability, whatever card it is printed on. Bot1's Koloth makes each
+# player two Tribbles at Bot1's end step, all goaded by Bot1; on turn 4 Bot2 casts Mirrorweave targeting its own first
+# Tribble, and every other creature - Koloth among them - is a copy of that Tribble until end of turn: no Tribble is goaded,
+# Bot2's Tribbles may stay home, and Bot1 keeps its 20 life.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Koloth, Tribble Hunter
+Mountain x2
+Mountain x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mirrorweave
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Koloth, Tribble Hunter.Cast
+? Bot1.Mana =
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Tribble Token#2.GoadedBy = Bot1
+? Bot1.Battlefield.Tribble Token#1.GoadedBy = Bot1
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Mirrorweave.Cast(Bot2.Battlefield.Tribble Token#1)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Tribble Token#1.GoadedBy = (absent)
+? Bot2.Battlefield.Tribble Token#2.GoadedBy = (absent)
+? Bot1.Battlefield.Tribble Token#1.GoadedBy = (absent)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Bot2.Battlefield.Tribble Token#1.Tapped = false
+Bot2.Battlefield.Tribble Token#2.Tapped = false

@@ -7,6 +7,7 @@ impl Query for UnusedQuery {
     fn can_attach_to(&self, _: ObjectId, _: ObjectId) -> bool { unreachable!() }
     fn enchanting_forbidden(&self, _: ObjectId, _: ObjectId) -> bool { unreachable!() }
         fn can_untap(&self, _: ObjectId) -> bool { unreachable!() }
+        fn goaders(&self, _: ObjectId) -> Vec<PlayerId> { unreachable!() }
     fn state(&self) -> &GameState { panic!("predicate does not inspect state") }
     fn card(&self, _: CardId) -> &'static CardDef { panic!("unused") }
     fn chars(&self, _: ObjectId) -> Chars { panic!("unused") }

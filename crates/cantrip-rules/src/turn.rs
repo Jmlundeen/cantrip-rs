@@ -1272,6 +1272,8 @@ fn block_capacity(cx: &Cx, blocker: ObjectId, rule_sources: &[ObjectId]) -> u32 
 /// (`AttackRules::solve`).
 fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], barred: Vec<(ObjectId, Target)>, costs: &[AttackCost]) -> AttackRules {
     let mut required = Vec::new();
+    // The static abilities that goad, found once for every creature.
+    let goad_sources = crate::static_rules::goad_sources(cx, cx.cards());
     for &id in eligible {
         for _ in 0..cx.chars(id).must_attack {
             required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
@@ -1287,15 +1289,14 @@ fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], barred: Vec<
             required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
             required.push(RequiredAttack { attacker: id, aim: AttackAim::PlayerOtherThan(e.controller) });
         }
-        let mut goaders: Vec<PlayerId> = Vec::new();
+        // Goad (CR 701.15a-d), from a resolved effect and from a static ability that says the creature is goaded alike; the
+        // same player goading it again makes no further requirement (CR 701.15d).
+        for goader in crate::static_rules::goaders_among(cx, &goad_sources, id) {
+            required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
+            required.push(RequiredAttack { attacker: id, aim: AttackAim::PlayerOtherThan(goader) });
+        }
         for e in cx.s().effects.iter().filter(|e| e.affected == id) {
             match e.kind {
-                // The same player goading it again makes no further requirement (CR 701.15d).
-                EffectKind::Goaded if !goaders.contains(&e.controller) => {
-                    goaders.push(e.controller);
-                    required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
-                    required.push(RequiredAttack { attacker: id, aim: AttackAim::PlayerOtherThan(e.controller) });
-                }
                 EffectKind::MustAttackAt(at) if in_force(cx, e) => required.push(RequiredAttack { attacker: id, aim: AttackAim::At(at) }),
                 _ => {}
             }

@@ -1447,7 +1447,8 @@ impl<'a> Projector<'a> {
             printed_toughness: printed_pt.map(|(_, t)| t),
             exerted: obj.marks.exerted_by != 0,
             saddled: game.is_saddled(id),
-            goaded: effect(EffectKind::Goaded),
+            // By a resolved goad or a static ability that says it is goaded (CR 701.15a): every Tribble under Koloth.
+            goaded: on_battlefield && !Query::goaders(game, id).is_empty(),
             band: s.attackers.iter().find(|a| a.id == id).map_or(0, |a| crate::prompt::wire(a.band)),
             harnessed: effect(EffectKind::Harnessed),
             choices,
@@ -2168,6 +2169,30 @@ mod tests {
             assert!(commander.commander_damage.iter().any(|damage| damage.player == commander.owner), "damage to the commander's owner is tracked too");
             assert_eq!(commander.commander_damage[0].damage, 0);
         }
+    }
+
+    /// A creature a static ability says is goaded is shown goaded as one a resolved goad is (CR 701.15a): Koloth, Tribble
+    /// Hunter's "All Tribbles ... are goaded" reaches the other player's Tribble while Koloth is on the battlefield.
+    #[test]
+    fn a_creature_goaded_by_a_static_ability_is_shown_goaded() {
+        let cards = cantrip_engine::cards();
+        let deck = vec![cards.find("Plains").expect("the card"); 20];
+        let mut game = cantrip_engine::Game::new(cards, &Setup { decks: vec![deck.clone(), deck], ..Default::default() });
+        let mut put = |name: &str, owner: PlayerId| {
+            let id = game.state.push_obj(Obj::new(cards.find(name).expect("the card"), owner, Zone::BATTLEFIELD));
+            game.state.zone_push(Zone::BATTLEFIELD, id);
+            id
+        };
+        let tribble = put("Tribble Cluster", PlayerId(1));
+        let goaded = |game: &cantrip_engine::Game| {
+            let mut handles = HandleSpace::new();
+            let view = player_view(game, PlayerId(0), &mut handles, &["Alice".into(), "Bob".into()], &[false, false], &HashSet::new(), &HashSet::new(), &HashSet::new());
+            view.objects.iter().find(|o| o.handle == handles.handle(tribble)).expect("the Tribble").goaded
+        };
+        assert!(!goaded(&game), "no Koloth, no goad");
+        let koloth = game.state.push_obj(Obj::new(cards.find("Koloth, Tribble Hunter").expect("the card"), PlayerId(0), Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, koloth);
+        assert!(goaded(&game), "Koloth's static ability goads every Tribble");
     }
 
     /// "Hexproof from [quality]" granted to a card is worded as printed cards word it (CR 702.11d, 702.11f-g).
