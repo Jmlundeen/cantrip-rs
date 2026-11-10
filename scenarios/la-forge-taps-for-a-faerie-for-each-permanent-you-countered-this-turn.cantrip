@@ -1,0 +1,58 @@
+# La Forge, Thoughtful as Ever's {T} ability makes one 1/1 blue Faerie token with flying for the one permanent Bot1 has put a
+# counter on this turn (its Memnite, from Revitalizing Repast) and none for anything else. The four colorless moxen cannot pay
+# the {U} in its cost, so the cast is refused until Mox Sapphire is there; on a later turn, with no counter put this turn, the
+# same tap makes no token at all.
+
+[Bot1 Deck]
+La Forge, Thoughtful as Ever
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Memnite
+Revitalizing Repast
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+! Bot1.Hand.La Forge, Thoughtful as Ever.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.La Forge, Thoughtful as Ever.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Revitalizing Repast.Cast(Bot1.Battlefield.Memnite)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.La Forge, Thoughtful as Ever.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 8
+[T5 Bot1.Main1]
+Bot1.Battlefield.La Forge, Thoughtful as Ever.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.La Forge, Thoughtful as Ever.Tapped = true
+Bot1.Battlefield.Faerie Token.Colors = Blue
+Bot1.Battlefield.Faerie Token.Power = 1
+Bot1.Battlefield.Faerie Token.Toughness = 1
+Bot1.Battlefield.Faerie Token.Keywords = Flying

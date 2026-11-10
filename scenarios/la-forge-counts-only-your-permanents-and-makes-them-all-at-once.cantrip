@@ -1,0 +1,69 @@
+# Two permanents Bot1 put a counter on this turn (Memnite and La Forge itself) give two Faerie tokens from one tap. In response
+# Bot2 puts a counter on its own Grizzly Bears in the same turn: that permanent is not one Bot1 controls, so it adds nothing and
+# the count stays at two.
+
+[Bot1 Deck]
+La Forge, Thoughtful as Ever
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Memnite
+Revitalizing Repast
+Revitalizing Repast
+Island x13
+
+[Bot2 Deck]
+Grizzly Bears
+Mox Jet
+Mox Emerald
+Revitalizing Repast
+Forest x16
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.La Forge, Thoughtful as Ever.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Revitalizing Repast.Cast(Bot1.Battlefield.Memnite)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Hand.Revitalizing Repast.Cast(Bot1.Battlefield.La Forge, Thoughtful as Ever)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot1.Battlefield.La Forge, Thoughtful as Ever.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Revitalizing Repast.Cast(Bot2.Battlefield.Grizzly Bears)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Memnite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.La Forge, Thoughtful as Ever.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Faerie Token#1.Power = 1
+Bot1.Battlefield.Faerie Token#1.Keywords = Flying
+Bot1.Battlefield.Faerie Token#2.Power = 1
+Bot1.Battlefield.Faerie Token#2.Keywords = Flying
+Bot1.Battlefield.Faerie Token#3 = (absent)
+Bot2.Battlefield.Faerie Token#1 = (absent)

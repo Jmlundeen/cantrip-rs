@@ -1,0 +1,8 @@
+{
+  "name": "La Forge, Thoughtful as Ever",
+  "manaCost": "{3}{U}",
+  "type": "Legendary Creature — Human Artificer",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "{T}: For each permanent you control that you've put a counter on this turn, create a 1/1 blue Faerie creature token with flying."
+}
