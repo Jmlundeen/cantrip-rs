@@ -1,0 +1,34 @@
+# Commander William Riker: "{1}, {T}: You and target opponent each draw two cards." The target must be an opponent: Bot1 himself is not one of the ability's candidates, and only
+# Bot2 can be named.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Commander William Riker
+Forest x18
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Commander William Riker.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Commander William Riker.Activate(Ability: You and target opponent each draw two cards; Bot1)
+Bot1.Battlefield.Commander William Riker.Activate(Ability: You and target opponent each draw two cards; Bot2)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot2.Hand.Count = 9
