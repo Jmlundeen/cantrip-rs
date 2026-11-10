@@ -1345,6 +1345,19 @@ pub fn this_blocks_a_creature(q: &dyn Query, asker: &Asker, event: &Event) -> Op
     }
 }
 
+/// "Whenever this creature blocks a creature with flying" (CR 509.3b, 702.22h): every `Blocks` event of the source (the attackers of
+/// a band it blocks too, `declared: false`) whose attacker is a creature with flying as the block is declared. Skystinger and
+/// Woolly Spider print it.
+pub fn this_blocks_a_creature_with_flying(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Blocks { blocker, attacker, .. } if *blocker == source && crate::targets::has_flying_creature(q, *attacker) => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "Whenever this creature blocks a creature with flying" (`this_blocks_a_creature_with_flying`).
+pub const THIS_BLOCKS_A_CREATURE_WITH_FLYING: Trigger = when(EventMask::BLOCKS, this_blocks_a_creature_with_flying);
+
 /// A player casts a spell of the given type; capture that spell as the subject (CR 603.2).
 /// Bloodbond March checks creatures and Presence of the Master checks enchantments.
 pub fn player_casts_spell_of_type(q: &dyn Query, event: &Event, kind: CardType) -> Option<Fired> {
