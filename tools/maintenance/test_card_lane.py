@@ -479,9 +479,9 @@ class LaneTest(unittest.TestCase):
         taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--engine", "--issue", "7")
         self.assertEqual(taken.returncode, 0, taken.stderr)
         self.card_b_scenario()
-        self.write("crates/cantrip-state/src/lib.rs", "// the core change\n")
-        self.write("crates/cantrip-mechanics/src/shared_thing.rs", "// the shared recipe\n")
-        self.write("dotnet/src/Thing.cs", "// the client change\n")
+        self.write("crates/cantrip-state/src/lib.rs", "pub fn entry_ready() {}\n")
+        self.write("crates/cantrip-mechanics/src/shared_thing.rs", "pub fn shared_recipe() {}\n")
+        self.write("dotnet/src/Thing.cs", "public sealed class ThingView {}\n")
         state = self.state()
         card = next(entry for entry in state["cards"] if entry["name"] == "Card B")
         claim = card["claim"]
@@ -491,9 +491,9 @@ class LaneTest(unittest.TestCase):
         made = lane.plan_commits(self.main, store, card, claim, reference, 7)
         self.assertEqual([entry["kind"] for entry in made], ["engine", "mechanics", "client", "card"])
         self.assertEqual(self.git(self.main, "log", "-4", "--format=%s").splitlines(),
-                         ["Card: Card B", "Client: what Card B adds to the client",
-                          "Mechanics: what Card B needs of the shared mechanics",
-                          "Engine: what Card B needs of the engine"])
+                         ["Card: Card B", "Client: Thing::ThingView",
+                          "Mechanics: shared_thing::shared_recipe",
+                          "Engine: state::entry_ready"])
         body = self.git(self.main, "log", "-1", "--format=%B")
         self.assertTrue(body.startswith("Card: Card B"))
         self.assertIn("Closes #7", body)

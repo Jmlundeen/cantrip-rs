@@ -1404,6 +1404,44 @@ def print_gates(card, root, gates, fast):
     print("check: PASS" if all(gate["status"] != "fail" for gate in gates) else "check: FAIL - nothing is committed")
 
 
+def surface_module(path):
+    """The module a changed file belongs to: `assimilate` for `crates/cantrip-mechanics/src/assimilate.rs`.
+
+    A `lib.rs` is its crate's directory with the `cantrip-` dropped (`state` for `cantrip-state`).
+    """
+    stem = os.path.splitext(os.path.basename(path))[0]
+    # A crate's `lib.rs` is two levels down: `crates/cantrip-state/src/lib.rs` is the `state` module.
+    name = os.path.basename(os.path.dirname(os.path.dirname(path))) if stem == "lib" else stem
+    return name[len("cantrip-"):] if name.startswith("cantrip-") else name
+
+
+RUST_ITEM = re.compile(r"^\+\s*pub (?:unsafe )?(?:fn|const|static|struct|enum|trait|type|union) (\w+)", re.M)
+CLIENT_TYPE = re.compile(r"^\+\s*(?:public|internal)\s+(?:sealed\s+|static\s+|partial\s+|abstract\s+)*"
+                         r"(?:class|record|struct|enum|interface) (\w+)", re.M)
+CLIENT_MEMBER = re.compile(r"^\+\s*public\s+[^=(]*?\b(\w+)\s*\(", re.M)
+
+
+def surface_message(prefix, root, paths):
+    """`Mechanics: assimilate::assimilate_all` - the repository's subjects name the surface changed, never the card.
+
+    Each changed file contributes its module and the public items it adds; one that adds none names only its module,
+    as `Mechanics: targets::SNOW_LAND` names the constant it adds.
+    """
+    names = []
+    for path in paths:
+        module = surface_module(path)
+        staged = git(root, "diff", "--cached", "-U0", "--", path).stdout
+        items = []
+        for pattern in (RUST_ITEM, CLIENT_TYPE, CLIENT_MEMBER):
+            items.extend(pattern.findall(staged))
+        items = list(dict.fromkeys(items))
+        if items:
+            names.extend(f"{module}::{item}" for item in items)
+        else:
+            names.append(module)
+    return f"{prefix}: " + ", ".join(dict.fromkeys(names))
+
+
 def plan_commits(root, store, card, claim, reference, issue):
     """Stage by category and commit Engine, Mechanics, Client, then exactly one Card commit."""
     entries = changed_paths(root)
@@ -1422,9 +1460,10 @@ def plan_commits(root, store, card, claim, reference, issue):
         groups[kind].append(entry["path"])
     if not groups["card"]:
         raise Refused("nothing of the card is changed: its content, Rust file or a scenario")
-    messages = {"engine": f"Engine: what {card['name']} needs of the engine",
-                "mechanics": f"Mechanics: what {card['name']} needs of the shared mechanics",
-                "client": f"Client: what {card['name']} adds to the client",
+    prefixes = {"engine": "Engine", "mechanics": "Mechanics", "client": "Client"}
+    messages = {"engine": None,  # each named from the surface it changes, once its paths are staged
+                "mechanics": None,
+                "client": None,
                 "card": f"Card: {card['name']}\n\nCloses #{issue}"}
     made = []
     for kind in ("engine", "mechanics", "client", "card"):
@@ -1435,7 +1474,7 @@ def plan_commits(root, store, card, claim, reference, issue):
         added = git(root, "add", "-A", "--", *paths, check=False)
         if added.returncode != 0:
             raise Failed(f"git add failed:\n{(added.stdout + added.stderr).strip()}")
-        message = messages[kind]
+        message = surface_message(prefixes[kind], root, paths) if kind in prefixes else messages[kind]
         committed = git(root, "commit", "-m", message, check=False)
         if committed.returncode != 0:
             raise Refused(f"git commit failed for {kind}:\n{(committed.stdout + committed.stderr).strip()[-3000:]}")
