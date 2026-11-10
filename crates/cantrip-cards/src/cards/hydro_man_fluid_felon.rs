@@ -1,20 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects;
-use cantrip_mechanics::triggers::YOUR_END_STEP;
+use cantrip_mechanics::triggers::{self, YOUR_END_STEP};
 use cantrip_oracle as oracle;
-
-/// "Whenever you cast a blue spell" (CR 603.2): the spell is blue by its own characteristics (CR 105.2), and "blue" is a
-/// word of Hydro-Man's text (CR 612).
-fn you_cast_a_blue_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { spell, player, .. }
-            if *player == q.controller(source) && q.chars(*spell).colors.has(q.words(source).color(Color::Blue)) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
-}
 
 /// "If Hydro-Man is a creature" (CR 603.4): an intervening "if", checked as the ability triggers and as it resolves.
 fn is_a_creature(q: &dyn Query, asker: &Asker) -> bool {
@@ -42,7 +29,7 @@ fn become_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::SPELL_CAST, you_cast_a_blue_spell), effects::this_gets::<1, 1>, "Whenever you cast a blue spell, if Hydro-Man is a creature, he gets +1/+1 until end of turn.")
+        triggered(when_asked(EventMask::SPELL_CAST, triggers::you_cast_a_spell_of_color::<{ Color::Blue as u8 }>), effects::this_gets::<1, 1>, "Whenever you cast a blue spell, if Hydro-Man is a creature, he gets +1/+1 until end of turn.")
             .condition(is_a_creature),
         triggered(YOUR_END_STEP, become_a_land, "At the beginning of your end step, untap Hydro-Man. Until your next turn, he becomes a land and gains \"{T}: Add {U}.\" (He's not a creature during that time.)"),
     ],

@@ -1261,6 +1261,20 @@ pub fn a_player_casts_a_spell_of_color<const COLOR: u8>(q: &dyn Query, me: &Aske
     }
 }
 
+/// "Whenever you cast a [color] spell" (CR 603.2, 601.2i): a spell its controller casts, judged on the spell as it stands on the
+/// stack once cast. `COLOR` is a `Color` as `u8`, a word of this permanent's own text (CR 612.2). Hydro-Man, Fluid Felon (blue)
+/// and Mountain Titan (black) print it.
+pub fn you_cast_a_spell_of_color<const COLOR: u8>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. }
+            if *player == me.controller && q.chars(*spell).colors.has(q.words(me.source).color(Color::ALL[COLOR as usize])) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a spell that targets a creature you control" (CR 603.2, 601.2c): a question about the spell as it is
 /// cast, whose targets are public from the moment it was announced. One trigger for the spell however many of the creatures it
 /// targets (CR 603.2c is about events: one cast is one event). A copy is not cast (CR 707.10), so it sets nothing off; a spell

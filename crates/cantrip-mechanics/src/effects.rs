@@ -2585,3 +2585,15 @@ pub fn draw_a_card_for_each_artifact_you_control(g: &mut dyn Game, item: &StackI
     g.draw(item.controller, count);
     Ok(())
 }
+
+/// "Attacking creatures get +`power`/+`toughness` until end of turn" (CR 611.2c): the creatures attacking as `source`'s spell
+/// or ability resolves, whoever controls them, and none that attack or are put onto the battlefield attacking later. One
+/// instruction. Army of Allah, Auron's Inspiration and Morale print it.
+pub fn attacking_creatures_get(g: &mut dyn Game, source: ObjectId, power: i32, toughness: i32) {
+    let attackers: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.is_attacking(id)).collect();
+    instruction(g, |g| {
+        for id in attackers {
+            crate::pump(g, source, id, power, toughness);
+        }
+    });
+}
