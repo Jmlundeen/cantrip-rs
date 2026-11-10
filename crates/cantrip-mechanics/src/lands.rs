@@ -376,6 +376,41 @@ pub const fn gain_land(a: Color, b: Color, text: &'static str) -> [AbilityDef; 2
     ]
 }
 
+/// "This land doesn't untap during your untap step if it has a depletion counter on it." (CR 502.3, 122.1): the card's
+/// `untap_bans` entry. Land Cap, Lava Tubes, River Delta, Timberline Ridge and Veldt print it.
+pub fn depletion_prevents_untap(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    id == asker.source && q.obj(id).counters(CounterKind::Depletion) > 0
+}
+
+fn remove_depletion_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.remove_counters(item.object, CounterKind::Depletion, 1);
+    Ok(())
+}
+
+fn add_chosen_color_and_depletion(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(), Suspend> {
+    let Some(color) = chosen else { return Ok(()) };
+    g.add_mana(asker.controller, color.mana(), 1);
+    g.end_sentence();
+    g.add_counters(asker.source, CounterKind::Depletion, 1);
+    Ok(())
+}
+
+/// A depletion land's two abilities (CR 603.2, 605.1a, 122.1), with `depletion_prevents_untap` in the card's `untap_bans`:
+/// "At the beginning of your upkeep, remove a depletion counter from this land." and "{T}: Add {A} or {B}. Put a depletion
+/// counter on this land." (`text` is the mana ability's full text), the color chosen as it resolves (CR 608.2d), the
+/// counter put on after it (a separate sentence, CR 608.2c). Land Cap, Lava Tubes, River Delta, Timberline Ridge and Veldt
+/// print it.
+pub const fn depletion_land(a: Color, b: Color, text: &'static str) -> [AbilityDef; 2] {
+    [
+        triggered(
+            triggers::YOUR_UPKEEP,
+            remove_depletion_counter,
+            "At the beginning of your upkeep, remove a depletion counter from this land.",
+        ),
+        mana_ability(TAP, add_by(add_chosen_color_and_depletion).choose_color().colors(ColorSet(ColorSet::of(a).0 | ColorSet::of(b).0)).yields_any(1), text),
+    ]
+}
+
 fn fetch_two_types<const A: u16, const B2: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let (a, b) = (word(g, item.object, A), word(g, item.object, B2));
     search_to_battlefield(g, item.controller, item.object, Find::ONE, false, move |q, c| {
