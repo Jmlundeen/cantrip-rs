@@ -137,6 +137,21 @@ pub fn search_zone_and_or_library_onto_battlefield(g: &mut dyn Game, player: Pla
     Ok(())
 }
 
+/// "Search your library and/or graveyard for [`rule`], reveal it, and put it into your hand. If you search your library
+/// this way, shuffle." (CR 701.23, 701.20a, 701.24): `search_zone_and_or_library` with `zones`, the cards found revealed
+/// and put into the hand together, and the library shuffled only when it was actually searched - a graveyard-only search
+/// is no library search and shuffles nothing. Delivery Moogle (an artifact card with mana value 2 or less) and Captain
+/// Kirk, Boldly Going (a basic land card or a card named Starship Enterprise) print it.
+pub fn search_zone_and_or_library_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId, zones: &[Zone], ask: &'static Question, rule: Selection) -> Result<(), Suspend> {
+    let (found, searched_library) = search_zone_and_or_library(g, player, source, zones, SearchDestination::Hand, Purpose::PutIntoHand, ask, rule)?;
+    g.reveal(player, &found);
+    put_found_into_hand(g, player, &found, true);
+    if searched_library {
+        g.shuffle(player);
+    }
+    Ok(())
+}
+
 /// The cards found put into the hand, then the library shuffled.
 fn into_hand(g: &mut dyn Game, player: PlayerId, found: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
     let moved = put_found_into_hand(g, player, found, revealed);
