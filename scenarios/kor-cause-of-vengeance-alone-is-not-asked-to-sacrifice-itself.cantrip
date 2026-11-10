@@ -1,0 +1,38 @@
+# Kor, Cause of Vengeance: with no other creature, "another creature" has nothing to offer (CR 109.5, 701.21a), so Bot1
+# is not asked and nothing is drawn or pumped. Kor itself would match the attack trigger, which is exactly what
+# "another" excludes, and it is still 4/4.
+
+[Bot1 Deck]
+Kor, Cause of Vengeance
+Black Lotus x4
+Black Lotus x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Kor, Cause of Vengeance.Cast(Spend: B, B, R, W)
+Bot1.Pass
+Bot1.Attack(Kor, Cause of Vengeance > Bot2)
+# Nothing is asked: Kor is the only creature and "another creature" excludes it, which the damage below shows - the
+# script runs straight through combat to the end.
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Kor, Cause of Vengeance.Power = 4
+Bot1.Battlefield.Kor, Cause of Vengeance.Toughness = 4
+Bot1.Graveyard.Count = 4
+Bot2.Life = 16
