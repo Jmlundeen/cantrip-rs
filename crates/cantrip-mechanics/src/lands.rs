@@ -685,3 +685,35 @@ pub fn return_all_land_cards_from_graveyard_tapped(g: &mut dyn Game, player: Pla
     g.put_all_onto_battlefield_as(&lands)?;
     Ok(())
 }
+
+fn put_storage_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_counters(item.object, CounterKind::Storage, 1);
+    Ok(())
+}
+
+fn add_for_each_storage_counter_removed<const M: u8>(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    g.add_mana(asker.controller, Mana::ALL[M as usize], g.mana_ability_x().unwrap_or(0));
+    Ok(())
+}
+
+/// An Ice Age storage land's two abilities (CR 603.4, 122.1, 605.1a, 106.3), with `enters: Some(mana::enters_tapped)` and
+/// `may_not_untap: true` on the card: "At the beginning of your upkeep, if this land is tapped, put a storage counter on it."
+/// and "{T}, Remove any number of storage counters from this land: Add [`M`] for each storage counter removed this way."
+/// (`text` is the mana ability's full text; `M` is `Mana::X as u8`). Hollow Trees, Dwarven Hold, Bottomless Vault, Icatian
+/// Store and Sand Silos print it.
+pub const fn storage_land<const M: u8>(text: &'static str) -> [AbilityDef; 2] {
+    [
+        triggered(
+            triggers::YOUR_UPKEEP,
+            put_storage_counter,
+            "At the beginning of your upkeep, if this land is tapped, put a storage counter on it.",
+        )
+        .condition(triggers::this_is_tapped),
+        mana_ability(
+            TAP.and(Cost { variable: Some(VariableCost::RemoveAnyNumberOfCounters(CounterKind::Storage)), ..Cost::NONE }),
+            add_by(add_for_each_storage_counter_removed::<M>),
+            text,
+        )
+        .x_is_mana_amount(),
+    ]
+}
