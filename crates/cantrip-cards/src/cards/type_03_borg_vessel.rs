@@ -10,13 +10,6 @@ fn artifact_spells_cost_one_less(q: &dyn Query, source: ObjectId, player: Player
     cantrip_mechanics::cost_reduction::spells_you_cast(q, source, player, costed, CardType::Artifact, 1)
 }
 
-/// "Whenever you cast a spell, create a 1/1 colorless Borg artifact creature token" (CR 603.2, 111.10b): one token for
-/// each spell its controller casts, this Spacecraft's own cast not among them (it is not on the battlefield yet).
-fn create_borg(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &tokens::BORG, 1)?;
-    Ok(())
-}
-
 /// The 7+ striation's layer 6 part (CR 721.2a, 613.6): flying and the cast trigger, together, so that both continue the one
 /// effect that began in layer 4 (an earlier "loses all abilities" takes both, CR 613.7).
 fn flying_and_the_cast_trigger(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
@@ -36,7 +29,10 @@ pub static CARD: CardDef = CardDef {
         static_ability(Layer::Ability, station::charged::<7>, flying_and_the_cast_trigger, SEVEN_PLUS).continues(),
         static_ability(Layer::PtSet, station::charged::<7>, statics::base_pt::<5, 5>, SEVEN_PLUS).continues(),
     ],
-    delayed: &[triggered(triggers::YOU_CAST_A_SPELL, create_borg, "Whenever you cast a spell, create a 1/1 colorless Borg artifact creature token.")],
+    // "Whenever you cast a spell, create a 1/1 colorless Borg artifact creature token" (CR 603.2, 111.10b): one token for
+    // each spell its controller casts, this Spacecraft's own cast not among them (it is not on the battlefield yet). The
+    // shared body.
+    delayed: &[triggered(triggers::YOU_CAST_A_SPELL, tokens::create_borg::<1>, "Whenever you cast a spell, create a 1/1 colorless Borg artifact creature token.")],
     ..oracle::TYPE_03_BORG_VESSEL
 };
 
