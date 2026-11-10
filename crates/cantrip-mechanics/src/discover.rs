@@ -25,13 +25,7 @@ pub fn cast_free_if_at_most_else_hand(g: &mut dyn Game, player: PlayerId, card: 
 /// picks the face when it has several, and casts it for {0}. Whether it was cast; a cast given up (CR 733.1)
 /// leaves the card where it was. Asked as "cast or put into hand" (`CastFoundOrHand`): the card goes to the hand when not cast. Discover, Bre of Clan Stoutarm and Beseech the Mirror print it.
 pub fn may_cast_free(g: &mut dyn Game, player: PlayerId, card: ObjectId, most: u32) -> Result<bool, Suspend> {
-    let ways: Vec<CastWay> = g.cast_ways_during_resolution(card).into_iter().filter(|w| u32::from(w.mana_value) <= most).collect();
-    if !ways.is_empty() && crate::effects::ask_may(g, player, card, Purpose::CastFoundOrHand)?
-        && let Some(way) = choose::cast_way(g, player, card, ways)?
-    {
-        return g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way: Some(way.way), ..CastTerms::default() });
-    }
-    Ok(false)
+    choose::may_cast_free_card(g, player, card, card, most, Purpose::CastFoundOrHand)
 }
 
 /// Discover `n` for `player`, as an effect resolves (CR 701.57a). The card exiled is cast without paying its
