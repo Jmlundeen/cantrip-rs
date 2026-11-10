@@ -1,0 +1,66 @@
+# Cmdr. Troi, Outgoing Empath: "Vigilance / {T}: Target opponent whose turn it is may cast a spell from their hand without
+# paying its mana cost. If they do, you copy that spell. You may choose new targets for the copy. If they don't, you draw a
+# card." Lightning Greaves gives Troi haste on turn 1, so its {T} ability can be activated on Bot2's turn, and its only legal
+# target is the opponent whose turn it is. Bot2 casts Lightning Bolt for nothing (CR 608.2g, 118.9) at Bot1; Bot1 copies that
+# spell and sends the copy at Bot2 (CR 707.10, 707.10c), so both players take 3 and Bot2's Bolt cost it nothing.
+
+[Bot1 Deck]
+Cmdr. Troi, Outgoing Empath
+Lightning Greaves
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Pass
+? Bot1.Mana = {U}{U}{R}{G}
+Bot1.Hand.Cmdr. Troi, Outgoing Empath.Cast
+Bot1.Pass
+? Bot1.Mana = 
+! Bot1.Battlefield.Cmdr. Troi, Outgoing Empath.Activate(Bot2)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Lightning Greaves.Activate(Ability: Equip; Cmdr. Troi, Outgoing Empath)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Turn = 2
+Bot1.Battlefield.Cmdr. Troi, Outgoing Empath.Activate(Bot2)
+? Bot1.Battlefield.Cmdr. Troi, Outgoing Empath.Tapped = true
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 17
+? Bot2.Life = 17
+? Bot1.Battlefield.Cmdr. Troi, Outgoing Empath.Keywords = Haste; Shroud; Vigilance
+? Bot2.Graveyard = Lightning Bolt
+? Bot2.Mana = 
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Cmdr. Troi, Outgoing Empath.Tapped = true
