@@ -1,0 +1,59 @@
+# Fleet Captain Christopher Pike: "two other target creatures" is exactly two (CR 115.1, 601.2c). With three Ornithopters
+# out, naming all three is refused for "No — {2}, {T}: Tap two other target creatures" on turn 3 and for "Yes — {1}, {T}:
+# Untap two other target creatures" on turn 5; each takes two of them, and the third stays as it was.
+
+[Bot1 Deck]
+Fleet Captain Christopher Pike
+Black Lotus
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Mox Sapphire
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Fleet Captain Christopher Pike.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Fleet Captain Christopher Pike.Activate(Ability: {2}, {T}: Tap two other target creatures)
+! Bot1.Target(Ornithopter#1; Ornithopter#2; Ornithopter#3)
+Bot1.Target(Ornithopter#1; Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#1.Tapped = True
+? Bot1.Battlefield.Ornithopter#2.Tapped = True
+? Bot1.Battlefield.Ornithopter#3.Tapped = False
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Fleet Captain Christopher Pike.Activate(Ability: {1}, {T}: Untap two other target creatures)
+! Bot1.Target(Ornithopter#1; Ornithopter#2; Ornithopter#3)
+Bot1.Target(Ornithopter#1; Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Fleet Captain Christopher Pike.Tapped = True
+Bot1.Battlefield.Ornithopter#1.Tapped = False
+Bot1.Battlefield.Ornithopter#2.Tapped = False
