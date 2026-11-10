@@ -1,0 +1,28 @@
+# Command Chair: "This artifact enters tapped. {T}: Add three mana of any one color." Cast on turn 1 with two Black Lotuses,
+# it arrives tapped, and on turn 3 one tap gives three mana of the one color chosen.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Command Chair
+Forest x20
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Command Chair.Cast
+? Bot1.Mana =
+Bot2.Pass
+? Bot1.Battlefield.Command Chair.Tapped = True
+[T3 Bot1.Main1]
+Bot1.Battlefield.Command Chair.Activate(Ability: Add three mana of any one color; Color: Blue)
+? Bot1.Mana = {U}{U}{U}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Command Chair.Tapped = True
