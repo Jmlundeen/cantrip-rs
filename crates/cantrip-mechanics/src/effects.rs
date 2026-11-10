@@ -158,6 +158,18 @@ pub fn targets_get<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackIte
     Ok(())
 }
 
+/// "One or two target creatures each gain `keyword` until end of turn" (CR 611.2a): every target still legal as the ability
+/// resolves (CR 608.2b), granted as one instruction, as `targets_get` pumps its targets. K't'inga-Class Battle Cruiser prints it.
+pub fn targets_gain(g: &mut dyn Game, item: &StackItem, keyword: Keyword) -> Result<(), Suspend> {
+    let creatures = crate::targets::legal_objects(g, item);
+    instruction(g, |g| {
+        for creature in creatures {
+            gain_until_end_of_turn(g, item.object, creature, keyword);
+        }
+    });
+    Ok(())
+}
+
 /// "Destroy all nonland permanents with mana value `limit` or less" (CR 701.8a): every such permanent on the battlefield,
 /// destroyed at once. The permanents it destroyed, for what the rest of the text does with them. Culling Ritual (2) and
 /// Pest Control (1) print it.

@@ -1,0 +1,114 @@
+# K't'inga-Class Battle Cruiser: "Whenever this Spacecraft enters or attacks, one or two target Klingons and/or Warriors you
+# control gain flying until end of turn" (CR 603.4, 611.2a) - entering with Defense Force Aggressor the only legal target the
+# engine takes it; on the first attack both of the two are chosen, on the second only one, and on the third three are refused
+# because the slot takes one or two (CR 601.2c). A creature that is no Klingon or Warrior (Grizzly Bears, and the Spacecraft
+# itself) and the opponent's own Klingon are refused and never gain flying. The flying ends at cleanup (CR 514.2), so nothing
+# has it on Bot2's turns. The 4+ striation (CR 721.2a-b) makes the Spacecraft a 5/5 artifact creature with flying at four charge
+# counters, which is what lets it attack at all.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Sapphire
+K't'inga-Class Battle Cruiser
+Defense Force Aggressor
+Blood-Sport Champion
+Grizzly Bears
+Ferocious Colonist
+Island x10
+
+[Bot2 Deck]
+General Chang, Cold Warrior x4
+Swamp x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Defense Force Aggressor.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.K't'inga-Class Battle Cruiser.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Defense Force Aggressor.Keywords = Flying
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.General Chang, Cold Warrior.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.General Chang, Cold Warrior.Keywords = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Blood-Sport Champion.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.K't'inga-Class Battle Cruiser.Activate(Ability: Station)
+Bot1.Choose(Defense Force Aggressor)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.K't'inga-Class Battle Cruiser.Activate(Ability: Station)
+Bot1.Choose(Blood-Sport Champion)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Counters.Charge = 4
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Types = Artifact; Creature
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Power = 5
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Toughness = 5
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Keywords = Flying
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(K't'inga-Class Battle Cruiser > Bot2)
+! Bot1.Target(General Chang, Cold Warrior)
+! Bot1.Target(K't'inga-Class Battle Cruiser)
+Bot1.Target(Defense Force Aggressor; Blood-Sport Champion)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Defense Force Aggressor.Keywords = Flying
+? Bot1.Battlefield.Blood-Sport Champion.Keywords = Deathtouch; Flying
+? Bot2.Battlefield.General Chang, Cold Warrior.Keywords = (absent)
+? Bot2.Life = 15
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Defense Force Aggressor.Keywords = (absent)
+? Bot1.Battlefield.Blood-Sport Champion.Keywords = Deathtouch
+[T5 Bot1.Main1]
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(K't'inga-Class Battle Cruiser > Bot2)
+! Bot1.Target(General Chang, Cold Warrior)
+! Bot1.Target(Grizzly Bears)
+Bot1.Target(Blood-Sport Champion)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Blood-Sport Champion.Keywords = Deathtouch; Flying
+? Bot1.Battlefield.Defense Force Aggressor.Keywords = (absent)
+? Bot1.Battlefield.Grizzly Bears.Keywords = (absent)
+? Bot2.Life = 10
+[T7 Bot1.Main1]
+Bot1.Hand.Ferocious Colonist.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(K't'inga-Class Battle Cruiser > Bot2)
+! Bot1.Target(Defense Force Aggressor; Blood-Sport Champion; Ferocious Colonist)
+Bot1.Target(Blood-Sport Champion)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Blood-Sport Champion.Keywords = Deathtouch; Flying
+? Bot1.Battlefield.Ferocious Colonist.Keywords = DoubleStrike
+? Bot2.Life = 5
+
+[Expect]
+Bot2.Life = 5
