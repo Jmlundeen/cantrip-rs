@@ -1,0 +1,78 @@
+# K't'inga-Class Battle Cruiser: station (CR 702.184a) puts charge counters equal to the tapped creature's power on it. Grizzly
+# Bears' 2 reach 2, General Chang's 1 reach 3, and Battle-Scarred Survivalist's 1 reach 4: the 4+ striation (CR 721.2b) makes it
+# an artifact creature with base power and toughness 5/5 and flying only at four, so at 2 and at 3 it is only an artifact.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+K't'inga-Class Battle Cruiser
+Grizzly Bears
+General Chang, Cold Warrior
+Battle-Scarred Survivalist
+Forest x5
+Island x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.K't'inga-Class Battle Cruiser.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Battlefield.K't'inga-Class Battle Cruiser.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Counters.Charge = 2
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Types = Artifact
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Power = (absent)
+[T5 Bot1.Main1]
+Bot1.Hand.General Chang, Cold Warrior.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Battlefield.K't'inga-Class Battle Cruiser.Activate(Ability: Station)
+Bot1.Choose(General Chang, Cold Warrior)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Counters.Charge = 3
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Types = Artifact
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Keywords = (absent)
+[T7 Bot1.Main1]
+Bot1.Hand.Battle-Scarred Survivalist.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Battlefield.K't'inga-Class Battle Cruiser.Activate(Ability: Station)
+Bot1.Choose(Battle-Scarred Survivalist)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Counters.Charge = 4
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Types = Artifact; Creature
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Power = 5
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Toughness = 5
+? Bot1.Battlefield.K't'inga-Class Battle Cruiser.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.K't'inga-Class Battle Cruiser.Counters.Charge = 4

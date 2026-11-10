@@ -1,0 +1,36 @@
+# Probe: "one or two target Klingons and/or Warriors you control" means permanents with those subtypes (CR 109.2), not only
+# creatures. Firdoch Core is a noncreature Kindred artifact with changeling, so a Klingon and a Warrior: it is a legal target.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Firdoch Core
+K't'inga-Class Battle Cruiser
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.K't'inga-Class Battle Cruiser.Cast
+Bot1.Target(Bot1.Battlefield.Firdoch Core)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Firdoch Core.Keywords = Changeling; Flying
