@@ -177,6 +177,7 @@ pub mod rampage;
 pub mod dethrone;
 pub mod devour;
 pub mod sunburst;
+pub mod spore;
 pub mod untap;
 pub mod vivid;
 pub mod vote;
