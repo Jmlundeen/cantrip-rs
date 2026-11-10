@@ -1,7 +1,7 @@
 # Kirk, Man of Action pumps every creature its controller controls with one of the six subtypes +2/+2 (CR 613.4c, layer
 # 7c): the Officer, the Artificer, the Doctor, the Pilot and the Scientist each get it; a Soldier gets nothing, and
-# neither does an Officer the other player controls (CR 109.5). "Other" leaves Kirk herself out of her own pump even
-# though she is an Officer (CR 109.5).
+# neither does an Officer the other player controls (CR 109.5). "Other" leaves Kirk himself out of his own pump even
+# though he is an Officer (CR 109.5).
 #
 # Everything is paid for out of Black Lotus, which is {0} and adds three mana at once (CR 500.4: a pool does not survive
 # a step, so a single card paying for itself beats tapping several one-mana sources across steps).
@@ -90,7 +90,7 @@ Bot2.Hand.General Chang, Cold Warrior.Cast(Spend: B)
 Bot2.Pass
 
 [Expect]
-# Kirk is 3/3 and an Officer, so her own pump passes her by (CR 109.5); the +1/+1 counter is the Hologram's ETB.
+# Kirk is 3/3 and an Officer, so his own pump passes him by (CR 109.5); the +1/+1 counter is the Hologram's ETB.
 Bot1.Battlefield.Kirk, Man of Action.Power = 4
 Bot1.Battlefield.Kirk, Man of Action.Toughness = 4
 Bot1.Battlefield.General Chang, Cold Warrior.Power = 3
