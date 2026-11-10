@@ -1459,16 +1459,36 @@ CLIENT_TYPE = re.compile(r"^\+\s*(?:public|internal)\s+(?:sealed\s+|static\s+|pa
 CLIENT_MEMBER = re.compile(r"^\+\s*public\s+[^=(]*?\b(\w+)\s*\(", re.M)
 
 
-def surface_message(prefix, root, paths):
-    """`Mechanics: assimilate::assimilate_all` - the repository's subjects name the surface changed, never the card.
+CARD_FILE = re.compile(r"^crates/cantrip-cards/src/cards/(\w+)\.rs$")
 
-    Each changed file contributes its module and the public items it adds; one that adds none names only its module,
-    as `Mechanics: targets::SNOW_LAND` names the constant it adds. A `Mechanics:` commit also carries the existing
-    cards refactored to call the function, and their modules are named with it, so the subject says what left them as
-    well as what arrived in cantrip-mechanics.
+
+def card_display_name(root, slug):
+    """The card a `crates/cantrip-cards/src/cards/<slug>.rs` file implements, from its content JSON's `name`, or the
+    slug opened out when there is no JSON (a card that needed no Rust file has none either)."""
+    content = os.path.join(root, "content", "mtg", "cards", slug.replace("_", "-") + ".json")
+    try:
+        return json.loads(read_text(content))["name"]
+    except (OSError, KeyError, ValueError):
+        return slug.replace("_", " ").title()
+
+
+def surface_message(prefix, root, paths, note=""):
+    """`Mechanics: assimilate::assimilate_all`, or `Mechanics: depletion lands` when the writer named it in `--note`.
+
+    The subject names the shared surface changed - a module and the public items it adds - and never a card: a card file
+    riding along is an existing card refactored to call the function, so it goes into the body as prose (`Land Cap, Lava
+    Tubes and Veldt now call it instead of keeping their own copy`), the way the repository's `Mechanics:` commits read.
+    `--note` carries a whole message of its own, first line as the subject and the rest as the body, for a change that
+    reads better as a phrase than as the names of the functions in it.
     """
-    names = []
+    if note.strip():
+        return note.strip()
+    names, carried = [], []
     for path in paths:
+        card = CARD_FILE.match(path)
+        if card:
+            carried.append(card_display_name(root, card.group(1)))
+            continue
         module = surface_module(path)
         staged = git(root, "diff", "--cached", "-U0", "--", path).stdout
         items = []
@@ -1479,10 +1499,19 @@ def surface_message(prefix, root, paths):
             names.extend(f"{module}::{item}" for item in items)
         else:
             names.append(module)
-    return f"{prefix}: " + ", ".join(dict.fromkeys(names))
+    names = list(dict.fromkeys(names))
+    subject = f"{prefix}: " + ", ".join(names) if names else f"{prefix}: shared mechanics"
+    if not carried:
+        return subject
+    if len(carried) > 1:
+        prose = ", ".join(carried[:-1]) + " and " + carried[-1]
+        body = f"{prose} now call it instead of keeping their own copy."
+    else:
+        body = f"{carried[0]} now calls it instead of keeping its own copy."
+    return f"{subject}\n\n{body}"
 
 
-def plan_commits(root, store, card, claim, reference, issue):
+def plan_commits(root, store, card, claim, reference, issue, note=""):
     """Stage by category and commit Engine, Mechanics, Client, then exactly one Card commit."""
     entries = changed_paths(root)
     content = content_from(reference, root)
@@ -1520,7 +1549,7 @@ def plan_commits(root, store, card, claim, reference, issue):
         added = git(root, "add", "-A", "--", *paths, check=False)
         if added.returncode != 0:
             raise Failed(f"git add failed:\n{(added.stdout + added.stderr).strip()}")
-        message = surface_message(prefixes[kind], root, paths) if kind in prefixes else messages[kind]
+        message = surface_message(prefixes[kind], root, paths, note) if kind in prefixes else messages[kind]
         committed = git(root, "commit", "-m", message, check=False)
         if committed.returncode != 0:
             raise Refused(f"git commit failed for {kind}:\n{(committed.stdout + committed.stderr).strip()[-3000:]}")
@@ -1620,7 +1649,7 @@ def cmd_commit(args):
     print_gates(card, root, gates, False)
     if not passed:
         raise Refused("the check failed; nothing was committed")
-    made = plan_commits(root, store, card, claim, reference, issue)
+    made = plan_commits(root, store, card, claim, reference, issue, note=args.note or "")
     print(f"{card['name']}: committed")
     for commit in made:
         print(f"  {commit['sha']} {commit['message']}  ({len(commit['paths'])} path(s))")

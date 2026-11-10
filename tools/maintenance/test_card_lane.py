@@ -522,6 +522,33 @@ class LaneTest(unittest.TestCase):
         self.assertEqual(made[1]["message"], "Card: Card B")
         self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
 
+    def test_a_mechanics_commit_names_no_card_in_its_subject(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--issue", "7")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.card_b_scenario()
+        self.write("crates/cantrip-mechanics/src/shared_thing.rs", "pub fn shared_recipe() {}" + '\\n')
+        self.write("crates/cantrip-cards/src/cards/card_c.rs", "pub static CARD: usize = 3;" + '\\n')
+        state = self.state()
+        card = next(entry for entry in state["cards"] if entry["name"] == "Card B")
+        with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
+            reference = f.read()
+        store = lane.Store(lane.common_dir(self.main), "q")
+        made = lane.plan_commits(self.main, store, card, card["claim"], reference, 7)
+        self.assertEqual(made[0]["message"], "Mechanics: shared_thing::shared_recipe")
+        body = self.git(self.main, "log", "-1", "--skip=1", "--format=%B")
+        self.assertIn("Card C now calls it instead of keeping its own copy.", body)
+        self.assertNotIn("card_c", made[0]["message"])
+        self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
+
+    def test_a_note_names_a_mechanics_commit_the_way_a_person_would(self):
+        lane = load_lane()
+        note = "Mechanics: depletion lands\n\nLand Cap, Lava Tubes and Veldt share it."
+        self.assertEqual(
+            lane.surface_message("Mechanics", self.main, ["crates/cantrip-mechanics/src/shared_thing.rs"], note),
+            note)
+
     def test_a_rewritten_scenario_of_the_card_is_in_scope_and_lands_again(self):
         lane = load_lane()
         self.assertEqual(self.queue("--card", "Card B").returncode, 0)

@@ -109,6 +109,8 @@ you from `PROMPT.md`, it already gives your queue, id, token and core scope; thi
    `Co-Authored-By`. If it refuses, nothing is committed (or only the commits before the failing one): fix the gate
    and run it again. `done` also closes a claim, but it is the manual close for work committed by hand and does not
    run the gates; a card you wrote uses `commit`.
+
+   A `Mechanics:` subject names the shared surface it changes, never a card: `Mechanics: assimilate::assimilate_all`, or a phrase written with `--note "Mechanics: depletion lands"` and the prose about the cards in its body. The existing cards that adopt the function are named in the body, in prose, never in the subject.
 5. **Share a mechanic as soon as it is committed.** `commit` shares when it closes. If you commit an `Engine:` or
    `Mechanics:` change by hand before the card is ready, share it so the next worker starts with it:
 
