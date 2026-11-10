@@ -332,6 +332,18 @@ pub fn pump_creatures_other_than(g: &mut dyn Game, source: ObjectId, other_than:
     });
 }
 
+/// "All nonartifact creatures get -`power`/-`toughness` until end of turn" (CR 611.2c): the creatures on the battlefield at
+/// this moment that `counts` accepts, whoever controls them, pumped in one instruction so state triggers wait for all of them
+/// (CR 603.3b). Battle of Wolf 359 prints it.
+pub fn pump_creatures_where(g: &mut dyn Game, source: ObjectId, counts: impl Fn(&dyn Game, ObjectId) -> bool, power: i32, toughness: i32) {
+    let creatures: Vec<ObjectId> = creatures_on_the_battlefield(g).into_iter().filter(|&id| counts(g, id)).collect();
+    instruction(g, |g| {
+        for id in creatures {
+            crate::pump(g, source, id, power, toughness);
+        }
+    });
+}
+
 /// "Creatures your opponents control get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): the creatures each opponent
 /// of `item`'s controller controls as it resolves, and no creature that enters later. Sandman's Quicksand (-2/-2 when its mayhem
 /// cost was paid) and Sephiroth, Planet's Heir (-2/-2) print it.
