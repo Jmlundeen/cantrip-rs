@@ -382,6 +382,16 @@ pub fn have_flying_and_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars)
     chars.keywords = chars.keywords.with(Keyword::Flying).with(Keyword::Haste);
 }
 
+/// "... has flying, menace and haste" (CR 702.9, 702.111, 702.10, layer 6). K'Vort-Class Raider's 4+ striation prints
+/// it.
+pub fn have_flying_menace_and_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars
+        .keywords
+        .with(Keyword::Flying)
+        .with(Keyword::Menace)
+        .with(Keyword::Haste);
+}
+
 /// "... has hexproof" (CR 702.11, layer 6) as a static ability's `StaticDef::apply`. Kaito, Bane of Nightmares' ninja form,
 /// Shardmage's Rescue's enchanted creature and Stoic Sphinx print it.
 pub fn have_hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
