@@ -51,6 +51,14 @@ pub static BORG: CardDef = CardDef {
     ..token!(Borg)
 };
 
+/// "Create [COUNT] 1/1 colorless Borg artifact creature tokens" (CR 701.7, 111.2): every token is made at once, as one
+/// event, under the ability's controller. Assembly Specialist, Tenacious Drone, Type-03 Borg Vessel and Class-4 Tactical
+/// Cube print it, with one or two tokens.
+pub fn create_borg<const COUNT: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    create(g, item.controller, &BORG, COUNT)?;
+    Ok(())
+}
+
 /// A 1/1 white Tribble creature token with "This token can't block" (CR 111.1, 111.10). Tribble Cluster and Koloth,
 /// Tribble Hunter create this exact token.
 pub static TRIBBLE: CardDef = CardDef {
