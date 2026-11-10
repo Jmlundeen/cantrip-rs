@@ -1,0 +1,12 @@
+{
+  "name": "Planet Killer",
+  "manaCost": "{8}",
+  "type": "Artifact Creature — Construct",
+  "power": 9,
+  "toughness": 9,
+  "oracleText": "Flying, indestructible\nThis creature attacks each combat if able.\nWhenever this creature deals combat damage to a player, put a +1/+1 counter on it for each land that player controls.",
+  "keywords": [
+    "Flying",
+    "Indestructible"
+  ]
+}
