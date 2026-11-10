@@ -1,0 +1,63 @@
+# Captain Janeway's "{2}, Tap an untapped creature you control: Captain Janeway can't be blocked this turn": the {2} comes
+# from a Mox Jet and an Island (the pool empty right after), the creature tapped is the Ornithopter, and Bot2's Ornithopter
+# - a creature that could block her - does not get the chance: Bot2 goes to 17, where a blocked 3/3 would leave it at 20.
+# On turn 4 Llanowar Elves, no Officer, hit Bot1 for 1 (Bot1 to 19): that damage asks the trigger and is turned away.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Mox Jet
+Captain Janeway, Endgame
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Llanowar Elves
+Forest x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Captain Janeway, Endgame.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Captain Janeway, Endgame.Activate(Tap: Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Captain Janeway, Endgame > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Life = 19
+? Bot2.Life = 17
+? Bot1.Battlefield.Ornithopter.Tapped = true
+
+[Expect]
+Bot1.Battlefield = Captain Janeway, Endgame; Island; Island; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Officer Token; Ornithopter
+Bot2.Battlefield = Forest; Llanowar Elves; Ornithopter
