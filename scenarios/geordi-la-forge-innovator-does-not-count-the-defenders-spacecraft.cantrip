@@ -1,0 +1,41 @@
+# Geordi La Forge, Innovator: "if you control a Spacecraft" is his controller's board only. Bot2's own Spacecraft does not
+# count, so the block is allowed and no damage reaches Bot2.
+
+[Bot1 Deck]
+Black Lotus
+Geordi La Forge, Innovator
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Borg Scout Sphere
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Geordi La Forge, Innovator.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Borg Scout Sphere.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Geordi La Forge, Innovator > Bot2)
+Bot2.Block(Ornithopter > Geordi La Forge, Innovator)
+[T3 Bot1.Main2]
+? Bot2.Life = 20
+? Bot2.Battlefield.Borg Scout Sphere.Subtypes = Spacecraft
+
+[Expect]
+Bot2.Life = 20
