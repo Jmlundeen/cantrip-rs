@@ -1,0 +1,48 @@
+# Qo'noS Quartermaster: "Menace" and "Whenever this creature attacks, add one mana of any color. Until end of turn, you
+# don't lose this mana as steps and phases end" (CR 106.4, 514.2). Bot1 casts it on turn 1, attacks on turn 3 and chooses
+# red: exactly one red mana is in the pool in the second main phase, past the end of combat, and it is gone on Bot2's turn.
+# Bot2's lone Memnite may not block it (menace).
+
+[Bot1 Deck]
+Qo'noS Quartermaster
+Mox Ruby
+Mox Jet
+Island
+Mountain
+Island
+Mountain
+Island x15
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Qo'noS Quartermaster.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Qo'noS Quartermaster > Bot2)
+Bot1.Colors(Red)
+[T3 Bot1.DeclareBlockers]
+! Bot2.Block(Bot2.Battlefield.Memnite > Bot1.Battlefield.Qo'noS Quartermaster)
+[T3 Bot1.Main2]
+? Bot1.Mana = {R} lasting {R}
+? Bot2.Life = 18
+[T4 Bot2.Main1]
+? Bot1.Mana =
+
+[Expect]
+Bot1.Mana =
+Bot2.Life = 18
