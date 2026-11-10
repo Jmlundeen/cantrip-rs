@@ -1,0 +1,48 @@
+# Kang, Suspicious Captain: "Whenever one or more goaded creatures attack" triggers once for the batch, however many goaded
+# creatures attack (CR 603.2c). Koloth, Tribble Hunter goads every Tribble (CR 701.15a), so Bot1's two Tribbles, made at
+# its turn-1 end step, must attack on turn 3 (CR 701.15b), together: Kang's ability triggers once and puts one +1/+1
+# counter on Kang, not one for each attacker.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Mox Ruby
+Koloth, Tribble Hunter
+Kang, Suspicious Captain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Koloth, Tribble Hunter.Cast
+? Bot1.Mana =
+[T2 Bot2.DeclareAttackers]
+Bot2.Attack(Tribble Token#1 > Bot1; Tribble Token#2 > Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Kang, Suspicious Captain.Cast
+Bot1.Target(Bot2.Battlefield.Tribble Token#1)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Tribble Token#1 > Bot2; Tribble Token#2 > Bot2)
+Bot1.Target(Bot1.Battlefield.Kang, Suspicious Captain)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+? Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = 1
+
+[Expect]
+Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Koloth, Tribble Hunter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Tribble Token#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Tribble Token#2.Counters.PlusOnePlusOne = (absent)
+Bot1.Life = 16
+Bot2.Life = 16

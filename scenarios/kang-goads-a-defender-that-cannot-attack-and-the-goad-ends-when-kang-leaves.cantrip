@@ -1,0 +1,70 @@
+# Kang, Suspicious Captain: the goad forces an attack only "if able" (CR 701.15b), and a creature with defender is not
+# able, so the Wall of Wood Kang goads on turn 3 stays home while Bot2 attacks with Ornithopter, which is not goaded. That
+# attack is one attack event and the Wall carries a goaded effect, but the attacking creature does not: Kang's ability does
+# not fire and no counter appears (CR 508.1, 603.2c) - a matcher keyed on goaded attackers alone, not on any goaded
+# creature anywhere. In turn 4's second main phase Bot2 kills Kang with Terror, and the goad it gave lasts only as long as
+# Bot1 controls Kang (CR 611.2b), so the Wall is no longer goaded on turn 5.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Kang, Suspicious Captain
+Mountain x2
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Wall of Wood
+Ornithopter
+Swamp
+Terror
+Forest x2
+Swamp x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Wall of Wood.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kang, Suspicious Captain.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Wall of Wood)
+[T3 Bot1.DeclareAttackers]
+? Bot2.Battlefield.Wall of Wood.GoadedBy = Bot1
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Terror.Cast(Bot1.Battlefield.Kang, Suspicious Captain)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Kang, Suspicious Captain = (absent)
+? Bot2.Battlefield.Wall of Wood.GoadedBy = (absent)
+? Bot1.Life = 20
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire
+Bot2.Battlefield.Wall of Wood.GoadedBy = (absent)
