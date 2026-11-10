@@ -1,0 +1,45 @@
+# Christine Chapel, Combat Medic {3}{G}: "Strange new worlds — When Christine Chapel enters, you gain life equal to the
+# number of differently named lands you control. Whenever you gain life, put two +1/+1 counters on Christine Chapel."
+# Forest and Island are two names, so Bot1 gains exactly 2 life (not 3 for three lands, and not Bot2's lands) and the
+# single life-gain event puts exactly two counters on her (CR 201.2a, 119.3, 603.2c).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Christine Chapel, Combat Medic
+Island
+Island x12
+
+[Bot2 Deck]
+Swamp
+Forest x10
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Christine Chapel, Combat Medic.Cast
+Bot1.Pass
+? Bot1.Mana = 
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Christine Chapel, Combat Medic.Counters.PlusOnePlusOne = 2
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Christine Chapel, Combat Medic.Power = 4
+Bot1.Battlefield.Christine Chapel, Combat Medic.Toughness = 4

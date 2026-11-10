@@ -1,0 +1,43 @@
+# Two Forests are one name, so Christine Chapel's "Strange new worlds" gains exactly 1 life - not 2 for two lands, and
+# not Bot2's lands (CR 201.2a, 608.2c) - and that one life-gain event puts exactly two +1/+1 counters on her (CR 603.2c).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Christine Chapel, Combat Medic
+Forest
+Island x12
+
+[Bot2 Deck]
+Swamp
+Island x10
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Christine Chapel, Combat Medic.Cast
+Bot1.Pass
+? Bot1.Mana = 
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Christine Chapel, Combat Medic.Counters.PlusOnePlusOne = 2
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Christine Chapel, Combat Medic.Power = 4
+Bot1.Battlefield.Christine Chapel, Combat Medic.Toughness = 4
