@@ -23,6 +23,18 @@ fn you_control_source(q: &dyn Query, e: &ContinuousEffect) -> bool {
 /// block" last so.
 pub const YOU_CONTROL_SOURCE: Lasting = Lasting { text: "you control {source}", holds: you_control_source };
 
+/// "Gain control of target [permanent] for as long as you control this creature" (CR 611.2b): the ability's controller gains
+/// control of its first target, lasting while `YOU_CONTROL_SOURCE` holds - the card lists it in `lasting`. Aladdin (artifact)
+/// and Thrull Champion (Thrull) print it.
+pub fn gain_control_of_target_while_you_control_source(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(object) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    let duration = Duration::AsLongAs(item.ability.card, 0);
+    instruction(g, |g| {
+        g.add_effect(item.object, object, EffectKind::Control(item.controller), duration);
+    });
+    Ok(())
+}
+
 /// "The number of counters on" an object (CR 122.1): counters of every kind, a +1/+1 and a -1/-1 counter both counted while
 /// state-based actions have not yet removed the pair (CR 704.5q). Read from the object as it last existed if it has left the
 /// battlefield (CR 608.2h). Jadzia Dax, Living Legacy and Savanti Romero, Time's Exile ask it of themselves. A count of one
