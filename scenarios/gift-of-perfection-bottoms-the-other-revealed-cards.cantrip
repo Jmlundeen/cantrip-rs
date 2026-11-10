@@ -1,0 +1,40 @@
+# Gift of Perfection: Bot2 reveals two Islands before its Ornithopter (CR 701.20a); the creature is assimilated and the
+# two Islands go to the bottom of Bot2's own library (CR 401.4), under the Forests that were beneath them, so Bot2's next
+# draw is a Forest and no Island (its opening hand held none).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Gift of Perfection
+Island x18
+
+[Bot2 Deck]
+Mox Jet x7
+Island x9
+Ornithopter
+Forest x8
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gift of Perfection.Cast(Spend: U, U, U, U, B)
+? Bot1.Mana =
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Subtypes = Borg
+? Bot2.Library.Count = 17
+[T2 Bot2.Main1]
+? Bot2.Hand.Island = (absent)
+? Bot2.Hand.Forest.Colors.Count = 0
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
