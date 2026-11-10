@@ -1,0 +1,62 @@
+# Deliver from Chaos: "Exile target artifact or creature. Create X 1/1 colorless Borg artifact creature tokens, where X is that
+# permanent's mana value." Bot2's Mind Stone (mana value 2) is exiled and exactly two Borg tokens are made for Bot1: the mana
+# value is read while it is still the permanent that is exiled (CR 202.3, 608.2h), not from the card afterwards.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Deliver from Chaos
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Mind Stone
+Mox Sapphire
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Mana = {W}{U}{B}{B}{R}
+Bot1.Hand.Deliver from Chaos.Cast(Bot2.Battlefield.Mind Stone)
+Bot1.Pass
+Bot2.Pass
+? Exile = Mind Stone
+? Bot1.Battlefield.Borg Token#1.Power = 1
+? Bot1.Battlefield.Borg Token#2.Toughness = 1
+? Bot1.Battlefield.Borg Token#1.Tapped = false
+? Bot1.Battlefield.Count = 7
+
+[Expect]
+Exile = Mind Stone
+Bot1.Battlefield.Borg Token#1.Power = 1
+Bot1.Battlefield.Borg Token#1.Toughness = 1
+Bot1.Battlefield.Borg Token#2.Power = 1
+Bot1.Battlefield.Count = 7
