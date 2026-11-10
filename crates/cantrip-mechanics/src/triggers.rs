@@ -446,6 +446,18 @@ pub fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fi
     }
 }
 
+/// "Whenever this creature attacks" with the attacking creature as the trigger's subject, for an ability that refers to the
+/// attacker - a target it names "creature defending player controls" (CR 508.5), which a target filter reads through
+/// `Query::event_subject`, or text that says "it". The plain `this_attacks` carries no subject, and an ability whose every
+/// target is illegal is removed as it would be put on the stack (CR 603.3d), so the ability needs this one. Giant Space Amoeba
+/// prints it.
+pub fn this_attacks_subject(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Attacks { attacker, .. } if *attacker == source => Fired::about(Target::Object(*attacker)),
+        _ => None,
+    }
+}
+
 /// "Whenever this creature is dealt damage" (CR 120.2, 603.2c): the damage it is dealt at once, even if it is lethal, as
 /// `data[0]` bounded to u32, or the bounded frozen payload with `.damage_amount()` ("that much"); damage of zero is not dealt. The ability is `.sums_per_subject()`, which adds up
 /// the events of one combat that hurt it from several sources. Screaming Nemesis and Hexhaven Invigorator print it. The
@@ -2371,6 +2383,8 @@ pub const THIS_TAKES_DAMAGE: Trigger = when(EventMask::DAMAGE, this_takes_damage
 pub const THIS_DEALT_DAMAGE: Trigger = THIS_TAKES_DAMAGE;
 pub const DEALS_COMBAT_DAMAGE_TO_A_CREATURE: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_a_creature);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
+/// "Whenever this creature attacks" with the attacking creature as the subject: see `this_attacks_subject`.
+pub const THIS_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, this_attacks_subject);
 /// "Whenever this creature blocks" (`this_blocks`).
 pub const THIS_BLOCKS: Trigger = when(EventMask::BLOCKS, this_blocks);
 pub const THIS_ATTACKS_ALONE: Trigger = when(EventMask::ATTACKS, this_attacks_alone);
