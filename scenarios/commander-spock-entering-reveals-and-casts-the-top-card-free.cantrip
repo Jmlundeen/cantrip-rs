@@ -1,0 +1,46 @@
+# Commander Spock: "Whenever Commander Spock enters or attacks, reveal the top card of your library. You may cast that card
+# without paying its mana cost if that spell's mana value is equal to or less than the number of differently named lands you
+# control." Bot1 has one differently named land (a Forest), so the Elite Vanguard (mana value 1) on top of the library may be
+# cast for nothing; it is cast, so the card is no longer on top of the library and nothing is drawn (CR 608.2g, 118.9).
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Commander Spock
+Island
+Island
+Elite Vanguard
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Commander Spock.Cast
+Bot1.Pass
+? Bot1.Mana = {G}
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Elite Vanguard.Power = 2
+? Bot1.Battlefield.Count = 5
+? Bot1.Hand.Count = 2
+? Bot1.Graveyard = Black Lotus
+
+[Expect]
+Bot1.Battlefield = Commander Spock; Elite Vanguard; Forest; Mox Pearl; Mox Sapphire
+Bot1.Hand.Count = 2
+Bot1.Graveyard = Black Lotus

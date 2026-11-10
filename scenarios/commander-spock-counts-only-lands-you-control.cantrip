@@ -1,0 +1,49 @@
+# Commander Spock: "the number of differently named lands you control" (CR 109.5) - Bot2's Savannah, Taiga and Tundra are not
+# Bot1's lands and must not count. Bot1 has one differently named land, so the Grizzly Bears (mana value 2) on top is not
+# offered even with three differently named lands across the table; it stays on top and Bot1 draws it.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Commander Spock
+Island
+Island
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Savannah
+Taiga
+Tundra
+Savannah
+Taiga
+Tundra
+Savannah
+Taiga x8
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Commander Spock.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 3
+? Bot1.Hand.Grizzly Bears.Colors = Green
+? Bot1.Battlefield.Count = 4
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Hand.Grizzly Bears.Colors = Green
+Bot2.Life = 20
