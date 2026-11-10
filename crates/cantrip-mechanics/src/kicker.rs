@@ -19,5 +19,5 @@ pub fn enters_with_counters<const KIND: usize>(g: &mut dyn Game, entering: &mut 
 /// spell once (CR 702.33d), so "if this spell was kicked" is the spell's `kicked`, as for any kicker. A kicker with mana is the
 /// card's `kicker` instead.
 pub const fn non_mana(cost: Cost) -> OptionalCost {
-    OptionalCost { cost, kicker: true }
+    OptionalCost { kicker: true, ..OptionalCost::new(cost) }
 }
