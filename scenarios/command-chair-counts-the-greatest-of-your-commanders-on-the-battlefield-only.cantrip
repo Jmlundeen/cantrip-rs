@@ -1,0 +1,57 @@
+# Command Chair: "{T}: Add X mana of any one color, where X is the greatest mana value among commanders you control." Bot1 has
+# three commanders: Llanowar Elves (mana value 1) and Grizzly Bears (2) are cast and on the battlefield, Craw Wurm (6) stays in the
+# command zone, where nobody controls it (CR 903.3, 109.4). Bot2's commander Hill Giant (4) is on the battlefield but is not
+# Bot1's. So X is 2: the greatest of Bot1's own commanders on the battlefield - not the least (1), not Bot2's (4), and not the
+# one still in the command zone (6).
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Llanowar Elves
+Grizzly Bears
+Craw Wurm
+
+[Bot2 Commander]
+Hill Giant
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Command Chair
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Island x26
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Command Chair.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Command.Hill Giant.Cast
+? Bot2.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Command Chair.Activate(Ability: Add three mana of any one color; Color: Green)
+? Bot1.Mana = {G}{G}{G}
+Bot1.Command.Llanowar Elves.Cast
+Bot1.Command.Grizzly Bears.Cast
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Command Chair.Activate(Ability: Add X mana; Color: Blue)
+? Bot1.Mana = {U}{U}
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Hill Giant.Power = 3
+Bot1.Command.Count = 1
