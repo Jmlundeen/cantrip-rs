@@ -1914,7 +1914,8 @@ def close(args, outcome):
         if outcome == "block":
             card["rule"] = args.rule
         if outcome in ("block", "abandon", "release"):
-            card["note"] = args.note if outcome != "release" else args.reason
+            # `release` and `abandon` take `--reason` and have no `--note` of their own.
+            card["note"] = getattr(args, "note", None) or args.reason
         card["claim"] = None
         store.log(state, outcome, id=wid, card=card["name"], commit=commit, shared=new,
                   note=(getattr(args, "note", None) or getattr(args, "reason", None) or ""))
