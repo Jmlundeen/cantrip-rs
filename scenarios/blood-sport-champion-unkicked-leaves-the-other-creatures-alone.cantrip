@@ -1,0 +1,31 @@
+# Blood-Sport Champion cast without its kicker: the trigger's intervening if is false, so the Ornithopter never gains
+# deathtouch, though the champion itself has it from its own line.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Blood-Sport Champion
+Ornithopter
+Island x6
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Blood-Sport Champion.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+? Bot1.Battlefield.Blood-Sport Champion.Keywords = Deathtouch
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Ornithopter; Blood-Sport Champion
