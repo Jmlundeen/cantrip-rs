@@ -15,13 +15,7 @@ fn make_officer(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// 611.2a): the targets are chosen as the trigger goes on the stack, and each still attacking and still a creature as it
 /// resolves gains flying (CR 608.2b, 506.4).
 fn grant_flying(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures = cantrip_mechanics::targets::legal_objects(g, item);
-    instruction(g, |g| {
-        for creature in creatures {
-            cantrip_mechanics::effects::gain_until_end_of_turn(g, item.object, creature, Keyword::Flying);
-        }
-    });
-    Ok(())
+    cantrip_mechanics::effects::targets_gain(g, item, Keyword::Flying)
 }
 
 /// The 6+ striation's layer 6 part (CR 721.2a, 613.6): flying and the attack trigger, together, so that both continue the one
