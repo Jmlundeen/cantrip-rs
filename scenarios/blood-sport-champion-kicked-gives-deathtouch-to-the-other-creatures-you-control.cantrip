@@ -1,0 +1,42 @@
+# Blood-Sport Champion paid with its kicker {2} (the pool empty right after, so one less fails): its enters trigger gives
+# deathtouch to the other creature Bot1 controls, and to nothing of Bot2's. On turn 5 the deathtouch is gone again.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Blood-Sport Champion
+Ornithopter
+Island x6
+Island x9
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Blood-Sport Champion.Cast(Kicked: 1)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying
+? Bot1.Battlefield.Blood-Sport Champion.Keywords = Deathtouch
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield = Blood-Sport Champion; Ornithopter; Swamp
+Bot2.Battlefield = Island; Ornithopter
