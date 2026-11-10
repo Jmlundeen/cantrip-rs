@@ -1,0 +1,89 @@
+# "Spacecraft creatures you control get +3/+3." Each player stations a Galvanizing Sawship (base 6/5 at 3+ charge counters): Bot1
+# taps Captain Kirk (power 3) to it, Bot2 taps a Phyrexian Soulgorger (power 8). Both are artifact creatures, so only Bot1's is a
+# Spacecraft creature Kirk controls - it is 9/8, Bot2's stays 6/5, and Bot1's Ornithopter (no Spacecraft subtype) and Kirk himself
+# get nothing.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Galvanizing Sawship
+Ornithopter
+Captain Kirk, Boldly Going
+Island x16
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Galvanizing Sawship
+Phyrexian Soulgorger
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Galvanizing Sawship.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Galvanizing Sawship.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Captain Kirk, Boldly Going.Cast
+Bot1.Decline
+Bot1.Battlefield.Galvanizing Sawship.Activate(Ability: Station)
+Bot1.Choose(Captain Kirk, Boldly Going)
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Phyrexian Soulgorger.Cast
+Bot2.Battlefield.Galvanizing Sawship.Activate(Ability: Station)
+Bot2.Choose(Phyrexian Soulgorger)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Galvanizing Sawship.Counters.Charge = 3
+? Bot2.Battlefield.Galvanizing Sawship.Counters.Charge = 8
+
+[Expect]
+Bot1.Battlefield.Galvanizing Sawship.Types = Artifact; Creature
+Bot1.Battlefield.Galvanizing Sawship.Power = 9
+Bot1.Battlefield.Galvanizing Sawship.Toughness = 8
+Bot2.Battlefield.Galvanizing Sawship.Power = 6
+Bot2.Battlefield.Galvanizing Sawship.Toughness = 5
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Captain Kirk, Boldly Going.Power = 3
+Bot1.Battlefield.Captain Kirk, Boldly Going.Toughness = 4

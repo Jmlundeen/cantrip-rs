@@ -1,0 +1,38 @@
+# Captain Kirk, Boldly Going's search takes "a card named Starship Enterprise" too (CR 201.2a): the library holds no basic
+# land card, only Darksteel Citadel (a land, not basic, refused) and Starship Enterprise, a nonland card that fits by its name
+# alone. It is revealed into Bot1's hand, and the library, searched, is shuffled.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Captain Kirk, Boldly Going
+Darksteel Citadel
+Darksteel Citadel
+Starship Enterprise
+Darksteel Citadel x12
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Captain Kirk, Boldly Going.Cast
+Bot1.Accept
+! Bot1.Search(Darksteel Citadel)
+Bot1.Search(Starship Enterprise)
+? Bot1.Revealed = Starship Enterprise
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Darksteel Citadel; Darksteel Citadel; Starship Enterprise
+Bot1.Library.Count = 12
+Bot1.Shuffles = 1
