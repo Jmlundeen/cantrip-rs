@@ -1166,15 +1166,14 @@ fn attack_rules(cx: &Cx, eligible: &[ObjectId], targets: &[Target], barred: Vec<
             required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
             required.push(RequiredAttack { attacker: id, aim: AttackAim::PlayerOtherThan(e.controller) });
         }
-        let mut goaders: Vec<PlayerId> = Vec::new();
+        // Goad (CR 701.15a-d), from a resolved effect and from a static ability that says the creature is goaded alike; the
+        // same player goading it again makes no further requirement (CR 701.15d).
+        for goader in goaders(cx, id) {
+            required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
+            required.push(RequiredAttack { attacker: id, aim: AttackAim::PlayerOtherThan(goader) });
+        }
         for e in cx.s().effects.iter().filter(|e| e.affected == id) {
             match e.kind {
-                // The same player goading it again makes no further requirement (CR 701.15d).
-                EffectKind::Goaded if !goaders.contains(&e.controller) => {
-                    goaders.push(e.controller);
-                    required.push(RequiredAttack { attacker: id, aim: AttackAim::Anything });
-                    required.push(RequiredAttack { attacker: id, aim: AttackAim::PlayerOtherThan(e.controller) });
-                }
                 EffectKind::MustAttackAt(at) if in_force(cx, e) => required.push(RequiredAttack { attacker: id, aim: AttackAim::At(at) }),
                 _ => {}
             }

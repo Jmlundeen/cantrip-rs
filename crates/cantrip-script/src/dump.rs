@@ -664,8 +664,7 @@ impl StateDump {
                         d.set(format!("{key}.Exerted"), true);
                     }
                     // The players who goaded it (CR 701.15a), while any goad lasts.
-                    let mut goaders: Vec<usize> =
-                        s.effects.iter().filter(|e| e.affected == id && e.kind == EffectKind::Goaded).map(|e| e.controller.0 as usize + 1).collect();
+                    let mut goaders: Vec<usize> = cantrip_engine::goaders(game, id).iter().map(|p| p.0 as usize + 1).collect();
                     if !goaders.is_empty() {
                         goaders.sort_unstable();
                         goaders.dedup();
