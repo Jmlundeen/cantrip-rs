@@ -1,0 +1,12 @@
+{
+  "name": "Commander William Riker",
+  "manaCost": "{1}{R}{W}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Vigilance, haste\n{1}, {T}: You and target opponent each draw two cards.",
+  "keywords": [
+    "Vigilance",
+    "Haste"
+  ]
+}
