@@ -1,0 +1,50 @@
+# The 4+ striation's threshold is exactly four (CR 721.2a): at three charge counters the Raider is not a creature and has
+# none of flying, menace or haste (CR 721.2c), which is what a count of three-or-more or five-or-more would get wrong.
+# Bejeweled Warg is only 3 power, so one station is all this reaches - and the hexproof it has on its own turn is there
+# regardless, because that ability is not part of the striation.
+[Bot1 Deck]
+K'Vort-Class Raider
+Bejeweled Warg
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Island
+Island x12
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.K'Vort-Class Raider.Cast
+? Bot1.Mana =
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bejeweled Warg.Cast(Spend: G, G)
+Bot1.Battlefield.K'Vort-Class Raider.Activate(Ability: Station)
+! Bot1.Choose(K'Vort-Class Raider)
+Bot1.Choose(Bejeweled Warg)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.K'Vort-Class Raider.Counters.Charge = 3
+? Bot1.Battlefield.K'Vort-Class Raider.Types = Artifact
+? Bot1.Battlefield.K'Vort-Class Raider.Power = (absent)
+? Bot1.Battlefield.K'Vort-Class Raider.Toughness = (absent)
+? Bot1.Battlefield.K'Vort-Class Raider.Keywords = Hexproof
+
+[Expect]
+Bot1.Battlefield.K'Vort-Class Raider.Counters.Charge = 3
+Bot1.Battlefield.K'Vort-Class Raider.Types = Artifact
+Bot1.Battlefield.K'Vort-Class Raider.Power = (absent)
+Bot1.Battlefield.K'Vort-Class Raider.Keywords = Hexproof
