@@ -1,0 +1,56 @@
+# Chief Montgomery Scott: "you may put ..." is optional. On turn 3 Bot1 declines and the Grizzly Bears stays in his hand; on turn 5
+# Scott has untapped, the offer comes again, and this time the Bears arrives with its one +1/+1 counter (one land, X = 1).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Chief Montgomery Scott
+Grizzly Bears
+Forest x16
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chief Montgomery Scott.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Chief Montgomery Scott.Activate(Ability: Strange new worlds)
+Bot2.Pass
+Bot1.Choose()
+[T3 Bot1.Main2]
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Chief Montgomery Scott.Activate(Ability: Strange new worlds)
+Bot1.Choose(Grizzly Bears)
+? Bot1.Mana =
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 3
+Bot1.Hand.Count = 1
