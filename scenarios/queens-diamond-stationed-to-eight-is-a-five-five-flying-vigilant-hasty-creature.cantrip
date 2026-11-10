@@ -1,0 +1,72 @@
+# Queen's Diamond: "It's an artifact creature at 8+" and "8+ | Flying, vigilance, haste", printed 5/5. Bot1 stations a
+# Mugato (power 6) on turn 3, then two Memnites (power 1 each): with six and with seven charge counters it is only an
+# artifact; with the eighth it is a 5/5 artifact creature with flying, vigilance and haste, and it attacks the turn it
+# got them: Bot2 goes from 20 to 15, and the Diamond did not tap to attack (CR 702.184a, 721.2a-b, 702.9, 702.20, 702.10).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Mox Emerald
+Queen's Diamond
+Mugato
+Forest
+Memnite
+Memnite
+Forest
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Queen's Diamond.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mugato.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Queen's Diamond.Activate(Ability: Station)
+Bot1.Choose(Mugato)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Queen's Diamond.Types = Artifact
+[T5 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Queen's Diamond.Activate(Ability: Station)
+Bot1.Choose(Memnite#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Queen's Diamond.Types = Artifact
+Bot1.Battlefield.Queen's Diamond.Activate(Ability: Station)
+Bot1.Choose(Memnite#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Queen's Diamond.Types = Artifact; Creature
+? Bot1.Battlefield.Queen's Diamond.Power = 5
+? Bot1.Battlefield.Queen's Diamond.Toughness = 5
+? Bot1.Battlefield.Queen's Diamond.Keywords = Flying; Haste; Vigilance
+Bot1.Attack(Queen's Diamond > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Life = 15
+? Bot1.Battlefield.Queen's Diamond.Tapped = false
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Queen's Diamond.Counters.Charge = 8
+Bot1.Battlefield.Queen's Diamond.Tapped = false
+Bot2.Life = 15

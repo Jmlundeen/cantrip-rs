@@ -1,0 +1,7 @@
+{
+  "name": "Queen's Diamond",
+  "manaCost": "{4}",
+  "type": "Legendary Artifact \u2014 Spacecraft",
+  "stationPt": "5/5",
+  "oracleText": "{T}: Choose a color. Add one mana of that color for each charge counter on Queen's Diamond. Spend this mana only to cast your commander.\nStation (Tap another creature you control: Put charge counters equal to its power on this Spacecraft. Station only as a sorcery. It's an artifact creature at 8+.)\n8+ | Flying, vigilance, haste"
+}

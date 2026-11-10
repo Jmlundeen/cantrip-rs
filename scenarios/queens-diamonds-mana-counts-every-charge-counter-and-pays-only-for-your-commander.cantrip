@@ -1,0 +1,71 @@
+# Queen's Diamond's {T} adds one mana of the chosen color for each charge counter on it - the two Bot2's Jefferies Tube
+# put on it count, whoever put them (CR 122.6, 605.1a) - and that mana may only be spent to cast Bot1's commander
+# (CR 106.6, 903.3, 903.3d). The Mountain's {R} pays the whole of a Lightning Bolt, and the Diamond's {R}{R} stays in
+# the pool, still restricted; then one of that {R}{R} pays the {R} of Raging Goblin, Bot1's commander, cast from the
+# command zone, and the other is left. Mana empties at the end of each step and phase (CR 106.4), so all of this is one
+# main phase.
+
+[Format]
+Commander
+
+[Bot1 Commander]
+Raging Goblin
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Queen's Diamond
+Lightning Bolt
+Mountain
+Mountain
+Island x5
+
+[Bot2 Deck]
+Jefferies Tube
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Queen's Diamond.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Jefferies Tube.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Jefferies Tube.Activate(Ability: Put two charge counters; Bot1.Battlefield.Queen's Diamond)
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Queen's Diamond.Counters.Charge = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Queen's Diamond.Activate(Ability: Choose a color; Color: Red)
+? Bot1.Mana = {R} {R}{R} (YourCommander)
+? Bot1.Battlefield.Queen's Diamond.Tapped = true
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana = {R}{R} (YourCommander)
+Bot1.Command.Raging Goblin.Cast
+? Bot1.Mana = {R} (YourCommander)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Raging Goblin.Power = 1
+? Bot2.Life = 37
+
+[Expect]
+Turn = 5
+Bot1.Commander.Raging Goblin.CastCount = 1
+Bot1.Mana = {R} (YourCommander)
