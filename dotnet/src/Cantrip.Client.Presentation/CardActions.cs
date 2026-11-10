@@ -689,6 +689,7 @@ public sealed class CardActions
         ManaSpendFilterView.ActivatedAbilities => "activated abilities",
         ManaSpendFilterView.ArtifactSpells => "artifact spells",
         ManaSpendFilterView.LegendarySpells => "legendary spells",
+        ManaSpendFilterView.YourCommander => "your commander",
         ManaSpendFilterView.NotNonartifactSpells => "anything but nonartifact spells",
         ManaSpendFilterView.SpellsFromExile => "spells cast from exile",
         ManaSpendFilterView.NotSpellsFromHand => "anything but spells cast from your hand",

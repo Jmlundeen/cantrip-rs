@@ -376,6 +376,8 @@ pub enum ManaSpendFilterView {
     ArtifactSpellsOrAbilities,
     /// Spells with one of the subtypes named beside it, or equip abilities: "Equipment spells or ... equip abilities".
     SubtypeSpellsOrEquipAbilities,
+    /// Only to cast the payer's own commander (CR 903.3d): "spend this mana only to cast your commander".
+    YourCommander,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

@@ -2507,6 +2507,10 @@ pub enum ManaRestriction {
     /// legendary as it is on the stack, never on an ability, nor on a cost paid for a spell that is not casting it ("unless its
     /// controller pays", CR 118.12). It does nothing to the spell it pays for.
     LegendarySpells,
+    /// "Spend this mana only to cast your commander" (CR 106.6, 903.3d): only on casting a spell that is the payer's own
+    /// commander - the card was designated a commander and the payer owns it (CR 903.3, 109.2) - never on an ability, nor on
+    /// a cost paid for a spell that is not casting it. Queen's Diamond prints it.
+    YourCommander,
     /// "Spend this mana only to cast [type] spells" (CR 106.6): only on casting a spell (CR 601.2g) that has one of these
     /// card types - not on an ability, nor on any other spell, nor on a cost paid for a spell that is not casting it
     /// ("unless its controller pays", CR 118.12). A spell with flashback or kicker is still the spell it is.
@@ -2699,7 +2703,9 @@ pub enum ManaPayment {
     /// cast, its mana value with X at 0, which `x` says could be raised.
     /// `from` is the kind of zone it is cast from (CR 601.2a): where the card is, for the advice; where it was, once on
     /// the stack (`Obj::cast_from`).
-    Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool, mana_value: u32, x: bool, from: ZoneKind },
+    /// `commander`: whether the spell is the payer's own commander (CR 903.3, 903.3d) - its card was designated a commander and
+    /// the payer owns it.
+    Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool, mana_value: u32, x: bool, from: ZoneKind, commander: bool },
     /// Activating an ability whose source has these card types and these subtypes as it is activated (CR 602.2b, 605.3a):
     /// both always filled, from the source's characteristics. `on_battlefield`: whether the source is a permanent (CR
     /// 109.2), not a card in a hand, a graveyard or exile.
@@ -2768,11 +2774,12 @@ impl ManaRestriction {
     /// of `Subtypes` are named for their subtypes and those of `ManaValue` for their number (`name`). A card naming a
     /// restriction of card types not here fails the build (`Adds::only_for` is checked at compile time), since the host
     /// has no word for it on the wire.
-    pub const NAMED: [(ManaRestriction, &'static str); 20] = [
+    pub const NAMED: [(ManaRestriction, &'static str); 21] = [
         (ManaRestriction::NotNonartifactSpells, "NotNonartifactSpells"),
         (ManaRestriction::GainsHaste, "GainsHaste"),
         (ManaRestriction::LegendaryUncounterable, "LegendarySpells, CantBeCountered"),
         (ManaRestriction::LegendarySpells, "LegendarySpells"),
+        (ManaRestriction::YourCommander, "YourCommander"),
         (ManaRestriction::ARTIFACT_SPELLS, "ArtifactSpells"),
         (ManaRestriction::INSTANT_OR_SORCERY_SPELLS, "InstantOrSorcerySpells"),
         (ManaRestriction::PLANESWALKER_SPELLS, "PlaneswalkerSpells"),
@@ -2796,7 +2803,8 @@ impl ManaRestriction {
             (ManaRestriction::NotNonartifactSpells, ManaRestriction::NotNonartifactSpells)
             | (ManaRestriction::GainsHaste, ManaRestriction::GainsHaste)
             | (ManaRestriction::LegendaryUncounterable, ManaRestriction::LegendaryUncounterable)
-            | (ManaRestriction::LegendarySpells, ManaRestriction::LegendarySpells) => true,
+            | (ManaRestriction::LegendarySpells, ManaRestriction::LegendarySpells)
+            | (ManaRestriction::YourCommander, ManaRestriction::YourCommander) => true,
             (ManaRestriction::Spells(a), ManaRestriction::Spells(b)) | (ManaRestriction::NonSpells(a), ManaRestriction::NonSpells(b)) => {
                 a.0 == b.0
             }
@@ -2887,6 +2895,7 @@ impl ManaRestriction {
             (ManaRestriction::NotSpellsFrom(_), _) => true,
             (ManaRestriction::GainsHaste, _) => true,
             (ManaRestriction::LegendaryUncounterable | ManaRestriction::LegendarySpells, ManaPayment::Spell { legendary, .. }) => legendary,
+            (ManaRestriction::YourCommander, ManaPayment::Spell { commander, .. }) => commander,
             (ManaRestriction::Spells(allowed) | ManaRestriction::SpellsOrAbilities(allowed, _), ManaPayment::Spell { types, .. }) => {
                 allowed.0 & types.0 != 0
             }
@@ -3393,6 +3402,7 @@ mod tests {
             mana_value: 2,
             x: false,
             from: ZoneKind::Hand,
+            commander: false,
         };
         let creature = TypeSet::of(&[CardType::Creature]);
         let plaza = ManaRestriction::LegendarySpells;
@@ -3415,6 +3425,34 @@ mod tests {
         assert_eq!(ManaRestriction::parse("LegendarySpells, CantBeCountered".split_whitespace()), Some(halfling));
     }
 
+    /// "Spend this mana only to cast your commander" (CR 106.6, 903.3d; Queen's Diamond): a spell that is the payer's own
+    /// commander, and nothing else - not another player's commander, not an ability, not anything that is not casting it.
+    #[test]
+    fn mana_for_your_commander_pays_for_only_it() {
+        let spell = |commander| ManaPayment::Spell {
+            types: TypeSet::of(&[CardType::Artifact]),
+            subtypes: SubtypeSet::NONE,
+            legendary: false,
+            mana_value: 4,
+            x: false,
+            from: ZoneKind::Hand,
+            commander,
+        };
+        let restriction = ManaRestriction::YourCommander;
+        assert!(restriction.may_pay(&spell(true)));
+        assert!(!restriction.may_pay(&spell(false)));
+        assert!(!restriction.may_pay(&ManaPayment::Ability {
+            source: TypeSet::of(&[CardType::Artifact]),
+            subtypes: SubtypeSet::NONE,
+            on_battlefield: true,
+            equip: false,
+        }));
+        assert!(!restriction.may_pay(&ManaPayment::Other));
+        assert_eq!(restriction.effects(), 0);
+        assert!(restriction.is_known());
+        assert_eq!(ManaRestriction::parse("YourCommander".split_whitespace()), Some(restriction));
+    }
+
     /// A restriction by subtype names any number of them, each exactly: the third of three pays for a spell with it, which a
     /// list cut down to two would have left out (CR 106.6, 205.3).
     #[test]
@@ -3427,6 +3465,7 @@ mod tests {
             mana_value: 2,
             x: false,
             from: ZoneKind::Hand,
+            commander: false,
         };
         for subtype in [Subtype::Dragon, Subtype::Omen, Subtype::Elf] {
             assert!(restriction.may_pay(&spell(subtype)), "{subtype:?}");
@@ -3442,7 +3481,7 @@ mod tests {
     fn equipment_spells_or_equip_abilities() {
         let restriction = ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Equipment).or_equip_abilities());
         let artifact = TypeSet::of(&[CardType::Artifact]);
-        let spell = |subtypes| ManaPayment::Spell { types: artifact, subtypes, legendary: false, mana_value: 2, x: false, from: ZoneKind::Hand };
+        let spell = |subtypes| ManaPayment::Spell { types: artifact, subtypes, legendary: false, mana_value: 2, x: false, from: ZoneKind::Hand, commander: false };
         let ability = |subtypes, equip| ManaPayment::Ability { source: artifact, subtypes, on_battlefield: true, equip };
         let equipment = SubtypeSet::of(&[Subtype::Equipment]);
         assert!(restriction.may_pay(&spell(equipment)));
@@ -3466,7 +3505,7 @@ mod tests {
         let artifact = TypeSet::of(&[CardType::Artifact]);
         let elemental = || SubtypeSet::of(&[Subtype::Elemental]);
         let ability = |source, subtypes, on_battlefield| ManaPayment::Ability { source, subtypes, on_battlefield, equip: false };
-        let spell = |types| ManaPayment::Spell { types, subtypes: SubtypeSet::NONE, legendary: false, mana_value: 2, x: false, from: ZoneKind::Hand };
+        let spell = |types| ManaPayment::Spell { types, subtypes: SubtypeSet::NONE, legendary: false, mana_value: 2, x: false, from: ZoneKind::Hand, commander: false };
         let castle = ManaRestriction::CREATURE_SPELLS_OR_ABILITIES_OF_CREATURES;
         assert!(castle.may_pay(&spell(creature)));
         assert!(!castle.may_pay(&spell(artifact)));

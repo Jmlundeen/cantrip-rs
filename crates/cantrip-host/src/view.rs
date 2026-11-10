@@ -146,6 +146,7 @@ pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, M
         ManaRestriction::GainsHaste => ManaSpendFilterView::None,
         // Told apart on the wire by their effects.
         ManaRestriction::LegendaryUncounterable | ManaRestriction::LegendarySpells => ManaSpendFilterView::LegendarySpells,
+        ManaRestriction::YourCommander => ManaSpendFilterView::YourCommander,
         r if r == ManaRestriction::ARTIFACT_SPELLS => ManaSpendFilterView::ArtifactSpells,
         r if r == ManaRestriction::INSTANT_OR_SORCERY_SPELLS => ManaSpendFilterView::InstantOrSorcerySpells,
         r if r == ManaRestriction::PLANESWALKER_SPELLS => ManaSpendFilterView::PlaneswalkerSpells,

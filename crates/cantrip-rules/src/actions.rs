@@ -5575,7 +5575,7 @@ fn affordable_with(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, c
         let any_color = !a.any_color
             && !a.spenders.is_empty()
             && static_rules::lets_spend_any_color(cx, &a.spenders, &Spending { player, source: Some(source), purpose: SpendingFor::Casting });
-        a.covers_for(&if any_color { cost.paid_with_any_color() } else { *cost }, &spell_payment(cx, source, a.names_subtypes()))
+        a.covers_for(&if any_color { cost.paid_with_any_color() } else { *cost }, &spell_payment(cx, player, source, a.names_subtypes()))
     } else {
         a.covers_for(cost, &ability_payment(cx, source, chars.types, chars.subtypes, false))
     }
@@ -6333,16 +6333,18 @@ fn tap_triggers(cx: &Cx, waiting: &[WaitingManaTrigger], id: ObjectId, player: P
 ///
 /// Its mana value is the face's with X at 0 (CR 202.3e), or for the back face of a nonmodal double-faced card its front
 /// face's (CR 712.8c); `x`, whether its mana cost has {X} in it, says it could be more (`Available::covers_for`).
-fn spell_kind(cx: &Cx, a: &Available, card: ObjectId, def: &CardDef) -> ManaPayment {
+fn spell_kind(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef) -> ManaPayment {
     let whole = cx.card(cx.s().obj(card).card);
     let back = !def.has_cost && whole.back.is_some_and(|b| std::ptr::eq(b, def));
     // At the least X may be announced as (CR 202.3e), as `least_cost` judges it.
     let mana_value = if back { whole.cost.mana_value() } else { def.cost.mana_value() + u32::from(def.cost.x) * u32::from(least_x(def.x_cant_be_zero)) };
     let (types, legendary, x) = (def.types, def.supertypes.legendary, def.cost.x > 0);
-    // Cast from where the card is (CR 601.2a).
+    // Cast from where the card is (CR 601.2a). The payer's own commander (CR 903.3, 903.3d): the card was designated a commander
+    // and the payer owns it.
     let from = cx.s().obj(card).zone.kind();
+    let commander = cx.s().obj(card).commander && cx.s().obj(card).owner == player;
     if !a.names_subtypes() {
-        return ManaPayment::Spell { types, subtypes: SubtypeSet::NONE, legendary, mana_value, x, from };
+        return ManaPayment::Spell { types, subtypes: SubtypeSet::NONE, legendary, mana_value, x, from, commander };
     }
     let mut subtypes = def.subtypes;
     if std::ptr::eq(def, cx.card(cx.s().obj(card).card)) {
@@ -6351,7 +6353,7 @@ fn spell_kind(cx: &Cx, a: &Available, card: ObjectId, def: &CardDef) -> ManaPaym
     if def.keywords.has(Keyword::Changeling) && (def.types.has(CardType::Creature) || def.types.has(CardType::Kindred)) {
         subtypes = Subtype::CREATURE_TYPES.into_iter().fold(subtypes, SubtypeSet::with);
     }
-    ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from }
+    ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from, commander }
 }
 
 /// Whether a static ability lets `player` spend mana as though it were mana of any color to cast `card` as `def` (CR
@@ -6381,7 +6383,7 @@ fn spell_covers(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
         }
         None => a,
     };
-    let payment = spell_kind(cx, a, card, def);
+    let payment = spell_kind(cx, a, player, card, def);
     if casts_with_any_color(cx, a, player, card, def) { a.covers_for(&cost.paid_with_any_color(), &payment) } else { a.covers_for(cost, &payment) }
 }
 
@@ -6418,7 +6420,7 @@ impl Available {
         // A spell whose X is still to be announced (CR 601.2b) has the larger mana value the larger X is (CR 202.3e):
         // mana for spells of a mana value or greater may pay for it at an X that brings it there (Ashling, Rimebound's
         // mana and a {X}{R} spell), each X costing its {X} symbols more.
-        let ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from } = *payment else { return false };
+        let ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from, commander } = *payment else { return false };
         let complex = self.complex.iter().flat_map(|(alternatives, _)| alternatives).filter_map(|a| a.restriction);
         let Some(most) = self.restricted.iter().map(|&(r, ..)| r).chain(complex).filter_map(|r| r.least_mana_value()).max() else { return false };
         if cost.x == 0 || mana_value >= most as u32 {
@@ -6428,7 +6430,10 @@ impl Available {
         (1..=(most as u32 - mana_value).div_ceil(per)).any(|n| {
             // X's generic mana, which only what may pay X pays ("Spend only black mana on X", CR 107.3, 601.2h).
             let more = cost.plus_x(n * per, cost.x_mana);
-            self.covers_as(&more, &ManaPayment::Spell { types, subtypes, legendary, mana_value: mana_value + n * per, x, from })
+            self.covers_as(
+                &more,
+                &ManaPayment::Spell { types, subtypes, legendary, mana_value: mana_value + n * per, x, from, commander },
+            )
         })
     }
 
@@ -9268,7 +9273,7 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
     // Assist (CR 702.132a): another player may pay generic mana of it - as much as the one who could pay the most.
     let cost = if with.assist && !no_mana && cost.generic > 0 { ManaCost { generic: cost.generic - assist_could_pay(cx, player, card, def, cost.generic), ..cost } } else { cost };
     if !with.any() && !no_mana {
-        return a.covers_for(&as_paid(cost), &spell_kind(cx, a, card, def));
+        return a.covers_for(&as_paid(cost), &spell_kind(cx, a, player, card, def));
     }
     let mut cost = cost;
     let mut generic: u32 = 0;
@@ -9291,7 +9296,7 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
     } else {
         a
     };
-    let covers = |cost: ManaCost| if no_mana { cost.is_zero() } else { a.covers_for(&as_paid(cost), &spell_kind(cx, a, card, def)) };
+    let covers = |cost: ManaCost| if no_mana { cost.is_zero() } else { a.covers_for(&as_paid(cost), &spell_kind(cx, a, player, card, def)) };
     if covers(ManaCost { generic: cost.generic.saturating_sub(generic), ..cost }) {
         return true;
     }
@@ -9316,7 +9321,7 @@ fn assist_could_pay(cx: &Cx, caster: PlayerId, card: ObjectId, def: &CardDef, ge
     let mut most = 0;
     for p in cx.s().turn_order_from(caster).filter(|&p| p != caster && cx.s().in_game(p)) {
         let a = available(cx, p);
-        let kind = spell_kind(cx, &a, card, def);
+        let kind = spell_kind(cx, &a, p, card, def);
         if let Some(n) = (most + 1..=generic).rev().find(|&n| a.covers_for(&ManaCost { generic: n, ..ManaCost::ZERO }, &kind)) {
             most = n;
         }
@@ -12578,8 +12583,11 @@ fn activate_mana_as(
             interval.resolution = head;
         }
         let outer = cx.mana_source.replace(source);
-        // Held for this production alone: a mana ability activated inside another's effect has its own.
-        let outer_held = if replaceable { cx.producing.replace(Vec::new()) } else { cx.producing.take() };
+        // Held for this production alone: a mana ability activated inside another's effect has its own. An effect whose
+        // ability's own `Adds` restricts its mana holds too, for the mana to be re-added with the restriction: the effect
+        // adds through `add_mana`, which knows nothing of it (CR 106.6).
+        let own_restriction = def.mana.is_some().then_some(restricted).flatten();
+        let outer_held = if replaceable || own_restriction.is_some() { cx.producing.replace(Vec::new()) } else { cx.producing.take() };
         let added = match def.mana {
             // What the mana ability does, its activator does (CR 605.3b, 122.6a): the counters it puts are theirs.
             Some(effect) => cx.acting_as(player, |cx| effect(cx, &asker, color)),
@@ -12589,14 +12597,30 @@ fn activate_mana_as(
                 Ok(())
             }
         };
-        let held = std::mem::replace(&mut cx.producing, outer_held);
+        let mut held = std::mem::replace(&mut cx.producing, outer_held);
         cx.mana_source = outer;
         if added.is_err() {
             cx.g.mana_rider = outer_rider;
         }
         added?;
-        if let Some(held) = held.filter(|_| replaceable) {
-            replaced = Some(produce(cx, player, source, &held));
+        // The ability's own restriction (CR 106.6) on the mana its effect added: what the effect did not restrict itself
+        // takes it, and what it did keeps its own.
+        if let Some(restriction) = own_restriction {
+            for h in held.iter_mut().flatten() {
+                h.restriction = h.restriction.or(Some(restriction));
+            }
+        }
+        if let Some(held) = held.filter(|h| !h.is_empty()) {
+            if replaceable {
+                replaced = Some(produce(cx, player, source, &held));
+            } else if own_restriction.is_some() {
+                // Re-added as the effect added it, the ability's "when that mana is spent" rider with it (`Adds::when_spent`).
+                let rider = cx.g.mana_rider;
+                for h in &held {
+                    crate::takeback::produced(cx.g, source);
+                    cx.st().add_mana_riding(h.to, h.mana, h.amount, source, h.restriction, h.lasts, h.snow, rider);
+                }
+            }
         }
     }
     cx.g.mana_rider = outer_rider;
@@ -13869,7 +13893,7 @@ fn payment_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> 
     match purpose {
         Paying::Casting if cx.s().obj(source).zone.is(ZoneKind::Stack) => {
             // The subtypes, only where some of the player's mana is limited by them.
-            spell_payment(cx, source, cx.s().restricted_of(player).any(|(r, _)| r.names_subtypes()))
+            spell_payment(cx, player, source, cx.s().restricted_of(player).any(|(r, _)| r.names_subtypes()))
         }
         Paying::Activating(payment) => payment,
         _ => ManaPayment::Other,
@@ -13890,7 +13914,7 @@ fn spending_for(cx: &Cx, source: ObjectId, purpose: Paying) -> SpendingFor {
 /// announced (CR 202.3e: 0 for a copy with no mana cost or of a back face, CR 707.9b, 202.3b, and for a face-down spell,
 /// CR 708.4; the cast half's alone, CR 709.3b), whether its mana cost has {X} and the zone it was cast from (CR 601.2a); its
 /// subtypes only `with_subtypes`, where some mana at hand is limited by them.
-fn spell_payment(cx: &Cx, spell: ObjectId, with_subtypes: bool) -> ManaPayment {
+fn spell_payment(cx: &Cx, payer: PlayerId, spell: ObjectId, with_subtypes: bool) -> ManaPayment {
     let chars = cx.chars(spell);
     let subtypes = if with_subtypes { chars.subtypes } else { SubtypeSet::NONE };
     ManaPayment::Spell {
@@ -13900,6 +13924,7 @@ fn spell_payment(cx: &Cx, spell: ObjectId, with_subtypes: bool) -> ManaPayment {
         mana_value: cx.mana_value(spell),
         x: cx.mana_cost(spell).x > 0,
         from: cx.s().obj(spell).cast_from.unwrap_or(ZoneKind::Stack),
+        commander: cx.s().obj(spell).commander && cx.s().obj(spell).owner == payer,
     }
 }
 
@@ -15152,6 +15177,25 @@ mod tests {
         Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None }
     }
 
+    /// "Spend this mana only to cast your commander" (Queen's Diamond, CR 106.6): your commander is a commander you own (CR
+    /// 903.3d). A commander exiled and cast by a player who does not own it - here through a permission to cast cards in exile -
+    /// is not that player's commander: their {G}{G} so restricted neither has it offered nor says it may pay for it, where the
+    /// owner's does both.
+    #[test]
+    fn mana_for_your_commander_pays_for_a_commander_you_own_and_not_another_players() {
+        for owner in [ME, THEM] {
+            let (mut game, ids) = table(&[(&EXILER, Zone::BATTLEFIELD, ME), (&BEAR, Zone::exile(owner), owner)]);
+            let bear = ids[1];
+            game.state.update_obj(bear, |obj| obj.commander = true);
+            game.state.add_mana(ME, Mana::G, 2, ids[0], Some(ManaRestriction::YourCommander), ManaLasts::Step, false);
+            let mut cx = cx(&mut game);
+            let offered = priority_options(&mut cx, ME).iter().any(|o| o.kind == ActionKind::CastSpell && o.source == Some(bear));
+            assert_eq!(offered, owner == ME, "the cast is offered for the restricted mana only to the commander's owner ({owner:?})");
+            let ManaPayment::Spell { commander, .. } = spell_payment(&cx, ME, bear, false) else { panic!("a spell's payment") };
+            assert_eq!(commander, owner == ME, "the spell is the payer's commander only if the payer owns it ({owner:?})");
+        }
+    }
+
     static PREPARE_SPELL: CardDef = CardDef {
         name: "Preparation Test Spell",
         types: TypeSet::of(&[CardType::Instant]),
@@ -15563,6 +15607,7 @@ mod tests {
         mana_value: 2,
         x: false,
         from: ZoneKind::Hand,
+        commander: false,
     };
 
     #[test]

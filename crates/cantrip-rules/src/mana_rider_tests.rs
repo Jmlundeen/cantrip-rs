@@ -61,6 +61,26 @@ static SPHERE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+fn red(g: &mut dyn cantrip_api::Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    g.add_mana(asker.controller, Mana::R, 1);
+    Ok(())
+}
+
+/// A mana ability whose own effect adds the mana, restricted by the ability ("Spend this mana only to cast creature spells")
+/// and ridden by its "when that mana is spent": the effect's mana is held and re-added with the restriction
+/// (`actions::activate_mana_as`), and keeps the rider through that.
+static RESTRICTED_PROBE: CardDef = CardDef {
+    name: "Rider Test Restricted Probe",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[mana_ability(
+        life(1),
+        add(Mana::R).by(red).only_for(ManaRestriction::CREATURE_SPELLS).when_spent(0),
+        "Pay 1 life: Add {R}. Spend this mana only to cast creature spells. When that mana is spent to cast a spell, you gain 1 life.",
+    )],
+    delayed: &[triggered(when_asked(EventMask::SPELL_CAST, on_a_spell_cast), gain_one, "When that mana is spent to cast a spell, you gain 1 life.")],
+    ..CardDef::BLANK
+};
+
 /// A 1/1 for {R}.
 static IMP: CardDef = CardDef {
     name: "Rider Test Imp",
@@ -82,7 +102,7 @@ static BRUTE: CardDef = CardDef {
 };
 
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &PROBE, &SPHERE, &IMP, &BRUTE])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &PROBE, &SPHERE, &IMP, &BRUTE, &RESTRICTED_PROBE])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     g.verify = true;
@@ -247,6 +267,23 @@ fn two_riders_of_one_source_are_a_choice_and_each_pays_as_chosen() {
         assert_eq!(riders(&g), vec![(probe, kept, 1)]);
         assert_eq!(g.state.player(YOU).life, if gains { life + 1 } else { life - 1 });
     }
+}
+
+/// CR 603.7a, 106.6: mana an ability's own effect adds, restricted by that ability, carries the ability's "when that mana is
+/// spent" rider as it is put in the pool with its restriction, and spent on a creature spell its delayed ability triggers.
+#[test]
+fn mana_an_effect_adds_under_its_abilitys_restriction_keeps_the_rider() {
+    let mut g = game();
+    let probe = put(&mut g, &RESTRICTED_PROBE, Zone::BATTLEFIELD);
+    let imp = put(&mut g, &IMP, Zone::hand(YOU));
+    activate(&mut g, probe, 0);
+    next(&mut g);
+    let rows: Vec<_> = g.state.mana_from_of(YOU).map(|e| (e.source, e.restriction, e.rider != 0, e.pool.get(Mana::R))).collect();
+    assert_eq!(rows, vec![(probe, Some(ManaRestriction::CREATURE_SPELLS), true, 1)], "the restricted {{R}} rides its delayed ability");
+    let life = g.state.player(YOU).life;
+    choose(&mut g, |o| o.kind == ActionKind::CastSpell && o.source == Some(imp), "the cast");
+    resolve(&mut g);
+    assert_eq!(g.state.player(YOU).life, life + 1, "the delayed ability triggered as the mana was spent");
 }
 
 /// CR 733.1: a cast given up with a mana ability that drew kept, whose {1} the payer paid with one of two riders, is taken
