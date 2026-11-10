@@ -20,6 +20,32 @@ pub fn assimilate(g: &mut dyn Game, item: &StackItem, card: ObjectId) -> Result<
     Ok(assimilate_all(g, item, &[card])?.first().copied())
 }
 
+/// "Assimilate a creature card exiled with it" (CR 607.2a, 608.2d): the creature cards of the pile this ability's source
+/// exiled and linked to it, one chosen as the ability resolves - a lone one forced - then assimilated. `None` means the pile
+/// held no creature card, or the controller chose none, so an ability with a fallback ("If you can't") can take it. Borg
+/// Cube and Assimilation Assessor print it.
+pub fn a_creature_card_exiled_with(g: &mut dyn Game, item: &StackItem) -> Result<Option<ObjectId>, Suspend> {
+    let exiled = g.exiled_with(g.linked(item));
+    let eligible: Vec<ObjectId> = exiled.into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    if eligible.is_empty() {
+        return Ok(None);
+    }
+    let chosen = crate::choose::select(
+        g,
+        item.controller,
+        item.object,
+        Purpose::PutOntoBattlefield,
+        eligible,
+        crate::select::creature_cards(crate::select::exactly(1)),
+    )?
+    .into_iter()
+    .next();
+    match chosen {
+        Some(card) => assimilate(g, item, card),
+        None => Ok(None),
+    }
+}
+
 /// Assimilate several cards at once (CR 101.4, 608.2f): they are put onto the battlefield as one event, each with its
 /// +1/+1 counter and as a Borg artifact creature, so each entering permanent sees the others already there (CR 614.12).
 /// Assimilate the Wounded's "for each opponent, assimilate up to one target creature card" prints it. `None` cards are
