@@ -1,0 +1,61 @@
+# Battle of Wolf 359 ({3}{B}{B}): Bot1 controls one artifact creature (Ornithopter), so X is 1 - Bot2's Ornithopter is an
+# artifact creature Bot1 does not control and does not count (CR 109.5). Every nonartifact creature gets -1/-1 (CR 611.2c):
+# Bot1's Llanowar Elves (1/1) dies, Bot2's Grizzly Bears (2/2) becomes 1/1, and both Ornithopters stay 0/2. The pump ends
+# with the turn (CR 514.2): on Bot1's next turn the Bears are 2/2 again.
+
+[Bot1 Deck]
+Swamp
+Mox Emerald
+Black Lotus
+Ornithopter
+Llanowar Elves
+Battle of Wolf 359
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Ornithopter
+Grizzly Bears
+Forest x12
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Battle of Wolf 359.Cast
+? Bot1.Mana =
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Grizzly Bears.Power = 1
+? Bot2.Battlefield.Grizzly Bears.Toughness = 1
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Grizzly Bears.Power = 2
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Battle of Wolf 359; Black Lotus
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Grizzly Bears.Power = 2
+Bot2.Battlefield.Grizzly Bears.Toughness = 2
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2

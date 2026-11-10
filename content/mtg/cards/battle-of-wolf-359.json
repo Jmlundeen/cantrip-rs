@@ -1,0 +1,6 @@
+{
+  "name": "Battle of Wolf 359",
+  "manaCost": "{3}{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "All nonartifact creatures get -X/-X until end of turn, where X is the number of artifact creatures you control."
+}
