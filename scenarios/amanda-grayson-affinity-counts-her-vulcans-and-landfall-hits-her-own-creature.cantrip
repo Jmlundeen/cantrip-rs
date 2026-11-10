@@ -1,0 +1,52 @@
+# Amanda Grayson, Logic's Link ({3}{G}) with affinity for Vulcans (CR 702.41a): with Xenobotanist and Astute Terraformer
+# (both Vulcans) on the battlefield it costs {1}{G}, paid exactly by the last two mana, where the full {3}{G} could not have
+# been paid. Its landfall puts two +1/+1 counters on a creature its controller controls (CR 122.1, 603.6a): Bot2's
+# Ornithopter is no legal target, so Astute Terraformer (2/2) becomes 4/4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Xenobotanist
+Astute Terraformer
+Amanda Grayson, Logic's Link
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Xenobotanist.Cast
+Bot1.Pass
+Bot1.Hand.Astute Terraformer.Cast
+Bot1.Pass
+Bot1.Hand.Amanda Grayson, Logic's Link.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Astute Terraformer)
+
+[Expect]
+Bot1.Battlefield.Amanda Grayson, Logic's Link.Power = 2
+Bot1.Battlefield.Amanda Grayson, Logic's Link.Toughness = 3
+Bot1.Battlefield.Astute Terraformer.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Astute Terraformer.Power = 4
+Bot1.Battlefield.Astute Terraformer.Toughness = 4
+Bot2.Life = 20
