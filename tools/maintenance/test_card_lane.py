@@ -703,5 +703,82 @@ class LaneTest(unittest.TestCase):
         self.assertIn("Closes #9", body)
 
 
+    def test_a_scratch_directory_does_not_block_a_claim(self):
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.write(".w1-scratch/notes.txt", "thinking about the card\n")
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--no-issue")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.assertEqual(self.status(self.state(), "Card B"), "working")
+
+    def test_a_no_issue_commit_closes_the_card_without_a_closes_line(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--no-issue")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.card_b_scenario()
+        gates = [{"name": "scope", "status": "pass", "summary": "checks out", "detail": "", "facts": {}}]
+        saved = os.getcwd()
+        os.chdir(self.main)
+        try:
+            with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)):
+                code = lane.cmd_commit(argparse.Namespace(queue="q", id="w1", issue=None, note="", no_issue=True))
+        finally:
+            os.chdir(saved)
+        self.assertEqual(code, 0)
+        self.assertEqual(self.status(self.state(), "Card B"), "done")
+        body = self.git(self.main, "log", "-1", "--format=%B")
+        self.assertTrue(body.startswith("Card: Card B"))
+        self.assertNotIn("Closes #", body)
+
+    def test_commit_refuses_without_an_issue_unless_no_issue_is_passed(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q").returncode, 0)
+        saved = os.getcwd()
+        os.chdir(self.main)
+        try:
+            with self.assertRaises(lane.Refused):
+                lane.cmd_commit(argparse.Namespace(queue="q", id="w1", issue=None, note="", no_issue=False))
+        finally:
+            os.chdir(saved)
+        self.assertEqual(self.status(self.state(), "Card B"), "working")
+
+    def test_done_gated_keeps_the_claim_open_when_a_gate_fails(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--no-issue").returncode, 0)
+        gates = [{"name": "scenarios", "status": "fail", "summary": "no scenario holds it", "detail": "", "facts": {}}]
+        saved = os.getcwd()
+        os.chdir(self.main)
+        try:
+            with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)):
+                with self.assertRaises(lane.Refused):
+                    lane.cmd_done(argparse.Namespace(queue="q", id="w1", commit=None, no_commit=False,
+                                                     note="", gated=True))
+        finally:
+            os.chdir(saved)
+        self.assertEqual(self.status(self.state(), "Card B"), "working")
+
+    def test_a_second_check_reuses_the_corpus_run_until_a_file_changes(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--no-issue")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        store = lane.Store(lane.common_dir(self.main), "q")
+        card = next(entry for entry in self.state()["cards"] if entry["name"] == "Card B")
+        reference = "=== Test points\n"
+        with mock.patch.object(lane, "gate_corpus", mock.Mock(return_value=("1 pass, 0 fail", ""))) as corpus:
+            first = lane.check_card(self.main, store, card, card["claim"], reference, fast=True)
+            lane.save_check(self.main, store, card, first, True)
+            second = lane.check_card(self.main, store, card, card["claim"], reference, fast=True)
+        self.assertEqual(corpus.call_count, 1)
+        summary = next(gate["summary"] for gate in second if gate["name"] == "corpus")
+        self.assertIn("reused", summary)
+        self.write("scenarios/card-b-more.cantrip", "# a new scenario\n\n[Bot1 Deck]\nCard B x20\n")
+        with mock.patch.object(lane, "gate_corpus", mock.Mock(return_value=("1 pass, 0 fail", ""))) as corpus:
+            lane.check_card(self.main, store, card, card["claim"], reference, fast=True)
+        self.assertEqual(corpus.call_count, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

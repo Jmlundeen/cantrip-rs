@@ -2,11 +2,11 @@
 
     python tools/maintenance/card-lane.py queue  [--queue NAME] [--format F | --file PATH | --card NAME ...]
     python tools/maintenance/card-lane.py queue  [--queue NAME] --backlog [--list CUBE | --file PATH]
-    python tools/maintenance/card-lane.py next   --id WORKER [--queue NAME] [--card NAME] [--refresh] [--engine] [--issue N]
+    python tools/maintenance/card-lane.py next   --id WORKER [--queue NAME] [--card NAME] [--refresh] [--engine] [--issue N | --no-issue]
     python tools/maintenance/card-lane.py status [--queue NAME] [--id WORKER]
     python tools/maintenance/card-lane.py check  [--queue NAME] [--id WORKER | --card NAME] [--fast]
-    python tools/maintenance/card-lane.py commit --id WORKER [--queue NAME] [--issue N] [--note TEXT]
-    python tools/maintenance/card-lane.py done   --id WORKER [--queue NAME] [--commit SHA | --no-commit] [--note TEXT]
+    python tools/maintenance/card-lane.py commit --id WORKER [--queue NAME] [--issue N | --no-issue] [--note TEXT]
+    python tools/maintenance/card-lane.py done   --id WORKER [--queue NAME] [--commit SHA | --no-commit] [--gated] [--note TEXT]
     python tools/maintenance/card-lane.py block  --id WORKER --rule CR [--queue NAME] [--note TEXT]
     python tools/maintenance/card-lane.py release --id WORKER --reason TEXT [--queue NAME]
     python tools/maintenance/card-lane.py abandon --id WORKER --reason TEXT [--queue NAME]
@@ -136,12 +136,21 @@ def require_branch(root):
     return branch
 
 
+SCRATCH = re.compile(r"^(?:\.?scratch|\.[\w.-]+-scratch)/")
+
+
 def status_paths(root):
-    """The worktree's uncommitted changes, leaving out the lane's own packets."""
+    """The worktree's uncommitted changes, leaving out the lane's own packets and the worker's scratch directory.
+
+    A scratch directory (`.w1-scratch/`, the skill's own advice for notes and drafts) is untracked and never
+    committed, so it must not hold up `next` or the card's own commits.
+    """
     lines = []
     for line in git(root, "status", "--porcelain").stdout.splitlines():
         path = line[3:].strip()
         if path.startswith(PACKETS + "/") or path == PACKETS:
+            continue
+        if line.startswith("??") and SCRATCH.match(path):
             continue
         lines.append(line)
     return lines
@@ -712,11 +721,18 @@ def write_brief(root, store, card, claim, reference, packet):
         f"    python tools/maintenance/card-lane.py check --id {claim['id']} --queue {store.name} --fast",
         f"    python tools/maintenance/card-lane.py commit --id {claim['id']} --queue {store.name}",
         "",
-        "`check --fast` skips only coverage and mutation while the card is being written; `commit` runs both. A failed",
-        "check names the gate and nothing is committed.",
+        "`check --fast` skips only coverage and mutation while the card is being written; `commit` runs both, and a",
+        "second `check` reuses the corpus run while the tree and every changed file are unchanged. A failed check",
+        "names the gate and nothing is committed. When the commits are made by hand, close with `done --gated`, which",
+        "runs the check first instead of closing unverified.",
+        "",
+        "A scenario skeleton is in the packet as `starter.cantrip`: copy it into `scenarios/` and grow it. The packet's",
+        "`reference.md` ends with the scenario notes - how each prompt is answered and what a check has to pin.",
         "",
         (f"The issue is #{claim['issue']}; the Card commit ends `Closes #{claim['issue']}`." if claim.get("issue")
-         else "No issue number is set: pass `--issue N` to `next` or `commit`, or set report.json's issue."),
+         else ("This repository's issues are disabled (`--no-issue`): the Card commit carries no `Closes` line, and "
+               "nothing else changes." if claim.get("no_issue")
+               else "No issue number is set: pass `--issue N`, or `--no-issue` when the repository cannot have one.")),
         "",
         ("This card may change the core (cantrip-state, cantrip-rules, cantrip-api) when its text needs a rule the"
          " engine does not have: do not block for it and do not work around it. The core change lands first, in its own"
@@ -779,6 +795,37 @@ def write_brief(root, store, card, claim, reference, packet):
     return "\n".join(lines).rstrip() + "\n"
 
 
+def packet_stale(packet):
+    """A packet written by another version of this lane, or not written at all, is rebuilt before the card is worked."""
+    if not os.path.isfile(os.path.join(packet, "brief.md")):
+        return True
+    try:
+        with open(os.path.join(packet, "state.json"), encoding="utf-8") as f:
+            return json.load(f).get("version") != PACKET_VERSION
+    except (OSError, json.JSONDecodeError):
+        return True
+
+
+def write_starter(root, tool, card, packet):
+    """The skeleton `new-card.py --scenario` writes, kept in the packet to copy: the cast, and the pool checked."""
+    starter = os.path.join(packet, "starter.cantrip")
+    if os.path.isfile(starter) or not os.path.isfile(tool):
+        return
+    scripts = os.path.join(root, "scenarios")
+    before = set(os.listdir(scripts)) if os.path.isdir(scripts) else set()
+    try:
+        run([sys.executable, tool, card["name"], "--scenario"], root)
+    except Exception:  # a card whose cost no free source makes still gets the notes below
+        return
+    after = set(os.listdir(scripts)) if os.path.isdir(scripts) else set()
+    for entry in sorted(after - before):
+        if entry.endswith(".cantrip"):
+            try:
+                shutil.move(os.path.join(scripts, entry), starter)
+            except OSError:
+                pass
+
+
 def build_packet(root, store, card, claim):
     """Everything the worker starts from, in the implementor's own worktree. Regenerable, never committed."""
     packet = packet_dir(root, store, card["name"])
@@ -793,6 +840,7 @@ def build_packet(root, store, card, claim):
             reference += f"\n[new-card.py exited {result.returncode}]\n"
     else:
         reference = f"new-card.py is missing at {tool}\n"
+    reference += SCENARIO_NOTES
     with open(os.path.join(packet, "reference.md"), "w", encoding="utf-8", newline="\n") as f:
         f.write(reference)
     content = content_from(reference, root)
@@ -811,9 +859,10 @@ def build_packet(root, store, card, claim):
             pass  # the check gate reports a report that cannot be read or filled
     with open(os.path.join(packet, "prior-art.md"), "w", encoding="utf-8", newline="\n") as f:
         f.write(prior_art(root, reference))
+    write_starter(root, tool, card, packet)
     with open(os.path.join(packet, "state.json"), "w", encoding="utf-8", newline="\n") as f:
-        json.dump({"queue": store.name, "branch": store.branch, "card": card["name"], "claim": claim},
-                  f, indent=1, ensure_ascii=False)
+        json.dump({"version": PACKET_VERSION, "queue": store.name, "branch": store.branch,
+                   "card": card["name"], "claim": claim}, f, indent=1, ensure_ascii=False)
     brief = write_brief(root, store, card, claim, reference, packet)
     with open(os.path.join(packet, "brief.md"), "w", encoding="utf-8", newline="\n") as f:
         f.write(brief)
@@ -837,6 +886,21 @@ def save_patch(root, store, name):
 
 REPORT = "report.json"
 CHECK = "check.json"
+PACKET_VERSION = 4
+SCENARIO_NOTES = """
+=== Scenario notes: how a scenario answers prompts and what it must check (each one cost a card a rebuild)
+  - `starter.cantrip` in this packet is the skeleton `new-card.py --scenario` writes: the card cast (or played) on
+    turn 1 and the pool checked empty after paying. Copy it into `scenarios/<card>-<what-it-shows>.cantrip`.
+  - Answer a prompt as `Bot1.<Verb>(...)`: `Modes(<the start of the chosen mode's text>)` for Choose one,
+    `Colors(Red)` for a color, `Choose()` for a yes/no, `Target(<name>)` for a target, `Search(<name>)` for a search,
+    `X(2)` for X.
+  - Counters at zero are absent keys (`.Counters.PlusOnePlusOne = (absent)`), so check after the trigger or ability
+    has resolved (`[T3 Bot1.Main2]`), not in the step that caused it.
+  - Check the cost paid exactly with `? Bot1.Mana =` right after the cast or activation; lasting mana prints as
+    `{R} lasting {R}`.
+  - A card put on the bottom of a library does not change the library's count: check the order, not the size.
+  - A mono-colored Mox needs no `Color:`; `! Bot1.Attack()` then proves a must-attack static.
+"""
 ENGINE_DIRS = ("crates/cantrip-state/", "crates/cantrip-rules/", "crates/cantrip-api/")
 ORACLE_DIRS = ("crates/cantrip-oracle/",)
 HARNESS_DIRS = ("crates/cantrip-script/",)
@@ -1313,7 +1377,7 @@ def gate_mutation(root, card, report):
     return f"{caught} caught, {survived} survived (all declared equivalent)", {"detail": out, "survivors": survivors}
 
 
-def gate_report(root, card, content, reference, report, looks, survivors, issue=0):
+def gate_report(root, card, content, reference, report, looks, survivors, issue=0, no_issue=False):
     if not isinstance(report, dict):
         raise GateFailed(f"{REPORT} is missing or not an object: fill it in from the packet")
     problems = []
@@ -1324,8 +1388,9 @@ def gate_report(root, card, content, reference, report, looks, survivors, issue=
         report_issue = int(report_issue)
     except (TypeError, ValueError):
         report_issue = 0
-    if report_issue <= 0 and not issue:
-        problems.append("no issue number: set report.json's \"issue\" or pass --issue N")
+    if report_issue <= 0 and not issue and not no_issue:
+        problems.append("no issue number: set report.json's \"issue\", pass --issue N, or pass --no-issue when "
+                        "the repository's issues are disabled (the Card commit then has no Closes line)")
     seen = {}
     for entry in report.get("validation") or []:
         if isinstance(entry, dict) and isinstance(entry.get("line"), str):
@@ -1373,10 +1438,46 @@ def gate_report(root, card, content, reference, report, looks, survivors, issue=
             f"{len(reference_rulings(reference))} ruling(s)"), ""
 
 
+def file_stamp(path):
+    try:
+        stat = os.stat(path)
+    except OSError:
+        return "gone"
+    return f"{stat.st_size}:{stat.st_mtime_ns}"
+
+
+def corpus_key(root, changed):
+    """What a corpus result depends on: the committed tree, and the size and mtime of every changed file.
+
+    Corpus costs a build and a run of the card's scenarios, and most checks change only the report; the key lets a
+    second check reuse the first one's pass until a Rust file or a scenario actually changes.
+    """
+    return "|".join([tree_sha(root)] + [f"{path}:{file_stamp(os.path.join(root, path))}" for path in sorted(changed)])
+
+
+def previous_check(root, store, name):
+    try:
+        return read_json(check_file(root, store, name))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def reused_corpus(previous, key):
+    """The corpus gate of the last check, when it passed over exactly this tree and these files."""
+    if not isinstance(previous, dict) or previous.get("corpus_key") != key:
+        return None
+    for gate in previous.get("gates") or []:
+        if isinstance(gate, dict) and gate.get("name") == "corpus" and gate.get("status") == "pass":
+            return gate
+    return None
+
+
 def check_card(root, store, card, claim, reference, fast=False):
     """Every gate, in order; fast skips only the two that rebuild and mutate the card."""
     gates = []
     changed = [entry["path"] for entry in changed_paths(root)]
+    key = corpus_key(root, changed)
+    previous = previous_check(root, store, card["name"])
 
     def add(name, function):
         try:
@@ -1403,7 +1504,12 @@ def check_card(root, store, card, claim, reference, fast=False):
     content = content_from(reference, root)
     add("oracle", lambda: gate_oracle(root, card))
     add("scenarios", lambda: gate_scenarios(root, card, content, reference))
-    add("corpus", lambda: gate_corpus(root, card, changed))
+    earlier = reused_corpus(previous, key)
+    if earlier:
+        gates.append(dict(earlier, corpus_key=key, summary=f"{earlier['summary']} (reused: the tree and every "
+                                                           "changed file are unchanged since that check)"))
+    else:
+        add("corpus", lambda: gate_corpus(root, card, changed))["corpus_key"] = key
     linted = add("lint", lambda: gate_lint(root, card))
     add("citations", lambda: gate_citations(root, card, reference))
     if fast:
@@ -1434,13 +1540,14 @@ def check_card(root, store, card, claim, reference, fast=False):
         looks = (linted.get("facts") or {}).get("looks") or []
         survivors = (mutation.get("facts") or {}).get("survivors") or []
         add("report", lambda: gate_report(root, card, content, reference, report, looks, survivors,
-                                          (claim or {}).get("issue")))
+                                          (claim or {}).get("issue"), bool((claim or {}).get("no_issue"))))
     return gates
 
 
 def save_check(root, store, card, gates, fast):
     passed = all(gate["status"] != "fail" for gate in gates)
     data = {"queue": store.name, "card": card["name"], "head": head_sha(root), "tree": tree_sha(root),
+            "corpus_key": next((gate.get("corpus_key") for gate in gates if gate.get("name") == "corpus"), None),
             "fast": bool(fast), "time": now(), "passed": passed, "gates": gates}
     write_json(check_file(root, store, card["name"]), data)
     return passed
@@ -1553,7 +1660,7 @@ def plan_commits(root, store, card, claim, reference, issue, note=""):
     messages = {"engine": None,  # each named from the surface it changes, once its paths are staged
                 "mechanics": None,  # named from the shared code it adds, once its paths are staged
                 "client": None,
-                "card": f"Card: {card['name']}" + (f"\n\nCloses #{issue}" if lands else "")}
+                "card": f"Card: {card['name']}" + (f"\n\nCloses #{issue}" if lands and issue else "")}
     made = []
     for kind in ("engine", "mechanics", "client", "card"):
         paths = groups[kind]
@@ -1577,11 +1684,13 @@ def plan_commits(root, store, card, claim, reference, issue, note=""):
         if kind == "card":
             if not body.startswith(f"Card: {card['name']}"):
                 raise Refused(f"the card commit's subject is not `Card: {card['name']}`: {body.splitlines()[0]}")
-            closing = re.search(rf"^Closes #{issue}$", body, re.M)
-            if lands and not closing:
+            if issue and lands and not re.search(rf"^Closes #{issue}$", body, re.M):
                 raise Refused(f"the card commit does not end with `Closes #{issue}`")
-            if not lands and re.search(r"^Closes #", body, re.M):
+            if issue and not lands and re.search(r"^Closes #", body, re.M):
                 raise Refused("this card commit only rewrites its scenarios, so it must not close the issue again")
+            if not issue and re.search(r"^Closes #", body, re.M):
+                raise Refused("the repository's issues are disabled, so this Card commit must not close one: drop "
+                              "the Closes line")
         made.append({"kind": kind, "sha": after[:9], "message": body.splitlines()[0], "paths": paths})
     dirty = status_paths(root)
     if dirty:
@@ -1656,8 +1765,13 @@ def cmd_commit(args):
         issue = int(issue)
     except (TypeError, ValueError):
         issue = 0
-    if issue <= 0:
-        raise Refused("no issue number: pass --issue N or set report.json's issue (the Card commit ends Closes #N)")
+    no_issue = bool(getattr(args, "no_issue", False) or claim.get("no_issue"))
+    if issue <= 0 and not no_issue:
+        raise Refused("no issue number: pass --issue N, or --no-issue when the repository's issues are disabled "
+                      "(the Card commit then ends without a Closes line)")
+    if no_issue:
+        issue = None
+        claim = dict(claim, no_issue=True)
     gates = check_card(root, store, card, claim, reference, fast=False)
     passed = save_check(root, store, card, gates, False)
     print_gates(card, root, gates, False)
@@ -1727,6 +1841,9 @@ def cmd_next(args):
             raise Refused("--issue takes a GitHub issue number, as --issue 123")
         if issue <= 0:
             raise Refused("--issue takes a positive GitHub issue number")
+    no_issue = bool(getattr(args, "no_issue", False))
+    if no_issue and issue:
+        raise Refused("--no-issue and --issue are alternatives: an issue is either there to close or it is not")
     root = worktree_root()
     store = Store(common_dir(root), args.queue)
     context = pool_context(root)
@@ -1745,6 +1862,8 @@ def cmd_next(args):
             claim = card["claim"]
             if issue and not claim.get("issue"):
                 claim["issue"] = issue
+            if no_issue:
+                claim["no_issue"] = True
             moved = norm(claim.get("worktree", "")) != norm(root)
             if moved:
                 if os.path.isdir(claim.get("worktree", "")):
@@ -1755,7 +1874,7 @@ def cmd_next(args):
                              agent=context["agent"])
                 store.log(state, "adopt", id=wid, card=card["name"], worktree=root)
             packet = packet_dir(root, store, card["name"])
-            fresh = moved or args.refresh or not os.path.isfile(os.path.join(packet, "brief.md"))
+            fresh = moved or args.refresh or packet_stale(packet)
         else:
             busy = open_in(state, root)
             if busy:
@@ -1780,7 +1899,7 @@ def cmd_next(args):
             card["claim"] = {"id": wid, "worktree": root, "packet": packet_dir(root, store, card["name"]),
                              "slot": context["slot"], "lease": context["lease"], "member": context["member"],
                              "agent": context["agent"], "head": head_sha(root), "engine": True,
-                             "issue": issue}
+                             "issue": issue, "no_issue": no_issue}
             store.log(state, "claim", id=wid, card=card["name"], worktree=root, slot=context["slot"],
                       lease=context["lease"], member=context["member"], engine=True)
             claim, fresh, opened = card["claim"], True, True
@@ -1940,7 +2059,13 @@ def close(args, outcome):
 
 
 def cmd_done(args):
-    print("note: `done` closes without the check and commit gates; `commit` is the gated path.", file=sys.stderr)
+    if getattr(args, "gated", False):
+        checked = cmd_check(argparse.Namespace(queue=args.queue, id=args.id, card=None, fast=False))
+        if checked != 0:
+            raise Refused("the check failed, so the claim stays open: fix it, or `release` the card")
+    else:
+        print("note: `done` closes without the check and commit gates; `commit` is the gated path, and "
+              "`done --gated` runs the check first when the commits were made by hand.", file=sys.stderr)
     return close(args, "done")
 
 
@@ -2010,6 +2135,8 @@ def command_line(argv=None):
     cmd.add_argument("--engine", action="store_true",
                      help="accepted and ignored: the core is always in scope, in its own Engine: commit")
     cmd.add_argument("--issue", type=int, metavar="N", help="the GitHub issue the Card commit closes")
+    cmd.add_argument("--no-issue", action="store_true",
+                     help="the repository's issues are disabled: the Card commit closes none")
     cmd.set_defaults(handler=cmd_next)
 
     cmd = sub.add_parser("status", help="the queue, its claims and the shared branch")
@@ -2028,6 +2155,8 @@ def command_line(argv=None):
     queue_flag(cmd)
     cmd.add_argument("--id", required=True, metavar="WORKER")
     cmd.add_argument("--issue", type=int, metavar="N", help="the GitHub issue the Card commit closes")
+    cmd.add_argument("--no-issue", action="store_true",
+                     help="the repository's issues are disabled: the Card commit closes none")
     cmd.add_argument("--note", metavar="TEXT")
     cmd.set_defaults(handler=cmd_commit)
 
@@ -2036,6 +2165,7 @@ def command_line(argv=None):
     cmd.add_argument("--id", required=True, metavar="WORKER")
     cmd.add_argument("--commit", metavar="SHA", help="the card's commit (default HEAD)")
     cmd.add_argument("--no-commit", action="store_true", help="the card needed no commit (already implemented)")
+    cmd.add_argument("--gated", action="store_true", help="run every check before closing")
     cmd.add_argument("--note", metavar="TEXT")
     cmd.set_defaults(handler=cmd_done)
 
