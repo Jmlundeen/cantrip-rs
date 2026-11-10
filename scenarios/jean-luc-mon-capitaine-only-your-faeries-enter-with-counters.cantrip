@@ -1,0 +1,48 @@
+# "Faeries you control": Bot2's Faerie Miscreant enters under Bot2's control while Jean-Luc is Bot1's, so it gets no counters
+# at all (CR 614.12) and stays a 1/1. Bot1's own Faerie, entering on turn 3 with Jean-Luc the only other creature Bot1
+# controls, gets exactly one counter for each of his two types (Human, Officer) and is a 3/3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Jean-Luc, Mon Capitaine
+Faerie Miscreant
+Island x12
+
+[Bot2 Deck]
+Island
+Faerie Miscreant
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Jean-Luc, Mon Capitaine.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Faerie Miscreant.Cast
+Bot2.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Miscreant.Cast
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Faerie Miscreant.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Faerie Miscreant.Power = 1
+Bot2.Battlefield.Faerie Miscreant.Toughness = 1
+Bot1.Battlefield.Faerie Miscreant.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Faerie Miscreant.Power = 3
+Bot1.Battlefield.Faerie Miscreant.Toughness = 3
