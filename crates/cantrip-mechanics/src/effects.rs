@@ -974,6 +974,14 @@ pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspe
     Ok(())
 }
 
+/// "You gain life equal to the number of differently named lands you control" (CR 201.2a, 608.2c): counted as the
+/// ability resolves, two lands with the same name counting once. Species 8472 and Christine Chapel, Combat Medic print
+/// it, both on "when this creature enters".
+pub fn gain_life_for_differently_named_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let n = crate::lands::differently_named_lands(g, item.controller) as i32;
+    gain_life(g, item, n)
+}
+
 /// "You gain life equal to its toughness" (CR 119.3, 608.2h) as a triggered ability's callback: the toughness of the trigger's
 /// subject (`StackItem::subject`, a permanent that entered or a creature that died) as the layers make it, or as it last
 /// existed on the battlefield if it has left. A permanent that is not a creature as the ability resolves has no toughness (CR 208.3) and
