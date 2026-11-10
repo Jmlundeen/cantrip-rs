@@ -3,14 +3,6 @@ use cantrip_mechanics::triggers::{THIS_ENTERS, YOUR_END_STEP};
 use cantrip_mechanics::{delayed, effects, targets};
 use cantrip_oracle as oracle;
 
-/// "Exile up to one other target creature you control. Return that card to the battlefield under its owner's control at the
-/// beginning of the next end step" (CR 603.7): a delayed ability about the card exiled. A token exiled this way ceases to
-/// exist, so there is nothing to return (CR 111.7, 400.7).
-fn exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    delayed::exile_target_then_return_at_next_end_step(g, item, 0, 0);
-    Ok(())
-}
-
 /// The intervening "if one or more cards were put into exile this turn" (CR 603.4): asked of the history, by anyone, from any
 /// zone. A token is not a card (CR 108.2, 111.1). Checked as the end step begins and again as the ability resolves.
 fn a_card_was_exiled_this_turn(q: &dyn Query, _: &Asker) -> bool {
@@ -20,10 +12,13 @@ fn a_card_was_exiled_this_turn(q: &dyn Query, _: &Asker) -> bool {
 }
 
 pub static CARD: CardDef = CardDef {
+    // "Exile up to one other target creature you control. Return that card to the battlefield under its owner's control at the
+    // beginning of the next end step" (CR 603.7): a delayed ability about the card exiled. A token exiled this way ceases to
+    // exist, so there is nothing to return (CR 111.7, 400.7). The shared slot-0 body.
     abilities: &[
         triggered(
             THIS_ENTERS,
-            exile,
+            delayed::exile_target_then_return_at_next_end_step_0,
             "When Ennis enters, exile up to one other target creature you control. Return that card to the battlefield under its owner's control at the beginning of the next end step.",
         )
         .targets(&[targets::OTHER_CREATURE_YOU_CONTROL.optional()]),

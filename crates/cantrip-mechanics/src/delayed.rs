@@ -84,6 +84,14 @@ pub fn exile_target_then_return_at_next_end_step(g: &mut dyn Game, item: &StackI
     }
 }
 
+/// `exile_target_then_return_at_next_end_step` as the body of a trigger or spell whose one target is its slot 0 and whose
+/// delayed ability is the card's number 0: Balance of Terror, Chief Kyle, Transporter Tech, Conciliator's Duelist, Ennis,
+/// Debate Moderator, Ghost of Illyria, S.H.I.E.L.D. Flying Car, Test of Priorities and Wiccan, Rising Magician print it.
+pub fn exile_target_then_return_at_next_end_step_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    exile_target_then_return_at_next_end_step(g, item, 0, 0);
+    Ok(())
+}
+
 /// Sets up the card's delayed ability number 0 to trigger "this turn" (CR 603.7b): each time its `listens`/`matches`
 /// accept an event, until the turn ends, controlled by the resolving ability's controller. `source` is the object the
 /// ability's `matches` is asked of: the spell for "whenever a creature you control dies this turn", the creature it
