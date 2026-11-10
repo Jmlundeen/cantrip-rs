@@ -1,0 +1,48 @@
+# Commander Spock: "Whenever Commander Spock enters or attacks, reveal the top card of your library. ... If it's a land card, you
+# may put it onto the battlefield tapped. If that card is still on top of your library, draw a card." As he enters the top card is
+# an Island: Bot1 declines to put it onto the battlefield, so it is still on top and Bot1 draws it. On turn 3 he attacks, and the
+# attack triggers the ability too: the Wasteland now on top is put onto the battlefield tapped, so nothing is drawn.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Commander Spock
+Island
+Island
+Island
+Island
+Wasteland
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Commander Spock.Cast
+Bot1.Pass
+Bot1.Decline
+? Bot1.Hand.Count = 3
+? Bot1.Battlefield.Count = 4
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Commander Spock > Bot2)
+Bot1.Accept
+? Bot1.Battlefield.Wasteland.Tapped = true
+? Bot1.Hand.Count = 4
+[T3 Bot1.Damage]
+? Bot2.Life = 17
+
+[Expect]
+Bot1.Battlefield.Wasteland.Tapped = true
+Bot1.Hand.Count = 4
+Bot1.Revealed = Island; Wasteland
