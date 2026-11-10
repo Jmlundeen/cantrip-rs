@@ -1,15 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::lands;
+use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
-
-/// "Strange new worlds — When this creature enters, you gain life equal to the number of differently named lands you
-/// control" (CR 603.6a, 201.2a): counted as the ability resolves, so a land that entered with it counts (CR 608.2c).
-fn gain_life_for_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let n = lands::differently_named_lands(g, item.controller) as i32;
-    g.gain_life(item.controller, n);
-    Ok(())
-}
 
 /// "This creature can't be blocked by artifact creatures" (CR 509.1b, 604.1): a blocker that is an artifact creature may
 /// not be declared against it. The rule is the source's own, so it is `block_rules`.
@@ -30,10 +22,12 @@ fn cant_be_targeted_by_an_opponents_artifact_ability(q: &dyn LayerQuery, source:
 }
 
 pub static CARD: CardDef = CardDef {
+    // "Strange new worlds — When this creature enters, you gain life equal to the number of differently named lands you
+    // control" (CR 603.6a, 201.2a): counted as the ability resolves, so a land that entered with it counts (CR 608.2c).
     abilities: &[triggered(
         THIS_ENTERS,
-        gain_life_for_lands,
-        "Strange new worlds — When this creature enters, you gain life equal to the number of differently named lands you control.",
+        effects::gain_life_for_differently_named_lands,
+        "Strange new worlds \u{2014} When this creature enters, you gain life equal to the number of differently named lands you control.",
     )],
     block_rules: &[cant_be_blocked_by_artifact_creatures],
     targeting_rules: &[TargetingRule {
