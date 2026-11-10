@@ -1,0 +1,11 @@
+{
+  "name": "Giant Space Amoeba",
+  "manaCost": "{4}{U}",
+  "type": "Creature — Germ",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nWhenever this creature attacks, target creature defending player controls gets -3/-0 until end of turn, then create a token that's a copy of this creature.",
+  "keywords": [
+    "Flying"
+  ]
+}
