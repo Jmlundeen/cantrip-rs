@@ -1,0 +1,54 @@
+# Chief Kyle, Transporter Tech {2}{W}{U}, Landfall: the land played on turn 1 is before Kyle is on the battlefield and
+# does not trigger; the Plains on turn 3 does. The exiled Thraben Inspector comes back at the beginning of that end step
+# as a new object, so its own "when this enters" investigates again - two Clue tokens (CR 603.6a, 603.7c, 400.7).
+# The Moxen and the Lotus pay {2}{W}{U} exactly, and Mox Pearl pays for the Inspector.
+
+[Bot1 Deck]
+Chief Kyle, Transporter Tech
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Thraben Inspector
+Island
+Plains
+Island x12
+
+[Bot2 Deck]
+Forest x10
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chief Kyle, Transporter Tech.Cast
+Bot1.Pass
+? Bot1.Mana = 
+Bot1.Hand.Plains.Play
+Bot1.Target(Thraben Inspector)
+Bot1.Pass
+Bot2.Pass
+? Exile = Thraben Inspector
+? Bot1.Battlefield = Chief Kyle, Transporter Tech; Clue Token; Island; Mox Pearl; Mox Sapphire; Plains
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Chief Kyle, Transporter Tech; Clue Token; Clue Token; Island; Mox Pearl; Mox Sapphire; Plains; Thraben Inspector
+? Exile.Count = 0
+
+[Expect]
+Bot1.Battlefield = Chief Kyle, Transporter Tech; Clue Token; Clue Token; Island; Mox Pearl; Mox Sapphire; Plains; Thraben Inspector
+Bot1.Battlefield.Thraben Inspector.Power = 1
+Bot1.Battlefield.Chief Kyle, Transporter Tech.Power = 3
+Exile.Count = 0

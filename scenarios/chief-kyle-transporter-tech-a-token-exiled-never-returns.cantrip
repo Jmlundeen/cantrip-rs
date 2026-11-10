@@ -1,0 +1,57 @@
+# A token exiled by Chief Kyle's landfall has ceased to exist and never comes back: the delayed ability is about the
+# card the object became, and a token is not a card (CR 111.7, 400.7, 603.7c). Frontline Rush makes the two Goblins on
+# turn 1, one is exiled on turn 3, and only the other is still on the battlefield at that end step.
+
+[Bot1 Deck]
+Chief Kyle, Transporter Tech
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Frontline Rush
+Island
+Island x12
+
+[Bot2 Deck]
+Forest x10
+Forest x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Frontline Rush.Cast
+Bot1.Modes(Create two 1/1 red Goblin creature tokens.)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chief Kyle, Transporter Tech.Cast
+Bot1.Pass
+? Bot1.Battlefield = Goblin Token; Goblin Token; Mox Pearl; Mox Ruby; Mox Sapphire
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Target(Goblin Token#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Chief Kyle, Transporter Tech; Goblin Token; Island; Mox Pearl; Mox Ruby; Mox Sapphire
+? Exile.Count = 0
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Chief Kyle, Transporter Tech; Goblin Token; Island; Mox Pearl; Mox Ruby; Mox Sapphire
+? Exile.Count = 0
+
+[Expect]
+Bot1.Battlefield = Chief Kyle, Transporter Tech; Goblin Token; Island; Mox Pearl; Mox Ruby; Mox Sapphire
+Exile.Count = 0
+Bot1.Battlefield.Chief Kyle, Transporter Tech.Power = 3

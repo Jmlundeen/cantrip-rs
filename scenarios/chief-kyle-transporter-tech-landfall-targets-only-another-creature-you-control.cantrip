@@ -1,0 +1,52 @@
+# Chief Kyle, Transporter Tech's landfall takes "up to one other target creature you control": Kyle itself is not
+# another creature (CR 109.5) and Bot2's Llanowar Elves is not one Kyle's controller controls, so neither is offered;
+# "up to one" also lets the target be none, which exiles nothing (CR 603.6a, 608.2c, 115.1).
+# Ornithopter is the one legal candidate, so the target question is really asked.
+
+[Bot1 Deck]
+Chief Kyle, Transporter Tech
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Ornithopter
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Llanowar Elves
+Forest x7
+Forest x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chief Kyle, Transporter Tech.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Target(Chief Kyle, Transporter Tech)
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 0
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Chief Kyle, Transporter Tech.Power = 3
+Bot2.Battlefield.Llanowar Elves.Power = 1
