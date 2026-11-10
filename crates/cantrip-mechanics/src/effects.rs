@@ -2597,3 +2597,14 @@ pub fn attacking_creatures_get(g: &mut dyn Game, source: ObjectId, power: i32, t
         }
     });
 }
+
+/// "Blocking creatures get +`power`/+`toughness` until end of turn" (CR 611.2c): the creatures blocking as `source`'s spell
+/// or ability resolves, whoever controls them, and none that block later. One instruction. Piety and Rally print it.
+pub fn blocking_creatures_get(g: &mut dyn Game, source: ObjectId, power: i32, toughness: i32) {
+    let blockers: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.is_blocking(id)).collect();
+    instruction(g, |g| {
+        for id in blockers {
+            crate::pump(g, source, id, power, toughness);
+        }
+    });
+}
