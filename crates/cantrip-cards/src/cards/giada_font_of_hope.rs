@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::replacements;
 use cantrip_oracle as oracle;
 
 /// How many Angels `controller` already controls on the battlefield (CR 614.12): "Angel" is a word of this card's text (CR 612).
@@ -14,18 +15,11 @@ fn angels_already_controlled(q: &dyn Query, asker: &Asker) -> i32 {
 /// apply to her (CR 614.12). With no Angel to count there is nothing to add.
 fn another_angel_enters_under_you(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
     let angel = q.words(asker.source).subtype(Subtype::Angel);
-    matches!(proposal, Proposal::ZoneChange(z)
-        if z.to.is(ZoneKind::Battlefield)
-            && z.controller == asker.controller
-            && q.chars(z.object).has_subtype(angel))
-        && angels_already_controlled(q, asker) > 0
+    replacements::a_subtype_you_control_enters_with_a_counter_for_each(q, asker, proposal, angel, angels_already_controlled)
 }
 
 fn add_a_counter_for_each_angel(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) {
-    let more = angels_already_controlled(q, asker);
-    if let Proposal::ZoneChange(z) = proposal {
-        z.counters[CounterKind::PlusOne as usize] += more as i32;
-    }
+    replacements::add_a_counter_for_each(q, asker, proposal, angels_already_controlled)
 }
 
 pub static CARD: CardDef = CardDef {
