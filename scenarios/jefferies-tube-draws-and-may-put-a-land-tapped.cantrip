@@ -1,0 +1,46 @@
+# Jefferies Tube's third ability draws a card and then may put a land card from its controller's hand onto the battlefield
+# tapped (CR 121.1, 608.2c, 608.2d, 614.1d): the card just drawn is in the hand to choose from, the land enters tapped and
+# uses no land play (CR 305.2), and a land in the other player's hand is not one of the choices. The {4} is paid exactly -
+# the pool is empty right after the activation.
+
+[Bot1 Deck]
+Jefferies Tube
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Jefferies Tube.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Jefferies Tube.Activate(Ability: Draw a card)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Hand = Island; Island; Lightning Bolt
+Bot1.Battlefield.Jefferies Tube.Tapped = true
+Bot1.Battlefield.Island.Tapped = true
+Bot1.LandsPlayed = 0
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 7

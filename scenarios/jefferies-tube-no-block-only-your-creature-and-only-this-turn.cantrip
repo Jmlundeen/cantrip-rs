@@ -1,0 +1,54 @@
+# Jefferies Tube's second ability makes only the creature its controller controls unblockable (CR 509.1b) - an opponent's
+# creature is not a legal target - and the effect lasts only this turn: on the next turn the same attacker is blocked as
+# usual (CR 611.2).
+
+[Bot1 Deck]
+Jefferies Tube
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Eager Cadet
+Island x13
+
+[Bot2 Deck]
+Memnite
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Jefferies Tube.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Hand.Eager Cadet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Jefferies Tube.Activate(Ability: can't be blocked; Bot2.Battlefield.Memnite)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Jefferies Tube.Activate(Ability: can't be blocked; Bot1.Battlefield.Eager Cadet)
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Eager Cadet > Bot2)
+! Bot2.Block(Memnite > Eager Cadet)
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Eager Cadet > Bot2)
+Bot2.Block(Memnite > Eager Cadet)
+? Combat.Blocks = Memnite > Eager Cadet
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Eager Cadet
+Bot2.Graveyard = Memnite
+Bot2.Life = 19
