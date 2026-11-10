@@ -47,12 +47,19 @@ pub fn controls_snow_land(q: &dyn Query, player: PlayerId) -> bool {
     q.state().battlefield().iter().any(|&id| q.controller(id) == player && q.chars(id).supertypes.snow && q.chars(id).is(CardType::Land))
 }
 
-/// "This creature can't attack unless defending player controls an Island" (CR 508.5, 509.1b): the attack rule of the creature
+/// "This creature can't attack unless defending player controls a [land type]" (CR 508.5, 509.1b): the attack rule of the creature
 /// itself, the defending player (including a battle's protector) read through the layers and the creature's words (CR 612.2).
-/// Island Fish Jasconius, Merchant Ship, Pirate Ship, Dandân and Sea Serpent print it.
-pub fn attack_rule_defender_controls_island(q: &dyn Query, asker: &Asker, attacker: ObjectId, defender: Target) -> bool {
+/// `LAND` is `sub(Subtype::Island)` for Island Fish Jasconius, Merchant Ship, Pirate Ship, Dandân and Sea Serpent, and
+/// `sub(Subtype::Mountain)` for Goblin Rock Sled.
+pub fn attack_rule_defender_controls<const LAND: u16>(q: &dyn Query, asker: &Asker, attacker: ObjectId, defender: Target) -> bool {
     attacker != asker.source || defending_player_of(q.state(), defender)
-        .is_none_or(|player| controls_land_type(q, player, q.words(asker.source).subtype(Subtype::Island)))
+        .is_none_or(|player| controls_land_type(q, player, word(q, asker.source, LAND)))
+}
+
+/// "A snow Mountain" (CR 205.4g, 205.3i), read through the words of the card whose text says it (CR 612.2): a permanent with
+/// the snow supertype and the land type Mountain. Glacial Crevasses and Goblin Ski Patrol ask it.
+pub fn snow_mountain(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).supertypes.snow && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mountain))
 }
 
 /// "When you control no Islands, sacrifice this creature" (CR 603.8): the state trigger's condition, read through the layers and

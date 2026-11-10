@@ -1,14 +1,13 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects;
+use cantrip_mechanics::{effects, triggers};
 use cantrip_oracle as oracle;
 
-/// "Whenever this creature blocks or becomes blocked" (CR 509.3a, 509.3c): it blocks (its first declared block), or it becomes
+/// "Whenever this creature blocks or becomes blocked" (CR 509.3a, 509.3c): it blocks (`triggers::this_blocks`), or it becomes
 /// blocked (CR 509.1h, the transition once, however many creatures block it, or an effect makes it blocked).
-fn when_this_blocks_or_becomes_blocked(_: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+fn when_this_blocks_or_becomes_blocked(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
     match *event {
-        Event::Blocks { blocker, declared: true, .. } if blocker == asker.source => Fired::PLAIN,
         Event::BecameBlocked { attacker } if attacker == asker.source => Fired::PLAIN,
-        _ => None,
+        _ => triggers::this_blocks(q, asker.source, event),
     }
 }
 

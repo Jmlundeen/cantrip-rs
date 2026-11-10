@@ -16,6 +16,15 @@ pub fn this_ability_activations_this_turn(q: &dyn Query, asker: &Asker) -> usize
         .count()
 }
 
+/// "[It] attacked during your last turn" (CR 508.1, 500.1): `object` was declared as an attacker in the most recent turn before
+/// this one that `player` was the active player of (turns they had no events in do not count, so a skipped turn is not
+/// their last). The object is the one that attacked, so a permanent that left and came back has not (CR 400.7). Giant Turtle
+/// and Goblin Rock Sled print it.
+pub fn attacked_during_last_turn_of(q: &dyn Query, player: PlayerId, object: ObjectId) -> bool {
+    let turn = q.history().all().iter().rev().find(|r| r.active == player && r.turn < q.state().turn.number).map(|r| r.turn);
+    q.history().all().iter().filter(|r| Some(r.turn) == turn).any(|r| matches!(r.event, Event::Attacks { attacker, .. } if attacker == object))
+}
+
 /// The `Cast` record of the spell `id`, or of the spell the permanent `id` became (CR 400.7, 608.3): the latest one. A copy of a
 /// spell was not cast (CR 707.10) and has none, and a permanent put onto the battlefield was never a spell.
 pub fn cast_of(q: &dyn Query, id: ObjectId) -> Option<Cast> {

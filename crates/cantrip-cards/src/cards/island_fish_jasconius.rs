@@ -20,6 +20,6 @@ pub static CARD: CardDef = CardDef {
             "When you control no Islands, sacrifice this creature.",
         ),
     ],
-    attack_rules: &[lands::attack_rule_defender_controls_island],
+    attack_rules: &[lands::attack_rule_defender_controls::<{ lands::sub(Subtype::Island) }>],
     ..oracle::ISLAND_FISH_JASCONIUS
 };

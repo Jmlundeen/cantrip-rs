@@ -500,11 +500,18 @@ pub fn sacrificed_by(q: &dyn Query, player: PlayerId, event: &Event) -> Option<O
 
 /// "Whenever this creature attacks or blocks" (CR 508.1m, 509.1, 603.2): its own attack or its own block of any
 /// attacker. Smuggler's Copter and Bebop & Rocksteady print it.
-pub fn this_attacks_or_blocks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn this_attacks_or_blocks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::Attacks { attacker, .. } if *attacker == source => Fired::PLAIN,
-        // Once, however many attackers it blocks (CR 509.3a): the attacker it was declared to block.
-        Event::Blocks { blocker, declared: true, .. } if *blocker == source => Fired::PLAIN,
+        _ => this_blocks(q, source, event).and(Fired::PLAIN),
+    }
+}
+
+/// "Whenever this creature blocks" (CR 509.1, 509.3a, 603.2): its own block, once however many attackers it blocks (the attacker
+/// it was declared to block), itself the subject. Chub Toad ("blocks or becomes blocked") and Goblin Snowman print it.
+pub fn this_blocks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Blocks { blocker, declared: true, .. } if *blocker == source => Fired::about(Target::Object(source)),
         _ => None,
     }
 }
@@ -2364,6 +2371,8 @@ pub const THIS_TAKES_DAMAGE: Trigger = when(EventMask::DAMAGE, this_takes_damage
 pub const THIS_DEALT_DAMAGE: Trigger = THIS_TAKES_DAMAGE;
 pub const DEALS_COMBAT_DAMAGE_TO_A_CREATURE: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_a_creature);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
+/// "Whenever this creature blocks" (`this_blocks`).
+pub const THIS_BLOCKS: Trigger = when(EventMask::BLOCKS, this_blocks);
 pub const THIS_ATTACKS_ALONE: Trigger = when(EventMask::ATTACKS, this_attacks_alone);
 pub const CREATURE_YOU_CONTROL_ATTACKS_ALONE: Trigger = when_asked(EventMask::ATTACKS, creature_you_control_attacks_alone);
 pub const EQUIPPED_CREATURE_ATTACKS_ALONE: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks_alone);

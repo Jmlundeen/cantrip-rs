@@ -713,6 +713,15 @@ pub fn itself_while_untapped(q: &dyn LayerQuery, source: ObjectId, affected: Obj
     source == affected && !q.state().obj(source).tapped
 }
 
+/// "As long as enchanted land is a basic Mountain, Goblin creatures get ..." (CR 604.1, 613.4c): every Goblin creature while the
+/// land this Aura enchants is a basic Mountain, both read through the words of the Aura's text (CR 612.2) and the land as the
+/// layers made it. Goblin Caves and Goblin Shrine print it.
+pub fn goblin_creatures_while_enchanted_land_is_basic_mountain(q: &dyn LayerQuery, source: ObjectId, _: ObjectId, so_far: &Chars) -> bool {
+    q.state().obj(source).attached_to.is_some_and(|land| q.chars(land).supertypes.basic && q.chars(land).has_subtype(q.words(source).subtype(Subtype::Mountain)))
+        && so_far.has_subtype(q.words(source).subtype(Subtype::Goblin))
+        && so_far.is(CardType::Creature)
+}
+
 /// "Gets +P/+T" (CR 613.4c): the power and toughness change of an Equipment's, Aura's or permanent's static ability, as the
 /// `apply` of a `Layer::PtModify` static (a negative number is a minus). Cori-Steel Cutter, Embercleave, Grafted Wargear,
 /// Doc Ock's Tentacles and the other plain "+N/+M" statics print it.
