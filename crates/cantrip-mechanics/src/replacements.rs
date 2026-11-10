@@ -538,3 +538,35 @@ fn lands_enter_untapped(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 /// "Lands you control enter untapped." (CR 614.1d): the whole replacement, as Spelunking and The Wandering Minstrel print it.
 pub const LANDS_YOU_CONTROL_ENTER_UNTAPPED: ReplacementDef =
     replacement(ReplacementKind::ZoneChange, lands_you_control_enter_applies, lands_enter_untapped, "lands you control enter untapped");
+
+/// A count of what a replacement adds a +1/+1 counter for, as the card's own ability reads it (CR 614.1c, 205.3m): read as
+/// the permanent would enter, so the object entering is not counted yet (CR 614.12).
+pub type AlreadyControlled = fn(&dyn Query, &Asker) -> i32;
+
+/// "Each [subtype] you control enters with an additional +1/+1 counter on it for each [already]" (CR 614.1c, 614.12, 122.6):
+/// a permanent about to enter the battlefield under this ability's controller that is one of `subtype` as it would exist
+/// there (CR 614.12), card or token alike, with at least one counter for `already` to add. A permanent entering at the same
+/// time as another is not on the battlefield yet, so it counts neither for that one nor for itself. Giada, Font of Hope and
+/// Jean-Luc, Mon Capitaine print it.
+pub fn a_subtype_you_control_enters_with_a_counter_for_each(
+    q: &dyn Query,
+    asker: &Asker,
+    proposal: &Proposal,
+    subtype: Subtype,
+    already: AlreadyControlled,
+) -> bool {
+    matches!(proposal, Proposal::ZoneChange(z)
+        if z.to.is(ZoneKind::Battlefield)
+            && z.controller == asker.controller
+            && q.chars(z.object).has_subtype(subtype))
+        && already(q, asker) > 0
+}
+
+/// The other half of `a_subtype_you_control_enters_with_a_counter_for_each`: that many +1/+1 counters, all at once, as part
+/// of how the permanent enters (CR 614.1c, 122.6).
+pub fn add_a_counter_for_each(q: &dyn Query, asker: &Asker, proposal: &mut Proposal, already: AlreadyControlled) {
+    let more = already(q, asker);
+    if let Proposal::ZoneChange(z) = proposal {
+        z.counters[CounterKind::PlusOne as usize] += more;
+    }
+}
