@@ -277,6 +277,18 @@ pub fn you_tap_a_land_for_mana(q: &dyn Query, source: ObjectId, event: &Event) -
     you_tap_for_mana(q, source, event, CardType::Land)
 }
 
+/// "{T}: Choose a color. Add one mana of that color for each charge counter on this [permanent]" (CR 605.1a, 106.3, 122.6):
+/// the mana ability's effect, for the color the player chose. Astral Cornucopia and Queen's Diamond print it.
+pub fn one_of_the_chosen_color_per_charge_counter(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(), Suspend> {
+    let Some(chosen) = chosen else { return Ok(()) };
+    let n = {
+        let q: &dyn Query = g;
+        i64::from(q.state().obj(asker.source).counters(CounterKind::Charge)) as u32
+    };
+    g.add_mana(asker.controller, chosen.mana(), n);
+    Ok(())
+}
+
 /// "... its controller adds an additional one mana of the chosen color." A triggered mana ability (CR 605.1b), resolving at
 /// once (CR 605.4a): the enchanted permanent's controller adds it, whoever controls the Aura. The color was chosen as the Aura
 /// entered; "the chosen color" is no color word (CR 612.2). An Aura that entered without choosing (none does) adds nothing.
