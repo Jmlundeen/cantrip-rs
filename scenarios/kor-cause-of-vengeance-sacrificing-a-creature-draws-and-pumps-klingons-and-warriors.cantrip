@@ -1,0 +1,75 @@
+# Kor, Cause of Vengeance, "Whenever you attack, you may sacrifice another creature. If you do, draw a card, then
+# Klingons and Warriors you control get +2/+2 until end of turn." (CR 603.4, 608.2c-d, 701.21a): Bot1 sacrifices its
+# Grizzly Bears, so it draws a card and every Klingon and Warrior it controls - Kor itself (a Klingon Warrior) and the
+# Burnout Bashtronaut (a Goblin Warrior) - gets +2/+2. Bot2's own Klingon Warrior is not Bot1's to pump.
+
+[Bot1 Deck]
+Kor, Cause of Vengeance
+Burnout Bashtronaut
+Grizzly Bears
+Black Lotus x4
+Black Lotus x30
+
+[Bot2 Deck]
+Gagh Slinger
+Black Lotus
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Kor, Cause of Vengeance.Cast(Spend: B, B, R, W)
+? Bot1.Mana = {W}{W}{W}{B}{B}{B}{B}{B}{B}{R}{R}{R}
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Grizzly Bears.Cast(Spend: G, G)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Burnout Bashtronaut.Cast(Spend: R)
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Gagh Slinger.Cast(Spend: R)
+Bot2.Pass
+Bot1.Attack(Kor, Cause of Vengeance > Bot2; Burnout Bashtronaut > Bot2)
+Bot1.Pass
+# "another creature" is one creature (CR 608.2d): the Grizzly Bears and the Burnout Bashtronaut cannot both go.
+! Bot1.Choose(Kor, Cause of Vengeance)
+! Bot1.Choose(Grizzly Bears; Burnout Bashtronaut)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+? Bot1.Battlefield.Kor, Cause of Vengeance.Power = 6
+? Bot1.Battlefield.Kor, Cause of Vengeance.Toughness = 6
+? Bot1.Battlefield.Burnout Bashtronaut.Power = 3
+? Bot1.Battlefield.Burnout Bashtronaut.Toughness = 3
+[T16 Bot2.Main1]
+Bot2.Pass
+# "Until end of turn" (CR 611.2a): on the next turn the pump is gone and Kor is 4/4 again.
+[T17 Bot1.Main1]
+? Bot1.Battlefield.Kor, Cause of Vengeance.Power = 4
+? Bot1.Battlefield.Kor, Cause of Vengeance.Toughness = 4
+? Bot1.Battlefield.Burnout Bashtronaut.Power = 1
+Bot1.Pass
+
+# The end-state is a turn after the pump ended, so these are the printed values; the +2/+2 is asserted above, on the
+# turn it was granted.
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Kor, Cause of Vengeance.Power = 4
+Bot1.Battlefield.Kor, Cause of Vengeance.Toughness = 4
+Bot1.Battlefield.Burnout Bashtronaut.Power = 1
+Bot1.Battlefield.Burnout Bashtronaut.Toughness = 1
+Bot1.Graveyard.Count = 8
+Bot2.Battlefield.Gagh Slinger.Power = 3
+Bot2.Battlefield.Gagh Slinger.Toughness = 2

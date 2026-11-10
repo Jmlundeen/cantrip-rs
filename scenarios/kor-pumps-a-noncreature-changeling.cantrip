@@ -1,0 +1,44 @@
+# Probe: "Klingons and Warriors you control get +2/+2 until end of turn" is every permanent with either subtype as it resolves
+# (CR 109.2, 611.2c), a noncreature one included: Firdoch Core (Kindred artifact, changeling) gets it, and once animated
+# later that turn it is a 4/4 with +2/+2: 6/6.
+
+[Bot1 Deck]
+Kor, Cause of Vengeance
+Firdoch Core
+Ornithopter
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Kor, Cause of Vengeance.Cast(Spend: B, B, R, W)
+Bot1.Hand.Firdoch Core.Cast(Spend: R, R, W)
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Attack(Kor, Cause of Vengeance > Bot2)
+Bot1.Choose(Ornithopter)
+? Bot1.Battlefield.Kor, Cause of Vengeance.Power = 6
+[T3 Bot1.Main2]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Firdoch Core.Activate(Ability: becomes)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Firdoch Core.Power = 6
+Bot1.Battlefield.Firdoch Core.Toughness = 6

@@ -1,0 +1,39 @@
+# Kor, Cause of Vengeance: the sacrifice is optional (CR 608.2d), and the draw and the pump are the "if you do" and the
+# "then" that follow it (CR 608.2c), so declining sacrifices nothing, draws nothing and pumps nobody - Kor is still 4/4.
+# The last part checks the pump is "until end of turn" (CR 611.2a): on Bot2's next turn Kor is back to 4/4.
+
+[Bot1 Deck]
+Kor, Cause of Vengeance
+Burnout Bashtronaut
+Black Lotus x4
+Black Lotus x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Kor, Cause of Vengeance.Cast(Spend: B, B, R, W)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Burnout Bashtronaut.Cast(Spend: R)
+Bot1.Attack(Kor, Cause of Vengeance > Bot2; Burnout Bashtronaut > Bot2)
+Bot1.Pass
+# Declining: the Burnout Bashtronaut is there and could be sacrificed ("another creature"), and Bot1 does not.
+Bot1.Choose
+? Bot1.Battlefield.Kor, Cause of Vengeance.Power = 4
+? Bot1.Battlefield.Burnout Bashtronaut.Power = 1
+
+[Expect]
+Bot1.Battlefield.Kor, Cause of Vengeance.Power = 4
+Bot1.Battlefield.Kor, Cause of Vengeance.Toughness = 4
+Bot1.Battlefield.Burnout Bashtronaut.Power = 1
+Bot1.Battlefield.Burnout Bashtronaut.Toughness = 1
+Bot1.Graveyard.Count = 5
