@@ -1,0 +1,58 @@
+# "Whenever another historic permanent you control with mana value 3 or greater enters, draw a card." Turn 1 casts Jean-Luc
+# himself: as the source he is no "another", so nothing is drawn and Bot1's library stays at 14. Turn 2 Bot2 casts its own
+# Simulacrum Synthesizer (an artifact, mana value 3) under Bot2's control, and Bot1 still draws nothing for it. Turn 3 Bot1's
+# Synthesizer enters: historic, exactly at "3 or greater", so Bot1 draws one card and its library is 12.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Simulacrum Synthesizer
+Jean-Luc Picard, Luminary
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Jet
+Mox Ruby
+Simulacrum Synthesizer
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Jean-Luc Picard, Luminary.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {W}{W}
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Library.Count = 13
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Simulacrum Synthesizer.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 12
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Simulacrum Synthesizer.Cast
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Library.Count = 11
+Bot1.Battlefield = Island; Jean-Luc Picard, Luminary; Mox Pearl; Mox Ruby; Mox Sapphire; Simulacrum Synthesizer
