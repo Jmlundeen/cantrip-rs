@@ -1,0 +1,57 @@
+# Koloth, Tribble Hunter: at the beginning of Bot1's end step each player creates two 1/1 white Tribble tokens with "This
+# token can't block." (CR 101.4, 111.1) - Bot1 two and Bot2 two, each under their own control - and "All Tribbles get
+# +1/+0 and are goaded" (CR 701.15a): every Tribble, either player's, is a 2/1 and goaded by Bot1's Koloth. Bot2's Tribbles
+# must therefore attack on turn 4 and must attack a player other than the goader's controller (CR 701.15b), Bot1, so they
+# deal 4: Bot1 is at 16. Tapping them for it is the test that the goad comes from Koloth and not from Bot2's choice.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Koloth, Tribble Hunter
+Mountain x2
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Forest x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Koloth, Tribble Hunter.Cast
+? Bot1.Mana =
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Count = 7
+? Bot2.Battlefield.Count = 3
+? Bot1.Battlefield.Tribble Token#1.Power = 2
+? Bot1.Battlefield.Tribble Token#1.Toughness = 1
+? Bot1.Battlefield.Tribble Token#1.Colors = White
+? Bot1.Battlefield.Tribble Token#1.Keywords = CantBlock
+? Bot1.Battlefield.Tribble Token#2.Power = 2
+? Bot2.Battlefield.Tribble Token#1.Power = 2
+? Bot2.Battlefield.Tribble Token#2.Toughness = 1
+? Bot2.Battlefield.Tribble Token#1.GoadedBy = Bot1
+? Bot2.Battlefield.Tribble Token#2.GoadedBy = Bot1
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Tribble Token#1 > Bot1; Tribble Token#2 > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 16
+? Bot2.Battlefield.Tribble Token#1.Tapped = true
+
+[Expect]
+Bot1.Life = 16
