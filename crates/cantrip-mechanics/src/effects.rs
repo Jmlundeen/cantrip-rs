@@ -312,6 +312,14 @@ pub fn creatures_you_control_where_gain(g: &mut dyn Game, item: &StackItem, keyw
     });
 }
 
+/// "Other creatures you control gain [keywords] until end of turn" (CR 611.2, 611.2c, 702): `creatures_you_control_gain` for the
+/// creatures `item`'s controller controls but its source, and no creature that enters later. Blood-Sport Champion's "if it was
+/// kicked, other creatures you control gain deathtouch until end of turn" prints it.
+pub fn other_creatures_you_control_gain(g: &mut dyn Game, item: &StackItem, keywords: &[Keyword]) {
+    let source = item.object;
+    creatures_you_control_where_gain(g, item, keywords, move |_, id| id != source);
+}
+
 /// "All creatures get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): every creature on the battlefield as
 /// `source`'s spell or ability resolves, whoever controls it, and no creature that enters later. Toxic Deluge (-X/-X) and
 /// Withering Curse (-2/-2) print it.
