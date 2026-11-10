@@ -680,6 +680,17 @@ pub fn put_cards_from_hand_on_top(g: &mut dyn Game, player: PlayerId, source: Ob
     Ok(())
 }
 
+/// "Draw a card, then you may put a land card from your hand onto the battlefield tapped" (CR 121.1, 608.2c, 608.2d,
+/// 614.1c): the draw ends the sentence, so the card just drawn is in the hand to choose from and may be the one put; any
+/// land card of the hand may be chosen, or none. Putting a land onto the battlefield is not playing it, so it uses no land
+/// play (CR 305.2). Jefferies Tube and H.E.R.B.I.E. Scout Unit print it.
+pub fn draw_a_card_then_may_put_a_land_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.draw(item.controller, 1);
+    g.end_sentence();
+    crate::hand::may_put_onto_battlefield_tapped(g, item.controller, item.object, |g, c| g.chars(c).is(CardType::Land))?;
+    Ok(())
+}
+
 /// "Target player draws N cards" (CR 121.1): the player the item targeted in `slot`, if the target is still legal (CR 608.2b).
 /// Ancestral Recall (three), Flame of Anor and Ashling's Command (two) print it.
 pub fn target_player_draws(g: &mut dyn Game, item: &StackItem, slot: usize, n: u32) {
