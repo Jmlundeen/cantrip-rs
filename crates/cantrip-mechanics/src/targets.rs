@@ -247,6 +247,13 @@ fn blocking_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// and Elven Fortress print it.
 pub const BLOCKING_CREATURE: TargetSpec = target(blocking_creature_filter);
 
+/// "Target creature it's blocking" (CR 115.1, 509.1g): a creature on the battlefield among `creatures_blocked_by` the ability's
+/// source, which reads the source as it last existed if it has left (CR 608.2h). Tinder Wall and Goblin Snowman print it.
+fn creature_blocked_by_source_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.creatures_blocked_by(asker.source).contains(&id))
+}
+pub const CREATURE_IT_IS_BLOCKING: TargetSpec = target(creature_blocked_by_source_filter);
+
 fn artifact_creature_or_land_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id)
         && (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Land)))
