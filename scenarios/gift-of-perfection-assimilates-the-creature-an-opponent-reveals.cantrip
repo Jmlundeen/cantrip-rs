@@ -1,0 +1,37 @@
+# Gift of Perfection: Bot2's library holds a creature on top, so it reveals that one card and Bot1 assimilates it -
+# the Ornithopter enters under Bot1 as a Borg artifact creature with a +1/+1 counter (CR 205.1b, 614.12).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Gift of Perfection
+Island x18
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gift of Perfection.Cast(Spend: U, U, U, U, B)
+? Bot1.Mana =
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Subtypes = Borg
+? Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter.Power = 1
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
