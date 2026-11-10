@@ -1,0 +1,41 @@
+# Commander's Sphere (CR 903.4f, 701.21a): with two commanders its first ability adds one mana of a color in
+# their combined identity. The second ability's cost is only the sacrifice, so it can be activated after the
+# artifact has already tapped for mana and the red mana remains in the pool while the card is drawn.
+
+[Format]
+Commander
+[Bot1 Commander]
+Rograkh, Son of Rohgahh
+Kytheon, Hero of Akros
+[Bot1 Deck]
+Commander's Sphere
+Plains x39
+[Bot2 Deck]
+Island x40
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Commander's Sphere.Cast
+? Bot1.Mana =
+Bot1.Pass
+? Bot1.CommanderColorIdentity = White; Red
+Bot1.Battlefield.Commander's Sphere.Activate(Ability: #1; Color: Red)
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Commander's Sphere.Tapped = true
+Bot1.Battlefield.Commander's Sphere.Activate(Ability: #2)
+? Bot1.Mana = {R}
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Commander's Sphere = (absent)
+? Bot1.Graveyard = Commander's Sphere
+? Bot1.Hand.Count = 6
+
+[Expect]
+Bot1.Battlefield.Commander's Sphere = (absent)
+Bot1.Mana = {R}
