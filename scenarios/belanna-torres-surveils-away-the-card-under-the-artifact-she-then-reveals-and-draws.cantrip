@@ -1,0 +1,51 @@
+# B'Elanna Torres, Scrapper: "{2}, {T}: Surveil 2, then you may reveal the top card of your library. Draw a card if it's
+# an artifact card. If you don't draw a card this way, put two +1/+1 counters on B'Elanna Torres." Her {1}{U}{R} is paid
+# exactly by a Mox Emerald, an Island and a Mountain. On turn 5 the library is Island, Ornithopter: the surveil is answered
+# first, taking the Island into the graveyard and keeping Ornithopter on top, so the card revealed and drawn is the
+# Ornithopter - with the steps the other way round the Island would be revealed first and nothing drawn. She stays a 2/2.
+
+[Bot1 Deck]
+Mox Emerald
+B'Elanna Torres, Scrapper
+Island
+Island
+Mountain
+Island
+Island
+Island
+Island
+Island
+Ornithopter
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.B'Elanna Torres, Scrapper.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.B'Elanna Torres, Scrapper.Activate
+Bot1.Arrange(Ornithopter | Island)
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Island; Island; Island; Island; Island; Ornithopter
+? Bot1.Battlefield.B'Elanna Torres, Scrapper.Power = 2
+? Bot1.Battlefield.B'Elanna Torres, Scrapper.Toughness = 2
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Hand.Count = 6
+Bot2.Library.Count = 11
