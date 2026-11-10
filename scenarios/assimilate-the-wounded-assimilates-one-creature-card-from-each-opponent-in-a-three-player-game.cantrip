@@ -1,0 +1,80 @@
+# Assimilate the Wounded ({2}{B}) in a three-player game: Innocent Blood makes each opponent sacrifice their only creature
+# on turn 4, so each graveyard holds a creature card put there from the battlefield this turn. "For each opponent, assimilate
+# up to one target creature card from that player's graveyard" (CR 608.2f) takes both as one event: Grizzly Bears (2/2) and
+# Runeclaw Bear (2/2) enter under Bot1's control as 3/3 Borg artifact creatures (CR 122.6, 205.1b, 614.12). The Runeclaw Bear
+# Bot2 discarded to Faithless Looting was never on the battlefield, and Bot3's Runeclaw Bear is not in Bot2's graveyard: both
+# are refused for Bot2's slot.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Innocent Blood
+Assimilate the Wounded
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Faithless Looting
+Grizzly Bears
+Runeclaw Bear
+Forest
+Forest x14
+
+[Bot3 Deck]
+Forest
+Mox Emerald
+Runeclaw Bear
+Forest x15
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Runeclaw Bear; Forest)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Hand.Mox Emerald.Cast
+Bot3.Pass
+Bot3.Battlefield.Mox Emerald.Activate
+Bot3.Battlefield.Forest.Activate
+Bot3.Hand.Runeclaw Bear.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Innocent Blood.Cast
+Bot1.Pass
+Bot1.Hand.Assimilate the Wounded.Cast
+! Bot1.Target(Bot3.Graveyard.Runeclaw Bear)
+! Bot1.Target(Bot2.Graveyard.Runeclaw Bear)
+Bot1.Target(Bot2.Graveyard.Grizzly Bears)
+Bot1.Target(Bot3.Graveyard.Runeclaw Bear)
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Types = Creature; Artifact
+Bot1.Battlefield.Grizzly Bears.Subtypes = Borg
+Bot1.Battlefield.Grizzly Bears.Power = 3
+Bot1.Battlefield.Grizzly Bears.Toughness = 3
+Bot1.Battlefield.Runeclaw Bear.Types = Creature; Artifact
+Bot1.Battlefield.Runeclaw Bear.Subtypes = Borg
+Bot1.Battlefield.Runeclaw Bear.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard.Count = 3
+Bot3.Graveyard.Count = 0
