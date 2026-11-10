@@ -2098,12 +2098,21 @@ pub struct OptionalCost {
     pub cost: Cost,
     /// Paying it kicks the spell (CR 702.33a): the spell is `kicked` once rather than `paid`.
     pub kicker: bool,
+    /// Paid any number of times (CR 702.56a: replicate's "you may pay [cost] any number of times"): the count is
+    /// announced before any target, as a multikicker's is, and the spell's `paid` is how many times it was paid.
+    pub repeatable: bool,
 }
 
 impl OptionalCost {
     /// An optional additional cost that is not a kicker.
     pub const fn new(cost: Cost) -> OptionalCost {
-        OptionalCost { cost, kicker: false }
+        OptionalCost { cost, kicker: false, repeatable: false }
+    }
+
+    /// An optional additional cost of `mana` that may be paid any number of times (CR 702.56a), an object giving a spell
+    /// replicate: paid with the other costs, and counted in the spell's `paid`.
+    pub const fn repeated(mana: ManaCost) -> OptionalCost {
+        OptionalCost { cost: Cost { mana, ..Cost::NONE }, kicker: false, repeatable: true }
     }
 }
 

@@ -9953,11 +9953,18 @@ fn cast(
     let mut option_costs: Vec<Cost> = Vec::new();
     let mut option_origins: Vec<CostOrigin> = Vec::new();
     for (option_index, (ability, giver, optional)) in cast_options(cx, spell).into_iter().enumerate() {
-        if announce_cast_option(cx, player, spell, ability.card, &optional)? {
+        let times = announce_cast_option(cx, player, spell, ability.card, &optional)?;
+        for _ in 0..times {
             paid_options.push((ability, giver));
             option_costs.push(optional.cost);
             option_origins.push(CostOrigin::GrantedOptional(option_index));
             cost.mana = add_cost(cost.mana, optional.cost.mana);
+        }
+        // CR 702.56b: how many times a cost that may be paid any number of times was paid is the spell's `paid`, which
+        // its copies and its "copy it for each time" trigger read.
+        if times > 0 && optional.repeatable {
+            item.paid = times;
+            cx.st().update_obj(spell, |o| o.paid = times);
         }
     }
 
@@ -11651,10 +11658,46 @@ fn announce_optional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 
 /// Announces whether the optional cost an ability the spell has offers is paid (CR 601.2b, 702.153b: casualty another object
 /// gave it), asked as the printed one is and worded by the labels of the card whose ability it is (`card`).
-fn announce_cast_option(cx: &mut Cx, player: PlayerId, spell: ObjectId, card: CardId, optional: &OptionalCost) -> R<bool> {
+fn announce_cast_option(cx: &mut Cx, player: PlayerId, spell: ObjectId, card: CardId, optional: &OptionalCost) -> R<u32> {
+    if optional.repeatable {
+        // CR 702.56a: a cost paid any number of times is announced as a number, as a multikicker's is.
+        let most = repeatable_payments(cx, spell, player, optional.cost.mana);
+        return announce_repeated(cx, player, spell, optional.cost.mana, most);
+    }
     let payable = can_pay_other(cx, spell, player, &optional.cost);
-    ask_optional(cx, player, spell, card, cx.card(card).labels.len(), payable)
+    Ok(u32::from(ask_optional(cx, player, spell, card, cx.card(card).labels.len(), payable)?))
 }
+
+/// The most times a cost that may be paid any number of times could be paid (CR 601.2b, 118.3): each payment's mana added
+/// to the last, no more than `REPEATED_PAYMENTS` of them, up to what the caster could pay.
+fn repeatable_payments(cx: &Cx, spell: ObjectId, player: PlayerId, one: ManaCost) -> u32 {
+    (1..=REPEATED_PAYMENTS)
+        .take_while(|&n| can_pay_other(cx, spell, player, &Cost { mana: repeated_total(one, n), ..Cost::NONE }))
+        .count() as u32
+}
+
+/// `one` paid `n` times over (CR 601.2f).
+fn repeated_total(one: ManaCost, n: u32) -> ManaCost {
+    let mut total = ManaCost::ZERO;
+    for _ in 0..n {
+        total = add_cost(total, one);
+    }
+    total
+}
+
+/// How many times a cost that may be paid any number of times is paid (CR 702.56a), announced before any target as a
+/// multikicker's count is, the total growing by one payment as the count does.
+fn announce_repeated(cx: &mut Cx, player: PlayerId, spell: ObjectId, one: ManaCost, most: u32) -> R<u32> {
+    if most == 0 {
+        return Ok(0);
+    }
+    let payments = Kicker { cost: one, extra: None, multi: true, waterbend: false };
+    announce_x(cx, player, spell, ManaCost::ZERO, Some(payments), None, 0, most, false, 0, "")
+}
+
+/// The most payments of such a cost asked about (CR 601.2b): no count is offered past this, which all the mana a pool and
+/// the lands of a turn could pay comes nowhere near.
+const REPEATED_PAYMENTS: u32 = 32;
 
 /// The question of an optional cost: cast without it, or paying it, the second on offer only when it is `payable`. Whether it was
 /// chosen.
