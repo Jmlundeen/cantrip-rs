@@ -2651,3 +2651,30 @@ pub fn type_you_control_to_graveyard<const TYPE: u8>(q: &dyn Query, me: &Asker, 
         _ => None,
     }
 }
+
+/// "Whenever another permanent you control with mana value `minimum` or greater enters" (CR 603.6a, 202.3): the permanent as
+/// it enters the battlefield, other than the ability's own source, under its controller's control as it enters, with a mana
+/// value (CR 202.3, `Query::mana_value`: a token's or a copy's as the rules read it) of at least `minimum`. Each card adds
+/// what makes its own permanent count: Simulacrum Synthesizer an artifact, Jean-Luc Picard, Luminary a historic permanent.
+pub fn another_permanent_you_control_enters_with_mana_value_at_least(
+    q: &dyn Query,
+    me: &Asker,
+    event: &Event,
+    minimum: u32,
+) -> Option<ObjectId> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if *new != me.source && to.is(ZoneKind::Battlefield) && q.controller(*new) == me.controller && q.mana_value(*new) >= minimum =>
+        {
+            Some(*new)
+        }
+        _ => None,
+    }
+}
+
+/// Whether a permanent is historic (CR 700.6): an artifact, a legendary permanent, or a Saga. Jean-Luc Picard, Luminary asks
+/// it of the permanent entering; Jhoira, Weatherlight Corsair of a permanent card (adding that it must be one).
+pub fn is_historic(q: &dyn Query, id: ObjectId) -> bool {
+    let c = q.chars(id);
+    c.is(CardType::Artifact) || c.supertypes.legendary || c.has_subtype(Subtype::Saga)
+}

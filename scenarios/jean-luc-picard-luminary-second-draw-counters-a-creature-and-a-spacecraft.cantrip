@@ -1,0 +1,59 @@
+# "Whenever you draw your second card each turn": turn 3's draw step is the first card and Opt's draw is the second, so the
+# ability triggers with Ornithopter and Wurmwall Sweeper on the battlefield. The creature slot refuses Mox Sapphire (an
+# artifact, not a creature) and takes Bot2's Llanowar Elves (any creature, whoever controls it); the Spacecraft slot takes
+# the Sweeper, leaving the other Spacecraft (Synthesizer Labship) alone: one +1/+1 counter and exactly two charge counters.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Jean-Luc Picard, Luminary
+Ornithopter
+Opt
+Synthesizer Labship
+Wurmwall Sweeper
+Island x9
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Jean-Luc Picard, Luminary.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Synthesizer Labship.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Island.Play
+Bot1.Hand.Opt.Cast
+Bot1.Battlefield.Island.Activate
+! Bot1.Target(Bot1.Battlefield.Mox Sapphire)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target(Bot1.Battlefield.Wurmwall Sweeper)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Wurmwall Sweeper.Counters.Charge = 2
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Synthesizer Labship.Counters.Charge = (absent)

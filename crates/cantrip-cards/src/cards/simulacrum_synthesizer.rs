@@ -1,6 +1,6 @@
 use cantrip_api::*;
+use cantrip_mechanics::triggers::{self, THIS_ENTERS};
 use cantrip_mechanics::tokens::{self, CONSTRUCT};
-use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
@@ -8,18 +8,8 @@ use cantrip_oracle as oracle;
 /// under its controller's control as it entered, whose mana value (CR 202.3, `Query::mana_value`: a token or a copy as the
 /// rules read it) is 3 or more.
 fn another_big_artifact_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. }
-            if *new != me.source
-                && to.is(ZoneKind::Battlefield)
-                && q.controller(*new) == me.controller
-                && q.chars(*new).is(CardType::Artifact)
-                && q.mana_value(*new) >= 3 =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
+    let new = triggers::another_permanent_you_control_enters_with_mana_value_at_least(q, me, event, 3)?;
+    if q.chars(new).is(CardType::Artifact) { Fired::PLAIN } else { None }
 }
 
 /// "Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'"
