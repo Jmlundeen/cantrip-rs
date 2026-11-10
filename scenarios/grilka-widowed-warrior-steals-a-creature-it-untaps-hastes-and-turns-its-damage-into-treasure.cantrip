@@ -1,0 +1,90 @@
+# Grilka, Widowed Warrior: "gain control of target creature an opponent controls until end of turn. Untap it. Until end of
+# turn, it gains trample, haste, and 'Whenever this creature deals combat damage to a player, create that many tapped
+# Treasure tokens.'" Bot1 casts Grilka and takes Bot2's Llanowar Elves (CR 613.1b): the Elf is untapped, has haste, so it
+# attacks Bot2 the turn it changed hands (CR 302.6, 702.10). The granted ability sees that 1 damage (CR 510.2, 603.2c) and
+# Bot1, the ability's controller, creates one tapped Treasure (CR 109.5). Bot2's Ornithopter is the other creature an
+# opponent controls offered and passed up (CR 115.1) - tapped by its own attack, so it cannot block the Elf - and Grilka
+# herself is no target an opponent controls.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mountain
+Forest
+Grilka, Widowed Warrior
+Mountain x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Ornithopter.Tapped = true
+? Bot2.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Grilka, Widowed Warrior.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Grilka, Widowed Warrior)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+? Bot1.Battlefield.Llanowar Elves.Keywords = Haste; Trample
+? Bot2.Battlefield.Ornithopter.Tapped = true
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Treasure Token.Tapped = true
+[T6 Bot2.Main1]
+? Bot2.Life = 19
+? Bot2.Battlefield.Llanowar Elves.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Jet; Mox Pearl; Mountain; Forest; Grilka, Widowed Warrior; Treasure Token
+Bot2.Battlefield = Forest; Llanowar Elves; Ornithopter
+Bot2.Life = 19
