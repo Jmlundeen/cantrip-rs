@@ -1,0 +1,54 @@
+# Probe: Chekov and McCoy's "Do this only once each turn" (CR 603.2h) is spent only by a draw that happened. Bot2's Notion Thief
+# replaces Bot1's draw (CR 614.6: Bot1 skips it and Bot2 draws instead), so Bot1 has not drawn with the ability, and a second
+# Requisition Raid the same turn triggers it again.
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Chekov and McCoy
+Requisition Raid
+Requisition Raid
+Black Lotus
+Forest x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Notion Thief
+Island x25
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chekov and McCoy.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Notion Thief.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Requisition Raid.Cast
+Bot1.Modes(3)
+Bot1.Target(Bot1)
+Bot1.Accept
+? Bot2.Hand.Count = 6
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Requisition Raid.Cast
+Bot1.Modes(3)
+Bot1.Target(Bot1)
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Chekov and McCoy.Power = 5
+Bot1.Hand.Count = 0
+Bot2.Hand.Count = 7

@@ -1,0 +1,46 @@
+# Chekov and McCoy: "Do this only once each turn" (CR 603.2h). The first Requisition Raid's counter on him is drawn for; a second
+# Raid the same turn puts another counter on him but the ability, already used, does not trigger again: no question is asked and
+# no second card is drawn. Contrast the replaced-draw scenario, where the draw never happened and the second counter triggers.
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Chekov and McCoy
+Requisition Raid
+Requisition Raid
+Black Lotus
+Forest x16
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chekov and McCoy.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Requisition Raid.Cast
+Bot1.Modes(3)
+Bot1.Target(Bot1)
+Bot1.Accept
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Requisition Raid.Cast
+Bot1.Modes(3)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Chekov and McCoy.Power = 5
+Bot1.Hand.Count = 1
