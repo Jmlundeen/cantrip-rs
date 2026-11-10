@@ -88,8 +88,25 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-146](#ki-146-the-booster-drafts-dragged-pick-test-once-saw-the-pick-fly-from-the-pack) | The booster draft's dragged-pick test once saw the pick fly from the pack | Pri-3 | Suspected |
 | [KI-147](#ki-147-two-tablet-browser-tests-wait-forever-for-unos-splash-to-go) | Two tablet browser tests wait forever for Uno's splash to go | Pri-3 | Open |
 | [KI-159](#ki-159-a-scenarios-spend-that-no-payment-asks-about-is-ignored) | A scenario's `Spend:` that no payment asks about is ignored | Pri-3 | Open |
+| [KI-160](#ki-160-a-granted-replicate-cost-is-announced-at-most-tens-of-millions-of-times) | A granted replicate cost is announced at most tens of millions of times | Pri-3 | Won't fix: beyond practical scale |
 
 ## Issues
+
+### KI-160: A granted replicate cost is announced at most tens of millions of times
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Won't fix: beyond practical scale | engine (`crates/cantrip-rules/src/actions.rs`, `repeatable_payments`) | 2026-11-12, review of PR #2855 |
+
+**Notes.** A cost a spell may pay any number of times (CR 702.56a: the replicate Hugh, First of Many gives) is announced
+as a count up to `u32::MAX / 64` divided by the largest number of any one symbol in a single payment - 33,554,431 payments
+of {2}{U} - so that the total of every instance (an object has at most 32 abilities) and the spell's own cost stays a
+number a `ManaCost` holds. A count past it is not offered. Play cannot reach it: each payment of {2}{U} is three mana, so the
+bound is a hundred million mana in a pool, made by hand on a clock (Grim Monolith untapped by Power Artifact makes one
+mana a loop).
+
+**Scenarios.** None: `repeated_option_tests::a_repeated_cost_may_be_paid_as_many_times_as_the_caster_can_pay` checks the
+count is offered past a million.
 
 ### KI-159: A scenario's `Spend:` that no payment asks about is ignored
 

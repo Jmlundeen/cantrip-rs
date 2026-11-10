@@ -19,6 +19,8 @@ mod takeback_tests;
 #[cfg(test)]
 mod mana_rider_tests;
 #[cfg(test)]
+mod repeated_option_tests;
+#[cfg(test)]
 mod legendary_mana_tests;
 #[cfg(test)]
 mod as_transforms_tests;

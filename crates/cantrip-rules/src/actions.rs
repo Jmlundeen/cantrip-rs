@@ -9984,12 +9984,21 @@ fn cast(
     let mut paid_options: Vec<(AbilityRef, ObjectId)> = Vec::new();
     let mut option_costs: Vec<Cost> = Vec::new();
     let mut option_origins: Vec<CostOrigin> = Vec::new();
+    // Each instance paid, once, with how many times its cost was: a cost that may be paid any number of times (CR 702.56a)
+    // is paid separately for each instance, which triggers on its own payments (CR 702.56b, `Event::PaidRepeatedly`).
+    let mut paid_instances: Vec<(AbilityRef, ObjectId, u32)> = Vec::new();
     for (option_index, (ability, giver, optional)) in cast_options(cx, spell).into_iter().enumerate() {
-        if announce_cast_option(cx, player, spell, ability.card, &optional)? {
+        let times = announce_cast_option(cx, player, spell, ability.card, &optional)?;
+        // What each payment pays besides mana is scheduled with the other costs; a cost paid any number of times is mana
+        // alone (`OptionalCost::repeated`), its payments all in the total, so it schedules one entry, its label's.
+        for _ in 0..if optional.repeatable { times.min(1) } else { times } {
             paid_options.push((ability, giver));
             option_costs.push(optional.cost);
             option_origins.push(CostOrigin::GrantedOptional(option_index));
-            cost.mana = add_cost(cost.mana, optional.cost.mana);
+        }
+        if times > 0 {
+            cost.mana = add_cost(cost.mana, repeated_total(optional.cost.mana, times));
+            paid_instances.push((ability, giver, times));
         }
     }
 
@@ -10480,7 +10489,10 @@ fn cast(
         }
     }
     let nth = count_u32(cx.history().casts_by(player).count());
-    let options = paid_options_now(cx, spell, paid_options);
+    let (options, repeated) = paid_options_now(cx, spell, paid_instances);
+    for (place, times) in repeated {
+        cx.record(Event::PaidRepeatedly { spell, place, times });
+    }
     cx.emit(Event::SpellCast { spell, player, nth, options });
     ops::became_targets(cx, targets.iter().copied(), spell, player, false);
     ops::commit_crime(cx, player, spell, targets);
@@ -11671,19 +11683,24 @@ fn cast_options(cx: &Cx, spell: ObjectId) -> Vec<(AbilityRef, ObjectId, Optional
 /// The `options` of the cast of `spell` (`Event::SpellCast`): a bit for each optional cost its abilities offer as it becomes
 /// cast (CR 601.2i), set where that instance's cost was paid (`paid`, each with its giver, `cast_options`). An instance the
 /// spell lost while its costs were paid (Silverquill sacrificed to the casualty it gave) has no bit, and one it gained was
-/// not paid, so the instances after it still read their own payments.
-fn paid_options_now(cx: &Cx, spell: ObjectId, mut paid: Vec<(AbilityRef, ObjectId)>) -> u32 {
+/// not paid, so the instances after it still read their own payments. With them, each paid instance of a cost that may be
+/// paid any number of times (CR 702.56a), by its bit, and how many times it was paid (`paid`, one entry for each instance).
+fn paid_options_now(cx: &Cx, spell: ObjectId, mut paid: Vec<(AbilityRef, ObjectId, u32)>) -> (u32, Vec<(u8, u32)>) {
     if paid.is_empty() {
-        return 0;
+        return (0, Vec::new());
     }
     let mut options = 0;
-    for (place, (ability, giver, _)) in cast_options(cx, spell).into_iter().enumerate() {
-        if let Some(at) = paid.iter().position(|&p| p == (ability, giver)) {
-            paid.swap_remove(at);
+    let mut repeated = Vec::new();
+    for (place, (ability, giver, optional)) in cast_options(cx, spell).into_iter().enumerate() {
+        if let Some(at) = paid.iter().position(|&(a, g, _)| (a, g) == (ability, giver)) {
+            let (.., times) = paid.swap_remove(at);
             options |= 1 << place;
+            if optional.repeatable {
+                repeated.push((place as u8, times));
+            }
         }
     }
-    options
+    (options, repeated)
 }
 
 /// Announces whether an optional cost that is not mana is paid (CR 601.2b), as the C# engine asks it: a choice between
@@ -11701,9 +11718,45 @@ fn announce_optional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 
 /// Announces whether the optional cost an ability the spell has offers is paid (CR 601.2b, 702.153b: casualty another object
 /// gave it), asked as the printed one is and worded by the labels of the card whose ability it is (`card`).
-fn announce_cast_option(cx: &mut Cx, player: PlayerId, spell: ObjectId, card: CardId, optional: &OptionalCost) -> R<bool> {
+fn announce_cast_option(cx: &mut Cx, player: PlayerId, spell: ObjectId, card: CardId, optional: &OptionalCost) -> R<u32> {
+    if optional.repeatable {
+        // CR 702.56a: a cost paid any number of times is announced as a number, as a multikicker's is.
+        let most = repeatable_payments(optional.cost.mana);
+        return announce_repeated(cx, player, spell, optional.cost.mana, most);
+    }
     let payable = can_pay_other(cx, spell, player, &optional.cost);
-    ask_optional(cx, player, spell, card, cx.card(card).labels.len(), payable)
+    Ok(u32::from(ask_optional(cx, player, spell, card, cx.card(card).labels.len(), payable)?))
+}
+
+/// The most times a cost of mana that may be paid any number of times may be announced as paid (CR 702.56a, 601.2b): no
+/// bound play can reach ("any number of times": Grim Monolith untapped by Power Artifact pays it as often as its mana
+/// lasts), the payment judging whether the total can be paid (CR 601.2h) and taking the cast back if not. Only so many that
+/// each instance's total, with every other instance's (an object has at most `MAX_ABILITIES`) and the spell's own cost,
+/// stays a number a cost holds: tens of millions of payments of a {2}{U}, more mana than a game played by hand makes
+/// (`docs/known-issues.md`, KI-160).
+fn repeatable_payments(one: ManaCost) -> u32 {
+    let largest = [one.generic, one.snow].into_iter().chain(one.symbols).chain(one.twobrid).max().unwrap_or(0);
+    u32::MAX / (2 * MAX_ABILITIES as u32) / largest.max(1)
+}
+
+/// `one` paid `n` times over (CR 601.2f), as `add_cost` adds each payment to the last.
+fn repeated_total(one: ManaCost, n: u32) -> ManaCost {
+    let mut total = ManaCost::ZERO;
+    total.add_generic(one.generic * n);
+    total.snow = one.snow * n;
+    total.symbols = one.symbols.map(|s| s * n);
+    total.twobrid = one.twobrid.map(|s| s * n);
+    total
+}
+
+/// How many times a cost that may be paid any number of times is paid (CR 702.56a), announced before any target as a
+/// multikicker's count is, the total growing by one payment as the count does.
+fn announce_repeated(cx: &mut Cx, player: PlayerId, spell: ObjectId, one: ManaCost, most: u32) -> R<u32> {
+    if most == 0 {
+        return Ok(0);
+    }
+    let payments = Kicker { cost: one, extra: None, multi: true, waterbend: false };
+    announce_x(cx, player, spell, ManaCost::ZERO, Some(payments), None, 0, most, false, 0, "")
 }
 
 /// The question of an optional cost: cast without it, or paying it, the second on offer only when it is `payable`. Whether it was

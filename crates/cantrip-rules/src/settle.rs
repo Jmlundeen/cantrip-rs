@@ -965,8 +965,8 @@ fn consider(
                 chapter_reached(cx, source, &chars, t.chapter, event)
             } else if t.attack_option.is_some() {
                 paid_to_attack(source, ability, chars.instance(nth), event)
-            } else if t.cast_option.is_some() {
-                paid_to_cast(cx, source, &chars, nth, event)
+            } else if let Some(option) = t.cast_option {
+                paid_to_cast(cx, source, &chars, nth, option, event)
             } else if t.listens.intersects(mask) {
                 t.fires(own, &Asker { instance: None, source, controller, by: by(), spell: false }, event)
             } else {
@@ -1153,11 +1153,23 @@ fn paid_to_attack(source: ObjectId, ability: AbilityRef, instance: u8, event: &E
 /// The "when you cast this spell, if its cost was paid" ability linked to an optional cost to cast (CR 607.2h, 601.2b;
 /// `TriggeredDef::cast_option`) triggers when that cost was paid: the payment of this instance of it, the `nth` of the spell's
 /// abilities, and no other (CR 702.153b). Its bit of the `SpellCast`'s `options` is its place among the abilities that have one.
-fn paid_to_cast(cx: &Cx, source: ObjectId, chars: &Chars, nth: usize, event: &Event) -> Option<Fired> {
+/// A cost that may be paid any number of times (`option`, CR 702.56a) triggers with how many times this instance's was paid
+/// (`Event::PaidRepeatedly`, recorded with the cast) as its first datum: each instance on its own payments (CR 702.56b).
+fn paid_to_cast(cx: &Cx, source: ObjectId, chars: &Chars, nth: usize, option: OptionalCost, event: &Event) -> Option<Fired> {
     match *event {
         Event::SpellCast { spell, options, .. } if spell == source => {
             let place = chars.abilities().take(nth).filter(|&a| matches!(cx.cards().ability(a), AbilityDef::Triggered(t) if t.cast_option.is_some())).count();
-            if options.checked_shr(place as u32).is_some_and(|o| o & 1 == 1) { Fired::PLAIN } else { None }
+            if !options.checked_shr(place as u32).is_some_and(|o| o & 1 == 1) {
+                return None;
+            }
+            if !option.repeatable {
+                return Fired::PLAIN;
+            }
+            let times = cx.g.log.iter().rev().find_map(|r| match r.event {
+                Event::PaidRepeatedly { spell, place: paid, times } if spell == source && usize::from(paid) == place => Some(times),
+                _ => None,
+            })?;
+            Some(Fired { subject: Target::None, data: [times, 0] })
         }
         _ => None,
     }
@@ -1858,8 +1870,8 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                         // still triggers from the zone it was put into.
                         && !(cx.cards().looks_back(ability, event, seen)
                             && events.iter().any(|e| matches!(e, Event::ZoneChange { new, .. } if *new == id)))
-                        && let Some(fired) = if t.cast_option.is_some() {
-                            paid_to_cast(cx, id, &chars, nth, event)
+                        && let Some(fired) = if let Some(option) = t.cast_option {
+                            paid_to_cast(cx, id, &chars, nth, option, event)
                         } else {
                             t.fires(own, &Asker { instance: None, source: id, controller: cx.s().obj(id).controller, by: by(), spell: false }, event)
                         }
