@@ -1,0 +1,80 @@
+# Kang, Suspicious Captain: the counter goes on a creature Bot1 controls. Kang enters on turn 3 and goads Bot2's Llanowar
+# Elves; on turn 4 that goaded creature must attack (CR 701.15b) and the attack fires "whenever one or more goaded
+# creatures attack" (CR 508.1, 603.2c). Kang is then Bot1's only creature, the only legal target, so the counter lands on
+# it. Grizzly Bears joins on turn 5, so Kang's own goaded attack that turn offers a real choice: Bot2's Elves, a creature
+# Bot1 does not control, is refused, and the counter goes on the Bears (CR 601.2c, 608.2b). The Elves attack again on turn
+# 6 and the choice is taken the other way, so each creature has exactly one +1/+1 counter: one counter per combat, one
+# point each, not two.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Kang, Suspicious Captain
+Mountain
+Grizzly Bears
+Mountain x2
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kang, Suspicious Captain.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Kang, Suspicious Captain > Bot2)
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target(Bot1.Battlefield.Grizzly Bears)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 1
+? Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Grizzly Bears.GoadedBy = (absent)
+? Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = 1
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Target(Bot1.Battlefield.Kang, Suspicious Captain)
+[T6 Bot2.Main2]
+? Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 1
+
+[Expect]
+Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 1
+Bot2.Life = 15

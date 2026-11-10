@@ -1,0 +1,69 @@
+# Kang, Suspicious Captain: entering on turn 3, it goads itself and the creature an opponent controls that it chose
+# (CR 701.15a) for as long as its controller controls it (CR 611.2b): both show GoadedBy Bot1, and Kang is summoning sick,
+# so it cannot attack that turn. A goaded creature attacks each combat if able and attacks a player other than the goader's
+# controller if able (CR 701.15b): Bot2's goaded Llanowar Elves must attack Bot1 on turn 4 - that attack is "one or more
+# goaded creatures attack" (CR 508.1, 603.2c), firing Kang's ability even though Bot1 is not the attacking player - and
+# Kang itself must attack on turn 5. Each attack puts one +1/+1 counter on a creature Bot1 controls (Kang), one per combat
+# and not one per goaded creature: one after turn 4, two after turn 5. Kang is no creature an opponent controls, so its own
+# entry ability cannot target it; Ornithopter is Bot2's second creature, so the choice is offered and a refusal taken first.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mountain
+Kang, Suspicious Captain
+Mountain x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kang, Suspicious Captain.Cast
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Target(Bot1.Battlefield.Kang, Suspicious Captain)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Kang, Suspicious Captain.GoadedBy = Bot1
+? Bot2.Battlefield.Llanowar Elves.GoadedBy = Bot1
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = 1
+? Bot1.Life = 19
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Kang, Suspicious Captain > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = 2
+? Bot2.Life = 14
+
+[Expect]
+Bot1.Battlefield.Kang, Suspicious Captain.Counters.PlusOnePlusOne = 2
+Bot1.Life = 19
+Bot2.Life = 14
