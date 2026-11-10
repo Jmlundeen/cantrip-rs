@@ -1,0 +1,8 @@
+{
+  "name": "Kirk, Man of Action",
+  "manaCost": "{2}{G}{W}{U}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Other Officers, Artificers, Doctors, Pilots, Scientists, and Spacecraft creatures you control get +2/+2."
+}

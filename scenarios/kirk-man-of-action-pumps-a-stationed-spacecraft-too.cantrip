@@ -1,0 +1,67 @@
+# Kirk, Man of Action pumps Spacecraft too (CR 613.4c, layer 7c). A Spacecraft is not a creature until it has enough
+# charge counters (CR 702.184b): Wurmwall Sweeper is a bare artifact at three and an artifact creature at four, and only
+# then does his +2/+2 apply. Kirk is 3/3, so stationing with him is one short; the fourth counter comes from a 1/1 Bird,
+# which Kirk leaves alone (a Bird is none of his six subtypes).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Wurmwall Sweeper
+City Pigeon
+Kirk, Man of Action
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Wurmwall Sweeper.Cast(Spend: U, U)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.City Pigeon.Cast(Spend: W)
+Bot1.Pass
+# Kirk, {2}{G}{W}{U}, out of four Lotuses.
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Kirk, Man of Action.Cast(Spend: G, G, G, W, U)
+Bot1.Pass
+# Three charge counters is not enough: still a bare artifact, and Kirk pumps no one.
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+Bot1.Choose(Kirk, Man of Action)
+Bot1.Pass
+? Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact
+# The Sweeper's fourth counter, from its own Servo, makes it a creature, and Kirk's +2/+2 lands: 2/2 printed, 4/4.
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+Bot1.Choose(City Pigeon)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Kirk, Man of Action.Power = 3
+Bot1.Battlefield.City Pigeon.Power = 1
+Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact; Creature
+Bot1.Battlefield.Wurmwall Sweeper.Power = 4
+Bot1.Battlefield.Wurmwall Sweeper.Toughness = 4
