@@ -94,7 +94,7 @@ public static class CreatureType
         "Caitian", "Camarid", "Camel", "Capybara", "Cardassian", "Caribou", "Carrier", "Cat", "Centaur", "Child", "Chimera", "Citizen", "Cleric", "Clown", "Cockatrice",
         "Construct", "Coward", "Coyote", "Crab", "Crocodile", "Custodes", "Cyberman", "Cyclops", "C’tan", "Dalek",
         "Dauthi", "Demigod", "Demon", "Denobulan", "Deserter", "Detective", "Devil", "Dinosaur", "Djinn", "Doctor", "Dog", "Dragon",
-        "Drake", "Dreadnought", "Drix", "Drone", "Druid", "Dryad", "Dwarf", "Echidna", "Efreet", "Egg", "El-Aurian", "Elder",
+        "Drake", "Dreadnought", "Drix", "Drone", "Druid", "Dryad", "Dwarf", "Echidna", "Edosian", "Efreet", "Egg", "El-Aurian", "Elder",
         "Eldrazi", "Elemental", "Elephant", "Elf", "Elk", "Employee", "Eternal", "Excalbian", "Eye", "Faerie", "Ferengi", "Ferret", "Fish",
         "Flagbearer", "Fox", "Fractal", "Frog", "Fungus", "Gamer", "Gamma", "Gargoyle", "Germ", "Giant", "Giraffe",
         "Gith", "Glimmer", "Gnoll", "Gnome", "Goat", "Goblin", "God", "Golem", "Gorgon", "Gorn", "Graveborn", "Gremlin",
