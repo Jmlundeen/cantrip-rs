@@ -1,0 +1,70 @@
+# K'Vort-Class Raider's 4+ striation, "Flying, menace, haste" with its 5/3 box (CR 721.2a-b): it is an artifact with no
+# power or toughness below four charge counters (CR 721.2c, 208.3) and is a 5/3 flying, menacing, hasty artifact creature
+# from four up. Sunset Saboteur (4 power, cast this turn) stations it to exactly four. It came under Bot1's control this
+# turn and would be summoning sick (CR 302.6), but haste (CR 702.10a) is exactly what lifts that, so it may attack
+# - and station taps "another" creature, so the Raider, an untapped creature now, cannot pay its own station cost.
+
+[Bot1 Deck]
+K'Vort-Class Raider
+Sunset Saboteur
+Mox Jet
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.K'Vort-Class Raider.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.K'Vort-Class Raider.Types = Artifact
+? Bot1.Battlefield.K'Vort-Class Raider.Power = (absent)
+? Bot1.Battlefield.K'Vort-Class Raider.Keywords = Hexproof
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sunset Saboteur.Cast(Spend: B, B)
+Bot1.Pass
+Bot1.Battlefield.K'Vort-Class Raider.Activate(Ability: Station)
+! Bot1.Choose(K'Vort-Class Raider)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.K'Vort-Class Raider.Counters.Charge = 4
+? Bot1.Battlefield.K'Vort-Class Raider.Types = Artifact; Creature
+? Bot1.Battlefield.K'Vort-Class Raider.Power = 5
+? Bot1.Battlefield.K'Vort-Class Raider.Toughness = 3
+? Bot1.Battlefield.K'Vort-Class Raider.Keywords = Flying; Haste; Hexproof; Menace
+? Bot1.Battlefield.K'Vort-Class Raider.SummoningSick = false
+[T3 Bot1.Main1]
+Bot1.Attack(K'Vort-Class Raider > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 15
+
+# At the end of the turn it is still the 4+ creature: the charge counters stay.
+[Expect]
+Bot1.Battlefield.K'Vort-Class Raider.Types = Artifact; Creature
+Bot1.Battlefield.K'Vort-Class Raider.Power = 5
+Bot1.Battlefield.K'Vort-Class Raider.Toughness = 3
+Bot1.Battlefield.K'Vort-Class Raider.Counters.Charge = 4
+Bot1.Battlefield.K'Vort-Class Raider.Keywords = Flying; Haste; Hexproof; Menace
+Bot2.Life = 15

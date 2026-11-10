@@ -1,0 +1,75 @@
+# "During your turn, this Spacecraft and creatures you control have hexproof" (CR 611.3a, 613.1f, 702.11b): the Raider
+# itself is covered whether or not the striation has made it a creature, and every creature its controller controls is
+# covered while it is that player's turn. The opposing Raider and creature are not. Fiery Impulse (CR 702.11b) is what
+# shows it: Bot1's creature is not a legal target while Bot1's turn is the active one and becomes one once the turn has
+# passed, while Bot2's own creature is targetable throughout - hexproof never stops its controller.
+[Bot1 Deck]
+K'Vort-Class Raider
+Grizzly Bears
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Black Lotus
+Fiery Impulse
+Island
+Island
+Island x8
+[Bot2 Deck]
+K'Vort-Class Raider
+Grizzly Bears
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Black Lotus
+Fiery Impulse
+Island
+Island
+Island x8
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.K'Vort-Class Raider.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.K'Vort-Class Raider.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast(Spend: G, G)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.K'Vort-Class Raider.Keywords = Hexproof
+? Bot1.Battlefield.Grizzly Bears.Keywords = Hexproof
+? Bot2.Battlefield.K'Vort-Class Raider.Keywords = (absent)
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+# On Bot2's turn the cover has moved over: Bot1's two are plain again and Bot2's Raider is the one that has it.
+? Bot1.Battlefield.K'Vort-Class Raider.Keywords = (absent)
+? Bot1.Battlefield.Grizzly Bears.Keywords = (absent)
+? Bot2.Battlefield.K'Vort-Class Raider.Keywords = Hexproof
+
+[Expect]
+Bot1.Battlefield.K'Vort-Class Raider.Keywords = (absent)
+Bot1.Battlefield.Grizzly Bears.Keywords = (absent)
+Bot2.Battlefield.K'Vort-Class Raider.Keywords = Hexproof
