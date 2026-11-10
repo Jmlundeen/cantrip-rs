@@ -1,0 +1,65 @@
+# Giant Space Amoeba: 3/3 Germ with flying; "Whenever this creature attacks, target creature defending player controls gets -3/-0
+# until end of turn, then create a token that's a copy of this creature." Bot1 casts it on turn 1 with Black Lotus and two Moxen.
+# On turn 3 it attacks: Bot2's Grizzly Bears is the creature the defending player controls, so it is that ability's target (CR
+# 603.3) and becomes -1/2 - three power off, no toughness (CR 611.2a) - and a 3/3 flying token copy of the Amoeba is created (CR
+# 707.2), untapped and not attacking (CR 508.4). The Bears has no flying or reach, so it may not block (CR 702.9b), and the Amoeba
+# deals 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Giant Space Amoeba
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Grizzly Bears
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Giant Space Amoeba.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Giant Space Amoeba > Bot2)
+Bot1.Pass
+Bot2.Pass
+! Bot2.Block(Grizzly Bears > Giant Space Amoeba)
+[T3 Bot1.CombatDamage]
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Grizzly Bears.Power = -1
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Grizzly Bears.Power = -1
+Bot2.Battlefield.Grizzly Bears.Toughness = 2
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Giant Space Amoeba#1.Power = 3
+Bot1.Battlefield.Giant Space Amoeba#1.Toughness = 3
+Bot1.Battlefield.Giant Space Amoeba#1.Keywords = Flying
+Bot1.Battlefield.Giant Space Amoeba#1.Tapped = true
+Bot1.Battlefield.Giant Space Amoeba#2.Tapped = false
