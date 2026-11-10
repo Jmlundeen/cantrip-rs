@@ -360,6 +360,14 @@ pub const PLAYER_OR_PLANESWALKER: TargetSpec = target(player_or_planeswalker_fil
 pub const CREATURE_OR_PLANESWALKER: TargetSpec = target(creature_or_planeswalker_filter);
 pub const PLAYER: TargetSpec = target(player_filter);
 pub const OPPONENT: TargetSpec = target(opponent_filter);
+
+fn opponent_whose_turn_it_is_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Player(p) if p != asker.controller && p == q.state().turn.active)
+}
+
+/// "Target opponent whose turn it is" (CR 102.1, 115.1): only the opponent whose turn it is now, so in a two-player game
+/// the opponent whenever the ability's controller is not the active player. Cmdr. Troi, Outgoing Empath prints it.
+pub const OPPONENT_WHOSE_TURN_IT_IS: TargetSpec = target(opponent_whose_turn_it_is_filter);
 pub const SPELL: TargetSpec = target(spell_filter);
 fn spell_or_ability_with_a_single_target_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     let state = q.state();
