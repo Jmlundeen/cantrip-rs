@@ -1,0 +1,48 @@
+# Optimization Annex: "If one or more charge counters would be put on an artifact you control, that many plus one charge
+# counters are put on it instead" (CR 122.6, 614.1a) - on an artifact already on the battlefield too, not only one entering
+# with counters. Bot1 stations its Queen's Diamond with a Memnite (power 1): station would put one charge counter on it
+# (CR 702.184a), and the Annex makes it two.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Optimization Annex
+Queen's Diamond
+Memnite
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Optimization Annex.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Queen's Diamond.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Queen's Diamond.Counters.Charge = (absent)
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Queen's Diamond.Activate(Ability: Station)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Queen's Diamond.Counters.Charge = 2
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Queen's Diamond.Counters.Charge = 2
+Bot1.Battlefield.Memnite.Tapped = true

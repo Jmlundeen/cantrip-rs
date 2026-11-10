@@ -1,0 +1,40 @@
+# "That many plus one charge counters are put on it instead" (CR 122.6, 614.1a): Astral Cornucopia cast with X of 2
+# would enter with two charge counters, so the Annex makes it three - not two, and not the original two plus the
+# replacement's three.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Pearl
+Optimization Annex
+Astral Cornucopia
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Optimization Annex.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Astral Cornucopia.Cast(X: 2)
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Astral Cornucopia.Counters.Charge = 3

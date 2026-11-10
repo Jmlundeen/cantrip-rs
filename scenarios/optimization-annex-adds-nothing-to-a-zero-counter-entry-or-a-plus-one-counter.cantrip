@@ -1,0 +1,38 @@
+# "one or more" (CR 614.1a) is a limit, not a floor: an Astral Cornucopia cast with X of 0 would enter with no charge
+# counter, so there is nothing for the Annex to add one to and it enters bare. And the Annex replaces charge counters
+# only: a Walking Ballista cast with X of 1 enters with its one +1/+1 counter, not two.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Optimization Annex
+Astral Cornucopia
+Walking Ballista
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Optimization Annex.Cast
+Bot1.Pass
+[Bot1.Main2]
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot1.Hand.Astral Cornucopia.Cast(X: 0)
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Astral Cornucopia.Counters.Charge = (absent)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Astral Cornucopia.Counters.Charge = (absent)

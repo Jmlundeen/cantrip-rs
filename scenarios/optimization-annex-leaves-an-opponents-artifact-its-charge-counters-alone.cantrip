@@ -1,0 +1,32 @@
+# "an artifact you control" (CR 614.12, 614.1a): the Annex's controller judges the recipient, so an artifact entering
+# under the opponent keeps the charge counters it would get - one for an Astral Cornucopia cast with X of 1 - with no
+# extra counter from Bot1's Annex.
+
+[Bot1 Deck]
+Mox Sapphire
+Optimization Annex
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Astral Cornucopia
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Optimization Annex.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Astral Cornucopia.Cast(X: 1)
+Bot2.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 2
+Bot2.Battlefield.Astral Cornucopia.Counters.Charge = 1
