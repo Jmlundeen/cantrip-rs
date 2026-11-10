@@ -1,0 +1,65 @@
+# Hugh, First of Many: "Artifact spells you cast" is its controller's spells only. Bot2 casts Ornithopter while Hugh is
+# on Bot1's battlefield, with enough mana for one replicate payment ({2}{U}) - if the grant read every player's artifact
+# spells, the cast would offer the cost and the spell would be copied (CR 702.56b). It gets nothing: one Ornithopter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Island
+Hugh, First of Many
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Island
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hugh, First of Many.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ornithopter.Cast(X: 1)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Count = 5
+
+[Expect]
+Bot2.Battlefield = Island; Mox Emerald; Mox Ruby; Mox Sapphire; Ornithopter
+Bot2.Battlefield.Count = 5
