@@ -1,0 +1,102 @@
+# Kirk, Man of Action pumps every creature its controller controls with one of the six subtypes +2/+2 (CR 613.4c, layer
+# 7c): the Officer, the Artificer, the Doctor, the Pilot and the Scientist each get it; a Soldier gets nothing, and
+# neither does an Officer the other player controls (CR 109.5). "Other" leaves Kirk himself out of his own pump even
+# though he is an Officer (CR 109.5).
+#
+# Everything is paid for out of Black Lotus, which is {0} and adds three mana at once (CR 500.4: a pool does not survive
+# a step, so a single card paying for itself beats tapping several one-mana sources across steps).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Kirk, Man of Action
+Black Lotus
+Black Lotus
+General Chang, Cold Warrior
+Black Lotus
+Black Lotus
+Goblin Welder
+Black Lotus
+Black Lotus
+Emergency Medical Hologram
+Black Lotus
+Black Lotus
+Fugitive Droid
+Black Lotus
+Black Lotus
+Alaborn Trooper
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+General Chang, Cold Warrior
+Island x20
+
+[Actions]
+# Turn 1: five Lotuses come down and Kirk takes all of them, {2}{G}{W}{U}.
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Kirk, Man of Action.Cast(Spend: G, G, G, W, U)
+Bot1.Pass
+# The Lotuses drawn ahead are played at once, so on a casting turn the activation is the only thing between the mana and
+# the cast (CR 500.4: a pool empties at the end of every step). One creature every four turns.
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.General Chang, Cold Warrior.Cast(Spend: B)
+Bot1.Pass
+[T11 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T13 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Goblin Welder.Cast(Spend: R)
+Bot1.Pass
+[T17 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T19 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Emergency Medical Hologram.Cast(Spend: W)
+Bot1.Pass
+[T23 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T25 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Fugitive Droid.Cast(Spend: U)
+Bot1.Pass
+[T26 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.General Chang, Cold Warrior.Cast(Spend: B)
+Bot2.Pass
+
+[Expect]
+# Kirk is 3/3 and an Officer, so his own pump passes him by (CR 109.5); the +1/+1 counter is the Hologram's ETB.
+Bot1.Battlefield.Kirk, Man of Action.Power = 4
+Bot1.Battlefield.Kirk, Man of Action.Toughness = 4
+Bot1.Battlefield.General Chang, Cold Warrior.Power = 3
+Bot1.Battlefield.General Chang, Cold Warrior.Toughness = 4
+Bot1.Battlefield.Goblin Welder.Power = 3
+Bot1.Battlefield.Emergency Medical Hologram.Power = 2
+Bot1.Battlefield.Emergency Medical Hologram.Toughness = 3
+Bot1.Battlefield.Fugitive Droid.Power = 3
+Bot2.Battlefield.General Chang, Cold Warrior.Power = 1
