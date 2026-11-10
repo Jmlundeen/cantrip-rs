@@ -635,6 +635,22 @@ pub fn look_at_top_select(
     Ok(taken)
 }
 
+/// "If it's a land card, you may put it onto the battlefield tapped" (CR 608.2d, 305.1) for a card just revealed or looked at as the
+/// ability resolves: asked only of a land card, and the permanent arrives tapped under its owner's control. Whether it entered - not
+/// whether the player said yes, so one a replacement effect stops (CR 614.6) did not. Risen Reef and Commander Spock print it.
+pub fn may_put_land_onto_battlefield_tapped(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    card: ObjectId,
+) -> Result<bool, Suspend> {
+    if !g.chars(card).is(CardType::Land) || !crate::effects::ask_may(g, player, source, Purpose::Optional)? {
+        return Ok(false);
+    }
+    let arrived = g.put_onto_battlefield(card, g.obj(card).owner, true)?;
+    Ok(g.is_on_battlefield(arrived))
+}
+
 /// "Look at the top `count` cards of your library. Put up to `most` [`kind`] cards [with total mana value N or less]
 /// from among them onto the battlefield. Put the rest on the bottom of your library in a random order [or
 /// `Rest::BottomChosen`: "in any order"]." (CR 401.2, 401.4): the player sees every card looked at (a smaller library
