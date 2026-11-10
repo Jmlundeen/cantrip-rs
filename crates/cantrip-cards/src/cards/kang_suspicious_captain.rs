@@ -20,7 +20,7 @@ fn goad_kang_and_the_chosen(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
 /// either player's - one trigger for the batch however many attack (CR 603.2c), which `once_per_batch` makes one.
 fn goaded_creature_attacks(q: &dyn Query, _: &Asker, event: &Event) -> Option<Fired> {
     let Event::Attacks { attacker, .. } = event else { return None };
-    if q.state().effects.iter().any(|e| e.affected == *attacker && e.kind == EffectKind::Goaded) { Fired::PLAIN } else { None }
+    if goaders(q, *attacker).is_empty() { None } else { Fired::PLAIN }
 }
 
 pub static CARD: CardDef = CardDef {
