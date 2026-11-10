@@ -1,0 +1,48 @@
+# Captain Janeway, Endgame and a Starfleet Security (both Officers) attack Bot2 unblocked on turn 5, with an Ornithopter
+# (not an Officer, and 0 power) hitting too: "one or more Officers
+# you control deal combat damage to a player" is one batch to one player, so one trigger (CR 603.2c) - one card drawn and
+# one 1/1 red Officer token, not two. Bot2: 20 - 3 - 1 = 16. Hand: the turn-5 draw and the trigger's card, the Ornithopter
+# and the rest of the opening seven having been cast.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Captain Janeway, Endgame
+Starfleet Security
+Island
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Starfleet Security.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Captain Janeway, Endgame.Cast
+? Bot1.Mana =
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Captain Janeway, Endgame > Bot2; Starfleet Security > Bot2; Ornithopter > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Battlefield.Officer Token.Power = 1
+? Bot1.Battlefield.Officer Token.Colors = Red
+? Bot1.Hand.Count = 3
+
+[Expect]
+Bot1.Battlefield = Island; Mox Pearl; Mox Ruby; Mox Emerald; Captain Janeway, Endgame; Ornithopter; Starfleet Security; Officer Token
