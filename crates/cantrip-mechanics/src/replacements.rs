@@ -18,15 +18,21 @@ pub const SPELL_ENTERS_WITH_FINALITY: GrantedReplacementDef = granted_replacemen
     "enters with a finality counter on it",
 );
 
-/// "If one or more +1/+1 counters would be put on a [permanent of these types] you control, that many plus one +1/+1
-/// counters are put on it instead" (CR 122.6, 614.1a): whether it replaces this event. Keyed to the recipient, never to
-/// who puts the counters; a permanent entering with counters is judged as it would exist on the battlefield
-/// (CR 614.12). Michelangelo, Weirdness to 11 (creatures) and Ozolith, the Shattered Spire (artifacts and creatures)
-/// print it.
-pub fn plus_one_counters_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal, types: &[CardType]) -> bool {
+/// "If one or more [counters of this kind] would be put on a [permanent of these types] you control, that many plus one
+/// [of that kind] are put on it instead" (CR 122.6, 614.1a): whether it replaces this event. Keyed to the recipient, never
+/// to who puts the counters; a permanent entering with counters is judged as it would exist on the battlefield (CR 614.12).
+/// Michelangelo, Weirdness to 11 (creatures), Ozolith, the Shattered Spire (artifacts and creatures) and Optimization Annex
+/// (charge counters on artifacts) print it.
+pub fn plus_one_counters_applies(
+    q: &dyn Query,
+    asker: &Asker,
+    proposal: &Proposal,
+    kind: CounterKind,
+    types: &[CardType],
+) -> bool {
     let Proposal::Counters(c) = proposal else { return false };
     c.controller == asker.controller
-        && c.counts[CounterKind::PlusOne as usize] > 0
+        && c.counts[kind as usize] > 0
         && (c.entering || q.is_on_battlefield(c.object))
         && types.iter().any(|&t| q.chars(c.object).is(t))
 }
@@ -59,10 +65,10 @@ pub fn double_counters_apply(proposal: &mut Proposal) {
     }
 }
 
-/// "... that many plus one": one more +1/+1 counter. Each such effect applies once, so a second adds another.
-pub fn plus_one_counters_apply(proposal: &mut Proposal) {
+/// "... that many plus one": one more counter of that kind. Each such effect applies once, so a second adds another.
+pub fn plus_one_counters_apply(proposal: &mut Proposal, kind: CounterKind) {
     if let Proposal::Counters(c) = proposal {
-        c.counts[CounterKind::PlusOne as usize] += 1;
+        c.counts[kind as usize] += 1;
     }
 }
 
@@ -91,11 +97,11 @@ fn twice_that_many_tokens(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 }
 
 fn plus_one_counters_on_your_creatures(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
-    plus_one_counters_applies(q, asker, proposal, &[CardType::Creature])
+    plus_one_counters_applies(q, asker, proposal, CounterKind::PlusOne, &[CardType::Creature])
 }
 
 fn plus_one_counters_apply_to_proposal(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
-    plus_one_counters_apply(proposal);
+    plus_one_counters_apply(proposal, CounterKind::PlusOne);
 }
 
 /// "If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on

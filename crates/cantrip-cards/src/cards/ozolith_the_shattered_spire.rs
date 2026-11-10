@@ -7,11 +7,17 @@ use cantrip_oracle as oracle;
 /// "If one or more +1/+1 counters would be put on an artifact or creature you control, that many plus one +1/+1
 /// counters are put on it instead." (CR 122.6, 614.1a.)
 fn applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
-    plus_one_counters_applies(q, asker, proposal, &[CardType::Artifact, CardType::Creature])
+    plus_one_counters_applies(
+        q,
+        asker,
+        proposal,
+        CounterKind::PlusOne,
+        &[CardType::Artifact, CardType::Creature],
+    )
 }
 
 fn apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
-    plus_one_counters_apply(proposal);
+    plus_one_counters_apply(proposal, CounterKind::PlusOne);
 }
 
 fn put_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
