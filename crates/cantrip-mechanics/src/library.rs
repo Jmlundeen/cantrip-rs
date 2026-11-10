@@ -1257,6 +1257,19 @@ pub fn reveal_until_n(
     (found, rest)
 }
 
+/// "Reveal cards from the top of your library until you reveal a land card. Put that card onto the battlefield tapped and the rest
+/// on the bottom of your library in a random order" (CR 701.20, 401.4): the cards are revealed together down to the first land card,
+/// or the whole library when it holds none (then nothing enters); the land enters tapped under `player` and every other revealed card
+/// goes to the bottom together. The Regalia and Janice Rand, Essential Aide print it.
+pub fn reveal_until_a_land_onto_battlefield_tapped(g: &mut dyn Game, player: PlayerId) -> Result<(), Suspend> {
+    let (lands, others) = reveal_until_n(g, player, 1, &|q, card| q.chars(card).is(CardType::Land));
+    if let Some(&land) = lands.first() {
+        g.put_onto_battlefield(land, player, true)?;
+    }
+    rest_to_bottom_in_random_order(g, player, &others);
+    Ok(())
+}
+
 /// "Exile cards from the top of your library until you exile a nonland card [that `qualifies`]" (CR 701.57a, 702.85a): each
 /// card is exiled one at a time, face up, from the top until one is a nonland card `qualifies` accepts, or the library
 /// is empty. Every card that really reached exile, in order (the qualifying one last), and the qualifying card if there

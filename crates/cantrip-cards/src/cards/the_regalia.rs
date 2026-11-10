@@ -5,17 +5,10 @@ use cantrip_mechanics::triggers::THIS_ATTACKS;
 use cantrip_oracle as oracle;
 
 /// "Whenever The Regalia attacks, reveal cards from the top of your library until you reveal a land card. Put that card onto the
-/// battlefield tapped and the rest on the bottom of your library in a random order" (CR 701.20, 401.4): the cards are revealed
-/// together down to the first land card, or the whole library when it holds none (then nothing enters); the land enters tapped
-/// and every other revealed card goes to the bottom together.
+/// battlefield tapped and the rest on the bottom of your library in a random order" (CR 701.20, 401.4): the shared
+/// `library::reveal_until_a_land_onto_battlefield_tapped`, which Janice Rand, Essential Aide prints too.
 fn reveal_until_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    let (lands, others) = library::reveal_until_n(g, you, 1, &|q, card| q.chars(card).is(CardType::Land));
-    if let Some(&land) = lands.first() {
-        g.put_onto_battlefield(land, you, true)?;
-    }
-    library::rest_to_bottom_in_random_order(g, you, &others);
-    Ok(())
+    library::reveal_until_a_land_onto_battlefield_tapped(g, item.controller)
 }
 
 /// Haste is a core keyword.
