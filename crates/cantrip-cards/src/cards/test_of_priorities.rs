@@ -9,17 +9,12 @@ fn surveil_then_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     Ok(())
 }
 
-/// "Exile target creature you control. Return that card to the battlefield under its owner's control at the beginning of
-/// the next end step" (CR 701.13a, 603.7c, 400.7): the delayed ability is about the card it became in exile.
-fn exile_and_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    delayed::exile_target_then_return_at_next_end_step(g, item, 0, 0);
-    Ok(())
-}
-
-/// "Choose one —" (CR 700.2).
+/// "Choose one —" (CR 700.2). The second mode's "Exile target creature you control. Return that card to the battlefield
+/// under its owner's control at the beginning of the next end step" (CR 701.13a, 603.7c, 400.7) is the shared slot-0 body:
+/// the delayed ability is about the card it became in exile.
 static MODAL: ModalDef = modes(&[
     mode(surveil_then_draw, "Power to Engines \u{2014} Surveil 2, then draw a card."),
-    mode(exile_and_return, "Power to Life Support \u{2014} Exile target creature you control. Return that card to the battlefield under its owner's control at the beginning of the next end step.")
+    mode(delayed::exile_target_then_return_at_next_end_step_0, "Power to Life Support \u{2014} Exile target creature you control. Return that card to the battlefield under its owner's control at the beginning of the next end step.")
         .targets(&[targets::CREATURE_YOU_CONTROL]),
 ]);
 

@@ -1,0 +1,26 @@
+# Command Chair's X is the greatest mana value among commanders you control; with no commander at all it is 0, and the
+# ability adds no mana.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Command Chair
+Forest x20
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Command Chair.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Command Chair.Activate(Ability: Add X mana; Color: Green)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Command Chair.Tapped = True

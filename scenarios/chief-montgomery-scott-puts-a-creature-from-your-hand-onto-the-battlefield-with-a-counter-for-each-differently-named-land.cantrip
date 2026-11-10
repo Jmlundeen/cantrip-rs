@@ -1,0 +1,47 @@
+# Chief Montgomery Scott: "Strange new worlds — {6}, {T}: You may put a creature or Spacecraft card from your hand onto the
+# battlefield. It enters with X additional +1/+1 counters on it if it's a creature ... where X is the number of differently named
+# lands you control." Bot1 controls one land (Forest), so X is 1 and the Grizzly Bears he puts onto the battlefield enters 3/3.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Chief Montgomery Scott
+Grizzly Bears
+Forest x16
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chief Montgomery Scott.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Chief Montgomery Scott.Activate(Ability: Strange new worlds)
+Bot1.Choose(Grizzly Bears)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 3
+Bot1.Battlefield.Grizzly Bears.Toughness = 3
+Bot1.Hand.Count = 0

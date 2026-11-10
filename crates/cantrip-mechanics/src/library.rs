@@ -137,6 +137,21 @@ pub fn search_zone_and_or_library_onto_battlefield(g: &mut dyn Game, player: Pla
     Ok(())
 }
 
+/// "Search your library and/or graveyard for [`rule`], reveal it, and put it into your hand. If you search your library
+/// this way, shuffle." (CR 701.23, 701.20a, 701.24): `search_zone_and_or_library` with `zones`, the cards found revealed
+/// and put into the hand together, and the library shuffled only when it was actually searched - a graveyard-only search
+/// is no library search and shuffles nothing. Delivery Moogle (an artifact card with mana value 2 or less) and Captain
+/// Kirk, Boldly Going (a basic land card or a card named Starship Enterprise) print it.
+pub fn search_zone_and_or_library_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId, zones: &[Zone], ask: &'static Question, rule: Selection) -> Result<(), Suspend> {
+    let (found, searched_library) = search_zone_and_or_library(g, player, source, zones, SearchDestination::Hand, Purpose::PutIntoHand, ask, rule)?;
+    g.reveal(player, &found);
+    put_found_into_hand(g, player, &found, true);
+    if searched_library {
+        g.shuffle(player);
+    }
+    Ok(())
+}
+
 /// The cards found put into the hand, then the library shuffled.
 fn into_hand(g: &mut dyn Game, player: PlayerId, found: &[ObjectId], revealed: bool) -> Vec<ObjectId> {
     let moved = put_found_into_hand(g, player, found, revealed);
@@ -618,6 +633,22 @@ pub fn look_at_top_select(
 /// Michelangelo's Technique (up to two, total mana value 6 or less) print it with a random order, untapped; Kaslem's
 /// Stonetree, Silverback Elder, Elvish Rejuvenator, Ignis Scientia and Freestrider Lookout (one land card, `tapped`) too; Collected Company (up
 /// to two) and Mayael the Anima (one) with the player's.
+/// "If it's a land card, you may put it onto the battlefield tapped" (CR 608.2d, 305.1) for a card just revealed or looked at as the
+/// ability resolves: asked only of a land card, and the permanent arrives tapped under its owner's control. Whether it entered - not
+/// whether the player said yes, so one a replacement effect stops (CR 614.6) did not. Risen Reef and Commander Spock print it.
+pub fn may_put_land_onto_battlefield_tapped(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    card: ObjectId,
+) -> Result<bool, Suspend> {
+    if !g.chars(card).is(CardType::Land) || !crate::effects::ask_may(g, player, source, Purpose::Optional)? {
+        return Ok(false);
+    }
+    let arrived = g.put_onto_battlefield(card, g.obj(card).owner, true)?;
+    Ok(g.is_on_battlefield(arrived))
+}
+
 pub fn look_at_top_onto_battlefield(
     g: &mut dyn Game,
     player: PlayerId,
@@ -1210,6 +1241,19 @@ pub fn reveal_until_n(
         g.reveal(player, &shown);
     }
     (found, rest)
+}
+
+/// "Reveal cards from the top of your library until you reveal a land card. Put that card onto the battlefield tapped and the rest
+/// on the bottom of your library in a random order" (CR 701.20, 401.4): the cards are revealed together down to the first land card,
+/// or the whole library when it holds none (then nothing enters); the land enters tapped under `player` and every other revealed card
+/// goes to the bottom together. The Regalia and Janice Rand, Essential Aide print it.
+pub fn reveal_until_a_land_onto_battlefield_tapped(g: &mut dyn Game, player: PlayerId) -> Result<(), Suspend> {
+    let (lands, others) = reveal_until_n(g, player, 1, &|q, card| q.chars(card).is(CardType::Land));
+    if let Some(&land) = lands.first() {
+        g.put_onto_battlefield(land, player, true)?;
+    }
+    rest_to_bottom_in_random_order(g, player, &others);
+    Ok(())
 }
 
 /// "Exile cards from the top of your library until you exile a nonland card [that `qualifies`]" (CR 701.57a, 702.85a): each

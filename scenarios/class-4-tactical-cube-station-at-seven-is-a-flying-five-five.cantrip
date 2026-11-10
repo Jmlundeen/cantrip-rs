@@ -1,0 +1,80 @@
+# Class-4 Tactical Cube's Station: tapping another creature you control puts charge counters equal to its power on it
+# (CR 702.184a). The two 1/1 Borg tokens are 2/2 under the Cube's own pump, so each gives two counters (4); Grizzly Bears,
+# which is not an artifact, gives two more (6); the 1/1 Llanowar Elves gives one (7). At 6 it is not a creature; at exactly
+# 7 it is an artifact creature with base 4/4, flying, and its own +1/+1, so 5/5 (CR 721.2a-b, 613.1f, 613.4c).
+
+[Bot1 Deck]
+Class-4 Tactical Cube
+Black Lotus
+Mox Pearl
+Llanowar Elves
+Grizzly Bears
+Forest
+Island
+Island x12
+
+[Bot2 Deck]
+Island x10
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Class-4 Tactical Cube.Cast
+Bot1.Pass
+? Bot1.Mana = 
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Class-4 Tactical Cube.Activate(Ability: Station)
+Bot1.Choose(Borg Token#1)
+Bot1.Battlefield.Class-4 Tactical Cube.Activate(Ability: Station)
+Bot1.Choose(Borg Token#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Class-4 Tactical Cube.Counters.Charge = 4
+? Bot1.Battlefield.Class-4 Tactical Cube.Types = Artifact
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.Class-4 Tactical Cube.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Class-4 Tactical Cube.Counters.Charge = 6
+? Bot1.Battlefield.Class-4 Tactical Cube.Types = Artifact
+[T5 Bot1.Main1]
+Bot1.Battlefield.Class-4 Tactical Cube.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Class-4 Tactical Cube.Counters.Charge = 7
+? Bot1.Battlefield.Class-4 Tactical Cube.Types = Artifact; Creature
+? Bot1.Battlefield.Class-4 Tactical Cube.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.Class-4 Tactical Cube.Counters.Charge = 7
+Bot1.Battlefield.Class-4 Tactical Cube.Power = 5
+Bot1.Battlefield.Class-4 Tactical Cube.Toughness = 5
+Bot1.Battlefield.Class-4 Tactical Cube.Keywords = Flying

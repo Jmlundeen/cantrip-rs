@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::library::{put_found_into_hand, search_zone_and_or_library};
+use cantrip_mechanics::library::search_zone_and_or_library_to_hand;
 use cantrip_mechanics::{select, triggers};
 use cantrip_oracle as oracle;
 
@@ -14,20 +14,13 @@ const ASK: Question = Question::new(
 /// "When this creature enters, search your library and/or graveyard for an artifact card with mana value 2 or less, reveal
 /// it, and put it into your hand. If you search your library this way, shuffle." (CR 701.23, 701.20a)
 ///
-/// `library::search_zone_and_or_library` with the graveyard: the one card is chosen among both zones, or left unfound in the
-/// library (CR 701.23b); a graveyard-only search is no library search (no shuffle) and, the graveyard being public, finds a
-/// card that fits.
+/// `library::search_zone_and_or_library_to_hand` with the graveyard: the one card is chosen among both zones, or left
+/// unfound in the library (CR 701.23b); a graveyard-only search is no library search (no shuffle) and, the graveyard being
+/// public, finds a card that fits.
 fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let rule = select::artifact_cards(select::up_to(1)).with(select::mana_value_at_most(2));
-    let (found, searched_library) =
-        search_zone_and_or_library(g, you, item.object, &[Zone::graveyard(you)], SearchDestination::Hand, Purpose::PutIntoHand, &ASK, rule)?;
-    g.reveal(you, &found);
-    put_found_into_hand(g, you, &found, true);
-    if searched_library {
-        g.shuffle(you);
-    }
-    Ok(())
+    search_zone_and_or_library_to_hand(g, you, item.object, &[Zone::graveyard(you)], &ASK, rule)
 }
 
 pub static CARD: CardDef = CardDef {

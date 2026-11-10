@@ -1,0 +1,54 @@
+# Geordi La Forge, Innovator: with his controller's own Spacecraft out, the block is refused, he deals 2 to Bot2 and the
+# combat damage draws him a card.
+
+[Bot1 Deck]
+Black Lotus
+Geordi La Forge, Innovator
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Borg Scout Sphere
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Geordi La Forge, Innovator.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Borg Scout Sphere.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Geordi La Forge, Innovator > Bot2)
+! Bot2.Block(Ornithopter > Geordi La Forge, Innovator)
+[T3 Bot1.Main2]
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot1.Battlefield.Borg Scout Sphere.Subtypes = Spacecraft
+? Bot1.Hand.Count = 4
+
+[Expect]
+Bot2.Life = 18

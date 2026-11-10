@@ -1,0 +1,8 @@
+{
+  "name": "Fleet Captain Christopher Pike",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 0,
+  "toughness": 6,
+  "oracleText": "Yes — {1}, {T}: Untap two other target creatures.\nNo — {2}, {T}: Tap two other target creatures."
+}

@@ -169,6 +169,22 @@ pub fn may_put_onto_battlefield(
     put_from_hand(g, player, source, false, |g, c| eligible(&g.chars(c)))
 }
 
+/// `may_put_onto_battlefield` counting the card's arrival: `counters` reads the card as it still is in the hand and says the counters
+/// it enters with (CR 614.1c, 122.1), which the game puts on it as it arrives rather than after. Chief Montgomery Scott prints it.
+pub fn may_put_onto_battlefield_with_counters(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    eligible: impl Fn(&dyn Game, ObjectId) -> bool,
+    counters: impl Fn(&dyn Game, ObjectId) -> Vec<(CounterKind, i32)>,
+) -> Result<Option<ObjectId>, Suspend> {
+    let Some(card) = choose_from_hand(g, player, source, eligible)? else {
+        return Ok(None);
+    };
+    let counters = counters(&*g, card);
+    Ok(Some(g.put_onto_battlefield_with_counters(card, player, false, &counters)?))
+}
+
 /// `may_put_onto_battlefield` for "... from your hand onto the battlefield tapped" (CR 614.1c), the card judged as an object
 /// in the hand, so what only the game can say (`Query::mana_value`: X is 0 in a hand, a Room's halves together, CR 107.3b, 202.3)
 /// can decide it. Anticausal Vestige and Insidious Fungus print it.

@@ -1,0 +1,59 @@
+# Cmdr. Troi, Outgoing Empath: "If they do, you copy that spell ... If they don't, you draw a card." Bot2 is offered the free
+# cast on its own turn and declines, so nothing is copied, no damage is dealt, the Bolt stays in Bot2's hand (it cost nothing to
+# keep it), and Bot1 draws a card. Lightning Greaves gives Troi haste, so the {T} ability can be activated on Bot2's turn.
+
+[Bot1 Deck]
+Cmdr. Troi, Outgoing Empath
+Lightning Greaves
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Pass
+Bot1.Hand.Cmdr. Troi, Outgoing Empath.Cast
+Bot1.Pass
+? Bot1.Mana = 
+? Bot1.Hand.Count = 0
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Lightning Greaves.Activate(Ability: Equip; Cmdr. Troi, Outgoing Empath)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot1.Battlefield.Cmdr. Troi, Outgoing Empath.Activate(Bot2)
+Bot2.Pass
+Bot2.Choose()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 1
+? Bot1.Life = 20
+? Bot2.Life = 20
+? Bot2.Hand.Count = 8
+? Bot2.Graveyard = 
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot2.Hand.Count = 8
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Cmdr. Troi, Outgoing Empath.Tapped = true

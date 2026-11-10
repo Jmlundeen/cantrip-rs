@@ -1,0 +1,8 @@
+{
+  "name": "Chief Kyle, Transporter Tech",
+  "manaCost": "{2}{W}{U}",
+  "type": "Legendary Creature — Human Artificer",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Landfall — Whenever a land you control enters, exile up to one other target creature you control. Return that card to the battlefield under its owner's control at the beginning of the next end step."
+}

@@ -974,6 +974,14 @@ pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspe
     Ok(())
 }
 
+/// "You gain life equal to the number of differently named lands you control" (CR 201.2a, 608.2c): counted as the
+/// ability resolves, two lands with the same name counting once. Species 8472 and Christine Chapel, Combat Medic print
+/// it, both on "when this creature enters".
+pub fn gain_life_for_differently_named_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let n = crate::lands::differently_named_lands(g, item.controller) as i32;
+    gain_life(g, item, n)
+}
+
 /// "You gain life equal to its toughness" (CR 119.3, 608.2h) as a triggered ability's callback: the toughness of the trigger's
 /// subject (`StackItem::subject`, a permanent that entered or a creature that died) as the layers make it, or as it last
 /// existed on the battlefield if it has left. A permanent that is not a creature as the ability resolves has no toughness (CR 208.3) and
@@ -1622,6 +1630,22 @@ const MAY_DRAW_A_CARD: Question = Question::new("Draw", "draw a card?", "", "Dra
 
 /// "You may draw a card" (CR 121.3, 608.2d): asked of the ability's controller, not offered a player who can't draw a card
 /// (`may_draw`). Leovold, Emissary of Trest and Mister Fantastic, Reed Richards print it.
+const MAY_DRAW_THAT_MANY_ONCE: Question = Question::new("Draw", "draw that many cards?", "One for each +1/+1 counter put  ·  only once each turn", "Draw", "Don't draw");
+
+/// "You may draw that many cards. Do this only once each turn." (CR 603.2h, 121.3): the effect of a triggered ability whose
+/// `item.data[0]` is the number of +1/+1 counters just put, so it offers to draw that many. Asked only while its source has
+/// not drawn with this ability this turn, and spent only by a yes; not offered to a player who can't draw that many (CR 121.3,
+/// 121.2b). Terrasymbiosis (counters put on a creature you control) and Chekov and McCoy (on itself) print it.
+pub fn may_draw_that_many_once_each_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if item.data[0] == 0 || g.history().done(item.object, item.ability, item.controller) {
+        return Ok(());
+    }
+    if may_draw(g, item.controller, item.object, item.data[0], &MAY_DRAW_THAT_MANY_ONCE)? {
+        g.note_done(item.object, item.ability, item.controller);
+    }
+    Ok(())
+}
+
 pub fn may_draw_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     may_draw(g, item.controller, item.object, 1, &MAY_DRAW_A_CARD)?;
     Ok(())

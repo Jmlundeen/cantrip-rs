@@ -1,0 +1,11 @@
+{
+  "name": "Cmdr. Troi, Outgoing Empath",
+  "manaCost": "{2}{U}{R}",
+  "type": "Legendary Creature — Betazoid Human Advisor",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Vigilance\n{T}: Target opponent whose turn it is may cast a spell from their hand without paying its mana cost. If they do, you copy that spell. You may choose new targets for the copy. If they don't, you draw a card.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

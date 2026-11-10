@@ -1,0 +1,58 @@
+# Chekov and McCoy: "Whenever you put one or more +1/+1 counters on Chekov and McCoy, you may draw that many cards. Do this only
+# once each turn." Requisition Raid puts a +1/+1 counter on each of Bot1's two creatures in one resolution: Chekov's ability triggers
+# for the counter on him and Bot1 draws exactly one card for it, the second counter putting nothing more on him. On turn 5 a second
+# Raid's counter is a new turn's, so he draws again.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Chekov and McCoy
+Ornithopter
+Requisition Raid
+Requisition Raid
+Forest x16
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chekov and McCoy.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Requisition Raid.Cast
+Bot1.Modes(3)
+Bot1.Target(Bot1)
+Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Requisition Raid.Cast
+Bot1.Modes(3)
+Bot1.Target(Bot1)
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Chekov and McCoy.Power = 5
+Bot1.Battlefield.Chekov and McCoy.Toughness = 5
+Bot1.Hand.Count = 2

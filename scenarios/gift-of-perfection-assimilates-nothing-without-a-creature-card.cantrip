@@ -1,0 +1,34 @@
+# Gift of Perfection: only the opponents' libraries are revealed. Bot2's holds no creature card, so nothing is
+# assimilated even though Bot1's own library has an Ornithopter on top, which stays there.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Gift of Perfection
+Island x3
+Ornithopter
+Island x14
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gift of Perfection.Cast(Spend: U, U, U, U, B)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 2
+? Bot1.Battlefield.Ornithopter = (absent)
+? Bot1.Library.Ornithopter.Subtypes = Thopter
+
+[Expect]
+Bot1.Battlefield.Ornithopter = (absent)

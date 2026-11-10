@@ -1,0 +1,47 @@
+# Commander Spock: "You may cast that card ... if that spell's mana value is equal to or less than the number of differently
+# named lands you control." Bot1 has one differently named land, so the Grizzly Bears (mana value 2) on top of its own library
+# is never offered; it is not a land either, so it is still the top card of the library and Bot1 draws it. Bot2's own Grizzly
+# Bears is in Bot2's hand and stays there: the reveal is of "your library" only.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Commander Spock
+Island
+Island
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Grizzly Bears
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Commander Spock.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 3
+? Bot1.Hand.Grizzly Bears.Colors = Green
+? Bot1.Battlefield.Count = 4
+? Bot2.Hand.Count = 7
+? Bot2.Hand.Grizzly Bears.Colors = Green
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Hand.Grizzly Bears.Colors = Green
+Bot2.Hand.Grizzly Bears.Colors = Green
+Bot1.Battlefield.Commander Spock.Types = Creature

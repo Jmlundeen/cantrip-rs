@@ -3,13 +3,12 @@ use cantrip_mechanics::{effects, triggers};
 use cantrip_oracle as oracle;
 
 /// "Other creatures you control get +1/+0 and gain deathtouch until end of turn." The creatures are those its controller controls as
-/// it resolves, not Syr Vondam, and none that enters later (CR 611.2c).
+/// it resolves, not Syr Vondam, and none that enters later (CR 611.2c): `effects::pump_other_creatures_you_control`, then
+/// `effects::other_creatures_you_control_gain`, which Blood-Sport Champion's kicked trigger prints.
 fn others_get_plus_one_and_deathtouch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    instruction(g, |g| {
-        for creature in effects::pump_other_creatures_you_control(g, item, 1, 0) {
-            effects::gain_until_end_of_turn(g, item.object, creature, Keyword::Deathtouch);
-        }
-    });
+    effects::pump_other_creatures_you_control(g, item, 1, 0);
+    g.end_sentence();
+    effects::other_creatures_you_control_gain(g, item, &[Keyword::Deathtouch]);
     Ok(())
 }
 

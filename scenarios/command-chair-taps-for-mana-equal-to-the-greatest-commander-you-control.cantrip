@@ -1,0 +1,38 @@
+# Command Chair's second ability adds X mana of one color, X the greatest mana value among commanders you control. Raging
+# Goblin is Bot1's commander ({R}, mana value 1), cast from the command zone on turn 3, so on turn 5 the Chair adds exactly
+# one mana for it - not two, and not the three the other ability gives.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Command Chair
+Forest x20
+
+[Bot1 Commander]
+Raging Goblin
+
+[Format]
+Commander
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Command Chair.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Command Chair.Activate(Ability: Add three mana of any one color; Color: Red)
+? Bot1.Mana = {R}{R}{R}
+Bot1.Command.Raging Goblin.Cast
+? Bot1.Mana = {R}{R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Command Chair.Activate(Ability: Add X mana; Color: Red)
+? Bot1.Mana = {R}
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Raging Goblin.Power = 1
