@@ -1,0 +1,8 @@
+{
+  "name": "Captain Janeway, Endgame",
+  "manaCost": "{1}{U}{R}{W}",
+  "type": "Legendary Creature — Human Officer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever one or more Officers you control deal combat damage to a player, you draw a card and create a 1/1 red Officer creature token.\n{2}, Tap an untapped creature you control: Captain Janeway can't be blocked this turn."
+}
