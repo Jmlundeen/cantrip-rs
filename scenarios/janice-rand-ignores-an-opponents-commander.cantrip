@@ -1,0 +1,52 @@
+# Janice Rand, Essential Aide: "Whenever a commander you control enters or attacks". Bot2's Raging Goblin is Bot2's commander and
+# attacks here too: it is not one Janice's controller controls (CR 903.3, 109.5), so nothing triggers - Janice keeps the single
+# +1/+1 counter her own entering gave her and no card leaves the library.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Forest
+Island x10
+
+[Bot1 Commander]
+Janice Rand, Essential Aide
+
+[Format]
+Commander
+
+[Bot2 Deck]
+Mox Ruby
+Island x10
+
+[Bot2 Commander]
+Raging Goblin
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Command.Janice Rand, Essential Aide.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Command.Raging Goblin.Cast
+? Bot1.Battlefield.Janice Rand, Essential Aide.Power = 4
+? Bot1.Library.Count = 5
+? Bot2.Library.Count = 3
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+[T4 Bot2.Main1]
+Bot2.Attack(Raging Goblin > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Janice Rand, Essential Aide.Power = 4
+? Bot1.Life = 39
+
+[Expect]
+Bot1.Battlefield.Janice Rand, Essential Aide.Power = 4
+Bot1.Battlefield.Janice Rand, Essential Aide.Toughness = 4
+Bot1.Library.Count = 4
