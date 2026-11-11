@@ -39,8 +39,6 @@ pub fn discover(g: &mut dyn Game, player: PlayerId, n: u32) -> Result<(), Suspen
     if let Some(card) = hit {
         cast_free_if_at_most_else_hand(g, player, card, n)?;
     }
-    // What was cast or put into hand has left exile with its identity; the rest go to the bottom, shuffled among themselves.
-    let rest: Vec<ObjectId> = exiled.into_iter().filter(|&c| is_live(g, c) && g.obj(c).zone.is(ZoneKind::Exile)).collect();
-    g.put_into_library(&rest, LibraryPlace::BottomInRandomOrder);
+    library::rest_of_exiled_to_bottom_in_random_order(g, &exiled);
     Ok(())
 }

@@ -778,6 +778,15 @@ pub fn look_for_type_or_two_basic_land_types(g: &mut dyn Game, item: &StackItem,
 
 /// "Put the rest on the bottom of your library in a random order" (CR 401.4) after looking at `looked`, cards of `player`'s
 /// library: those still in it, a card taken having left. Narset, Parter of Veils, Once Upon a Time and United Battlefront print it.
+/// "Put the rest on the bottom of their library in a random order" (CR 401.4, 701.57a): the cards an exiling walk exiled
+/// that are still in exile - the card it stopped on has been cast, put into a hand or assimilated - go to the bottom of
+/// their owner's library, shuffled among themselves. Discover and The Borg Queen print it, the first as "the other
+/// exiled cards go to the bottom of the library in a random order".
+pub fn rest_of_exiled_to_bottom_in_random_order(g: &mut dyn Game, exiled: &[ObjectId]) {
+    let rest: Vec<ObjectId> = exiled.iter().copied().filter(|&c| is_live(g, c) && g.obj(c).zone.is(ZoneKind::Exile)).collect();
+    g.put_into_library(&rest, LibraryPlace::BottomInRandomOrder);
+}
+
 pub fn rest_to_bottom_in_random_order(g: &mut dyn Game, player: PlayerId, looked: &[ObjectId]) {
     let rest: Vec<ObjectId> = looked.iter().copied().filter(|c| is_live(g, *c) && g.obj(*c).zone == Zone::library(player)).collect();
     g.bottom_in_random_order(player, &rest);
