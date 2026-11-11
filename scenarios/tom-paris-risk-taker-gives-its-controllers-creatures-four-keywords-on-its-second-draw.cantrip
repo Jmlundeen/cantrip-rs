@@ -1,0 +1,52 @@
+# Tom Paris, Risk-Taker {4}{U}{R} (cast on turn 1 off two Black Lotuses, a Mox Sapphire and a Mox Ruby) is on the
+# battlefield with an Ornithopter when Howling Mine makes Bot1 draw two cards in its turn-3 draw step: the second card
+# drawn triggers seek out, and every creature Bot1 controls gains flying, double strike, vigilance and haste until end of
+# turn (CR 603.2, 611.2c, 702.4, 702.9, 702.10, 702.20). Bot2's own Ornithopter gains nothing, and on Bot2's own turn the
+# keywords are gone again.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Howling Mine
+Tom Paris, Risk-Taker
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Howling Mine.Cast
+Bot1.Hand.Tom Paris, Risk-Taker.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Tom Paris, Risk-Taker.Keywords = DoubleStrike; Flying; Haste; Vigilance
+? Bot1.Battlefield.Ornithopter.Keywords = DoubleStrike; Flying; Haste; Vigilance
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Step = Main1
+Bot1.Battlefield.Tom Paris, Risk-Taker.Keywords = (absent)
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Ornithopter.Keywords = Flying

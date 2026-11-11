@@ -1,0 +1,8 @@
+{
+  "name": "Tom Paris, Risk-Taker",
+  "manaCost": "{4}{U}{R}",
+  "type": "Legendary Creature — Human Pilot",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Seek out — Whenever you draw your second card each turn, creatures you control gain flying, double strike, vigilance, and haste until end of turn."
+}
