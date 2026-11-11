@@ -1,0 +1,62 @@
+# U.S.S. Defiant, Mirror Migrant for {2} cast with flash during Bot2's turn, so it is not on the battlefield in time to be
+# cast for free: its enters ability phases out the Spacecraft and the one creature of Bot1's own that it targets, together
+# (CR 702.26b, 702.26h), while Bot2's Memnite is refused as a target ("you control", CR 109.5) and Bot1's own Ornithopter is
+# left phased in. Both phase in during Bot1's next untap step (CR 502.1), so they are on the battlefield again on turn 3.
+
+[Bot1 Deck]
+U.S.S. Defiant, Mirror Migrant
+Memnite
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Island x13
+
+[Bot2 Deck]
+Kobolds of Kher Keep
+Plains x19
+
+[Actions]
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Kobolds of Kher Keep.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.U.S.S. Defiant, Mirror Migrant.Cast
+? Bot1.Mana =
+! Bot1.Target(Bot2.Battlefield.Kobolds of Kher Keep)
+! Bot1.Target(Bot1.Battlefield.Memnite; Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut.U.S.S. Defiant, Mirror Migrant.Keywords = Flash
+? Bot1.Battlefield.U.S.S. Defiant, Mirror Migrant = (absent)
+? Bot1.PhasedOut.Memnite.Power = 1
+? Bot1.Battlefield.Memnite = (absent)
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Kobolds of Kher Keep.Power = 0
+? Bot1.PhasedOut.Count = 2
+[T3 Bot1.Main1]
+? Bot1.PhasedOut.Count = 0
+? Bot1.Battlefield.Memnite.Power = 1
+? Bot1.Battlefield.U.S.S. Defiant, Mirror Migrant.Types = Artifact
+? Bot1.Battlefield.U.S.S. Defiant, Mirror Migrant.Subtypes = Spacecraft
+? Bot2.Battlefield.Kobolds of Kher Keep.Power = 0
+? Bot1.Battlefield.U.S.S. Defiant, Mirror Migrant.Tapped = false
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Count = 7
+Bot1.PhasedOut.Count = 0
+Bot2.Battlefield.Count = 1
+Stack.Count = 0
