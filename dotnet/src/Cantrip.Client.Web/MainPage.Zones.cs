@@ -612,6 +612,11 @@ public sealed partial class MainPage
             if (!restricted.Source.IsNone)
             {
                 string from = client.Object(restricted.Source)?.Name ?? "a permanent";
+                // Mana a "when that mana is spent" ability rides (CR 603.7a) is that ability's: each rider a chip of its own.
+                string riding = restricted.Rider == 0 ? string.Empty : $" · ability #{restricted.Rider}";
+                string why = restricted.Rider == 0
+                    ? $"kept apart because {from} cares whether it is spent"
+                    : $"carrying {from}'s \"when that mana is spent\" ability #{restricted.Rider}";
                 chips.Add(Chip(
                     restricted.Type,
                     ManaSpendFilterView.None,
@@ -619,12 +624,13 @@ public sealed partial class MainPage
                     [],
                     0,
                     restricted.Amount,
-                    restricted.Snow ? $"snow · from {from}" : $"from {from}",
+                    restricted.Snow ? $"snow · from {from}{riding}" : $"from {from}{riding}",
                     restricted.Snow
-                        ? $"Mana {from} produced, kept apart because {from} cares whether it is spent. Produced by a snow source; may also pay {{S}}"
-                        : $"Mana {from} produced, kept apart because {from} cares whether it is spent",
+                        ? $"Mana {from} produced, {why}. Produced by a snow source; may also pay {{S}}"
+                        : $"Mana {from} produced, {why}",
                     restricted.Source,
-                    restricted.Snow));
+                    restricted.Snow,
+                    restricted.Rider));
                 continue;
             }
 
@@ -667,7 +673,7 @@ public sealed partial class MainPage
 
         return chips;
 
-        PlayerRail.ManaChipSpec Chip(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue, int count, string? caption, string? tooltip, ViewHandle source = default, bool snow = false)
+        PlayerRail.ManaChipSpec Chip(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue, int count, string? caption, string? tooltip, ViewHandle source = default, bool snow = false, uint rider = 0)
         {
             if (paying is null)
             {
@@ -675,13 +681,13 @@ public sealed partial class MainPage
             }
 
             int committed = paying.Committed
-                .Where(c => c.Type == type && c.Filter == filter && c.Effect == effect && c.SpendSubtypes.SequenceEqual(subtypes) && c.SpendManaValue == manaValue && c.Source == source && c.Snow == snow)
+                .Where(c => c.Type == type && c.Filter == filter && c.Effect == effect && c.SpendSubtypes.SequenceEqual(subtypes) && c.SpendManaValue == manaValue && c.Source == source && c.Snow == snow && c.Rider == rider)
                 .Sum(c => c.Amount);
 
             string spokenFor = committed == 0 ? string.Empty : $"{committed} to spell";
             string full = caption is null ? spokenFor : spokenFor.Length == 0 ? caption : $"{caption} · {spokenFor}";
 
-            IReadOnlyList<ActionOptionMessage> assignments = _actions.AssignmentsFor(type, filter, effect, subtypes, manaValue, source, snow);
+            IReadOnlyList<ActionOptionMessage> assignments = _actions.AssignmentsFor(type, filter, effect, subtypes, manaValue, source, snow, rider);
             if (assignments.Count == 0)
             {
                 return new PlayerRail.ManaChipSpec(type, count, full.Length == 0 ? null : full, tooltip, null);

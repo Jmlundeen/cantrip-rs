@@ -6,7 +6,7 @@
 //! first one offered.
 
 use cantrip_api::*;
-use cantrip_state::Span;
+use cantrip_state::{ManaPart, Span};
 use cantrip_state::{XCost, XCosted};
 
 use crate::layers::{self, live, summoning_sick};
@@ -4572,7 +4572,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
         return Vec::new();
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None, takeback: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
     // The ability asked as it is (CR 607.5): its own cost change reads its own links.
     let by = cx.link_of_nth(source, index as usize);
@@ -4630,7 +4630,7 @@ pub fn cast_face_of(game: &crate::Game, card: ObjectId, index: u8) -> &'static C
 
 /// A copy of the position (no tree) to ask the rules of, through a frame's view, for a menu row's advice.
 fn advice_game(game: &crate::Game) -> crate::Game {
-    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: game.producible_path.clone(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() }
+    crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: game.producible_path.clone(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None, takeback: Default::default() }
 }
 
 /// What `player` would be offered at this priority with a thousand mana of every type in their pool: what a script's refusal
@@ -12192,7 +12192,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
     if !changers {
         return None;
     }
-    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None, takeback: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);
@@ -12362,6 +12362,9 @@ fn activate_mana_as(
     let instance = instance_nth(cx, source, &cx.chars(source), index as usize);
     // What restricts its mana, read from the source as it is activated, before a cost may take it away (CR 106.6).
     let restricted = def.restricted.map(|r| restriction_from(cx, source, r, by));
+    // "When that mana is spent" (CR 603.7a): the delayed ability its mana will carry has the words of the ability as it
+    // is activated, read before a cost may take the source away (CR 603.7, 113.7a).
+    let rider_words = def.mana_rider.map(|_| Query::words(&*cx, source));
     // And what mana paying its own mana cost pays for: the source as it is activated, before {T} or "exile this" is paid
     // (CR 602.2a, 113.7a, 601.2h: those costs may be paid in any order).
     let chars = cx.chars(source);
@@ -12487,6 +12490,9 @@ fn activate_mana_as(
     // mana the effect adds is held, not added, and proposed whole once the effect is done.
     let replaceable = def.cost.tap && !adds_nothing && crate::replace::mana_may_be_replaced(cx);
     let mut replaced = None;
+    // The mana it produces carries its delayed ability (`Adds::when_spent`), whatever replacement effects make of it.
+    let rider = if def.mana_rider.is_some() && !adds_nothing { crate::takeback::rider(cx.g) } else { 0 };
+    let outer_rider = std::mem::replace(&mut cx.g.mana_rider, rider);
     if !adds_nothing {
         // The mana is produced by the ability's source (CR 106.3), whatever has become of it paying the cost.
         let head = cx.g.log.len() as u32;
@@ -12507,10 +12513,30 @@ fn activate_mana_as(
         };
         let held = std::mem::replace(&mut cx.producing, outer_held);
         cx.mana_source = outer;
+        if added.is_err() {
+            cx.g.mana_rider = outer_rider;
+        }
         added?;
         if let Some(held) = held.filter(|_| replaceable) {
             replaced = Some(produce(cx, player, source, &held));
         }
+    }
+    cx.g.mana_rider = outer_rider;
+    // The ability creates "when that mana is spent" as it resolves (CR 603.7a), about the mana it produced: none, none to
+    // wait for. Its source is the mana ability's, its controller the player who activated it (CR 603.7e).
+    if let (Some(index), true) = (def.mana_rider, rider != 0 && cx.s().mana_from.iter().any(|e| e.rider == rider)) {
+        let since = cx.g.log.len() as u32;
+        cx.st().delayed_push(cantrip_state::Delayed {
+            when: DelayedWhen::ThatMana(rider),
+            source,
+            controller: player,
+            ability: AbilityRef::delayed(ability.card, index),
+            subject: Target::None,
+            members: Default::default(),
+            since,
+            acquired,
+            words: rider_words,
+        });
     }
     if def.cost.tap {
         let produced = match replaced {
@@ -12574,7 +12600,8 @@ fn produce(cx: &mut Cx, player: PlayerId, source: ObjectId, held: &[crate::Produ
             let n = result.mana.get(m);
             if n > 0 {
                 crate::takeback::produced(cx.g, source);
-                cx.st().add_mana(result.to, m, n, source, result.restriction, result.lasts, snow);
+                let rider = cx.g.mana_rider;
+                cx.st().add_mana_riding(result.to, m, n, source, result.restriction, result.lasts, snow, rider);
                 produced.0[m as usize] += n;
             }
         }
@@ -12722,7 +12749,7 @@ pub(crate) fn producible_types_in(game: &crate::Game, permanent: ObjectId) -> (C
 
 /// A rules query over a read-only state, as target and cost checks outside a frame read it.
 pub(crate) fn producible_types_on(cards: &'static CardTable, state: &GameState, events: &[Record], permanent: ObjectId) -> (ColorSet, bool) {
-    let mut copy = crate::Game { state: state.clone(), log: events.to_vec(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards, verify: false, max_events: crate::MAX_GAME_EVENTS, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
+    let mut copy = crate::Game { state: state.clone(), log: events.to_vec(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards, verify: false, max_events: crate::MAX_GAME_EVENTS, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None, takeback: Default::default() };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
     producible_types(&cx, permanent)
 }
@@ -13533,15 +13560,16 @@ struct ManaGroup {
     mana: Mana,
     snow: bool,
     restriction: Option<ManaRestriction>,
-    from: Option<ObjectId>,
+    from: Option<ManaPart>,
     n: u32,
 }
 
-fn quality_groups(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying, told: &[ObjectId]) -> Vec<ManaGroup> {
+fn quality_groups(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying, told: &[ManaPart]) -> Vec<ManaGroup> {
     let payment = payment_for(cx, player, source, purpose);
     let mut groups: Vec<ManaGroup> = Vec::new();
     for row in cx.s().mana_from_of(player).filter(|e| e.restriction.is_none_or(|r| r.may_pay(&payment))) {
-        let from = (row.restriction.is_none() && told.contains(&row.source)).then_some(row.source);
+        let part = (row.source, row.rider);
+        let from = (row.restriction.is_none() && told.contains(&part)).then_some(part);
         for mana in Mana::ALL {
             let n = row.pool.get(mana);
             if n == 0 { continue; }
@@ -13611,7 +13639,8 @@ fn quality_assign_options(groups: &[ManaGroup], owed: &ManaCost) -> Vec<ActionOp
         for pay_snow in [false, true] {
             if if pay_snow { !g.snow || owed.snow == 0 } else { !pays(owed, g.mana) } { continue; }
             let mut option = ActionOption::simple(ActionKind::AssignMana);
-            option.source = g.from;
+            option.source = g.from.map(|(source, _)| source);
+            option.rider = g.from.map_or(0, |(_, rider)| rider);
             option.mana = Some(g.mana);
             option.restriction = g.restriction;
             option.snow = g.snow;
@@ -13625,17 +13654,20 @@ fn quality_assign_options(groups: &[ManaGroup], owed: &ManaCost) -> Vec<ActionOp
 /// Advisory completions for shared scripted payment, using the exact same snow/type matching as the rules. Every
 /// offered assignment remains legal; this does not hide a payer's choice to spend a different source or pay another symbol.
 pub(crate) fn viable_pool_assignments(state: &GameState, player: PlayerId, remaining: &ManaCost, options: &[ActionOption]) -> Vec<usize> {
-    let told: Vec<ObjectId> = options.iter().filter(|o| o.kind == ActionKind::AssignMana && o.restriction.is_none()).filter_map(|o| o.source).collect();
+    let part = |o: &ActionOption| o.source.map(|source| (source, o.rider));
+    let told: Vec<ManaPart> = options.iter().filter(|o| o.kind == ActionKind::AssignMana && o.restriction.is_none()).filter_map(part).collect();
     let mut groups: Vec<ManaGroup> = Vec::new();
     let mut mapped = Vec::new();
     for (index, option) in options.iter().enumerate().filter(|(_, o)| o.kind == ActionKind::AssignMana) {
         let Some(mana) = option.mana else { continue };
-        let at = match groups.iter().position(|g| g.mana == mana && g.snow == option.snow && g.restriction == option.restriction && g.from == option.source) {
+        let from = part(option);
+        let at = match groups.iter().position(|g| g.mana == mana && g.snow == option.snow && g.restriction == option.restriction && g.from == from) {
             Some(at) => at,
             None => {
                 let n = state.mana_from_of(player).filter(|row| row.snow == option.snow && row.restriction == option.restriction
-                    && option.source.map_or(row.restriction.is_some() || !told.contains(&row.source), |source| source == row.source)).map(|row| row.pool.get(mana)).sum();
-                groups.push(ManaGroup { mana, snow: option.snow, restriction: option.restriction, from: option.source, n });
+                    && from.map_or(row.restriction.is_some() || !told.contains(&(row.source, row.rider)), |p| p == (row.source, row.rider)))
+                    .map(|row| row.pool.get(mana)).sum();
+                groups.push(ManaGroup { mana, snow: option.snow, restriction: option.restriction, from, n });
                 groups.len() - 1
             }
         };
@@ -13655,7 +13687,7 @@ pub(crate) fn viable_pool_assignments(state: &GameState, player: PlayerId, remai
     }).collect()
 }
 
-fn take_group(cx: &mut Cx, player: PlayerId, group: ManaGroup, n: u32, told: &[ObjectId], taken: &mut Vec<(ObjectId, Mana, u32, bool)>, record: bool) -> u32 {
+fn take_group(cx: &mut Cx, player: PlayerId, group: ManaGroup, n: u32, told: &[ManaPart], taken: &mut Vec<(ObjectId, Mana, u32, bool, u32)>, record: bool) -> u32 {
     let except = if group.restriction.is_none() { told } else { &[] };
     crate::takeback::spend(cx, player, group.restriction, group.mana, n,
         cantrip_state::ManaPick::Quality { snow: group.snow, from: group.from, except }, taken, record)
@@ -13664,7 +13696,7 @@ fn take_group(cx: &mut Cx, player: PlayerId, group: ManaGroup, n: u32, told: &[O
 /// The pool units that would pay something owed, as `AssignMana` options, in the C# engine's order: colorless first,
 /// then colors the cost does not name, then the colors it names. Ordinary mana a rule tells apart by its source (`told`,
 /// each source with its mana, CR 106.3) is offered as that source's, after the ordinary mana of its kind no rule tells apart.
-fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], told: &[(ObjectId, ManaPool)], owed: &ManaCost) -> Vec<ActionOption> {
+fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], told: &[(ManaPart, ManaPool)], owed: &ManaCost) -> Vec<ActionOption> {
     let named = |mana: Mana| {
         owed.symbols[mana as usize] > 0 || owed.hybrid.iter().flatten().any(|(a, b)| *a == mana || *b == mana)
     };
@@ -13693,11 +13725,12 @@ fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], t
                 option.mana = Some(mana);
                 out.push(option);
             }
-            for &(source, from) in told {
+            for &((source, rider), from) in told {
                 if from.get(mana) > 0 {
                     let mut option = ActionOption::simple(ActionKind::AssignMana);
                     option.mana = Some(mana);
                     option.source = Some(source);
+                    option.rider = rider;
                     out.push(option);
                 }
             }
@@ -13706,12 +13739,12 @@ fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], t
     out
 }
 
-/// The ordinary mana in `player`'s pool that each of the `told` sources produced (CR 106.3).
-fn told_pools(cx: &Cx, player: PlayerId, told: &[ObjectId]) -> Vec<(ObjectId, ManaPool)> {
-    let mut out: Vec<(ObjectId, ManaPool)> = told.iter().map(|&s| (s, ManaPool::default())).collect();
+/// The ordinary mana in `player`'s pool of each of the `told` parts (CR 106.3).
+fn told_pools(cx: &Cx, player: PlayerId, told: &[ManaPart]) -> Vec<(ManaPart, ManaPool)> {
+    let mut out: Vec<(ManaPart, ManaPool)> = told.iter().map(|&p| (p, ManaPool::default())).collect();
     for e in cx.s().mana_from_of(player) {
         if e.restriction.is_none()
-            && let Some(at) = told.iter().position(|&s| s == e.source)
+            && let Some(at) = told.iter().position(|&p| p == (e.source, e.rider))
         {
             for m in 0..6 {
                 out[at].1 .0[m] += e.pool.0[m];
@@ -13723,21 +13756,21 @@ fn told_pools(cx: &Cx, player: PlayerId, told: &[ObjectId]) -> Vec<(ObjectId, Ma
 
 /// Records what a payment for `on` spent, one `Event::ManaSpent` for each source it took mana from, in the order it first
 /// took from each (CR 106.3, 601.2h).
-fn record_spent(cx: &mut Cx, player: PlayerId, on: ObjectId, cast: bool, taken: &[(ObjectId, Mana, u32, bool)]) {
-    let mut by: Vec<(ObjectId, ManaTally, u64)> = Vec::new();
-    for &(source, mana, n, snow) in taken {
-        let at = match by.iter().position(|(s, ..)| *s == source) {
+fn record_spent(cx: &mut Cx, player: PlayerId, on: ObjectId, cast: bool, taken: &[(ObjectId, Mana, u32, bool, u32)]) {
+    let mut by: Vec<(ObjectId, u32, ManaTally, u64)> = Vec::new();
+    for &(source, mana, n, snow, rider) in taken {
+        let at = match by.iter().position(|(s, r, ..)| *s == source && *r == rider) {
             Some(at) => at,
             None => {
-                by.push((source, ManaTally::default(), 0));
+                by.push((source, rider, ManaTally::default(), 0));
                 by.len() - 1
             }
         };
-        by[at].1.add(mana, n);
-        if snow { by[at].2 += u64::from(n); }
+        by[at].2.add(mana, n);
+        if snow { by[at].3 += u64::from(n); }
     }
-    for (source, mana, snow) in by {
-        cx.record(Event::ManaSpent { player, source, on, cast, mana, snow: snow.min(u64::from(u32::MAX)) as u32 });
+    for (source, rider, mana, snow) in by {
+        cx.record(Event::ManaSpent { player, source, on, cast, mana, snow: snow.min(u64::from(u32::MAX)) as u32, rider });
     }
 }
 
@@ -13830,7 +13863,7 @@ fn spendable(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> Ma
 
 /// Takes `spent` out of the pool, restricted mana first (it is what the C# engine prefers spending), each unit's source
 /// pushed onto `taken`. What the mana taken does to what it pays for (`ManaRestriction::effects`).
-fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, spent: &[u32; 6], taken: &mut Vec<(ObjectId, Mana, u32, bool)>, record: bool) -> u8 {
+fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, spent: &[u32; 6], taken: &mut Vec<(ObjectId, Mana, u32, bool, u32)>, record: bool) -> u8 {
     let restricted = restricted_for(cx, player, source, purpose);
     let mut used = 0u8;
     for mana in Mana::ALL {
@@ -14090,7 +14123,7 @@ fn commit_mana_helpers(cx: &mut Cx, source: ObjectId, scope: Option<PaymentScope
 }
 
 /// Commit the units spent so far before another cost may inspect the game, then resume that cost's scheduler.
-fn checkpoint_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, taken: &mut Vec<(ObjectId, Mana, u32, bool)>, tapped: &mut Vec<Event>, helper_receipts: &mut Vec<(ObjectId, CostPart)>, delved: &mut Vec<ObjectId>, checkpoint: &mut Option<&mut dyn FnMut(&mut Cx, &mut Vec<Event>, &mut Vec<(ObjectId, CostPart)>, &mut Vec<ObjectId>) -> R<bool>>) -> R<()> {
+fn checkpoint_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, taken: &mut Vec<(ObjectId, Mana, u32, bool, u32)>, tapped: &mut Vec<Event>, helper_receipts: &mut Vec<(ObjectId, CostPart)>, delved: &mut Vec<ObjectId>, checkpoint: &mut Option<&mut dyn FnMut(&mut Cx, &mut Vec<Event>, &mut Vec<(ObjectId, CostPart)>, &mut Vec<ObjectId>) -> R<bool>>) -> R<()> {
     let Some(hook) = checkpoint.as_deref_mut() else { return Ok(()) };
     let cast = purpose == Paying::Casting && cx.s().obj(source).zone.is(ZoneKind::Stack);
     record_spent(cx, player, source, cast, taken);
@@ -14179,7 +14212,7 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
     // How many of the generic mana tapping has paid for as waterbend (CR 701.67b), against what waterbend may pay.
     let mut bent: u32 = 0;
     // The mana spent, unit by unit, with the source of each (CR 106.3).
-    let mut taken: Vec<(ObjectId, Mana, u32, bool)> = Vec::new();
+    let mut taken: Vec<(ObjectId, Mana, u32, bool, u32)> = Vec::new();
     let record = helpers.mana_ability;
     // A mana ability activated again as a take-back keeps it (`takeback`, CR 733.1) pays as it paid then: the same mana
     // abilities activated, the same mana spent, and nothing asked.
@@ -14193,8 +14226,10 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                     crate::takeback::step(cx.g, crate::takeback::Step::Activate(a.clone()));
                     activate_recorded_mana(cx, &a)?;
                 }
-                crate::takeback::Step::Spend { restriction, mana, n, source: from, snow } => {
-                    let got = crate::takeback::spend(cx, player, restriction, mana, n, cantrip_state::ManaPick::Quality { snow, from: Some(from), except: &[] }, &mut taken, true);
+                // The very mana it spent then: of that source and that rider (`ManaPart`). Mana of two riders is never alike
+                // (CR 603.7, 601.2h); a rider made during the action is made again under its number (`takeback::rider`).
+                crate::takeback::Step::Spend { restriction, mana, n, source: from, snow, rider } => {
+                    let got = crate::takeback::spend(cx, player, restriction, mana, n, cantrip_state::ManaPick::Quality { snow, from: Some((from, rider)), except: &[] }, &mut taken, true);
                     if got < n {
                         crate::takeback::script_failed(cx.g);
                         return Err(Stop::Cancel);
@@ -14274,7 +14309,7 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                 decided = Ways::Many;
             }
         }
-        let spend_pool = |cx: &mut Cx, paid: &mut ManaPool, used: &mut u8, taken: &mut Vec<(ObjectId, Mana, u32, bool)>, spent: [u32; 6]| {
+        let spend_pool = |cx: &mut Cx, paid: &mut ManaPool, used: &mut u8, taken: &mut Vec<(ObjectId, Mana, u32, bool, u32)>, spent: [u32; 6]| {
             *used |= take_mana(cx, player, source, helpers.purpose, &spent, taken, record);
             for mana in Mana::ALL {
                 paid.0[mana as usize] += spent[mana as usize];
@@ -14332,7 +14367,8 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                 ActionKind::AssignMana => {
                     let mana = action.mana.expect("mana");
                     if groups.is_some() {
-                        let group = ManaGroup { mana, snow: action.snow, restriction: action.restriction, from: action.source, n: 1 };
+                        let from = action.source.map(|source| (source, action.rider));
+                        let group = ManaGroup { mana, snow: action.snow, restriction: action.restriction, from, n: 1 };
                         if take_group(cx, player, group, 1, &told, &mut taken, record) != 1 { return Err(Stop::Cancel); }
                         if let Some(r) = action.restriction { used |= r.effects(); }
                         paid.0[mana as usize] += 1;
@@ -14354,7 +14390,7 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                         // Mana of the source the option names, or of none a rule tells apart (CR 106.3).
                         None => {
                             let pick = match action.source {
-                                Some(from) => cantrip_state::ManaPick::From(from),
+                                Some(from) => cantrip_state::ManaPick::From((from, action.rider)),
                                 None => cantrip_state::ManaPick::Except(&told),
                             };
                             crate::takeback::spend(cx, player, None, mana, 1, pick, &mut taken, record);

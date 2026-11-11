@@ -1569,6 +1569,20 @@ pub(crate) fn lost_the_game(cx: &mut Cx, losses: &[(PlayerId, LossReason)], batt
     collect_batch(cx, &events, Some(Before { battlefield, then, seen_by_all: &[] }), start);
 }
 
+/// How many mana that a "when that mana is spent" delayed ability rides (`DelayedWhen::ThatMana`) were spent to cast the
+/// spell `event` says was cast (CR 603.7a, 106.3, 601.2h): the `ManaSpent` records of its casting. Each is a trigger (Path of
+/// Ancestry's ruling: two of its mana spent on one creature spell are two). Zero for any other event.
+fn that_mana_spent(cx: &Cx, rider: u32, event: &Event) -> u32 {
+    let Event::SpellCast { spell, .. } = *event else { return 0 };
+    cx.g.log.iter().rev()
+        .take_while(|r| r.turn == cx.s().turn.number)
+        .filter_map(|r| match r.event {
+            Event::ManaSpent { on, cast: true, mana, rider: r, .. } if on == spell && r == rider => Some(mana.total()),
+            _ => None,
+        })
+        .sum()
+}
+
 /// Every triggered ability this event triggers (CR 603.2).
 /// Ask the event of the watched object, but ask the creating ability's conditions of its actual source.
 pub(crate) fn delayed_fires(q: &dyn Query, d: &cantrip_state::Delayed, t: &TriggeredDef, asker: &Asker, event: &Event) -> Option<Fired> {
@@ -1705,7 +1719,14 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                         }
                         _ => &given,
                     };
+                    // "When that mana is spent" triggers once for each mana of it spent to cast this spell (`DelayedWhen::ThatMana`),
+                    // on nothing but a spell being cast; every other one once.
+                    let times = match d.when {
+                        DelayedWhen::ThatMana(rider) => that_mana_spent(cx, rider, event),
+                        _ => 1,
+                    };
                     if d.when.is_event()
+                        && times > 0
                         && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
                         // A delayed triggered mana ability never goes on the stack: it resolves as the mana ability that
                         // triggered it does (CR 605.1b, 605.4a), in `tapped_for_mana`.
@@ -1730,6 +1751,15 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                                 },
                             ))
                     {
+                        for _ in 1..times {
+                            found.push((
+                                PendingTrigger { event_amount: None, source: d.source, ability: d.ability, controller: d.controller,
+                                    subject: fired.subject, data: fired.data, members: d.members, count: None, since: Some(d.since),
+                                    acquired: d.acquired, words: d.words },
+                                t,
+                                Again::new(),
+                            ));
+                        }
                         found.push((
                             PendingTrigger { event_amount: matched_damage_amount(t, event),
                                 source: d.source,
@@ -1765,6 +1795,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, star
                             cx.st().delayed_remove(at);
                         }
                     }
+                }
+                // A spell cast has spent what it spent: a "when that mana is spent" none of whose mana is left is gone.
+                if matches!(event, Event::SpellCast { .. }) {
+                    cx.st().drop_spent_mana_riders();
                 }
             }
             // Abilities that function in other zones (`TriggeredDef::functions`, CR 113.6): each asked only in the zones it
@@ -2025,7 +2059,8 @@ pub fn step_began(cx: &mut Cx, step: Step) {
             | DelayedWhen::UntilEvent
             | DelayedWhen::UntilNextTurnOf(_)
             | DelayedWhen::NextThisTurn
-            | DelayedWhen::WhenEvent => {
+            | DelayedWhen::WhenEvent
+            | DelayedWhen::ThatMana(_) => {
                 (false, false)
             }
         };

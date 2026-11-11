@@ -8,7 +8,9 @@ use crate::*;
 
 /// Pool mana a payment spends: its kind, its restriction (CR 106.6), and the name of the source that produced it, for
 /// mana of one kind from several sources.
-pub type Spend = (Mana, Option<ManaRestriction>, Option<String>, Option<bool>, Option<bool>);
+/// A `Spend:` item: the mana, its restriction, the source it is told apart by, whether it is snow, whether it pays {S},
+/// and whether a "when that mana is spent" ability rides it (`Riding` / `NonRiding`, CR 603.7a: the first rider offered).
+pub type Spend = (Mana, Option<ManaRestriction>, Option<String>, Option<bool>, Option<bool>, Option<bool>);
 
 /// What a payment is told to do beyond paying what is owed from the pool: the X or kicker count to announce, the pool
 /// mana to spend first, the creatures Convoke taps (in the order the payment asks, CR 702.51a) and how many cards Delve
@@ -128,6 +130,9 @@ pub fn auto_pay(
             (o.mana, o.restriction) == (Some(wanted.0), wanted.1)
                 && wanted.3.is_none_or(|snow| snow == o.snow)
                 && wanted.4.is_none_or(|pay_snow| pay_snow == o.pay_snow)
+                // An option says which delayed ability rides its mana, if one does (`ActionOption::rider`): `Riding` takes the
+                // first of a source's riders offered.
+                && wanted.5.is_none_or(|riding| riding == (o.rider != 0))
                 && from(o).map(|n| n.to_ascii_lowercase())
                     == wanted.2.as_ref().map(|n| n.to_ascii_lowercase())
         }) {

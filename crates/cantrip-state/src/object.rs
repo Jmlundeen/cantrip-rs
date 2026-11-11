@@ -2174,7 +2174,12 @@ pub enum DelayedWhen {
     /// Landseeker's "at the beginning of the end step on your next turn" and Meandering Towershell's "at the beginning of
     /// the declare attackers step on your next turn".
     NextTurnStep { step: Step, player: PlayerId, after: u32 },
-
+    /// "When that mana is spent [to cast a spell ...], [effect]" (CR 603.7a, 106.3): a delayed triggered ability the
+    /// mana ability that produced the mana created as it resolved, riding that mana (`ManaFrom::rider`, this number). It
+    /// triggers once for each mana of it spent to cast a spell its `listens`/`matches` accept as cast (`Event::SpellCast`;
+    /// Path of Ancestry's rulings: two of its mana spent are two triggers, on one spell or two), and is gone once none of
+    /// that mana is left in a pool. Path of Ancestry, Pyromancer's Goggles, Primal Wellspring and Second City print it.
+    ThatMana(u32),
 }
 
 impl DelayedWhen {
@@ -2188,6 +2193,7 @@ impl DelayedWhen {
                 | DelayedWhen::UntilNextTurnOf(_)
                 | DelayedWhen::NextThisTurn
                 | DelayedWhen::WhenEvent
+                | DelayedWhen::ThatMana(_)
         )
     }
 
@@ -2353,6 +2359,10 @@ pub struct ManaFrom {
     pub snow: bool,
     /// How long the mana lasts (CR 106.4, 500.5a).
     pub lasts: ManaLasts,
+    /// The delayed triggered ability "when that mana is spent" the ability that produced it created (CR 603.7a, 106.3:
+    /// Path of Ancestry, Pyromancer's Goggles), its `DelayedWhen::ThatMana` number; 0 for none. Mana of one rider is kept
+    /// apart from all other mana, the same source's included.
+    pub rider: u32,
     pub pool: ManaPool,
 }
 
@@ -2368,26 +2378,34 @@ pub enum ManaLasts {
     Turn,
 }
 
-/// Which mana of a kind a spending takes, by its source (CR 106.3).
+/// Mana told apart for its payer (CR 106.3, 601.2h): the source that produced it, and the "when that mana is spent"
+/// delayed ability that rides it (`ManaFrom::rider`, CR 603.7a), 0 for none. Each rider is told apart from all other mana,
+/// its own source's other riders included: each is a delayed ability of its own, created with its own words and at its own
+/// moment (CR 603.7, 612: Pyromancer's Goggles' "red" rewritten between two activations), so mana of two riders is never
+/// interchangeable, and which of them pays is the payer's choice.
+pub type ManaPart = (ObjectId, u32);
+
+/// Which mana of a kind a spending takes, by its source (CR 106.3) and the delayed ability that rides it.
 #[derive(Clone, Copy, Debug)]
 pub enum ManaPick<'a> {
     /// Any: the mana that does not last first (`Player::spend_mana`'s order), then in the order it came.
     Any,
-    /// Mana this source produced.
-    From(ObjectId),
-    /// Mana none of these sources produced.
-    Except(&'a [ObjectId]),
-    /// A captured source quality, optionally one source or excluding the sources told apart by another rule.
-    Quality { snow: bool, from: Option<ObjectId>, except: &'a [ObjectId] },
+    /// Mana this source produced, of this rider (0 for none).
+    From(ManaPart),
+    /// Mana of none of these parts.
+    Except(&'a [ManaPart]),
+    /// A captured source quality, optionally one part or excluding the parts told apart by another rule.
+    Quality { snow: bool, from: Option<ManaPart>, except: &'a [ManaPart] },
 }
 
 impl ManaPick<'_> {
-    pub fn takes(&self, source: ObjectId, snow: bool) -> bool {
+    pub fn takes(&self, source: ObjectId, snow: bool, rider: u32) -> bool {
+        let part = (source, rider);
         match self {
             ManaPick::Any => true,
-            ManaPick::From(s) => *s == source,
-            ManaPick::Except(not) => !not.contains(&source),
-            ManaPick::Quality { snow: wanted, from, except } => *wanted == snow && from.map_or(!except.contains(&source), |s| s == source),
+            ManaPick::From(p) => *p == part,
+            ManaPick::Except(not) => !not.contains(&part),
+            ManaPick::Quality { snow: wanted, from, except } => *wanted == snow && from.map_or(!except.contains(&part), |p| p == part),
         }
     }
 }

@@ -89,6 +89,8 @@ pub fn next_step(game: &mut Game) {
             let keep = kept.iter().find(|&&(q, _)| q == p).map_or([false; 6], |&(_, k)| k);
             s.empty_mana_keeping(p, ends, keep);
         }
+        // "When that mana is spent" waits only while some of that mana is left (`DelayedWhen::ThatMana`).
+        s.drop_spent_mana_riders();
     }
     let main_seen = turn.scheduled && game.log.iter().rev().take_while(|r| r.turn == turn.number).any(|r| matches!(r.event, Event::StepBegan { step } if step.is_main()));
     let s = &mut game.state;

@@ -17,6 +17,8 @@ mod base_power_tests;
 #[cfg(test)]
 mod takeback_tests;
 #[cfg(test)]
+mod mana_rider_tests;
+#[cfg(test)]
 mod legendary_mana_tests;
 #[cfg(test)]
 mod as_transforms_tests;
@@ -335,6 +337,9 @@ pub struct Game {
     pub(crate) effect_words: std::cell::Cell<Option<(ObjectId, Words)>>,
     /// The current mana activation's X, scoped across nested activations and reset before suspension returns.
     pub(crate) mana_activation_x: Option<u32>,
+    /// The "when that mana is spent" delayed ability the mana ability being activated gives the mana it produces
+    /// (`ManaFrom::rider`, `Adds::when_spent`), 0 for none. Bookkeeping of that activation, scoped with it.
+    pub(crate) mana_rider: u32,
     /// The current immediate mana ability's history anchors (CR 605.3, 611.2b), scoped with its activation X.
     /// Bookkeeping of this call, never per-card remembered state; nested abilities restore the enclosing interval.
     mana_interval: Option<ManaInterval>,
@@ -421,7 +426,7 @@ impl Clone for Game {
             history_end: self.history_end,
             check: StateCheck::NONE,
             spells_as_cast: Default::default(),
-            own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None,
+            own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None,
             takeback: Default::default(),
         }
     }
@@ -443,7 +448,7 @@ impl Game {
             check: StateCheck::NONE,
             spells_as_cast: Default::default(),
             own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None,
-            effect_words: Default::default(), mana_activation_x: None, mana_interval: None,
+            effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None,
             takeback: Default::default(),
         }
     }
@@ -582,7 +587,7 @@ impl Game {
             t.priority = chooser;
         });
 
-        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() };
+        let mut game = Game { state, log: Vec::new(), tree: tree::Tree::new(), at: tree::NodeId::ROOT, cards, verify: false, max_events: MAX_GAME_EVENTS, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None, takeback: Default::default() };
         // CR 103.2b: the companion chosen as the deck was built is revealed once the starting player is known, if the starting
         // deck - the library as dealt - fulfils its condition; one that doesn't is a sideboard card, and nothing is said of it.
         for (p, id) in companions {
@@ -1026,7 +1031,7 @@ impl Game {
         let state = self.state.clone_with_journal_from(floor);
         let root = self.tree.next();
         let tree = tree::Tree::rooted(root, (state.mark(), self.log.len()));
-        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_interval: None, takeback: Default::default() }
+        Game { state, log: self.log.clone(), tree, at: root, cards: self.cards, verify: self.verify, max_events: self.max_events, history_end: None, check: StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None, takeback: Default::default() }
     }
 
     /// Gives the game's generator another seed (`GameState::reseed`): a fork for search that must not shuffle or roll
@@ -1239,9 +1244,10 @@ impl Game {
         turn::attack_rules_allow(self, self.cards, creature)
     }
 
-    /// The sources of the ordinary mana in `player`'s pool that a rule tells apart from other mana (CR 106.3): mana the player
-    /// spends only by choosing it, which the pool shows as that source's.
-    pub fn mana_told_apart(&self, player: PlayerId) -> Vec<ObjectId> {
+    /// The parts of the ordinary mana in `player`'s pool that a rule tells apart from other mana (CR 106.3; a source, and
+    /// the "when that mana is spent" ability that rides its mana, 0 for none): mana the player spends only by choosing it,
+    /// which the pool shows as that source's.
+    pub fn mana_told_apart(&self, player: PlayerId) -> Vec<cantrip_state::ManaPart> {
         static_rules::mana_told_apart(self, self.cards, player)
     }
 
@@ -1807,7 +1813,7 @@ impl<'a> Cx<'a> {
         }
         let source = self.mana_source();
         takeback::produced(self.g, source);
-        self.g.state.add_mana(player, mana, amount, source, None, lasts, snow);
+        self.g.state.add_mana_riding(player, mana, amount, source, None, lasts, snow, self.g.mana_rider);
     }
 
     /// Runs one immediate mana ability with its own history interval and activation X. Restores the enclosing
@@ -1816,7 +1822,9 @@ impl<'a> Cx<'a> {
         let head = self.g.log.len() as u32;
         let outer_interval = self.g.mana_interval.replace(ManaInterval { source, since: head, tapped_since: head, resolution: head, cost_objects: Vec::new() });
         let outer_x = self.g.mana_activation_x.take();
+        let outer_rider = std::mem::take(&mut self.g.mana_rider);
         let done = f(self);
+        self.g.mana_rider = outer_rider;
         self.g.mana_activation_x = outer_x;
         self.g.mana_interval = outer_interval;
         done
@@ -2904,7 +2912,7 @@ impl cantrip_api::Game for Cx<'_> {
         }
         let source = self.mana_source();
         takeback::produced(self.g, source);
-        self.g.state.add_mana(player, mana, amount, source, None, ManaLasts::Step, snow);
+        self.g.state.add_mana_riding(player, mana, amount, source, None, ManaLasts::Step, snow, self.g.mana_rider);
     }
 
     fn add_mana_in_any_combination(&mut self, asker: &Asker, colors: ColorSet, count: u32) -> Result<(), Suspend> {
@@ -2938,7 +2946,7 @@ impl cantrip_api::Game for Cx<'_> {
         }
         let source = self.mana_source();
         takeback::produced(self.g, source);
-        self.g.state.add_mana(player, mana, amount, source, Some(restriction), ManaLasts::Step, snow);
+        self.g.state.add_mana_riding(player, mana, amount, source, Some(restriction), ManaLasts::Step, snow, self.g.mana_rider);
     }
 
     fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i32) {

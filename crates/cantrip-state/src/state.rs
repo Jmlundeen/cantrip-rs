@@ -750,6 +750,12 @@ impl GameState {
     /// Adds `n` mana of one kind that `source` produced (CR 106.3) to `player`'s pool (CR 106.4): mana `restriction` limits,
     /// if it has one (CR 106.6), kept apart; mana that lasts as `lasts` says (CR 500.5a), which no restricted mana does.
     pub fn add_mana(&mut self, player: PlayerId, mana: Mana, n: u32, source: ObjectId, restriction: Option<ManaRestriction>, lasts: ManaLasts, snow: bool) {
+        self.add_mana_riding(player, mana, n, source, restriction, lasts, snow, 0);
+    }
+
+    /// `add_mana`, of mana a delayed triggered ability rides (`ManaFrom::rider`; 0 for none).
+    #[allow(clippy::too_many_arguments)]
+    pub fn add_mana_riding(&mut self, player: PlayerId, mana: Mana, n: u32, source: ObjectId, restriction: Option<ManaRestriction>, lasts: ManaLasts, snow: bool, rider: u32) {
         let m = mana as usize;
         // A pool has no limit (CR 106.4); its counts are `u32`, past any number of rounds a loop is let run, and saturate
         // rather than wrap so that the sources' entries still add up to them.
@@ -771,7 +777,7 @@ impl GameState {
             }),
         }
         let lasts = if restriction.is_none() { lasts } else { ManaLasts::Step };
-        match self.mana_from.iter().position(|e| e.player == player && e.restriction == restriction && e.source == source && e.lasts == lasts && e.snow == snow) {
+        match self.mana_from.iter().position(|e| e.player == player && e.restriction == restriction && e.source == source && e.lasts == lasts && e.snow == snow && e.rider == rider) {
             Some(at) => {
                 let old = self.mana_from[at];
                 self.mana_from[at].pool.0[m] += n;
@@ -780,7 +786,7 @@ impl GameState {
             None => {
                 let mut pool = ManaPool::default();
                 pool.0[m] = n;
-                self.mana_from.push(ManaFrom { player, restriction, source, snow, lasts, pool });
+                self.mana_from.push(ManaFrom { player, restriction, source, snow, lasts, rider, pool });
                 self.log(Undo::ManaFromPushed);
             }
         }
@@ -788,7 +794,8 @@ impl GameState {
 
     /// Spends up to `n` mana of one kind from `player`'s pool: of `restriction`, or ordinary mana for none, and of the
     /// sources `pick` allows - the mana that does not last before the mana that does, then in the order it came. How much
-    /// there was to spend; each source's share is pushed onto `taken` (CR 106.3).
+    /// there was to spend; each source's share is pushed onto `taken` (CR 106.3), with whether that source was snow and the
+    /// delayed ability that mana carries (`ManaFrom::rider`).
     pub fn spend_mana(
         &mut self,
         player: PlayerId,
@@ -796,7 +803,7 @@ impl GameState {
         mana: Mana,
         n: u32,
         pick: ManaPick,
-        taken: &mut Vec<(ObjectId, Mana, u32, bool)>,
+        taken: &mut Vec<(ObjectId, Mana, u32, bool, u32)>,
     ) -> u32 {
         let m = mana as usize;
         let mut left = n;
@@ -804,10 +811,10 @@ impl GameState {
             let mut at = 0;
             while left > 0 && at < self.mana_from.len() {
                 let e = self.mana_from[at];
-                if e.player == player && e.restriction == restriction && e.lasts == lasts && e.pool.0[m] > 0 && pick.takes(e.source, e.snow) {
+                if e.player == player && e.restriction == restriction && e.lasts == lasts && e.pool.0[m] > 0 && pick.takes(e.source, e.snow, e.rider) {
                     let take = e.pool.0[m].min(left);
                     left -= take;
-                    taken.push((e.source, mana, take, e.snow));
+                    taken.push((e.source, mana, take, e.snow, e.rider));
                     let mut after = e;
                     after.pool.0[m] -= take;
                     if after.pool.is_empty() {
@@ -888,7 +895,7 @@ impl GameState {
                 }
                 // What is kept is ordinary mana from now on: one entry per source and restriction, as `add_mana` keeps it. The
                 // parts add up to no more than the pool holds, so this cannot overflow.
-                match after.iter_mut().find(|a| a.player == player && a.source == e.source && a.restriction == e.restriction && a.lasts == ManaLasts::Step) {
+                match after.iter_mut().find(|a| a.player == player && a.source == e.source && a.restriction == e.restriction && a.rider == e.rider && a.lasts == ManaLasts::Step) {
                     Some(a) => {
                         for (k, n) in a.pool.0.iter_mut().zip(pool.0) {
                             *k += n;
@@ -1250,6 +1257,36 @@ impl GameState {
         let d = self.delayed.remove(at);
         self.log(Undo::DelayedRemoved(at as u32, d));
         d
+    }
+
+    /// A number for the delayed ability that will ride mana about to be produced (`DelayedWhen::ThatMana`): one no
+    /// waiting delayed ability or mana in a pool has, so that no other mana is told for that mana.
+    pub fn new_mana_rider(&self) -> u32 {
+        let mut n = self.delayed.iter().filter_map(|d| match d.when { DelayedWhen::ThatMana(n) => Some(n), _ => None }).max().unwrap_or(0).wrapping_add(1);
+        while n == 0 || self.mana_rider_used(n) {
+            n = n.wrapping_add(1);
+        }
+        n
+    }
+
+    /// Whether some waiting delayed ability or mana in a pool has this rider number (`DelayedWhen::ThatMana`).
+    pub fn mana_rider_used(&self, n: u32) -> bool {
+        self.mana_from.iter().any(|e| e.rider == n) || self.delayed.iter().any(|d| d.when == DelayedWhen::ThatMana(n))
+    }
+
+    /// Removes each "when that mana is spent" delayed ability none of whose mana is left in a pool (`DelayedWhen::ThatMana`):
+    /// spent on something it didn't trigger on, or lost as a step ended (CR 500.5). It can't trigger again.
+    pub fn drop_spent_mana_riders(&mut self) {
+        let mut at = 0;
+        while at < self.delayed.len() {
+            if let DelayedWhen::ThatMana(n) = self.delayed[at].when
+                && !self.mana_from.iter().any(|e| e.rider == n)
+            {
+                self.delayed_remove(at);
+                continue;
+            }
+            at += 1;
+        }
     }
 
     /// Keeps last-known information (CR 608.2h): an object's as it ceases to be that object, or a spell's as it becomes

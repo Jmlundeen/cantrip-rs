@@ -594,20 +594,23 @@ impl<'a> Projector<'a> {
         }
         // Ordinary mana a rule tells apart by the source that produced it (CR 106.3) is a kind of its own, as restricted mana
         // is: that source's, shown apart from the rest and named by it.
+        // The mana a "when that mana is spent" ability rides is told apart too (`ManaPart`), shown as its source's and named by
+        // its rider, apart from its source's other mana and every other rider's.
         let told = game.mana_told_apart(p);
-        for &source in &told {
-            for e in s.mana_from_of(p).filter(|e| !e.snow && e.restriction.is_none() && e.source == source) {
+        for &(source, rider) in &told {
+            for e in s.mana_from_of(p).filter(|e| !e.snow && e.restriction.is_none() && e.source == source && e.rider == rider) {
                 for mana in Mana::ALL {
                     let n = e.pool.get(mana);
                     if n > 0 {
                         summary.mana[mana as usize] -= count(n);
                         let handle = handles.handle(source);
-                        match summary.restricted_mana.iter_mut().find(|r| r.source == handle && r.r#type == Some(mana_view(mana))) {
+                        match summary.restricted_mana.iter_mut().find(|r| !r.snow && r.source == handle && r.rider == rider && r.r#type == Some(mana_view(mana))) {
                             Some(r) => r.amount += count(n),
                             None => summary.restricted_mana.push(RestrictedManaView {
                                 r#type: Some(mana_view(mana)),
                                 amount: count(n),
                                 source: handle,
+                                rider,
                                 ..Default::default()
                             }),
                         }
@@ -617,16 +620,16 @@ impl<'a> Projector<'a> {
         }
         for entry in s.mana_from_of(p).filter(|e| e.snow) {
             let (filter, effect, spend_subtypes, spend_mana_value) = entry.restriction.map_or((ManaSpendFilterView::None, ManaSpendEffectView::None, Vec::new(), 0), restriction_view);
-            let source = if entry.restriction.is_none() && told.contains(&entry.source) { handles.handle(entry.source) } else { ViewHandle::NONE };
+            let (source, rider) = if entry.restriction.is_none() && told.contains(&(entry.source, entry.rider)) { (handles.handle(entry.source), entry.rider) } else { (ViewHandle::NONE, 0) };
             for mana in Mana::ALL {
                 let n = entry.pool.get(mana);
                 if n == 0 { continue; }
                 if entry.restriction.is_none() { summary.mana[mana as usize] -= count(n); }
-                match summary.restricted_mana.iter_mut().find(|r| r.snow && r.source == source && r.r#type == Some(mana_view(mana))
+                match summary.restricted_mana.iter_mut().find(|r| r.snow && r.source == source && r.rider == rider && r.r#type == Some(mana_view(mana))
                     && r.filter == filter && r.effect == effect && r.spend_subtypes == spend_subtypes && r.spend_mana_value == spend_mana_value) {
                     Some(r) => r.amount += count(n),
                     None => summary.restricted_mana.push(RestrictedManaView { r#type: Some(mana_view(mana)), amount: count(n),
-                        filter, effect, spend_subtypes: spend_subtypes.clone(), spend_mana_value, source, snow: true }),
+                        filter, effect, spend_subtypes: spend_subtypes.clone(), spend_mana_value, source, snow: true, rider }),
                 }
             }
         }
@@ -645,6 +648,7 @@ impl<'a> Projector<'a> {
                         spend_mana_value,
                         source: ViewHandle::NONE,
                         snow: false,
+                        rider: 0,
                     });
                 }
             }
@@ -764,6 +768,7 @@ impl<'a> Projector<'a> {
         // that turn's end step, you lose the game"), whose spell is gone; and one waiting for a step of a player's next turn (Kav
         // Landseeker's "sacrifice that token"), which outlasts the turn its source may leave in; and one waiting for an event of an object it watches
         // ("when that land dies or is put into exile, return it", earthbend), which nothing on that object shows.
+        // And one riding mana in a pool ("when that mana is spent ...", Path of Ancestry), which the pool does not say.
         for d in s.delayed.iter().filter(|d| {
             d.controller == p
                 && matches!(
@@ -778,6 +783,7 @@ impl<'a> Projector<'a> {
                         | DelayedWhen::ExtraTurnStep { .. }
                         | DelayedWhen::NextTurnStep { .. }
                         | DelayedWhen::WhenEvent
+                        | DelayedWhen::ThatMana(_)
                 )
         }) {
             let printed = game.cards.ability(d.ability).text();

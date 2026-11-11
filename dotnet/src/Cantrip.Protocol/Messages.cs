@@ -2493,6 +2493,13 @@ public sealed class ActionOptionMessage
     [Key(36)]
     public bool PaySnow { get; set; }
 
+    /// <summary>
+    /// For <see cref="ActionKindView.AssignMana"/>: the "when that mana is spent" delayed ability its mana carries (CR
+    /// 603.7a), as the pool names it (<see cref="RestrictedManaView.Rider"/>); 0 for none.
+    /// </summary>
+    [Key(37)]
+    public uint Rider { get; set; }
+
 }
 
 /// <summary>

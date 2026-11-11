@@ -2634,6 +2634,22 @@ it never goes on the stack (CR 605.4a). "Whenever [you tap / a player taps] a [l
 an additional [mana]" is `mana::you_tap_a_land_type_for_mana` or `a_player_taps_a_land_type_for_mana` with
 `mana::that_player_adds_an_additional`, the type read through the source's words (Nissa, Who Shakes the World too).
 
+Mana can carry a delayed triggered ability: "Add [mana]. When that mana is spent to cast [a spell], [effect]" (CR 603.7a,
+106.3; Path of Ancestry, Pyromancer's Goggles, Primal Wellspring, Second City). The mana ability's `Adds::when_spent(i)`
+names the card's `delayed[i]`; as the activation produces its mana (`activate_mana_as`, `Game::mana_rider`) every unit of
+it, through whatever replacement effects change it, is added with a fresh rider number (`ManaFrom::rider`), kept apart
+from all other mana, the same source's included, and told apart for its payer from every other mana - its source's
+other mana and every other rider, its source's too: two riders are two abilities, each with the words its source had and
+created at its own moment (Pyromancer's Goggles' "red" rewritten between two activations), so which pays is the payer's
+choice (CR 601.2h; `static_rules::mana_told_apart`'s `ManaPart` of source and rider, an `AssignMana` option's and an
+answer's `rider`, the view's `RestrictedManaView::rider`, `Spend: W Riding from ...`). A take-back replays a kept mana
+ability's payment with the very rider it spent, and a rider a kept ability made is made again under its number
+(`takeback::rider`), as the objects it made keep their ids; then a
+`DelayedWhen::ThatMana(rider)` ability is created, its source the mana ability's, its controller the activator (CR
+603.7e). Each `Event::ManaSpent` names the rider of the mana it records. On a `SpellCast` the ability triggers once for
+each mana of its rider spent to cast that spell, when its own matcher accepts the spell as cast - wherever the source has
+gone; once none of its mana is left in a pool (spent, or lost as a step ends) it is dropped (`drop_spent_mana_riders`).
+
 Every triggered mana ability states what it adds (`TriggeredDef::mana_yield`, a `TriggeredMana`: one mana of a type, one
 of a type the permanent produced, one of its source's chosen color), since its effect is code. The advice of what a
 player can pay (`actions::available_without`) counts it: while some permanent's or delayed triggered mana ability waits

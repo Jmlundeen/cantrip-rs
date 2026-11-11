@@ -3084,7 +3084,8 @@ fn colors_of(step: &ActionStep) -> R<Option<Vec<Color>>> {
 }
 
 /// `Spend:` names pool mana by its symbol, and for mana that carries a restriction its name after it: `R`, `R GainsHaste`;
-/// mana told apart by its source names the source after `from`: `W from Barracks of the Thousand`. A restriction's name
+/// mana told apart by its source names the source after `from`: `W from Barracks of the Thousand`, and `Riding` or
+/// `NonRiding` says whether a "when that mana is spent" ability rides it (`W Riding from Path of Ancestry`). A restriction's name
 /// has a comma in it (`LegendarySpells, CantBeCountered`), so pieces are split where a symbol begins.
 fn spend_of(step: &ActionStep) -> R<VecDeque<Spend>> {
     let mut out = VecDeque::new();
@@ -3114,9 +3115,12 @@ fn spend_of(step: &ActionStep) -> R<VecDeque<Spend>> {
                 None => None,
             };
             let mut snow = None;
+            let mut riding = None;
             rest.retain(|word| {
                 if word.eq_ignore_ascii_case("Snow") { snow = Some(true); false }
                 else if word.eq_ignore_ascii_case("NonSnow") { snow = Some(false); false }
+                else if word.eq_ignore_ascii_case("Riding") { riding = Some(true); false }
+                else if word.eq_ignore_ascii_case("NonRiding") { riding = Some(false); false }
                 else { true }
             });
             let mut pay_snow = None;
@@ -3132,7 +3136,7 @@ fn spend_of(step: &ActionStep) -> R<VecDeque<Spend>> {
                     None => return fail(format!("line {}: Spend: {piece} names something that is not a mana restriction", step.line)),
                 }
             };
-            out.push_back((mana, restriction, from, snow, pay_snow));
+            out.push_back((mana, restriction, from, snow, pay_snow, riding));
         }
     }
     Ok(out)

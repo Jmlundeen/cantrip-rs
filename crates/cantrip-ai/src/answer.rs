@@ -405,8 +405,8 @@ impl Answering {
                         && o.index == a.index
                         && (o.granted_by, o.paid_by) == (a.granted_by, a.paid_by)
                         && (o.kind != ActionKind::AssignMana
-                            || (o.mana, o.restriction, o.snow, o.pay_snow)
-                                == (a.mana, a.restriction, a.snow, a.pay_snow))
+                            || (o.mana, o.restriction, o.snow, o.pay_snow, o.rider)
+                                == (a.mana, a.restriction, a.snow, a.pay_snow, a.rider))
                 })?;
                 let option = self.perms.options.iter().position(|&e| e == engine)?;
                 let o = &canonical[option];

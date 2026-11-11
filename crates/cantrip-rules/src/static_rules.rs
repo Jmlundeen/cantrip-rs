@@ -3,6 +3,7 @@
 //! without them pays one table lookup per permanent when something is cast or activated.
 
 use cantrip_api::*;
+use cantrip_state::ManaPart;
 
 use crate::Cx;
 
@@ -65,21 +66,28 @@ pub fn mana_kept(cx: &Cx) -> Vec<(PlayerId, [bool; 6])> {
     kept
 }
 
-/// The sources of the ordinary mana in `player`'s pool whose mana an ability of a permanent on the battlefield tells apart
-/// (CR 106.3, `CardDef::mana_told_apart`): mana its payer chooses to spend or keep (CR 601.2h, 118.3a). Asked only while
-/// that mana came from more than one source, since one source's mana is all alike: a pool of one land's mana searches
-/// nothing. Restricted mana is told apart by its restriction alone (CR 106.6); none in content is told apart by source too.
-pub fn mana_told_apart(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> Vec<ObjectId> {
+/// The parts of the ordinary mana in `player`'s pool told apart for its payer (CR 106.3): mana its payer chooses to spend
+/// or keep (CR 601.2h, 118.3a). Each is a source with the delayed ability that rides its mana, 0 for none (`ManaPart`). A
+/// source's mana is told apart where an ability of a permanent on the battlefield says so (`CardDef::mana_told_apart`);
+/// mana a "when that mana is spent" delayed ability rides (`ManaFrom::rider`, CR 603.7a) is told apart by the rules
+/// themselves, wherever its source has gone, from every other mana - its own source's other mana and every other rider's,
+/// the same source's included: whether it is spent decides whether that ability triggers, and two riders are two abilities,
+/// each with its own words (CR 603.7, 612). Asked only while the pool holds more than one part, since one part's mana is
+/// all alike: a pool of one land's mana searches nothing. Restricted mana is told apart by its restriction alone (CR
+/// 106.6); none in content is told apart by source too.
+pub fn mana_told_apart(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> Vec<ManaPart> {
     let s = q.state();
-    let mut from: Vec<ObjectId> = Vec::new();
+    let mut parts: Vec<ManaPart> = Vec::new();
     for e in s.mana_from_of(player) {
-        if e.restriction.is_none() && !from.contains(&e.source) {
-            from.push(e.source);
+        let part = (e.source, e.rider);
+        if e.restriction.is_none() && !parts.contains(&part) {
+            parts.push(part);
         }
     }
-    if from.len() < 2 {
+    if parts.len() < 2 {
         return Vec::new();
     }
+    let riding = parts.iter().any(|&(_, rider)| rider != 0);
     let rules: Vec<(ObjectId, PlayerId, &'static CardDef, Option<Linked>)> = s
         .battlefield()
         .iter()
@@ -94,13 +102,13 @@ pub fn mana_told_apart(q: &dyn Query, cards: &'static CardTable, player: PlayerI
                 .map(move |(def, by)| (id, obj.controller, def, by))
         })
         .collect();
-    if rules.is_empty() {
+    if rules.is_empty() && !riding {
         return Vec::new();
     }
-    from.retain(|&source| {
-        rules.iter().any(|&(id, controller, def, by)| def.mana_told_apart.iter().any(|rule| rule(q, &Asker { instance: None, source: id, controller, by, spell: false }, source)))
+    parts.retain(|&(source, rider)| {
+        rider != 0 || rules.iter().any(|&(id, controller, def, by)| def.mana_told_apart.iter().any(|rule| rule(q, &Asker { instance: None, source: id, controller, by, spell: false }, source)))
     });
-    from
+    parts
 }
 
 /// The kinds of zone `player` can't cast spells from right now (CR 101.2, 601.3): those a static ability of a permanent on the

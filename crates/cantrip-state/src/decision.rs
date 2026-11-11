@@ -186,7 +186,6 @@ pub const PAY_IMPROVISE: u8 = 1;
 pub const PAY_CONVOKE: u8 = 2;
 /// Waterbend (CR 701.67a): an untapped artifact or creature tapped pays {1}.
 pub const PAY_WATERBEND: u8 = 3;
-
 /// The `most` of a cost a player "may pay any number of times" as an effect resolves (`RequestKind::UnlessPays::times`,
 /// `Game::may_pay_times`): no number but what the cost's shape holds (`ManaCost::times`).
 pub const ANY_NUMBER_OF_TIMES: u32 = u32::MAX;
@@ -230,6 +229,10 @@ pub struct ActionOption {
     /// `pay_snow` chooses whether an assigned unit pays a {S} symbol.
     pub snow: bool,
     pub pay_snow: bool,
+    /// For `AssignMana`: the "when that mana is spent" delayed ability the mana carries (`ManaFrom::rider`, CR 603.7a), 0
+    /// for none. Mana of each rider is told apart from all other mana (`ManaPart`): two riders are two abilities, whose
+    /// words may differ (CR 603.7, 612), so which of them pays is the payer's choice (CR 601.2h).
+    pub rider: u32,
     /// For a mana ability offered while a cost is paid: the mana it adds is restricted so that none of it may pay this
     /// cost (CR 106.6). Activating it is still a choice the player has (CR 601.2g, 605.3a); it only fills the pool.
     pub pays_nothing: bool,
@@ -252,6 +255,7 @@ impl ActionOption {
             restriction: None,
             snow: false,
             pay_snow: false,
+            rider: 0,
             pays_nothing: false,
         }
     }
@@ -277,6 +281,8 @@ pub struct Action {
     /// `pay_snow` chooses whether an assigned unit pays a {S} symbol.
     pub snow: bool,
     pub pay_snow: bool,
+    /// For AssignMana, the delayed ability the mana carries (`ActionOption::rider`).
+    pub rider: u32,
 }
 
 impl Action {
@@ -293,6 +299,7 @@ impl Action {
             restriction: option.restriction,
             snow: option.snow,
             pay_snow: option.pay_snow,
+            rider: option.rider,
         }
     }
 }

@@ -143,18 +143,19 @@ public sealed class CardActions
     /// of a mana value or greater by that mana value. Ordinary mana a rule tells apart by the permanent that produced it
     /// (CR 106.3) is offered as that permanent's (<paramref name="source"/>), apart from the rest of its kind.
     /// </summary>
-    public ActionOptionMessage? AssignFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes = null, int manaValue = 0, ViewHandle source = default, bool snow = false) =>
-        Assignable.FirstOrDefault(option => AssignmentMatches(option, type, filter, effect, subtypes, manaValue, source, snow));
+    public ActionOptionMessage? AssignFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes = null, int manaValue = 0, ViewHandle source = default, bool snow = false, uint rider = 0) =>
+        Assignable.FirstOrDefault(option => AssignmentMatches(option, type, filter, effect, subtypes, manaValue, source, snow, rider));
 
-    /// <summary>Every allocation offered for this pool chip, including choosing whether snow mana pays {S}.</summary>
-    public IReadOnlyList<ActionOptionMessage> AssignmentsFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes = null, int manaValue = 0, ViewHandle source = default, bool snow = false) =>
-        [.. Assignable.Where(option => AssignmentMatches(option, type, filter, effect, subtypes, manaValue, source, snow))];
+    /// <summary>Every allocation offered for this pool chip, including choosing whether snow mana pays {S}. Mana a "when that
+    /// mana is spent" ability rides (CR 603.7a) is told apart by its <paramref name="rider"/> too.</summary>
+    public IReadOnlyList<ActionOptionMessage> AssignmentsFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes = null, int manaValue = 0, ViewHandle source = default, bool snow = false, uint rider = 0) =>
+        [.. Assignable.Where(option => AssignmentMatches(option, type, filter, effect, subtypes, manaValue, source, snow, rider))];
 
-    private static bool AssignmentMatches(ActionOptionMessage option, ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes, int manaValue, ViewHandle source, bool snow) =>
+    private static bool AssignmentMatches(ActionOptionMessage option, ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes, int manaValue, ViewHandle source, bool snow, uint rider) =>
         option.Produces.Count == 1 && option.Produces[0] == type
         && option.Filter == filter && option.Effect == effect
         && option.SpendSubtypes.SequenceEqual(subtypes ?? [])
-        && option.SpendManaValue == manaValue && option.Source == source && option.Snow == snow;
+        && option.SpendManaValue == manaValue && option.Source == source && option.Snow == snow && option.Rider == rider;
 
     public IReadOnlyList<ActionOptionMessage> For(ViewHandle handle) =>
         _bySource.TryGetValue(handle.Value, out List<ActionOptionMessage>? options) ? options : None;

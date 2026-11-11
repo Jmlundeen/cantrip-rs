@@ -22,8 +22,9 @@ fn fits(option: &ActionOption, action: &Action) -> bool {
     if option.granted_by != action.granted_by || option.paid_by != action.paid_by {
         return false;
     }
-    // Restricted mana is a kind of its own (CR 106.6): spending it is answered with its restriction.
-    if option.kind == ActionKind::AssignMana && (option.mana != action.mana || option.restriction != action.restriction || option.snow != action.snow || option.pay_snow != action.pay_snow) {
+    // Restricted mana is a kind of its own (CR 106.6): spending it is answered with its restriction. So is the mana each
+    // "when that mana is spent" ability rides (CR 603.7a): answered with its rider.
+    if option.kind == ActionKind::AssignMana && (option.mana != action.mana || option.restriction != action.restriction || option.snow != action.snow || option.pay_snow != action.pay_snow || option.rider != action.rider) {
         return false;
     }
     match action.color {

@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 231;
+    public const int ProtocolVersion = 232;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -248,6 +248,14 @@ public sealed class RestrictedManaView
     /// <summary>Snow-source mana quality or the {S} symbol it pays (CR 107.4h).</summary>
     [Key(8)]
     public bool Snow { get; set; }
+
+    /// <summary>
+    /// The "when that mana is spent" delayed ability this mana carries (CR 603.7a: Path of Ancestry's), a number the game
+    /// gives each; 0 for none. Mana of each rider is a kind of its own, apart from its source's other mana and other riders,
+    /// which an <see cref="ActionKindView.AssignMana"/> option names as its <c>Rider</c>.
+    /// </summary>
+    [Key(9)]
+    public uint Rider { get; set; }
 
 }
 

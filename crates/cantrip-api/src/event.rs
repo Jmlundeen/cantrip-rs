@@ -232,7 +232,9 @@ pub enum Event {
     /// of it, or a payment as something resolves. One record for each source a payment took mana from, recorded as the
     /// payment is made, so a spell's come before its `Cast`: "using mana produced by [this]", "mana from a Treasure was spent
     /// to cast it" (`History::mana_spent_to_cast`). Only recorded.
-    ManaSpent { player: PlayerId, source: ObjectId, on: ObjectId, cast: bool, mana: ManaTally, snow: u32 },
+    /// `rider` is the "when that mana is spent" delayed ability the mana carried (`ManaFrom::rider`), 0 for none: one event
+    /// for each source and rider.
+    ManaSpent { player: PlayerId, source: ObjectId, on: ObjectId, cast: bool, mana: ManaTally, snow: u32, rider: u32 },
     /// `creature` convoked `spell` (CR 702.51c): it was tapped to pay for mana in the spell's total cost (CR 702.51a,
     /// 601.2h) as the spell was cast. Recorded as it is tapped, right after its `Tapped`, so a spell's come before its
     /// `Cast`; a tap for mana or for improvise is no convoke. It names the creature and copies nothing out of it: what it

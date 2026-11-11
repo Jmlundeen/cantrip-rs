@@ -122,6 +122,7 @@ pub fn translate(
                 restriction: restriction_of(a.filter, a.effect, &a.spend_subtypes, a.spend_mana_value),
                 snow: a.snow,
                 pay_snow: a.pay_snow,
+                rider: 0,
             };
             if let Some(s) = a.sacrifice {
                 action.targets.push(Target::Object(object(handles, game, s)?));
@@ -163,7 +164,7 @@ pub fn translate(
                 } else {
                     let mut matching = options.iter().filter(alike);
                     match (matching.next(), matching.next()) {
-                        (Some(first), Some(second)) if (first.granted_by, first.paid_by) != (second.granted_by, second.paid_by) => {
+                        (Some(first), Some(second)) if (first.granted_by, first.paid_by, first.rider) != (second.granted_by, second.paid_by, second.rider) => {
                             return Err(Untranslatable::Illegal("several options are alike: say which with its OptionId".into()));
                         }
                         (Some(first), _) => first,
@@ -172,6 +173,8 @@ pub fn translate(
                 };
                 action.granted_by = taken.granted_by;
                 action.paid_by = taken.paid_by;
+                // So is the delayed ability riding the mana it assigns (CR 603.7a), which the wire does not name.
+                action.rider = taken.rider;
             }
             Answer::Act(action)
         }
@@ -315,7 +318,7 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
                         && o.index == action.index
                         && o.granted_by == action.granted_by
                         && o.paid_by == action.paid_by
-                        && (action.kind != ActionKind::AssignMana || (o.mana, o.restriction, o.snow, o.pay_snow) == (action.mana, action.restriction, action.snow, action.pay_snow))
+                        && (action.kind != ActionKind::AssignMana || (o.mana, o.restriction, o.snow, o.pay_snow, o.rider) == (action.mana, action.restriction, action.snow, action.pay_snow, action.rider))
                 })
             {
                 a.option_id = i as i32 + 1;

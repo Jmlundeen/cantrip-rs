@@ -47,7 +47,7 @@ pub(crate) enum Step {
     /// Another mana ability was activated to pay it.
     Activate(Activation),
     /// Mana of the pool was spent on it: `n` of `mana` that `source` produced, of this restriction or none.
-    Spend { restriction: Option<ManaRestriction>, mana: Mana, n: u32, source: ObjectId, snow: bool },
+    Spend { restriction: Option<ManaRestriction>, mana: Mana, n: u32, source: ObjectId, snow: bool, rider: u32 },
 }
 
 /// A mana ability's activation as the run made it.
@@ -64,6 +64,8 @@ struct Run {
     pays: (usize, usize),
     /// The objects made while it was under way: the ids from the first to the one past the last.
     objects: (usize, usize),
+    /// The "when that mana is spent" riders made while it was under way (`Trail::riders`).
+    riders: (usize, usize),
     /// The sources of the mana added while it was the innermost activation (CR 106.3): its own, and that of the triggered
     /// mana abilities it triggered (CR 605.1b, 605.4a).
     produced: Vec<ObjectId>,
@@ -81,6 +83,9 @@ pub(crate) struct Trail {
     asks: Vec<(Answer, bool)>,
     /// Each mana ability's payment of its own mana cost, in the order begun.
     pays: Vec<Vec<Step>>,
+    /// The number of each "when that mana is spent" delayed ability a mana ability made while one was under way
+    /// (`DelayedWhen::ThatMana`, `ManaFrom::rider`), in the order made.
+    riders: Vec<u32>,
     /// The activations under way, innermost last.
     open: Vec<usize>,
     /// The payments under way, innermost last.
@@ -93,6 +98,7 @@ pub(crate) struct Since {
     runs: usize,
     asks: usize,
     pays: usize,
+    riders: usize,
     /// How many objects the game had.
     objects: usize,
 }
@@ -109,6 +115,9 @@ impl Since {
 pub(crate) struct Script {
     asks: VecDeque<Answer>,
     pays: VecDeque<Vec<Step>>,
+    /// The numbers of the riders they made, made again under the same numbers (`rider`): the mana they paid with is named
+    /// by them (`Step::Spend`), as the objects they made keep their ids.
+    riders: VecDeque<u32>,
     /// The replay asked something the script has no answer to, or could not spend what it says.
     failed: bool,
 }
@@ -134,6 +143,7 @@ impl Takeback {
         t.runs.clear();
         t.asks.clear();
         t.pays.clear();
+        t.riders.clear();
         t.open.clear();
         t.paying.clear();
     }
@@ -142,7 +152,7 @@ impl Takeback {
 /// Where the trail stands now.
 pub(crate) fn since(g: &Game) -> Since {
     let t = &g.takeback.trail;
-    Since { runs: t.runs.len(), asks: t.asks.len(), pays: t.pays.len(), objects: g.state.objects.len() }
+    Since { runs: t.runs.len(), asks: t.asks.len(), pays: t.pays.len(), riders: t.riders.len(), objects: g.state.objects.len() }
 }
 
 /// A mana ability's activation begins.
@@ -157,6 +167,7 @@ pub(crate) fn begin(g: &mut Game, act: Activation) -> usize {
         asks: (t.asks.len(), t.asks.len()),
         pays: (t.pays.len(), t.pays.len()),
         objects: (objects, objects),
+        riders: (t.riders.len(), t.riders.len()),
         produced: Vec::new(),
         done: false,
     });
@@ -171,11 +182,12 @@ pub(crate) fn end(g: &mut Game, run: usize, done: bool) {
     if let Some(at) = t.open.iter().rposition(|&r| r == run) {
         t.open.truncate(at);
     }
-    let (asks, pays) = (t.asks.len(), t.pays.len());
+    let (asks, pays, riders) = (t.asks.len(), t.pays.len(), t.riders.len());
     if let Some(r) = t.runs.get_mut(run) {
         r.log.1 = log;
         r.asks.1 = asks;
         r.pays.1 = pays;
+        r.riders.1 = riders;
         r.objects.1 = objects;
         r.done = done;
     }
@@ -208,6 +220,27 @@ pub(crate) fn produced(g: &mut Game, source: ObjectId) {
             produced.push(source);
         }
     }
+}
+
+/// The number of the "when that mana is spent" delayed ability a mana ability being activated makes (`DelayedWhen::ThatMana`,
+/// `ManaFrom::rider`): one no waiting delayed ability or mana in a pool has (`GameState::new_mana_rider`), kept for a take-back
+/// of the action it is activated during. While a replay runs, the number the activation it replays made, so that what the
+/// replay spends names the same mana (`Step::Spend`); one the script lacks, or that is taken, means the replay went off it.
+pub(crate) fn rider(g: &mut Game) -> u32 {
+    let scripted = g.takeback.script.as_mut().map(|s| s.riders.pop_front());
+    let rider = match scripted {
+        Some(Some(n)) if n != 0 && !g.state.mana_rider_used(n) => n,
+        Some(_) => {
+            script_failed(g);
+            g.state.new_mana_rider()
+        }
+        None => g.state.new_mana_rider(),
+    };
+    let t = &mut g.takeback.trail;
+    if !t.open.is_empty() {
+        t.riders.push(rider);
+    }
+    rider
 }
 
 /// A mana ability's payment of its own mana cost begins.
@@ -381,6 +414,7 @@ fn script(t: &Trail, outermost: &[usize]) -> Script {
         let run = &t.runs[r];
         script.asks.extend(t.asks[run.asks.0..run.asks.1].iter().filter(|(_, paying)| !paying).map(|(a, _)| a.clone()));
         script.pays.extend(t.pays[run.pays.0..run.pays.1].iter().cloned());
+        script.riders.extend(t.riders[run.riders.0..run.riders.1].iter().copied());
     }
     script
 }
@@ -440,7 +474,7 @@ pub(crate) fn take_back(cx: &mut Cx, mark: Mark, log_mark: usize, since: Since) 
         }
     }
     let script = cx.g.takeback.script.take().unwrap_or_default();
-    ok &= !script.failed && script.asks.is_empty() && script.pays.is_empty();
+    ok &= !script.failed && script.asks.is_empty() && script.pays.is_empty() && script.riders.is_empty();
     for (zone, at, id) in set_aside.into_iter().rev() {
         let at = at.min(cx.s().zone(zone).len());
         cx.st().zone_insert(zone, at, id);
@@ -517,6 +551,7 @@ fn truncate(g: &mut Game, since: Since) {
     t.runs.truncate(since.runs);
     t.asks.truncate(since.asks);
     t.pays.truncate(since.pays);
+    t.riders.truncate(since.riders);
     t.open.retain(|&r| r < since.runs);
     t.paying.retain(|&p| p < since.pays);
 }
@@ -531,14 +566,14 @@ pub(crate) fn spend(
     mana: Mana,
     n: u32,
     pick: ManaPick,
-    taken: &mut Vec<(ObjectId, Mana, u32, bool)>,
+    taken: &mut Vec<(ObjectId, Mana, u32, bool, u32)>,
     record: bool,
 ) -> u32 {
     let from = taken.len();
     let got = cx.st().spend_mana(player, restriction, mana, n, pick, taken);
     if record {
-        for &(source, mana, n, snow) in &taken[from..] {
-            step(cx.g, Step::Spend { restriction, mana, n, source, snow });
+        for &(source, mana, n, snow, rider) in &taken[from..] {
+            step(cx.g, Step::Spend { restriction, mana, n, source, snow, rider });
         }
     }
     got

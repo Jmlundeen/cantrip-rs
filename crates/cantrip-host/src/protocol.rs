@@ -491,11 +491,17 @@ pub struct RestrictedManaView {
     /// For `ManaValueSpells` and `ManaValueOrXSpells`: the least mana value the spell may have; 0 otherwise.
     pub spend_mana_value: i32,
     /// The permanent that produced it, for ordinary mana a rule tells apart by its source (CR 106.3: "mana produced by
-    /// Barracks of the Thousand"), which `AssignMana` options name as their `Source`; none otherwise.
+    /// Barracks of the Thousand"), which `AssignMana` options name as their `Source`, and for the mana a "when that mana is
+    /// spent" ability rides (Path of Ancestry's, CR 603.7a), which is told apart from the rest of its source's; none otherwise.
     pub source: ViewHandle,
     /// Captured snow-source quality (CR 107.4h), independent of type and restriction.
     #[serde(default)]
     pub snow: bool,
+    /// The "when that mana is spent" delayed ability this mana carries (CR 603.7a), a number the game gives each; 0 for
+    /// none. Mana of each rider is shown apart, from its source's other mana and other riders, and `AssignMana` options name
+    /// it as their `Rider`.
+    #[serde(default)]
+    pub rider: u32,
 }
 
 /// One object the viewer can see. Characteristics are computed, never printed.
@@ -820,6 +826,10 @@ pub struct ActionOptionMessage {
     pub snow: bool,
     #[serde(default)]
     pub pay_snow: bool,
+    /// For `AssignMana`: the "when that mana is spent" delayed ability its mana carries (CR 603.7a), as the pool names it
+    /// (`RestrictedManaView::rider`); 0 for none. Two riders of one source are two kinds of mana its payer chooses between.
+    #[serde(default)]
+    pub rider: u32,
 }
 
 impl ActionOptionMessage {
@@ -861,6 +871,7 @@ impl ActionOptionMessage {
             cast_prototyped: false,
             snow: false,
             pay_snow: false,
+            rider: 0,
         }
     }
 }

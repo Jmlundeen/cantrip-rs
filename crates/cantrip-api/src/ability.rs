@@ -286,6 +286,7 @@ pub const fn mana_ability(cost: Cost, adds: Adds, text: &'static str) -> Ability
         any_color: adds.any_color,
         colors: adds.colors,
         restricted: adds.restricted,
+        mana_rider: adds.rider,
         ..ActivatedDef::BLANK
     })
 }
@@ -462,10 +463,21 @@ pub struct Adds {
     /// anyone may know of it before it is activated.
     pub effect: Option<ManaEffect>,
     pub capability: Option<ManaCapability>,
+    /// The card's delayed ability (`CardDef::delayed`, by index) its mana carries: "When that mana is spent ..." (`when_spent`).
+    pub rider: Option<u8>,
 }
 
 impl Adds {
-    const NOTHING: Adds = Adds { pool: ManaPool([0; 6]), any: 0, any_color: false, colors: ColorSet::NONE, restricted: None, effect: None, capability: None };
+    const NOTHING: Adds = Adds { pool: ManaPool([0; 6]), any: 0, any_color: false, colors: ColorSet::NONE, restricted: None, effect: None, capability: None, rider: None };
+
+    /// "Add [mana]. When that mana is spent [to cast ...], [effect]" (CR 603.7a, 106.3): as the ability resolves it creates
+    /// the card's delayed triggered ability `delayed` (`CardDef::delayed[delayed]`), which rides the mana it produces, through
+    /// whatever replacement effects change it (`DelayedWhen::ThatMana`). That ability's `listens` is `SPELL_CAST`, and its
+    /// `matches` says which spell cast with that mana makes it trigger, once for each mana of it spent. Path of Ancestry,
+    /// Pyromancer's Goggles, Primal Wellspring and Second City print it.
+    pub const fn when_spent(self, delayed: u8) -> Adds {
+        Adds { rider: Some(delayed), ..self }
+    }
 
     /// "Spend this mana only ..." (CR 106.6): the mana goes to the pool apart from unrestricted mana.
     /// A restriction of card types that is not one of `ManaRestriction::NAMED` fails the build.

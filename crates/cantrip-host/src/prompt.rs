@@ -133,6 +133,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     m.ability_index = i32::from(o.index);
     m.snow = o.snow;
     m.pay_snow = o.pay_snow;
+    m.rider = o.rider;
 
     // A face-down permanent's special action that turns it face up (CR 116.2b): for its mana cost (CR 701.40b, 701.58b), or
     // for the morph or disguise cost it would have face up (CR 702.37e, 702.168d), that way's keyword line naming the cost.

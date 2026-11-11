@@ -1569,6 +1569,8 @@ pub struct ActivatedDef {
     /// For a mana ability: its mana can only be spent as this restriction allows (CR 106.6), and goes to the pool
     /// apart from unrestricted mana.
     pub restricted: Option<ManaRestriction>,
+    /// The card's delayed ability "when that mana is spent" its mana carries (`Adds::when_spent`, CR 603.7a).
+    pub mana_rider: Option<u8>,
     /// Its mana cost is a waterbend cost (CR 701.67a): each generic mana of it may be paid by tapping an untapped
     /// artifact or creature its controller has, instead.
     pub waterbend: bool,
@@ -1674,6 +1676,7 @@ impl ActivatedDef {
         power_up: false,
         cost_change: None,
         restricted: None,
+        mana_rider: None,
         waterbend: false,
         tap_creatures_for_mana: false,
         equip: false,
