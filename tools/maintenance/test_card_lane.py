@@ -22,6 +22,12 @@ sys.dont_write_bytecode = True
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPT = os.path.join(HERE, "card-lane.py")
+# The messages a shared-code commit owes: what changed in the rules' words, and why. The lane refuses the
+# function-name template it can generate, so a test that makes an Engine: or Mechanics: commit writes one.
+ENGINE_MESSAGE = ("Engine: an entry is ready once its parts are\n\n"
+                  "A part that is not ready kept the whole entry from being ready, and no card could ask otherwise.")
+MECHANICS_MESSAGE = ("Mechanics: a shared recipe two cards print exactly\n\n"
+                     "Both cards had their own copy of it, so every change to the rule was made twice.")
 GIT_ENV = {"GIT_AUTHOR_NAME": "Test", "GIT_AUTHOR_EMAIL": "test@example.com",
            "GIT_COMMITTER_NAME": "Test", "GIT_COMMITTER_EMAIL": "test@example.com"}
 
@@ -66,6 +72,20 @@ print("  - it does the thing")
 relative = os.path.relpath(code, root).replace(os.sep, "/")
 print(("\n=== wrote " if written else "\n=== ") + relative + (" (characteristics only; add the behavior)" if written else " exists:"))
 '''
+
+
+def headless():
+    """A stdin with no terminal, as a worker agent's shell has: `commit` refuses rather than prompts."""
+    fake = mock.Mock()
+    fake.isatty.return_value = False
+    return fake
+
+
+def commit_args(no_issue=False, fix=False, no_review=False, message=None):
+    """What the `commit` command line hands its handler, when the test calls it rather than the subprocess."""
+    return argparse.Namespace(queue="q", id="w1", issue=None, note="", message=message or [],
+                              no_review=no_review, review_note="", no_issue=no_issue, review_lane="review",
+                              fix=fix)
 
 
 class LaneTest(unittest.TestCase):
@@ -131,6 +151,23 @@ class LaneTest(unittest.TestCase):
 
     def status(self, state, card):
         return next(entry["status"] for entry in state["cards"] if entry["name"] == card)
+
+    def write_queue(self, state):
+        path = os.path.join(self.main, ".git", "card-lane", "q", "queue.json")
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(state, f)
+        return 0
+
+    def commit_with_gates(self, lane, fix=False):
+        """`commit` with every gate passing, so the review gate is what is under test, not a card's code."""
+        gates = [{"name": "scope", "status": "pass", "summary": "checks out", "detail": "", "facts": {}}]
+        saved = os.getcwd()
+        os.chdir(self.main)
+        try:
+            with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)):
+                return lane.cmd_commit(commit_args(fix=fix))
+        finally:
+            os.chdir(saved)
 
     def worktree(self, name):
         path = os.path.join(self.tmp, name)
@@ -488,12 +525,14 @@ class LaneTest(unittest.TestCase):
         with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
             reference = f.read()
         store = lane.Store(lane.common_dir(self.main), "q")
-        made = lane.plan_commits(self.main, store, card, claim, reference, 7)
+        made = lane.plan_commits(self.main, store, card, claim, reference, 7, review=False,
+                                 messages=lane.parsed_messages([
+                                     "engine=" + ENGINE_MESSAGE, "mechanics=" + MECHANICS_MESSAGE]))
         self.assertEqual([entry["kind"] for entry in made], ["engine", "mechanics", "client", "card"])
         self.assertEqual(self.git(self.main, "log", "-4", "--format=%s").splitlines(),
                          ["Card: Card B", "Client: Thing::ThingView",
-                          "Mechanics: shared_thing::shared_recipe",
-                          "Engine: state::entry_ready"])
+                          "Mechanics: a shared recipe two cards print exactly",
+                          "Engine: an entry is ready once its parts are"])
         body = self.git(self.main, "log", "-1", "--format=%B")
         self.assertTrue(body.startswith("Card: Card B"))
         self.assertIn("Closes #7", body)
@@ -514,11 +553,13 @@ class LaneTest(unittest.TestCase):
         with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
             reference = f.read()
         store = lane.Store(lane.common_dir(self.main), "q")
-        made = lane.plan_commits(self.main, store, card, claim, reference, 7)
+        with mock.patch.object(lane.sys, "stdin", headless()):
+            made = lane.plan_commits(self.main, store, card, claim, reference, 7, review=False,
+                                     messages=lane.parsed_messages(["mechanics=" + MECHANICS_MESSAGE]))
         self.assertEqual([entry["kind"] for entry in made], ["mechanics", "card"])
         self.assertEqual(sorted(made[0]["paths"]),
                          ["crates/cantrip-cards/src/cards/card_c.rs", "crates/cantrip-mechanics/src/shared_thing.rs"])
-        self.assertTrue(made[0]["message"].startswith("Mechanics: "))
+        self.assertTrue(made[0]["message"].startswith("Mechanics: a shared recipe"))
         self.assertEqual(made[1]["message"], "Card: Card B")
         self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
 
@@ -535,11 +576,13 @@ class LaneTest(unittest.TestCase):
         with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
             reference = f.read()
         store = lane.Store(lane.common_dir(self.main), "q")
-        made = lane.plan_commits(self.main, store, card, card["claim"], reference, 7)
-        self.assertEqual(made[0]["message"], "Mechanics: shared_thing::shared_recipe")
-        body = self.git(self.main, "log", "-1", "--skip=1", "--format=%B")
-        self.assertIn("Card C now calls it instead of keeping its own copy.", body)
+        with mock.patch.object(lane.sys, "stdin", headless()):
+            made = lane.plan_commits(self.main, store, card, card["claim"], reference, 7, review=False,
+                                     messages=lane.parsed_messages(["mechanics=" + MECHANICS_MESSAGE]))
+        self.assertTrue(made[0]["message"].startswith("Mechanics: a shared recipe"))
+        self.assertIn("every change to the rule was made twice", made[0]["body"])
         self.assertNotIn("card_c", made[0]["message"])
+        self.assertNotIn("Card C", made[0]["message"])
         self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
 
     def test_a_note_names_a_mechanics_commit_the_way_a_person_would(self):
@@ -548,6 +591,124 @@ class LaneTest(unittest.TestCase):
         self.assertEqual(
             lane.surface_message("Mechanics", self.main, ["crates/cantrip-mechanics/src/shared_thing.rs"], note),
             note)
+
+    def test_a_shared_code_message_is_the_template_until_it_is_written_by_hand(self):
+        lane = load_lane()
+        # what commit generates from the changed functions is a template, not a message
+        self.assertIn("names a function", lane.message_problem("mechanics", "Mechanics: shared_thing::shared_recipe"))
+        self.assertIn("names a function", lane.message_problem("engine", "Engine: state::entry_ready"))
+        self.assertIn("names a function", lane.message_problem("engine", "Engine: entry_ready"))
+        self.assertIn("shared mechanics", lane.message_problem("engine", "Engine: shared mechanics"))
+        self.assertTrue(lane.message_problem("engine", "Engine: "))
+        self.assertIn("must start", lane.message_problem("engine", "Handler: an entry is ready") or "")
+        # a message that says what changed passes, and a Client: message is never rewritten
+        self.assertIsNone(lane.message_problem("engine", ENGINE_MESSAGE))
+        self.assertIsNone(lane.message_problem("mechanics", MECHANICS_MESSAGE))
+        self.assertIsNone(lane.message_problem("client", "Client: Thing::ThingView"))
+
+    def test_a_message_takes_a_subject_and_a_body_from_a_file(self):
+        lane = load_lane()
+        body = os.path.join(self.tmp, "body.txt")
+        with open(body, "w", encoding="utf-8", newline="\n") as f:
+            f.write("It was needed before the card could ask the question.\n")
+        given = lane.parsed_messages(["mechanics=Mechanics: the shared recipe", "mechanics2=@" + body])
+        self.assertEqual(given["mechanics"],
+                         "Mechanics: the shared recipe\n\nIt was needed before the card could ask the question.")
+        self.assertIn("names a function", lane.message_problem("mechanics", "Mechanics: shared_thing::go"))
+        with self.assertRaises(lane.Refused):
+            lane.parsed_messages(["mechanics2=orphan body"])
+        with self.assertRaises(lane.Refused):
+            lane.parsed_messages(["cards=Card: nope"])
+
+    def test_commit_refuses_a_shared_code_message_nobody_rewrote(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q",
+                                   "--no-issue").returncode, 0)
+        self.card_b_scenario()
+        self.write("crates/cantrip-mechanics/src/shared_thing.rs", "pub fn shared_recipe() {}\n")
+        saved = os.getcwd()
+        os.chdir(self.main)
+        try:
+            gates = [{"name": "scope", "status": "pass", "summary": "ok", "detail": "", "facts": {}}]
+            headless = mock.Mock()
+            headless.isatty.return_value = False
+            with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)), \
+                    mock.patch.object(lane.sys, "stdin", headless):
+                with self.assertRaises(lane.Refused) as refused:
+                    lane.cmd_commit(commit_args())
+        finally:
+            os.chdir(saved)
+        self.assertIn("rewritten", str(refused.exception))
+        self.assertIn("--message mechanics=", str(refused.exception))
+        self.assertEqual(self.status(self.state(), "Card B"), "working")
+
+    def test_a_written_message_survives_into_the_commit(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q",
+                                   "--no-issue").returncode, 0)
+        self.card_b_scenario()
+        self.write("crates/cantrip-mechanics/src/shared_thing.rs", "pub fn shared_recipe() {}\n")
+        body = os.path.join(self.tmp, "mechanics.txt")
+        with open(body, "w", encoding="utf-8", newline="\n") as f:
+            f.write(MECHANICS_MESSAGE + "\n")
+        saved = os.getcwd()
+        os.chdir(self.main)
+        try:
+            gates = [{"name": "scope", "status": "pass", "summary": "ok", "detail": "", "facts": {}}]
+            with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)):
+                code = lane.cmd_commit(commit_args(message=[f"mechanics=@{body}"]))
+        finally:
+            os.chdir(saved)
+        self.assertEqual(code, 0)
+        text = self.git(self.main, "log", "-1", "--skip=1", "--format=%B")
+        self.assertTrue(text.startswith(MECHANICS_MESSAGE.splitlines()[0]))
+        self.assertIn("every change to the rule was made twice", text)
+
+    def test_no_review_lands_the_card_at_once(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q",
+                                   "--issue", "9").returncode, 0)
+        self.card_b_scenario()
+        saved = os.getcwd()
+        os.chdir(self.main)
+        try:
+            gates = [{"name": "scope", "status": "pass", "summary": "ok", "detail": "", "facts": {}}]
+            with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)):
+                code = lane.cmd_commit(commit_args(no_review=True))
+        finally:
+            os.chdir(saved)
+        self.assertEqual(code, 0)
+        self.assertEqual(self.status(self.state(), "Card B"), "done")
+        self.assertEqual(self.git(self.main, "rev-parse", "card-lane/q"), self.git(self.main, "rev-parse", "HEAD"))
+        self.assertIn("Closes #9", self.git(self.main, "log", "-1", "--format=%B"))
+
+    def test_a_review_note_is_kept_and_a_block_needs_one(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q",
+                                   "--no-issue").returncode, 0)
+        self.card_b_scenario()
+        self.commit_with_gates(lane)
+        refused = self.lane(self.main, "review", "--queue", "q", "--block", "Card B", "--findings", "1")
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn("--note", refused.stderr)
+        blocked = self.lane(self.main, "review", "--queue", "q", "--block", "Card B", "--findings", "1",
+                            "--note", "the trigger must fire for the opponent too, so make it 'each upkeep'")
+        self.assertEqual(blocked.returncode, 0, blocked.stderr)
+        listing = self.lane(self.main, "review", "--queue", "q", "--list")
+        self.assertEqual(listing.returncode, 0, listing.stderr)
+        self.assertIn("BLOCKED", listing.stdout)
+        self.assertIn("each upkeep", listing.stdout)
+
+    def test_review_list_shows_the_waiting_cards_and_the_cap(self):
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        listing = self.lane(self.main, "review", "--queue", "q", "--list")
+        self.assertEqual(listing.returncode, 0, listing.stderr)
+        self.assertIn("0/20", listing.stdout)
+        self.assertIn("nothing is waiting", listing.stdout)
 
     def test_a_card_name_with_a_comma_survives_the_pending_list_and_next(self):
         lane = load_lane()
@@ -620,7 +781,9 @@ class LaneTest(unittest.TestCase):
         with open(os.path.join(self.main, ".card-lane", "q", "card-b", "reference.md"), encoding="utf-8") as f:
             reference = f.read()
         store = lane.Store(lane.common_dir(self.main), "q")
-        made = lane.plan_commits(self.main, store, card, card["claim"], reference, 8)
+        with mock.patch.object(lane.sys, "stdin", headless()):
+            made = lane.plan_commits(self.main, store, card, card["claim"], reference, 8, review=False,
+                                     messages=lane.parsed_messages(["engine=" + ENGINE_MESSAGE]))
         kinds = [entry["kind"] for entry in made]
         self.assertIn("engine", kinds)
         self.assertLess(kinds.index("engine"), kinds.index("card"))
@@ -681,26 +844,102 @@ class LaneTest(unittest.TestCase):
         self.assertIn("declared equivalent", summary)
         self.assertEqual(facts["survivors"], [survivor])
 
-    def test_commit_closes_the_claim_and_shares_the_branch(self):
+    def test_commit_sends_the_card_to_the_review_branch_and_not_the_queue(self):
         lane = load_lane()
         self.assertEqual(self.queue("--card", "Card B").returncode, 0)
         taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q", "--issue", "9")
         self.assertEqual(taken.returncode, 0, taken.stderr)
         self.card_b_scenario()
-        gates = [{"name": "scope", "status": "pass", "summary": "checks out", "detail": "", "facts": {}}]
-        saved = os.getcwd()
-        os.chdir(self.main)
-        try:
-            with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)):
-                code = lane.cmd_commit(argparse.Namespace(queue="q", id="w1", issue=None, note=""))
-        finally:
-            os.chdir(saved)
-        self.assertEqual(code, 0)
-        self.assertEqual(self.status(self.state(), "Card B"), "done")
-        self.assertEqual(self.git(self.main, "rev-parse", "card-lane/q"), self.git(self.main, "rev-parse", "HEAD"))
+        self.commit_with_gates(lane)
+        self.assertEqual(self.status(self.state(), "Card B"), "review")
+        head = self.git(self.main, "rev-parse", "HEAD")
+        self.assertEqual(self.git(self.main, "rev-parse", "card-lane/review"), head)
+        self.assertNotEqual(self.git(self.main, "rev-parse", "card-lane/q"), head)
         body = self.git(self.main, "log", "-1", "--format=%B")
         self.assertTrue(body.startswith("Card: Card B"))
-        self.assertIn("Closes #9", body)
+        self.assertNotIn("Closes #", body)  # only the review's pass closes the issue
+        card = next(entry for entry in self.state()["cards"] if entry["name"] == "Card B")
+        self.assertEqual(card["review"]["author"], "w1")
+        self.assertEqual(card["review"]["commits"], [head])
+
+    def test_review_pass_moves_the_card_onto_the_queue_and_writes_its_closes(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q",
+                                   "--issue", "9").returncode, 0)
+        self.card_b_scenario()
+        self.commit_with_gates(lane)
+        passed = self.lane(self.main, "review", "--queue", "q", "--pass", "Card B")
+        self.assertEqual(passed.returncode, 0, passed.stderr)
+        self.assertEqual(self.status(self.state(), "Card B"), "done")
+        self.assertEqual(self.git(self.main, "rev-parse", "card-lane/q"),
+                         self.git(self.main, "rev-parse", "HEAD"))
+        body = self.git(self.main, "log", "-1", "--format=%B")
+        self.assertTrue(body.startswith("Card: Card B"))
+        self.assertTrue(body.rstrip().endswith("Closes #9"), body)
+        self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
+
+    def test_a_card_cleared_from_the_gate_still_holds_its_place_until_it_passes(self):
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        state = self.state()
+        state["cards"][0].update(status="review", review={"author": "w9", "commits": [], "state": "blocked"})
+        self.write_queue(state)
+        status = self.lane(self.main, "status", "--queue", "q")
+        self.assertEqual(status.returncode, 0, status.stderr)
+        self.assertIn("1/20", status.stdout)
+        self.assertIn("blocked, back for its fixes", status.stdout)
+
+    def test_a_blocked_card_goes_back_to_its_author_and_its_fix_returns_to_the_gate(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q",
+                                   "--issue", "9").returncode, 0)
+        self.card_b_scenario()
+        self.commit_with_gates(lane)
+        blocked = self.lane(self.main, "review", "--queue", "q", "--block", "Card B", "--findings", "1",
+                            "--note", "the trigger fires on the wrong player's upkeep; it must read 'each upkeep', "
+                                      "so make it fire for the opponent as well")
+        self.assertEqual(blocked.returncode, 0, blocked.stderr)
+        card = next(entry for entry in self.state()["cards"] if entry["name"] == "Card B")
+        self.assertEqual(card["status"], "review")
+        self.assertEqual(card["review"]["state"], "blocked")
+        self.assertEqual(card["review"]["findings"], 1)
+        self.assertTrue(card["review"]["next_message"].startswith("the trigger fires"))
+        # the author takes it back as a claim, fixes it, and sends it back to the gate
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q").returncode, 0)
+        self.assertEqual(self.status(self.state(), "Card B"), "working")
+        self.write("crates/cantrip-cards/src/cards/card_b.rs", "// the fix\n")
+        self.commit_with_gates(lane, fix=True)
+        card = next(entry for entry in self.state()["cards"] if entry["name"] == "Card B")
+        self.assertEqual(card["status"], "review")
+        self.assertEqual(card["review"]["state"], "waiting")
+        self.assertEqual(card["review"]["bumps"], 1)
+        # and a fix that passed again does not close the issue a second time
+        self.lane(self.main, "review", "--queue", "q", "--pass", "Card B")
+        self.assertEqual(self.status(self.state(), "Card B"), "done")
+        self.assertEqual(self.git(self.main, "log", "-1", "--format=%B").count("Closes #9"), 1)
+
+    def test_the_review_gate_caps_the_queue_at_twenty_cards(self):
+        names = [f"Card {n}" for n in range(20)]
+        self.assertEqual(self.queue(*names, "--card", "Card Z").returncode, 0)
+        state = self.state()
+        for index, name in enumerate(names):
+            card = next(entry for entry in state["cards"] if entry["name"] == name)
+            card.update(status="review", review={"author": f"w{index}", "commits": [], "state": "waiting"})
+        self.write_queue(state)
+        refused = self.lane(self.main, "next", "--id", "w1", "--queue", "q")
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn("20", refused.stderr)
+        self.assertIn("review gate", refused.stderr)
+        self.assertEqual(self.status(self.state(), "Card Z"), "pending")
+        # a card cleared from the gate makes room for the next one
+        state = self.state()
+        done = next(entry for entry in state["cards"] if entry["name"] == names[0])
+        done["status"] = "done"
+        self.write_queue(state)
+        taken = self.lane(self.main, "next", "--id", "w1", "--queue", "q")
+        self.assertEqual(taken.returncode, 0, taken.stderr)
+        self.assertEqual(self.status(self.state(), "Card Z"), "working")
 
 
     def test_a_scratch_directory_does_not_block_a_claim(self):
@@ -721,14 +960,18 @@ class LaneTest(unittest.TestCase):
         os.chdir(self.main)
         try:
             with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)):
-                code = lane.cmd_commit(argparse.Namespace(queue="q", id="w1", issue=None, note="", no_issue=True))
+                code = lane.cmd_commit(commit_args(no_issue=True))
         finally:
             os.chdir(saved)
         self.assertEqual(code, 0)
-        self.assertEqual(self.status(self.state(), "Card B"), "done")
+        self.assertEqual(self.status(self.state(), "Card B"), "review")
         body = self.git(self.main, "log", "-1", "--format=%B")
         self.assertTrue(body.startswith("Card: Card B"))
         self.assertNotIn("Closes #", body)
+        passed = self.lane(self.main, "review", "--queue", "q", "--pass", "Card B")
+        self.assertEqual(passed.returncode, 0, passed.stderr)
+        self.assertEqual(self.status(self.state(), "Card B"), "done")
+        self.assertNotIn("Closes #", self.git(self.main, "log", "-1", "--format=%B"))
 
     def test_commit_refuses_without_an_issue_unless_no_issue_is_passed(self):
         lane = load_lane()

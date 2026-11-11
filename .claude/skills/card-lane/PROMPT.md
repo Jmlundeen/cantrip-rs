@@ -1,8 +1,9 @@
 # Pointing an agent at this lane
 
 `SKILL.md` beside this file is the whole card-lane instruction set: the queue, the claim, the packet, `add-cards`, the
-gates and the shared branch. A solo implementor needs no coordinator; a pool implementor gets its queue, worker id and
-token from a composer, and this file is the handoff. Any harness that can run a shell and read a file can follow it.
+gates, the two shared branches and the review gate. A solo implementor needs no coordinator; a pool implementor gets
+its queue, worker id and token from a composer, and this file is the handoff. Any harness that can run a shell and
+read a file can follow it.
 
 ## One implementor for a composer
 
@@ -43,8 +44,24 @@ Use this when a composer owns the queue and the pool, and each fresh agent takes
 > commits, so `share` puts the core first. Fill the packet's `report.json`, run
 > `python <LANE> check --id <WORKER> --queue <QUEUE> --fast` while writing, and
 > `python <LANE> commit --id <WORKER> --queue <QUEUE>` when it passes. `commit` runs every
-> gate, writes the `Engine:`/`Mechanics:`/`Client:` commits the change needs and one `Card: <Name>` commit ending
-> `Closes #N`, then closes the claim and shares the queue branch. Do not use `done` for a card you wrote.
+> gate, writes the `Engine:`/`Mechanics:`/`Client:` commits the change needs and one `Card: <Name>` commit, then sends
+> the card to the review gate. A card that passes is **not** done and does not land yet: `review --pass`, by someone
+> who did not write it, is what clears it. Do not use `done` for a card you wrote.
+>
+> **The `Engine:` and `Mechanics:` commit messages are yours to write.** They are shared code, not the card's, so the
+> subject says what changed in the rules' words - never a function's name - and the body says why; the repository's
+> `git log --format=%B --grep="^Engine:"` is the model. Your shell has no terminal, so `commit` refuses the generated
+> template rather than prompting. Pass the whole message with it:
+>
+> `python <LANE> commit --id <WORKER> --queue <QUEUE> --message mechanics="Mechanics: <what the recipe is>" --message mechanics2=@<a file with the body>`
+>
+> (`--message engine=...` for an `Engine:` commit: `--message engine="Engine: <the subject>"` and, when the body is
+> more than one line, `--message engine2=@<file>`.) A `Client:` message is left as written.
+>
+> If the review sent the card back to you (`review --block` on the issue, `review --list` shows it), fix the
+> findings on its own branch: `commit` again - with a written `Engine:`/`Mechanics:` message if the finding changes
+> shared code - `share`, then tell the composer; the lane brings it back with `review --fix`. While 20 cards wait at
+> the review gate, `next` claims no new card and says so: that is the gate being cleared, not an error.
 >
 > If the text needs something even a core change cannot express, run
 > `python <LANE> block --id <WORKER> --queue <QUEUE> --rule <CR> --note "..."`, report the gap,
@@ -89,15 +106,19 @@ Use this in a queue worktree with no pool.
 > `tools/maintenance/card-lane.py`), then work cards in the queue worktree with
 > `python <LANE> next --id <WORKER> --queue <QUEUE>`,
 > `python <LANE> check --id <WORKER> --queue <QUEUE> --fast` and
-> `python <LANE> commit --id <WORKER> --queue <QUEUE>` until the queue is empty. Do the card as
-> `add-cards` says; one `Card:` commit per card, no `Co-Authored-By`; push or land the queue branch as `claims.md`
-> says.
+> `python <LANE> commit --id <WORKER> --queue <QUEUE>` until the queue is empty, writing every `Engine:` and
+> `Mechanics:` message yourself (`--message engine=...`/`mechanics=...`). Do the card as `add-cards` says; one `Card:`
+> commit per card, no `Co-Authored-By`. Each card that passes waits at the review gate
+> (`review --list`, then `review --pass`/`--block` once you have reviewed it as `review.md` says); the queue branch
+> carries only reviewed cards, and it is what you push or land as `claims.md` says.
 
 ## Several implementors at once
 
 The composer section above is the parallel form: one queue, one lease and token per implementor, a unique `<WORKER>` for
 each, and no card named in advance. The queue is atomic, so two `next` calls never take the same card; the shared
-`card-lane/<QUEUE>` branch carries an `Engine:` or `Mechanics:` commit into the next implementor's `next`.
+`card-lane/<QUEUE>` branch carries an `Engine:` or `Mechanics:` commit into the next implementor's `next`. Cards go
+through the review gate (`card-lane/review`) before they reach that branch, and 20 at the gate stop new claims, so the
+composer keeps reviewers working: a gate nobody clears stops every implementor.
 
 What the agent needs on the machine: `python` (3.10+), `git`, `cargo` with the MSVC toolchain on Windows, and the
 Cantrip checkout. It needs no Claude-specific tool: the prompts use the shell and file reads.

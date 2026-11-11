@@ -1,4 +1,4 @@
-"""The card lane: one shared queue for a pool of implementors, and one packet per card.
+"""The card lane: one shared queue for a pool of implementors, one packet per card, and the review gate.
 
     python tools/maintenance/card-lane.py queue  [--queue NAME] [--format F | --file PATH | --card NAME ...]
     python tools/maintenance/card-lane.py queue  [--queue NAME] --backlog [--list CUBE | --file PATH]
@@ -6,6 +6,9 @@
     python tools/maintenance/card-lane.py status [--queue NAME] [--id WORKER]
     python tools/maintenance/card-lane.py check  [--queue NAME] [--id WORKER | --card NAME] [--fast]
     python tools/maintenance/card-lane.py commit --id WORKER [--queue NAME] [--issue N | --no-issue] [--note TEXT]
+                                                 [--message KIND=TEXT ...] [--no-review] [--review-note TEXT]
+    python tools/maintenance/card-lane.py review [--queue NAME] [--list] [--pass NAME | --block NAME --findings N
+                                                  --note TEXT | --fix NAME] [--sha SHA]
     python tools/maintenance/card-lane.py done   --id WORKER [--queue NAME] [--commit SHA | --no-commit] [--gated] [--note TEXT]
     python tools/maintenance/card-lane.py block  --id WORKER --rule CR [--queue NAME] [--note TEXT]
     python tools/maintenance/card-lane.py release --id WORKER --reason TEXT [--queue NAME]
@@ -26,10 +29,17 @@ parallel without taking the same card:
   away with the slot). A packet holds `brief.md`, `reference.md` (everything `new-card.py` prints: Oracle text,
   rulings, CR, prior art, test points), `prior-art.md` (the matched cards' code and a scenario), the content JSON and
   `state.json`. Nothing is written outside the worktree.
-- **One shared branch.** Every claim starts from `card-lane/<queue>`: `next` merges its tip into the slot before work,
-  and `share` (or `done`, `block`, `release`) updates it from the slot with a compare-and-swap. A `Mechanics:` or
-  `Engine:` commit made by one implementor is therefore in the next implementor's tree, so shared mechanics and
-  implemented gaps are reused instead of written twice.
+- **Two shared branches, in order.** Every claim starts from `card-lane/<queue>`: `next` merges its tip into the slot
+  before work, and `share` (or `done`, `block`, `release`) updates it from the slot with a compare-and-swap. A
+  `Mechanics:` or `Engine:` commit made by one implementor is therefore in the next implementor's tree, so shared
+  mechanics and implemented gaps are reused instead of written twice. **A card that passes every gate does not land
+  from there:** `commit` puts its commits on the review branch `card-lane/<review>` and the card waits at the review
+  gate until a reviewer passes or blocks it (`review`). `review --pass` is the only thing that moves its commits onto
+  `card-lane/<queue>`, where a fix back from the author also goes; `review --fix` brings that fix to the gate and
+  merges the queue branch, so nothing queued is ever in review twice.
+- **The review gate holds at most 20 cards** (per queue). `next` claims no new card once 20 are at the gate: a card
+  waiting on a reviewer is work in front of the queue, not work left to hand out, and a gate nobody clears stops
+  everything until it is cleared. A blocked card's own fix is not a new card and does not count twice.
 - **The pool is the context.** In a pool slot the lane reads `.git/cantrip-worktrees.json` (through
   `tools/maintenance/worktrees.py`, the pool's own model): the slot must be leased and have a joined member, and the
   claim records that lease and member. A worktree outside the pool may still be used solo, and its claim says so.
@@ -47,19 +57,32 @@ The card's quality gates are the lane's too, adapted from the add-cards flow and
   skips only those two while the card is being written.
 - **`commit`** runs every gate, then writes the `Engine:`, `Mechanics:` and `Client:` commits the change needs, each
   with only its own paths and in that order, so a core change a card needs lands before the card's own commits and is
-  on the queue's branch for the next implementor, and exactly one `Card: <Name>` commit ending `Closes #N` - or, when it only rewrites
-  scenarios the card already has, saying what it is and closing nothing; no commit carries `Co-Authored-By`. It
-  closes the claim (`done`) and shares the branch. Nothing is committed if the gate refuses. A `Mechanics:` commit is
-  not the shared function alone: it carries every existing card that already printed the same thing, refactored to
-  call that function, so those card files are in its scope and the `Card:` commit stays the card's own files.
+  on the shared branch for the next implementor, and exactly one `Card: <Name>` commit saying what it is; no commit
+  carries `Co-Authored-By`. Nothing is committed if the gate refuses. A `Mechanics:` commit is not the shared function
+  alone: it carries every existing card that already printed the same thing, refactored to call that function, so
+  those card files are in its scope and the `Card:` commit stays the card's own files.
+- **The `Engine:` and `Mechanics:` messages are rewritten, not generated.** They are shared code, not the card's, so
+  the message `commit` would write from the names of the functions changed is only a template: the lane refuses it
+  and the message is written again by a person - interactively when `commit` has a terminal, or by the worker with
+  `commit --message engine="..."`/`--message mechanics="..."` (or `@file`) when it does not. The subject says what
+  changed in the rules' words, never a function's name, and the body says why; the repository's own
+  `git log --format=%B --grep="^Engine:"` is the model. A `Client:` message is left as written.
+- **The review gate.** A card that passes `commit` goes to `card-lane/<review>` and waits; the card does not become
+  `done`, and its commit closes no issue yet. The reviewer follows `review.md` and clears it: `review --pass` moves
+  its commits onto the queue branch and writes the `Closes #N` (once - a card cleared again after a fix keeps the
+  issue it already closed); `review --block --findings N --note "..."` gives it back to its author, who fixes it,
+  commits an `Engine:`/`Mechanics:` commit of its own (rewritten the same way) when the finding changes shared code,
+  `share`s it on the queue branch, and brings it back with `review --fix`.
 """
 
+import argparse
 import argparse
 import contextlib
 import datetime
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -74,6 +97,11 @@ import worktrees  # noqa: E402  the pool's state is read through its own model, 
 
 PACKETS = ".card-lane"
 DEFAULT_QUEUE = "default"
+DEFAULT_REVIEW = "review"
+# The review gate's cap: a queue with this many cards waiting at the review branch claims no new card until one is
+# cleared (`review --pass` or `review --block`). Two less than a full review round, so the review agents always have
+# room to run beside the implementors.
+REVIEW_LIMIT = 20
 LOCK_WAIT = 30.0
 LOCK_STALE = 300.0  # a lock file this old was left by a killed command, and is broken
 LOG_KEEP = 500
@@ -176,10 +204,10 @@ def slug(name):
     return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", folded)).strip("-")
 
 
-def queue_name(value):
+def queue_name(value, what="a queue name"):
     name = str(value or DEFAULT_QUEUE).strip()
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,40}", name) or ".." in name:
-        raise Refused(f"a queue name is letters, digits, '.', '_' or '-' (up to 41), not {value!r}")
+        raise Refused(f"{what} is letters, digits, '.', '_' or '-' (up to 41), not {value!r}")
     return name
 
 
@@ -195,12 +223,14 @@ def worker_id(value):
 class Store:
     """One queue, in the repository's git common directory, shared by every worktree and changed under a lock."""
 
-    def __init__(self, common, name):
+    def __init__(self, common, name=DEFAULT_QUEUE, review=DEFAULT_REVIEW):
         self.name = queue_name(name)
+        self.review = queue_name(review, "--review")
         self.dir = os.path.join(common, "card-lane", self.name)
         self.path = os.path.join(self.dir, "queue.json")
         self.lock_path = os.path.join(self.dir, "queue.lock")
         self.branch = f"card-lane/{self.name}"
+        self.review_branch = f"card-lane/{self.review}"
         os.makedirs(self.dir, exist_ok=True)
 
     def read(self):
@@ -218,6 +248,8 @@ class Store:
                 time.sleep(0.05)
         state.setdefault("queue", self.name)
         state.setdefault("branch", self.branch)
+        state.setdefault("review", self.review)
+        state.setdefault("review_branch", self.review_branch)
         state.setdefault("created", now())
         state.setdefault("updated", now())
         state.setdefault("cards", [])
@@ -303,6 +335,25 @@ def open_in(state, path):
         if card.get("status") == "working" and norm((card.get("claim") or {}).get("worktree", "")) == norm(path):
             return card
     return None
+
+
+def in_review(state):
+    """The cards at the review gate, oldest first: the branch's cap counts these with the fixes coming back."""
+    waiting = [card for card in state["cards"] if card.get("status") == "review"]
+    return sorted(waiting, key=lambda card: (card.get("reviewed") or "", card["name"]))
+
+
+def review_pending(state):
+    """How many cards are at the review gate: waiting for a reviewer, and a blocked one back for its fixes."""
+    return len(in_review(state))
+
+
+def require_review_room(state):
+    """A card is claimed only while the review branch is short of its cap, so a reviewer never queues behind a queue."""
+    held = review_pending(state)
+    if held >= REVIEW_LIMIT:
+        raise Refused(f"{held} card(s) are at the review gate, the cap is {REVIEW_LIMIT}: claim nothing until a "
+                      f"reviewer clears one (`review --pass` or `review --block`)")
 
 
 def implemented_names(root):
@@ -417,6 +468,25 @@ def branch_tip(root, branch):
     return ref_tip(root, f"refs/heads/{branch}")
 
 
+def review_base(root, store):
+    """The review branch, cut from remote main the first time it is read."""
+    tip = branch_tip(root, store.review_branch)
+    if tip:
+        return tip
+    base = main_tip(root, refresh=True)
+    git(root, "branch", store.review_branch, base, check=False)  # another reader may have won the race
+    return branch_tip(root, store.review_branch) or base
+
+
+def queue_gap(root, store, base):
+    """The tip of the queue branch when it carries a commit the review branch lacks - a fix back from its author - or
+    None. The review branch merges it, so a queued card's commits are never in review twice."""
+    queue = branch_tip(root, store.branch)
+    if not queue or queue == base or ancestor(root, queue, base):
+        return None
+    return queue
+
+
 def ancestor(root, older, newer):
     return git(root, "merge-base", "--is-ancestor", older, newer, check=False).returncode == 0
 
@@ -527,36 +597,39 @@ def merge_branch(root, store):
     return tip
 
 
-def publish(root, store, claim=None):
-    """Move the queue's branch to this worktree's HEAD, merging in whatever other workers shared meanwhile."""
+def publish(root, store, claim=None, branch=None):
+    """Move a shared branch (the queue's, or the review lane's) to this worktree's HEAD, merging in whatever other
+    workers shared meanwhile."""
+    target = branch or store.branch
     ensure_branch(root, store)
     require_claim_base(root, store, claim)
-    branch = require_branch(root)
-    elsewhere = checked_out_elsewhere(root, store.branch)
-    if elsewhere:
-        raise Refused(f"{store.branch} is checked out in {elsewhere}: a shared branch is never checked out; "
-                      f"work on the slot's own branch")
+    here = require_branch(root)
+    if target == store.branch:
+        elsewhere = checked_out_elsewhere(root, target)
+        if elsewhere:
+            raise Refused(f"{target} is checked out in {elsewhere}: a shared branch is never checked out; "
+                          f"work on the slot's own branch")
     shared = []
     for _ in range(5):
-        old = branch_tip(root, store.branch) or ZERO
+        old = branch_tip(root, target) or ZERO
         new = head_sha(root)
         if old == new:
             return new, shared
         if old != ZERO and not ancestor(root, old, new):
-            require_clean(root, f"before {store.branch} is merged in so it can be shared")
+            require_clean(root, f"before {target} is merged in so it can be shared")
             result = git(root, "merge", "--no-edit", old, check=False)
             if result.returncode != 0:
                 git(root, "merge", "--abort", check=False)
-                raise Refused(f"{store.branch} moved on and does not merge cleanly with {branch}; nothing is left "
+                raise Refused(f"{target} moved on and does not merge cleanly with {here}; nothing is left "
                               f"half-merged:\n{(result.stdout + result.stderr).strip()[-1200:]}\n"
-                              f"Run `git merge {store.branch}`, resolve it, commit, and try again.")
+                              f"Run `git merge {target}`, resolve it, commit, and try again.")
             new = head_sha(root)
-        result = git(root, "update-ref", f"refs/heads/{store.branch}", new, old, check=False)
+        result = git(root, "update-ref", f"refs/heads/{target}", new, old, check=False)
         if result.returncode == 0:
             shared += git(root, "log", "--format=%h %s", f"{old}..{new}" if old != ZERO else f"-5 {new}").stdout.splitlines()
             return new, shared
         time.sleep(0.1)  # another worker updated the branch first: merge what it shared and retry
-    raise Refused(f"{store.branch} kept moving while this worktree tried to share; try again")
+    raise Refused(f"{target} kept moving while this worktree tried to share; try again")
 
 
 # ---- the pool -------------------------------------------------------------------------------------------------------
@@ -806,7 +879,9 @@ def card_issue(root, name):
     the work will land, even from a fork whose own issues are disabled. A failure is not fatal: the claim then carries
     no issue, which `commit` accepts (as `--no-issue`).
     """
-    tool = os.environ.get("CANTRIP_ISSUES_TOOL") or os.path.join(root, "tools", "maintenance", "card-issues.py")
+    lane_tool = os.path.join(os.path.dirname(os.path.abspath(__file__)), "card-issues.py")
+    tool = (os.environ.get("CANTRIP_ISSUES_TOOL") or (lane_tool if os.path.isfile(lane_tool) else "")
+            or os.path.join(root, "tools", "maintenance", "card-issues.py"))
     if not os.path.isfile(tool):
         return None, "card-issues.py is missing"
     result = run([sys.executable, tool, "claim", name], root)
@@ -1662,8 +1737,94 @@ def surface_message(prefix, root, paths, note=""):
     return f"{subject}\n\n{body}"
 
 
-def plan_commits(root, store, card, claim, reference, issue, note=""):
-    """Stage by category and commit Engine, Mechanics, Client, then exactly one Card commit."""
+# A rewrite of a commit message: the whole message, first line the subject. `Engine:` and `Mechanics:` are shared code,
+# not a card's work, so their messages must say what changed and why by a person reading `git log` later - the
+# repository's own `Engine:` and `Mechanics:` messages are the model (`git log --format=%B --grep="^Engine:"`).
+KIND_PREFIX = {"engine": "Engine", "mechanics": "Mechanics", "client": "Client", "card": "Card"}
+# A subject that is not a message: a function name on its own (`Engine: entry_ready`), a module and its items
+# (`Mechanics: assimilate::assimilate_all`), or nothing at all.
+NOT_A_REASON = re.compile(r"^\s*[\w.]+(?:::[\w.<>, ]+)?\s*$")
+MESSAGE_KINDS = ("engine", "mechanics")  # the commits whose message is written, never generated
+MESSAGE_RULES = (
+    (KIND_PREFIX["engine"],
+     "say what changed in the engine and why, in the words of the rule it implements - what was impossible, wrong or "
+     "missing before, and what a card can now do (-s'd: 'Engine: an unpayable resolution cost asks nothing "
+     "(CR 118.3)')"),
+    (KIND_PREFIX["mechanics"],
+     "say what recipe the shared surface now holds, written with the effect's own words rather than the function's "
+     "name (-s'd: 'Mechanics: this blocks or becomes blocked, and put cards from hand on top')"),
+)
+
+
+def message_problem(kind, text):
+    """Why an `Engine:` or `Mechanics:` message is not one, or None. The subject is one line and says what changed in
+    the rules' words; the body says why, and is owed for a subclass the lane can be holding."""
+    prefix = KIND_PREFIX.get(kind)
+    if prefix not in dict(MESSAGE_RULES):
+        return None  # a Client: or Card: message is not the lane's to rewrite
+    lines = str(text or "").replace("\r\n", "\n").strip().splitlines()
+    if not lines:
+        return f"an empty {prefix}: message"
+    subject = lines[0].strip()
+    if not subject.startswith(prefix + ": "):
+        return f"the {prefix}: commit's subject must start `{prefix}: `"
+    said = subject[len(prefix) + 2:].strip()
+    if not said:
+        return f"the {prefix}: commit's subject says what changed after `{prefix}: `"
+    if NOT_A_REASON.match(said) or re.fullmatch(r"shared mechanics", said, re.I):
+        return f"`{subject}` names a function, not what changed: " + dict(MESSAGE_RULES)[prefix]
+    return None
+
+
+def rewrite_message(root, kind, text):
+    """Ask a person for the commit message a shared-code commit owes. `CANTRIP_MESSAGE_AGENT` is the command that
+    writes it (STDIN the template, its output the whole message); with no command and no terminal (a worker agent's
+    shell) the lane refuses and the worker passes `commit --message <kind>=...`."""
+    template = text.rstrip() + "\n"
+    agent = os.environ.get("CANTRIP_MESSAGE_AGENT", "").strip()
+    if agent:
+        result = subprocess.run(shlex.split(agent, posix=os.name != "nt"), input=template, cwd=root,
+                                capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+        raise Refused(f"{agent} did not write a {KIND_PREFIX[kind]}: message: "
+                      f"{(result.stderr or result.stdout).strip()[-600:]}")
+    if not (sys.stdin and sys.stdin.isatty()):
+        raise Refused(
+            f"the {KIND_PREFIX[kind]}: commit's message has to be rewritten: it is shared code, not the card's own,\n"
+            f"  so its subject says what changed in the rules' words and its body says why\n"
+            f"  (see `git log --format=%B --grep=\"^Engine:\"`). Write it, then run:\n"
+            f"    commit --message {kind}=\"{KIND_PREFIX[kind]}: <the subject>\" --message {kind}2=@<file with the body>\n"
+            f"  Nothing is lost: the other commits are made after it, in the same run.\n"
+            f"  What is wrong with the message the lane would write: {message_problem(kind, text)}.")
+    print(f"the {KIND_PREFIX[kind]}: commit's message (the card's work is not its own, so it is written here):")
+    for line in text.splitlines():
+        print(f"  | {line}")
+    print("  " + dict(MESSAGE_RULES)[kind] + ".")
+    print("  One line at a time; end with a line holding only '.'.")
+    while True:
+        written = []
+        while True:
+            try:
+                line = input("  > ")
+            except EOFError:
+                line = "."
+            if line.strip() == ".":
+                break
+            written.append(line)
+        candidate = "\n".join(written).strip()
+        problem = message_problem(kind, candidate)
+        if problem:
+            print(f"  {problem}.")
+            continue
+        return candidate
+
+
+def plan_commits(root, store, card, claim, reference, issue, note="", messages=None, review=True):
+    """Stage by category and commit Engine, Mechanics, Client, then exactly one Card commit.
+
+    `review` is the normal path: the card is not done yet, so its commit closes nothing (the review's `--pass` writes
+    the `Closes #N` as the card is cleared). `review=False` lands the card at once and keeps the `Closes #N`."""
     entries = changed_paths(root)
     content = content_from(reference, root)
     content_rel = clean_relative(root, content) if content else None
@@ -1685,10 +1846,20 @@ def plan_commits(root, store, card, claim, reference, issue, note=""):
         raise Refused("nothing of the card is changed: its content, Rust file or a scenario")
     lands = any(path in (content_rel, card_rel) for path in groups["card"])
     prefixes = {"engine": "Engine", "mechanics": "Mechanics", "client": "Client"}
-    messages = {"engine": None,  # each named from the surface it changes, once its paths are staged
-                "mechanics": None,  # named from the shared code it adds, once its paths are staged
+    given = {kind: (value or "").strip() for kind, value in (messages or {}).items()}
+    unknown = sorted(set(given) - set(prefixes))
+    if unknown:
+        raise Refused(f"--message names the commit by kind: engine, mechanics or client, not {', '.join(unknown)}")
+    for kind, text in given.items():
+        if text and not groups[kind]:
+            raise Refused(f"--message {kind}= ... but this change has no {KIND_PREFIX[kind]}: commit to write")
+        problem = message_problem(kind, text)
+        if problem:
+            raise Refused(f"--message {kind}= ...: {problem}")
+    messages = {"engine": None,  # written here, once its paths are staged
+                "mechanics": None,  # written here, once its paths are staged
                 "client": None,
-                "card": f"Card: {card['name']}" + (f"\n\nCloses #{issue}" if lands and issue else "")}
+                "card": f"Card: {card['name']}" + (f"\n\nCloses #{issue}" if lands and issue and not review else "")}
     made = []
     for kind in ("engine", "mechanics", "client", "card"):
         paths = groups[kind]
@@ -1698,7 +1869,10 @@ def plan_commits(root, store, card, claim, reference, issue, note=""):
         added = git(root, "add", "-A", "--", *paths, check=False)
         if added.returncode != 0:
             raise Failed(f"git add failed:\n{(added.stdout + added.stderr).strip()}")
-        message = surface_message(prefixes[kind], root, paths, note) if kind in prefixes else messages[kind]
+        message = (given.get(kind) if kind != "card" else None) or (
+            surface_message(prefixes[kind], root, paths, note) if kind in prefixes else messages[kind])
+        if kind in MESSAGE_KINDS and message_problem(kind, message):
+            message = rewrite_message(root, kind, message)
         committed = git(root, "commit", "-m", message, check=False)
         if committed.returncode != 0:
             raise Refused(f"git commit failed for {kind}:\n{(committed.stdout + committed.stderr).strip()[-3000:]}")
@@ -1709,17 +1883,21 @@ def plan_commits(root, store, card, claim, reference, issue, note=""):
             raise Refused(f"the {kind} commit made {count} commits, not one; inspect the branch")
         if "co-authored-by" in body.lower():
             raise Refused(f"the {kind} commit carries Co-Authored-By, which this repository forbids; amend it")
+        if kind in MESSAGE_KINDS and message_problem(kind, body):
+            raise Refused(f"the {kind} commit was made with a message the lane will not keep: "
+                          f"{message_problem(kind, body)}")
         if kind == "card":
             if not body.startswith(f"Card: {card['name']}"):
                 raise Refused(f"the card commit's subject is not `Card: {card['name']}`: {body.splitlines()[0]}")
-            if issue and lands and not re.search(rf"^Closes #{issue}$", body, re.M):
+            if issue and lands and not review and not re.search(rf"^Closes #{issue}$", body, re.M):
                 raise Refused(f"the card commit does not end with `Closes #{issue}`")
             if issue and not lands and re.search(r"^Closes #", body, re.M):
                 raise Refused("this card commit only rewrites its scenarios, so it must not close the issue again")
             if not issue and re.search(r"^Closes #", body, re.M):
                 raise Refused("the repository's issues are disabled, so this Card commit must not close one: drop "
                               "the Closes line")
-        made.append({"kind": kind, "sha": after[:9], "message": body.splitlines()[0], "paths": paths})
+        made.append({"kind": kind, "sha": after[:9], "message": body.splitlines()[0], "paths": paths,
+                     "body": body})
     dirty = status_paths(root)
     if dirty:
         raise Refused("commits were made but the tree is still dirty:\n  " + "\n  ".join(dirty[:12]))
@@ -1805,13 +1983,360 @@ def cmd_commit(args):
     print_gates(card, root, gates, False)
     if not passed:
         raise Refused("the check failed; nothing was committed")
-    made = plan_commits(root, store, card, claim, reference, issue, note=args.note or "")
+    wants_review = not getattr(args, "no_review", False)
+    made = plan_commits(root, store, card, claim, reference, issue, note=args.note or "",
+                        messages=parsed_messages(getattr(args, "message", None)), review=wants_review)
     print(f"{card['name']}: committed")
     for commit in made:
         print(f"  {commit['sha']} {commit['message']}  ({len(commit['paths'])} path(s))")
+    if wants_review:
+        return to_review(root, store, wid, card, made, getattr(args, "review_note", None) or "")
+    print(f"{card['name']}: done, not sent to review (--no-review); on {store.branch} at {made[-1]['sha']}.")
     close_args = argparse.Namespace(id=wid, queue=store.name, commit=made[-1]["sha"], no_commit=False,
                                     note=args.note or "")
     return close(close_args, "done")
+
+
+def parsed_messages(values):
+    """The whole message for a shared-code commit, by kind, from `--message`.
+
+    `--message mechanics="Mechanics: <subject>"` is the subject - a function name in it is refused - and
+    `--message mechanics2="@<file>"` (or the text itself) is the body, appended after a blank line: the subject is
+    one shell argument however long it is, so the body goes in a file rather than a second quoting problem.
+    A plain `--message mechanics="..."` with the whole message in it is the same thing as the two together.
+    """
+    given, bodies = {}, {}
+    for value in values or []:
+        kind, sep, text = str(value).partition("=")
+        kind = kind.strip().lower()
+        body = kind.endswith("2")
+        stem = kind[:-1] if body else kind
+        if not sep or stem not in ("engine", "mechanics", "client"):
+            raise Refused(f'--message takes <engine|mechanics|client>[2]=<text or @file>, not {value!r}')
+        if text.startswith("@"):
+            path = text[1:]
+            if not os.path.isfile(path):
+                raise Refused(f"--message {kind}=@...: no file at {path}")
+            text = read_text(path)
+        (bodies if body else given)[stem] = text.replace("\r\n", "\n").strip()
+    for kind, body in bodies.items():
+        if not given.get(kind):
+            raise Refused(f"--message {kind}2= the body of a {kind} message, but --message {kind}= the subject is missing")
+        given[kind] = given[kind] + "\n\n" + body
+    return given
+
+
+def to_review(root, store, wid, card, made, note=""):
+    """Hand the card to the review gate: its commits go on the review branch, the claim becomes a card in review."""
+    base = review_base(root, store)
+    new, shared = publish(root, store, card["claim"], branch=store.review_branch)
+    start = card["claim"].get("head") or base
+    commits = git(root, "log", "--reverse", "--format=%H", f"{start}..HEAD", check=False).stdout.split()
+    shared_commits = [commit for commit in made if commit["kind"] in ("engine", "mechanics")]
+    reason = "\n\n".join(commit.get("body", "") for commit in shared_commits).strip()
+    with store.locked() as state:
+        recorded = open_claim(state, wid)
+        if recorded is None or recorded["name"] != card["name"]:
+            raise Refused(f"{wid} lost its claim while the card was going to review")
+        reviewed = now()
+        before = recorded.get("review") or {}
+        bumps = (before.get("bumps", 0) + 1) if before else 0  # back from a reviewer's block: not a first review
+        recorded.update(status="review", claim=None, commit=commits[-1] if commits else None, finished=None, review={
+            "author": wid, "commits": commits, "head": head_sha(root), "branch": store.review_branch,
+            "reviewed": reviewed, "note": note, "reason": reason, "bumps": bumps, "state": "waiting",
+            "shared": [commit["kind"] for commit in shared_commits],
+            "issue": card["claim"].get("issue"), "no_issue": card["claim"].get("no_issue")})
+        store.log(state, "review", id=wid, card=card["name"], branch=store.review_branch, commits=commits,
+                  shared=len(shared_commits))
+        held = review_pending(state)
+    print(f"{card['name']}: in review on {store.review_branch} at {new[:9]} ({held}/{REVIEW_LIMIT} at the gate).")
+    if shared_commits:
+        print(f"  it carries a {', '.join(commit['kind'] for commit in shared_commits)} commit: the reviewer weighs its"
+              f" message against the code.")
+    print(f"  clear it with `review --pass --card \"{card['name']}\"` or")
+    print(f"  `review --block --card \"{card['name']}\" --findings <n> --note \"...\"`.")
+    return 0
+
+
+# ---- the review gate -------------------------------------------------------------------------------------------------
+
+# A shared-code commit's message states, in its body, what a `git log` reader needs and a function name never says:
+# the rule (or the second card, for a mechanics recipe) it was written for and what it decides. One of these markers
+# in the body is that account, and a reviewer checks it against the code; a `--note` too short to say it, or one that
+# only names functions, is not.
+REASON_MARKERS = re.compile(
+    r"\bCR \d|[A-Za-z]+\.\d+[a-z]?\b|instead of|before|because|so that|would|never|no longer|cannot|can't|"
+    r"now |still |only |gap|wrong", re.I)
+FUNCTION_LINE = re.compile(r"^[\w.]+(?:::[^:]*)?$")
+
+
+def review_offline(root, store, card, review, commit):
+    """Bring a card's commits into a reviewer's worktree, from the review branch, and show what is under review."""
+    packet = packet_dir(root, store, card["name"])
+    line = git(root, "log", "--format=%H %s", f"{commit}^..{commit}").stdout.strip()
+    print(f"{card['name']}: review commit {line}")
+    commits = review.get("commits") or []
+    if commits:
+        changed = git(root, "diff", "--name-only", f"{commits[0]}^..{commit}", check=False).stdout.split()
+        if changed:
+            print("  the paths this review changed:")
+            for changed_path in changed:
+                print(f"    {changed_path}")
+    print(f"  packet: {packet}")
+    print("  `reference.md` holds the Oracle text, the rulings and the CR rules; `report.json` the author's evidence.")
+    print("  Review it as `review.md` says; the verdict is `review --pass` or `review --block` from the lane checkout.")
+    return 0
+
+
+def commit_kind_of(root, sha):
+    """Which commit a commit is, by its subject: engine, mechanics, client, or the card's own."""
+    subject = git(root, "log", "-1", "--format=%s", sha, check=False).stdout.strip()
+    for kind, prefix in KIND_PREFIX.items():
+        if subject.startswith(prefix + ":"):
+            return kind
+    return "card"
+
+
+def review_fix(root, store, card, review):
+    """A blocked card is back: its author shares the fix on the queue branch and brings it to the gate with `--fix`."""
+    ensure_branch(root, store)
+    base = review_base(root, store)
+    gap = queue_gap(root, store, base)
+    if gap is None:
+        raise Refused(f"{card['name']} has no fix on {store.branch}: commit the finding's fix on its own branch, "
+                      f"`share` it, then `review --fix --card \"{card['name']}\"`")
+    if not ancestor(root, gap, head_sha(root)):
+        raise Refused(f"this worktree is behind {gap}, the fix on {store.branch}: merge or rebase onto it first")
+    new, _ = publish(root, store, None, branch=store.review_branch)
+    with store.locked() as state:
+        recorded = card_of(state, card["name"])
+        if recorded is None or recorded.get("status") != "review":
+            raise Refused(f"{card['name']} left the review gate while its fix was going back")
+        recorded["review"]["bumps"] = recorded["review"].get("bumps", 0) + 1
+        recorded["review"]["head"] = new
+        recorded["review"]["reviewed"] = now()
+        recorded["review"]["state"] = "waiting"
+        store.log(state, "review-fix", card=card["name"], branch=store.review_branch, tip=new)
+    print(f"{card['name']}: the fix is back at the review gate, {store.review_branch} at {new[:9]}: review it again.")
+    return 0
+
+
+def note_problem(note):
+    """Why a `--note` does not record what a shared-code change decides, or None."""
+    text = str(note or "").strip()
+    if not text:
+        return "there is no reason written in its message"
+    lines = [line for line in text.splitlines() if line.strip()]
+    if all(FUNCTION_LINE.match(line.strip()) for line in lines):
+        return "the note only names functions; it must say what the change decides, in the rule's words"
+    if len(text) < 60 or not REASON_MARKERS.search(text):
+        return "the note is too short to record what the change decides: say why it was needed and what it decides"
+    return None
+
+
+def review_block(root, store, card, args):
+    """A finding that changes code goes back to the author. A card with a shared-code commit is cleared only once the
+    finding and its own account of the change agree on what was decided - a finding that names nothing the change
+    records is a question about the message as much as about the code."""
+    if not args.note or not args.note.strip():
+        raise Refused("--block needs --note: the finding, and what to change, for the author")
+    review = card["review"]
+    if not review.get("commits"):
+        raise Refused(f"{card['name']} has no review commit recorded")
+    shared = [sha for sha in review["commits"] if commit_kind_of(root, sha) in ("engine", "mechanics")]
+    if shared:
+        reason = review.get("reason") or ""
+        problem = note_problem(reason)
+        if problem:
+            raise Refused(f"{card['name']} carries a shared-code commit and a finding is weighed against the reason "
+                          f"written in its message: {problem}. Its author writes one with `review --pass"
+                          f" --card ... --reason \"...\"` or `commit --message <kind>=\"...\"`.")
+        problem = note_problem(args.note)
+        if problem:
+            raise Refused("--block's note is kept as the card's record of what went back:\n  " + problem)
+    with store.locked() as state:
+        recorded = card_of(state, card["name"])
+        if recorded and recorded.get("status") == "review":
+            recorded["review"]["next_message"] = args.note.strip()
+    return None
+
+
+def review_blocked(root, store, card, args):
+    review = card["review"]
+    with store.locked() as state:
+        recorded = card_of(state, card["name"])
+        if recorded is None or recorded.get("status") != "review":
+            raise Refused(f"{card['name']} left the review gate while it was being blocked")
+        recorded["review"]["state"] = "blocked"
+        recorded["review"]["findings"] = int(args.findings or 0)
+        recorded["review"]["finding_note"] = args.note.strip()
+        recorded["review"]["blocked"] = now()
+        store.log(state, "review-block", card=card["name"], findings=args.findings, branch=store.branch)
+        held = review_pending(state)
+    print(f"{card['name']}: blocked, {args.findings} finding(s) go back to {review['author']} "
+          f"({held}/{REVIEW_LIMIT} at the gate).")
+    print("  the author commits the fix on its own branch - a shared-code finding in an Engine:/Mechanics: commit "
+          "with its own reason -")
+    print("  shares it, `next --id <author>`, and brings it back with `review --fix --card \"%s\"`." % card["name"])
+    log_progress(root, card.get("issue") or review.get("issue"), "review-blocked", findings=args.findings)
+    return 0
+
+
+def closable(root, card):
+    """The issue the card closes, or None when it closes none (`next --no-issue`, or a repository without issues)."""
+    issue = card.get("issue") or card["review"].get("issue")
+    if issue:
+        return issue
+    number, said = card_issue(root, card["name"])
+    if not number:
+        print(f"note: {card['name']} closes no issue: {said.splitlines()[-1] if said else ''}", file=sys.stderr)
+    return number
+
+
+def add_closes(root, store, review, issue):
+    """Write the `Closes #N` the Card commit could not carry while the card was only in review.
+
+    The card's commit is the one under review, and a fix back from its author may sit above it. So the branch is
+    reset to that commit, its message amended, and everything above replayed with `git rebase --onto` - a history
+    rewrite git does, rather than one the lane assembles by hand out of `commit-tree` and `cherry-pick`.
+    """
+    shas = review.get("commits") or []
+    if not shas:
+        return None
+    sha = shas[-1]
+    body = git(root, "log", "-1", "--format=%B", sha).stdout.replace("\r\n", "\n").rstrip()
+    if re.search(r"^Closes #", body, re.M):
+        return None
+    tip = branch_tip(root, store.review_branch)
+    if not tip or not ancestor(root, sha, tip):
+        raise Refused(f"{sha} is not on {store.review_branch}: the card's commit is not the one in review")
+    require_clean(root, "before the Card commit's message is amended")
+    here = head_sha(root)
+    git(root, "reset", "--hard", "--quiet", sha)
+    amendment = f"{body}\n\nCloses #{issue}"
+    amended = git(root, "commit", "--amend", "--quiet", "-m", amendment, check=False)
+    if amended.returncode != 0:
+        raise Failed(f"git commit --amend failed:\n{(amended.stdout + amended.stderr).strip()[-2000:]}")
+    new = head_sha(root)
+    if tip != sha:
+        replayed = git(root, "rebase", "--quiet", "--onto", new, sha, tip, check=False)
+        if replayed.returncode != 0:
+            git(root, "rebase", "--abort", check=False)
+            git(root, "reset", "--hard", "--quiet", here)
+            raise Refused("the commits above the card's do not replay onto its amended message:\n"
+                          + (replayed.stdout + replayed.stderr).strip()[-1200:])
+        new = head_sha(root)
+    result = git(root, "update-ref", f"refs/heads/{store.review_branch}", new, tip, check=False)
+    if result.returncode != 0:
+        raise Refused(f"{store.review_branch} moved while the card's close was being written: try `review"
+                      f" --pass` again")
+    print(f"  the Card commit now ends `Closes #{issue}`")
+    return new
+
+
+def log_progress(root, issue, event, **fields):
+    """Tell the card's issue, as `card-issues.py log` does. A repository without issues is not a failure here."""
+    if not issue:
+        return
+    tool = os.path.join(root, "tools", "maintenance", "card-issues.py")
+    if not os.path.isfile(tool):
+        return
+    command = [sys.executable, tool, "log", str(issue), event]
+    if event == "review-blocked":
+        command += ["--findings", str(fields.get("findings") or 0)]
+    result = run(command, root)
+    if result.returncode != 0:
+        said = (result.stderr or result.stdout).strip().splitlines()
+        print(f"note: the progress log did not take `{event}`: {said[-1] if said else '?'}", file=sys.stderr)
+
+
+def review_pass(root, store, card):
+    """Clear a card from the gate onto the queue branch - the only way its commits leave the review branch."""
+    ensure_branch(root, store)
+    review = card["review"]
+    if not review.get("commits"):
+        raise Refused(f"{card['name']} has no review commit recorded: pass --review <sha>")
+    issue = closable(root, card)
+    if issue:
+        # the card's commit closes its issue here, on the pass that clears it - a card that came back for a fix
+        # has no `Closes` yet, so the first pass to clear it writes the only one
+        if add_closes(root, store, review, issue):
+            git(root, "reset", "--hard", "--quiet", branch_tip(root, store.review_branch))
+    new, _ = publish(root, store, None, branch=store.branch)
+    shas = git(root, "log", "--reverse", "--format=%h", f"{review['commits'][0]}^..HEAD").stdout.split()
+    last = git(root, "rev-parse", "HEAD").stdout.strip()
+    for sha in reversed(shas):
+        if commit_kind_of(root, sha) == "card":
+            last = git(root, "rev-parse", sha).stdout.strip()
+            break
+    with store.locked() as state:
+        recorded = card_of(state, card["name"])
+        if recorded is None or recorded.get("status") != "review":
+            raise Refused(f"{card['name']} left the review gate while it was being cleared")
+        recorded.update(status="done", commit=last[:9], finished=now(), claim=None)
+        recorded["review"]["cleared"] = now()
+        recorded["review"]["head"] = head_sha(root)
+        store.log(state, "review-pass", card=card["name"], branch=store.branch, commits=shas)
+        held = review_pending(state)
+    print(f"{card['name']}: reviewed and passed, on {store.branch} at {new[:9]}:")
+    for sha in shas:
+        print(f"    {sha} {git(root, 'log', '-1', '--format=%s', sha).stdout.strip()}")
+    print(f"  {held} of {REVIEW_LIMIT} at the gate. Push and land it: `git push origin {store.branch}`.")
+    log_progress(root, card.get("issue") or review.get("issue"), "review-passed")
+    return 0
+
+
+def review_list(root, store):
+    state = store.read()
+    waiting = in_review(state)
+    tip = branch_tip(root, store.review_branch)
+    print(f"review gate - {store.review_branch} at {tip[:9] if tip else 'not created yet'}")
+    print(f"  {len(waiting)}/{REVIEW_LIMIT} card(s) at the gate; a queue with {REVIEW_LIMIT} claims no new card")
+    for card in waiting:
+        review = card["review"]
+        since = f", {review['bumps']} fix(es) back" if review.get("bumps") else ""
+        blocked = "  BLOCKED, back for its fixes" if review.get("state") == "blocked" else ""
+        print(f"  {card['name']}  [{review['author']}]  since {review.get('reviewed', '?')}{since}{blocked}")
+        if review.get("state") == "blocked" and review.get("finding_note"):
+            print(f"    finding: {review['finding_note'].splitlines()[0]}")
+        for sha in review.get("commits") or []:
+            print(f"    {sha[:9]} {git(root, 'log', '-1', '--format=%s', sha, check=False).stdout.strip()}")
+    if not waiting:
+        print("  nothing is waiting: cards arrive here when `commit` passes every gate")
+    return 0
+
+
+def cmd_review(args):
+    """The review gate: list it, hand a card to a reviewer, take a fix back, and pass or block it."""
+    root = worktree_root()
+    store = Store(common_dir(root), args.queue, args.review_lane or DEFAULT_REVIEW)
+    pool_context(root)
+    named = args.pass_card or args.block or args.fix
+    if not (named or args.list):
+        raise Refused("say what the review gate does: --list, --pass --card NAME, --block --card NAME --findings N "
+                      "--note \"...\", or --fix --card NAME")
+    if sum(1 for value in (args.pass_card, args.block, args.fix) if value) > 1:
+        raise Refused("--pass, --block and --fix are one at a time: they are the review's verdict and the fix's return")
+    state = store.read()
+    if not named:
+        return review_list(root, store)
+    card = card_of_or_hint(state, named)
+    if not card.get("review"):
+        raise Refused(f"{card['name']} has never been to the review gate")
+    if args.fix and card.get("status") == "working":
+        raise Refused(f"{card['name']} is back with its author ({card['claim'] and card['claim']['id']}): the fix "
+                      f"goes to the gate from that worktree, `review --fix --card \"{card['name']}\"`")
+    if card.get("status") != "review":
+        raise Refused(f"{card['name']} is not at the review gate ({card['status']}); only a card in review is cleared")
+    review = card["review"]
+    if args.sha and not review.get("commits"):
+        review["commits"] = [ref_tip(root, args.sha) or args.sha]
+    if args.block:
+        review_block(root, store, card, args)
+        return review_blocked(root, store, card, args)
+    if args.fix:
+        return review_fix(root, store, card, review)
+    return review_pass(root, store, card)
 
 
 # ---- commands -------------------------------------------------------------------------------------------------------
@@ -1908,11 +2433,32 @@ def cmd_next(args):
             if busy:
                 raise Refused(f"this worktree already holds {busy['name']} open for {busy['claim']['id']}. One open "
                               f"card per worktree: `done`, `block` or `release` it first.")
+            # A card the review sent back is this author's work before the queue is: the fix takes a claim again, so
+            # the claim stays one per worktree and `review --fix` brings it back to the gate once it is committed.
+            back = [entry for entry in in_review(state)
+                    if entry["review"].get("author") == wid and entry["review"].get("state") == "blocked"]
+            reopened = next((entry for entry in back
+                             if not args.card or args.card.casefold() == entry["name"].casefold()), None)
+            if reopened is None:
+                require_review_room(state)  # the gate counts the wait; its own fix does not make it longer
             require_clean(root, "before opening a card")
-            if args.card:
+            if reopened is not None:
+                card = reopened
+                claim = {"id": wid, "worktree": root, "packet": packet_dir(root, store, card["name"]),
+                         "slot": context["slot"], "lease": context["lease"], "member": context["member"],
+                         "agent": context["agent"], "head": head_sha(root), "engine": True,
+                         "issue": card["review"].get("issue"), "no_issue": card["review"].get("no_issue"),
+                         "review_back": card["review"].get("findings", 0)}
+                card.update(status="working", claim=claim, commit=None, finished=None, failure=None)
+                store.log(state, "reopen", id=wid, card=card["name"], findings=card["review"].get("findings", 0))
+                fresh, opened = True, True
+            elif args.card:
                 card = card_of_or_hint(state, args.card)
                 if card["status"] == "done":
                     raise Refused(f"{card['name']} is already done in queue {store.name}")
+                if card["status"] == "review":
+                    raise Refused(f"{card['name']} is in review; a card in review is cleared from the gate "
+                                  f"(`review --pass`/`--block`), not claimed again")
                 if card["status"] == "working" and (card.get("claim") or {}).get("id") != wid:
                     raise Refused(f"{card['name']} is being worked by {card['claim']['id']}")
             else:
@@ -1920,16 +2466,21 @@ def cmd_next(args):
                 if card is None:
                     counts = {kind: sum(1 for entry in state["cards"] if entry["status"] == kind)
                               for kind in ("working", "done", "blocked", "abandoned")}
+                    held = review_pending(state)
                     raise Refused(f"queue {store.name} has no pending card (" +
-                                  ", ".join(f"{n} {kind}" for kind, n in counts.items()) + ")")
-            card.update(status="working", attempts=card.get("attempts", 0) + 1, started=now(),
-                        commit=None, finished=None, failure=None)
-            card["claim"] = {"id": wid, "worktree": root, "packet": packet_dir(root, store, card["name"]),
-                             "slot": context["slot"], "lease": context["lease"], "member": context["member"],
-                             "agent": context["agent"], "head": head_sha(root), "engine": True,
-                             "issue": issue, "no_issue": no_issue}
-            store.log(state, "claim", id=wid, card=card["name"], worktree=root, slot=context["slot"],
-                      lease=context["lease"], member=context["member"], engine=True)
+                                  ", ".join(f"{n} {kind}" for kind, n in counts.items()) +
+                                  f"; {held}/{REVIEW_LIMIT} at the review gate)")
+            if reopened is None:
+                card.update(status="working", attempts=card.get("attempts", 0) + 1, started=now(),
+                            commit=None, finished=None, failure=None)
+                card["claim"] = {"id": wid, "worktree": root, "packet": packet_dir(root, store, card["name"]),
+                                 "slot": context["slot"], "lease": context["lease"], "member": context["member"],
+                                 "agent": context["agent"], "head": head_sha(root), "engine": True,
+                                 "issue": issue, "no_issue": no_issue}
+                store.log(state, "claim", id=wid, card=card["name"], worktree=root, slot=context["slot"],
+                          lease=context["lease"], member=context["member"], engine=True)
+                claim = card["claim"]
+            card["status"] = "working"
             claim, fresh, opened = card["claim"], True, True
             packet = packet_dir(root, store, card["name"])
     try:
@@ -1981,7 +2532,7 @@ def cmd_status(args):
     leases, members = pool_claims(common)
     tip = branch_tip(root, store.branch)
     counts = {kind: sum(1 for card in state["cards"] if card["status"] == kind)
-              for kind in ("working", "done", "blocked", "abandoned", "pending")}
+              for kind in ("working", "review", "done", "blocked", "abandoned", "pending")}
     print(f"queue {store.name} ({store.path})")
     print(f"  {len(state['cards'])} card(s): " + ", ".join(f"{n} {kind}" for kind, n in counts.items() if n or kind != "pending"))
     if tip:
@@ -1991,6 +2542,16 @@ def cmd_status(args):
         print(f"  shared branch {store.branch} at {tip[:9]}: {ahead} commit(s) not on {MAIN}")
     else:
         print(f"  shared branch {store.branch}: not created yet (the first claim makes it)")
+    at_review = review_pending(state)
+    review_tip = branch_tip(root, store.review_branch)
+    print(f"  review gate {store.review_branch}"
+          + (f" at {review_tip[:9]}" if review_tip else " (not created yet)")
+          + f": {at_review}/{REVIEW_LIMIT} card(s)"
+          + (", so no new card is claimed" if at_review >= REVIEW_LIMIT else ""))
+    for card in in_review(state):
+        review = card["review"]
+        state_word = "blocked, back for its fixes" if review.get("state") == "blocked" else "waiting"
+        print(f"  review: {card['name']}  [{review['author']}]  {state_word}  since {review.get('reviewed', '?')}")
     working = [card for card in state["cards"] if card["status"] == "working"]
     if args.id:
         working = [card for card in working if card["claim"]["id"] == args.id]
@@ -2067,8 +2628,14 @@ def close(args, outcome):
         card = open_claim(state, wid)
         if card is None:
             raise Refused(f"{wid} lost its claim while {outcome} was being recorded")
-        card["status"] = "done" if outcome == "done" else ("blocked" if outcome == "block" else
-                                                           ("abandoned" if outcome == "abandon" else "pending"))
+        went_back = bool(card.get("review"))  # a card the review sent back: its fix is not a card of its own
+        if went_back and outcome != "abandon":
+            card["status"] = "review"  # a fix that is not shared yet is still reviewed; the gate's cap still counts it
+            card["review"]["state"] = "waiting" if outcome == "done" else "blocked"
+            card["review"]["findings"] = card["review"].get("findings", 0)
+        else:
+            card["status"] = "done" if outcome == "done" else ("blocked" if outcome == "block" else
+                                                               ("abandoned" if outcome == "abandon" else "pending"))
         card["commit"] = commit
         card["finished"] = now()
         card["failure"] = None
@@ -2082,6 +2649,9 @@ def close(args, outcome):
                   note=(getattr(args, "note", None) or getattr(args, "reason", None) or ""))
     what = {"done": f"done, on {store.branch} at {(new or '?')[:9]}", "block": "blocked",
             "abandon": "abandoned", "release": "back in the queue (pending)"}[outcome]
+    if went_back and outcome != "abandon":
+        what = (f"back at the review gate on {store.review_branch} at {(new or '?')[:9]}"
+                if outcome == "done" else "blocked again, back with its author")
     print(f"{card['name']}: {what}.")
     if shared:
         print("  shared now on " + store.branch + ":")
@@ -2155,6 +2725,11 @@ def command_line(argv=None):
         p.add_argument("--queue", default=DEFAULT_QUEUE, metavar="NAME",
                        help=f"the shared queue (default {DEFAULT_QUEUE}); its branch is card-lane/<NAME>")
 
+    def review_lane_flag(p):
+        p.add_argument("--review-lane", default=DEFAULT_REVIEW, metavar="LANE",
+                       help=f"the review branch under card-lane/ (default {DEFAULT_REVIEW}); the queue's review gate "
+                            f"is card-lane/<LANE>")
+
     cmd = sub.add_parser("queue", help="make or extend the shared queue")
     queue_flag(cmd)
     cmd.add_argument("--format", metavar="F", help="docs/formats/<F>.json, in its own order")
@@ -2191,14 +2766,40 @@ def command_line(argv=None):
     cmd.add_argument("--fast", action="store_true", help="skip only coverage and mutation")
     cmd.set_defaults(handler=cmd_check)
 
-    cmd = sub.add_parser("commit", help="gate the card, commit it in the add-cards shape, and close it")
+    cmd = sub.add_parser("commit", help="gate the card, commit it in the add-cards shape, and send it to review")
     queue_flag(cmd)
+    review_lane_flag(cmd)
     cmd.add_argument("--id", required=True, metavar="WORKER")
     cmd.add_argument("--issue", type=int, metavar="N", help="the GitHub issue the Card commit closes")
     cmd.add_argument("--no-issue", action="store_true",
                      help="the repository's issues are disabled: the Card commit closes none")
-    cmd.add_argument("--note", metavar="TEXT")
+    cmd.add_argument("--note", metavar="TEXT",
+                     help="a Mechanics: message written by hand, as its whole subject and body")
+    cmd.add_argument("--message", action="append", metavar="KIND=TEXT",
+                     help="a shared-code commit's message: engine=..., mechanics=... or client=..., or @path to read "
+                          "it from a file; add KIND2= for its body (a subject is one shell argument, the body reads "
+                          "better from @file). An Engine: or Mechanics: message is never generated: it is written "
+                          "here, or at the prompt when commit has a terminal")
+    cmd.add_argument("--no-review", action="store_true",
+                     help="skip the review gate and close the card at once (a card nobody needs to re-read)")
+    cmd.add_argument("--review-note", metavar="TEXT", help="what the reviewer should know, kept with the card")
     cmd.set_defaults(handler=cmd_commit)
+
+    cmd = sub.add_parser("review",
+                         help="the review gate: the cards waiting on the review branch, and their verdicts")
+    queue_flag(cmd)
+    review_lane_flag(cmd)
+    cmd.add_argument("--list", action="store_true", help="the cards at the gate, oldest first")
+    cmd.add_argument("--pass", dest="pass_card", metavar="NAME", help="the review passed: clear it onto the queue")
+    cmd.add_argument("--block", metavar="NAME",
+                     help="a finding that changes code: send the card back to its author")
+    cmd.add_argument("--fix", metavar="NAME",
+                     help="a blocked card's fix is shared: bring it back to the gate")
+    cmd.add_argument("--findings", type=int, default=0, metavar="N", help="with --block, how many block the card")
+    cmd.add_argument("--note", metavar="TEXT", help="with --block, the finding and what to change")
+    cmd.add_argument("--sha", metavar="SHA",
+                     help="the commit under review, for a card the lane did not hand to the gate itself")
+    cmd.set_defaults(handler=cmd_review)
 
     cmd = sub.add_parser("done", help="close the claim without the gates (commit is the gated path)")
     queue_flag(cmd)

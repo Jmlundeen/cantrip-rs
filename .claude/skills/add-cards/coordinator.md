@@ -34,12 +34,15 @@ core-feature agents and review agents run on Opus. Agents read only what their w
      the same id gets its open card back, and each packet is written in that implementor's worktree. `check` runs the
      card's scope, Oracle, scenario, corpus, lint, citation and report gates (`--fast` skips coverage and mutation),
      and `commit` runs every gate, writes the `Engine:`/`Mechanics:`/`Client:` commits and one `Card:` commit, then
-     closes the claim; `done`, `block` and `release` close one by hand. The lane's `card-lane/<queue>` branch is
-     shared, so a `Mechanics:` or `Engine:` commit made by one agent is merged into the next agent's `next`; it starts
-     at `origin/main`, so while the lane itself is being tested, run its script from the lane checkout against a
-     queue worktree based on `origin/main` and keep the lane's own commits off the shared branch. The lane
-     is dispatch and the mechanical gate, not the claim or the review: the card's GitHub issue is still claimed first
-     (`claims.md`), and `review.md` is still the verdict. The command model is
+     sends the card to the review gate - its `Engine:` and `Mechanics:` messages are rewritten by a person, not
+     generated from function names; `done`, `block` and `release` close one by hand. The lane's `card-lane/<queue>`
+     branch is shared, so a `Mechanics:` or `Engine:` commit made by one agent is merged into the next agent's `next`;
+     a card reaches it only when a reviewer passes it, its commits waiting on `card-lane/review` until `review --pass`
+     (and 20 cards at that gate stop `next` claiming more, so the coordinator keeps reviewers working: step 4 is
+     what clears it); both branches start at `origin/main`, so while the lane itself is being tested, run its script
+     from the lane checkout against a queue worktree based on `origin/main` and keep the lane's own commits off the
+     shared branch. The lane is dispatch and the mechanical gate, not the claim or the review: the card's GitHub issue
+     is still claimed first (`claims.md`), and `review.md` is still the verdict. The command model is
      `.claude/skills/card-lane/SKILL.md`. A fresh lane implementor gets
      `.claude/skills/card-lane/PROMPT.md`, filled with its queue, worker id and token (never its slot path or lease);
      the prompt points at that skill and at `add-cards`/`write-game-script`, and its composer section is the
