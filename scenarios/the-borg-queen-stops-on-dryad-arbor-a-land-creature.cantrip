@@ -1,0 +1,37 @@
+# Probe: The Borg Queen's walk stops on Dryad Arbor, a creature card (a Land Creature) - CR 701.13a "until they exile a
+# creature card".
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Jet
+Mox Pearl
+The Borg Queen
+Plains
+Plains x14
+
+[Bot2 Deck]
+Island x8
+Dryad Arbor
+Grizzly Bears
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Borg Queen.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Dryad Arbor.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Grizzly Bears = (absent)

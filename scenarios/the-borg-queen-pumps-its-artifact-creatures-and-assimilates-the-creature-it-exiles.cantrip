@@ -1,0 +1,70 @@
+# The Borg Queen (cast on turn 1 off two Black Lotuses, a Mox Jet and a Mox Pearl) gives artifact creatures its
+# controller has +2/+2 - its own 4/4 is a 6/6 and an Ornithopter is a 2/4 - while Bot2's own Ornithopter stays 0/2.
+# Its entry trigger targets an opponent - a third seat forces the choice (Bot1 itself and a permanent are no targets at
+# all, CR 115.1) - and the targeted opponent exiles
+# Islands, a Swamp, a Forest and a Mountain until a Grizzly Bears: the Bears is assimilated as a Borg artifact creature
+# with a +1/+1 counter (5/5 here, CR 205.1b, 614.12) and the six other exiled cards go to the bottom, so nothing is
+# left in exile and Bot2's library is the same size but for the assimilated Bears, which left it (CR 401.4, 701.13a).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Jet
+Mox Pearl
+The Borg Queen
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Ornithopter
+Island x9
+Swamp
+Forest
+Mountain
+Grizzly Bears
+Island x10
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.The Borg Queen.Cast
+Bot1.Pass
+? Bot1.Mana = {U}
+! Bot1.Target(Bot1)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.The Borg Queen.Power = 6
+Bot1.Battlefield.The Borg Queen.Toughness = 6
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Grizzly Bears.Power = 5
+Bot1.Battlefield.Grizzly Bears.Toughness = 5
+Bot1.Battlefield.Grizzly Bears.Types = Creature; Artifact
+Bot1.Battlefield.Grizzly Bears.Subtypes = Borg
+Bot1.Battlefield.Grizzly Bears.Counters.PlusOnePlusOne = 1
+Exile.Count = 0
+Bot2.Library.Count = 15
+Bot2.Battlefield = Ornithopter; Island
