@@ -1,0 +1,113 @@
+# Starship Enterprise: landfall puts four charge counters on it (CR 603.6a), and Bot2's land entering adds none (CR 109.5).
+# Station taps a creature for charge counters equal to its power (CR 702.184a): at twelve counters a Grizzly Bears of power 2
+# takes it to fourteen and one Llanowar Elves of power 1 to fifteen - still only an artifact, not a creature - and the second
+# Elves to sixteen, where it is a 4/6 artifact creature with flying in addition to its other types (CR 721.2a-b). Turn 7 that
+# flier is blocked by a Wind Drake, so its combat damage is dealt to a creature and nothing is drawn (CR 120.3, 609.3); turn 9
+# it gets through to the player and draws exactly the four damage it dealt (CR 121.1).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Starship Enterprise
+Llanowar Elves
+Llanowar Elves
+Grizzly Bears
+Forest
+Forest
+Forest
+Island x10
+
+[Bot2 Deck]
+Wind Drake
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Starship Enterprise.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Starship Enterprise.Counters.Charge = 4
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Starship Enterprise.Counters.Charge = 4
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Starship Enterprise.Counters.Charge = 8
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Island#3.Activate
+Bot2.Hand.Wind Drake.Cast
+Bot2.Pass
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Starship Enterprise.Counters.Charge = 12
+Bot1.Battlefield.Starship Enterprise.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Starship Enterprise.Counters.Charge = 14
+Bot1.Battlefield.Starship Enterprise.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Starship Enterprise.Counters.Charge = 15
+? Bot1.Battlefield.Starship Enterprise.Types = Artifact
+Bot1.Battlefield.Starship Enterprise.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Starship Enterprise.Counters.Charge = 16
+? Bot1.Battlefield.Starship Enterprise.Types = Artifact; Creature
+? Bot1.Battlefield.Starship Enterprise.Keywords = Flying
+? Bot1.Battlefield.Starship Enterprise.Power = 4
+? Bot1.Battlefield.Starship Enterprise.Toughness = 6
+[Bot1.BeginCombat]
+Bot1.Attack(Starship Enterprise)
+Bot2.Block(Wind Drake > Starship Enterprise)
+[Bot1.Main2]
+? Bot1.Hand.Count = 0
+? Bot2.Life = 20
+? Bot2.Battlefield.Wind Drake = (absent)
+[T9 Bot1.Main1]
+[Bot1.BeginCombat]
+Bot1.Attack(Starship Enterprise)
+[Bot1.Main2]
+? Bot1.Hand.Count = 5
+
+[Expect]
+Bot2.Life = 16
