@@ -1505,6 +1505,10 @@ pub enum Purpose {
     /// The player, planeswalker or battle a creature put onto the battlefield attacking attacks, chosen by its controller
     /// as it enters when the effect names none (CR 508.4): not a target.
     EnterAttacking,
+    /// "You may reselect which player or permanent that creature is attacking" (CR 508.4, 508.5): the player, planeswalker or
+    /// battle an attacking creature could attack now, chosen by the ability's controller. Not a target, and none chosen is
+    /// no change. Tuvok, Chief Tactical Officer.
+    ReselectAttackTarget,
     /// A plain "you may" with nothing more to say about it. A prompt that asks only this shows the source's text and Yes
     /// and No; a card says what it asks with [`Purpose::Ask`] instead.
     Optional,

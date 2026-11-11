@@ -4955,6 +4955,32 @@ pub fn put_onto_battlefield_attacking(cx: &mut Cx, object: ObjectId, controller:
     Ok(new)
 }
 
+/// An attacking creature attacks `defender` from now on (`Game::set_attack_target`; Tuvok, Chief Tactical Officer's
+/// "reselect which player or permanent that creature is attacking"), and its band with it (CR 702.22d).
+pub fn set_attack_target(cx: &mut Cx, attacker: ObjectId, defender: Target) {
+    // Its defending player once it attacks that (CR 508.5), and it must be something its controller could attack at all
+    // (CR 508.4a): an opponent, or a planeswalker or battle of one.
+    let Some(defending) = defending_player_of(cx.s(), defender) else { return };
+    let Some(&current) = cx.s().attackers.iter().find(|a| a.id == attacker) else { return };
+    let controlling = cx.s().obj(attacker).controller;
+    if current.target == defender || !cx.could_enter_attacking(controlling, defender) {
+        return;
+    }
+    let attacked_as = defender.object().map_or(TypeSet::NONE, |d| attackable_types(&cx.chars(d)));
+    // All creatures in an attacking band attack the same player, planeswalker or battle (CR 702.22d), so reselecting a
+    // member reselects the band.
+    let band = current.band;
+    let mut attackers = cx.s().attackers.clone();
+    for a in attackers.iter_mut() {
+        if a.id == attacker || (band != 0 && a.band == band) {
+            a.target = defender;
+            a.defending = defending;
+            a.attacked_as = attacked_as;
+        }
+    }
+    cx.st().set_attackers(attackers);
+}
+
 /// Permanents just put onto the battlefield attacking `defender` become attacking creatures (CR 506.3, 508.4), not declared
 /// as attackers, so no "whenever ... attacks" sees them; one that entered during the declare blockers step or later is
 /// unblocked (CR 508.4d). Each one that the rules keep out of combat only enters: outside a combat with attackers declared

@@ -1087,6 +1087,11 @@ pub trait Game: Query {
     /// (`create_tokens_attacking`'s limits: no combat, not a creature, a defender that can't be attacked) only stays where it
     /// is. A copy that enters attacking is made by `create_token_copies_attacking` instead, so that it is attacking as its entry is matched.
     fn enter_attacking(&mut self, entered: &[ObjectId], defender: Target);
+    /// "For each of them, you may reselect which player or permanent that creature is attacking" (CR 508.4, 508.5): an
+    /// attacking creature attacks `defender` from now on - still attacking, still declared as the attacker it was, blocked or
+    /// not as it was, and in its band (a band attacks one player, planeswalker or battle, CR 702.22d, so its other members move with it). Nothing if it is
+    /// no longer attacking, or if `defender` is not something its controller could attack. Tuvok, Chief Tactical Officer.
+    fn set_attack_target(&mut self, attacker: ObjectId, defender: Target);
     /// Makes an attacking creature blocked (CR 509.1h, 509.3c), without adding a blocking creature.
     /// Dazzling Beauty and Curtain of Light print this operation. A creature already blocked causes no new trigger.
     fn become_blocked(&mut self, attacker: ObjectId);

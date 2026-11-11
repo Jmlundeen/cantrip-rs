@@ -2565,6 +2565,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::create_token_copies_attacking(self, values, controller, count, tapped, defender).map_err(|_| Suspend)
     }
 
+    fn set_attack_target(&mut self, attacker: ObjectId, defender: Target) {
+        self.instruction(|cx| ops::set_attack_target(cx, attacker, defender), |_| true);
+    }
+
     fn enter_attacking(&mut self, entered: &[ObjectId], defender: Target) {
         ops::attack_with_tokens(self, entered, defender);
     }
