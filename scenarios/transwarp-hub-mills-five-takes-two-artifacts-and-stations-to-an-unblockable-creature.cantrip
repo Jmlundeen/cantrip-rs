@@ -1,0 +1,61 @@
+# Transwarp Hub {2}{U} (cast on turn 1 off a Black Lotus, a Mox Sapphire, a Mox Emerald and a Mox Pearl) mills the five
+# cards under its controller's library and takes two of the three artifact cards among them into hand - no more than two
+# (CR 701.17a, 608.2d). Station with the 2/2 Grizzly Bears gives two charge counters, and at two the Hub has no {T}
+# ability (the 3+ striation, CR 721.2a): the refusal proves it. A second station on turn 3 with the 1/1 Healer's Hawk
+# makes three, and now "{T}: Target creature can't be blocked this turn" is offered: the Hub taps and the targeted Grizzly
+# Bears can't be blocked this turn (CR 509.1b, 611.2c).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Transwarp Hub
+Grizzly Bears
+Healer's Hawk
+Ornithopter
+Island
+Mox Ruby
+Island
+Mox Jet
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Transwarp Hub.Cast
+? Bot1.Mana =
+! Bot1.Choose(Ornithopter; Mox Ruby; Mox Jet)
+Bot1.Choose(Ornithopter; Mox Ruby)
+Bot1.Battlefield.Transwarp Hub.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+! Bot1.Battlefield.Transwarp Hub.Activate(Target: Grizzly Bears)
+
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+Bot1.Battlefield.Transwarp Hub.Activate(Ability: Station)
+Bot1.Choose(Healer's Hawk)
+Bot1.Battlefield.Transwarp Hub.Activate(Ability: Target creature can't be blocked; Target: Grizzly Bears)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Step = Main2
+Bot1.Battlefield.Transwarp Hub.Counters.Charge = 3
+Bot1.Battlefield.Grizzly Bears.CantBeBlocked = true
+Bot1.Graveyard = Mox Jet; Island; Island; Black Lotus
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 4

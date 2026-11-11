@@ -1,0 +1,39 @@
+# Transwarp Hub's 3+ striation grants "{T}: Target creature can't be blocked this turn" and nothing below three
+# (CR 721.2a). One station with the 2/2 Grizzly Bears leaves exactly two charge counters, so the card says only what it
+# printed: the granted line is absent from its rules and the Hub is untapped at the end of the turn.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Transwarp Hub
+Grizzly Bears
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Transwarp Hub.Cast
+Bot1.Choose()
+Bot1.Battlefield.Transwarp Hub.Activate(Ability: Station)
+Bot1.Choose(Grizzly Bears)
+[T1 Bot1.End]
+! Bot1.Battlefield.Transwarp Hub.Activate(Target: Grizzly Bears)
+
+[Expect]
+Turn = 1
+Step = End
+Bot1.Battlefield.Transwarp Hub.Counters.Charge = 2
+Bot1.Battlefield.Transwarp Hub.Tapped = false
+Bot1.Battlefield.Grizzly Bears.CantBeBlocked = (absent)
