@@ -1,0 +1,88 @@
+# S.S. Botany Bay: its {T} ability exiles one card from each graveyard. Bot1's graveyard holds two cards it may exile
+# (Bear Cub and a Black Lotus), and "you may exile A card" takes exactly one: the question must refuse both. Only the
+# creature card Bot1 owns is linked to Botany Bay, so when the now-creature Botany Bay deals combat damage, that Bear Cub
+# returns to Bot1's hand, and the Grizzly Bears Bot2 exiled - a card Bot1 does not own - stays in exile.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Pearl
+S.S. Botany Bay
+Bear Cub
+Forest
+Gigantosaurus
+Forest
+Island x9
+
+[Bot2 Deck]
+Forest x5
+Grizzly Bears
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.S.S. Botany Bay.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bear Cub.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Bear Cub > Bot2)
+Bot2.Block(Grizzly Bears > Bear Cub)
+[T5 Bot1.Main2]
+? Bot1.Graveyard = Bear Cub; Black Lotus
+? Exile =
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Gigantosaurus.Cast
+Bot1.Pass
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.S.S. Botany Bay.Counters.Charge = 10
+? Bot1.Battlefield.S.S. Botany Bay.Types = Artifact; Creature
+? Exile =
+[T7 Bot1.Main1]
+# Nothing is exiled with Botany Bay yet: the combat-damage trigger resolves and returns nothing.
+Bot1.Attack(S.S. Botany Bay > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+? Exile =
+? Bot2.Life = 17
+# Now Bot1 exiles one card from each graveyard; "you may exile a card" makes the question refuse both.
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Each opponent exiles a card from their graveyard. You may exile a card from your graveyard.)
+Bot2.Choose(Grizzly Bears)
+! Bot1.Choose(Bear Cub; Black Lotus)
+Bot1.Choose(Bear Cub)
+? Exile = Bear Cub; Grizzly Bears
+? Bot1.Graveyard = Black Lotus; Black Lotus
+
+[Expect]
+Turn = 9
+Exile = Bear Cub; Grizzly Bears
+Bot1.Graveyard = Black Lotus; Black Lotus
+Bot2.Life = 17

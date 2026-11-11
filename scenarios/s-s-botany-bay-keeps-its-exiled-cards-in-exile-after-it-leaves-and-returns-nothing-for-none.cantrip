@@ -1,0 +1,82 @@
+# S.S. Botany Bay: its {T} ability's exile is linked to it (CR 607.2a) but is NOT "until it leaves the battlefield" -
+# destroying the artifact leaves the exiled cards in exile, because CR 610.3 does not apply to an exile with no stated
+# duration (g.exile_with(..., until_leaves = false)); and the combat-damage trigger resolving with nothing exiled with
+# it returns nothing and does not fail.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Pearl
+S.S. Botany Bay
+Bear Cub
+Forest
+Gigantosaurus
+Forest
+Island x9
+
+[Bot2 Deck]
+Forest x5
+Grizzly Bears
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.S.S. Botany Bay.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bear Cub.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Bear Cub > Bot2)
+Bot2.Block(Grizzly Bears > Bear Cub)
+[T5 Bot1.Main2]
+? Bot1.Graveyard = Bear Cub; Black Lotus
+? Exile =
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Gigantosaurus.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.S.S. Botany Bay.Counters.Charge = 10
+? Bot1.Battlefield.S.S. Botany Bay.Types = Artifact; Creature
+? Exile =
+[T7 Bot1.Main1]
+# Botany Bay is a creature (the 8+ striation) and nothing is exiled with it, so the combat-damage trigger returns nothing.
+Bot1.Attack(S.S. Botany Bay > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+? Exile =
+? Bot2.Life = 17
+
+[Expect]
+Turn = 7
+Exile =
+Bot2.Life = 17

@@ -1,0 +1,72 @@
+# S.S. Botany Bay: the {T} ability's exile has no stated duration, so the cards it exiles stay exiled for good - CR 610.3's
+# return-on-leaving applies only to an exile that explicitly lasts until the source leaves. Shattering the artifact after
+# it exiled cards leaves those cards in exile (g.exile_with(..., until_leaves = false)).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+S.S. Botany Bay
+Forest
+Shatter
+Memnite
+Memnite
+Bear Cub
+Grizzly Bears
+Island x10
+
+[Bot2 Deck]
+Forest x5
+Memnite
+Grizzly Bears
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.S.S. Botany Bay.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Memnite#1.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Memnite.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+# A Memnite trades with Bot2's Memnite, putting a creature card in each graveyard to exile.
+Bot1.Attack(Memnite > Bot2)
+Bot2.Block(Memnite > Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+? Bot1.Graveyard = Memnite; Black Lotus
+# The {T} ability exiles a creature card from each graveyard and links both to Botany Bay.
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Each opponent exiles a card from their graveyard. You may exile a card from your graveyard.)
+Bot2.Choose(Memnite)
+Bot1.Choose(Memnite)
+? Exile = Memnite; Memnite
+# Destroy it: the exiled Memnite is not "until ~ leaves the battlefield", so it stays in exile.
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Shatter.Cast(Bot1.Battlefield.S.S. Botany Bay)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Shatter; S.S. Botany Bay; Black Lotus; Black Lotus
+? Exile = Memnite; Memnite
+? Bot1.Battlefield = Memnite
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Shatter; S.S. Botany Bay; Black Lotus; Black Lotus
+Exile = Memnite; Memnite
+Bot1.Battlefield = Memnite

@@ -1,0 +1,55 @@
+# S.S. Botany Bay: "{T}: Each opponent exiles a card from their graveyard. You may exile a card from your graveyard."
+# Bot2's exile reads only Bot2's graveyard (a Grizzly Bears, which Bot1's graveyard never held) and Bot1's only Bot1's
+# (a Bear Cub); both exiles are mandatory-or-may as written, and the {3} was paid exactly (CR 608.2d, 406.2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+S.S. Botany Bay
+Bear Cub
+Forest x14
+
+[Bot2 Deck]
+Forest x5
+Grizzly Bears
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.S.S. Botany Bay.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bear Cub.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Bear Cub > Bot2)
+Bot2.Block(Grizzly Bears > Bear Cub)
+[T5 Bot1.Main2]
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Each opponent exiles a card from their graveyard. You may exile a card from your graveyard.)
+Bot2.Choose(Grizzly Bears)
+Bot1.Choose(Bear Cub)
+
+[Expect]
+Turn = 5
+Exile = Grizzly Bears; Bear Cub
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = S.S. Botany Bay; Mox Emerald; Mox Pearl
+Bot2.Life = 20

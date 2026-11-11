@@ -1,0 +1,89 @@
+# S.S. Botany Bay: the exile links to the ability's source, and "Whenever S.S. Botany Bay deals combat damage to a
+# player, return each creature card you own exiled with it to the battlefield." A Bear Cub (Bot1's) and a Grizzly Bears
+# (Bot2's) die in combat, and Botany Bay's next {T} exiles one from each graveyard with the link; Bot1 stations a
+# Gigantosaurus (power 10) to reach the 8+ striation in one activation and attacks the turn it got the counter: Bot2
+# goes from 20 to 17 and Bot1's Bear Cub comes back, while Bot2's Grizzly Bears - not owned by Bot1 - stays exiled
+# (CR 607.2a, 510.2, 702.184a, 721.2a-b, 108.3).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Pearl
+S.S. Botany Bay
+Bear Cub
+Forest
+Gigantosaurus
+Forest
+Island x9
+
+[Bot2 Deck]
+Forest x5
+Grizzly Bears
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.S.S. Botany Bay.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bear Cub.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Grizzly Bears.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Bear Cub > Bot2)
+Bot2.Block(Grizzly Bears > Bear Cub)
+[T5 Bot1.Main2]
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Each opponent exiles a card from their graveyard. You may exile a card from your graveyard.)
+Bot2.Choose(Grizzly Bears)
+Bot1.Choose(Bear Cub)
+? Exile = Grizzly Bears; Bear Cub
+? Bot1.Graveyard = Black Lotus
+? Bot2.Graveyard.Count = 0
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Gigantosaurus.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Station)
+Bot1.Choose(Gigantosaurus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.S.S. Botany Bay.Types = Artifact; Creature
+? Bot1.Battlefield.S.S. Botany Bay.Power = 3
+? Bot1.Battlefield.S.S. Botany Bay.Keywords = Flying
+Bot1.Attack(S.S. Botany Bay > Bot2)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Bear Cub.Power = 2
+? Exile = Grizzly Bears
+? Bot2.Life = 17
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Bear Cub; Forest; Gigantosaurus; Mox Emerald; Mox Pearl; S.S. Botany Bay
+Bot1.Battlefield.S.S. Botany Bay.Counters.Charge = 10
+Bot1.Graveyard = Black Lotus; Black Lotus
+Exile = Grizzly Bears
+Bot2.Life = 17

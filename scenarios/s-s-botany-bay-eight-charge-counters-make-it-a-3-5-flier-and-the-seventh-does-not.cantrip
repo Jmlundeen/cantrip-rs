@@ -1,0 +1,86 @@
+# S.S. Botany Bay: the 8+ striation is exactly eight charge counters (CR 721.2a-b). Craw Wurm (power 6) and one Memnite
+# (power 1) put seven, which is one short: it stays a plain artifact with no base P/T of 3/5 and no flying. Stationing the
+# second Memnite makes eight, and only then is it a 3/5 artifact creature with flying.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+S.S. Botany Bay
+Forest x4
+Craw Wurm
+Memnite
+Memnite
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.S.S. Botany Bay.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Hand.Craw Wurm.Cast
+Bot1.Pass
+Bot1.Hand.Memnite.Cast
+Bot1.Pass
+Bot1.Hand.Memnite#1.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Craw Wurm.Power = 6
+? Bot1.Battlefield.Memnite#1.Power = 1
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Station)
+Bot1.Choose(Craw Wurm)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.S.S. Botany Bay.Counters.Charge = 6
+? Bot1.Battlefield.S.S. Botany Bay.Types = Artifact
+? Bot1.Battlefield.S.S. Botany Bay.Keywords = (absent)
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Station)
+Bot1.Choose(Memnite#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.S.S. Botany Bay.Counters.Charge = 7
+? Bot1.Battlefield.S.S. Botany Bay.Types = Artifact
+? Bot1.Battlefield.S.S. Botany Bay.Keywords = (absent)
+Bot1.Battlefield.S.S. Botany Bay.Activate(Ability: Station)
+Bot1.Choose(Memnite#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.S.S. Botany Bay.Counters.Charge = 8
+? Bot1.Battlefield.S.S. Botany Bay.Types = Artifact; Creature
+? Bot1.Battlefield.S.S. Botany Bay.Power = 3
+? Bot1.Battlefield.S.S. Botany Bay.Toughness = 5
+? Bot1.Battlefield.S.S. Botany Bay.Keywords = Flying
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.S.S. Botany Bay.Counters.Charge = 8
+Bot1.Battlefield.S.S. Botany Bay.Types = Artifact; Creature
+Bot1.Battlefield.S.S. Botany Bay.Power = 3
+Bot1.Battlefield.S.S. Botany Bay.Toughness = 5
+Bot1.Battlefield.S.S. Botany Bay.Keywords = Flying
