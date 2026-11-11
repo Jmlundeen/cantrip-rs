@@ -1,0 +1,82 @@
+# Shore Leave Planet: "This land enters tapped. {T}: Add {U}. {4}{U}: This land becomes a copy of target creature you control
+# until end of turn, except it isn't legendary and it's a Robot artifact in addition to its other types." It enters tapped
+# (CR 614.1d) and taps for one blue. On turn 5 it copies Bot1's own Grizzly Bears - Bot2's Llanowar Elves refused, "you
+# control" - so it is a 2/2 Bear that is also a Robot artifact (CR 707.9b, "in addition to its other types"); the effect ends
+# in the cleanup step (CR 514.2) and it is a land again on turn 7. On turn 7 it copies the legendary Isamaru and both stay,
+# which is what pins "it isn't legendary" (CR 704.5j).
+
+[Bot1 Deck]
+Shore Leave Planet
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Emerald
+Isamaru, Hound of Konda
+Grizzly Bears
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Shore Leave Planet.Play
+? Bot1.Battlefield.Shore Leave Planet.Tapped = true
+? Bot1.Battlefield.Shore Leave Planet.Types = Land
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Isamaru, Hound of Konda.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Grizzly Bears.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Shore Leave Planet.Activate(Ability: Add {U})
+? Bot1.Mana = {U}
+! Bot1.Battlefield.Shore Leave Planet.Activate(Ability: Add {U})
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Shore Leave Planet.Activate(Ability: Add {U})
+! Bot1.Battlefield.Shore Leave Planet.Activate(Bot2.Battlefield.Llanowar Elves; Ability: becomes a copy)
+Bot1.Battlefield.Shore Leave Planet.Activate(Bot1.Battlefield.Grizzly Bears; Ability: becomes a copy)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Grizzly Bears#1.Types = Creature; Artifact
+? Bot1.Battlefield.Grizzly Bears#1.Subtypes = Bear; Robot
+? Bot1.Battlefield.Grizzly Bears#1.Power = 2
+? Bot1.Battlefield.Shore Leave Planet = (absent)
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Shore Leave Planet.Types = Land
+? Bot1.Battlefield.Shore Leave Planet.Subtypes = Planet
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Shore Leave Planet.Activate(Ability: Add {U})
+Bot1.Battlefield.Shore Leave Planet.Activate(Bot1.Battlefield.Isamaru, Hound of Konda; Ability: becomes a copy)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Isamaru, Hound of Konda#1.Types = Creature; Artifact
+? Bot1.Battlefield.Isamaru, Hound of Konda#2.Supertypes = Legendary
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Battlefield.Shore Leave Planet.Types = Land
+Bot1.Battlefield.Shore Leave Planet.Subtypes = Planet
