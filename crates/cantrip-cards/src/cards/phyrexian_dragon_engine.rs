@@ -19,12 +19,9 @@ fn enters_from_your_graveyard(q: &dyn Query, source: ObjectId, event: &Event) ->
 
 /// You may discard your hand. If you do, draw three cards (an empty hand discarded still counts).
 fn rummage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let player = item.controller;
-    if !effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
-        return Ok(());
+    if effects::may_discard_hand(g, item, &ASK)?.is_some() {
+        g.draw(item.controller, 3);
     }
-    g.discard_hand(player);
-    g.draw(player, 3);
     Ok(())
 }
 

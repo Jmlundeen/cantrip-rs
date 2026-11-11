@@ -7,10 +7,8 @@ const ASK: Question = Question::new("Discard", "discard your hand?", "If you do,
 /// "You may discard your hand. If you do, draw two cards" (CR 608.2c-d, 701.9): the controller is asked as it resolves; an empty hand
 /// may be discarded too, and that counts as having done it.
 fn may_discard_hand_to_draw_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let player = item.controller;
-    if effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
-        g.discard_hand(player);
-        g.draw(player, 2);
+    if effects::may_discard_hand(g, item, &ASK)?.is_some() {
+        g.draw(item.controller, 2);
     }
     Ok(())
 }

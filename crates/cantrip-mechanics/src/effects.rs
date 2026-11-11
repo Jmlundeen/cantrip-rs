@@ -982,6 +982,20 @@ pub fn discard_hand_then_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Res
     Ok(())
 }
 
+/// "You may discard your hand" (CR 608.2c-d, 701.9): its controller is asked as the ability resolves, and their whole hand
+/// goes at once if they accept. An empty hand may be discarded too, and that counts as having done it.
+///
+/// Says how many cards were discarded, for a "draw a card for each card discarded this way" (CR 121.1) - which is settled
+/// before any card is drawn - or `None` when the player declined. Narset, Jeskai Waymaster, Vaultguard Trooper, Phyrexian
+/// Dragon Engine and U.S.S. Enterprise-C, Time-Tossed print it.
+pub fn may_discard_hand(g: &mut dyn Game, item: &StackItem, question: &'static Question) -> Result<Option<u32>, Suspend> {
+    let player = item.controller;
+    if !ask_may(g, player, item.object, Purpose::Ask(question))? {
+        return Ok(None);
+    }
+    Ok(Some(g.discard_hand(player).len() as u32))
+}
+
 /// "Each player discards their hand, then draws seven cards": every player, in turn order from the active player
 /// (CR 101.4), discards together and then draws; nobody is asked, a whole hand leaving nothing to choose. Wheel of Fortune
 /// and Reforge the Soul print it.

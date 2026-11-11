@@ -9,9 +9,9 @@ const ASK: Question = Question::new("Discard", "discard your hand?", "If you do,
 /// its controller cast count, not an opponent's, and the count is not changed by the discard.
 fn may_discard_hand_to_draw_for_spells(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    if effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
+    if effects::may_discard_hand(g, item, &ASK)?.is_some() {
         let spells = g.history().casts_by(player).count();
-        effects::discard_hand_then_draw(g, item, spells as u32)?;
+        g.draw(player, spells as u32);
     }
     Ok(())
 }
