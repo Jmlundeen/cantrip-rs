@@ -2856,3 +2856,17 @@ pub fn untap_other_creatures_you_control(g: &mut dyn Game, item: &StackItem) -> 
     g.untap_together(&creatures);
     Ok(())
 }
+
+/// "Put N charge counters on this artifact" (CR 122.1a): the source itself, as the ability resolves. Weather Maker prints it
+/// with one, Starship Enterprise with four.
+pub fn charge_counters_on_self<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_counters(item.object, CounterKind::Charge, N);
+    Ok(())
+}
+
+/// "Draw that many cards" (CR 121.1, 608.2c): as many cards as the combat damage the trigger's event dealt to the player
+/// (`StackItem::matched_damage_amount`). April, Reporter of the Weird prints it before a discard, Starship Enterprise alone.
+pub fn draw_that_many(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.draw(item.controller, item.matched_damage_amount());
+    Ok(())
+}

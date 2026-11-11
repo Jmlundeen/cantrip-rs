@@ -1,11 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::{discard_chosen, triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_EVENT};
+use cantrip_mechanics::{discard_chosen, effects, triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_EVENT};
 use cantrip_oracle as oracle;
 
 /// "Draw that many cards, then discard a card" (CR 121.1, 701.9): as many cards as the combat damage April dealt to the player (the
 /// trigger's `event_amount`), all drawn before the discard is chosen.
 fn draw_that_many_then_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.draw(item.controller, item.matched_damage_amount());
+    effects::draw_that_many(g, item)?;
     discard_chosen(g, item.controller, item.object, 1)?;
     Ok(())
 }

@@ -2,15 +2,9 @@ use cantrip_api::*;
 use cantrip_mechanics::{effects, targets, triggers::LANDFALL};
 use cantrip_oracle as oracle;
 
-/// "Put a charge counter on this artifact."
-fn charge(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::Charge, 1);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(LANDFALL, charge, "Landfall \u{2014} Whenever a land you control enters, put a charge counter on this artifact."),
+        triggered(LANDFALL, effects::charge_counters_on_self::<1>, "Landfall \u{2014} Whenever a land you control enters, put a charge counter on this artifact."),
         mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any color."),
         mana_ability(
             TAP.and(remove_counters(CounterKind::Charge, 2)),
