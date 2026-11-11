@@ -1,0 +1,65 @@
+# The Guardian of Forever ({3} legendary artifact creature, 0/6, defender). On turn 1 it is cast with no other creature around
+# it but Kobolds of Kher Keep, and with four mana floating the activation is refused all the same: "another nontoken
+# creature" is not the Guardian itself and a token would not do (CR 109.1, 111.1, 118.3). On turn 3 the Kobolds, which could
+# attack, is kept out of combat and the Guardian is refused as an attacker while it is neither tapped nor summoning sick
+# (CR 702.3). It is then sacrificed as part of the activation's cost, paid exactly {4} from four Moxen with the pool empty
+# afterwards (CR 601.2h, 608.2h), and the delayed ability returns that card - the same object - under Bot1's control at the
+# beginning of that turn's end step (CR 603.7c, 400.7).
+
+[Bot1 Deck]
+The Guardian of Forever
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Black Lotus
+Kobolds of Kher Keep
+Plains x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Guardian of Forever.Cast
+? Bot1.Mana =
+[T1 Bot1.Main2]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+? Bot1.Mana = {W}{W}{W}{G}
+! Bot1.Battlefield.The Guardian of Forever.Activate
+Bot1.Hand.Kobolds of Kher Keep.Cast
+[T3 Bot1.Attackers]
+! Bot1.Attack(The Guardian of Forever > Bot2)
+Bot1.Attack()
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.The Guardian of Forever.Activate
+Bot1.Choose(Kobolds of Kher Keep)
+? Bot1.Mana =
+? Bot1.Graveyard = Kobolds of Kher Keep; Black Lotus
+? Bot1.Battlefield.Kobolds of Kher Keep = (absent)
+? Bot1.Battlefield.The Guardian of Forever.Toughness = 6
+? Bot1.Battlefield.The Guardian of Forever.Tapped = false
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Kobolds of Kher Keep.Toughness = 1
+? Bot1.Battlefield.Kobolds of Kher Keep.Power = 0
+? Bot1.Graveyard.Count = 1
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet; Mox Emerald; The Guardian of Forever; Kobolds of Kher Keep
+Bot1.Graveyard = Black Lotus
+Stack.Count = 0

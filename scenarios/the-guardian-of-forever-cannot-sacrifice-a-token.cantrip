@@ -1,0 +1,40 @@
+# The Guardian of Forever's "{4}, Sacrifice another nontoken creature" (CR 111.1, 118.3, 602.2b): with the two 1/1 Spirit
+# tokens of Lingering Souls as Bot1's only other creatures and four mana floating, the activation is not offered - a token
+# can't pay the cost - and both tokens stay.
+
+[Bot1 Deck]
+The Guardian of Forever
+Black Lotus
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Lingering Souls
+Plains x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Guardian of Forever.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Lingering Souls.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{W}{W}{W}
+! Bot1.Battlefield.The Guardian of Forever.Activate
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Sapphire; Spirit Token; Spirit Token; The Guardian of Forever
+Bot1.Battlefield.The Guardian of Forever.Toughness = 6
