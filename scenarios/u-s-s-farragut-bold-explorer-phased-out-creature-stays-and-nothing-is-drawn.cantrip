@@ -1,0 +1,45 @@
+# Farragut: the landfall creature is phased out by Defiant before the end step, so it is not put on the bottom (CR 702.26b) and "when you do" (CR 603.12) draws nothing.
+
+[Bot1 Deck]
+U.S.S. Farragut, Bold Explorer
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Ornithopter
+U.S.S. Defiant, Mirror Migrant
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.U.S.S. Farragut, Bold Explorer.Cast
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.U.S.S. Defiant, Mirror Migrant.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut.Count = 2
+? Bot1.Hand.Count = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot1.Hand.Count = 0
+Bot1.PhasedOut.Count = 2

@@ -1,0 +1,45 @@
+# Six charge counters are below the 7+ striation (CR 721.2a-b): U.S.S. Farragut, Bold Explorer is still only a Legendary
+# Artifact - not a creature, no flying, no 4/4. It got them from Station with the 6-power Winding Wurm that its own
+# landfall put onto the battlefield.
+
+[Bot1 Deck]
+U.S.S. Farragut, Bold Explorer
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Winding Wurm
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.U.S.S. Farragut, Bold Explorer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot1.Choose(Winding Wurm)
+Bot1.Pass
+Bot1.Battlefield.U.S.S. Farragut, Bold Explorer.Activate(Ability: Station)
+Bot1.Choose(Winding Wurm)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.U.S.S. Farragut, Bold Explorer.Counters.Charge = 6
+Bot1.Battlefield.U.S.S. Farragut, Bold Explorer.Keywords = (absent)
+Bot1.Battlefield.U.S.S. Farragut, Bold Explorer.Power = (absent)
+Bot1.Battlefield.U.S.S. Farragut, Bold Explorer.Types = Artifact

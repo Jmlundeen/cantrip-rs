@@ -1,0 +1,56 @@
+# U.S.S. Farragut, Bold Explorer's landfall: "you may put a creature card from your hand onto the battlefield. That
+# creature gains haste. At the beginning of the next end step, put it on the bottom of your library. When you do, draw a
+# card." (CR 603.6a, 608.2d, 611.2a, 603.7c, 400.3, 603.12, 121.1)
+# Bot2's Llanowar Elves is a creature card that is not in YOUR hand, so the choice never offers it and it stays in Bot2's
+# hand; the Ornithopter put onto the battlefield has haste at once (no Summoning Sickness check), and at the beginning of
+# the next end step it goes to the BOTTOM of Bot1's library, which draws a card.
+
+[Bot1 Deck]
+U.S.S. Farragut, Bold Explorer
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Llanowar Elves
+Forest x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.U.S.S. Farragut, Bold Explorer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+! Bot1.Choose(Llanowar Elves)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+[T1 Bot1.End]
+Bot1.Pass
+? Bot1.Hand.Count = 0
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Pass
+? Bot1.Hand.Count = 1
+
+[Expect]
+Bot1.Library = Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Ornithopter
+Bot2.Hand.Llanowar Elves.Power = 1
+Bot2.Library.Count = 12
+Bot1.Battlefield = Island; Mox Jet; Mox Pearl; Mox Sapphire; U.S.S. Farragut, Bold Explorer
+Combat.Attackers.Count = 0

@@ -1,0 +1,41 @@
+# U.S.S. Farragut, Bold Explorer's landfall is "you MAY put a creature card from your hand onto the battlefield": declining
+# is the empty answer to the choice (CR 608.2d), so the Force of Nature stays in hand and no delayed ability is set up.
+
+[Bot1 Deck]
+U.S.S. Farragut, Bold Explorer
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Force of Nature
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.U.S.S. Farragut, Bold Explorer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot1.Choose()
+Bot1.Pass
+
+[Expect]
+Bot1.Hand.Force of Nature.Power = 8
+Bot1.Battlefield = Island; Mox Jet; Mox Pearl; Mox Sapphire; U.S.S. Farragut, Bold Explorer
+Bot1.Battlefield.U.S.S. Farragut, Bold Explorer.Counters.Charge = (absent)
+Delayed.Count = 0
