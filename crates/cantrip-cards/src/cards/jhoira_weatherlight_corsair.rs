@@ -1,12 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::THIS_ENTERS_OR_ATTACKS;
+use cantrip_mechanics::triggers::{self, THIS_ENTERS_OR_ATTACKS};
 use cantrip_mechanics::{library, targets};
 use cantrip_oracle as oracle;
 
 /// "A historic permanent card" (CR 700.6, 110.4a): a card with a permanent type that is an artifact, legendary or Saga.
 fn is_historic_permanent_card(q: &dyn Query, card: ObjectId) -> bool {
     let c = q.chars(card);
-    targets::is_permanent_card(&c) && (c.is(CardType::Artifact) || c.supertypes.legendary || c.has_subtype(Subtype::Saga))
+    targets::is_permanent_card(&c) && triggers::is_historic_chars(&c)
 }
 
 /// "Whenever Jhoira enters or attacks, target opponent reveals cards from the top of their library until they reveal a
