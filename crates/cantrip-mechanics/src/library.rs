@@ -787,6 +787,19 @@ pub fn rest_of_exiled_to_bottom_in_random_order(g: &mut dyn Game, exiled: &[Obje
     g.put_into_library(&rest, LibraryPlace::BottomInRandomOrder);
 }
 
+/// "Mill `n` cards, then put up to two [kind] cards from among them into your hand" (CR 701.17a, 608.2d): the cards the mill
+/// moved are the ones offered, as they are where they went (a graveyard, or exile by a replacement effect); up to two of them
+/// that `rule` allows, none when there are none, and nothing is asked when nothing was milled. Thranduil, Sindarin Liege
+/// (land cards, four) and Transwarp Hub (artifact cards, five) print it.
+pub fn mill_then_up_to_two_to_hand(g: &mut dyn Game, item: &StackItem, n: u32, rule: Selection) -> Result<(), Suspend> {
+    let you = item.controller;
+    let milled = g.mill(you, n);
+    g.end_sentence();
+    let chosen = crate::choose::select(g, you, item.object, Purpose::PutIntoHand, milled, rule)?;
+    g.return_to_hand(&chosen);
+    Ok(())
+}
+
 pub fn rest_to_bottom_in_random_order(g: &mut dyn Game, player: PlayerId, looked: &[ObjectId]) {
     let rest: Vec<ObjectId> = looked.iter().copied().filter(|c| is_live(g, *c) && g.obj(*c).zone == Zone::library(player)).collect();
     g.bottom_in_random_order(player, &rest);
