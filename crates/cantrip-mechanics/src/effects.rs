@@ -2899,3 +2899,15 @@ pub fn draw_that_many(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     g.draw(item.controller, item.matched_damage_amount());
     Ok(())
 }
+
+/// "Draw X cards, then you may put up to X land cards from your hand onto the battlefield tapped" (CR 121.1, 608.2c, 608.2d,
+/// 614.1c): the draw is a sentence of its own, so the cards just drawn are in the hand to choose from (CR 603.3b), and the
+/// "up to" is answered with any number from none to X. The lands are chosen together and put tapped (CR 101.4), and putting
+/// one onto the battlefield is not playing it, so it uses no land play (CR 305.2). Lt. Arex, Ever-Adapting prints it with
+/// three, Starfleet Communicator with X.
+pub fn draw_then_may_put_up_to_lands_tapped(g: &mut dyn Game, player: PlayerId, source: ObjectId, most: u32) -> Result<(), Suspend> {
+    g.draw(player, most);
+    g.end_sentence();
+    crate::hand::may_put_up_to_onto_battlefield_tapped(g, player, source, crate::select::land_cards(crate::select::up_to(most)))?;
+    Ok(())
+}
