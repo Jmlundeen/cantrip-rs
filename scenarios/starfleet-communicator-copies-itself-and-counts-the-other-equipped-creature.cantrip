@@ -1,0 +1,106 @@
+# Starfleet Communicator {3} is copied as it is cast, so a token copy of the Equipment enters beside the original
+# (CR 707.10f). With a Communicator on each of three attacking-capable 0/2 Ornithopters, attacking with one of them makes X
+# the number of *other* creatures with a Communicator attached - the two it left behind, not the attacker itself, and not
+# Bot2's equipped Ornithopter - so the attack draws two cards and may put up to two lands from hand onto the battlefield
+# tapped (CR 608.2c, 608.2d, 614.1c). The two cards drawn on turn 7 are both lands and both are put, which is why a count of
+# one fails; the Forest played this turn leaves no other land in hand, so the empty hand is exactly two drawn. On turn 9 the
+# same attack declines the up-to-two, and the two lands it drew stay in hand.
+
+[Bot1 Deck]
+Starfleet Communicator
+Starfleet Communicator
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Ornithopter
+Ornithopter
+Ornithopter
+Forest
+Forest
+Mountain
+Island
+Swamp
+Island x10
+
+[Bot2 Deck]
+Mox Emerald x3
+Ornithopter
+Starfleet Communicator
+Forest x2
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Starfleet Communicator.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Battlefield.Mox Emerald#3.Activate
+Bot2.Hand.Starfleet Communicator.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Starfleet Communicator.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Starfleet Communicator#1.Activate(Bot2.Battlefield.Ornithopter; Ability: Equip)
+? Bot2.Mana =
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Starfleet Communicator#1.Activate(Bot1.Battlefield.Ornithopter#1; Ability: Equip)
+Bot1.Battlefield.Starfleet Communicator#2.Activate(Bot1.Battlefield.Ornithopter#2; Ability: Equip)
+Bot1.Battlefield.Starfleet Communicator#3.Activate(Bot1.Battlefield.Ornithopter#3; Ability: Equip)
+? Bot1.Mana =
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[Bot1.BeginCombat]
+Bot1.Attack(Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Forest; Mountain)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 0
+? Bot1.Battlefield.Mountain.Tapped = true
+[T7 Bot1.Main2]
+[T9 Bot1.Main1]
+[Bot1.BeginCombat]
+Bot1.Attack(Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Starfleet Communicator#1.Types = Artifact
+Bot1.Battlefield.Starfleet Communicator#2.Types = Artifact
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Swamp = (absent)
+Bot2.Hand.Count = 5
