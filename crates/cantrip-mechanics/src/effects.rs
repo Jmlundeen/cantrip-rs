@@ -170,6 +170,21 @@ pub fn targets_get<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackIte
     Ok(())
 }
 
+/// "One or two target creatures each get +`P`/+`T` and gain `keyword` until end of turn" (CR 611.2a): every target still legal
+/// as the ability resolves (CR 608.2b), pumped and given the keyword as one instruction, the two a card would otherwise write
+/// as two steps. Heroes' Hangout's Patrol Night (+1/+0 and first strike), Invigorated Rampage's second mode (+2/+0 and trample)
+/// and Vic Fontaine, One Night Only (+2/+0 and lifelink) print it.
+pub fn targets_get_and_gain(g: &mut dyn Game, item: &StackItem, power: i32, toughness: i32, keyword: Keyword) -> Result<(), Suspend> {
+    let creatures = crate::targets::legal_objects(g, item);
+    instruction(g, |g| {
+        for creature in creatures {
+            crate::pump(g, item.object, creature, power, toughness);
+            gain_until_end_of_turn(g, item.object, creature, keyword);
+        }
+    });
+    Ok(())
+}
+
 /// "One or two target creatures each gain `keyword` until end of turn" (CR 611.2a): every target still legal as the ability
 /// resolves (CR 608.2b), granted as one instruction, as `targets_get` pumps its targets. K't'inga-Class Battle Cruiser (flying), Shuttlecraft Galileo (flying) and Swashbuckler
 /// Extraordinaire (double strike) print it.

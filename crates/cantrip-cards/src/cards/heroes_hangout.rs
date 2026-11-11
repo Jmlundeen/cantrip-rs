@@ -14,14 +14,7 @@ fn date_night(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Patrol Night - One or two target creatures each get +1/+0 and gain first strike until end of turn."
 fn patrol_night(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures = targets::legal_objects(g, item);
-    instruction(g, |g| {
-        for creature in creatures {
-            g.add_effect(item.object, creature, EffectKind::Pump(1, 0), Duration::EndOfTurn);
-            effects::gain_until_end_of_turn(g, item.object, creature, Keyword::FirstStrike);
-        }
-    });
-    Ok(())
+    effects::targets_get_and_gain(g, item, 1, 0, Keyword::FirstStrike)
 }
 
 static MODAL: ModalDef = modes(&[
