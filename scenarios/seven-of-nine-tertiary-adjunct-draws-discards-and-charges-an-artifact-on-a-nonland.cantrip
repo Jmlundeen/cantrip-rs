@@ -1,0 +1,83 @@
+# Seven of Nine, Tertiary Adjunct: "That Is Irrelevant — {T}: Draw a card, then discard a card. When you discard a nonland
+# card this way, put two charge counters on up to one target artifact." Four activations, one per rule the text turns on:
+# on turn 3 the card the ability just drew (Opt) is the one discarded - it is drawn first, CR 701.9 - and the reflexive
+# ability (CR 603.12) takes one own artifact out of several, refusing Bot2's Island as a non-artifact; on turn 5 a land is
+# discarded, so it never triggers; on turn 7 it puts them on Bot2's artifact; on turn 9 the "up to one" target is declined.
+
+[Bot1 Deck]
+Seven of Nine, Tertiary Adjunct
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Plains
+Plains
+Plains
+Negate
+Opt
+Essence Scatter
+Island
+Mana Leak
+Ponder
+Counterspell
+Brainstorm
+Island x8
+
+[Bot2 Deck]
+Island
+Island
+Sol Ring
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Seven of Nine, Tertiary Adjunct.Cast
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Seven of Nine, Tertiary Adjunct.Activate
+! Bot1.Choose()
+Bot1.Choose(Opt)
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot1.Battlefield.Mox Jet)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Mox Jet.Counters.Charge = 2
+? Bot1.Battlefield.Mox Sapphire.Counters.Charge = (absent)
+? Bot1.Graveyard = Opt
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Hand.Sol Ring.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Seven of Nine, Tertiary Adjunct.Activate
+Bot1.Choose(Island)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Mox Jet.Counters.Charge = 2
+? Bot1.Battlefield.Seven of Nine, Tertiary Adjunct.Counters.Charge = (absent)
+? Bot1.Graveyard = Island; Opt
+[T7 Bot1.Main1]
+Bot1.Battlefield.Seven of Nine, Tertiary Adjunct.Activate
+Bot1.Choose(Ponder)
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+[T7 Bot1.Main2]
+? Bot2.Battlefield.Sol Ring.Counters.Charge = 2
+? Bot1.Battlefield.Mox Jet.Counters.Charge = 2
+[T9 Bot1.Main1]
+Bot1.Battlefield.Seven of Nine, Tertiary Adjunct.Activate
+Bot1.Choose(Brainstorm)
+Bot1.Target()
+[T9 Bot1.Main2]
+
+[Expect]
+Turn = 9
+Bot1.Battlefield.Seven of Nine, Tertiary Adjunct.Tapped = true
+Bot1.Battlefield.Mox Jet.Counters.Charge = 2
+Bot1.Battlefield.Mox Sapphire.Counters.Charge = (absent)
+Bot1.Battlefield.Mox Pearl.Counters.Charge = (absent)
+Bot2.Battlefield.Sol Ring.Counters.Charge = 2
+Bot1.Graveyard = Brainstorm; Ponder; Island; Opt
