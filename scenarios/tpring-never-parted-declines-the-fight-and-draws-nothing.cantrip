@@ -1,0 +1,58 @@
+# T'Pring, Never Parted: the two targets are "another target creature you control" - T'Pring itself is no target, and
+# neither is an artifact Bot1 controls (CR 115.1) - and one an opponent controls; Bot1's Grizzly Bears is chosen for the
+# first. Bot1 then declines the "you may have the chosen creatures fight each other", so neither creature deals damage,
+# the delayed ability is never set up, and nothing is drawn (CR 701.14b, 608.2d): Bot1's hand is only the turn's draw.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Black Lotus
+Grizzly Bears
+T'Pring, Never Parted
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Grizzly Bears
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.T'Pring, Never Parted.Cast
+! Bot1.Target(T'Pring, Never Parted)
+! Bot1.Target(Mox Sapphire)
+Bot1.Target(Grizzly Bears)
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Step = Main2
+Bot1.Hand.Count = 1
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Black Lotus; Forest; Grizzly Bears; Mox Emerald; Mox Sapphire; T'Pring, Never Parted
+Bot2.Battlefield.Grizzly Bears.Toughness = 2

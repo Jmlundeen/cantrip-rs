@@ -1,0 +1,58 @@
+# T'Pring, Never Parted {3}{G}{U} (cast on turn 3 off two Black Lotuses, a Mox Sapphire and a Mox Emerald) picks Bot1's
+# Grizzly Bears and Bot2's Grizzly Bears as its two targets - another creature its controller controls and one an
+# opponent controls (CR 115.1) - and is told to have them fight: each deals 2 to the other at once (CR 701.14a), both
+# die as the state-based actions are checked, and the delayed ability that watched those two objects draws a card for
+# each of them (CR 603.7c, 121.1). Bot1's hand therefore holds the turn's draw plus two more.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Black Lotus
+Grizzly Bears
+T'Pring, Never Parted
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Grizzly Bears
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Grizzly Bears.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Grizzly Bears.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.T'Pring, Never Parted.Cast
+Bot1.Target(Grizzly Bears)
+Bot1.Accept
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Step = Main2
+Bot1.Graveyard = Grizzly Bears; Black Lotus
+Bot2.Graveyard = Grizzly Bears
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Black Lotus; Forest; Mox Emerald; Mox Sapphire; T'Pring, Never Parted
