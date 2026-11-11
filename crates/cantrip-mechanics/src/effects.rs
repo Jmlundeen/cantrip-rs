@@ -744,11 +744,41 @@ pub fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// `loot` for an ability that goes on to ask about the card: the cards the discard actually discarded, wherever they went (a
 /// graveyard, or exile by a madness replacement), none for an empty hand. Ninja's Blades loses the damaged player life equal to its mana value.
 pub fn loot_discarding(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<Vec<ObjectId>, Suspend> {
+    loot_discarding_or_may(g, player, source, false)
+}
+
+/// `loot_discarding` for "draw a card, then you may discard a card" when `may` (CR 608.2d): declining is the empty answer to the
+/// up-to-one choice.
+fn loot_discarding_or_may(g: &mut dyn Game, player: PlayerId, source: ObjectId, may: bool) -> Result<Vec<ObjectId>, Suspend> {
     g.draw(player, 1);
     // A draw replacement may change state without recording an event (CR 603.8, 608.2c).
     g.end_sentence();
-    let chosen = crate::choose_from_hand(g, player, source, 1)?;
+    let hand = g.state().zone(Zone::hand(player)).to_vec();
+    let chosen = crate::choose::cards(g, player, source, Purpose::Discard, hand, 1, may)?;
     Ok(g.discard_together(&chosen))
+}
+
+/// "Draw a card, then discard a card. When you discard a nonland card this way, ..." (CR 603.12): the controller draws, then
+/// discards a card they choose (CR 701.9, nothing asked of an empty hand), and `ability` - the card's reflexive ability - is put
+/// on the stack only when a card discarded this way is a nonland card, judged by what it is where it went (CR 701.9c, an
+/// unrevealed hidden-zone discard is undefined). Teo, Spirited Glider and Seven of Nine, Tertiary Adjunct print it.
+pub fn loot_then_reflexive(g: &mut dyn Game, item: &StackItem, ability: AbilityRef) -> Result<(), Suspend> {
+    loot_then_reflexive_discarding(g, item, ability, false)
+}
+
+/// `loot_then_reflexive` for "draw a card, then you may discard a card" (CR 608.2d): declining is the empty answer to the
+/// up-to-one choice, and an empty hand offers none, so nothing triggers either way. Glacial Dragonhunt prints it.
+pub fn loot_then_maybe_reflexive(g: &mut dyn Game, item: &StackItem, ability: AbilityRef) -> Result<(), Suspend> {
+    loot_then_reflexive_discarding(g, item, ability, true)
+}
+
+fn loot_then_reflexive_discarding(g: &mut dyn Game, item: &StackItem, ability: AbilityRef, may: bool) -> Result<(), Suspend> {
+    let you = item.controller;
+    let discarded = loot_discarding_or_may(g, you, item.object, may)?;
+    if discarded.iter().any(|&card| crate::hand::discarded_nonland_card(&*g, card)) {
+        g.reflexive_trigger(item.object, you, ability, Target::None);
+    }
+    Ok(())
 }
 
 /// "[Player] discards any number of cards, then draws that many cards" (CR 701.9, 121.1): `player` chooses any number of cards of
@@ -2532,6 +2562,14 @@ pub fn planeswalker_becomes_creature_preventing_damage(
 pub fn minus_one_counters_on_target<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
     g.add_counters(creature, CounterKind::MinusOne, N);
+    Ok(())
+}
+
+/// "Put `N` charge counters on target [permanent]" (CR 122.1a, 608.2b): the first target, and nothing if none was chosen or
+/// it is no longer legal as this resolves. Drill Too Deep (five) and Seven of Nine, Tertiary Adjunct (two) print it.
+pub fn charge_counters_on_target<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(object) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    g.add_counters(object, CounterKind::Charge, N);
     Ok(())
 }
 

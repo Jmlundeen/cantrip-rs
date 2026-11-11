@@ -9,16 +9,8 @@ fn spacecraft_or_planet_you_control(q: &dyn Query, asker: &Asker, t: Target) -> 
         && matches!(t, Target::Object(id) if q.chars(id).has_subtype(Subtype::Spacecraft) || q.chars(id).has_subtype(Subtype::Planet))
 }
 
-/// "Put five charge counters on target Spacecraft or Planet you control."
-fn five_charge_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(object) = targets::object(g, item, 0) {
-        g.add_counters(object, CounterKind::Charge, 5);
-    }
-    Ok(())
-}
-
 static MODAL: ModalDef = modes(&[
-    mode(five_charge_counters, "Put five charge counters on target Spacecraft or Planet you control.")
+    mode(effects::charge_counters_on_target::<5>, "Put five charge counters on target Spacecraft or Planet you control.")
         .targets(&[target(spacecraft_or_planet_you_control)]),
     mode(effects::destroy_first_target, "Destroy target artifact.").targets(&[targets::ARTIFACT]),
 ]);
