@@ -42,6 +42,17 @@ pub static ILLUSION_3_3_ARTIFACT: CardDef = CardDef {
     ..token!(Illusion)
 };
 
+/// A colorless 4/3 Spacecraft Illusion artifact creature token with flying (CR 111). U.S.S. Stargazer, Here and There's
+/// Picard Maneuver creates this exact token.
+pub static SPACECRAFT_ILLUSION: CardDef = CardDef {
+    colors: Some(ColorSet::NONE),
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    power: Some(4),
+    toughness: Some(3),
+    keywords: Keywords::of(&[Keyword::Flying]),
+    ..token!(Spacecraft Illusion)
+};
+
 /// A 1/1 colorless Borg artifact creature token (CR 111). Antagonist Incorporator, Assembly Specialist, Locutus of Borg,
 /// Conquest Mission and Join the Collective create this exact token.
 pub static BORG: CardDef = CardDef {
