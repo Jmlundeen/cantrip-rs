@@ -1,0 +1,67 @@
+# Spock, Voice of Reason: "{2}, {T}: Draw a card for each nontoken permanent you control that entered this turn." On turn 3
+# Bot1 plays an Island and casts Savannah Lions, and Secure the Wastes makes a Warrior token: two of those three entered
+# this turn under Bot1 and are nontoken, so Bot1 draws exactly two - the token is not counted (CR 111.1) and neither is
+# Bot2's Forest, which entered this turn but is not Bot1's. The moxen and Spock entered on turn 1 and are not counted
+# either. On turn 5 nothing entered this turn, so the same activation draws none: "this turn" is the turn of the
+# activation.
+
+[Bot1 Deck]
+Spock, Voice of Reason
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Black Lotus
+Savannah Lions
+Secure the Wastes
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Forest
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spock, Voice of Reason.Cast
+? Bot1.Mana =
+? Bot1.Hand.Count = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Savannah Lions.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Secure the Wastes.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Warrior Token.Power = 1
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Spock, Voice of Reason.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Spock, Voice of Reason.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 3
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Spock, Voice of Reason.Tapped = true
+Bot1.Battlefield.Warrior Token.Power = 1
+Bot2.Battlefield = Forest

@@ -1,0 +1,8 @@
+{
+  "name": "Spock, Voice of Reason",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Vulcan Human Scientist",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "{2}, {T}: Draw a card for each nontoken permanent you control that entered this turn."
+}
