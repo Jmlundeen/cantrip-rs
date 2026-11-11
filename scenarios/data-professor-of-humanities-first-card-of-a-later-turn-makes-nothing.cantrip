@@ -1,0 +1,52 @@
+# Data, Professor of Humanities: "Seek out — Whenever you draw your second card each turn, create two 1/1 blue Faerie
+# creature tokens with flying." Nothing here draws more than the one card of a draw step, so turn 5's single card is the
+# first of that turn and is not its second (CR 121.2, 603.2): no Faerie is made. A trigger that fired on any draw would
+# make two, so this scenario is what tells "second card" from "a card".
+
+[Bot1 Deck]
+Data, Professor of Humanities
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Sapphire
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Data, Professor of Humanities.Cast(Spend: R, W, U, U)
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Faerie Token#1 = (absent)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Data, Professor of Humanities.Toughness = 4
+Bot1.Battlefield.Faerie Token#1 = (absent)
