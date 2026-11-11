@@ -540,6 +540,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         | Purpose::Targets
         | Purpose::ChangeTargetTo
         | Purpose::EnterAttacking
+        | Purpose::ReselectAttackTarget
         | Purpose::Color
         | Purpose::Optional
         | Purpose::Ask(_)
