@@ -1,0 +1,6 @@
+{
+  "name": "Temporal Tribulation",
+  "manaCost": "{2}{U}",
+  "type": "Instant",
+  "oracleText": "Exile two target permanents you control. Return those cards to the battlefield under their owner's control at the beginning of the next end step.\nFlashback {5}{U} (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+}
