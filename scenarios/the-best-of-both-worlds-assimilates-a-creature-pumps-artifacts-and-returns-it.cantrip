@@ -1,0 +1,75 @@
+# The Best of Both Worlds ({4}{W}{U} Saga) on turn 3, after Bot2 has cast two Kobolds of Kher Keep (no mana needed): chapter
+# I assimilates only the chosen one (Bot1 controls it as a 1/2 artifact creature Borg with a +1/+1 counter, no longer a
+# Kobold), refuses Bot1's own Kobolds and Ornithopter, and the Saga remembers it. Bot1's Ornithopter, an artifact creature,
+# is a control for chapter II on turn 5: it gets +2/+2 until end of turn while Bot1's nonartifact Kobolds and Bot2's
+# creatures do not, and the pump is gone on turn 6. Chapter III on turn 7 exiles the remembered Borg and returns it under
+# Bot2's control as a new object with its printed characteristics, then the Saga sacrifices itself after III (CR 714.4,
+# 607.2d, 400.7, 611.2c).
+
+[Bot1 Deck]
+The Best of Both Worlds
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Kobolds of Kher Keep
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Kobolds of Kher Keep x2
+Forest x20
+
+[Actions]
+Bot1.Hand.Kobolds of Kher Keep.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Plains.Play
+Bot2.Hand.Kobolds of Kher Keep.Cast
+Bot2.Hand.Kobolds of Kher Keep.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.The Best of Both Worlds.Cast
+! Bot1.Target(Bot1.Battlefield.Kobolds of Kher Keep)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Kobolds of Kher Keep)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Kobolds of Kher Keep#1.Power = 0
+? Bot1.Battlefield.Kobolds of Kher Keep#2.Power = 1
+? Bot1.Battlefield.Kobolds of Kher Keep#2.Toughness = 2
+? Bot1.Battlefield.Kobolds of Kher Keep#2.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Kobolds of Kher Keep#2.Subtypes = Borg
+? Bot2.Battlefield.Count = 1
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Kobolds of Kher Keep#2.Power = 3
+? Bot1.Battlefield.Kobolds of Kher Keep#2.Toughness = 4
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot1.Battlefield.Kobolds of Kher Keep#1.Power = 0
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Kobolds of Kher Keep#2.Power = 1
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T7 Bot1.Main2]
+? Bot2.Battlefield.Count = 2
+? Bot2.Battlefield.Kobolds of Kher Keep#2.Subtypes = Kobold
+? Bot2.Battlefield.Kobolds of Kher Keep#2.Types = Creature
+? Bot1.Battlefield.Kobolds of Kher Keep.Power = 0
+? Bot1.Battlefield.Kobolds of Kher Keep.Types = Creature
+? Bot1.Battlefield.Count = 5
+? Bot1.Battlefield.The Best of Both Worlds = (absent)
+
+[Expect]
+Turn = 7
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield = Kobolds of Kher Keep; Ornithopter; Mox Pearl; Mox Sapphire; Plains
+Bot2.Battlefield = Kobolds of Kher Keep; Kobolds of Kher Keep
+Bot1.Graveyard = The Best of Both Worlds; Black Lotus
+Stack.Count = 0

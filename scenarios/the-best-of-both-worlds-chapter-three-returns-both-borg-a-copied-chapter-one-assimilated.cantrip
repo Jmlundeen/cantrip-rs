@@ -1,0 +1,77 @@
+# The Best of Both Worlds with Peter Parker's Camera copying chapter I: on turn 3 the chapter I trigger aims at one of Bot2's
+# Kobolds of Kher Keep and, with it on the stack, Bot1 pays {2} and a film counter to copy it, choosing the other Kobolds for
+# the copy. Both are assimilated (Bot1 controls two 1/2 Borg with a +1/+1 counter). Chapter III on turn 7 reads both from the
+# history, not one remembered object: it exiles and returns both under Bot2's control with their printed characteristics
+# (CR 607.3, 608.2c, 400.7).
+
+[Bot1 Deck]
+The Best of Both Worlds
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Black Lotus
+Peter Parker's Camera
+Plains x14
+
+[Bot2 Deck]
+Kobolds of Kher Keep x2
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Peter Parker's Camera.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Kobolds of Kher Keep.Cast
+Bot2.Hand.Kobolds of Kher Keep.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Best of Both Worlds.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Kobolds of Kher Keep#1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Peter Parker's Camera.Activate(Stack.The Best of Both Worlds)
+Bot1.Target(Bot2.Battlefield.Kobolds of Kher Keep#2)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Count = 0
+? Bot1.Battlefield.Kobolds of Kher Keep#1.Subtypes = Borg
+? Bot1.Battlefield.Kobolds of Kher Keep#2.Subtypes = Borg
+? Bot1.Battlefield.Kobolds of Kher Keep#1.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Kobolds of Kher Keep#2.Counters.PlusOnePlusOne = 1
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Kobolds of Kher Keep = (absent)
+? Bot2.Battlefield.Count = 2
+? Bot2.Battlefield.Kobolds of Kher Keep#1.Subtypes = Kobold
+? Bot2.Battlefield.Kobolds of Kher Keep#2.Subtypes = Kobold
+? Bot2.Battlefield.Kobolds of Kher Keep#1.Power = 0
+? Bot2.Battlefield.Kobolds of Kher Keep#2.Power = 0
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.The Best of Both Worlds = (absent)
+Stack.Count = 0
