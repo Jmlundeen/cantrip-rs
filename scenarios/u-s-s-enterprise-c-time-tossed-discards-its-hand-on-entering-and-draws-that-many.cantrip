@@ -1,0 +1,40 @@
+# U.S.S. Enterprise-C, Time-Tossed: "When U.S.S. Enterprise-C enters or dies, you may discard your hand. If you do, draw a
+# card for each card discarded this way." It enters on turn one off Black Lotus and two Moxen with three cards left in hand
+# (an Island and two Volcanic Islands), the offer is accepted, and exactly those three go to the graveyard together and three
+# cards come back (CR 603.6a, 608.2c-d, 701.9, 121.1) - Bot2's hand of seven is not "your hand" and stays where it is.
+
+[Bot1 Deck]
+Black Lotus
+Island
+Mox Pearl
+Mox Sapphire
+U.S.S. Enterprise-C, Time-Tossed
+Volcanic Island x20
+
+[Bot2 Deck]
+Counterspell
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.U.S.S. Enterprise-C, Time-Tossed.Cast
+? Bot1.Mana =
+Bot1.Accept
+Bot1.Pass
+? Bot1.Battlefield.U.S.S. Enterprise-C, Time-Tossed.Types = Artifact
+? Bot1.Hand.Count = 3
+? Bot1.Graveyard.Count = 4
+? Bot2.Hand.Count = 7
+? Bot1.Library.Count = 15
+
+[Expect]
+Bot1.Battlefield.U.S.S. Enterprise-C, Time-Tossed.Types = Artifact
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 4
+Bot2.Hand.Count = 7
+Bot1.Library.Count = 15
