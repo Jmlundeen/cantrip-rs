@@ -92,6 +92,17 @@ pub fn exile_target_then_return_at_next_end_step_0(g: &mut dyn Game, item: &Stac
     Ok(())
 }
 
+/// "Exile those targets. Return those cards to the battlefield under their owner's control at the beginning of the next end
+/// step." (CR 603.7, 400.7): the targets still legal as the spell resolves are exiled together, and the card's delayed ability
+/// number 0 is set up about the cards exiled - a token has ceased to exist and does not return, and a card that left exile in
+/// between is a new object and does not either. Elrond, Moon-Reader prints it of up to two other nonland permanents and
+/// Temporal Tribulation of two permanents.
+pub fn exile_targets_then_return_at_next_end_step_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let exiled = g.exile_all(&crate::targets::legal_objects(g, item));
+    at_next_end_step_about(g, item, 0, &exiled);
+    Ok(())
+}
+
 /// Sets up the card's delayed ability number 0 to trigger "this turn" (CR 603.7b): each time its `listens`/`matches`
 /// accept an event, until the turn ends, controlled by the resolving ability's controller. `source` is the object the
 /// ability's `matches` is asked of: the spell for "whenever a creature you control dies this turn", the creature it

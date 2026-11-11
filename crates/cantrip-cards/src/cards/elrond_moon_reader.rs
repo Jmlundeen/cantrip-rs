@@ -11,13 +11,10 @@ fn you_activate_an_ability_of_a_creature(q: &dyn Query, me: &Asker, event: &Even
 }
 
 /// "Exile up to two other target nonland permanents you control. Return those cards to the battlefield under their owner's
-/// control at the beginning of the next end step." (CR 701.13, 603.7, 400.7): those still legal are exiled together, and the
-/// delayed ability is about the cards exiled (CR 603.7c): a token has ceased to exist and does not return, a card that left
-/// exile in between is a new object and does not either.
+/// control at the beginning of the next end step." (CR 701.13, 603.7, 400.7): the shared body in
+/// delayed::exile_targets_then_return_at_next_end_step_0, of the targets that are still legal.
 fn flicker(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let exiled = g.exile_all(&targets::legal_objects(g, item));
-    delayed::at_next_end_step_about(g, item, 0, &exiled);
-    Ok(())
+    delayed::exile_targets_then_return_at_next_end_step_0(g, item)
 }
 
 pub static CARD: CardDef = CardDef {
