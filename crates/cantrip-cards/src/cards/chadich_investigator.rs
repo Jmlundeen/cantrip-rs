@@ -3,9 +3,7 @@ use cantrip_mechanics::{tokens, triggers};
 use cantrip_oracle as oracle;
 
 fn create_token(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let player = item.controller;
-    tokens::create(g, player, &tokens::KLINGON, 1)?;
-    Ok(())
+    tokens::create_klingons(g, item.controller, 1)
 }
 
 pub static CARD: CardDef = CardDef {

@@ -4,8 +4,7 @@ use cantrip_mechanics::tokens::KLINGON;
 use cantrip_oracle as oracle;
 
 fn create_token(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &KLINGON, 1)?;
-    Ok(())
+    tokens::create_klingons(g, item.controller, 1)
 }
 
 pub static CARD: CardDef = CardDef {

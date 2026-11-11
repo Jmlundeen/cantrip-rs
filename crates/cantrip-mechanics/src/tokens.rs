@@ -567,6 +567,13 @@ pub fn each_player_creates(g: &mut dyn Game, def: &'static CardDef, count: u32) 
     g.create_tokens_together(&tokens)
 }
 
+/// "Create `count` 2/1 red Klingon Warrior creature tokens with haste" (CR 111.1): the KLINGON token, made together as one
+/// event (CR 101.4). Boarding Action, Cha'DIch Investigator, The Duras Sisters and Sins of the Father make it.
+pub fn create_klingons(g: &mut dyn Game, controller: PlayerId, count: u32) -> Result<(), Suspend> {
+    create(g, controller, &KLINGON, count)?;
+    Ok(())
+}
+
 /// "create X [tokens], where X is its power" (CR 608.2h, 107.1b): `count` tokens of `def` made together (CR 101.4) under
 /// the ability's controller, `count` being the power the object the ability came from had as it last existed on the
 /// battlefield - its counters, pumps and everything else it had as it left - and none for a power of 0 or less, since a
