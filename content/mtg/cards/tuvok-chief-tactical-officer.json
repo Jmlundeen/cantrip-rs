@@ -1,0 +1,11 @@
+{
+  "name": "Tuvok, Chief Tactical Officer",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Vulcan Officer",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flash\nWhen Tuvok enters during the declare attackers step, choose up to two target attacking creatures. For each of them, you may reselect which player or permanent that creature is attacking. (A creature can't attack its controller.)",
+  "keywords": [
+    "Flash"
+  ]
+}

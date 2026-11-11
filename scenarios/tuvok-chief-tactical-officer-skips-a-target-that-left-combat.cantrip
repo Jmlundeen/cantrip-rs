@@ -1,0 +1,59 @@
+# A target is judged on its own as the ability resolves (CR 608.2b): Bot1 flashes Tuvok in during Bot2's declare attackers step
+# and takes both attackers, then destroys the Kobolds with Lightning Bolt before the trigger resolves, so that slot is passed over
+# and only the Memnite is asked about - its answer of none leaves it attacking Bot1.
+
+[Bot1 Deck]
+Tuvok, Chief Tactical Officer
+Black Lotus
+Lightning Bolt
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Island x14
+
+[Bot2 Deck]
+Kobolds of Kher Keep
+Memnite
+Plains x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Kobolds of Kher Keep.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Attackers]
+Bot2.Attack(Kobolds of Kher Keep > Bot1; Memnite > Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tuvok, Chief Tactical Officer.Cast
+? Bot1.Mana =
+Bot1.Target(Bot2.Battlefield.Kobolds of Kher Keep; Bot2.Battlefield.Memnite)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Kobolds of Kher Keep)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot2.Graveyard = Kobolds of Kher Keep
+? Bot1.Life = 19
+? Bot2.Life = 20
+? Bot2.Battlefield.Count = 1
+? Bot1.Battlefield.Tuvok, Chief Tactical Officer.Power = 2
+
+[Expect]
+Turn = 4
+Bot2.Graveyard = Kobolds of Kher Keep
+Bot1.Life = 19
+Bot2.Life = 20
+Bot2.Battlefield.Count = 1
+Stack.Count = 0

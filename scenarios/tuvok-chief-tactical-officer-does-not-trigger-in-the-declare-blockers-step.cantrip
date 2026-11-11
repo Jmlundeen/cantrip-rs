@@ -1,0 +1,44 @@
+# Tuvok's ability triggers only when it enters during the declare attackers step: flashed in during the declare blockers
+# step, with Bot2's Memnite still attacking, it enters and nothing triggers - Bot1 is asked for no target, nothing is
+# reselected, and the Memnite deals Bot1 its 1 damage (CR 603.2, 508.1).
+
+[Bot1 Deck]
+Tuvok, Chief Tactical Officer
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Island x16
+
+[Bot2 Deck]
+Memnite
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Attackers]
+Bot2.Attack(Memnite > Bot1)
+[T4 Bot2.Blockers]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tuvok, Chief Tactical Officer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+? Stack.Count = 0
+? Combat.Attackers = Memnite > Bot1
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Tuvok, Chief Tactical Officer.Toughness = 3
+Bot1.Life = 19
+Bot2.Life = 20
+Stack.Count = 0

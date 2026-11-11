@@ -1,0 +1,73 @@
+# Tuvok flashed in during Bot2's declare attackers step reselects what the attackers attack (CR 508.4, 508.5): both of
+# Bot2's attackers are chosen as its two targets, while Bot1's own Ornithopter, a creature that is not attacking, is refused;
+# the Dwarven Mauler is reselected onto Bot1's Liliana - Bot2, its own controller, is not offered, and it attacks one thing,
+# so Bot1 and Liliana both are refused (CR 506.2, 508.1b) - and the answer of none leaves the Memnite attacking Bot1. Each prompt
+# is its own choice, so damage lands on both: 1 to Bot1's life and 2 to the planeswalker's loyalty. Tuvok's {2}{U} is paid
+# exactly, checked with an empty pool.
+
+[Bot1 Deck]
+Tuvok, Chief Tactical Officer
+Black Lotus
+Liliana of the Veil
+Ornithopter
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Island x13
+
+[Bot2 Deck]
+Dwarven Mauler
+Kobolds of Kher Keep
+Memnite
+Mountain x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Dwarven Mauler.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Kobolds of Kher Keep.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Attackers]
+Bot2.Attack(Dwarven Mauler > Bot1; Kobolds of Kher Keep > Bot1; Memnite > Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tuvok, Chief Tactical Officer.Cast
+? Bot1.Mana =
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+! Bot1.Target(Bot2.Battlefield.Dwarven Mauler; Bot2.Battlefield.Kobolds of Kher Keep; Bot2.Battlefield.Memnite)
+Bot1.Target(Bot2.Battlefield.Dwarven Mauler; Bot2.Battlefield.Memnite)
+! Bot1.Target(Bot2)
+! Bot1.Target(Bot1; Bot1.Battlefield.Liliana of the Veil)
+Bot1.Target(Bot1.Battlefield.Liliana of the Veil)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot1.Life = 19
+? Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 1
+? Bot2.Life = 20
+? Bot2.Battlefield.Memnite.Tapped = true
+? Bot1.Battlefield.Ornithopter.Power = 0
+
+[Expect]
+Turn = 4
+Bot1.Life = 19
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 1
+Bot2.Life = 20
+Bot2.Battlefield.Dwarven Mauler.Tapped = true
+Stack.Count = 0
