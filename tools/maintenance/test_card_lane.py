@@ -81,11 +81,10 @@ def headless():
     return fake
 
 
-def commit_args(no_issue=False, fix=False, no_review=False, message=None):
+def commit_args(no_issue=False, fix=False, no_review=False, message=None, worker="w1", card=None):
     """What the `commit` command line hands its handler, when the test calls it rather than the subprocess."""
-    return argparse.Namespace(queue="q", id="w1", issue=None, note="", message=message or [],
-                              no_review=no_review, review_note="", no_issue=no_issue, review_lane="review",
-                              fix=fix)
+    return argparse.Namespace(queue="q", id=worker, issue=None, note="", message=message or [], card=card,
+                              no_review=no_review, review_note="", no_issue=no_issue, fix=fix)
 
 
 class LaneTest(unittest.TestCase):
@@ -447,10 +446,10 @@ class LaneTest(unittest.TestCase):
 
     # -- the gates ---------------------------------------------------------------------------------------------------
 
-    def card_b_scenario(self):
-        return self.write("scenarios/card-b-shows-itself.cantrip",
-                          "# Card B: it is cast.\n# CR 601.2.\n\n[Bot1 Deck]\nCard B\n\n[Bot2 Deck]\nIsland x20\n\n"
-                          "[Actions]\nBot1.Hand.Card B.Cast\n? Bot1.Mana =\n\n[Expect]\nBot1.Battlefield.Card B = 1\n")
+    def card_b_scenario(self, name="Card B"):
+        return self.write(f"scenarios/{name.lower().replace(' ', '-')}-shows-itself.cantrip",
+                          f"# {name}: it is cast.\n# CR 601.2.\n\n[Bot1 Deck]\n{name}\n\n[Bot2 Deck]\nIsland x20\n\n"
+                          f"[Actions]\nBot1.Hand.{name}.Cast\n? Bot1.Mana =\n\n[Expect]\nBot1.Battlefield.{name} = 1\n")
 
     def report_path(self):
         return os.path.join(self.main, ".card-lane", "q", "card-b", "report.json")
@@ -852,15 +851,21 @@ class LaneTest(unittest.TestCase):
         self.card_b_scenario()
         self.commit_with_gates(lane)
         self.assertEqual(self.status(self.state(), "Card B"), "review")
+        # the gate branch gets a cherry-picked copy: its own commit, above main, and not touching the queue branch
         head = self.git(self.main, "rev-parse", "HEAD")
-        self.assertEqual(self.git(self.main, "rev-parse", "card-lane/review"), head)
-        self.assertNotEqual(self.git(self.main, "rev-parse", "card-lane/q"), head)
-        body = self.git(self.main, "log", "-1", "--format=%B")
+        gate = self.git(self.main, "rev-parse", "card-lane/q-review")
+        # a cherry-pick of the tip onto the same parent reproduces it; what matters is where it is
+        self.assertNotEqual(self.git(self.main, "rev-parse", "card-lane/q"), gate)
+        body = self.git(self.main, "log", "-1", "--format=%B", gate)
         self.assertTrue(body.startswith("Card: Card B"))
         self.assertNotIn("Closes #", body)  # only the review's pass closes the issue
         card = next(entry for entry in self.state()["cards"] if entry["name"] == "Card B")
         self.assertEqual(card["review"]["author"], "w1")
         self.assertEqual(card["review"]["commits"], [head])
+        self.assertEqual(card["review"]["head"], gate)
+        # the worktree is left on its own branch, clean
+        self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
+        self.assertEqual(self.git(self.main, "rev-parse", "--abbrev-ref", "HEAD"), "main")
 
     def test_review_pass_moves_the_card_onto_the_queue_and_writes_its_closes(self):
         lane = load_lane()
@@ -872,12 +877,54 @@ class LaneTest(unittest.TestCase):
         passed = self.lane(self.main, "review", "--queue", "q", "--pass", "Card B")
         self.assertEqual(passed.returncode, 0, passed.stderr)
         self.assertEqual(self.status(self.state(), "Card B"), "done")
-        self.assertEqual(self.git(self.main, "rev-parse", "card-lane/q"),
-                         self.git(self.main, "rev-parse", "HEAD"))
-        body = self.git(self.main, "log", "-1", "--format=%B")
+        # the card's commits are cherry-picked onto the queue branch: a new commit there, not a merged tip
+        queue = self.git(self.main, "rev-parse", "card-lane/q")
+        self.assertNotEqual(queue, self.git(self.main, "rev-parse", "card-lane/q-review"))
+        body = self.git(self.main, "log", "-1", "--format=%B", queue)
         self.assertTrue(body.startswith("Card: Card B"))
         self.assertTrue(body.rstrip().endswith("Closes #9"), body)
+        # and the queue branch is a straight line: the card, on main, and no merge commit anywhere
+        self.assertEqual(self.git(self.main, "log", "--format=%s", "card-lane/q").splitlines()[0], "Card: Card B")
+        self.assertEqual(self.git(self.main, "rev-list", "--merges", "card-lane/q").strip(), "")
         self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
+
+    def test_the_lane_cherry_picks_the_cards_commits_and_nothing_else(self):
+        """The review branch is a line of card work: whatever the worktree carried stays behind it."""
+        lane = load_lane()
+        # a commit of this worktree's own, on no shared branch: it must not travel to the gate
+        self.write("notes/scratch.md", "a thought\n")
+        self.git(self.main, "add", "-A")
+        self.git(self.main, "commit", "-q", "-m", "a worktree's own scratch")
+        self.assertEqual(self.queue("--card", "Card B").returncode, 0)
+        self.assertEqual(self.lane(self.main, "next", "--id", "w1", "--queue", "q",
+                                   "--issue", "9").returncode, 0)
+        self.card_b_scenario()
+        self.commit_with_gates(lane)
+        subjects = self.git(self.main, "log", "--format=%s", "card-lane/q-review").splitlines()
+        self.assertEqual(subjects[0], "Card: Card B")
+        self.assertNotIn("a worktree's own scratch", subjects)
+        self.assertEqual(self.git(self.main, "rev-list", "--merges", "card-lane/q").strip(), "")
+
+    def test_two_cards_reach_the_queue_as_two_commits_and_no_merge(self):
+        lane = load_lane()
+        self.assertEqual(self.queue("--card", "Card B", "--card", "Card C").returncode, 0)
+        for worker, name in (("w1", "Card B"), ("w2", "Card C")):
+            self.assertEqual(self.lane(self.main, "next", "--id", worker, "--queue", "q",
+                                       "--issue", "9").returncode, 0)
+            self.card_b_scenario(name)
+            gates = [{"name": "scope", "status": "pass", "summary": "checks out", "detail": "", "facts": {}}]
+            saved = os.getcwd()
+            os.chdir(self.main)
+            try:
+                with mock.patch.object(lane, "check_card", mock.Mock(return_value=gates)):
+                    lane.cmd_commit(commit_args(worker=worker, card=name))
+            finally:
+                os.chdir(saved)
+            passed = self.lane(self.main, "review", "--queue", "q", "--pass", name)
+            self.assertEqual(passed.returncode, 0, passed.stderr)
+        subjects = self.git(self.main, "log", "--format=%s", "card-lane/q").splitlines()
+        self.assertEqual(subjects[:2], ["Card: Card C", "Card: Card B"])
+        self.assertEqual(self.git(self.main, "rev-list", "--merges", "card-lane/q").strip(), "")
 
     def test_a_card_cleared_from_the_gate_still_holds_its_place_until_it_passes(self):
         self.assertEqual(self.queue("--card", "Card B").returncode, 0)
@@ -917,7 +964,8 @@ class LaneTest(unittest.TestCase):
         # and a fix that passed again does not close the issue a second time
         self.lane(self.main, "review", "--queue", "q", "--pass", "Card B")
         self.assertEqual(self.status(self.state(), "Card B"), "done")
-        self.assertEqual(self.git(self.main, "log", "-1", "--format=%B").count("Closes #9"), 1)
+        self.assertEqual(self.git(self.main, "log", "card-lane/q", "--format=%B").count("Closes #9"), 1)
+        self.assertEqual(self.git(self.main, "status", "--porcelain"), "")
 
     def test_the_review_gate_caps_the_queue_at_twenty_cards(self):
         names = [f"Card {n}" for n in range(20)]

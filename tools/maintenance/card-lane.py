@@ -29,14 +29,21 @@ parallel without taking the same card:
   away with the slot). A packet holds `brief.md`, `reference.md` (everything `new-card.py` prints: Oracle text,
   rulings, CR, prior art, test points), `prior-art.md` (the matched cards' code and a scenario), the content JSON and
   `state.json`. Nothing is written outside the worktree.
-- **Two shared branches, in order.** Every claim starts from `card-lane/<queue>`: `next` merges its tip into the slot
-  before work, and `share` (or `done`, `block`, `release`) updates it from the slot with a compare-and-swap. A
-  `Mechanics:` or `Engine:` commit made by one implementor is therefore in the next implementor's tree, so shared
-  mechanics and implemented gaps are reused instead of written twice. **A card that passes every gate does not land
-  from there:** `commit` puts its commits on the review branch `card-lane/<review>` and the card waits at the review
-  gate until a reviewer passes or blocks it (`review`). `review --pass` is the only thing that moves its commits onto
-  `card-lane/<queue>`, where a fix back from the author also goes; `review --fix` brings that fix to the gate and
-  merges the queue branch, so nothing queued is ever in review twice.
+- **Two branches per queue, in that order.**
+  - `card-lane/<queue>-review` is where every card in progress lives. `next` merges its tip into the slot before work,
+    so a `Mechanics:` or `Engine:` commit made by one implementor is in the next implementor's tree and shared game
+    rules are reused instead of written twice. `commit` cherry-picks the card's own commits onto it, and `share` (or
+    `done`, `block`, `release`) puts hand-committed work there with a compare-and-swap.
+  - `card-lane/<queue>` is the reviewed line: only `review --pass` writes to it, by cherry-picking the card's commits
+    on top of its tip once a reviewer has cleared them. It is what a release pushes and lands.
+  - **Everything is cherry-picked, never merged.** A shared branch is a straight line of card work: a worktree has
+    whatever it was handed (the gate's tip, its own scratch, an earlier card), and merging that in would bury the
+    card's commits in the history of a branch nobody worked on. So `commit` replays the card's own commits onto the
+    gate and `review --pass` replays the gate's onto the queue branch, in order, one at a time, and the branch only
+    moves when every replay succeeded - a conflict leaves it untouched. A worktree therefore keeps its own history and
+    the shared branches keep one commit per card's commit, in the order they were reviewed.
+  - `review --fix` brings a blocked card's fix back to the gate: the fix's new commits from the queue branch are
+    cherry-picked onto `card-lane/<queue>-review` above the card's own, so nothing queued is ever in review twice.
 - **The review gate holds at most 20 cards** (per queue). `next` claims no new card once 20 are at the gate: a card
   waiting on a reviewer is work in front of the queue, not work left to hand out, and a gate nobody clears stops
   everything until it is cleared. A blocked card's own fix is not a new card and does not count twice.
@@ -67,15 +74,14 @@ The card's quality gates are the lane's too, adapted from the add-cards flow and
   `commit --message engine="..."`/`--message mechanics="..."` (or `@file`) when it does not. The subject says what
   changed in the rules' words, never a function's name, and the body says why; the repository's own
   `git log --format=%B --grep="^Engine:"` is the model. A `Client:` message is left as written.
-- **The review gate.** A card that passes `commit` goes to `card-lane/<review>` and waits; the card does not become
-  `done`, and its commit closes no issue yet. The reviewer follows `review.md` and clears it: `review --pass` moves
-  its commits onto the queue branch and writes the `Closes #N` (once - a card cleared again after a fix keeps the
-  issue it already closed); `review --block --findings N --note "..."` gives it back to its author, who fixes it,
-  commits an `Engine:`/`Mechanics:` commit of its own (rewritten the same way) when the finding changes shared code,
-  `share`s it on the queue branch, and brings it back with `review --fix`.
+- **The review gate.** A card that passes `commit` goes to `card-lane/<queue>-review` and waits; the card does not
+  become `done`, and its commit closes no issue yet. The reviewer follows `review.md` and clears it: `review --pass`
+  cherry-picks its commits onto `card-lane/<queue>` and rewrites the Card commit to end `Closes #N` (once - a card
+  cleared again after a fix keeps the issue it already closed); `review --block --findings N --note "..."` gives it
+  back to its author, who fixes it, commits an `Engine:`/`Mechanics:` commit of its own (rewritten the same way) when
+  the finding changes shared code, `share`s it, and brings it back with `review --fix`.
 """
 
-import argparse
 import argparse
 import contextlib
 import datetime
@@ -97,7 +103,6 @@ import worktrees  # noqa: E402  the pool's state is read through its own model, 
 
 PACKETS = ".card-lane"
 DEFAULT_QUEUE = "default"
-DEFAULT_REVIEW = "review"
 # The review gate's cap: a queue with this many cards waiting at the review branch claims no new card until one is
 # cleared (`review --pass` or `review --block`). Two less than a full review round, so the review agents always have
 # room to run beside the implementors.
@@ -223,14 +228,14 @@ def worker_id(value):
 class Store:
     """One queue, in the repository's git common directory, shared by every worktree and changed under a lock."""
 
-    def __init__(self, common, name=DEFAULT_QUEUE, review=DEFAULT_REVIEW):
+    def __init__(self, common, name=DEFAULT_QUEUE):
         self.name = queue_name(name)
-        self.review = queue_name(review, "--review")
         self.dir = os.path.join(common, "card-lane", self.name)
         self.path = os.path.join(self.dir, "queue.json")
         self.lock_path = os.path.join(self.dir, "queue.lock")
         self.branch = f"card-lane/{self.name}"
-        self.review_branch = f"card-lane/{self.review}"
+        # the gate is the queue's own: one queue, one review branch, never a lane chosen per command
+        self.review_branch = f"card-lane/{self.name}-review"
         os.makedirs(self.dir, exist_ok=True)
 
     def read(self):
@@ -248,7 +253,6 @@ class Store:
                 time.sleep(0.05)
         state.setdefault("queue", self.name)
         state.setdefault("branch", self.branch)
-        state.setdefault("review", self.review)
         state.setdefault("review_branch", self.review_branch)
         state.setdefault("created", now())
         state.setdefault("updated", now())
@@ -478,13 +482,18 @@ def review_base(root, store):
     return branch_tip(root, store.review_branch) or base
 
 
-def queue_gap(root, store, base):
-    """The tip of the queue branch when it carries a commit the review branch lacks - a fix back from its author - or
-    None. The review branch merges it, so a queued card's commits are never in review twice."""
-    queue = branch_tip(root, store.branch)
-    if not queue or queue == base or ancestor(root, queue, base):
-        return None
-    return queue
+def ensure_review_branch(root, store):
+    """`card-lane/<queue>-review`, cut from remote main, the queue's own gate: every card in progress is on it."""
+    return review_base(root, store)
+
+
+def card_commit_of(root, shas):
+    """The card's own commit among a card's commits: the last one that is not shared code."""
+    found = None
+    for sha in shas or []:
+        if commit_kind_of(root, sha) == "card":
+            found = sha
+    return found
 
 
 def ancestor(root, older, newer):
@@ -583,17 +592,23 @@ def checked_out_elsewhere(root, branch):
 
 
 def merge_branch(root, store):
-    """Bring the queue's branch into this worktree before a card is opened."""
-    tip = branch_tip(root, store.branch)
+    """Bring the queue's shared work into this worktree before a card is opened.
+
+    That is the review branch, not the queue branch: every card in progress is on the gate, so a shared `Engine:` or
+    `Mechanics:` commit reaches the next implementor from there. The queue branch carries only cards a reviewer has
+    already cleared. `commit` cherry-picks a card's own commits onto whichever of the two it lands on, so the history
+    this worktree was handed never travels to a shared branch.
+    """
+    tip = branch_tip(root, store.review_branch) or branch_tip(root, store.branch)
     if not tip or ancestor(root, tip, "HEAD"):
         return None
     require_clean(root, "before the shared branch is merged in")
     result = git(root, "merge", "--no-edit", tip, check=False)
     if result.returncode != 0:
         git(root, "merge", "--abort", check=False)
-        raise Refused(f"{store.branch} does not merge cleanly into this worktree; nothing is left half-merged:\n"
-                      f"{(result.stdout + result.stderr).strip()[-1200:]}\n"
-                      f"Resolve it by hand with `git merge {store.branch}`, or tell the coordinator.")
+        raise Refused(f"{store.review_branch} does not merge cleanly into this worktree; nothing is left "
+                      f"half-merged:\n{(result.stdout + result.stderr).strip()[-1200:]}\n"
+                      f"Resolve it by hand with `git merge {store.review_branch}`, or tell the coordinator.")
     return tip
 
 
@@ -630,6 +645,51 @@ def publish(root, store, claim=None, branch=None):
             return new, shared
         time.sleep(0.1)  # another worker updated the branch first: merge what it shared and retry
     raise Refused(f"{target} kept moving while this worktree tried to share; try again")
+
+
+def cherry_pick(root, target, shas, what):
+    """Put these commits on `target`, in order, as new commits - never a merge.
+
+    A shared branch is a straight line of card work. A worktree's branch has whatever it was handed (the queue
+    branch's tip, its own scratch, an earlier card), and merging it into `target` would bury the card's commits in the
+    history of a branch nobody worked on. So `target` is detached, checked out, and the commits are replayed onto it
+    one at a time; the branch only moves once every replay succeeded, so a conflict leaves it exactly as it was. The
+    worktree goes back to its own branch either way.
+    """
+    if not shas:
+        return branch_tip(root, target)
+    require_clean(root, f"before {target} is given {what}")
+    here = require_branch(root)
+    old = branch_tip(root, target)
+    if old is None:
+        raise Refused(f"{target} is missing: a shared branch starts at {MAIN} (`git branch {target} {MAIN}`)")
+    elsewhere = checked_out_elsewhere(root, target)
+    if elsewhere:
+        raise Refused(f"{target} is checked out in {elsewhere}: a shared branch is never checked out, so the lane "
+                      f"cannot replay {what} onto it")
+    started = git(root, "switch", "--quiet", "--detach", old, check=False)
+    if started.returncode != 0:
+        raise Failed(f"git switch --detach {old[:9]} failed:\n{(started.stdout + started.stderr).strip()[-1500:]}")
+    try:
+        for sha in shas:
+            replayed = git(root, "cherry-pick", sha, check=False)
+            if replayed.returncode != 0:
+                git(root, "cherry-pick", "--abort", check=False)
+                raise Refused(f"{what} does not replay onto {target} cleanly; {target} is unchanged:\n"
+                              f"  {git(root, 'log', '-1', '--format=%h %s', sha, check=False).stdout.strip()}\n"
+                              f"{(replayed.stdout + replayed.stderr).strip()[-1200:]}\n"
+                              f"Resolve it by hand: `git switch --detach {target}`, `git cherry-pick {sha[:9]}`, fix "
+                              f"the card, then `git branch -f {target}`.")
+        new = head_sha(root)
+        moved = git(root, "update-ref", f"refs/heads/{target}", new, old, check=False)
+        if moved.returncode != 0:
+            raise Refused(f"{target} moved while {what} was being replayed onto it: try again")
+    finally:
+        back = git(root, "switch", "--quiet", here, check=False)
+        if back.returncode != 0:
+            raise Failed(f"{what} is on {target}, but this worktree could not go back to {here}:\n"
+                         f"{(back.stdout + back.stderr).strip()[-1500:]}")
+    return new
 
 
 # ---- the pool -------------------------------------------------------------------------------------------------------
@@ -2027,11 +2087,27 @@ def parsed_messages(values):
 
 
 def to_review(root, store, wid, card, made, note=""):
-    """Hand the card to the review gate: its commits go on the review branch, the claim becomes a card in review."""
+    """Hand the card to the review gate: its commits are cherry-picked onto `card-lane/<queue>-review`.
+
+    Only the card's own commits go, in order, replayed onto the gate - so the review branch is a straight line of
+    card work and carries none of the worktree's history, and a card that came back for a fix adds only the fix's new
+    commits.
+    """
     base = review_base(root, store)
-    new, shared = publish(root, store, card["claim"], branch=store.review_branch)
-    start = card["claim"].get("head") or base
-    commits = git(root, "log", "--reverse", "--format=%H", f"{start}..HEAD", check=False).stdout.split()
+    claim_head = card["claim"].get("head") or base
+    commits = git(root, "log", "--reverse", "--format=%H", f"{claim_head}..HEAD", check=False).stdout.split()
+    if not commits:
+        raise Refused(f"{card['name']} has no commit of its own: `commit` writes the Card: commit and sends it here")
+    start = base
+    before = (card.get("review") or {}).get("commits") or []
+    if before:
+        # a fix back from its author: only the commits above the ones already in review are new
+        start = before[-1]
+        commits = [sha for sha in commits if not ancestor(root, sha, start)]
+        if not commits:
+            raise Refused(f"{card['name']} has nothing new to bring back to the gate: commit the finding's fix "
+                          f"first")
+    new = cherry_pick(root, store.review_branch, commits, f"the {card['name']} commits")
     shared_commits = [commit for commit in made if commit["kind"] in ("engine", "mechanics")]
     reason = "\n\n".join(commit.get("body", "") for commit in shared_commits).strip()
     with store.locked() as state:
@@ -2039,24 +2115,25 @@ def to_review(root, store, wid, card, made, note=""):
         if recorded is None or recorded["name"] != card["name"]:
             raise Refused(f"{wid} lost its claim while the card was going to review")
         reviewed = now()
-        before = recorded.get("review") or {}
-        bumps = (before.get("bumps", 0) + 1) if before else 0  # back from a reviewer's block: not a first review
-        recorded.update(status="review", claim=None, commit=commits[-1] if commits else None, finished=None, review={
-            "author": wid, "commits": commits, "head": head_sha(root), "branch": store.review_branch,
-            "reviewed": reviewed, "note": note, "reason": reason, "bumps": bumps, "state": "waiting",
-            "shared": [commit["kind"] for commit in shared_commits],
+        prior = recorded.get("review") or {}
+        bumps = (prior.get("bumps", 0) + 1) if prior else 0  # back from a reviewer's block: not a first review
+        recorded.update(status="review", claim=None, commit=commits[-1], finished=None, review={
+            "author": wid, "commits": (before + commits), "head": new, "branch": store.review_branch,
+            "reviewed": reviewed, "note": note, "reason": reason or prior.get("reason", ""), "bumps": bumps,
+            "state": "waiting", "shared": [commit["kind"] for commit in shared_commits] or prior.get("shared", []),
             "issue": card["claim"].get("issue"), "no_issue": card["claim"].get("no_issue")})
         store.log(state, "review", id=wid, card=card["name"], branch=store.review_branch, commits=commits,
                   shared=len(shared_commits))
         held = review_pending(state)
     print(f"{card['name']}: in review on {store.review_branch} at {new[:9]} ({held}/{REVIEW_LIMIT} at the gate).")
+    for sha in commits:
+        print(f"    {sha[:9]} {git(root, 'log', '-1', '--format=%s', sha).stdout.strip()}")
     if shared_commits:
         print(f"  it carries a {', '.join(commit['kind'] for commit in shared_commits)} commit: the reviewer weighs its"
               f" message against the code.")
     print(f"  clear it with `review --pass --card \"{card['name']}\"` or")
     print(f"  `review --block --card \"{card['name']}\" --findings <n> --note \"...\"`.")
     return 0
-
 
 # ---- the review gate -------------------------------------------------------------------------------------------------
 
@@ -2098,28 +2175,44 @@ def commit_kind_of(root, sha):
 
 
 def review_fix(root, store, card, review):
-    """A blocked card is back: its author shares the fix on the queue branch and brings it to the gate with `--fix`."""
+    """A blocked card is back: its author shares the fix on the queue branch and brings it to the gate with `--fix`.
+
+    The fix's commits are the ones on the queue branch that the card's own commits do not already carry - cherry-picked
+    onto the gate, so the review branch stays a line of card work. A fix that shares an `Engine:` or `Mechanics:`
+    change therefore arrives as that commit plus the card commit that uses it.
+    """
     ensure_branch(root, store)
-    base = review_base(root, store)
-    gap = queue_gap(root, store, base)
-    if gap is None:
+    ensure_review_branch(root, store)
+    review_shas = review.get("commits") or []
+    known = set(review_shas)
+    queue_tip = branch_tip(root, store.branch)
+    if not queue_tip:
+        raise Refused(f"{store.branch} is missing: the fix is shared there first")
+    since = review_shas[-1] if review_shas else main_tip(root)
+    fix = [sha for sha in git(root, "log", "--reverse", "--format=%H", f"{since}..{queue_tip}",
+                              check=False).stdout.split() if sha not in known]
+    if not fix:
         raise Refused(f"{card['name']} has no fix on {store.branch}: commit the finding's fix on its own branch, "
                       f"`share` it, then `review --fix --card \"{card['name']}\"`")
-    if not ancestor(root, gap, head_sha(root)):
-        raise Refused(f"this worktree is behind {gap}, the fix on {store.branch}: merge or rebase onto it first")
-    new, _ = publish(root, store, None, branch=store.review_branch)
+    new = cherry_pick(root, store.review_branch, fix, f"the {card['name']} fix")
     with store.locked() as state:
         recorded = card_of(state, card["name"])
         if recorded is None or recorded.get("status") != "review":
             raise Refused(f"{card['name']} left the review gate while its fix was going back")
+        recorded["review"]["commits"] = review_shas + fix
         recorded["review"]["bumps"] = recorded["review"].get("bumps", 0) + 1
         recorded["review"]["head"] = new
         recorded["review"]["reviewed"] = now()
         recorded["review"]["state"] = "waiting"
-        store.log(state, "review-fix", card=card["name"], branch=store.review_branch, tip=new)
+        for sha in fix:
+            kind = commit_kind_of(root, sha)
+            if kind in ("engine", "mechanics") and kind not in recorded["review"].get("shared", []):
+                recorded["review"].setdefault("shared", []).append(kind)
+        store.log(state, "review-fix", card=card["name"], branch=store.review_branch, commits=fix, tip=new)
     print(f"{card['name']}: the fix is back at the review gate, {store.review_branch} at {new[:9]}: review it again.")
+    for sha in fix:
+        print(f"    {sha[:9]} {git(root, 'log', '-1', '--format=%s', sha).stdout.strip()}")
     return 0
-
 
 def note_problem(note):
     """Why a `--note` does not record what a shared-code change decides, or None."""
@@ -2194,45 +2287,40 @@ def closable(root, card):
 
 
 def add_closes(root, store, review, issue):
-    """Write the `Closes #N` the Card commit could not carry while the card was only in review.
+    """The card's commit, rewritten to end `Closes #N`, as a commit to replay onto the queue branch.
 
-    The card's commit is the one under review, and a fix back from its author may sit above it. So the branch is
-    reset to that commit, its message amended, and everything above replayed with `git rebase --onto` - a history
-    rewrite git does, rather than one the lane assembles by hand out of `commit-tree` and `cherry-pick`.
+    The card commit could not carry the close while it was only in review. It is the last commit of its own among the
+    ones under review (a fix back from its author may sit above it), so that commit is replayed with its message
+    amended - onto the queue branch's tip, never by rewriting the review branch the reviewer signed off on.
     """
     shas = review.get("commits") or []
     if not shas:
         return None
-    sha = shas[-1]
-    body = git(root, "log", "-1", "--format=%B", sha).stdout.replace("\r\n", "\n").rstrip()
+    card_commit = None
+    for sha in shas:
+        if commit_kind_of(root, sha) == "card":
+            card_commit = sha
+    if not card_commit:
+        return None
+    body = git(root, "log", "-1", "--format=%B", card_commit).stdout.replace("\r\n", "\n").rstrip()
     if re.search(r"^Closes #", body, re.M):
         return None
-    tip = branch_tip(root, store.review_branch)
-    if not tip or not ancestor(root, sha, tip):
-        raise Refused(f"{sha} is not on {store.review_branch}: the card's commit is not the one in review")
     require_clean(root, "before the Card commit's message is amended")
-    here = head_sha(root)
-    git(root, "reset", "--hard", "--quiet", sha)
-    amendment = f"{body}\n\nCloses #{issue}"
-    amended = git(root, "commit", "--amend", "--quiet", "-m", amendment, check=False)
-    if amended.returncode != 0:
-        raise Failed(f"git commit --amend failed:\n{(amended.stdout + amended.stderr).strip()[-2000:]}")
-    new = head_sha(root)
-    if tip != sha:
-        replayed = git(root, "rebase", "--quiet", "--onto", new, sha, tip, check=False)
-        if replayed.returncode != 0:
-            git(root, "rebase", "--abort", check=False)
-            git(root, "reset", "--hard", "--quiet", here)
-            raise Refused("the commits above the card's do not replay onto its amended message:\n"
-                          + (replayed.stdout + replayed.stderr).strip()[-1200:])
-        new = head_sha(root)
-    result = git(root, "update-ref", f"refs/heads/{store.review_branch}", new, tip, check=False)
-    if result.returncode != 0:
-        raise Refused(f"{store.review_branch} moved while the card's close was being written: try `review"
-                      f" --pass` again")
-    print(f"  the Card commit now ends `Closes #{issue}`")
-    return new
-
+    here = require_branch(root)
+    started = git(root, "switch", "--quiet", "--detach", card_commit, check=False)
+    if started.returncode != 0:
+        raise Failed(f"git switch --detach {card_commit[:9]} failed:\n{(started.stdout + started.stderr).strip()[-1500:]}")
+    try:
+        amended = git(root, "commit", "--amend", "--quiet", "-m", f"{body}\n\nCloses #{issue}", check=False)
+        if amended.returncode != 0:
+            raise Failed(f"git commit --amend failed:\n{(amended.stdout + amended.stderr).strip()[-2000:]}")
+        marked = head_sha(root)
+    finally:
+        back = git(root, "switch", "--quiet", here, check=False)
+        if back.returncode != 0:
+            raise Failed(f"could not go back to {here}:\n{(back.stdout + back.stderr).strip()[-1500:]}")
+    print(f"  the Card commit will end `Closes #{issue}` on {store.branch}")
+    return marked
 
 def log_progress(root, issue, event, **fields):
     """Tell the card's issue, as `card-issues.py log` does. A repository without issues is not a failure here."""
@@ -2251,40 +2339,41 @@ def log_progress(root, issue, event, **fields):
 
 
 def review_pass(root, store, card):
-    """Clear a card from the gate onto the queue branch - the only way its commits leave the review branch."""
+    """Clear a card from the gate onto the queue branch: the only way its commits leave the review branch.
+
+    The card's commits are cherry-picked onto `card-lane/<queue>` in order, so that branch is a straight line of
+    reviewed card work however many worktrees shared it, and the review branch keeps its own copy for the record.
+    """
     ensure_branch(root, store)
     review = card["review"]
-    if not review.get("commits"):
+    shas = list(review.get("commits") or [])
+    if not shas:
         raise Refused(f"{card['name']} has no review commit recorded: pass --review <sha>")
     issue = closable(root, card)
-    if issue:
-        # the card's commit closes its issue here, on the pass that clears it - a card that came back for a fix
-        # has no `Closes` yet, so the first pass to clear it writes the only one
-        if add_closes(root, store, review, issue):
-            git(root, "reset", "--hard", "--quiet", branch_tip(root, store.review_branch))
-    new, _ = publish(root, store, None, branch=store.branch)
-    shas = git(root, "log", "--reverse", "--format=%h", f"{review['commits'][0]}^..HEAD").stdout.split()
-    last = git(root, "rev-parse", "HEAD").stdout.strip()
-    for sha in reversed(shas):
-        if commit_kind_of(root, sha) == "card":
-            last = git(root, "rev-parse", sha).stdout.strip()
-            break
+    marked = add_closes(root, store, review, issue) if issue else None
+    if marked:
+        # the close goes on the queue branch in place of the card commit it was copied from
+        replay = [marked if sha == card_commit_of(root, shas) else sha for sha in shas]
+    else:
+        replay = shas
+    new = cherry_pick(root, store.branch, replay, f"the {card['name']} commits")
+    last = card_commit_of(root, replay) or replay[-1]
     with store.locked() as state:
         recorded = card_of(state, card["name"])
         if recorded is None or recorded.get("status") != "review":
             raise Refused(f"{card['name']} left the review gate while it was being cleared")
         recorded.update(status="done", commit=last[:9], finished=now(), claim=None)
         recorded["review"]["cleared"] = now()
-        recorded["review"]["head"] = head_sha(root)
-        store.log(state, "review-pass", card=card["name"], branch=store.branch, commits=shas)
+        recorded["review"]["head"] = new
+        recorded["review"]["landed"] = replay
+        store.log(state, "review-pass", card=card["name"], branch=store.branch, commits=replay)
         held = review_pending(state)
-    print(f"{card['name']}: reviewed and passed, on {store.branch} at {new[:9]}:")
-    for sha in shas:
-        print(f"    {sha} {git(root, 'log', '-1', '--format=%s', sha).stdout.strip()}")
+    print(f"{card['name']}: reviewed and passed, cherry-picked onto {store.branch} at {new[:9]}:")
+    for sha in replay:
+        print(f"    {sha[:9]} {git(root, 'log', '-1', '--format=%s', sha).stdout.strip()}")
     print(f"  {held} of {REVIEW_LIMIT} at the gate. Push and land it: `git push origin {store.branch}`.")
     log_progress(root, card.get("issue") or review.get("issue"), "review-passed")
     return 0
-
 
 def review_list(root, store):
     state = store.read()
@@ -2309,7 +2398,7 @@ def review_list(root, store):
 def cmd_review(args):
     """The review gate: list it, hand a card to a reviewer, take a fix back, and pass or block it."""
     root = worktree_root()
-    store = Store(common_dir(root), args.queue, args.review_lane or DEFAULT_REVIEW)
+    store = Store(common_dir(root), args.queue)
     pool_context(root)
     named = args.pass_card or args.block or args.fix
     if not (named or args.list):
@@ -2723,12 +2812,8 @@ def command_line(argv=None):
 
     def queue_flag(p):
         p.add_argument("--queue", default=DEFAULT_QUEUE, metavar="NAME",
-                       help=f"the shared queue (default {DEFAULT_QUEUE}); its branch is card-lane/<NAME>")
-
-    def review_lane_flag(p):
-        p.add_argument("--review-lane", default=DEFAULT_REVIEW, metavar="LANE",
-                       help=f"the review branch under card-lane/ (default {DEFAULT_REVIEW}); the queue's review gate "
-                            f"is card-lane/<LANE>")
+                       help=f"the shared queue (default {DEFAULT_QUEUE}); its branches are card-lane/<NAME> for "
+                            f"reviewed work and card-lane/<NAME>-review for the gate")
 
     cmd = sub.add_parser("queue", help="make or extend the shared queue")
     queue_flag(cmd)
@@ -2768,7 +2853,6 @@ def command_line(argv=None):
 
     cmd = sub.add_parser("commit", help="gate the card, commit it in the add-cards shape, and send it to review")
     queue_flag(cmd)
-    review_lane_flag(cmd)
     cmd.add_argument("--id", required=True, metavar="WORKER")
     cmd.add_argument("--issue", type=int, metavar="N", help="the GitHub issue the Card commit closes")
     cmd.add_argument("--no-issue", action="store_true",
@@ -2788,7 +2872,6 @@ def command_line(argv=None):
     cmd = sub.add_parser("review",
                          help="the review gate: the cards waiting on the review branch, and their verdicts")
     queue_flag(cmd)
-    review_lane_flag(cmd)
     cmd.add_argument("--list", action="store_true", help="the cards at the gate, oldest first")
     cmd.add_argument("--pass", dest="pass_card", metavar="NAME", help="the review passed: clear it onto the queue")
     cmd.add_argument("--block", metavar="NAME",

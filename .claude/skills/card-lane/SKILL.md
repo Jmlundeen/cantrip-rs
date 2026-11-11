@@ -21,14 +21,20 @@ queue, the claim, the packet, the two shared branches, `check`, `commit` and `re
   `new-card.py` prints: Oracle text, rulings, CR rules, prior art, test points), `prior-art.md` (the matched cards'
   code and a scenario), `content.json`, `report.json` (the line-by-line evidence `check` reads) and `state.json`.
   Gitignored, regenerable, thrown away with the slot.
-- **Two shared branches, in order.** `card-lane/<queue>` is the work branch: `next` merges its tip into the slot
-  before a card is opened, and `share`, `done`, `block` and `release` update it with a compare-and-swap. It is cut from
-  remote main (`origin/main`), never from the checkout that ran `queue`; a worktree carrying the lane's own files is
-  refused, and an existing queue branch cut from the lane's work is refused. A `Mechanics:` or `Engine:` commit made
-  by one implementor is therefore in the next implementor's worktree: shared mechanics and implemented engine gaps are
-  reused instead of written twice. `card-lane/<review>` is the review gate: a card that passes every gate goes there,
-  not to the queue branch, and only `review --pass` moves its commits onto the queue branch. A fix back from an author
-  goes to the queue branch and `review --fix` merges it into the review branch, so nothing queued is in review twice.
+- **Two branches per queue, in that order.**
+  - `card-lane/<queue>-review` holds every card in progress. `next` merges its tip into the slot before a card is
+    opened, and `commit` puts the card's own commits there. A `Mechanics:` or `Engine:` commit made by one implementor
+    is therefore in the next implementor's worktree: shared mechanics and implemented engine gaps are reused instead
+    of written twice. `share`, `done`, `block` and `release` update it with a compare-and-swap.
+  - `card-lane/<queue>` holds only reviewed cards. Only `review --pass` writes to it, and it is what a release pushes
+    and lands.
+  - Both are cut from remote main (`origin/main`), never from the checkout that ran `queue`; a worktree carrying the
+    lane's own files is refused, and a branch cut from the lane's work is refused.
+  - **Everything is cherry-picked; nothing is merged.** A shared branch is a straight line of card work. `commit`
+    replays the card's own commits onto the gate and `review --pass` replays the gate's onto the queue branch, in
+    order and one at a time, so only the card's commits travel - not the worktree history they were made on. The
+    branch moves only when every replay succeeded: a conflict leaves it exactly as it was and tells you to resolve it
+    by hand.
 - **The review gate holds at most 20 cards.** `next` claims no new card while 20 are at the gate: a card waiting on a
   reviewer is work in front of the queue, not work left to hand out. A blocked card's own fix does not count twice.
 
@@ -69,15 +75,16 @@ the one instruction set.
 4. **Watch, do not hand out:** `python tools/maintenance/card-lane.py status --queue trc` lists who holds what and
    whether a claim's lease or member has gone. A dead claim is freed with `release --id <id> --reason "..."` from
    its worktree, or from any worktree when the slot is gone.
-5. **Land from the shared branch.** Its commits are local until pushed: `git push origin card-lane/trc` (or land
-   them) before `tools\worktree.cmd release <lease>` - the pool refuses a slot whose commits are on no origin branch.
-   A card is on that branch only after a reviewer passed it (`review --pass`); a card still at the gate is on
-   `card-lane/review` and is not landed.
+5. **Land from the reviewed branch.** `card-lane/trc` carries only cards a reviewer passed. Its commits are local
+   until pushed: `git push origin card-lane/trc` (or land them) before `tools\worktree.cmd release <lease>` - the pool
+   refuses a slot whose commits are on no origin branch. A card still at the gate is on `card-lane/trc-review` and is
+   not landed.
 6. **Work the review gate.** `python tools/maintenance/card-lane.py review --queue trc --list` shows what waits. A
    reviewer (someone who did not write the card, `review.md`) reads it and clears it with `review --pass --card
-   "<Name>"`, or sends it back with `review --block --card "<Name>" --findings <n> --note "<the finding>"`. A blocked
-   card's author fixes it, commits an `Engine:`/`Mechanics:` commit of its own when the finding changes shared code,
-   `share`s it, and brings it back with `review --fix --card "<Name>"`.
+   "<Name>"` - which cherry-picks the card's commits onto `card-lane/trc` - or sends it back with `review --block
+   --card "<Name>" --findings <n> --note "<the finding>"`. A blocked card's author fixes it, commits an
+   `Engine:`/`Mechanics:` commit of its own when the finding changes shared code, `share`s it, and brings it back with
+   `review --fix --card "<Name>"`, which cherry-picks the fix onto `card-lane/trc-review` above the card's own commits.
 
 ## Implementor
 
@@ -118,8 +125,9 @@ you from `PROMPT.md`, it already gives your queue, id, token and core scope; thi
 
    It runs every gate, writes the `Engine:`, `Mechanics:` and `Client:` commits the change needs (each with only its
    own paths), then exactly one `Card: <Name>` commit, and sends the card to the review gate on
-   `card-lane/<review>`. No commit carries `Co-Authored-By`. If it refuses, nothing is committed (or only the commits
-   before the failing one): fix the gate and run it again. `done` also closes a claim, but it is the manual close for
+   `card-lane/<queue>-review`, by cherry-pick, so only the card's own commits travel and not the history of the
+   worktree they were made on. No commit carries `Co-Authored-By`. If it refuses, nothing is committed (or only the
+   commits before the failing one): fix the gate and run it again. `done` also closes a claim, but it is the manual close for
    work committed by hand and does not run the gates; a card you wrote uses `commit`. `--no-review` skips the gate and
    closes the card at once, for a card nobody needs to re-read.
 
@@ -139,20 +147,22 @@ you from `PROMPT.md`, it already gives your queue, id, token and core scope; thi
    `Mechanics: assimilate::assimilate_all` are refused), and the body says why; the repository's own
    `git log --format=%B --grep="^Engine:"` is the model. A `Client:` message is left as written. The existing cards
    that adopt a shared function are named in the body, in prose, never in the subject.
-5. **Share a mechanic as soon as it is committed.** `commit` shares the queue branch when it sends the card to
-   review. If you commit an `Engine:` or `Mechanics:` change by hand before the card is ready, share it so the next
-   worker starts with it:
+5. **Share a mechanic as soon as it is committed.** `commit` puts the card on the gate branch
+   (`card-lane/trc-review`) when it sends it to review. If you commit an `Engine:` or `Mechanics:` change by hand
+   before the card is ready, share it so the next worker starts with it:
 
    ```sh
    python tools/maintenance/card-lane.py share --id w1 --queue trc
    ```
 
-   That merges the queue's branch into your slot if someone else moved it, then moves the branch to your `HEAD`.
+   That merges the gate branch into your slot if someone else moved it, then moves the gate branch to your `HEAD`.
+   `commit` and `review` cherry-pick instead (`card-lane/<queue>-review` for work in progress,
+   `card-lane/<queue>` for cards a reviewer passed), so a shared branch is always a straight line of card work.
 6. **The core is yours when the card needs it.** A missing rule is a gap to fill, never a reason to block and never a
    workaround: write the core change proper and for every card (mirror the rule, cite the CR, never widen a central
    switch for one card), and benchmark it (`cargo run --release -p cantrip-bench -- --games 128`, the "engine
    answering" line before and after, reported with it). `commit` writes it as the `Engine:` commit *before* the
-   `Mechanics:` and `Card:` commits, so `share` puts the core on the queue's branch first and the next implementor
+   `Mechanics:` and `Card:` commits, so `share` puts the core on the gate branch first and the next implementor
    starts with it. Its message is rewritten like any other `Engine:` message.
 7. **Block only what the core cannot express.** If even a core change cannot say what the text needs, block with the
    rule - never a workaround:
@@ -240,6 +250,9 @@ what keeps two builds off each other.
   worktree under another id.
 - It does not merge a branch that conflicts: it aborts the merge and tells you to resolve it by hand. Nothing is left
   half-merged.
+- It never merges into a queue branch, reviewed or not: `commit` and `review` cherry-pick, so a shared branch carries
+  one line of card work and no merge commits, and a worktree's own history never reaches it. A cherry-pick that does
+  not apply cleanly leaves the branch exactly as it was and says which commit failed.
 - It does not write outside the worktree: the queue and the branch are in the repository's git common directory, the
   packet is in the worktree, and nothing is committed.
 - It is not a claim on GitHub. Two people in different clones have two queues; the issue claim is still the rule

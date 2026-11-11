@@ -90,8 +90,9 @@ The composer:
    main, otherwise `tools/maintenance/card-lane.py` in the slot. Leave `<AGENT_ID>` for the agent to fill from its
    own context (or `<WORKER>` when its harness has none). Give each agent a unique `<WORKER>`; never give it the
    slot path or lease ID, and never a card name.
-4. Watch `python <LANE> status --queue <QUEUE>`; when the agent leaves, land its commits from
-   `card-lane/<QUEUE>`, then `tools\worktree.cmd release <LEASE>`. A new card gets a new lease and a fresh agent.
+4. Watch `python <LANE> status --queue <QUEUE>`; when the agent leaves, its card waits at the review gate. Land a
+   card only after `review --pass` has cherry-picked it onto `card-lane/<QUEUE>`, then `tools\worktree.cmd release
+   <LEASE>`. A new card gets a new lease and a fresh agent.
 
 ## A solo implementor
 
@@ -115,10 +116,11 @@ Use this in a queue worktree with no pool.
 ## Several implementors at once
 
 The composer section above is the parallel form: one queue, one lease and token per implementor, a unique `<WORKER>` for
-each, and no card named in advance. The queue is atomic, so two `next` calls never take the same card; the shared
-`card-lane/<QUEUE>` branch carries an `Engine:` or `Mechanics:` commit into the next implementor's `next`. Cards go
-through the review gate (`card-lane/review`) before they reach that branch, and 20 at the gate stop new claims, so the
-composer keeps reviewers working: a gate nobody clears stops every implementor.
+each, and no card named in advance. The queue is atomic, so two `next` calls never take the same card. Two branches
+carry the work, in that order: `card-lane/<QUEUE>-review` holds every card in progress - so a shared `Engine:` or
+`Mechanics:` commit reaches the next implementor's `next` - and `card-lane/<QUEUE>` holds only cards a reviewer passed.
+Both are built by cherry-pick, one commit per card commit, so a worktree's own history never lands. 20 cards at the
+gate stop new claims, so the composer keeps reviewers working: a gate nobody clears stops every implementor.
 
 What the agent needs on the machine: `python` (3.10+), `git`, `cargo` with the MSVC toolchain on Windows, and the
 Cantrip checkout. It needs no Claude-specific tool: the prompts use the shell and file reads.

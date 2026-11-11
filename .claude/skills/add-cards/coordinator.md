@@ -35,11 +35,12 @@ core-feature agents and review agents run on Opus. Agents read only what their w
      card's scope, Oracle, scenario, corpus, lint, citation and report gates (`--fast` skips coverage and mutation),
      and `commit` runs every gate, writes the `Engine:`/`Mechanics:`/`Client:` commits and one `Card:` commit, then
      sends the card to the review gate - its `Engine:` and `Mechanics:` messages are rewritten by a person, not
-     generated from function names; `done`, `block` and `release` close one by hand. The lane's `card-lane/<queue>`
-     branch is shared, so a `Mechanics:` or `Engine:` commit made by one agent is merged into the next agent's `next`;
-     a card reaches it only when a reviewer passes it, its commits waiting on `card-lane/review` until `review --pass`
-     (and 20 cards at that gate stop `next` claiming more, so the coordinator keeps reviewers working: step 4 is
-     what clears it); both branches start at `origin/main`, so while the lane itself is being tested, run its script
+     generated from function names; `done`, `block` and `release` close one by hand. Two branches carry the work, in
+     that order: `card-lane/<queue>-review` holds every card in progress, so a `Mechanics:` or `Engine:` commit made by
+     one agent is in the next agent's `next`, and `card-lane/<queue>` holds only cards a reviewer passed. Both are
+     built by cherry-pick, one commit per card commit, so a worktree's history never lands and there are no merge
+     commits. 20 cards at the gate stop `next` claiming more, so the coordinator keeps reviewers working: step 4 is
+     what clears it. Both branches start at `origin/main`, so while the lane itself is being tested, run its script
      from the lane checkout against a queue worktree based on `origin/main` and keep the lane's own commits off the
      shared branch. The lane is dispatch and the mechanical gate, not the claim or the review: the card's GitHub issue
      is still claimed first (`claims.md`), and `review.md` is still the verdict. The command model is
