@@ -1,0 +1,60 @@
+# The Promise of Kahless {4}{B} (cast on turn 5 off two Black Lotuses) comes after Faithless Looting put a Human Warrior
+# and a Klingon Warrior into Bot1's graveyard on turn 1. Bot1 may sacrifice a Klingon or Warrior - the artifact Mox Ruby
+# is refused, and so is sacrificing both creatures at once (it is "a", one permanent, CR 701.21a) - and sacrifices the
+# Klingon Scout Battle-Scarred Survivalist, a Klingon but no Warrior, which also proves the "or" of the rule (CR 612.2).
+# "If you do" then returns both creature cards of those two types together (CR 608.2c-f): the Human Warrior Abzan Guide
+# and the Klingon Warrior Cha'DIch Investigator. The sacrificed Scout is "other" and stays in the graveyard, and the
+# Klingon Warrior Bot2 discarded to hand size on its turn stays in Bot2's graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Ruby
+Faithless Looting
+Blood-Sport Champion
+Abzan Guide
+Cha'DIch Investigator
+Battle-Scarred Survivalist
+The Promise of Kahless
+Swamp x10
+
+[Bot2 Deck]
+Island x7
+Blood-Sport Champion
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Abzan Guide; Cha'DIch Investigator)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Blood-Sport Champion.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Battle-Scarred Survivalist.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.The Promise of Kahless.Cast
+? Bot1.Mana = {B}
+! Bot1.Choose(Mox Ruby)
+! Bot1.Choose(Blood-Sport Champion; Battle-Scarred Survivalist)
+Bot1.Choose(Battle-Scarred Survivalist)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Step = Main2
+Bot1.Battlefield = Abzan Guide; Blood-Sport Champion; Cha'DIch Investigator; Klingon Warrior Token; Mox Ruby
+Bot1.Battlefield.Abzan Guide.Power = 4
+Bot1.Graveyard = The Promise of Kahless; Battle-Scarred Survivalist; Black Lotus; Black Lotus; Black Lotus; Black Lotus; Faithless Looting
+Bot2.Graveyard = Island; Blood-Sport Champion

@@ -1,0 +1,46 @@
+# The Promise of Kahless sacrifices "a Klingon or Warrior" - a permanent, not only a creature (CR 109.2, 205.3m): Firdoch Core,
+# a noncreature Kindred artifact with changeling (every creature type, CR 702.73a), is offered and sacrificed. "If you do" then
+# returns the Klingon and Warrior CREATURE cards: Cha'DIch Investigator comes back, while the other Firdoch Core that Faithless
+# Looting discarded - a Klingon and a Warrior, but no creature card - stays in the graveyard beside the sacrificed one. (The
+# Investigator's own enters ability makes the Klingon Warrior token.)
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Faithless Looting
+Firdoch Core
+Firdoch Core
+Cha'DIch Investigator
+The Promise of Kahless
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Firdoch Core; Cha'DIch Investigator)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.The Promise of Kahless.Cast
+Bot1.Choose(Firdoch Core)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Step = Main2
+Bot1.Battlefield = Cha'DIch Investigator; Klingon Warrior Token; Mox Ruby; Swamp; Swamp
+Bot1.Graveyard = The Promise of Kahless; Firdoch Core; Black Lotus; Black Lotus; Faithless Looting; Firdoch Core

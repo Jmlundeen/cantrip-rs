@@ -1,0 +1,50 @@
+# The Promise of Kahless {4}{B}: with a Klingon Scout on the battlefield and a Klingon Warrior and a Human Warrior in the
+# graveyard, Bot1 declines the "you may sacrifice a Klingon or Warrior" - the empty answer to the up-to-one choice - so
+# "if you do" does not hold: nothing leaves the graveyard and the Scout stays on the battlefield (CR 608.2c, 701.21a).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Ruby
+Faithless Looting
+Blood-Sport Champion
+Abzan Guide
+Cha'DIch Investigator
+Battle-Scarred Survivalist
+The Promise of Kahless
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Abzan Guide; Cha'DIch Investigator)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Blood-Sport Champion.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Battle-Scarred Survivalist.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.The Promise of Kahless.Cast
+Bot1.Choose()
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Step = Main2
+Bot1.Battlefield = Battle-Scarred Survivalist; Blood-Sport Champion; Mox Ruby
+Bot1.Battlefield.Battle-Scarred Survivalist.Power = 1
+Bot1.Graveyard = The Promise of Kahless; Black Lotus; Black Lotus; Black Lotus; Black Lotus; Faithless Looting; Cha'DIch Investigator; Abzan Guide
