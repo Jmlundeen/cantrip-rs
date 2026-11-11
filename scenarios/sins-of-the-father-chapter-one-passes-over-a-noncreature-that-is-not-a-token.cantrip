@@ -1,0 +1,54 @@
+# Sins of the Father, chapter I: "Each opponent sacrifices a nontoken creature of their choice." Bot2 has no nontoken
+# creature at all - only the 1/1 Warrior token Secure the Wastes made and three nontoken artifacts - so it sacrifices
+# nothing: a token is not a nontoken permanent and an artifact is not a creature (CR 701.21a). Nothing is asked of it and
+# nothing leaves its battlefield.
+
+[Bot1 Deck]
+Sins of the Father
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Secure the Wastes
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Secure the Wastes.Cast(X: 1)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sins of the Father.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Mox Pearl; Mox Emerald; Mox Jet; Warrior Token
+Bot2.Graveyard = Secure the Wastes
+Bot1.Battlefield.Sins of the Father.Counters.Lore = 1

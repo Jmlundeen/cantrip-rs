@@ -1,0 +1,91 @@
+# Sins of the Father: a Saga's three chapters. I (as it enters): Bot2 sacrifices one nontoken creature of its choice - one
+# of its three Ornithopters, while the 1/1 Warrior token Secure the Wastes made is not one (CR 701.21a) - so two
+# Ornithopters and the token stay and only one card joins the graveyard. II (after Bot1's next draw step): one 2/1 red
+# Klingon Warrior with haste for Bot1's one opponent (CR 608.2c). III (after the next draw step): exile target player's
+# graveyard - Bot2's, holding the one creature card the sacrifice put there and a sorcery - and each opponent of Bot1 loses
+# that much life: one (CR 406.2, 119.3). A creature is refused as that target: it is a player's graveyard. Then the Saga is
+# sacrificed, having reached III (CR 714.4).
+
+[Bot1 Deck]
+Sins of the Father
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Secure the Wastes
+Ornithopter
+Ornithopter
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Secure the Wastes.Cast(X: 1)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Warrior Token.Power = 1
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sins of the Father.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Count = 5
+? Bot2.Graveyard = Ornithopter; Secure the Wastes
+? Bot2.Battlefield.Warrior Token.Power = 1
+? Bot1.Battlefield.Sins of the Father.Counters.Lore = 1
+? Bot1.Battlefield.Klingon Warrior Token = (absent)
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Klingon Warrior Token.Power = 2
+? Bot1.Battlefield.Klingon Warrior Token.Toughness = 1
+? Bot1.Battlefield.Klingon Warrior Token.Colors = Red
+? Bot1.Battlefield.Klingon Warrior Token.Subtypes = Klingon; Warrior
+? Bot1.Battlefield.Klingon Warrior Token.Keywords = Haste
+? Bot1.Battlefield.Sins of the Father.Counters.Lore = 2
+[T7 Bot1.Main1]
+? Client.Bot1.Prompt.Detail = Exile target player's graveyard  ·  2 possible targets
+! Bot1.Target(Bot2.Battlefield.Warrior Token)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot2.Life = 19
+Bot2.Graveyard.Count = 0
+Exile = Ornithopter; Secure the Wastes
+Bot2.Battlefield.Warrior Token.Power = 1
+Bot1.Graveyard = Sins of the Father
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire; Mox Emerald; Klingon Warrior Token
