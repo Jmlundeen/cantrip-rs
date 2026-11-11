@@ -2163,6 +2163,21 @@ pub fn deals_combat_damage_to_player(_: &dyn Query, source: ObjectId, event: &Ev
     }
 }
 
+/// "Whenever this creature deals combat damage to an opponent" (CR 510.2, 603.2): its own combat damage to a player who is
+/// not its controller, greater than zero (CR 120.8). That player is the trigger's subject and the amount is carried in bounded
+/// `data[0]`, so `.damage_amount()` reads "that much". Questing Beast and U.S.S. Prometheus, Prototype's Multivector Assault
+/// Mode print it.
+pub fn deals_combat_damage_to_an_opponent(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: from, target: Target::Player(p), amount, kind, .. }
+            if kind.is_combat() && *from == source && *amount > 0 && *p != q.controller(source) =>
+        {
+            Some(Fired { subject: Target::Player(*p), data: [*amount, 0] })
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever this creature deals combat damage to a creature" (CR 510.2, 603.2): once for each creature it damages, judged
 /// as the damage is dealt, with "that creature" the trigger's subject. Stinkweed Imp prints it, and Kaldra Compleat grants it.
 pub fn deals_combat_damage_to_a_creature(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
