@@ -1,19 +1,8 @@
 use cantrip_api::*;
+use cantrip_mechanics::cost_reduction;
 use cantrip_oracle as oracle;
 
-/// "Spells you cast cost {1} less to cast." (CR 604.1).
-fn spells_cast_cost_1_less_rule(
-    q: &dyn Query,
-    source: ObjectId,
-    player: PlayerId,
-    costed: Costed,
-    _: &[Target],
-) -> CostDelta {
-    let Costed::Spell(_) = costed else { return CostDelta::NONE };
-    if player == q.controller(source) { CostDelta::less(1) } else { CostDelta::NONE }
-}
-
 pub static CARD: CardDef = CardDef {
-    cost_changes: &[spells_cast_cost_1_less_rule],
+    cost_changes: &[cost_reduction::spells_you_cast_cost_1_less],
     ..oracle::STONE_CALENDAR
 };

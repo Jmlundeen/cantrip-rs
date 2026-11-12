@@ -37,6 +37,13 @@ pub fn spells_you_cast(q: &dyn Query, source: ObjectId, player: PlayerId, costed
     if player == q.controller(source) && q.chars(spell).is(card_type) { CostDelta::less(amount) } else { CostDelta::NONE }
 }
 
+/// "Spells you cast cost {1} less to cast" (CR 601.2f, 118.7a): its controller's spells of any type; a generic reduction takes
+/// only the generic part. Stone Calendar and The Immortal Sun.
+pub fn spells_you_cast_cost_1_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    let Costed::Spell(_) = costed else { return CostDelta::NONE };
+    if player == q.controller(source) { CostDelta::less(1) } else { CostDelta::NONE }
+}
+
 /// Whether `spell` is the first spell `player` casts this turn that `kind` accepts (CR 601.2f, 118.7): `kind` reads a spell's
 /// characteristics as it was cast, and no other such spell was cast by them this turn - before the source came to the battlefield
 /// included, a spell that `kind` rejects not counting. Asked of this turn's casts, which hold a spell once it has been cast,
