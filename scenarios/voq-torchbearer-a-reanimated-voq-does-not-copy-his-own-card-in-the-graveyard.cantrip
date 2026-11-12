@@ -1,0 +1,44 @@
+# Voq, Torchbearer: "a copy of a creature card in a graveyard" is another card. Voq is reanimated, so while he enters his own
+# card is in the graveyard and is a creature card that would match (CR 400.7): it is not one of the candidates, leaving
+# Bot2's Entombed Llanowar Elves as the only one. Copying it makes him a 1/1, not the 4/3 he is printed as (CR 707.2, 707.9a).
+
+[Bot1 Deck]
+Swamp x2
+Entomb
+Reanimate
+Island x8
+Voq, Torchbearer x2
+Island x6
+
+[Bot2 Deck]
+Swamp
+Entomb
+Forest x8
+Llanowar Elves x3
+Forest x7
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Voq, Torchbearer)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Voq, Torchbearer)
+? Bot1.Mana =
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Klingon; Spy
+Bot1.Battlefield.Llanowar Elves.Keywords = Menace
+Bot1.Graveyard = Reanimate; Entomb
+Bot1.Life = 16

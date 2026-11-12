@@ -1,0 +1,50 @@
+# Voq, Torchbearer: "ChoH'a' — You may have Voq enter as a copy of a creature card in a graveyard, except he's a Klingon Spy in
+# addition to his other types and has menace." Bot2's Entomb puts Llanowar Elves into Bot2's graveyard, so an opponent's
+# graveyard is as available as your own (a choice, not a target, CR 608.2d). Voq enters as a copy of it: 1/1, with the Elf and
+# Druid types and Klingon and Spy added, and menace (CR 614.1c, 707.9b). Bot2's deck lists the Elves past the opening seven so
+# they are still in the library for Entomb.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Mox Pearl
+Voq, Torchbearer
+Island x15
+
+[Bot2 Deck]
+Swamp
+Entomb
+Forest x8
+Llanowar Elves x3
+Forest x7
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Voq, Torchbearer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Mox Emerald; Mox Pearl; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Klingon; Spy
+Bot1.Battlefield.Llanowar Elves.Keywords = Menace
+Bot2.Graveyard = Entomb; Llanowar Elves
+Bot2.Battlefield = Swamp

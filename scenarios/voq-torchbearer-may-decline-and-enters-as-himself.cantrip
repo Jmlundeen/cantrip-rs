@@ -1,0 +1,46 @@
+# Voq, Torchbearer: the "you may" of ChoH'a'. Declining leaves him what he is printed as: a 4/3 legendary Klingon Spy with
+# menace (CR 614.1c, 608.2d). A creature card was in Bot2's graveyard, so the question was really asked.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Mox Pearl
+Voq, Torchbearer
+Island x15
+
+[Bot2 Deck]
+Swamp
+Entomb
+Forest x8
+Llanowar Elves x3
+Forest x7
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Voq, Torchbearer.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Mox Emerald; Mox Pearl; Voq, Torchbearer
+Bot1.Battlefield.Voq, Torchbearer.Power = 4
+Bot1.Battlefield.Voq, Torchbearer.Toughness = 3
+Bot1.Battlefield.Voq, Torchbearer.Subtypes = Klingon; Spy
+Bot1.Battlefield.Voq, Torchbearer.Keywords = Menace
+Bot2.Graveyard = Entomb; Llanowar Elves
