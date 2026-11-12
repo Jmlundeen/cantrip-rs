@@ -1429,6 +1429,18 @@ pub fn opponent_casts_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Even
     }
 }
 
+/// "Whenever an opponent casts a creature spell" (CR 603.2, 601.2i): a spell cast, not one copied (CR 707.10), by a player other
+/// than the ability's controller, read as it stands on the stack. The trigger is about the player who cast it ("that player").
+/// Sam Kirk, Xenoanthropologist and Soul Barrier print it.
+pub fn opponent_casts_creature_spell(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. } if *player != me.controller && q.chars(*spell).is(CardType::Creature) => {
+            Fired::about(Target::Player(*player))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a spell from exile" (CR 601.2a, 603.2): the spell's controller is the ability's controller and the zone
 /// it was cast from, recorded on it, is exile. Appa, Steadfast Guardian and Quintorius Kand print it.
 pub fn you_cast_a_spell_from_exile(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
