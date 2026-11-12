@@ -20,3 +20,11 @@ pub fn assimilate(g: &mut dyn Game, item: &StackItem, card: ObjectId) -> Result<
     let entered = g.put_all_onto_battlefield_becoming(&[(card, item.controller)], item, &AS_BORG_ARTIFACT_CREATURE, &[(CounterKind::PlusOne, 1)])?;
     Ok(entered.first().copied())
 }
+
+/// "Assimilate target creature card ...": the ability's first target, assimilated as the ability resolves; nothing happens if
+/// the target is no longer legal (CR 608.2b). Borg Queen, Perfection Manifest and Death Is Irrelevant print it.
+pub fn assimilate_the_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(card) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    assimilate(g, item, card)?;
+    Ok(())
+}

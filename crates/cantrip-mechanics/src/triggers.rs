@@ -1710,6 +1710,18 @@ pub fn each_players_draw_step(q: &dyn Query, _: ObjectId, event: &Event) -> Opti
     each_players_step(q, event, Step::Draw)
 }
 
+/// "At the beginning of each player's end step, that player ..." (CR 513.1, 603.2), about the player whose end step it is.
+/// Fevered Visions prints it.
+pub fn each_players_end_step(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    each_players_step(q, event, Step::End)
+}
+
+/// "At the beginning of combat on each player's turn, that player ..." (CR 507.1, 603.2), about the player whose beginning of
+/// combat step it is. Peace in Our Time prints it.
+pub fn each_players_beginning_of_combat(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    each_players_step(q, event, Step::BeginCombat)
+}
+
 /// "At the beginning of each player's first main phase, that player ..." (CR 505.1a, 603.2), about the player whose precombat
 /// main phase it is. Cheering Crowd prints it.
 pub fn each_players_first_main_phase(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
@@ -2484,6 +2496,8 @@ pub const EACH_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, each_upkeep);
 pub const EACH_PLAYERS_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, each_players_upkeep);
 pub const EACH_PLAYERS_DRAW_STEP: Trigger = when(EventMask::STEP_BEGAN, each_players_draw_step);
 pub const EACH_PLAYERS_FIRST_MAIN_PHASE: Trigger = when(EventMask::STEP_BEGAN, each_players_first_main_phase);
+pub const EACH_PLAYERS_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_players_end_step);
+pub const EACH_PLAYERS_BEGINNING_OF_COMBAT: Trigger = when(EventMask::STEP_BEGAN, each_players_beginning_of_combat);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
 pub const END_OF_COMBAT: Trigger = when(EventMask::STEP_BEGAN, end_of_combat);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);

@@ -10,15 +10,6 @@ const MAY_DRAW: Question = Question::new(
     "Don't draw",
 );
 
-/// "At the beginning of combat on each player's turn" (CR 507.1): the beginning of combat step of the active player's
-/// turn, whoever that is; the ability is about that player.
-fn each_players_combat(q: &dyn Query, _: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::StepBegan { step: Step::BeginCombat } => Fired::about(Target::Player(q.state().turn.active)),
-        _ => None,
-    }
-}
-
 /// "That player may draw a card. If they do, they can't attack this turn and you put a peace counter on this enchantment."
 /// The draw is offered to that player alone; a card drawn is what makes the rest happen (CR 608.2c), not the yes - a draw a
 /// replacement took (CR 614.6) or an empty library stops is none - and the rule that keeps them from attacking is about the
@@ -55,7 +46,7 @@ fn win_the_game(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            when_asked(EventMask::STEP_BEGAN, each_players_combat),
+            triggers::EACH_PLAYERS_BEGINNING_OF_COMBAT,
             draw_for_peace,
             "At the beginning of combat on each player's turn, that player may draw a card. If they do, they can't attack this turn and you put a peace counter on this enchantment.",
         ),
