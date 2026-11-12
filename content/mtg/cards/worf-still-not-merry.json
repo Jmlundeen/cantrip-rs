@@ -1,0 +1,8 @@
+{
+  "name": "Worf, Still Not Merry",
+  "manaCost": "{3}{R}{W}",
+  "type": "Legendary Creature — Klingon Warrior Officer",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Whenever Worf attacks, for each attacking non-Faerie creature, create a tapped and attacking 1/1 blue Faerie creature token with flying."
+}

@@ -1,0 +1,46 @@
+# Worf, Still Not Merry: "Whenever Worf attacks, for each attacking non-Faerie creature, create a tapped and attacking 1/1 blue
+# Faerie creature token with flying." Worf and Llanowar Elves attack, so two creatures count - Worf himself among them - and two
+# Faeries are made together, tapped and attacking Bot2 (CR 603.4, 508.2, 508.4). All four attack for 5 + 1 + 1 + 1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Worf, Still Not Merry
+Llanowar Elves
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Worf, Still Not Merry.Cast
+? Bot1.Mana =
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Worf, Still Not Merry > Bot2; Llanowar Elves > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers.Count = 4
+? Bot1.Battlefield.Faerie Token#1.Tapped = true
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Faerie Token#1.Power = 1
+Bot1.Battlefield.Faerie Token#1.Toughness = 1
+Bot1.Battlefield.Faerie Token#1.Keywords = Flying
+Bot1.Battlefield.Faerie Token#1.Colors = Blue
+Bot1.Battlefield.Faerie Token#2.Keywords = Flying
+Bot2.Life = 12
