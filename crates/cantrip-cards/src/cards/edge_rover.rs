@@ -6,10 +6,7 @@ use cantrip_oracle as oracle;
 /// "When this creature dies, each player creates a Lander token": each player in turn order starting with the active
 /// player (CR 101.4) makes one under their own control; a player who has left the game is not "each player" (CR 800.4a).
 fn each_player_creates_a_lander(g: &mut dyn Game, _item: &StackItem) -> Result<(), Suspend> {
-    let players: Vec<PlayerId> = g.state().apnap().collect();
-    for player in players {
-        tokens::create_lander(g, player)?;
-    }
+    tokens::each_player_creates(g, &LANDER, 1)?;
     Ok(())
 }
 

@@ -556,6 +556,17 @@ pub fn create(g: &mut dyn Game, controller: PlayerId, def: &'static CardDef, cou
     g.create_tokens(def, controller, count, false)
 }
 
+/// "Each player creates `count` [token]" (CR 111.1, 101.4): `count` tokens of `def` for each player in turn order starting
+/// with the active player, each under their own control, all made together as one event so that a trigger on "one or more
+/// tokens enter" fires once; a player who has left the game is not "each player" (CR 800.4a). Edge Rover (a Lander), Party
+/// Dude (a Food) and Koloth, Tribble Hunter (two Tribbles) print it. The tokens created.
+pub fn each_player_creates(g: &mut dyn Game, def: &'static CardDef, count: u32) -> Result<Vec<ObjectId>, Suspend> {
+    let def = g.card_id(def);
+    let tokens: Vec<(CardId, PlayerId)> =
+        g.state().apnap().collect::<Vec<_>>().into_iter().flat_map(|player| std::iter::repeat((def, player)).take(count as usize)).collect();
+    g.create_tokens_together(&tokens)
+}
+
 /// "Create a 0/0 green and blue Fractal creature token. Put `n` +1/+1 counters on it" (CR 111.1, 122.1, 608.2c): two
 /// instructions, the counters put on every token that was made (a token doubler makes two) all together as one event. With
 /// `n` of 0 nothing is put, and the 0/0 token goes to the graveyard as a state-based action (CR 704.5f). The card file lists

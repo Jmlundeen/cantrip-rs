@@ -5,9 +5,7 @@ use cantrip_oracle as oracle;
 
 /// Level 1: "each player creates a Food token" (CR 111.10b), together (CR 101.4).
 fn each_player_creates_food(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
-    for player in g.state().apnap().collect::<Vec<_>>() {
-        tokens::create_food(g, player)?;
-    }
+    tokens::each_player_creates(g, &tokens::FOOD, 1)?;
     Ok(())
 }
 
