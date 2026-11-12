@@ -676,6 +676,22 @@ pub fn counter_target_ability(g: &mut dyn Game, item: &StackItem, slot: usize) -
     Some(countered)
 }
 
+/// "Counter target spell, activated ability, or triggered ability": counters whichever the target in `slot` is, a spell
+/// (`counter_target`) or an ability (`counter_target_ability`), if it is still a legal target (CR 701.6, 608.2b). Returns
+/// the controller it had on the stack, read before it was countered, for "its controller draws a card". Disallow,
+/// Louisoix's Sacrifice, Consign to Memory and Ertai Resurrected's first mode print it.
+pub fn counter_target_spell_or_ability(g: &mut dyn Game, item: &StackItem, slot: usize) -> Option<PlayerId> {
+    match item.target(slot) {
+        Target::Ability(_) => counter_target_ability(g, item, slot).map(|ability| ability.controller),
+        _ => {
+            let spell = targets::object(g, item, slot)?;
+            let controller = g.controller(spell);
+            g.counter(spell);
+            Some(controller)
+        }
+    }
+}
+
 /// What "counter [it] unless [its controller] pays [cost]" asks the payer (CR 118.12a): ward's (CR 702.21a) and the
 /// counterspells' that leave it to the spell's controller (Mana Leak, No More Lies).
 pub use cantrip_api::intrinsic::COUNTERED_UNLESS_PAID;

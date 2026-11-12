@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets::{self, filters};
-use cantrip_mechanics::{counter_target, counter_target_ability};
+use cantrip_mechanics::counter_target_spell_or_ability;
 use cantrip_oracle as oracle;
 
 /// "Counter target activated ability, triggered ability, or noncreature spell" (CR 115.1, 605.3b): an ability on the stack
@@ -16,14 +16,7 @@ fn legendary_creature(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
 
 /// Counters the spell or the ability, whichever was targeted (CR 701.6, 608.2b).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    match item.target(0) {
-        Target::Ability(_) => {
-            counter_target_ability(g, item, 0);
-        }
-        _ => {
-            counter_target(g, item, 0);
-        }
-    }
+    counter_target_spell_or_ability(g, item, 0);
     Ok(())
 }
 
