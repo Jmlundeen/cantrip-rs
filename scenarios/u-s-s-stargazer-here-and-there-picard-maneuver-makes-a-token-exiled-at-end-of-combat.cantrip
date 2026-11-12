@@ -1,0 +1,61 @@
+# U.S.S. Stargazer, Here and There at 6+ is a 4/3 artifact creature with flying (CR 721.2a-b); when it attacks, Picard
+# Maneuver makes a tapped and attacking 4/3 colorless Spacecraft Illusion artifact creature token with flying, which is never
+# declared as an attacker (CR 508.4) and is exiled at end of combat (CR 603.7). Both deal 4, so Bot2 goes from 20 to 12.
+
+[Bot1 Deck]
+U.S.S. Stargazer, Here and There
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Emerald
+Winding Wurm
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.U.S.S. Stargazer, Here and There.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Winding Wurm.Cast
+? Bot1.Mana = {G}
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Activate(Ability: Station)
+Bot1.Choose(Winding Wurm)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Stargazer, Here and There.Counters.Charge = 6
+? Bot1.Battlefield.U.S.S. Stargazer, Here and There.Keywords = Flying
+? Bot1.Battlefield.U.S.S. Stargazer, Here and There.Power = 4
+? Bot1.Battlefield.U.S.S. Stargazer, Here and There.Toughness = 3
+Bot1.Attack(U.S.S. Stargazer, Here and There > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spacecraft Illusion Token.Power = 4
+? Bot1.Battlefield.Spacecraft Illusion Token.Toughness = 3
+? Bot1.Battlefield.Spacecraft Illusion Token.Keywords = Flying
+? Bot1.Battlefield.Spacecraft Illusion Token.Tapped = true
+? Bot1.Battlefield.Spacecraft Illusion Token.Colors = (absent)
+? Bot1.Battlefield.Spacecraft Illusion Token.Types = Artifact; Creature
+? Bot1.Battlefield.Spacecraft Illusion Token.Subtypes = Illusion; Spacecraft
+? Combat.Attackers.Count = 2
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 12
+Bot1.Battlefield.Spacecraft Illusion Token = (absent)
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Counters.Charge = 6
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Keywords = Flying
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Power = 4
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Toughness = 3

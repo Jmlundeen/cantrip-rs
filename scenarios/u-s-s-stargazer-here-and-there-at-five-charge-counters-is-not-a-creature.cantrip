@@ -1,0 +1,41 @@
+# Five charge counters are below the 6+ striation (CR 721.2a-b): U.S.S. Stargazer, Here and There is still only a Legendary
+# Artifact - not a creature, no flying, no 4/3. It got them from Station with the 5/5 Shivan Dragon.
+
+[Bot1 Deck]
+U.S.S. Stargazer, Here and There
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Emerald
+Shivan Dragon
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.U.S.S. Stargazer, Here and There.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Shivan Dragon.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Activate(Ability: Station)
+Bot1.Choose(Shivan Dragon)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Stargazer, Here and There.Counters.Charge = 5
+
+[Expect]
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Counters.Charge = 5
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Keywords = (absent)
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Power = (absent)
+Bot1.Battlefield.U.S.S. Stargazer, Here and There.Types = Artifact
