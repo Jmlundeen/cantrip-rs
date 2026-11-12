@@ -644,6 +644,7 @@ fn resolve_inner(cx: &mut Cx, summarize_terminal_mana: bool) -> R<Flow> {
                     becomes: None,
                     own: None,
                     melded: None,
+                    counters_if: None,
                 };
                 ops::prepare_entry(cx, &mut entering)?;
                 // CR 303.4i, 608.3c: an Aura spell whose target is still legal, but which as it would exist on the

@@ -2523,6 +2523,12 @@ impl cantrip_api::Game for Cx<'_> {
             .map_err(|_| Suspend)
     }
 
+    fn put_onto_battlefield_with_counters_if(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: CountersIf) -> Result<ObjectId, Suspend> {
+        ops::put_onto_battlefield_with_counters_if(self, object, controller, tapped, counters)
+            .map(|v| v.first().copied().unwrap_or(object))
+            .map_err(|_| Suspend)
+    }
+
     fn create_tokens_with_counters(&mut self, def: CardId, controller: PlayerId, count: u32, tapped: bool, counters: &[(CounterKind, i32)], words: Words) -> Result<Vec<ObjectId>, Suspend> {
         let tokens: Vec<(CardId, PlayerId)> = (0..count).map(|_| (def, controller)).collect();
         ops::create_tokens_worded(self, &tokens, tapped, None, counters, words, None, None).map_err(|_| Suspend)

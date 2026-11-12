@@ -4,7 +4,7 @@
 
 use cantrip_state::*;
 
-use crate::card::{CounterTo, Entering, EntersAs, FaceDown, LibraryPlace, TurnUp, WayDef};
+use crate::card::{CounterTo, CountersIf, Entering, EntersAs, FaceDown, LibraryPlace, TurnUp, WayDef};
 use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef, CauseKind, PlayerCounter, TriggeredDef};
 use crate::chars::Chars;
 use crate::history::{History, Record};
@@ -953,6 +953,13 @@ pub trait Game: Query {
     /// `put_onto_battlefield`, the object entering with these counters as well (CR 122.6, 614.1c): persist's and undying's
     /// "return it with a counter on it". They are part of how it enters, so a replacement of counters applies (CR 614.1).
     fn put_onto_battlefield_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i32)]) -> Result<ObjectId, Suspend>;
+    /// `put_onto_battlefield`, the object entering with the counters `counters` gives it for what it is ("it enters with X
+    /// additional +1/+1 counters on it if it's a creature", CR 614.1c): a replacement effect of the effect putting it there,
+    /// applied among the others that modify how it enters, in the order its controller chooses (CR 616.1), and judged on it
+    /// as it would exist on the battlefield as it applies (CR 614.12) - after the copy effect it enters with (CR 616.1c), so
+    /// a Phyrexian Metamorph entering as a copy of an artifact is no creature, and an artifact March of the Machines makes a
+    /// creature is one. Returns the new object.
+    fn put_onto_battlefield_with_counters_if(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: CountersIf) -> Result<ObjectId, Suspend>;
     /// Whether a counter of `kind` can't be put on `object`, controlled by `controller`, right now (CR 122.6, 101.2): a static
     /// ability on the battlefield says so (Solemnity's "counters can't be put on creatures", Melira's -1/-1 counters). Asked
     /// of a permanent entering as its own replacement is applied, it is judged as it would exist on the battlefield

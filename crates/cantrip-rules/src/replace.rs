@@ -68,6 +68,10 @@ pub(crate) enum Origin {
     /// offered while it would have more instances than have applied, and ordered with the others that modify how it enters
     /// (CR 616.1).
     Riot,
+    /// "It enters with ... counters on it if it's a ..." of the effect putting the entering permanent onto the battlefield
+    /// (CR 614.1c, `Entering::counters_if`): of the permanent itself, offered while it would be one of what it names, and
+    /// ordered with the others that modify how it enters (CR 616.1).
+    CountersIf,
 }
 
 /// One effect that applies to the event: its source, and which of the source's replacements it is.
@@ -115,6 +119,10 @@ const ENTERS_HINT: &str = "its own replacement as it enters";
 
 /// What an instance of riot says it does, for the player who orders it with others (CR 616.1, 702.136a).
 const RIOT_HINT: &str = "riot: it enters with an additional +1/+1 counter, or gains haste";
+
+/// What the "it enters with ... counters on it if it's a ..." of the effect putting it onto the battlefield says it does
+/// (CR 616.1, `Entering::counters_if`).
+const COUNTERS_IF_HINT: &str = "it enters with the additional counters the effect putting it onto the battlefield gives it";
 
 /// What a permanent's own entering replacement (`CardDef::enters`) says it does, for the player who orders it with others
 /// (CR 616.1): the line of its card's rules text that says how it enters ("This land enters tapped.", "As this creature
@@ -641,6 +649,19 @@ fn candidates_for(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Opti
             }
         }
     }
+    // The counters the effect putting it onto the battlefield gives it if it's one of what that effect names (CR 614.1c,
+    // `Entering::counters_if`), ordered with the rest (CR 616.1): offered while, as it would exist with those applied so far
+    // (CR 614.12, 616.1f), it would get some - a copy effect it enters with already over it (CR 616.1c). Not an ability of
+    // its own, so one it would have lost its abilities there still has it.
+    if let (Some(e), Proposal::ZoneChange(z)) = (entry, proposal)
+        && z.object == e.object
+        && z.to.is(ZoneKind::Battlefield)
+        && let Some(counters) = e.counters_if
+        && let Some(w) = cx.entering.filter(|w| w.object == e.object)
+        && counters.counters(&w.chars).iter().any(|&n| n > 0)
+    {
+        found.push(Candidate { source: e.object, index: 0, origin: Origin::CountersIf });
+    }
     // The discarded card's own madness (CR 702.35a), ordered with the rest (CR 616.1). It is offered first, as the
     // order its owner almost always wants: declining the cast still puts the card into the graveyard, where the other
     // effects meet it again. A player or bot who takes the first offer keeps the madness.
@@ -774,6 +795,7 @@ fn hint_of(cx: &Cx, proposal: &Proposal, c: &Candidate) -> &'static str {
         Origin::PlayedTapped => PLAYED_TAPPED_HINT,
         Origin::Enters(card) => enters_hint(cx.cards().get(card)),
         Origin::Riot => RIOT_HINT,
+        Origin::CountersIf => COUNTERS_IF_HINT,
     }
 }
 
@@ -1062,6 +1084,22 @@ fn apply_each(cx: &mut Cx, proposal: &mut Proposal, mut entry: Option<&mut Enter
                     e.controller = z.controller;
                     e.tapped = z.tapped;
                     crate::ops::apply_riot(cx, e);
+                    cx.entering = Some(crate::ops::as_it_would_exist(cx, e));
+                }
+            }
+            // The counters the effect putting it there gives it for what it now would be (CR 614.1c, 614.12), each kind it
+            // names, more it enters with (CR 122.6). Applied once: it is emptied. It is judged again as it would exist with
+            // them (CR 614.12).
+            Origin::CountersIf => {
+                if let (Some(e), Proposal::ZoneChange(z)) = (entry.as_deref_mut(), &mut *proposal)
+                    && let Some(counters) = e.counters_if.take()
+                    && let Some(w) = cx.entering.filter(|w| w.object == e.object)
+                {
+                    e.controller = z.controller;
+                    e.tapped = z.tapped;
+                    for (n, with) in e.counters.iter_mut().zip(counters.counters(&w.chars)) {
+                        *n += with;
+                    }
                     cx.entering = Some(crate::ops::as_it_would_exist(cx, e));
                 }
             }

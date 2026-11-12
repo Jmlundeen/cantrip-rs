@@ -128,6 +128,56 @@ pub struct Entering {
     /// It is melding with this card, its counterpart (CR 701.42a, 712.14c): the two enter as one permanent, with only the
     /// characteristics of their combined back face (CR 712.8g), which it enters as (`copy`). Set by the meld verb alone.
     pub melded: Option<ObjectId>,
+    /// The "it enters with ... counters on it if it's a ..." of the effect putting it onto the battlefield
+    /// (`Game::put_onto_battlefield_with_counters_if`), a replacement effect (CR 614.1c) the engine applies among the others
+    /// that modify how it enters, in the order its controller chooses (CR 616.1), judged on it as it would exist then
+    /// (CR 614.12). Emptied as it applies; a card never reads or sets it.
+    pub counters_if: Option<CountersIf>,
+}
+
+/// What an entering permanent is asked to be by `CountersIf`: "if it's a creature", "if it's a Spacecraft".
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EnteringIs {
+    Type(CardType),
+    Subtype(Subtype),
+}
+
+impl EnteringIs {
+    /// Whether a permanent with these characteristics is it.
+    pub fn of(self, chars: &Chars) -> bool {
+        match self {
+            EnteringIs::Type(t) => chars.is(t),
+            EnteringIs::Subtype(s) => chars.has_subtype(s),
+        }
+    }
+}
+
+/// "It enters with `amount` additional [kind] counters on it if it's a [quality] and `amount` additional [kind] counters on it
+/// if it's a [quality]" (CR 614.1c, 122.6): the replacement effect an effect that puts a permanent onto the battlefield makes
+/// about it (`Game::put_onto_battlefield_with_counters_if`). Each part whose quality the permanent has gives it `amount`
+/// counters of its kind. Chief Montgomery Scott ("X additional +1/+1 counters on it if it's a creature and X additional
+/// charge counters on it if it's a Spacecraft"), What Must Be Done ("two additional +1/+1 counters on it if it's a
+/// creature") and Semester's End ("an additional +1/+1 counter on it if it's a creature and an additional loyalty counter on
+/// it if it's a planeswalker") print it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CountersIf {
+    pub amount: i32,
+    pub parts: &'static [(CounterKind, EnteringIs)],
+}
+
+impl CountersIf {
+    /// The counters it gives a permanent with these characteristics (CR 122.6): none where `amount` is not positive.
+    pub fn counters(&self, chars: &Chars) -> [i32; CounterKind::COUNT] {
+        let mut counters = [0; CounterKind::COUNT];
+        if self.amount > 0 {
+            for &(kind, is) in self.parts {
+                if is.of(chars) {
+                    counters[kind as usize] += self.amount;
+                }
+            }
+        }
+        counters
+    }
 }
 
 /// What an effect that puts a card onto the battlefield says it is (CR 614.12: it enters as that, never as what it was;

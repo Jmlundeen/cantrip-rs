@@ -1189,7 +1189,7 @@ pub fn return_exiled(cx: &mut Cx) -> R<bool> {
         .collect();
     // One move (CR 610.3d): the cards going back to a hand or a graveyard and the permanents entering arrive together.
     let actors: Vec<_> = due.iter().map(|&(id, link)| (id, link.return_by.map_or(PutBy::Rules, PutBy::Player))).collect();
-    put_onto_battlefield_into(cx, elsewhere, &to_battlefield, ZoneReason::Other, &[], None, None, &actors)?;
+    put_onto_battlefield_into(cx, elsewhere, &to_battlefield, ZoneReason::Other, &[], None, None, None, &actors)?;
     // The return is one one-shot effect, created once (CR 610.3): the duration is over whether or not the card got where
     // it went. One that could not - an Aura with nothing to enchant (CR 303.4g), a move a replacement left in exile - stays
     // there as a card exiled with that permanent and nothing more, never returned again. Cleared once the moves are done,
@@ -1545,7 +1545,9 @@ fn entry_replacements(cx: &mut Cx, entering: &mut Entering, proposed: ZoneChange
     // A copy's own replacements that function from every zone are its, not its card's (`judged_entering`).
     let copy_replaces = copy_over(cx, entering) && cx.cards().replaces[entering_card(cx, entering).0 as usize];
     let others = copy_replaces || crate::replace::zone_change_possible(cx, &proposed);
-    if !(own && (riot || others)) && !(riot && others) {
+    // The counters the effect putting it there gives it for what it is (`Entering::counters_if`) are judged on it as it would
+    // exist as they apply, ordered with the rest (CR 614.12, 616.1): never the shortcut.
+    if entering.counters_if.is_none() && !(own && (riot || others)) && !(riot && others) {
         let mut proposed = proposed;
         apply_own_entering(cx, entering, proposed.controller, proposed.tapped);
         proposed.controller = entering.controller;
@@ -1854,14 +1856,21 @@ pub fn put_onto_battlefield_along(
     with: &[(CounterKind, i32)],
     becomes: Option<Becomes>,
 ) -> R<Vec<ObjectId>> {
-    put_onto_battlefield_into(cx, moves, objects, reason, with, becomes, None, &[])
+    put_onto_battlefield_into(cx, moves, objects, reason, with, becomes, None, None, &[])
+}
+
+/// `put_onto_battlefield` of one object, which enters with the counters the effect putting it there gives it for what it
+/// is as it would exist on the battlefield ("if it's a creature", CR 614.1c, 614.12): a replacement effect applied among the
+/// others that modify how it enters (`Entering::counters_if`, `replace::entry`).
+pub fn put_onto_battlefield_with_counters_if(cx: &mut Cx, id: ObjectId, controller: PlayerId, tapped: bool, counters: CountersIf) -> R<Vec<ObjectId>> {
+    put_onto_battlefield_into(cx, Vec::new(), &[(id, controller, tapped)], ZoneReason::Other, &[], None, Some(counters), None, &[])
 }
 
 /// A named player, separately from its entering controller, performs each put (CR 110.2a, 608.2c).
 pub fn put_onto_battlefield_by(cx: &mut Cx, objects: &[(ObjectId, PlayerId, bool, PlayerId)], with: &[(CounterKind, i32)]) -> R<Vec<ObjectId>> {
     let rows: Vec<_> = objects.iter().map(|&(id, controller, tapped, _)| (id, controller, tapped)).collect();
     let actors: Vec<_> = objects.iter().map(|&(id, _, _, by)| (id, PutBy::Player(by))).collect();
-    put_onto_battlefield_into(cx, Vec::new(), &rows, ZoneReason::Other, with, None, None, &actors)
+    put_onto_battlefield_into(cx, Vec::new(), &rows, ZoneReason::Other, with, None, None, None, &actors)
 }
 
 fn put_onto_battlefield_into(
@@ -1871,6 +1880,7 @@ fn put_onto_battlefield_into(
     reason: ZoneReason,
     with: &[(CounterKind, i32)],
     becomes: Option<Becomes>,
+    counters_if: Option<CountersIf>,
     attacking: Option<Target>,
     putters: &[(ObjectId, PutBy)],
 ) -> R<Vec<ObjectId>> {
@@ -1878,7 +1888,7 @@ fn put_onto_battlefield_into(
     // What leaves the battlefield in this move is gone as each entering permanent is judged (CR 101.4, 614.12).
     let leaving: Vec<ObjectId> = moves.iter().map(|m| m.id).filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Battlefield)).collect();
     let outer_leaving = std::mem::replace(&mut *cx.s().leaving_together.borrow_mut(), leaving);
-    let prepared = prepare_entries(cx, &mut moves, objects, with, becomes);
+    let prepared = prepare_entries(cx, &mut moves, objects, with, becomes, counters_if);
     *cx.s().leaving_together.borrow_mut() = outer_leaving;
     prepared?;
     if !putters.is_empty() {
@@ -1912,7 +1922,14 @@ pub(crate) fn instant_or_sorcery(def: &CardDef) -> bool {
 }
 
 /// Each of `objects` prepared to enter (`prepare_entry`) and added to `moves`.
-fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, PlayerId, bool)], with: &[(CounterKind, i32)], becomes: Option<Becomes>) -> R<()> {
+fn prepare_entries(
+    cx: &mut Cx,
+    moves: &mut Vec<Moving>,
+    objects: &[(ObjectId, PlayerId, bool)],
+    with: &[(CounterKind, i32)],
+    becomes: Option<Becomes>,
+    counters_if: Option<CountersIf>,
+) -> R<()> {
     let bans = crate::static_rules::enter_bans(cx);
     for &(id, controller, tapped) in objects {
         // A card that has changed zones since it was chosen is a new object, not the one to put onto the battlefield
@@ -1927,7 +1944,7 @@ fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, P
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes, own: None, melded: None };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes, own: None, melded: None, counters_if };
         prepare_entry(cx, &mut entering)?;
         // One its own daybound turned over as it would enter (CR 702.145b) is judged as that face (CR 304.4, 307.4).
         if entering.transformed && instant_or_sorcery_entering(cx, id, true) {
@@ -1997,6 +2014,7 @@ pub fn put_onto_battlefield_as(
         becomes: None,
         own: None,
         melded: None,
+        counters_if: None,
     };
     prepare_entry(cx, &mut entering)?;
     // Turned over by its own daybound as it would enter (CR 702.145b), it is judged as that face (CR 304.4, 307.4).
@@ -2047,6 +2065,7 @@ pub fn meld(cx: &mut Cx, first: ObjectId, second: ObjectId, controller: PlayerId
         becomes: None,
         own: None,
         melded: Some(second),
+        counters_if: None,
     };
     prepare_entry(cx, &mut entering)?;
     let entered = move_together(cx, &[Moving { entering: Some(entering), ..Moving::to(first, Zone::BATTLEFIELD) }], ZoneReason::Other);
@@ -2240,6 +2259,7 @@ fn entering_attached(cx: &Cx, bans: &[(ObjectId, PlayerId, &'static CardDef, Opt
         becomes: None,
         own: None,
         melded: None,
+        counters_if: None,
     })
 }
 
@@ -2731,7 +2751,7 @@ fn create_tokens_onto(
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes: None, own: None, melded: None };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, chosen_number: None, chosen_object: None, emblem: None, attach: aura.and_then(|i| i.target(0).object()), attach_player: aura.and_then(|i| i.target(0).player()), x: 0 , transformed: back_up, protector: None, read_ahead: None, riot_haste: false, instead: None, becomes: None, own: None, melded: None, counters_if: None };
         prepare_entry(cx, &mut entering)?;
         // A token that would be a copy of an instant or sorcery card is not created (CR 111.5), nor one with such a face up
         // (CR 712.13a: a copy of a double-faced permanent spell turned over as it would enter).
@@ -4930,7 +4950,7 @@ pub fn attack_with_tokens(cx: &mut Cx, created: &[ObjectId], defender: Target) {
 pub fn put_onto_battlefield_attacking(cx: &mut Cx, object: ObjectId, controller: PlayerId, defender: Target, counters: &[(CounterKind, i32)]) -> R<ObjectId> {
     // Thousand-Faced Shadow and Fallen Shinobi use this ninjutsu path.
     // It is attacking before its arrival is observed (CR 603.6a, 508.4).
-    let new = put_onto_battlefield_into(cx, Vec::new(), &[(object, controller, true)], ZoneReason::Other, counters, None, Some(defender), &[])?
+    let new = put_onto_battlefield_into(cx, Vec::new(), &[(object, controller, true)], ZoneReason::Other, counters, None, None, Some(defender), &[])?
         .first().copied().unwrap_or(object);
     Ok(new)
 }
@@ -5771,6 +5791,7 @@ mod tests {
             becomes: None,
             own: None,
             melded: None,
+            counters_if: None,
         }
     }
 

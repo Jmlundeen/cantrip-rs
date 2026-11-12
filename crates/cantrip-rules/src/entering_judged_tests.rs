@@ -161,6 +161,7 @@ fn entering(id: ObjectId, controller: PlayerId, tapped: bool) -> Entering {
         becomes: None,
         own: None,
         melded: None,
+        counters_if: None,
     }
 }
 

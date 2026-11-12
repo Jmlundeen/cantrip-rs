@@ -369,6 +369,7 @@ fn entry(id: ObjectId, copy: Option<Copiable>) -> Entering {
         becomes: None,
         own: None,
         melded: None,
+        counters_if: None,
     }
 }
 
