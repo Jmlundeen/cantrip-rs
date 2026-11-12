@@ -1227,6 +1227,15 @@ pub fn this_becomes_the_target(_: &dyn Query, source: ObjectId, event: &Event) -
     }
 }
 
+/// "Whenever you cast a colorless spell" (CR 603.2): judged on the spell as it is on the stack, not by its mana cost. Forsaken
+/// Monument, Ugin, Eye of the Storms, Kozilek's Sentinel, Nettle Drone and Thought Harvester print it.
+pub fn colorless_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. } if *player == me.controller && q.chars(*spell).colors.is_empty() => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a noncreature spell" (CR 603.2): prowess, Displacer Kitten and Dragon's Rage Channeler print it.
 pub fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {

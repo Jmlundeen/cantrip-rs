@@ -16,16 +16,6 @@ fn exile_colored(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Whenever you cast a colorless spell": judged on the spell as it is on the stack, not by its mana cost.
-fn colorless_spell_you_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { spell, player, .. } if *player == q.controller(source) && q.chars(*spell).colors.is_empty() => {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
-}
-
 /// +2: You gain 3 life and draw a card.
 fn plus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.gain_life(item.controller, 3);
@@ -63,7 +53,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::CAST_THIS_SPELL, exile_colored, "When you cast this spell, exile up to one target permanent that's one or more colors.")
             .targets(&[up_to_one(colored_permanent)]),
-        triggered(when(EventMask::SPELL_CAST, colorless_spell_you_cast), exile_colored, "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.")
+        triggered(when_asked(EventMask::SPELL_CAST, cantrip_mechanics::triggers::colorless_spell_you_cast), exile_colored, "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.")
             .targets(&[up_to_one(colored_permanent)]),
         ability(loyalty(2), plus_two, "+2: You gain 3 life and draw a card."),
         ability(loyalty(0), cantrip_mechanics::effects::add_colorless::<3>, "0: Add {C}{C}{C}.").produces_mana(),
