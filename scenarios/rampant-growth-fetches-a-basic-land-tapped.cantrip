@@ -1,0 +1,29 @@
+# Rampant Growth {1}{G}: "Search your library for a basic land card, put it onto the battlefield tapped, then shuffle" (CR
+# 701.23). Forest and Mox Emerald pay the {G}{G} exactly; the Island found enters tapped and the library is shuffled.
+# Bot2's own Islands stay in Bot2's library: the search is only of Bot1's.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Rampant Growth
+Forest x4
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rampant Growth.Cast
+? Bot1.Mana =
+Bot1.Search(Island)
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Shuffles = 1
+Bot2.Library.Count = 13
+Bot2.Battlefield.Count = 0
