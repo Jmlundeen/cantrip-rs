@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::{self, THIS_ENTERS};
-use cantrip_mechanics::{choose, effects, history, select, targets};
+use cantrip_mechanics::{effects, hand, history, select, targets};
 use cantrip_oracle as oracle;
 
 fn creature_card_with_mana_value_1_or_less_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -25,12 +25,7 @@ fn sacrifice_draw_put(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     g.end_sentence();
     let x = history::mana_value_of_sacrificed_permanent(g, sacrificed);
     g.draw(you, x);
-    let hand = g.state().zone(Zone::hand(you)).to_vec();
-    let rule = select::cards(select::up_to(1)).with(select::PERMANENT_CARD).with(select::mana_value_at_most(x));
-    let chosen = choose::select(g, you, item.object, Purpose::PutOntoBattlefield, hand, rule)?;
-    for card in chosen {
-        g.put_onto_battlefield(card, you, false)?;
-    }
+    hand::may_put_onto_battlefield_judged(g, you, item.object, |g, c| targets::is_permanent_card(&g.chars(c)) && g.mana_value(c) <= x)?;
     Ok(())
 }
 

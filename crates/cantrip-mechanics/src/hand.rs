@@ -169,6 +169,19 @@ pub fn may_put_onto_battlefield(
     put_from_hand(g, player, source, false, |g, c| eligible(&g.chars(c)))
 }
 
+/// `may_put_onto_battlefield` with the card judged as an object in the hand, so what only the game can say (`Query::mana_value`:
+/// X is 0 in a hand, a Room's halves together, CR 107.3b, 202.3) can decide it: "you may put a creature card with mana value 3
+/// or less from your hand onto the battlefield". Curzon Dax, Bound by Blood and Venom, Lethal Protector print it; the tapped
+/// form is `may_put_onto_battlefield_tapped`.
+pub fn may_put_onto_battlefield_judged(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    eligible: impl Fn(&dyn Game, ObjectId) -> bool,
+) -> Result<Option<ObjectId>, Suspend> {
+    put_from_hand(g, player, source, false, eligible)
+}
+
 /// `may_put_onto_battlefield` for "... from your hand onto the battlefield tapped" (CR 614.1c), the card judged as an object
 /// in the hand, so what only the game can say (`Query::mana_value`: X is 0 in a hand, a Room's halves together, CR 107.3b, 202.3)
 /// can decide it. Anticausal Vestige and Insidious Fungus print it.
