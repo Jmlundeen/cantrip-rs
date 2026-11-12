@@ -471,28 +471,42 @@ const BIN: Question = Question::new(
     "Leave it on top",
 );
 
+/// "Look at the top card of your library. If it [passes `qualifies`], you may reveal it and put it into your hand." (CR 701.20a.)
+/// The card is looked at whatever it is, and may be left unrevealed even if it qualifies (`reveal` is the question asked then);
+/// an empty library has nothing to look at. `qualifies` is judged on the card looked at. Returns the card looked at and whether
+/// it went to the hand. Herald's Horn, Traveling Botanist and Gathering Stone print it.
+pub fn look_at_top_may_take(
+    g: &mut dyn Game,
+    item: &StackItem,
+    reveal: &'static Question,
+    qualifies: impl FnOnce(&mut dyn Game, ObjectId) -> bool,
+) -> Result<Option<(ObjectId, bool)>, Suspend> {
+    let you = item.controller;
+    let Some(&top) = top_of_library(g, you, 1).first() else {
+        return Ok(None);
+    };
+    g.look_at(you, &[top]);
+    if qualifies(g, top) && crate::effects::ask_may(g, you, item.object, Purpose::Ask(reveal))? {
+        g.reveal(you, &[top]);
+        g.return_to_hand_revealed(&[top]);
+        return Ok(Some((top, true)));
+    }
+    Ok(Some((top, false)))
+}
+
 /// "Look at the top card of your library. If it [passes `qualifies`], you may reveal it and put it into your hand. If you don't
-/// put the card into your hand, you may put it into your graveyard." (CR 701.20a.) The card is looked at whatever it is, and may
-/// be left unrevealed even if it qualifies (`reveal` is the question asked then); not put into the hand, it may go to the
-/// graveyard - no discard, no mill. An empty library has nothing to look at. `qualifies` is judged on the card looked at, with
-/// the ability's stack item. Traveling Botanist (a land card) and Gathering Stone (a card of the chosen type) print it.
+/// put the card into your hand, you may put it into your graveyard." (CR 701.20a.) `look_at_top_may_take`, then, not put into
+/// the hand, the card may go to the graveyard - no discard, no mill. Traveling Botanist (a land card) and Gathering Stone (a
+/// card of the chosen type) print it.
 pub fn look_at_top_may_take_else_bin(
     g: &mut dyn Game,
     item: &StackItem,
     reveal: &'static Question,
     qualifies: impl FnOnce(&mut dyn Game, ObjectId) -> bool,
 ) -> Result<(), Suspend> {
-    let you = item.controller;
-    let Some(&top) = top_of_library(g, you, 1).first() else {
-        return Ok(());
-    };
-    g.look_at(you, &[top]);
-    if qualifies(g, top) && crate::effects::ask_may(g, you, item.object, Purpose::Ask(reveal))? {
-        g.reveal(you, &[top]);
-        g.return_to_hand_revealed(&[top]);
-        return Ok(());
-    }
-    if crate::effects::ask_may(g, you, item.object, Purpose::Ask(&BIN))? {
+    if let Some((top, false)) = look_at_top_may_take(g, item, reveal, qualifies)?
+        && crate::effects::ask_may(g, item.controller, item.object, Purpose::Ask(&BIN))?
+    {
         g.put_into_graveyard(&[top]);
     }
     Ok(())

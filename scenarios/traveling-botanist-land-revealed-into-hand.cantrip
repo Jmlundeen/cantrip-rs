@@ -1,4 +1,4 @@
-# Traveling Botanist: "Whenever this creature becomes tapped" (attacking taps it), it looks at the top card; a land (Forest) may be revealed and put into the hand.
+# Traveling Botanist: "Whenever this creature becomes tapped" (attacking taps it), it looks at the top card; a land (Forest) may be revealed and put into the hand. Taken, it is not offered to the graveyard as well.
 
 [Bot1 Deck]
 Black Lotus
@@ -23,6 +23,7 @@ Bot1.Pass
 Bot2.Pass
 ? Bot1.Looked = Forest
 Bot1.Accept
+! Bot1.Accept
 ? Bot1.Revealed = Forest
 
 [Expect]
