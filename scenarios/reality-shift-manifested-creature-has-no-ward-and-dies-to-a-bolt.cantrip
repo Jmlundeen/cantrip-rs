@@ -1,0 +1,46 @@
+# A manifested permanent is a plain face-down 2/2 with no abilities (CR 701.40a, 708.2) - not a cloaked one, which would
+# have ward {2} (CR 701.58a). After Reality Shift exiles Bot2's Memnite and Bot2 manifests the Forest on top of its library,
+# Bot1 Lightning Bolts the face-down creature: no ward triggers, so the 2/2 dies and is revealed as the Forest in Bot2's
+# graveyard (CR 708.9).
+
+[Bot1 Deck]
+Island
+Island
+Reality Shift
+Black Lotus
+Lightning Bolt
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Memnite
+Island x7
+Forest
+Island x11
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Memnite.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Reality Shift.Cast(Bot2.Battlefield.Memnite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield..FaceDownName = Forest
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.#1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Forest

@@ -34,7 +34,7 @@ pub fn manifest_dread_object(g: &mut dyn Game, player: PlayerId, source: ObjectI
     {
         manifested = card;
     }
-    let made = g.put_onto_battlefield_face_down(manifested, player, FaceDown::Manifested, false)?;
+    let made = crate::manifest::manifest(g, player, manifested)?;
     // "Then put the cards you looked at that were not manifested this way into your graveyard" (CR 701.62a): the chosen one
     // too when it wasn't, a rule or effect keeping it from entering (CR 701.40f) - every looked-at card still where it was.
     let rest: Vec<(ObjectId, Zone)> =

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{manifest, targets};
 use cantrip_oracle as oracle;
 
 /// "Exile target creature. Its controller manifests the top card of their library." (CR 701.40a, 608.2h): the exiling is
@@ -11,8 +11,7 @@ fn exile_and_manifest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     let controller = g.controller(creature);
     g.exile(creature);
     g.end_sentence();
-    let Some(&top) = g.state().zone(Zone::library(controller)).first() else { return Ok(()) };
-    g.put_onto_battlefield_face_down(top, controller, FaceDown::Manifested, false)?;
+    manifest::manifest_top_of_library(g, controller)?;
     Ok(())
 }
 

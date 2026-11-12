@@ -1,0 +1,40 @@
+# "Its controller manifests the top card of their library" (CR 701.40a, 608.2h): Bot2's library is empty by turn 3 (an
+# eight-card deck, seven in the opening hand and one drawn), so exiling Bot2's Ornithopter manifests nothing - no
+# face-down creature appears on either side and nothing else happens.
+
+[Bot1 Deck]
+Island
+Island
+Reality Shift
+Island
+Island
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x7
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Reality Shift.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Library.Count = 0
+Bot2.Battlefield.Ornithopter = (absent)
+Bot2.Battlefield.Count = 1
+Bot1.Battlefield.Count = 2
+Exile.Count = 1
