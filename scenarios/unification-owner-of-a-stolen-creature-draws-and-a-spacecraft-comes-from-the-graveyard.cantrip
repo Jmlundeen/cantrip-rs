@@ -1,0 +1,65 @@
+# Unification: chapter I reads the creature's owner, not its controller (CR 108.3, 121.1). Bot1 has taken Bot2's Ornithopter
+# with Act of Treason, so Bot2 - its owner - draws two and it is shuffled into Bot2's library (CR 701.24a); Bot1, who controls
+# it, draws nothing. Chapter II takes the Spacecraft from the graveyard, Entombed there on turn one, with none in hand (CR
+# 608.2d).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Ruby
+Act of Treason
+Unification
+Entomb
+Swamp
+Volcanic Island x4
+Borg Scout Sphere
+Volcanic Island x12
+
+[Bot2 Deck]
+Ornithopter
+Volcanic Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Borg Scout Sphere)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+? Bot1.Graveyard = Entomb; Borg Scout Sphere
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {U})
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Unification.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Unification.Counters.Lore = 1
+? Bot1.Hand.Count = 0
+? Bot2.Hand.Count = 9
+? Bot2.Library.Count = 10
+? Bot1.Battlefield.Ornithopter = (absent)
+? Bot2.Battlefield.Count = 0
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Unification.Counters.Lore = 2
+Bot1.Choose(Borg Scout Sphere)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Borg Scout Sphere.Types = Artifact
+? Bot1.Graveyard.Borg Scout Sphere = (absent)
+
+[Expect]
+Bot1.Battlefield.Borg Scout Sphere.Types = Artifact
+Bot1.Graveyard = Black Lotus; Act of Treason; Black Lotus; Entomb
+Bot2.Library.Count = 9

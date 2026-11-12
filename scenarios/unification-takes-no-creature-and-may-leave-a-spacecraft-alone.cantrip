@@ -1,0 +1,45 @@
+# The Saga's chapter I is "up to one target creature": answering none draws nothing and shuffles nothing (CR 115.1d), and
+# chapter II is a "may": declining leaves the Spacecraft card in the hand (CR 608.2d, 101.4). Chapter III then draws for both
+# players as usual.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Borg Scout Sphere
+Mox Pearl
+Mox Sapphire
+Unification
+Volcanic Island x16
+
+[Bot2 Deck]
+Ornithopter
+Volcanic Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Unification.Cast
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Unification.Counters.Lore = 1
+? Bot2.Battlefield.Ornithopter.Types = Artifact; Creature
+? Bot2.Hand.Count = 7
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Unification.Counters.Lore = 2
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 3
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Battlefield.Count = 3

@@ -1,0 +1,55 @@
+# Unification is a Saga: chapter I resolves as it enters, chapter II after its controller's next draw step, chapter III after
+# the one after that, when it is sacrificed (CR 714.2b, 714.3a). Chapter I's target is Bot2's Ornithopter, so its owner draws
+# two and then shuffles it in (CR 121.1, 701.24a); chapter II puts a Spacecraft from the Saga's controller's hand onto the
+# battlefield; chapter III has Bot1 and Bot2 each draw two (CR 121.2c).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Borg Scout Sphere
+Mox Pearl
+Mox Sapphire
+Unification
+Volcanic Island x16
+
+[Bot2 Deck]
+Ornithopter
+Volcanic Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Unification.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U}
+? Bot1.Battlefield.Unification.Counters.Lore = 1
+? Bot2.Battlefield.Count = 0
+? Bot2.Hand.Count = 9
+? Bot1.Battlefield.Count = 3
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Unification.Counters.Lore = 2
+Bot1.Choose(Borg Scout Sphere)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 4
+? Bot1.Battlefield.Borg Scout Sphere.Tapped = false
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 7
+? Bot2.Hand.Count = 9
+? Bot1.Battlefield.Count = 3
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Count = 3
