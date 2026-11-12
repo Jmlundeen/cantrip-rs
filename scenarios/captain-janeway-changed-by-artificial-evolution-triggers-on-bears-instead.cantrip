@@ -1,0 +1,55 @@
+# Captain Janeway's "one or more Officers you control" is a word of her text (CR 612.2): Artificial Evolution replaces
+# Officer with Bear in it, so Grizzly Bears - no Officer - attacking alone now triggers it. Bot1 draws a card (its hand is
+# that card alone, Artificial Evolution having taken the turn-5 draw) and Bot2 takes 2. Read as the printed Officer, the
+# trigger would not fire and the hand would be empty.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Captain Janeway, Endgame
+Grizzly Bears
+Island
+Island
+Artificial Evolution
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Grizzly Bears.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Captain Janeway, Endgame.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Artificial Evolution.Cast(Captain Janeway, Endgame)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Officer)
+Bot1.Modes(Bear)
+? Bot1.Battlefield.Captain Janeway, Endgame.Subtypes = Bear; Human
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Grizzly Bears > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Life = 18
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Count = 9

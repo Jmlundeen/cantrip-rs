@@ -2257,6 +2257,19 @@ pub fn creature_you_control_with_a_counter_deals_combat_damage_to_player(q: &dyn
     }
 }
 
+/// "Whenever one or more [subtype]s you control deal combat damage to a player" (CR 510.2, 603.2c): the subtype is the
+/// number `lands::sub` gives, read as a word of the source's own text (CR 612.2), so a text-changing effect changes it. One
+/// trigger for each player the batch damaged, with that player the trigger's subject (the ability uses `sums_per_subject`).
+/// Captain Janeway, Endgame (Officers) and Feline Sovereign (Cats) print it.
+pub fn subtype_you_control_deal_combat_damage_to_player<const SUBTYPE: u16>(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source, .. } if q.chars(*source).has_subtype(crate::lands::word(q, me.source, SUBTYPE)) => {
+            creature_you_control_deals_combat_damage_to_player(q, me, event)
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you commit a crime" (CR 700.13): the ability's controller cast a spell, activated an ability or put a
 /// triggered ability on the stack that targets an opponent, anything an opponent controls and/or a card in an opponent's
 /// graveyard - once for that spell or ability, however many such targets it has. Magda, the Hoardmaster, Raven of Fell

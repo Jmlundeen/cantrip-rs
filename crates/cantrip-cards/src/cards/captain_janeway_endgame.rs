@@ -1,17 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::creature_you_control_deals_combat_damage_to_player;
-use cantrip_mechanics::{TAP_AN_UNTAPPED_CREATURE, effects, tokens};
+use cantrip_mechanics::triggers::subtype_you_control_deal_combat_damage_to_player;
+use cantrip_mechanics::{lands, TAP_AN_UNTAPPED_CREATURE, effects, tokens};
 use cantrip_oracle as oracle;
-
-/// "Whenever one or more Officers you control deal combat damage to a player" (CR 603.2c): one trigger for each player the
-/// batch damaged, however many of the Officers dealt it, the Officer read from the text (CR 612).
-fn officers_deal_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    let Event::Damage { source, .. } = event else { return None };
-    if !q.chars(*source).has_subtype(Subtype::Officer) {
-        return None;
-    }
-    creature_you_control_deals_combat_damage_to_player(q, me, event)
-}
 
 /// "You draw a card and create a 1/1 red Officer creature token." The card first, then the token (CR 608.2c).
 fn draw_a_card_and_create_an_officer(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -23,7 +13,7 @@ fn draw_a_card_and_create_an_officer(g: &mut dyn Game, item: &StackItem) -> Resu
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            when_asked(EventMask::DAMAGE, officers_deal_combat_damage_to_player),
+            when_asked(EventMask::DAMAGE, subtype_you_control_deal_combat_damage_to_player::<{ lands::sub(Subtype::Officer) }>),
             draw_a_card_and_create_an_officer,
             "Whenever one or more Officers you control deal combat damage to a player, you draw a card and create a 1/1 red Officer creature token.",
         )
