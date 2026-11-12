@@ -2273,6 +2273,18 @@ pub fn exile_first_target_players_graveyard(g: &mut dyn Game, item: &StackItem) 
     Ok(())
 }
 
+/// "Exile any number of target players' graveyards" (CR 406.2, 608.2b): every card in the graveyard of each of the ability's
+/// target players still legal, in one move. With no targets, or none still legal, nothing happens. The Death of Gwen
+/// Stacy's chapter III and Stonespeaker Crystal print it.
+pub fn exile_target_players_graveyards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let cards: Vec<ObjectId> = crate::targets::legal_players(g, item)
+        .into_iter()
+        .flat_map(|player| g.state().zone(Zone::graveyard(player)).to_vec())
+        .collect();
+    g.exile_all(&cards);
+    Ok(())
+}
+
 /// "Exile all creatures" (CR 406.2, 608.2f): every creature on the battlefield, whoever controls it, in one move, tokens too.
 /// How many were exiled (CR 608.2c: the moves made, those a replacement sent elsewhere included; a merged creature once
 /// however many cards it became, CR 730.2, 730.3c), for "X is the number of creatures exiled this way". Sunfall and

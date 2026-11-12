@@ -33,20 +33,11 @@ fn each_player_discards_or_loses_three(g: &mut dyn Game, item: &StackItem) -> Re
     Ok(())
 }
 
-/// III: "Exile any number of target players' graveyards." (CR 406.2, 608.2b): every card in the graveyard of each target
-/// player still legal, in one move. With no targets nothing happens.
-fn exile_target_players_graveyards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let cards: Vec<ObjectId> =
-        targets::legal_players(g, item).into_iter().flat_map(|player| g.state().zone(Zone::graveyard(player)).to_vec()).collect();
-    g.exile_all(&cards);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         chapter(1, effects::destroy_first_target, "I \u{2014} Destroy target creature.").targets(&[targets::CREATURE]),
         chapter(2, each_player_discards_or_loses_three, "II \u{2014} Each player may discard a card. Each player who doesn't loses 3 life."),
-        chapter(3, exile_target_players_graveyards, "III \u{2014} Exile any number of target players' graveyards.")
+        chapter(3, effects::exile_target_players_graveyards, "III \u{2014} Exile any number of target players' graveyards.")
             .targets(&[targets::PLAYER.between(0, TargetSpec::ANY_NUMBER)]),
     ],
     ..oracle::THE_DEATH_OF_GWEN_STACY
