@@ -1,0 +1,69 @@
+# Multivector Assault Mode counts combat damage dealt "to an opponent" only (CR 120.3, 310.6): when U.S.S. Prometheus, Prototype
+# attacks Bot2's Liliana of the Veil instead of Bot2, the six damage is dealt to the planeswalker - no opponent is dealt any, so
+# its 8+ ability does not trigger and Bot3 takes nothing, which is the state the game was in before the attack apart from the
+# planeswalker's loyalty.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Kalakscion, Hunger Tyrant
+Memnite
+Mox Pearl
+Mox Sapphire
+U.S.S. Prometheus, Prototype
+Volcanic Island x20
+
+[Bot2 Deck]
+Black Lotus
+Island x3
+Liliana of the Veil
+Mox Jet
+Swamp x2
+
+[Bot3 Deck]
+Volcanic Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Kalakscion, Hunger Tyrant.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.U.S.S. Prometheus, Prototype.Cast
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Activate(Ability: Station)
+Bot1.Choose(Kalakscion, Hunger Tyrant)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Activate(Ability: Station)
+Bot1.Choose(Memnite)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Counters.Charge = 8
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+Bot1.Pass
+Bot3.Pass
+? Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
+[T4 Bot1.Main1]
+Bot1.Attack(U.S.S. Prometheus, Prototype > Liliana of the Veil)
+[T4 Bot1.Main2]
+? Bot2.Battlefield.Liliana of the Veil = (absent)
+? Bot2.Life = 20
+? Bot3.Life = 20
+? Bot1.Life = 20
+
+[Expect]
+Bot2.Life = 20
+Bot3.Life = 20
+Bot1.Life = 20
+Bot2.Battlefield.Liliana of the Veil = (absent)

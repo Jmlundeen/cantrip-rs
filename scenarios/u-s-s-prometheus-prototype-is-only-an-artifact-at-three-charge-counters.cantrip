@@ -1,0 +1,60 @@
+# The 4+ striation is exact (CR 721.2a-b): three charge counters from three Memnites leave U.S.S. Prometheus, Prototype a plain
+# artifact - no creature, no flying, no power - and the fourth makes it an artifact creature 6/6 with flying in addition to its
+# types. The 6/6 is the station box, so it is the base power and toughness a layer 7b setting them gives.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Memnite
+Memnite
+Memnite
+Memnite
+U.S.S. Prometheus, Prototype
+Volcanic Island x20
+
+[Bot2 Deck]
+Volcanic Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.U.S.S. Prometheus, Prototype.Cast
+? Bot1.Mana = {U}
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Types = Artifact
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Activate(Ability: Station)
+Bot1.Choose(Memnite#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Activate(Ability: Station)
+Bot1.Choose(Memnite#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Activate(Ability: Station)
+Bot1.Choose(Memnite#3)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Counters.Charge = 3
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Types = Artifact
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Power = (absent)
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Activate(Ability: Station)
+Bot1.Choose(Memnite#4)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Counters.Charge = 4
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Types = Artifact; Creature
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Keywords = Flying
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Power = 6
+? Bot1.Battlefield.U.S.S. Prometheus, Prototype.Toughness = 6
+
+[Expect]
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Counters.Charge = 4
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Types = Artifact; Creature
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Keywords = Flying
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Power = 6
+Bot1.Battlefield.U.S.S. Prometheus, Prototype.Toughness = 6
