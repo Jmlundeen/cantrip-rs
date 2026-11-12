@@ -1,0 +1,49 @@
+# Beast Within: "Destroy target permanent. Its controller creates a 3/3 green Beast creature token." (CR 701.8, 701.19a):
+# the destroy can be regenerated. Bot2 regenerates its Drudge Skeletons in response off its Swamp: the shield replaces
+# the destruction, so the Skeletons stay (tapped) and Bot2 still gets the Beast, its target having been legal.
+# A destroy that ignored regeneration would put the Skeletons in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Beast Within
+Island x18
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Drudge Skeletons
+Swamp x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Drudge Skeletons.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Beast Within.Cast(Bot2.Battlefield.Drudge Skeletons)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Drudge Skeletons.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Beast Within; Black Lotus
+Bot2.Graveyard = Black Lotus
+Bot2.Battlefield = Beast Token; Drudge Skeletons; Swamp
+Bot2.Battlefield.Drudge Skeletons.Tapped = true
+Bot2.Battlefield.Beast Token.Power = 3

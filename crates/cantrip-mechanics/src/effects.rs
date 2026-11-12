@@ -1350,9 +1350,25 @@ pub fn may_destroy_first_target(g: &mut dyn Game, item: &StackItem) -> Result<()
 /// controller read before the destroy, and the token created whether or not it was destroyed (indestructible, regenerated);
 /// an illegal target creates nothing (CR 608.2b). Stroke of Midnight and Bovine Intervention print it.
 pub fn destroy_and_its_controller_creates(g: &mut dyn Game, item: &StackItem, token: &'static CardDef) -> Result<(), Suspend> {
+    destroy_then_its_controller_creates(g, item, token, true)
+}
+
+/// "Destroy target [permanent]. It can't be regenerated. Its controller creates a [token]" (CR 701.8, 701.19c, 608.2h):
+/// `destroy_and_its_controller_creates` with a destroy a regeneration shield does not save. Pongify and Rapid
+/// Hybridization print it.
+pub fn destroy_no_regen_and_its_controller_creates(g: &mut dyn Game, item: &StackItem, token: &'static CardDef) -> Result<(), Suspend> {
+    destroy_then_its_controller_creates(g, item, token, false)
+}
+
+fn destroy_then_its_controller_creates(g: &mut dyn Game, item: &StackItem, token: &'static CardDef, regenerable: bool) -> Result<(), Suspend> {
     let Some(target) = crate::targets::object(g, item, 0) else { return Ok(()) };
     let controller = g.controller(target);
-    g.destroy(target);
+    if regenerable {
+        g.destroy(target);
+    } else {
+        g.destroy_no_regen(target);
+    }
+    g.end_sentence();
     crate::tokens::create(g, controller, token, 1)?;
     Ok(())
 }
