@@ -1,11 +1,6 @@
 use cantrip_api::*;
+use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
-
-/// "This artifact enters tapped." (CR 614.1d)
-fn enters_tapped(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.tapped = true;
-    Ok(())
-}
 
 /// "{T}: Add X mana of any one color, where X is the greatest mana value among commanders you control." Only a creature a
 /// game designated as a commander counts, and only while it is a permanent you control (CR 903.3, 109.4): a commander in the
@@ -37,6 +32,6 @@ pub static CARD: CardDef = CardDef {
             "{T}: Add X mana of any one color, where X is the greatest mana value among commanders you control.",
         ),
     ],
-    enters: Some(enters_tapped),
+    enters: Some(mana::enters_tapped),
     ..oracle::COMMAND_CHAIR
 };

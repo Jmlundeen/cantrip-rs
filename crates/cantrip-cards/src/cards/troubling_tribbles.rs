@@ -3,7 +3,7 @@ use cantrip_mechanics::{copy, triggers};
 use cantrip_oracle as oracle;
 
 /// "At the beginning of your upkeep, create a token that's a copy of this creature" (CR 707.2, 111.1): the token copies
-/// what this creature is as the ability resolves, including the +1/+1 counters on it.
+/// what this creature is as the ability resolves (its copiable values, last existed on the battlefield); a copy takes no counters (CR 707.2).
 fn another_tribble(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     copy::create_token_copy_of_it(g, item, |_, values| values)
 }
