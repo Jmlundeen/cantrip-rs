@@ -378,6 +378,46 @@ pub fn cast_up_to_free(g: &mut dyn Game, player: PlayerId, source: ObjectId, car
     Ok(())
 }
 
+/// "You may cast up to `most` spells that `fits` from among [these cards]" as an effect resolves (CR 608.2g): the controller is
+/// offered, one at a time, the cards among `cards` with a way to cast them that `fits` - judged by the face that would be the
+/// spell (CR 709.3a, 715.3a), so an Adventure's instant half counts as an instant - then the way when the card has several, and
+/// casts it on `terms` (the cost paid, what happens to it afterward) with that way and `player` as its caster. Nothing is asked
+/// when nothing qualifies; a cast given up (CR 733.1) leaves the card where it was, does not count, and the player may redo it, cast another card or
+/// decline (CR 733.2). `purpose` words the
+/// question. Lieutenant Nyota Uhura (free, from among exiled cards) and Bilbo, Thief in the Night (paid, from a graveyard) print it.
+pub fn cast_up_to_among(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    purpose: Purpose,
+    cards: &[ObjectId],
+    most: usize,
+    terms: CastTerms,
+    fits: impl Fn(&dyn Game, &CastWay) -> bool,
+) -> Result<(), Suspend> {
+    let ways_of = |g: &mut dyn Game, card: ObjectId| -> Vec<CastWay> {
+        let ways = g.cast_ways_during_resolution_by(card, player);
+        ways.into_iter().filter(|w| fits(&*g, w)).collect()
+    };
+    let mut cast = 0;
+    while cast < most {
+        let mut eligible: Vec<ObjectId> = Vec::new();
+        for &card in cards {
+            if !ways_of(&mut *g, card).is_empty() {
+                eligible.push(card);
+            }
+        }
+        let Some(&card) = cards_from(g, player, source, purpose, cards.to_vec(), eligible, 1, true)?.first() else { return Ok(()) };
+        let ways = ways_of(&mut *g, card);
+        let Some(way) = cast_way(g, player, card, ways)? else { return Ok(()) };
+        g.cast_during_resolution_as(card, CastTerms { way: Some(way.way), caster: Some(player), ..terms })?;
+        if g.obj(card).became.is_some() {
+            cast += 1;
+        }
+    }
+    Ok(())
+}
+
 /// "Choose A or B": one of the words a card's text offers to choose between, words that otherwise have no rules meaning
 /// (CR 607.2f), by index into its `labels`: `options` are the indices of the words offered, in the card's order. Asked even
 /// when the choice is forced; the question is captioned with every word offered ("Frostcliff Siege: choose Jeskai or Temur").
