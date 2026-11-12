@@ -1,0 +1,50 @@
+# The ability says "one or two target creatures" (CR 601.2c, 115.1): one alone is a complete choice, so Vic Fontaine, One Night
+# Only is the only creature pumped and lifelinked on the second card drawn, and Bot2's Ornithopter - a legal target it could
+# have taken - is untouched at 0/2 with its own flying.
+
+[Bot1 Deck]
+Ancestral Recall
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Vic Fontaine, One Night Only
+Volcanic Island x18
+
+[Bot2 Deck]
+Ornithopter
+Volcanic Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Vic Fontaine, One Night Only.Cast
+? Bot1.Mana = {W}{W}
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Vic Fontaine, One Night Only)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Vic Fontaine, One Night Only.Power = 5
+? Bot1.Battlefield.Vic Fontaine, One Night Only.Toughness = 3
+? Bot1.Battlefield.Vic Fontaine, One Night Only.Keywords = Lifelink
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.Vic Fontaine, One Night Only.Power = 5
+Bot1.Battlefield.Vic Fontaine, One Night Only.Toughness = 3
+Bot1.Battlefield.Vic Fontaine, One Night Only.Keywords = Lifelink
+Bot2.Battlefield.Ornithopter.Power = 0

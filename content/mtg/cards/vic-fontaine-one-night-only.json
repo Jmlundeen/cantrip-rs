@@ -1,0 +1,8 @@
+{
+  "name": "Vic Fontaine, One Night Only",
+  "manaCost": "{1}{R}{W}",
+  "type": "Legendary Artifact Creature — Illusion Performer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Seek out — Whenever you draw your second card each turn, one or two target creatures each get +2/+0 and gain lifelink until end of turn."
+}
