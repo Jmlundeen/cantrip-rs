@@ -4,7 +4,7 @@
 //!
 //! The "enters tapped" part of a land is `mana::enters_tapped`, `mana::enters_tapped_unless_pay_two_life` (shock lands) or
 //! `enters_tapped_unless_you_control`, `enters_tapped_unless_you_control_three_or_more_other`,
-//! `enters_tapped_unless_you_control_either` or
+//! `enters_tapped_unless_you_control_either`, `enters_tapped_unless_you_reveal` or
 //! `enters_tapped_unless_opponents_control` below; the card sets it in `enters`.
 
 use crate::library::{ask_may_search, find_to_battlefield, find_to_hand, find_to_top, search_to_battlefield, Find};
@@ -180,6 +180,34 @@ pub fn enters_tapped_unless_opponents_control<const N: usize>(g: &mut dyn Game, 
 pub fn enters_tapped_unless_you_control_either<const A: u16, const B: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let (a, b) = (word(g, entering.object, A), word(g, entering.object, B));
     if !controls_land_type(g, entering.controller, a) && !controls_land_type(g, entering.controller, b) {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
+/// "As this land enters, you may reveal a [land type] or [land type] card from your hand. If you don't, this land enters
+/// tapped" (CR 614.1d, 701.20a): the player is asked whether to reveal, then which matching card, each type read through the
+/// land's words (CR 612.2). Foreboding Ruins, Fortified Village, Port Town and the Snarl cycle (Shineshadow, Frostboil,
+/// Furycalm, Vineglimmer) print it.
+pub fn enters_tapped_unless_you_reveal<const A: u16, const B: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    let (a, b) = (word(g, entering.object, A), word(g, entering.object, B));
+    let controller = entering.controller;
+    let mut revealed = false;
+    if effects::ask_may(g, controller, entering.object, Purpose::Optional)? {
+        let candidates: Vec<ObjectId> = {
+            let q: &dyn Query = g;
+            q.state()
+                .zone(Zone::hand(controller))
+                .iter()
+                .copied()
+                .filter(|&id| !q.state().obj(id).token && !q.state().obj(id).card_copy && (q.chars(id).has_subtype(a) || q.chars(id).has_subtype(b)))
+                .collect()
+        };
+        let chosen = choose::select(g, controller, entering.object, Purpose::Reveal, candidates, select::Selection::of(select::Count::AsManyAsCan(1), &[]))?;
+        g.reveal(controller, &chosen);
+        revealed = !chosen.is_empty();
+    }
+    if !revealed {
         entering.tapped = true;
     }
     Ok(())
