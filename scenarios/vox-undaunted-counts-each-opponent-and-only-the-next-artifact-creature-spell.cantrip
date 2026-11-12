@@ -1,0 +1,63 @@
+# Võx, Child of the Collective with two opponents: undaunted is {1} less for each opponent (CR 702.125a), so the first
+# Spellskite {2} costs nothing at all, and the second costs its full {2} - only the next artifact creature spell has it
+# (CR 611.2a). On turn four the first-main trigger gives undaunted again, and Grizzly Bears {1}{G}, a creature spell that is not
+# an artifact, still costs its full {1}{G}.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Võx, Child of the Collective
+Spellskite
+Spellskite
+Grizzly Bears
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Võx, Child of the Collective.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Stack.Count = 0
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+? Bot1.Mana = {G}{G}{G}
+Bot1.Hand.Spellskite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Mana = {G}{G}{G}
+Bot1.Hand.Spellskite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Mana = {G}
+[T4 Bot1.Main2]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Grizzly Bears.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot1.Battlefield.Grizzly Bears.Power = 2
+Bot1.Battlefield.Count = 6

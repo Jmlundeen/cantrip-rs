@@ -1,0 +1,53 @@
+# Võx's entering trigger gives the next artifact creature spell undaunted this turn, so with one opponent Spellskite {2} is cast
+# off the one mana Võx's own cast left in the pool (CR 702.125a, 601.2f, 611.2a). Without the reduction the two mana it costs
+# are not there and the cast could not be made at all; with a wrong reduction the pool afterwards would hold another amount.
+# Võx, Child of the Collective {4}{U}: Legendary Artifact Creature — Borg, 3/3
+#   When Võx enters and at the beginning of your first main phase, the next artifact creature spell and the next Spacecraft spell you cast this turn have undaunted. (They cost {1} less to cast for each opponent.)
+
+[Bot1 Deck]
+Võx, Child of the Collective
+Spellskite
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Võx, Child of the Collective.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U}
+? Bot1.Battlefield.Võx, Child of the Collective.Toughness = 3
+Bot1.Hand.Spellskite.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Spellskite.Toughness = 4
+Bot1.Battlefield.Count = 8

@@ -1,0 +1,8 @@
+{
+  "name": "Võx, Child of the Collective",
+  "manaCost": "{4}{U}",
+  "type": "Legendary Artifact Creature — Borg",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When Võx enters and at the beginning of your first main phase, the next artifact creature spell and the next Spacecraft spell you cast this turn have undaunted. (They cost {1} less to cast for each opponent.)"
+}

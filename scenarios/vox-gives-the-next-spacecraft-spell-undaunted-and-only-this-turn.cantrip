@@ -1,0 +1,64 @@
+# Võx's first-main trigger gives the next Spacecraft spell undaunted, so Class-F Shuttlecraft {3} is cast on turn five off two
+# mana rather than three. The rider granted when Võx entered on turn three is gone by the end of that turn (CR 611.2a, 514.2):
+# the Shuttlecraft is reduced once, by turn five's own trigger, and a rider that had lasted would have left the pool a mana
+# richer. Võx, Child of the Collective {4}{U}: Legendary Artifact Creature — Borg, 3/3
+#   When Võx enters and at the beginning of your first main phase, the next artifact creature spell and the next Spacecraft spell you cast this turn have undaunted. (They cost {1} less to cast for each opponent.)
+
+[Bot1 Deck]
+Võx, Child of the Collective
+Class-F Shuttlecraft
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Võx, Child of the Collective.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Võx, Child of the Collective.Power = 3
+Bot1.Pass
+
+[T5 Bot1.Main2]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Class-F Shuttlecraft.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U}{U}{B}{R}{G}
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Count = 9
+Bot1.Battlefield.Class-F Shuttlecraft.Types = Artifact
