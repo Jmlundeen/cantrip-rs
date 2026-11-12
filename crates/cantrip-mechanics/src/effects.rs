@@ -464,8 +464,20 @@ pub fn plus_one_counter_on_each_of_subtype_you_control<const SUBTYPE: u16>(g: &m
 /// read through the words of the source's text (CR 612.2). The permanents. Ran and Shaw (Dragons, +2/+0) and Summon: Esper
 /// Ramuh (Wizards, +1/+0) print it.
 pub fn subtype_you_control_get(g: &mut dyn Game, item: &StackItem, subtype: Subtype, power: i32, toughness: i32) -> Vec<ObjectId> {
-    let word = g.words(item.object).subtype(subtype);
-    let objects: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).has_subtype(word)).collect();
+    subtypes_you_control_get(g, item, [subtype, subtype], power, toughness)
+}
+
+/// "[Subtype] and [subtype] you control get +`power`/+`toughness` until end of turn" (CR 109.2, 611.2c): the permanents, of any
+/// card type, that the ability's controller controls as it resolves and that have either subtype (a Klingon Warrior once),
+/// the source among them, and none that enters later. A noncreature one is pumped too and keeps it if it is animated later
+/// that turn. Each subtype is read through the words of the source's text
+/// (CR 612.2). The permanents, for what the rest of the sentence does to them ("and gain trample"). Kor, Cause of Vengeance
+/// ("Klingons and Warriors", +2/+2) and Gnarling Targ ("Klingons and Warriors", +2/+0) print it; `subtype_you_control_get` is it
+/// with one subtype.
+pub fn subtypes_you_control_get(g: &mut dyn Game, item: &StackItem, subtypes: [Subtype; 2], power: i32, toughness: i32) -> Vec<ObjectId> {
+    let words = subtypes.map(|subtype| g.words(item.object).subtype(subtype));
+    let objects: Vec<ObjectId> =
+        g.permanents_of(item.controller).into_iter().filter(|&id| words.iter().any(|&word| g.chars(id).has_subtype(word))).collect();
     instruction(g, |g| {
         for &id in &objects {
             crate::pump(g, item.object, id, power, toughness);
