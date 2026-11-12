@@ -5,7 +5,7 @@
 //! The "enters tapped" part of a land is `mana::enters_tapped`, `mana::enters_tapped_unless_pay_two_life` (shock lands) or
 //! `enters_tapped_unless_you_control`, `enters_tapped_unless_you_control_three_or_more_other`,
 //! `enters_tapped_unless_you_control_either`, `enters_tapped_unless_you_reveal` or
-//! `enters_tapped_unless_opponents_control` below; the card sets it in `enters`.
+//! `enters_tapped_unless_opponents_control` or `enters_tapped_unless_two_or_more_opponents` below; the card sets it in `enters`.
 
 use crate::library::{ask_may_search, find_to_battlefield, find_to_hand, find_to_top, search_to_battlefield, Find};
 use crate::select;
@@ -169,6 +169,16 @@ pub fn enters_tapped_unless_opponents_control<const N: usize>(g: &mut dyn Game, 
         .filter(|&id| g.obj(id).became.is_none() && g.chars(id).is(CardType::Land))
         .count();
     if lands < N {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
+/// "This land enters tapped unless you have two or more opponents" (CR 614.1d): judged as the land enters, so in a duel it
+/// is tapped and in a multiplayer game it is not; a player eliminated before it enters is no longer an opponent. Morphic
+/// Pool, Sea of Clouds, Training Center and Vault of Champions print it.
+pub fn enters_tapped_unless_two_or_more_opponents(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    if g.state().opponents(entering.controller).count() < 2 {
         entering.tapped = true;
     }
     Ok(())
