@@ -370,6 +370,19 @@ pub fn nth_counter_put_on_this<const KIND: u8, const N: i32>(_: &dyn Query, me: 
     }
 }
 
+/// "Whenever you put one or more +1/+1 counters on this creature" (CR 122.6, 603.2c): the player who put them is the event's,
+/// so counters an opponent's spell or ability puts on it do not trigger the ability, while ones its controller puts there do;
+/// it triggers once however many are put at once, and the number put is carried in `data[0]`. The `listens` mask is
+/// `EventMask::COUNTERS`. Exemplar of Light and Chekov and McCoy print it.
+pub fn you_put_plus_one_counters_on_this(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::CountersPut { object, kind: CounterKind::PlusOne, amount, by, .. } if *object == me.source && *amount > 0 && *by == me.controller => {
+            Some(Fired { subject: Target::Object(me.source), data: [*amount as u32, 0] })
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a spell with {X} in its mana cost" (CR 107.3, 601.2i, 603.2): the spell's mana cost as it is on the
 /// stack, whatever X is chosen to be; a copy is not cast (CR 707.10). The trigger is about the spell (its subject), and
 /// carries no X: an ability that needs it reads the spell's X as the ability resolves (on the stack, or as it last was there
@@ -2398,6 +2411,8 @@ pub const YOU_SCRY_OR_SURVEIL: Trigger = when_asked(EventMask(EventMask::SCRIED.
 pub const YOU_DRAW_A_CARD: Trigger = when_asked(EventMask::DREW, you_draw_a_card);
 pub const AN_OPPONENT_DRAWS_A_CARD: Trigger = when_asked(EventMask::DREW, an_opponent_draws_a_card);
 pub const YOU_GAIN_LIFE: Trigger = when_asked(EventMask::LIFE_CHANGE, you_gain_life);
+/// "Whenever you put one or more +1/+1 counters on this creature" (`you_put_plus_one_counters_on_this`).
+pub const YOU_PUT_PLUS_ONE_COUNTERS_ON_THIS: Trigger = when_asked(EventMask::COUNTERS, you_put_plus_one_counters_on_this);
 /// "When you cast this spell": functions from the stack (CR 113.6k, `when_this_spell_is_cast`).
 pub const CAST_THIS_SPELL: Trigger = when_this_spell_is_cast(cast_this_spell);
 /// "Whenever you cast a spell with {X} in its mana cost" (`you_cast_a_spell_with_x_in_its_mana_cost`).
