@@ -144,6 +144,20 @@ pub fn equipment_attached_to(q: &dyn Query, creature: ObjectId) -> Vec<ObjectId>
     q.state().battlefield().iter().copied().filter(|&id| q.attached_to(id) == Some(creature) && q.chars(id).has_subtype(Subtype::Equipment)).collect()
 }
 
+/// "The number of other creatures you control with a [subtype] attached to them" (CR 301.5, 205.3g): `controller`'s creatures
+/// other than `except`, each with an Equipment of `subtype` attached to it, as the layers have them now. Combadge asks whether
+/// there are any ("while you control another creature with a Communicator attached to it"), Starfleet Communicator how many.
+pub fn other_creatures_with_equipment_of_subtype(q: &dyn Query, controller: PlayerId, except: ObjectId, subtype: Subtype) -> u32 {
+    q.permanents_of(controller)
+        .into_iter()
+        .filter(|&id| {
+            id != except
+                && q.chars(id).is(CardType::Creature)
+                && equipment_attached_to(q, id).into_iter().any(|equipment| q.chars(equipment).has_subtype(subtype))
+        })
+        .count() as u32
+}
+
 /// The Auras and Equipment attached to `host` (CR 301.5, 303.4), counted as the layers are worked out: every permanent on the battlefield
 /// attached to it that is an Aura or an Equipment, judged on what the earlier layers made it (an animated Equipment still counts, one that
 /// stopped being an Equipment does not), each once, whoever controls it. Kellan, the Fae-Blooded and With Great Power . . . count them.

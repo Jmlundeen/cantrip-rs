@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::attach::{attached_object, equip, equipment_attached_to};
+use cantrip_mechanics::attach::{attached_object, equip, other_creatures_with_equipment_of_subtype};
 use cantrip_mechanics::statics::grant_delayed_ability;
 use cantrip_mechanics::triggers::{CAST_THIS_SPELL, THIS_ATTACKS};
 use cantrip_mechanics::effects;
@@ -17,11 +17,7 @@ fn copy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// with the attack only and never again as the ability resolves (no intervening "if", CR 603.4), about a creature other
 /// than the attacking one that has an Equipment with the Communicator subtype attached to it (CR 301.5, 205.3g).
 fn another_creature_has_a_communicator(q: &dyn Query, asker: &Asker) -> bool {
-    q.permanents_of(asker.controller).into_iter().any(|id| {
-        id != asker.source
-            && q.chars(id).is(CardType::Creature)
-            && equipment_attached_to(q, id).into_iter().any(|equipment| q.chars(equipment).has_subtype(Subtype::Communicator))
-    })
+    other_creatures_with_equipment_of_subtype(q, asker.controller, asker.source, Subtype::Communicator) > 0
 }
 
 pub static CARD: CardDef = CardDef {
