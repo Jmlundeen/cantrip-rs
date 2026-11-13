@@ -39,6 +39,25 @@ card(s) the PR adds or changes, every other card or shared function it touches, 
 the commits, or `gh issue list --search "<Card Name> in:title" --state all`; a card with no issue gets one with
 `card-issues.py claim --pr "Card Name"` (the PR's own branch has the card, so `--pr`) only if the user agrees - the claim may be the contributor's).
 
+## 1a. A batched PR gets a dedupe pass first
+
+A PR of more than about ten cards is reviewed in batches of about ten, one Opus reviewer per batch. Before the first
+batch, one fresh Sonnet agent (a card agent's prompt, as in step 3) makes a single pass over **every** card in the PR
+and fixes the overlap a reviewer would otherwise block each batch on:
+- `card-dupes.py` and `card-lint.py` on each card;
+- a hand-written copy of a shared function, target constant, trigger constant or keyword (seek out, cycling, equip,
+  enters tapped, drains, legal targets, cost reductions, "opponents attacked this turn", token creation);
+- "<subtype>s you control" filtered to creatures (CR 109.2);
+- a loop over players for one simultaneous action;
+- a clamped or saturated count.
+
+Each fix is a `fixup!` of the commit it belongs to; a shared function that does not yet exist is its own `Mechanics:`
+commit before the cards that use it. The agent runs the scenarios of the cards it changed and reports what it changed,
+card by card. The batch reviewers then start on the deduped commits.
+
+On PR #2855 (197 cards) about 85% of batches came back blocked, mostly on this overlap, and each blocked batch cost a
+fix round and a re-review. One pass up front turns most batches into a single review.
+
 ## 2. Straight to the review: an Opus agent
 
 Start a fresh agent (`model: "opus"`, no worktree isolation) exactly as `coordinator.md` step 4 says for a review
