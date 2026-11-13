@@ -112,6 +112,7 @@ pub mod outlaw;
 pub mod outside;
 pub mod persist;
 pub mod riot;
+pub mod undaunted;
 pub mod unleash;
 pub mod embalm;
 pub(crate) mod copy_from_graveyard;
