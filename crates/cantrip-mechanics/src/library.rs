@@ -1342,6 +1342,19 @@ pub fn exile_until_nonland(
     by: Option<Linked>,
     qualifies: &dyn Fn(&dyn Query, ObjectId) -> bool,
 ) -> (Vec<ObjectId>, Option<ObjectId>) {
+    exile_until(g, player, by, &|q, card| !q.chars(card).is(CardType::Land) && qualifies(q, card))
+}
+
+/// "Exile cards from the top of your library until you exile a [card that `qualifies`]" (CR 701.13a): the walk of
+/// `exile_until_nonland` with no land gate, for a predicate a land can meet (a creature card: Dryad Arbor is one). Every
+/// card that really reached exile, in order (the qualifying one last), and the qualifying card if there was one. The
+/// Borg Queen's creature card and `exile_until_nonland` (cascade, discover) print it.
+pub fn exile_until(
+    g: &mut dyn Game,
+    player: PlayerId,
+    by: Option<Linked>,
+    qualifies: &dyn Fn(&dyn Query, ObjectId) -> bool,
+) -> (Vec<ObjectId>, Option<ObjectId>) {
     let mut exiled = Vec::new();
     while let Some(&top) = g.state().zone(Zone::library(player)).first() {
         let moved = match by {
@@ -1352,7 +1365,7 @@ pub fn exile_until_nonland(
             continue;
         }
         exiled.push(moved);
-        if !g.chars(moved).is(CardType::Land) && qualifies(&*g, moved) {
+        if qualifies(&*g, moved) {
             return (exiled, Some(moved));
         }
     }
